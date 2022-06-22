@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/main_browse_fragment"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/wallpaper_1" />
+    android:layout_height="match_parent" />

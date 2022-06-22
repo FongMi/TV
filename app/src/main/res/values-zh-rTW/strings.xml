@@ -3,5 +3,7 @@
     <string name="app_name">熊愛影視</string>
     <string name="setting_url">配置接口</string>
     <string name="setting_history">歷史配置</string>
+    <string name="dialog_positive">確定</string>
+    <string name="dialog_negative">取消</string>
   
 </resources>

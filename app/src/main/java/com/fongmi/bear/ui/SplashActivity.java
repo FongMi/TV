@@ -38,6 +38,6 @@ public class SplashActivity extends BaseActivity {
     }
 
     private void openHome() {
-        new Handler().postDelayed(() -> HomeActivity.newInstance(this), 2000);
+        new Handler().postDelayed(() -> HomeActivity.newInstance(this), 500);
     }
 }

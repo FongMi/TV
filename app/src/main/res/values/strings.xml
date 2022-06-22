@@ -3,5 +3,7 @@
     <string name="app_name">BearTV</string>
     <string name="setting_url">Configure</string>
     <string name="setting_history">History</string>
+    <string name="dialog_positive">OK</string>
+    <string name="dialog_negative">Cancel</string>
 
 </resources>

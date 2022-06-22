@@ -14,5 +14,6 @@
     <color name="transparent">#00000000</color>
     <color name="trans_20">#33000000</color>
     <color name="trans_25">#40000000</color>
+    <color name="trans_50">#80000000</color>
 
 </resources>
