@@ -1,0 +1,15 @@
+<resources>
+
+    <color name="primary">@color/black</color>
+    <color name="primaryDark">@color/black</color>
+    <color name="accent">@color/blue_500</color>
+
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+    <color name="blue_500">#2196F3</color>
+    <color name="grey_700">#616161</color>
+    <color name="grey_900">#212121</color>
+    <color name="green_400">#66BB6A</color>
+    <color name="transparent">#00000000</color>
+
+</resources>
