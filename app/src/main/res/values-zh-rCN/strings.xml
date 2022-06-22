@@ -1,5 +1,7 @@
 <resources>
 
     <string name="app_name">熊爱影视</string>
-  
+    <string name="setting_url">配置接口</string>
+    <string name="setting_history">历史配置</string>
+
 </resources>

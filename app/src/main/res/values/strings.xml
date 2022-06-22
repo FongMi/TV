@@ -1,5 +1,7 @@
 <resources>
 
     <string name="app_name">BearTV</string>
+    <string name="setting_url">Configure</string>
+    <string name="setting_history">History</string>
 
 </resources>

@@ -8,35 +8,30 @@ import com.fongmi.bear.App;
 
 public class Prefers {
 
-    private static SharedPreferences getPreferences() {
+    private static SharedPreferences getPrefers() {
         return PreferenceManager.getDefaultSharedPreferences(App.get());
     }
 
-    private static String getString(String key, String defaultValue) {
-        return getPreferences().getString(key, defaultValue);
+    public static String getString(String key) {
+        return getString(key, "");
     }
 
-    private static void putString(String key, String value) {
-        getPreferences().edit().putString(key, value).apply();
+    public static String getString(String key, String defaultValue) {
+        return getPrefers().getString(key, defaultValue);
     }
 
-    private static int getInt(String key, int defaultValue) {
-        return getPreferences().getInt(key, defaultValue);
-    }
-
-    private static void putInt(String key, int value) {
-        getPreferences().edit().putInt(key, value).apply();
-    }
-
-    private static boolean getBoolean(String key) {
-        return getBoolean(key, false);
-    }
-
-    private static boolean getBoolean(String key, boolean defaultValue) {
-        return getPreferences().getBoolean(key, defaultValue);
-    }
-
-    private static void putBoolean(String key, boolean value) {
-        getPreferences().edit().putBoolean(key, value).apply();
+    public static void put(String key, Object obj) {
+        if (obj == null) return;
+        if (obj instanceof String) {
+            getPrefers().edit().putString(key, (String) obj).apply();
+        } else if (obj instanceof Boolean) {
+            getPrefers().edit().putBoolean(key, (Boolean) obj).apply();
+        } else if (obj instanceof Float) {
+            getPrefers().edit().putFloat(key, (Float) obj).apply();
+        } else if (obj instanceof Integer) {
+            getPrefers().edit().putInt(key, (Integer) obj).apply();
+        } else if (obj instanceof Long) {
+            getPrefers().edit().putLong(key, (Long) obj).apply();
+        }
     }
 }

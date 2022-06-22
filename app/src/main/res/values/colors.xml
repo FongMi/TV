@@ -12,5 +12,7 @@
     <color name="grey_900">#212121</color>
     <color name="green_400">#66BB6A</color>
     <color name="transparent">#00000000</color>
+    <color name="trans_20">#33000000</color>
+    <color name="trans_25">#40000000</color>
 
 </resources>
