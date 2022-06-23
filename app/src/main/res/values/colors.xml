@@ -2,7 +2,7 @@
 
     <color name="primary">@color/black</color>
     <color name="primaryDark">@color/black</color>
-    <color name="accent">@color/blue_500</color>
+    <color name="accent">@color/white</color>
 
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>

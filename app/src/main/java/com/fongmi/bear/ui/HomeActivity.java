@@ -12,7 +12,7 @@ public class HomeActivity extends BaseActivity {
 
     private ActivityHomeBinding binding;
 
-    public static void newInstance(Activity activity) {
+    public static void start(Activity activity) {
         activity.startActivity(new Intent(activity, HomeActivity.class));
         activity.finish();
     }
@@ -25,7 +25,7 @@ public class HomeActivity extends BaseActivity {
     @Override
     protected void initView() {
         if (App.get().getConfig() == null) {
-            SettingActivity.newInstance(this);
+            SettingActivity.start(this);
         } else {
 
         }

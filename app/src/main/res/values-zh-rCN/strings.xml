@@ -1,6 +1,7 @@
 <resources>
 
     <string name="app_name">熊爱影视</string>
+    <string name="splash_info">正在载入配置</string>
     <string name="setting_url">配置接口</string>
     <string name="setting_history">历史配置</string>
     <string name="dialog_positive">确定</string>

@@ -17,7 +17,7 @@ public class SettingActivity extends BaseActivity {
 
     private ActivitySettingBinding binding;
 
-    public static void newInstance(Activity activity) {
+    public static void start(Activity activity) {
         activity.startActivity(new Intent(activity, SettingActivity.class));
     }
 

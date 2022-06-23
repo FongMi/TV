@@ -1,5 +1,6 @@
 package com.fongmi.bear.ui;
 
+import android.app.Activity;
 import android.content.res.Configuration;
 import android.os.Bundle;
 
@@ -20,6 +21,10 @@ public abstract class BaseActivity extends AppCompatActivity {
         Utils.hideSystemUI(this);
         initView();
         initEvent();
+    }
+
+    protected Activity getActivity() {
+        return this;
     }
 
     protected void initView() {
