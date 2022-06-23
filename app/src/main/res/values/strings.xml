@@ -1,9 +1,25 @@
 <resources>
 
+    <!-- App -->
     <string name="app_name">BearTV</string>
+
+    <!-- Splash -->
     <string name="splash_info">Loading config</string>
+
+    <!-- Home -->
+    <string name="home_vod">Vod</string>
+    <string name="home_live">Live</string>
+    <string name="home_search">Search</string>
+    <string name="home_push">Push</string>
+    <string name="home_setting">Setting</string>
+    <string name="home_recent">Recent</string>
+    <string name="home_update">Recommend</string>
+
+    <!-- Setting -->
     <string name="setting_url">Configure</string>
     <string name="setting_history">History</string>
+
+    <!-- Dialog -->
     <string name="dialog_positive">OK</string>
     <string name="dialog_negative">Cancel</string>
 

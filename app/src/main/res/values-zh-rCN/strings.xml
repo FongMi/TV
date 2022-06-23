@@ -1,9 +1,25 @@
 <resources>
 
+    <!-- App -->
     <string name="app_name">熊爱影视</string>
+
+    <!-- Splash -->
     <string name="splash_info">正在载入配置</string>
+
+    <!-- Home -->
+    <string name="home_vod">点播</string>
+    <string name="home_live">直播</string>
+    <string name="home_search">搜寻</string>
+    <string name="home_push">推送</string>
+    <string name="home_setting">设定</string>
+    <string name="home_recent">最近观看</string>
+    <string name="home_update">更新推荐</string>
+
+    <!-- Setting -->
     <string name="setting_url">配置接口</string>
     <string name="setting_history">历史配置</string>
+
+    <!-- Dialog -->
     <string name="dialog_positive">确定</string>
     <string name="dialog_negative">取消</string>
 

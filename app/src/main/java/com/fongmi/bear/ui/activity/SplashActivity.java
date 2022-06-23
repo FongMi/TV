@@ -1,4 +1,4 @@
-package com.fongmi.bear.ui;
+package com.fongmi.bear.ui.activity;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
