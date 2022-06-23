@@ -2,7 +2,6 @@
 
     <color name="primary">@color/black</color>
     <color name="primaryDark">@color/black</color>
-    <color name="accent">@color/white</color>
 
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>
@@ -12,8 +11,9 @@
     <color name="grey_900">#212121</color>
     <color name="green_400">#66BB6A</color>
     <color name="transparent">#00000000</color>
-    <color name="trans_20">#33000000</color>
-    <color name="trans_25">#40000000</color>
-    <color name="trans_50">#80000000</color>
+    <color name="black_20">#33000000</color>
+    <color name="black_25">#40000000</color>
+    <color name="black_50">#80000000</color>
+    <color name="white_90">#E6FFFFFF</color>
 
 </resources>

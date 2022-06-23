@@ -34,4 +34,8 @@ public class Prefers {
             getPrefers().edit().putLong(key, (Long) obj).apply();
         }
     }
+
+    public static String getUrl() {
+        return Prefers.getString("url");
+    }
 }

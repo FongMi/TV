@@ -19,6 +19,10 @@ public class Func {
         this.setDrawable();
     }
 
+    public int getResId() {
+        return resId;
+    }
+
     public int getDrawable() {
         return drawable;
     }

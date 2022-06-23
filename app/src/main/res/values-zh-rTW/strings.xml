@@ -22,5 +22,9 @@
     <!-- Dialog -->
     <string name="dialog_positive">確定</string>
     <string name="dialog_negative">取消</string>
+    <string name="dialog_config_url_hint">請輸入配置接口</string>
+
+    <!-- Error -->
+    <string name="error_config">配置載入失敗</string>
 
 </resources>

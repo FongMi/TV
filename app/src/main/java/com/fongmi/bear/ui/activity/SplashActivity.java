@@ -52,9 +52,8 @@ public class SplashActivity extends BaseActivity {
     }
 
     private void checkUrl() {
-        String url = Prefers.getString("url");
-        if (url.isEmpty()) HomeActivity.start(getActivity());
-        else getConfig(url);
+        if (Prefers.getUrl().isEmpty()) HomeActivity.start(getActivity());
+        else getConfig(Prefers.getUrl());
     }
 
     private void getConfig(String url) {
@@ -64,6 +63,11 @@ public class SplashActivity extends BaseActivity {
                 Config config = Config.objectFrom(response.body().string());
                 App.get().setConfig(config);
                 loadJar(config.getSpider());
+            }
+
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                HomeActivity.start(getActivity());
             }
         });
     }

@@ -7,11 +7,10 @@ import android.view.View;
 
 import androidx.viewbinding.ViewBinding;
 
-import com.fongmi.bear.R;
 import com.fongmi.bear.databinding.ActivitySettingBinding;
 import com.fongmi.bear.databinding.DialogConfigBinding;
+import com.fongmi.bear.utils.Notify;
 import com.fongmi.bear.utils.Prefers;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class SettingActivity extends BaseActivity {
 
@@ -28,7 +27,7 @@ public class SettingActivity extends BaseActivity {
 
     @Override
     protected void initView() {
-        binding.url.setText(Prefers.getString("url"));
+        binding.url.setText(Prefers.getUrl());
     }
 
     @Override
@@ -37,16 +36,12 @@ public class SettingActivity extends BaseActivity {
     }
 
     private void showConfig(View view) {
-        DialogConfigBinding dialog = DialogConfigBinding.inflate(LayoutInflater.from(this));
-        dialog.url.setText(Prefers.getString("url"));
-        dialog.url.setSelection(dialog.url.getText().length());
-        new MaterialAlertDialogBuilder(this, R.style.DialogTheme)
-                .setView(dialog.getRoot())
-                .setNegativeButton(R.string.dialog_negative, null)
-                .setPositiveButton(R.string.dialog_positive, (dialogInterface, i) -> {
-                    Prefers.put("url", dialog.url.getText().toString().trim());
-                    binding.url.setText(Prefers.getString("url"));
-                }).show();
-
+        DialogConfigBinding bindingDialog = DialogConfigBinding.inflate(LayoutInflater.from(this));
+        bindingDialog.url.setText(Prefers.getUrl());
+        bindingDialog.url.setSelection(bindingDialog.url.getText().length());
+        Notify.show(this, bindingDialog.getRoot(), (dialogInterface, i) -> {
+            Prefers.put("url", bindingDialog.url.getText().toString().trim());
+            binding.url.setText(Prefers.getUrl());
+        });
     }
 }

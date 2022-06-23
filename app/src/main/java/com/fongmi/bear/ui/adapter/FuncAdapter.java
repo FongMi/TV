@@ -16,13 +16,22 @@ import java.util.List;
 
 public class FuncAdapter extends RecyclerView.Adapter<FuncAdapter.FuncHolder> {
 
+    private OnItemClickListener listener;
     private List<Func> items;
 
     public FuncAdapter() {
         addAll();
     }
 
-    static class FuncHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public interface OnItemClickListener {
+        void onItemClick(Func item);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
+
+    class FuncHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private final AdapterFuncBinding binding;
 
@@ -34,6 +43,7 @@ public class FuncAdapter extends RecyclerView.Adapter<FuncAdapter.FuncHolder> {
 
         @Override
         public void onClick(View view) {
+            listener.onItemClick(items.get(getLayoutPosition()));
         }
     }
 
