@@ -5,19 +5,18 @@ import android.app.PictureInPictureParams;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.provider.Settings;
-import android.util.DisplayMetrics;
 import android.util.Rational;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.fongmi.bear.App;
 import com.google.android.exoplayer2.util.Util;
 
 public class Utils {
-
-    private static DisplayMetrics getDisplayMetrics() {
-        return App.get().getResources().getDisplayMetrics();
-    }
 
     public static String getString(int resId) {
         return App.get().getString(resId);
@@ -63,20 +62,8 @@ public class Utils {
         return event.getKeyCode() == KeyEvent.KEYCODE_DPAD_RIGHT;
     }
 
-    public static void showViews(View... views) {
-        for (View view : views) showView(view);
-    }
-
-    public static void hideViews(View... views) {
-        for (View view : views) hideView(view);
-    }
-
-    public static void showView(View view) {
-        view.setVisibility(View.VISIBLE);
-    }
-
-    public static void hideView(View view) {
-        view.setVisibility(View.GONE);
+    public static void loadImage(String url, ImageView view) {
+        Glide.with(App.get()).load(url).transform(new CenterCrop(), new RoundedCorners(ResUtil.dp2px(10))).into(view);
     }
 
     public static void hideSystemUI(Activity activity) {

@@ -2,7 +2,6 @@ package com.fongmi.bear;
 
 import android.app.Application;
 
-import com.fongmi.bear.bean.Config;
 import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.LogAdapter;
 import com.orhanobut.logger.Logger;
@@ -11,7 +10,6 @@ import com.orhanobut.logger.PrettyFormatStrategy;
 public class App extends Application {
 
     private static App instance;
-    private Config config;
 
     public App() {
         instance = this;
@@ -19,14 +17,6 @@ public class App extends Application {
 
     public static App get() {
         return instance;
-    }
-
-    public Config getConfig() {
-        return config;
-    }
-
-    public void setConfig(Config config) {
-        this.config = config;
     }
 
     @Override

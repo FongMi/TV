@@ -14,6 +14,6 @@
     <color name="black_20">#33000000</color>
     <color name="black_25">#40000000</color>
     <color name="black_50">#80000000</color>
-    <color name="white_90">#E6FFFFFF</color>
+    <color name="black_60">#99000000</color>
 
 </resources>
