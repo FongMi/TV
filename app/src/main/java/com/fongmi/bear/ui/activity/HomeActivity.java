@@ -48,8 +48,12 @@ public class HomeActivity extends BaseActivity {
     }
 
     private void setRecyclerView() {
+        binding.func.setHasFixedSize(true);
+        binding.func.setNestedScrollingEnabled(false);
         binding.func.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         binding.func.setAdapter(funcAdapter = new FuncAdapter());
+        binding.update.setHasFixedSize(true);
+        binding.update.setNestedScrollingEnabled(false);
         binding.update.setLayoutManager(new GridLayoutManager(this, 5));
         binding.update.addItemDecoration(new SpaceItemDecoration(5, 12, false, 0));
         binding.update.setAdapter(vodAdapter = new VodAdapter());
