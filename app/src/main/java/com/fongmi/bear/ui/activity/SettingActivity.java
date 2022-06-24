@@ -7,8 +7,10 @@ import android.view.View;
 
 import androidx.viewbinding.ViewBinding;
 
+import com.fongmi.bear.ApiConfig;
 import com.fongmi.bear.databinding.ActivitySettingBinding;
 import com.fongmi.bear.databinding.DialogConfigBinding;
+import com.fongmi.bear.net.Callback;
 import com.fongmi.bear.utils.Notify;
 import com.fongmi.bear.utils.Prefers;
 
@@ -17,7 +19,7 @@ public class SettingActivity extends BaseActivity {
     private ActivitySettingBinding binding;
 
     public static void start(Activity activity) {
-        activity.startActivity(new Intent(activity, SettingActivity.class));
+        activity.startActivityForResult(new Intent(activity, SettingActivity.class), 1000);
     }
 
     @Override
@@ -42,6 +44,22 @@ public class SettingActivity extends BaseActivity {
         Notify.show(this, bindingDialog.getRoot(), (dialogInterface, i) -> {
             Prefers.put("url", bindingDialog.url.getText().toString().trim());
             binding.url.setText(Prefers.getUrl());
+            reloadConfig();
+        });
+    }
+
+    //TODO SHOW PROGRESS
+    private void reloadConfig() {
+        ApiConfig.get().loadConfig(new Callback() {
+            @Override
+            public void success() {
+                setResult(RESULT_OK);
+            }
+
+            @Override
+            public void error(String msg) {
+                Notify.show(msg);
+            }
         });
     }
 }

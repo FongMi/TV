@@ -1,5 +1,8 @@
 package com.fongmi.bear.bean;
 
+import android.text.TextUtils;
+import android.view.View;
+
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
@@ -19,18 +22,22 @@ public class Vod {
     }
 
     public String getVodId() {
-        return vodId;
+        return TextUtils.isEmpty(vodId) ? "" : vodId;
     }
 
     public String getVodName() {
-        return vodName;
+        return TextUtils.isEmpty(vodName) ? "" : vodName;
     }
 
     public String getVodPic() {
-        return vodPic;
+        return TextUtils.isEmpty(vodPic) ? "" : vodPic;
     }
 
     public String getVodRemarks() {
-        return vodRemarks;
+        return TextUtils.isEmpty(vodRemarks) ? "" : vodRemarks;
+    }
+
+    public int getRemarkVisible() {
+        return getVodRemarks().isEmpty() ? View.GONE : View.VISIBLE;
     }
 }

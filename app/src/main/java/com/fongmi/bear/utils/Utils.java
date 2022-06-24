@@ -63,7 +63,7 @@ public class Utils {
     }
 
     public static void loadImage(String url, ImageView view) {
-        Glide.with(App.get()).load(url).transform(new CenterCrop(), new RoundedCorners(ResUtil.dp2px(10))).into(view);
+        Glide.with(App.get()).load(url).transform(new CenterCrop(), new RoundedCorners(ResUtil.dp2px(8))).into(view);
     }
 
     public static void hideSystemUI(Activity activity) {

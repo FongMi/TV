@@ -1,5 +1,8 @@
 package com.fongmi.bear;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import androidx.annotation.NonNull;
 
 import com.fongmi.bear.bean.Live;
@@ -15,9 +18,14 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.Call;
 import okhttp3.Request;
@@ -25,13 +33,14 @@ import okhttp3.Response;
 
 public class ApiConfig {
 
-    private List<Site> sites;
-    private List<Parse> parses;
-    private List<Live> channels;
-    private Parse defaultParse;
-    private JarLoader jarLoader;
+    private final JarLoader jarLoader;
+    private final List<Parse> parses;
+    private final List<Live> lives;
+    private final List<Site> sites;
+    private final Handler handler;
     private String spider;
-    private Site home;
+    private Parse parse;
+    private Site site;
 
     private static class Loader {
         static volatile ApiConfig INSTANCE = new ApiConfig();
@@ -42,10 +51,19 @@ public class ApiConfig {
     }
 
     public ApiConfig() {
+        this.site = new Site();
         this.sites = new ArrayList<>();
         this.parses = new ArrayList<>();
-        this.channels = new ArrayList<>();
+        this.lives = new ArrayList<>();
         this.jarLoader = new JarLoader();
+        this.handler = new Handler(Looper.getMainLooper());
+    }
+
+    private void clear() {
+        this.sites.clear();
+        this.parses.clear();
+        this.lives.clear();
+        this.site = new Site();
     }
 
     public void loadConfig(Callback callback) {
@@ -53,17 +71,18 @@ public class ApiConfig {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) {
                 try {
+                    clear();
                     parseJson(response.body().string());
                     loadJar();
-                    callback.success();
+                    handler.post(callback::success);
                 } catch (Exception e) {
-                    callback.error("解析配置失敗");
+                    handler.post(() -> callback.error("解析配置失敗"));
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                callback.error("無法取得配置");
+                handler.post(() -> callback.error("取得配置失敗"));
             }
         });
     }
@@ -84,7 +103,9 @@ public class ApiConfig {
             site.setExt(Json.safeString(obj, "ext", ""));
             sites.add(site);
         }
-        if (sites.size() > 0) home = sites.get(0);
+        if (sites.size() > 0) {
+            site = sites.get(0);
+        }
     }
 
     private void loadJar() throws IOException {
@@ -97,7 +118,24 @@ public class ApiConfig {
         return jarLoader.getSpider(site.getApi(), site.getExt());
     }
 
-    public Site getHome() {
-        return home;
+    public Object[] proxyLocal(Map<?, ?> param) {
+        return jarLoader.proxyInvoke(param);
+    }
+
+    public JSONObject jsonExt(String key, LinkedHashMap<String, String> jxs, String url) {
+        return jarLoader.jsonExt(key, jxs, url);
+    }
+
+    public JSONObject jsonExtMix(String flag, String key, String name, LinkedHashMap<String, HashMap<String, String>> jxs, String url) {
+        return jarLoader.jsonExtMix(flag, key, name, jxs, url);
+    }
+
+    public Site getSite(String key) {
+        for (Site item : sites) if (item.getKey().equals(key)) return item;
+        return new Site();
+    }
+
+    public Site getSite() {
+        return site;
     }
 }

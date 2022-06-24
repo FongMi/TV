@@ -68,6 +68,8 @@ public class VodAdapter extends RecyclerView.Adapter<VodAdapter.VodHolder> {
     public void onBindViewHolder(@NonNull VodAdapter.VodHolder holder, int position) {
         Vod item = items.get(position);
         holder.binding.name.setText(item.getVodName());
+        holder.binding.remark.setText(item.getVodRemarks());
+        holder.binding.remark.setVisibility(item.getRemarkVisible());
         Utils.loadImage(item.getVodPic(), holder.binding.image);
     }
 }

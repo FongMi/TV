@@ -6,8 +6,12 @@ import com.fongmi.bear.App;
 import com.fongmi.bear.utils.FileUtil;
 import com.orhanobut.logger.Logger;
 
+import org.json.JSONObject;
+
 import java.io.FileOutputStream;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -77,16 +81,44 @@ public class JarLoader {
             spiders.put(clsKey, spider);
             return spider;
         } catch (Exception e) {
+            e.printStackTrace();
             return new SpiderNull();
+        }
+    }
+
+    public JSONObject jsonExt(String key, LinkedHashMap<String, String> jxs, String url) {
+        try {
+            String clsKey = "Json" + key;
+            String hotClass = "com.github.catvod.parser." + clsKey;
+            Class<?> jsonParserCls = classLoader.loadClass(hotClass);
+            Method mth = jsonParserCls.getMethod("parse", LinkedHashMap.class, String.class);
+            return (JSONObject) mth.invoke(null, jxs, url);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public JSONObject jsonExtMix(String flag, String key, String name, LinkedHashMap<String, HashMap<String, String>> jxs, String url) {
+        try {
+            String clsKey = "Mix" + key;
+            String hotClass = "com.github.catvod.parser." + clsKey;
+            Class<?> jsonParserCls = classLoader.loadClass(hotClass);
+            Method mth = jsonParserCls.getMethod("parse", LinkedHashMap.class, String.class, String.class, String.class);
+            return (JSONObject) mth.invoke(null, jxs, name, flag, url);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
     public Object[] proxyInvoke(Map params) {
         try {
             if (proxyFun != null) return (Object[]) proxyFun.invoke(null, params);
-        } catch (Exception ignored) {
-
+            else return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
-        return null;
     }
 }

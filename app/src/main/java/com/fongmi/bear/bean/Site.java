@@ -15,15 +15,15 @@ public class Site {
     @SerializedName("name")
     private String name;
     @SerializedName("type")
-    private Integer type;
+    private int type;
     @SerializedName("api")
     private String api;
     @SerializedName("searchable")
-    private Integer searchable;
+    private int searchable;
     @SerializedName("quickSearch")
-    private Integer quickSearch;
+    private int quickSearch;
     @SerializedName("filterable")
-    private Integer filterable;
+    private int filterable;
     @SerializedName("ext")
     private String ext;
 

@@ -10,6 +10,7 @@ import androidx.viewbinding.ViewBinding;
 import com.fongmi.bear.ApiConfig;
 import com.fongmi.bear.databinding.ActivitySplashBinding;
 import com.fongmi.bear.net.Callback;
+import com.fongmi.bear.utils.Notify;
 
 @SuppressLint("CustomSplashScreen")
 public class SplashActivity extends BaseActivity {
@@ -48,6 +49,7 @@ public class SplashActivity extends BaseActivity {
             @Override
             public void error(String msg) {
                 HomeActivity.start(getActivity());
+                Notify.show(msg);
             }
         });
     }
