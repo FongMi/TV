@@ -20,10 +20,10 @@ import com.fongmi.bear.ui.custom.SpaceItemDecoration;
 
 public class HomeActivity extends BaseActivity {
 
-    private ActivityHomeBinding binding;
-    private SiteViewModel siteViewModel;
-    private FuncAdapter funcAdapter;
-    private VodAdapter vodAdapter;
+    private ActivityHomeBinding mBinding;
+    private SiteViewModel mSiteViewModel;
+    private FuncAdapter mFuncAdapter;
+    private VodAdapter mVodAdapter;
 
     public static void start(Activity activity) {
         activity.startActivity(new Intent(activity, HomeActivity.class));
@@ -32,7 +32,7 @@ public class HomeActivity extends BaseActivity {
 
     @Override
     protected ViewBinding getBinding() {
-        return binding = ActivityHomeBinding.inflate(getLayoutInflater());
+        return mBinding = ActivityHomeBinding.inflate(getLayoutInflater());
     }
 
     @Override
@@ -44,28 +44,28 @@ public class HomeActivity extends BaseActivity {
 
     @Override
     protected void initEvent() {
-        funcAdapter.setOnItemClickListener(this::onFuncClick);
+        mFuncAdapter.setOnItemClickListener(this::onFuncClick);
     }
 
     private void setRecyclerView() {
-        binding.func.setHasFixedSize(true);
-        binding.func.setNestedScrollingEnabled(false);
-        binding.func.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        binding.func.setAdapter(funcAdapter = new FuncAdapter());
-        binding.update.setHasFixedSize(true);
-        binding.update.setNestedScrollingEnabled(false);
-        binding.update.setLayoutManager(new GridLayoutManager(this, 5));
-        binding.update.addItemDecoration(new SpaceItemDecoration(5, 12, false, 0));
-        binding.update.setAdapter(vodAdapter = new VodAdapter());
+        mBinding.func.setHasFixedSize(true);
+        mBinding.func.setNestedScrollingEnabled(false);
+        mBinding.func.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        mBinding.func.setAdapter(mFuncAdapter = new FuncAdapter());
+        mBinding.update.setHasFixedSize(true);
+        mBinding.update.setNestedScrollingEnabled(false);
+        mBinding.update.setLayoutManager(new GridLayoutManager(this, 5));
+        mBinding.update.addItemDecoration(new SpaceItemDecoration(5, 12, false, 0));
+        mBinding.update.setAdapter(mVodAdapter = new VodAdapter());
     }
 
     private void setViewModel() {
-        siteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
-        siteViewModel.result.observe(this, result -> vodAdapter.addAll(result.getList()));
+        mSiteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
+        mSiteViewModel.mResult.observe(this, result -> mVodAdapter.addAll(result.getList()));
     }
 
     private void homeContent() {
-        siteViewModel.homeContent(ApiConfig.get().getSite().getKey());
+        mSiteViewModel.homeContent(ApiConfig.get().getHome().getKey());
     }
 
     private void onFuncClick(Func item) {

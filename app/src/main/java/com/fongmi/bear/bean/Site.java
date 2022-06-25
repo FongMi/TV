@@ -1,12 +1,6 @@
 package com.fongmi.bear.bean;
 
-import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
-import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Site {
 
@@ -27,10 +21,7 @@ public class Site {
     @SerializedName("ext")
     private String ext;
 
-    public static List<Site> arrayFrom(String str) {
-        Type listType = new TypeToken<ArrayList<Site>>() {}.getType();
-        return new Gson().fromJson(str, listType);
-    }
+    private boolean home;
 
     public String getKey() {
         return key;
@@ -94,5 +85,21 @@ public class Site {
 
     public void setExt(String ext) {
         this.ext = ext;
+    }
+
+    public boolean isHome() {
+        return home;
+    }
+
+    public void setHome(boolean home) {
+        this.home = home;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Site)) return false;
+        Site it = (Site) obj;
+        return getKey().equals(it.getKey());
     }
 }

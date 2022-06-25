@@ -14,13 +14,13 @@ import com.fongmi.bear.utils.Utils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VodAdapter extends RecyclerView.Adapter<VodAdapter.VodHolder> {
+public class VodAdapter extends RecyclerView.Adapter<VodAdapter.ViewHolder> {
 
-    private OnItemClickListener listener;
-    private List<Vod> items;
+    private OnItemClickListener mListener;
+    private List<Vod> mItems;
 
     public VodAdapter() {
-        items = new ArrayList<>();
+        mItems = new ArrayList<>();
     }
 
     public interface OnItemClickListener {
@@ -28,14 +28,14 @@ public class VodAdapter extends RecyclerView.Adapter<VodAdapter.VodHolder> {
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
-        this.listener = listener;
+        this.mListener = listener;
     }
 
-    class VodHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private final AdapterVodBinding binding;
 
-        public VodHolder(@NonNull AdapterVodBinding binding) {
+        public ViewHolder(@NonNull AdapterVodBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
             itemView.setOnClickListener(this);
@@ -43,30 +43,30 @@ public class VodAdapter extends RecyclerView.Adapter<VodAdapter.VodHolder> {
 
         @Override
         public void onClick(View view) {
-            listener.onItemClick(items.get(getLayoutPosition()));
+            mListener.onItemClick(mItems.get(getLayoutPosition()));
         }
     }
 
     public void addAll(List<Vod> items) {
-        this.items.clear();
-        this.items.addAll(items);
+        mItems.clear();
+        mItems.addAll(items);
         notifyDataSetChanged();
     }
 
     @Override
     public int getItemCount() {
-        return items.size();
+        return mItems.size();
     }
 
     @NonNull
     @Override
-    public VodAdapter.VodHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new VodHolder(AdapterVodBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+    public VodAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        return new ViewHolder(AdapterVodBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
     }
 
     @Override
-    public void onBindViewHolder(@NonNull VodAdapter.VodHolder holder, int position) {
-        Vod item = items.get(position);
+    public void onBindViewHolder(@NonNull VodAdapter.ViewHolder holder, int position) {
+        Vod item = mItems.get(position);
         holder.binding.name.setText(item.getVodName());
         holder.binding.remark.setText(item.getVodRemarks());
         holder.binding.remark.setVisibility(item.getRemarkVisible());

@@ -3,6 +3,7 @@ package com.fongmi.bear.bean;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Collections;
 import java.util.List;
 
 public class Result {
@@ -15,6 +16,6 @@ public class Result {
     }
 
     public List<Vod> getList() {
-        return list;
+        return list == null ? Collections.emptyList() : list;
     }
 }

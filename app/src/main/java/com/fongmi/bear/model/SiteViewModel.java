@@ -13,21 +13,22 @@ import java.util.concurrent.Executors;
 
 public class SiteViewModel extends ViewModel {
 
-    public static final ExecutorService service = Executors.newFixedThreadPool(5);
-
-    public MutableLiveData<Result> result;
+    public static final ExecutorService mService = Executors.newFixedThreadPool(5);
+    public MutableLiveData<Result> mResult;
 
     public SiteViewModel() {
-        this.result = new MutableLiveData<>();
+        this.mResult = new MutableLiveData<>();
     }
 
     public void homeContent(String key) {
         Site site = ApiConfig.get().getSite(key);
         int type = site.getType();
         if (type == 3) {
-            service.execute(() -> {
+            mService.execute(() -> {
                 Spider spider = ApiConfig.get().getCSP(site);
-                result.postValue(Result.objectFrom(spider.homeContent(false)));
+                Result result = Result.objectFrom(spider.homeContent(false));
+                if (result.getList().isEmpty()) result = Result.objectFrom(spider.homeVideoContent());
+                mResult.postValue(result);
             });
         }
     }

@@ -15,25 +15,25 @@ import com.fongmi.bear.utils.Notify;
 @SuppressLint("CustomSplashScreen")
 public class SplashActivity extends BaseActivity {
 
-    private ActivitySplashBinding binding;
+    private ActivitySplashBinding mBinding;
 
     @Override
     protected ViewBinding getBinding() {
-        return binding = ActivitySplashBinding.inflate(getLayoutInflater());
+        return mBinding = ActivitySplashBinding.inflate(getLayoutInflater());
     }
 
     @Override
     protected void initView() {
-        binding.title.animate().alpha(1).setDuration(2000).setListener(onAnimationEnd()).start();
+        mBinding.title.animate().alpha(1).setDuration(2000).setListener(onAnimationEnd()).start();
     }
 
     private AnimatorListenerAdapter onAnimationEnd() {
         return new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                binding.title.setVisibility(View.GONE);
-                binding.progress.animate().alpha(1).setDuration(500).start();
-                binding.info.animate().alpha(1).setDuration(500).start();
+                mBinding.title.setVisibility(View.GONE);
+                mBinding.progress.animate().alpha(1).setDuration(500).start();
+                mBinding.info.animate().alpha(1).setDuration(500).start();
                 loadConfig();
             }
         };

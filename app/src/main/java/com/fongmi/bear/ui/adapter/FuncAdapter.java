@@ -14,10 +14,10 @@ import com.fongmi.bear.databinding.AdapterFuncBinding;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FuncAdapter extends RecyclerView.Adapter<FuncAdapter.FuncHolder> {
+public class FuncAdapter extends RecyclerView.Adapter<FuncAdapter.ViewHolder> {
 
-    private OnItemClickListener listener;
-    private List<Func> items;
+    private OnItemClickListener mListener;
+    private List<Func> mItems;
 
     public FuncAdapter() {
         addAll();
@@ -28,14 +28,14 @@ public class FuncAdapter extends RecyclerView.Adapter<FuncAdapter.FuncHolder> {
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
-        this.listener = listener;
+        this.mListener = listener;
     }
 
-    class FuncHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private final AdapterFuncBinding binding;
 
-        public FuncHolder(@NonNull AdapterFuncBinding binding) {
+        public ViewHolder(@NonNull AdapterFuncBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
             itemView.setOnClickListener(this);
@@ -43,33 +43,33 @@ public class FuncAdapter extends RecyclerView.Adapter<FuncAdapter.FuncHolder> {
 
         @Override
         public void onClick(View view) {
-            listener.onItemClick(items.get(getLayoutPosition()));
+            mListener.onItemClick(mItems.get(getLayoutPosition()));
         }
     }
 
     public void addAll() {
-        items = new ArrayList<>();
-        items.add(Func.create(R.string.home_vod));
-        items.add(Func.create(R.string.home_live));
-        items.add(Func.create(R.string.home_search));
-        items.add(Func.create(R.string.home_push));
-        items.add(Func.create(R.string.home_setting));
+        mItems = new ArrayList<>();
+        mItems.add(Func.create(R.string.home_vod));
+        mItems.add(Func.create(R.string.home_live));
+        mItems.add(Func.create(R.string.home_search));
+        mItems.add(Func.create(R.string.home_push));
+        mItems.add(Func.create(R.string.home_setting));
     }
 
     @Override
     public int getItemCount() {
-        return items.size();
+        return mItems.size();
     }
 
     @NonNull
     @Override
-    public FuncAdapter.FuncHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new FuncHolder(AdapterFuncBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+    public FuncAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        return new ViewHolder(AdapterFuncBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
     }
 
     @Override
-    public void onBindViewHolder(@NonNull FuncAdapter.FuncHolder holder, int position) {
-        Func item = items.get(position);
+    public void onBindViewHolder(@NonNull FuncAdapter.ViewHolder holder, int position) {
+        Func item = mItems.get(position);
         holder.binding.icon.setImageResource(item.getDrawable());
         holder.binding.text.setText(item.getText());
     }

@@ -16,8 +16,9 @@
     <string name="home_update">更新推荐</string>
 
     <!-- Setting -->
-    <string name="setting_url">配置接口</string>
-    <string name="setting_history">历史配置</string>
+    <string name="setting_site">首页</string>
+    <string name="setting_url">配置</string>
+    <string name="setting_history">历史纪录</string>
 
     <!-- Dialog -->
     <string name="dialog_positive">确定</string>

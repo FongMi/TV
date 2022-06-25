@@ -12,8 +12,11 @@
     <color name="green_400">#66BB6A</color>
     <color name="transparent">#00000000</color>
     <color name="black_20">#33000000</color>
-    <color name="black_25">#40000000</color>
+    <color name="black_30">#4D000000</color>
+    <color name="black_40">#66000000</color>
     <color name="black_50">#80000000</color>
     <color name="black_60">#99000000</color>
+    <color name="black_70">#B3000000</color>
+    <color name="black_80">#CC000000</color>
 
 </resources>

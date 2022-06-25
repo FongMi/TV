@@ -6,7 +6,7 @@ import okhttp3.OkHttpClient;
 
 public class OKHttp {
 
-    private final OkHttpClient client;
+    private final OkHttpClient mClient;
 
     private static class Loader {
         static volatile OKHttp INSTANCE = new OKHttp();
@@ -17,7 +17,7 @@ public class OKHttp {
     }
 
     public OKHttp() {
-        client = getBuilder().build();
+        mClient = getBuilder().build();
     }
 
     private OkHttpClient.Builder getBuilder() {
@@ -25,6 +25,6 @@ public class OKHttp {
     }
 
     public OkHttpClient client() {
-        return client;
+        return mClient;
     }
 }

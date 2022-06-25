@@ -40,7 +40,7 @@ public class ApiConfig {
     private final Handler handler;
     private String spider;
     private Parse parse;
-    private Site site;
+    private Site home;
 
     private static class Loader {
         static volatile ApiConfig INSTANCE = new ApiConfig();
@@ -51,7 +51,7 @@ public class ApiConfig {
     }
 
     public ApiConfig() {
-        this.site = new Site();
+        this.home = new Site();
         this.sites = new ArrayList<>();
         this.parses = new ArrayList<>();
         this.lives = new ArrayList<>();
@@ -63,7 +63,7 @@ public class ApiConfig {
         this.sites.clear();
         this.parses.clear();
         this.lives.clear();
-        this.site = new Site();
+        this.home = new Site();
     }
 
     public void loadConfig(Callback callback) {
@@ -104,7 +104,7 @@ public class ApiConfig {
             sites.add(site);
         }
         if (sites.size() > 0) {
-            site = sites.get(0);
+            setHome(sites.get(0));
         }
     }
 
@@ -135,7 +135,15 @@ public class ApiConfig {
         return new Site();
     }
 
-    public Site getSite() {
-        return site;
+    public List<Site> getSites() {
+        return sites;
+    }
+
+    public Site getHome() {
+        return home;
+    }
+
+    public void setHome(Site home) {
+        this.home = home;
     }
 }
