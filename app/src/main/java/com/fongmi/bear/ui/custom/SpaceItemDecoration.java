@@ -10,10 +10,10 @@ import com.fongmi.bear.utils.ResUtil;
 
 public class SpaceItemDecoration extends RecyclerView.ItemDecoration {
 
-    private boolean includeEdge;
-    private int spanCount;
-    private int spacing;
-    private int headerNum;
+    private final boolean includeEdge;
+    private final int spanCount;
+    private final int spacing;
+    private final int headerNum;
 
     public SpaceItemDecoration(int spanCount, int spacing, boolean includeEdge, int headerNum) {
         this.spanCount = spanCount;

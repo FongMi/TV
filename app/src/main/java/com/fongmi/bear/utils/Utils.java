@@ -7,7 +7,6 @@ import android.os.Build;
 import android.provider.Settings;
 import android.util.Rational;
 import android.view.KeyEvent;
-import android.view.View;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -64,11 +63,6 @@ public class Utils {
 
     public static void loadImage(String url, ImageView view) {
         Glide.with(App.get()).load(url).transform(new CenterCrop(), new RoundedCorners(ResUtil.dp2px(8))).into(view);
-    }
-
-    public static void hideSystemUI(Activity activity) {
-        int flags = View.SYSTEM_UI_FLAG_LOW_PROFILE | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
-        activity.getWindow().getDecorView().setSystemUiVisibility(flags);
     }
 
     public static boolean hasPIP() {

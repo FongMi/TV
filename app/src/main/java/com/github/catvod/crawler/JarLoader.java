@@ -73,7 +73,7 @@ public class JarLoader {
 
     public Spider getSpider(String key, String ext) {
         String clsKey = key.replace("csp_", "");
-        if (spiders.contains(clsKey)) return spiders.get(clsKey);
+        if (spiders.containsKey(clsKey)) return spiders.get(clsKey);
         if (classLoader == null) return new SpiderNull();
         try {
             Spider spider = (Spider) classLoader.loadClass("com.github.catvod.spider." + clsKey).newInstance();

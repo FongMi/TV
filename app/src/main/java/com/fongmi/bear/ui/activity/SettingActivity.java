@@ -44,16 +44,17 @@ public class SettingActivity extends BaseActivity {
         Notify.show(this, bindingDialog.getRoot(), (dialogInterface, i) -> {
             Prefers.put("url", bindingDialog.url.getText().toString().trim());
             binding.url.setText(Prefers.getUrl());
+            Notify.progress(this);
             reloadConfig();
         });
     }
 
-    //TODO SHOW PROGRESS
     private void reloadConfig() {
         ApiConfig.get().loadConfig(new Callback() {
             @Override
             public void success() {
                 setResult(RESULT_OK);
+                Notify.dismiss();
             }
 
             @Override
