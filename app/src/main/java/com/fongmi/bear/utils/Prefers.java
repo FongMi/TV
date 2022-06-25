@@ -38,4 +38,16 @@ public class Prefers {
     public static String getUrl() {
         return Prefers.getString("url");
     }
+
+    public static void putUrl(String url) {
+        Prefers.put("url", url);
+    }
+
+    public static String getHome() {
+        return Prefers.getString("home");
+    }
+
+    public static void putHome(String home) {
+        Prefers.put("home", home);
+    }
 }

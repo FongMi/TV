@@ -51,7 +51,6 @@ public class ApiConfig {
     }
 
     public ApiConfig() {
-        this.home = new Site();
         this.sites = new ArrayList<>();
         this.parses = new ArrayList<>();
         this.lives = new ArrayList<>();
@@ -63,7 +62,7 @@ public class ApiConfig {
         this.sites.clear();
         this.parses.clear();
         this.lives.clear();
-        this.home = new Site();
+        this.home = null;
     }
 
     public void loadConfig(Callback callback) {
@@ -101,10 +100,11 @@ public class ApiConfig {
             site.setSearchable(Json.safeInt(obj, "quickSearch", 1));
             site.setFilterable(Json.safeInt(obj, "filterable", 1));
             site.setExt(Json.safeString(obj, "ext", ""));
+            if (site.getKey().equals(Prefers.getHome())) setHome(site);
             sites.add(site);
         }
-        if (sites.size() > 0) {
-            setHome(sites.get(0));
+        if (getHome() == null) {
+            setHome(sites.isEmpty() ? new Site() : sites.get(0));
         }
     }
 
@@ -131,8 +131,7 @@ public class ApiConfig {
     }
 
     public Site getSite(String key) {
-        for (Site item : sites) if (item.getKey().equals(key)) return item;
-        return new Site();
+        return sites.get(Math.max(sites.indexOf(Site.get(key)), 0));
     }
 
     public List<Site> getSites() {
@@ -145,5 +144,7 @@ public class ApiConfig {
 
     public void setHome(Site home) {
         this.home = home;
+        this.home.setHome(true);
+        Prefers.putHome(home.getKey());
     }
 }

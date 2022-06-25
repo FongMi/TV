@@ -51,7 +51,7 @@ public class SettingActivity extends BaseActivity {
         bindingDialog.url.setText(Prefers.getUrl());
         bindingDialog.url.setSelection(bindingDialog.url.getText().length());
         Notify.show(this, bindingDialog.getRoot(), (dialogInterface, i) -> {
-            Prefers.put("url", bindingDialog.url.getText().toString().trim());
+            Prefers.putUrl(bindingDialog.url.getText().toString().trim());
             mBinding.url.setText(Prefers.getUrl());
             Notify.progress(this);
             loadConfig();
@@ -62,6 +62,7 @@ public class SettingActivity extends BaseActivity {
         ApiConfig.get().loadConfig(new Callback() {
             @Override
             public void success() {
+                mBinding.home.setText(ApiConfig.get().getHome().getName());
                 setResult(RESULT_OK);
                 Notify.dismiss();
             }
@@ -74,11 +75,13 @@ public class SettingActivity extends BaseActivity {
     }
 
     private void showSite(View view) {
+        int position = ApiConfig.get().getSites().indexOf(ApiConfig.get().getHome());
         DialogSiteBinding bindingDialog = DialogSiteBinding.inflate(LayoutInflater.from(this));
-        bindingDialog.site.setHasFixedSize(true);
         bindingDialog.site.setLayoutManager(new LinearLayoutManager(this));
+        bindingDialog.site.getItemAnimator().setChangeDuration(0);
         bindingDialog.site.setAdapter(mAdapter);
         mAdapter.addAll(ApiConfig.get().getSites());
+        bindingDialog.site.scrollToPosition(position);
         Notify.show(this, bindingDialog.getRoot());
     }
 

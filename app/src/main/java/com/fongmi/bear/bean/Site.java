@@ -23,6 +23,12 @@ public class Site {
 
     private boolean home;
 
+    public static Site get(String key) {
+        Site site = new Site();
+        site.setKey(key);
+        return site;
+    }
+
     public String getKey() {
         return key;
     }

@@ -75,5 +75,7 @@ public class SiteAdapter extends RecyclerView.Adapter<SiteAdapter.ViewHolder> {
         Site item = mItems.get(position);
         holder.itemView.setSelected(item.isHome());
         holder.binding.name.setText(item.getName());
+        if (item.isHome()) holder.itemView.requestFocus();
+        else holder.itemView.clearFocus();
     }
 }
