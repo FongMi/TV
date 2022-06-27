@@ -37,5 +37,6 @@ public class SiteViewModel extends ViewModel {
                 mResult.postValue(result);
             });
         }
+        mResult.postValue(new Result());
     }
 }
