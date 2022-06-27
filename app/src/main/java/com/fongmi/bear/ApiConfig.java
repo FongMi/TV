@@ -79,13 +79,13 @@ public class ApiConfig {
                     loadJar();
                     handler.post(callback::success);
                 } catch (Exception e) {
-                    handler.post(() -> callback.error("解析配置失敗"));
+                    handler.post(() -> callback.error("配置解析失敗"));
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                handler.post(() -> callback.error("取得配置失敗"));
+                handler.post(() -> callback.error("配置取得失敗"));
             }
         });
     }

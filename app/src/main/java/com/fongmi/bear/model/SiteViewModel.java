@@ -7,6 +7,7 @@ import com.fongmi.bear.ApiConfig;
 import com.fongmi.bear.bean.Result;
 import com.fongmi.bear.bean.Site;
 import com.github.catvod.crawler.Spider;
+import com.github.catvod.crawler.SpiderDebug;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -22,12 +23,17 @@ public class SiteViewModel extends ViewModel {
 
     public void homeContent(String key) {
         Site site = ApiConfig.get().getSite(key);
-        int type = site.getType();
-        if (type == 3) {
+        if (site.getType() == 3) {
             mService.execute(() -> {
                 Spider spider = ApiConfig.get().getCSP(site);
-                Result result = Result.objectFrom(spider.homeContent(false));
-                if (result.getList().isEmpty()) result = Result.objectFrom(spider.homeVideoContent());
+                String homeContent = spider.homeContent(false);
+                SpiderDebug.log(homeContent);
+                Result result = Result.objectFrom(homeContent);
+                if (result.getList().isEmpty()) {
+                    String homeVideoContent = spider.homeVideoContent();
+                    SpiderDebug.log(homeVideoContent);
+                    result = Result.objectFrom(homeVideoContent);
+                }
                 mResult.postValue(result);
             });
         }

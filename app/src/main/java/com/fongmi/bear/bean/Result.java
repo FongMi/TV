@@ -12,7 +12,8 @@ public class Result {
     private List<Vod> list;
 
     public static Result objectFrom(String str) {
-        return new Gson().fromJson(str, Result.class);
+        Result result = new Gson().fromJson(str, Result.class);
+        return result == null ? new Result() : result;
     }
 
     public List<Vod> getList() {
