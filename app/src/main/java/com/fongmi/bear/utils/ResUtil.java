@@ -8,7 +8,7 @@ import com.fongmi.bear.App;
 
 public class ResUtil {
 
-    private static DisplayMetrics getDisplayMetrics() {
+    public static DisplayMetrics getDisplayMetrics() {
         return App.get().getResources().getDisplayMetrics();
     }
 

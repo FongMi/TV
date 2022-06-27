@@ -3,8 +3,10 @@ package com.fongmi.bear.utils;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -38,6 +40,10 @@ public class Notify {
     public static void show(Context context, View view) {
         AlertDialog dialog = new MaterialAlertDialogBuilder(context).setView(view).create();
         dialog.getWindow().setDimAmount(0);
+        DisplayMetrics metrics = ResUtil.getDisplayMetrics();
+        WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
+        params.width = (int) (metrics.widthPixels * 0.4f);
+        dialog.getWindow().setAttributes(params);
         dialog.show();
     }
 
