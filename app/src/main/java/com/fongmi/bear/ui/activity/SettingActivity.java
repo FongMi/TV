@@ -80,6 +80,7 @@ public class SettingActivity extends BaseActivity {
         DialogSiteBinding bindingDialog = DialogSiteBinding.inflate(LayoutInflater.from(this));
         bindingDialog.site.setLayoutManager(new LinearLayoutManager(this));
         bindingDialog.site.getItemAnimator().setChangeDuration(0);
+        bindingDialog.site.setHasFixedSize(true);
         bindingDialog.site.setAdapter(mAdapter);
         mAdapter.addAll(ApiConfig.get().getSites());
         bindingDialog.site.scrollToPosition(position);

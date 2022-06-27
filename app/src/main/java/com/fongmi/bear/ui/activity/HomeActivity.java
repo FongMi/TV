@@ -49,26 +49,24 @@ public class HomeActivity extends BaseActivity {
 
     private void setRecyclerView() {
         mBinding.func.setHasFixedSize(true);
-        mBinding.func.setNestedScrollingEnabled(false);
         mBinding.func.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         mBinding.func.setAdapter(mFuncAdapter = new FuncAdapter());
-        mBinding.update.setHasFixedSize(true);
-        mBinding.update.setNestedScrollingEnabled(false);
-        mBinding.update.setLayoutManager(new GridLayoutManager(this, 5));
-        mBinding.update.addItemDecoration(new SpaceItemDecoration(5, 12, false, 0));
-        mBinding.update.setAdapter(mVodAdapter = new VodAdapter());
+        mBinding.recommend.setHasFixedSize(true);
+        mBinding.recommend.setLayoutManager(new GridLayoutManager(this, 5));
+        mBinding.recommend.addItemDecoration(new SpaceItemDecoration(5, 12, false, 0));
+        mBinding.recommend.setAdapter(mVodAdapter = new VodAdapter());
     }
 
     private void setViewModel() {
         mSiteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mSiteViewModel.mResult.observe(this, result -> {
             mVodAdapter.addAll(result.getList());
-            mBinding.updateLayout.showContent();
+            mBinding.recommendLayout.showContent();
         });
     }
 
     private void homeContent() {
-        mBinding.updateLayout.showProgress();
+        mBinding.recommendLayout.showProgress();
         mSiteViewModel.homeContent(ApiConfig.get().getHome().getKey());
     }
 

@@ -13,7 +13,7 @@
     <string name="home_push">Push</string>
     <string name="home_setting">Setting</string>
     <string name="home_recent">Recent</string>
-    <string name="home_update">Recommend</string>
+    <string name="home_recommend">Recommend</string>
 
     <!-- Setting -->
     <string name="setting_site">Home site</string>
