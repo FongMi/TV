@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.fongmi.bear.ui.custom.ProgressLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/progress"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:nestedScrollingEnabled="false" />
+
+</com.fongmi.bear.ui.custom.ProgressLayout>

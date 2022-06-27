@@ -32,7 +32,6 @@ public class SplashActivity extends BaseActivity {
             @Override
             public void onAnimationEnd(Animator animation) {
                 mBinding.title.setVisibility(View.GONE);
-                mBinding.progress.animate().alpha(1).setDuration(500).start();
                 mBinding.info.animate().alpha(1).setDuration(500).start();
                 loadConfig();
             }

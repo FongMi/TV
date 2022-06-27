@@ -38,7 +38,6 @@ public class ApiConfig {
     private final List<Live> lives;
     private final List<Site> sites;
     private final Handler handler;
-    private String spider;
     private Parse parse;
     private Site home;
 
@@ -75,8 +74,10 @@ public class ApiConfig {
             public void onResponse(@NonNull Call call, @NonNull Response response) {
                 try {
                     clear();
-                    parseJson(response.body().string());
-                    loadJar();
+                    JsonObject object = new Gson().fromJson(response.body().string(), JsonObject.class);
+                    String spider = Json.safeString(object, "spider", "");
+                    parseJson(object);
+                    loadJar(spider);
                     handler.post(callback::success);
                 } catch (Exception e) {
                     handler.post(() -> callback.error("配置解析失敗"));
@@ -90,9 +91,7 @@ public class ApiConfig {
         });
     }
 
-    private void parseJson(String json) {
-        JsonObject object = new Gson().fromJson(json, JsonObject.class);
-        spider = Json.safeString(object, "spider", "");
+    private void parseJson(JsonObject object) {
         for (JsonElement opt : object.get("sites").getAsJsonArray()) {
             JsonObject obj = (JsonObject) opt;
             Site site = new Site();
@@ -112,7 +111,7 @@ public class ApiConfig {
         }
     }
 
-    private void loadJar() throws IOException {
+    private void loadJar(String spider) throws IOException {
         Request request = new Request.Builder().url(spider).build();
         Response response = OKHttp.get().client().newCall(request).execute();
         jarLoader.load(response.body().bytes());

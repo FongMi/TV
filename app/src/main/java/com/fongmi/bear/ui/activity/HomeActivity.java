@@ -9,9 +9,9 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.viewbinding.ViewBinding;
 
-import com.fongmi.bear.ApiConfig;
 import com.fongmi.bear.R;
 import com.fongmi.bear.bean.Func;
+import com.fongmi.bear.bean.Result;
 import com.fongmi.bear.databinding.ActivityHomeBinding;
 import com.fongmi.bear.model.SiteViewModel;
 import com.fongmi.bear.ui.adapter.FuncAdapter;
@@ -39,7 +39,7 @@ public class HomeActivity extends BaseActivity {
     protected void initView() {
         setRecyclerView();
         setViewModel();
-        homeContent();
+        getContent();
     }
 
     @Override
@@ -61,17 +61,21 @@ public class HomeActivity extends BaseActivity {
         mSiteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mSiteViewModel.mResult.observe(this, result -> {
             mVodAdapter.addAll(result.getList());
-            mBinding.recommendLayout.showContent();
+            mBinding.progress.showContent();
         });
     }
 
-    private void homeContent() {
-        mBinding.recommendLayout.showProgress();
-        mSiteViewModel.homeContent(ApiConfig.get().getHome().getKey());
+    private void getContent() {
+        mBinding.progress.showProgress();
+        mSiteViewModel.homeContent();
     }
 
     private void onFuncClick(Func item) {
         switch (item.getResId()) {
+            case R.string.home_vod:
+                Result result = mSiteViewModel.getResult().getValue();
+                if (result != null) VodActivity.start(this, result);
+                break;
             case R.string.home_setting:
                 SettingActivity.start(this);
                 break;
@@ -82,6 +86,6 @@ public class HomeActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode != RESULT_OK) return;
-        homeContent();
+        getContent();
     }
 }

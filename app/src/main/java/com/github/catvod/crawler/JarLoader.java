@@ -4,7 +4,6 @@ import android.content.Context;
 
 import com.fongmi.bear.App;
 import com.fongmi.bear.utils.FileUtil;
-import com.orhanobut.logger.Logger;
 
 import org.json.JSONObject;
 
@@ -51,7 +50,7 @@ public class JarLoader {
                     if (classInit != null) {
                         Method method = classInit.getMethod("init", Context.class);
                         method.invoke(classInit, App.get());
-                        Logger.d("自定義爬蟲代碼加載成功！");
+                        SpiderDebug.log("自定義爬蟲代碼加載成功！");
                         try {
                             Class<?> proxy = classLoader.loadClass("com.github.catvod.spider.Proxy");
                             proxyFun = proxy.getMethod("proxy", Map.class);

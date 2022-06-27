@@ -13,7 +13,7 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.fongmi.bear.App;
 import com.fongmi.bear.R;
-import com.fongmi.bear.databinding.DialogProgressBinding;
+import com.fongmi.bear.databinding.ViewProgressBinding;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class Notify {
@@ -54,7 +54,7 @@ public class Notify {
     }
 
     public static void progress(Context context) {
-        DialogProgressBinding binding = DialogProgressBinding.inflate(LayoutInflater.from(context));
+        ViewProgressBinding binding = ViewProgressBinding.inflate(LayoutInflater.from(context));
         get().mProgress = new MaterialAlertDialogBuilder(context).setView(binding.getRoot()).create();
         get().mProgress.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         get().mProgress.show();
