@@ -1,5 +1,7 @@
 package com.fongmi.bear.model;
 
+import android.text.TextUtils;
+
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
@@ -14,17 +16,22 @@ import java.util.concurrent.Executors;
 
 public class SiteViewModel extends ViewModel {
 
-    public static final ExecutorService mService = Executors.newFixedThreadPool(5);
+    public ExecutorService mService;
     public MutableLiveData<Result> mResult;
 
     public SiteViewModel() {
+        this.mService = Executors.newFixedThreadPool(5);
         this.mResult = new MutableLiveData<>();
     }
 
     public void homeContent(String key) {
+        if (TextUtils.isEmpty(key)) {
+            mResult.postValue(new Result());
+            return;
+        }
         Site site = ApiConfig.get().getSite(key);
         if (site.getType() == 3) {
-            mService.execute(() -> {
+            mService.submit(() -> {
                 Spider spider = ApiConfig.get().getCSP(site);
                 String homeContent = spider.homeContent(false);
                 SpiderDebug.log(homeContent);
@@ -37,6 +44,5 @@ public class SiteViewModel extends ViewModel {
                 mResult.postValue(result);
             });
         }
-        mResult.postValue(new Result());
     }
 }
