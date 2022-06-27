@@ -61,10 +61,14 @@ public class HomeActivity extends BaseActivity {
 
     private void setViewModel() {
         mSiteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
-        mSiteViewModel.mResult.observe(this, result -> mVodAdapter.addAll(result.getList()));
+        mSiteViewModel.mResult.observe(this, result -> {
+            mVodAdapter.addAll(result.getList());
+            mBinding.updateLayout.showContent();
+        });
     }
 
     private void homeContent() {
+        mBinding.updateLayout.showProgress();
         mSiteViewModel.homeContent(ApiConfig.get().getHome().getKey());
     }
 
