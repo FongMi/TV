@@ -71,13 +71,14 @@ public class JarLoader {
         }
     }
 
-    public Spider getSpider(String key, String ext) {
+    public Spider getSpider(String key, String api, String ext) {
         try {
-            String clsKey = key.replace("csp_", "");
+            api = api.replace("csp_", "");
+            if (spiders.containsKey(key)) return spiders.get(key);
             if (classLoader == null) return new SpiderNull();
-            Spider spider = spiders.containsKey(clsKey) ? spiders.get(clsKey) : (Spider) classLoader.loadClass("com.github.catvod.spider." + clsKey).newInstance();
+            Spider spider = (Spider) classLoader.loadClass("com.github.catvod.spider." + api).newInstance();
             spider.init(App.get(), ext);
-            spiders.put(clsKey, spider);
+            spiders.put(key, spider);
             return spider;
         } catch (Exception e) {
             e.printStackTrace();

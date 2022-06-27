@@ -2,6 +2,7 @@ package com.fongmi.bear.utils;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Toast;
@@ -59,6 +60,7 @@ public class Notify {
 
     private void makeText(String message) {
         if (mToast != null) mToast.cancel();
+        if (TextUtils.isEmpty(message)) return;
         mToast = Toast.makeText(App.get(), message, Toast.LENGTH_LONG);
         mToast.show();
         dismiss();

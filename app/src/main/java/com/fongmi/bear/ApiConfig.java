@@ -66,6 +66,10 @@ public class ApiConfig {
     }
 
     public void loadConfig(Callback callback) {
+        if (Prefers.getUrl().isEmpty()) {
+            handler.post(() -> callback.error(""));
+            return;
+        }
         OKHttp.get().client().newCall(new Request.Builder().url(Prefers.getUrl()).build()).enqueue(new Callback() {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) {
@@ -103,7 +107,7 @@ public class ApiConfig {
             if (site.getKey().equals(Prefers.getHome())) setHome(site);
             sites.add(site);
         }
-        if (getHome() == null) {
+        if (home == null) {
             setHome(sites.isEmpty() ? new Site() : sites.get(0));
         }
     }
@@ -115,7 +119,7 @@ public class ApiConfig {
     }
 
     public Spider getCSP(Site site) {
-        return jarLoader.getSpider(site.getApi(), site.getExt());
+        return jarLoader.getSpider(site.getKey(), site.getApi(), site.getExt());
     }
 
     public Object[] proxyLocal(Map<?, ?> param) {
@@ -131,7 +135,8 @@ public class ApiConfig {
     }
 
     public Site getSite(String key) {
-        return sites.get(Math.max(sites.indexOf(Site.get(key)), 0));
+        int index = sites.indexOf(Site.get(key));
+        return index == -1 ? new Site() : sites.get(index);
     }
 
     public List<Site> getSites() {
@@ -139,7 +144,7 @@ public class ApiConfig {
     }
 
     public Site getHome() {
-        return home;
+        return home == null ? new Site() : home;
     }
 
     public void setHome(Site home) {

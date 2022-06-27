@@ -75,6 +75,7 @@ public class SettingActivity extends BaseActivity {
     }
 
     private void showSite(View view) {
+        if (ApiConfig.get().getSites().isEmpty()) return;
         int position = ApiConfig.get().getSites().indexOf(ApiConfig.get().getHome());
         DialogSiteBinding bindingDialog = DialogSiteBinding.inflate(LayoutInflater.from(this));
         bindingDialog.site.setLayoutManager(new LinearLayoutManager(this));

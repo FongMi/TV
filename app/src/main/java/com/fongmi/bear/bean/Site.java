@@ -1,5 +1,7 @@
 package com.fongmi.bear.bean;
 
+import android.text.TextUtils;
+
 import com.google.gson.annotations.SerializedName;
 
 public class Site {
@@ -30,7 +32,7 @@ public class Site {
     }
 
     public String getKey() {
-        return key;
+        return TextUtils.isEmpty(key) ? "" : key;
     }
 
     public void setKey(String key) {
