@@ -58,7 +58,7 @@ public class VodActivity extends BaseActivity {
 
     private void setPager() {
         mBinding.pager.setAdapter(new PageAdapter(this, mResult.getTypes(), mResult.getFilters()));
-        mBinding.pager.setOffscreenPageLimit(mResult.getTypes().size());
+        if (mResult.getTypes().size() > 0) mBinding.pager.setOffscreenPageLimit(mResult.getTypes().size());
         mBinding.pager.setUserInputEnabled(false);
     }
 }

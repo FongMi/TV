@@ -40,7 +40,7 @@ public class Result {
     }
 
     public List<Class> getTypes() {
-        return types;
+        return types == null ? Collections.emptyList() : types;
     }
 
     public List<Vod> getList() {
