@@ -10,16 +10,17 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/type"
+        <androidx.leanback.widget.HorizontalGridView
+            android:id="@+id/recycler"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false" />
 
-        <androidx.viewpager2.widget.ViewPager2
+        <androidx.leanback.tab.LeanbackViewPager
             android:id="@+id/pager"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="12dp" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

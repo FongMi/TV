@@ -1,36 +1,37 @@
 package com.fongmi.bear.ui.adapter;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentStatePagerAdapter;
 
-import com.fongmi.bear.bean.Class;
-import com.fongmi.bear.bean.Filter;
+import com.fongmi.bear.bean.Result;
 import com.fongmi.bear.ui.fragment.VodFragment;
 
-import java.util.LinkedHashMap;
-import java.util.List;
+public class PageAdapter extends FragmentStatePagerAdapter {
 
-public class PageAdapter extends FragmentStateAdapter {
+    private final Result mResult;
 
-    private final List<Class> mItems;
-    private final LinkedHashMap<String, List<Filter>> mFilters;
+    public PageAdapter(@NonNull FragmentManager fm, Result result) {
+        super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
+        mResult = result;
+    }
 
-    public PageAdapter(@NonNull FragmentActivity activity, List<Class> items, LinkedHashMap<String, List<Filter>> filters) {
-        super(activity);
-        mItems = items;
-        mFilters = filters;
+    @Nullable
+    @Override
+    public CharSequence getPageTitle(int position) {
+        return mResult.getTypes().get(position).getTypeName();
     }
 
     @NonNull
     @Override
-    public Fragment createFragment(int position) {
-        return VodFragment.newInstance(mItems.get(position).getTypeId(), mFilters.get(mItems.get(position).getTypeId()));
+    public Fragment getItem(int position) {
+        return VodFragment.newInstance(mResult.getTypes().get(position).getTypeId(), mResult.getFilters().get(mResult.getTypes().get(position).getTypeId()));
     }
 
     @Override
-    public int getItemCount() {
-        return mItems.size();
+    public int getCount() {
+        return mResult.getTypes().size();
     }
 }

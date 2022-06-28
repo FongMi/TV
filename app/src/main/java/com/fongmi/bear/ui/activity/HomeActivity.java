@@ -2,11 +2,10 @@ package com.fongmi.bear.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.view.ViewGroup;
 
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.bear.R;
@@ -16,7 +15,7 @@ import com.fongmi.bear.databinding.ActivityHomeBinding;
 import com.fongmi.bear.model.SiteViewModel;
 import com.fongmi.bear.ui.adapter.FuncAdapter;
 import com.fongmi.bear.ui.adapter.VodAdapter;
-import com.fongmi.bear.ui.custom.SpaceItemDecoration;
+import com.fongmi.bear.utils.ResUtil;
 
 public class HomeActivity extends BaseActivity {
 
@@ -48,13 +47,14 @@ public class HomeActivity extends BaseActivity {
     }
 
     private void setRecyclerView() {
-        mBinding.func.setHasFixedSize(true);
-        mBinding.func.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         mBinding.func.setAdapter(mFuncAdapter = new FuncAdapter());
-        mBinding.recommend.setHasFixedSize(true);
-        mBinding.recommend.setLayoutManager(new GridLayoutManager(this, 5));
-        mBinding.recommend.addItemDecoration(new SpaceItemDecoration(5, 12, false, 0));
+        mBinding.func.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+        mBinding.recent.setNumColumns(5);
+        mBinding.recent.setAdapter(mVodAdapter = new VodAdapter());
+        mBinding.recent.setItemSpacing(ResUtil.dp2px(12));
+        mBinding.recommend.setNumColumns(5);
         mBinding.recommend.setAdapter(mVodAdapter = new VodAdapter());
+        mBinding.recommend.setItemSpacing(ResUtil.dp2px(12));
     }
 
     private void setViewModel() {

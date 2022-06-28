@@ -1,10 +1,13 @@
 package com.fongmi.bear.ui.activity;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.viewbinding.ViewBinding;
 
@@ -50,11 +53,15 @@ public class SettingActivity extends BaseActivity {
         DialogConfigBinding bindingDialog = DialogConfigBinding.inflate(LayoutInflater.from(this));
         bindingDialog.url.setText(Prefers.getUrl());
         bindingDialog.url.setSelection(bindingDialog.url.getText().length());
-        Notify.show(this, bindingDialog.getRoot(), (dialogInterface, i) -> {
+        AlertDialog dialog = Notify.show(this, bindingDialog.getRoot(), (dialogInterface, i) -> {
             Prefers.putUrl(bindingDialog.url.getText().toString().trim());
             mBinding.url.setText(Prefers.getUrl());
             Notify.progress(this);
             loadConfig();
+        });
+        bindingDialog.url.setOnEditorActionListener((textView, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE) dialog.getButton(DialogInterface.BUTTON_POSITIVE).performClick();
+            return true;
         });
     }
 

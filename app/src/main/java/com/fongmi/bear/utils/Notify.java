@@ -47,10 +47,11 @@ public class Notify {
         dialog.show();
     }
 
-    public static void show(Context context, View view, DialogInterface.OnClickListener listener) {
+    public static AlertDialog show(Context context, View view, DialogInterface.OnClickListener listener) {
         AlertDialog dialog = new MaterialAlertDialogBuilder(context).setView(view).setNegativeButton(R.string.dialog_negative, null).setPositiveButton(R.string.dialog_positive, listener).create();
         dialog.getWindow().setDimAmount(0);
         dialog.show();
+        return dialog;
     }
 
     public static void progress(Context context) {

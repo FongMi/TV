@@ -45,11 +45,6 @@ public class TypeAdapter extends RecyclerView.Adapter<TypeAdapter.ViewHolder> {
         }
     }
 
-    public void setSelect(int position) {
-        for (int i = 0; i < mItems.size(); i++) mItems.get(i).setSelect(i == position);
-        notifyItemRangeChanged(0, mItems.size());
-    }
-
     @Override
     public int getItemCount() {
         return mItems.size();
@@ -65,6 +60,5 @@ public class TypeAdapter extends RecyclerView.Adapter<TypeAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull TypeAdapter.ViewHolder holder, int position) {
         Class item = mItems.get(position);
         holder.binding.name.setText(item.getTypeName());
-        holder.itemView.setSelected(item.isSelect());
     }
 }

@@ -17,9 +17,9 @@
             android:textColor="@color/white"
             android:textSize="24sp" />
 
-        <androidx.recyclerview.widget.RecyclerView
+        <androidx.leanback.widget.HorizontalGridView
             android:id="@+id/func"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:nestedScrollingEnabled="false"
@@ -33,12 +33,13 @@
             android:textColor="@color/white"
             android:textSize="24sp" />
 
-        <androidx.recyclerview.widget.RecyclerView
+        <androidx.leanback.widget.VerticalGridView
             android:id="@+id/recent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:nestedScrollingEnabled="false" />
+            android:nestedScrollingEnabled="false"
+            android:visibility="gone" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -54,7 +55,7 @@
             android:layout_height="match_parent"
             android:layout_marginTop="16dp">
 
-            <androidx.recyclerview.widget.RecyclerView
+            <androidx.leanback.widget.VerticalGridView
                 android:id="@+id/recommend"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"

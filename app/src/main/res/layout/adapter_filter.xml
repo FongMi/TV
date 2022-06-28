@@ -3,9 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginEnd="12dp"
-    android:background="@drawable/selector_item"
+    android:background="@drawable/selector_type"
     android:focusable="true"
+    android:layout_margin="4dp"
     android:focusableInTouchMode="true">
 
     <TextView

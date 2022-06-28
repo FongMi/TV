@@ -3,22 +3,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center"
     android:orientation="horizontal">
 
     <TextView
         android:id="@+id/name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="12dp"
-        android:background="@drawable/shape_item_normal"
+        android:layout_marginEnd="4dp"
+        android:background="@drawable/selector_type"
         android:textColor="@color/white"
         android:textSize="16sp"
         tools:text="地區" />
 
-    <androidx.recyclerview.widget.RecyclerView
+    <androidx.leanback.widget.HorizontalGridView
         android:id="@+id/recycler"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:nestedScrollingEnabled="false" />
 
 </LinearLayout>

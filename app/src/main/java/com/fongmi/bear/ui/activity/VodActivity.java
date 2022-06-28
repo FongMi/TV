@@ -2,14 +2,15 @@ package com.fongmi.bear.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.view.ViewGroup;
 
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.bear.bean.Result;
 import com.fongmi.bear.databinding.ActivityVodBinding;
 import com.fongmi.bear.ui.adapter.PageAdapter;
 import com.fongmi.bear.ui.adapter.TypeAdapter;
+import com.fongmi.bear.utils.ResUtil;
 
 public class VodActivity extends BaseActivity {
 
@@ -43,22 +44,18 @@ public class VodActivity extends BaseActivity {
     protected void initEvent() {
         mTypeAdapter.setOnItemClickListener(position -> {
             mBinding.pager.setCurrentItem(position, false);
-            mTypeAdapter.setSelect(position);
         });
     }
 
     private void setRecyclerView() {
-        mBinding.type.setHasFixedSize(true);
-        mBinding.type.getItemAnimator().setChangeDuration(0);
-        mBinding.type.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        mBinding.type.setAdapter(mTypeAdapter = new TypeAdapter(mResult.getTypes()));
-        mBinding.type.scrollToPosition(0);
-        mTypeAdapter.setSelect(0);
+        mBinding.recycler.setNumRows(1);
+        mBinding.recycler.setHorizontalSpacing(ResUtil.dp2px(12));
+        mBinding.recycler.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+        mBinding.recycler.setAdapter(mTypeAdapter = new TypeAdapter(mResult.getTypes()));
     }
 
     private void setPager() {
-        mBinding.pager.setAdapter(new PageAdapter(this, mResult.getTypes(), mResult.getFilters()));
+        mBinding.pager.setAdapter(new PageAdapter(getSupportFragmentManager(), mResult));
         if (mResult.getTypes().size() > 0) mBinding.pager.setOffscreenPageLimit(mResult.getTypes().size());
-        mBinding.pager.setUserInputEnabled(false);
     }
 }
