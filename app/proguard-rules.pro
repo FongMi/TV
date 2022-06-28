@@ -12,3 +12,10 @@
 }
 -keep,allowobfuscation,allowshrinking class com.google.gson.reflect.TypeToken
 -keep,allowobfuscation,allowshrinking class * extends com.google.gson.reflect.TypeToken
+
+# CatVod
+-keep class com.github.catvod.crawler.** { *; }
+
+# OkHttp
+-dontwarn okhttp3.**
+-keep class okhttp3.** { *; }

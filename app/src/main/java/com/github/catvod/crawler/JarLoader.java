@@ -50,7 +50,6 @@ public class JarLoader {
                     if (classInit != null) {
                         Method method = classInit.getMethod("init", Context.class);
                         method.invoke(classInit, App.get());
-                        SpiderDebug.log("自定義爬蟲代碼加載成功！");
                         try {
                             Class<?> proxy = classLoader.loadClass("com.github.catvod.spider.Proxy");
                             proxyFun = proxy.getMethod("proxy", Map.class);
