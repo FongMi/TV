@@ -45,7 +45,8 @@ public class SiteViewModel extends ViewModel {
                 if (result.getList().size() > 0) return result;
                 String homeVideoContent = spider.homeVideoContent();
                 SpiderDebug.json(homeVideoContent);
-                return Result.objectFrom(homeVideoContent);
+                result.setList(Result.objectFrom(homeVideoContent).getList());
+                return result;
             });
         }
     }

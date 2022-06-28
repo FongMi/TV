@@ -28,6 +28,10 @@ public class Result {
         return list == null ? Collections.emptyList() : list;
     }
 
+    public void setList(List<Vod> list) {
+        this.list = list;
+    }
+
     @NonNull
     @Override
     public String toString() {

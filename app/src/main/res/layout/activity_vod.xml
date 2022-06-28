@@ -7,20 +7,19 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tab"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/type"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/transparent"
-            android:nestedScrollingEnabled="false" />
+            android:layout_height="wrap_content" />
 
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/pager"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:nestedScrollingEnabled="false" />
+            android:layout_marginTop="16dp" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
