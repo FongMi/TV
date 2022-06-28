@@ -41,17 +41,23 @@ public class VodActivity extends BaseActivity {
 
     @Override
     protected void initEvent() {
-        mTypeAdapter.setOnItemClickListener(position -> mBinding.pager.setCurrentItem(position, false));
+        mTypeAdapter.setOnItemClickListener(position -> {
+            mBinding.pager.setCurrentItem(position, false);
+            mTypeAdapter.setSelect(position);
+        });
     }
 
     private void setRecyclerView() {
         mBinding.type.setHasFixedSize(true);
+        mBinding.type.getItemAnimator().setChangeDuration(0);
         mBinding.type.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         mBinding.type.setAdapter(mTypeAdapter = new TypeAdapter(mResult.getTypes()));
+        mBinding.type.scrollToPosition(0);
+        mTypeAdapter.setSelect(0);
     }
 
     private void setPager() {
-        mBinding.pager.setAdapter(new PageAdapter(this, mResult.getTypes()));
+        mBinding.pager.setAdapter(new PageAdapter(this, mResult.getTypes(), mResult.getFilters()));
         mBinding.pager.setOffscreenPageLimit(mResult.getTypes().size());
         mBinding.pager.setUserInputEnabled(false);
     }

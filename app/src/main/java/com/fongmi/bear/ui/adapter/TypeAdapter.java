@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.fongmi.bear.bean.Type;
+import com.fongmi.bear.bean.Class;
 import com.fongmi.bear.databinding.AdapterTypeBinding;
 
 import java.util.List;
@@ -15,9 +15,9 @@ import java.util.List;
 public class TypeAdapter extends RecyclerView.Adapter<TypeAdapter.ViewHolder> {
 
     private OnItemClickListener mListener;
-    private final List<Type> mItems;
+    private final List<Class> mItems;
 
-    public TypeAdapter(List<Type> items) {
+    public TypeAdapter(List<Class> items) {
         mItems = items;
     }
 
@@ -29,7 +29,7 @@ public class TypeAdapter extends RecyclerView.Adapter<TypeAdapter.ViewHolder> {
         this.mListener = listener;
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnFocusChangeListener {
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private final AdapterTypeBinding binding;
 
@@ -37,18 +37,17 @@ public class TypeAdapter extends RecyclerView.Adapter<TypeAdapter.ViewHolder> {
             super(binding.getRoot());
             this.binding = binding;
             itemView.setOnClickListener(this);
-            itemView.setOnFocusChangeListener(this);
         }
 
         @Override
         public void onClick(View view) {
             mListener.onItemClick(getLayoutPosition());
         }
+    }
 
-        @Override
-        public void onFocusChange(View view, boolean focus) {
-            if (focus) mListener.onItemClick(getLayoutPosition());
-        }
+    public void setSelect(int position) {
+        for (int i = 0; i < mItems.size(); i++) mItems.get(i).setSelect(i == position);
+        notifyItemRangeChanged(0, mItems.size());
     }
 
     @Override
@@ -64,7 +63,8 @@ public class TypeAdapter extends RecyclerView.Adapter<TypeAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull TypeAdapter.ViewHolder holder, int position) {
-        Type item = mItems.get(position);
+        Class item = mItems.get(position);
         holder.binding.name.setText(item.getTypeName());
+        holder.itemView.setSelected(item.isSelect());
     }
 }
