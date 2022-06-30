@@ -1,66 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:orientation="vertical">
 
-    <LinearLayout
+    <androidx.leanback.widget.VerticalGridView
+        android:id="@+id/recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:padding="24dp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/app_name"
-            android:textColor="@color/white"
-            android:textSize="24sp" />
-
-        <androidx.leanback.widget.HorizontalGridView
-            android:id="@+id/func"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:nestedScrollingEnabled="false"
-            android:overScrollMode="never" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/home_recent"
-            android:textColor="@color/white"
-            android:textSize="24sp" />
-
-        <androidx.leanback.widget.VerticalGridView
-            android:id="@+id/recent"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:nestedScrollingEnabled="false"
-            android:visibility="gone" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="@string/home_recommend"
-            android:textColor="@color/white"
-            android:textSize="24sp" />
-
-        <com.fongmi.bear.ui.custom.ProgressLayout
-            android:id="@+id/progress"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="16dp">
-
-            <androidx.leanback.widget.VerticalGridView
-                android:id="@+id/recommend"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:nestedScrollingEnabled="false" />
-
-        </com.fongmi.bear.ui.custom.ProgressLayout>
-    </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+</LinearLayout>
