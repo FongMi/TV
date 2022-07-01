@@ -37,7 +37,6 @@ public class FuncPresenter extends Presenter {
 
     @Override
     public void onUnbindViewHolder(Presenter.ViewHolder viewHolder) {
-
     }
 
     public static class ViewHolder extends Presenter.ViewHolder {

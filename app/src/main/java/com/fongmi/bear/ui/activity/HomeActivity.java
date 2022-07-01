@@ -16,12 +16,11 @@ import com.fongmi.bear.bean.Result;
 import com.fongmi.bear.bean.Vod;
 import com.fongmi.bear.databinding.ActivityHomeBinding;
 import com.fongmi.bear.model.SiteViewModel;
+import com.fongmi.bear.ui.custom.CustomRowPresenter;
 import com.fongmi.bear.ui.custom.CustomSelector;
 import com.fongmi.bear.ui.presenter.FuncPresenter;
-import com.fongmi.bear.ui.presenter.FuncRowPresenter;
 import com.fongmi.bear.ui.presenter.TitlePresenter;
 import com.fongmi.bear.ui.presenter.VodPresenter;
-import com.fongmi.bear.ui.presenter.VodRowPresenter;
 import com.fongmi.bear.utils.ResUtil;
 import com.fongmi.bear.utils.Utils;
 
@@ -60,10 +59,10 @@ public class HomeActivity extends BaseActivity {
     private void setRecyclerView() {
         CustomSelector selector = new CustomSelector();
         selector.addPresenter(String.class, new TitlePresenter());
-        selector.addPresenter(ListRow.class, new VodRowPresenter(), VodPresenter.class);
-        selector.addPresenter(ListRow.class, new FuncRowPresenter(), FuncPresenter.class);
+        selector.addPresenter(ListRow.class, new CustomRowPresenter(16), VodPresenter.class);
+        selector.addPresenter(ListRow.class, new CustomRowPresenter(16), FuncPresenter.class);
         ItemBridgeAdapter adapter = new ItemBridgeAdapter(mAdapter = new ArrayObjectAdapter(selector));
-        mBinding.recycler.setVerticalSpacing(ResUtil.dp2px(24));
+        mBinding.recycler.setVerticalSpacing(ResUtil.dp2px(16));
         mBinding.recycler.setAdapter(adapter);
     }
 

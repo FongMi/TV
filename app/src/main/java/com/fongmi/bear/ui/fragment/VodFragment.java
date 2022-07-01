@@ -8,15 +8,21 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.leanback.widget.ArrayObjectAdapter;
+import androidx.leanback.widget.ItemBridgeAdapter;
+import androidx.leanback.widget.ListRow;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.fongmi.bear.bean.Filter;
+import com.fongmi.bear.bean.Vod;
 import com.fongmi.bear.databinding.FragmentVodBinding;
-import com.fongmi.bear.databinding.ViewFilterBinding;
 import com.fongmi.bear.model.SiteViewModel;
-import com.fongmi.bear.ui.adapter.FilterAdapter;
-import com.fongmi.bear.ui.adapter.VodAdapter;
+import com.fongmi.bear.ui.custom.CustomRowPresenter;
+import com.fongmi.bear.ui.custom.CustomSelector;
+import com.fongmi.bear.ui.presenter.FilterPresenter;
+import com.fongmi.bear.ui.presenter.VodPresenter;
 import com.fongmi.bear.utils.ResUtil;
+import com.fongmi.bear.utils.Utils;
 import com.google.gson.Gson;
 
 import java.util.HashMap;
@@ -26,7 +32,7 @@ public class VodFragment extends Fragment {
 
     private FragmentVodBinding mBinding;
     private SiteViewModel mSiteViewModel;
-    private VodAdapter mVodAdapter;
+    private ArrayObjectAdapter mAdapter;
 
     private String getTypeId() {
         return getArguments().getString("typeId");
@@ -61,35 +67,34 @@ public class VodFragment extends Fragment {
     }
 
     private void setRecyclerView() {
-        mBinding.recycler.setNumColumns(5);
-        mBinding.recycler.setItemSpacing(ResUtil.dp2px(12));
-        mBinding.recycler.setAdapter(mVodAdapter = new VodAdapter());
+        CustomSelector selector = new CustomSelector();
+        selector.addPresenter(ListRow.class, new CustomRowPresenter(16), VodPresenter.class);
+        selector.addPresenter(ListRow.class, new CustomRowPresenter(8), FilterPresenter.class);
+        ItemBridgeAdapter adapter = new ItemBridgeAdapter(mAdapter = new ArrayObjectAdapter(selector));
+        mBinding.recycler.setVerticalSpacing(ResUtil.dp2px(16));
+        mBinding.recycler.setAdapter(adapter);
     }
 
     private void setViewModel() {
         mSiteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mSiteViewModel.mResult.observe(getViewLifecycleOwner(), result -> {
-            mVodAdapter.addAll(result.getList());
-            mBinding.progress.showContent();
+            for (List<Vod> items : Utils.chunkList(result.getList(), 5)) {
+                ArrayObjectAdapter adapter = new ArrayObjectAdapter(new VodPresenter());
+                adapter.addAll(0, items);
+                mAdapter.add(new ListRow(adapter));
+            }
         });
-    }
-
-    private void getContent() {
-        mBinding.progress.showProgress();
-        mSiteViewModel.categoryContent(getTypeId(), "1", true, new HashMap<>());
     }
 
     private void setFilter() {
         for (Filter filter : Filter.arrayFrom(getFilter())) {
-            ViewFilterBinding binding = ViewFilterBinding.inflate(getLayoutInflater());
-            FilterAdapter adapter = new FilterAdapter(filter.getValue());
-            adapter.setOnItemClickListener(position -> {
-
-            });
-            binding.name.setText(filter.getName());
-            binding.recycler.setAdapter(adapter);
-            binding.recycler.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-            mBinding.filter.addView(binding.getRoot());
+            ArrayObjectAdapter adapter = new ArrayObjectAdapter(new FilterPresenter());
+            adapter.addAll(0, filter.getValue());
+            mAdapter.add(new ListRow(adapter));
         }
+    }
+
+    private void getContent() {
+        mSiteViewModel.categoryContent(getTypeId(), "1", true, new HashMap<>());
     }
 }

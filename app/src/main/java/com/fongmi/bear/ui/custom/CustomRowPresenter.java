@@ -1,4 +1,4 @@
-package com.fongmi.bear.ui.presenter;
+package com.fongmi.bear.ui.custom;
 
 import android.annotation.SuppressLint;
 
@@ -8,9 +8,12 @@ import androidx.leanback.widget.RowPresenter;
 
 import com.fongmi.bear.utils.ResUtil;
 
-public class VodRowPresenter extends ListRowPresenter {
+public class CustomRowPresenter extends ListRowPresenter {
 
-    public VodRowPresenter() {
+    private int spacing;
+
+    public CustomRowPresenter(int spacing) {
+        this.spacing = spacing;
         setShadowEnabled(false);
         setSelectEffectEnabled(false);
         setKeepChildForeground(false);
@@ -21,7 +24,7 @@ public class VodRowPresenter extends ListRowPresenter {
     protected void initializeRowViewHolder(RowPresenter.ViewHolder holder) {
         super.initializeRowViewHolder(holder);
         ViewHolder vh = (ViewHolder) holder;
-        vh.getGridView().setItemSpacing(ResUtil.dp2px(16));
+        vh.getGridView().setHorizontalSpacing(ResUtil.dp2px(spacing));
         vh.getGridView().setFocusScrollStrategy(HorizontalGridView.FOCUS_SCROLL_ITEM);
     }
 }

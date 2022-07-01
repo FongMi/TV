@@ -1,21 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.fongmi.bear.ui.custom.ProgressLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/progress"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-    <LinearLayout
-        android:id="@+id/filter"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
-        android:orientation="vertical" />
 
     <androidx.leanback.widget.VerticalGridView
         android:id="@+id/recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/filter"
-        android:nestedScrollingEnabled="false" />
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:paddingStart="24dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="24dp"
+        android:paddingBottom="24dp"
+        app:focusOutEnd="true"
+        app:focusOutFront="true" />
 
-</com.fongmi.bear.ui.custom.ProgressLayout>
+</FrameLayout>

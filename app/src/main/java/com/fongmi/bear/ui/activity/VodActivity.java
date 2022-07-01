@@ -2,21 +2,29 @@ package com.fongmi.bear.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.leanback.widget.ArrayObjectAdapter;
+import androidx.leanback.widget.ItemBridgeAdapter;
+import androidx.leanback.widget.OnChildViewHolderSelectedListener;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
+import androidx.viewpager.widget.ViewPager;
 
 import com.fongmi.bear.bean.Result;
 import com.fongmi.bear.databinding.ActivityVodBinding;
 import com.fongmi.bear.ui.adapter.PageAdapter;
-import com.fongmi.bear.ui.adapter.TypeAdapter;
+import com.fongmi.bear.ui.presenter.TypePresenter;
 import com.fongmi.bear.utils.ResUtil;
 
 public class VodActivity extends BaseActivity {
 
     private ActivityVodBinding mBinding;
-    private TypeAdapter mTypeAdapter;
     private Result mResult;
+    private View mOldView;
 
     private String getResult() {
         return getIntent().getStringExtra("result");
@@ -42,16 +50,30 @@ public class VodActivity extends BaseActivity {
 
     @Override
     protected void initEvent() {
-        mTypeAdapter.setOnItemClickListener(position -> {
-            mBinding.pager.setCurrentItem(position, false);
+        mBinding.pager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                mBinding.recycler.setSelectedPosition(position);
+            }
+        });
+        mBinding.recycler.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
+            @Override
+            public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
+                mBinding.pager.setCurrentItem(position);
+                if (mOldView != null) mOldView.setSelected(false);
+                mOldView = child.itemView;
+                mOldView.setSelected(true);
+            }
         });
     }
 
     private void setRecyclerView() {
-        mBinding.recycler.setNumRows(1);
-        mBinding.recycler.setHorizontalSpacing(ResUtil.dp2px(12));
+        mBinding.recycler.setHorizontalSpacing(ResUtil.dp2px(16));
         mBinding.recycler.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-        mBinding.recycler.setAdapter(mTypeAdapter = new TypeAdapter(mResult.getTypes()));
+        ArrayObjectAdapter arrayObjectAdapter = new ArrayObjectAdapter(new TypePresenter());
+        arrayObjectAdapter.addAll(0, mResult.getTypes());
+        ItemBridgeAdapter adapter = new ItemBridgeAdapter(arrayObjectAdapter);
+        mBinding.recycler.setAdapter(adapter);
     }
 
     private void setPager() {

@@ -1,19 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/name"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="@drawable/selector_type"
     android:focusable="true"
-    android:layout_margin="4dp"
-    android:focusableInTouchMode="true">
-
-    <TextView
-        android:id="@+id/name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/white"
-        android:textSize="16sp"
-        tools:text="電影" />
-
-</FrameLayout>
+    android:focusableInTouchMode="true"
+    android:textColor="@color/white"
+    android:textSize="16sp"
+    tools:text="電影" />
