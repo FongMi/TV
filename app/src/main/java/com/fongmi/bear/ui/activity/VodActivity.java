@@ -22,8 +22,8 @@ import com.fongmi.bear.utils.ResUtil;
 
 public class VodActivity extends BaseActivity {
 
-    private ActivityVodBinding mBinding;
     private TypePresenter mTypePresenter;
+    private ActivityVodBinding mBinding;
     private Result mResult;
     private View mOldView;
 

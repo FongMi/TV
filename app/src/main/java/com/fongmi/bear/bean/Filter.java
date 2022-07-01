@@ -64,5 +64,13 @@ public class Filter {
         public void setSelect(boolean select) {
             this.select = select;
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (!(obj instanceof Value)) return false;
+            Value it = (Value) obj;
+            return getV().equals(it.getV());
+        }
     }
 }

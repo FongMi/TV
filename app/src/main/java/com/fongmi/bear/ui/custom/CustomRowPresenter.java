@@ -10,7 +10,7 @@ import com.fongmi.bear.utils.ResUtil;
 
 public class CustomRowPresenter extends ListRowPresenter {
 
-    private int spacing;
+    private final int spacing;
 
     public CustomRowPresenter(int spacing) {
         this.spacing = spacing;

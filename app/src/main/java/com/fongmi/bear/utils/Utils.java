@@ -16,9 +16,6 @@ import com.fongmi.bear.App;
 import com.fongmi.bear.R;
 import com.google.android.exoplayer2.util.Util;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Utils {
 
     public static String getString(int resId) {
@@ -90,13 +87,5 @@ public class Utils {
 
     public static String getUserAgent() {
         return Util.getUserAgent(App.get(), App.get().getPackageName().concat(".").concat(getUUID()));
-    }
-
-    public static <T> List<List<T>> chunkList(List<T> list, int chunkSize) {
-        List<List<T>> chunkList = new ArrayList<>(list.size() / chunkSize);
-        for (int i = 0; i < list.size(); i += chunkSize) {
-            chunkList.add(list.subList(i, i + chunkSize >= list.size() ? list.size() - 1 : i + chunkSize));
-        }
-        return chunkList;
     }
 }

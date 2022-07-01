@@ -22,7 +22,7 @@ import com.fongmi.bear.ui.custom.CustomSelector;
 import com.fongmi.bear.ui.presenter.FilterPresenter;
 import com.fongmi.bear.ui.presenter.VodPresenter;
 import com.fongmi.bear.utils.ResUtil;
-import com.fongmi.bear.utils.Utils;
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 
 import java.util.HashMap;
@@ -30,9 +30,11 @@ import java.util.List;
 
 public class VodFragment extends Fragment {
 
+    private HashMap<String, String> mExtend;
     private FragmentVodBinding mBinding;
     private SiteViewModel mSiteViewModel;
     private ArrayObjectAdapter mAdapter;
+    private List<Filter> mFilters;
 
     private String getTypeId() {
         return getArguments().getString("typeId");
@@ -55,6 +57,8 @@ public class VodFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = FragmentVodBinding.inflate(inflater, container, false);
+        mFilters = Filter.arrayFrom(getFilter());
+        mExtend = new HashMap<>();
         return mBinding.getRoot();
     }
 
@@ -78,7 +82,7 @@ public class VodFragment extends Fragment {
     private void setViewModel() {
         mSiteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mSiteViewModel.mResult.observe(getViewLifecycleOwner(), result -> {
-            for (List<Vod> items : Utils.chunkList(result.getList(), 5)) {
+            for (List<Vod> items : Lists.partition(result.getList(), 5)) {
                 ArrayObjectAdapter adapter = new ArrayObjectAdapter(new VodPresenter());
                 adapter.addAll(0, items);
                 mAdapter.add(new ListRow(adapter));
@@ -87,14 +91,22 @@ public class VodFragment extends Fragment {
     }
 
     private void setFilter() {
-        for (Filter filter : Filter.arrayFrom(getFilter())) {
-            ArrayObjectAdapter adapter = new ArrayObjectAdapter(new FilterPresenter());
+        for (Filter filter : mFilters) {
+            FilterPresenter presenter = new FilterPresenter(filter.getKey());
+            ArrayObjectAdapter adapter = new ArrayObjectAdapter(presenter);
             adapter.addAll(0, filter.getValue());
             mAdapter.add(new ListRow(adapter));
+            presenter.setOnClickListener((view, key, item) -> {
+                if (mExtend.get(key) == null || !mExtend.get(key).equals(item.getV())) {
+                    mExtend.put(key, item.getV());
+                    getContent();
+                }
+            });
         }
     }
 
     private void getContent() {
-        mSiteViewModel.categoryContent(getTypeId(), "1", true, new HashMap<>());
+        if (mAdapter.size() > mFilters.size()) mAdapter.removeItems(mFilters.size(), mAdapter.size() - mFilters.size());
+        mSiteViewModel.categoryContent(getTypeId(), "1", true, mExtend);
     }
 }
