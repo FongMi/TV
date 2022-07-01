@@ -47,7 +47,7 @@ public class Filter {
         @SerializedName("v")
         private String v;
 
-        private boolean select;
+        private boolean activated;
 
         public String getN() {
             return n;
@@ -57,12 +57,12 @@ public class Filter {
             return v;
         }
 
-        public boolean isSelect() {
-            return select;
+        public boolean isActivated() {
+            return activated;
         }
 
-        public void setSelect(boolean select) {
-            this.select = select;
+        public void setActivated(Value item) {
+            this.activated = item.equals(this);
         }
 
         @Override

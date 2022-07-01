@@ -1,7 +1,6 @@
 package com.fongmi.bear.ui.presenter;
 
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -20,7 +19,7 @@ public class FilterPresenter extends Presenter {
     }
 
     public interface OnClickListener {
-        void onItemClick(View view, String key, Filter.Value item);
+        void onItemClick(String key, Filter.Value item);
     }
 
     public void setOnClickListener(OnClickListener listener) {
@@ -37,8 +36,8 @@ public class FilterPresenter extends Presenter {
         Filter.Value item = (Filter.Value) object;
         ViewHolder holder = (ViewHolder) viewHolder;
         holder.binding.name.setText(item.getN());
-        holder.binding.getRoot().setSelected(item.isSelect());
-        setOnClickListener(holder, view -> mListener.onItemClick(holder.binding.getRoot(), mKey, item));
+        holder.binding.name.setActivated(item.isActivated());
+        setOnClickListener(holder, view -> mListener.onItemClick(mKey, item));
     }
 
     @Override

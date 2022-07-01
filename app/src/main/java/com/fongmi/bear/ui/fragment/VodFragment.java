@@ -27,6 +27,7 @@ import com.google.gson.Gson;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class VodFragment extends Fragment {
 
@@ -94,19 +95,27 @@ public class VodFragment extends Fragment {
         for (Filter filter : mFilters) {
             FilterPresenter presenter = new FilterPresenter(filter.getKey());
             ArrayObjectAdapter adapter = new ArrayObjectAdapter(presenter);
+            presenter.setOnClickListener((key, item) -> setClick(adapter, key, item));
             adapter.addAll(0, filter.getValue());
             mAdapter.add(new ListRow(adapter));
-            presenter.setOnClickListener((view, key, item) -> {
-                if (mExtend.get(key) == null || !mExtend.get(key).equals(item.getV())) {
-                    mExtend.put(key, item.getV());
-                    getContent();
-                }
-            });
         }
     }
 
+    private void setClick(ArrayObjectAdapter adapter, String key, Filter.Value item) {
+        if (mExtend.get(key) != null && Objects.equals(mExtend.get(key), item.getV())) return;
+        for (int i = 0; i < adapter.size(); i++) ((Filter.Value) adapter.get(i)).setActivated(item);
+        adapter.notifyArrayItemRangeChanged(0, adapter.size());
+        mExtend.put(key, item.getV());
+        getContent();
+    }
+
     private void getContent() {
-        if (mAdapter.size() > mFilters.size()) mAdapter.removeItems(mFilters.size(), mAdapter.size() - mFilters.size());
-        mSiteViewModel.categoryContent(getTypeId(), "1", true, mExtend);
+        getContent("1");
+    }
+
+    private void getContent(String page) {
+        boolean clear = page.equals("1") && mAdapter.size() > mFilters.size();
+        if (clear) mAdapter.removeItems(mFilters.size(), mAdapter.size() - mFilters.size());
+        mSiteViewModel.categoryContent(getTypeId(), page, true, mExtend);
     }
 }

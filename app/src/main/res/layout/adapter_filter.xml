@@ -4,9 +4,9 @@
     android:id="@+id/name"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@drawable/selector_type"
+    android:background="@drawable/selector_filter"
     android:focusable="true"
     android:focusableInTouchMode="true"
     android:textColor="@color/white"
     android:textSize="16sp"
-    tools:text="電影" />
+    tools:text="全部" />
