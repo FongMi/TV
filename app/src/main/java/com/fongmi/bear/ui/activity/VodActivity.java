@@ -23,6 +23,7 @@ import com.fongmi.bear.utils.ResUtil;
 public class VodActivity extends BaseActivity {
 
     private ActivityVodBinding mBinding;
+    private TypePresenter mTypePresenter;
     private Result mResult;
     private View mOldView;
 
@@ -50,6 +51,7 @@ public class VodActivity extends BaseActivity {
 
     @Override
     protected void initEvent() {
+        mTypePresenter.setOnClickListener((item) -> mBinding.pager.setCurrentItem(mResult.getTypes().indexOf(item)));
         mBinding.pager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
@@ -70,7 +72,7 @@ public class VodActivity extends BaseActivity {
     private void setRecyclerView() {
         mBinding.recycler.setHorizontalSpacing(ResUtil.dp2px(16));
         mBinding.recycler.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-        ArrayObjectAdapter arrayObjectAdapter = new ArrayObjectAdapter(new TypePresenter());
+        ArrayObjectAdapter arrayObjectAdapter = new ArrayObjectAdapter(mTypePresenter = new TypePresenter());
         arrayObjectAdapter.addAll(0, mResult.getTypes());
         ItemBridgeAdapter adapter = new ItemBridgeAdapter(arrayObjectAdapter);
         mBinding.recycler.setAdapter(adapter);

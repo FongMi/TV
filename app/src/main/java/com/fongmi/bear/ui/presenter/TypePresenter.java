@@ -11,6 +11,16 @@ import com.fongmi.bear.databinding.AdapterTypeBinding;
 
 public class TypePresenter extends Presenter {
 
+    private OnClickListener mListener;
+
+    public interface OnClickListener {
+        void onItemClick(Class item);
+    }
+
+    public void setOnClickListener(OnClickListener listener) {
+        this.mListener = listener;
+    }
+
     @Override
     public Presenter.ViewHolder onCreateViewHolder(ViewGroup parent) {
         return new ViewHolder(AdapterTypeBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
@@ -21,6 +31,7 @@ public class TypePresenter extends Presenter {
         Class item = (Class) object;
         ViewHolder holder = (ViewHolder) viewHolder;
         holder.binding.name.setText(item.getTypeName());
+        setOnClickListener(holder, view -> mListener.onItemClick(item));
     }
 
     @Override
