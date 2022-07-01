@@ -19,7 +19,9 @@ import com.fongmi.bear.databinding.FragmentVodBinding;
 import com.fongmi.bear.model.SiteViewModel;
 import com.fongmi.bear.ui.custom.CustomRowPresenter;
 import com.fongmi.bear.ui.custom.CustomSelector;
+import com.fongmi.bear.ui.custom.Scroller;
 import com.fongmi.bear.ui.presenter.FilterPresenter;
+import com.fongmi.bear.ui.presenter.ProgressPresenter;
 import com.fongmi.bear.ui.presenter.VodPresenter;
 import com.fongmi.bear.utils.ResUtil;
 import com.google.common.collect.Lists;
@@ -29,13 +31,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
-public class VodFragment extends Fragment {
+public class VodFragment extends Fragment implements Scroller.Callback {
 
     private HashMap<String, String> mExtend;
     private FragmentVodBinding mBinding;
     private SiteViewModel mSiteViewModel;
     private ArrayObjectAdapter mAdapter;
     private List<Filter> mFilters;
+    private Scroller mScroller;
 
     private String getTypeId() {
         return getArguments().getString("typeId");
@@ -73,9 +76,11 @@ public class VodFragment extends Fragment {
 
     private void setRecyclerView() {
         CustomSelector selector = new CustomSelector();
+        selector.addPresenter(String.class, new ProgressPresenter());
         selector.addPresenter(ListRow.class, new CustomRowPresenter(16), VodPresenter.class);
         selector.addPresenter(ListRow.class, new CustomRowPresenter(8), FilterPresenter.class);
         ItemBridgeAdapter adapter = new ItemBridgeAdapter(mAdapter = new ArrayObjectAdapter(selector));
+        mBinding.recycler.addOnScrollListener(mScroller = new Scroller(this));
         mBinding.recycler.setVerticalSpacing(ResUtil.dp2px(16));
         mBinding.recycler.setAdapter(adapter);
     }
@@ -83,6 +88,8 @@ public class VodFragment extends Fragment {
     private void setViewModel() {
         mSiteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mSiteViewModel.mResult.observe(getViewLifecycleOwner(), result -> {
+            mAdapter.remove("progress");
+            mScroller.endLoading(result.getList().isEmpty());
             for (List<Vod> items : Lists.partition(result.getList(), 5)) {
                 ArrayObjectAdapter adapter = new ArrayObjectAdapter(new VodPresenter());
                 adapter.addAll(0, items);
@@ -110,6 +117,7 @@ public class VodFragment extends Fragment {
     }
 
     private void getContent() {
+        mScroller.reset();
         getContent("1");
     }
 
@@ -117,5 +125,11 @@ public class VodFragment extends Fragment {
         boolean clear = page.equals("1") && mAdapter.size() > mFilters.size();
         if (clear) mAdapter.removeItems(mFilters.size(), mAdapter.size() - mFilters.size());
         mSiteViewModel.categoryContent(getTypeId(), page, true, mExtend);
+    }
+
+    @Override
+    public void onLoadMore(String page) {
+        mAdapter.add("progress");
+        getContent(page);
     }
 }

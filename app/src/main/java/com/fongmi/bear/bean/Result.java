@@ -20,6 +20,8 @@ import java.util.List;
 
 public class Result {
 
+    @SerializedName("page")
+    private String page;
     @SerializedName("class")
     private List<Class> types;
     @SerializedName("list")
@@ -37,6 +39,10 @@ public class Result {
             e.printStackTrace();
             return new Result();
         }
+    }
+
+    public String getPage() {
+        return page;
     }
 
     public List<Class> getTypes() {
