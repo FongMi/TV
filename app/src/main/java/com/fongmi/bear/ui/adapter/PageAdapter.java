@@ -13,7 +13,7 @@ public class PageAdapter extends FragmentStatePagerAdapter {
     private final Result result;
 
     public PageAdapter(@NonNull FragmentManager fm, Result result) {
-        super(fm);
+        super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         this.result = result;
     }
 
