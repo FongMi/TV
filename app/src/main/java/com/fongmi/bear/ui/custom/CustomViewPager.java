@@ -33,8 +33,18 @@ public class CustomViewPager extends ViewPager {
     }
 
     private void init() {
-        rect = new Rect();
-        shake = AnimationUtils.loadAnimation(getContext(), R.anim.shake);
+        this.rect = new Rect();
+        this.shake = AnimationUtils.loadAnimation(getContext(), R.anim.shake);
+        setPageTransformer(false, (page, position) -> {
+            page.setTranslationX(page.getWidth() * -position);
+            if (position <= -1.0F || position >= 1.0F) {
+                page.setAlpha(0.0F);
+            } else if (position == 0.0F) {
+                page.setAlpha(1.0F);
+            } else {
+                page.setAlpha(1.0F - Math.abs(position));
+            }
+        });
     }
 
     @Override
