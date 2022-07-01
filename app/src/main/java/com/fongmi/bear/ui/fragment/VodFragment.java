@@ -69,8 +69,8 @@ public class VodFragment extends Fragment implements Scroller.Callback {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         setRecyclerView();
         setViewModel();
-        getContent();
         setFilter();
+        getVideo();
     }
 
     private void setRecyclerView() {
@@ -111,23 +111,23 @@ public class VodFragment extends Fragment implements Scroller.Callback {
         for (int i = 0; i < adapter.size(); i++) ((Filter.Value) adapter.get(i)).setActivated(item);
         adapter.notifyArrayItemRangeChanged(0, adapter.size());
         mExtend.put(key, item.getV());
-        getContent();
+        getVideo();
     }
 
-    private void getContent() {
+    private void getVideo() {
         mScroller.reset();
-        getContent("1");
+        getVideo("1");
     }
 
-    private void getContent(String page) {
+    private void getVideo(String page) {
         boolean clear = page.equals("1") && mAdapter.size() > mFilters.size();
         if (clear) mAdapter.removeItems(mFilters.size(), mAdapter.size() - mFilters.size());
         mSiteViewModel.categoryContent(getTypeId(), page, true, mExtend);
+        mAdapter.add("progress");
     }
 
     @Override
     public void onLoadMore(String page) {
-        mAdapter.add("progress");
-        getContent(page);
+        getVideo(page);
     }
 }

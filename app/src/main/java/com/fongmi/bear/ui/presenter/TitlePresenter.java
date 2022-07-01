@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.leanback.widget.Presenter;
 
 import com.fongmi.bear.databinding.AdapterTitleBinding;
+import com.fongmi.bear.utils.ResUtil;
 
 public class TitlePresenter extends Presenter {
 
@@ -18,7 +19,7 @@ public class TitlePresenter extends Presenter {
     @Override
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object object) {
         TitlePresenter.ViewHolder holder = (TitlePresenter.ViewHolder) viewHolder;
-        holder.binding.header.setText(object.toString());
+        holder.binding.header.setText(ResUtil.getString((int) object));
     }
 
     @Override
