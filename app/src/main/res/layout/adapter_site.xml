@@ -1,22 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/name"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="6dp"
-    android:layout_marginBottom="6dp"
     android:background="@drawable/selector_site"
     android:focusable="true"
-    android:focusableInTouchMode="true">
-
-    <TextView
-        android:id="@+id/name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:singleLine="true"
-        android:textColor="@color/white"
-        android:textSize="18sp"
-        tools:text="泥巴影院" />
-
-</LinearLayout>
+    android:focusableInTouchMode="true"
+    android:gravity="center"
+    android:singleLine="true"
+    android:textColor="@color/white"
+    android:textSize="18sp"
+    tools:text="泥巴影院" />

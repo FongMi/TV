@@ -18,8 +18,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class Notify {
 
+    private AlertDialog mDialog;
     private Toast mToast;
-    private AlertDialog mProgress;
 
     private static class Loader {
         static volatile Notify INSTANCE = new Notify();
@@ -38,13 +38,13 @@ public class Notify {
     }
 
     public static void show(Context context, View view) {
-        AlertDialog dialog = new MaterialAlertDialogBuilder(context).setView(view).create();
-        dialog.getWindow().setDimAmount(0);
+        get().mDialog = new MaterialAlertDialogBuilder(context).setView(view).create();
+        get().mDialog.getWindow().setDimAmount(0);
         DisplayMetrics metrics = ResUtil.getDisplayMetrics();
-        WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
-        params.width = (int) (metrics.widthPixels * 0.4f);
-        dialog.getWindow().setAttributes(params);
-        dialog.show();
+        WindowManager.LayoutParams params = get().mDialog.getWindow().getAttributes();
+        params.width = (int) (metrics.widthPixels * 0.3f);
+        get().mDialog.getWindow().setAttributes(params);
+        get().mDialog.show();
     }
 
     public static AlertDialog show(Context context, View view, DialogInterface.OnClickListener listener) {
@@ -56,13 +56,13 @@ public class Notify {
 
     public static void progress(Context context) {
         ViewProgressBinding binding = ViewProgressBinding.inflate(LayoutInflater.from(context));
-        get().mProgress = new MaterialAlertDialogBuilder(context).setView(binding.getRoot()).create();
-        get().mProgress.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-        get().mProgress.show();
+        get().mDialog = new MaterialAlertDialogBuilder(context).setView(binding.getRoot()).create();
+        get().mDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        get().mDialog.show();
     }
 
     public static void dismiss() {
-        if (get().mProgress != null && get().mProgress.isShowing()) get().mProgress.dismiss();
+        if (get().mDialog != null && get().mDialog.isShowing()) get().mDialog.dismiss();
     }
 
     private void makeText(String message) {

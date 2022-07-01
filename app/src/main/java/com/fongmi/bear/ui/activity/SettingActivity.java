@@ -8,7 +8,8 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.leanback.widget.ArrayObjectAdapter;
+import androidx.leanback.widget.ItemBridgeAdapter;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.bear.ApiConfig;
@@ -17,14 +18,14 @@ import com.fongmi.bear.databinding.ActivitySettingBinding;
 import com.fongmi.bear.databinding.DialogConfigBinding;
 import com.fongmi.bear.databinding.DialogSiteBinding;
 import com.fongmi.bear.net.Callback;
-import com.fongmi.bear.ui.adapter.SiteAdapter;
+import com.fongmi.bear.ui.presenter.SitePresenter;
 import com.fongmi.bear.utils.Notify;
 import com.fongmi.bear.utils.Prefers;
+import com.fongmi.bear.utils.ResUtil;
 
 public class SettingActivity extends BaseActivity {
 
     private ActivitySettingBinding mBinding;
-    private SiteAdapter mAdapter;
 
     public static void start(Activity activity) {
         activity.startActivityForResult(new Intent(activity, SettingActivity.class), 1000);
@@ -39,14 +40,12 @@ public class SettingActivity extends BaseActivity {
     protected void initView() {
         mBinding.home.setText(ApiConfig.get().getHome().getName());
         mBinding.url.setText(Prefers.getUrl());
-        mAdapter = new SiteAdapter();
     }
 
     @Override
     protected void initEvent() {
         mBinding.config.setOnClickListener(this::showConfig);
         mBinding.site.setOnClickListener(this::showSite);
-        mAdapter.setOnItemClickListener(this::onSiteClick);
     }
 
     private void showConfig(View view) {
@@ -85,18 +84,22 @@ public class SettingActivity extends BaseActivity {
         if (ApiConfig.get().getSites().isEmpty()) return;
         int position = ApiConfig.get().getSites().indexOf(ApiConfig.get().getHome());
         DialogSiteBinding bindingDialog = DialogSiteBinding.inflate(LayoutInflater.from(this));
-        bindingDialog.site.setLayoutManager(new LinearLayoutManager(this));
-        bindingDialog.site.getItemAnimator().setChangeDuration(0);
-        bindingDialog.site.setHasFixedSize(true);
-        bindingDialog.site.setAdapter(mAdapter);
-        mAdapter.addAll(ApiConfig.get().getSites());
-        bindingDialog.site.scrollToPosition(position);
+        SitePresenter presenter = new SitePresenter();
+        ArrayObjectAdapter adapter = new ArrayObjectAdapter(presenter);
+        adapter.addAll(0, ApiConfig.get().getSites());
+        presenter.setOnClickListener(item -> setSite(adapter, item));
+        bindingDialog.recycler.setVerticalSpacing(ResUtil.dp2px(16));
+        bindingDialog.recycler.setAdapter(new ItemBridgeAdapter(adapter));
+        bindingDialog.recycler.scrollToPosition(position);
         Notify.show(this, bindingDialog.getRoot());
     }
 
-    public void onSiteClick(Site item) {
+    public void setSite(ArrayObjectAdapter adapter, Site item) {
+        for (int i = 0; i < adapter.size(); i++) ((Site) adapter.get(i)).setActivated(item);
+        adapter.notifyArrayItemRangeChanged(0, adapter.size());
         mBinding.home.setText(item.getName());
         ApiConfig.get().setHome(item);
         setResult(RESULT_OK);
+        Notify.dismiss();
     }
 }
