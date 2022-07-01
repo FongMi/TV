@@ -9,11 +9,17 @@ import androidx.leanback.widget.Presenter;
 import com.fongmi.bear.bean.Func;
 import com.fongmi.bear.bean.Vod;
 import com.fongmi.bear.databinding.AdapterVodBinding;
+import com.fongmi.bear.utils.ResUtil;
 import com.fongmi.bear.utils.Utils;
 
 public class VodPresenter extends Presenter {
 
     private OnClickListener mListener;
+    private final int mCount;
+
+    public VodPresenter(int count) {
+        mCount = count;
+    }
 
     public interface OnClickListener {
         void onItemClick(Func item);
@@ -25,7 +31,10 @@ public class VodPresenter extends Presenter {
 
     @Override
     public Presenter.ViewHolder onCreateViewHolder(ViewGroup parent) {
-        return new ViewHolder(AdapterVodBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        ViewHolder holder = new ViewHolder(AdapterVodBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        holder.binding.getRoot().getLayoutParams().width = ResUtil.dp2px(mCount == 5 ? 150 : 144);
+        holder.binding.getRoot().getLayoutParams().height = ResUtil.dp2px(mCount == 5 ? 200 : 192);
+        return holder;
     }
 
     @Override

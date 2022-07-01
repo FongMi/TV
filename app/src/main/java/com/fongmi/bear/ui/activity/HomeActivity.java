@@ -22,7 +22,6 @@ import com.fongmi.bear.ui.presenter.FuncPresenter;
 import com.fongmi.bear.ui.presenter.TitlePresenter;
 import com.fongmi.bear.ui.presenter.VodPresenter;
 import com.fongmi.bear.utils.ResUtil;
-import com.google.common.collect.Lists;
 
 import java.util.List;
 
@@ -68,8 +67,8 @@ public class HomeActivity extends BaseActivity {
     private void setViewModel() {
         mSiteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mSiteViewModel.mResult.observe(this, result -> {
-            for (List<Vod> items : Lists.partition(result.getList(), 5)) {
-                ArrayObjectAdapter adapter = new ArrayObjectAdapter(new VodPresenter());
+            for (List<Vod> items : result.partition()) {
+                ArrayObjectAdapter adapter = new ArrayObjectAdapter(new VodPresenter(items.size()));
                 adapter.addAll(0, items);
                 mAdapter.add(new ListRow(adapter));
             }

@@ -2,6 +2,7 @@ package com.fongmi.bear.bean;
 
 import androidx.annotation.NonNull;
 
+import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
@@ -61,6 +62,17 @@ public class Result {
         return filters == null ? new LinkedHashMap<>() : filters;
     }
 
+    public List<List<Vod>> partition() {
+        if (getList().size() % 6 == 0) return Lists.partition(getList(), 6);
+        else return Lists.partition(getList(), 5);
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return new Gson().toJson(this);
+    }
+
     static class FiltersAdapter implements JsonDeserializer<LinkedHashMap<String, List<Filter>>> {
 
         @Override
@@ -77,11 +89,5 @@ public class Result {
             }
             return filterMap;
         }
-    }
-
-    @NonNull
-    @Override
-    public String toString() {
-        return new Gson().toJson(this);
     }
 }

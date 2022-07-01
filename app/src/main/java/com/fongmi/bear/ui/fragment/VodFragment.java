@@ -24,7 +24,6 @@ import com.fongmi.bear.ui.presenter.FilterPresenter;
 import com.fongmi.bear.ui.presenter.ProgressPresenter;
 import com.fongmi.bear.ui.presenter.VodPresenter;
 import com.fongmi.bear.utils.ResUtil;
-import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 
 import java.util.HashMap;
@@ -89,8 +88,8 @@ public class VodFragment extends Fragment implements Scroller.Callback {
         mSiteViewModel.mResult.observe(getViewLifecycleOwner(), result -> {
             mAdapter.remove("progress");
             mScroller.endLoading(result.getList().isEmpty());
-            for (List<Vod> items : Lists.partition(result.getList(), 5)) {
-                ArrayObjectAdapter adapter = new ArrayObjectAdapter(new VodPresenter());
+            for (List<Vod> items : result.partition()) {
+                ArrayObjectAdapter adapter = new ArrayObjectAdapter(new VodPresenter(items.size()));
                 adapter.addAll(0, items);
                 mAdapter.add(new ListRow(adapter));
             }

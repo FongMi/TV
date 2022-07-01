@@ -89,8 +89,7 @@ public class CustomHorizontalGridView extends HorizontalGridView {
             currentFocused = null;
         } else if (currentFocused != null) {
             boolean isChild = false;
-            for (ViewParent parent = currentFocused.getParent(); parent instanceof ViewGroup;
-                 parent = parent.getParent()) {
+            for (ViewParent parent = currentFocused.getParent(); parent instanceof ViewGroup; parent = parent.getParent()) {
                 if (parent == this) {
                     isChild = true;
                     break;
