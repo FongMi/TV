@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.fongmi.bear.ui.custom.ProgressLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/progress"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="24dp">
+    android:layout_height="match_parent">
 
     <com.google.android.exoplayer2.ui.StyledPlayerView
         android:id="@+id/video"
         android:layout_width="400dp"
         android:layout_height="225dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="12dp"
         android:focusable="true"
         android:focusableInTouchMode="true" />
 
@@ -18,7 +21,8 @@
         android:id="@+id/name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="24dp"
         android:layout_toEndOf="@+id/video"
         android:singleLine="true"
         android:textColor="@color/white"
@@ -32,6 +36,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/name"
         android:layout_alignStart="@+id/name"
+        android:layout_marginEnd="24dp"
         android:layout_toEndOf="@+id/video"
         android:orientation="horizontal">
 
@@ -64,6 +69,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/row1"
         android:layout_alignStart="@+id/name"
+        android:layout_marginEnd="24dp"
         android:layout_toEndOf="@+id/video"
         android:orientation="horizontal">
 
@@ -97,6 +103,7 @@
         android:layout_below="@+id/row2"
         android:layout_alignStart="@+id/name"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="24dp"
         android:layout_toEndOf="@+id/video"
         android:singleLine="true"
         android:textColor="@color/white"
@@ -110,6 +117,7 @@
         android:layout_below="@+id/director"
         android:layout_alignStart="@+id/name"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="24dp"
         android:layout_toEndOf="@+id/video"
         android:singleLine="true"
         android:textColor="@color/white"
@@ -118,17 +126,54 @@
 
     <TextView
         android:id="@+id/content"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/actor"
         android:layout_alignStart="@+id/name"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="24dp"
         android:layout_toEndOf="@+id/video"
         android:ellipsize="end"
         android:lineSpacingExtra="4dp"
-        android:maxLines="2"
+        android:maxLines="3"
         android:textColor="@color/white"
         android:textSize="16sp"
         tools:text="簡介：" />
+
+    <androidx.leanback.widget.HorizontalGridView
+        android:id="@+id/from"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/video"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:paddingStart="24dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="24dp"
+        android:paddingBottom="16dp"
+        app:focusOutEnd="true"
+        app:focusOutFront="true" />
+
+    <androidx.leanback.widget.HorizontalGridView
+        android:id="@+id/episode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/from"
+        android:layout_marginTop="16dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        app:focusOutEnd="true"
+        app:focusOutFront="true" />
+
+    <androidx.leanback.widget.HorizontalGridView
+        android:id="@+id/group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/episode"
+        android:layout_marginTop="16dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        app:focusOutEnd="true"
+        app:focusOutFront="true" />
 
 </com.fongmi.bear.ui.custom.ProgressLayout>

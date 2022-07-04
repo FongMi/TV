@@ -11,6 +11,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.leanback.widget.ArrayObjectAdapter;
+import androidx.leanback.widget.FocusHighlight;
+import androidx.leanback.widget.FocusHighlightHelper;
 import androidx.leanback.widget.ItemBridgeAdapter;
 import androidx.leanback.widget.OnChildViewHolderSelectedListener;
 import androidx.recyclerview.widget.RecyclerView;
@@ -65,9 +67,9 @@ public class VodActivity extends BaseActivity {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
                 mBinding.pager.setCurrentItem(position);
-                if (mOldView != null) mOldView.setSelected(false);
+                if (mOldView != null) mOldView.setActivated(false);
                 mOldView = child.itemView;
-                mOldView.setSelected(true);
+                mOldView.setActivated(true);
             }
         });
     }
@@ -77,7 +79,9 @@ public class VodActivity extends BaseActivity {
         mBinding.recycler.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         ArrayObjectAdapter adapter = new ArrayObjectAdapter(mTypePresenter = new TypePresenter());
         adapter.addAll(0, mResult.getTypes());
-        mBinding.recycler.setAdapter(new ItemBridgeAdapter(adapter));
+        ItemBridgeAdapter bridgeAdapter = new ItemBridgeAdapter(adapter);
+        mBinding.recycler.setAdapter(bridgeAdapter);
+        FocusHighlightHelper.setupBrowseItemFocusHighlight(bridgeAdapter, FocusHighlight.ZOOM_FACTOR_MEDIUM, false);
     }
 
     private void setPager() {

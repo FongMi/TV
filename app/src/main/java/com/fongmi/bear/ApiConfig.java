@@ -34,6 +34,7 @@ import okhttp3.Response;
 public class ApiConfig {
 
     private final JarLoader jarLoader;
+    private final List<String> flags;
     private final List<Parse> parses;
     private final List<Live> lives;
     private final List<Site> sites;
@@ -51,6 +52,7 @@ public class ApiConfig {
 
     public ApiConfig() {
         this.sites = new ArrayList<>();
+        this.flags = new ArrayList<>();
         this.parses = new ArrayList<>();
         this.lives = new ArrayList<>();
         this.jarLoader = new JarLoader();
@@ -59,6 +61,7 @@ public class ApiConfig {
 
     private void clear() {
         this.sites.clear();
+        this.flags.clear();
         this.parses.clear();
         this.lives.clear();
         this.home = null;
@@ -109,6 +112,7 @@ public class ApiConfig {
         if (home == null) {
             setHome(sites.isEmpty() ? new Site() : sites.get(0));
         }
+        flags.addAll(Json.safeList(object, "flags"));
     }
 
     private void loadJar(String spider) throws IOException {
@@ -140,6 +144,10 @@ public class ApiConfig {
 
     public List<Site> getSites() {
         return sites;
+    }
+
+    public List<String> getFlags() {
+        return flags;
     }
 
     public Site getHome() {

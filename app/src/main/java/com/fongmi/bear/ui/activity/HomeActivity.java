@@ -26,7 +26,7 @@ import com.fongmi.bear.utils.ResUtil;
 
 import java.util.List;
 
-public class HomeActivity extends BaseActivity {
+public class HomeActivity extends BaseActivity implements VodPresenter.OnClickListener {
 
     private ActivityHomeBinding mBinding;
     private SiteViewModel mSiteViewModel;
@@ -71,7 +71,9 @@ public class HomeActivity extends BaseActivity {
         mSiteViewModel.mResult.observe(this, result -> {
             mAdapter.remove("progress");
             for (List<Vod> items : result.partition()) {
-                ArrayObjectAdapter adapter = new ArrayObjectAdapter(new VodPresenter(items.size()));
+                VodPresenter presenter = new VodPresenter(items.size());
+                ArrayObjectAdapter adapter = new ArrayObjectAdapter(presenter);
+                presenter.setOnClickListener(this);
                 adapter.addAll(0, items);
                 mAdapter.add(new ListRow(adapter));
             }
@@ -111,6 +113,11 @@ public class HomeActivity extends BaseActivity {
                 SettingActivity.start(this);
                 break;
         }
+    }
+
+    @Override
+    public void onItemClick(Vod item) {
+        DetailActivity.start(getActivity(), item.getVodId());
     }
 
     @Override

@@ -72,6 +72,16 @@ public class SiteViewModel extends ViewModel {
         });
     }
 
+    public void playerContent(String flag, String id) {
+        Site home = ApiConfig.get().getHome();
+        postResult(() -> {
+            Spider spider = ApiConfig.get().getCSP(home);
+            String playerContent = spider.playerContent(flag, id, ApiConfig.get().getFlags());
+            SpiderDebug.json(playerContent);
+            return Result.objectFrom(playerContent);
+        });
+    }
+
     private void postResult(Callable<Result> callable) {
         mService.execute(() -> {
             try {

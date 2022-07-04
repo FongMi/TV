@@ -74,7 +74,7 @@ public class Vod {
     }
 
     public String getVodContent() {
-        return TextUtils.isEmpty(vodContent) ? "" : vodContent;
+        return TextUtils.isEmpty(vodContent) ? "" : vodContent.replaceAll("\\s+","");
     }
 
     public String getVodPlayFrom() {

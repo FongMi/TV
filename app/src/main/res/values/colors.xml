@@ -11,6 +11,7 @@
     <color name="grey_900">#212121</color>
     <color name="green_400">#66BB6A</color>
     <color name="transparent">#00000000</color>
+    <color name="black_10">#1A000000</color>
     <color name="black_20">#33000000</color>
     <color name="black_30">#4D000000</color>
     <color name="black_40">#66000000</color>

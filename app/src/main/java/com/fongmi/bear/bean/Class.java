@@ -9,22 +9,12 @@ public class Class {
     @SerializedName("type_name")
     private String typeName;
 
-    private boolean select;
-
     public String getTypeId() {
         return typeId;
     }
 
     public String getTypeName() {
         return typeName;
-    }
-
-    public boolean isSelect() {
-        return select;
-    }
-
-    public void setSelect(boolean select) {
-        this.select = select;
     }
 
     @Override
