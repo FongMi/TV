@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
 
     <!-- App -->
     <string name="app_name">熊愛影視</string>
@@ -14,6 +14,15 @@
     <string name="home_setting">設定</string>
     <string name="home_recent">最近觀看</string>
     <string name="home_recommend">更新推薦</string>
+
+    <!-- Detail -->
+    <string name="detail_site">站源：<xliff:g name="name">%s</xliff:g></string>
+    <string name="detail_year">年份：<xliff:g name="name">%s</xliff:g></string>
+    <string name="detail_area">地區：<xliff:g name="name">%s</xliff:g></string>
+    <string name="detail_type">類型：<xliff:g name="name">%s</xliff:g></string>
+    <string name="detail_director">導演：<xliff:g name="name">%s</xliff:g></string>
+    <string name="detail_actor">演員：<xliff:g name="name">%s</xliff:g></string>
+    <string name="detail_content">簡介：<xliff:g name="name">%s</xliff:g></string>
 
     <!-- Setting -->
     <string name="setting_site">首頁</string>

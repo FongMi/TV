@@ -6,7 +6,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.leanback.widget.Presenter;
 
-import com.fongmi.bear.bean.Func;
 import com.fongmi.bear.bean.Vod;
 import com.fongmi.bear.databinding.AdapterVodBinding;
 import com.fongmi.bear.utils.ResUtil;
@@ -22,7 +21,7 @@ public class VodPresenter extends Presenter {
     }
 
     public interface OnClickListener {
-        void onItemClick(Func item);
+        void onItemClick(Vod item);
     }
 
     public void setOnClickListener(OnClickListener listener) {
@@ -45,6 +44,7 @@ public class VodPresenter extends Presenter {
         holder.binding.remark.setText(item.getVodRemarks());
         holder.binding.remark.setVisibility(item.getRemarkVisible());
         Utils.loadImage(item.getVodPic(), holder.binding.image);
+        setOnClickListener(holder, view -> mListener.onItemClick(item));
     }
 
     @Override

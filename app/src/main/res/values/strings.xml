@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
 
     <!-- App -->
     <string name="app_name">BearTV</string>
@@ -14,6 +14,15 @@
     <string name="home_setting">Setting</string>
     <string name="home_recent">Recent</string>
     <string name="home_recommend">Recommend</string>
+
+    <!-- Detail -->
+    <string name="detail_site">Site: <xliff:g name="name">%s</xliff:g></string>
+    <string name="detail_year">Year: <xliff:g name="name">%s</xliff:g></string>
+    <string name="detail_area">Area: <xliff:g name="name">%s</xliff:g></string>
+    <string name="detail_type">Type: <xliff:g name="name">%s</xliff:g></string>
+    <string name="detail_director">Director: <xliff:g name="name">%s</xliff:g></string>
+    <string name="detail_actor">Actor: <xliff:g name="name">%s</xliff:g></string>
+    <string name="detail_content">Summary: <xliff:g name="name">%s</xliff:g></string>
 
     <!-- Setting -->
     <string name="setting_site">Home site</string>

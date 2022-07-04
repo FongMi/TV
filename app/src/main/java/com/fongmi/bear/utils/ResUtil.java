@@ -19,4 +19,8 @@ public class ResUtil {
     public static String getString(@StringRes int resId) {
         return App.get().getString(resId);
     }
+
+    public static String getString(@StringRes int resId, Object... formatArgs) {
+        return App.get().getString(resId, formatArgs);
+    }
 }

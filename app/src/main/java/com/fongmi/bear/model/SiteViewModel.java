@@ -12,6 +12,7 @@ import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderDebug;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -58,6 +59,16 @@ public class SiteViewModel extends ViewModel {
             String categoryContent = spider.categoryContent(tid, page, filter, extend);
             SpiderDebug.json(categoryContent);
             return Result.objectFrom(categoryContent);
+        });
+    }
+
+    public void detailContent(String id) {
+        Site home = ApiConfig.get().getHome();
+        postResult(() -> {
+            Spider spider = ApiConfig.get().getCSP(home);
+            String detailContent = spider.detailContent(List.of(id));
+            SpiderDebug.json(detailContent);
+            return Result.objectFrom(detailContent);
         });
     }
 

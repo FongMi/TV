@@ -17,6 +17,7 @@ import com.fongmi.bear.bean.Filter;
 import com.fongmi.bear.bean.Vod;
 import com.fongmi.bear.databinding.FragmentVodBinding;
 import com.fongmi.bear.model.SiteViewModel;
+import com.fongmi.bear.ui.activity.DetailActivity;
 import com.fongmi.bear.ui.custom.CustomRowPresenter;
 import com.fongmi.bear.ui.custom.CustomSelector;
 import com.fongmi.bear.ui.custom.Scroller;
@@ -30,7 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
-public class VodFragment extends Fragment implements Scroller.Callback {
+public class VodFragment extends Fragment implements Scroller.Callback, VodPresenter.OnClickListener {
 
     private HashMap<String, String> mExtend;
     private FragmentVodBinding mBinding;
@@ -89,7 +90,9 @@ public class VodFragment extends Fragment implements Scroller.Callback {
             mAdapter.remove("progress");
             mScroller.endLoading(result.getList().isEmpty());
             for (List<Vod> items : result.partition()) {
-                ArrayObjectAdapter adapter = new ArrayObjectAdapter(new VodPresenter(items.size()));
+                VodPresenter presenter = new VodPresenter(items.size());
+                ArrayObjectAdapter adapter = new ArrayObjectAdapter(presenter);
+                presenter.setOnClickListener(this);
                 adapter.addAll(0, items);
                 mAdapter.add(new ListRow(adapter));
             }
@@ -124,6 +127,11 @@ public class VodFragment extends Fragment implements Scroller.Callback {
         if (clear) mAdapter.removeItems(mFilters.size(), mAdapter.size() - mFilters.size());
         mSiteViewModel.categoryContent(getTypeId(), page, true, mExtend);
         mAdapter.add("progress");
+    }
+
+    @Override
+    public void onItemClick(Vod item) {
+        DetailActivity.start(getActivity(), item.getVodId());
     }
 
     @Override
