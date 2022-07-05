@@ -144,6 +144,7 @@ public class VodFragment extends Fragment implements Scroller.Callback, VodPrese
     @Override
     public void onResume() {
         super.onResume();
+        //TODO NEED FIX BUG
         mBinding.recycler.moveToTop();
     }
 }

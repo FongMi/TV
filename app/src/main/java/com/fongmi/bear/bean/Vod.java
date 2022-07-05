@@ -6,6 +6,9 @@ import android.view.View;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Vod {
 
     @SerializedName("vod_id")
@@ -74,7 +77,7 @@ public class Vod {
     }
 
     public String getVodContent() {
-        return TextUtils.isEmpty(vodContent) ? "" : vodContent.replaceAll("\\s+","");
+        return TextUtils.isEmpty(vodContent) ? "" : vodContent.replaceAll("\\s+", "");
     }
 
     public String getVodPlayFrom() {
@@ -87,5 +90,60 @@ public class Vod {
 
     public int getRemarkVisible() {
         return getVodRemarks().isEmpty() ? View.GONE : View.VISIBLE;
+    }
+
+    public List<Flag> getVodFlags() {
+        List<Flag> items = new ArrayList<>();
+        String[] playFlags = getVodPlayFrom().split("\\$\\$\\$");
+        String[] playUrls = getVodPlayUrl().split("\\$\\$\\$");
+        for (int i = 0; i < playFlags.length; i++) {
+            Flag item = new Flag(playFlags[i]);
+            String[] urls = playUrls[i].contains("#") ? playUrls[i].split("#") : new String[]{playUrls[i]};
+            for (String url : urls) {
+                if (!url.contains("$")) continue;
+                String[] split = url.split("\\$");
+                if (split.length >= 2) item.episodes.add(new Flag.Episode(split[0], split[1]));
+            }
+            items.add(item);
+        }
+        return items;
+    }
+
+    public static class Flag {
+
+        private final String flag;
+        private final List<Episode> episodes;
+
+        public Flag(String flag) {
+            this.flag = flag;
+            this.episodes = new ArrayList<>();
+        }
+
+        public String getFlag() {
+            return flag;
+        }
+
+        public List<Episode> getEpisodes() {
+            return episodes;
+        }
+
+        public static class Episode {
+
+            private final String name;
+            private final String url;
+
+            public Episode(String name, String url) {
+                this.name = name;
+                this.url = url;
+            }
+
+            public String getName() {
+                return name;
+            }
+
+            public String getUrl() {
+                return url;
+            }
+        }
     }
 }

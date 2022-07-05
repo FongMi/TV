@@ -130,7 +130,7 @@
         tools:text="簡介：" />
 
     <androidx.leanback.widget.HorizontalGridView
-        android:id="@+id/from"
+        android:id="@+id/flag"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/video"
@@ -139,7 +139,7 @@
         android:paddingStart="24dp"
         android:paddingTop="12dp"
         android:paddingEnd="24dp"
-        android:paddingBottom="16dp"
+        android:paddingBottom="8dp"
         app:focusOutEnd="true"
         app:focusOutFront="true" />
 
@@ -147,8 +147,11 @@
         android:id="@+id/episode"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/from"
-        android:layout_marginTop="16dp"
+        android:layout_below="@+id/flag"
+        android:paddingStart="24dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="24dp"
+        android:paddingBottom="8dp"
         android:clipChildren="false"
         android:clipToPadding="false"
         app:focusOutEnd="true"

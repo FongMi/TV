@@ -6,15 +6,15 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.leanback.widget.Presenter;
 
-import com.fongmi.bear.bean.Class;
+import com.fongmi.bear.bean.Vod;
 import com.fongmi.bear.databinding.AdapterItemBinding;
 
-public class ItemPresenter extends Presenter {
+public class EpisodePresenter extends Presenter {
 
     private OnClickListener mListener;
 
     public interface OnClickListener {
-        void onItemClick(Class item);
+        void onItemClick(Vod.Flag.Episode item);
     }
 
     public void setOnClickListener(OnClickListener listener) {
@@ -28,8 +28,9 @@ public class ItemPresenter extends Presenter {
 
     @Override
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object object) {
+        Vod.Flag.Episode item = (Vod.Flag.Episode) object;
         ViewHolder holder = (ViewHolder) viewHolder;
-        holder.binding.text.setText(object.toString());
+        holder.binding.text.setText(item.getName());
     }
 
     @Override
