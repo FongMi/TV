@@ -37,12 +37,12 @@ public class CustomViewPager extends ViewPager {
         this.shake = AnimationUtils.loadAnimation(getContext(), R.anim.shake);
         setPageTransformer(false, (page, position) -> {
             page.setTranslationX(page.getWidth() * -position);
-            if (position <= -1.0F || position >= 1.0F) {
-                page.setAlpha(0.0F);
-            } else if (position == 0.0F) {
-                page.setAlpha(1.0F);
+            if (position <= -1 || position >= 1) {
+                page.setAlpha(0);
+            } else if (position == 0) {
+                page.setAlpha(1);
             } else {
-                page.setAlpha(1.0F - Math.abs(position));
+                page.setAlpha(1 - Math.abs(position));
             }
         });
     }
@@ -87,16 +87,16 @@ public class CustomViewPager extends ViewPager {
         View nextFocused = FocusFinder.getInstance().findNextFocus(this, currentFocused, direction);
         if (nextFocused != null && nextFocused != currentFocused) {
             if (direction == View.FOCUS_LEFT) {
-                final int nextLeft = getChildRectInPagerCoordinates(rect, nextFocused).left;
-                final int currLeft = getChildRectInPagerCoordinates(rect, currentFocused).left;
+                int nextLeft = getChildRectInPagerCoordinates(rect, nextFocused).left;
+                int currLeft = getChildRectInPagerCoordinates(rect, currentFocused).left;
                 if (currentFocused != null && nextLeft >= currLeft) {
                     handled = pageLeft();
                 } else {
                     handled = nextFocused.requestFocus();
                 }
             } else if (direction == View.FOCUS_RIGHT) {
-                final int nextLeft = getChildRectInPagerCoordinates(rect, nextFocused).left;
-                final int currLeft = getChildRectInPagerCoordinates(rect, currentFocused).left;
+                int nextLeft = getChildRectInPagerCoordinates(rect, nextFocused).left;
+                int currLeft = getChildRectInPagerCoordinates(rect, currentFocused).left;
                 if (currentFocused != null && nextLeft <= currLeft) {
                     handled = pageRight();
                 } else {
@@ -105,14 +105,14 @@ public class CustomViewPager extends ViewPager {
             }
         } else if (direction == FOCUS_LEFT) {
             if (getCurrentItem() == 0) {
-                shakeX(currentFocused);
+                shake(currentFocused);
                 handled = true;
             } else {
                 handled = pageLeft();
             }
         } else if (direction == FOCUS_RIGHT) {
             if (getAdapter() != null && getCurrentItem() == getAdapter().getCount() - 1) {
-                shakeX(currentFocused);
+                shake(currentFocused);
                 handled = true;
             } else {
                 handled = pageRight();
@@ -138,7 +138,7 @@ public class CustomViewPager extends ViewPager {
         outRect.bottom = child.getBottom();
         ViewParent parent = child.getParent();
         while (parent instanceof ViewGroup && parent != this) {
-            final ViewGroup group = (ViewGroup) parent;
+            ViewGroup group = (ViewGroup) parent;
             outRect.left += group.getLeft();
             outRect.right += group.getRight();
             outRect.top += group.getTop();
@@ -157,14 +157,14 @@ public class CustomViewPager extends ViewPager {
     }
 
     boolean pageRight() {
-        if (getAdapter() != null && getCurrentItem() < (getAdapter().getCount() - 1)) {
+        if (getAdapter() != null && getCurrentItem() < getAdapter().getCount() - 1) {
             setCurrentItem(getCurrentItem() + 1, true);
             return true;
         }
         return false;
     }
 
-    private void shakeX(View currentFocused) {
+    private void shake(View currentFocused) {
         if (currentFocused != null) {
             currentFocused.clearAnimation();
             currentFocused.startAnimation(shake);

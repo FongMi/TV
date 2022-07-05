@@ -11,8 +11,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.leanback.widget.ArrayObjectAdapter;
-import androidx.leanback.widget.FocusHighlight;
-import androidx.leanback.widget.FocusHighlightHelper;
 import androidx.leanback.widget.ItemBridgeAdapter;
 import androidx.leanback.widget.OnChildViewHolderSelectedListener;
 import androidx.recyclerview.widget.RecyclerView;
@@ -37,6 +35,7 @@ public class VodActivity extends BaseActivity {
     }
 
     public static void start(Activity activity, Result result) {
+        if (result == null || result.getTypes().isEmpty()) return;
         Intent intent = new Intent(activity, VodActivity.class);
         intent.putExtra("result", result.toString());
         activity.startActivity(intent);
@@ -68,6 +67,7 @@ public class VodActivity extends BaseActivity {
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
                 mBinding.pager.setCurrentItem(position);
                 if (mOldView != null) mOldView.setActivated(false);
+                if (child == null) return;
                 mOldView = child.itemView;
                 mOldView.setActivated(true);
             }
@@ -81,7 +81,6 @@ public class VodActivity extends BaseActivity {
         adapter.addAll(0, mResult.getTypes());
         ItemBridgeAdapter bridgeAdapter = new ItemBridgeAdapter(adapter);
         mBinding.recycler.setAdapter(bridgeAdapter);
-        FocusHighlightHelper.setupBrowseItemFocusHighlight(bridgeAdapter, FocusHighlight.ZOOM_FACTOR_MEDIUM, false);
     }
 
     private void setPager() {

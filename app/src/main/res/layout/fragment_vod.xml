@@ -4,14 +4,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.leanback.widget.VerticalGridView
+    <com.fongmi.bear.ui.custom.CustomVerticalGridView
         android:id="@+id/recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipChildren="false"
         android:clipToPadding="false"
         android:paddingStart="24dp"
-        android:paddingTop="8dp"
+        android:paddingTop="16dp"
         android:paddingEnd="24dp"
         android:paddingBottom="24dp"
         app:focusOutEnd="true"

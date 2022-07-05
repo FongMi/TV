@@ -6,10 +6,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.google.android.exoplayer2.ui.StyledPlayerView
+    <com.google.android.exoplayer2.ui.PlayerView
         android:id="@+id/video"
-        android:layout_width="400dp"
-        android:layout_height="225dp"
+        android:layout_width="360dp"
+        android:layout_height="200dp"
         android:layout_marginStart="24dp"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="24dp"
@@ -31,7 +31,7 @@
         tools:text="慶餘年第二季" />
 
     <LinearLayout
-        android:id="@+id/row1"
+        android:id="@+id/row"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/name"
@@ -45,7 +45,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginEnd="12dp"
             android:singleLine="true"
             android:textColor="@color/white"
             android:textSize="16sp"
@@ -56,29 +56,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:layout_marginEnd="12dp"
             android:singleLine="true"
             android:textColor="@color/white"
             android:textSize="16sp"
             tools:text="年份：2022" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/row2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/row1"
-        android:layout_alignStart="@+id/name"
-        android:layout_marginEnd="24dp"
-        android:layout_toEndOf="@+id/video"
-        android:orientation="horizontal">
 
         <TextView
             android:id="@+id/area"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginEnd="12dp"
             android:singleLine="true"
             android:textColor="@color/white"
             android:textSize="16sp"
@@ -100,7 +89,7 @@
         android:id="@+id/director"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/row2"
+        android:layout_below="@+id/row"
         android:layout_alignStart="@+id/name"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="24dp"

@@ -14,7 +14,6 @@
         android:paddingStart="24dp"
         android:paddingTop="24dp"
         android:paddingEnd="24dp"
-        android:paddingBottom="8dp"
         app:focusOutEnd="true"
         app:focusOutFront="true" />
 

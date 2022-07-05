@@ -41,8 +41,8 @@ public class CustomHorizontalGridView extends HorizontalGridView {
     @Override
     public View focusSearch(View focused, int direction) {
         if (focused != null) {
-            final FocusFinder finder = FocusFinder.getInstance();
-            final View found = finder.findNextFocus(this, focused, direction);
+            FocusFinder finder = FocusFinder.getInstance();
+            View found = finder.findNextFocus(this, focused, direction);
             if (direction == View.FOCUS_LEFT || direction == View.FOCUS_RIGHT) {
                 if ((found == null || found.getId() != R.id.name) && getScrollState() == SCROLL_STATE_IDLE) {
                     focused.clearAnimation();
@@ -103,14 +103,14 @@ public class CustomHorizontalGridView extends HorizontalGridView {
         View nextFocused = FocusFinder.getInstance().findNextFocus(this, currentFocused, direction);
         if (nextFocused == null || nextFocused == currentFocused) {
             if (direction == FOCUS_LEFT || direction == FOCUS_RIGHT) {
-                shakeX(currentFocused);
+                shake(currentFocused);
                 handled = true;
             }
         }
         return handled;
     }
 
-    private void shakeX(View currentFocused) {
+    private void shake(View currentFocused) {
         if (currentFocused != null && getScrollState() == SCROLL_STATE_IDLE) {
             currentFocused.clearAnimation();
             currentFocused.startAnimation(shake);

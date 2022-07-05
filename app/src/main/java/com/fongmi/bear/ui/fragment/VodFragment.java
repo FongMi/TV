@@ -13,6 +13,7 @@ import androidx.leanback.widget.ItemBridgeAdapter;
 import androidx.leanback.widget.ListRow;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.fongmi.bear.R;
 import com.fongmi.bear.bean.Filter;
 import com.fongmi.bear.bean.Vod;
 import com.fongmi.bear.databinding.FragmentVodBinding;
@@ -80,6 +81,7 @@ public class VodFragment extends Fragment implements Scroller.Callback, VodPrese
         selector.addPresenter(ListRow.class, new CustomRowPresenter(16), VodPresenter.class);
         selector.addPresenter(ListRow.class, new CustomRowPresenter(8), FilterPresenter.class);
         mBinding.recycler.addOnScrollListener(mScroller = new Scroller(this));
+        mBinding.recycler.setTabView(getActivity().findViewById(R.id.recycler));
         mBinding.recycler.setVerticalSpacing(ResUtil.dp2px(16));
         mBinding.recycler.setAdapter(new ItemBridgeAdapter(mAdapter = new ArrayObjectAdapter(selector)));
     }
@@ -137,5 +139,11 @@ public class VodFragment extends Fragment implements Scroller.Callback, VodPrese
     @Override
     public void onLoadMore(String page) {
         getVideo(page);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mBinding.recycler.moveToTop();
     }
 }
