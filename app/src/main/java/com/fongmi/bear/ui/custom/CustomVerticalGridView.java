@@ -70,6 +70,7 @@ public class CustomVerticalGridView extends VerticalGridView {
 
     public void moveToTop() {
         mTabView.setVisibility(View.VISIBLE);
+        mTabView.requestFocus();
         scrollToPosition(0);
     }
 }
