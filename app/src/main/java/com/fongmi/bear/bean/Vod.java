@@ -36,6 +36,8 @@ public class Vod {
     @SerializedName("vod_play_url")
     private String vodPlayUrl;
 
+    private List<Flag> vodFlags;
+
     public static Vod objectFrom(String str) {
         return new Gson().fromJson(str, Vod.class);
     }
@@ -88,25 +90,16 @@ public class Vod {
         return TextUtils.isEmpty(vodPlayUrl) ? "" : vodPlayUrl;
     }
 
-    public int getRemarkVisible() {
-        return getVodRemarks().isEmpty() ? View.GONE : View.VISIBLE;
+    public List<Flag> getVodFlags() {
+        return vodFlags;
     }
 
-    public List<Flag> getVodFlags() {
-        List<Flag> items = new ArrayList<>();
-        String[] playFlags = getVodPlayFrom().split("\\$\\$\\$");
-        String[] playUrls = getVodPlayUrl().split("\\$\\$\\$");
-        for (int i = 0; i < playFlags.length; i++) {
-            Flag item = new Flag(playFlags[i]);
-            String[] urls = playUrls[i].contains("#") ? playUrls[i].split("#") : new String[]{playUrls[i]};
-            for (String url : urls) {
-                if (!url.contains("$")) continue;
-                String[] split = url.split("\\$");
-                if (split.length >= 2) item.episodes.add(new Flag.Episode(split[0], split[1]));
-            }
-            items.add(item);
-        }
-        return items;
+    public void setVodFlags(List<Flag> vodFlags) {
+        this.vodFlags = vodFlags;
+    }
+
+    public int getRemarkVisible() {
+        return getVodRemarks().isEmpty() ? View.GONE : View.VISIBLE;
     }
 
     public static class Flag {

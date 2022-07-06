@@ -10,6 +10,7 @@ import androidx.leanback.widget.ListRow;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewbinding.ViewBinding;
 
+import com.fongmi.bear.ApiConfig;
 import com.fongmi.bear.R;
 import com.fongmi.bear.bean.Func;
 import com.fongmi.bear.bean.Result;
@@ -89,7 +90,7 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
 
     private void getVideo() {
         if (mAdapter.size() > 4) mAdapter.removeItems(4, mAdapter.size() - 4);
-        mSiteViewModel.homeContent();
+        if (!ApiConfig.get().getHome().getKey().isEmpty()) mSiteViewModel.homeContent();
         mAdapter.add("progress");
     }
 

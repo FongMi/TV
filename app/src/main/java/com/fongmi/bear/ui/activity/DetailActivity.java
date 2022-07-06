@@ -24,8 +24,6 @@ import com.fongmi.bear.ui.presenter.EpisodePresenter;
 import com.fongmi.bear.ui.presenter.FlagPresenter;
 import com.fongmi.bear.utils.ResUtil;
 
-import java.util.List;
-
 public class DetailActivity extends BaseActivity {
 
     private ActivityDetailBinding mBinding;
@@ -110,17 +108,13 @@ public class DetailActivity extends BaseActivity {
         setText(mBinding.content, R.string.detail_content, item.getVodContent());
         setText(mBinding.director, R.string.detail_director, item.getVodDirector());
         setText(mBinding.site, R.string.detail_site, ApiConfig.get().getHome().getName());
-        setFlag(item.getVodFlags());
+        mFlagAdapter.addAll(0, item.getVodFlags());
+        setEpisode((Vod.Flag) mFlagAdapter.get(0));
     }
 
     private void setText(TextView view, int resId, String text) {
         if (text.isEmpty()) view.setVisibility(View.GONE);
         else view.setText(ResUtil.getString(resId, text));
-    }
-
-    private void setFlag(List<Vod.Flag> items) {
-        mFlagAdapter.addAll(0, items);
-        setEpisode((Vod.Flag) mFlagAdapter.get(0));
     }
 
     private void setEpisode(Vod.Flag item) {

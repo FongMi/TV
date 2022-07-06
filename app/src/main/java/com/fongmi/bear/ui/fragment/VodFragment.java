@@ -142,9 +142,8 @@ public class VodFragment extends Fragment implements Scroller.Callback, VodPrese
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        //TODO NEED FIX BUG
-        mBinding.recycler.moveToTop();
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (mBinding != null && !isVisibleToUser) mBinding.recycler.moveToTop();
     }
 }
