@@ -148,12 +148,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/flag"
+        android:clipChildren="false"
+        android:clipToPadding="false"
         android:paddingStart="24dp"
         android:paddingTop="8dp"
         android:paddingEnd="24dp"
         android:paddingBottom="8dp"
-        android:clipChildren="false"
-        android:clipToPadding="false"
         app:focusOutEnd="true"
         app:focusOutFront="true" />
 
@@ -162,10 +162,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/episode"
-        android:layout_marginTop="16dp"
         android:clipChildren="false"
         android:clipToPadding="false"
+        android:paddingStart="24dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="24dp"
+        android:paddingBottom="8dp"
+        android:visibility="gone"
         app:focusOutEnd="true"
-        app:focusOutFront="true" />
+        app:focusOutFront="true"
+        tools:visibility="visible" />
 
 </com.fongmi.bear.ui.custom.ProgressLayout>

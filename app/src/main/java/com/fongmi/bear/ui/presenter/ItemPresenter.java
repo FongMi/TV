@@ -9,7 +9,7 @@ import androidx.leanback.widget.Presenter;
 import com.fongmi.bear.bean.Vod;
 import com.fongmi.bear.databinding.AdapterItemBinding;
 
-public class EpisodePresenter extends Presenter {
+public class ItemPresenter extends Presenter {
 
     private OnClickListener mListener;
 
@@ -28,9 +28,14 @@ public class EpisodePresenter extends Presenter {
 
     @Override
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object object) {
-        Vod.Flag.Episode item = (Vod.Flag.Episode) object;
         ViewHolder holder = (ViewHolder) viewHolder;
-        holder.binding.text.setText(item.getName());
+        if (object instanceof Vod.Flag) {
+            holder.binding.text.setText(((Vod.Flag) object).getFlag());
+        } else if (object instanceof Vod.Flag.Episode) {
+            holder.binding.text.setText(((Vod.Flag.Episode) object).getName());
+        } else {
+            holder.binding.text.setText(object.toString());
+        }
     }
 
     @Override
