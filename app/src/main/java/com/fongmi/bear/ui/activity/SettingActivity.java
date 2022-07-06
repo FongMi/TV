@@ -75,6 +75,7 @@ public class SettingActivity extends BaseActivity {
 
             @Override
             public void error(String msg) {
+                Notify.dismiss();
                 Notify.show(msg);
             }
         });

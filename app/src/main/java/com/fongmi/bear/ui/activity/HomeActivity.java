@@ -90,7 +90,8 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
 
     private void getVideo() {
         if (mAdapter.size() > 4) mAdapter.removeItems(4, mAdapter.size() - 4);
-        if (!ApiConfig.get().getHome().getKey().isEmpty()) mSiteViewModel.homeContent();
+        if (ApiConfig.get().getHome().getKey().isEmpty()) return;
+        mSiteViewModel.homeContent();
         mAdapter.add("progress");
     }
 

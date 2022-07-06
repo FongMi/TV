@@ -70,6 +70,5 @@ public class Notify {
         if (TextUtils.isEmpty(message)) return;
         mToast = Toast.makeText(App.get(), message, Toast.LENGTH_LONG);
         mToast.show();
-        dismiss();
     }
 }
