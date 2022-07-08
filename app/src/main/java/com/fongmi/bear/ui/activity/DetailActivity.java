@@ -79,7 +79,7 @@ public class DetailActivity extends BaseActivity {
         mBinding.group.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
-                mBinding.episode.setSelectedPosition(position * 20);
+                if (mEpisodeAdapter.size() > 20) mBinding.episode.setSelectedPosition(position * 20);
             }
         });
         mBinding.flag.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
@@ -138,7 +138,7 @@ public class DetailActivity extends BaseActivity {
         List<String> items = new ArrayList<>();
         int itemSize = (int) Math.ceil(size / 20.0f);
         for (int i = 0; i < itemSize; i++) items.add(String.valueOf(i * 20 + 1));
-        mGroupAdapter.addAll(0, items);
         mBinding.group.setVisibility(View.VISIBLE);
+        mGroupAdapter.addAll(0, items);
     }
 }

@@ -10,17 +10,11 @@ import android.view.KeyEvent;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.CenterCrop;
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.fongmi.bear.App;
 import com.fongmi.bear.R;
 import com.google.android.exoplayer2.util.Util;
 
 public class Utils {
-
-    public static String getString(int resId) {
-        return App.get().getString(resId);
-    }
 
     public static boolean hasEvent(KeyEvent event) {
         return isArrowKey(event) || isBackKey(event) || isMenuKey(event) || isDigitKey(event) || event.isLongPress();
@@ -63,7 +57,7 @@ public class Utils {
     }
 
     public static void loadImage(String url, ImageView view) {
-        Glide.with(App.get()).load(url).placeholder(R.drawable.ic_img_loading).error(R.drawable.ic_img_error).transform(new CenterCrop(), new RoundedCorners(ResUtil.dp2px(8))).into(view);
+        Glide.with(App.get()).load(url).placeholder(R.drawable.ic_img_loading).error(R.drawable.ic_img_error).into(view);
     }
 
     public static boolean hasPIP() {

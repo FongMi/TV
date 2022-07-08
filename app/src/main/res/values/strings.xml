@@ -35,6 +35,7 @@
     <string name="dialog_config_url_hint">Please enter the configuration url</string>
 
     <!-- Error -->
-    <string name="error_config">Configuration load failed</string>
+    <string name="error_config_get">Configuration get failed</string>
+    <string name="error_config_parse">Configuration parse failed</string>
 
 </resources>

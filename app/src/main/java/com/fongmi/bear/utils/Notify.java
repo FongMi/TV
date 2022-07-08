@@ -30,7 +30,7 @@ public class Notify {
     }
 
     public static void show(int resId) {
-        show(Utils.getString(resId));
+        if (resId != 0) show(ResUtil.getString(resId));
     }
 
     public static void show(String text) {

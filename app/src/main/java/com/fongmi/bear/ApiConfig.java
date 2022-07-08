@@ -2,6 +2,7 @@ package com.fongmi.bear;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Patterns;
 
 import androidx.annotation.NonNull;
 
@@ -68,8 +69,8 @@ public class ApiConfig {
     }
 
     public void loadConfig(Callback callback) {
-        if (Prefers.getUrl().isEmpty()) {
-            handler.post(() -> callback.error(""));
+        if (Prefers.getUrl().isEmpty() || !Patterns.WEB_URL.matcher(Prefers.getUrl()).matches()) {
+            handler.post(() -> callback.error(0));
             return;
         }
         OKHttp.get().client().newCall(new Request.Builder().url(Prefers.getUrl()).build()).enqueue(new Callback() {
@@ -83,13 +84,13 @@ public class ApiConfig {
                     loadJar(spider);
                     handler.post(callback::success);
                 } catch (Exception e) {
-                    handler.post(() -> callback.error("配置解析失敗"));
+                    handler.post(() -> callback.error(R.string.error_config_parse));
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                handler.post(() -> callback.error("配置取得失敗"));
+                handler.post(() -> callback.error(R.string.error_config_get));
             }
         });
     }
@@ -115,7 +116,7 @@ public class ApiConfig {
         flags.addAll(Json.safeList(object, "flags"));
     }
 
-    private void loadJar(String spider) throws IOException {
+    private void loadJar(String spider) throws Exception {
         Request request = new Request.Builder().url(spider).build();
         Response response = OKHttp.get().client().newCall(request).execute();
         jarLoader.load(response.body().bytes());
