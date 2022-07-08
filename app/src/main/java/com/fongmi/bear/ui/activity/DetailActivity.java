@@ -107,6 +107,7 @@ public class DetailActivity extends BaseActivity implements Player.Callback {
     }
 
     private void getPlayer(String flag, String id) {
+        mBinding.progress.getRoot().setVisibility(View.VISIBLE);
         mSiteViewModel.playerContent(flag, id);
     }
 
@@ -154,7 +155,7 @@ public class DetailActivity extends BaseActivity implements Player.Callback {
 
     @Override
     public void onPrepared() {
-
+        mBinding.progress.getRoot().setVisibility(View.GONE);
     }
 
     @Override

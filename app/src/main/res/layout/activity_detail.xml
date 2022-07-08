@@ -23,6 +23,11 @@
             android:layout_height="match_parent"
             app:use_controller="false" />
 
+        <include
+            android:id="@+id/progress"
+            layout="@layout/view_progress"
+            android:visibility="gone" />
+
     </FrameLayout>
 
     <TextView
