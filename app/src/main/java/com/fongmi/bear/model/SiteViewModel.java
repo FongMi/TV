@@ -9,6 +9,8 @@ import com.fongmi.bear.bean.Site;
 import com.fongmi.bear.bean.Vod;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderDebug;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,30 +18,27 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 public class SiteViewModel extends ViewModel {
 
-    public MutableLiveData<Result> mResult;
-    public ExecutorService mService;
-
-    private enum Func {
-        HOME, CATEGORY, DETAIL, PLAYER, SEARCH
-    }
+    public MutableLiveData<JsonObject> player;
+    public MutableLiveData<Result> result;
+    public ExecutorService service;
 
     public SiteViewModel() {
-        this.mService = Executors.newFixedThreadPool(2);
-        this.mResult = new MutableLiveData<>();
+        this.service = Executors.newFixedThreadPool(2);
+        this.result = new MutableLiveData<>();
+        this.player = new MutableLiveData<>();
     }
 
     public MutableLiveData<Result> getResult() {
-        return mResult;
+        return result;
     }
 
     public void homeContent() {
         Site home = ApiConfig.get().getHome();
-        postResult(Func.HOME, () -> {
+        postResult(() -> {
             Spider spider = ApiConfig.get().getCSP(home);
             String homeContent = spider.homeContent(false);
             SpiderDebug.json(homeContent);
@@ -54,7 +53,7 @@ public class SiteViewModel extends ViewModel {
 
     public void categoryContent(String tid, String page, boolean filter, HashMap<String, String> extend) {
         Site home = ApiConfig.get().getHome();
-        postResult(Func.CATEGORY, () -> {
+        postResult(() -> {
             Spider spider = ApiConfig.get().getCSP(home);
             String categoryContent = spider.categoryContent(tid, page, filter, extend);
             SpiderDebug.json(categoryContent);
@@ -64,42 +63,48 @@ public class SiteViewModel extends ViewModel {
 
     public void detailContent(String id) {
         Site home = ApiConfig.get().getHome();
-        postResult(Func.DETAIL, () -> {
+        postResult(() -> {
             Spider spider = ApiConfig.get().getCSP(home);
             String detailContent = spider.detailContent(List.of(id));
             SpiderDebug.json(detailContent);
-            return Result.objectFrom(detailContent);
+            Result result = Result.objectFrom(detailContent);
+            if (result.getList().isEmpty()) return result;
+            Vod vod = result.getList().get(0);
+            vod.setVodFlags(getVodFlags(vod));
+            return result;
         });
     }
 
     public void playerContent(String flag, String id) {
         Site home = ApiConfig.get().getHome();
-        postResult(Func.PLAYER, () -> {
+        postPlayer(() -> {
             Spider spider = ApiConfig.get().getCSP(home);
             String playerContent = spider.playerContent(flag, id, ApiConfig.get().getFlags());
             SpiderDebug.json(playerContent);
-            return Result.objectFrom(playerContent);
+            JsonObject object = JsonParser.parseString(playerContent).getAsJsonObject();
+            if (!object.has("flag")) object.addProperty("flag", flag);
+            return object;
         });
     }
 
-    private void postResult(Func func, Callable<Result> callable) {
-        mService.execute(() -> {
+    private void postResult(Callable<Result> callable) {
+        service.execute(() -> {
             try {
-                Future<Result> future = mService.submit(callable);
-                Result result = future.get(10, TimeUnit.SECONDS);
-                checkResult(func, result);
-                mResult.postValue(result);
+                result.postValue(service.submit(callable).get(10, TimeUnit.SECONDS));
             } catch (Exception e) {
-                mResult.postValue(new Result());
+                result.postValue(new Result());
             }
         });
     }
 
-    private void checkResult(Func func, Result result) {
-        if (func.equals(Func.DETAIL) && result.getList().size() > 0) {
-            Vod vod = result.getList().get(0);
-            vod.setVodFlags(getVodFlags(vod));
-        }
+    private void postPlayer(Callable<JsonObject> callable) {
+        service.execute(() -> {
+            try {
+                player.postValue(service.submit(callable).get(10, TimeUnit.SECONDS));
+            } catch (Exception e) {
+                player.postValue(null);
+            }
+        });
     }
 
     private List<Vod.Flag> getVodFlags(Vod vod) {

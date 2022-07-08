@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.fongmi.bear.ui.custom.ProgressLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/progress"
     android:layout_width="match_parent"
@@ -14,7 +15,8 @@
         android:layout_marginEnd="24dp"
         android:layout_marginBottom="12dp"
         android:focusable="true"
-        android:focusableInTouchMode="true" />
+        android:focusableInTouchMode="true"
+        app:use_controller="false" />
 
     <TextView
         android:id="@+id/name"

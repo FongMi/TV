@@ -69,7 +69,7 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
 
     private void setViewModel() {
         mSiteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
-        mSiteViewModel.mResult.observe(this, result -> {
+        mSiteViewModel.result.observe(this, result -> {
             mAdapter.remove("progress");
             for (List<Vod> items : result.partition()) {
                 VodPresenter presenter = new VodPresenter(items.size());

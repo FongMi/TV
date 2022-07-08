@@ -88,7 +88,7 @@ public class VodFragment extends Fragment implements Scroller.Callback, VodPrese
 
     private void setViewModel() {
         mSiteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
-        mSiteViewModel.mResult.observe(getViewLifecycleOwner(), result -> {
+        mSiteViewModel.result.observe(getViewLifecycleOwner(), result -> {
             mAdapter.remove("progress");
             mScroller.endLoading(result.getList().isEmpty());
             for (List<Vod> items : result.partition()) {

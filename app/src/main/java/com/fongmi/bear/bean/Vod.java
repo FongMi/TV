@@ -124,6 +124,7 @@ public class Vod {
 
             private final String name;
             private final String url;
+            private boolean activated;
 
             public Episode(String name, String url) {
                 this.name = name;
@@ -136,6 +137,14 @@ public class Vod {
 
             public String getUrl() {
                 return url;
+            }
+
+            public boolean isActivated() {
+                return activated;
+            }
+
+            public void setActivated(Episode item) {
+                this.activated = item.equals(this);
             }
         }
     }
