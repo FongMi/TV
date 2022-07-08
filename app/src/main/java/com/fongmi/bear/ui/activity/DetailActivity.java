@@ -29,7 +29,7 @@ import com.fongmi.bear.utils.ResUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DetailActivity extends BaseActivity {
+public class DetailActivity extends BaseActivity implements Player.Callback {
 
     private ActivityDetailBinding mBinding;
     private ArrayObjectAdapter mFlagAdapter;
@@ -56,8 +56,8 @@ public class DetailActivity extends BaseActivity {
 
     @Override
     protected void initView() {
-        mBinding.progress.showProgress();
-        mBinding.video.setPlayer(Player.exo());
+        mBinding.progressLayout.showProgress();
+        mBinding.video.setPlayer(Player.get().exo(this));
         setRecyclerView();
         setViewModel();
         getDetail();
@@ -114,13 +114,13 @@ public class DetailActivity extends BaseActivity {
         mSiteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mSiteViewModel.player.observe(this, object -> Player.get().setMediaSource(object));
         mSiteViewModel.result.observe(this, result -> {
-            if (result.getList().isEmpty()) mBinding.progress.showErrorText();
+            if (result.getList().isEmpty()) mBinding.progressLayout.showErrorText();
             else setDetail(result.getList().get(0));
         });
     }
 
     private void setDetail(Vod item) {
-        mBinding.progress.showContent();
+        mBinding.progressLayout.showContent();
         mBinding.name.setText(item.getVodName());
         setText(mBinding.year, R.string.detail_year, item.getVodYear());
         setText(mBinding.area, R.string.detail_area, item.getVodArea());
@@ -150,5 +150,16 @@ public class DetailActivity extends BaseActivity {
         for (int i = 0; i < itemSize; i++) items.add(String.valueOf(i * 20 + 1));
         mBinding.group.setVisibility(View.VISIBLE);
         mGroupAdapter.addAll(0, items);
+    }
+
+    @Override
+    public void onPrepared() {
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Player.get().stop();
     }
 }

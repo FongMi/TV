@@ -7,9 +7,10 @@ import com.google.gson.JsonParser;
 
 import java.util.HashMap;
 
-public class Player {
+public class Player implements com.google.android.exoplayer2.Player.Listener {
 
-    private ExoPlayer mPlayer;
+    private ExoPlayer player;
+    private Callback callback;
 
     private static class Loader {
         static volatile Player INSTANCE = new Player();
@@ -19,8 +20,11 @@ public class Player {
         return Loader.INSTANCE;
     }
 
-    public static ExoPlayer exo() {
-        return get().mPlayer = get().mPlayer == null ? new ExoPlayer.Builder(App.get()).build() : get().mPlayer;
+    public ExoPlayer exo(Callback callback) {
+        if (player == null) player = new ExoPlayer.Builder(App.get()).build();
+        player.addListener(this);
+        this.callback = callback;
+        return player;
     }
 
     public void setMediaSource(JsonObject object) {
@@ -30,8 +34,24 @@ public class Player {
             JsonObject header = JsonParser.parseString(object.get("header").getAsString()).getAsJsonObject();
             for (String key : header.keySet()) headers.put(key, header.get(key).getAsString());
         }
-        mPlayer.setMediaSource(ExoUtil.getSource(headers, url));
-        mPlayer.prepare();
-        mPlayer.play();
+        player.setMediaSource(ExoUtil.getSource(headers, url));
+        player.prepare();
+        player.play();
+    }
+
+    public void stop() {
+        if (player != null && player.isPlaying()) {
+            player.stop();
+        }
+    }
+
+    @Override
+    public void onPlaybackStateChanged(int state) {
+        if (state != com.google.android.exoplayer2.Player.STATE_READY) return;
+        callback.onPrepared();
+    }
+
+    public interface Callback {
+        void onPrepared();
     }
 }
