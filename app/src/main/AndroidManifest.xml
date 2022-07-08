@@ -70,6 +70,11 @@
             android:screenOrientation="sensorLandscape" />
 
         <activity
+            android:name=".ui.activity.PlayActivity"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
+            android:screenOrientation="sensorLandscape" />
+
+        <activity
             android:name=".ui.activity.SettingActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
             android:screenOrientation="sensorLandscape" />

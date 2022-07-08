@@ -57,7 +57,7 @@ public class DetailActivity extends BaseActivity implements Player.Callback {
     @Override
     protected void initView() {
         mBinding.progressLayout.showProgress();
-        mBinding.video.setPlayer(Player.get().exo(this));
+        mBinding.video.setPlayer(Player.get().callback(this).exo());
         setRecyclerView();
         setViewModel();
         getDetail();
@@ -78,15 +78,17 @@ public class DetailActivity extends BaseActivity implements Player.Callback {
         mBinding.group.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
-                if (mEpisodeAdapter.size() > 20) {
-                    mBinding.episode.setSelectedPosition(position * 20);
-                }
+                if (mEpisodeAdapter.size() > 20) mBinding.episode.setSelectedPosition(position * 20);
             }
         });
         mEpisodePresenter.setOnClickListener(item -> {
             for (int i = 0; i < mEpisodeAdapter.size(); i++) ((Vod.Flag.Episode) mEpisodeAdapter.get(i)).setActivated(item);
             mEpisodeAdapter.notifyArrayItemRangeChanged(0, mEpisodeAdapter.size());
             getPlayer(mEpisodePresenter.getFlag(), item.getUrl());
+        });
+        mBinding.frame.setOnClickListener(view -> {
+            mBinding.video.setPlayer(null);
+            PlayActivity.newInstance(getActivity());
         });
     }
 
@@ -159,8 +161,14 @@ public class DetailActivity extends BaseActivity implements Player.Callback {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        mBinding.video.setPlayer(Player.get().exo());
+    }
+
+    @Override
+    public void onBackPressed() {
         Player.get().stop();
+        super.onBackPressed();
     }
 }

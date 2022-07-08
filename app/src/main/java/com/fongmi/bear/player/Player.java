@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 public class Player implements com.google.android.exoplayer2.Player.Listener {
 
-    private ExoPlayer player;
+    private final ExoPlayer exoPlayer;
     private Callback callback;
 
     private static class Loader {
@@ -20,11 +20,18 @@ public class Player implements com.google.android.exoplayer2.Player.Listener {
         return Loader.INSTANCE;
     }
 
-    public ExoPlayer exo(Callback callback) {
-        if (player == null) player = new ExoPlayer.Builder(App.get()).build();
-        player.addListener(this);
+    public Player() {
+        exoPlayer = new ExoPlayer.Builder(App.get()).build();
+        exoPlayer.addListener(this);
+    }
+
+    public Player callback(Callback callback) {
         this.callback = callback;
-        return player;
+        return this;
+    }
+
+    public ExoPlayer exo() {
+        return exoPlayer;
     }
 
     public void setMediaSource(JsonObject object) {
@@ -34,14 +41,32 @@ public class Player implements com.google.android.exoplayer2.Player.Listener {
             JsonObject header = JsonParser.parseString(object.get("header").getAsString()).getAsJsonObject();
             for (String key : header.keySet()) headers.put(key, header.get(key).getAsString());
         }
-        player.setMediaSource(ExoUtil.getSource(headers, url));
-        player.prepare();
-        player.play();
+        exoPlayer.setMediaSource(ExoUtil.getSource(headers, url));
+        exoPlayer.prepare();
+        exoPlayer.play();
+    }
+
+    public void pause() {
+        if (exoPlayer != null) {
+            exoPlayer.pause();
+        }
     }
 
     public void stop() {
-        if (player != null && player.isPlaying()) {
-            player.stop();
+        if (exoPlayer != null) {
+            exoPlayer.stop();
+        }
+    }
+
+    public void play() {
+        if (exoPlayer != null) {
+            exoPlayer.play();
+        }
+    }
+
+    public void release() {
+        if (exoPlayer != null) {
+            exoPlayer.release();
         }
     }
 
