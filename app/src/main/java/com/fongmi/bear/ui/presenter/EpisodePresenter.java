@@ -7,9 +7,9 @@ import androidx.annotation.NonNull;
 import androidx.leanback.widget.Presenter;
 
 import com.fongmi.bear.bean.Vod;
-import com.fongmi.bear.databinding.AdapterItemBinding;
+import com.fongmi.bear.databinding.AdapterEpisodeBinding;
 
-public class ItemPresenter extends Presenter {
+public class EpisodePresenter extends Presenter {
 
     private OnClickListener mListener;
 
@@ -23,19 +23,14 @@ public class ItemPresenter extends Presenter {
 
     @Override
     public Presenter.ViewHolder onCreateViewHolder(ViewGroup parent) {
-        return new ViewHolder(AdapterItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        return new ViewHolder(AdapterEpisodeBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
     }
 
     @Override
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object object) {
+        Vod.Flag.Episode item = (Vod.Flag.Episode) object;
         ViewHolder holder = (ViewHolder) viewHolder;
-        if (object instanceof Vod.Flag) {
-            holder.binding.text.setText(((Vod.Flag) object).getFlag());
-        } else if (object instanceof Vod.Flag.Episode) {
-            holder.binding.text.setText(((Vod.Flag.Episode) object).getName());
-        } else {
-            holder.binding.text.setText(object.toString());
-        }
+        holder.binding.text.setText(item.getName());
     }
 
     @Override
@@ -44,9 +39,9 @@ public class ItemPresenter extends Presenter {
 
     public static class ViewHolder extends Presenter.ViewHolder {
 
-        private final AdapterItemBinding binding;
+        private final AdapterEpisodeBinding binding;
 
-        public ViewHolder(@NonNull AdapterItemBinding binding) {
+        public ViewHolder(@NonNull AdapterEpisodeBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
         }

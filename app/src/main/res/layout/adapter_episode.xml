@@ -8,6 +8,8 @@
     android:focusable="true"
     android:focusableInTouchMode="true"
     android:gravity="center"
+    android:nextFocusUp="@+id/flag"
+    android:nextFocusDown="@+id/group"
     android:textColor="@color/white"
     android:textSize="16sp"
-    tools:text="泥巴" />
+    tools:text="20" />

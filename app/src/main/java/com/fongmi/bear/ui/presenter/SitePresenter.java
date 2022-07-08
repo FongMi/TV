@@ -31,7 +31,7 @@ public class SitePresenter extends Presenter {
         Site item = (Site) object;
         ViewHolder holder = (ViewHolder) viewHolder;
         holder.view.setActivated(item.isHome());
-        holder.binding.name.setText(item.getName());
+        holder.binding.text.setText(item.getName());
         setOnClickListener(holder, view -> mListener.onItemClick(item));
     }
 

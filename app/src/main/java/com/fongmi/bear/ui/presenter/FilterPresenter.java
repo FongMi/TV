@@ -35,8 +35,8 @@ public class FilterPresenter extends Presenter {
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object object) {
         Filter.Value item = (Filter.Value) object;
         ViewHolder holder = (ViewHolder) viewHolder;
-        holder.binding.name.setText(item.getN());
-        holder.binding.name.setActivated(item.isActivated());
+        holder.binding.text.setText(item.getN());
+        holder.binding.text.setActivated(item.isActivated());
         setOnClickListener(holder, view -> mListener.onItemClick(mKey, item));
     }
 

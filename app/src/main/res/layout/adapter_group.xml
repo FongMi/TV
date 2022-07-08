@@ -4,9 +4,11 @@
     android:id="@+id/text"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@drawable/selector_filter"
+    android:background="@drawable/selector_item"
     android:focusable="true"
     android:focusableInTouchMode="true"
+    android:gravity="center"
+    android:nextFocusUp="@+id/episode"
     android:textColor="@color/white"
     android:textSize="16sp"
-    tools:text="全部" />
+    tools:text="11" />

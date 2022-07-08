@@ -6,20 +6,21 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.leanback.widget.Presenter;
 
-import com.fongmi.bear.databinding.AdapterTitleBinding;
-import com.fongmi.bear.utils.ResUtil;
+import com.fongmi.bear.bean.Vod;
+import com.fongmi.bear.databinding.AdapterFlagBinding;
 
-public class TitlePresenter extends Presenter {
+public class FlagPresenter extends Presenter {
 
     @Override
     public Presenter.ViewHolder onCreateViewHolder(ViewGroup parent) {
-        return new TitlePresenter.ViewHolder(AdapterTitleBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        return new ViewHolder(AdapterFlagBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
     }
 
     @Override
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object object) {
-        TitlePresenter.ViewHolder holder = (TitlePresenter.ViewHolder) viewHolder;
-        holder.binding.text.setText(ResUtil.getString((int) object));
+        Vod.Flag item = (Vod.Flag) object;
+        ViewHolder holder = (ViewHolder) viewHolder;
+        holder.binding.text.setText(item.getFlag());
     }
 
     @Override
@@ -28,9 +29,9 @@ public class TitlePresenter extends Presenter {
 
     public static class ViewHolder extends Presenter.ViewHolder {
 
-        private final AdapterTitleBinding binding;
+        private final AdapterFlagBinding binding;
 
-        public ViewHolder(@NonNull AdapterTitleBinding binding) {
+        public ViewHolder(@NonNull AdapterFlagBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
         }

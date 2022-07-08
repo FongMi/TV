@@ -20,7 +20,9 @@ import com.fongmi.bear.R;
 import com.fongmi.bear.bean.Vod;
 import com.fongmi.bear.databinding.ActivityDetailBinding;
 import com.fongmi.bear.model.SiteViewModel;
-import com.fongmi.bear.ui.presenter.ItemPresenter;
+import com.fongmi.bear.ui.presenter.EpisodePresenter;
+import com.fongmi.bear.ui.presenter.FlagPresenter;
+import com.fongmi.bear.ui.presenter.GroupPresenter;
 import com.fongmi.bear.utils.ResUtil;
 
 import java.util.ArrayList;
@@ -33,7 +35,7 @@ public class DetailActivity extends BaseActivity {
     private ArrayObjectAdapter mFlagAdapter;
     private ArrayObjectAdapter mEpisodeAdapter;
     private ArrayObjectAdapter mGroupAdapter;
-    private ItemPresenter mEpisodePresenter;
+    private EpisodePresenter mEpisodePresenter;
     private View mOldView;
 
     private String getId() {
@@ -67,17 +69,17 @@ public class DetailActivity extends BaseActivity {
     private void setRecyclerView() {
         mBinding.flag.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.flag.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-        mBinding.flag.setAdapter(new ItemBridgeAdapter(mFlagAdapter = new ArrayObjectAdapter(new ItemPresenter())));
+        mBinding.flag.setAdapter(new ItemBridgeAdapter(mFlagAdapter = new ArrayObjectAdapter(new FlagPresenter())));
         mBinding.episode.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.episode.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-        mBinding.episode.setAdapter(new ItemBridgeAdapter(mEpisodeAdapter = new ArrayObjectAdapter(mEpisodePresenter = new ItemPresenter())));
+        mBinding.episode.setAdapter(new ItemBridgeAdapter(mEpisodeAdapter = new ArrayObjectAdapter(mEpisodePresenter = new EpisodePresenter())));
         mBinding.group.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.group.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-        mBinding.group.setAdapter(new ItemBridgeAdapter(mGroupAdapter = new ArrayObjectAdapter(new ItemPresenter())));
+        mBinding.group.setAdapter(new ItemBridgeAdapter(mGroupAdapter = new ArrayObjectAdapter(new GroupPresenter())));
         mBinding.group.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
-                mBinding.episode.setSelectedPosition(position * 10);
+                mBinding.episode.setSelectedPosition(position * 20);
             }
         });
         mBinding.flag.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
@@ -129,13 +131,13 @@ public class DetailActivity extends BaseActivity {
     private void setEpisode(Vod.Flag item) {
         mEpisodeAdapter.clear();
         mEpisodeAdapter.addAll(0, item.getEpisodes());
-        if (item.getEpisodes().size() > 10) setGroup(item.getEpisodes().size());
+        if (item.getEpisodes().size() > 20) setGroup(item.getEpisodes().size());
     }
 
     private void setGroup(int size) {
         List<String> items = new ArrayList<>();
-        int itemSize = (int) Math.ceil(size / 10.0f);
-        for (int i = 0; i < itemSize; i++) items.add((i * 10 + 1) + "~" + (i * 10 + 10));
+        int itemSize = (int) Math.ceil(size / 20.0f);
+        for (int i = 0; i < itemSize; i++) items.add(String.valueOf(i * 20 + 1));
         mGroupAdapter.addAll(0, items);
         mBinding.group.setVisibility(View.VISIBLE);
     }
