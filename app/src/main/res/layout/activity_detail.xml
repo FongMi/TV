@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/progressLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:keepScreenOn="true">
 
     <FrameLayout
         android:id="@+id/frame"
@@ -14,9 +15,9 @@
         android:layout_marginTop="24dp"
         android:layout_marginEnd="24dp"
         android:layout_marginBottom="12dp"
-        android:foreground="@drawable/selector_video"
         android:focusable="true"
-        android:focusableInTouchMode="true">
+        android:focusableInTouchMode="true"
+        android:foreground="@drawable/selector_video">
 
         <com.google.android.exoplayer2.ui.PlayerView
             android:id="@+id/video"

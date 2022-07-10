@@ -23,7 +23,6 @@ public class PlayActivity extends BaseActivity {
 
     @Override
     protected void initView() {
-        mBinding.video.setControllerAutoShow(false);
         mBinding.video.setPlayer(Player.get().exo());
     }
 
