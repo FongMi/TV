@@ -1,6 +1,9 @@
 package com.fongmi.bear.player;
 
+import android.app.Activity;
+
 import com.fongmi.bear.App;
+import com.fongmi.bear.ui.custom.CustomWebView;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -10,6 +13,8 @@ import java.util.HashMap;
 public class Player implements com.google.android.exoplayer2.Player.Listener {
 
     private final ExoPlayer exoPlayer;
+    private CustomWebView webView;
+    private Activity activity;
     private Callback callback;
 
     private static class Loader {
@@ -25,8 +30,9 @@ public class Player implements com.google.android.exoplayer2.Player.Listener {
         exoPlayer.addListener(this);
     }
 
-    public Player callback(Callback callback) {
-        this.callback = callback;
+    public Player callback(Activity activity) {
+        this.callback = (Callback) activity;
+        this.activity = activity;
         return this;
     }
 
@@ -36,14 +42,33 @@ public class Player implements com.google.android.exoplayer2.Player.Listener {
 
     public void setMediaSource(JsonObject object) {
         HashMap<String, String> headers = new HashMap<>();
+        String parse = object.get("parse").getAsString();
         String url = object.get("url").getAsString();
         if (object.has("header")) {
             JsonObject header = JsonParser.parseString(object.get("header").getAsString()).getAsJsonObject();
             for (String key : header.keySet()) headers.put(key, header.get(key).getAsString());
         }
-        exoPlayer.setMediaSource(ExoUtil.getSource(headers, url));
-        exoPlayer.prepare();
-        exoPlayer.play();
+        if (parse.equals("1")) {
+            loadWebView(url);
+        } else {
+            setMediaSource(headers, url);
+        }
+    }
+
+    private void loadWebView(String url) {
+        activity.runOnUiThread(() -> {
+            if (webView != null) webView.destroy();
+            webView = new CustomWebView(App.get()).init();
+            webView.loadUrl(url);
+        });
+    }
+
+    public void setMediaSource(HashMap<String, String> headers, String url) {
+        activity.runOnUiThread(() -> {
+            exoPlayer.setMediaSource(ExoUtil.getSource(headers, url));
+            exoPlayer.prepare();
+            exoPlayer.play();
+        });
     }
 
     public void pause() {
