@@ -34,11 +34,12 @@ import okhttp3.Response;
 
 public class ApiConfig {
 
-    private final JarLoader jarLoader;
+    private final List<String> ads;
     private final List<String> flags;
     private final List<Parse> parses;
     private final List<Live> lives;
     private final List<Site> sites;
+    private final JarLoader loader;
     private final Handler handler;
     private Parse parse;
     private Site home;
@@ -52,19 +53,21 @@ public class ApiConfig {
     }
 
     public ApiConfig() {
-        this.sites = new ArrayList<>();
+        this.ads = new ArrayList<>();
         this.flags = new ArrayList<>();
         this.parses = new ArrayList<>();
         this.lives = new ArrayList<>();
-        this.jarLoader = new JarLoader();
+        this.sites = new ArrayList<>();
+        this.loader = new JarLoader();
         this.handler = new Handler(Looper.getMainLooper());
     }
 
-    private void clear() {
-        this.sites.clear();
+    public void clear() {
+        this.ads.clear();
         this.flags.clear();
         this.parses.clear();
         this.lives.clear();
+        this.sites.clear();
         this.home = null;
     }
 
@@ -77,7 +80,6 @@ public class ApiConfig {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) {
                 try {
-                    clear();
                     JsonObject object = new Gson().fromJson(response.body().string(), JsonObject.class);
                     String spider = Json.safeString(object, "spider", "");
                     parseJson(object);
@@ -110,32 +112,31 @@ public class ApiConfig {
             if (site.getKey().equals(Prefers.getHome())) setHome(site);
             sites.add(site);
         }
-        if (home == null) {
-            setHome(sites.isEmpty() ? new Site() : sites.get(0));
-        }
+        if (home == null) setHome(sites.isEmpty() ? new Site() : sites.get(0));
         flags.addAll(Json.safeList(object, "flags"));
+        ads.addAll(Json.safeList(object, "ads"));
     }
 
     private void loadJar(String spider) throws Exception {
         Request request = new Request.Builder().url(spider).build();
         Response response = OKHttp.get().client().newCall(request).execute();
-        jarLoader.load(response.body().bytes());
+        loader.load(response.body().bytes());
     }
 
     public Spider getCSP(Site site) {
-        return jarLoader.getSpider(site.getKey(), site.getApi(), site.getExt());
+        return loader.getSpider(site.getKey(), site.getApi(), site.getExt());
     }
 
     public Object[] proxyLocal(Map<?, ?> param) {
-        return jarLoader.proxyInvoke(param);
+        return loader.proxyInvoke(param);
     }
 
     public JSONObject jsonExt(String key, LinkedHashMap<String, String> jxs, String url) {
-        return jarLoader.jsonExt(key, jxs, url);
+        return loader.jsonExt(key, jxs, url);
     }
 
     public JSONObject jsonExtMix(String flag, String key, String name, LinkedHashMap<String, HashMap<String, String>> jxs, String url) {
-        return jarLoader.jsonExtMix(flag, key, name, jxs, url);
+        return loader.jsonExtMix(flag, key, name, jxs, url);
     }
 
     public Site getSite(String key) {
@@ -145,6 +146,10 @@ public class ApiConfig {
 
     public List<Site> getSites() {
         return sites;
+    }
+
+    public String getAds() {
+        return ads.toString();
     }
 
     public List<String> getFlags() {

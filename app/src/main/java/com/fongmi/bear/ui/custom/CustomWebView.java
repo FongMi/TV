@@ -3,8 +3,6 @@ package com.fongmi.bear.ui.custom;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.http.SslError;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.AttributeSet;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebResourceRequest;
@@ -16,16 +14,20 @@ import android.webkit.WebViewClient;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.fongmi.bear.ApiConfig;
 import com.fongmi.bear.player.Player;
 import com.fongmi.bear.utils.Utils;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.ByteArrayInputStream;
 
 public class CustomWebView extends WebView {
 
+    private WebResourceResponse empty;
+    private String ads;
+
     public CustomWebView(@NonNull Context context) {
         super(context);
+        initSettings();
     }
 
     public CustomWebView(@NonNull Context context, @Nullable AttributeSet attrs) {
@@ -37,7 +39,9 @@ public class CustomWebView extends WebView {
     }
 
     @SuppressLint("SetJavaScriptEnabled")
-    public CustomWebView init() {
+    public void initSettings() {
+        this.ads = ApiConfig.get().getAds();
+        this.empty = new WebResourceResponse("text/plain", "utf-8", new ByteArrayInputStream("".getBytes()));
         getSettings().setUseWideViewPort(true);
         getSettings().setDatabaseEnabled(true);
         getSettings().setDomStorageEnabled(true);
@@ -45,13 +49,28 @@ public class CustomWebView extends WebView {
         getSettings().setBlockNetworkImage(true);
         getSettings().setLoadWithOverviewMode(true);
         getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+        getSettings().setJavaScriptCanOpenWindowsAutomatically(false);
         getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         setWebViewClient(webViewClient());
-        return this;
+    }
+
+    public void start(String url) {
+        stopLoading();
+        loadUrl(url);
     }
 
     private WebViewClient webViewClient() {
         return new WebViewClient() {
+            @Nullable
+            @Override
+            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                String url = request.getUrl().toString();
+                String host = request.getUrl().getHost();
+                if (ads.contains(host)) return empty;
+                if (Utils.isVideoFormat(url)) Player.get().setMediaSource(request.getRequestHeaders(), url);
+                return super.shouldInterceptRequest(view, request);
+            }
+
             @Override
             public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
                 handler.proceed();
@@ -61,29 +80,11 @@ public class CustomWebView extends WebView {
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 return false;
             }
-
-            @Nullable
-            @Override
-            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-                String url = request.getUrl().toString();
-                HashMap<String, String> headers = new HashMap<>();
-                Map<String, String> hds = request.getRequestHeaders();
-                for (String k : hds.keySet()) {
-                    if (k.equalsIgnoreCase("user-agent") || k.equalsIgnoreCase("referer") || k.equalsIgnoreCase("origin")) {
-                        headers.put(k, hds.get(k));
-                    }
-                }
-                if (Utils.isVideoFormat(url)) {
-                    if (headers.isEmpty()) {
-                        new Handler(Looper.getMainLooper()).post(() -> destroy());
-                        Player.get().setMediaSource(headers, url);
-                    } else {
-                        new Handler(Looper.getMainLooper()).post(() -> destroy());
-                        Player.get().setMediaSource(new HashMap<>(), url);
-                    }
-                }
-                return super.shouldInterceptRequest(view, request);
-            }
         };
+    }
+
+    public void stop() {
+        stopLoading();
+        loadUrl("about:blank");
     }
 }

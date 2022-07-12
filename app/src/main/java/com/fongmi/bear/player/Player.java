@@ -9,6 +9,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class Player implements com.google.android.exoplayer2.Player.Listener {
 
@@ -26,6 +27,7 @@ public class Player implements com.google.android.exoplayer2.Player.Listener {
     }
 
     public Player() {
+        webView = new CustomWebView(App.get());
         exoPlayer = new ExoPlayer.Builder(App.get()).build();
         exoPlayer.addListener(this);
     }
@@ -57,17 +59,16 @@ public class Player implements com.google.android.exoplayer2.Player.Listener {
 
     private void loadWebView(String url) {
         activity.runOnUiThread(() -> {
-            if (webView != null) webView.destroy();
-            webView = new CustomWebView(App.get()).init();
-            webView.loadUrl(url);
+            webView.start(url);
         });
     }
 
-    public void setMediaSource(HashMap<String, String> headers, String url) {
+    public void setMediaSource(Map<String, String> headers, String url) {
         activity.runOnUiThread(() -> {
             exoPlayer.setMediaSource(ExoUtil.getSource(headers, url));
             exoPlayer.prepare();
             exoPlayer.play();
+            webView.stop();
         });
     }
 
