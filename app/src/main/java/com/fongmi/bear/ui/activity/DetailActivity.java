@@ -68,11 +68,7 @@ public class DetailActivity extends BaseActivity implements Player.Callback {
         mBinding.flag.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
-                if (mOldView != null) mOldView.setActivated(false);
-                if (child == null) return;
-                mOldView = child.itemView;
-                mOldView.setActivated(true);
-                setEpisode((Vod.Flag) mFlagAdapter.get(position));
+                setFlagActivated(child, position);
             }
         });
         mBinding.group.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
@@ -82,8 +78,7 @@ public class DetailActivity extends BaseActivity implements Player.Callback {
             }
         });
         mEpisodePresenter.setOnClickListener(item -> {
-            for (int i = 0; i < mEpisodeAdapter.size(); i++) ((Vod.Flag.Episode) mEpisodeAdapter.get(i)).setActivated(item);
-            mEpisodeAdapter.notifyArrayItemRangeChanged(0, mEpisodeAdapter.size());
+            setEpisodeActivated(item);
             getPlayer(mEpisodePresenter.getFlag(), item.getUrl());
         });
         mBinding.frame.setOnClickListener(view -> {
@@ -138,6 +133,23 @@ public class DetailActivity extends BaseActivity implements Player.Callback {
     private void setText(TextView view, int resId, String text) {
         if (text.isEmpty()) view.setVisibility(View.GONE);
         else view.setText(ResUtil.getString(resId, text));
+    }
+
+    private void setFlagActivated(RecyclerView.ViewHolder child, int position) {
+        if (mOldView != null) mOldView.setActivated(false);
+        if (child == null) return;
+        mOldView = child.itemView;
+        mOldView.setActivated(true);
+        setEpisode((Vod.Flag) mFlagAdapter.get(position));
+    }
+
+    private void setEpisodeActivated(Vod.Flag.Episode item) {
+        for (int i = 0; i < mFlagAdapter.size(); i++) {
+            Vod.Flag flag = (Vod.Flag) mFlagAdapter.get(i);
+            if (mBinding.flag.getSelectedPosition() == i) flag.setActivated(item);
+            else flag.deactivated();
+        }
+        mEpisodeAdapter.notifyArrayItemRangeChanged(0, mEpisodeAdapter.size());
     }
 
     private void setEpisode(Vod.Flag item) {
