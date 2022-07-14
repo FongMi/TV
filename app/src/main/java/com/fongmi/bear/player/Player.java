@@ -98,11 +98,24 @@ public class Player implements com.google.android.exoplayer2.Player.Listener {
 
     @Override
     public void onPlaybackStateChanged(int state) {
-        if (state != com.google.android.exoplayer2.Player.STATE_READY) return;
-        callback.onPrepared();
+        switch (state) {
+            case com.google.android.exoplayer2.Player.STATE_BUFFERING:
+                callback.onBuffering();
+                break;
+            case com.google.android.exoplayer2.Player.STATE_READY:
+                callback.onReady();
+                break;
+            case com.google.android.exoplayer2.Player.STATE_ENDED:
+                break;
+            case com.google.android.exoplayer2.Player.STATE_IDLE:
+                break;
+        }
     }
 
     public interface Callback {
-        void onPrepared();
+
+        void onBuffering();
+
+        void onReady();
     }
 }

@@ -168,7 +168,12 @@ public class DetailActivity extends BaseActivity implements Player.Callback {
     }
 
     @Override
-    public void onPrepared() {
+    public void onBuffering() {
+        mBinding.progress.getRoot().setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onReady() {
         mBinding.progress.getRoot().setVisibility(View.GONE);
     }
 
