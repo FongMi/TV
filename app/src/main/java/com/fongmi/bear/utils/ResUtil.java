@@ -12,6 +12,10 @@ public class ResUtil {
         return App.get().getResources().getDisplayMetrics();
     }
 
+    public static int getScreenWidthPx() {
+        return getDisplayMetrics().widthPixels;
+    }
+
     public static int dp2px(int dpValue) {
         return Math.round(dpValue * getDisplayMetrics().density);
     }

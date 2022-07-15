@@ -74,6 +74,11 @@ public class Players implements Player.Listener {
         });
     }
 
+    public void toggle() {
+        if (exoPlayer.isPlaying()) exoPlayer.pause();
+        else exoPlayer.play();
+    }
+
     public void pause() {
         if (exoPlayer != null) {
             exoPlayer.pause();

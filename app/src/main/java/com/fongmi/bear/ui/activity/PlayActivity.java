@@ -77,7 +77,7 @@ public class PlayActivity extends BaseActivity implements KeyDownImpl {
 
     @Override
     public void onKeyCenter() {
-        mBinding.video.showController();
+        Players.get().toggle();
     }
 
     @Override
