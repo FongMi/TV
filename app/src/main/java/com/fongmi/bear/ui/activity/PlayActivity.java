@@ -8,12 +8,18 @@ import android.view.View;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.bear.databinding.ActivityPlayBinding;
+import com.fongmi.bear.event.PlayerEvent;
 import com.fongmi.bear.impl.KeyDownImpl;
-import com.fongmi.bear.player.Player;
+import com.fongmi.bear.player.Players;
 import com.fongmi.bear.utils.KeyDown;
 import com.fongmi.bear.utils.Utils;
+import com.google.android.exoplayer2.Player;
 
-public class PlayActivity extends BaseActivity implements Player.Callback, KeyDownImpl {
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
+public class PlayActivity extends BaseActivity implements KeyDownImpl {
 
     private ActivityPlayBinding mBinding;
     private KeyDown mKeyDown;
@@ -30,27 +36,22 @@ public class PlayActivity extends BaseActivity implements Player.Callback, KeyDo
     @Override
     protected void initView() {
         mKeyDown = KeyDown.create(this);
-        mBinding.video.setPlayer(Player.get().callback(this).exo());
+        mBinding.video.setPlayer(Players.get().callback(this).exo());
     }
 
     @Override
     protected void initEvent() {
-
+        EventBus.getDefault().register(this);
     }
 
-    @Override
-    public void onBuffering() {
-        mBinding.progress.getRoot().setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void onReady() {
-        mBinding.progress.getRoot().setVisibility(View.GONE);
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onPlaybackStateChanged(PlayerEvent event) {
+        mBinding.progress.getRoot().setVisibility(event.getState() == Player.STATE_BUFFERING ? View.VISIBLE : View.GONE);
     }
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (!mBinding.video.isControllerVisible() && Utils.hasEvent(event)) return mKeyDown.onKeyDown(event);
+        if (!mBinding.video.isControllerFullyVisible() && Utils.hasEvent(event)) return mKeyDown.onKeyDown(event);
         else return super.dispatchKeyEvent(event);
     }
 
@@ -96,10 +97,16 @@ public class PlayActivity extends BaseActivity implements Player.Callback, KeyDo
 
     @Override
     public void onBackPressed() {
-        if (mBinding.video.isControllerVisible()) {
+        if (mBinding.video.isControllerFullyVisible()) {
             mBinding.video.hideController();
         } else {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
     }
 }
