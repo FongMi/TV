@@ -46,9 +46,9 @@ public class SplashActivity extends BaseActivity {
             }
 
             @Override
-            public void error(String msg) {
+            public void error(int resId) {
                 HomeActivity.start(getActivity());
-                Notify.show(msg);
+                Notify.show(resId);
             }
         });
     }

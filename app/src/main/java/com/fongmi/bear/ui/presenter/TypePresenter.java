@@ -30,7 +30,7 @@ public class TypePresenter extends Presenter {
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object object) {
         Class item = (Class) object;
         ViewHolder holder = (ViewHolder) viewHolder;
-        holder.binding.name.setText(item.getTypeName());
+        holder.binding.text.setText(item.getTypeName());
         setOnClickListener(holder, view -> mListener.onItemClick(item));
     }
 

@@ -8,6 +8,7 @@
     android:focusable="true"
     android:focusableInTouchMode="true"
     android:gravity="center"
+    android:nextFocusUp="@+id/episode"
     android:textColor="@color/white"
     android:textSize="16sp"
-    tools:text="泥巴" />
+    tools:text="11" />

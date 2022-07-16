@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="150dp"
     android:layout_height="200dp"
+    android:background="@color/black_20"
     android:focusable="true"
     android:focusableInTouchMode="true">
 
@@ -18,7 +19,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/name"
-        android:background="@drawable/shape_vod_remark"
+        android:background="#CC177535"
+        android:ellipsize="end"
+        android:padding="4dp"
         android:singleLine="true"
         android:textColor="@color/white"
         android:textSize="14sp"
@@ -29,7 +32,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="@drawable/shape_vod_name"
+        android:background="@color/black_50"
         android:ellipsize="marquee"
         android:gravity="center"
         android:marqueeRepeatLimit="marquee_forever"

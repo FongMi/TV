@@ -56,6 +56,7 @@ public class SettingActivity extends BaseActivity {
             Prefers.putUrl(bindingDialog.url.getText().toString().trim());
             mBinding.url.setText(Prefers.getUrl());
             Notify.progress(this);
+            ApiConfig.get().clear();
             loadConfig();
         });
         bindingDialog.url.setOnEditorActionListener((textView, actionId, event) -> {
@@ -74,8 +75,10 @@ public class SettingActivity extends BaseActivity {
             }
 
             @Override
-            public void error(String msg) {
-                Notify.show(msg);
+            public void error(int resId) {
+                mBinding.home.setText(ApiConfig.get().getHome().getName());
+                Notify.dismiss();
+                Notify.show(resId);
             }
         });
     }

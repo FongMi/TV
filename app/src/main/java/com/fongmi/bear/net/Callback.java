@@ -1,6 +1,7 @@
 package com.fongmi.bear.net;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
 
 import java.io.IOException;
 
@@ -12,7 +13,7 @@ public abstract class Callback implements okhttp3.Callback {
     public void success() {
     }
 
-    public void error(String msg) {
+    public void error(@StringRes int resId) {
     }
 
     @Override

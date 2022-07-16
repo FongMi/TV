@@ -30,7 +30,7 @@ public class Notify {
     }
 
     public static void show(int resId) {
-        show(Utils.getString(resId));
+        if (resId != 0) show(ResUtil.getString(resId));
     }
 
     public static void show(String text) {
@@ -70,6 +70,5 @@ public class Notify {
         if (TextUtils.isEmpty(message)) return;
         mToast = Toast.makeText(App.get(), message, Toast.LENGTH_LONG);
         mToast.show();
-        dismiss();
     }
 }

@@ -37,35 +37,19 @@ public class JarLoader {
         }
     }
 
-    public void load(byte[] jarData) {
-        try {
-            spiders.clear();
-            proxyFun = null;
-            writeJar(jarData);
-            classLoader = new DexClassLoader(FileUtil.getJarPath(), FileUtil.getCachePath(), null, App.get().getClassLoader());
-            int count = 0;
-            do {
-                try {
-                    Class<?> classInit = classLoader.loadClass("com.github.catvod.spider.Init");
-                    if (classInit != null) {
-                        Method method = classInit.getMethod("init", Context.class);
-                        method.invoke(classInit, App.get());
-                        try {
-                            Class<?> proxy = classLoader.loadClass("com.github.catvod.spider.Proxy");
-                            proxyFun = proxy.getMethod("proxy", Map.class);
-                        } catch (Exception e) {
-
-                        }
-                        break;
-                    }
-                    Thread.sleep(200);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                count++;
-            } while (count < 5);
-        } catch (Exception e) {
-            e.printStackTrace();
+    public void load(byte[] jarData) throws Exception {
+        spiders.clear();
+        proxyFun = null;
+        writeJar(jarData);
+        classLoader = new DexClassLoader(FileUtil.getJarPath(), FileUtil.getCachePath(), null, App.get().getClassLoader());
+        Class<?> classInit = classLoader.loadClass("com.github.catvod.spider.Init");
+        Class<?> classProxy = classLoader.loadClass("com.github.catvod.spider.Proxy");
+        if (classInit != null) {
+            Method method = classInit.getMethod("init", Context.class);
+            method.invoke(classInit, App.get());
+        }
+        if (classProxy != null) {
+            proxyFun = classProxy.getMethod("proxy", Map.class);
         }
     }
 

@@ -4,9 +4,15 @@
     android:id="@+id/text"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@drawable/selector_filter"
+    android:background="@drawable/selector_item"
+    android:ellipsize="marquee"
     android:focusable="true"
     android:focusableInTouchMode="true"
+    android:gravity="center"
+    android:maxEms="10"
+    android:nextFocusUp="@+id/flag"
+    android:nextFocusDown="@+id/group"
+    android:singleLine="true"
     android:textColor="@color/white"
     android:textSize="16sp"
-    tools:text="全部" />
+    tools:text="20" />

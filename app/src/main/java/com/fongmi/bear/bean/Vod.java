@@ -6,6 +6,9 @@ import android.view.View;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Vod {
 
     @SerializedName("vod_id")
@@ -32,6 +35,8 @@ public class Vod {
     private String vodPlayFrom;
     @SerializedName("vod_play_url")
     private String vodPlayUrl;
+
+    private List<Flag> vodFlags;
 
     public static Vod objectFrom(String str) {
         return new Gson().fromJson(str, Vod.class);
@@ -74,7 +79,7 @@ public class Vod {
     }
 
     public String getVodContent() {
-        return TextUtils.isEmpty(vodContent) ? "" : vodContent.replaceAll("\\s+","");
+        return TextUtils.isEmpty(vodContent) ? "" : vodContent.replaceAll("\\s+", "");
     }
 
     public String getVodPlayFrom() {
@@ -85,7 +90,74 @@ public class Vod {
         return TextUtils.isEmpty(vodPlayUrl) ? "" : vodPlayUrl;
     }
 
+    public List<Flag> getVodFlags() {
+        return vodFlags;
+    }
+
+    public void setVodFlags(List<Flag> vodFlags) {
+        this.vodFlags = vodFlags;
+    }
+
     public int getRemarkVisible() {
         return getVodRemarks().isEmpty() ? View.GONE : View.VISIBLE;
+    }
+
+    public static class Flag {
+
+        private final String flag;
+        private final List<Episode> episodes;
+
+        public Flag(String flag) {
+            this.flag = flag;
+            this.episodes = new ArrayList<>();
+        }
+
+        public String getFlag() {
+            return flag;
+        }
+
+        public List<Episode> getEpisodes() {
+            return episodes;
+        }
+
+        public void deactivated() {
+            for (Episode item : getEpisodes()) item.deactivated();
+        }
+
+        public void setActivated(Episode episode) {
+            for (Episode item : getEpisodes()) item.setActivated(episode);
+        }
+
+        public static class Episode {
+
+            private final String name;
+            private final String url;
+            private boolean activated;
+
+            public Episode(String name, String url) {
+                this.name = name;
+                this.url = url;
+            }
+
+            public String getName() {
+                return name;
+            }
+
+            public String getUrl() {
+                return url;
+            }
+
+            public boolean isActivated() {
+                return activated;
+            }
+
+            private void deactivated() {
+                this.activated = false;
+            }
+
+            private void setActivated(Episode item) {
+                this.activated = item.equals(this);
+            }
+        }
     }
 }

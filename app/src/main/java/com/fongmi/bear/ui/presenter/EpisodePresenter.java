@@ -6,32 +6,41 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.leanback.widget.Presenter;
 
-import com.fongmi.bear.bean.Site;
-import com.fongmi.bear.databinding.AdapterSiteBinding;
+import com.fongmi.bear.bean.Vod;
+import com.fongmi.bear.databinding.AdapterEpisodeBinding;
 
-public class SitePresenter extends Presenter {
+public class EpisodePresenter extends Presenter {
 
     private OnClickListener mListener;
+    private String flag;
 
     public interface OnClickListener {
-        void onItemClick(Site item);
+        void onItemClick(Vod.Flag.Episode item);
     }
 
     public void setOnClickListener(OnClickListener listener) {
         this.mListener = listener;
     }
 
+    public String getFlag() {
+        return flag;
+    }
+
+    public void setFlag(String flag) {
+        this.flag = flag;
+    }
+
     @Override
     public Presenter.ViewHolder onCreateViewHolder(ViewGroup parent) {
-        return new ViewHolder(AdapterSiteBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        return new ViewHolder(AdapterEpisodeBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
     }
 
     @Override
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object object) {
-        Site item = (Site) object;
+        Vod.Flag.Episode item = (Vod.Flag.Episode) object;
         ViewHolder holder = (ViewHolder) viewHolder;
-        holder.view.setActivated(item.isHome());
         holder.binding.text.setText(item.getName());
+        holder.binding.text.setActivated(item.isActivated());
         setOnClickListener(holder, view -> mListener.onItemClick(item));
     }
 
@@ -41,9 +50,9 @@ public class SitePresenter extends Presenter {
 
     public static class ViewHolder extends Presenter.ViewHolder {
 
-        private final AdapterSiteBinding binding;
+        private final AdapterEpisodeBinding binding;
 
-        public ViewHolder(@NonNull AdapterSiteBinding binding) {
+        public ViewHolder(@NonNull AdapterEpisodeBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
         }
