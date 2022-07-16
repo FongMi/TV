@@ -120,6 +120,14 @@ public class Vod {
             return episodes;
         }
 
+        public void deactivated() {
+            for (Episode item : getEpisodes()) item.deactivated();
+        }
+
+        public void setActivated(Episode episode) {
+            for (Episode item : getEpisodes()) item.setActivated(episode);
+        }
+
         public static class Episode {
 
             private final String name;
@@ -143,7 +151,11 @@ public class Vod {
                 return activated;
             }
 
-            public void setActivated(Episode item) {
+            private void deactivated() {
+                this.activated = false;
+            }
+
+            private void setActivated(Episode item) {
                 this.activated = item.equals(this);
             }
         }

@@ -3,37 +3,39 @@ package com.fongmi.bear.player;
 import android.app.Activity;
 
 import com.fongmi.bear.App;
+import com.fongmi.bear.event.PlayerEvent;
 import com.fongmi.bear.ui.custom.CustomWebView;
 import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.Player;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class Player implements com.google.android.exoplayer2.Player.Listener {
+public class Players implements Player.Listener {
 
     private final ExoPlayer exoPlayer;
     private CustomWebView webView;
     private Activity activity;
-    private Callback callback;
 
     private static class Loader {
-        static volatile Player INSTANCE = new Player();
+        static volatile Players INSTANCE = new Players();
     }
 
-    public static Player get() {
+    public static Players get() {
         return Loader.INSTANCE;
     }
 
-    public Player() {
+    public Players() {
         webView = new CustomWebView(App.get());
         exoPlayer = new ExoPlayer.Builder(App.get()).build();
         exoPlayer.addListener(this);
     }
 
-    public Player callback(Activity activity) {
-        this.callback = (Callback) activity;
+    public Players callback(Activity activity) {
         this.activity = activity;
         return this;
     }
@@ -72,6 +74,11 @@ public class Player implements com.google.android.exoplayer2.Player.Listener {
         });
     }
 
+    public void toggle() {
+        if (exoPlayer.isPlaying()) exoPlayer.pause();
+        else exoPlayer.play();
+    }
+
     public void pause() {
         if (exoPlayer != null) {
             exoPlayer.pause();
@@ -81,6 +88,7 @@ public class Player implements com.google.android.exoplayer2.Player.Listener {
     public void stop() {
         if (exoPlayer != null) {
             exoPlayer.stop();
+            exoPlayer.seekTo(0);
         }
     }
 
@@ -98,11 +106,6 @@ public class Player implements com.google.android.exoplayer2.Player.Listener {
 
     @Override
     public void onPlaybackStateChanged(int state) {
-        if (state != com.google.android.exoplayer2.Player.STATE_READY) return;
-        callback.onPrepared();
-    }
-
-    public interface Callback {
-        void onPrepared();
+        EventBus.getDefault().post(new PlayerEvent(state));
     }
 }

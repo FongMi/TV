@@ -6,11 +6,17 @@
     android:background="@color/black"
     android:keepScreenOn="true">
 
-    <com.google.android.exoplayer2.ui.PlayerView
+    <com.google.android.exoplayer2.ui.StyledPlayerView
         android:id="@+id/video"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:resize_mode="fill"
-        app:use_controller="false" />
+        app:auto_show="false"
+        app:controller_layout_id="@layout/view_controller"
+        app:resize_mode="fill" />
+
+    <include
+        android:id="@+id/progress"
+        layout="@layout/view_progress"
+        android:visibility="gone" />
 
 </FrameLayout>

@@ -19,17 +19,23 @@ import com.fongmi.bear.ApiConfig;
 import com.fongmi.bear.R;
 import com.fongmi.bear.bean.Vod;
 import com.fongmi.bear.databinding.ActivityDetailBinding;
+import com.fongmi.bear.event.PlayerEvent;
 import com.fongmi.bear.model.SiteViewModel;
-import com.fongmi.bear.player.Player;
+import com.fongmi.bear.player.Players;
 import com.fongmi.bear.ui.presenter.EpisodePresenter;
 import com.fongmi.bear.ui.presenter.FlagPresenter;
 import com.fongmi.bear.ui.presenter.GroupPresenter;
 import com.fongmi.bear.utils.ResUtil;
+import com.google.android.exoplayer2.Player;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class DetailActivity extends BaseActivity implements Player.Callback {
+public class DetailActivity extends BaseActivity {
 
     private ActivityDetailBinding mBinding;
     private ArrayObjectAdapter mFlagAdapter;
@@ -57,7 +63,7 @@ public class DetailActivity extends BaseActivity implements Player.Callback {
     @Override
     protected void initView() {
         mBinding.progressLayout.showProgress();
-        mBinding.video.setPlayer(Player.get().callback(this).exo());
+        mBinding.video.setPlayer(Players.get().callback(this).exo());
         setRecyclerView();
         setViewModel();
         getDetail();
@@ -65,14 +71,11 @@ public class DetailActivity extends BaseActivity implements Player.Callback {
 
     @Override
     protected void initEvent() {
+        EventBus.getDefault().register(this);
         mBinding.flag.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
-                if (mOldView != null) mOldView.setActivated(false);
-                if (child == null) return;
-                mOldView = child.itemView;
-                mOldView.setActivated(true);
-                setEpisode((Vod.Flag) mFlagAdapter.get(position));
+                setFlagActivated(child, position);
             }
         });
         mBinding.group.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
@@ -82,8 +85,7 @@ public class DetailActivity extends BaseActivity implements Player.Callback {
             }
         });
         mEpisodePresenter.setOnClickListener(item -> {
-            for (int i = 0; i < mEpisodeAdapter.size(); i++) ((Vod.Flag.Episode) mEpisodeAdapter.get(i)).setActivated(item);
-            mEpisodeAdapter.notifyArrayItemRangeChanged(0, mEpisodeAdapter.size());
+            setEpisodeActivated(item);
             getPlayer(mEpisodePresenter.getFlag(), item.getUrl());
         });
         mBinding.frame.setOnClickListener(view -> {
@@ -115,7 +117,7 @@ public class DetailActivity extends BaseActivity implements Player.Callback {
 
     private void setViewModel() {
         mSiteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
-        mSiteViewModel.player.observe(this, object -> Player.get().setMediaSource(object));
+        mSiteViewModel.player.observe(this, object -> Players.get().setMediaSource(object));
         mSiteViewModel.result.observe(this, result -> {
             if (result.getList().isEmpty()) mBinding.progressLayout.showErrorText();
             else setDetail(result.getList().get(0));
@@ -140,6 +142,23 @@ public class DetailActivity extends BaseActivity implements Player.Callback {
         else view.setText(ResUtil.getString(resId, text));
     }
 
+    private void setFlagActivated(RecyclerView.ViewHolder child, int position) {
+        if (mOldView != null) mOldView.setActivated(false);
+        if (child == null) return;
+        mOldView = child.itemView;
+        mOldView.setActivated(true);
+        setEpisode((Vod.Flag) mFlagAdapter.get(position));
+    }
+
+    private void setEpisodeActivated(Vod.Flag.Episode item) {
+        for (int i = 0; i < mFlagAdapter.size(); i++) {
+            Vod.Flag flag = (Vod.Flag) mFlagAdapter.get(i);
+            if (mBinding.flag.getSelectedPosition() == i) flag.setActivated(item);
+            else flag.deactivated();
+        }
+        mEpisodeAdapter.notifyArrayItemRangeChanged(0, mEpisodeAdapter.size());
+    }
+
     private void setEpisode(Vod.Flag item) {
         mEpisodeAdapter.clear();
         mEpisodePresenter.setFlag(item.getFlag());
@@ -155,20 +174,21 @@ public class DetailActivity extends BaseActivity implements Player.Callback {
         mGroupAdapter.addAll(0, items);
     }
 
-    @Override
-    public void onPrepared() {
-        mBinding.progress.getRoot().setVisibility(View.GONE);
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onPlaybackStateChanged(PlayerEvent event) {
+        mBinding.progress.getRoot().setVisibility(event.getState() == Player.STATE_BUFFERING ? View.VISIBLE : View.GONE);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        mBinding.video.setPlayer(Player.get().exo());
+        mBinding.video.setPlayer(Players.get().exo());
     }
 
     @Override
-    public void onBackPressed() {
-        Player.get().stop();
-        super.onBackPressed();
+    protected void onDestroy() {
+        super.onDestroy();
+        Players.get().stop();
+        EventBus.getDefault().unregister(this);
     }
 }

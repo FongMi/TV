@@ -15,7 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.fongmi.bear.ApiConfig;
-import com.fongmi.bear.player.Player;
+import com.fongmi.bear.player.Players;
 import com.fongmi.bear.utils.Utils;
 
 import java.io.ByteArrayInputStream;
@@ -67,7 +67,7 @@ public class CustomWebView extends WebView {
                 String url = request.getUrl().toString();
                 String host = request.getUrl().getHost();
                 if (ads.contains(host)) return empty;
-                if (Utils.isVideoFormat(url)) Player.get().setMediaSource(request.getRequestHeaders(), url);
+                if (Utils.isVideoFormat(url)) Players.get().setMediaSource(request.getRequestHeaders(), url);
                 return super.shouldInterceptRequest(view, request);
             }
 
