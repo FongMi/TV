@@ -24,6 +24,15 @@
     <string name="detail_actor">Actor: <xliff:g name="name">%s</xliff:g></string>
     <string name="detail_content">Summary: <xliff:g name="name">%s</xliff:g></string>
 
+    <!-- Play -->
+    <string name="play_play">Play</string>
+    <string name="play_next">Next</string>
+    <string name="play_prev">Prev</string>
+    <string name="play_ready">Ready to play: <xliff:g name="name">%s</xliff:g></string>
+    <string name="play_reset">Replay</string>
+    <string name="play_speed">Speed</string>
+    <string name="play_scale">Scale</string>
+
     <!-- Setting -->
     <string name="setting_site">Home site</string>
     <string name="setting_url">Configure</string>
@@ -37,5 +46,7 @@
     <!-- Error -->
     <string name="error_config_get">Configuration get failed</string>
     <string name="error_config_parse">Configuration parse failed</string>
+    <string name="error_play_next">It\'s the last episode!</string>
+    <string name="error_play_prev">It\'s the first episode!</string>
 
 </resources>

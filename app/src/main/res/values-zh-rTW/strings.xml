@@ -24,6 +24,15 @@
     <string name="detail_actor">演員：<xliff:g name="name">%s</xliff:g></string>
     <string name="detail_content">簡介：<xliff:g name="name">%s</xliff:g></string>
 
+    <!-- Play -->
+    <string name="play_play">播放</string>
+    <string name="play_next">下一集</string>
+    <string name="play_prev">上一集</string>
+    <string name="play_ready">準備播放：<xliff:g name="name">%s</xliff:g></string>
+    <string name="play_reset">重播本集</string>
+    <string name="play_speed">倍速</string>
+    <string name="play_scale">縮放</string>
+
     <!-- Setting -->
     <string name="setting_site">首頁</string>
     <string name="setting_url">配置</string>
@@ -37,5 +46,7 @@
     <!-- Error -->
     <string name="error_config_get">配置取得失敗</string>
     <string name="error_config_parse">配置解析失敗</string>
+    <string name="error_play_next">已經是最後一集了！</string>
+    <string name="error_play_prev">已經是第一集了！</string>
 
 </resources>

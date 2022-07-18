@@ -22,7 +22,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
-            android:text="播放"
+            android:text="@string/play_play"
             android:textColor="@color/grey_700"
             android:textSize="16sp" />
 
@@ -34,7 +34,7 @@
             android:background="@drawable/selector_text"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            android:text="下一集"
+            android:text="@string/play_next"
             android:textColor="@color/white" />
 
         <TextView
@@ -45,7 +45,7 @@
             android:background="@drawable/selector_text"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            android:text="上一集"
+            android:text="@string/play_prev"
             android:textColor="@color/white" />
 
         <TextView
@@ -55,14 +55,14 @@
             android:background="@drawable/selector_text"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            android:text="重播本集"
+            android:text="@string/play_reset"
             android:textColor="@color/white" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
-            android:text="倍速"
+            android:text="@string/play_speed"
             android:textColor="@color/grey_700"
             android:textSize="16sp" />
 
@@ -80,7 +80,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
-            android:text="縮放比例"
+            android:text="@string/play_scale"
             android:textColor="@color/grey_700"
             android:textSize="16sp" />
 

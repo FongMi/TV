@@ -49,6 +49,10 @@ public class DetailActivity extends BaseActivity {
         return getIntent().getStringExtra("id");
     }
 
+    private Vod.Flag getVodFlag() {
+        return (Vod.Flag) mFlagAdapter.get(mBinding.flag.getSelectedPosition());
+    }
+
     public static void start(Activity activity, String id) {
         Intent intent = new Intent(activity, DetailActivity.class);
         intent.putExtra("id", id);
@@ -86,11 +90,11 @@ public class DetailActivity extends BaseActivity {
         });
         mEpisodePresenter.setOnClickListener(item -> {
             setEpisodeActivated(item);
-            getPlayer(mEpisodePresenter.getFlag(), item.getUrl());
+            getPlayer(item.getUrl());
         });
         mBinding.frame.setOnClickListener(view -> {
             mBinding.video.setPlayer(null);
-            PlayActivity.newInstance(getActivity());
+            PlayActivity.newInstance(getActivity(), getVodFlag());
         });
     }
 
@@ -110,9 +114,9 @@ public class DetailActivity extends BaseActivity {
         mSiteViewModel.detailContent(getId());
     }
 
-    private void getPlayer(String flag, String id) {
+    private void getPlayer(String id) {
         mBinding.progress.getRoot().setVisibility(View.VISIBLE);
-        mSiteViewModel.playerContent(flag, id);
+        mSiteViewModel.playerContent(getVodFlag().getFlag(), id);
     }
 
     private void setViewModel() {
@@ -161,16 +165,16 @@ public class DetailActivity extends BaseActivity {
 
     private void setEpisode(Vod.Flag item) {
         mEpisodeAdapter.clear();
-        mEpisodePresenter.setFlag(item.getFlag());
         mEpisodeAdapter.addAll(0, item.getEpisodes());
-        if (item.getEpisodes().size() > 20) setGroup(item.getEpisodes().size());
+        setGroup(item.getEpisodes().size());
     }
 
     private void setGroup(int size) {
         List<String> items = new ArrayList<>();
         int itemSize = (int) Math.ceil(size / 20.0f);
         for (int i = 0; i < itemSize; i++) items.add(String.valueOf(i * 20 + 1));
-        mBinding.group.setVisibility(View.VISIBLE);
+        mBinding.group.setVisibility(itemSize > 1 ? View.VISIBLE : View.GONE);
+        mGroupAdapter.clear();
         mGroupAdapter.addAll(0, items);
     }
 
