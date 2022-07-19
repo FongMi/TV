@@ -27,7 +27,6 @@ public class SiteViewModel extends ViewModel {
     public ExecutorService service;
 
     public SiteViewModel() {
-        this.service = Executors.newFixedThreadPool(2);
         this.result = new MutableLiveData<>();
         this.player = new MutableLiveData<>();
     }
@@ -87,22 +86,29 @@ public class SiteViewModel extends ViewModel {
         });
     }
 
+    private void initService(boolean close) {
+        if (service != null && close) service.shutdownNow();
+        service = Executors.newFixedThreadPool(2);
+    }
+
     private void postResult(Callable<Result> callable) {
+        initService(false);
         service.execute(() -> {
             try {
-                result.postValue(service.submit(callable).get(10, TimeUnit.SECONDS));
+                if (!Thread.interrupted()) result.postValue(service.submit(callable).get(10, TimeUnit.SECONDS));
             } catch (Exception e) {
-                result.postValue(new Result());
+                if (!Thread.interrupted()) result.postValue(new Result());
             }
         });
     }
 
     private void postPlayer(Callable<JsonObject> callable) {
+        initService(true);
         service.execute(() -> {
             try {
-                player.postValue(service.submit(callable).get(10, TimeUnit.SECONDS));
+                if (!Thread.interrupted()) player.postValue(service.submit(callable).get(10, TimeUnit.SECONDS));
             } catch (Exception e) {
-                player.postValue(null);
+                if (!Thread.interrupted()) player.postValue(null);
             }
         });
     }
@@ -122,5 +128,10 @@ public class SiteViewModel extends ViewModel {
             items.add(item);
         }
         return items;
+    }
+
+    @Override
+    protected void onCleared() {
+        if (service != null) service.shutdownNow();
     }
 }

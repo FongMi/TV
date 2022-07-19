@@ -49,4 +49,12 @@
     <string name="error_play_next">已经是最后一集了！</string>
     <string name="error_play_prev">已经是第一集了！</string>
 
+    <string-array name="select_scale">
+        <item>预设</item>
+        <item>宽度</item>
+        <item>高度</item>
+        <item>填充</item>
+        <item>缩放</item>
+    </string-array>
+
 </resources>

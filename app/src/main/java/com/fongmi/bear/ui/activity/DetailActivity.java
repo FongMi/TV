@@ -25,6 +25,7 @@ import com.fongmi.bear.player.Players;
 import com.fongmi.bear.ui.presenter.EpisodePresenter;
 import com.fongmi.bear.ui.presenter.FlagPresenter;
 import com.fongmi.bear.ui.presenter.GroupPresenter;
+import com.fongmi.bear.utils.Prefers;
 import com.fongmi.bear.utils.ResUtil;
 import com.google.android.exoplayer2.Player;
 
@@ -68,6 +69,7 @@ public class DetailActivity extends BaseActivity {
     protected void initView() {
         mBinding.progressLayout.showProgress();
         mBinding.video.setPlayer(Players.get().callback(this).exo());
+        mBinding.video.setResizeMode(Prefers.getScale());
         setRecyclerView();
         setViewModel();
         getDetail();
@@ -121,7 +123,9 @@ public class DetailActivity extends BaseActivity {
 
     private void setViewModel() {
         mSiteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
-        mSiteViewModel.player.observe(this, object -> Players.get().setMediaSource(object));
+        mSiteViewModel.player.observe(this, object -> {
+            if (object != null) Players.get().setMediaSource(object);
+        });
         mSiteViewModel.result.observe(this, result -> {
             if (result.getList().isEmpty()) mBinding.progressLayout.showErrorText();
             else setDetail(result.getList().get(0));
@@ -186,6 +190,7 @@ public class DetailActivity extends BaseActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        mBinding.video.setResizeMode(Prefers.getScale());
         mBinding.video.setPlayer(Players.get().exo());
     }
 

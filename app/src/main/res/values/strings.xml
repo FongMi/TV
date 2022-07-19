@@ -49,4 +49,12 @@
     <string name="error_play_next">It\'s the last episode!</string>
     <string name="error_play_prev">It\'s the first episode!</string>
 
+    <string-array name="select_scale">
+        <item>Default</item>
+        <item>Width</item>
+        <item>Height</item>
+        <item>Fill</item>
+        <item>Zoom</item>
+    </string-array>
+
 </resources>

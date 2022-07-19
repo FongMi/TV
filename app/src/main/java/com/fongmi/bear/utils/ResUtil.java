@@ -2,6 +2,7 @@ package com.fongmi.bear.utils;
 
 import android.util.DisplayMetrics;
 
+import androidx.annotation.ArrayRes;
 import androidx.annotation.StringRes;
 
 import com.fongmi.bear.App;
@@ -26,5 +27,9 @@ public class ResUtil {
 
     public static String getString(@StringRes int resId, Object... formatArgs) {
         return App.get().getString(resId, formatArgs);
+    }
+
+    public static CharSequence[] getStringArray(@ArrayRes int resId) {
+        return App.get().getResources().getStringArray(resId);
     }
 }

@@ -44,6 +44,16 @@ public class Players implements Player.Listener {
         return exoPlayer;
     }
 
+    public String getSpeed() {
+        return String.valueOf(exoPlayer.getPlaybackParameters().speed);
+    }
+
+    public String addSpeed() {
+        float speed = exoPlayer.getPlaybackParameters().speed;
+        exoPlayer.setPlaybackSpeed(speed = speed >= 3 ? 0.75f : speed + 0.25f);
+        return String.valueOf(speed);
+    }
+
     public void setMediaSource(JsonObject object) {
         HashMap<String, String> headers = new HashMap<>();
         String parse = object.get("parse").getAsString();
@@ -89,6 +99,7 @@ public class Players implements Player.Listener {
         if (exoPlayer != null) {
             exoPlayer.stop();
             exoPlayer.seekTo(0);
+            exoPlayer.setPlaybackSpeed(1.0f);
         }
     }
 

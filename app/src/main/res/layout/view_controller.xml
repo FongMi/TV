@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/exo_controller"
+    android:id="@+id/control"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="bottom"
@@ -49,6 +49,7 @@
             android:textColor="@color/white" />
 
         <TextView
+            android:id="@+id/replay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
@@ -67,14 +68,15 @@
             android:textSize="16sp" />
 
         <TextView
+            android:id="@+id/speed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:background="@drawable/selector_text"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            android:text="x1.0"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            tools:text="1.0" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -85,14 +87,15 @@
             android:textSize="16sp" />
 
         <TextView
+            android:id="@+id/scale"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:background="@drawable/selector_text"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            android:text="預設"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            tools:text="預設" />
 
     </LinearLayout>
 
@@ -121,7 +124,7 @@
             android:layout_weight="1"
             android:nextFocusUp="@+id/next"
             app:buffered_color="@color/grey_700"
-            app:played_color="@color/grey_900"
+            app:played_color="@color/blue_700"
             app:scrubber_color="@color/blue_500"
             app:unplayed_color="@color/grey_500" />
 
