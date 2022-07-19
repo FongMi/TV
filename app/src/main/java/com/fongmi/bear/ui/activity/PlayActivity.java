@@ -57,11 +57,12 @@ public class PlayActivity extends BaseActivity implements KeyDownImpl {
         mVodFlag = Vod.Flag.objectFrom(getFlag());
         mControl = ViewControllerBinding.bind(mBinding.video.findViewById(R.id.control));
         mControl.scale.setText(ResUtil.getStringArray(R.array.select_scale)[Prefers.getScale()]);
-        mBinding.video.setPlayer(Players.get().callback(this).exo());
+        mBinding.video.setPlayer(Players.get().activity(this).exo());
         mBinding.video.setControllerHideOnTouch(false);
         mBinding.video.setControllerShowTimeoutMs(0);
         mBinding.video.setResizeMode(Prefers.getScale());
         mControl.speed.setText(Players.get().getSpeed());
+        if (Players.get().isIdle()) showProgress();
         setViewModel();
         findCurrent();
     }
@@ -92,12 +93,24 @@ public class PlayActivity extends BaseActivity implements KeyDownImpl {
         }
     }
 
+    private void showProgress() {
+        if (mBinding.progress.getRoot().getVisibility() == View.GONE) {
+            mBinding.progress.getRoot().setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void hideProgress() {
+        if (mBinding.progress.getRoot().getVisibility() == View.VISIBLE) {
+            mBinding.progress.getRoot().setVisibility(View.GONE);
+        }
+    }
+
     private void getPlayer() {
-        mBinding.progress.getRoot().setVisibility(View.VISIBLE);
         Vod.Flag.Episode episode = mVodFlag.getEpisodes().get(mCurrent);
         mSiteViewModel.playerContent(mVodFlag.getFlag(), episode.getUrl());
         Notify.show(ResUtil.getString(R.string.play_ready, episode.getName()));
         mVodFlag.setActivated(episode);
+        showProgress();
     }
 
     private void onNext() {
@@ -122,7 +135,8 @@ public class PlayActivity extends BaseActivity implements KeyDownImpl {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onPlaybackStateChanged(PlayerEvent event) {
-        mBinding.progress.getRoot().setVisibility(event.getState() == Player.STATE_BUFFERING ? View.VISIBLE : View.GONE);
+        if (event.getState() == Player.STATE_BUFFERING) showProgress();
+        else hideProgress();
     }
 
     @Override
@@ -176,11 +190,18 @@ public class PlayActivity extends BaseActivity implements KeyDownImpl {
 
     }
 
+    private void setResult() {
+        Intent intent = new Intent();
+        intent.putExtra("current", mCurrent);
+        setResult(RESULT_OK, intent);
+    }
+
     @Override
     public void onBackPressed() {
         if (mBinding.video.isControllerFullyVisible()) {
             mBinding.video.hideController();
         } else {
+            setResult();
             super.onBackPressed();
         }
     }

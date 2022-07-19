@@ -68,7 +68,7 @@ public class DetailActivity extends BaseActivity {
     @Override
     protected void initView() {
         mBinding.progressLayout.showProgress();
-        mBinding.video.setPlayer(Players.get().callback(this).exo());
+        mBinding.video.setPlayer(Players.get().activity(this).exo());
         mBinding.video.setResizeMode(Prefers.getScale());
         setRecyclerView();
         setViewModel();
@@ -191,7 +191,14 @@ public class DetailActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         mBinding.video.setResizeMode(Prefers.getScale());
-        mBinding.video.setPlayer(Players.get().exo());
+        mBinding.video.setPlayer(Players.get().activity(this).exo());
+        if (data != null) checkResult(data);
+    }
+
+    private void checkResult(Intent data) {
+        int current = data.getIntExtra("current", 0);
+        setEpisodeActivated((Vod.Flag.Episode) mEpisodeAdapter.get(current));
+        mBinding.episode.setSelectedPosition(current);
     }
 
     @Override
