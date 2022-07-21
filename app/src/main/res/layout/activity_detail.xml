@@ -15,6 +15,7 @@
         android:layout_marginTop="24dp"
         android:layout_marginEnd="24dp"
         android:layout_marginBottom="12dp"
+        android:background="@color/black"
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:foreground="@drawable/selector_video">
@@ -23,7 +24,8 @@
             android:id="@+id/video"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:resize_mode="fill"
+            android:background="@color/black"
+            app:resize_mode="fit"
             app:use_controller="false" />
 
         <include

@@ -18,14 +18,14 @@ public class KeyDown {
     }
 
     public boolean onKeyDown(KeyEvent event) {
-        if (event.getAction() == KeyEvent.ACTION_DOWN && Utils.isUpKey(event)) {
-            mKeyDown.onKeyVertical(true);
-        } else if (event.getAction() == KeyEvent.ACTION_DOWN && Utils.isDownKey(event)) {
-            mKeyDown.onKeyVertical(false);
-        } else if (event.getAction() == KeyEvent.ACTION_DOWN && Utils.isLeftKey(event)) {
+        if (event.getAction() == KeyEvent.ACTION_DOWN && Utils.isLeftKey(event)) {
             mKeyDown.onSeek(false);
         } else if (event.getAction() == KeyEvent.ACTION_DOWN && Utils.isRightKey(event)) {
             mKeyDown.onSeek(true);
+        } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isUpKey(event)) {
+            mKeyDown.onKeyUp();
+        } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isDownKey(event)) {
+            mKeyDown.onKeyDown();
         } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isLeftKey(event)) {
             mKeyDown.onKeyLeft();
         } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isRightKey(event)) {

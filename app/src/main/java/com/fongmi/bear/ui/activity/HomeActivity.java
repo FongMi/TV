@@ -132,7 +132,7 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         Players.get().release();
+        super.onDestroy();
     }
 }

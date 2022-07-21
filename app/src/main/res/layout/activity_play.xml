@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         app:auto_show="false"
         app:controller_layout_id="@layout/view_controller"
-        app:resize_mode="fill" />
+        app:resize_mode="fit" />
 
     <include
         android:id="@+id/progress"

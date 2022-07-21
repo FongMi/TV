@@ -20,6 +20,10 @@ public class Prefers {
         return getPrefers().getString(key, defaultValue);
     }
 
+    public static int getInt(String key) {
+        return getPrefers().getInt(key, 0);
+    }
+
     public static void put(String key, Object obj) {
         if (obj == null) return;
         if (obj instanceof String) {
@@ -49,5 +53,13 @@ public class Prefers {
 
     public static void putHome(String home) {
         Prefers.put("home", home);
+    }
+
+    public static int getScale() {
+        return Prefers.getInt("scale");
+    }
+
+    public static void putScale(int scale) {
+        Prefers.put("scale", scale);
     }
 }

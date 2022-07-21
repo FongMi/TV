@@ -4,7 +4,9 @@ public interface KeyDownImpl {
 
     void onSeek(boolean forward);
 
-    void onKeyVertical(boolean up);
+    void onKeyUp();
+
+    void onKeyDown();
 
     void onKeyLeft();
 

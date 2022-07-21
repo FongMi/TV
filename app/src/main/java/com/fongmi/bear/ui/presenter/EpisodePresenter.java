@@ -12,7 +12,6 @@ import com.fongmi.bear.databinding.AdapterEpisodeBinding;
 public class EpisodePresenter extends Presenter {
 
     private OnClickListener mListener;
-    private String flag;
 
     public interface OnClickListener {
         void onItemClick(Vod.Flag.Episode item);
@@ -20,14 +19,6 @@ public class EpisodePresenter extends Presenter {
 
     public void setOnClickListener(OnClickListener listener) {
         this.mListener = listener;
-    }
-
-    public String getFlag() {
-        return flag;
-    }
-
-    public void setFlag(String flag) {
-        this.flag = flag;
     }
 
     @Override

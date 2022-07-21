@@ -25,6 +25,8 @@ import com.fongmi.bear.player.Players;
 import com.fongmi.bear.ui.presenter.EpisodePresenter;
 import com.fongmi.bear.ui.presenter.FlagPresenter;
 import com.fongmi.bear.ui.presenter.GroupPresenter;
+import com.fongmi.bear.utils.Notify;
+import com.fongmi.bear.utils.Prefers;
 import com.fongmi.bear.utils.ResUtil;
 import com.google.android.exoplayer2.Player;
 
@@ -49,6 +51,10 @@ public class DetailActivity extends BaseActivity {
         return getIntent().getStringExtra("id");
     }
 
+    private Vod.Flag getVodFlag() {
+        return (Vod.Flag) mFlagAdapter.get(mBinding.flag.getSelectedPosition());
+    }
+
     public static void start(Activity activity, String id) {
         Intent intent = new Intent(activity, DetailActivity.class);
         intent.putExtra("id", id);
@@ -63,7 +69,8 @@ public class DetailActivity extends BaseActivity {
     @Override
     protected void initView() {
         mBinding.progressLayout.showProgress();
-        mBinding.video.setPlayer(Players.get().callback(this).exo());
+        mBinding.video.setPlayer(Players.get().exo());
+        mBinding.video.setResizeMode(Prefers.getScale());
         setRecyclerView();
         setViewModel();
         getDetail();
@@ -86,11 +93,11 @@ public class DetailActivity extends BaseActivity {
         });
         mEpisodePresenter.setOnClickListener(item -> {
             setEpisodeActivated(item);
-            getPlayer(mEpisodePresenter.getFlag(), item.getUrl());
+            getPlayer(item.getUrl());
         });
         mBinding.frame.setOnClickListener(view -> {
             mBinding.video.setPlayer(null);
-            PlayActivity.newInstance(getActivity());
+            PlayActivity.newInstance(getActivity(), getVodFlag());
         });
     }
 
@@ -110,14 +117,16 @@ public class DetailActivity extends BaseActivity {
         mSiteViewModel.detailContent(getId());
     }
 
-    private void getPlayer(String flag, String id) {
+    private void getPlayer(String id) {
         mBinding.progress.getRoot().setVisibility(View.VISIBLE);
-        mSiteViewModel.playerContent(flag, id);
+        mSiteViewModel.playerContent(getVodFlag().getFlag(), id);
     }
 
     private void setViewModel() {
         mSiteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
-        mSiteViewModel.player.observe(this, object -> Players.get().setMediaSource(object));
+        mSiteViewModel.player.observe(this, object -> {
+            if (object != null) Players.get().setMediaSource(object);
+        });
         mSiteViewModel.result.observe(this, result -> {
             if (result.getList().isEmpty()) mBinding.progressLayout.showErrorText();
             else setDetail(result.getList().get(0));
@@ -161,28 +170,37 @@ public class DetailActivity extends BaseActivity {
 
     private void setEpisode(Vod.Flag item) {
         mEpisodeAdapter.clear();
-        mEpisodePresenter.setFlag(item.getFlag());
         mEpisodeAdapter.addAll(0, item.getEpisodes());
-        if (item.getEpisodes().size() > 20) setGroup(item.getEpisodes().size());
+        setGroup(item.getEpisodes().size());
     }
 
     private void setGroup(int size) {
         List<String> items = new ArrayList<>();
         int itemSize = (int) Math.ceil(size / 20.0f);
         for (int i = 0; i < itemSize; i++) items.add(String.valueOf(i * 20 + 1));
-        mBinding.group.setVisibility(View.VISIBLE);
+        mBinding.group.setVisibility(itemSize > 1 ? View.VISIBLE : View.GONE);
+        mGroupAdapter.clear();
         mGroupAdapter.addAll(0, items);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onPlaybackStateChanged(PlayerEvent event) {
         mBinding.progress.getRoot().setVisibility(event.getState() == Player.STATE_BUFFERING ? View.VISIBLE : View.GONE);
+        if (event.getState() == -1) Notify.show(R.string.error_play_parse);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        mBinding.video.setResizeMode(Prefers.getScale());
         mBinding.video.setPlayer(Players.get().exo());
+        if (data != null) checkResult(data);
+    }
+
+    private void checkResult(Intent data) {
+        int current = data.getIntExtra("current", 0);
+        setEpisodeActivated((Vod.Flag.Episode) mEpisodeAdapter.get(current));
+        mBinding.episode.setSelectedPosition(current);
     }
 
     @Override
