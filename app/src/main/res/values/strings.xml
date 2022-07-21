@@ -48,6 +48,7 @@
     <string name="error_config_parse">Configuration parse failed</string>
     <string name="error_play_next">It\'s the last episode!</string>
     <string name="error_play_prev">It\'s the first episode!</string>
+    <string name="error_play_parse">Unable to parse url</string>
 
     <string-array name="select_scale">
         <item>Default</item>

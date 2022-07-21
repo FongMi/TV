@@ -57,11 +57,11 @@ public class PlayActivity extends BaseActivity implements KeyDownImpl {
         mVodFlag = Vod.Flag.objectFrom(getFlag());
         mControl = ViewControllerBinding.bind(mBinding.video.findViewById(R.id.control));
         mControl.scale.setText(ResUtil.getStringArray(R.array.select_scale)[Prefers.getScale()]);
-        mBinding.video.setPlayer(Players.get().activity(this).exo());
+        mControl.speed.setText(Players.get().getSpeed());
+        mBinding.video.setResizeMode(Prefers.getScale());
         mBinding.video.setControllerHideOnTouch(false);
         mBinding.video.setControllerShowTimeoutMs(0);
-        mBinding.video.setResizeMode(Prefers.getScale());
-        mControl.speed.setText(Players.get().getSpeed());
+        mBinding.video.setPlayer(Players.get().exo());
         if (Players.get().isIdle()) showProgress();
         setViewModel();
         findCurrent();
@@ -135,6 +135,7 @@ public class PlayActivity extends BaseActivity implements KeyDownImpl {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onPlaybackStateChanged(PlayerEvent event) {
+        if (event.getState() == -1) Notify.show(R.string.error_play_parse);
         if (event.getState() == Player.STATE_BUFFERING) showProgress();
         else hideProgress();
     }
@@ -158,6 +159,7 @@ public class PlayActivity extends BaseActivity implements KeyDownImpl {
     @Override
     public void onKeyDown() {
         mBinding.video.showController();
+        mControl.next.requestFocus();
     }
 
     @Override

@@ -48,6 +48,7 @@
     <string name="error_config_parse">配置解析失敗</string>
     <string name="error_play_next">已經是最後一集了！</string>
     <string name="error_play_prev">已經是第一集了！</string>
+    <string name="error_play_parse">無法解析網址</string>
 
     <string-array name="select_scale">
         <item>預設</item>

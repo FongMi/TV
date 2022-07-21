@@ -1,6 +1,7 @@
 package com.fongmi.bear.player;
 
-import android.app.Activity;
+import android.os.Handler;
+import android.os.Looper;
 
 import com.fongmi.bear.App;
 import com.fongmi.bear.event.PlayerEvent;
@@ -17,9 +18,9 @@ import java.util.Map;
 
 public class Players implements Player.Listener {
 
+    private final CustomWebView webView;
     private final ExoPlayer exoPlayer;
-    private CustomWebView webView;
-    private Activity activity;
+    private final Handler handler;
 
     private static class Loader {
         static volatile Players INSTANCE = new Players();
@@ -31,13 +32,9 @@ public class Players implements Player.Listener {
 
     public Players() {
         webView = new CustomWebView(App.get());
+        handler = new Handler(Looper.getMainLooper());
         exoPlayer = new ExoPlayer.Builder(App.get()).build();
         exoPlayer.addListener(this);
-    }
-
-    public Players activity(Activity activity) {
-        this.activity = activity;
-        return this;
     }
 
     public ExoPlayer exo() {
@@ -74,13 +71,14 @@ public class Players implements Player.Listener {
     }
 
     private void loadWebView(String url) {
-        activity.runOnUiThread(() -> {
-            webView.start(url);
-        });
+        handler.removeCallbacks(mTimer);
+        handler.postDelayed(mTimer, 5000);
+        handler.post(() -> webView.start(url));
     }
 
     public void setMediaSource(Map<String, String> headers, String url) {
-        activity.runOnUiThread(() -> {
+        handler.post(() -> {
+            handler.removeCallbacks(mTimer);
             exoPlayer.setMediaSource(ExoUtil.getSource(headers, url));
             exoPlayer.prepare();
             exoPlayer.play();
@@ -89,8 +87,8 @@ public class Players implements Player.Listener {
     }
 
     public void toggle() {
-        if (exoPlayer.isPlaying()) exoPlayer.pause();
-        else exoPlayer.play();
+        if (exoPlayer.isPlaying()) pause();
+        else play();
     }
 
     public void pause() {
@@ -118,6 +116,15 @@ public class Players implements Player.Listener {
             exoPlayer.release();
         }
     }
+
+    private final Runnable mTimer = new Runnable() {
+        @Override
+        public void run() {
+            EventBus.getDefault().post(new PlayerEvent(-1));
+            exoPlayer.stop();
+            webView.stop();
+        }
+    };
 
     @Override
     public void onPlaybackStateChanged(int state) {
