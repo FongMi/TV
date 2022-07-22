@@ -8,6 +8,7 @@ import com.fongmi.bear.bean.Result;
 import com.fongmi.bear.bean.Site;
 import com.fongmi.bear.bean.Vod;
 import com.fongmi.bear.net.OKHttp;
+import com.fongmi.bear.utils.Utils;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderDebug;
 import com.google.gson.JsonObject;
@@ -117,12 +118,21 @@ public class SiteViewModel extends ViewModel {
     public void playerContent(String flag, String id) {
         Site home = ApiConfig.get().getHome();
         postPlayer(() -> {
-            Spider spider = ApiConfig.get().getCSP(home);
-            String playerContent = spider.playerContent(flag, id, ApiConfig.get().getFlags());
-            SpiderDebug.json(playerContent);
-            JsonObject object = JsonParser.parseString(playerContent).getAsJsonObject();
-            if (!object.has("flag")) object.addProperty("flag", flag);
-            return object;
+            if (home.getType() == 3) {
+                Spider spider = ApiConfig.get().getCSP(home);
+                String playerContent = spider.playerContent(flag, id, ApiConfig.get().getFlags());
+                SpiderDebug.json(playerContent);
+                JsonObject object = JsonParser.parseString(playerContent).getAsJsonObject();
+                if (!object.has("flag")) object.addProperty("flag", flag);
+                return object;
+            } else {
+                JsonObject object = new JsonObject();
+                object.addProperty("url", id);
+                object.addProperty("flag", flag);
+                object.addProperty("playUrl", home.getPlayerUrl());
+                object.addProperty("parse", Utils.isVideoFormat(id) ? "0" : "1");
+                return object;
+            }
         });
     }
 

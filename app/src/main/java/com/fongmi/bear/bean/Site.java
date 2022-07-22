@@ -14,6 +14,8 @@ public class Site {
     private int type;
     @SerializedName("api")
     private String api;
+    @SerializedName("playerUrl")
+    private String playerUrl;
     @SerializedName("searchable")
     private int searchable;
     @SerializedName("quickSearch")
@@ -61,6 +63,10 @@ public class Site {
 
     public void setApi(String api) {
         this.api = api;
+    }
+
+    public String getPlayerUrl() {
+        return playerUrl;
     }
 
     public Integer getSearchable() {
