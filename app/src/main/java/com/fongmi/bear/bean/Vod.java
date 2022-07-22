@@ -93,7 +93,7 @@ public class Vod {
     }
 
     public List<Flag> getVodFlags() {
-        return vodFlags;
+        return vodFlags = vodFlags == null ? new ArrayList<>() : vodFlags;
     }
 
     public void setVodFlags(List<Flag> vodFlags) {
@@ -102,6 +102,21 @@ public class Vod {
 
     public int getRemarkVisible() {
         return getVodRemarks().isEmpty() ? View.GONE : View.VISIBLE;
+    }
+
+    public void setVodFlags() {
+        String[] playFlags = getVodPlayFrom().split("\\$\\$\\$");
+        String[] playUrls = getVodPlayUrl().split("\\$\\$\\$");
+        for (int i = 0; i < playFlags.length; i++) {
+            Vod.Flag item = new Vod.Flag(playFlags[i]);
+            String[] urls = playUrls[i].contains("#") ? playUrls[i].split("#") : new String[]{playUrls[i]};
+            for (String url : urls) {
+                if (!url.contains("$")) continue;
+                String[] split = url.split("\\$");
+                if (split.length >= 2) item.getEpisodes().add(new Vod.Flag.Episode(split[0], split[1]));
+            }
+            getVodFlags().add(item);
+        }
     }
 
     public static class Flag {
