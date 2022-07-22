@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -19,7 +18,6 @@ import androidx.leanback.widget.ItemBridgeAdapter;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.bear.ApiConfig;
-import com.fongmi.bear.R;
 import com.fongmi.bear.bean.Site;
 import com.fongmi.bear.databinding.ActivitySettingBinding;
 import com.fongmi.bear.databinding.DialogConfigBinding;
@@ -38,10 +36,7 @@ public class SettingActivity extends BaseActivity {
         activity.startActivityForResult(new Intent(activity, SettingActivity.class), 1000);
     }
 
-    private final ActivityResultLauncher<String> permissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-        if (!isGranted) Notify.show(R.string.error_config_get);
-        else loadConfig();
-    });
+    private final ActivityResultLauncher<String> permissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> loadConfig());
 
     @Override
     protected ViewBinding getBinding() {
@@ -78,16 +73,10 @@ public class SettingActivity extends BaseActivity {
     }
 
     private void checkUrl() {
-        if (Patterns.WEB_URL.matcher(Prefers.getUrl()).matches()) {
+        if (Prefers.getUrl().startsWith("file://") && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
+        } else {
             loadConfig();
-            return;
-        }
-        if (Prefers.getUrl().startsWith("file://")) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                loadConfig();
-            } else {
-                permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
-            }
         }
     }
 
