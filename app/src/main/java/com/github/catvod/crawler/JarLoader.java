@@ -7,7 +7,7 @@ import com.fongmi.bear.utils.FileUtil;
 
 import org.json.JSONObject;
 
-import java.io.FileOutputStream;
+import java.io.File;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -26,22 +26,10 @@ public class JarLoader {
         this.spiders = new ConcurrentHashMap<>();
     }
 
-    public void writeJar(byte[] jarData) {
-        try {
-            FileOutputStream fos = new FileOutputStream(FileUtil.getJar());
-            fos.write(jarData);
-            fos.flush();
-            fos.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void load(byte[] jarData) throws Exception {
+    public void load(File file) throws Exception {
         spiders.clear();
         proxyFun = null;
-        writeJar(jarData);
-        classLoader = new DexClassLoader(FileUtil.getJarPath(), FileUtil.getCachePath(), null, App.get().getClassLoader());
+        classLoader = new DexClassLoader(file.getAbsolutePath(), FileUtil.getCachePath(), null, App.get().getClassLoader());
         Class<?> classInit = classLoader.loadClass("com.github.catvod.spider.Init");
         Class<?> classProxy = classLoader.loadClass("com.github.catvod.spider.Proxy");
         if (classInit != null) {

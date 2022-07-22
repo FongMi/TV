@@ -4,13 +4,12 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Patterns;
 
-import androidx.annotation.NonNull;
-
 import com.fongmi.bear.bean.Live;
 import com.fongmi.bear.bean.Parse;
 import com.fongmi.bear.bean.Site;
 import com.fongmi.bear.net.Callback;
 import com.fongmi.bear.net.OKHttp;
+import com.fongmi.bear.utils.FileUtil;
 import com.fongmi.bear.utils.Json;
 import com.fongmi.bear.utils.Prefers;
 import com.github.catvod.crawler.JarLoader;
@@ -18,9 +17,11 @@ import com.github.catvod.crawler.Spider;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonReader;
 
 import org.json.JSONObject;
 
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,7 +29,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import okhttp3.Call;
 import okhttp3.Request;
 import okhttp3.Response;
 
@@ -72,29 +72,46 @@ public class ApiConfig {
     }
 
     public void loadConfig(Callback callback) {
-        if (Prefers.getUrl().isEmpty() || !Patterns.WEB_URL.matcher(Prefers.getUrl()).matches()) {
-            handler.post(() -> callback.error(0));
-            return;
-        }
-        OKHttp.get().client().newCall(new Request.Builder().url(Prefers.getUrl()).build()).enqueue(new Callback() {
-            @Override
-            public void onResponse(@NonNull Call call, @NonNull Response response) {
-                try {
-                    JsonObject object = new Gson().fromJson(response.body().string(), JsonObject.class);
-                    String spider = Json.safeString(object, "spider", "");
-                    parseJson(object);
-                    loadJar(spider);
-                    handler.post(callback::success);
-                } catch (Exception e) {
-                    handler.post(() -> callback.error(R.string.error_config_parse));
-                }
+        String url = Prefers.getUrl();
+        new Thread(() -> {
+            if (url.startsWith("file://")) {
+                getFileConfig(url, callback);
+            } else if (Patterns.WEB_URL.matcher(url).matches()) {
+                getWebConfig(url, callback);
+            } else {
+                handler.post(() -> callback.error(0));
             }
+        }).start();
+    }
 
-            @Override
-            public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                handler.post(() -> callback.error(R.string.error_config_get));
-            }
-        });
+    private void getFileConfig(String url, Callback callback) {
+        try {
+            JsonReader reader = new JsonReader(new FileReader(FileUtil.getLocal(url)));
+            parseConfig(new Gson().fromJson(reader, JsonObject.class), callback);
+        } catch (Exception e) {
+            handler.post(() -> callback.error(R.string.error_config_get));
+        }
+    }
+
+    private void getWebConfig(String url, Callback callback) {
+        try {
+            Response response = OKHttp.get().client().newCall(new Request.Builder().url(url).build()).execute();
+            parseConfig(new Gson().fromJson(response.body().string(), JsonObject.class), callback);
+        } catch (IOException e) {
+            handler.post(() -> callback.error(R.string.error_config_get));
+        }
+    }
+
+    private void parseConfig(JsonObject object, Callback callback) {
+        try {
+            String spider = Json.safeString(object, "spider", "");
+            parseJson(object);
+            parseJar(spider);
+            handler.post(callback::success);
+        } catch (Exception e) {
+            e.printStackTrace();
+            handler.post(() -> callback.error(R.string.error_config_parse));
+        }
     }
 
     private void parseJson(JsonObject object) {
@@ -117,10 +134,14 @@ public class ApiConfig {
         ads.addAll(Json.safeList(object, "ads"));
     }
 
-    private void loadJar(String spider) throws Exception {
-        Request request = new Request.Builder().url(spider).build();
-        Response response = OKHttp.get().client().newCall(request).execute();
-        loader.load(response.body().bytes());
+    private void parseJar(String spider) throws Exception {
+        if (spider.startsWith("file://")) {
+            loader.load(FileUtil.getLocal(spider));
+        } else if (Patterns.WEB_URL.matcher(spider).matches()) {
+            Response response = OKHttp.get().client().newCall(new Request.Builder().url(spider).build()).execute();
+            FileUtil.write(FileUtil.getJar(), response.body().bytes());
+            loader.load(FileUtil.getJar());
+        }
     }
 
     public Spider getCSP(Site site) {
