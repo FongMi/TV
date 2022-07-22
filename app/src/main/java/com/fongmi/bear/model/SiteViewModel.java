@@ -7,6 +7,7 @@ import com.fongmi.bear.ApiConfig;
 import com.fongmi.bear.bean.Result;
 import com.fongmi.bear.bean.Site;
 import com.fongmi.bear.bean.Vod;
+import com.fongmi.bear.net.OKHttp;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderDebug;
 import com.google.gson.JsonObject;
@@ -19,6 +20,9 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+
+import okhttp3.HttpUrl;
+import okhttp3.Response;
 
 public class SiteViewModel extends ViewModel {
 
@@ -38,39 +42,75 @@ public class SiteViewModel extends ViewModel {
     public void homeContent() {
         Site home = ApiConfig.get().getHome();
         postResult(() -> {
-            Spider spider = ApiConfig.get().getCSP(home);
-            String homeContent = spider.homeContent(false);
-            SpiderDebug.json(homeContent);
-            Result result = Result.objectFrom(homeContent);
-            if (result.getList().size() > 0) return result;
-            String homeVideoContent = spider.homeVideoContent();
-            SpiderDebug.json(homeVideoContent);
-            result.setList(Result.objectFrom(homeVideoContent).getList());
-            return result;
+            if (home.getType() == 3) {
+                Spider spider = ApiConfig.get().getCSP(home);
+                String homeContent = spider.homeContent(false);
+                SpiderDebug.json(homeContent);
+                Result result = Result.objectFrom(homeContent);
+                if (result.getList().size() > 0) return result;
+                String homeVideoContent = spider.homeVideoContent();
+                SpiderDebug.json(homeVideoContent);
+                result.setList(Result.objectFrom(homeVideoContent).getList());
+                return result;
+            } else {
+                Response response = OKHttp.newCall(home.getApi()).execute();
+                if (home.getType() == 1) {
+                    String homeContent = response.body().string();
+                    SpiderDebug.json(homeContent);
+                    return Result.objectFrom(homeContent);
+                }
+                return new Result();
+            }
         });
     }
 
     public void categoryContent(String tid, String page, boolean filter, HashMap<String, String> extend) {
         Site home = ApiConfig.get().getHome();
         postResult(() -> {
-            Spider spider = ApiConfig.get().getCSP(home);
-            String categoryContent = spider.categoryContent(tid, page, filter, extend);
-            SpiderDebug.json(categoryContent);
-            return Result.objectFrom(categoryContent);
+            if (home.getType() == 3) {
+                Spider spider = ApiConfig.get().getCSP(home);
+                String categoryContent = spider.categoryContent(tid, page, filter, extend);
+                SpiderDebug.json(categoryContent);
+                return Result.objectFrom(categoryContent);
+            } else {
+                HttpUrl url = HttpUrl.parse(home.getApi()).newBuilder().addQueryParameter("ac", home.getType() == 0 ? "videolist" : "detail").addQueryParameter("t", tid).addQueryParameter("pg", page).build();
+                Response response = OKHttp.newCall(url).execute();
+                if (home.getType() == 1) {
+                    String categoryContent = response.body().string();
+                    SpiderDebug.json(categoryContent);
+                    return Result.objectFrom(categoryContent);
+                }
+                return new Result();
+            }
         });
     }
 
     public void detailContent(String id) {
         Site home = ApiConfig.get().getHome();
         postResult(() -> {
-            Spider spider = ApiConfig.get().getCSP(home);
-            String detailContent = spider.detailContent(List.of(id));
-            SpiderDebug.json(detailContent);
-            Result result = Result.objectFrom(detailContent);
-            if (result.getList().isEmpty()) return result;
-            Vod vod = result.getList().get(0);
-            vod.setVodFlags(getVodFlags(vod));
-            return result;
+            if (home.getType() == 3) {
+                Spider spider = ApiConfig.get().getCSP(home);
+                String detailContent = spider.detailContent(List.of(id));
+                SpiderDebug.json(detailContent);
+                Result result = Result.objectFrom(detailContent);
+                if (result.getList().isEmpty()) return result;
+                Vod vod = result.getList().get(0);
+                vod.setVodFlags(getVodFlags(vod));
+                return result;
+            } else {
+                HttpUrl url = HttpUrl.parse(home.getApi()).newBuilder().addQueryParameter("ac", home.getType() == 0 ? "videolist" : "detail").addQueryParameter("ids", id).build();
+                Response response = OKHttp.newCall(url).execute();
+                if (home.getType() == 1) {
+                    String detailContent = response.body().string();
+                    SpiderDebug.json(detailContent);
+                    Result result = Result.objectFrom(detailContent);
+                    if (result.getList().isEmpty()) return result;
+                    Vod vod = result.getList().get(0);
+                    vod.setVodFlags(getVodFlags(vod));
+                    return result;
+                }
+            }
+            return new Result();
         });
     }
 

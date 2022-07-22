@@ -72,7 +72,7 @@ public class Result {
         @Override
         public LinkedHashMap<String, List<Filter>> deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             LinkedHashMap<String, List<Filter>> filterMap = new LinkedHashMap<>();
-            JsonObject filters = (JsonObject) json.getAsJsonObject();
+            JsonObject filters = json.getAsJsonObject();
             if (filters == null) return filterMap;
             for (String key : filters.keySet()) {
                 List<Filter> items = new ArrayList<>();

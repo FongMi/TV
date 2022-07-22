@@ -29,7 +29,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import okhttp3.Request;
 import okhttp3.Response;
 
 public class ApiConfig {
@@ -91,7 +90,7 @@ public class ApiConfig {
 
     private void getWebConfig(String url, Callback callback) {
         try {
-            Response response = OKHttp.get().client().newCall(new Request.Builder().url(url).build()).execute();
+            Response response = OKHttp.newCall(url).execute();
             parseConfig(new Gson().fromJson(response.body().string(), JsonObject.class), callback);
         } catch (IOException e) {
             handler.post(() -> callback.error(R.string.error_config_get));
@@ -134,7 +133,7 @@ public class ApiConfig {
         if (spider.startsWith("file://")) {
             loader.load(FileUtil.getLocal(spider));
         } else if (Patterns.WEB_URL.matcher(spider).matches()) {
-            Response response = OKHttp.get().client().newCall(new Request.Builder().url(spider).build()).execute();
+            Response response = OKHttp.newCall(spider).execute();
             FileUtil.write(FileUtil.getJar(), response.body().bytes());
             loader.load(FileUtil.getJar());
         }
