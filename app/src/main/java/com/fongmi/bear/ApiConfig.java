@@ -72,15 +72,11 @@ public class ApiConfig {
     }
 
     public void loadConfig(Callback callback) {
-        String url = Prefers.getUrl();
         new Thread(() -> {
-            if (url.startsWith("file://")) {
-                getFileConfig(url, callback);
-            } else if (Patterns.WEB_URL.matcher(url).matches()) {
-                getWebConfig(url, callback);
-            } else {
-                handler.post(() -> callback.error(0));
-            }
+            String url = Prefers.getUrl();
+            if (url.startsWith("file://")) getFileConfig(url, callback);
+            else if (Patterns.WEB_URL.matcher(url).matches()) getWebConfig(url, callback);
+            else handler.post(() -> callback.error(0));
         }).start();
     }
 

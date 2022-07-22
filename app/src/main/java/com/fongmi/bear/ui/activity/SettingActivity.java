@@ -92,6 +92,7 @@ public class SettingActivity extends BaseActivity {
             @Override
             public void error(int resId) {
                 mBinding.home.setText(ApiConfig.get().getHome().getName());
+                setResult(RESULT_OK);
                 Notify.dismiss();
                 Notify.show(resId);
             }
