@@ -5,6 +5,9 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
+import android.os.Environment;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -36,7 +39,8 @@ public class SettingActivity extends BaseActivity {
         activity.startActivityForResult(new Intent(activity, SettingActivity.class), 1000);
     }
 
-    private final ActivityResultLauncher<String> permissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> loadConfig());
+    private final ActivityResultLauncher<String> launcherString = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> loadConfig());
+    private final ActivityResultLauncher<Intent> launcherIntent = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> loadConfig());
 
     @Override
     protected ViewBinding getBinding() {
@@ -73,8 +77,10 @@ public class SettingActivity extends BaseActivity {
     }
 
     private void checkUrl() {
-        if (Prefers.getUrl().startsWith("file://") && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
+        if (Prefers.getUrl().startsWith("file://") && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
+            launcherIntent.launch(new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION));
+        } else if (Prefers.getUrl().startsWith("file://") && Build.VERSION.SDK_INT < Build.VERSION_CODES.R && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            launcherString.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
         } else {
             loadConfig();
         }
