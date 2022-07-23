@@ -121,6 +121,7 @@ public class ApiConfig {
             site.setSearchable(Json.safeInt(obj, "quickSearch", 1));
             site.setFilterable(Json.safeInt(obj, "filterable", 1));
             site.setExt(Json.safeString(obj, "ext", ""));
+            if (site.getExt().startsWith("file://")) site.setExt(FileUtil.read(site.getExt()));
             if (site.getKey().equals(Prefers.getHome())) setHome(site);
             sites.add(site);
         }

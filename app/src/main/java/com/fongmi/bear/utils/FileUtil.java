@@ -4,8 +4,11 @@ import android.os.Environment;
 
 import com.fongmi.bear.App;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStreamReader;
 
 public class FileUtil {
 
@@ -38,5 +41,18 @@ public class FileUtil {
         fos.write(data);
         fos.flush();
         fos.close();
+    }
+
+    public static String read(String path) {
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(getLocal(path))));
+            StringBuilder sb = new StringBuilder();
+            String text;
+            while ((text = br.readLine()) != null) sb.append(text).append("\n");
+            br.close();
+            return sb.toString();
+        } catch (Exception e) {
+            return "";
+        }
     }
 }
