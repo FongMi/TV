@@ -32,10 +32,12 @@ public class CustomWebView extends WebView {
 
     public CustomWebView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        initSettings();
     }
 
     public CustomWebView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        initSettings();
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -67,7 +69,7 @@ public class CustomWebView extends WebView {
                 String url = request.getUrl().toString();
                 String host = request.getUrl().getHost();
                 if (ads.contains(host)) return empty;
-                if (Utils.isVideoFormat(url)) Players.get().setMediaSource(request.getRequestHeaders(), url);
+                if (Utils.isVideoFormat(url) || request.getRequestHeaders().containsKey("Range")) Players.get().setMediaSource(request.getRequestHeaders(), url);
                 return super.shouldInterceptRequest(view, request);
             }
 
