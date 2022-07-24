@@ -2,6 +2,7 @@ package com.fongmi.bear.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.text.Html;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -46,6 +47,7 @@ public class DetailActivity extends BaseActivity {
     private EpisodePresenter mEpisodePresenter;
     private SiteViewModel mSiteViewModel;
     private View mOldView;
+    private boolean init;
 
     private String getId() {
         return getIntent().getStringExtra("id");
@@ -136,13 +138,13 @@ public class DetailActivity extends BaseActivity {
     private void setDetail(Vod item) {
         mBinding.progressLayout.showContent();
         mBinding.name.setText(item.getVodName());
+        setText(mBinding.site, R.string.detail_site, ApiConfig.get().getHome().getName());
         setText(mBinding.year, R.string.detail_year, item.getVodYear());
         setText(mBinding.area, R.string.detail_area, item.getVodArea());
         setText(mBinding.type, R.string.detail_type, item.getTypeName());
         setText(mBinding.actor, R.string.detail_actor, item.getVodActor());
-        setText(mBinding.content, R.string.detail_content, item.getVodContent());
         setText(mBinding.director, R.string.detail_director, item.getVodDirector());
-        setText(mBinding.site, R.string.detail_site, ApiConfig.get().getHome().getName());
+        setText(mBinding.content, R.string.detail_content, Html.fromHtml(item.getVodContent()).toString());
         mFlagAdapter.addAll(0, item.getVodFlags());
     }
 
@@ -171,6 +173,7 @@ public class DetailActivity extends BaseActivity {
     private void setEpisode(Vod.Flag item) {
         mEpisodeAdapter.clear();
         mEpisodeAdapter.addAll(0, item.getEpisodes());
+        mEpisodePresenter.performClick((Vod.Flag.Episode) mEpisodeAdapter.get(0));
         setGroup(item.getEpisodes().size());
     }
 

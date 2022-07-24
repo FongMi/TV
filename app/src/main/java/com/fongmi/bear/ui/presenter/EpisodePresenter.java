@@ -12,6 +12,7 @@ import com.fongmi.bear.databinding.AdapterEpisodeBinding;
 public class EpisodePresenter extends Presenter {
 
     private OnClickListener mListener;
+    private boolean firstOpen;
 
     public interface OnClickListener {
         void onItemClick(Vod.Flag.Episode item);
@@ -24,6 +25,12 @@ public class EpisodePresenter extends Presenter {
     @Override
     public Presenter.ViewHolder onCreateViewHolder(ViewGroup parent) {
         return new ViewHolder(AdapterEpisodeBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+    }
+
+    public void performClick(Vod.Flag.Episode item) {
+        if (firstOpen) return;
+        firstOpen = true;
+        mListener.onItemClick(item);
     }
 
     @Override
