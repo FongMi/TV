@@ -85,7 +85,7 @@ public class VodActivity extends BaseActivity {
 
     private void setPager() {
         mBinding.pager.setAdapter(new PageAdapter(getSupportFragmentManager()));
-        if (mResult.getTypes().size() > 0) mBinding.pager.setOffscreenPageLimit(mResult.getTypes().size());
+        if (mResult.getTypes().size() > 0) mBinding.pager.setOffscreenPageLimit(Math.min(mResult.getTypes().size(), 5));
     }
 
     class PageAdapter extends FragmentStatePagerAdapter {
