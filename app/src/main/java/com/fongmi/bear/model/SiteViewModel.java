@@ -44,18 +44,18 @@ public class SiteViewModel extends ViewModel {
             if (home.getType() == 3) {
                 Spider spider = ApiConfig.get().getCSP(home);
                 String homeContent = spider.homeContent(false);
-                SpiderDebug.json(homeContent);
+                SpiderDebug.log(homeContent);
                 Result result = Result.objectFrom(homeContent);
                 if (result.getList().size() > 0) return result;
                 String homeVideoContent = spider.homeVideoContent();
-                SpiderDebug.json(homeVideoContent);
+                SpiderDebug.log(homeVideoContent);
                 result.setList(Result.objectFrom(homeVideoContent).getList());
                 return result;
             } else {
                 Response response = OKHttp.newCall(home.getApi()).execute();
                 if (home.getType() == 1) {
                     String homeContent = response.body().string();
-                    SpiderDebug.json(homeContent);
+                    SpiderDebug.log(homeContent);
                     return Result.objectFrom(homeContent);
                 }
                 return new Result();
@@ -69,14 +69,14 @@ public class SiteViewModel extends ViewModel {
             if (home.getType() == 3) {
                 Spider spider = ApiConfig.get().getCSP(home);
                 String categoryContent = spider.categoryContent(tid, page, filter, extend);
-                SpiderDebug.json(categoryContent);
+                SpiderDebug.log(categoryContent);
                 return Result.objectFrom(categoryContent);
             } else {
                 HttpUrl url = HttpUrl.parse(home.getApi()).newBuilder().addQueryParameter("ac", home.getType() == 0 ? "videolist" : "detail").addQueryParameter("t", tid).addQueryParameter("pg", page).build();
                 Response response = OKHttp.newCall(url).execute();
                 if (home.getType() == 1) {
                     String categoryContent = response.body().string();
-                    SpiderDebug.json(categoryContent);
+                    SpiderDebug.log(categoryContent);
                     return Result.objectFrom(categoryContent);
                 }
                 return new Result();
@@ -90,7 +90,7 @@ public class SiteViewModel extends ViewModel {
             if (home.getType() == 3) {
                 Spider spider = ApiConfig.get().getCSP(home);
                 String detailContent = spider.detailContent(List.of(id));
-                SpiderDebug.json(detailContent);
+                SpiderDebug.log(detailContent);
                 Result result = Result.objectFrom(detailContent);
                 if (!result.getList().isEmpty()) result.getList().get(0).setVodFlags();
                 return result;
@@ -99,7 +99,7 @@ public class SiteViewModel extends ViewModel {
                 Response response = OKHttp.newCall(url).execute();
                 if (home.getType() == 1) {
                     String detailContent = response.body().string();
-                    SpiderDebug.json(detailContent);
+                    SpiderDebug.log(detailContent);
                     Result result = Result.objectFrom(detailContent);
                     if (!result.getList().isEmpty()) result.getList().get(0).setVodFlags();
                     return result;
@@ -115,7 +115,7 @@ public class SiteViewModel extends ViewModel {
             if (home.getType() == 3) {
                 Spider spider = ApiConfig.get().getCSP(home);
                 String playerContent = spider.playerContent(flag, id, ApiConfig.get().getFlags());
-                SpiderDebug.json(playerContent);
+                SpiderDebug.log(playerContent);
                 JsonObject object = JsonParser.parseString(playerContent).getAsJsonObject();
                 if (!object.has("flag")) object.addProperty("flag", flag);
                 return object;

@@ -60,8 +60,8 @@ public class Utils {
         return event.getKeyCode() == KeyEvent.KEYCODE_DPAD_RIGHT;
     }
 
-    public static void loadImage(String url, ImageView view) {
-        Glide.with(App.get()).load(url).placeholder(R.drawable.ic_img_loading).error(R.drawable.ic_img_error).into(view);
+    public static <T> void loadImage(T model, ImageView view) {
+        Glide.with(App.get()).load(model).placeholder(R.drawable.ic_img_loading).error(R.drawable.ic_img_error).into(view);
     }
 
     public static boolean hasPIP() {

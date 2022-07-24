@@ -9,7 +9,6 @@ import androidx.leanback.widget.Presenter;
 import com.fongmi.bear.bean.Vod;
 import com.fongmi.bear.databinding.AdapterVodBinding;
 import com.fongmi.bear.utils.ResUtil;
-import com.fongmi.bear.utils.Utils;
 
 public class VodPresenter extends Presenter {
 
@@ -40,10 +39,10 @@ public class VodPresenter extends Presenter {
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object object) {
         Vod item = (Vod) object;
         ViewHolder holder = (ViewHolder) viewHolder;
+        item.loadImg(holder.binding.image);
         holder.binding.name.setText(item.getVodName());
         holder.binding.remark.setText(item.getVodRemarks());
         holder.binding.remark.setVisibility(item.getRemarkVisible());
-        Utils.loadImage(item.getVodPic(), holder.binding.image);
         setOnClickListener(holder, view -> mListener.onItemClick(item));
     }
 

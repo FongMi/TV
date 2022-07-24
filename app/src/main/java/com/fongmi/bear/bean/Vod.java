@@ -2,9 +2,13 @@ package com.fongmi.bear.bean;
 
 import android.text.TextUtils;
 import android.view.View;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 
+import com.amulyakhare.textdrawable.TextDrawable;
+import com.amulyakhare.textdrawable.util.ColorGenerator;
+import com.fongmi.bear.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
@@ -96,12 +100,17 @@ public class Vod {
         return vodFlags = vodFlags == null ? new ArrayList<>() : vodFlags;
     }
 
-    public void setVodFlags(List<Flag> vodFlags) {
-        this.vodFlags = vodFlags;
-    }
-
     public int getRemarkVisible() {
         return getVodRemarks().isEmpty() ? View.GONE : View.VISIBLE;
+    }
+
+    public void loadImg(ImageView view) {
+        if (TextUtils.isEmpty(getVodPic())) {
+            String text = getVodName().isEmpty() ? "" : getVodName().substring(0, 1);
+            view.setImageDrawable(TextDrawable.builder().buildRect(text, ColorGenerator.MATERIAL.getColor(text)));
+        } else {
+            Utils.loadImage(getVodPic(), view);
+        }
     }
 
     public void setVodFlags() {
