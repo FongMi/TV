@@ -20,7 +20,6 @@ import com.fongmi.bear.utils.KeyDown;
 import com.fongmi.bear.utils.Notify;
 import com.fongmi.bear.utils.Prefers;
 import com.fongmi.bear.utils.ResUtil;
-import com.fongmi.bear.utils.Utils;
 import com.google.android.exoplayer2.Player;
 
 import org.greenrobot.eventbus.EventBus;
@@ -142,7 +141,7 @@ public class PlayActivity extends BaseActivity implements KeyDownImpl {
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (!mBinding.video.isControllerFullyVisible() && Utils.hasEvent(event)) return mKeyDown.onKeyDown(event);
+        if (!mBinding.video.isControllerFullyVisible() && mKeyDown.hasEvent(event)) return mKeyDown.onKeyDown(event);
         else return super.dispatchKeyEvent(event);
     }
 
