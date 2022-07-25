@@ -12,36 +12,67 @@ import com.fongmi.bear.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.ElementList;
+import org.simpleframework.xml.Path;
+import org.simpleframework.xml.Root;
+import org.simpleframework.xml.Text;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@Root(strict = false)
 public class Vod {
 
+    @Element(name = "id", required = false)
     @SerializedName("vod_id")
     private String vodId;
+
+    @Element(name = "name", required = false)
     @SerializedName("vod_name")
     private String vodName;
+
+    @Element(name = "type", required = false)
     @SerializedName("type_name")
     private String typeName;
+
+    @Element(name = "pic", required = false)
     @SerializedName("vod_pic")
     private String vodPic;
+
+    @Element(name = "note", required = false)
     @SerializedName("vod_remarks")
     private String vodRemarks;
+
+    @Element(name = "year", required = false)
     @SerializedName("vod_year")
     private String vodYear;
+
+    @Element(name = "area", required = false)
     @SerializedName("vod_area")
     private String vodArea;
+
+    @Element(name = "director", required = false)
     @SerializedName("vod_director")
     private String vodDirector;
+
+    @Element(name = "actor", required = false)
     @SerializedName("vod_actor")
     private String vodActor;
+
+    @Element(name = "des", required = false)
     @SerializedName("vod_content")
     private String vodContent;
+
     @SerializedName("vod_play_from")
     private String vodPlayFrom;
+
     @SerializedName("vod_play_url")
     private String vodPlayUrl;
 
+    @Path("dl")
+    @ElementList(entry = "dd", required = false, inline = true)
     private List<Flag> vodFlags;
 
     public static Vod objectFrom(String str) {
@@ -117,39 +148,61 @@ public class Vod {
         String[] playFlags = getVodPlayFrom().split("\\$\\$\\$");
         String[] playUrls = getVodPlayUrl().split("\\$\\$\\$");
         for (int i = 0; i < playFlags.length; i++) {
+            if (playFlags[i].isEmpty()) continue;
             Vod.Flag item = new Vod.Flag(playFlags[i]);
-            String[] urls = playUrls[i].contains("#") ? playUrls[i].split("#") : new String[]{playUrls[i]};
-            for (String url : urls) {
-                if (!url.contains("$")) continue;
-                String[] split = url.split("\\$");
-                if (split.length >= 2) item.getEpisodes().add(new Vod.Flag.Episode(split[0], split[1]));
-            }
+            item.createEpisode(playUrls[i]);
             getVodFlags().add(item);
+        }
+        for (Vod.Flag item : getVodFlags()) {
+            if (item.getUrls() == null) continue;
+            item.createEpisode(item.getUrls());
         }
     }
 
     public static class Flag {
 
+        @Attribute(name = "flag", required = false)
         @SerializedName("flag")
-        private final String flag;
+        private String flag;
+
+        @Text
+        private String urls;
+
         @SerializedName("episodes")
-        private final List<Episode> episodes;
+        private List<Episode> episodes;
 
         public static Flag objectFrom(String str) {
             return new Gson().fromJson(str, Flag.class);
         }
 
-        public Flag(String flag) {
-            this.flag = flag;
+        public Flag() {
             this.episodes = new ArrayList<>();
+        }
+
+        public Flag(String flag) {
+            this();
+            this.flag = flag;
         }
 
         public String getFlag() {
             return flag;
         }
 
+        public String getUrls() {
+            return urls;
+        }
+
         public List<Episode> getEpisodes() {
             return episodes;
+        }
+
+        public void createEpisode(String data) {
+            String[] urls = data.contains("#") ? data.split("#") : new String[]{data};
+            for (String url : urls) {
+                if (!url.contains("$")) return;
+                String[] split = url.split("\\$");
+                if (split.length >= 2) getEpisodes().add(new Vod.Flag.Episode(split[0], split[1]));
+            }
         }
 
         public void deactivated() {

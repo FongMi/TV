@@ -2,10 +2,18 @@ package com.fongmi.bear.bean;
 
 import com.google.gson.annotations.SerializedName;
 
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Root;
+import org.simpleframework.xml.Text;
+
+@Root(strict = false)
 public class Class {
 
+    @Attribute(name = "id", required = false)
     @SerializedName("type_id")
     private String typeId;
+
+    @Text
     @SerializedName("type_name")
     private String typeName;
 

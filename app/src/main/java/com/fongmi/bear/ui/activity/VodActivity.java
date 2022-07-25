@@ -48,7 +48,7 @@ public class VodActivity extends BaseActivity {
 
     @Override
     protected void initView() {
-        mResult = Result.objectFrom(getResult());
+        mResult = Result.fromJson(getResult());
         setRecyclerView();
         setPager();
     }

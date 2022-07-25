@@ -21,7 +21,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.HttpUrl;
-import okhttp3.Response;
 
 public class SiteViewModel extends ViewModel {
 
@@ -45,20 +44,18 @@ public class SiteViewModel extends ViewModel {
                 Spider spider = ApiConfig.get().getCSP(home);
                 String homeContent = spider.homeContent(false);
                 SpiderDebug.log(homeContent);
-                Result result = Result.objectFrom(homeContent);
+                Result result = Result.fromJson(homeContent);
                 if (result.getList().size() > 0) return result;
                 String homeVideoContent = spider.homeVideoContent();
                 SpiderDebug.log(homeVideoContent);
-                result.setList(Result.objectFrom(homeVideoContent).getList());
+                result.setList(Result.fromJson(homeVideoContent).getList());
                 return result;
             } else {
-                Response response = OKHttp.newCall(home.getApi()).execute();
-                if (home.getType() == 1) {
-                    String homeContent = response.body().string();
-                    SpiderDebug.log(homeContent);
-                    return Result.objectFrom(homeContent);
-                }
-                return new Result();
+                String body = OKHttp.newCall(home.getApi()).execute().body().string();
+                SpiderDebug.xml(body);
+                if (home.getType() == 0) return Result.fromXml(body);
+                else if (home.getType() == 1) return Result.fromJson(body);
+                else return new Result();
             }
         });
     }
@@ -70,15 +67,13 @@ public class SiteViewModel extends ViewModel {
                 Spider spider = ApiConfig.get().getCSP(home);
                 String categoryContent = spider.categoryContent(tid, page, filter, extend);
                 SpiderDebug.log(categoryContent);
-                return Result.objectFrom(categoryContent);
+                return Result.fromJson(categoryContent);
             } else {
                 HttpUrl url = HttpUrl.parse(home.getApi()).newBuilder().addQueryParameter("ac", home.getType() == 0 ? "videolist" : "detail").addQueryParameter("t", tid).addQueryParameter("pg", page).build();
-                Response response = OKHttp.newCall(url).execute();
-                if (home.getType() == 1) {
-                    String categoryContent = response.body().string();
-                    SpiderDebug.log(categoryContent);
-                    return Result.objectFrom(categoryContent);
-                }
+                String body = OKHttp.newCall(url).execute().body().string();
+                SpiderDebug.xml(body);
+                if (home.getType() == 0) return Result.fromXml(body);
+                else if (home.getType() == 1) return Result.fromJson(body);
                 return new Result();
             }
         });
@@ -91,21 +86,20 @@ public class SiteViewModel extends ViewModel {
                 Spider spider = ApiConfig.get().getCSP(home);
                 String detailContent = spider.detailContent(List.of(id));
                 SpiderDebug.log(detailContent);
-                Result result = Result.objectFrom(detailContent);
+                Result result = Result.fromJson(detailContent);
                 if (!result.getList().isEmpty()) result.getList().get(0).setVodFlags();
                 return result;
             } else {
                 HttpUrl url = HttpUrl.parse(home.getApi()).newBuilder().addQueryParameter("ac", home.getType() == 0 ? "videolist" : "detail").addQueryParameter("ids", id).build();
-                Response response = OKHttp.newCall(url).execute();
-                if (home.getType() == 1) {
-                    String detailContent = response.body().string();
-                    SpiderDebug.log(detailContent);
-                    Result result = Result.objectFrom(detailContent);
-                    if (!result.getList().isEmpty()) result.getList().get(0).setVodFlags();
-                    return result;
-                }
+                String body = OKHttp.newCall(url).execute().body().string();
+                SpiderDebug.xml(body);
+                Result result;
+                if (home.getType() == 0) result = Result.fromXml(body);
+                else if (home.getType() == 1) result = Result.fromJson(body);
+                else result = new Result();
+                if (!result.getList().isEmpty()) result.getList().get(0).setVodFlags();
+                return result;
             }
-            return new Result();
         });
     }
 
@@ -138,6 +132,7 @@ public class SiteViewModel extends ViewModel {
                 if (!Thread.interrupted()) result.postValue(service.submit(callable).get(5, TimeUnit.SECONDS));
             } catch (Exception e) {
                 if (!Thread.interrupted()) result.postValue(null);
+                e.printStackTrace();
             }
         });
     }

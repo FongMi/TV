@@ -13,27 +13,48 @@ import com.google.gson.JsonParseException;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 
+import org.simpleframework.xml.ElementList;
+import org.simpleframework.xml.Path;
+import org.simpleframework.xml.Root;
+import org.simpleframework.xml.core.Persister;
+
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+@Root(name = "rss", strict = false)
 public class Result {
 
+    @Path("class")
+    @ElementList(entry = "ty", required = false, inline = true)
     @SerializedName("class")
     private List<Class> types;
+
+    @Path("list")
+    @ElementList(entry = "video", required = false, inline = true)
     @SerializedName("list")
     private List<Vod> list;
+
     @SerializedName("filters")
     private LinkedHashMap<String, List<Filter>> filters;
 
-    public static Result objectFrom(String str) {
+    public static Result fromJson(String str) {
         try {
             Type type = new TypeToken<LinkedHashMap<String, List<Filter>>>() {}.getType();
             Gson gson = new GsonBuilder().registerTypeAdapter(type, new FiltersAdapter()).create();
             Result result = gson.fromJson(str, Result.class);
             return result == null ? new Result() : result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Result();
+        }
+    }
+
+    public static Result fromXml(String str) {
+        try {
+            return new Persister().read(Result.class, str);
         } catch (Exception e) {
             e.printStackTrace();
             return new Result();

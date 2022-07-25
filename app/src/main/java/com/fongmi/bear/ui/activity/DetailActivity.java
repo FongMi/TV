@@ -130,6 +130,7 @@ public class DetailActivity extends BaseActivity {
             if (object != null) Players.get().setMediaSource(object);
         });
         mSiteViewModel.result.observe(this, result -> {
+            if (result == null) return;
             if (result.getList().isEmpty()) mBinding.progressLayout.showErrorText();
             else setDetail(result.getList().get(0));
         });
