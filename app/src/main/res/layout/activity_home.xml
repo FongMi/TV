@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:keepScreenOn="true">
@@ -11,5 +12,16 @@
         android:clipChildren="false"
         android:clipToPadding="false"
         android:padding="24dp" />
+
+    <TextView
+        android:id="@+id/time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_margin="24dp"
+        android:letterSpacing="0.02"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        tools:text="07/25 09:20:00" />
 
 </FrameLayout>

@@ -2,12 +2,16 @@ package com.fongmi.bear.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.ItemBridgeAdapter;
 import androidx.leanback.widget.ListRow;
+import androidx.leanback.widget.OnChildViewHolderSelectedListener;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.bear.ApiConfig;
@@ -23,6 +27,7 @@ import com.fongmi.bear.ui.presenter.FuncPresenter;
 import com.fongmi.bear.ui.presenter.ProgressPresenter;
 import com.fongmi.bear.ui.presenter.TitlePresenter;
 import com.fongmi.bear.ui.presenter.VodPresenter;
+import com.fongmi.bear.utils.Clock;
 import com.fongmi.bear.utils.ResUtil;
 
 import java.util.List;
@@ -46,6 +51,7 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
 
     @Override
     protected void initView() {
+        Clock.start(mBinding.time);
         setRecyclerView();
         setViewModel();
         setAdapter();
@@ -55,6 +61,12 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
     @Override
     protected void initEvent() {
         mFuncPresenter.setOnClickListener(this::onFuncClick);
+        mBinding.recycler.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
+            @Override
+            public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
+                mBinding.time.setVisibility(position == 1 ? View.VISIBLE : View.GONE);
+            }
+        });
     }
 
     private void setRecyclerView() {
@@ -126,5 +138,11 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) getVideo();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Clock.destroy();
     }
 }
