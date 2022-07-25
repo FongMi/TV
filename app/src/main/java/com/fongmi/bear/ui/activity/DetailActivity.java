@@ -174,7 +174,7 @@ public class DetailActivity extends BaseActivity {
     private void setEpisode(Vod.Flag item) {
         mEpisodeAdapter.clear();
         mEpisodeAdapter.addAll(0, item.getEpisodes());
-        mEpisodePresenter.performClick((Vod.Flag.Episode) mEpisodeAdapter.get(0));
+        if (mEpisodeAdapter.size() > 0) mEpisodePresenter.performClick((Vod.Flag.Episode) mEpisodeAdapter.get(0));
         setGroup(item.getEpisodes().size());
     }
 
