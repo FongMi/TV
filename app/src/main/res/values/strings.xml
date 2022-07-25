@@ -25,7 +25,7 @@
     <string name="detail_content">Summary: <xliff:g name="name">%s</xliff:g></string>
 
     <!-- Play -->
-    <string name="play_play">Play</string>
+    <string name="play">Play</string>
     <string name="play_next">Next</string>
     <string name="play_prev">Prev</string>
     <string name="play_ready">Ready to play: <xliff:g name="name">%s</xliff:g></string>

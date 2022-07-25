@@ -8,6 +8,8 @@ import androidx.annotation.NonNull;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
+import com.fongmi.bear.R;
+import com.fongmi.bear.utils.ResUtil;
 import com.fongmi.bear.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
@@ -199,9 +201,9 @@ public class Vod {
         public void createEpisode(String data) {
             String[] urls = data.contains("#") ? data.split("#") : new String[]{data};
             for (String url : urls) {
-                if (!url.contains("$")) return;
                 String[] split = url.split("\\$");
                 if (split.length >= 2) getEpisodes().add(new Vod.Flag.Episode(split[0], split[1]));
+                else getEpisodes().add(new Vod.Flag.Episode(ResUtil.getString(R.string.play), url));
             }
         }
 

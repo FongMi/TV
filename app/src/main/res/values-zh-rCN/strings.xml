@@ -25,7 +25,7 @@
     <string name="detail_content">简介：<xliff:g name="name">%s</xliff:g></string>
 
     <!-- Play -->
-    <string name="play_play">播放</string>
+    <string name="play">播放</string>
     <string name="play_next">下一集</string>
     <string name="play_prev">上一集</string>
     <string name="play_ready">准备播放：<xliff:g name="name">%s</xliff:g></string>
