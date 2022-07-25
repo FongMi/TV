@@ -11,7 +11,7 @@ import androidx.viewbinding.ViewBinding;
 import com.fongmi.bear.R;
 import com.fongmi.bear.bean.Vod;
 import com.fongmi.bear.databinding.ActivityPlayBinding;
-import com.fongmi.bear.databinding.ViewControllerBinding;
+import com.fongmi.bear.databinding.ViewControllerBottomBinding;
 import com.fongmi.bear.event.PlayerEvent;
 import com.fongmi.bear.impl.KeyDownImpl;
 import com.fongmi.bear.model.SiteViewModel;
@@ -21,16 +21,22 @@ import com.fongmi.bear.utils.Notify;
 import com.fongmi.bear.utils.Prefers;
 import com.fongmi.bear.utils.ResUtil;
 import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.util.Util;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.Formatter;
+import java.util.Locale;
+
 public class PlayActivity extends BaseActivity implements KeyDownImpl {
 
-    private ViewControllerBinding mControl;
+    private ViewControllerBottomBinding mControl;
     private ActivityPlayBinding mBinding;
     private SiteViewModel mSiteViewModel;
+    private StringBuilder mBuilder;
+    private Formatter mFormatter;
     private Vod.Flag mVodFlag;
     private KeyDown mKeyDown;
     private int mCurrent;
@@ -52,14 +58,15 @@ public class PlayActivity extends BaseActivity implements KeyDownImpl {
 
     @Override
     protected void initView() {
+        mBuilder = new StringBuilder();
         mKeyDown = KeyDown.create(this);
         mVodFlag = Vod.Flag.objectFrom(getFlag());
-        mControl = ViewControllerBinding.bind(mBinding.video.findViewById(R.id.control));
+        mFormatter = new Formatter(mBuilder, Locale.getDefault());
+        mControl = ViewControllerBottomBinding.bind(mBinding.video.findViewById(com.google.android.exoplayer2.ui.R.id.exo_controller));
         mControl.scale.setText(ResUtil.getStringArray(R.array.select_scale)[Prefers.getScale()]);
         mControl.speed.setText(Players.get().getSpeed());
         mBinding.video.setResizeMode(Prefers.getScale());
-        mBinding.video.setControllerHideOnTouch(false);
-        mBinding.video.setControllerShowTimeoutMs(0);
+        mBinding.video.setControllerShowTimeoutMs(3000);
         mBinding.video.setPlayer(Players.get().exo());
         if (Players.get().isIdle()) showProgress();
         setViewModel();
@@ -147,7 +154,12 @@ public class PlayActivity extends BaseActivity implements KeyDownImpl {
 
     @Override
     public void onSeek(boolean forward) {
-
+        long time = Players.get().exo().getCurrentPosition() + (forward ? 10000 : -10000);
+        mBinding.center.exoDuration.setText(mControl.exoDuration.getText());
+        mBinding.center.exoPosition.setText(Util.getStringForTime(mBuilder, mFormatter, time));
+        mBinding.center.action.setImageResource(forward ? R.drawable.ic_forward : R.drawable.ic_rewind);
+        mBinding.center.getRoot().setVisibility(View.VISIBLE);
+        Players.get().exo().seekTo(time);
     }
 
     @Override
@@ -163,17 +175,27 @@ public class PlayActivity extends BaseActivity implements KeyDownImpl {
 
     @Override
     public void onKeyLeft() {
-
+        mBinding.center.getRoot().setVisibility(View.GONE);
+        mBinding.center.action.setImageResource(R.drawable.ic_play);
     }
 
     @Override
     public void onKeyRight() {
-
+        mBinding.center.getRoot().setVisibility(View.GONE);
+        mBinding.center.action.setImageResource(R.drawable.ic_play);
     }
 
     @Override
     public void onKeyCenter() {
-        Players.get().toggle();
+        if (Players.get().isPlaying()) {
+            Players.get().pause();
+            mBinding.center.getRoot().setVisibility(View.VISIBLE);
+            mBinding.center.exoDuration.setText(mControl.exoDuration.getText());
+            mBinding.center.exoPosition.setText(Util.getStringForTime(mBuilder, mFormatter, Players.get().exo().getCurrentPosition()));
+        } else {
+            Players.get().play();
+            mBinding.center.getRoot().setVisibility(View.GONE);
+        }
     }
 
     @Override

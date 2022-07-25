@@ -55,6 +55,10 @@ public class Players implements Player.Listener {
         return exoPlayer.getPlaybackState() == Player.STATE_IDLE;
     }
 
+    public boolean isPlaying() {
+        return exoPlayer.isPlaying();
+    }
+
     public void setMediaSource(JsonObject object) {
         HashMap<String, String> headers = new HashMap<>();
         String parse = object.get("parse").getAsString();
@@ -84,11 +88,6 @@ public class Players implements Player.Listener {
             exoPlayer.play();
             webView.stop();
         });
-    }
-
-    public void toggle() {
-        if (exoPlayer.isPlaying()) pause();
-        else play();
     }
 
     public void pause() {
