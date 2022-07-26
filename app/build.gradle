@@ -50,7 +50,7 @@ dependencies {
     implementation 'org.greenrobot:eventbus:3.3.1'
     implementation 'org.jsoup:jsoup:1.14.3'
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
-    implementation 'org.simpleframework:simple-xml:2.7.1'
+    implementation('org.simpleframework:simple-xml:2.7.1') { exclude group: 'stax', module: 'stax-api' exclude group: 'xpp3', module: 'xpp3' }
     annotationProcessor 'androidx.room:room-compiler:2.4.2'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.13.2'
 }
