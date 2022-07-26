@@ -52,6 +52,7 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
     @Override
     protected void initView() {
         Clock.start(mBinding.time);
+        Players.get().init();
         setRecyclerView();
         setViewModel();
         setAdapter();
@@ -145,6 +146,5 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
         Players.get().release();
         super.onDestroy();
         Clock.destroy();
-        System.exit(0);
     }
 }
