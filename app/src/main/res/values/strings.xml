@@ -2,6 +2,7 @@
 
     <!-- App -->
     <string name="app_name">BearTV</string>
+    <string name="app_exit">Press back again to exit</string>
 
     <!-- Splash -->
     <string name="splash_info">Loading configuration</string>

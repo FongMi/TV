@@ -2,6 +2,7 @@ package com.fongmi.bear.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Handler;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -28,6 +29,7 @@ import com.fongmi.bear.ui.presenter.ProgressPresenter;
 import com.fongmi.bear.ui.presenter.TitlePresenter;
 import com.fongmi.bear.ui.presenter.VodPresenter;
 import com.fongmi.bear.utils.Clock;
+import com.fongmi.bear.utils.Notify;
 import com.fongmi.bear.utils.ResUtil;
 
 import java.util.List;
@@ -38,6 +40,7 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
     private SiteViewModel mSiteViewModel;
     private FuncPresenter mFuncPresenter;
     private ArrayObjectAdapter mAdapter;
+    private boolean mConfirmExit;
 
     public static void start(Activity activity) {
         activity.startActivity(new Intent(activity, HomeActivity.class));
@@ -139,6 +142,17 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) getVideo();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (!mConfirmExit) {
+            mConfirmExit = true;
+            Notify.show(R.string.app_exit);
+            new Handler().postDelayed(() -> mConfirmExit = false, 1000);
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override
