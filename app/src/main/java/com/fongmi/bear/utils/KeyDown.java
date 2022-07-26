@@ -7,7 +7,7 @@ import com.fongmi.bear.impl.KeyDownImpl;
 public class KeyDown {
 
     private final KeyDownImpl mKeyDown;
-    private boolean mPress;
+    private int mHoldTime;
 
     public static KeyDown create(KeyDownImpl keyDown) {
         return new KeyDown(keyDown);
@@ -18,56 +18,34 @@ public class KeyDown {
     }
 
     public boolean onKeyDown(KeyEvent event) {
-        if (event.getAction() == KeyEvent.ACTION_DOWN && isLeftKey(event)) {
-            mKeyDown.onSeek(false);
-        } else if (event.getAction() == KeyEvent.ACTION_DOWN && isRightKey(event)) {
-            mKeyDown.onSeek(true);
-        } else if (event.getAction() == KeyEvent.ACTION_UP && isUpKey(event)) {
-            mKeyDown.onKeyUp();
+        boolean isLeft = isLeftKey(event);
+        boolean isRight = isRightKey(event);
+        if (event.getAction() == KeyEvent.ACTION_DOWN && (isLeft || isRight)) {
+            mKeyDown.onSeeking(isRight ? addTime() : subTime());
+        } else if (event.getAction() == KeyEvent.ACTION_UP && (isLeft || isRight)) {
+            mKeyDown.onSeekTo(mHoldTime);
         } else if (event.getAction() == KeyEvent.ACTION_UP && isDownKey(event)) {
             mKeyDown.onKeyDown();
-        } else if (event.getAction() == KeyEvent.ACTION_UP && isLeftKey(event)) {
-            mKeyDown.onKeyLeft();
-        } else if (event.getAction() == KeyEvent.ACTION_UP && isRightKey(event)) {
-            mKeyDown.onKeyRight();
-        } else if (event.getAction() == KeyEvent.ACTION_UP && isBackKey(event)) {
-            mKeyDown.onKeyBack();
-        } else if (event.getAction() == KeyEvent.ACTION_UP && isMenuKey(event)) {
-            mKeyDown.onKeyMenu();
-        } else if (isEnterKey(event)) {
-            checkPress(event);
+        } else if (event.getAction() == KeyEvent.ACTION_UP && isEnterKey(event)) {
+            mKeyDown.onKeyCenter();
         }
         return true;
     }
 
-    private void checkPress(KeyEvent event) {
-        if (event.isLongPress()) {
-            mPress = true;
-            mKeyDown.onLongPress();
-        } else if (event.getAction() == KeyEvent.ACTION_UP) {
-            if (mPress) mPress = false;
-            else mKeyDown.onKeyCenter();
-        }
+    private int addTime() {
+        return mHoldTime = mHoldTime + 10000;
+    }
+
+    private int subTime() {
+        return mHoldTime = mHoldTime - 10000;
+    }
+
+    public void resetTime() {
+        mHoldTime = 0;
     }
 
     public boolean hasEvent(KeyEvent event) {
-        return isArrowKey(event) || isBackKey(event) || isMenuKey(event) || isDigitKey(event) || event.isLongPress();
-    }
-
-    private boolean isArrowKey(KeyEvent event) {
         return isEnterKey(event) || isUpKey(event) || isDownKey(event) || isLeftKey(event) || isRightKey(event);
-    }
-
-    private boolean isBackKey(KeyEvent event) {
-        return event.getKeyCode() == KeyEvent.KEYCODE_BACK;
-    }
-
-    private boolean isMenuKey(KeyEvent event) {
-        return event.getKeyCode() == KeyEvent.KEYCODE_MENU;
-    }
-
-    private boolean isDigitKey(KeyEvent event) {
-        return event.getKeyCode() >= KeyEvent.KEYCODE_0 && event.getKeyCode() <= KeyEvent.KEYCODE_9 || event.getKeyCode() >= KeyEvent.KEYCODE_NUMPAD_0 && event.getKeyCode() <= KeyEvent.KEYCODE_NUMPAD_9;
     }
 
     private boolean isEnterKey(KeyEvent event) {

@@ -17,10 +17,10 @@ import androidx.viewbinding.ViewBinding;
 import com.fongmi.bear.ApiConfig;
 import com.fongmi.bear.R;
 import com.fongmi.bear.bean.Func;
-import com.fongmi.bear.bean.Result;
 import com.fongmi.bear.bean.Vod;
 import com.fongmi.bear.databinding.ActivityHomeBinding;
 import com.fongmi.bear.model.SiteViewModel;
+import com.fongmi.bear.player.Players;
 import com.fongmi.bear.ui.custom.CustomRowPresenter;
 import com.fongmi.bear.ui.custom.CustomSelector;
 import com.fongmi.bear.ui.presenter.FuncPresenter;
@@ -121,8 +121,7 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
     private void onFuncClick(Func item) {
         switch (item.getResId()) {
             case R.string.home_vod:
-                Result result = mSiteViewModel.getResult().getValue();
-                VodActivity.start(this, result);
+                VodActivity.start(this, mSiteViewModel.getResult().getValue());
                 break;
             case R.string.home_setting:
                 SettingActivity.start(this);
@@ -143,7 +142,9 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
 
     @Override
     protected void onDestroy() {
+        Players.get().release();
         super.onDestroy();
         Clock.destroy();
+        System.exit(0);
     }
 }

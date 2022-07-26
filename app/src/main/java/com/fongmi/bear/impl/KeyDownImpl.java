@@ -2,21 +2,11 @@ package com.fongmi.bear.impl;
 
 public interface KeyDownImpl {
 
-    void onSeek(boolean forward);
+    void onSeeking(int time);
 
-    void onKeyUp();
+    void onSeekTo(int time);
 
     void onKeyDown();
 
-    void onKeyLeft();
-
-    void onKeyRight();
-
     void onKeyCenter();
-
-    void onKeyMenu();
-
-    void onKeyBack();
-
-    void onLongPress();
 }

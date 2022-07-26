@@ -2,6 +2,7 @@ package com.fongmi.bear;
 
 import android.app.Application;
 
+import com.fongmi.bear.player.Players;
 import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.LogAdapter;
 import com.orhanobut.logger.Logger;
@@ -22,6 +23,7 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Players.get().init();
         Logger.addLogAdapter(getLogAdapter());
     }
 

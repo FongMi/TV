@@ -8,19 +8,24 @@ import com.fongmi.bear.event.PlayerEvent;
 import com.fongmi.bear.ui.custom.CustomWebView;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.util.Util;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.util.Formatter;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class Players implements Player.Listener {
 
-    private final CustomWebView webView;
-    private final ExoPlayer exoPlayer;
-    private final Handler handler;
+    private CustomWebView webView;
+    private StringBuilder builder;
+    private Formatter formatter;
+    private ExoPlayer exoPlayer;
+    private Handler handler;
 
     private static class Loader {
         static volatile Players INSTANCE = new Players();
@@ -30,10 +35,12 @@ public class Players implements Player.Listener {
         return Loader.INSTANCE;
     }
 
-    public Players() {
+    public void init() {
+        builder = new StringBuilder();
         webView = new CustomWebView(App.get());
         handler = new Handler(Looper.getMainLooper());
         exoPlayer = new ExoPlayer.Builder(App.get()).build();
+        formatter = new Formatter(builder, Locale.getDefault());
         exoPlayer.addListener(this);
     }
 
@@ -49,6 +56,14 @@ public class Players implements Player.Listener {
         float speed = exoPlayer.getPlaybackParameters().speed;
         exoPlayer.setPlaybackSpeed(speed = speed >= 3 ? 0.75f : speed + 0.25f);
         return String.valueOf(speed);
+    }
+
+    public String getTime(int time) {
+        return Util.getStringForTime(builder, formatter, exoPlayer.getCurrentPosition() + time);
+    }
+
+    public void seekTo(int time) {
+        exoPlayer.seekTo(exoPlayer.getCurrentPosition() + time);
     }
 
     public boolean isIdle() {
@@ -112,7 +127,16 @@ public class Players implements Player.Listener {
 
     public void release() {
         if (exoPlayer != null) {
+            exoPlayer.removeListener(this);
             exoPlayer.release();
+            exoPlayer = null;
+        }
+        if (webView != null) {
+            webView.destroy();
+            webView = null;
+        }
+        if (handler != null) {
+            handler = null;
         }
     }
 

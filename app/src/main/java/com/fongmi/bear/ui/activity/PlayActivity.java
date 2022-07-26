@@ -21,22 +21,16 @@ import com.fongmi.bear.utils.Notify;
 import com.fongmi.bear.utils.Prefers;
 import com.fongmi.bear.utils.ResUtil;
 import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.util.Util;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-
-import java.util.Formatter;
-import java.util.Locale;
 
 public class PlayActivity extends BaseActivity implements KeyDownImpl {
 
     private ViewControllerBottomBinding mControl;
     private ActivityPlayBinding mBinding;
     private SiteViewModel mSiteViewModel;
-    private StringBuilder mBuilder;
-    private Formatter mFormatter;
     private Vod.Flag mVodFlag;
     private KeyDown mKeyDown;
     private int mCurrent;
@@ -58,10 +52,8 @@ public class PlayActivity extends BaseActivity implements KeyDownImpl {
 
     @Override
     protected void initView() {
-        mBuilder = new StringBuilder();
         mKeyDown = KeyDown.create(this);
         mVodFlag = Vod.Flag.objectFrom(getFlag());
-        mFormatter = new Formatter(mBuilder, Locale.getDefault());
         mControl = ViewControllerBottomBinding.bind(mBinding.video.findViewById(com.google.android.exoplayer2.ui.R.id.exo_controller));
         mControl.scale.setText(ResUtil.getStringArray(R.array.select_scale)[Prefers.getScale()]);
         mControl.speed.setText(Players.get().getSpeed());
@@ -153,18 +145,19 @@ public class PlayActivity extends BaseActivity implements KeyDownImpl {
     }
 
     @Override
-    public void onSeek(boolean forward) {
-        long time = Players.get().exo().getCurrentPosition() + (forward ? 10000 : -10000);
+    public void onSeeking(int time) {
         mBinding.center.exoDuration.setText(mControl.exoDuration.getText());
-        mBinding.center.exoPosition.setText(Util.getStringForTime(mBuilder, mFormatter, time));
-        mBinding.center.action.setImageResource(forward ? R.drawable.ic_forward : R.drawable.ic_rewind);
+        mBinding.center.exoPosition.setText(Players.get().getTime(time));
+        mBinding.center.action.setImageResource(time > 0 ? R.drawable.ic_forward : R.drawable.ic_rewind);
         mBinding.center.getRoot().setVisibility(View.VISIBLE);
-        Players.get().exo().seekTo(time);
     }
 
     @Override
-    public void onKeyUp() {
-
+    public void onSeekTo(int time) {
+        mBinding.center.action.setImageResource(R.drawable.ic_play);
+        mBinding.center.getRoot().setVisibility(View.GONE);
+        Players.get().seekTo(time);
+        mKeyDown.resetTime();
     }
 
     @Override
@@ -174,43 +167,16 @@ public class PlayActivity extends BaseActivity implements KeyDownImpl {
     }
 
     @Override
-    public void onKeyLeft() {
-        mBinding.center.getRoot().setVisibility(View.GONE);
-        mBinding.center.action.setImageResource(R.drawable.ic_play);
-    }
-
-    @Override
-    public void onKeyRight() {
-        mBinding.center.getRoot().setVisibility(View.GONE);
-        mBinding.center.action.setImageResource(R.drawable.ic_play);
-    }
-
-    @Override
     public void onKeyCenter() {
         if (Players.get().isPlaying()) {
             Players.get().pause();
             mBinding.center.getRoot().setVisibility(View.VISIBLE);
+            mBinding.center.exoPosition.setText(Players.get().getTime(0));
             mBinding.center.exoDuration.setText(mControl.exoDuration.getText());
-            mBinding.center.exoPosition.setText(Util.getStringForTime(mBuilder, mFormatter, Players.get().exo().getCurrentPosition()));
         } else {
             Players.get().play();
             mBinding.center.getRoot().setVisibility(View.GONE);
         }
-    }
-
-    @Override
-    public void onKeyMenu() {
-
-    }
-
-    @Override
-    public void onKeyBack() {
-        onBackPressed();
-    }
-
-    @Override
-    public void onLongPress() {
-
     }
 
     private void setResult() {
