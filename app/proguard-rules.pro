@@ -13,6 +13,14 @@
 -keep,allowobfuscation,allowshrinking class com.google.gson.reflect.TypeToken
 -keep,allowobfuscation,allowshrinking class * extends com.google.gson.reflect.TypeToken
 
+# SimpleXML
+-keep interface org.simpleframework.xml.core.Label { public *; }
+-keep class * implements org.simpleframework.xml.core.Label { public *; }
+-keep interface org.simpleframework.xml.core.Parameter { public *; }
+-keep class * implements org.simpleframework.xml.core.Parameter { public *; }
+-keep interface org.simpleframework.xml.core.Extractor { public *; }
+-keep class * implements org.simpleframework.xml.core.Extractor { public *; }
+
 # CatVod
 -keep class com.github.catvod.crawler.** { *; }
 
