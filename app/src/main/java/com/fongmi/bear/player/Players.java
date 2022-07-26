@@ -27,7 +27,6 @@ public class Players implements Player.Listener {
     private Formatter formatter;
     private ExoPlayer exoPlayer;
     private Handler handler;
-    private String videoKey;
 
     private static class Loader {
         static volatile Players INSTANCE = new Players();
@@ -50,14 +49,6 @@ public class Players implements Player.Listener {
         return exoPlayer;
     }
 
-    public String getVideoKey() {
-        return videoKey;
-    }
-
-    public void setVideoKey(String videoKey) {
-        this.videoKey = videoKey;
-    }
-
     public String getSpeed() {
         return String.format(Locale.getDefault(), "%.2f", exoPlayer.getPlaybackParameters().speed);
     }
@@ -70,16 +61,15 @@ public class Players implements Player.Listener {
         return getSpeed();
     }
 
-    public String getTime(int time) {
-        return Util.getStringForTime(builder, formatter, exoPlayer.getCurrentPosition() + time);
+    public String getTime(long time) {
+        time = exoPlayer.getCurrentPosition() + time;
+        if (time > exoPlayer.getDuration()) time = exoPlayer.getDuration();
+        else if (time < 0) time = 0;
+        return Util.getStringForTime(builder, formatter, time);
     }
 
     public void seekTo(int time) {
         exoPlayer.seekTo(exoPlayer.getCurrentPosition() + time);
-    }
-
-    public boolean isIdle() {
-        return exoPlayer.getPlaybackState() == Player.STATE_IDLE;
     }
 
     public boolean isPlaying() {

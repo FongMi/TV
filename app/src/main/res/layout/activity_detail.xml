@@ -13,8 +13,6 @@
         android:layout_height="200dp"
         android:layout_marginStart="24dp"
         android:layout_marginTop="24dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="12dp"
         android:background="@color/black"
         android:focusable="true"
         android:focusableInTouchMode="true"
@@ -25,12 +23,24 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/black"
+            app:animation_enabled="false"
+            app:auto_show="false"
+            app:controller_layout_id="@layout/view_controller_bottom"
             app:resize_mode="fit"
+            app:surface_type="surface_view"
             app:use_controller="false" />
 
         <include
             android:id="@+id/progress"
             layout="@layout/view_progress"
+            android:visibility="gone" />
+
+        <include
+            android:id="@+id/center"
+            layout="@layout/view_controller_center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:visibility="gone" />
 
     </FrameLayout>
@@ -39,6 +49,7 @@
         android:id="@+id/name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="24dp"
         android:layout_toEndOf="@+id/frame"
@@ -152,6 +163,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/frame"
+        android:layout_marginTop="12dp"
         android:clipChildren="false"
         android:clipToPadding="false"
         android:paddingStart="24dp"
