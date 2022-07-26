@@ -59,7 +59,6 @@ public class PlayActivity extends BaseActivity implements KeyDownImpl {
         mControl.speed.setText(Players.get().getSpeed());
         mBinding.video.setResizeMode(Prefers.getScale());
         mBinding.video.setControllerShowTimeoutMs(3000);
-        mBinding.video.setPlayer(Players.get().exo());
         if (Players.get().isIdle()) showProgress();
         setViewModel();
         findCurrent();
@@ -86,8 +85,17 @@ public class PlayActivity extends BaseActivity implements KeyDownImpl {
         for (int i = 0; i < mVodFlag.getEpisodes().size(); i++) {
             if (mVodFlag.getEpisodes().get(i).isActivated()) {
                 mCurrent = i;
+                checkVideoKey();
+                mBinding.video.setPlayer(Players.get().exo());
                 break;
             }
+        }
+    }
+
+    private void checkVideoKey() {
+        if (!mVodFlag.getEpisodes().get(mCurrent).getUrl().equals(Players.get().getVideoKey())) {
+            Players.get().stop();
+            getPlayer();
         }
     }
 
@@ -107,6 +115,7 @@ public class PlayActivity extends BaseActivity implements KeyDownImpl {
         Vod.Flag.Episode episode = mVodFlag.getEpisodes().get(mCurrent);
         mSiteViewModel.playerContent(mVodFlag.getFlag(), episode.getUrl());
         Notify.show(ResUtil.getString(R.string.play_ready, episode.getName()));
+        Players.get().setVideoKey(episode.getUrl());
         mVodFlag.setActivated(episode);
         showProgress();
     }

@@ -47,7 +47,6 @@ public class DetailActivity extends BaseActivity {
     private EpisodePresenter mEpisodePresenter;
     private SiteViewModel mSiteViewModel;
     private View mOldView;
-    private boolean init;
 
     private String getId() {
         return getIntent().getStringExtra("id");
@@ -95,7 +94,8 @@ public class DetailActivity extends BaseActivity {
         });
         mEpisodePresenter.setOnClickListener(item -> {
             setEpisodeActivated(item);
-            getPlayer(item.getUrl());
+            if (Players.get().isPlaying()) mBinding.frame.performClick();
+            else getPlayer(item.getUrl());
         });
         mBinding.frame.setOnClickListener(view -> {
             mBinding.video.setPlayer(null);
@@ -122,6 +122,7 @@ public class DetailActivity extends BaseActivity {
     private void getPlayer(String id) {
         mBinding.progress.getRoot().setVisibility(View.VISIBLE);
         mSiteViewModel.playerContent(getVodFlag().getFlag(), id);
+        Players.get().setVideoKey(id);
     }
 
     private void setViewModel() {

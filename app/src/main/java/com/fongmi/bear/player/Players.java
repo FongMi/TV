@@ -27,6 +27,7 @@ public class Players implements Player.Listener {
     private Formatter formatter;
     private ExoPlayer exoPlayer;
     private Handler handler;
+    private String videoKey;
 
     private static class Loader {
         static volatile Players INSTANCE = new Players();
@@ -47,6 +48,14 @@ public class Players implements Player.Listener {
 
     public ExoPlayer exo() {
         return exoPlayer;
+    }
+
+    public String getVideoKey() {
+        return videoKey;
+    }
+
+    public void setVideoKey(String videoKey) {
+        this.videoKey = videoKey;
     }
 
     public String getSpeed() {
