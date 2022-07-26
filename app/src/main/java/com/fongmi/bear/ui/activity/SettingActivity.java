@@ -61,16 +61,16 @@ public class SettingActivity extends BaseActivity {
 
     private void showConfig(View view) {
         DialogConfigBinding bindingDialog = DialogConfigBinding.inflate(LayoutInflater.from(this));
-        bindingDialog.url.setText(Prefers.getUrl());
-        bindingDialog.url.setSelection(bindingDialog.url.getText().length());
+        bindingDialog.text.setText(Prefers.getUrl());
+        bindingDialog.text.setSelection(bindingDialog.text.getText().length());
         AlertDialog dialog = Notify.show(this, bindingDialog.getRoot(), (dialogInterface, i) -> {
-            Prefers.putUrl(bindingDialog.url.getText().toString().trim());
+            Prefers.putUrl(bindingDialog.text.getText().toString().trim());
             mBinding.url.setText(Prefers.getUrl());
             Notify.progress(this);
             ApiConfig.get().clear();
             checkUrl();
         });
-        bindingDialog.url.setOnEditorActionListener((textView, actionId, event) -> {
+        bindingDialog.text.setOnEditorActionListener((textView, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) dialog.getButton(DialogInterface.BUTTON_POSITIVE).performClick();
             return true;
         });

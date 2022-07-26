@@ -9,6 +9,7 @@ import com.fongmi.bear.ui.custom.CustomWebView;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.util.Util;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -77,18 +78,25 @@ public class Players implements Player.Listener {
     }
 
     public void setMediaSource(JsonObject object) {
-        HashMap<String, String> headers = new HashMap<>();
         String parse = object.get("parse").getAsString();
         String url = object.get("url").getAsString();
-        if (object.has("header")) {
-            JsonObject header = JsonParser.parseString(object.get("header").getAsString()).getAsJsonObject();
-            for (String key : header.keySet()) headers.put(key, header.get(key).getAsString());
-        }
         if (parse.equals("1")) {
             loadWebView(url);
         } else {
-            setMediaSource(headers, url);
+            setMediaSource(getPlayHeader(object), url);
         }
+    }
+
+    private HashMap<String, String> getPlayHeader(JsonObject object) {
+        HashMap<String, String> headers = new HashMap<>();
+        if (!object.has("header")) return headers;
+        String header = object.get("header").getAsString();
+        JsonElement element = JsonParser.parseString(header);
+        if (element.isJsonObject()) {
+            object = element.getAsJsonObject();
+            for (String key : object.keySet()) headers.put(key, object.get(key).getAsString());
+        }
+        return headers;
     }
 
     private void loadWebView(String url) {
