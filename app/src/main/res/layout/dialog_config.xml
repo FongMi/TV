@@ -8,12 +8,12 @@
     android:paddingEnd="16dp">
 
     <EditText
-        android:id="@+id/url"
+        android:id="@+id/text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/dialog_config_url_hint"
         android:imeOptions="actionDone"
-        android:inputType="textUri"
+        android:inputType="text"
         android:singleLine="true"
         android:textSize="18sp" />
 
