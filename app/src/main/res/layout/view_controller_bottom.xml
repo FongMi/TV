@@ -78,7 +78,7 @@
                 android:focusable="true"
                 android:focusableInTouchMode="true"
                 android:textColor="@color/white"
-                tools:text="1.0" />
+                tools:text="1.00" />
 
             <TextView
                 android:layout_width="wrap_content"

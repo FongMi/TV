@@ -49,13 +49,15 @@ public class Players implements Player.Listener {
     }
 
     public String getSpeed() {
-        return String.valueOf(exoPlayer.getPlaybackParameters().speed);
+        return String.format(Locale.getDefault(), "%.2f", exoPlayer.getPlaybackParameters().speed);
     }
 
     public String addSpeed() {
         float speed = exoPlayer.getPlaybackParameters().speed;
-        exoPlayer.setPlaybackSpeed(speed = speed >= 3 ? 0.75f : speed + 0.25f);
-        return String.valueOf(speed);
+        float addon = speed >= 2 ? 1f : 0.25f;
+        speed = speed >= 5 ? 0.5f : speed + addon;
+        exoPlayer.setPlaybackSpeed(speed);
+        return getSpeed();
     }
 
     public String getTime(int time) {
