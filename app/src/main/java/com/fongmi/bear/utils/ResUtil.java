@@ -1,9 +1,12 @@
 package com.fongmi.bear.utils;
 
+import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
 
 import androidx.annotation.ArrayRes;
+import androidx.annotation.DrawableRes;
 import androidx.annotation.StringRes;
+import androidx.core.content.ContextCompat;
 
 import com.fongmi.bear.App;
 
@@ -31,5 +34,9 @@ public class ResUtil {
 
     public static CharSequence[] getStringArray(@ArrayRes int resId) {
         return App.get().getResources().getStringArray(resId);
+    }
+
+    public static Drawable getDrawable(@DrawableRes int resId) {
+        return ContextCompat.getDrawable(App.get(), resId);
     }
 }

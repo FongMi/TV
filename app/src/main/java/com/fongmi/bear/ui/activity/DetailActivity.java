@@ -56,6 +56,7 @@ public class DetailActivity extends BaseActivity implements KeyDownImpl {
     private boolean mFullscreen;
     private KeyDown mKeyDown;
     private View mOldView;
+    private int mCurrent;
 
     private String getId() {
         return getIntent().getStringExtra("id");
@@ -66,7 +67,12 @@ public class DetailActivity extends BaseActivity implements KeyDownImpl {
     }
 
     private Vod.Flag.Episode getEpisode() {
-        return getVodFlag().getEpisodes().get(mBinding.episode.getSelectedPosition());
+        return (Vod.Flag.Episode) mEpisodeAdapter.get(getEpisodePosition());
+    }
+
+    private int getEpisodePosition() {
+        for (int i = 0; i < mEpisodeAdapter.size(); i++) if (((Vod.Flag.Episode) mEpisodeAdapter.get(i)).isActivated()) return i;
+        return 0;
     }
 
     public static void start(Activity activity, String id) {
@@ -140,9 +146,10 @@ public class DetailActivity extends BaseActivity implements KeyDownImpl {
     }
 
     private void getPlayer(Vod.Flag.Episode item) {
+        setEpisodeActivated(item);
         mBinding.progress.getRoot().setVisibility(View.VISIBLE);
         mSiteViewModel.playerContent(getVodFlag().getFlag(), item.getUrl());
-        setEpisodeActivated(item);
+        if (mFullscreen) Notify.show(ResUtil.getString(R.string.play_ready, item.getName()));
     }
 
     private void setViewModel() {
@@ -184,9 +191,10 @@ public class DetailActivity extends BaseActivity implements KeyDownImpl {
     }
 
     private void setEpisodeActivated(Vod.Flag.Episode item) {
+        mCurrent = mBinding.flag.getSelectedPosition();
         for (int i = 0; i < mFlagAdapter.size(); i++) {
             Vod.Flag flag = (Vod.Flag) mFlagAdapter.get(i);
-            if (mBinding.flag.getSelectedPosition() == i) flag.setActivated(item);
+            if (mCurrent == i) flag.setActivated(item);
             else flag.deactivated();
         }
         mEpisodeAdapter.notifyArrayItemRangeChanged(0, mEpisodeAdapter.size());
@@ -209,32 +217,33 @@ public class DetailActivity extends BaseActivity implements KeyDownImpl {
     }
 
     private void enterFullscreen() {
-        mBinding.frame.setFocusable(false);
-        mBinding.video.setUseController(true);
+        mBinding.frame.setForeground(null);
         mBinding.frame.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
+        mBinding.flag.setSelectedPosition(mCurrent);
+        mBinding.video.setUseController(true);
         mFullscreen = true;
     }
 
     private void exitFullscreen() {
-        mBinding.frame.setFocusable(true);
-        mBinding.video.setUseController(false);
+        mBinding.frame.setForeground(ResUtil.getDrawable(R.drawable.selector_video));
         mBinding.frame.setLayoutParams(mFrameParams);
+        mBinding.video.setUseController(false);
         mFullscreen = false;
     }
 
     private void onNext() {
-        int max = getVodFlag().getEpisodes().size() - 1;
-        int current = mBinding.episode.getSelectedPosition();
+        int current = getEpisodePosition();
+        int max = mEpisodeAdapter.size() - 1;
         current = ++current > max ? max : current;
-        Vod.Flag.Episode item = getVodFlag().getEpisodes().get(current);
+        Vod.Flag.Episode item = (Vod.Flag.Episode) mEpisodeAdapter.get(current);
         if (item.isActivated()) Notify.show(R.string.error_play_next);
         else getPlayer(item);
     }
 
     private void onPrev() {
-        int current = mBinding.episode.getSelectedPosition();
+        int current = getEpisodePosition();
         current = --current < 0 ? 0 : current;
-        Vod.Flag.Episode item = getVodFlag().getEpisodes().get(current);
+        Vod.Flag.Episode item = (Vod.Flag.Episode) mEpisodeAdapter.get(current);
         if (item.isActivated()) Notify.show(R.string.error_play_prev);
         else getPlayer(item);
     }

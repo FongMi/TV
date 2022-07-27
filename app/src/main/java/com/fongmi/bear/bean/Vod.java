@@ -247,10 +247,6 @@ public class Vod {
                 return activated;
             }
 
-            public void setActivated(boolean activated) {
-                this.activated = activated;
-            }
-
             private void deactivated() {
                 this.activated = false;
             }
