@@ -13,10 +13,10 @@ import com.fongmi.bear.utils.ResUtil;
 public class VodPresenter extends Presenter {
 
     private OnClickListener mListener;
-    private final int mCount;
+    private int width, height;
 
-    public VodPresenter(int count) {
-        mCount = count;
+    public VodPresenter(int columns) {
+        setLayoutSize(columns);
     }
 
     public interface OnClickListener {
@@ -27,11 +27,18 @@ public class VodPresenter extends Presenter {
         this.mListener = listener;
     }
 
+    private void setLayoutSize(int columns) {
+        int space = ResUtil.dp2px(16) * (columns - 1) + ResUtil.dp2px(48);
+        int base = ResUtil.getScreenWidthPx() - space;
+        width = (int) base / columns;
+        height = (int) (width / 0.75);
+    }
+
     @Override
     public Presenter.ViewHolder onCreateViewHolder(ViewGroup parent) {
         ViewHolder holder = new ViewHolder(AdapterVodBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
-        holder.binding.getRoot().getLayoutParams().width = ResUtil.dp2px(mCount == 5 ? 150 : 144);
-        holder.binding.getRoot().getLayoutParams().height = ResUtil.dp2px(mCount == 5 ? 200 : 192);
+        holder.binding.getRoot().getLayoutParams().width = width;
+        holder.binding.getRoot().getLayoutParams().height = height;
         return holder;
     }
 

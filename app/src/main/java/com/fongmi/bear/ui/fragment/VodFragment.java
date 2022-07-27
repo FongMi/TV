@@ -93,7 +93,7 @@ public class VodFragment extends Fragment implements Scroller.Callback, VodPrese
             if (result == null) return;
             mScroller.endLoading(result.getList().isEmpty());
             for (List<Vod> items : result.partition()) {
-                VodPresenter presenter = new VodPresenter(items.size());
+                VodPresenter presenter = new VodPresenter(result.getColumns());
                 ArrayObjectAdapter adapter = new ArrayObjectAdapter(presenter);
                 presenter.setOnClickListener(this);
                 adapter.addAll(0, items);

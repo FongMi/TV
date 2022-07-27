@@ -89,7 +89,7 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
             mAdapter.remove("progress");
             if (result == null) return;
             for (List<Vod> items : result.partition()) {
-                VodPresenter presenter = new VodPresenter(items.size());
+                VodPresenter presenter = new VodPresenter(result.getColumns());
                 ArrayObjectAdapter adapter = new ArrayObjectAdapter(presenter);
                 presenter.setOnClickListener(this);
                 adapter.addAll(0, items);
