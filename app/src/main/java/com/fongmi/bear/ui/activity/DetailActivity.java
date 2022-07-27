@@ -2,6 +2,7 @@ package com.fongmi.bear.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Handler;
 import android.text.Html;
 import android.view.KeyEvent;
 import android.view.View;
@@ -89,7 +90,7 @@ public class DetailActivity extends BaseActivity implements KeyDownImpl {
     @Override
     protected void initView() {
         mKeyDown = KeyDown.create(this);
-        mFrameParams = mBinding.frame.getLayoutParams();
+        mFrameParams = mBinding.video.getLayoutParams();
         mBinding.progressLayout.showProgress();
         setRecyclerView();
         setVideoView();
@@ -117,7 +118,7 @@ public class DetailActivity extends BaseActivity implements KeyDownImpl {
                 if (mEpisodeAdapter.size() > 20) mBinding.episode.setSelectedPosition(position * 20);
             }
         });
-        mBinding.frame.setOnClickListener(view -> enterFullscreen());
+        mBinding.video.setOnClickListener(view -> enterFullscreen());
         mEpisodePresenter.setOnClickListener(this::getPlayer);
     }
 
@@ -217,16 +218,16 @@ public class DetailActivity extends BaseActivity implements KeyDownImpl {
     }
 
     private void enterFullscreen() {
-        mBinding.frame.setForeground(null);
-        mBinding.frame.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
+        mBinding.video.setForeground(null);
+        mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
+        new Handler().postDelayed(() -> mBinding.video.setUseController(true),250);
         mBinding.flag.setSelectedPosition(mCurrent);
-        mBinding.video.setUseController(true);
         mFullscreen = true;
     }
 
     private void exitFullscreen() {
-        mBinding.frame.setForeground(ResUtil.getDrawable(R.drawable.selector_video));
-        mBinding.frame.setLayoutParams(mFrameParams);
+        mBinding.video.setForeground(ResUtil.getDrawable(R.drawable.selector_video));
+        mBinding.video.setLayoutParams(mFrameParams);
         mBinding.video.setUseController(false);
         mFullscreen = false;
     }
