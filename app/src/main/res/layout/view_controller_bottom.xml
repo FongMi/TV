@@ -36,6 +36,7 @@
                 android:background="@drawable/selector_text"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
+                android:nextFocusLeft="@id/next"
                 android:nextFocusDown="@id/exo_progress"
                 android:text="@string/play_next"
                 android:textColor="@color/white" />
@@ -100,6 +101,8 @@
                 android:background="@drawable/selector_text"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
+                android:nextFocusRight="@id/scale"
+                android:nextFocusDown="@id/exo_progress"
                 android:textColor="@color/white"
                 tools:text="預設" />
 
@@ -130,7 +133,10 @@
                 android:layout_weight="1"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
+                android:nextFocusLeft="@id/exo_progress"
+                android:nextFocusRight="@id/exo_progress"
                 android:nextFocusUp="@+id/next"
+                android:nextFocusDown="@id/exo_progress"
                 app:buffered_color="@color/grey_700"
                 app:played_color="@color/blue_700"
                 app:scrubber_color="@color/blue_500"
