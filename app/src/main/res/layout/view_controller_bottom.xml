@@ -36,6 +36,7 @@
                 android:background="@drawable/selector_text"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
+                android:nextFocusDown="@id/exo_progress"
                 android:text="@string/play_next"
                 android:textColor="@color/white" />
 
@@ -47,6 +48,7 @@
                 android:background="@drawable/selector_text"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
+                android:nextFocusDown="@id/exo_progress"
                 android:text="@string/play_prev"
                 android:textColor="@color/white" />
 
@@ -58,6 +60,7 @@
                 android:background="@drawable/selector_text"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
+                android:nextFocusDown="@id/exo_progress"
                 android:text="@string/play_reset"
                 android:textColor="@color/white" />
 
@@ -77,6 +80,7 @@
                 android:background="@drawable/selector_text"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
+                android:nextFocusDown="@id/exo_progress"
                 android:textColor="@color/white"
                 tools:text="1.00" />
 
@@ -124,6 +128,8 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginEnd="8dp"
                 android:layout_weight="1"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
                 android:nextFocusUp="@+id/next"
                 app:buffered_color="@color/grey_700"
                 app:played_color="@color/blue_700"
