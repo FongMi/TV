@@ -52,7 +52,7 @@ public class SiteViewModel extends ViewModel {
                 return result;
             } else {
                 String body = OKHttp.newCall(home.getApi()).execute().body().string();
-                SpiderDebug.xml(body);
+                SpiderDebug.log(body);
                 if (home.getType() == 0) return Result.fromXml(body);
                 else if (home.getType() == 1) return Result.fromJson(body);
                 else return new Result();
@@ -71,7 +71,7 @@ public class SiteViewModel extends ViewModel {
             } else {
                 HttpUrl url = HttpUrl.parse(home.getApi()).newBuilder().addQueryParameter("ac", home.getType() == 0 ? "videolist" : "detail").addQueryParameter("t", tid).addQueryParameter("pg", page).build();
                 String body = OKHttp.newCall(url).execute().body().string();
-                SpiderDebug.xml(body);
+                SpiderDebug.log(body);
                 if (home.getType() == 0) return Result.fromXml(body);
                 else if (home.getType() == 1) return Result.fromJson(body);
                 return new Result();
@@ -92,7 +92,7 @@ public class SiteViewModel extends ViewModel {
             } else {
                 HttpUrl url = HttpUrl.parse(home.getApi()).newBuilder().addQueryParameter("ac", home.getType() == 0 ? "videolist" : "detail").addQueryParameter("ids", id).build();
                 String body = OKHttp.newCall(url).execute().body().string();
-                SpiderDebug.xml(body);
+                SpiderDebug.log(body);
                 Result result;
                 if (home.getType() == 0) result = Result.fromXml(body);
                 else if (home.getType() == 1) result = Result.fromJson(body);

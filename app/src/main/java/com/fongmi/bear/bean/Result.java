@@ -65,6 +65,10 @@ public class Result {
         return types == null ? Collections.emptyList() : types;
     }
 
+    public void setTypes(List<Class> types) {
+        this.types = types;
+    }
+
     public List<Vod> getList() {
         return list == null ? Collections.emptyList() : list;
     }

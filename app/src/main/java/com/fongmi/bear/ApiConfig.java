@@ -108,17 +108,8 @@ public class ApiConfig {
     }
 
     private void parseJson(JsonObject object) {
-        for (JsonElement opt : object.get("sites").getAsJsonArray()) {
-            JsonObject obj = (JsonObject) opt;
-            Site site = new Site();
-            site.setKey(obj.get("key").getAsString().trim());
-            site.setName(obj.get("name").getAsString().trim());
-            site.setType(obj.get("type").getAsInt());
-            site.setApi(obj.get("api").getAsString().trim());
-            site.setSearchable(Json.safeInt(obj, "searchable", 1));
-            site.setSearchable(Json.safeInt(obj, "quickSearch", 1));
-            site.setFilterable(Json.safeInt(obj, "filterable", 1));
-            site.setExt(Json.safeString(obj, "ext", ""));
+        for (JsonElement element : object.get("sites").getAsJsonArray()) {
+            Site site = Site.objectFrom(element);
             if (site.getExt().startsWith("file://")) site.setExt(FileUtil.read(site.getExt()));
             if (site.getKey().equals(Prefers.getHome())) setHome(site);
             sites.add(site);

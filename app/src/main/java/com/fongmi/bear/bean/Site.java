@@ -2,7 +2,12 @@ package com.fongmi.bear.bean;
 
 import android.text.TextUtils;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
+
+import java.util.Collections;
+import java.util.List;
 
 public class Site {
 
@@ -17,15 +22,21 @@ public class Site {
     @SerializedName("playerUrl")
     private String playerUrl;
     @SerializedName("searchable")
-    private int searchable;
+    private Integer searchable;
     @SerializedName("quickSearch")
-    private int quickSearch;
+    private Integer quickSearch;
     @SerializedName("filterable")
-    private int filterable;
+    private Integer filterable;
     @SerializedName("ext")
     private String ext;
+    @SerializedName("categories")
+    private List<String> categories;
 
     private boolean home;
+
+    public static Site objectFrom(JsonElement element) {
+        return new Gson().fromJson(element, Site.class);
+    }
 
     public static Site get(String key) {
         Site site = new Site();
@@ -42,63 +53,43 @@ public class Site {
     }
 
     public String getName() {
-        return name;
+        return TextUtils.isEmpty(name) ? "" : name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Integer getType() {
+    public int getType() {
         return type;
     }
 
-    public void setType(Integer type) {
-        this.type = type;
-    }
-
     public String getApi() {
-        return api;
-    }
-
-    public void setApi(String api) {
-        this.api = api;
+        return TextUtils.isEmpty(api) ? "" : api;
     }
 
     public String getPlayerUrl() {
-        return playerUrl;
+        return TextUtils.isEmpty(playerUrl) ? "" : playerUrl;
     }
 
     public Integer getSearchable() {
-        return searchable;
-    }
-
-    public void setSearchable(Integer searchable) {
-        this.searchable = searchable;
+        return searchable == null ? 1 : searchable;
     }
 
     public Integer getQuickSearch() {
-        return quickSearch;
-    }
-
-    public void setQuickSearch(Integer quickSearch) {
-        this.quickSearch = quickSearch;
+        return quickSearch == null ? 1 : quickSearch;
     }
 
     public Integer getFilterable() {
-        return filterable;
-    }
-
-    public void setFilterable(Integer filterable) {
-        this.filterable = filterable;
+        return filterable == null ? 1 : filterable;
     }
 
     public String getExt() {
-        return ext;
+        return TextUtils.isEmpty(ext) ? "" : ext;
     }
 
     public void setExt(String ext) {
         this.ext = ext;
+    }
+
+    public List<String> getCategories() {
+        return categories == null ? Collections.emptyList() : categories;
     }
 
     public boolean isHome() {

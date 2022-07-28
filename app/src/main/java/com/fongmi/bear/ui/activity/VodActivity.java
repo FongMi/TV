@@ -17,11 +17,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewpager.widget.ViewPager;
 
+import com.fongmi.bear.ApiConfig;
+import com.fongmi.bear.bean.Class;
 import com.fongmi.bear.bean.Result;
 import com.fongmi.bear.databinding.ActivityVodBinding;
 import com.fongmi.bear.ui.fragment.VodFragment;
 import com.fongmi.bear.ui.presenter.TypePresenter;
 import com.fongmi.bear.utils.ResUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class VodActivity extends BaseActivity {
 
@@ -49,6 +54,7 @@ public class VodActivity extends BaseActivity {
     @Override
     protected void initView() {
         mResult = Result.fromJson(getResult());
+        sortCategories();
         setRecyclerView();
         setPager();
     }
@@ -72,6 +78,12 @@ public class VodActivity extends BaseActivity {
                 mOldView.setActivated(true);
             }
         });
+    }
+
+    private void sortCategories() {
+        List<Class> newTypes = new ArrayList<>();
+        for (String cate : ApiConfig.get().getHome().getCategories()) for (Class type : mResult.getTypes()) if (cate.equals(type.getTypeName())) newTypes.add(type);
+        if (newTypes.size() > 0) mResult.setTypes(newTypes);
     }
 
     private void setRecyclerView() {
