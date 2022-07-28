@@ -141,7 +141,10 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) getVideo();
+        if (resultCode != RESULT_OK) return;
+        String type = data != null ? data.getStringExtra("type") : "";
+        if (type.equals("thumbnail")) mAdapter.notifyArrayItemRangeChanged(4, mAdapter.size() - 4);
+        else getVideo();
     }
 
     @Override

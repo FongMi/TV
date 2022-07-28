@@ -137,5 +137,8 @@ public class SettingActivity extends BaseActivity {
         index = index == 2 ? 0 : ++index;
         mBinding.compress.setText(array[index]);
         Prefers.putThumbnail(index);
+        Intent intent = new Intent();
+        intent.putExtra("type", "thumbnail");
+        setResult(RESULT_OK, intent);
     }
 }
