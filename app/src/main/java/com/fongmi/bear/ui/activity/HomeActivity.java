@@ -22,6 +22,7 @@ import com.fongmi.bear.bean.Vod;
 import com.fongmi.bear.databinding.ActivityHomeBinding;
 import com.fongmi.bear.model.SiteViewModel;
 import com.fongmi.bear.player.Players;
+import com.fongmi.bear.server.Server;
 import com.fongmi.bear.ui.custom.CustomRowPresenter;
 import com.fongmi.bear.ui.custom.CustomSelector;
 import com.fongmi.bear.ui.presenter.FuncPresenter;
@@ -55,6 +56,7 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
     @Override
     protected void initView() {
         Clock.start(mBinding.time);
+        Server.get().start();
         Players.get().init();
         setRecyclerView();
         setViewModel();
@@ -160,8 +162,9 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
 
     @Override
     protected void onDestroy() {
-        Players.get().release();
         ApiConfig.get().clear();
+        Players.get().release();
+        Server.get().stop();
         super.onDestroy();
         Clock.destroy();
     }
