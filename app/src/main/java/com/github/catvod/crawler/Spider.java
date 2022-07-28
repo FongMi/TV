@@ -2,10 +2,14 @@ package com.github.catvod.crawler;
 
 import android.content.Context;
 
+import com.fongmi.bear.net.OKHttp;
+
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.List;
+
+import okhttp3.Dns;
 
 public abstract class Spider {
 
@@ -72,5 +76,9 @@ public abstract class Spider {
      */
     public boolean manualVideoCheck() {
         return false;
+    }
+
+    public static Dns safeDns() {
+        return OKHttp.get().getDns();
     }
 }

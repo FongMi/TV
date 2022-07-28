@@ -46,6 +46,7 @@
     <string name="dialog_config_url_hint">請輸入配置接口</string>
 
     <!-- Error -->
+    <string name="error_device">僅支援電視</string>
     <string name="error_config_get">配置取得失敗</string>
     <string name="error_config_parse">配置解析失敗</string>
     <string name="error_play_next">已經是最後一集了！</string>

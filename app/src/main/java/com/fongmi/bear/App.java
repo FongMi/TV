@@ -2,7 +2,6 @@ package com.fongmi.bear;
 
 import android.app.Application;
 
-import com.fongmi.bear.player.Players;
 import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.LogAdapter;
 import com.orhanobut.logger.Logger;
