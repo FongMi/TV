@@ -38,6 +38,7 @@
     <string name="setting_site">Home site</string>
     <string name="setting_url">Configure</string>
     <string name="setting_history">History</string>
+    <string name="setting_thumbnail">Thumbnail</string>
 
     <!-- Dialog -->
     <string name="dialog_positive">OK</string>
@@ -50,6 +51,12 @@
     <string name="error_play_next">It\'s the last episode!</string>
     <string name="error_play_prev">It\'s the first episode!</string>
     <string name="error_play_parse">Unable to parse url</string>
+
+    <string-array name="select_thumbnail">
+        <item>High</item>
+        <item>Medium</item>
+        <item>Low</item>
+    </string-array>
 
     <string-array name="select_scale">
         <item>Default</item>

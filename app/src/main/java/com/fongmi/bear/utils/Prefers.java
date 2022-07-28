@@ -12,16 +12,20 @@ public class Prefers {
         return PreferenceManager.getDefaultSharedPreferences(App.get());
     }
 
-    public static String getString(String key) {
-        return getString(key, "");
-    }
-
     public static String getString(String key, String defaultValue) {
         return getPrefers().getString(key, defaultValue);
     }
 
+    public static String getString(String key) {
+        return getString(key, "");
+    }
+
+    public static int getInt(String key, int defaultValue) {
+        return getPrefers().getInt(key, defaultValue);
+    }
+
     public static int getInt(String key) {
-        return getPrefers().getInt(key, 0);
+        return getInt(key, 0);
     }
 
     public static void put(String key, Object obj) {
@@ -61,5 +65,13 @@ public class Prefers {
 
     public static void putScale(int scale) {
         Prefers.put("scale", scale);
+    }
+
+    public static int getThumbnail() {
+        return Prefers.getInt("thumbnail", 1);
+    }
+
+    public static void putThumbnail(int thumbnail) {
+        Prefers.put("thumbnail", thumbnail);
     }
 }

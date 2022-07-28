@@ -21,6 +21,7 @@ import androidx.leanback.widget.ItemBridgeAdapter;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.bear.ApiConfig;
+import com.fongmi.bear.R;
 import com.fongmi.bear.bean.Site;
 import com.fongmi.bear.databinding.ActivitySettingBinding;
 import com.fongmi.bear.databinding.DialogConfigBinding;
@@ -49,14 +50,16 @@ public class SettingActivity extends BaseActivity {
 
     @Override
     protected void initView() {
-        mBinding.home.setText(ApiConfig.get().getHome().getName());
         mBinding.url.setText(Prefers.getUrl());
+        mBinding.home.setText(ApiConfig.get().getHome().getName());
+        mBinding.compress.setText(ResUtil.getStringArray(R.array.select_thumbnail)[Prefers.getThumbnail()]);
     }
 
     @Override
     protected void initEvent() {
-        mBinding.config.setOnClickListener(this::showConfig);
         mBinding.site.setOnClickListener(this::showSite);
+        mBinding.config.setOnClickListener(this::showConfig);
+        mBinding.thumbnail.setOnClickListener(this::setThumbnail);
     }
 
     private void showConfig(View view) {
@@ -126,5 +129,13 @@ public class SettingActivity extends BaseActivity {
         ApiConfig.get().setHome(item);
         setResult(RESULT_OK);
         Notify.dismiss();
+    }
+
+    public void setThumbnail(View view) {
+        CharSequence[] array = ResUtil.getStringArray(R.array.select_thumbnail);
+        int index = Prefers.getThumbnail();
+        index = index == 2 ? 0 : ++index;
+        mBinding.compress.setText(array[index]);
+        Prefers.putThumbnail(index);
     }
 }

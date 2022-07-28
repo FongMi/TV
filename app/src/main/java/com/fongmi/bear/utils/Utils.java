@@ -7,11 +7,8 @@ import android.os.Build;
 import android.provider.Settings;
 import android.util.Rational;
 import android.view.View;
-import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
 import com.fongmi.bear.App;
-import com.fongmi.bear.R;
 import com.google.android.exoplayer2.util.Util;
 
 import java.util.regex.Pattern;
@@ -19,10 +16,6 @@ import java.util.regex.Pattern;
 public class Utils {
 
     private static final Pattern snifferMatch = Pattern.compile("http((?!http).){26,}?\\.(m3u8|mp4|flv|avi|mkv|rm|wmv|mpg)\\?.*|http((?!http).){26,}\\.(m3u8|mp4|flv|avi|mkv|rm|wmv|mpg)|http((?!http).){26,}?/m3u8\\?pt=m3u8.*|http((?!http).)*?default\\.ixigua\\.com/.*|http((?!http).)*?cdn-tos[^\\?]*|http((?!http).)*?/obj/tos[^\\?]*|http.*?/player/m3u8play\\.php\\?url=.*|http.*?/player/.*?[pP]lay\\.php\\?url=.*|http.*?/playlist/m3u8/\\?vid=.*|http.*?\\.php\\?type=m3u8&.*|http.*?/download.aspx\\?.*|http.*?/api/up_api.php\\?.*|https.*?\\.66yk\\.cn.*|http((?!http).)*?netease\\.com/file/.*");
-
-    public static <T> void loadImage(T model, ImageView view) {
-        Glide.with(App.get()).load(model).placeholder(R.drawable.ic_img_loading).error(R.drawable.ic_img_error).into(view);
-    }
 
     public static boolean hasPIP() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && App.get().getPackageManager().hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE);
