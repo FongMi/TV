@@ -17,7 +17,7 @@ import com.fongmi.bear.R;
 public class ImgUtil {
 
     public static void load(String url, ImageView view) {
-        float thumbnail = (float) (1 - Prefers.getThumbnail() * 0.3);
+        float thumbnail = 1 - Prefers.getThumbnail() * 0.3f;
         Glide.with(App.get()).load(url).thumbnail(thumbnail).signature(new ObjectKey(url + "_" + thumbnail)).placeholder(R.drawable.ic_img_loading).error(R.drawable.ic_img_error).listener(getListener(view)).into(view);
     }
 
