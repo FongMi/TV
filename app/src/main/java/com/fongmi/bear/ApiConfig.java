@@ -35,13 +35,13 @@ import okhttp3.Response;
 
 public class ApiConfig {
 
-    private final List<String> ads;
-    private final List<String> flags;
-    private final List<Parse> parses;
-    private final List<Live> lives;
-    private final List<Site> sites;
-    private final JarLoader loader;
-    private final Handler handler;
+    private List<String> ads;
+    private List<String> flags;
+    private List<Parse> parses;
+    private List<Live> lives;
+    private List<Site> sites;
+    private JarLoader loader;
+    private Handler handler;
     private Parse parse;
     private Site home;
 
@@ -53,23 +53,15 @@ public class ApiConfig {
         return Loader.INSTANCE;
     }
 
-    public ApiConfig() {
+    public ApiConfig init() {
         this.ads = new ArrayList<>();
+        this.sites = new ArrayList<>();
+        this.lives = new ArrayList<>();
         this.flags = new ArrayList<>();
         this.parses = new ArrayList<>();
-        this.lives = new ArrayList<>();
-        this.sites = new ArrayList<>();
         this.loader = new JarLoader();
         this.handler = new Handler(Looper.getMainLooper());
-    }
-
-    public void clear() {
-        this.ads.clear();
-        this.flags.clear();
-        this.parses.clear();
-        this.lives.clear();
-        this.sites.clear();
-        this.home = null;
+        return this;
     }
 
     public void loadConfig(Callback callback) {
@@ -188,5 +180,26 @@ public class ApiConfig {
         this.home = home;
         this.home.setHome(true);
         Prefers.putHome(home.getKey());
+    }
+
+    public ApiConfig clear() {
+        this.ads.clear();
+        this.sites.clear();
+        this.lives.clear();
+        this.flags.clear();
+        this.parses.clear();
+        this.home = null;
+        return this;
+    }
+
+    public void release() {
+        this.ads = null;
+        this.home = null;
+        this.sites = null;
+        this.lives = null;
+        this.flags = null;
+        this.parses = null;
+        this.loader = null;
+        this.handler = null;
     }
 }

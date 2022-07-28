@@ -162,10 +162,10 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
 
     @Override
     protected void onDestroy() {
-        ApiConfig.get().clear();
+        ApiConfig.get().release();
         Players.get().release();
+        Clock.get().release();
         Server.get().stop();
         super.onDestroy();
-        Clock.destroy();
     }
 }

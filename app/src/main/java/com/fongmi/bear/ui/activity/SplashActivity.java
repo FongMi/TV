@@ -39,7 +39,7 @@ public class SplashActivity extends BaseActivity {
     }
 
     private void loadConfig() {
-        ApiConfig.get().loadConfig(new Callback() {
+        ApiConfig.get().init().loadConfig(new Callback() {
             @Override
             public void success() {
                 HomeActivity.start(getActivity());

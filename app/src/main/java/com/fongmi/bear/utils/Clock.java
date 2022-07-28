@@ -12,8 +12,8 @@ import java.util.TimerTask;
 
 public class Clock {
 
-    private final SimpleDateFormat formatter;
-    private final Handler handler;
+    private SimpleDateFormat formatter;
+    private Handler handler;
     private Timer timer;
 
     private static class Loader {
@@ -24,18 +24,14 @@ public class Clock {
         return Loader.INSTANCE;
     }
 
-    public Clock() {
+    public void init() {
         this.formatter = new SimpleDateFormat("MM/dd HH:mm:ss", Locale.getDefault());
         this.handler = new Handler(Looper.getMainLooper());
     }
 
     public static void start(TextView view) {
-        get().cancel();
+        get().init();
         get().run(view);
-    }
-
-    public static void destroy() {
-        get().cancel();
     }
 
     private void run(TextView view) {
@@ -48,7 +44,10 @@ public class Clock {
         }, 0, 1000);
     }
 
-    private void cancel() {
+    public void release() {
         if (timer != null) timer.cancel();
+        formatter = null;
+        handler = null;
+        timer = null;
     }
 }

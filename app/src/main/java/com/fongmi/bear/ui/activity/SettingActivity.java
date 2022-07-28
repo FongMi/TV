@@ -70,7 +70,6 @@ public class SettingActivity extends BaseActivity {
             Prefers.putUrl(bindingDialog.text.getText().toString().trim());
             mBinding.url.setText(Prefers.getUrl());
             Notify.progress(this);
-            ApiConfig.get().clear();
             checkUrl();
         });
         bindingDialog.text.setOnEditorActionListener((textView, actionId, event) -> {
@@ -90,7 +89,7 @@ public class SettingActivity extends BaseActivity {
     }
 
     private void loadConfig() {
-        ApiConfig.get().loadConfig(new Callback() {
+        ApiConfig.get().clear().loadConfig(new Callback() {
             @Override
             public void success() {
                 mBinding.home.setText(ApiConfig.get().getHome().getName());
