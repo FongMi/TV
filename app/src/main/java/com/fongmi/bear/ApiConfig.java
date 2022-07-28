@@ -131,6 +131,7 @@ public class ApiConfig {
     }
 
     private void parseJar(String spider) throws Exception {
+        if (spider.contains(";md5")) spider = spider.split(";md5")[0];
         if (spider.startsWith("file://")) {
             loader.load(FileUtil.getLocal(spider));
         } else if (Patterns.WEB_URL.matcher(spider).matches()) {

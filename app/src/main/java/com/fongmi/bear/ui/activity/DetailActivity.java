@@ -25,7 +25,6 @@ import com.fongmi.bear.bean.Vod;
 import com.fongmi.bear.databinding.ActivityDetailBinding;
 import com.fongmi.bear.databinding.ViewControllerBottomBinding;
 import com.fongmi.bear.event.PlayerEvent;
-import com.fongmi.bear.impl.KeyDownImpl;
 import com.fongmi.bear.model.SiteViewModel;
 import com.fongmi.bear.player.Players;
 import com.fongmi.bear.ui.presenter.EpisodePresenter;
@@ -44,7 +43,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DetailActivity extends BaseActivity implements KeyDownImpl {
+public class DetailActivity extends BaseActivity implements KeyDown.Listener {
 
     private ViewControllerBottomBinding mControl;
     private ViewGroup.LayoutParams mFrameParams;

@@ -2,32 +2,30 @@ package com.fongmi.bear.utils;
 
 import android.view.KeyEvent;
 
-import com.fongmi.bear.impl.KeyDownImpl;
-
 public class KeyDown {
 
-    private final KeyDownImpl mKeyDown;
+    private final Listener mListener;
     private int mHoldTime;
 
-    public static KeyDown create(KeyDownImpl keyDown) {
-        return new KeyDown(keyDown);
+    public static KeyDown create(Listener listener) {
+        return new KeyDown(listener);
     }
 
-    private KeyDown(KeyDownImpl keyDown) {
-        this.mKeyDown = keyDown;
+    private KeyDown(Listener listener) {
+        this.mListener = listener;
     }
 
     public boolean onKeyDown(KeyEvent event) {
         boolean isLeft = isLeftKey(event);
         boolean isRight = isRightKey(event);
         if (event.getAction() == KeyEvent.ACTION_DOWN && (isLeft || isRight)) {
-            mKeyDown.onSeeking(isRight ? addTime() : subTime());
+            mListener.onSeeking(isRight ? addTime() : subTime());
         } else if (event.getAction() == KeyEvent.ACTION_UP && (isLeft || isRight)) {
-            mKeyDown.onSeekTo(mHoldTime);
+            mListener.onSeekTo(mHoldTime);
         } else if (event.getAction() == KeyEvent.ACTION_UP && isDownKey(event)) {
-            mKeyDown.onKeyDown();
+            mListener.onKeyDown();
         } else if (event.getAction() == KeyEvent.ACTION_UP && isEnterKey(event)) {
-            mKeyDown.onKeyCenter();
+            mListener.onKeyCenter();
         }
         return true;
     }
@@ -66,5 +64,16 @@ public class KeyDown {
 
     private boolean isRightKey(KeyEvent event) {
         return event.getKeyCode() == KeyEvent.KEYCODE_DPAD_RIGHT;
+    }
+
+    public interface Listener {
+
+        void onSeeking(int time);
+
+        void onSeekTo(int time);
+
+        void onKeyDown();
+
+        void onKeyCenter();
     }
 }
