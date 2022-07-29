@@ -2,8 +2,8 @@ package com.github.catvod.crawler;
 
 import android.content.Context;
 
-import com.fongmi.bear.App;
-import com.fongmi.bear.utils.FileUtil;
+import com.fongmi.tv.App;
+import com.fongmi.tv.utils.FileUtil;
 
 import org.json.JSONObject;
 

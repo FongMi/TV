@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.fongmi.bear.ui.custom.CustomVerticalGridView
+    <com.fongmi.tv.ui.custom.CustomVerticalGridView
         android:id="@+id/recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

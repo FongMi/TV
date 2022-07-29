@@ -1,4 +1,4 @@
-# BearTV
+# AlphaTV
 
 ### Based on CatVod  
 https://github.com/CatVodTVOfficial

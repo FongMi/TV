@@ -6,7 +6,7 @@ android {
     compileSdk 32
 
     defaultConfig {
-        applicationId "com.fongmi.bear"
+        applicationId "com.fongmi.tv"
         minSdk 21
         targetSdk 32
         versionCode 1
