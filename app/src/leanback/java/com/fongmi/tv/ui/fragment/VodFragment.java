@@ -21,7 +21,7 @@ import com.fongmi.tv.model.SiteViewModel;
 import com.fongmi.tv.ui.activity.DetailActivity;
 import com.fongmi.tv.ui.custom.CustomRowPresenter;
 import com.fongmi.tv.ui.custom.CustomSelector;
-import com.fongmi.tv.ui.custom.Scroller;
+import com.fongmi.tv.ui.custom.CustomScroller;
 import com.fongmi.tv.ui.presenter.FilterPresenter;
 import com.fongmi.tv.ui.presenter.ProgressPresenter;
 import com.fongmi.tv.ui.presenter.VodPresenter;
@@ -32,14 +32,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
-public class VodFragment extends Fragment implements Scroller.Callback, VodPresenter.OnClickListener {
+public class VodFragment extends Fragment implements CustomScroller.Callback, VodPresenter.OnClickListener {
 
     private HashMap<String, String> mExtend;
     private FragmentVodBinding mBinding;
     private SiteViewModel mSiteViewModel;
     private ArrayObjectAdapter mAdapter;
+    private CustomScroller mScroller;
     private List<Filter> mFilters;
-    private Scroller mScroller;
 
     private String getTypeId() {
         return getArguments().getString("typeId");
@@ -80,7 +80,7 @@ public class VodFragment extends Fragment implements Scroller.Callback, VodPrese
         selector.addPresenter(String.class, new ProgressPresenter());
         selector.addPresenter(ListRow.class, new CustomRowPresenter(16), VodPresenter.class);
         selector.addPresenter(ListRow.class, new CustomRowPresenter(8), FilterPresenter.class);
-        mBinding.recycler.addOnScrollListener(mScroller = new Scroller(this));
+        mBinding.recycler.addOnScrollListener(mScroller = new CustomScroller(this));
         mBinding.recycler.setTabView(getActivity().findViewById(R.id.recycler));
         mBinding.recycler.setVerticalSpacing(ResUtil.dp2px(16));
         mBinding.recycler.setAdapter(new ItemBridgeAdapter(mAdapter = new ArrayObjectAdapter(selector)));

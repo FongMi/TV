@@ -6,13 +6,13 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class Scroller extends RecyclerView.OnScrollListener {
+public class CustomScroller extends RecyclerView.OnScrollListener {
 
     private final Callback callback;
     private boolean loading;
     private int page;
 
-    public Scroller(Callback callback) {
+    public CustomScroller(Callback callback) {
         this.callback = callback;
         this.page = 1;
     }
