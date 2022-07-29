@@ -11,9 +11,7 @@ import com.fongmi.tv.net.Callback;
 import com.fongmi.tv.net.OKHttp;
 import com.fongmi.tv.utils.FileUtil;
 import com.fongmi.tv.utils.Json;
-import com.fongmi.tv.utils.Notify;
 import com.fongmi.tv.utils.Prefers;
-import com.fongmi.tv.utils.Utils;
 import com.github.catvod.crawler.JarLoader;
 import com.github.catvod.crawler.Spider;
 import com.google.gson.Gson;
@@ -65,10 +63,6 @@ public class ApiConfig {
     }
 
     public void loadConfig(Callback callback) {
-        if (Utils.isPhone()) {
-            Notify.show(R.string.error_device);
-            return;
-        }
         new Thread(() -> {
             String url = Prefers.getUrl();
             if (url.startsWith("file://")) getFileConfig(url, callback);
