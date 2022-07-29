@@ -14,5 +14,5 @@ dependencyResolutionManagement {
         google()
     }
 }
-rootProject.name = "AlphaTV"
+rootProject.name = "TV"
 include ':app'
