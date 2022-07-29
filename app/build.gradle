@@ -4,6 +4,7 @@ plugins {
 
 android {
     compileSdk 32
+    flavorDimensions "default"
 
     defaultConfig {
         applicationId "com.fongmi.tv"
@@ -11,6 +12,15 @@ android {
         targetSdk 32
         versionCode 1
         versionName "1.0.0"
+    }
+
+    productFlavors {
+        leanback {
+            dimension "default"
+        }
+        mobile {
+            dimension "default"
+        }
     }
 
     buildFeatures {
@@ -33,9 +43,9 @@ android {
 }
 
 dependencies {
+    leanbackImplementation 'androidx.leanback:leanback:1.2.0-alpha02'
     implementation 'androidx.appcompat:appcompat:1.4.2'
     implementation 'androidx.preference:preference:1.2.0'
-    implementation 'androidx.leanback:leanback:1.2.0-alpha02'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation 'androidx.room:room-runtime:2.4.3'
     implementation 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
