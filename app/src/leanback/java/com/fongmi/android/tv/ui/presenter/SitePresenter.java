@@ -30,9 +30,8 @@ public class SitePresenter extends Presenter {
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object object) {
         Site item = (Site) object;
         ViewHolder holder = (ViewHolder) viewHolder;
-        holder.view.setActivated(item.isHome());
-        holder.binding.text.setText(item.getName());
         setOnClickListener(holder, view -> mListener.onItemClick(item));
+        holder.binding.text.setText((item.isHome() ? "√ " : "").concat(item.getName()));
     }
 
     @Override

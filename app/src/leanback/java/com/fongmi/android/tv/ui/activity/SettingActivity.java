@@ -122,7 +122,7 @@ public class SettingActivity extends BaseActivity {
     }
 
     public void setSite(ArrayObjectAdapter adapter, Site item) {
-        for (int i = 0; i < adapter.size(); i++) ((Site) adapter.get(i)).setActivated(item);
+        for (int i = 0; i < adapter.size(); i++) ((Site) adapter.get(i)).setHome(item);
         adapter.notifyArrayItemRangeChanged(0, adapter.size());
         mBinding.home.setText(item.getName());
         ApiConfig.get().setHome(item);

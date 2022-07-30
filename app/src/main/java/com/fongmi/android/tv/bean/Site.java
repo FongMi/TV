@@ -100,7 +100,7 @@ public class Site {
         this.home = home;
     }
 
-    public void setActivated(Site item) {
+    public void setHome(Site item) {
         this.home = item.equals(this);
     }
 
