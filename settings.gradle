@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "TV"
 include ':app'
+include ':catvod'
