@@ -2,14 +2,10 @@ package com.fongmi.android.tv.bean;
 
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 
-import com.amulyakhare.textdrawable.TextDrawable;
-import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
@@ -77,10 +73,6 @@ public class Vod {
     @ElementList(entry = "dd", required = false, inline = true)
     private List<Flag> vodFlags;
 
-    public static Vod objectFrom(String str) {
-        return new Gson().fromJson(str, Vod.class);
-    }
-
     public String getVodId() {
         return TextUtils.isEmpty(vodId) ? "" : vodId;
     }
@@ -135,15 +127,6 @@ public class Vod {
 
     public int getRemarkVisible() {
         return getVodRemarks().isEmpty() ? View.GONE : View.VISIBLE;
-    }
-
-    public void loadImg(ImageView view) {
-        if (TextUtils.isEmpty(getVodPic())) {
-            String text = getVodName().isEmpty() ? "" : getVodName().substring(0, 1);
-            view.setImageDrawable(TextDrawable.builder().buildRect(text, ColorGenerator.MATERIAL.getColor(text)));
-        } else {
-            ImgUtil.load(getVodPic(), view);
-        }
     }
 
     public void setVodFlags() {

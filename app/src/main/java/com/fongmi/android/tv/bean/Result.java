@@ -2,7 +2,6 @@ package com.fongmi.android.tv.bean;
 
 import androidx.annotation.NonNull;
 
-import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
@@ -79,14 +78,6 @@ public class Result {
 
     public LinkedHashMap<String, List<Filter>> getFilters() {
         return filters == null ? new LinkedHashMap<>() : filters;
-    }
-
-    public List<List<Vod>> partition() {
-        return Lists.partition(getList(), getColumns());
-    }
-
-    public int getColumns() {
-        return getList().size() % 6 == 0 ? 6 : 5;
     }
 
     @NonNull

@@ -15,6 +15,20 @@
         tools:src="@drawable/ic_img_loading" />
 
     <TextView
+        android:id="@+id/site"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="#CCF44336"
+        android:ellipsize="end"
+        android:padding="4dp"
+        android:singleLine="true"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:visibility="gone"
+        tools:text="泥巴" />
+
+    <TextView
         android:id="@+id/remark"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

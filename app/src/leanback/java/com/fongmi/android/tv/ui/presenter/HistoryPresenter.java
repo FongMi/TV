@@ -1,28 +1,34 @@
 package com.fongmi.android.tv.ui.presenter;
 
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.leanback.widget.Presenter;
 
-import com.fongmi.android.tv.bean.Vod;
+import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.databinding.AdapterVodBinding;
 import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.ResUtil;
 
-public class VodPresenter extends Presenter {
+public class HistoryPresenter extends Presenter {
 
-    private final OnClickListener mListener;
+    private OnClickListener mListener;
     private int width, height;
 
-    public VodPresenter(OnClickListener listener, int columns) {
-        this.mListener = listener;
+    public HistoryPresenter(int columns) {
         setLayoutSize(columns);
     }
 
     public interface OnClickListener {
-        void onItemClick(Vod item);
+        void onItemClick(History item);
+    }
+
+    public void setOnClickListener(OnClickListener listener) {
+        this.mListener = listener;
     }
 
     private void setLayoutSize(int columns) {
@@ -42,11 +48,12 @@ public class VodPresenter extends Presenter {
 
     @Override
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object object) {
-        Vod item = (Vod) object;
+        History item = (History) object;
         ViewHolder holder = (ViewHolder) viewHolder;
         holder.binding.name.setText(item.getVodName());
-        holder.binding.remark.setText(item.getVodRemarks());
-        holder.binding.remark.setVisibility(item.getRemarkVisible());
+        holder.binding.site.setVisibility(View.VISIBLE);
+        holder.binding.site.setText(ApiConfig.get().getSite(item.getSiteKey()).getName());
+        holder.binding.remark.setText(ResUtil.getString(R.string.vod_last, item.getVodRemarks()));
         ImgUtil.load(item.getVodName(), item.getVodPic(), holder.binding.image);
         setOnClickListener(holder, view -> mListener.onItemClick(item));
     }

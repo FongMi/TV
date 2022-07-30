@@ -1,10 +1,13 @@
 package com.fongmi.android.tv.utils;
 
 import android.graphics.drawable.Drawable;
+import android.text.TextUtils;
 import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
 
+import com.amulyakhare.textdrawable.TextDrawable;
+import com.amulyakhare.textdrawable.util.ColorGenerator;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
@@ -15,6 +18,15 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 
 public class ImgUtil {
+
+    public static void load(String vodName, String vodPic, ImageView view) {
+        if (TextUtils.isEmpty(vodPic)) {
+            String text = vodName.isEmpty() ? "" : vodName.substring(0, 1);
+            view.setImageDrawable(TextDrawable.builder().buildRect(text, ColorGenerator.MATERIAL.getColor(text)));
+        } else {
+            ImgUtil.load(vodPic, view);
+        }
+    }
 
     public static void load(String url, ImageView view) {
         float thumbnail = 1 - Prefers.getThumbnail() * 0.3f;

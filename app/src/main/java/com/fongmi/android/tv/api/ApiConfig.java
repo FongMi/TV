@@ -84,7 +84,7 @@ public class ApiConfig {
         try {
             Response response = OKHttp.newCall(url).execute();
             parseConfig(new Gson().fromJson(response.body().string(), JsonObject.class), callback);
-        } catch (IOException e) {
+        } catch (Exception e) {
             handler.post(() -> callback.error(R.string.error_config_get));
         }
     }

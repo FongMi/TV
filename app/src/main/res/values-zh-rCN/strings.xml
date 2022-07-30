@@ -16,6 +16,9 @@
     <string name="home_recent">最近观看</string>
     <string name="home_recommend">更新推荐</string>
 
+    <!-- Vod -->
+    <string name="vod_last">上次看到<xliff:g name="name">%s</xliff:g></string>
+
     <!-- Detail -->
     <string name="detail_site">站源：<xliff:g name="name">%s</xliff:g></string>
     <string name="detail_year">年份：<xliff:g name="name">%s</xliff:g></string>

@@ -19,12 +19,15 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
-import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.ActivityDetailBinding;
 import com.fongmi.android.tv.databinding.ViewControllerBottomBinding;
+import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.event.PlayerEvent;
+import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.presenter.EpisodePresenter;
@@ -55,11 +58,16 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
     private SiteViewModel mSiteViewModel;
     private boolean mFullscreen;
     private KeyDown mKeyDown;
+    private History mHistory;
     private View mOldView;
     private int mCurrent;
 
     private String getId() {
         return getIntent().getStringExtra("id");
+    }
+
+    private String getVodKey() {
+        return ApiConfig.get().getHome().getKey() + "_" + getVodFlag().getFlag() + "_" + getId();
     }
 
     private Vod.Flag getVodFlag() {
@@ -88,6 +96,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
 
     @Override
     protected void initView() {
+        mHistory = new History();
         mKeyDown = KeyDown.create(this);
         mFrameParams = mBinding.video.getLayoutParams();
         mBinding.progressLayout.showProgress();
@@ -166,6 +175,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
 
     private void setDetail(Vod item) {
         mBinding.progressLayout.showContent();
+        mBinding.video.setTag(item.getVodPic());
         mBinding.name.setText(item.getVodName());
         setText(mBinding.site, R.string.detail_site, ApiConfig.get().getHome().getName());
         setText(mBinding.year, R.string.detail_year, item.getVodYear());
@@ -219,7 +229,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
     private void enterFullscreen() {
         mBinding.video.setForeground(null);
         mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
-        new Handler().postDelayed(() -> mBinding.video.setUseController(true),250);
+        new Handler().postDelayed(() -> mBinding.video.setUseController(true), 250);
         mBinding.flag.setSelectedPosition(mCurrent);
         mFullscreen = true;
     }
@@ -255,10 +265,22 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
         Prefers.putScale(scale);
     }
 
+    private void newHistory() {
+        mHistory.setKey(getVodKey());
+        mHistory.setEpisodeUrl(getEpisode().getUrl());
+        mHistory.setVodRemarks(getEpisode().getName());
+        mHistory.setCreateTime(System.currentTimeMillis());
+        mHistory.setVodPic(mBinding.video.getTag().toString());
+        mHistory.setVodName(mBinding.name.getText().toString());
+        AppDatabase.get().getHistoryDao().insertOrUpdate(mHistory);
+        EventBus.getDefault().post(RefreshEvent.recent());
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onPlaybackStateChanged(PlayerEvent event) {
         mBinding.progress.getRoot().setVisibility(event.getState() == Player.STATE_BUFFERING ? View.VISIBLE : View.GONE);
         if (event.getState() == -1) Notify.show(R.string.error_play_parse);
+        if (event.getState() == Player.STATE_READY) newHistory();
     }
 
     @Override

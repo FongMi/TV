@@ -20,24 +20,28 @@ import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.ItemBridgeAdapter;
 import androidx.viewbinding.ViewBinding;
 
-import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.databinding.ActivitySettingBinding;
 import com.fongmi.android.tv.databinding.DialogConfigBinding;
 import com.fongmi.android.tv.databinding.DialogSiteBinding;
+import com.fongmi.android.tv.db.AppDatabase;
+import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.ui.presenter.SitePresenter;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 
+import org.greenrobot.eventbus.EventBus;
+
 public class SettingActivity extends BaseActivity {
 
     private ActivitySettingBinding mBinding;
 
     public static void start(Activity activity) {
-        activity.startActivityForResult(new Intent(activity, SettingActivity.class), 1000);
+        activity.startActivity(new Intent(activity, SettingActivity.class));
     }
 
     private final ActivityResultLauncher<String> launcherString = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> loadConfig());
@@ -67,9 +71,11 @@ public class SettingActivity extends BaseActivity {
         bindingDialog.text.setText(Prefers.getUrl());
         bindingDialog.text.setSelection(bindingDialog.text.getText().length());
         AlertDialog dialog = Notify.show(this, bindingDialog.getRoot(), (dialogInterface, i) -> {
+            if (bindingDialog.text.getText().toString().equals(Prefers.getUrl())) return;
             Prefers.putUrl(bindingDialog.text.getText().toString().trim());
             mBinding.url.setText(Prefers.getUrl());
             Notify.progress(this);
+            AppDatabase.clear();
             checkUrl();
         });
         bindingDialog.text.setOnEditorActionListener((textView, actionId, event) -> {
@@ -93,14 +99,16 @@ public class SettingActivity extends BaseActivity {
             @Override
             public void success() {
                 mBinding.home.setText(ApiConfig.get().getHome().getName());
-                setResult(RESULT_OK);
+                EventBus.getDefault().post(RefreshEvent.recent());
+                EventBus.getDefault().post(RefreshEvent.video());
                 Notify.dismiss();
             }
 
             @Override
             public void error(int resId) {
                 mBinding.home.setText(ApiConfig.get().getHome().getName());
-                setResult(RESULT_OK);
+                EventBus.getDefault().post(RefreshEvent.recent());
+                EventBus.getDefault().post(RefreshEvent.video());
                 Notify.dismiss();
                 Notify.show(resId);
             }
@@ -122,11 +130,11 @@ public class SettingActivity extends BaseActivity {
     }
 
     public void setSite(ArrayObjectAdapter adapter, Site item) {
+        ApiConfig.get().setHome(item);
+        mBinding.home.setText(item.getName());
         for (int i = 0; i < adapter.size(); i++) ((Site) adapter.get(i)).setHome(item);
         adapter.notifyArrayItemRangeChanged(0, adapter.size());
-        mBinding.home.setText(item.getName());
-        ApiConfig.get().setHome(item);
-        setResult(RESULT_OK);
+        EventBus.getDefault().post(RefreshEvent.video());
         Notify.dismiss();
     }
 
@@ -134,10 +142,8 @@ public class SettingActivity extends BaseActivity {
         CharSequence[] array = ResUtil.getStringArray(R.array.select_thumbnail);
         int index = Prefers.getThumbnail();
         index = index == 2 ? 0 : ++index;
-        mBinding.compress.setText(array[index]);
         Prefers.putThumbnail(index);
-        Intent intent = new Intent();
-        intent.putExtra("type", "thumbnail");
-        setResult(RESULT_OK, intent);
+        mBinding.compress.setText(array[index]);
+        EventBus.getDefault().post(RefreshEvent.image());
     }
 }

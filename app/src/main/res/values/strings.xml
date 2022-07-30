@@ -16,6 +16,9 @@
     <string name="home_recent">Recent</string>
     <string name="home_recommend">Recommend</string>
 
+    <!-- Vod -->
+    <string name="vod_last">Last seen <xliff:g name="name">%s</xliff:g></string>
+
     <!-- Detail -->
     <string name="detail_site">Site: <xliff:g name="name">%s</xliff:g></string>
     <string name="detail_year">Year: <xliff:g name="name">%s</xliff:g></string>
