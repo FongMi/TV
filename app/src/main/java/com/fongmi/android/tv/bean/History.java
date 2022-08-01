@@ -12,6 +12,7 @@ public class History {
     private String key;
     private String vodPic;
     private String vodName;
+    private String vodFlag;
     private String vodRemarks;
     private String episodeUrl;
     private long createTime;
@@ -43,6 +44,14 @@ public class History {
 
     public void setVodName(String vodName) {
         this.vodName = vodName;
+    }
+
+    public String getVodFlag() {
+        return vodFlag;
+    }
+
+    public void setVodFlag(String vodFlag) {
+        this.vodFlag = vodFlag;
     }
 
     public String getVodRemarks() {
@@ -81,11 +90,15 @@ public class History {
         return getKey().split("_")[0];
     }
 
-    public String getFlag() {
+    public String getVodId() {
         return getKey().split("_")[1];
     }
 
-    public String getVodId() {
-        return getKey().split("_")[2];
+    public Vod.Flag getFlag() {
+        return new Vod.Flag(getVodFlag());
+    }
+
+    public Vod.Flag.Episode getEpisode() {
+        return new Vod.Flag.Episode(getEpisodeUrl());
     }
 }

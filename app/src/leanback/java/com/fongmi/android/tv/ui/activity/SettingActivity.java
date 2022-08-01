@@ -55,7 +55,7 @@ public class SettingActivity extends BaseActivity {
     @Override
     protected void initView() {
         mBinding.url.setText(Prefers.getUrl());
-        mBinding.home.setText(ApiConfig.get().getHome().getName());
+        mBinding.home.setText(ApiConfig.getHomeName());
         mBinding.compress.setText(ResUtil.getStringArray(R.array.select_thumbnail)[Prefers.getThumbnail()]);
     }
 
@@ -98,7 +98,7 @@ public class SettingActivity extends BaseActivity {
         ApiConfig.get().clear().loadConfig(new Callback() {
             @Override
             public void success() {
-                mBinding.home.setText(ApiConfig.get().getHome().getName());
+                mBinding.home.setText(ApiConfig.getHomeName());
                 EventBus.getDefault().post(RefreshEvent.recent());
                 EventBus.getDefault().post(RefreshEvent.video());
                 Notify.dismiss();
@@ -106,7 +106,7 @@ public class SettingActivity extends BaseActivity {
 
             @Override
             public void error(int resId) {
-                mBinding.home.setText(ApiConfig.get().getHome().getName());
+                mBinding.home.setText(ApiConfig.getHomeName());
                 EventBus.getDefault().post(RefreshEvent.recent());
                 EventBus.getDefault().post(RefreshEvent.video());
                 Notify.dismiss();

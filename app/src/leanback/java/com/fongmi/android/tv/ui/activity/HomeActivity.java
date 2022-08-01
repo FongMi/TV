@@ -178,12 +178,12 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
 
     @Override
     public void onItemClick(Vod item) {
-        DetailActivity.start(getActivity(), item.getVodId());
+        DetailActivity.start(this, item.getVodId());
     }
 
     @Override
     public void onItemClick(History item) {
-
+        DetailActivity.start(this, item.getSiteKey(), item.getVodId());
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

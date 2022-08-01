@@ -52,7 +52,7 @@ public class HistoryPresenter extends Presenter {
         ViewHolder holder = (ViewHolder) viewHolder;
         holder.binding.name.setText(item.getVodName());
         holder.binding.site.setVisibility(View.VISIBLE);
-        holder.binding.site.setText(ApiConfig.get().getSite(item.getSiteKey()).getName());
+        holder.binding.site.setText(ApiConfig.getSiteName(item.getSiteKey()));
         holder.binding.remark.setText(ResUtil.getString(R.string.vod_last, item.getVodRemarks()));
         ImgUtil.load(item.getVodName(), item.getVodPic(), holder.binding.image);
         setOnClickListener(holder, view -> mListener.onItemClick(item));

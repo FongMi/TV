@@ -22,7 +22,6 @@ import com.google.gson.stream.JsonReader;
 import org.json.JSONObject;
 
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -49,6 +48,14 @@ public class ApiConfig {
 
     public static ApiConfig get() {
         return Loader.INSTANCE;
+    }
+
+    public static String getHomeName() {
+        return get().getHome().getName();
+    }
+
+    public static String getSiteName(String key) {
+        return get().getSite(key).getName();
     }
 
     public ApiConfig init() {

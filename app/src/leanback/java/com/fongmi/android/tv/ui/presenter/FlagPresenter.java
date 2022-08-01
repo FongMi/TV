@@ -11,6 +11,16 @@ import com.fongmi.android.tv.databinding.AdapterFlagBinding;
 
 public class FlagPresenter extends Presenter {
 
+    private OnClickListener mListener;
+
+    public interface OnClickListener {
+        void onItemClick(Vod.Flag item);
+    }
+
+    public void setOnClickListener(OnClickListener listener) {
+        this.mListener = listener;
+    }
+
     @Override
     public Presenter.ViewHolder onCreateViewHolder(ViewGroup parent) {
         return new ViewHolder(AdapterFlagBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
@@ -21,6 +31,8 @@ public class FlagPresenter extends Presenter {
         Vod.Flag item = (Vod.Flag) object;
         ViewHolder holder = (ViewHolder) viewHolder;
         holder.binding.text.setText(item.getFlag());
+        holder.binding.text.setActivated(item.isActivated());
+        setOnClickListener(holder, view -> mListener.onItemClick(item));
     }
 
     @Override

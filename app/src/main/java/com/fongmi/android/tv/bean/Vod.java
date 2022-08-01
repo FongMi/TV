@@ -156,6 +156,8 @@ public class Vod {
         @SerializedName("episodes")
         private List<Episode> episodes;
 
+        private boolean activated;
+
         public static Flag objectFrom(String str) {
             return new Gson().fromJson(str, Flag.class);
         }
@@ -190,12 +192,28 @@ public class Vod {
             }
         }
 
+        public boolean isActivated() {
+            return activated;
+        }
+
+        public void setActivated(boolean activated) {
+            this.activated = activated;
+        }
+
         public void deactivated() {
             for (Episode item : getEpisodes()) item.deactivated();
         }
 
         public void setActivated(Episode episode) {
             for (Episode item : getEpisodes()) item.setActivated(episode);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (!(obj instanceof Flag)) return false;
+            Flag it = (Flag) obj;
+            return getFlag().equals(it.getFlag());
         }
 
         @NonNull
@@ -210,8 +228,12 @@ public class Vod {
             private final String name;
             @SerializedName("url")
             private final String url;
-            @SerializedName("activated")
+
             private boolean activated;
+
+            public Episode(String url) {
+                this("", url);
+            }
 
             public Episode(String name, String url) {
                 this.name = name;
@@ -236,6 +258,14 @@ public class Vod {
 
             private void setActivated(Episode item) {
                 this.activated = item.equals(this);
+            }
+
+            @Override
+            public boolean equals(Object obj) {
+                if (this == obj) return true;
+                if (!(obj instanceof Episode)) return false;
+                Episode it = (Episode) obj;
+                return getUrl().equals(it.getUrl());
             }
         }
     }

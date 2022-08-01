@@ -79,23 +79,23 @@ public class SiteViewModel extends ViewModel {
         });
     }
 
-    public void detailContent(String id) {
-        Site home = ApiConfig.get().getHome();
+    public void detailContent(String key, String id) {
+        Site site = ApiConfig.get().getSite(key);
         execute(result, () -> {
-            if (home.getType() == 3) {
-                Spider spider = ApiConfig.get().getCSP(home);
+            if (site.getType() == 3) {
+                Spider spider = ApiConfig.get().getCSP(site);
                 String detailContent = spider.detailContent(List.of(id));
                 SpiderDebug.log(detailContent);
                 Result result = Result.fromJson(detailContent);
                 if (!result.getList().isEmpty()) result.getList().get(0).setVodFlags();
                 return result;
             } else {
-                HttpUrl url = HttpUrl.parse(home.getApi()).newBuilder().addQueryParameter("ac", home.getType() == 0 ? "videolist" : "detail").addQueryParameter("ids", id).build();
+                HttpUrl url = HttpUrl.parse(site.getApi()).newBuilder().addQueryParameter("ac", site.getType() == 0 ? "videolist" : "detail").addQueryParameter("ids", id).build();
                 String body = OKHttp.newCall(url).execute().body().string();
                 SpiderDebug.log(body);
                 Result result;
-                if (home.getType() == 0) result = Result.fromXml(body);
-                else if (home.getType() == 1) result = Result.fromJson(body);
+                if (site.getType() == 0) result = Result.fromXml(body);
+                else if (site.getType() == 1) result = Result.fromJson(body);
                 else result = new Result();
                 if (!result.getList().isEmpty()) result.getList().get(0).setVodFlags();
                 return result;
@@ -103,11 +103,11 @@ public class SiteViewModel extends ViewModel {
         });
     }
 
-    public void playerContent(String flag, String id) {
-        Site home = ApiConfig.get().getHome();
+    public void playerContent(String key, String flag, String id) {
+        Site site = ApiConfig.get().getSite(key);
         execute(player, () -> {
-            if (home.getType() == 3) {
-                Spider spider = ApiConfig.get().getCSP(home);
+            if (site.getType() == 3) {
+                Spider spider = ApiConfig.get().getCSP(site);
                 String playerContent = spider.playerContent(flag, id, ApiConfig.get().getFlags());
                 SpiderDebug.log(playerContent);
                 JsonObject object = JsonParser.parseString(playerContent).getAsJsonObject();
@@ -117,7 +117,7 @@ public class SiteViewModel extends ViewModel {
                 JsonObject object = new JsonObject();
                 object.addProperty("url", id);
                 object.addProperty("flag", flag);
-                object.addProperty("playUrl", home.getPlayerUrl());
+                object.addProperty("playUrl", site.getPlayerUrl());
                 object.addProperty("parse", Utils.isVideoFormat(id) ? "0" : "1");
                 return object;
             }

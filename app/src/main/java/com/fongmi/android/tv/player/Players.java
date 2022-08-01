@@ -126,6 +126,9 @@ public class Players implements Player.Listener {
             exoPlayer.seekTo(0);
             exoPlayer.setPlaybackSpeed(1.0f);
         }
+        if (webView != null) {
+            webView.stop();
+        }
     }
 
     public void play() {
