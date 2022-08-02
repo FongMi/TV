@@ -99,7 +99,7 @@ public class SettingActivity extends BaseActivity {
             @Override
             public void success() {
                 mBinding.home.setText(ApiConfig.getHomeName());
-                EventBus.getDefault().post(RefreshEvent.recent());
+                EventBus.getDefault().post(RefreshEvent.history());
                 EventBus.getDefault().post(RefreshEvent.video());
                 Notify.dismiss();
             }
@@ -107,7 +107,7 @@ public class SettingActivity extends BaseActivity {
             @Override
             public void error(int resId) {
                 mBinding.home.setText(ApiConfig.getHomeName());
-                EventBus.getDefault().post(RefreshEvent.recent());
+                EventBus.getDefault().post(RefreshEvent.history());
                 EventBus.getDefault().post(RefreshEvent.video());
                 Notify.dismiss();
                 Notify.show(resId);

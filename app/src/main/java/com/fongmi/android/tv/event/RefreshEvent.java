@@ -12,8 +12,8 @@ public class RefreshEvent {
         return new RefreshEvent(Type.VIDEO);
     }
 
-    public static RefreshEvent recent() {
-        return new RefreshEvent(Type.RECENT);
+    public static RefreshEvent history() {
+        return new RefreshEvent(Type.HISTORY);
     }
 
     public RefreshEvent(Type type) {
@@ -25,6 +25,6 @@ public class RefreshEvent {
     }
 
     public enum Type {
-        IMAGE, VIDEO, RECENT
+        IMAGE, VIDEO, HISTORY
     }
 }

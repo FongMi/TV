@@ -49,11 +49,11 @@ import java.util.List;
 
 public class HomeActivity extends BaseActivity implements VodPresenter.OnClickListener, FuncPresenter.OnClickListener, HistoryPresenter.OnClickListener {
 
+    private ActivityHomeBinding mBinding;
+    private SiteViewModel mSiteViewModel;
+    private ArrayObjectAdapter mAdapter;
     private ArrayObjectAdapter mHistoryAdapter;
     private HistoryPresenter mHistoryPresenter;
-    private ActivityHomeBinding mBinding;
-    private ArrayObjectAdapter mAdapter;
-    private SiteViewModel mSiteViewModel;
     private FuncPresenter mFuncPresenter;
     private boolean mConfirmExit;
 
@@ -75,7 +75,7 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
         setRecyclerView();
         setViewModel();
         setAdapter();
-        getRecent();
+        getHistory();
         getVideo();
     }
 
@@ -115,7 +115,7 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
     private void setAdapter() {
         mAdapter.add(R.string.app_name);
         mAdapter.add(getFuncRow());
-        mAdapter.add(R.string.home_recent);
+        mAdapter.add(R.string.home_history);
         mAdapter.add(R.string.home_recommend);
     }
 
@@ -147,17 +147,17 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
         return new ListRow(adapter);
     }
 
-    private void getRecent() {
-        int recentIndex = getRecentIndex();
+    private void getHistory() {
+        int historyIndex = getHistoryIndex();
         int recommendIndex = getRecommendIndex();
         List<History> items = AppDatabase.get().getHistoryDao().getAll();
         if (items.isEmpty()) return;
-        if (recommendIndex - recentIndex != 2) mAdapter.add(recentIndex, new ListRow(mHistoryAdapter));
+        if (recommendIndex - historyIndex != 2) mAdapter.add(historyIndex, new ListRow(mHistoryAdapter));
         mHistoryAdapter.setItems(items, null);
     }
 
-    private int getRecentIndex() {
-        for (int i = 0; i < mAdapter.size(); i++) if (mAdapter.get(i).equals(R.string.home_recent)) return i + 1;
+    private int getHistoryIndex() {
+        for (int i = 0; i < mAdapter.size(); i++) if (mAdapter.get(i).equals(R.string.home_history)) return i + 1;
         return -1;
     }
 
@@ -193,7 +193,7 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
         mHistoryAdapter.remove(item);
         AppDatabase.get().getHistoryDao().delete(item.getKey());
         if (mHistoryAdapter.size() > 0) return;
-        mAdapter.removeItems(getRecentIndex(), 1);
+        mAdapter.removeItems(getHistoryIndex(), 1);
         mHistoryPresenter.setDelete(false);
     }
 
@@ -211,8 +211,8 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
             getVideo();
         } else if (event.getType() == RefreshEvent.Type.IMAGE) {
             mAdapter.notifyArrayItemRangeChanged(getRecommendIndex(), mAdapter.size() - getRecommendIndex());
-        } else if (event.getType() == RefreshEvent.Type.RECENT) {
-            getRecent();
+        } else if (event.getType() == RefreshEvent.Type.HISTORY) {
+            getHistory();
         }
     }
 

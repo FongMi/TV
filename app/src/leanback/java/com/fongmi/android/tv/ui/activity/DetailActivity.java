@@ -296,7 +296,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
         history.setVodPic(mBinding.video.getTag().toString());
         history.setVodName(mBinding.name.getText().toString());
         AppDatabase.get().getHistoryDao().insertOrUpdate(history);
-        EventBus.getDefault().post(RefreshEvent.recent());
+        EventBus.getDefault().post(RefreshEvent.history());
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
