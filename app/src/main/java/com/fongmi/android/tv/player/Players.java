@@ -3,10 +3,15 @@ package com.fongmi.android.tv.player;
 import android.os.Handler;
 import android.os.Looper;
 
+import androidx.annotation.NonNull;
+
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.ui.custom.CustomWebView;
+import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.util.Util;
 import com.google.gson.JsonElement;
@@ -62,14 +67,22 @@ public class Players implements Player.Listener {
     }
 
     public String getTime(long time) {
-        time = exoPlayer.getCurrentPosition() + time;
+        time = getCurrentPosition() + time;
         if (time > exoPlayer.getDuration()) time = exoPlayer.getDuration();
         else if (time < 0) time = 0;
         return Util.getStringForTime(builder, formatter, time);
     }
 
+    public long getCurrentPosition() {
+        return exoPlayer.getCurrentPosition();
+    }
+
     public void seekTo(int time) {
-        exoPlayer.seekTo(exoPlayer.getCurrentPosition() + time);
+        exoPlayer.seekTo(getCurrentPosition() + time);
+    }
+
+    public void seekTo(long time) {
+        exoPlayer.seekTo(time);
     }
 
     public boolean isPlaying() {
@@ -110,8 +123,13 @@ public class Players implements Player.Listener {
             exoPlayer.setMediaSource(ExoUtil.getSource(headers, url));
             exoPlayer.prepare();
             exoPlayer.play();
+            checkPosition();
             webView.stop();
         });
+    }
+
+    private void checkPosition() {
+
     }
 
     public void pause() {
@@ -155,11 +173,16 @@ public class Players implements Player.Listener {
     private final Runnable mTimer = new Runnable() {
         @Override
         public void run() {
-            EventBus.getDefault().post(new PlayerEvent(-1));
+            EventBus.getDefault().post(new PlayerEvent(ResUtil.getString(R.string.error_play_parse)));
             exoPlayer.stop();
             webView.stop();
         }
     };
+
+    @Override
+    public void onPlayerError(@NonNull PlaybackException error) {
+        EventBus.getDefault().post(new PlayerEvent(ResUtil.getString(R.string.error_play)));
+    }
 
     @Override
     public void onPlaybackStateChanged(int state) {

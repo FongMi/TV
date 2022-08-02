@@ -299,10 +299,14 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
         EventBus.getDefault().post(RefreshEvent.history());
     }
 
+    private void updateHistory() {
+
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onPlaybackStateChanged(PlayerEvent event) {
         mBinding.progress.getRoot().setVisibility(event.getState() == Player.STATE_BUFFERING ? View.VISIBLE : View.GONE);
-        if (event.getState() == -1) Notify.show(R.string.error_play_parse);
+        Notify.show(event.getMsg());
     }
 
     @Override

@@ -54,6 +54,7 @@
     <string name="error_play_next">已经是最后一集了！</string>
     <string name="error_play_prev">已经是第一集了！</string>
     <string name="error_play_parse">无法解析网址</string>
+    <string name="error_play">不支援的影片格式</string>
 
     <string-array name="select_thumbnail">
         <item>高质量</item>
