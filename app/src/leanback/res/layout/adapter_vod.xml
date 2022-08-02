@@ -14,6 +14,17 @@
         android:scaleType="center"
         tools:src="@drawable/ic_img_loading" />
 
+    <ImageView
+        android:id="@+id/delete"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:background="@color/white_30"
+        android:scaleType="center"
+        android:src="@drawable/ic_delete"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
     <TextView
         android:id="@+id/site"
         android:layout_width="wrap_content"
