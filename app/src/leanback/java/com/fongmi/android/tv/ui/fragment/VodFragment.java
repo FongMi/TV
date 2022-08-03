@@ -1,6 +1,7 @@
 package com.fongmi.android.tv.ui.fragment;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -92,7 +93,6 @@ public class VodFragment extends Fragment implements CustomScroller.Callback, Vo
     private void setViewModel() {
         mSiteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mSiteViewModel.result.observe(getViewLifecycleOwner(), result -> {
-            mAdapter.remove("progress");
             mScroller.endLoading(result == null || result.getList().isEmpty());
             if (result != null) addVideo(result);
         });
@@ -125,7 +125,6 @@ public class VodFragment extends Fragment implements CustomScroller.Callback, Vo
         boolean clear = page.equals("1") && mAdapter.size() > mFilters.size();
         if (clear) mAdapter.removeItems(mFilters.size(), mAdapter.size() - mFilters.size());
         mSiteViewModel.categoryContent(getTypeId(), page, true, mExtend);
-        mAdapter.add("progress");
     }
 
     private void addVideo(Result result) {
@@ -146,6 +145,7 @@ public class VodFragment extends Fragment implements CustomScroller.Callback, Vo
 
     @Override
     public void onLoadMore(String page) {
+        mScroller.setLoading(true);
         getVideo(page);
     }
 

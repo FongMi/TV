@@ -1,8 +1,5 @@
 package com.fongmi.android.tv.ui.custom;
 
-import android.os.Handler;
-import android.view.View;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,17 +15,9 @@ public class CustomScroller extends RecyclerView.OnScrollListener {
     }
 
     @Override
-    public void onScrollStateChanged(@NonNull RecyclerView view, int newState) {
-        if (isLoading() || !isBottom(view) || newState != RecyclerView.SCROLL_STATE_IDLE) return;
-        setLoading(true); callback.onLoadMore(String.valueOf(++page));
-    }
-
-    private boolean isBottom(RecyclerView view) {
-        View lastChildView = view.getLayoutManager().getChildAt(view.getLayoutManager().getChildCount() - 1);
-        int lastChildBottom = lastChildView.getBottom();
-        int recyclerBottom = view.getBottom() - view.getPaddingBottom();
-        int lastPosition = view.getLayoutManager().getPosition(lastChildView);
-        return lastChildBottom == recyclerBottom && lastPosition == view.getLayoutManager().getItemCount() - 1;
+    public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+        if (isLoading() || recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE) return;
+        if (!recyclerView.canScrollVertically(1) && dy > 0) callback.onLoadMore(String.valueOf(++page));
     }
 
     public void reset() {
@@ -39,13 +28,13 @@ public class CustomScroller extends RecyclerView.OnScrollListener {
         return loading;
     }
 
-    private void setLoading(boolean loading) {
+    public void setLoading(boolean loading) {
         this.loading = loading;
     }
 
     public void endLoading(boolean empty) {
-        new Handler().postDelayed(() -> setLoading(false), 1000);
         if (empty) page--;
+        setLoading(false);
     }
 
     public interface Callback {
