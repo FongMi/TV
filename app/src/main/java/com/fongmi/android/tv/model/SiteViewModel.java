@@ -42,7 +42,7 @@ public class SiteViewModel extends ViewModel {
         execute(result, () -> {
             if (home.getType() == 3) {
                 Spider spider = ApiConfig.get().getCSP(home);
-                String homeContent = spider.homeContent(false);
+                String homeContent = spider.homeContent(true);
                 SpiderDebug.log(homeContent);
                 Result result = Result.fromJson(homeContent);
                 if (result.getList().size() > 0) return result;
