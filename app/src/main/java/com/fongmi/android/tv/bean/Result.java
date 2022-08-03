@@ -1,5 +1,7 @@
 package com.fongmi.android.tv.bean;
 
+import android.text.TextUtils;
+
 import androidx.annotation.NonNull;
 
 import com.google.gson.Gson;
@@ -39,6 +41,19 @@ public class Result {
     @SerializedName("filters")
     private LinkedHashMap<String, List<Filter>> filters;
 
+    @SerializedName("playUrl")
+    private String playUrl;
+    @SerializedName("header")
+    private String header;
+    @SerializedName("parse")
+    private String parse;
+    @SerializedName("flag")
+    private String flag;
+    @SerializedName("jx")
+    private String jx;
+    @SerializedName("url")
+    private String url;
+
     public static Result fromJson(String str) {
         try {
             Type type = new TypeToken<LinkedHashMap<String, List<Filter>>>() {}.getType();
@@ -60,6 +75,10 @@ public class Result {
         }
     }
 
+    public static Result objectFrom(String str) {
+        return new Gson().fromJson(str, Result.class);
+    }
+
     public List<Class> getTypes() {
         return types == null ? Collections.emptyList() : types;
     }
@@ -78,6 +97,54 @@ public class Result {
 
     public LinkedHashMap<String, List<Filter>> getFilters() {
         return filters == null ? new LinkedHashMap<>() : filters;
+    }
+
+    public String getPlayUrl() {
+        return TextUtils.isEmpty(playUrl) ? "" : playUrl;
+    }
+
+    public void setPlayUrl(String playUrl) {
+        this.playUrl = playUrl;
+    }
+
+    public String getHeader() {
+        return TextUtils.isEmpty(header) ? "" : header;
+    }
+
+    public void setHeader(String header) {
+        this.header = header;
+    }
+
+    public String getParse() {
+        return TextUtils.isEmpty(parse) ? "1" : parse;
+    }
+
+    public void setParse(String parse) {
+        this.parse = parse;
+    }
+
+    public String getFlag() {
+        return TextUtils.isEmpty(flag) ? "" : flag;
+    }
+
+    public void setFlag(String flag) {
+        this.flag = flag;
+    }
+
+    public String getJx() {
+        return TextUtils.isEmpty(jx) ? "0" : jx;
+    }
+
+    public void setJx(String jx) {
+        this.jx = jx;
+    }
+
+    public String getUrl() {
+        return TextUtils.isEmpty(url) ? "" : url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     @NonNull

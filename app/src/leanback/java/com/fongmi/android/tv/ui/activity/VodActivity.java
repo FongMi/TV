@@ -40,7 +40,7 @@ public class VodActivity extends BaseActivity {
     }
 
     public static void start(Activity activity, Result result) {
-        if (result == null || result.getTypes().isEmpty()) return;
+        if (result.getTypes().isEmpty()) return;
         Intent intent = new Intent(activity, VodActivity.class);
         intent.putExtra("result", result.toString());
         activity.startActivity(intent);
