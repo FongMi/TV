@@ -17,7 +17,7 @@ public class FileUtil {
     }
 
     public static File getCacheDir() {
-        return App.get().getExternalCacheDir();
+        return App.get().getCacheDir();
     }
 
     public static String getCachePath() {
