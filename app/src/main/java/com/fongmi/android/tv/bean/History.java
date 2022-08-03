@@ -87,11 +87,11 @@ public class History {
     }
 
     public String getSiteKey() {
-        return getKey().split("_")[0];
+        return getKey().substring(0, getKey().lastIndexOf("_"));
     }
 
     public String getVodId() {
-        return getKey().split("_")[1];
+        return getKey().substring(getKey().lastIndexOf("_") + 1);
     }
 
     public Vod.Flag getFlag() {
