@@ -2,7 +2,6 @@ package com.fongmi.android.tv.api;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Patterns;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Live;
@@ -13,6 +12,7 @@ import com.fongmi.android.tv.net.OKHttp;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Json;
 import com.fongmi.android.tv.utils.Prefers;
+import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.crawler.Spider;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -27,8 +27,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import okhttp3.Response;
 
 public class ApiConfig {
 
@@ -72,8 +70,8 @@ public class ApiConfig {
     public void loadConfig(Callback callback) {
         new Thread(() -> {
             String url = Prefers.getUrl();
-            if (url.startsWith("file://")) getFileConfig(url, callback);
-            else if (Patterns.WEB_URL.matcher(url).matches()) getWebConfig(url, callback);
+            if (url.startsWith("http")) getWebConfig(url, callback);
+            else if (url.startsWith("file")) getFileConfig(url, callback);
             else handler.post(() -> callback.error(0));
         }).start();
     }
@@ -89,8 +87,7 @@ public class ApiConfig {
 
     private void getWebConfig(String url, Callback callback) {
         try {
-            Response response = OKHttp.newCall(url).execute();
-            parseConfig(new Gson().fromJson(response.body().string(), JsonObject.class), callback);
+            parseConfig(new Gson().fromJson(OKHttp.newCall(url).execute().body().string(), JsonObject.class), callback);
         } catch (Exception e) {
             handler.post(() -> callback.error(R.string.error_config_get));
         }
@@ -111,7 +108,7 @@ public class ApiConfig {
     private void parseJson(JsonObject object) {
         for (JsonElement element : object.get("sites").getAsJsonArray()) {
             Site site = Site.objectFrom(element);
-            if (site.getExt().startsWith("file://")) site.setExt(FileUtil.read(site.getExt()));
+            site.setExt(parseExt(site.getExt()));
             if (site.getKey().equals(Prefers.getHome())) setHome(site);
             sites.add(site);
         }
@@ -120,14 +117,22 @@ public class ApiConfig {
         ads.addAll(Json.safeList(object, "ads"));
     }
 
+    private String parseExt(String ext) {
+        if (ext.startsWith("http")) return ext;
+        else if (ext.startsWith("file")) return FileUtil.read(ext);
+        else if (ext.endsWith(".json")) return parseExt(Utils.convert(ext));
+        return ext;
+    }
+
     private void parseJar(String spider) throws Exception {
         if (spider.contains(";md5")) spider = spider.split(";md5")[0];
-        if (spider.startsWith("file://")) {
-            loader.load(FileUtil.getLocal(spider));
-        } else if (Patterns.WEB_URL.matcher(spider).matches()) {
-            Response response = OKHttp.newCall(spider).execute();
-            FileUtil.write(FileUtil.getJar(), response.body().bytes());
+        if (spider.startsWith("http")) {
+            FileUtil.write(FileUtil.getJar(), OKHttp.newCall(spider).execute().body().bytes());
             loader.load(FileUtil.getJar());
+        } else if (spider.startsWith("file")) {
+            loader.load(FileUtil.getLocal(spider));
+        } else if (!spider.isEmpty()) {
+            parseJar(Utils.convert(spider));
         }
     }
 
