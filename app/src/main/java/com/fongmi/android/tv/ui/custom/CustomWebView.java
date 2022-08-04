@@ -3,7 +3,6 @@ package com.fongmi.android.tv.ui.custom;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.http.SslError;
-import android.util.AttributeSet;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
@@ -27,16 +26,6 @@ public class CustomWebView extends WebView {
 
     public CustomWebView(@NonNull Context context) {
         super(context);
-        initSettings();
-    }
-
-    public CustomWebView(@NonNull Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
-        initSettings();
-    }
-
-    public CustomWebView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
         initSettings();
     }
 
