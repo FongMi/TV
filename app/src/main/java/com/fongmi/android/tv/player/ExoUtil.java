@@ -41,7 +41,7 @@ public class ExoUtil {
     }
 
     private static DataSource.Factory getFactory(Map<String, String> headers, String url) {
-        HttpDataSource.Factory httpDataSourceFactory = new DefaultHttpDataSource.Factory().setDefaultRequestProperties(headers).setAllowCrossProtocolRedirects(true);
+        HttpDataSource.Factory httpDataSourceFactory = new DefaultHttpDataSource.Factory().setDefaultRequestProperties(headers).setConnectTimeoutMs(10000).setReadTimeoutMs(10000).setAllowCrossProtocolRedirects(true);
         return url.startsWith("rtmp") ? new RtmpDataSource.Factory() : new DefaultDataSource.Factory(App.get(), httpDataSourceFactory);
     }
 }
