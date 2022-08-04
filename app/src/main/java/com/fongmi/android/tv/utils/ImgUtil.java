@@ -1,7 +1,6 @@
 package com.fongmi.android.tv.utils;
 
 import android.graphics.drawable.Drawable;
-import android.text.TextUtils;
 import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
@@ -19,26 +18,21 @@ import com.fongmi.android.tv.R;
 
 public class ImgUtil {
 
-    public static void load(String vodName, String vodPic, ImageView view) {
-        if (TextUtils.isEmpty(vodPic)) {
-            String text = vodName.isEmpty() ? "" : vodName.substring(0, 1);
-            view.setImageDrawable(TextDrawable.builder().buildRect(text, ColorGenerator.MATERIAL.getColor(text)));
-        } else {
-            load(vodPic, view);
-        }
-    }
-
     public static void load(String url, ImageView view) {
-        float thumbnail = 1 - Prefers.getThumbnail() * 0.3f;
-        Glide.with(App.get()).load(url).thumbnail(thumbnail).signature(new ObjectKey(url + "_" + thumbnail)).placeholder(R.drawable.ic_img_loading).error(R.drawable.ic_img_error).listener(getListener(view)).into(view);
+        Glide.with(App.get()).load(url).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).into(view);
     }
 
-    private static RequestListener<Drawable> getListener(ImageView view) {
+    public static void load(String vodName, String vodPic, ImageView view) {
+        float thumbnail = 1 - Prefers.getThumbnail() * 0.3f;
+        Glide.with(App.get()).load(vodPic).sizeMultiplier(thumbnail).signature(new ObjectKey(vodPic + "_" + thumbnail)).placeholder(R.drawable.ic_img_loading).listener(getListener(vodName, view)).into(view);
+    }
+
+    private static RequestListener<Drawable> getListener(String vodName, ImageView view) {
         return new RequestListener<>() {
             @Override
             public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                view.setScaleType(ImageView.ScaleType.CENTER);
-                return false;
+                ImgUtil.onLoadFailed(vodName, view);
+                return true;
             }
 
             @Override
@@ -47,5 +41,16 @@ public class ImgUtil {
                 return false;
             }
         };
+    }
+
+    private static void onLoadFailed(String vodName, ImageView view) {
+        String text = vodName.isEmpty() ? "" : vodName.substring(0, 1);
+        if (text.isEmpty()) {
+            view.setImageResource(R.drawable.ic_img_error);
+            view.setScaleType(ImageView.ScaleType.CENTER);
+        } else {
+            view.setImageDrawable(TextDrawable.builder().buildRect(text, ColorGenerator.MATERIAL.getColor(text)));
+            view.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        }
     }
 }

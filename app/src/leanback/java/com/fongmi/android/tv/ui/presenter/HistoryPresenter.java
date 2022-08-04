@@ -20,8 +20,8 @@ public class HistoryPresenter extends Presenter {
     private int width, height;
     private boolean delete;
 
-    public HistoryPresenter(int columns) {
-        setLayoutSize(columns);
+    public HistoryPresenter() {
+        setLayoutSize();
     }
 
     public interface OnClickListener {
@@ -45,11 +45,11 @@ public class HistoryPresenter extends Presenter {
         this.delete = delete;
     }
 
-    private void setLayoutSize(int columns) {
-        int space = ResUtil.dp2px(16) * (columns - 1) + ResUtil.dp2px(48);
+    private void setLayoutSize() {
+        int space = ResUtil.dp2px(64) + ResUtil.dp2px(48);
         int base = ResUtil.getScreenWidthPx() - space;
-        width = (int) base / columns;
-        height = (int) (width / 0.75);
+        width = base / 5;
+        height = (int) (width / 0.75f);
     }
 
     @Override
@@ -71,9 +71,13 @@ public class HistoryPresenter extends Presenter {
         holder.binding.site.setVisibility(delete ? View.GONE : View.VISIBLE);
         holder.binding.remark.setVisibility(delete ? View.GONE : View.VISIBLE);
         holder.binding.delete.setVisibility(!delete ? View.GONE : View.VISIBLE);
-        ImgUtil.load(item.getVodName(), item.getVodPic(), holder.binding.image);
-        holder.view.setOnLongClickListener(view -> mListener.onLongClick());
-        holder.view.setOnClickListener(view -> {
+        ImgUtil.load(item.getVodPic(), holder.binding.image);
+        setClickListener(holder.view, item);
+    }
+
+    private void setClickListener(View root, History item) {
+        root.setOnLongClickListener(view -> mListener.onLongClick());
+        root.setOnClickListener(view -> {
             if (isDelete()) mListener.onItemDelete(item);
             else mListener.onItemClick(item);
         });

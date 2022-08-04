@@ -101,7 +101,7 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
         selector.addPresenter(ListRow.class, new CustomRowPresenter(16), HistoryPresenter.class);
         mBinding.recycler.setVerticalSpacing(ResUtil.dp2px(16));
         mBinding.recycler.setAdapter(new ItemBridgeAdapter(mAdapter = new ArrayObjectAdapter(selector)));
-        mHistoryAdapter = new ArrayObjectAdapter(mHistoryPresenter = new HistoryPresenter(5));
+        mHistoryAdapter = new ArrayObjectAdapter(mHistoryPresenter = new HistoryPresenter());
     }
 
     private void setViewModel() {
