@@ -23,10 +23,12 @@ import okhttp3.HttpUrl;
 public class SiteViewModel extends ViewModel {
 
     public MutableLiveData<Result> result;
+    public MutableLiveData<Result> player;
     public ExecutorService service;
 
     public SiteViewModel() {
         this.result = new MutableLiveData<>();
+        this.player = new MutableLiveData<>();
     }
 
     public MutableLiveData<Result> getResult() {
@@ -101,7 +103,7 @@ public class SiteViewModel extends ViewModel {
 
     public void playerContent(String key, String flag, String id) {
         Site site = ApiConfig.get().getSite(key);
-        execute(result, () -> {
+        execute(player, () -> {
             if (site.getType() == 3) {
                 Spider spider = ApiConfig.get().getCSP(site);
                 String playerContent = spider.playerContent(flag, id, ApiConfig.get().getFlags());
