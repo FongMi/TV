@@ -150,9 +150,10 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
     private void getHistory() {
         int historyIndex = getHistoryIndex();
         int recommendIndex = getRecommendIndex();
+        boolean isExist = recommendIndex - historyIndex == 2;
         List<History> items = AppDatabase.get().getHistoryDao().getAll();
-        if (items.isEmpty()) return;
-        if (recommendIndex - historyIndex != 2) mAdapter.add(historyIndex, new ListRow(mHistoryAdapter));
+        if (items.isEmpty() && isExist) mAdapter.removeItems(getHistoryIndex(), 1);
+        if (items.size() > 0 && !isExist) mAdapter.add(historyIndex, new ListRow(mHistoryAdapter));
         mHistoryAdapter.setItems(items, null);
     }
 
