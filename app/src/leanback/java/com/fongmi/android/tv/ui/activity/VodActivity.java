@@ -97,7 +97,6 @@ public class VodActivity extends BaseActivity {
 
     private void setPager() {
         mBinding.pager.setAdapter(new PageAdapter(getSupportFragmentManager()));
-        if (mResult.getTypes().size() > 0) mBinding.pager.setOffscreenPageLimit(Math.min(mResult.getTypes().size(), 5));
     }
 
     class PageAdapter extends FragmentStatePagerAdapter {
@@ -115,6 +114,10 @@ public class VodActivity extends BaseActivity {
         @Override
         public int getCount() {
             return mResult.getTypes().size();
+        }
+
+        @Override
+        public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
         }
     }
 }

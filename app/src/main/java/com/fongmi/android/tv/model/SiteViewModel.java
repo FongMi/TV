@@ -128,7 +128,6 @@ public class SiteViewModel extends ViewModel {
                 if (!Thread.interrupted()) result.postValue(service.submit(callable).get(5, TimeUnit.SECONDS));
             } catch (Exception e) {
                 if (!Thread.interrupted()) result.postValue(new Result());
-                e.printStackTrace();
             }
         });
     }
