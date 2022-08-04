@@ -71,6 +71,10 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
         return getIntent().getStringExtra("id");
     }
 
+    private String getHistoryKey() {
+        return getKey().concat("_").concat(getId());
+    }
+
     private Vod.Flag getVodFlag() {
         return (Vod.Flag) mFlagAdapter.get(mBinding.flag.getSelectedPosition());
     }
@@ -166,7 +170,8 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
         if (mFullscreen) Notify.show(ResUtil.getString(R.string.play_ready, item.getName()));
         mSiteViewModel.playerContent(getKey(), getVodFlag().getFlag(), item.getUrl());
         mBinding.progress.getRoot().setVisibility(View.VISIBLE);
-        addHistory(item);
+        Players.get().setKey(getHistoryKey());
+        updateHistory(item);
     }
 
     private void setViewModel() {
@@ -197,17 +202,6 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
     private void setText(TextView view, int resId, String text) {
         if (text.isEmpty()) view.setVisibility(View.GONE);
         else view.setText(ResUtil.getString(resId, text));
-    }
-
-    private void checkHistory() {
-        History history = AppDatabase.get().getHistoryDao().find(getKey() + "_" + getId());
-        if (history != null) {
-            setFlagActivated(history.getFlag());
-            setEpisodeActivated(history.getEpisode());
-        } else {
-            setFlagActivated((Vod.Flag) mFlagAdapter.get(0));
-            setEpisodeActivated((Vod.Flag.Episode) mEpisodeAdapter.get(0));
-        }
     }
 
     private void setFlagActivated(Vod.Flag item) {
@@ -283,21 +277,40 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
         Prefers.putScale(scale);
     }
 
-    private void addHistory(Vod.Flag.Episode item) {
+    private void checkHistory() {
+        History history = AppDatabase.get().getHistoryDao().find(getHistoryKey());
+        if (history != null) {
+            setFlagActivated(history.getFlag());
+            setEpisodeActivated(history.getEpisode());
+        } else {
+            createHistory();
+            setFlagActivated((Vod.Flag) mFlagAdapter.get(0));
+            setEpisodeActivated((Vod.Flag.Episode) mEpisodeAdapter.get(0));
+        }
+    }
+
+    private void createHistory() {
         History history = new History();
-        history.setKey(getKey() + "_" + getId());
+        history.setKey(getHistoryKey());
+        history.setVodPic(mBinding.video.getTag().toString());
+        history.setVodName(mBinding.name.getText().toString());
+        AppDatabase.get().getHistoryDao().insertOrUpdate(history);
+    }
+
+    private void updateHistory(Vod.Flag.Episode item) {
+        History history = AppDatabase.get().getHistoryDao().find(getHistoryKey());
         history.setVodFlag(getVodFlag().getFlag());
         history.setEpisodeUrl(item.getUrl());
         history.setVodRemarks(item.getName());
         history.setCreateTime(System.currentTimeMillis());
-        history.setVodPic(mBinding.video.getTag().toString());
-        history.setVodName(mBinding.name.getText().toString());
-        AppDatabase.get().getHistoryDao().insertOrUpdate(history);
+        AppDatabase.get().getHistoryDao().update(history);
         EventBus.getDefault().post(RefreshEvent.history());
     }
 
     private void updateHistory() {
-
+        History history = AppDatabase.get().getHistoryDao().find(getHistoryKey());
+        history.setDuration(Players.get().getCurrentPosition());
+        AppDatabase.get().getHistoryDao().update(history);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -361,6 +374,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        updateHistory();
         Players.get().stop();
         EventBus.getDefault().unregister(this);
     }
