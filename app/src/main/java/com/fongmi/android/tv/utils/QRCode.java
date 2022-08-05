@@ -30,11 +30,11 @@ public class QRCode {
         return bitmap;
     }
 
-    public static Bitmap getBitmap(String contents, int size) {
+    public static Bitmap getBitmap(String contents, int size, int margin) {
         try {
             Map<EncodeHintType, Object> hints = new EnumMap<>(EncodeHintType.class);
             hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
-            hints.put(EncodeHintType.MARGIN, 0);
+            hints.put(EncodeHintType.MARGIN, margin);
             return createBitmap(new MultiFormatWriter().encode(contents, BarcodeFormat.QR_CODE, ResUtil.dp2px(size), ResUtil.dp2px(size), hints));
         } catch (Exception e) {
             return null;

@@ -174,6 +174,9 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
             case R.string.home_vod:
                 VodActivity.start(this, mSiteViewModel.getResult().getValue());
                 break;
+            case R.string.home_push:
+                PushActivity.start(this);
+                break;
             case R.string.home_setting:
                 SettingActivity.start(this);
                 break;

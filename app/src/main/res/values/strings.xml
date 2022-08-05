@@ -19,6 +19,9 @@
     <!-- Vod -->
     <string name="vod_last">Last seen <xliff:g name="name">%s</xliff:g></string>
 
+    <!-- Push -->
+    <string name="push_info">Connect your phone or pc to the same LAN, scan QR Code or enter the URL in browser\n<xliff:g name="name">%s</xliff:g></string>
+
     <!-- Detail -->
     <string name="detail_site">Site: <xliff:g name="name">%s</xliff:g></string>
     <string name="detail_year">Year: <xliff:g name="name">%s</xliff:g></string>

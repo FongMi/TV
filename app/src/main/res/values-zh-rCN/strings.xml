@@ -19,6 +19,9 @@
     <!-- Vod -->
     <string name="vod_last">上次看到<xliff:g name="name">%s</xliff:g></string>
 
+    <!-- Push -->
+    <string name="push_info">手机或电脑连接连接同一个局域网，扫描 QR Code 或浏览器输入网址\n<xliff:g name="name">%s</xliff:g></string>
+
     <!-- Detail -->
     <string name="detail_site">站源：<xliff:g name="name">%s</xliff:g></string>
     <string name="detail_year">年份：<xliff:g name="name">%s</xliff:g></string>
