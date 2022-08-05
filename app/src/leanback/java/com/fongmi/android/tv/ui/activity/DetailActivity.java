@@ -162,11 +162,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
     }
 
     private void getPlayer() {
-        getPlayer(getEpisodePosition());
-    }
-
-    private void getPlayer(int position) {
-        Vod.Flag.Episode item = (Vod.Flag.Episode) mEpisodeAdapter.get(position);
+        Vod.Flag.Episode item = (Vod.Flag.Episode) mEpisodeAdapter.get(getEpisodePosition());
         if (mFullscreen) Notify.show(ResUtil.getString(R.string.play_ready, item.getName()));
         mSiteViewModel.playerContent(getKey(), getVodFlag().getFlag(), item.getUrl());
         mBinding.progress.getRoot().setVisibility(View.VISIBLE);
@@ -219,15 +215,10 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
 
     private void setEpisodeActivated(Vod.Flag.Episode item) {
         mCurrent = mBinding.flag.getSelectedPosition();
-        for (int i = 0; i < mFlagAdapter.size(); i++) {
-            Vod.Flag flag = (Vod.Flag) mFlagAdapter.get(i);
-            if (mCurrent == i) flag.setActivated(item);
-            else flag.deactivated();
-        }
+        for (int i = 0; i < mFlagAdapter.size(); i++) ((Vod.Flag) mFlagAdapter.get(i)).toggle(mCurrent == i, item);
         mEpisodeAdapter.notifyArrayItemRangeChanged(0, mEpisodeAdapter.size());
-        int position = getEpisodePosition();
-        mHandler.post(() -> mBinding.episode.setSelectedPosition(position));
-        getPlayer(position);
+        mHandler.post(() -> mBinding.episode.setSelectedPosition(getEpisodePosition()));
+        getPlayer();
     }
 
     private void setGroup(int size) {

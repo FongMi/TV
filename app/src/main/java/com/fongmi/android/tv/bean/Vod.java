@@ -200,12 +200,9 @@ public class Vod {
             this.activated = activated;
         }
 
-        public void deactivated() {
-            for (Episode item : getEpisodes()) item.deactivated();
-        }
-
-        public void setActivated(Episode episode) {
-            for (Episode item : getEpisodes()) item.setActivated(episode);
+        public void toggle(boolean activated, Episode episode) {
+            if (activated) for (Episode item : getEpisodes()) item.setActivated(episode);
+            else for (Episode item : getEpisodes()) item.deactivated();
         }
 
         @Override
