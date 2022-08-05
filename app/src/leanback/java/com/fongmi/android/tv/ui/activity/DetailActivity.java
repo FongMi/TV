@@ -300,8 +300,10 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
 
     private void updateHistory() {
         History history = AppDatabase.get().getHistoryDao().find(getHistoryKey());
-        history.setDuration(Players.get().getCurrentPosition());
-        AppDatabase.get().getHistoryDao().update(history);
+        if (history != null) {
+            history.setDuration(Players.get().getCurrentPosition());
+            AppDatabase.get().getHistoryDao().update(history);
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
