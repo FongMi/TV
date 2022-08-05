@@ -1,11 +1,8 @@
 package com.fongmi.android.tv;
 
-import android.content.Context;
+import android.app.Application;
 
-import androidx.multidex.MultiDex;
-import androidx.multidex.MultiDexApplication;
-
-public class App extends MultiDexApplication {
+public class App extends Application {
 
     private static App instance;
 
@@ -15,11 +12,5 @@ public class App extends MultiDexApplication {
 
     public static App get() {
         return instance;
-    }
-
-    @Override
-    protected void attachBaseContext(Context base) {
-        super.attachBaseContext(base);
-        MultiDex.install(this);
     }
 }
