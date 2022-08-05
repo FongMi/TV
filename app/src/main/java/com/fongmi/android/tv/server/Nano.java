@@ -21,8 +21,8 @@ public class Nano extends NanoHTTPD {
     private List<RequestProcess> processes;
     private Listener listener;
 
-    public Nano() {
-        super(9978);
+    public Nano(int port) {
+        super(port);
         addRequestProcess();
     }
 

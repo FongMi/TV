@@ -8,6 +8,7 @@ import org.greenrobot.eventbus.EventBus;
 public class Server implements Nano.Listener {
 
     private Nano nano;
+    private int port;
 
     private static class Loader {
         static volatile Server INSTANCE = new Server();
@@ -17,20 +18,28 @@ public class Server implements Nano.Listener {
         return Loader.INSTANCE;
     }
 
+    public Server() {
+        this.port = 9978;
+    }
+
     public String getAddress(boolean local) {
-        return "http://" + (local ? "127.0.0.1" : Utils.getIP()) + ":" + nano.getListeningPort() + "/";
+        return "http://" + (local ? "127.0.0.1" : Utils.getIP()) + ":" + port + "/";
     }
 
     public void start() {
         if (nano != null) return;
-        try {
-            nano = new Nano();
-            nano.setListener(this);
-            nano.start();
-        } catch (Exception e) {
-            nano.stop();
-            nano = null;
-        }
+        do {
+            try {
+                nano = new Nano(port);
+                nano.setListener(this);
+                nano.start();
+                break;
+            } catch (Exception e) {
+                ++port;
+                nano.stop();
+                nano = null;
+            }
+        } while (port < 9999);
     }
 
     public void stop() {
