@@ -40,7 +40,7 @@
     <!-- Setting -->
     <string name="setting_site">首頁</string>
     <string name="setting_url">配置</string>
-    <string name="setting_history">歷史紀錄</string>
+    <string name="setting_history">歷史</string>
     <string name="setting_thumbnail">縮圖</string>
 
     <!-- Dialog -->

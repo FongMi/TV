@@ -1,0 +1,26 @@
+body,
+html {
+  height: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: system-ui, -apple-system, Helvetica Neue, sans-serif;
+}
+
+.page,
+body {
+  background-color: var(--weui-BG-0);
+}
+
+.page {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  box-sizing: border-box;
+  z-index: 1;
+}

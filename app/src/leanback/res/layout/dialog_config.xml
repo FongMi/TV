@@ -1,20 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:paddingStart="16dp"
-    android:paddingTop="16dp"
-    android:paddingEnd="16dp">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="24dp">
+
+    <ImageView
+        android:id="@+id/code"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:scaleType="fitXY" />
 
     <EditText
         android:id="@+id/text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_toEndOf="@+id/code"
         android:hint="@string/dialog_config_url_hint"
         android:imeOptions="actionDone"
+        android:importantForAutofill="no"
         android:inputType="text"
         android:singleLine="true"
         android:textSize="18sp" />
 
-</LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/text"
+        android:layout_alignBottom="@+id/code"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/history"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="@color/grey_700"
+            android:singleLine="true"
+            android:text="@string/setting_history"
+            android:textColor="@color/white" />
+
+        <Button
+            android:id="@+id/negative"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/grey_700"
+            android:singleLine="true"
+            android:text="@string/dialog_negative"
+            android:textColor="@color/white" />
+
+        <Button
+            android:id="@+id/positive"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="@color/grey_700"
+            android:singleLine="true"
+            android:text="@string/dialog_positive"
+            android:textColor="@color/white" />
+
+    </LinearLayout>
+</RelativeLayout>

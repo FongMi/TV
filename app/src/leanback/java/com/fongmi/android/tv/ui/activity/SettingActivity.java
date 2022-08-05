@@ -2,7 +2,6 @@ package com.fongmi.android.tv.ui.activity;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -10,11 +9,9 @@ import android.os.Environment;
 import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.ItemBridgeAdapter;
@@ -24,11 +21,11 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.databinding.ActivitySettingBinding;
-import com.fongmi.android.tv.databinding.DialogConfigBinding;
 import com.fongmi.android.tv.databinding.DialogSiteBinding;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.net.Callback;
+import com.fongmi.android.tv.ui.custom.ConfigDialog;
 import com.fongmi.android.tv.ui.presenter.SitePresenter;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
@@ -36,7 +33,7 @@ import com.fongmi.android.tv.utils.ResUtil;
 
 import org.greenrobot.eventbus.EventBus;
 
-public class SettingActivity extends BaseActivity {
+public class SettingActivity extends BaseActivity implements ConfigDialog.Callback {
 
     private ActivitySettingBinding mBinding;
 
@@ -62,26 +59,16 @@ public class SettingActivity extends BaseActivity {
     @Override
     protected void initEvent() {
         mBinding.site.setOnClickListener(this::showSite);
-        mBinding.config.setOnClickListener(this::showConfig);
+        mBinding.config.setOnClickListener(view -> ConfigDialog.show(this));
         mBinding.thumbnail.setOnClickListener(this::setThumbnail);
     }
 
-    private void showConfig(View view) {
-        DialogConfigBinding bindingDialog = DialogConfigBinding.inflate(LayoutInflater.from(this));
-        bindingDialog.text.setText(Prefers.getUrl());
-        bindingDialog.text.setSelection(bindingDialog.text.getText().length());
-        AlertDialog dialog = Notify.show(this, bindingDialog.getRoot(), (dialogInterface, i) -> {
-            if (bindingDialog.text.getText().toString().equals(Prefers.getUrl())) return;
-            Prefers.putUrl(bindingDialog.text.getText().toString().trim());
-            mBinding.url.setText(Prefers.getUrl());
-            Notify.progress(this);
-            AppDatabase.clear();
-            checkUrl();
-        });
-        bindingDialog.text.setOnEditorActionListener((textView, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_DONE) dialog.getButton(DialogInterface.BUTTON_POSITIVE).performClick();
-            return true;
-        });
+    @Override
+    public void setConfig() {
+        mBinding.url.setText(Prefers.getUrl());
+        Notify.progress(this);
+        AppDatabase.clear();
+        checkUrl();
     }
 
     private void checkUrl() {
