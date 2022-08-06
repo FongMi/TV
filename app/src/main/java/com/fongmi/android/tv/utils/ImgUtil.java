@@ -19,7 +19,7 @@ import com.fongmi.android.tv.R;
 public class ImgUtil {
 
     public static void load(String url, ImageView view) {
-        Glide.with(App.get()).load(url).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).into(view);
+        Glide.with(App.get()).load(url).override(ResUtil.dp2px(300), ResUtil.dp2px(400)).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).into(view);
     }
 
     public static void load(String vodName, String vodPic, ImageView view) {

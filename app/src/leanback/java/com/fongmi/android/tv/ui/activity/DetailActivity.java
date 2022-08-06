@@ -290,7 +290,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
 
     private void updateHistory(Vod.Flag.Episode item, boolean reset) {
         History history = AppDatabase.get().getHistoryDao().find(getHistoryKey());
-        reset = reset || !history.getEpisodeUrl().equals(item.getUrl());
+        reset = reset || !item.getUrl().equals(history.getEpisodeUrl());
         long duration = reset ? 0 : history.getDuration();
         history.setDuration(duration);
         history.setEpisodeUrl(item.getUrl());

@@ -63,7 +63,7 @@ public class History {
     }
 
     public String getEpisodeUrl() {
-        return episodeUrl;
+        return episodeUrl == null ? "" : episodeUrl;
     }
 
     public void setEpisodeUrl(String episodeUrl) {
