@@ -118,7 +118,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
         mControl.next.setOnClickListener(view -> onNext());
         mControl.prev.setOnClickListener(view -> onPrev());
         mControl.scale.setOnClickListener(view -> onScale());
-        mControl.reset.setOnClickListener(view -> getPlayer());
+        mControl.reset.setOnClickListener(view -> getPlayer(true));
         mControl.speed.setOnClickListener(view -> mControl.speed.setText(Players.get().addSpeed()));
         mBinding.flag.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
@@ -161,13 +161,12 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
         mSiteViewModel.detailContent(getKey(), getId());
     }
 
-    private void getPlayer() {
+    private void getPlayer(boolean reset) {
         Vod.Flag.Episode item = (Vod.Flag.Episode) mEpisodeAdapter.get(getEpisodePosition());
         if (mFullscreen) Notify.show(ResUtil.getString(R.string.play_ready, item.getName()));
         mSiteViewModel.playerContent(getKey(), getVodFlag().getFlag(), item.getUrl());
         mBinding.progress.getRoot().setVisibility(View.VISIBLE);
-        Players.get().setKey(getHistoryKey());
-        updateHistory(item);
+        updateHistory(item, reset);
     }
 
     private void setViewModel() {
@@ -180,6 +179,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
     }
 
     private void setDetail(Vod item) {
+        Players.get().setKey(getHistoryKey());
         mBinding.progressLayout.showContent();
         mBinding.video.setTag(item.getVodPic());
         mBinding.name.setText(item.getVodName());
@@ -218,7 +218,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
         for (int i = 0; i < mFlagAdapter.size(); i++) ((Vod.Flag) mFlagAdapter.get(i)).toggle(mCurrent == i, item);
         mEpisodeAdapter.notifyArrayItemRangeChanged(0, mEpisodeAdapter.size());
         mHandler.post(() -> mBinding.episode.setSelectedPosition(getEpisodePosition()));
-        getPlayer();
+        getPlayer(false);
     }
 
     private void setGroup(int size) {
@@ -288,11 +288,14 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
         AppDatabase.get().getHistoryDao().insertOrUpdate(history);
     }
 
-    private void updateHistory(Vod.Flag.Episode item) {
+    private void updateHistory(Vod.Flag.Episode item, boolean reset) {
         History history = AppDatabase.get().getHistoryDao().find(getHistoryKey());
-        history.setVodFlag(getVodFlag().getFlag());
+        reset = reset || !history.getEpisodeUrl().equals(item.getUrl());
+        long duration = reset ? 0 : history.getDuration();
+        history.setDuration(duration);
         history.setEpisodeUrl(item.getUrl());
         history.setVodRemarks(item.getName());
+        history.setVodFlag(getVodFlag().getFlag());
         history.setCreateTime(System.currentTimeMillis());
         AppDatabase.get().getHistoryDao().update(history);
         EventBus.getDefault().post(RefreshEvent.history());
