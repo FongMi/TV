@@ -55,7 +55,7 @@ public class History {
     }
 
     public String getVodRemarks() {
-        return vodRemarks;
+        return vodRemarks == null ? "" : vodRemarks;
     }
 
     public void setVodRemarks(String vodRemarks) {
