@@ -29,7 +29,7 @@ public class ImgUtil {
     }
 
     public static void load(String url, ImageView view) {
-        Glide.with(App.get()).load(url).override(getWidth(), getHeight()).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).into(view);
+        Glide.with(App.get()).load(url).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).into(view);
     }
 
     public static void load(String vodName, String vodPic, ImageView view) {
