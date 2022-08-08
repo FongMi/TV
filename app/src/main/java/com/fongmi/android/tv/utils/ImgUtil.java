@@ -18,13 +18,22 @@ import com.fongmi.android.tv.R;
 
 public class ImgUtil {
 
+    private static int getWidth() {
+        float thumbnail = 1 - Prefers.getThumbnail() * 0.3f;
+        return ResUtil.dp2px((int) Math.ceil(300 * thumbnail));
+    }
+
+    private static int getHeight() {
+        float thumbnail = 1 - Prefers.getThumbnail() * 0.3f;
+        return ResUtil.dp2px((int) Math.ceil(400 * thumbnail));
+    }
+
     public static void load(String url, ImageView view) {
-        Glide.with(App.get()).load(url).override(ResUtil.dp2px(300), ResUtil.dp2px(400)).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).into(view);
+        Glide.with(App.get()).load(url).override(getWidth(), getHeight()).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).into(view);
     }
 
     public static void load(String vodName, String vodPic, ImageView view) {
-        float thumbnail = 1 - Prefers.getThumbnail() * 0.3f;
-        Glide.with(App.get()).load(vodPic).sizeMultiplier(thumbnail).signature(new ObjectKey(vodPic + "_" + thumbnail)).placeholder(R.drawable.ic_img_loading).listener(getListener(vodName, view)).into(view);
+        Glide.with(App.get()).load(vodPic).override(getWidth(), getHeight()).signature(new ObjectKey(vodPic + "_" + Prefers.getThumbnail())).placeholder(R.drawable.ic_img_loading).listener(getListener(vodName, view)).into(view);
     }
 
     private static RequestListener<Drawable> getListener(String vodName, ImageView view) {
