@@ -23,7 +23,7 @@ public class Server implements Nano.Listener {
     }
 
     public String getAddress(boolean local) {
-        return "http://" + (local ? "127.0.0.1" : Utils.getIP()) + ":" + port + "/";
+        return "http://" + (local ? "127.0.0.1" : Utils.getIP()) + ":" + port;
     }
 
     public void start() {
