@@ -36,6 +36,7 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
     private SiteViewModel mSiteViewModel;
     private ArrayObjectAdapter mAdapter;
     private ExecutorService mService;
+    private List<Site> mSites;
 
     public static void start(Activity activity) {
         start(activity, "");
@@ -56,6 +57,7 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
     protected void initView() {
         setRecyclerView();
         setViewModel();
+        setSite();
     }
 
     @Override
@@ -77,10 +79,15 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
 
     private void setViewModel() {
         mSiteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
-        mSiteViewModel.result.observe(this, this::addVideo);
+        mSiteViewModel.result.observe(this, this::addResult);
     }
 
-    private void addVideo(Result result) {
+    private void setSite() {
+        mSites = new ArrayList<>();
+        for (Site site : ApiConfig.get().getSites()) if (site.isSearchable()) mSites.add(site);
+    }
+
+    private void addResult(Result result) {
         List<ListRow> rows = new ArrayList<>();
         for (List<Vod> items : Lists.partition(result.getList(), 5)) {
             ArrayObjectAdapter adapter = new ArrayObjectAdapter(new VodPresenter(this, 5));
@@ -94,13 +101,9 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
     private void startSearch() {
         String keyword = mBinding.keyword.getText().toString().trim();
         if (TextUtils.isEmpty(keyword)) return;
-        hideLayout();
         mService = Executors.newFixedThreadPool(5);
-        for (Site item : ApiConfig.get().getSites()) {
-            if (item.isSearchable()) {
-                mService.execute(() -> mSiteViewModel.searchContent(item.getKey(), keyword));
-            }
-        }
+        for (Site site : mSites) mService.execute(() -> mSiteViewModel.searchContent(site.getKey(), keyword));
+        hideLayout();
     }
 
     private void stopSearch() {
