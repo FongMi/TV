@@ -35,12 +35,12 @@
         </activity>
 
         <activity
-            android:name=".ui.activity.HomeActivity"
+            android:name=".ui.activity.DetailActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
             android:screenOrientation="sensorLandscape" />
 
         <activity
-            android:name=".ui.activity.VodActivity"
+            android:name=".ui.activity.HomeActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
             android:screenOrientation="sensorLandscape" />
 
@@ -50,12 +50,17 @@
             android:screenOrientation="sensorLandscape" />
 
         <activity
-            android:name=".ui.activity.DetailActivity"
+            android:name=".ui.activity.SearchActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
             android:screenOrientation="sensorLandscape" />
 
         <activity
             android:name=".ui.activity.SettingActivity"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
+            android:screenOrientation="sensorLandscape" />
+
+        <activity
+            android:name=".ui.activity.VodActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
             android:screenOrientation="sensorLandscape" />
 

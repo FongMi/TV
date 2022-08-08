@@ -24,7 +24,6 @@ import com.fongmi.android.tv.ui.custom.CustomRowPresenter;
 import com.fongmi.android.tv.ui.custom.CustomScroller;
 import com.fongmi.android.tv.ui.custom.CustomSelector;
 import com.fongmi.android.tv.ui.presenter.FilterPresenter;
-import com.fongmi.android.tv.ui.presenter.ProgressPresenter;
 import com.fongmi.android.tv.ui.presenter.VodPresenter;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.common.collect.Lists;
@@ -80,7 +79,6 @@ public class VodFragment extends Fragment implements CustomScroller.Callback, Vo
 
     private void setRecyclerView() {
         CustomSelector selector = new CustomSelector();
-        selector.addPresenter(String.class, new ProgressPresenter());
         selector.addPresenter(ListRow.class, new CustomRowPresenter(16), VodPresenter.class);
         selector.addPresenter(ListRow.class, new CustomRowPresenter(8), FilterPresenter.class);
         mBinding.recycler.addOnScrollListener(mScroller = new CustomScroller(this));

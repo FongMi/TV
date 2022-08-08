@@ -49,9 +49,9 @@ import java.util.List;
 
 public class DetailActivity extends BaseActivity implements KeyDown.Listener {
 
+    private ActivityDetailBinding mBinding;
     private ViewControllerBottomBinding mControl;
     private ViewGroup.LayoutParams mFrameParams;
-    private ActivityDetailBinding mBinding;
     private ArrayObjectAdapter mFlagAdapter;
     private ArrayObjectAdapter mGroupAdapter;
     private ArrayObjectAdapter mEpisodeAdapter;

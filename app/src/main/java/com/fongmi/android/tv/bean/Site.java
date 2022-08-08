@@ -68,16 +68,16 @@ public class Site {
         return TextUtils.isEmpty(playerUrl) ? "" : playerUrl;
     }
 
-    public Integer getSearchable() {
-        return searchable == null ? 1 : searchable;
+    public boolean isSearchable() {
+        return searchable == null || searchable == 1;
     }
 
-    public Integer getQuickSearch() {
-        return quickSearch == null ? 1 : quickSearch;
+    public boolean isQuickSearch() {
+        return quickSearch == null || quickSearch == 1;
     }
 
-    public Integer getFilterable() {
-        return filterable == null ? 1 : filterable;
+    public boolean isFilterable() {
+        return filterable == null || filterable == 1;
     }
 
     public String getExt() {

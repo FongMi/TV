@@ -30,8 +30,8 @@ import java.util.List;
 
 public class VodActivity extends BaseActivity {
 
-    private TypePresenter mTypePresenter;
     private ActivityVodBinding mBinding;
+    private TypePresenter mTypePresenter;
     private Result mResult;
     private View mOldView;
 

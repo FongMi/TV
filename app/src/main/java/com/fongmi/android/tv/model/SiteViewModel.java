@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
+import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.net.OKHttp;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.crawler.Spider;
@@ -52,8 +53,7 @@ public class SiteViewModel extends ViewModel {
                 String body = OKHttp.newCall(home.getApi()).execute().body().string();
                 SpiderDebug.log(body);
                 if (home.getType() == 0) return Result.fromXml(body);
-                else if (home.getType() == 1) return Result.fromJson(body);
-                else return new Result();
+                else return Result.fromJson(body);
             }
         });
     }
@@ -71,8 +71,7 @@ public class SiteViewModel extends ViewModel {
                 String body = OKHttp.newCall(url).execute().body().string();
                 SpiderDebug.log(body);
                 if (home.getType() == 0) return Result.fromXml(body);
-                else if (home.getType() == 1) return Result.fromJson(body);
-                return new Result();
+                else return Result.fromJson(body);
             }
         });
     }
@@ -93,8 +92,7 @@ public class SiteViewModel extends ViewModel {
                 SpiderDebug.log(body);
                 Result result;
                 if (site.getType() == 0) result = Result.fromXml(body);
-                else if (site.getType() == 1) result = Result.fromJson(body);
-                else result = new Result();
+                else result = Result.fromJson(body);
                 if (!result.getList().isEmpty()) result.getList().get(0).setVodFlags();
                 return result;
             }
@@ -120,6 +118,32 @@ public class SiteViewModel extends ViewModel {
                 return result;
             }
         });
+    }
+
+    public void searchContent(String key, String keyword) {
+        try {
+            Site site = ApiConfig.get().getSite(key);
+            if (site.getType() == 3) {
+                Spider spider = ApiConfig.get().getCSP(site);
+                String searchContent = spider.searchContent(keyword, false);
+                SpiderDebug.log(searchContent);
+                postSearch(site, Result.fromJson(searchContent));
+            } else {
+                HttpUrl.Builder builder = HttpUrl.parse(site.getApi()).newBuilder().addQueryParameter("wd", keyword);
+                if (site.getType() == 1) builder.addQueryParameter("ac", "detail");
+                String body = OKHttp.newCall(builder.build()).execute().body().string();
+                SpiderDebug.log(body);
+                if (site.getType() == 0) postSearch(site, Result.fromXml(body));
+                else postSearch(site, Result.fromJson(body));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void postSearch(Site site, Result item) {
+        for (Vod vod : item.getList()) vod.setSite(site);
+        if (!item.getList().isEmpty()) result.postValue(item);
     }
 
     private void execute(MutableLiveData<Result> result, Callable<Result> callable) {

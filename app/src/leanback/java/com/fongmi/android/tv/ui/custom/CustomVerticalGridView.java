@@ -35,6 +35,7 @@ public class CustomVerticalGridView extends VerticalGridView {
         setOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable ViewHolder child, int position, int subposition) {
+                if (mTabView == null) return;
                 if (pressUp && position == 0) {
                     mTabView.setVisibility(View.VISIBLE);
                 } else if (pressDown && position == 1) {
@@ -61,16 +62,17 @@ public class CustomVerticalGridView extends VerticalGridView {
                 pressDown = true;
                 return super.dispatchKeyEvent(event);
             case KeyEvent.KEYCODE_BACK:
-                moveToTop();
-                return true;
+                return moveToTop();
             default:
                 return super.dispatchKeyEvent(event);
         }
     }
 
-    public void moveToTop() {
+    public boolean moveToTop() {
+        if (mTabView == null) return false;
         mTabView.setVisibility(View.VISIBLE);
         mTabView.requestFocus();
         scrollToPosition(0);
+        return true;
     }
 }

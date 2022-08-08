@@ -19,7 +19,7 @@ public class TitlePresenter extends Presenter {
     @Override
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object object) {
         TitlePresenter.ViewHolder holder = (TitlePresenter.ViewHolder) viewHolder;
-        holder.binding.text.setText(ResUtil.getString((int) object));
+        holder.binding.text.setText(object instanceof String ? object.toString() : ResUtil.getString((int) object));
     }
 
     @Override

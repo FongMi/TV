@@ -73,6 +73,8 @@ public class Vod {
     @ElementList(entry = "dd", required = false, inline = true)
     private List<Flag> vodFlags;
 
+    private Site site;
+
     public String getVodId() {
         return TextUtils.isEmpty(vodId) ? "" : vodId;
     }
@@ -123,6 +125,14 @@ public class Vod {
 
     public List<Flag> getVodFlags() {
         return vodFlags = vodFlags == null ? new ArrayList<>() : vodFlags;
+    }
+
+    public Site getSite() {
+        return site;
+    }
+
+    public void setSite(Site site) {
+        this.site = site;
     }
 
     public int getRemarkVisible() {

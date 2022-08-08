@@ -51,11 +51,11 @@ import java.util.List;
 public class HomeActivity extends BaseActivity implements VodPresenter.OnClickListener, FuncPresenter.OnClickListener, HistoryPresenter.OnClickListener {
 
     private ActivityHomeBinding mBinding;
-    private SiteViewModel mSiteViewModel;
     private ArrayObjectAdapter mAdapter;
     private ArrayObjectAdapter mHistoryAdapter;
     private HistoryPresenter mHistoryPresenter;
     private FuncPresenter mFuncPresenter;
+    private SiteViewModel mSiteViewModel;
     private boolean mConfirmExit;
 
     public static void start(Activity activity) {
@@ -174,6 +174,9 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
             case R.string.home_vod:
                 VodActivity.start(this, mSiteViewModel.getResult().getValue());
                 break;
+            case R.string.home_search:
+                SearchActivity.start(this);
+                break;
             case R.string.home_push:
                 PushActivity.start(this);
                 break;
@@ -223,8 +226,15 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onServerEvent(ServerEvent event) {
-        if (event.getType() != ServerEvent.Type.PUSH || ApiConfig.get().getSite("push_agent") == null) return;
-        DetailActivity.start(this, "push_agent", event.getText());
+        switch (event.getType()) {
+            case SEARCH:
+                SearchActivity.start(this, event.getText());
+                break;
+            case PUSH:
+                if (ApiConfig.get().getSite("push_agent") == null) return;
+                DetailActivity.start(this, "push_agent", event.getText());
+                break;
+        }
     }
 
     @Override
