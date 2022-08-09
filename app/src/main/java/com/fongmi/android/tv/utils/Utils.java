@@ -4,11 +4,9 @@ import android.app.Activity;
 import android.app.PictureInPictureParams;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.provider.Settings;
-import android.text.TextUtils;
 import android.text.format.Formatter;
 import android.util.Rational;
 import android.view.View;
@@ -16,6 +14,11 @@ import android.view.View;
 import com.fongmi.android.tv.App;
 import com.google.android.exoplayer2.util.Util;
 
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
 import java.util.regex.Pattern;
 
 public class Utils {
@@ -44,7 +47,27 @@ public class Utils {
 
     public static String getIP() {
         WifiManager manager = (WifiManager) App.get().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        return Formatter.formatIpAddress(manager.getConnectionInfo().getIpAddress());
+        int ipAddress = manager.getConnectionInfo().getIpAddress();
+        if (ipAddress != 0)  return Formatter.formatIpAddress(manager.getConnectionInfo().getIpAddress());
+        try {
+            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+            while (interfaces.hasMoreElements()) {
+                NetworkInterface element = interfaces.nextElement();
+                String interfaceName = element.getDisplayName();
+                if (interfaceName.equals("eth0") || interfaceName.equals("wlan0")) {
+                    Enumeration<InetAddress> addresses = element.getInetAddresses();
+                    while (addresses.hasMoreElements()) {
+                        InetAddress address = addresses.nextElement();
+                        if (!address.isLoopbackAddress() && address instanceof Inet4Address) {
+                            return address.getHostAddress();
+                        }
+                    }
+                }
+            }
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
+        return "0.0.0.0";
     }
 
     public static String getUUID() {
@@ -61,11 +84,5 @@ public class Utils {
         return false;
     }
 
-    public static String convert(String text) {
-        if (TextUtils.isEmpty(text)) return "";
-        if (text.startsWith(".")) text = text.substring(1);
-        if (text.startsWith("/")) text = text.substring(1);
-        Uri uri = Uri.parse(Prefers.getUrl());
-        return uri.toString().replace(uri.getLastPathSegment(), text);
-    }
+
 }

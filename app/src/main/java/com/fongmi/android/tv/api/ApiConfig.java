@@ -1,7 +1,9 @@
 package com.fongmi.android.tv.api;
 
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.TextUtils;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Live;
@@ -12,7 +14,6 @@ import com.fongmi.android.tv.net.OKHttp;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Json;
 import com.fongmi.android.tv.utils.Prefers;
-import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.crawler.Spider;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -120,7 +121,7 @@ public class ApiConfig {
     private String parseExt(String ext) {
         if (ext.startsWith("http")) return ext;
         else if (ext.startsWith("file")) return FileUtil.read(ext);
-        else if (ext.endsWith(".json")) return parseExt(Utils.convert(ext));
+        else if (ext.endsWith(".json")) return parseExt(convert(ext));
         return ext;
     }
 
@@ -132,8 +133,16 @@ public class ApiConfig {
         } else if (spider.startsWith("file")) {
             loader.load(FileUtil.getLocal(spider));
         } else if (!spider.isEmpty()) {
-            parseJar(Utils.convert(spider));
+            parseJar(convert(spider));
         }
+    }
+
+    private String convert(String text) {
+        if (TextUtils.isEmpty(text)) return "";
+        if (text.startsWith(".")) text = text.substring(1);
+        if (text.startsWith("/")) text = text.substring(1);
+        Uri uri = Uri.parse(Prefers.getUrl());
+        return uri.toString().replace(uri.getLastPathSegment(), text);
     }
 
     public Spider getCSP(Site site) {
