@@ -1,9 +1,19 @@
 package com.fongmi.android.tv.server;
 
+import android.content.Context;
+import android.net.wifi.WifiManager;
+import android.text.format.Formatter;
+
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.event.ServerEvent;
-import com.fongmi.android.tv.utils.Utils;
 
 import org.greenrobot.eventbus.EventBus;
+
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
 
 public class Server implements Nano.Listener {
 
@@ -23,7 +33,7 @@ public class Server implements Nano.Listener {
     }
 
     public String getAddress(boolean local) {
-        return "http://" + (local ? "127.0.0.1" : Utils.getIP()) + ":" + port;
+        return "http://" + (local ? "127.0.0.1" : getIP()) + ":" + port;
     }
 
     public void start() {
@@ -47,6 +57,30 @@ public class Server implements Nano.Listener {
             nano.stop();
             nano = null;
         }
+    }
+
+    private String getIP() {
+        WifiManager manager = (WifiManager) App.get().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        int address = manager.getConnectionInfo().getIpAddress();
+        if (address != 0) return Formatter.formatIpAddress(address);
+        try {
+            return getHostAddress();
+        } catch (SocketException e) {
+            return "";
+        }
+    }
+
+    private String getHostAddress() throws SocketException {
+        for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
+            NetworkInterface interfaces = en.nextElement();
+            for (Enumeration<InetAddress> addresses = interfaces.getInetAddresses(); addresses.hasMoreElements(); ) {
+                InetAddress inetAddress = addresses.nextElement();
+                if (!inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address) {
+                    return inetAddress.getHostAddress();
+                }
+            }
+        }
+        return "";
     }
 
     @Override

@@ -2,23 +2,15 @@ package com.fongmi.android.tv.utils;
 
 import android.app.Activity;
 import android.app.PictureInPictureParams;
-import android.content.Context;
 import android.content.pm.PackageManager;
-import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.provider.Settings;
-import android.text.format.Formatter;
 import android.util.Rational;
 import android.view.View;
 
 import com.fongmi.android.tv.App;
 import com.google.android.exoplayer2.util.Util;
 
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.util.Enumeration;
 import java.util.regex.Pattern;
 
 public class Utils {
@@ -45,31 +37,6 @@ public class Utils {
         activity.getWindow().getDecorView().setSystemUiVisibility(flags);
     }
 
-    public static String getIP() {
-        WifiManager manager = (WifiManager) App.get().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        int ipAddress = manager.getConnectionInfo().getIpAddress();
-        if (ipAddress != 0)  return Formatter.formatIpAddress(manager.getConnectionInfo().getIpAddress());
-        try {
-            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-            while (interfaces.hasMoreElements()) {
-                NetworkInterface element = interfaces.nextElement();
-                String interfaceName = element.getDisplayName();
-                if (interfaceName.equals("eth0") || interfaceName.equals("wlan0")) {
-                    Enumeration<InetAddress> addresses = element.getInetAddresses();
-                    while (addresses.hasMoreElements()) {
-                        InetAddress address = addresses.nextElement();
-                        if (!address.isLoopbackAddress() && address instanceof Inet4Address) {
-                            return address.getHostAddress();
-                        }
-                    }
-                }
-            }
-        } catch (SocketException e) {
-            e.printStackTrace();
-        }
-        return "0.0.0.0";
-    }
-
     public static String getUUID() {
         return Settings.Secure.getString(App.get().getContentResolver(), Settings.Secure.ANDROID_ID);
     }
@@ -83,6 +50,4 @@ public class Utils {
         if (SNIFFER.matcher(url).find()) return !url.contains("cdn-tos") || (!url.contains(".js") && !url.contains(".css"));
         return false;
     }
-
-
 }
