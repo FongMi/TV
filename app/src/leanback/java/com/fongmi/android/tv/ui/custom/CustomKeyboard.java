@@ -71,7 +71,7 @@ public class CustomKeyboard implements KeyboardPresenter.OnClickListener {
                 binding.keyword.setSelection(cursor - 1);
                 break;
             default:
-                if (binding.keyword.length() > 19) return;
+                if (binding.keyword.length() > 29) return;
                 sb.insert(cursor, text);
                 binding.keyword.setText(sb.toString());
                 binding.keyword.setSelection(cursor + 1);

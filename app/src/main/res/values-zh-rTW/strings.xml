@@ -19,6 +19,11 @@
     <!-- Vod -->
     <string name="vod_last">上次看到<xliff:g name="name">%s</xliff:g></string>
 
+    <!-- Search -->
+    <string name="search_hint">輸入關鍵字…</string>
+    <string name="search_clear">清空</string>
+    <string name="search_remote">遠程</string>
+
     <!-- Push -->
     <string name="push_info">手機或電腦連接同一個區域網路，掃描 QR Code 或瀏覽器輸入網址\n<xliff:g name="name">%s</xliff:g></string>
 

@@ -46,7 +46,7 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
     public static void start(Activity activity, String keyword) {
         Intent intent = new Intent(activity, SearchActivity.class);
         intent.putExtra("keyword", keyword);
-        //activity.startActivity(intent);
+        activity.startActivity(intent);
     }
 
     @Override
@@ -57,6 +57,7 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
     @Override
     protected void initView() {
         CustomKeyboard.init(mBinding);
+        mBinding.keyword.requestFocus();
         setRecyclerView();
         setViewModel();
         setSite();
@@ -65,6 +66,8 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
     @Override
     protected void initEvent() {
         mBinding.search.setOnClickListener(view -> onSearch());
+        mBinding.clear.setOnClickListener(view -> mBinding.keyword.setText(""));
+        mBinding.remote.setOnClickListener(view -> PushActivity.start(this));
         mBinding.keyword.setOnEditorActionListener((textView, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) mBinding.search.performClick();
             return true;

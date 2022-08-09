@@ -26,26 +26,30 @@
     <RelativeLayout
         android:id="@+id/layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:gravity="center">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:id="@+id/search_bar"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/keyboard"
-            android:layout_centerHorizontal="true"
+            android:layout_alignStart="@+id/keyboard"
+            android:layout_alignEnd="@+id/keyboard"
             android:layout_marginStart="24dp"
             android:layout_marginEnd="24dp"
             android:orientation="horizontal">
 
             <com.fongmi.android.tv.ui.custom.CustomEditText
                 android:id="@+id/keyword"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
+                android:layout_weight="1"
                 android:background="@drawable/selector_item"
-                android:hint="輸入關鍵字..."
+                android:hint="@string/search_hint"
+                android:imeOptions="actionDone"
                 android:inputType="textCapCharacters|textAutoCorrect|textAutoComplete"
-                android:maxLength="20"
+                android:maxLength="30"
                 android:singleLine="true"
                 android:textColor="@color/white"
                 android:textColorHint="@color/white"
@@ -55,10 +59,34 @@
                 android:id="@+id/search"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
                 android:background="@drawable/selector_item"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
-                android:text="搜尋"
+                android:text="@string/home_search"
+                android:textColor="@color/white"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:background="@drawable/selector_item"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:text="@string/search_clear"
+                android:textColor="@color/white"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/remote"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/selector_item"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:text="@string/search_remote"
                 android:textColor="@color/white"
                 android:textSize="18sp" />
 
@@ -68,8 +96,7 @@
             android:id="@+id/keyboard"
             android:layout_width="556dp"
             android:layout_height="244dp"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/search_bar"
             android:clipChildren="false"
             android:clipToPadding="false"
             android:padding="24dp"

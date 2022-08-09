@@ -19,6 +19,11 @@
     <!-- Vod -->
     <string name="vod_last">Last seen <xliff:g name="name">%s</xliff:g></string>
 
+    <!-- Search -->
+    <string name="search_hint">Keywords…</string>
+    <string name="search_clear">Clear</string>
+    <string name="search_remote">Remote</string>
+
     <!-- Push -->
     <string name="push_info">Connect phone or pc to LAN and scan QR Code or enter the URL in browser\n<xliff:g name="name">%s</xliff:g></string>
 
