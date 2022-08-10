@@ -2,6 +2,7 @@ package com.fongmi.android.tv.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -39,12 +40,17 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
     private ExecutorService mService;
     private List<Site> mSites;
 
+    private String getKeyword() {
+        return getIntent().getStringExtra("keyword");
+    }
+
     public static void start(Activity activity) {
         start(activity, "");
     }
 
     public static void start(Activity activity, String keyword) {
         Intent intent = new Intent(activity, SearchActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         intent.putExtra("keyword", keyword);
         activity.startActivity(intent);
     }
@@ -55,11 +61,19 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
     }
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        checkKeyword();
+    }
+
+    @Override
     protected void initView() {
         CustomKeyboard.init(mBinding);
         mBinding.keyword.requestFocus();
         setRecyclerView();
         setViewModel();
+        checkKeyword();
         setSite();
     }
 
@@ -84,7 +98,9 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
 
     private void setViewModel() {
         mSiteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
-        mSiteViewModel.result.observe(this, this::addVideo);
+        mSiteViewModel.result.observe(this, result -> {
+            if (mService != null) addVideo(result);
+        });
     }
 
     private void setSite() {
@@ -93,6 +109,15 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
         if (!mSites.contains(ApiConfig.get().getHome())) return;
         mSites.remove(ApiConfig.get().getHome());
         mSites.add(0, ApiConfig.get().getHome());
+    }
+
+    private void checkKeyword() {
+        if (getKeyword().isEmpty()) return;
+        stopSearch();
+        mAdapter.clear();
+        mBinding.keyword.setText(getKeyword());
+        mBinding.keyword.setSelection(mBinding.keyword.length());
+        new Handler().postDelayed(this::onSearch, 250);
     }
 
     private void addVideo(Result result) {
@@ -122,14 +147,12 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
     }
 
     private void showProgress() {
-        mBinding.keyword.setText("");
-        mBinding.progressLayout.showProgress();
         mBinding.layout.setVisibility(View.GONE);
         mBinding.progressLayout.setVisibility(View.VISIBLE);
+        mBinding.progressLayout.showProgress();
     }
 
     private void hideProgress() {
-        mAdapter.clear();
         mBinding.layout.setVisibility(View.VISIBLE);
         mBinding.progressLayout.setVisibility(View.INVISIBLE);
     }
@@ -146,6 +169,7 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
     @Override
     public void onBackPressed() {
         if (isProgressVisible()) {
+            mAdapter.clear();
             hideProgress();
             stopSearch();
         } else {

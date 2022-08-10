@@ -90,6 +90,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
 
     public static void start(Activity activity, String key, String id) {
         Intent intent = new Intent(activity, DetailActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         intent.putExtra("key", key);
         intent.putExtra("id", id);
         activity.startActivity(intent);
@@ -98,6 +99,14 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
     @Override
     protected ViewBinding getBinding() {
         return mBinding = ActivityDetailBinding.inflate(getLayoutInflater());
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        mBinding.progressLayout.showProgress();
+        setIntent(intent);
+        getDetail();
     }
 
     @Override
@@ -190,7 +199,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
         setText(mBinding.site, R.string.detail_site, ApiConfig.getSiteName(getKey()));
         setText(mBinding.director, R.string.detail_director, item.getVodDirector());
         setText(mBinding.content, R.string.detail_content, Html.fromHtml(item.getVodContent()).toString());
-        mFlagAdapter.addAll(0, item.getVodFlags());
+        mFlagAdapter.setItems(item.getVodFlags(), null);
         mBinding.video.requestFocus();
         checkHistory();
     }

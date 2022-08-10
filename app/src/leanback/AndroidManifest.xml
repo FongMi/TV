@@ -37,6 +37,7 @@
         <activity
             android:name=".ui.activity.DetailActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
+            android:launchMode="singleTop"
             android:screenOrientation="sensorLandscape" />
 
         <activity
@@ -52,6 +53,7 @@
         <activity
             android:name=".ui.activity.SearchActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
+            android:launchMode="singleTop"
             android:screenOrientation="sensorLandscape" />
 
         <activity
