@@ -65,9 +65,9 @@
     <string name="error_play">不支援的影片格式</string>
 
     <string-array name="select_thumbnail">
-        <item>高质量</item>
-        <item>中质量</item>
         <item>低质量</item>
+        <item>中质量</item>
+        <item>高质量</item>
     </string-array>
 
     <string-array name="select_scale">

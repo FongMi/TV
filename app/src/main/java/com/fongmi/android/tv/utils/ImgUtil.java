@@ -19,12 +19,12 @@ import com.fongmi.android.tv.R;
 public class ImgUtil {
 
     private static int getWidth() {
-        float thumbnail = 1 - Prefers.getThumbnail() * 0.3f;
+        float thumbnail = 0.3f * Prefers.getThumbnail() + 0.4f;
         return ResUtil.dp2px((int) Math.ceil(300 * thumbnail));
     }
 
     private static int getHeight() {
-        float thumbnail = 1 - Prefers.getThumbnail() * 0.3f;
+        float thumbnail = 0.3f * Prefers.getThumbnail() + 0.4f;
         return ResUtil.dp2px((int) Math.ceil(400 * thumbnail));
     }
 

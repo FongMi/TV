@@ -65,9 +65,9 @@
     <string name="error_play">Unsupported video format</string>
 
     <string-array name="select_thumbnail">
-        <item>High</item>
-        <item>Medium</item>
         <item>Low</item>
+        <item>Medium</item>
+        <item>High</item>
     </string-array>
 
     <string-array name="select_scale">
