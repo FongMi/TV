@@ -16,6 +16,8 @@ public class History {
     private String vodRemarks;
     private String episodeUrl;
     private long createTime;
+    private long opening;
+    private long ending;
     private long duration;
 
     public History() {
@@ -76,6 +78,22 @@ public class History {
 
     public void setCreateTime(long createTime) {
         this.createTime = createTime;
+    }
+
+    public long getOpening() {
+        return opening;
+    }
+
+    public void setOpening(long opening) {
+        this.opening = opening;
+    }
+
+    public long getEnding() {
+        return ending;
+    }
+
+    public void setEnding(long ending) {
+        this.ending = ending;
     }
 
     public long getDuration() {

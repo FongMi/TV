@@ -41,9 +41,9 @@
     <string name="play_next">Next</string>
     <string name="play_prev">Prev</string>
     <string name="play_ready">Ready to play: <xliff:g name="name">%s</xliff:g></string>
-    <string name="play_reset">Replay</string>
-    <string name="play_speed">Speed</string>
-    <string name="play_scale">Scale</string>
+    <string name="play_replay">Replay</string>
+    <string name="play_reset">Reset</string>
+    <string name="play_oped">OP&amp;ED</string>
 
     <!-- Setting -->
     <string name="setting_site">Home site</string>
@@ -63,6 +63,9 @@
     <string name="error_play_prev">It\'s the first episode!</string>
     <string name="error_play_parse">Unable to parse url</string>
     <string name="error_play">Unsupported video format</string>
+
+    <!-- UNIT -->
+    <string name="second"><xliff:g name="name">%s</xliff:g> s</string>
 
     <string-array name="select_thumbnail">
         <item>Low</item>

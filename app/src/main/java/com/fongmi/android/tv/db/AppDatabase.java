@@ -13,7 +13,7 @@ import com.fongmi.android.tv.db.dao.HistoryDao;
 @Database(entities = {History.class}, version = AppDatabase.VERSION, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
-    public static final int VERSION = 2;
+    public static final int VERSION = 3;
 
     private static volatile AppDatabase instance;
 

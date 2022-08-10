@@ -82,6 +82,10 @@ public class Players implements Player.Listener {
         time = getCurrentPosition() + time;
         if (time > exoPlayer.getDuration()) time = exoPlayer.getDuration();
         else if (time < 0) time = 0;
+        return getStringForTime(time);
+    }
+
+    public String getStringForTime(long time) {
         return Util.getStringForTime(builder, formatter, time);
     }
 

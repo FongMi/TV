@@ -41,9 +41,9 @@
     <string name="play_next">下一集</string>
     <string name="play_prev">上一集</string>
     <string name="play_ready">准备播放：<xliff:g name="name">%s</xliff:g></string>
-    <string name="play_reset">重播本集</string>
-    <string name="play_speed">倍速</string>
-    <string name="play_scale">缩放</string>
+    <string name="play_replay">重播本集</string>
+    <string name="play_reset">重置</string>
+    <string name="play_oped">片头片尾</string>
 
     <!-- Setting -->
     <string name="setting_site">首页</string>
@@ -63,6 +63,9 @@
     <string name="error_play_prev">已经是第一集了！</string>
     <string name="error_play_parse">无法解析网址</string>
     <string name="error_play">不支援的影片格式</string>
+
+    <!-- UNIT -->
+    <string name="second"><xliff:g name="name">%s</xliff:g> 秒</string>
 
     <string-array name="select_thumbnail">
         <item>低质量</item>

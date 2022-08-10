@@ -74,4 +74,12 @@ public class Prefers {
     public static void putThumbnail(int thumbnail) {
         Prefers.put("thumbnail", thumbnail);
     }
+
+    public static int getInterval() {
+        return Prefers.getInt("interval", 15);
+    }
+
+    public static void putInterval(int interval) {
+        Prefers.put("interval", interval);
+    }
 }

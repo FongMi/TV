@@ -61,6 +61,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
     private boolean mFullscreen;
     private KeyDown mKeyDown;
     private Handler mHandler;
+    private History mHistory;
     private int mCurrent;
 
     private String getKey() {
@@ -127,7 +128,11 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
         mControl.next.setOnClickListener(view -> onNext());
         mControl.prev.setOnClickListener(view -> onPrev());
         mControl.scale.setOnClickListener(view -> onScale());
-        mControl.reset.setOnClickListener(view -> getPlayer(true));
+        mControl.reset.setOnClickListener(view -> onReset());
+        mControl.ending.setOnClickListener(view -> onEnding());
+        mControl.opening.setOnClickListener(view -> onOpening());
+        mControl.interval.setOnClickListener(view -> onInterval());
+        mControl.replay.setOnClickListener(view -> getPlayer(true));
         mControl.speed.setOnClickListener(view -> mControl.speed.setText(Players.get().addSpeed()));
         mBinding.flag.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
@@ -161,6 +166,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
     private void setVideoView() {
         mControl = ViewControllerBottomBinding.bind(mBinding.video.findViewById(com.google.android.exoplayer2.ui.R.id.exo_controller));
         mControl.scale.setText(ResUtil.getStringArray(R.array.select_scale)[Prefers.getScale()]);
+        mControl.interval.setText(ResUtil.getString(R.string.second, Prefers.getInterval()));
         mControl.speed.setText(Players.get().getSpeed());
         mBinding.video.setResizeMode(Prefers.getScale());
         mBinding.video.setPlayer(Players.get().exo());
@@ -170,12 +176,12 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
         mSiteViewModel.detailContent(getKey(), getId());
     }
 
-    private void getPlayer(boolean reset) {
+    private void getPlayer(boolean replay) {
         Vod.Flag.Episode item = (Vod.Flag.Episode) mEpisodeAdapter.get(getEpisodePosition());
         if (mFullscreen) Notify.show(ResUtil.getString(R.string.play_ready, item.getName()));
         mSiteViewModel.playerContent(getKey(), getVodFlag().getFlag(), item.getUrl());
         mBinding.progress.getRoot().setVisibility(View.VISIBLE);
-        updateHistory(item, reset);
+        updateHistory(item, replay);
     }
 
     private void setViewModel() {
@@ -277,45 +283,74 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
         Prefers.putScale(scale);
     }
 
+    private void onOpening() {
+        mHistory.setOpening(mHistory.getOpening() + Prefers.getInterval() * 1000L);
+        if (mHistory.getOpening() > 5 * 60 * 1000) mHistory.setOpening(0);
+        mControl.opening.setText(Players.get().getStringForTime(mHistory.getOpening()));
+    }
+
+    private void onEnding() {
+        mHistory.setEnding(mHistory.getEnding() + Prefers.getInterval() * 1000L);
+        if (mHistory.getEnding() > 5 * 60 * 1000) mHistory.setEnding(0);
+        mControl.ending.setText(Players.get().getStringForTime(mHistory.getEnding()));
+    }
+
+    private void onInterval() {
+        int interval = Prefers.getInterval() * 2;
+        if (interval > 60) interval = 15;
+        Prefers.putInterval(interval);
+        mControl.interval.setText(ResUtil.getString(R.string.second, Prefers.getInterval()));
+    }
+
+    private void onReset() {
+        mHistory.setEnding(0);
+        mHistory.setOpening(0);
+        mControl.ending.setText(Players.get().getStringForTime(mHistory.getEnding()));
+        mControl.opening.setText(Players.get().getStringForTime(mHistory.getOpening()));
+        AppDatabase.get().getHistoryDao().update(mHistory);
+    }
+
     private void checkHistory() {
-        History history = AppDatabase.get().getHistoryDao().find(getHistoryKey());
-        if (history != null) {
-            setFlagActivated(history.getFlag());
-            setEpisodeActivated(history.getEpisode());
+        mHistory = AppDatabase.get().getHistoryDao().find(getHistoryKey());
+        if (mHistory != null) {
+            setFlagActivated(mHistory.getFlag());
+            setEpisodeActivated(mHistory.getEpisode());
+            mControl.opening.setText(Players.get().getStringForTime(mHistory.getOpening()));
+            mControl.ending.setText(Players.get().getStringForTime(mHistory.getEnding()));
         } else {
-            createHistory();
+            mHistory = createHistory();
             setFlagActivated((Vod.Flag) mFlagAdapter.get(0));
             setEpisodeActivated((Vod.Flag.Episode) mEpisodeAdapter.get(0));
+            mControl.opening.setText(Players.get().getStringForTime(0));
+            mControl.ending.setText(Players.get().getStringForTime(0));
         }
     }
 
-    private void createHistory() {
+    private History createHistory() {
         History history = new History();
         history.setKey(getHistoryKey());
         history.setVodPic(mBinding.video.getTag().toString());
         history.setVodName(mBinding.name.getText().toString());
         AppDatabase.get().getHistoryDao().insertOrUpdate(history);
+        return history;
     }
 
-    private void updateHistory(Vod.Flag.Episode item, boolean reset) {
-        History history = AppDatabase.get().getHistoryDao().find(getHistoryKey());
-        reset = reset || !item.getUrl().equals(history.getEpisodeUrl());
-        long duration = reset ? 0 : history.getDuration();
-        history.setDuration(duration);
-        history.setEpisodeUrl(item.getUrl());
-        history.setVodRemarks(item.getName());
-        history.setVodFlag(getVodFlag().getFlag());
-        history.setCreateTime(System.currentTimeMillis());
-        AppDatabase.get().getHistoryDao().update(history);
+    private void updateHistory(Vod.Flag.Episode item, boolean replay) {
+        replay = replay || !item.getUrl().equals(mHistory.getEpisodeUrl());
+        long duration = replay ? 0 : mHistory.getDuration();
+        mHistory.setDuration(duration);
+        mHistory.setEpisodeUrl(item.getUrl());
+        mHistory.setVodRemarks(item.getName());
+        mHistory.setVodFlag(getVodFlag().getFlag());
+        mHistory.setCreateTime(System.currentTimeMillis());
+        AppDatabase.get().getHistoryDao().update(mHistory);
         EventBus.getDefault().post(RefreshEvent.history());
     }
 
     private void updateHistory() {
-        History history = AppDatabase.get().getHistoryDao().find(getHistoryKey());
-        if (history != null) {
-            history.setDuration(Players.get().getCurrentPosition());
-            AppDatabase.get().getHistoryDao().update(history);
-        }
+        if (mHistory == null) return;
+        mHistory.setDuration(Players.get().getCurrentPosition());
+        AppDatabase.get().getHistoryDao().update(mHistory);
     }
 
     private final Runnable mHideCenter = new Runnable() {

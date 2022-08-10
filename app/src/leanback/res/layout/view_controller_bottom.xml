@@ -23,7 +23,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
+                android:layout_marginEnd="8dp"
                 android:text="@string/play"
                 android:textColor="@color/grey_700"
                 android:textSize="16sp" />
@@ -54,30 +54,22 @@
                 android:textColor="@color/white" />
 
             <TextView
-                android:id="@+id/reset"
+                android:id="@+id/replay"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
+                android:layout_marginEnd="8dp"
                 android:background="@drawable/selector_text"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
                 android:nextFocusDown="@id/exo_progress"
-                android:text="@string/play_reset"
+                android:text="@string/play_replay"
                 android:textColor="@color/white" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
-                android:text="@string/play_speed"
-                android:textColor="@color/grey_700"
-                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/speed"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
+                android:layout_marginEnd="8dp"
                 android:background="@drawable/selector_text"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
@@ -86,25 +78,77 @@
                 tools:text="1.00" />
 
             <TextView
+                android:id="@+id/scale"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
-                android:text="@string/play_scale"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/selector_text"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:nextFocusRight="@id/opening"
+                android:nextFocusDown="@id/exo_progress"
+                android:textColor="@color/white"
+                tools:text="預設" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="@string/play_oped"
                 android:textColor="@color/grey_700"
                 android:textSize="16sp" />
 
             <TextView
-                android:id="@+id/scale"
+                android:id="@+id/opening"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
+                android:layout_marginEnd="8dp"
                 android:background="@drawable/selector_text"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
-                android:nextFocusRight="@id/scale"
+                android:nextFocusRight="@id/ending"
                 android:nextFocusDown="@id/exo_progress"
                 android:textColor="@color/white"
-                tools:text="預設" />
+                tools:text="00:00" />
+
+            <TextView
+                android:id="@+id/ending"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/selector_text"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:nextFocusRight="@id/interval"
+                android:nextFocusDown="@id/exo_progress"
+                android:textColor="@color/white"
+                tools:text="00:00" />
+
+            <TextView
+                android:id="@+id/interval"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/selector_text"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:nextFocusRight="@id/reset"
+                android:nextFocusDown="@id/exo_progress"
+                android:textColor="@color/white"
+                tools:text="15秒" />
+
+            <TextView
+                android:id="@+id/reset"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/selector_text"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:nextFocusRight="@id/reset"
+                android:nextFocusDown="@id/exo_progress"
+                android:text="@string/play_reset"
+                android:textColor="@color/white" />
 
         </LinearLayout>
 
