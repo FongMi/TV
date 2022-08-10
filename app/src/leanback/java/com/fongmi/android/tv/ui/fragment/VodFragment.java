@@ -73,7 +73,6 @@ public class VodFragment extends Fragment implements CustomScroller.Callback, Vo
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         setRecyclerView();
         setViewModel();
-        setFilter();
         getVideo();
     }
 
@@ -93,16 +92,6 @@ public class VodFragment extends Fragment implements CustomScroller.Callback, Vo
             mScroller.endLoading(result.getList().isEmpty());
             if (result.getList().size() > 0) addVideo(result);
         });
-    }
-
-    private void setFilter() {
-        for (Filter filter : mFilters) {
-            FilterPresenter presenter = new FilterPresenter(filter.getKey());
-            ArrayObjectAdapter adapter = new ArrayObjectAdapter(presenter);
-            presenter.setOnClickListener((key, item) -> setClick(adapter, key, item));
-            adapter.addAll(0, filter.getValue());
-            mAdapter.add(new ListRow(adapter));
-        }
     }
 
     private void setClick(ArrayObjectAdapter adapter, String key, Filter.Value item) {
@@ -133,6 +122,27 @@ public class VodFragment extends Fragment implements CustomScroller.Callback, Vo
             rows.add(new ListRow(adapter));
         }
         mAdapter.addAll(mAdapter.size(), rows);
+    }
+
+    private void addFilter() {
+        List<ListRow> rows = new ArrayList<>();
+        for (Filter filter : mFilters) {
+            FilterPresenter presenter = new FilterPresenter(filter.getKey());
+            ArrayObjectAdapter adapter = new ArrayObjectAdapter(presenter);
+            presenter.setOnClickListener((key, item) -> setClick(adapter, key, item));
+            adapter.addAll(0, filter.getValue());
+            rows.add(new ListRow(adapter));
+        }
+        mAdapter.addAll(0, rows);
+    }
+
+    public void toggleFilter(boolean open) {
+        if (open) {
+            addFilter();
+            mBinding.recycler.postDelayed(() -> mBinding.recycler.smoothScrollToPosition(0), 50);
+        } else {
+            mAdapter.removeItems(0, mFilters.size());
+        }
     }
 
     @Override

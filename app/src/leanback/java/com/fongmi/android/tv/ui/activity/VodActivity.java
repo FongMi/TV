@@ -32,6 +32,8 @@ public class VodActivity extends BaseActivity {
 
     private ActivityVodBinding mBinding;
     private TypePresenter mTypePresenter;
+    private ArrayObjectAdapter mAdapter;
+    private PageAdapter mPageAdapter;
     private Result mResult;
     private View mOldView;
 
@@ -54,14 +56,13 @@ public class VodActivity extends BaseActivity {
     @Override
     protected void initView() {
         mResult = Result.fromJson(getResult());
-        sortCategories();
         setRecyclerView();
         setPager();
+        setTypes();
     }
 
     @Override
     protected void initEvent() {
-        mTypePresenter.setOnClickListener((item) -> mBinding.pager.setCurrentItem(mResult.getTypes().indexOf(item)));
         mBinding.pager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
@@ -78,25 +79,39 @@ public class VodActivity extends BaseActivity {
                 mOldView.setActivated(true);
             }
         });
-    }
-
-    private void sortCategories() {
-        List<Class> newTypes = new ArrayList<>();
-        for (String cate : ApiConfig.get().getHome().getCategories()) for (Class type : mResult.getTypes()) if (cate.equals(type.getTypeName())) newTypes.add(type);
-        if (newTypes.size() > 0) mResult.setTypes(newTypes);
+        mTypePresenter.setOnClickListener(item -> {
+            int index = mResult.getTypes().indexOf(item);
+            if (index != mBinding.pager.getCurrentItem()) mBinding.pager.setCurrentItem(index);
+            else item.setFilter(item.getFilter() == null ? null : !item.getFilter());
+            if (item.getFilter() != null) updateFilter(item.getFilter());
+        });
     }
 
     private void setRecyclerView() {
         mBinding.recycler.setHorizontalSpacing(ResUtil.dp2px(16));
         mBinding.recycler.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-        ArrayObjectAdapter adapter = new ArrayObjectAdapter(mTypePresenter = new TypePresenter());
-        adapter.addAll(0, mResult.getTypes());
-        ItemBridgeAdapter bridgeAdapter = new ItemBridgeAdapter(adapter);
-        mBinding.recycler.setAdapter(bridgeAdapter);
+        mBinding.recycler.setAdapter(new ItemBridgeAdapter(mAdapter = new ArrayObjectAdapter(mTypePresenter = new TypePresenter())));
     }
 
     private void setPager() {
-        mBinding.pager.setAdapter(new PageAdapter(getSupportFragmentManager()));
+        mBinding.pager.setAdapter(mPageAdapter = new PageAdapter(getSupportFragmentManager()));
+    }
+
+    private void setTypes() {
+        List<Class> newTypes = new ArrayList<>();
+        for (String cate : ApiConfig.get().getHome().getCategories()) for (Class type : mResult.getTypes()) if (cate.equals(type.getTypeName())) newTypes.add(type);
+        if (newTypes.size() > 0) mResult.setTypes(newTypes);
+        for (Class type : mResult.getTypes()) if (mResult.getFilters().containsKey(type.getTypeId())) type.setFilter(false);
+        mAdapter.setItems(mResult.getTypes(), null);
+    }
+
+    private void updateFilter(boolean filter) {
+        mAdapter.notifyArrayItemRangeChanged(0, mAdapter.size());
+        getVodFragment().toggleFilter(filter);
+    }
+
+    private VodFragment getVodFragment() {
+        return (VodFragment) mPageAdapter.instantiateItem(mBinding.pager, mBinding.pager.getCurrentItem());
     }
 
     class PageAdapter extends FragmentStatePagerAdapter {

@@ -17,12 +17,22 @@ public class Class {
     @SerializedName("type_name")
     private String typeName;
 
+    private Boolean filter;
+
     public String getTypeId() {
         return typeId;
     }
 
     public String getTypeName() {
         return typeName;
+    }
+
+    public void setFilter(Boolean filter) {
+        this.filter = filter;
+    }
+
+    public Boolean getFilter() {
+        return filter;
     }
 
     @Override
