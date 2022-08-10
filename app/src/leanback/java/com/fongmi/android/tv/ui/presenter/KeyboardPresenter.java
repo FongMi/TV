@@ -1,6 +1,7 @@
 package com.fongmi.android.tv.ui.presenter;
 
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -17,7 +18,10 @@ public class KeyboardPresenter extends Presenter {
     }
 
     public interface OnClickListener {
-        void onItemClick(String item);
+
+        void onTextClick(String text);
+
+        void onIconClick(int resId);
     }
 
     @Override
@@ -27,10 +31,20 @@ public class KeyboardPresenter extends Presenter {
 
     @Override
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object object) {
-        String item = (String) object;
         ViewHolder holder = (ViewHolder) viewHolder;
-        setOnClickListener(holder, view -> mListener.onItemClick(item));
-        holder.binding.text.setText(item);
+        if (object instanceof String) {
+            String text = (String) object;
+            holder.binding.text.setText(text);
+            holder.binding.icon.setVisibility(View.GONE);
+            holder.binding.text.setVisibility(View.VISIBLE);
+            setOnClickListener(holder, view -> mListener.onTextClick(text));
+        } else {
+            int resId = (int) object;
+            holder.binding.icon.setImageResource(resId);
+            holder.binding.text.setVisibility(View.GONE);
+            holder.binding.icon.setVisibility(View.VISIBLE);
+            setOnClickListener(holder, view -> mListener.onIconClick(resId));
+        }
     }
 
     @Override

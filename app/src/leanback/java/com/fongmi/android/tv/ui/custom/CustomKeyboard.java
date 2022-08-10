@@ -1,9 +1,12 @@
 package com.fongmi.android.tv.ui.custom;
 
+import android.annotation.SuppressLint;
+
 import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.ItemBridgeAdapter;
 import androidx.leanback.widget.ListRow;
 
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.ActivitySearchBinding;
 import com.fongmi.android.tv.ui.presenter.KeyboardPresenter;
 import com.fongmi.android.tv.utils.ResUtil;
@@ -14,11 +17,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class CustomKeyboard implements KeyboardPresenter.OnClickListener {
-
-    private static final String LEFT = "◁";
-    private static final String RIGHT = "▷";
-    private static final String BACK = "⌫";
-    private static final String ENTER = "⏎";
 
     private final ActivitySearchBinding binding;
 
@@ -40,9 +38,9 @@ public class CustomKeyboard implements KeyboardPresenter.OnClickListener {
     }
 
     private List<ListRow> getRows() {
-        List<String> keys = Arrays.asList("1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", LEFT, RIGHT, BACK, ENTER);
+        List<Object> keys = Arrays.asList("1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", R.drawable.ic_keyboard_left, R.drawable.ic_keyboard_right, R.drawable.ic_keyboard_back, R.drawable.ic_keyboard_enter);
         List<ListRow> rows = new ArrayList<>();
-        for (List<String> items : Lists.partition(keys, 10)) {
+        for (List<Object> items : Lists.partition(keys, 10)) {
             ArrayObjectAdapter adapter = new ArrayObjectAdapter(new KeyboardPresenter(this));
             adapter.addAll(0, items);
             rows.add(new ListRow(adapter));
@@ -51,30 +49,35 @@ public class CustomKeyboard implements KeyboardPresenter.OnClickListener {
     }
 
     @Override
-    public void onItemClick(String text) {
+    public void onTextClick(String text) {
         StringBuilder sb = new StringBuilder(binding.keyword.getText().toString());
         int cursor = binding.keyword.getSelectionStart();
-        switch (text) {
-            case ENTER:
+        if (binding.keyword.length() > 29) return;
+        sb.insert(cursor, text);
+        binding.keyword.setText(sb.toString());
+        binding.keyword.setSelection(cursor + 1);
+    }
+
+    @Override
+    @SuppressLint("NonConstantResourceId")
+    public void onIconClick(int resId) {
+        StringBuilder sb = new StringBuilder(binding.keyword.getText().toString());
+        int cursor = binding.keyword.getSelectionStart();
+        switch (resId) {
+            case R.drawable.ic_keyboard_enter:
                 binding.search.performClick();
                 break;
-            case LEFT:
+            case R.drawable.ic_keyboard_left:
                 binding.keyword.setSelection(--cursor < 0 ? 0 : cursor);
                 break;
-            case RIGHT:
+            case R.drawable.ic_keyboard_right:
                 binding.keyword.setSelection(++cursor > binding.keyword.length() ? binding.keyword.length() : cursor);
                 break;
-            case BACK:
+            case R.drawable.ic_keyboard_back:
                 if (cursor == 0) return;
                 sb.deleteCharAt(cursor - 1);
                 binding.keyword.setText(sb.toString());
                 binding.keyword.setSelection(cursor - 1);
-                break;
-            default:
-                if (binding.keyword.length() > 29) return;
-                sb.insert(cursor, text);
-                binding.keyword.setText(sb.toString());
-                binding.keyword.setSelection(cursor + 1);
                 break;
         }
     }
