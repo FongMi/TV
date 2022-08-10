@@ -375,6 +375,18 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        Players.get().pause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Players.get().play();
+    }
+
+    @Override
     public void onBackPressed() {
         if (mBinding.video.isControllerFullyVisible()) {
             mBinding.video.hideController();
