@@ -364,13 +364,15 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
     private final Runnable mProgress = new Runnable() {
         @Override
         public void run() {
-            if (mHistory.getOpening() >= Players.get().getCurrentPosition()) {
-                Players.get().seekTo(mHistory.getOpening());
-            }
-            if (Players.get().getDuration() > 0 && mHistory.getEnding() + Players.get().getCurrentPosition() >= Players.get().getDuration()) {
+            boolean keep = true;
+            long duration = Players.get().getDuration();
+            long current = Players.get().getCurrentPosition();
+            if (mHistory.getOpening() >= current) Players.get().seekTo(mHistory.getOpening());
+            if (duration > 0 && mHistory.getEnding() + current >= duration) {
+                keep = false;
                 onNext();
             }
-            mHandler.postDelayed(mProgress, 1000);
+            if (keep) mHandler.postDelayed(mProgress, 1000);
         }
     };
 
