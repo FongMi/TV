@@ -21,6 +21,6 @@ public abstract class Callback implements okhttp3.Callback {
     }
 
     @Override
-    public void onResponse(@NonNull Call call, @NonNull Response response) {
+    public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
     }
 }

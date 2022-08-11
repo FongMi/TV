@@ -179,7 +179,7 @@
                 android:focusableInTouchMode="true"
                 android:nextFocusLeft="@id/exo_progress"
                 android:nextFocusRight="@id/exo_progress"
-                android:nextFocusUp="@+id/next"
+                android:nextFocusUp="@id/next"
                 android:nextFocusDown="@id/exo_progress"
                 app:buffered_color="@color/grey_700"
                 app:played_color="@color/blue_700"

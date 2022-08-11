@@ -1,0 +1,37 @@
+package com.fongmi.android.tv.bean;
+
+import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Suggest {
+
+    @SerializedName("data")
+    private List<Data> data;
+
+    private static Suggest objectFrom(String str) {
+        return new Gson().fromJson(str, Suggest.class);
+    }
+
+    public static List<String> get(String str) {
+        List<String> items = new ArrayList<>();
+        for (Data item : objectFrom(str).getData()) items.add(item.getName());
+        return items;
+    }
+
+    private List<Data> getData() {
+        return data;
+    }
+
+    static class Data {
+
+        @SerializedName("name")
+        private String name;
+
+        private String getName() {
+            return name;
+        }
+    }
+}

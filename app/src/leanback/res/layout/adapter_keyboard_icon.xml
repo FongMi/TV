@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/icon"
+    android:layout_width="44dp"
+    android:layout_height="44dp"
+    android:background="@drawable/selector_keyboard"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:padding="6dp"
+    tools:src="@drawable/ic_keyboard_back" />
