@@ -26,6 +26,7 @@ import com.fongmi.android.tv.ui.presenter.TypePresenter;
 import com.fongmi.android.tv.utils.ResUtil;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class VodActivity extends BaseActivity {
@@ -44,6 +45,7 @@ public class VodActivity extends BaseActivity {
     public static void start(Activity activity, Result result) {
         if (result == null || result.getTypes().isEmpty()) return;
         Intent intent = new Intent(activity, VodActivity.class);
+        result.setList(Collections.emptyList());
         intent.putExtra("result", result.toString());
         activity.startActivity(intent);
     }
