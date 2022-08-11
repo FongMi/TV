@@ -45,7 +45,9 @@ public class VodPresenter extends Presenter {
         Vod item = (Vod) object;
         ViewHolder holder = (ViewHolder) viewHolder;
         holder.binding.name.setText(item.getVodName());
+        holder.binding.year.setText(item.getVodYear());
         holder.binding.remark.setText(item.getVodRemarks());
+        holder.binding.year.setVisibility(item.getYearVisible());
         holder.binding.remark.setVisibility(item.getRemarkVisible());
         ImgUtil.load(item.getVodName(), item.getVodPic(), holder.binding.image);
         setOnClickListener(holder, view -> mListener.onItemClick(item));

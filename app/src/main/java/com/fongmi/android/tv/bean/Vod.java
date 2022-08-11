@@ -135,6 +135,10 @@ public class Vod {
         this.site = site;
     }
 
+    public int getYearVisible() {
+        return getVodYear().isEmpty() ? View.GONE : View.VISIBLE;
+    }
+
     public int getRemarkVisible() {
         return getVodRemarks().isEmpty() ? View.GONE : View.VISIBLE;
     }
