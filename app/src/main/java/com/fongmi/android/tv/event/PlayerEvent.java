@@ -4,7 +4,7 @@ import android.text.TextUtils;
 
 public class PlayerEvent {
 
-    private int state;
+    private final int state;
     private String msg;
 
     public PlayerEvent(int state) {
@@ -12,6 +12,7 @@ public class PlayerEvent {
     }
 
     public PlayerEvent(String msg) {
+        this.state = -1;
         this.msg = msg;
     }
 

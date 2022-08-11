@@ -367,7 +367,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
             if (mHistory.getOpening() >= Players.get().getCurrentPosition()) {
                 Players.get().seekTo(mHistory.getOpening());
             }
-            if (mHistory.getEnding() + Players.get().getCurrentPosition() >= Players.get().getDuration()) {
+            if (Players.get().getDuration() > 0 && mHistory.getEnding() + Players.get().getCurrentPosition() >= Players.get().getDuration()) {
                 onNext();
             }
             mHandler.postDelayed(mProgress, 1000);
@@ -376,7 +376,6 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onPlayerEvent(PlayerEvent event) {
-        Notify.show(event.getMsg());
         switch (event.getState()) {
             case 0:
                 checkPosition();
@@ -389,6 +388,10 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
                 break;
             case Player.STATE_ENDED:
                 onNext();
+                break;
+            default:
+                mBinding.progress.getRoot().setVisibility(View.GONE);
+                Notify.show(event.getMsg());
                 break;
         }
     }
