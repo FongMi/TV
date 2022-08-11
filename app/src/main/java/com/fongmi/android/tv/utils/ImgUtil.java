@@ -2,7 +2,6 @@ package com.fongmi.android.tv.utils;
 
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
-import android.util.Log;
 import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
