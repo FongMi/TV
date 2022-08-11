@@ -1,6 +1,7 @@
 package com.fongmi.android.tv.utils;
 
 import android.graphics.drawable.Drawable;
+import android.text.TextUtils;
 import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
@@ -33,7 +34,8 @@ public class ImgUtil {
     }
 
     public static void load(String vodName, String vodPic, ImageView view) {
-        Glide.with(App.get()).load(vodPic).override(getWidth(), getHeight()).signature(new ObjectKey(vodPic + "_" + Prefers.getThumbnail())).placeholder(R.drawable.ic_img_loading).listener(getListener(vodName, view)).into(view);
+        if (TextUtils.isEmpty(vodPic)) onLoadFailed(vodName, view);
+        else Glide.with(App.get()).load(vodPic).override(getWidth(), getHeight()).signature(new ObjectKey(vodPic + "_" + Prefers.getThumbnail())).placeholder(R.drawable.ic_img_loading).listener(getListener(vodName, view)).into(view);
     }
 
     private static RequestListener<Drawable> getListener(String vodName, ImageView view) {

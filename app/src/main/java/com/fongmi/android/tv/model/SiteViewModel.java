@@ -15,6 +15,7 @@ import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderDebug;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -93,7 +94,7 @@ public class SiteViewModel extends ViewModel {
         execute(result, () -> {
             if (site.getType() == 3) {
                 Spider spider = ApiConfig.get().getCSP(site);
-                String detailContent = spider.detailContent(List.of(id));
+                String detailContent = spider.detailContent(Arrays.asList(id));
                 SpiderDebug.log(detailContent);
                 Result result = Result.fromJson(detailContent);
                 if (!result.getList().isEmpty()) result.getList().get(0).setVodFlags();
