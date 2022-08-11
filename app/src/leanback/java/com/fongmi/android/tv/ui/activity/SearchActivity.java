@@ -17,7 +17,6 @@ import androidx.leanback.widget.ListRow;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewbinding.ViewBinding;
 
-import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Filter;
 import com.fongmi.android.tv.bean.Result;
@@ -33,7 +32,6 @@ import com.fongmi.android.tv.ui.presenter.EpisodePresenter;
 import com.fongmi.android.tv.ui.presenter.FilterPresenter;
 import com.fongmi.android.tv.ui.presenter.TitlePresenter;
 import com.fongmi.android.tv.ui.presenter.VodPresenter;
-import com.fongmi.android.tv.utils.Json;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
@@ -44,10 +42,8 @@ import com.google.gson.JsonParser;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 
 public class SearchActivity extends BaseActivity implements VodPresenter.OnClickListener {
 
@@ -244,9 +240,6 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
                 String result = OKHttp.newCall("https://suggest.video.iqiyi.com/?if=mobile&key=" + entered).execute().body().string();
                 JsonObject json = JsonParser.parseString(result.substring(result.indexOf("{"), result.lastIndexOf("}") + 1)).getAsJsonObject();
                 JsonArray itemList = json.get("data").getAsJsonArray();
-                List<ListRow> rows = new ArrayList<>();
-                //ArrayObjectAdapter adapter = new ArrayObjectAdapter(presenter);
-                //presenter.setOnClickListener((key, item) -> recommendWordClick(recommendWordAdapter, key, item));
                 JsonObject filterMapped = (JsonObject) JsonParser.parseString("{\"key\":\"recommend_word\",\"name\":\"recommend_word\",value:[]}");
                 for (JsonElement ele : itemList) {
                     JsonObject obj = (JsonObject) ele;
@@ -256,9 +249,6 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
                     converted.addProperty("v", word);
                     filterMapped.getAsJsonArray("value").add(converted);
                 }
-                //adapter.addAll(0, Filter.objectFrom(filterMapped).getValue());
-                //rows.add(new ListRow(adapter));
-                //recommendWordAdapter.addAll(0, rows);
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
