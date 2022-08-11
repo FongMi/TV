@@ -1,5 +1,8 @@
 package com.fongmi.android.tv.net;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
@@ -34,5 +37,15 @@ public class OKHttp {
     public static <T> Call newCall(T url) {
         if (url instanceof HttpUrl) return get().client().newCall(new Request.Builder().url((HttpUrl) url).build());
         else return get().client().newCall(new Request.Builder().url((String) url).build());
+    }
+
+    public static <T> Call newCall(String url, HashMap<String, String> params) {
+        return get().client().newCall(new Request.Builder().url(buildUrl(url, params)).build());
+    }
+
+    private static HttpUrl buildUrl(String url, HashMap<String, String> params) {
+        HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(url)).newBuilder();
+        for (Map.Entry<String, String> entry : params.entrySet()) builder.addQueryParameter(entry.getKey(), entry.getValue());
+        return builder.build();
     }
 }
