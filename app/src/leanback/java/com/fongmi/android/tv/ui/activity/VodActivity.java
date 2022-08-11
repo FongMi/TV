@@ -57,8 +57,8 @@ public class VodActivity extends BaseActivity {
     protected void initView() {
         mResult = Result.fromJson(getResult());
         setRecyclerView();
-        setPager();
         setTypes();
+        setPager();
     }
 
     @Override
@@ -93,16 +93,16 @@ public class VodActivity extends BaseActivity {
         mBinding.recycler.setAdapter(new ItemBridgeAdapter(mAdapter = new ArrayObjectAdapter(mTypePresenter = new TypePresenter())));
     }
 
-    private void setPager() {
-        mBinding.pager.setAdapter(mPageAdapter = new PageAdapter(getSupportFragmentManager()));
-    }
-
     private void setTypes() {
         List<Class> newTypes = new ArrayList<>();
         for (String cate : ApiConfig.get().getHome().getCategories()) for (Class type : mResult.getTypes()) if (cate.equals(type.getTypeName())) newTypes.add(type);
         if (newTypes.size() > 0) mResult.setTypes(newTypes);
         for (Class type : mResult.getTypes()) if (mResult.getFilters().containsKey(type.getTypeId())) type.setFilter(false);
         mAdapter.setItems(mResult.getTypes(), null);
+    }
+
+    private void setPager() {
+        mBinding.pager.setAdapter(mPageAdapter = new PageAdapter(getSupportFragmentManager()));
     }
 
     private void updateFilter(boolean filter) {
