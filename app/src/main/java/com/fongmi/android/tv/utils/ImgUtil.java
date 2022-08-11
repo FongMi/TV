@@ -2,6 +2,7 @@ package com.fongmi.android.tv.utils;
 
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
@@ -19,23 +20,14 @@ import com.fongmi.android.tv.R;
 
 public class ImgUtil {
 
-    private static int getWidth() {
-        float thumbnail = 0.3f * Prefers.getThumbnail() + 0.4f;
-        return ResUtil.dp2px((int) Math.ceil(300 * thumbnail));
-    }
-
-    private static int getHeight() {
-        float thumbnail = 0.3f * Prefers.getThumbnail() + 0.4f;
-        return ResUtil.dp2px((int) Math.ceil(400 * thumbnail));
-    }
-
     public static void load(String url, ImageView view) {
         Glide.with(App.get()).load(url).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).into(view);
     }
 
     public static void load(String vodName, String vodPic, ImageView view) {
+        float thumbnail = 0.3f * Prefers.getThumbnail() + 0.4f;
         if (TextUtils.isEmpty(vodPic)) onLoadFailed(vodName, view);
-        else Glide.with(App.get()).load(vodPic).override(getWidth(), getHeight()).signature(new ObjectKey(vodPic + "_" + Prefers.getThumbnail())).placeholder(R.drawable.ic_img_loading).listener(getListener(vodName, view)).into(view);
+        else Glide.with(App.get()).load(vodPic).sizeMultiplier(thumbnail).signature(new ObjectKey(vodPic + "_" + Prefers.getThumbnail())).placeholder(R.drawable.ic_img_loading).listener(getListener(vodName, view)).into(view);
     }
 
     private static RequestListener<Drawable> getListener(String vodName, ImageView view) {
