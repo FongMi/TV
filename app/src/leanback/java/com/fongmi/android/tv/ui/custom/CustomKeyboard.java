@@ -2,8 +2,6 @@ package com.fongmi.android.tv.ui.custom;
 
 import android.annotation.SuppressLint;
 
-import androidx.recyclerview.widget.GridLayoutManager;
-
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.ActivitySearchBinding;
 import com.fongmi.android.tv.ui.adapter.KeyboardAdapter;
@@ -22,7 +20,6 @@ public class CustomKeyboard implements KeyboardAdapter.OnClickListener {
 
     private void initView() {
         binding.keyboard.setHasFixedSize(true);
-        binding.keyboard.setLayoutManager(new GridLayoutManager(binding.getRoot().getContext(), 10));
         binding.keyboard.addItemDecoration(new SpaceItemDecoration(10, 8));
         binding.keyboard.setAdapter(new KeyboardAdapter(this));
     }
