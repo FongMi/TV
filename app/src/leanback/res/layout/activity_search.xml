@@ -92,11 +92,20 @@
 
         </LinearLayout>
 
+        <com.fongmi.android.tv.ui.custom.CustomHorizontalGridView
+            android:id="@+id/recommend_word_grid"
+            android:layout_width="556dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/search_bar"
+            android:layout_marginTop="4mm"
+            android:layout_marginBottom="4mm"
+            android:visibility="gone" />
+
         <androidx.leanback.widget.VerticalGridView
             android:id="@+id/keyboard"
             android:layout_width="556dp"
             android:layout_height="244dp"
-            android:layout_below="@+id/search_bar"
+            android:layout_below="@id/recommend_word_grid"
             android:clipChildren="false"
             android:clipToPadding="false"
             android:padding="24dp"
