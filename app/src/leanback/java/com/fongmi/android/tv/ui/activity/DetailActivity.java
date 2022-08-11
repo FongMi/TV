@@ -361,11 +361,50 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
         }
     };
 
+    private final Runnable mProgress = new Runnable() {
+        @Override
+        public void run() {
+            if (mHistory.getOpening() >= Players.get().getCurrentPosition()) {
+                Players.get().seekTo(mHistory.getOpening());
+            }
+            if (mHistory.getEnding() + Players.get().getCurrentPosition() >= Players.get().getDuration()) {
+                onNext();
+            }
+            mHandler.postDelayed(mProgress, 1000);
+        }
+    };
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onPlayerEvent(PlayerEvent event) {
-        mBinding.progress.getRoot().setVisibility(event.getState() == Player.STATE_BUFFERING ? View.VISIBLE : View.GONE);
-        if (event.getState() == Player.STATE_ENDED) onNext();
         Notify.show(event.getMsg());
+        switch (event.getState()) {
+            case 0:
+                checkPosition();
+                break;
+            case Player.STATE_BUFFERING:
+                mBinding.progress.getRoot().setVisibility(View.VISIBLE);
+                break;
+            case Player.STATE_READY:
+                mBinding.progress.getRoot().setVisibility(View.GONE);
+                break;
+            case Player.STATE_ENDED:
+                onNext();
+                break;
+        }
+    }
+
+    private void checkPosition() {
+        Players.get().seekTo(mHistory.getDuration());
+        stopTimer();
+        setTimer();
+    }
+
+    private void stopTimer() {
+        mHandler.removeCallbacks(mProgress);
+    }
+
+    private void setTimer() {
+        mHandler.postDelayed(mProgress, 1000);
     }
 
     @Override
@@ -435,6 +474,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        stopTimer();
         updateHistory();
         Players.get().stop();
         EventBus.getDefault().unregister(this);

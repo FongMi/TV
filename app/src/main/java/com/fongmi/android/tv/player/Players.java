@@ -7,9 +7,7 @@ import androidx.annotation.NonNull;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Result;
-import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.ui.custom.CustomWebView;
 import com.fongmi.android.tv.utils.ResUtil;
@@ -80,7 +78,7 @@ public class Players implements Player.Listener {
 
     public String getTime(long time) {
         time = getCurrentPosition() + time;
-        if (time > exoPlayer.getDuration()) time = exoPlayer.getDuration();
+        if (time > getDuration()) time = getDuration();
         else if (time < 0) time = 0;
         return getStringForTime(time);
     }
@@ -91,6 +89,10 @@ public class Players implements Player.Listener {
 
     public long getCurrentPosition() {
         return exoPlayer.getCurrentPosition();
+    }
+
+    public long getDuration() {
+        return exoPlayer.getDuration();
     }
 
     public void seekTo(int time) {
@@ -134,17 +136,11 @@ public class Players implements Player.Listener {
         handler.post(() -> {
             handler.removeCallbacks(mTimer);
             exoPlayer.setMediaSource(ExoUtil.getSource(headers, url));
+            EventBus.getDefault().post(new PlayerEvent(0));
             exoPlayer.prepare();
             exoPlayer.play();
-            checkPosition();
             webView.stop();
         });
-    }
-
-    private void checkPosition() {
-        History history = AppDatabase.get().getHistoryDao().find(getKey());
-        if (history == null) return;
-        seekTo(history.getDuration());
     }
 
     public void pause() {
