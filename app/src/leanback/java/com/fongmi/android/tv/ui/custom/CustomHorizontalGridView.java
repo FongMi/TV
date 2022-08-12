@@ -55,16 +55,7 @@ public class CustomHorizontalGridView extends HorizontalGridView {
     }
 
     @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        if (event.getAction() == KeyEvent.ACTION_DOWN) {
-            if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
-                if (getSelectedPosition() != 0) {
-                    if (getVisibility() != View.VISIBLE) setVisibility(View.VISIBLE);
-                    setSelectedPositionSmooth(0);
-                    return true;
-                }
-            }
-        }
+    public boolean dispatchKeyEvent(@NonNull KeyEvent event) {
         return super.dispatchKeyEvent(event) || executeKeyEvent(event);
     }
 

@@ -2,6 +2,7 @@ package com.fongmi.android.tv.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -65,6 +66,7 @@ public class VodActivity extends BaseActivity {
 
     @Override
     protected void initEvent() {
+        mTypePresenter.setOnClickListener(this::updateFilter);
         mBinding.pager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
@@ -80,12 +82,6 @@ public class VodActivity extends BaseActivity {
                 mOldView = child.itemView;
                 mOldView.setActivated(true);
             }
-        });
-        mTypePresenter.setOnClickListener(item -> {
-            int index = mResult.getTypes().indexOf(item);
-            if (index != mBinding.pager.getCurrentItem()) mBinding.pager.setCurrentItem(index);
-            else item.setFilter(item.getFilter() == null ? null : !item.getFilter());
-            if (item.getFilter() != null) updateFilter(item.getFilter());
         });
     }
 
@@ -107,9 +103,26 @@ public class VodActivity extends BaseActivity {
         mBinding.pager.setAdapter(mPageAdapter = new PageAdapter(getSupportFragmentManager()));
     }
 
-    private void updateFilter(boolean filter) {
-        mAdapter.notifyArrayItemRangeChanged(0, mAdapter.size());
-        getVodFragment().toggleFilter(filter);
+    private void updateFilter(Class item) {
+        if (item.getFilter() != null) {
+            item.toggleFilter();
+            getVodFragment().toggleFilter(item.getFilter());
+            mAdapter.notifyArrayItemRangeChanged(0, mAdapter.size());
+        }
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        boolean isMenuUp = event.getAction() == KeyEvent.ACTION_UP && event.getKeyCode() == KeyEvent.KEYCODE_MENU;
+        if (isMenuUp) updateFilter(mResult.getTypes().get(mBinding.pager.getCurrentItem()));
+        return super.dispatchKeyEvent(event);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Class item = mResult.getTypes().get(mBinding.pager.getCurrentItem());
+        if (item.getFilter()) updateFilter(item);
+        else super.onBackPressed();
     }
 
     private VodFragment getVodFragment() {
