@@ -105,11 +105,11 @@ public class History {
     }
 
     public String getSiteKey() {
-        return getKey().substring(0, getKey().lastIndexOf("_"));
+        return getKey().substring(0, getKey().lastIndexOf("@@@"));
     }
 
     public String getVodId() {
-        return getKey().substring(getKey().lastIndexOf("_") + 1);
+        return getKey().substring(getKey().lastIndexOf("@@@") + 1);
     }
 
     public Vod.Flag getFlag() {
