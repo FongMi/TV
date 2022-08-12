@@ -35,6 +35,11 @@ public class Class {
         return filter;
     }
 
+    public void toggleFilter() {
+        if (getFilter() == null) return;
+        setFilter(!getFilter());
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;

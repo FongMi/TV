@@ -12,6 +12,7 @@ import androidx.appcompat.app.AlertDialog;
 import com.fongmi.android.tv.databinding.DialogConfigBinding;
 import com.fongmi.android.tv.event.ServerEvent;
 import com.fongmi.android.tv.server.Server;
+import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.QRCode;
 import com.fongmi.android.tv.utils.ResUtil;
@@ -57,6 +58,7 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
     }
 
     private void initEvent() {
+        binding.history.setOnClickListener(this::onHistory);
         binding.positive.setOnClickListener(this::onPositive);
         binding.negative.setOnClickListener(this::onNegative);
         binding.text.setOnEditorActionListener((textView, actionId, event) -> {
@@ -73,6 +75,10 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
 
     private void onNegative(View view) {
         dialog.dismiss();
+    }
+
+    private void onHistory(View view) {
+        Notify.show("尚未開發");
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
