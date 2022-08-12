@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import com.fongmi.android.tv.db.AppDatabase;
+
 @Entity
 public class History {
 
@@ -105,11 +107,11 @@ public class History {
     }
 
     public String getSiteKey() {
-        return getKey().substring(0, getKey().lastIndexOf("@@@"));
+        return getKey().substring(0, getKey().lastIndexOf(AppDatabase.SYMBOL));
     }
 
     public String getVodId() {
-        return getKey().substring(getKey().lastIndexOf("@@@") + 3);
+        return getKey().substring(getKey().lastIndexOf(AppDatabase.SYMBOL) + AppDatabase.SYMBOL.length());
     }
 
     public Vod.Flag getFlag() {
