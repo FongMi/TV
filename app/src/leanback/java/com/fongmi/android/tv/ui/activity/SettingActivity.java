@@ -38,7 +38,7 @@ public class SettingActivity extends BaseActivity implements ConfigDialog.Callba
     private ActivitySettingBinding mBinding;
 
     public static void start(Activity activity) {
-        activity.startActivityForResult(new Intent(activity, SettingActivity.class), 1000);
+        activity.startActivity(new Intent(activity, SettingActivity.class));
     }
 
     private final ActivityResultLauncher<String> launcherString = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> loadConfig());
@@ -121,7 +121,7 @@ public class SettingActivity extends BaseActivity implements ConfigDialog.Callba
         mBinding.home.setText(item.getName());
         for (int i = 0; i < adapter.size(); i++) ((Site) adapter.get(i)).setHome(item);
         adapter.notifyArrayItemRangeChanged(0, adapter.size());
-        setResult(RESULT_OK);
+        EventBus.getDefault().post(RefreshEvent.video());
         Notify.dismiss();
     }
 
