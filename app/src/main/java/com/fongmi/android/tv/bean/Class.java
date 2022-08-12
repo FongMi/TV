@@ -36,7 +36,6 @@ public class Class {
     }
 
     public void toggleFilter() {
-        if (getFilter() == null) return;
         setFilter(!getFilter());
     }
 

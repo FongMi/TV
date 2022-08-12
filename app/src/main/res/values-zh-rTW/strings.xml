@@ -63,6 +63,7 @@
     <string name="error_play_prev">已經是第一集了！</string>
     <string name="error_play_parse">無法解析網址</string>
     <string name="error_play">不支援的影片格式</string>
+    <string name="error_empty">找不到資料</string>
 
     <!-- UNIT -->
     <string name="second"><xliff:g name="name">%s</xliff:g> 秒</string>

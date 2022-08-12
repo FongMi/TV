@@ -188,7 +188,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
         mSiteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mSiteViewModel.player.observe(this, result -> Players.get().setMediaSource(result));
         mSiteViewModel.result.observe(this, result -> {
-            if (result.getList().isEmpty()) mBinding.progressLayout.showErrorText();
+            if (result.getList().isEmpty()) mBinding.progressLayout.showEmpty();
             else setDetail(result.getList().get(0));
         });
     }

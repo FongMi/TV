@@ -6,8 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
+import com.fongmi.android.tv.databinding.ViewEmptyBinding;
 import com.fongmi.android.tv.databinding.ViewProgressBinding;
 
 import java.util.ArrayList;
@@ -23,9 +23,9 @@ public class ProgressLayout extends RelativeLayout {
         CONTENT, PROGRESS, ERROR
     }
 
+    private View mErrorView;
     private View mProgressView;
-    private TextView mErrorTextView;
-    private List<View> mContentViews = new ArrayList<View>();
+    private List<View> mContentViews = new ArrayList<>();
 
     private ProgressLayout.State mState = ProgressLayout.State.CONTENT;
 
@@ -49,18 +49,15 @@ public class ProgressLayout extends RelativeLayout {
         layoutParams.addRule(CENTER_IN_PARENT);
         mProgressView.setTag(TAG_PROGRESS);
         addView(mProgressView, layoutParams);
-        mErrorTextView = new TextView(getContext());
-        mErrorTextView.setTag(TAG_ERROR);
-        layoutParams = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParams.addRule(CENTER_IN_PARENT);
-        addView(mErrorTextView, layoutParams);
+        mErrorView = ViewEmptyBinding.inflate(LayoutInflater.from(getContext())).getRoot();
+        mErrorView.setTag(TAG_ERROR);
+        addView(mErrorView, layoutParams);
         mProgressView.setVisibility(GONE);
     }
 
     @Override
     public void addView(View child, int index, ViewGroup.LayoutParams params) {
         super.addView(child, index, params);
-
         if (child.getTag() == null || (!child.getTag().equals(TAG_PROGRESS) && !child.getTag().equals(TAG_ERROR))) {
             mContentViews.add(child);
         }
@@ -74,19 +71,19 @@ public class ProgressLayout extends RelativeLayout {
         switchState(ProgressLayout.State.PROGRESS, null, skipIds);
     }
 
-    public void showErrorText() {
+    public void showEmpty() {
         switchState(ProgressLayout.State.ERROR, null, Collections.<Integer>emptyList());
     }
 
-    public void showErrorText(List<Integer> skipIds) {
+    public void showEmpty(List<Integer> skipIds) {
         switchState(ProgressLayout.State.ERROR, null, skipIds);
     }
 
-    public void showErrorText(String error) {
+    public void showEmpty(String error) {
         switchState(ProgressLayout.State.ERROR, error, Collections.<Integer>emptyList());
     }
 
-    public void showErrorText(String error, List<Integer> skipIds) {
+    public void showEmpty(String error, List<Integer> skipIds) {
         switchState(ProgressLayout.State.ERROR, error, skipIds);
     }
 
@@ -114,18 +111,17 @@ public class ProgressLayout extends RelativeLayout {
         mState = state;
         switch (state) {
             case CONTENT:
-                mErrorTextView.setVisibility(View.GONE);
+                mErrorView.setVisibility(View.GONE);
                 mProgressView.setVisibility(View.GONE);
                 setContentVisibility(true, skipIds);
                 break;
             case PROGRESS:
-                mErrorTextView.setVisibility(View.GONE);
+                mErrorView.setVisibility(View.GONE);
                 mProgressView.setVisibility(View.VISIBLE);
                 setContentVisibility(false, skipIds);
                 break;
             case ERROR:
-                mErrorTextView.setText(errorText);
-                mErrorTextView.setVisibility(View.VISIBLE);
+                mErrorView.setVisibility(View.VISIBLE);
                 mProgressView.setVisibility(View.GONE);
                 setContentVisibility(false, skipIds);
                 break;

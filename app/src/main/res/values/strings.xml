@@ -63,6 +63,7 @@
     <string name="error_play_prev">It\'s the first episode!</string>
     <string name="error_play_parse">Unable to parse url</string>
     <string name="error_play">Unsupported video format</string>
+    <string name="error_empty">Not found</string>
 
     <!-- UNIT -->
     <string name="second"><xliff:g name="name">%s</xliff:g> s</string>
