@@ -238,6 +238,12 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) getVideo();
+    }
+
+    @Override
     public void onBackPressed() {
         if (mHistoryPresenter.isDelete()) {
             mHistoryPresenter.setDelete(false);
