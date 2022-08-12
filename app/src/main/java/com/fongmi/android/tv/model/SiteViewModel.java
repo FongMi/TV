@@ -165,7 +165,7 @@ public class SiteViewModel extends ViewModel {
         service = Executors.newFixedThreadPool(2);
         service.execute(() -> {
             try {
-                if (!Thread.interrupted()) result.postValue(service.submit(callable).get(5, TimeUnit.SECONDS));
+                if (!Thread.interrupted()) result.postValue(service.submit(callable).get(15, TimeUnit.SECONDS));
             } catch (Exception e) {
                 if (!Thread.interrupted()) result.postValue(new Result());
             }
