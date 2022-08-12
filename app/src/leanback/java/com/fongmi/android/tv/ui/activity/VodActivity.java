@@ -121,7 +121,7 @@ public class VodActivity extends BaseActivity {
     @Override
     public void onBackPressed() {
         Class item = mResult.getTypes().get(mBinding.pager.getCurrentItem());
-        if (item.getFilter()) updateFilter(item);
+        if (item.getFilter() != null && item.getFilter()) updateFilter(item);
         else super.onBackPressed();
     }
 
