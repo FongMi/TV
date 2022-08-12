@@ -47,7 +47,7 @@ public class Utils {
 
     public static boolean isVideoFormat(String url) {
         if (url.contains("=http") || url.contains("=https") || url.contains("=https%3a%2f") || url.contains("=http%3a%2f")) return false;
-        if (SNIFFER.matcher(url).find()) return !url.contains("cdn-tos") || (!url.contains(".js") && !url.contains(".css"));
+        if (SNIFFER.matcher(url).find() || url.endsWith(".m3u8")) return !url.contains("cdn-tos") || (!url.contains(".js") && !url.contains(".css"));
         return false;
     }
 }
