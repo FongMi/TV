@@ -238,16 +238,12 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) getVideo();
-    }
-
-    @Override
     public void onBackPressed() {
         if (mHistoryPresenter.isDelete()) {
             mHistoryPresenter.setDelete(false);
             mHistoryAdapter.notifyArrayItemRangeChanged(0, mHistoryAdapter.size());
+        } else if (mBinding.recycler.getSelectedPosition() != 1) {
+            mBinding.recycler.smoothScrollToPosition(1);
         } else if (!mConfirmExit) {
             mConfirmExit = true;
             Notify.show(R.string.app_exit);
