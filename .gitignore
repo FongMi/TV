@@ -1,6 +1,5 @@
 .gradle
 .idea
 *build
-*.json
 *.jks
 /local.properties
