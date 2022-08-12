@@ -19,7 +19,7 @@
             android:hint="@string/search_hint"
             android:imeOptions="actionDone"
             android:inputType="textCapCharacters|textAutoCorrect|textAutoComplete"
-            android:letterSpacing="0.05"
+            android:letterSpacing="0.02"
             android:maxLength="50"
             android:paddingStart="24dp"
             android:paddingTop="24dp"

@@ -109,7 +109,7 @@ public class History {
     }
 
     public String getVodId() {
-        return getKey().substring(getKey().lastIndexOf("@@@") + 1);
+        return getKey().substring(getKey().lastIndexOf("@@@") + 3);
     }
 
     public Vod.Flag getFlag() {
