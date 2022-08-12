@@ -229,6 +229,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
     }
 
     private void setEpisodeActivated(Vod.Flag.Episode item) {
+        if (shouldEnterFullscreen()) return;
         mCurrent = mBinding.flag.getSelectedPosition();
         for (int i = 0; i < mFlagAdapter.size(); i++) ((Vod.Flag) mFlagAdapter.get(i)).toggle(mCurrent == i, item);
         mEpisodeAdapter.notifyArrayItemRangeChanged(0, mEpisodeAdapter.size());
@@ -242,6 +243,12 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
         for (int i = 0; i < itemSize; i++) items.add(String.valueOf(i * 20 + 1));
         mBinding.group.setVisibility(itemSize > 1 ? View.VISIBLE : View.GONE);
         mGroupAdapter.setItems(items, null);
+    }
+
+    private boolean shouldEnterFullscreen() {
+        boolean enter = mBinding.episode.getSelectedPosition() == getEpisodePosition();
+        if (enter) enterFullscreen();
+        return enter;
     }
 
     private void enterFullscreen() {
