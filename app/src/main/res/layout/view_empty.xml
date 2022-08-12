@@ -17,7 +17,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:letterSpacing="0.02"
         android:text="@string/error_empty"
         android:textColor="@color/white"
         android:textSize="20sp"

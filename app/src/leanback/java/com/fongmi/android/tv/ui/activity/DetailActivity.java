@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Html;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -74,7 +73,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
     }
 
     private String getHistoryKey() {
-        return getKey().concat("@@@").concat(getId());
+        return getKey().concat(AppDatabase.SYMBOL).concat(getId());
     }
 
     private Vod.Flag getVodFlag() {

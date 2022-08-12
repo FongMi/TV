@@ -14,6 +14,7 @@ import com.fongmi.android.tv.db.dao.HistoryDao;
 public abstract class AppDatabase extends RoomDatabase {
 
     public static final int VERSION = 4;
+    public static final String SYMBOL = "@@@";
 
     private static volatile AppDatabase instance;
 
