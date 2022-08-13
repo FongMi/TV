@@ -64,17 +64,18 @@ public class SettingActivity extends BaseActivity implements ConfigDialog.Callba
     }
 
     @Override
-    public void setConfig() {
-        mBinding.url.setText(Prefers.getUrl());
+    public void setConfig(String url) {
+        mBinding.url.setText(url);
         Notify.progress(this);
         AppDatabase.clear();
-        checkUrl();
+        Prefers.putUrl(url);
+        checkUrl(url);
     }
 
-    private void checkUrl() {
-        if (Prefers.getUrl().startsWith("file://") && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
+    private void checkUrl(String url) {
+        if (url.startsWith("file://") && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
             launcherIntent.launch(new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION));
-        } else if (Prefers.getUrl().startsWith("file://") && Build.VERSION.SDK_INT < Build.VERSION_CODES.R && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+        } else if (url.startsWith("file://") && Build.VERSION.SDK_INT < Build.VERSION_CODES.R && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             launcherString.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
         } else {
             loadConfig();

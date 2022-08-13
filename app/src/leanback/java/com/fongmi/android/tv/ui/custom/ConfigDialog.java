@@ -68,8 +68,9 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
     }
 
     private void onPositive(View view) {
-        Prefers.putUrl(binding.text.getText().toString().trim());
-        callback.setConfig();
+        String url = binding.text.getText().toString().trim();
+        if (url.startsWith("clan")) url = url.replace("clan", "file");
+        callback.setConfig(url);
         dialog.dismiss();
     }
 
@@ -95,6 +96,6 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
 
     public interface Callback {
 
-        void setConfig();
+        void setConfig(String url);
     }
 }
