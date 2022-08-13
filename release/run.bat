@@ -1,2 +1,2 @@
-move .\leanback\release\*.* .\
+move .\leanback\release\*.apk .\
 rmdir /s /q .\leanback
