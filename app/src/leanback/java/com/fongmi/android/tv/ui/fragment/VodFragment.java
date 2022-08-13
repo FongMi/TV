@@ -24,7 +24,6 @@ import com.fongmi.android.tv.ui.custom.CustomRowPresenter;
 import com.fongmi.android.tv.ui.custom.CustomScroller;
 import com.fongmi.android.tv.ui.custom.CustomSelector;
 import com.fongmi.android.tv.ui.presenter.FilterPresenter;
-import com.fongmi.android.tv.ui.presenter.ProgressPresenter;
 import com.fongmi.android.tv.ui.presenter.VodPresenter;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.common.collect.Lists;
@@ -79,7 +78,6 @@ public class VodFragment extends Fragment implements CustomScroller.Callback, Vo
 
     private void setRecyclerView() {
         CustomSelector selector = new CustomSelector();
-        selector.addPresenter(String.class, new ProgressPresenter());
         selector.addPresenter(ListRow.class, new CustomRowPresenter(16), VodPresenter.class);
         selector.addPresenter(ListRow.class, new CustomRowPresenter(8), FilterPresenter.class);
         mBinding.recycler.addOnScrollListener(mScroller = new CustomScroller(this));
@@ -92,7 +90,6 @@ public class VodFragment extends Fragment implements CustomScroller.Callback, Vo
         mSiteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mSiteViewModel.result.observe(getViewLifecycleOwner(), result -> {
             mScroller.endLoading(result.getList().isEmpty());
-            mAdapter.remove("progress");
             addVideo(result);
             checkSize();
         });
@@ -121,7 +118,6 @@ public class VodFragment extends Fragment implements CustomScroller.Callback, Vo
         boolean clear = page.equals("1") && mAdapter.size() > mFilters.size();
         if (clear) mAdapter.removeItems(mFilters.size(), mAdapter.size() - mFilters.size());
         mSiteViewModel.categoryContent(getTypeId(), page, true, mExtend);
-        if (!page.equals("1")) mAdapter.add("progress");
     }
 
     private void addVideo(Result result) {
