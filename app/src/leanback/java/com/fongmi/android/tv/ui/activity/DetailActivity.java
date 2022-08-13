@@ -247,7 +247,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
     }
 
     private boolean shouldEnterFullscreen(Vod.Flag.Episode item) {
-        boolean enter = !mFullscreen && item.isActivated();
+        boolean enter = !mFullscreen && item.isActivated() && !Players.get().isIdle();
         if (enter) enterFullscreen();
         return enter;
     }

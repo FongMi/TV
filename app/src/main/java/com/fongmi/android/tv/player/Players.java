@@ -107,6 +107,10 @@ public class Players implements Player.Listener {
         return exoPlayer.isPlaying();
     }
 
+    public boolean isIdle() {
+        return exoPlayer.getPlaybackState() == Player.STATE_IDLE;
+    }
+
     public void setMediaSource(Result result) {
         if (result.getUrl().isEmpty()) {
             EventBus.getDefault().post(new PlayerEvent(ResUtil.getString(R.string.error_play_load)));
