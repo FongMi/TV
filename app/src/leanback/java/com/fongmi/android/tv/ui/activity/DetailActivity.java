@@ -246,7 +246,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
     }
 
     private boolean shouldEnterFullscreen() {
-        boolean enter = mBinding.episode.getSelectedPosition() == getEpisodePosition();
+        boolean enter = !mFullscreen && mBinding.episode.getSelectedPosition() == getEpisodePosition();
         if (enter) enterFullscreen();
         return enter;
     }
