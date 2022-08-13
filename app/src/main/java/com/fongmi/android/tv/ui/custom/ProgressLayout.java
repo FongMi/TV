@@ -11,23 +11,20 @@ import com.fongmi.android.tv.databinding.ViewEmptyBinding;
 import com.fongmi.android.tv.databinding.ViewProgressBinding;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class ProgressLayout extends RelativeLayout {
 
     private static final String TAG_PROGRESS = "ProgressLayout.TAG_PROGRESS";
-    private static final String TAG_ERROR = "ProgressLayout.TAG_ERROR";
 
     public enum State {
-        CONTENT, PROGRESS, ERROR
+        CONTENT, PROGRESS, EMPTY
     }
 
-    private View mErrorView;
+    private List<View> mContentViews;
     private View mProgressView;
-    private List<View> mContentViews = new ArrayList<>();
-
-    private ProgressLayout.State mState = ProgressLayout.State.CONTENT;
+    private View mEmptyView;
+    private State mState;
 
     public ProgressLayout(Context context) {
         super(context);
@@ -44,111 +41,80 @@ public class ProgressLayout extends RelativeLayout {
     }
 
     private void init() {
+        mState = State.CONTENT;
+        mContentViews = new ArrayList<>();
+        initView();
+    }
+
+    private void initView() {
+        mEmptyView = ViewEmptyBinding.inflate(LayoutInflater.from(getContext())).getRoot();
+        mEmptyView.setTag(TAG_PROGRESS);
+        mEmptyView.setVisibility(GONE);
         mProgressView = ViewProgressBinding.inflate(LayoutInflater.from(getContext())).getRoot();
-        LayoutParams layoutParams = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParams.addRule(CENTER_IN_PARENT);
         mProgressView.setTag(TAG_PROGRESS);
-        addView(mProgressView, layoutParams);
-        mErrorView = ViewEmptyBinding.inflate(LayoutInflater.from(getContext())).getRoot();
-        mErrorView.setTag(TAG_ERROR);
-        addView(mErrorView, layoutParams);
         mProgressView.setVisibility(GONE);
+        LayoutParams params = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.addRule(CENTER_IN_PARENT);
+        addView(mProgressView, params);
+        addView(mEmptyView, params);
     }
 
     @Override
     public void addView(View child, int index, ViewGroup.LayoutParams params) {
         super.addView(child, index, params);
-        if (child.getTag() == null || (!child.getTag().equals(TAG_PROGRESS) && !child.getTag().equals(TAG_ERROR))) {
+        if (child.getTag() == null || !child.getTag().equals(TAG_PROGRESS)) {
             mContentViews.add(child);
         }
     }
 
     public void showProgress() {
-        switchState(ProgressLayout.State.PROGRESS, null, Collections.<Integer>emptyList());
-    }
-
-    public void showProgress(List<Integer> skipIds) {
-        switchState(ProgressLayout.State.PROGRESS, null, skipIds);
+        switchState(State.PROGRESS);
     }
 
     public void showEmpty() {
-        switchState(ProgressLayout.State.ERROR, null, Collections.<Integer>emptyList());
-    }
-
-    public void showEmpty(List<Integer> skipIds) {
-        switchState(ProgressLayout.State.ERROR, null, skipIds);
-    }
-
-    public void showEmpty(String error) {
-        switchState(ProgressLayout.State.ERROR, error, Collections.<Integer>emptyList());
-    }
-
-    public void showEmpty(String error, List<Integer> skipIds) {
-        switchState(ProgressLayout.State.ERROR, error, skipIds);
+        switchState(State.EMPTY);
     }
 
     public void showContent() {
-        switchState(ProgressLayout.State.CONTENT, null, Collections.<Integer>emptyList());
+        switchState(State.CONTENT);
     }
 
-    public void showContent(List<Integer> skipIds) {
-        switchState(ProgressLayout.State.CONTENT, null, skipIds);
-    }
-
-    public void switchState(ProgressLayout.State state) {
-        switchState(state, null, Collections.<Integer>emptyList());
-    }
-
-    public void switchState(ProgressLayout.State state, String errorText) {
-        switchState(state, errorText, Collections.<Integer>emptyList());
-    }
-
-    public void switchState(ProgressLayout.State state, List<Integer> skipIds) {
-        switchState(state, null, skipIds);
-    }
-
-    public void switchState(ProgressLayout.State state, String errorText, List<Integer> skipIds) {
+    public void switchState(State state) {
+        if (mState == state) return;
         mState = state;
         switch (state) {
             case CONTENT:
-                mErrorView.setVisibility(View.GONE);
-                mProgressView.setVisibility(View.GONE);
-                setContentVisibility(true, skipIds);
+                mEmptyView.setVisibility(GONE);
+                mProgressView.setVisibility(GONE);
+                setContentVisibility(true);
                 break;
             case PROGRESS:
-                mErrorView.setVisibility(View.GONE);
-                mProgressView.setVisibility(View.VISIBLE);
-                setContentVisibility(false, skipIds);
+                mEmptyView.setVisibility(GONE);
+                mProgressView.setVisibility(VISIBLE);
+                setContentVisibility(false);
                 break;
-            case ERROR:
-                mErrorView.setVisibility(View.VISIBLE);
-                mProgressView.setVisibility(View.GONE);
-                setContentVisibility(false, skipIds);
+            case EMPTY:
+                mEmptyView.setVisibility(VISIBLE);
+                mProgressView.setVisibility(GONE);
+                setContentVisibility(false);
                 break;
         }
     }
 
-    public ProgressLayout.State getState() {
-        return mState;
-    }
-
-    public boolean isProgress() {
-        return mState == ProgressLayout.State.PROGRESS;
-    }
-
-    public boolean isContent() {
-        return mState == ProgressLayout.State.CONTENT;
-    }
-
-    public boolean isError() {
-        return mState == ProgressLayout.State.ERROR;
-    }
-
-    private void setContentVisibility(boolean visible, List<Integer> skipIds) {
-        for (View v : mContentViews) {
-            if (!skipIds.contains(v.getId())) {
-                v.setVisibility(visible ? View.VISIBLE : View.GONE);
-            }
+    private void setContentVisibility(boolean visible) {
+        for (View view : mContentViews) {
+            if (visible) showView(view);
+            else hideView(view);
         }
+    }
+
+    private void showView(View view) {
+        view.setAlpha(0f);
+        view.setVisibility(VISIBLE);
+        view.animate().alpha(1f).setStartDelay(250).setDuration(250).setListener(null);
+    }
+
+    private void hideView(View view) {
+        view.setVisibility(INVISIBLE);
     }
 }
