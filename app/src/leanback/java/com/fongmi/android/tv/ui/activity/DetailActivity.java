@@ -320,7 +320,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
 
     private void checkHistory() {
         mHistory = AppDatabase.get().getHistoryDao().find(getHistoryKey());
-        if (mFlagAdapter.size() == 0 || mEpisodeAdapter.size() == 0) {
+        if (mFlagAdapter.size() == 0) {
             Notify.show(R.string.error_episode);
             return;
         }
