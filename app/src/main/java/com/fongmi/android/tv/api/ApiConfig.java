@@ -82,6 +82,7 @@ public class ApiConfig {
             JsonReader reader = new JsonReader(new FileReader(FileUtil.getLocal(url)));
             parseConfig(new Gson().fromJson(reader, JsonObject.class), callback);
         } catch (Exception e) {
+            e.printStackTrace();
             handler.post(() -> callback.error(R.string.error_config_get));
         }
     }
@@ -90,6 +91,7 @@ public class ApiConfig {
         try {
             parseConfig(new Gson().fromJson(OKHttp.newCall(url).execute().body().string(), JsonObject.class), callback);
         } catch (Exception e) {
+            e.printStackTrace();
             handler.post(() -> callback.error(R.string.error_config_get));
         }
     }
@@ -139,9 +141,11 @@ public class ApiConfig {
 
     private String convert(String text) {
         if (TextUtils.isEmpty(text)) return "";
+        if (text.startsWith("clan")) return text.replace("clan", "file");
         if (text.startsWith(".")) text = text.substring(1);
         if (text.startsWith("/")) text = text.substring(1);
         Uri uri = Uri.parse(Prefers.getUrl());
+        if (uri.getLastPathSegment() == null) return uri.getScheme() + "://" + text;
         return uri.toString().replace(uri.getLastPathSegment(), text);
     }
 
