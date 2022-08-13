@@ -64,6 +64,7 @@
     <string name="error_play_parse">Unable to parse url</string>
     <string name="error_play_load">Unable to load url</string>
     <string name="error_play_format">Unsupported video format</string>
+    <string name="error_episode">No episode data</string>
     <string name="error_empty">Not found</string>
 
     <!-- UNIT -->
