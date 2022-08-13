@@ -61,8 +61,9 @@
     <string name="error_config_parse">配置解析失敗</string>
     <string name="error_play_next">已經是最後一集了！</string>
     <string name="error_play_prev">已經是第一集了！</string>
-    <string name="error_play_parse">無法解析網址</string>
-    <string name="error_play">不支援的影片格式</string>
+    <string name="error_play_parse">播放網址解析失敗</string>
+    <string name="error_play_load">播放資料載入失敗</string>
+    <string name="error_play_format">不支援的影片格式</string>
     <string name="error_empty">找不到資料</string>
 
     <!-- UNIT -->

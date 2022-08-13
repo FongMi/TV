@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="@drawable/shape_item_activated"
+    android:gravity="center"
+    android:orientation="vertical"
     android:padding="@dimen/exo_styled_controls_padding">
 
     <ImageView
         android:id="@+id/action"
         android:layout_width="52dp"
         android:layout_height="52dp"
-        android:layout_centerHorizontal="true"
         android:background="?attr/selectableItemBackground"
         android:scaleType="fitXY"
         android:src="@drawable/ic_play" />
@@ -18,7 +19,6 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/action"
         android:orientation="horizontal">
 
         <TextView
@@ -47,4 +47,4 @@
             tools:text="00:00:00" />
 
     </LinearLayout>
-</RelativeLayout>
+</LinearLayout>

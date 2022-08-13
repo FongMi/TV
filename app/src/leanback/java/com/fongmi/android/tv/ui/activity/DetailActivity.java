@@ -181,6 +181,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
         if (mFullscreen) Notify.show(ResUtil.getString(R.string.play_ready, item.getName()));
         mSiteViewModel.playerContent(getKey(), getVodFlag().getFlag(), item.getUrl());
         mBinding.progress.getRoot().setVisibility(View.VISIBLE);
+        mBinding.error.getRoot().setVisibility(View.GONE);
         updateHistory(item, replay);
     }
 
@@ -389,6 +390,8 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
             case 0:
                 checkPosition();
                 break;
+            case Player.STATE_IDLE:
+                break;
             case Player.STATE_BUFFERING:
                 mBinding.progress.getRoot().setVisibility(View.VISIBLE);
                 break;
@@ -399,8 +402,10 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
                 onNext();
                 break;
             default:
+                Players.get().stop();
                 mBinding.progress.getRoot().setVisibility(View.GONE);
-                Notify.show(event.getMsg());
+                mBinding.error.getRoot().setVisibility(View.VISIBLE);
+                mBinding.error.text.setText(event.getMsg());
                 break;
         }
     }

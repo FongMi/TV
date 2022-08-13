@@ -108,7 +108,9 @@ public class Players implements Player.Listener {
     }
 
     public void setMediaSource(Result result) {
-        if (result.getParse().equals("1")) {
+        if (result.getUrl().isEmpty()) {
+            EventBus.getDefault().post(new PlayerEvent(ResUtil.getString(R.string.error_play_load)));
+        } else if (result.getParse().equals("1")) {
             loadWebView(result.getUrl());
         } else {
             setMediaSource(getPlayHeader(result), result.getUrl());
@@ -152,7 +154,7 @@ public class Players implements Player.Listener {
     public void stop() {
         if (exoPlayer != null) {
             exoPlayer.stop();
-            exoPlayer.seekTo(0);
+            exoPlayer.clearMediaItems();
             exoPlayer.setPlaybackSpeed(1.0f);
         }
         if (webView != null) {
@@ -192,7 +194,7 @@ public class Players implements Player.Listener {
 
     @Override
     public void onPlayerError(@NonNull PlaybackException error) {
-        EventBus.getDefault().post(new PlayerEvent(ResUtil.getString(R.string.error_play)));
+        EventBus.getDefault().post(new PlayerEvent(ResUtil.getString(R.string.error_play_format)));
     }
 
     @Override
