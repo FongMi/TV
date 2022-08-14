@@ -134,7 +134,7 @@ public class Players implements Player.Listener {
 
     private void loadWebView(String url) {
         handler.removeCallbacks(mTimer);
-        handler.postDelayed(mTimer, 15000);
+        handler.postDelayed(mTimer, 30000);
         handler.post(() -> webView.start(url));
     }
 

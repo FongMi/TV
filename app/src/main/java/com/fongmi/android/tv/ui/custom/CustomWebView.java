@@ -18,10 +18,15 @@ import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.utils.Utils;
 
 import java.io.ByteArrayInputStream;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class CustomWebView extends WebView {
 
     private WebResourceResponse empty;
+    private List<String> keys;
     private String ads;
 
     public CustomWebView(@NonNull Context context) {
@@ -32,6 +37,7 @@ public class CustomWebView extends WebView {
     @SuppressLint("SetJavaScriptEnabled")
     public void initSettings() {
         this.ads = ApiConfig.get().getAds();
+        this.keys = Arrays.asList("user-agent", "referer", "origin");
         this.empty = new WebResourceResponse("text/plain", "utf-8", new ByteArrayInputStream("".getBytes()));
         getSettings().setUseWideViewPort(true);
         getSettings().setDatabaseEnabled(true);
@@ -58,7 +64,8 @@ public class CustomWebView extends WebView {
                 String url = request.getUrl().toString();
                 String host = request.getUrl().getHost();
                 if (ads.contains(host)) return empty;
-                if (Utils.isVideoFormat(url) || request.getRequestHeaders().containsKey("Range")) Players.get().setMediaSource(request.getRequestHeaders(), url);
+                Map<String, String> headers = request.getRequestHeaders();
+                if (Utils.isVideoFormat(url) || headers.containsKey("Range")) Players.get().setMediaSource(get(headers), url);
                 return super.shouldInterceptRequest(view, request);
             }
 
@@ -72,6 +79,12 @@ public class CustomWebView extends WebView {
                 return false;
             }
         };
+    }
+
+    private Map<String, String> get(Map<String, String> headers) {
+        Map<String, String> news = new HashMap<>();
+        for (String key : headers.keySet()) if (keys.contains(key.toLowerCase())) news.put(key, headers.get(key));
+        return news;
     }
 
     public void stop() {
