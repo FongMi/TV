@@ -34,7 +34,6 @@ import com.fongmi.android.tv.ui.presenter.TitlePresenter;
 import com.fongmi.android.tv.ui.presenter.VodPresenter;
 import com.fongmi.android.tv.ui.presenter.WordPresenter;
 import com.fongmi.android.tv.utils.ResUtil;
-import com.google.common.collect.Lists;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -141,14 +140,10 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
     }
 
     private void addVideo(Result result) {
-        List<ListRow> rows = new ArrayList<>();
-        for (List<Vod> items : Lists.partition(result.getList(), 5)) {
-            ArrayObjectAdapter adapter = new ArrayObjectAdapter(new VodPresenter(this, 5));
-            adapter.addAll(0, items);
-            rows.add(new ListRow(adapter));
-        }
+        ArrayObjectAdapter adapter = new ArrayObjectAdapter(new VodPresenter(this, 5));
+        adapter.addAll(0, result.getList());
         mAdapter.add(result.getList().get(0).getSite().getName());
-        mAdapter.addAll(mAdapter.size(), rows);
+        mAdapter.add(new ListRow(adapter));
         mBinding.progressLayout.showContent();
     }
 
