@@ -69,7 +69,7 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:id="@+id/mic"
+                android:id="@+id/voice"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_gravity="center"
@@ -78,7 +78,7 @@
                 android:focusable="true"
                 android:focusableInTouchMode="true"
                 android:scaleType="center"
-                android:src="@drawable/ic_mic" />
+                android:src="@drawable/ic_voice" />
 
             <TextView
                 android:id="@+id/search"

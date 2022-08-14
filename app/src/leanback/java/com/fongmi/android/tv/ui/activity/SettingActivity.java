@@ -35,14 +35,14 @@ import org.greenrobot.eventbus.EventBus;
 
 public class SettingActivity extends BaseActivity implements ConfigDialog.Callback {
 
+    private final ActivityResultLauncher<String> launcherString = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> loadConfig());
+    private final ActivityResultLauncher<Intent> launcherIntent = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> loadConfig());
+
     private ActivitySettingBinding mBinding;
 
     public static void start(Activity activity) {
         activity.startActivity(new Intent(activity, SettingActivity.class));
     }
-
-    private final ActivityResultLauncher<String> launcherString = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> loadConfig());
-    private final ActivityResultLauncher<Intent> launcherIntent = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> loadConfig());
 
     @Override
     protected ViewBinding getBinding() {
