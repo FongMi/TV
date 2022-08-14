@@ -119,6 +119,6 @@ public class History {
     }
 
     public Vod.Flag.Episode getEpisode() {
-        return new Vod.Flag.Episode(getEpisodeUrl());
+        return new Vod.Flag.Episode(getVodRemarks(), getEpisodeUrl());
     }
 }

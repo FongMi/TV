@@ -242,10 +242,6 @@ public class Vod {
 
             private boolean activated;
 
-            public Episode(String url) {
-                this("", url);
-            }
-
             public Episode(String name, String url) {
                 this.name = name;
                 this.url = url;
@@ -276,7 +272,7 @@ public class Vod {
                 if (this == obj) return true;
                 if (!(obj instanceof Episode)) return false;
                 Episode it = (Episode) obj;
-                return getUrl().equals(it.getUrl());
+                return getName().equals(it.getName()) || getUrl().equals(it.getUrl());
             }
         }
     }
