@@ -6,6 +6,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 public class Parse {
 
     @SerializedName("name")
@@ -15,7 +17,7 @@ public class Parse {
     @SerializedName("url")
     private String url;
     @SerializedName("ext")
-    private String ext;
+    private Ext ext;
 
     public static Parse objectFrom(JsonElement element) {
         return new Gson().fromJson(element, Parse.class);
@@ -58,8 +60,16 @@ public class Parse {
         this.url = url;
     }
 
-    public String getExt() {
-        return TextUtils.isEmpty(ext) ? "" : ext;
+    public Ext getExt() {
+        return ext;
+    }
+
+    public boolean hasHeader() {
+        return getExt() != null && getExt().getHeader() != null;
+    }
+
+    public JsonElement getHeader() {
+        return getExt().getHeader();
     }
 
     @Override
@@ -68,5 +78,21 @@ public class Parse {
         if (!(obj instanceof Parse)) return false;
         Parse it = (Parse) obj;
         return getName().equals(it.getName());
+    }
+
+    public static class Ext {
+
+        @SerializedName("flag")
+        private List<String> flag;
+        @SerializedName("header")
+        private JsonElement header;
+
+        public List<String> getFlag() {
+            return flag;
+        }
+
+        public JsonElement getHeader() {
+            return header;
+        }
     }
 }

@@ -11,6 +11,8 @@ import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.event.PlayerEvent;
+import com.fongmi.android.tv.net.Callback;
+import com.fongmi.android.tv.net.OKHttp;
 import com.fongmi.android.tv.ui.custom.CustomWebView;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -23,10 +25,15 @@ import com.google.gson.JsonParser;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.IOException;
 import java.util.Formatter;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+
+import okhttp3.Call;
+import okhttp3.Headers;
+import okhttp3.Response;
 
 public class Players implements Player.Listener {
 
@@ -126,11 +133,14 @@ public class Players implements Player.Listener {
     private HashMap<String, String> getHeaders(Result result) {
         HashMap<String, String> headers = new HashMap<>();
         if (result.getHeader().isEmpty()) return headers;
-        JsonElement element = JsonParser.parseString(result.getHeader());
-        if (element.isJsonObject()) {
-            JsonObject object = element.getAsJsonObject();
-            for (String key : object.keySet()) headers.put(key, object.get(key).getAsString());
-        }
+        return getHeaders(JsonParser.parseString(result.getHeader()));
+    }
+
+    private HashMap<String, String> getHeaders(JsonElement element) {
+        HashMap<String, String> headers = new HashMap<>();
+        if (!element.isJsonObject()) return headers;
+        JsonObject object = element.getAsJsonObject();
+        for (String key : object.keySet()) headers.put(key, object.get(key).getAsString());
         return headers;
     }
 
@@ -150,7 +160,18 @@ public class Players implements Player.Listener {
         if (parse.getType() == 0) {
             loadWebView(parse.getUrl() + result.getUrl());
         } else if (parse.getType() == 1) {
+            Headers headers = new Headers.Builder().build();
+            if (parse.hasHeader()) headers = Headers.of(getHeaders(parse.getHeader()));
+            OKHttp.newCall(parse.getUrl() + result.getUrl(), headers).enqueue(new Callback() {
+                @Override
+                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                }
 
+                @Override
+                public void onFailure(@NonNull Call call, @NonNull IOException e) {
+
+                }
+            });
         } else if (parse.getType() == 2) {
 
         } else if (parse.getType() == 3) {
