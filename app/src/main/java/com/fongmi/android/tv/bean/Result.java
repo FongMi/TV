@@ -111,10 +111,6 @@ public class Result {
         return TextUtils.isEmpty(header) ? "" : header;
     }
 
-    public void setHeader(String header) {
-        this.header = header;
-    }
-
     public String getParse() {
         return TextUtils.isEmpty(parse) ? "1" : parse;
     }
@@ -133,10 +129,6 @@ public class Result {
 
     public String getJx() {
         return TextUtils.isEmpty(jx) ? "0" : jx;
-    }
-
-    public void setJx(String jx) {
-        this.jx = jx;
     }
 
     public String getUrl() {

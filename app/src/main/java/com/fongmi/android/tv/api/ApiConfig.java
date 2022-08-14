@@ -115,7 +115,13 @@ public class ApiConfig {
             if (site.getKey().equals(Prefers.getHome())) setHome(site);
             sites.add(site);
         }
+        for (JsonElement element : object.get("parses").getAsJsonArray()) {
+            Parse parse = Parse.objectFrom(element);
+            if (parse.getName().equals(Prefers.getParse())) setParse(parse);
+            parses.add(parse);
+        }
         if (home == null) setHome(sites.isEmpty() ? new Site() : sites.get(0));
+        if (parse == null) setParse(parses.isEmpty() ? new Parse() : parses.get(0));
         flags.addAll(Json.safeList(object, "flags"));
         ads.addAll(Json.safeList(object, "ads"));
     }
@@ -170,8 +176,17 @@ public class ApiConfig {
         return index == -1 ? new Site() : sites.get(index);
     }
 
+    public Parse getParse(String name) {
+        int index = parses.indexOf(Parse.get(name));
+        return index == -1 ? null : parses.get(index);
+    }
+
     public List<Site> getSites() {
         return sites;
+    }
+
+    public List<Parse> getParses() {
+        return parses;
     }
 
     public String getAds() {
@@ -190,6 +205,15 @@ public class ApiConfig {
         this.home = home;
         this.home.setHome(true);
         Prefers.putHome(home.getKey());
+    }
+
+    public Parse getParse() {
+        return parse == null ? new Parse() : parse;
+    }
+
+    public void setParse(Parse parse) {
+        this.parse = parse;
+        Prefers.putParse(parse.getName());
     }
 
     public ApiConfig clear() {
