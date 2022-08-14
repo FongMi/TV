@@ -59,6 +59,14 @@ public class Prefers {
         Prefers.put("home", home);
     }
 
+    public static String getParse() {
+        return Prefers.getString("parse");
+    }
+
+    public static void putParse(String parse) {
+        Prefers.put("parse", parse);
+    }
+
     public static int getScale() {
         return Prefers.getInt("scale");
     }

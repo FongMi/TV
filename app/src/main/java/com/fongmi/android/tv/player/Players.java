@@ -7,6 +7,8 @@ import androidx.annotation.NonNull;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.ui.custom.CustomWebView;
@@ -114,14 +116,14 @@ public class Players implements Player.Listener {
     public void setMediaSource(Result result) {
         if (result.getUrl().isEmpty()) {
             EventBus.getDefault().post(new PlayerEvent(ResUtil.getString(R.string.error_play_load)));
-        } else if (result.getParse().equals("1")) {
-            loadWebView(result.getUrl());
+        } else if (result.getParse().equals("1") || result.getJx().equals("1")) {
+            startParse(result);
         } else {
-            setMediaSource(getPlayHeader(result), result.getUrl());
+            setMediaSource(getHeaders(result), result.getPlayUrl() + result.getUrl());
         }
     }
 
-    private HashMap<String, String> getPlayHeader(Result result) {
+    private HashMap<String, String> getHeaders(Result result) {
         HashMap<String, String> headers = new HashMap<>();
         if (result.getHeader().isEmpty()) return headers;
         JsonElement element = JsonParser.parseString(result.getHeader());
@@ -130,6 +132,30 @@ public class Players implements Player.Listener {
             for (String key : object.keySet()) headers.put(key, object.get(key).getAsString());
         }
         return headers;
+    }
+
+    private Parse getParse(String playUrl, boolean useParse) {
+        if (useParse) return ApiConfig.get().getParse();
+        if (playUrl.startsWith("json:")) return Parse.get(1, playUrl.substring(5));
+        if (playUrl.startsWith("parse:")) {
+            Parse parse = ApiConfig.get().getParse(playUrl.substring(6));
+            if (parse != null) return parse;
+        }
+        return Parse.get(0, playUrl);
+    }
+
+    private void startParse(Result result) {
+        boolean useParse = (result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx().equals("1");
+        Parse parse = getParse(result.getPlayUrl(), useParse);
+        if (parse.getType() == 0) {
+            loadWebView(parse.getUrl() + result.getUrl());
+        } else if (parse.getType() == 1) {
+
+        } else if (parse.getType() == 2) {
+
+        } else if (parse.getType() == 3) {
+
+        }
     }
 
     private void loadWebView(String url) {
