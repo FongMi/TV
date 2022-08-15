@@ -52,6 +52,7 @@ public class CustomWebView extends WebView {
         getSettings().setJavaScriptEnabled(true);
         getSettings().setBlockNetworkImage(true);
         getSettings().setLoadWithOverviewMode(true);
+        getSettings().setLoadsImagesAutomatically(false);
         getSettings().setJavaScriptCanOpenWindowsAutomatically(false);
         getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         setWebViewClient(webViewClient());
@@ -94,12 +95,8 @@ public class CustomWebView extends WebView {
         @Override
         public void run() {
             if (retry > 5) return;
-            if (retry++ == 5) {
-                stop();
-                PlayerEvent.error(R.string.error_play_parse);
-            } else {
-                reload();
-            }
+            if (retry++ == 5) stop(true);
+            else reload();
         }
     };
 
@@ -112,13 +109,14 @@ public class CustomWebView extends WebView {
     private void post(Map<String, String> headers, String url) {
         handler.removeCallbacks(mTimer);
         handler.post(() -> {
-            stop();
+            stop(false);
             Players.get().setMediaSource(headers, url);
         });
     }
 
-    public void stop() {
+    public void stop(boolean error) {
         stopLoading();
         loadUrl("about:blank");
+        if (error) PlayerEvent.error(R.string.error_play_parse);
     }
 }
