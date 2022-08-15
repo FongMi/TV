@@ -272,7 +272,7 @@ public class Vod {
                 if (this == obj) return true;
                 if (!(obj instanceof Episode)) return false;
                 Episode it = (Episode) obj;
-                return getName().equals(it.getName()) || getUrl().equals(it.getUrl());
+                return getUrl().equals(it.getUrl()) || getName().equals(it.getName());
             }
         }
     }
