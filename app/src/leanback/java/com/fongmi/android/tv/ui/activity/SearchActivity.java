@@ -69,6 +69,10 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
         return getIntent().getStringExtra("keyword");
     }
 
+    private boolean hasVoice() {
+        return SpeechRecognizer.isRecognitionAvailable(this);
+    }
+
     public static void start(Activity activity) {
         start(activity, "");
     }
@@ -96,6 +100,7 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
     protected void initView() {
         mHandler = new Handler(Looper.getMainLooper());
         mRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
+        mBinding.voice.setVisibility(hasVoice() ? View.VISIBLE : View.GONE);
         mBinding.keyword.requestFocus();
         CustomKeyboard.init(mBinding);
         setRecyclerView();
