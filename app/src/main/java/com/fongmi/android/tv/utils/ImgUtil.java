@@ -1,6 +1,6 @@
 package com.fongmi.android.tv.utils;
 
-import android.graphics.drawable.Drawable;
+import android.graphics.Bitmap;
 import android.text.TextUtils;
 import android.widget.ImageView;
 
@@ -25,20 +25,21 @@ public class ImgUtil {
 
     public static void load(String vodName, String vodPic, ImageView view) {
         float thumbnail = 0.3f * Prefers.getThumbnail() + 0.4f;
+        view.setScaleType(ImageView.ScaleType.CENTER);
         if (TextUtils.isEmpty(vodPic)) onLoadFailed(vodName, view);
-        else Glide.with(App.get()).load(vodPic).sizeMultiplier(thumbnail).signature(new ObjectKey(vodPic + "_" + Prefers.getThumbnail())).placeholder(R.drawable.ic_img_loading).listener(getListener(vodName, view)).into(view);
+        else Glide.with(App.get()).asBitmap().load(vodPic).skipMemoryCache(true).sizeMultiplier(thumbnail).signature(new ObjectKey(vodPic + "_" + Prefers.getThumbnail())).placeholder(R.drawable.ic_img_loading).listener(getListener(vodName, view)).into(view);
     }
 
-    private static RequestListener<Drawable> getListener(String vodName, ImageView view) {
+    private static RequestListener<Bitmap> getListener(String vodName, ImageView view) {
         return new RequestListener<>() {
             @Override
-            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
                 ImgUtil.onLoadFailed(vodName, view);
                 return true;
             }
 
             @Override
-            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+            public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
                 view.setScaleType(ImageView.ScaleType.CENTER_CROP);
                 return false;
             }

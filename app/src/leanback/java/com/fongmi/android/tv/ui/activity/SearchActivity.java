@@ -85,6 +85,7 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
     @Override
     protected void initView() {
         mHandler = new Handler(Looper.getMainLooper());
+        mBinding.keyword.requestFocus();
         CustomKeyboard.init(mBinding);
         setRecyclerView();
         setViewModel();
@@ -99,12 +100,6 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
         mBinding.search.setOnClickListener(view -> onSearch());
         mBinding.clear.setOnClickListener(view -> mBinding.keyword.setText(""));
         mBinding.remote.setOnClickListener(view -> PushActivity.start(this));
-        mBinding.voice.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                
-            }
-        });
         mBinding.keyword.setOnEditorActionListener((textView, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) mBinding.search.performClick();
             return true;
@@ -176,6 +171,7 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
     }
 
     private void hideProgress() {
+        mBinding.clear.requestFocus();
         mBinding.layout.setVisibility(View.VISIBLE);
         mBinding.progressLayout.setVisibility(View.INVISIBLE);
     }
