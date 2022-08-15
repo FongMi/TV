@@ -1,23 +1,25 @@
 package com.fongmi.android.tv.event;
 
+import org.greenrobot.eventbus.EventBus;
+
 public class ServerEvent {
 
     private final String text;
     private final Type type;
 
-    public static ServerEvent search(String text) {
-        return new ServerEvent(Type.SEARCH, text);
+    public static void search(String text) {
+        EventBus.getDefault().post(new ServerEvent(Type.SEARCH, text));
     }
 
-    public static ServerEvent push(String text) {
-        return new ServerEvent(Type.PUSH, text);
+    public static void push(String text) {
+        EventBus.getDefault().post(new ServerEvent(Type.PUSH, text));
     }
 
-    public static ServerEvent api(String text) {
-        return new ServerEvent(Type.API, text);
+    public static void api(String text) {
+        EventBus.getDefault().post(new ServerEvent(Type.API, text));
     }
 
-    public ServerEvent(Type type, String text) {
+    private ServerEvent(Type type, String text) {
         this.type = type;
         this.text = text;
     }

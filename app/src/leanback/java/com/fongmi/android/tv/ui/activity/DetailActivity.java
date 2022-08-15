@@ -356,7 +356,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
         mHistory.setVodFlag(getVodFlag().getFlag());
         mHistory.setCreateTime(System.currentTimeMillis());
         AppDatabase.get().getHistoryDao().update(mHistory);
-        EventBus.getDefault().post(RefreshEvent.history());
+        RefreshEvent.history();
     }
 
     private void updateHistory() {

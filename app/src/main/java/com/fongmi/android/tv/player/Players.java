@@ -1,8 +1,5 @@
 package com.fongmi.android.tv.player;
 
-import android.os.Handler;
-import android.os.Looper;
-
 import androidx.annotation.NonNull;
 
 import com.fongmi.android.tv.App;
@@ -14,7 +11,6 @@ import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.net.OKHttp;
 import com.fongmi.android.tv.ui.custom.CustomWebView;
-import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.Player;
@@ -22,8 +18,6 @@ import com.google.android.exoplayer2.util.Util;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
-import org.greenrobot.eventbus.EventBus;
 
 import java.io.IOException;
 import java.util.Formatter;
@@ -41,7 +35,6 @@ public class Players implements Player.Listener {
     private StringBuilder builder;
     private Formatter formatter;
     private ExoPlayer exoPlayer;
-    private Handler handler;
     private String key;
 
     private static class Loader {
@@ -55,7 +48,6 @@ public class Players implements Player.Listener {
     public void init() {
         builder = new StringBuilder();
         webView = new CustomWebView(App.get());
-        handler = new Handler(Looper.getMainLooper());
         exoPlayer = new ExoPlayer.Builder(App.get()).build();
         formatter = new Formatter(builder, Locale.getDefault());
         exoPlayer.addListener(this);
@@ -122,7 +114,7 @@ public class Players implements Player.Listener {
 
     public void setMediaSource(Result result) {
         if (result.getUrl().isEmpty()) {
-            EventBus.getDefault().post(new PlayerEvent(ResUtil.getString(R.string.error_play_load)));
+            PlayerEvent.error(R.string.error_play_load);
         } else if (result.getParse().equals("1") || result.getJx().equals("1")) {
             startParse(result);
         } else {
@@ -158,7 +150,7 @@ public class Players implements Player.Listener {
         boolean useParse = (result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx().equals("1");
         Parse parse = getParse(result.getPlayUrl(), useParse);
         if (parse.getType() == 0) {
-            loadWebView(parse.getUrl() + result.getUrl());
+            webView.start(parse.getUrl() + result.getUrl());
         } else if (parse.getType() == 1) {
             Headers headers = new Headers.Builder().build();
             if (parse.hasHeader()) headers = Headers.of(getHeaders(parse.getHeader()));
@@ -179,21 +171,11 @@ public class Players implements Player.Listener {
         }
     }
 
-    private void loadWebView(String url) {
-        handler.removeCallbacks(mTimer);
-        handler.postDelayed(mTimer, 30000);
-        handler.post(() -> webView.start(url));
-    }
-
     public void setMediaSource(Map<String, String> headers, String url) {
-        handler.post(() -> {
-            handler.removeCallbacks(mTimer);
-            exoPlayer.setMediaSource(ExoUtil.getSource(headers, url));
-            EventBus.getDefault().post(new PlayerEvent(0));
-            exoPlayer.prepare();
-            exoPlayer.play();
-            webView.stop();
-        });
+        exoPlayer.setMediaSource(ExoUtil.getSource(headers, url));
+        PlayerEvent.state(0);
+        exoPlayer.prepare();
+        exoPlayer.play();
     }
 
     public void pause() {
@@ -229,27 +211,15 @@ public class Players implements Player.Listener {
             webView.destroy();
             webView = null;
         }
-        if (handler != null) {
-            handler = null;
-        }
     }
-
-    private final Runnable mTimer = new Runnable() {
-        @Override
-        public void run() {
-            EventBus.getDefault().post(new PlayerEvent(ResUtil.getString(R.string.error_play_parse)));
-            exoPlayer.stop();
-            webView.stop();
-        }
-    };
 
     @Override
     public void onPlayerError(@NonNull PlaybackException error) {
-        EventBus.getDefault().post(new PlayerEvent(ResUtil.getString(R.string.error_play_format)));
+        PlayerEvent.error(R.string.error_play_format);
     }
 
     @Override
     public void onPlaybackStateChanged(int state) {
-        EventBus.getDefault().post(new PlayerEvent(state));
+        PlayerEvent.state(state);
     }
 }
