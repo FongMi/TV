@@ -1,11 +1,15 @@
 package com.fongmi.android.tv.ui.custom;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatEditText;
+
+import com.fongmi.android.tv.R;
 
 public class CustomEditText extends AppCompatEditText {
 
@@ -22,12 +26,13 @@ public class CustomEditText extends AppCompatEditText {
     }
 
     @Override
-    public boolean isCursorVisible() {
+    public boolean isFocused() {
         return true;
     }
 
     @Override
-    public boolean isFocused() {
-        return true;
+    protected void onFocusChanged(boolean focused, int direction, Rect previouslyFocusedRect) {
+        super.onFocusChanged(focused, direction, previouslyFocusedRect);
+        setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(focused ? R.color.white : R.color.transparent)));
     }
 }

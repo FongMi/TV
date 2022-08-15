@@ -3,6 +3,7 @@
     <color name="primary">@color/black</color>
     <color name="primaryDark">@color/black</color>
     <color name="transparent">#00000000</color>
+    <color name="black">#000000</color>
     <color name="black_10">#1A000000</color>
     <color name="black_20">#33000000</color>
     <color name="black_30">#4D000000</color>
@@ -11,6 +12,7 @@
     <color name="black_60">#99000000</color>
     <color name="black_70">#B3000000</color>
     <color name="black_80">#CC000000</color>
+    <color name="white">#FFFFFF</color>
     <color name="white_10">#1AFFFFFF</color>
     <color name="white_20">#33FFFFFF</color>
     <color name="white_30">#4DFFFFFF</color>

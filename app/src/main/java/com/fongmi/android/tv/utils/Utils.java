@@ -2,11 +2,14 @@ package com.fongmi.android.tv.utils;
 
 import android.app.Activity;
 import android.app.PictureInPictureParams;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.IBinder;
 import android.provider.Settings;
 import android.util.Rational;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import com.fongmi.android.tv.App;
 import com.google.android.exoplayer2.util.Util;
@@ -49,5 +52,13 @@ public class Utils {
         if (url.contains("=http") || url.contains("=https") || url.contains("=https%3a%2f") || url.contains("=http%3a%2f")) return false;
         if (SNIFFER.matcher(url).find()) return !url.contains("cdn-tos") || (!url.contains(".js") && !url.contains(".css"));
         return false;
+    }
+
+    public static void hideKeyboard(View view) {
+        InputMethodManager imm = (InputMethodManager) App.get().getSystemService(Context.INPUT_METHOD_SERVICE);
+        IBinder windowToken = view.getWindowToken();
+        if (imm != null && windowToken != null) {
+            imm.hideSoftInputFromWindow(windowToken, 0);
+        }
     }
 }
