@@ -34,6 +34,7 @@ import com.fongmi.android.tv.ui.presenter.TitlePresenter;
 import com.fongmi.android.tv.ui.presenter.VodPresenter;
 import com.fongmi.android.tv.ui.presenter.WordPresenter;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.Utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -85,7 +86,6 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
     protected void initView() {
         mHandler = new Handler(Looper.getMainLooper());
         CustomKeyboard.init(mBinding);
-        mBinding.keyword.requestFocus();
         setRecyclerView();
         setViewModel();
         checkKeyword();
@@ -99,6 +99,12 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
         mBinding.search.setOnClickListener(view -> onSearch());
         mBinding.clear.setOnClickListener(view -> mBinding.keyword.setText(""));
         mBinding.remote.setOnClickListener(view -> PushActivity.start(this));
+        mBinding.voice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                
+            }
+        });
         mBinding.keyword.setOnEditorActionListener((textView, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) mBinding.search.performClick();
             return true;
@@ -153,6 +159,7 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
         if (TextUtils.isEmpty(keyword)) return;
         mService = Executors.newFixedThreadPool(5);
         for (Site site : mSites) mService.execute(() -> mSiteViewModel.searchContent(site.getKey(), keyword));
+        Utils.hideKeyboard(mBinding.keyword);
         showProgress();
     }
 

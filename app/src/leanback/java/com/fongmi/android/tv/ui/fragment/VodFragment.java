@@ -146,7 +146,7 @@ public class VodFragment extends Fragment implements CustomScroller.Callback, Vo
     public void toggleFilter(boolean open) {
         if (open) {
             addFilter();
-            mBinding.recycler.postDelayed(() -> mBinding.recycler.smoothScrollToPosition(0), 100);
+            mBinding.recycler.postDelayed(() -> mBinding.recycler.smoothScrollToPosition(0), 50);
         } else {
             mAdapter.removeItems(0, mFilters.size());
         }
