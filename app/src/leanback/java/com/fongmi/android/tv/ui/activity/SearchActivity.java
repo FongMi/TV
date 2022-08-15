@@ -196,7 +196,7 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
         mService = Executors.newFixedThreadPool(5);
         for (Site site : mSites) mService.execute(() -> mSiteViewModel.searchContent(site.getKey(), keyword));
         Utils.hideKeyboard(mBinding.keyword);
-        showProgress();
+        showResult();
     }
 
     private void stopSearch() {
@@ -205,19 +205,19 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
         mService = null;
     }
 
-    private void showProgress() {
+    private void showResult() {
         mBinding.layout.setVisibility(View.GONE);
         mBinding.progressLayout.setVisibility(View.VISIBLE);
         mBinding.progressLayout.showProgress();
     }
 
-    private void hideProgress() {
+    private void hideResult() {
         mBinding.clear.requestFocus();
         mBinding.layout.setVisibility(View.VISIBLE);
         mBinding.progressLayout.setVisibility(View.INVISIBLE);
     }
 
-    private boolean isProgressVisible() {
+    private boolean isResultVisible() {
         return mBinding.progressLayout.getVisibility() == View.VISIBLE;
     }
 
@@ -254,9 +254,9 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
 
     @Override
     public void onBackPressed() {
-        if (isProgressVisible()) {
+        if (isResultVisible()) {
             mAdapter.clear();
-            hideProgress();
+            hideResult();
             stopSearch();
         } else {
             super.onBackPressed();
