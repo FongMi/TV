@@ -1,22 +1,29 @@
 package com.fongmi.android.tv.ui.activity;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Looper;
+import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
 import android.text.Editable;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.ItemBridgeAdapter;
 import androidx.leanback.widget.ListRow;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewbinding.ViewBinding;
 
+import com.fongmi.android.tv.CustomListener;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Hot;
 import com.fongmi.android.tv.bean.Result;
@@ -45,9 +52,12 @@ import java.util.concurrent.Executors;
 import okhttp3.Call;
 import okhttp3.Response;
 
-public class SearchActivity extends BaseActivity implements VodPresenter.OnClickListener, WordPresenter.OnClickListener, TextWatcher {
+public class SearchActivity extends BaseActivity implements VodPresenter.OnClickListener, WordPresenter.OnClickListener {
+
+    private final ActivityResultLauncher<String> launcherString = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> onVoice());
 
     private ActivitySearchBinding mBinding;
+    private SpeechRecognizer mRecognizer;
     private SiteViewModel mSiteViewModel;
     private ArrayObjectAdapter mWordAdapter;
     private ArrayObjectAdapter mAdapter;
@@ -85,6 +95,7 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
     @Override
     protected void initView() {
         mHandler = new Handler(Looper.getMainLooper());
+        mRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
         mBinding.keyword.requestFocus();
         CustomKeyboard.init(mBinding);
         setRecyclerView();
@@ -96,13 +107,28 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
 
     @Override
     protected void initEvent() {
-        mBinding.keyword.addTextChangedListener(this);
+        mBinding.voice.setOnClickListener(view -> onVoice());
         mBinding.search.setOnClickListener(view -> onSearch());
         mBinding.clear.setOnClickListener(view -> mBinding.keyword.setText(""));
         mBinding.remote.setOnClickListener(view -> PushActivity.start(this));
         mBinding.keyword.setOnEditorActionListener((textView, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) mBinding.search.performClick();
             return true;
+        });
+        mBinding.keyword.addTextChangedListener(new CustomListener() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.toString().isEmpty()) getHot();
+                else getSuggest(s.toString());
+            }
+        });
+        mRecognizer.setRecognitionListener(new CustomListener() {
+            @Override
+            public void onResults(String result) {
+                mBinding.search.requestFocus();
+                mBinding.keyword.setText(result);
+                mBinding.keyword.setSelection(result.length());
+            }
         });
     }
 
@@ -146,6 +172,16 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
         mAdapter.add(result.getList().get(0).getSite().getName());
         mAdapter.add(new ListRow(adapter));
         mBinding.progressLayout.showContent();
+    }
+
+    private void onVoice() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            launcherString.launch(Manifest.permission.RECORD_AUDIO);
+        } else {
+            Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+            mRecognizer.startListening(intent);
+        }
     }
 
     private void onSearch() {
@@ -212,20 +248,6 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
     }
 
     @Override
-    public void afterTextChanged(Editable s) {
-        if (s.toString().isEmpty()) getHot();
-        else getSuggest(s.toString());
-    }
-
-    @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
-    }
-
-    @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-    }
-
-    @Override
     public void onBackPressed() {
         if (isProgressVisible()) {
             mAdapter.clear();
@@ -239,6 +261,7 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        mRecognizer.destroy();
         stopSearch();
     }
 }
