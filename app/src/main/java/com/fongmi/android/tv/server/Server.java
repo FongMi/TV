@@ -7,8 +7,6 @@ import android.text.format.Formatter;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.event.ServerEvent;
 
-import org.greenrobot.eventbus.EventBus;
-
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -85,16 +83,16 @@ public class Server implements Nano.Listener {
 
     @Override
     public void onSearch(String text) {
-        EventBus.getDefault().post(ServerEvent.search(text));
+        ServerEvent.search(text);
     }
 
     @Override
     public void onPush(String url) {
-        EventBus.getDefault().post(ServerEvent.push(url));
+        ServerEvent.push(url);
     }
 
     @Override
     public void onApi(String url) {
-        EventBus.getDefault().post(ServerEvent.api(url));
+        ServerEvent.api(url);
     }
 }

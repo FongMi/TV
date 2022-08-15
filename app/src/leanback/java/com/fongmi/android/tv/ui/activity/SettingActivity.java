@@ -31,8 +31,6 @@ import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 
-import org.greenrobot.eventbus.EventBus;
-
 public class SettingActivity extends BaseActivity implements ConfigDialog.Callback {
 
     private final ActivityResultLauncher<String> launcherString = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> loadConfig());
@@ -87,16 +85,16 @@ public class SettingActivity extends BaseActivity implements ConfigDialog.Callba
             @Override
             public void success() {
                 mBinding.home.setText(ApiConfig.getHomeName());
-                EventBus.getDefault().post(RefreshEvent.history());
-                EventBus.getDefault().post(RefreshEvent.video());
+                RefreshEvent.history();
+                RefreshEvent.video();
                 Notify.dismiss();
             }
 
             @Override
             public void error(int resId) {
                 mBinding.home.setText(ApiConfig.getHomeName());
-                EventBus.getDefault().post(RefreshEvent.history());
-                EventBus.getDefault().post(RefreshEvent.video());
+                RefreshEvent.history();
+                RefreshEvent.video();
                 Notify.dismiss();
                 Notify.show(resId);
             }
@@ -122,7 +120,7 @@ public class SettingActivity extends BaseActivity implements ConfigDialog.Callba
         mBinding.home.setText(item.getName());
         for (int i = 0; i < adapter.size(); i++) ((Site) adapter.get(i)).setHome(item);
         adapter.notifyArrayItemRangeChanged(0, adapter.size());
-        EventBus.getDefault().post(RefreshEvent.video());
+        RefreshEvent.video();
         Notify.dismiss();
     }
 
@@ -132,6 +130,6 @@ public class SettingActivity extends BaseActivity implements ConfigDialog.Callba
         index = index == 2 ? 0 : ++index;
         Prefers.putThumbnail(index);
         mBinding.compress.setText(array[index]);
-        EventBus.getDefault().post(RefreshEvent.image());
+        RefreshEvent.image();
     }
 }
