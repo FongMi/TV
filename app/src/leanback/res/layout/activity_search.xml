@@ -104,6 +104,7 @@
                 android:focusable="true"
                 android:focusableInTouchMode="true"
                 android:gravity="center"
+                android:nextFocusLeft="@id/word"
                 android:text="@string/search_clear"
                 android:textColor="@color/white"
                 android:textSize="18sp" />
