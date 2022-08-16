@@ -380,7 +380,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
             long duration = Players.get().getDuration();
             long current = Players.get().getCurrentPosition();
             if (mHistory.getOpening() >= current) Players.get().seekTo(mHistory.getOpening());
-            if (duration > 0 && mHistory.getEnding() + current >= duration) {
+            if (mHistory.getEnding() > 0 && mHistory.getEnding() + current >= duration) {
                 keep = false;
                 onNext();
             }
