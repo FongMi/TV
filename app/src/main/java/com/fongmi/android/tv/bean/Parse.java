@@ -22,6 +22,8 @@ public class Parse {
     @SerializedName("ext")
     private Ext ext;
 
+    private boolean activated;
+
     public static Parse objectFrom(JsonElement element) {
         return new Gson().fromJson(element, Parse.class);
     }
@@ -65,6 +67,14 @@ public class Parse {
 
     public Ext getExt() {
         return ext == null ? new Ext() : ext;
+    }
+
+    public boolean isActivated() {
+        return activated;
+    }
+
+    public void setActivated(boolean activated) {
+        this.activated = activated;
     }
 
     public boolean hasHeader() {
