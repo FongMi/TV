@@ -49,18 +49,19 @@ public class Result {
     private String playUrl;
     @SerializedName("header")
     private String header;
-    @SerializedName("parse")
-    private String parse;
     @SerializedName("flag")
     private String flag;
-    @SerializedName("jx")
-    private String jx;
     @SerializedName("url")
     private String url;
+    @SerializedName("parse")
+    private Integer parse;
+    @SerializedName("jx")
+    private Integer jx;
 
     public static Result fromJson(String str) {
         try {
-            Type type = new TypeToken<LinkedHashMap<String, List<Filter>>>() {}.getType();
+            Type type = new TypeToken<LinkedHashMap<String, List<Filter>>>() {
+            }.getType();
             Gson gson = new GsonBuilder().registerTypeAdapter(type, new FiltersAdapter()).create();
             Result result = gson.fromJson(str, Result.class);
             return result == null ? new Result() : result;
@@ -115,11 +116,11 @@ public class Result {
         return TextUtils.isEmpty(header) ? "" : header;
     }
 
-    public String getParse() {
-        return TextUtils.isEmpty(parse) ? "1" : parse;
+    public Integer getParse() {
+        return parse == null ? 1 : parse;
     }
 
-    public void setParse(String parse) {
+    public void setParse(Integer parse) {
         this.parse = parse;
     }
 
@@ -131,8 +132,8 @@ public class Result {
         this.flag = flag;
     }
 
-    public String getJx() {
-        return TextUtils.isEmpty(jx) ? "0" : jx;
+    public Integer getJx() {
+        return jx == null ? 0 : jx;
     }
 
     public String getUrl() {

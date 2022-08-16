@@ -1,6 +1,9 @@
 package com.fongmi.android.tv.bean;
 
 import android.text.TextUtils;
+import android.util.Base64;
+
+import androidx.annotation.NonNull;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -72,6 +75,12 @@ public class Parse {
         return getExt().getHeader();
     }
 
+    public String mixUrl() {
+        int index = getUrl().indexOf("?");
+        if (getExt() == null || index == -1) return getUrl();
+        return getUrl().substring(0, index + 1) + "cat_ext=" + Base64.encodeToString(getExt().toString().getBytes(), Base64.DEFAULT | Base64.URL_SAFE | Base64.NO_WRAP) + "&" + getUrl().substring(index + 1);
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -93,6 +102,12 @@ public class Parse {
 
         public JsonElement getHeader() {
             return header;
+        }
+
+        @NonNull
+        @Override
+        public String toString() {
+            return new Gson().toJson(this);
         }
     }
 }
