@@ -40,6 +40,7 @@ public class VodFragment extends Fragment implements CustomScroller.Callback, Vo
     private FragmentVodBinding mBinding;
     private SiteViewModel mSiteViewModel;
     private ArrayObjectAdapter mAdapter;
+    private ArrayObjectAdapter mLast;
     private CustomScroller mScroller;
     private List<Filter> mFilters;
 
@@ -121,12 +122,13 @@ public class VodFragment extends Fragment implements CustomScroller.Callback, Vo
     }
 
     private void addVideo(Result result) {
-        int columns = result.getList().size() % 6 == 0 ? 6 : 5;
         List<ListRow> rows = new ArrayList<>();
-        for (List<Vod> items : Lists.partition(result.getList(), columns)) {
-            ArrayObjectAdapter adapter = new ArrayObjectAdapter(new VodPresenter(this, columns));
-            adapter.addAll(0, items);
-            rows.add(new ListRow(adapter));
+        List<List<Vod>> parts = mLast != null && 5 - mLast.size() > 0 ? Lists.partition(result.getList(), 5 - mLast.size()) : null;
+        if (parts != null) mLast.addAll(mLast.size(), parts.get(0));
+        for (List<Vod> items : Lists.partition(parts != null ? parts.get(1) : result.getList(), 5)) {
+            mLast = new ArrayObjectAdapter(new VodPresenter(this));
+            mLast.addAll(0, items);
+            rows.add(new ListRow(mLast));
         }
         mAdapter.addAll(mAdapter.size(), rows);
     }

@@ -16,19 +16,19 @@ public class VodPresenter extends Presenter {
     private final OnClickListener mListener;
     private int width, height;
 
-    public VodPresenter(OnClickListener listener, int columns) {
+    public VodPresenter(OnClickListener listener) {
         this.mListener = listener;
-        setLayoutSize(columns);
+        setLayoutSize();
     }
 
     public interface OnClickListener {
         void onItemClick(Vod item);
     }
 
-    private void setLayoutSize(int columns) {
-        int space = ResUtil.dp2px(16) * (columns - 1) + ResUtil.dp2px(48);
+    private void setLayoutSize() {
+        int space = ResUtil.dp2px(112);
         int base = ResUtil.getScreenWidthPx() - space;
-        width = base / columns;
+        width = base / 5;
         height = (int) (width / 0.75f);
     }
 
