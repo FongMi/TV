@@ -37,9 +37,9 @@ import com.fongmi.android.tv.ui.presenter.ProgressPresenter;
 import com.fongmi.android.tv.ui.presenter.TitlePresenter;
 import com.fongmi.android.tv.ui.presenter.VodPresenter;
 import com.fongmi.android.tv.utils.Clock;
-import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.Updater;
 import com.google.common.collect.Lists;
 
 import org.greenrobot.eventbus.EventBus;
@@ -62,6 +62,7 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
     public static void start(Activity activity) {
         activity.startActivity(new Intent(activity, HomeActivity.class));
         activity.finish();
+        Updater.check();
     }
 
     @Override
@@ -71,7 +72,6 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
 
     @Override
     protected void initView() {
-        new Thread(FileUtil::checkUpdate).start();
         Clock.start(mBinding.time);
         Server.get().start();
         Players.get().init();
