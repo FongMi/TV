@@ -130,10 +130,9 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
     }
 
     private void addVideo(Result result) {
-        int columns = result.getList().size() % 6 == 0 ? 6 : 5;
         List<ListRow> rows = new ArrayList<>();
-        for (List<Vod> items : Lists.partition(result.getList(), columns)) {
-            ArrayObjectAdapter adapter = new ArrayObjectAdapter(new VodPresenter(this, columns));
+        for (List<Vod> items : Lists.partition(result.getList(), 5)) {
+            ArrayObjectAdapter adapter = new ArrayObjectAdapter(new VodPresenter(this));
             adapter.addAll(0, items);
             rows.add(new ListRow(adapter));
         }
