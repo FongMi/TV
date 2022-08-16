@@ -15,7 +15,6 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Filter;
-import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.FragmentVodBinding;
 import com.fongmi.android.tv.model.SiteViewModel;
@@ -91,8 +90,8 @@ public class VodFragment extends Fragment implements CustomScroller.Callback, Vo
         mSiteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mSiteViewModel.result.observe(getViewLifecycleOwner(), result -> {
             mScroller.endLoading(result.getList().isEmpty());
-            addVideo(result);
-            checkSize();
+            addVideo(result.getList());
+            checkPage();
         });
     }
 
@@ -109,7 +108,7 @@ public class VodFragment extends Fragment implements CustomScroller.Callback, Vo
         getVideo("1");
     }
 
-    private void checkSize() {
+    private void checkPage() {
         if (mScroller.getPage() != 1 || mAdapter.size() >= 4) return;
         mScroller.addPage();
         getVideo("2");
@@ -121,13 +120,23 @@ public class VodFragment extends Fragment implements CustomScroller.Callback, Vo
         mSiteViewModel.categoryContent(getTypeId(), page, true, mExtend);
     }
 
-    private void addVideo(Result result) {
+    private boolean isNotFull(List<Vod> items) {
+        if (mLast == null) return false;
+        int size = 5 - mLast.size();
+        if (size == 0) return false;
+        List<Vod> first = new ArrayList<>(items.subList(0, size));
+        List<Vod> second = new ArrayList<>(items.subList(size, items.size()));
+        mLast.addAll(mLast.size(), first);
+        addVideo(second);
+        return true;
+    }
+
+    private void addVideo(List<Vod> items) {
+        if (isNotFull(items)) return;
         List<ListRow> rows = new ArrayList<>();
-        List<List<Vod>> parts = mLast != null && 5 - mLast.size() > 0 ? Lists.partition(result.getList(), 5 - mLast.size()) : null;
-        if (parts != null) mLast.addAll(mLast.size(), parts.get(0));
-        for (List<Vod> items : Lists.partition(parts != null ? parts.get(1) : result.getList(), 5)) {
+        for (List<Vod> part : Lists.partition(items, 5)) {
             mLast = new ArrayObjectAdapter(new VodPresenter(this));
-            mLast.addAll(0, items);
+            mLast.addAll(0, part);
             rows.add(new ListRow(mLast));
         }
         mAdapter.addAll(mAdapter.size(), rows);
