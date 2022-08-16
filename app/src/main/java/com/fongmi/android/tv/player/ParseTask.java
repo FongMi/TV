@@ -5,6 +5,7 @@ import android.os.Looper;
 
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Parse;
+import com.fongmi.android.tv.bean.ParseResult;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.net.OKHttp;
 import com.fongmi.android.tv.utils.Json;
@@ -12,6 +13,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -36,48 +38,83 @@ public class ParseTask {
         this.callback = callback;
     }
 
+    private boolean useParse(Result result) {
+        return (result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx() == 1;
+    }
+
     public void run(Result result) {
-        boolean useParse = (result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx().equals("1");
-        setParse(result.getPlayUrl() + result.getUrl(), useParse);
-        executor.submit(this::doInBackground);
+        setParse(result.getPlayUrl(), useParse(result));
+        executor.submit(() -> doInBackground(result.getUrl(), result.getFlag()));
     }
 
     private void setParse(String url, boolean useParse) {
         if (useParse) parse = ApiConfig.get().getParse();
-        if (url.startsWith("json:")) parse = Parse.get(1, url.substring(5));
-        if (url.startsWith("parse:")) parse = ApiConfig.get().getParse(url.substring(6));
+        else if (url.startsWith("json:")) parse = Parse.get(1, url.substring(5));
+        else if (url.startsWith("parse:")) parse = ApiConfig.get().getParse(url.substring(6));
         if (parse == null) parse = Parse.get(0, url);
     }
 
-    private void doInBackground() {
+    private void doInBackground(String webUrl, String flag) {
         switch (parse.getType()) {
             case 0: //嗅探
-                handler.post(() -> Players.get().web().start(parse.getUrl(), callback));
+                handler.post(() -> Players.get().web().start(parse.getUrl() + webUrl, callback));
                 break;
             case 1: //Json
-                jsonParse();
+                jsonParse(webUrl);
                 break;
             case 2: //Json 擴展
-
+                jsonExtend(webUrl);
                 break;
             case 3: //聚合
-
+                jsonMix(webUrl, flag);
                 break;
         }
     }
 
-    private void jsonParse() {
+    private void jsonParse(String webUrl) {
         try {
-            Headers headers = new Headers.Builder().build();
-            if (parse.hasHeader()) headers = Headers.of(Json.toMap(parse.getHeader()));
-            Response response = OKHttp.newCall(parse.getUrl(), headers).execute();
+            Headers reqHeader = new Headers.Builder().build();
+            if (parse.hasHeader()) reqHeader = Headers.of(Json.toMap(parse.getHeader()));
+            Response response = OKHttp.newCall(parse.getUrl() + webUrl, reqHeader).execute();
             JsonObject object = JsonParser.parseString(response.body().string()).getAsJsonObject();
-            HashMap<String, String> header = new HashMap<>();
-            for (String key : object.keySet()) if (key.equalsIgnoreCase("user-agent") || key.equalsIgnoreCase("referer")) header.put(key, object.get(key).getAsString());
-            onParseSuccess(header, object.get("url").getAsString());
+            HashMap<String, String> headers = new HashMap<>();
+            for (String key : object.keySet()) if (key.equalsIgnoreCase("user-agent") || key.equalsIgnoreCase("referer")) headers.put(key, object.get(key).getAsString());
+            onParseSuccess(headers, object.get("url").getAsString());
         } catch (Exception e) {
             e.printStackTrace();
             onParseError();
+        }
+    }
+
+    private void jsonExtend(String webUrl) {
+        LinkedHashMap<String, String> jxs = new LinkedHashMap<>();
+        for (Parse item : ApiConfig.get().getParses()) if (item.getType() == 1) jxs.put(item.getName(), item.mixUrl());
+        ParseResult result = ParseResult.objectFrom(ApiConfig.get().jsonExt(parse.getUrl(), jxs, webUrl));
+        if (result.getUrl().isEmpty()) {
+            onParseError();
+        } else if (result.getParse() == 1) {
+            handler.post(() -> Players.get().web().start(result.getUrl(), callback));
+        } else {
+            onParseSuccess(result.hasHeader() ? Json.toMap(result.getHeader()) : new HashMap<>(), result.getUrl());
+        }
+    }
+
+    private void jsonMix(String webUrl, String flag) {
+        LinkedHashMap<String, HashMap<String, String>> jxs = new LinkedHashMap<>();
+        for (Parse item : ApiConfig.get().getParses()) {
+            HashMap<String, String> map = new HashMap<>();
+            map.put("type", item.getType().toString());
+            map.put("ext", item.getExt().toString());
+            map.put("url", item.getUrl());
+            jxs.put(item.getName(), map);
+        }
+        ParseResult result = ParseResult.objectFrom(ApiConfig.get().jsonExtMix(flag + "111", parse.getUrl(), parse.getName(), jxs, webUrl));
+        if (result.getUrl().isEmpty()) {
+            onParseError();
+        } else if (result.getParse() == 1) {
+            handler.post(() -> Players.get().web().start(result.getUrl(), callback));
+        } else {
+            onParseSuccess(result.hasHeader() ? Json.toMap(result.getHeader()) : new HashMap<>(), result.getUrl());
         }
     }
 

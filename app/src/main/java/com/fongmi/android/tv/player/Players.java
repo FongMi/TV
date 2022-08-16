@@ -106,7 +106,7 @@ public class Players implements Player.Listener, ParseTask.Callback {
     public void setMediaSource(Result result) {
         if (result.getUrl().isEmpty()) {
             PlayerEvent.error(R.string.error_play_load);
-        } else if (result.getParse().equals("1") || result.getJx().equals("1")) {
+        } else if (result.getParse() == 1 || result.getJx() == 1) {
             ParseTask.create(this).run(result);
         } else {
             setMediaSource(result.getHeaders(), result.getPlayUrl() + result.getUrl());
