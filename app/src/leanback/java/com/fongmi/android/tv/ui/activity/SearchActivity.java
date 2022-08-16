@@ -137,7 +137,7 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
                 mBinding.search.requestFocus();
                 mBinding.voice.clearAnimation();
                 mBinding.keyword.setText(result);
-                mBinding.keyword.setSelection(result.length());
+                mBinding.keyword.setSelection(mBinding.keyword.length());
             }
         });
     }
