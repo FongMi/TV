@@ -64,11 +64,11 @@ public class Parse {
     }
 
     public Ext getExt() {
-        return ext;
+        return ext == null ? new Ext() : ext;
     }
 
     public boolean hasHeader() {
-        return getExt() != null && getExt().getHeader() != null;
+        return getExt().getHeader() != null;
     }
 
     public JsonElement getHeader() {
@@ -77,7 +77,7 @@ public class Parse {
 
     public String mixUrl() {
         int index = getUrl().indexOf("?");
-        if (getExt() == null || index == -1) return getUrl();
+        if (index == -1) return getUrl();
         return getUrl().substring(0, index + 1) + "cat_ext=" + Base64.encodeToString(getExt().toString().getBytes(), Base64.DEFAULT | Base64.URL_SAFE | Base64.NO_WRAP) + "&" + getUrl().substring(index + 1);
     }
 
