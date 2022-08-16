@@ -120,19 +120,17 @@ public class VodFragment extends Fragment implements CustomScroller.Callback, Vo
         mSiteViewModel.categoryContent(getTypeId(), page, true, mExtend);
     }
 
-    private boolean isNotFull(List<Vod> items) {
+    private boolean checkLastSize(List<Vod> items) {
         if (mLast == null) return false;
         int size = 5 - mLast.size();
         if (size == 0) return false;
-        List<Vod> first = new ArrayList<>(items.subList(0, size));
-        List<Vod> second = new ArrayList<>(items.subList(size, items.size()));
-        mLast.addAll(mLast.size(), first);
-        addVideo(second);
+        mLast.addAll(mLast.size(), new ArrayList<>(items.subList(0, size)));
+        addVideo(new ArrayList<>(items.subList(size, items.size())));
         return true;
     }
 
     private void addVideo(List<Vod> items) {
-        if (isNotFull(items)) return;
+        if (checkLastSize(items)) return;
         List<ListRow> rows = new ArrayList<>();
         for (List<Vod> part : Lists.partition(items, 5)) {
             mLast = new ArrayObjectAdapter(new VodPresenter(this));
