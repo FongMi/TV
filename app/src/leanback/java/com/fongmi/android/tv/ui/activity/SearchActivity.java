@@ -11,6 +11,7 @@ import android.speech.SpeechRecognizer;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.animation.Animation;
 import android.view.inputmethod.EditorInfo;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -24,6 +25,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.CustomListener;
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Hot;
 import com.fongmi.android.tv.bean.Result;
@@ -64,6 +66,7 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
     private ExecutorService mService;
     private List<Site> mSites;
     private Handler mHandler;
+    private Animation mBlink;
 
     private String getKeyword() {
         return getIntent().getStringExtra("keyword");
@@ -98,6 +101,7 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
 
     @Override
     protected void initView() {
+        mBlink = ResUtil.getAnim(R.anim.voice);
         mHandler = new Handler(Looper.getMainLooper());
         mRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
         mBinding.voice.setVisibility(hasVoice() ? View.VISIBLE : View.GONE);
@@ -131,6 +135,7 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
             @Override
             public void onResults(String result) {
                 mBinding.search.requestFocus();
+                mBinding.voice.clearAnimation();
                 mBinding.keyword.setText(result);
                 mBinding.keyword.setSelection(result.length());
             }
@@ -185,6 +190,7 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
         } else {
             Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+            mBinding.voice.startAnimation(mBlink);
             mRecognizer.startListening(intent);
         }
     }
