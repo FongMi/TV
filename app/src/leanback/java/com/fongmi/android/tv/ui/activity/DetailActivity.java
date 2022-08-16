@@ -63,6 +63,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
     private Handler mHandler;
     private History mHistory;
     private int mCurrent;
+    private int mRetry;
 
     private String getKey() {
         return getIntent().getStringExtra("key");
@@ -178,7 +179,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
 
     private void getPlayer(boolean replay) {
         Vod.Flag.Episode item = (Vod.Flag.Episode) mEpisodeAdapter.get(getEpisodePosition());
-        if (mFullscreen) Notify.show(ResUtil.getString(R.string.play_ready, item.getName()));
+        if (mFullscreen && mRetry == 0) Notify.show(ResUtil.getString(R.string.play_ready, item.getName()));
         mSiteViewModel.playerContent(getKey(), getVodFlag().getFlag(), item.getUrl());
         mBinding.progress.getRoot().setVisibility(View.VISIBLE);
         mBinding.error.getRoot().setVisibility(View.GONE);
@@ -401,15 +402,14 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
                 break;
             case Player.STATE_READY:
                 mBinding.progress.getRoot().setVisibility(View.GONE);
+                mRetry = 0;
                 break;
             case Player.STATE_ENDED:
                 onNext();
                 break;
             default:
-                Players.get().stop();
-                mBinding.progress.getRoot().setVisibility(View.GONE);
-                mBinding.error.getRoot().setVisibility(View.VISIBLE);
-                mBinding.error.text.setText(event.getMsg());
+                if (!event.isRetry() || ++mRetry > 3) onError(event.getMsg());
+                else onRetry();
                 break;
         }
     }
@@ -426,6 +426,20 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
 
     private void setTimer() {
         mHandler.postDelayed(mProgress, 1000);
+    }
+
+    private void onRetry() {
+        updateHistory();
+        getPlayer(false);
+    }
+
+    private void onError(String msg) {
+        mBinding.progress.getRoot().setVisibility(View.GONE);
+        mBinding.error.getRoot().setVisibility(View.VISIBLE);
+        mBinding.error.text.setText(msg);
+        Players.get().stop();
+        stopTimer();
+        mRetry = 0;
     }
 
     @Override
