@@ -133,7 +133,7 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
         List<ListRow> rows = new ArrayList<>();
         for (List<Vod> items : Lists.partition(result.getList(), 5)) {
             ArrayObjectAdapter adapter = new ArrayObjectAdapter(new VodPresenter(this));
-            adapter.addAll(0, items);
+            adapter.setItems(items, null);
             rows.add(new ListRow(adapter));
         }
         mAdapter.addAll(mAdapter.size(), rows);

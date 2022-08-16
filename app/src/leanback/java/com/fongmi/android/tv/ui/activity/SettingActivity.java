@@ -116,10 +116,10 @@ public class SettingActivity extends BaseActivity implements ConfigDialog.Callba
     }
 
     public void setSite(ArrayObjectAdapter adapter, Site item) {
-        ApiConfig.get().setHome(item);
-        mBinding.home.setText(item.getName());
-        for (int i = 0; i < adapter.size(); i++) ((Site) adapter.get(i)).setHome(item);
+        for (int i = 0; i < adapter.size(); i++) ((Site) adapter.get(i)).setActivated(item);
         adapter.notifyArrayItemRangeChanged(0, adapter.size());
+        mBinding.home.setText(item.getName());
+        ApiConfig.get().setHome(item);
         RefreshEvent.video();
         Notify.dismiss();
     }

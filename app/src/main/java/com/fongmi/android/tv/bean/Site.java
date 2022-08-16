@@ -32,7 +32,7 @@ public class Site {
     @SerializedName("categories")
     private List<String> categories;
 
-    private boolean home;
+    private boolean activated;
 
     public static Site objectFrom(JsonElement element) {
         return new Gson().fromJson(element, Site.class);
@@ -92,16 +92,17 @@ public class Site {
         return categories == null ? Collections.emptyList() : categories;
     }
 
-    public boolean isHome() {
-        return home;
+
+    public boolean isActivated() {
+        return activated;
     }
 
-    public void setHome(boolean home) {
-        this.home = home;
+    public void setActivated(boolean activated) {
+        this.activated = activated;
     }
 
-    public void setHome(Site item) {
-        this.home = item.equals(this);
+    public void setActivated(Site item) {
+        this.activated = item.equals(this);
     }
 
     @Override

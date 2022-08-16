@@ -203,7 +203,7 @@ public class ApiConfig {
 
     public void setHome(Site home) {
         this.home = home;
-        this.home.setHome(true);
+        this.home.setActivated(true);
         Prefers.putHome(home.getKey());
     }
 
@@ -213,6 +213,7 @@ public class ApiConfig {
 
     public void setParse(Parse parse) {
         this.parse = parse;
+        this.parse.setActivated(true);
         Prefers.putParse(parse.getName());
     }
 

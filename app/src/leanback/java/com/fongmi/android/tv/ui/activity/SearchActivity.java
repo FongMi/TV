@@ -178,7 +178,7 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
 
     private void addVideo(Result result) {
         ArrayObjectAdapter adapter = new ArrayObjectAdapter(new VodPresenter(this));
-        adapter.addAll(0, result.getList());
+        adapter.setItems(result.getList(), null);
         mAdapter.add(result.getList().get(0).getSite().getName());
         mAdapter.add(new ListRow(adapter));
         mBinding.progressLayout.showContent();
