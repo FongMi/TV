@@ -458,7 +458,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
 
     @Override
     public void onSeekTo(int time) {
-        mHandler.postDelayed(mHideCenter, 250);
+        mHandler.postDelayed(mHideCenter, 500);
         Players.get().seekTo(time);
         Players.get().play();
         mKeyDown.resetTime();
