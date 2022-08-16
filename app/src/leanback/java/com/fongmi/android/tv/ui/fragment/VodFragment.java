@@ -121,7 +121,7 @@ public class VodFragment extends Fragment implements CustomScroller.Callback, Vo
     }
 
     private boolean checkLastSize(List<Vod> items) {
-        if (mLast == null) return false;
+        if (mLast == null || items.size() == 0) return false;
         int size = 5 - mLast.size();
         if (size == 0) return false;
         mLast.addAll(mLast.size(), new ArrayList<>(items.subList(0, size)));
