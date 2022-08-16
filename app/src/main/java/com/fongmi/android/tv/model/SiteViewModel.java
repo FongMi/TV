@@ -83,19 +83,9 @@ public class SiteViewModel extends ViewModel {
                 String categoryContent = spider.categoryContent(tid, page, filter, extend);
                 SpiderDebug.log(categoryContent);
                 return Result.fromJson(categoryContent);
-            } else if (home.getType() == 4) {
-                HashMap<String, String> params = new HashMap<>();
-                params.put("ac", "detail");
-                params.put("t", tid);
-                params.put("pg", page);
-                String extStr = new Gson().toJson(extend);
-                String ext = Base64.encodeToString(extStr.getBytes(), Base64.DEFAULT|Base64.NO_WRAP);
-                params.put("ext", ext);
-                String body = OKHttp.newCall(home.getApi(), params).execute().body().string();
-                SpiderDebug.log(body);
-                return Result.fromJson(body);
             } else {
                 HashMap<String, String> params = new HashMap<>();
+                if (home.getType() == 4) params.put("ext", getBase64Ext(extend));
                 params.put("ac", home.getType() == 0 ? "videolist" : "detail");
                 params.put("t", tid);
                 params.put("pg", page);
@@ -116,13 +106,6 @@ public class SiteViewModel extends ViewModel {
                 Result result = Result.fromJson(detailContent);
                 if (!result.getList().isEmpty()) result.getList().get(0).setVodFlags();
                 return result;
-            } else if (site.getType() == 4) {
-                HashMap<String, String> params = new HashMap<>();
-                params.put("ac", "detail");
-                params.put("ids", id);
-                String body = OKHttp.newCall(site.getApi(), params).execute().body().string();
-                SpiderDebug.log(body);
-                return Result.fromJson(body);
             } else {
                 HashMap<String, String> params = new HashMap<>();
                 params.put("ac", site.getType() == 0 ? "videolist" : "detail");
@@ -172,16 +155,9 @@ public class SiteViewModel extends ViewModel {
                 String searchContent = spider.searchContent(keyword, false);
                 SpiderDebug.log(searchContent);
                 postSearch(site, Result.fromJson(searchContent));
-            } else if (site.getType() == 4) {
-                HashMap<String, String> params = new HashMap<>();
-                params.put("ac", "detail");
-                params.put("wd", keyword);
-                String searchContent = OKHttp.newCall(site.getApi(), params).execute().body().string();
-                SpiderDebug.log(searchContent);
-                postSearch(site, Result.fromJson(searchContent));
             } else {
                 HashMap<String, String> params = new HashMap<>();
-                if (site.getType() == 1) params.put("ac", "detail");
+                if (site.getType() != 0) params.put("ac", "detail");
                 params.put("wd", keyword);
                 String body = OKHttp.newCall(site.getApi(), params).execute().body().string();
                 SpiderDebug.log(body);
@@ -191,6 +167,11 @@ public class SiteViewModel extends ViewModel {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private String getBase64Ext(HashMap<String, String> extend) {
+        String extStr = new Gson().toJson(extend);
+        return Base64.encodeToString(extStr.getBytes(), Base64.DEFAULT | Base64.NO_WRAP);
     }
 
     private void postSearch(Site site, Result item) {
