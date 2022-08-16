@@ -2,7 +2,10 @@ package com.fongmi.android.tv.utils;
 
 import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 
+import androidx.annotation.AnimRes;
 import androidx.annotation.ArrayRes;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.StringRes;
@@ -38,5 +41,9 @@ public class ResUtil {
 
     public static Drawable getDrawable(@DrawableRes int resId) {
         return ContextCompat.getDrawable(App.get(), resId);
+    }
+
+    public static Animation getAnim(@AnimRes int resId) {
+        return AnimationUtils.loadAnimation(App.get(), resId);
     }
 }

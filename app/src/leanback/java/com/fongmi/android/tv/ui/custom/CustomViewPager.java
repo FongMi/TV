@@ -10,13 +10,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.viewpager.widget.ViewPager;
 
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.utils.ResUtil;
 
 public class CustomViewPager extends ViewPager {
 
@@ -34,7 +34,7 @@ public class CustomViewPager extends ViewPager {
 
     private void init() {
         this.rect = new Rect();
-        this.shake = AnimationUtils.loadAnimation(getContext(), R.anim.shake);
+        this.shake = ResUtil.getAnim(R.anim.shake);
         setPageTransformer(false, (page, position) -> {
             page.setTranslationX(page.getWidth() * -position);
             if (position <= -1 || position >= 1) {
