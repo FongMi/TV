@@ -1,6 +1,7 @@
 package com.fongmi.android.tv.model;
 
 import android.text.TextUtils;
+import android.util.Base64;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -13,6 +14,7 @@ import com.fongmi.android.tv.net.OKHttp;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderDebug;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,6 +53,10 @@ public class SiteViewModel extends ViewModel {
                 SpiderDebug.log(homeVideoContent);
                 result.setList(Result.fromJson(homeVideoContent).getList());
                 return result;
+            } else if (home.getType() == 4) {
+                String homeContent = OKHttp.newCall(home.getApi()).execute().body().string();
+                SpiderDebug.log(homeContent);
+                return Result.fromJson(homeContent);
             } else {
                 String body = OKHttp.newCall(home.getApi()).execute().body().string();
                 SpiderDebug.log(body);
@@ -77,6 +83,17 @@ public class SiteViewModel extends ViewModel {
                 String categoryContent = spider.categoryContent(tid, page, filter, extend);
                 SpiderDebug.log(categoryContent);
                 return Result.fromJson(categoryContent);
+            } else if (home.getType() == 4) {
+                HashMap<String, String> params = new HashMap<>();
+                params.put("ac", "detail");
+                params.put("t", tid);
+                params.put("pg", page);
+                String extStr = new Gson().toJson(extend);
+                String ext = Base64.encodeToString(extStr.getBytes(), Base64.DEFAULT|Base64.NO_WRAP);
+                params.put("ext", ext);
+                String body = OKHttp.newCall(home.getApi(), params).execute().body().string();
+                SpiderDebug.log(body);
+                return Result.fromJson(body);
             } else {
                 HashMap<String, String> params = new HashMap<>();
                 params.put("ac", home.getType() == 0 ? "videolist" : "detail");
@@ -99,6 +116,13 @@ public class SiteViewModel extends ViewModel {
                 Result result = Result.fromJson(detailContent);
                 if (!result.getList().isEmpty()) result.getList().get(0).setVodFlags();
                 return result;
+            } else if (site.getType() == 4) {
+                HashMap<String, String> params = new HashMap<>();
+                params.put("ac", "detail");
+                params.put("ids", id);
+                String body = OKHttp.newCall(site.getApi(), params).execute().body().string();
+                SpiderDebug.log(body);
+                return Result.fromJson(body);
             } else {
                 HashMap<String, String> params = new HashMap<>();
                 params.put("ac", site.getType() == 0 ? "videolist" : "detail");
@@ -122,6 +146,13 @@ public class SiteViewModel extends ViewModel {
                 Result result = Result.objectFrom(playerContent);
                 if (result.getFlag().isEmpty()) result.setFlag(flag);
                 return result;
+            } else if (site.getType() == 4) {
+                HashMap<String, String> params = new HashMap<>();
+                params.put("play", id);
+                params.put("flag", flag);
+                String body = OKHttp.newCall(site.getApi(), params).execute().body().string();
+                SpiderDebug.log(body);
+                return Result.fromJson(body);
             } else {
                 Result result = new Result();
                 result.setUrl(id);
@@ -139,6 +170,13 @@ public class SiteViewModel extends ViewModel {
             if (site.getType() == 3) {
                 Spider spider = ApiConfig.get().getCSP(site);
                 String searchContent = spider.searchContent(keyword, false);
+                SpiderDebug.log(searchContent);
+                postSearch(site, Result.fromJson(searchContent));
+            } else if (site.getType() == 4) {
+                HashMap<String, String> params = new HashMap<>();
+                params.put("ac", "detail");
+                params.put("wd", keyword);
+                String searchContent = OKHttp.newCall(site.getApi(), params).execute().body().string();
                 SpiderDebug.log(searchContent);
                 postSearch(site, Result.fromJson(searchContent));
             } else {
