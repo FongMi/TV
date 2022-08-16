@@ -10,10 +10,6 @@ import android.util.Log;
 import androidx.core.content.FileProvider;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.BuildConfig;
-import com.fongmi.android.tv.net.OKHttp;
-
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -44,10 +40,6 @@ public class FileUtil {
 
     public static File getJar() {
         return getCacheFile("spider.jar");
-    }
-
-    public static File getApk() {
-        return getCacheFile("update.apk");
     }
 
     public static File getLocal(String path) {
@@ -90,18 +82,7 @@ public class FileUtil {
         if (dir.delete()) Log.d(TAG, "Deleted:" + dir.getPath());
     }
 
-    public static void checkUpdate() {
-        try {
-            String json = OKHttp.newCall("https://github.com/FongMi/TV/raw/main/release/leanback.json").execute().body().string();
-            JSONObject object = new JSONObject(json);
-            if (object.optInt("version") <= BuildConfig.VERSION_CODE) clearDir(getCacheDir());
-            else open(write(getApk(), OKHttp.newCall(object.optString("url")).execute().body().bytes()));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static void open(File file) {
+    public static void openFile(File file) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
