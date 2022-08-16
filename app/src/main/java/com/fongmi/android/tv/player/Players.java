@@ -4,32 +4,19 @@ import androidx.annotation.NonNull;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.api.ApiConfig;
-import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.event.PlayerEvent;
-import com.fongmi.android.tv.net.Callback;
-import com.fongmi.android.tv.net.OKHttp;
 import com.fongmi.android.tv.ui.custom.CustomWebView;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.util.Util;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
-import java.io.IOException;
 import java.util.Formatter;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import okhttp3.Call;
-import okhttp3.Headers;
-import okhttp3.Response;
-
-public class Players implements Player.Listener {
+public class Players implements Player.Listener, ParseTask.Callback {
 
     private CustomWebView webView;
     private StringBuilder builder;
@@ -55,6 +42,10 @@ public class Players implements Player.Listener {
 
     public ExoPlayer exo() {
         return exoPlayer;
+    }
+
+    public CustomWebView web() {
+        return webView;
     }
 
     public String getKey() {
@@ -116,58 +107,9 @@ public class Players implements Player.Listener {
         if (result.getUrl().isEmpty()) {
             PlayerEvent.error(R.string.error_play_load);
         } else if (result.getParse().equals("1") || result.getJx().equals("1")) {
-            startParse(result);
+            ParseTask.create(this).run(result);
         } else {
-            setMediaSource(getHeaders(result), result.getPlayUrl() + result.getUrl());
-        }
-    }
-
-    private HashMap<String, String> getHeaders(Result result) {
-        HashMap<String, String> headers = new HashMap<>();
-        if (result.getHeader().isEmpty()) return headers;
-        return getHeaders(JsonParser.parseString(result.getHeader()));
-    }
-
-    private HashMap<String, String> getHeaders(JsonElement element) {
-        HashMap<String, String> headers = new HashMap<>();
-        if (!element.isJsonObject()) return headers;
-        JsonObject object = element.getAsJsonObject();
-        for (String key : object.keySet()) headers.put(key, object.get(key).getAsString());
-        return headers;
-    }
-
-    private Parse getParse(String playUrl, boolean useParse) {
-        if (useParse) return ApiConfig.get().getParse();
-        if (playUrl.startsWith("json:")) return Parse.get(1, playUrl.substring(5));
-        if (playUrl.startsWith("parse:")) {
-            Parse parse = ApiConfig.get().getParse(playUrl.substring(6));
-            if (parse != null) return parse;
-        }
-        return Parse.get(0, playUrl);
-    }
-
-    private void startParse(Result result) {
-        boolean useParse = (result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx().equals("1");
-        Parse parse = getParse(result.getPlayUrl(), useParse);
-        if (parse.getType() == 0) {
-            webView.start(parse.getUrl() + result.getUrl());
-        } else if (parse.getType() == 1) {
-            Headers headers = new Headers.Builder().build();
-            if (parse.hasHeader()) headers = Headers.of(getHeaders(parse.getHeader()));
-            OKHttp.newCall(parse.getUrl() + result.getUrl(), headers).enqueue(new Callback() {
-                @Override
-                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                }
-
-                @Override
-                public void onFailure(@NonNull Call call, @NonNull IOException e) {
-
-                }
-            });
-        } else if (parse.getType() == 2) {
-
-        } else if (parse.getType() == 3) {
-
+            setMediaSource(result.getHeaders(), result.getPlayUrl() + result.getUrl());
         }
     }
 
@@ -211,6 +153,16 @@ public class Players implements Player.Listener {
             webView.destroy();
             webView = null;
         }
+    }
+
+    @Override
+    public void onParseSuccess(Map<String, String> headers, String url) {
+        setMediaSource(headers, url);
+    }
+
+    @Override
+    public void onParseError() {
+        PlayerEvent.error(R.string.error_play_parse);
     }
 
     @Override
