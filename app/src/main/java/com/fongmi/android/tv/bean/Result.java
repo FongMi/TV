@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 
+import com.fongmi.android.tv.utils.Json;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
@@ -11,6 +12,7 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 
@@ -22,8 +24,10 @@ import org.simpleframework.xml.core.Persister;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Root(name = "rss", strict = false)
 public class Result {
@@ -137,6 +141,12 @@ public class Result {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public Map<String, String> getHeaders() {
+        HashMap<String, String> headers = new HashMap<>();
+        if (getHeader().isEmpty()) return headers;
+        return Json.toMap(JsonParser.parseString(getHeader()));
     }
 
     @NonNull

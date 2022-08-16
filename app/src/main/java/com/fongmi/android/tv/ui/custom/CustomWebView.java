@@ -15,10 +15,8 @@ import android.webkit.WebViewClient;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
-import com.fongmi.android.tv.event.PlayerEvent;
-import com.fongmi.android.tv.player.Players;
+import com.fongmi.android.tv.player.ParseTask;
 import com.fongmi.android.tv.utils.Utils;
 
 import java.io.ByteArrayInputStream;
@@ -29,6 +27,7 @@ import java.util.Map;
 
 public class CustomWebView extends WebView {
 
+    private ParseTask.Callback callback;
     private WebResourceResponse empty;
     private List<String> keys;
     private Handler handler;
@@ -58,7 +57,8 @@ public class CustomWebView extends WebView {
         setWebViewClient(webViewClient());
     }
 
-    public void start(String url) {
+    public void start(String url, ParseTask.Callback callback) {
+        this.callback = callback;
         stopLoading();
         loadUrl(url);
         retry = 0;
@@ -75,7 +75,7 @@ public class CustomWebView extends WebView {
                 handler.removeCallbacks(mTimer);
                 handler.postDelayed(mTimer, 5000);
                 Map<String, String> headers = request.getRequestHeaders();
-                if (Utils.isVideoFormat(url) || headers.containsKey("Range")) post(get(headers), url);
+                if (Utils.isVideoFormat(url) || headers.containsKey("Range")) post(headers, url);
                 return super.shouldInterceptRequest(view, request);
             }
 
@@ -100,23 +100,20 @@ public class CustomWebView extends WebView {
         }
     };
 
-    private Map<String, String> get(Map<String, String> headers) {
+    private void post(Map<String, String> headers, String url) {
         Map<String, String> news = new HashMap<>();
         for (String key : headers.keySet()) if (keys.contains(key.toLowerCase())) news.put(key, headers.get(key));
-        return news;
-    }
-
-    private void post(Map<String, String> headers, String url) {
         handler.removeCallbacks(mTimer);
         handler.post(() -> {
+            callback.onParseSuccess(news, url);
             stop(false);
-            Players.get().setMediaSource(headers, url);
         });
     }
 
     public void stop(boolean error) {
         stopLoading();
         loadUrl("about:blank");
-        if (error) PlayerEvent.error(R.string.error_play_parse);
+        handler.removeCallbacks(mTimer);
+        if (error) handler.post(() -> callback.onParseError());
     }
 }

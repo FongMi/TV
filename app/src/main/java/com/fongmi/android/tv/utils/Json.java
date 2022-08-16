@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class Json {
@@ -19,5 +20,13 @@ public class Json {
         if (obj.get(key).isJsonObject()) result.add(obj.get(key).getAsString());
         else for (JsonElement opt : obj.getAsJsonArray(key)) result.add(opt.getAsString());
         return result;
+    }
+
+    public static HashMap<String, String> toMap(JsonElement element) {
+        HashMap<String, String> map = new HashMap<>();
+        if (!element.isJsonObject()) return map;
+        JsonObject object = element.getAsJsonObject();
+        for (String key : object.keySet()) map.put(key, object.get(key).getAsString());
+        return map;
     }
 }
