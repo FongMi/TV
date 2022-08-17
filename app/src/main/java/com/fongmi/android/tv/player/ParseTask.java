@@ -88,7 +88,7 @@ public class ParseTask {
         Result result = Result.fromObject(ApiConfig.get().jsonExt(parse.getUrl(), jxs, webUrl));
         if (result.getUrl().isEmpty()) {
             onParseError();
-        } else if (result.getParse() == 1) {
+        } else if (result.getParse(0) == 1) {
             handler.post(() -> Players.get().web().start(result.getUrl(), callback));
         } else {
             onParseSuccess(result.getHeaders(), result.getUrl(), result.getJxFrom());
@@ -107,7 +107,7 @@ public class ParseTask {
         Result result = Result.fromObject(ApiConfig.get().jsonExtMix(flag + "@", parse.getUrl(), parse.getName(), jxs, webUrl));
         if (result.getUrl().isEmpty()) {
             onParseError();
-        } else if (result.getParse() == 1) {
+        } else if (result.getParse(0) == 1) {
             handler.post(() -> Players.get().web().start(result.getUrl(), callback));
         } else {
             onParseSuccess(result.getHeaders(), result.getUrl(), result.getJxFrom());

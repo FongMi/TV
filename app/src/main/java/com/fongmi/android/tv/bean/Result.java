@@ -127,8 +127,8 @@ public class Result {
         return TextUtils.isEmpty(jxFrom) ? "" : jxFrom;
     }
 
-    public Integer getParse() {
-        return parse == null ? 1 : parse;
+    public Integer getParse(Integer def) {
+        return parse == null ? def : parse;
     }
 
     public void setParse(Integer parse) {
