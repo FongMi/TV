@@ -5,7 +5,6 @@ import android.os.Looper;
 
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Parse;
-import com.fongmi.android.tv.bean.ParseResult;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.net.OKHttp;
 import com.fongmi.android.tv.utils.Json;
@@ -86,13 +85,13 @@ public class ParseTask {
     private void jsonExtend(String webUrl) {
         LinkedHashMap<String, String> jxs = new LinkedHashMap<>();
         for (Parse item : ApiConfig.get().getParses()) if (item.getType() == 1) jxs.put(item.getName(), item.mixUrl());
-        ParseResult result = ParseResult.objectFrom(ApiConfig.get().jsonExt(parse.getUrl(), jxs, webUrl));
+        Result result = Result.fromObject(ApiConfig.get().jsonExt(parse.getUrl(), jxs, webUrl));
         if (result.getUrl().isEmpty()) {
             onParseError();
         } else if (result.getParse() == 1) {
             handler.post(() -> Players.get().web().start(result.getUrl(), callback));
         } else {
-            onParseSuccess(result.hasHeader() ? Json.toMap(result.getHeader()) : new HashMap<>(), result.getUrl());
+            onParseSuccess(result.getHeaders(), result.getUrl());
         }
     }
 
@@ -105,13 +104,13 @@ public class ParseTask {
             map.put("url", item.getUrl());
             jxs.put(item.getName(), map);
         }
-        ParseResult result = ParseResult.objectFrom(ApiConfig.get().jsonExtMix(flag + "@", parse.getUrl(), parse.getName(), jxs, webUrl));
+        Result result = Result.fromObject(ApiConfig.get().jsonExtMix(flag + "@", parse.getUrl(), parse.getName(), jxs, webUrl));
         if (result.getUrl().isEmpty()) {
             onParseError();
         } else if (result.getParse() == 1) {
             handler.post(() -> Players.get().web().start(result.getUrl(), callback));
         } else {
-            onParseSuccess(result.hasHeader() ? Json.toMap(result.getHeader()) : new HashMap<>(), result.getUrl());
+            onParseSuccess(result.getHeaders(), result.getUrl());
         }
     }
 

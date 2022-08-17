@@ -40,7 +40,8 @@
                 android:nextFocusLeft="@id/next"
                 android:nextFocusDown="@id/parse"
                 android:text="@string/play_next"
-                android:textColor="@color/white" />
+                android:textColor="@color/white"
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/prev"
@@ -52,7 +53,8 @@
                 android:focusableInTouchMode="true"
                 android:nextFocusDown="@id/parse"
                 android:text="@string/play_prev"
-                android:textColor="@color/white" />
+                android:textColor="@color/white"
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/replay"
@@ -64,7 +66,8 @@
                 android:focusableInTouchMode="true"
                 android:nextFocusDown="@id/parse"
                 android:text="@string/play_replay"
-                android:textColor="@color/white" />
+                android:textColor="@color/white"
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/speed"
@@ -76,6 +79,7 @@
                 android:focusableInTouchMode="true"
                 android:nextFocusDown="@id/parse"
                 android:textColor="@color/white"
+                android:textSize="14sp"
                 tools:text="1.00" />
 
             <TextView
@@ -88,6 +92,7 @@
                 android:focusableInTouchMode="true"
                 android:nextFocusDown="@id/parse"
                 android:textColor="@color/white"
+                android:textSize="14sp"
                 tools:text="預設" />
 
             <TextView
@@ -108,6 +113,7 @@
                 android:focusableInTouchMode="true"
                 android:nextFocusDown="@id/parse"
                 android:textColor="@color/white"
+                android:textSize="14sp"
                 tools:text="00:00" />
 
             <TextView
@@ -120,6 +126,7 @@
                 android:focusableInTouchMode="true"
                 android:nextFocusDown="@id/parse"
                 android:textColor="@color/white"
+                android:textSize="14sp"
                 tools:text="00:00" />
 
             <TextView
@@ -132,6 +139,7 @@
                 android:focusableInTouchMode="true"
                 android:nextFocusDown="@id/parse"
                 android:textColor="@color/white"
+                android:textSize="14sp"
                 tools:text="15秒" />
 
             <TextView
@@ -144,7 +152,8 @@
                 android:nextFocusRight="@id/reset"
                 android:nextFocusDown="@id/parse"
                 android:text="@string/play_reset"
-                android:textColor="@color/white" />
+                android:textColor="@color/white"
+                android:textSize="14sp" />
 
         </LinearLayout>
 

@@ -12,10 +12,10 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.google.gson.JsonParser;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 
+import org.json.JSONObject;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Path;
 import org.simpleframework.xml.Root;
@@ -45,28 +45,28 @@ public class Result {
     @SerializedName("filters")
     private LinkedHashMap<String, List<Filter>> filters;
 
+    @SerializedName("header")
+    private JsonElement header;
     @SerializedName("playUrl")
     private String playUrl;
-    @SerializedName("header")
-    private String header;
-    @SerializedName("flag")
-    private String flag;
-    @SerializedName("url")
-    private String url;
+    @SerializedName("jxFrom")
+    private String jxFrom;
     @SerializedName("parse")
     private Integer parse;
     @SerializedName("jx")
     private Integer jx;
+    @SerializedName("flag")
+    private String flag;
+    @SerializedName("url")
+    private String url;
 
     public static Result fromJson(String str) {
         try {
-            Type type = new TypeToken<LinkedHashMap<String, List<Filter>>>() {
-            }.getType();
+            Type type = new TypeToken<LinkedHashMap<String, List<Filter>>>() {}.getType();
             Gson gson = new GsonBuilder().registerTypeAdapter(type, new FiltersAdapter()).create();
             Result result = gson.fromJson(str, Result.class);
             return result == null ? new Result() : result;
         } catch (Exception e) {
-            e.printStackTrace();
             return new Result();
         }
     }
@@ -75,13 +75,20 @@ public class Result {
         try {
             return new Persister().read(Result.class, str);
         } catch (Exception e) {
-            e.printStackTrace();
             return new Result();
         }
     }
 
+    public static Result fromObject(JSONObject object) {
+        return objectFrom(object.toString());
+    }
+
     public static Result objectFrom(String str) {
-        return new Gson().fromJson(str, Result.class);
+        try {
+            return new Gson().fromJson(str, Result.class);
+        } catch (Exception e) {
+            return new Result();
+        }
     }
 
     public List<Class> getTypes() {
@@ -104,6 +111,10 @@ public class Result {
         return filters == null ? new LinkedHashMap<>() : filters;
     }
 
+    private JsonElement getHeader() {
+        return header;
+    }
+
     public String getPlayUrl() {
         return TextUtils.isEmpty(playUrl) ? "" : playUrl;
     }
@@ -112,8 +123,8 @@ public class Result {
         this.playUrl = playUrl;
     }
 
-    public String getHeader() {
-        return TextUtils.isEmpty(header) ? "" : header;
+    public String getJxFrom() {
+        return TextUtils.isEmpty(jxFrom) ? "" : jxFrom;
     }
 
     public Integer getParse() {
@@ -124,16 +135,16 @@ public class Result {
         this.parse = parse;
     }
 
+    public Integer getJx() {
+        return jx == null ? 0 : jx;
+    }
+
     public String getFlag() {
         return TextUtils.isEmpty(flag) ? "" : flag;
     }
 
     public void setFlag(String flag) {
         this.flag = flag;
-    }
-
-    public Integer getJx() {
-        return jx == null ? 0 : jx;
     }
 
     public String getUrl() {
@@ -144,10 +155,12 @@ public class Result {
         this.url = url;
     }
 
+    public boolean hasHeader() {
+        return getHeader() != null;
+    }
+
     public Map<String, String> getHeaders() {
-        HashMap<String, String> headers = new HashMap<>();
-        if (getHeader().isEmpty()) return headers;
-        return Json.toMap(JsonParser.parseString(getHeader()));
+        return hasHeader() ? Json.toMap(getHeader()) : new HashMap<>();
     }
 
     @NonNull
