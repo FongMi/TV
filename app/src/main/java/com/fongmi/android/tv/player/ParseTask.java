@@ -38,13 +38,10 @@ public class ParseTask {
         this.callback = callback;
     }
 
-    private boolean useParse(Result result) {
-        return (result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx() == 1;
-    }
-
-    public void run(Result result) {
-        setParse(result.getPlayUrl(), useParse(result));
+    public ParseTask run(Result result, boolean useParse) {
+        setParse(result.getPlayUrl(), useParse);
         executor.submit(() -> doInBackground(result.getUrl(), result.getFlag()));
+        return this;
     }
 
     private void setParse(String url, boolean useParse) {
@@ -108,7 +105,7 @@ public class ParseTask {
             map.put("url", item.getUrl());
             jxs.put(item.getName(), map);
         }
-        ParseResult result = ParseResult.objectFrom(ApiConfig.get().jsonExtMix(flag + "111", parse.getUrl(), parse.getName(), jxs, webUrl));
+        ParseResult result = ParseResult.objectFrom(ApiConfig.get().jsonExtMix(flag + "@", parse.getUrl(), parse.getName(), jxs, webUrl));
         if (result.getUrl().isEmpty()) {
             onParseError();
         } else if (result.getParse() == 1) {

@@ -203,8 +203,8 @@ public class ApiConfig {
 
     public void setHome(Site home) {
         this.home = home;
-        this.home.setActivated(true);
         Prefers.putHome(home.getKey());
+        for (Site item : sites) item.setActivated(home);
     }
 
     public Parse getParse() {
@@ -213,8 +213,8 @@ public class ApiConfig {
 
     public void setParse(Parse parse) {
         this.parse = parse;
-        this.parse.setActivated(true);
         Prefers.putParse(parse.getName());
+        for (Parse item : parses) item.setActivated(parse);
     }
 
     public ApiConfig clear() {

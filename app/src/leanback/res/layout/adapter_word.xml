@@ -4,7 +4,7 @@
     android:id="@+id/text"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@drawable/selector_type"
+    android:background="@drawable/selector_item_round"
     android:focusable="true"
     android:focusableInTouchMode="true"
     android:nextFocusLeft="@id/word"

@@ -8,7 +8,9 @@
     android:focusable="true"
     android:focusableInTouchMode="true"
     android:gravity="center"
+    android:nextFocusUp="@id/next"
+    android:nextFocusDown="@id/exo_progress"
     android:singleLine="true"
     android:textColor="@color/white"
-    android:textSize="18sp"
+    android:textSize="14sp"
     tools:text="解析" />

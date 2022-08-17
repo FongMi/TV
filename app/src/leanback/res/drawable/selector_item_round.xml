@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/shape_item_round_focused" android:state_focused="true" />
+    <item android:drawable="@drawable/shape_item_round_activated" android:state_activated="true" />
+    <item android:drawable="@drawable/shape_item_round_normal" />
+</selector>

@@ -10,7 +10,7 @@ import com.fongmi.android.tv.databinding.AdapterWordBinding;
 
 public class WordPresenter extends Presenter {
 
-    private OnClickListener mListener;
+    private final OnClickListener mListener;
 
     public WordPresenter(OnClickListener listener) {
         this.mListener = listener;
@@ -18,10 +18,6 @@ public class WordPresenter extends Presenter {
 
     public interface OnClickListener {
         void onItemClick(String text);
-    }
-
-    public void setOnClickListener(OnClickListener listener) {
-        this.mListener = listener;
     }
 
     @Override

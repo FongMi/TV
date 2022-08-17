@@ -23,6 +23,8 @@ import androidx.viewbinding.ViewBinding;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.History;
+import com.fongmi.android.tv.bean.Parse;
+import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.ActivityDetailBinding;
 import com.fongmi.android.tv.databinding.ViewControllerBottomBinding;
@@ -34,6 +36,7 @@ import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.presenter.EpisodePresenter;
 import com.fongmi.android.tv.ui.presenter.FlagPresenter;
 import com.fongmi.android.tv.ui.presenter.GroupPresenter;
+import com.fongmi.android.tv.ui.presenter.ParsePresenter;
 import com.fongmi.android.tv.utils.KeyDown;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
@@ -55,8 +58,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
     private ArrayObjectAdapter mFlagAdapter;
     private ArrayObjectAdapter mGroupAdapter;
     private ArrayObjectAdapter mEpisodeAdapter;
-    private EpisodePresenter mEpisodePresenter;
-    private FlagPresenter mFlagPresenter;
+    private ArrayObjectAdapter mParseAdapter;
     private SiteViewModel mSiteViewModel;
     private boolean mFullscreen;
     private KeyDown mKeyDown;
@@ -100,7 +102,9 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
 
     @Override
     protected ViewBinding getBinding() {
-        return mBinding = ActivityDetailBinding.inflate(getLayoutInflater());
+        mBinding = ActivityDetailBinding.inflate(getLayoutInflater());
+        mControl = ViewControllerBottomBinding.bind(mBinding.video.findViewById(com.google.android.exoplayer2.ui.R.id.exo_controller));
+        return mBinding;
     }
 
     @Override
@@ -148,29 +152,43 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
             }
         });
         mBinding.video.setOnClickListener(view -> enterFullscreen());
-        mFlagPresenter.setOnClickListener(this::setFlagActivated);
-        mEpisodePresenter.setOnClickListener(this::setEpisodeActivated);
     }
 
     private void setRecyclerView() {
         mBinding.flag.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.flag.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-        mBinding.flag.setAdapter(new ItemBridgeAdapter(mFlagAdapter = new ArrayObjectAdapter(mFlagPresenter = new FlagPresenter())));
+        mBinding.flag.setAdapter(new ItemBridgeAdapter(mFlagAdapter = new ArrayObjectAdapter(new FlagPresenter(this::setFlagActivated))));
         mBinding.episode.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.episode.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-        mBinding.episode.setAdapter(new ItemBridgeAdapter(mEpisodeAdapter = new ArrayObjectAdapter(mEpisodePresenter = new EpisodePresenter())));
+        mBinding.episode.setAdapter(new ItemBridgeAdapter(mEpisodeAdapter = new ArrayObjectAdapter(new EpisodePresenter(this::setEpisodeActivated))));
         mBinding.group.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.group.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         mBinding.group.setAdapter(new ItemBridgeAdapter(mGroupAdapter = new ArrayObjectAdapter(new GroupPresenter())));
+        mControl.parse.setHorizontalSpacing(ResUtil.dp2px(8));
+        mControl.parse.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+        mControl.parse.setAdapter(new ItemBridgeAdapter(mParseAdapter = new ArrayObjectAdapter(new ParsePresenter(this::setParseActivated))));
+        mParseAdapter.setItems(ApiConfig.get().getParses(), null);
     }
 
     private void setVideoView() {
-        mControl = ViewControllerBottomBinding.bind(mBinding.video.findViewById(com.google.android.exoplayer2.ui.R.id.exo_controller));
         mControl.scale.setText(ResUtil.getStringArray(R.array.select_scale)[Prefers.getScale()]);
         mControl.interval.setText(ResUtil.getString(R.string.second, Prefers.getInterval()));
         mControl.speed.setText(Players.get().getSpeed());
         mBinding.video.setResizeMode(Prefers.getScale());
         mBinding.video.setPlayer(Players.get().exo());
+    }
+
+    private void setViewModel() {
+        mSiteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
+        mSiteViewModel.player.observe(this, result -> {
+            boolean useParse = (result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx() == 1;
+            mControl.parseLayout.setVisibility(useParse ? View.VISIBLE : View.GONE);
+            Players.get().setMediaSource(result, useParse);
+        });
+        mSiteViewModel.result.observe(this, result -> {
+            if (result.getList().isEmpty()) mBinding.progressLayout.showEmpty();
+            else setDetail(result.getList().get(0));
+        });
     }
 
     private void getDetail() {
@@ -184,15 +202,6 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
         mBinding.progress.getRoot().setVisibility(View.VISIBLE);
         mBinding.error.getRoot().setVisibility(View.GONE);
         updateHistory(item, replay);
-    }
-
-    private void setViewModel() {
-        mSiteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
-        mSiteViewModel.player.observe(this, result -> Players.get().setMediaSource(result));
-        mSiteViewModel.result.observe(this, result -> {
-            if (result.getList().isEmpty()) mBinding.progressLayout.showEmpty();
-            else setDetail(result.getList().get(0));
-        });
     }
 
     private void setDetail(Vod item) {
@@ -237,6 +246,15 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
         mEpisodeAdapter.notifyArrayItemRangeChanged(0, mEpisodeAdapter.size());
         mHandler.post(() -> mBinding.episode.setSelectedPosition(getEpisodePosition()));
         getPlayer(false);
+    }
+
+    private void setParseActivated(Parse item) {
+        ApiConfig.get().setParse(item);
+        mBinding.error.getRoot().setVisibility(View.GONE);
+        mBinding.progress.getRoot().setVisibility(View.VISIBLE);
+        Result result = mSiteViewModel.getPlayer().getValue();
+        if (result != null) Players.get().setMediaSource(result, true);
+        mParseAdapter.notifyArrayItemRangeChanged(0, mParseAdapter.size());
     }
 
     private void setGroup(int size) {
@@ -402,7 +420,6 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
                 break;
             case Player.STATE_READY:
                 mBinding.progress.getRoot().setVisibility(View.GONE);
-                mRetry = 0;
                 break;
             case Player.STATE_ENDED:
                 onNext();
@@ -418,6 +435,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
         Players.get().seekTo(mHistory.getDuration());
         stopTimer();
         setTimer();
+        mRetry = 0;
     }
 
     private void stopTimer() {

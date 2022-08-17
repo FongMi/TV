@@ -40,6 +40,10 @@ public class SiteViewModel extends ViewModel {
         return result;
     }
 
+    public MutableLiveData<Result> getPlayer() {
+        return player;
+    }
+
     public void homeContent() {
         Site home = ApiConfig.get().getHome();
         execute(result, () -> {

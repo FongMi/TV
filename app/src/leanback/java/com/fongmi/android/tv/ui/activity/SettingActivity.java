@@ -105,19 +105,15 @@ public class SettingActivity extends BaseActivity implements ConfigDialog.Callba
         if (ApiConfig.get().getSites().isEmpty()) return;
         int position = ApiConfig.get().getSites().indexOf(ApiConfig.get().getHome());
         DialogSiteBinding bindingDialog = DialogSiteBinding.inflate(LayoutInflater.from(this));
-        SitePresenter presenter = new SitePresenter();
-        ArrayObjectAdapter adapter = new ArrayObjectAdapter(presenter);
+        ArrayObjectAdapter adapter = new ArrayObjectAdapter(new SitePresenter(this::setSite));
         adapter.addAll(0, ApiConfig.get().getSites());
-        presenter.setOnClickListener(item -> setSite(adapter, item));
         bindingDialog.recycler.setVerticalSpacing(ResUtil.dp2px(16));
         bindingDialog.recycler.setAdapter(new ItemBridgeAdapter(adapter));
         bindingDialog.recycler.scrollToPosition(position);
         Notify.show(this, bindingDialog.getRoot());
     }
 
-    public void setSite(ArrayObjectAdapter adapter, Site item) {
-        for (int i = 0; i < adapter.size(); i++) ((Site) adapter.get(i)).setActivated(item);
-        adapter.notifyArrayItemRangeChanged(0, adapter.size());
+    public void setSite(Site item) {
         mBinding.home.setText(item.getName());
         ApiConfig.get().setHome(item);
         RefreshEvent.video();

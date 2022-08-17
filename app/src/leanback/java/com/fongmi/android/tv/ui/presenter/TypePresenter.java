@@ -13,14 +13,14 @@ import com.fongmi.android.tv.utils.ResUtil;
 
 public class TypePresenter extends Presenter {
 
-    private OnClickListener mListener;
+    private final OnClickListener mListener;
+
+    public TypePresenter(OnClickListener listener) {
+        this.mListener = listener;
+    }
 
     public interface OnClickListener {
         void onItemClick(Class item);
-    }
-
-    public void setOnClickListener(OnClickListener listener) {
-        this.mListener = listener;
     }
 
     @Override

@@ -6,32 +6,33 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.leanback.widget.Presenter;
 
-import com.fongmi.android.tv.bean.Site;
-import com.fongmi.android.tv.databinding.AdapterSiteBinding;
+import com.fongmi.android.tv.bean.Parse;
+import com.fongmi.android.tv.databinding.AdapterParseBinding;
 
-public class SitePresenter extends Presenter {
+public class ParsePresenter extends Presenter {
 
     private final OnClickListener mListener;
 
-    public SitePresenter(OnClickListener listener) {
+    public ParsePresenter(OnClickListener listener) {
         this.mListener = listener;
     }
 
     public interface OnClickListener {
-        void onItemClick(Site item);
+        void onItemClick(Parse parse);
     }
 
     @Override
     public Presenter.ViewHolder onCreateViewHolder(ViewGroup parent) {
-        return new ViewHolder(AdapterSiteBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        return new ViewHolder(AdapterParseBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
     }
 
     @Override
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object object) {
-        Site item = (Site) object;
+        Parse item = (Parse) object;
         ViewHolder holder = (ViewHolder) viewHolder;
+        holder.binding.text.setText(item.getName());
+        holder.binding.text.setActivated(item.isActivated());
         setOnClickListener(holder, view -> mListener.onItemClick(item));
-        holder.binding.text.setText((item.isActivated() ? "√ " : "").concat(item.getName()));
     }
 
     @Override
@@ -40,9 +41,9 @@ public class SitePresenter extends Presenter {
 
     public static class ViewHolder extends Presenter.ViewHolder {
 
-        private final AdapterSiteBinding binding;
+        private final AdapterParseBinding binding;
 
-        public ViewHolder(@NonNull AdapterSiteBinding binding) {
+        public ViewHolder(@NonNull AdapterParseBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
         }

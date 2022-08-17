@@ -11,14 +11,14 @@ import com.fongmi.android.tv.databinding.AdapterEpisodeBinding;
 
 public class EpisodePresenter extends Presenter {
 
-    private OnClickListener mListener;
+    private final OnClickListener mListener;
+
+    public EpisodePresenter(OnClickListener listener) {
+        this.mListener = listener;
+    }
 
     public interface OnClickListener {
         void onItemClick(Vod.Flag.Episode item);
-    }
-
-    public void setOnClickListener(OnClickListener listener) {
-        this.mListener = listener;
     }
 
     @Override

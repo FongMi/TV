@@ -22,6 +22,7 @@ public class Players implements Player.Listener, ParseTask.Callback {
     private StringBuilder builder;
     private Formatter formatter;
     private ExoPlayer exoPlayer;
+    private ParseTask parseTask;
     private String key;
 
     private static class Loader {
@@ -103,11 +104,12 @@ public class Players implements Player.Listener, ParseTask.Callback {
         return exoPlayer.getPlaybackState() == Player.STATE_IDLE;
     }
 
-    public void setMediaSource(Result result) {
+    public void setMediaSource(Result result, boolean useParse) {
         if (result.getUrl().isEmpty()) {
             PlayerEvent.error(R.string.error_play_load);
         } else if (result.getParse() == 1 || result.getJx() == 1) {
-            ParseTask.create(this).run(result);
+            if (parseTask != null) parseTask.cancel();
+            parseTask = ParseTask.create(this).run(result, useParse);
         } else {
             setMediaSource(result.getHeaders(), result.getPlayUrl() + result.getUrl());
         }

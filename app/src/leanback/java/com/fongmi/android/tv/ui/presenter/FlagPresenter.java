@@ -11,14 +11,14 @@ import com.fongmi.android.tv.databinding.AdapterFlagBinding;
 
 public class FlagPresenter extends Presenter {
 
-    private OnClickListener mListener;
+    private final OnClickListener mListener;
+
+    public FlagPresenter(OnClickListener listener) {
+        this.mListener = listener;
+    }
 
     public interface OnClickListener {
         void onItemClick(Vod.Flag item);
-    }
-
-    public void setOnClickListener(OnClickListener listener) {
-        this.mListener = listener;
     }
 
     @Override
