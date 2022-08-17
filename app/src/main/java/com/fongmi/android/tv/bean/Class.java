@@ -36,8 +36,9 @@ public class Class {
         return filter;
     }
 
-    public void toggleFilter() {
+    public Class toggleFilter() {
         setFilter(!getFilter());
+        return this;
     }
 
     public int getIcon() {
