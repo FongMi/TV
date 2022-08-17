@@ -77,6 +77,10 @@ public class Parse {
         this.activated = activated;
     }
 
+    public void setActivated(Parse item) {
+        this.activated = item.equals(this);
+    }
+
     public boolean hasHeader() {
         return getExt().getHeader() != null;
     }

@@ -33,7 +33,6 @@ import java.util.List;
 public class VodActivity extends BaseActivity {
 
     private ActivityVodBinding mBinding;
-    private TypePresenter mTypePresenter;
     private ArrayObjectAdapter mAdapter;
     private PageAdapter mPageAdapter;
     private Result mResult;
@@ -66,7 +65,6 @@ public class VodActivity extends BaseActivity {
 
     @Override
     protected void initEvent() {
-        mTypePresenter.setOnClickListener(this::updateFilter);
         mBinding.pager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
@@ -88,7 +86,7 @@ public class VodActivity extends BaseActivity {
     private void setRecyclerView() {
         mBinding.recycler.setHorizontalSpacing(ResUtil.dp2px(16));
         mBinding.recycler.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-        mBinding.recycler.setAdapter(new ItemBridgeAdapter(mAdapter = new ArrayObjectAdapter(mTypePresenter = new TypePresenter())));
+        mBinding.recycler.setAdapter(new ItemBridgeAdapter(mAdapter = new ArrayObjectAdapter(new TypePresenter(this::updateFilter))));
     }
 
     private void setTypes() {
