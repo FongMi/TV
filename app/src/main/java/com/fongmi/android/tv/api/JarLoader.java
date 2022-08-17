@@ -28,18 +28,17 @@ public class JarLoader {
         this.spiders = new ConcurrentHashMap<>();
     }
 
-    public void load(File file) throws Exception {
+    public void load(File file) {
         spiders.clear();
         proxyFun = null;
         classLoader = new DexClassLoader(file.getAbsolutePath(), FileUtil.getCachePath(), null, App.get().getClassLoader());
-        Class<?> classInit = classLoader.loadClass("com.github.catvod.spider.Init");
-        Class<?> classProxy = classLoader.loadClass("com.github.catvod.spider.Proxy");
-        if (classInit != null) {
+        try {
+            Class<?> classInit = classLoader.loadClass("com.github.catvod.spider.Init");
             Method method = classInit.getMethod("init", Context.class);
             method.invoke(classInit, App.get());
-        }
-        if (classProxy != null) {
+            Class<?> classProxy = classLoader.loadClass("com.github.catvod.spider.Proxy");
             proxyFun = classProxy.getMethod("proxy", Map.class);
+        } catch (Exception ignored) {
         }
     }
 
