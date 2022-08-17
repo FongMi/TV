@@ -184,11 +184,19 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
             boolean useParse = (result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx() == 1;
             mControl.parseLayout.setVisibility(useParse ? View.VISIBLE : View.GONE);
             Players.get().setMediaSource(result, useParse);
+            resetFocus(useParse);
         });
         mSiteViewModel.result.observe(this, result -> {
             if (result.getList().isEmpty()) mBinding.progressLayout.showEmpty();
             else setDetail(result.getList().get(0));
         });
+    }
+
+    private void resetFocus(boolean useParse) {
+        mControl.exoProgress.setNextFocusUpId(useParse ? R.id.parse : R.id.next);
+        for (int i = 0; i < mControl.playLayout.getChildCount(); i++) {
+            mControl.playLayout.getChildAt(i).setNextFocusDownId(useParse ? R.id.parse : com.google.android.exoplayer2.ui.R.id.exo_progress);
+        }
     }
 
     private void getDetail() {
