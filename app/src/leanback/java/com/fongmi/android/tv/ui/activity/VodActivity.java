@@ -97,9 +97,9 @@ public class VodActivity extends BaseActivity {
             }
         }
         if (newTypes.size() > 0) mResult.setTypes(newTypes);
-        for (Class item : mResult.getTypes()) {
-            if (ApiConfig.get().getHome().isFilterable() && mResult.getFilters().containsKey(item.getTypeId())) {
-                item.setFilter(false);
+        if (ApiConfig.get().getHome().isFilterable()) {
+            for (Class item : mResult.getTypes()) {
+                if (mResult.getFilters().containsKey(item.getTypeId())) item.setFilter(false);
             }
         }
         mAdapter.setItems(mResult.getTypes(), null);
