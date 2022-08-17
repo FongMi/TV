@@ -59,6 +59,7 @@
     <string name="dialog_positive">确定</string>
     <string name="dialog_negative">取消</string>
     <string name="dialog_config_url_hint">请输入配置接口</string>
+    <string name="dialog_config_info">手机或电脑连接同一个局域网\n扫描 QR Code 或浏览器输入地址\n<xliff:g name="name">%s</xliff:g></string>
 
     <!-- Error -->
     <string name="error_config_get">配置取得失败</string>

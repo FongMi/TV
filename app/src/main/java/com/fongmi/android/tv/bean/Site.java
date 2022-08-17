@@ -72,12 +72,24 @@ public class Site {
         return searchable == null || searchable == 1;
     }
 
+    public void setSearchable(boolean searchable) {
+        this.searchable = searchable ? 1 : 0;
+    }
+
     public boolean isQuickSearch() {
         return quickSearch == null || quickSearch == 1;
     }
 
+    public void setQuickSearch(boolean quickSearch) {
+        this.quickSearch = quickSearch ? 1 : 0;
+    }
+
     public boolean isFilterable() {
         return filterable == null || filterable == 1;
+    }
+
+    public void setFilterable(boolean filterable) {
+        this.filterable = filterable ? 1 : 0;
     }
 
     public String getExt() {

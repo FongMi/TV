@@ -59,6 +59,7 @@
     <string name="dialog_positive">確定</string>
     <string name="dialog_negative">取消</string>
     <string name="dialog_config_url_hint">請輸入配置接口</string>
+    <string name="dialog_config_info">手機或電腦連接同一個區域網路\n掃描 QR Code 或瀏覽器輸入網址\n<xliff:g name="name">%s</xliff:g></string>
 
     <!-- Error -->
     <string name="error_config_get">配置取得失敗</string>

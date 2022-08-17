@@ -6,7 +6,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.leanback.widget.Presenter;
 
-import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Class;
 import com.fongmi.android.tv.databinding.AdapterTypeBinding;
 import com.fongmi.android.tv.utils.ResUtil;
@@ -34,7 +33,7 @@ public class TypePresenter extends Presenter {
         ViewHolder holder = (ViewHolder) viewHolder;
         holder.binding.text.setText(item.getTypeName());
         holder.binding.text.setCompoundDrawablePadding(ResUtil.dp2px(4));
-        holder.binding.text.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, item.getFilter() == null ? 0 : item.getFilter() ? R.drawable.ic_filter_off : R.drawable.ic_filter_on, 0);
+        holder.binding.text.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, item.getIcon(), 0);
         setOnClickListener(holder, view -> mListener.onItemClick(item));
     }
 

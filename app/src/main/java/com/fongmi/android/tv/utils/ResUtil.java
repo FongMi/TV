@@ -23,6 +23,10 @@ public class ResUtil {
         return getDisplayMetrics().widthPixels;
     }
 
+    public static int getScreenHeightPx() {
+        return getDisplayMetrics().heightPixels;
+    }
+
     public static int dp2px(int dpValue) {
         return Math.round(dpValue * getDisplayMetrics().density);
     }
