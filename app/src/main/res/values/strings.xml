@@ -59,6 +59,7 @@
     <string name="dialog_positive">OK</string>
     <string name="dialog_negative">Cancel</string>
     <string name="dialog_config_url_hint">Please enter the configuration url</string>
+    <string name="dialog_config_info">Connect phone or pc to LAN and Scan QR Code or enter the URL in browser\n<xliff:g name="name">%s</xliff:g></string>
 
     <!-- Error -->
     <string name="error_config_get">Configuration get failed</string>

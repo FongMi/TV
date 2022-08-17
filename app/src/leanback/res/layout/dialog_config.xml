@@ -2,22 +2,24 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:padding="24dp">
+    android:padding="16dp">
 
     <ImageView
         android:id="@+id/code"
-        android:layout_width="160dp"
-        android:layout_height="160dp"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
         android:scaleType="fitXY" />
 
     <TextView
         android:id="@+id/info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
+        android:layout_marginStart="12dp"
         android:layout_toEndOf="@+id/code"
         android:lineSpacingExtra="4dp"
-        android:text="@string/push_info"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
+        android:text="@string/dialog_config_info"
         android:textColor="@color/grey_700"
         android:textSize="16sp" />
 
@@ -28,7 +30,6 @@
         android:layout_above="@+id/bottom"
         android:layout_alignStart="@+id/info"
         android:layout_marginBottom="16dp"
-        android:background="@null"
         android:hint="@string/dialog_config_url_hint"
         android:imeOptions="actionDone"
         android:importantForAutofill="no"

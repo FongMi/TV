@@ -7,6 +7,7 @@
     android:background="@drawable/selector_item_round"
     android:focusable="true"
     android:focusableInTouchMode="true"
+    android:gravity="center"
     android:textColor="@color/white"
     android:textSize="16sp"
     tools:text="電影" />
