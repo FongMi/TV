@@ -75,7 +75,7 @@ public class ParseTask {
             JsonObject object = JsonParser.parseString(response.body().string()).getAsJsonObject();
             HashMap<String, String> headers = new HashMap<>();
             for (String key : object.keySet()) if (key.equalsIgnoreCase("user-agent") || key.equalsIgnoreCase("referer")) headers.put(key, object.get(key).getAsString());
-            onParseSuccess(headers, object.get("url").getAsString());
+            onParseSuccess(headers, object.get("url").getAsString(), "");
         } catch (Exception e) {
             e.printStackTrace();
             onParseError();
@@ -91,7 +91,7 @@ public class ParseTask {
         } else if (result.getParse() == 1) {
             handler.post(() -> Players.get().web().start(result.getUrl(), callback));
         } else {
-            onParseSuccess(result.getHeaders(), result.getUrl());
+            onParseSuccess(result.getHeaders(), result.getUrl(), result.getJxFrom());
         }
     }
 
@@ -110,13 +110,13 @@ public class ParseTask {
         } else if (result.getParse() == 1) {
             handler.post(() -> Players.get().web().start(result.getUrl(), callback));
         } else {
-            onParseSuccess(result.getHeaders(), result.getUrl());
+            onParseSuccess(result.getHeaders(), result.getUrl(), result.getJxFrom());
         }
     }
 
-    private void onParseSuccess(Map<String, String> headers, String url) {
+    private void onParseSuccess(Map<String, String> headers, String url, String from) {
         handler.post(() -> {
-            if (callback != null) callback.onParseSuccess(headers, url);
+            if (callback != null) callback.onParseSuccess(headers, url, from);
         });
     }
 
@@ -134,7 +134,7 @@ public class ParseTask {
 
     public interface Callback {
 
-        void onParseSuccess(Map<String, String> headers, String url);
+        void onParseSuccess(Map<String, String> headers, String url, String from);
 
         void onParseError();
     }

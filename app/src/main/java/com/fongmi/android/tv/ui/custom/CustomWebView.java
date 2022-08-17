@@ -105,7 +105,7 @@ public class CustomWebView extends WebView {
         for (String key : headers.keySet()) if (keys.contains(key.toLowerCase())) news.put(key, headers.get(key));
         handler.removeCallbacks(mTimer);
         handler.post(() -> {
-            callback.onParseSuccess(news, url);
+            callback.onParseSuccess(news, url, "");
             stop(false);
         });
     }

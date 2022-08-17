@@ -45,6 +45,10 @@
     <string name="play_reset">Reset</string>
     <string name="play_oped">OP&amp;ED</string>
 
+    <!-- Parse -->
+    <string name="parse">Parse</string>
+    <string name="parse_from">Parse from: <xliff:g name="name">%s</xliff:g></string>
+
     <!-- Setting -->
     <string name="setting_site">Home site</string>
     <string name="setting_url">Configure</string>
