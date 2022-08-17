@@ -107,7 +107,7 @@
                 android:nextFocusLeft="@id/word"
                 android:text="@string/search_clear"
                 android:textColor="@color/white"
-                android:textSize="18sp" />
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/search"
@@ -121,7 +121,7 @@
                 android:gravity="center"
                 android:text="@string/home_search"
                 android:textColor="@color/white"
-                android:textSize="18sp" />
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/remote"
@@ -134,7 +134,7 @@
                 android:gravity="center"
                 android:text="@string/search_remote"
                 android:textColor="@color/white"
-                android:textSize="18sp" />
+                android:textSize="16sp" />
 
         </LinearLayout>
     </RelativeLayout>

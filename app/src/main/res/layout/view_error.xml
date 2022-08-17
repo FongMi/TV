@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:textColor="@color/white"
-        android:textSize="18sp"
-        tools:text="@string/error_play" />
+        android:textSize="16sp"
+        tools:text="@string/error_play_format" />
 
 </LinearLayout>
