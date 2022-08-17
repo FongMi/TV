@@ -7,6 +7,8 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.ui.custom.CustomWebView;
+import com.fongmi.android.tv.utils.Notify;
+import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.Player;
@@ -158,7 +160,8 @@ public class Players implements Player.Listener, ParseTask.Callback {
     }
 
     @Override
-    public void onParseSuccess(Map<String, String> headers, String url) {
+    public void onParseSuccess(Map<String, String> headers, String url, String from) {
+        if (from.length() > 0) Notify.show(ResUtil.getString(R.string.parse_from, from));
         setMediaSource(headers, url);
     }
 

@@ -164,13 +164,14 @@
             android:layout_marginTop="16dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:visibility="gone">
+            android:visibility="gone"
+            tools:visibility="visible">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="12dp"
-                android:text="解析"
+                android:text="@string/parse"
                 android:textColor="@color/grey_700"
                 android:textSize="18sp" />
 
