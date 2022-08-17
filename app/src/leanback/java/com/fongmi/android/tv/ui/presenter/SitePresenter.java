@@ -6,7 +6,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.leanback.widget.Presenter;
 
-import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.databinding.AdapterSiteBinding;
 
@@ -36,12 +35,12 @@ public class SitePresenter extends Presenter {
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object object) {
         Site item = (Site) object;
         ViewHolder holder = (ViewHolder) viewHolder;
+        holder.binding.text.setText(item.getActivatedName());
+        holder.binding.filter.setImageResource(item.getFilterIcon());
+        holder.binding.search.setImageResource(item.getSearchIcon());
         holder.binding.text.setOnClickListener(v -> mListener.onTextClick(item));
         holder.binding.search.setOnClickListener(v -> mListener.onSearchClick(item));
         holder.binding.filter.setOnClickListener(v -> mListener.onFilterClick(item));
-        holder.binding.text.setText((item.isActivated() ? "√ " : "").concat(item.getName()));
-        holder.binding.filter.setImageResource(item.isFilterable() ? R.drawable.ic_filter_on : R.drawable.ic_filter_off);
-        holder.binding.search.setImageResource(item.isSearchable() ? R.drawable.ic_search_on : R.drawable.ic_search_off);
     }
 
     @Override

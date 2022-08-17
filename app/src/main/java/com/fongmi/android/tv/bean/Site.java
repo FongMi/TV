@@ -2,6 +2,7 @@ package com.fongmi.android.tv.bean;
 
 import android.text.TextUtils;
 
+import com.fongmi.android.tv.R;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
@@ -23,8 +24,6 @@ public class Site {
     private String playerUrl;
     @SerializedName("searchable")
     private Integer searchable;
-    @SerializedName("quickSearch")
-    private Integer quickSearch;
     @SerializedName("filterable")
     private Integer filterable;
     @SerializedName("ext")
@@ -76,14 +75,6 @@ public class Site {
         this.searchable = searchable ? 1 : 0;
     }
 
-    public boolean isQuickSearch() {
-        return quickSearch == null || quickSearch == 1;
-    }
-
-    public void setQuickSearch(boolean quickSearch) {
-        this.quickSearch = quickSearch ? 1 : 0;
-    }
-
     public boolean isFilterable() {
         return filterable == null || filterable == 1;
     }
@@ -104,7 +95,6 @@ public class Site {
         return categories == null ? Collections.emptyList() : categories;
     }
 
-
     public boolean isActivated() {
         return activated;
     }
@@ -115,6 +105,18 @@ public class Site {
 
     public void setActivated(Site item) {
         this.activated = item.equals(this);
+    }
+
+    public String getActivatedName() {
+        return (isActivated() ? "√ " : "").concat(getName());
+    }
+
+    public int getSearchIcon() {
+        return isSearchable() ? R.drawable.ic_search_on : R.drawable.ic_search_off;
+    }
+
+    public int getFilterIcon() {
+        return isFilterable() ? R.drawable.ic_filter_on : R.drawable.ic_filter_off;
     }
 
     @Override
