@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/navigation"
         app:defaultNavHost="true"
-        app:navGraph="@navigation/nav_main" />
+        app:navGraph="@navigation/nav_graph" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/navigation"
