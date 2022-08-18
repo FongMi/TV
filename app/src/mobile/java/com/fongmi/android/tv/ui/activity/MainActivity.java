@@ -26,18 +26,11 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void initView() {
-
-
+        NavHostFragment fragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.container);
+        NavigationUI.setupWithNavController(mBinding.navigation, fragment.getNavController());
     }
 
     @Override
     protected void initEvent() {
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        NavHostFragment fragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.container);
-        NavigationUI.setupWithNavController(mBinding.navigation, fragment.getNavController());
     }
 }
