@@ -7,67 +7,59 @@ import android.view.WindowManager;
 import androidx.appcompat.app.AlertDialog;
 import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.ItemBridgeAdapter;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.fongmi.android.tv.SettingCallback;
-import com.fongmi.android.tv.api.ApiConfig;
-import com.fongmi.android.tv.bean.Site;
-import com.fongmi.android.tv.databinding.DialogSiteBinding;
-import com.fongmi.android.tv.ui.presenter.SitePresenter;
+import com.fongmi.android.tv.bean.Config;
+import com.fongmi.android.tv.databinding.DialogConfigHistoryBinding;
+import com.fongmi.android.tv.ui.presenter.ConfigPresenter;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-public class SiteDialog implements SitePresenter.OnClickListener {
+public class ConfigHistoryDialog implements ConfigPresenter.OnClickListener {
 
+    private DialogConfigHistoryBinding binding;
     private ArrayObjectAdapter adapter;
-    private DialogSiteBinding binding;
     private SettingCallback callback;
     private AlertDialog dialog;
 
     public static void show(Activity activity) {
-        if (ApiConfig.get().getSites().isEmpty()) return;
-        new SiteDialog().create(activity);
+        new ConfigHistoryDialog().create(activity);
     }
 
     public void create(Activity activity) {
         callback = (SettingCallback) activity;
-        binding = DialogSiteBinding.inflate(LayoutInflater.from(activity));
+        binding = DialogConfigHistoryBinding.inflate(LayoutInflater.from(activity));
         dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).create();
         setRecyclerView();
         setDialog();
     }
 
     private void setRecyclerView() {
-        int position = ApiConfig.get().getSites().indexOf(ApiConfig.get().getHome());
-        adapter = new ArrayObjectAdapter(new SitePresenter(this));
-        adapter.addAll(0, ApiConfig.get().getSites());
+        adapter = new ArrayObjectAdapter(new ConfigPresenter(this));
+        binding.recycler.setLayoutManager(new LinearLayoutManager(dialog.getContext()));
         binding.recycler.setAdapter(new ItemBridgeAdapter(adapter));
-        binding.recycler.scrollToPosition(position);
+        adapter.addAll(0, Config.getAll());
     }
 
     private void setDialog() {
         WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
         params.width = (int) (ResUtil.getScreenWidthPx() * 0.45f);
-        params.height = (int) (ResUtil.getScreenHeightPx() * 0.8f);
         dialog.getWindow().setAttributes(params);
         dialog.getWindow().setDimAmount(0);
         dialog.show();
     }
 
     @Override
-    public void onTextClick(Site item) {
-        callback.setSite(item);
+    public void onTextClick(Config item) {
+        callback.setConfig(item.getUrl());
         dialog.dismiss();
     }
 
     @Override
-    public void onSearchClick(Site item) {
-        item.setSearchable(!item.isSearchable());
-        adapter.notifyArrayItemRangeChanged(0, adapter.size());
-    }
-
-    @Override
-    public void onFilterClick(Site item) {
-        item.setFilterable(!item.isFilterable());
-        adapter.notifyArrayItemRangeChanged(0, adapter.size());
+    public void onDeleteClick(Config item) {
+        item.delete();
+        adapter.remove(item);
+        if (adapter.size() == 0) dialog.dismiss();
     }
 }

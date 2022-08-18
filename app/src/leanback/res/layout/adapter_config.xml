@@ -9,7 +9,7 @@
     <TextView
         android:id="@+id/text"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_weight="1"
         android:background="@drawable/selector_text"
         android:ellipsize="marquee"
@@ -21,30 +21,18 @@
         android:singleLine="true"
         android:textColor="@color/white"
         android:textSize="18sp"
-        tools:text="泥巴" />
+        tools:text="https://fongmi.github.io/cat.json" />
 
     <ImageView
-        android:id="@+id/search"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:id="@+id/delete"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginStart="12dp"
-        android:layout_marginEnd="12dp"
         android:background="@drawable/selector_text"
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:padding="8dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_search_on" />
-
-    <ImageView
-        android:id="@+id/filter"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/selector_text"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:padding="8dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/ic_filter_on" />
+        android:src="@drawable/ic_delete" />
 
 </LinearLayout>

@@ -40,6 +40,7 @@ public class ApiConfig {
     private Handler handler;
     private Parse parse;
     private Site home;
+    private int cid;
 
     private static class Loader {
         static volatile ApiConfig INSTANCE = new ApiConfig();
@@ -55,6 +56,10 @@ public class ApiConfig {
 
     public static String getSiteName(String key) {
         return get().getSite(key).getName();
+    }
+
+    public static int getCid() {
+        return get().cid;
     }
 
     public ApiConfig init() {
@@ -217,6 +222,10 @@ public class ApiConfig {
         this.parse.setActivated(true);
         Prefers.putParse(parse.getName());
         for (Parse item : parses) item.setActivated(parse);
+    }
+
+    public void setCid(int cid) {
+        this.cid = cid;
     }
 
     public ApiConfig clear() {

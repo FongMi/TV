@@ -6,6 +6,8 @@ import androidx.room.PrimaryKey;
 
 import com.fongmi.android.tv.db.AppDatabase;
 
+import java.util.List;
+
 @Entity
 public class History {
 
@@ -21,6 +23,7 @@ public class History {
     private long opening;
     private long ending;
     private long duration;
+    private int cid;
 
     public History() {
     }
@@ -106,6 +109,14 @@ public class History {
         this.duration = duration;
     }
 
+    public int getCid() {
+        return cid;
+    }
+
+    public void setCid(int cid) {
+        this.cid = cid;
+    }
+
     public String getSiteKey() {
         return getKey().substring(0, getKey().lastIndexOf(AppDatabase.SYMBOL));
     }
@@ -120,5 +131,32 @@ public class History {
 
     public Vod.Flag.Episode getEpisode() {
         return new Vod.Flag.Episode(getVodRemarks(), getEpisodeUrl());
+    }
+
+    public static History find(String key) {
+        return AppDatabase.get().getHistoryDao().find(key);
+    }
+
+    public static List<History> find(int cid) {
+        return AppDatabase.get().getHistoryDao().find(cid);
+    }
+
+    public static void delete(int id) {
+        AppDatabase.get().getHistoryDao().delete(id);
+    }
+
+    public History save() {
+        AppDatabase.get().getHistoryDao().insertOrUpdate(this);
+        return this;
+    }
+
+    public History update() {
+        AppDatabase.get().getHistoryDao().update(this);
+        return this;
+    }
+
+    public History delete() {
+        AppDatabase.get().getHistoryDao().delete(getKey());
+        return this;
     }
 }

@@ -23,7 +23,6 @@ import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.ActivityHomeBinding;
-import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.event.ServerEvent;
 import com.fongmi.android.tv.model.SiteViewModel;
@@ -153,7 +152,7 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
         int historyIndex = getHistoryIndex();
         int recommendIndex = getRecommendIndex();
         boolean isExist = recommendIndex - historyIndex == 2;
-        List<History> items = AppDatabase.get().getHistoryDao().getAll();
+        List<History> items = History.find(ApiConfig.getCid());
         if (items.isEmpty() && isExist) mAdapter.removeItems(getHistoryIndex(), 1);
         if (items.size() > 0 && !isExist) mAdapter.add(historyIndex, new ListRow(mHistoryAdapter));
         mHistoryAdapter.setItems(items, null);
@@ -199,8 +198,7 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
 
     @Override
     public void onItemDelete(History item) {
-        mHistoryAdapter.remove(item);
-        AppDatabase.get().getHistoryDao().delete(item.getKey());
+        mHistoryAdapter.remove(item.delete());
         if (mHistoryAdapter.size() > 0) return;
         mAdapter.removeItems(getHistoryIndex(), 1);
         mHistoryPresenter.setDelete(false);

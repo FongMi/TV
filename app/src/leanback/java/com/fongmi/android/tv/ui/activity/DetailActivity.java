@@ -342,11 +342,11 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
         mHistory.setOpening(0);
         mControl.ending.setText(Players.get().getStringForTime(mHistory.getEnding()));
         mControl.opening.setText(Players.get().getStringForTime(mHistory.getOpening()));
-        AppDatabase.get().getHistoryDao().update(mHistory);
+        mHistory.update();
     }
 
     private void checkHistory() {
-        mHistory = AppDatabase.get().getHistoryDao().find(getHistoryKey());
+        mHistory = History.find(getHistoryKey());
         if (mFlagAdapter.size() == 0) {
             Notify.show(R.string.error_episode);
             return;
@@ -368,10 +368,10 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
     private History createHistory() {
         History history = new History();
         history.setKey(getHistoryKey());
+        history.setCid(ApiConfig.getCid());
         history.setVodPic(mBinding.video.getTag().toString());
         history.setVodName(mBinding.name.getText().toString());
-        AppDatabase.get().getHistoryDao().insertOrUpdate(history);
-        return history;
+        return history.save();
     }
 
     private void updateHistory(Vod.Flag.Episode item, boolean replay) {
@@ -382,14 +382,12 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
         mHistory.setVodRemarks(item.getName());
         mHistory.setVodFlag(getVodFlag().getFlag());
         mHistory.setCreateTime(System.currentTimeMillis());
-        AppDatabase.get().getHistoryDao().update(mHistory);
-        RefreshEvent.history();
     }
 
     private void updateHistory() {
         if (mHistory == null) return;
         mHistory.setDuration(Players.get().getCurrentPosition());
-        AppDatabase.get().getHistoryDao().update(mHistory);
+        mHistory.update();
     }
 
     private final Runnable mHideCenter = new Runnable() {
@@ -538,6 +536,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
         stopTimer();
         updateHistory();
         Players.get().stop();
+        RefreshEvent.history();
         EventBus.getDefault().unregister(this);
     }
 }

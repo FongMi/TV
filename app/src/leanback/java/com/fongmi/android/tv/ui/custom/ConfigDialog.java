@@ -10,6 +10,7 @@ import android.view.inputmethod.EditorInfo;
 import androidx.appcompat.app.AlertDialog;
 
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.SettingCallback;
 import com.fongmi.android.tv.databinding.DialogConfigBinding;
 import com.fongmi.android.tv.event.ServerEvent;
 import com.fongmi.android.tv.server.Server;
@@ -25,15 +26,15 @@ import org.greenrobot.eventbus.ThreadMode;
 public class ConfigDialog implements DialogInterface.OnDismissListener {
 
     private DialogConfigBinding binding;
+    private SettingCallback callback;
     private AlertDialog dialog;
-    private Callback callback;
 
     public static void show(Activity activity) {
         new ConfigDialog().create(activity);
     }
 
     public void create(Activity activity) {
-        callback = (Callback) activity;
+        callback = (SettingCallback) activity;
         binding = DialogConfigBinding.inflate(LayoutInflater.from(activity));
         dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).create();
         EventBus.getDefault().register(this);
@@ -89,10 +90,5 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
     @Override
     public void onDismiss(DialogInterface dialogInterface) {
         EventBus.getDefault().unregister(this);
-    }
-
-    public interface Callback {
-
-        void setConfig(String url);
     }
 }
