@@ -7,25 +7,8 @@
     <!-- Splash -->
     <string name="splash_info">Loading configuration</string>
 
-    <!-- Home -->
-    <string name="home_vod">Vod</string>
-    <string name="home_live">Live</string>
-    <string name="home_search">Search</string>
-    <string name="home_push">Push</string>
-    <string name="home_setting">Setting</string>
-    <string name="home_history">History</string>
-    <string name="home_recommend">Recommend</string>
-
     <!-- Vod -->
     <string name="vod_last">Last seen <xliff:g name="name">%s</xliff:g></string>
-
-    <!-- Search -->
-    <string name="search_hint">Keywords…</string>
-    <string name="search_clear">Clear</string>
-    <string name="search_remote">Remote</string>
-
-    <!-- Push -->
-    <string name="push_info">Connect phone or pc to LAN and scan QR Code or enter the URL in browser\n<xliff:g name="name">%s</xliff:g></string>
 
     <!-- Detail -->
     <string name="detail_site">Site: <xliff:g name="name">%s</xliff:g></string>
@@ -58,8 +41,7 @@
     <!-- Dialog -->
     <string name="dialog_positive">OK</string>
     <string name="dialog_negative">Cancel</string>
-    <string name="dialog_config_url_hint">Please enter the configuration url</string>
-    <string name="dialog_config_info">Connect phone or pc to LAN and Scan QR Code or enter the URL in browser\n<xliff:g name="name">%s</xliff:g></string>
+    <string name="dialog_config_hint">Please enter the configuration url</string>
 
     <!-- Error -->
     <string name="error_config_get">Configuration get failed</string>

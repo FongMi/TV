@@ -3,8 +3,10 @@ package com.fongmi.android.tv.ui.activity;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
+import android.os.Bundle;
 import android.view.View;
 
+import androidx.core.splashscreen.SplashScreen;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.api.ApiConfig;
@@ -20,6 +22,12 @@ public class SplashActivity extends BaseActivity {
     @Override
     protected ViewBinding getBinding() {
         return mBinding = ActivitySplashBinding.inflate(getLayoutInflater());
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        SplashScreen.installSplashScreen(this);
+        super.onCreate(savedInstanceState);
     }
 
     @Override

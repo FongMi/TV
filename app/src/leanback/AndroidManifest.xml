@@ -31,7 +31,8 @@
             android:name=".ui.activity.SplashActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
             android:exported="true"
-            android:screenOrientation="sensorLandscape">
+            android:screenOrientation="sensorLandscape"
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -41,14 +42,19 @@
         </activity>
 
         <activity
-            android:name=".ui.activity.DetailActivity"
+            android:name=".ui.activity.HomeActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
-            android:launchMode="singleTop"
             android:screenOrientation="sensorLandscape" />
 
         <activity
-            android:name=".ui.activity.HomeActivity"
+            android:name=".ui.activity.VodActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
+            android:screenOrientation="sensorLandscape" />
+
+        <activity
+            android:name=".ui.activity.DetailActivity"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
+            android:launchMode="singleTop"
             android:screenOrientation="sensorLandscape" />
 
         <activity
@@ -65,11 +71,6 @@
 
         <activity
             android:name=".ui.activity.SettingActivity"
-            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
-            android:screenOrientation="sensorLandscape" />
-
-        <activity
-            android:name=".ui.activity.VodActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
             android:screenOrientation="sensorLandscape" />
 

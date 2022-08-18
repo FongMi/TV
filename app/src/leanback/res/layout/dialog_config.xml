@@ -30,7 +30,7 @@
         android:layout_above="@+id/bottom"
         android:layout_alignStart="@+id/info"
         android:layout_marginBottom="16dp"
-        android:hint="@string/dialog_config_url_hint"
+        android:hint="@string/dialog_config_hint"
         android:imeOptions="actionDone"
         android:importantForAutofill="no"
         android:inputType="text"

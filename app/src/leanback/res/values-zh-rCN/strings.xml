@@ -1,0 +1,23 @@
+<resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
+
+    <!-- Home -->
+    <string name="home_vod">点播</string>
+    <string name="home_live">直播</string>
+    <string name="home_search">搜索</string>
+    <string name="home_push">推送</string>
+    <string name="home_setting">设定</string>
+    <string name="home_history">最近观看</string>
+    <string name="home_recommend">更新推荐</string>
+
+    <!-- Search -->
+    <string name="search_hint">输入关键字…</string>
+    <string name="search_clear">清空</string>
+    <string name="search_remote">远程</string>
+
+    <!-- Push -->
+    <string name="push_info">手机或电脑连接同一个局域网，扫描 QR Code 或浏览器输入地址\n<xliff:g name="name">%s</xliff:g></string>
+
+    <!-- Dialog -->
+    <string name="dialog_config_info">手机或电脑连接同一个局域网\n扫描 QR Code 或浏览器输入地址\n<xliff:g name="name">%s</xliff:g></string>
+
+</resources>
