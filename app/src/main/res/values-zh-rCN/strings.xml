@@ -7,25 +7,8 @@
     <!-- Splash -->
     <string name="splash_info">正在加载配置</string>
 
-    <!-- Home -->
-    <string name="home_vod">点播</string>
-    <string name="home_live">直播</string>
-    <string name="home_search">搜索</string>
-    <string name="home_push">推送</string>
-    <string name="home_setting">设定</string>
-    <string name="home_history">最近观看</string>
-    <string name="home_recommend">更新推荐</string>
-
     <!-- Vod -->
     <string name="vod_last">上次看到<xliff:g name="name">%s</xliff:g></string>
-
-    <!-- Search -->
-    <string name="search_hint">输入关键字…</string>
-    <string name="search_clear">清空</string>
-    <string name="search_remote">远程</string>
-
-    <!-- Push -->
-    <string name="push_info">手机或电脑连接同一个局域网，扫描 QR Code 或浏览器输入地址\n<xliff:g name="name">%s</xliff:g></string>
 
     <!-- Detail -->
     <string name="detail_site">站源：<xliff:g name="name">%s</xliff:g></string>
@@ -58,8 +41,7 @@
     <!-- Dialog -->
     <string name="dialog_positive">确定</string>
     <string name="dialog_negative">取消</string>
-    <string name="dialog_config_url_hint">请输入配置接口</string>
-    <string name="dialog_config_info">手机或电脑连接同一个局域网\n扫描 QR Code 或浏览器输入地址\n<xliff:g name="name">%s</xliff:g></string>
+    <string name="dialog_config_hint">请输入配置接口</string>
 
     <!-- Error -->
     <string name="error_config_get">配置取得失败</string>
