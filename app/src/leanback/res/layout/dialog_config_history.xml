@@ -11,11 +11,11 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
-        android:text="@string/setting_site_select"
+        android:text="@string/setting_history"
         android:textColor="@color/grey_700"
         android:textSize="18sp" />
 
-    <androidx.leanback.widget.VerticalGridView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -1,10 +1,10 @@
 package com.fongmi.android.tv.bean;
 
 import android.text.TextUtils;
-import android.util.Base64;
 
 import androidx.annotation.NonNull;
 
+import com.fongmi.android.tv.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
@@ -92,7 +92,7 @@ public class Parse {
     public String mixUrl() {
         int index = getUrl().indexOf("?");
         if (index == -1) return getUrl();
-        return getUrl().substring(0, index + 1) + "cat_ext=" + Base64.encodeToString(getExt().toString().getBytes(), Base64.DEFAULT | Base64.URL_SAFE | Base64.NO_WRAP) + "&" + getUrl().substring(index + 1);
+        return getUrl().substring(0, index + 1) + "cat_ext=" + Utils.getBase64(getExt().toString()) + "&" + getUrl().substring(index + 1);
     }
 
     @Override

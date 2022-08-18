@@ -59,10 +59,10 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
     private final ActivityResultLauncher<String> launcherString = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> onVoice());
 
     private ActivitySearchBinding mBinding;
-    private SpeechRecognizer mRecognizer;
     private SiteViewModel mSiteViewModel;
     private ArrayObjectAdapter mWordAdapter;
     private ArrayObjectAdapter mAdapter;
+    private SpeechRecognizer mRecognizer;
     private ExecutorService mService;
     private List<Site> mSites;
     private Handler mHandler;

@@ -15,19 +15,21 @@ import androidx.core.content.ContextCompat;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.SettingCallback;
 import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.databinding.ActivitySettingBinding;
-import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.ui.custom.ConfigDialog;
+import com.fongmi.android.tv.ui.custom.ConfigHistoryDialog;
 import com.fongmi.android.tv.ui.custom.SiteDialog;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 
-public class SettingActivity extends BaseActivity implements ConfigDialog.Callback, SiteDialog.Callback {
+public class SettingActivity extends BaseActivity implements SettingCallback {
 
     private final ActivityResultLauncher<String> launcherString = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> loadConfig());
     private final ActivityResultLauncher<Intent> launcherIntent = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> loadConfig());
@@ -54,6 +56,7 @@ public class SettingActivity extends BaseActivity implements ConfigDialog.Callba
     protected void initEvent() {
         mBinding.site.setOnClickListener(view -> SiteDialog.show(this));
         mBinding.config.setOnClickListener(view -> ConfigDialog.show(this));
+        mBinding.history.setOnClickListener(view -> ConfigHistoryDialog.show(this));
         mBinding.thumbnail.setOnClickListener(this::setThumbnail);
     }
 
@@ -68,7 +71,6 @@ public class SettingActivity extends BaseActivity implements ConfigDialog.Callba
     public void setConfig(String url) {
         mBinding.url.setText(url);
         Notify.progress(this);
-        AppDatabase.clear();
         Prefers.putUrl(url);
         checkUrl(url);
     }
@@ -87,21 +89,23 @@ public class SettingActivity extends BaseActivity implements ConfigDialog.Callba
         ApiConfig.get().clear().loadConfig(new Callback() {
             @Override
             public void success() {
-                mBinding.home.setText(ApiConfig.getHomeName());
-                RefreshEvent.history();
-                RefreshEvent.video();
-                Notify.dismiss();
+                Config.save();
+                setSite(0);
             }
 
             @Override
             public void error(int resId) {
-                mBinding.home.setText(ApiConfig.getHomeName());
-                RefreshEvent.history();
-                RefreshEvent.video();
-                Notify.dismiss();
-                Notify.show(resId);
+                setSite(resId);
             }
         });
+    }
+
+    private void setSite(int resId) {
+        mBinding.home.setText(ApiConfig.getHomeName());
+        RefreshEvent.history();
+        RefreshEvent.video();
+        Notify.show(resId);
+        Notify.dismiss();
     }
 
     public void setThumbnail(View view) {

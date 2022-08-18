@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.IBinder;
 import android.provider.Settings;
+import android.util.Base64;
 import android.util.Rational;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -52,6 +53,10 @@ public class Utils {
         if (url.contains("=http") || url.contains("=https") || url.contains("=https%3a%2f") || url.contains("=http%3a%2f")) return false;
         if (SNIFFER.matcher(url).find()) return !url.contains("cdn-tos") || (!url.contains(".js") && !url.contains(".css"));
         return false;
+    }
+
+    public static String getBase64(String ext) {
+        return Base64.encodeToString(ext.getBytes(), Base64.DEFAULT | Base64.NO_WRAP);
     }
 
     public static void hideKeyboard(View view) {

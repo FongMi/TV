@@ -10,6 +10,7 @@ import androidx.core.splashscreen.SplashScreen;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.databinding.ActivitySplashBinding;
 import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.utils.Notify;
@@ -51,6 +52,7 @@ public class SplashActivity extends BaseActivity {
             @Override
             public void success() {
                 HomeActivity.start(getActivity());
+                Config.save();
             }
 
             @Override
