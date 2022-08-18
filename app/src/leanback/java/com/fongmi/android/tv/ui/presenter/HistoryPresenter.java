@@ -67,7 +67,6 @@ public class HistoryPresenter extends Presenter {
         holder.binding.name.setText(item.getVodName());
         holder.binding.site.setText(ApiConfig.getSiteName(item.getSiteKey()));
         holder.binding.remark.setText(ResUtil.getString(R.string.vod_last, item.getVodRemarks()));
-        holder.binding.name.setVisibility(delete ? View.GONE : View.VISIBLE);
         holder.binding.site.setVisibility(delete ? View.GONE : View.VISIBLE);
         holder.binding.remark.setVisibility(delete ? View.GONE : View.VISIBLE);
         holder.binding.delete.setVisibility(!delete ? View.GONE : View.VISIBLE);
