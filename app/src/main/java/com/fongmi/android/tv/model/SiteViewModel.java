@@ -168,7 +168,7 @@ public class SiteViewModel extends ViewModel {
                 if (site.getType() == 0) postSearch(site, Result.fromXml(body));
                 else postSearch(site, Result.fromJson(body));
             }
-        } catch (Exception e) {
+        } catch (Exception | NoClassDefFoundError e) {
             e.printStackTrace();
         }
     }
