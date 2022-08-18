@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/home"
+        android:icon="@drawable/ic_home"
+        android:title="@string/main_home" />
+
+    <item
+        android:id="@+id/vod"
+        android:icon="@drawable/ic_vod"
+        android:title="@string/main_vod" />
+
+    <item
+        android:id="@+id/setting"
+        android:icon="@drawable/ic_setting"
+        android:title="@string/main_setting" />
+
+</menu>

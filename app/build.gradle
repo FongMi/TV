@@ -51,6 +51,7 @@ android {
 dependencies {
     implementation project(':catvod')
     implementation 'androidx.appcompat:appcompat:1.4.2'
+    implementation 'androidx.core:core-splashscreen:1.0.0'
     implementation 'androidx.preference:preference:1.2.0'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation 'androidx.room:room-runtime:2.4.3'
@@ -68,6 +69,8 @@ dependencies {
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
     implementation('org.simpleframework:simple-xml:2.7.1') { exclude group: 'stax', module: 'stax-api' exclude group: 'xpp3', module: 'xpp3' }
     leanbackImplementation 'androidx.leanback:leanback:1.2.0-alpha02'
+    mobileImplementation 'androidx.navigation:navigation-fragment:2.5.1'
+    mobileImplementation 'androidx.navigation:navigation-ui:2.5.1'
     annotationProcessor 'androidx.room:room-compiler:2.4.3'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.13.2'
 }

@@ -1,0 +1,8 @@
+<resources>
+
+    <!-- Main -->
+    <string name="main_home">首页</string>
+    <string name="main_vod">片库</string>
+    <string name="main_setting">设定</string>
+
+</resources>
