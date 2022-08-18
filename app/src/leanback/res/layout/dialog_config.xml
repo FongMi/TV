@@ -43,7 +43,6 @@
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/info"
         android:layout_alignBottom="@+id/code"
-        android:gravity="end"
         android:orientation="horizontal">
 
         <TextView
