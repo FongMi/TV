@@ -1,8 +1,8 @@
 <resources>
 
-    <!-- Main -->
-    <string name="main_home">Home</string>
-    <string name="main_vod">Vod</string>
-    <string name="main_setting">Setting</string>
+    <!-- Nav -->
+    <string name="nav_home">Home</string>
+    <string name="nav_vod">Vod</string>
+    <string name="nav_setting">Setting</string>
 
 </resources>

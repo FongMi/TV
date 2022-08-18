@@ -57,6 +57,6 @@ public class SiteDialog implements SiteAdapter.OnClickListener {
 
     public interface Callback {
 
-        void setSite(Site site);
+        void setSite(Site item);
     }
 }

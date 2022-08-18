@@ -57,7 +57,7 @@ public class SiteAdapter extends RecyclerView.Adapter<SiteAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Site site = mItems.get(position);
-        holder.binding.text.setText(site.getActivatedName());
+        Site item = mItems.get(position);
+        holder.binding.text.setText(item.getActivatedName());
     }
 }

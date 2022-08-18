@@ -10,8 +10,8 @@ import com.fongmi.android.tv.utils.ResUtil;
 
 public class SpaceItemDecoration extends RecyclerView.ItemDecoration {
 
-    private final int spanCount;
     private final int spacing;
+    private final int spanCount;
 
     public SpaceItemDecoration(int spanCount, int spacing) {
         this.spanCount = spanCount;
