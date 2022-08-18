@@ -147,7 +147,7 @@ public class Vod {
         String[] playFlags = getVodPlayFrom().split("\\$\\$\\$");
         String[] playUrls = getVodPlayUrl().split("\\$\\$\\$");
         for (int i = 0; i < playFlags.length; i++) {
-            if (playFlags[i].isEmpty()) continue;
+            if (playFlags[i].isEmpty() || i >= playUrls.length) continue;
             Vod.Flag item = new Vod.Flag(playFlags[i]);
             item.createEpisode(playUrls[i]);
             getVodFlags().add(item);

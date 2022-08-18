@@ -190,6 +190,7 @@ public class SiteViewModel extends ViewModel {
             try {
                 if (!Thread.interrupted()) result.postValue(service.submit(callable).get(15, TimeUnit.SECONDS));
             } catch (Exception e) {
+                e.printStackTrace();
                 if (e instanceof InterruptedException) return;
                 if (!Thread.interrupted()) result.postValue(new Result());
             }
