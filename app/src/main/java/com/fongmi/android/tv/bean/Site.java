@@ -7,6 +7,7 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.db.AppDatabase;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
@@ -142,16 +143,18 @@ public class Site {
         return getSearchable() == null || getSearchable() == 1;
     }
 
-    public void setSearchable(boolean searchable) {
+    public Site setSearchable(boolean searchable) {
         setSearchable(searchable ? 1 : 0);
+        return this;
     }
 
     public boolean isFilterable() {
         return getFilterable() == null || getFilterable() == 1;
     }
 
-    public void setFilterable(boolean filterable) {
+    public Site setFilterable(boolean filterable) {
         setFilterable(filterable ? 1 : 0);
+        return this;
     }
 
     public int getSearchIcon() {
@@ -160,6 +163,22 @@ public class Site {
 
     public int getFilterIcon() {
         return isFilterable() ? R.drawable.ic_filter_on : R.drawable.ic_filter_off;
+    }
+
+    public static Site find(String key) {
+        return AppDatabase.get().getSiteDao().find(key);
+    }
+
+    public void save() {
+        AppDatabase.get().getSiteDao().insertOrUpdate(this);
+    }
+
+    public Site sync() {
+        Site item = find(getKey());
+        if (item == null) return this;
+        setSearchable(item.getSearchable());
+        setFilterable(item.getFilterable());
+        return this;
     }
 
     @Override

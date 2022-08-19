@@ -115,15 +115,15 @@ public class ApiConfig {
 
     private void parseJson(JsonObject object) {
         for (JsonElement element : object.get("sites").getAsJsonArray()) {
-            Site site = Site.objectFrom(element);
+            Site site = Site.objectFrom(element).sync();
             site.setExt(parseExt(site.getExt()));
             if (site.getKey().equals(Prefers.getHome())) setHome(site);
-            sites.add(site);
+            if (!sites.contains(site)) sites.add(site);
         }
         for (JsonElement element : object.get("parses").getAsJsonArray()) {
             Parse parse = Parse.objectFrom(element);
             if (parse.getName().equals(Prefers.getParse())) setParse(parse);
-            parses.add(parse);
+            if (!parses.contains(parse)) parses.add(parse);
         }
         if (home == null) setHome(sites.isEmpty() ? new Site() : sites.get(0));
         if (parse == null) setParse(parses.isEmpty() ? new Parse() : parses.get(0));
