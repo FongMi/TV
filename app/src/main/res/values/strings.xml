@@ -35,7 +35,6 @@
     <!-- Setting -->
     <string name="setting_site">Home site</string>
     <string name="setting_url">Configuration</string>
-    <string name="setting_history">History configuration</string>
     <string name="setting_thumbnail">Thumbnail</string>
 
     <!-- Dialog -->
