@@ -24,10 +24,12 @@ public class Json {
     }
 
     public static JsonObject safeObject(JsonElement element) {
-        if (element.getAsString().isEmpty()) return null;
-        if (element.isJsonObject()) return element.getAsJsonObject();
-        else if (element.isJsonPrimitive()) return JsonParser.parseString(element.getAsJsonPrimitive().getAsString()).getAsJsonObject();
-        return null;
+        try {
+            if (element.isJsonPrimitive()) element = JsonParser.parseString(element.getAsJsonPrimitive().getAsString());
+            return element.getAsJsonObject();
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public static HashMap<String, String> toMap(JsonElement element) {
