@@ -106,6 +106,10 @@ public class Players implements Player.Listener, ParseTask.Callback {
         return exoPlayer.getPlaybackState() == Player.STATE_IDLE;
     }
 
+    public boolean canNext() {
+        return getCurrentPosition() >= getDuration();
+    }
+
     public void setMediaSource(Result result, boolean useParse) {
         if (result.getUrl().isEmpty()) {
             PlayerEvent.error(R.string.error_play_load);
