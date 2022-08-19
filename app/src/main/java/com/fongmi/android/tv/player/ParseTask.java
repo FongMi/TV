@@ -69,9 +69,7 @@ public class ParseTask {
 
     private void jsonParse(String webUrl) {
         try {
-            Headers reqHeader = new Headers.Builder().build();
-            if (parse.hasHeader()) reqHeader = Headers.of(Json.toMap(parse.getHeader()));
-            Response response = OKHttp.newCall(parse.getUrl() + webUrl, reqHeader).execute();
+            Response response = OKHttp.newCall(parse.getUrl() + webUrl, Headers.of(Json.toMap(parse.getHeader()))).execute();
             JsonObject object = JsonParser.parseString(response.body().string()).getAsJsonObject();
             HashMap<String, String> headers = new HashMap<>();
             for (String key : object.keySet()) if (key.equalsIgnoreCase("user-agent") || key.equalsIgnoreCase("referer")) headers.put(key, object.get(key).getAsString());
