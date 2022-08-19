@@ -253,6 +253,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
         for (int i = 0; i < mFlagAdapter.size(); i++) ((Vod.Flag) mFlagAdapter.get(i)).toggle(mCurrent == i, item);
         mEpisodeAdapter.notifyArrayItemRangeChanged(0, mEpisodeAdapter.size());
         mHandler.post(() -> mBinding.episode.setSelectedPosition(getEpisodePosition()));
+        if (mEpisodeAdapter.size() == 0) return;
         getPlayer(false);
     }
 
