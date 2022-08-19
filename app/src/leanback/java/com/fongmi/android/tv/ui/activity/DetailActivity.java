@@ -428,7 +428,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
                 mBinding.progress.getRoot().setVisibility(View.GONE);
                 break;
             case Player.STATE_ENDED:
-                onNext();
+                if (Players.get().canNext()) onNext();
                 break;
             default:
                 if (!event.isRetry() || ++mRetry > 3) onError(event.getMsg());
