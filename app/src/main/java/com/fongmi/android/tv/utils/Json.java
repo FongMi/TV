@@ -2,6 +2,7 @@ package com.fongmi.android.tv.utils;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,10 +23,16 @@ public class Json {
         return result;
     }
 
+    public static JsonObject safeObject(JsonElement element) {
+        if (element.isJsonObject()) return element.getAsJsonObject();
+        else if (element.isJsonPrimitive()) return JsonParser.parseString(element.getAsJsonPrimitive().getAsString()).getAsJsonObject();
+        return null;
+    }
+
     public static HashMap<String, String> toMap(JsonElement element) {
         HashMap<String, String> map = new HashMap<>();
-        if (!element.isJsonObject()) return map;
-        JsonObject object = element.getAsJsonObject();
+        JsonObject object = safeObject(element);
+        if (object == null) return map;
         for (String key : object.keySet()) map.put(key, object.get(key).getAsString());
         return map;
     }
