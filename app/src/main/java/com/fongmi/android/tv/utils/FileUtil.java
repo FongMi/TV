@@ -79,7 +79,7 @@ public class FileUtil {
         }
     }
 
-    public static boolean isSame(String md5) throws IOException {
+    public static boolean equals(String md5) throws IOException {
         return Files.hash(FileUtil.getJar(), Hashing.md5()).toString().equalsIgnoreCase(md5);
     }
 
