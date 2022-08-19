@@ -442,7 +442,6 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
         Players.get().seekTo(mHistory.getDuration());
         stopTimer();
         setTimer();
-        mRetry = 0;
     }
 
     private void stopTimer() {
