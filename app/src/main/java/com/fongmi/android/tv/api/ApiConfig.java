@@ -139,14 +139,18 @@ public class ApiConfig {
     }
 
     private void parseJar(String spider) throws Exception {
-        if (spider.contains(";md5")) spider = spider.split(";md5")[0];
-        if (spider.startsWith("http")) {
-            FileUtil.write(FileUtil.getJar(), OKHttp.newCall(spider).execute().body().bytes());
+        String[] texts = spider.split(";md5;");
+        String md5 = texts.length > 1 ? texts[1].trim() : "";
+        String url = texts[0];
+        if (md5.length() > 0 && FileUtil.isSame(md5)) {
             loader.load(FileUtil.getJar());
-        } else if (spider.startsWith("file")) {
-            loader.load(FileUtil.getLocal(spider));
-        } else if (!spider.isEmpty()) {
-            parseJar(convert(spider));
+        } else if (url.startsWith("http")) {
+            FileUtil.write(FileUtil.getJar(), OKHttp.newCall(url).execute().body().bytes());
+            loader.load(FileUtil.getJar());
+        } else if (url.startsWith("file")) {
+            loader.load(FileUtil.getLocal(url));
+        } else if (!url.isEmpty()) {
+            parseJar(convert(url));
         }
     }
 
