@@ -24,7 +24,6 @@ import org.simpleframework.xml.core.Persister;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -155,12 +154,8 @@ public class Result {
         this.url = url;
     }
 
-    public boolean hasHeader() {
-        return getHeader() != null;
-    }
-
     public Map<String, String> getHeaders() {
-        return hasHeader() ? Json.toMap(getHeader()) : new HashMap<>();
+        return Json.toMap(getHeader());
     }
 
     @NonNull

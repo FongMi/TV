@@ -81,10 +81,6 @@ public class Parse {
         this.activated = item.equals(this);
     }
 
-    public boolean hasHeader() {
-        return getExt().getHeader() != null;
-    }
-
     public JsonElement getHeader() {
         return getExt().getHeader();
     }
