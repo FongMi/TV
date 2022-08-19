@@ -40,6 +40,7 @@ public class SiteDialog implements SitePresenter.OnClickListener {
         int position = ApiConfig.get().getSites().indexOf(ApiConfig.get().getHome());
         adapter = new ArrayObjectAdapter(new SitePresenter(this));
         adapter.addAll(0, ApiConfig.get().getSites());
+        binding.recycler.setVerticalSpacing(ResUtil.dp2px(16));
         binding.recycler.setAdapter(new ItemBridgeAdapter(adapter));
         binding.recycler.scrollToPosition(position);
     }
