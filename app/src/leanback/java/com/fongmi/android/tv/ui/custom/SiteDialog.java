@@ -62,13 +62,13 @@ public class SiteDialog implements SitePresenter.OnClickListener {
 
     @Override
     public void onSearchClick(Site item) {
-        item.setSearchable(!item.isSearchable());
+        item.setSearchable(!item.isSearchable()).save();
         adapter.notifyArrayItemRangeChanged(0, adapter.size());
     }
 
     @Override
     public void onFilterClick(Site item) {
-        item.setFilterable(!item.isFilterable());
+        item.setFilterable(!item.isFilterable()).save();
         adapter.notifyArrayItemRangeChanged(0, adapter.size());
     }
 }
