@@ -17,7 +17,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URLConnection;
 
@@ -79,7 +78,7 @@ public class FileUtil {
         }
     }
 
-    public static boolean equals(String md5) throws IOException {
+    public static boolean equals(String md5) throws Exception {
         return Files.hash(FileUtil.getJar(), Hashing.md5()).toString().equalsIgnoreCase(md5);
     }
 
