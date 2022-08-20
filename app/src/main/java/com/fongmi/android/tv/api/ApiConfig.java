@@ -140,7 +140,7 @@ public class ApiConfig {
 
     private void parseJar(String spider) throws Exception {
         String[] texts = spider.split(";md5;");
-        String md5 = texts.length > 1 ? texts[1].trim() : "";
+        String md5 = spider.startsWith("http") && texts.length > 1 ? texts[1].trim() : "";
         String url = texts[0];
         if (md5.length() > 0 && FileUtil.equals(md5)) {
             loader.load(FileUtil.getJar());
