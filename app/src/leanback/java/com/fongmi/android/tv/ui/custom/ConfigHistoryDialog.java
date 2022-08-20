@@ -5,22 +5,20 @@ import android.view.LayoutInflater;
 import android.view.WindowManager;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.leanback.widget.ArrayObjectAdapter;
-import androidx.leanback.widget.ItemBridgeAdapter;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.fongmi.android.tv.SettingCallback;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.databinding.DialogConfigHistoryBinding;
-import com.fongmi.android.tv.ui.presenter.ConfigPresenter;
+import com.fongmi.android.tv.ui.adapter.ConfigAdapter;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-public class ConfigHistoryDialog implements ConfigPresenter.OnClickListener {
+public class ConfigHistoryDialog implements ConfigAdapter.OnClickListener {
 
     private DialogConfigHistoryBinding binding;
-    private ArrayObjectAdapter adapter;
     private SettingCallback callback;
+    private ConfigAdapter adapter;
     private AlertDialog dialog;
 
     public static void show(Activity activity) {
@@ -36,10 +34,8 @@ public class ConfigHistoryDialog implements ConfigPresenter.OnClickListener {
     }
 
     private void setRecyclerView() {
-        adapter = new ArrayObjectAdapter(new ConfigPresenter(this));
         binding.recycler.setLayoutManager(new LinearLayoutManager(dialog.getContext()));
-        binding.recycler.setAdapter(new ItemBridgeAdapter(adapter));
-        adapter.addAll(0, Config.getAll());
+        binding.recycler.setAdapter(adapter = new ConfigAdapter(this));
     }
 
     private void setDialog() {
@@ -58,8 +54,6 @@ public class ConfigHistoryDialog implements ConfigPresenter.OnClickListener {
 
     @Override
     public void onDeleteClick(Config item) {
-        item.delete();
-        adapter.remove(item);
-        if (adapter.size() == 0) dialog.dismiss();
+        if (adapter.remove(item) == 0) dialog.dismiss();
     }
 }
