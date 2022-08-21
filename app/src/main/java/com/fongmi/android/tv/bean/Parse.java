@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class Parse {
@@ -85,10 +86,18 @@ public class Parse {
         return getExt().getHeader();
     }
 
-    public String mixUrl() {
+    public String extUrl() {
         int index = getUrl().indexOf("?");
         if (index == -1) return getUrl();
         return getUrl().substring(0, index + 1) + "cat_ext=" + Utils.getBase64(getExt().toString()) + "&" + getUrl().substring(index + 1);
+    }
+
+    public HashMap<String, String> mixMap() {
+        HashMap<String, String> map = new HashMap<>();
+        map.put("type", getType().toString());
+        map.put("ext", getExt().toString());
+        map.put("url", getUrl());
+        return map;
     }
 
     @Override

@@ -82,27 +82,17 @@ public class ParseTask {
 
     private void jsonExtend(String webUrl) {
         LinkedHashMap<String, String> jxs = new LinkedHashMap<>();
-        for (Parse item : ApiConfig.get().getParses()) if (item.getType() == 1) jxs.put(item.getName(), item.mixUrl());
-        Result result = Result.fromObject(ApiConfig.get().jsonExt(parse.getUrl(), jxs, webUrl));
-        if (result.getUrl().isEmpty()) {
-            onParseError();
-        } else if (result.getParse(0) == 1) {
-            handler.post(() -> Players.get().web().start(result.getUrl(), callback));
-        } else {
-            onParseSuccess(result.getHeaders(), result.getUrl(), result.getJxFrom());
-        }
+        for (Parse item : ApiConfig.get().getParses()) if (item.getType() == 1) jxs.put(item.getName(), item.extUrl());
+        checkResult(Result.fromObject(ApiConfig.get().jsonExt(parse.getUrl(), jxs, webUrl)));
     }
 
     private void jsonMix(String webUrl, String flag) {
         LinkedHashMap<String, HashMap<String, String>> jxs = new LinkedHashMap<>();
-        for (Parse item : ApiConfig.get().getParses()) {
-            HashMap<String, String> map = new HashMap<>();
-            map.put("type", item.getType().toString());
-            map.put("ext", item.getExt().toString());
-            map.put("url", item.getUrl());
-            jxs.put(item.getName(), map);
-        }
-        Result result = Result.fromObject(ApiConfig.get().jsonExtMix(flag + "@", parse.getUrl(), parse.getName(), jxs, webUrl));
+        for (Parse item : ApiConfig.get().getParses()) jxs.put(item.getName(), item.mixMap());
+        checkResult(Result.fromObject(ApiConfig.get().jsonExtMix(flag + "@", parse.getUrl(), parse.getName(), jxs, webUrl)));
+    }
+
+    private void checkResult(Result result) {
         if (result.getUrl().isEmpty()) {
             onParseError();
         } else if (result.getParse(0) == 1) {
