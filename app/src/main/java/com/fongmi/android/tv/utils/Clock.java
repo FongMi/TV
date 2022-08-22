@@ -39,7 +39,7 @@ public class Clock {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                if (formatter == null) return;
+                if (handler == null || view == null || formatter == null) return;
                 handler.post(() -> view.setText(formatter.format(new Date())));
             }
         }, 0, 1000);
