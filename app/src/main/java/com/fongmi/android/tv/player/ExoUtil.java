@@ -7,7 +7,6 @@ import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.ext.rtmp.RtmpDataSource;
 import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.source.rtsp.RtspMediaSource;
@@ -27,16 +26,14 @@ public class ExoUtil {
         DataSource.Factory factory = getFactory(headers, url);
         MediaItem mediaItem = new MediaItem.Builder().setUri(videoUri).build();
         int type = Util.inferContentType(videoUri);
-        if (type == C.CONTENT_TYPE_HLS || url.contains("php") || url.contains("m3u8")) {
-            return new HlsMediaSource.Factory(factory).createMediaSource(mediaItem);
-        } else if (type == C.CONTENT_TYPE_DASH) {
+        if (type == C.CONTENT_TYPE_DASH) {
             return new DashMediaSource.Factory(factory).createMediaSource(mediaItem);
         } else if (type == C.CONTENT_TYPE_SS) {
             return new SsMediaSource.Factory(factory).createMediaSource(mediaItem);
         } else if (type == C.CONTENT_TYPE_RTSP) {
             return new RtspMediaSource.Factory().createMediaSource(mediaItem);
         } else {
-            return new ProgressiveMediaSource.Factory(factory).createMediaSource(mediaItem);
+            return new HlsMediaSource.Factory(factory).createMediaSource(mediaItem);
         }
     }
 
