@@ -87,10 +87,6 @@ public class Site {
         return TextUtils.isEmpty(playerUrl) ? "" : playerUrl;
     }
 
-    public void setPlayerUrl(String playerUrl) {
-        this.playerUrl = playerUrl;
-    }
-
     public Integer getSearchable() {
         return searchable;
     }
@@ -117,10 +113,6 @@ public class Site {
 
     public List<String> getCategories() {
         return categories == null ? Collections.emptyList() : categories;
-    }
-
-    public void setCategories(List<String> categories) {
-        this.categories = categories;
     }
 
     public boolean isActivated() {
