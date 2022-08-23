@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Html;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,7 +66,6 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
     private Handler mHandler;
     private History mHistory;
     private int mCurrent;
-    private int mRetry;
 
     private String getKey() {
         return getIntent().getStringExtra("key");
@@ -205,7 +205,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
 
     private void getPlayer(boolean replay) {
         Vod.Flag.Episode item = (Vod.Flag.Episode) mEpisodeAdapter.get(getEpisodePosition());
-        if (mFullscreen && mRetry == 0) Notify.show(ResUtil.getString(R.string.play_ready, item.getName()));
+        if (mFullscreen && Players.get().getRetry() == 0) Notify.show(ResUtil.getString(R.string.play_ready, item.getName()));
         mSiteViewModel.playerContent(getKey(), getVodFlag().getFlag(), item.getUrl());
         mBinding.progress.getRoot().setVisibility(View.VISIBLE);
         mBinding.error.getRoot().setVisibility(View.GONE);
@@ -432,7 +432,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
                 if (Players.get().canNext()) onNext();
                 break;
             default:
-                if (!event.isRetry() || ++mRetry > 3) onError(event.getMsg());
+                if (!event.isRetry() || Players.get().addRetry() > 3) onError(event.getMsg());
                 else onRetry();
                 break;
         }
@@ -463,7 +463,6 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
         mBinding.error.text.setText(msg);
         Players.get().stop();
         stopTimer();
-        mRetry = 0;
     }
 
     @Override
