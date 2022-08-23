@@ -64,6 +64,10 @@ public class Players implements Player.Listener, ParseTask.Callback {
         return retry;
     }
 
+    public void setRetry(int retry) {
+        this.retry = retry;
+    }
+
     public int addRetry() {
         ++retry;
         return retry;
