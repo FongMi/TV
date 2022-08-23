@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Html;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -426,6 +425,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
                 mBinding.progress.getRoot().setVisibility(View.VISIBLE);
                 break;
             case Player.STATE_READY:
+                Players.get().setRetry(0);
                 mBinding.progress.getRoot().setVisibility(View.GONE);
                 break;
             case Player.STATE_ENDED:
