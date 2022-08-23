@@ -24,7 +24,7 @@
     <string name="play_next">下一集</string>
     <string name="play_prev">上一集</string>
     <string name="play_ready">准备播放：<xliff:g name="name">%s</xliff:g></string>
-    <string name="play_replay">重播本集</string>
+    <string name="play_replay">重播</string>
     <string name="play_reset">重置</string>
     <string name="play_oped">片头片尾</string>
 
