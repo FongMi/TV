@@ -375,7 +375,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
     }
 
     private void updateHistory(Vod.Flag.Episode item, boolean replay) {
-        replay = replay || !item.getUrl().equals(mHistory.getEpisodeUrl());
+        replay = replay || !item.equals(mHistory.getEpisode());
         long duration = replay ? 0 : mHistory.getDuration();
         mHistory.setDuration(duration);
         mHistory.setEpisodeUrl(item.getUrl());
