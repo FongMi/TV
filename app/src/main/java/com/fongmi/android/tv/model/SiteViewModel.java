@@ -145,7 +145,7 @@ public class SiteViewModel extends ViewModel {
                 Result result = new Result();
                 result.setUrl(id);
                 result.setFlag(flag);
-                result.setPlayUrl(site.getPlayerUrl());
+                result.setPlayUrl(site.getPlayUrl());
                 result.setParse(Utils.isVideoFormat(id) ? 0 : 1);
                 return result;
             }

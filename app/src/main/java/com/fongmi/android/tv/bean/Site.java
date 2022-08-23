@@ -15,7 +15,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.Collections;
 import java.util.List;
 
-@Entity(ignoredColumns = {"type", "api", "playerUrl", "ext", "categories"})
+@Entity(ignoredColumns = {"type", "api", "playUrl", "ext", "categories"})
 public class Site {
 
     @NonNull
@@ -28,8 +28,8 @@ public class Site {
     private int type;
     @SerializedName("api")
     private String api;
-    @SerializedName("playerUrl")
-    private String playerUrl;
+    @SerializedName("playUrl")
+    private String playUrl;
     @SerializedName("searchable")
     private Integer searchable;
     @SerializedName("filterable")
@@ -83,8 +83,8 @@ public class Site {
         this.api = api;
     }
 
-    public String getPlayerUrl() {
-        return TextUtils.isEmpty(playerUrl) ? "" : playerUrl;
+    public String getPlayUrl() {
+        return playUrl;
     }
 
     public Integer getSearchable() {
