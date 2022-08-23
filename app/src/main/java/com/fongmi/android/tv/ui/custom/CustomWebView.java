@@ -49,9 +49,7 @@ public class CustomWebView extends WebView {
         getSettings().setDatabaseEnabled(true);
         getSettings().setDomStorageEnabled(true);
         getSettings().setJavaScriptEnabled(true);
-        getSettings().setBlockNetworkImage(true);
         getSettings().setLoadWithOverviewMode(true);
-        getSettings().setLoadsImagesAutomatically(false);
         getSettings().setJavaScriptCanOpenWindowsAutomatically(false);
         getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         setWebViewClient(webViewClient());
@@ -73,7 +71,7 @@ public class CustomWebView extends WebView {
                 String host = request.getUrl().getHost();
                 if (ads.contains(host)) return empty;
                 handler.removeCallbacks(mTimer);
-                handler.postDelayed(mTimer, 5000);
+                handler.postDelayed(mTimer, 15 * 1000);
                 Map<String, String> headers = request.getRequestHeaders();
                 if (Utils.isVideoFormat(url) || headers.containsKey("Range")) post(headers, url);
                 return super.shouldInterceptRequest(view, request);
@@ -94,8 +92,8 @@ public class CustomWebView extends WebView {
     private final Runnable mTimer = new Runnable() {
         @Override
         public void run() {
-            if (retry > 5) return;
-            if (retry++ == 5) stop(true);
+            if (retry > 3) return;
+            if (retry++ == 3) stop(true);
             else reload();
         }
     };
