@@ -57,7 +57,9 @@ public class SiteViewModel extends ViewModel {
                 result.setList(Result.fromJson(homeVideoContent).getList());
                 return result;
             } else if (site.getType() == 4) {
-                String body = OKHttp.newCall(site.getApi()).execute().body().string();
+                HashMap<String, String> params = new HashMap<>();
+                params.put("filter", "true");
+                String body = OKHttp.newCall(site.getApi(), params).execute().body().string();
                 SpiderDebug.log(body);
                 return Result.fromJson(body);
             } else {
