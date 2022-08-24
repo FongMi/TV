@@ -39,6 +39,7 @@ public class HistoryDialog implements ConfigAdapter.OnClickListener {
     }
 
     private void setDialog() {
+        if (adapter.getItemCount() == 0) return;
         WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
         params.width = (int) (ResUtil.getScreenWidthPx() * 0.45f);
         dialog.getWindow().setAttributes(params);
