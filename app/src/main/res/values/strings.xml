@@ -18,6 +18,7 @@
     <string name="detail_director">Director: <xliff:g name="name">%s</xliff:g></string>
     <string name="detail_actor">Actor: <xliff:g name="name">%s</xliff:g></string>
     <string name="detail_content">Summary: <xliff:g name="name">%s</xliff:g></string>
+    <string name="detail_reverse">Reverse</string>
 
     <!-- Play -->
     <string name="play">Play</string>
