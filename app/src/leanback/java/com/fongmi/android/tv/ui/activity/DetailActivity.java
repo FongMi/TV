@@ -33,11 +33,11 @@ import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.player.Players;
+import com.fongmi.android.tv.ui.custom.CustomKeyDown;
 import com.fongmi.android.tv.ui.presenter.EpisodePresenter;
 import com.fongmi.android.tv.ui.presenter.FlagPresenter;
 import com.fongmi.android.tv.ui.presenter.GroupPresenter;
 import com.fongmi.android.tv.ui.presenter.ParsePresenter;
-import com.fongmi.android.tv.utils.KeyDown;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
@@ -48,9 +48,10 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-public class DetailActivity extends BaseActivity implements KeyDown.Listener {
+public class DetailActivity extends BaseActivity implements CustomKeyDown.Listener {
 
     private ActivityDetailBinding mBinding;
     private ViewControllerBottomBinding mControl;
@@ -60,8 +61,9 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
     private ArrayObjectAdapter mEpisodeAdapter;
     private ArrayObjectAdapter mParseAdapter;
     private SiteViewModel mSiteViewModel;
+    private CustomKeyDown mKeyDown;
     private boolean mFullscreen;
-    private KeyDown mKeyDown;
+    private boolean mReverse;
     private Handler mHandler;
     private History mHistory;
     private int mCurrent;
@@ -116,7 +118,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
 
     @Override
     protected void initView() {
-        mKeyDown = KeyDown.create(this);
+        mKeyDown = CustomKeyDown.create(this);
         mHandler = new Handler(Looper.getMainLooper());
         mFrameParams = mBinding.video.getLayoutParams();
         mBinding.progressLayout.showProgress();
@@ -129,8 +131,8 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
     @Override
     protected void initEvent() {
         EventBus.getDefault().register(this);
-        mControl.next.setOnClickListener(view -> onNext());
-        mControl.prev.setOnClickListener(view -> onPrev());
+        mControl.next.setOnClickListener(view -> checkNext());
+        mControl.prev.setOnClickListener(view -> checkPrev());
         mControl.scale.setOnClickListener(view -> onScale());
         mControl.reset.setOnClickListener(view -> onReset());
         mControl.ending.setOnClickListener(view -> onEnding());
@@ -147,7 +149,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
         mBinding.group.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
-                if (mEpisodeAdapter.size() > 20) mBinding.episode.setSelectedPosition(position * 20);
+                if (mEpisodeAdapter.size() > 20 && position > 0) mBinding.episode.setSelectedPosition(--position * 20);
             }
         });
         mBinding.video.setOnClickListener(view -> enterFullscreen());
@@ -162,7 +164,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
         mBinding.episode.setAdapter(new ItemBridgeAdapter(mEpisodeAdapter = new ArrayObjectAdapter(new EpisodePresenter(this::setEpisodeActivated))));
         mBinding.group.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.group.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-        mBinding.group.setAdapter(new ItemBridgeAdapter(mGroupAdapter = new ArrayObjectAdapter(new GroupPresenter())));
+        mBinding.group.setAdapter(new ItemBridgeAdapter(mGroupAdapter = new ArrayObjectAdapter(new GroupPresenter(this::setReverse))));
         mControl.parse.setHorizontalSpacing(ResUtil.dp2px(8));
         mControl.parse.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         mControl.parse.setAdapter(new ItemBridgeAdapter(mParseAdapter = new ArrayObjectAdapter(new ParsePresenter(this::setParseActivated))));
@@ -256,6 +258,12 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
         getPlayer(false);
     }
 
+    private void setReverse() {
+        mReverse = !mReverse;
+        Collections.reverse(getVodFlag().getEpisodes());
+        mEpisodeAdapter.setItems(getVodFlag().getEpisodes(), null);
+    }
+
     private void setParseActivated(Parse item) {
         ApiConfig.get().setParse(item);
         mBinding.error.getRoot().setVisibility(View.GONE);
@@ -267,6 +275,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
 
     private void setGroup(int size) {
         List<String> items = new ArrayList<>();
+        items.add(getString(R.string.detail_reverse));
         int itemSize = (int) Math.ceil(size / 20.0f);
         for (int i = 0; i < itemSize; i++) items.add(String.valueOf(i * 20 + 1));
         mBinding.group.setVisibility(itemSize > 1 ? View.VISIBLE : View.GONE);
@@ -294,12 +303,22 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
         mFullscreen = false;
     }
 
+    private void checkNext() {
+        if (mReverse) onPrev();
+        else onNext();
+    }
+
+    private void checkPrev() {
+        if (mReverse) onNext();
+        else onPrev();
+    }
+
     private void onNext() {
         int current = getEpisodePosition();
         int max = mEpisodeAdapter.size() - 1;
         current = ++current > max ? max : current;
         Vod.Flag.Episode item = (Vod.Flag.Episode) mEpisodeAdapter.get(current);
-        if (item.isActivated()) Notify.show(R.string.error_play_next);
+        if (item.isActivated()) Notify.show(mReverse ? R.string.error_play_prev : R.string.error_play_next);
         else setEpisodeActivated(item);
     }
 
@@ -307,7 +326,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
         int current = getEpisodePosition();
         current = --current < 0 ? 0 : current;
         Vod.Flag.Episode item = (Vod.Flag.Episode) mEpisodeAdapter.get(current);
-        if (item.isActivated()) Notify.show(R.string.error_play_prev);
+        if (item.isActivated()) Notify.show(mReverse ? R.string.error_play_next : R.string.error_play_prev);
         else setEpisodeActivated(item);
     }
 
@@ -407,7 +426,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
             if (mHistory.getOpening() >= current) Players.get().seekTo(mHistory.getOpening());
             if (mHistory.getEnding() > 0 && duration > 0 && mHistory.getEnding() + current >= duration) {
                 keep = false;
-                onNext();
+                checkNext();
             }
             if (keep) mHandler.postDelayed(mProgress, 1000);
         }
@@ -429,7 +448,7 @@ public class DetailActivity extends BaseActivity implements KeyDown.Listener {
                 mBinding.progress.getRoot().setVisibility(View.GONE);
                 break;
             case Player.STATE_ENDED:
-                if (Players.get().canNext()) onNext();
+                if (Players.get().canNext()) checkNext();
                 break;
             default:
                 if (!event.isRetry() || Players.get().addRetry() > 3) onError(event.getMsg());
