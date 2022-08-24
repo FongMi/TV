@@ -1,4 +1,4 @@
-package com.fongmi.android.tv.ui.custom;
+package com.fongmi.android.tv.ui.custom.dialog;
 
 import android.app.Activity;
 import android.view.LayoutInflater;
@@ -9,25 +9,25 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.fongmi.android.tv.SettingCallback;
 import com.fongmi.android.tv.bean.Config;
-import com.fongmi.android.tv.databinding.DialogConfigHistoryBinding;
+import com.fongmi.android.tv.databinding.DialogHistoryBinding;
 import com.fongmi.android.tv.ui.adapter.ConfigAdapter;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-public class ConfigHistoryDialog implements ConfigAdapter.OnClickListener {
+public class HistoryDialog implements ConfigAdapter.OnClickListener {
 
-    private DialogConfigHistoryBinding binding;
+    private DialogHistoryBinding binding;
     private SettingCallback callback;
     private ConfigAdapter adapter;
     private AlertDialog dialog;
 
     public static void show(Activity activity) {
-        new ConfigHistoryDialog().create(activity);
+        new HistoryDialog().create(activity);
     }
 
     public void create(Activity activity) {
         callback = (SettingCallback) activity;
-        binding = DialogConfigHistoryBinding.inflate(LayoutInflater.from(activity));
+        binding = DialogHistoryBinding.inflate(LayoutInflater.from(activity));
         dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).create();
         setRecyclerView();
         setDialog();

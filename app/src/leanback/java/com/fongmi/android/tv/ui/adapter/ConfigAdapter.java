@@ -58,7 +58,7 @@ public class ConfigAdapter extends RecyclerView.Adapter<ConfigAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Config item = (Config) mItems.get(position);
+        Config item = mItems.get(position);
         holder.binding.text.setText(item.getUrl());
         holder.binding.text.setOnClickListener(v -> mListener.onTextClick(item));
         holder.binding.delete.setOnClickListener(v -> mListener.onDeleteClick(item));
