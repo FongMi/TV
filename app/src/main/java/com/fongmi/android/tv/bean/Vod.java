@@ -135,6 +135,14 @@ public class Vod {
         this.site = site;
     }
 
+    public String getSiteName() {
+        return getSite() == null ? "" : getSite().getName();
+    }
+
+    public int getSiteVisible() {
+        return getSite() == null ? View.GONE : View.VISIBLE;
+    }
+
     public int getYearVisible() {
         return getVodYear().isEmpty() ? View.GONE : View.VISIBLE;
     }

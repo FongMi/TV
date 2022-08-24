@@ -124,6 +124,7 @@ public class VodFragment extends Fragment implements CustomScroller.Callback, Vo
         if (mLast == null || items.size() == 0) return false;
         int size = 5 - mLast.size();
         if (size == 0) return false;
+        size = Math.min(size, items.size());
         mLast.addAll(mLast.size(), new ArrayList<>(items.subList(0, size)));
         addVideo(new ArrayList<>(items.subList(size, items.size())));
         return true;

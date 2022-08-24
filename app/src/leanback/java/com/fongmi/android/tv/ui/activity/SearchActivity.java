@@ -28,7 +28,6 @@ import com.fongmi.android.tv.CustomListener;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Hot;
-import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Suggest;
 import com.fongmi.android.tv.bean.Vod;
@@ -39,11 +38,11 @@ import com.fongmi.android.tv.net.OKHttp;
 import com.fongmi.android.tv.ui.custom.CustomKeyboard;
 import com.fongmi.android.tv.ui.custom.CustomRowPresenter;
 import com.fongmi.android.tv.ui.custom.CustomSelector;
-import com.fongmi.android.tv.ui.presenter.TitlePresenter;
 import com.fongmi.android.tv.ui.presenter.VodPresenter;
 import com.fongmi.android.tv.ui.presenter.WordPresenter;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Utils;
+import com.google.common.collect.Lists;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -59,10 +58,11 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
     private final ActivityResultLauncher<String> launcherString = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> onVoice());
 
     private ActivitySearchBinding mBinding;
+    private SpeechRecognizer mRecognizer;
     private SiteViewModel mSiteViewModel;
     private ArrayObjectAdapter mWordAdapter;
     private ArrayObjectAdapter mAdapter;
-    private SpeechRecognizer mRecognizer;
+    private ArrayObjectAdapter mLast;
     private ExecutorService mService;
     private List<Site> mSites;
     private Handler mHandler;
@@ -144,7 +144,6 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
 
     private void setRecyclerView() {
         CustomSelector selector = new CustomSelector();
-        selector.addPresenter(String.class, new TitlePresenter());
         selector.addPresenter(ListRow.class, new CustomRowPresenter(16), VodPresenter.class);
         mBinding.recycler.setVerticalSpacing(ResUtil.dp2px(16));
         mBinding.recycler.setAdapter(new ItemBridgeAdapter(mAdapter = new ArrayObjectAdapter(selector)));
@@ -155,7 +154,7 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
     private void setViewModel() {
         mSiteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mSiteViewModel.result.observe(this, result -> {
-            if (mService != null) addVideo(result);
+            if (mService != null) addVideo(result.getList());
         });
     }
 
@@ -174,14 +173,6 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
         if (!mSites.contains(home)) return;
         mSites.remove(home);
         mSites.add(0, home);
-    }
-
-    private void addVideo(Result result) {
-        ArrayObjectAdapter adapter = new ArrayObjectAdapter(new VodPresenter(this));
-        adapter.setItems(result.getList(), null);
-        mAdapter.add(result.getList().get(0).getSite().getName());
-        mAdapter.add(new ListRow(adapter));
-        mBinding.progressLayout.showContent();
     }
 
     private void onVoice() {
@@ -205,10 +196,33 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
         showResult();
     }
 
+    private boolean checkLastSize(List<Vod> items) {
+        if (mLast == null || items.size() == 0) return false;
+        int size = 5 - mLast.size();
+        if (size == 0) return false;
+        size = Math.min(size, items.size());
+        mLast.addAll(mLast.size(), new ArrayList<>(items.subList(0, size)));
+        addVideo(new ArrayList<>(items.subList(size, items.size())));
+        return true;
+    }
+
+    private void addVideo(List<Vod> items) {
+        if (checkLastSize(items)) return;
+        List<ListRow> rows = new ArrayList<>();
+        for (List<Vod> part : Lists.partition(items, 5)) {
+            mLast = new ArrayObjectAdapter(new VodPresenter(this));
+            mLast.setItems(part, null);
+            rows.add(new ListRow(mLast));
+        }
+        mAdapter.addAll(mAdapter.size(), rows);
+        mBinding.progressLayout.showContent();
+    }
+
     private void stopSearch() {
         if (mService == null) return;
         mService.shutdownNow();
         mService = null;
+        mLast = null;
     }
 
     private void showResult() {
