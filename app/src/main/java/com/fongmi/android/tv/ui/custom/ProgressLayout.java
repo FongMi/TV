@@ -115,6 +115,6 @@ public class ProgressLayout extends RelativeLayout {
     }
 
     private void hideView(View view) {
-        view.setVisibility(INVISIBLE);
+        view.setVisibility(GONE);
     }
 }
