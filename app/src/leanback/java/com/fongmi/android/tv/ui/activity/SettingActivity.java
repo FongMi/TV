@@ -22,9 +22,9 @@ import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.databinding.ActivitySettingBinding;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.net.Callback;
-import com.fongmi.android.tv.ui.custom.ConfigDialog;
-import com.fongmi.android.tv.ui.custom.ConfigHistoryDialog;
-import com.fongmi.android.tv.ui.custom.SiteDialog;
+import com.fongmi.android.tv.ui.custom.dialog.ConfigDialog;
+import com.fongmi.android.tv.ui.custom.dialog.HistoryDialog;
+import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
@@ -56,7 +56,7 @@ public class SettingActivity extends BaseActivity implements SettingCallback {
     protected void initEvent() {
         mBinding.site.setOnClickListener(view -> SiteDialog.show(this));
         mBinding.config.setOnClickListener(view -> ConfigDialog.show(this));
-        mBinding.history.setOnClickListener(view -> ConfigHistoryDialog.show(this));
+        mBinding.history.setOnClickListener(view -> HistoryDialog.show(this));
         mBinding.thumbnail.setOnClickListener(this::setThumbnail);
     }
 

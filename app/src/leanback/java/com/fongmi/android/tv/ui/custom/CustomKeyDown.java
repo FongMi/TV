@@ -1,17 +1,17 @@
-package com.fongmi.android.tv.utils;
+package com.fongmi.android.tv.ui.custom;
 
 import android.view.KeyEvent;
 
-public class KeyDown {
+public class CustomKeyDown {
 
     private final Listener mListener;
     private int mHoldTime;
 
-    public static KeyDown create(Listener listener) {
-        return new KeyDown(listener);
+    public static CustomKeyDown create(Listener listener) {
+        return new CustomKeyDown(listener);
     }
 
-    private KeyDown(Listener listener) {
+    private CustomKeyDown(Listener listener) {
         this.mListener = listener;
     }
 
