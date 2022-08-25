@@ -7,7 +7,7 @@ import android.view.WindowManager;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.fongmi.android.tv.SettingCallback;
+import com.fongmi.android.tv.impl.SettingCallback;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.databinding.DialogHistoryBinding;
 import com.fongmi.android.tv.ui.adapter.ConfigAdapter;
