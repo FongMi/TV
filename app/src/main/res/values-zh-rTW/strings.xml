@@ -54,6 +54,13 @@
     <string name="error_episode">暫無播放資料</string>
     <string name="error_empty">找不到資料</string>
 
+    <!-- Crash -->
+    <string name="crash_info">發生意外錯誤\n抱歉給您帶來不便</string>
+    <string name="crash_restart">重新啟動</string>
+    <string name="crash_details">錯誤訊息</string>
+    <string name="crash_details_title">錯誤訊息</string>
+    <string name="crash_details_close">關閉</string>
+
     <!-- UNIT -->
     <string name="second"><xliff:g name="name">%s</xliff:g> 秒</string>
 

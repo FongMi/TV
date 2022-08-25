@@ -36,5 +36,10 @@
                 android:resource="@xml/file_paths" />
 
         </provider>
+
+        <activity
+            android:name=".ui.activity.CrashActivity"
+            android:process=":error_activity" />
+
     </application>
 </manifest>
