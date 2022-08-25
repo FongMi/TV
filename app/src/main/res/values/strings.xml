@@ -54,6 +54,13 @@
     <string name="error_episode">No episode data</string>
     <string name="error_empty">Not found</string>
 
+    <!-- Crash -->
+    <string name="crash_info">An unexpected error occurred.\nSorry for the inconvenience.</string>
+    <string name="crash_restart">Restart app</string>
+    <string name="crash_details">Error details</string>
+    <string name="crash_details_title">Error details</string>
+    <string name="crash_details_close">Close</string>
+
     <!-- UNIT -->
     <string name="second"><xliff:g name="name">%s</xliff:g> s</string>
 
