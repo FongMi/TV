@@ -10,7 +10,7 @@ import android.view.inputmethod.EditorInfo;
 import androidx.appcompat.app.AlertDialog;
 
 import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.SettingCallback;
+import com.fongmi.android.tv.impl.SettingCallback;
 import com.fongmi.android.tv.databinding.DialogConfigBinding;
 import com.fongmi.android.tv.event.ServerEvent;
 import com.fongmi.android.tv.server.Server;
