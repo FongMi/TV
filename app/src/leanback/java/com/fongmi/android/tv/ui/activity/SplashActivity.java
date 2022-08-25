@@ -33,7 +33,7 @@ public class SplashActivity extends BaseActivity {
 
     @Override
     protected void initView() {
-        mBinding.title.animate().alpha(1).setDuration(2000).setListener(onAnimationEnd()).start();
+        mBinding.title.animate().alpha(1).setDuration(1000).setListener(onAnimationEnd()).start();
     }
 
     private AnimatorListenerAdapter onAnimationEnd() {
