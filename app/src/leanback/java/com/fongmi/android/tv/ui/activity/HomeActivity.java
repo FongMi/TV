@@ -258,7 +258,6 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
         Server.get().stop();
         Clock.get().release();
         Players.get().release();
-        ApiConfig.get().release();
         EventBus.getDefault().unregister(this);
     }
 }

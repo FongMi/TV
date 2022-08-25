@@ -241,15 +241,4 @@ public class ApiConfig {
         this.home = null;
         return this;
     }
-
-    public void release() {
-        this.ads = null;
-        this.home = null;
-        this.sites = null;
-        this.lives = null;
-        this.flags = null;
-        this.parses = null;
-        this.loader = null;
-        this.handler = null;
-    }
 }
