@@ -51,7 +51,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class DetailActivity extends BaseActivity implements CustomKeyDown.Listener {
+public class DetailActivity extends BaseActivity implements CustomKeyDown.Listener, GroupPresenter.OnClickListener {
 
     private ActivityDetailBinding mBinding;
     private ViewControllerBottomBinding mControl;
@@ -149,7 +149,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         mBinding.group.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
-                if (mEpisodeAdapter.size() > 20 && position > 0) mBinding.episode.setSelectedPosition(--position * 20);
+                if (mEpisodeAdapter.size() > 20 && position > 1) mBinding.episode.setSelectedPosition((position - 2) * 20);
             }
         });
         mBinding.video.setOnClickListener(view -> enterFullscreen());
@@ -164,7 +164,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         mBinding.episode.setAdapter(new ItemBridgeAdapter(mEpisodeAdapter = new ArrayObjectAdapter(new EpisodePresenter(this::setEpisodeActivated))));
         mBinding.group.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.group.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-        mBinding.group.setAdapter(new ItemBridgeAdapter(mGroupAdapter = new ArrayObjectAdapter(new GroupPresenter(this::setReverse))));
+        mBinding.group.setAdapter(new ItemBridgeAdapter(mGroupAdapter = new ArrayObjectAdapter(new GroupPresenter(this))));
         mControl.parse.setHorizontalSpacing(ResUtil.dp2px(8));
         mControl.parse.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         mControl.parse.setAdapter(new ItemBridgeAdapter(mParseAdapter = new ArrayObjectAdapter(new ParsePresenter(this::setParseActivated))));
@@ -258,12 +258,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         getPlayer(false);
     }
 
-    private void setReverse() {
-        mReverse = !mReverse;
-        Collections.reverse(getVodFlag().getEpisodes());
-        mEpisodeAdapter.setItems(getVodFlag().getEpisodes(), null);
-    }
-
     private void setParseActivated(Parse item) {
         ApiConfig.get().setParse(item);
         mBinding.error.getRoot().setVisibility(View.GONE);
@@ -275,11 +269,25 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
 
     private void setGroup(int size) {
         List<String> items = new ArrayList<>();
-        items.add(getString(R.string.detail_reverse));
+        items.add(getString(R.string.play_reverse));
+        items.add(getString(R.string.play_forward));
         int itemSize = (int) Math.ceil(size / 20.0f);
-        for (int i = 0; i < itemSize; i++) items.add(String.valueOf(i * 20 + 1));
-        mBinding.group.setVisibility(itemSize > 1 ? View.VISIBLE : View.GONE);
+        if (itemSize > 1) for (int i = 0; i < itemSize; i++) items.add(String.valueOf(i * 20 + 1));
+        mBinding.group.setVisibility(size > 1 ? View.VISIBLE : View.GONE);
         mGroupAdapter.setItems(items, null);
+    }
+
+    @Override
+    public void onRevClick() {
+        Collections.reverse(getVodFlag().getEpisodes());
+        mEpisodeAdapter.setItems(getVodFlag().getEpisodes(), null);
+    }
+
+    @Override
+    public void onDirClick(TextView view) {
+        mReverse = !mReverse;
+        view.setText(mReverse ? R.string.play_backward : R.string.play_forward);
+        Notify.show(mReverse ? R.string.play_backward_hint : R.string.play_forward_hint);
     }
 
     private boolean shouldEnterFullscreen(Vod.Flag.Episode item) {

@@ -2,6 +2,7 @@ package com.fongmi.android.tv.ui.presenter;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.leanback.widget.Presenter;
@@ -13,13 +14,22 @@ import com.fongmi.android.tv.utils.ResUtil;
 public class GroupPresenter extends Presenter {
 
     private final OnClickListener mListener;
+    private final String backward;
+    private final String forward;
+    private final String reverse;
 
     public GroupPresenter(OnClickListener listener) {
         this.mListener = listener;
+        this.backward = ResUtil.getString(R.string.play_backward);
+        this.forward = ResUtil.getString(R.string.play_forward);
+        this.reverse = ResUtil.getString(R.string.play_reverse);
     }
 
     public interface OnClickListener {
-        void onItemClick();
+
+        void onDirClick(TextView view);
+
+        void onRevClick();
     }
 
     @Override
@@ -32,8 +42,8 @@ public class GroupPresenter extends Presenter {
         ViewHolder holder = (ViewHolder) viewHolder;
         String text = object.toString();
         holder.binding.text.setText(text);
-        boolean reverse = text.equals(ResUtil.getString(R.string.detail_reverse));
-        if (reverse) setOnClickListener(holder, view -> mListener.onItemClick());
+        if (text.equals(reverse)) setOnClickListener(holder, view -> mListener.onRevClick());
+        if (text.equals(backward) || text.equals(forward)) setOnClickListener(holder, view -> mListener.onDirClick(holder.binding.text));
     }
 
     @Override

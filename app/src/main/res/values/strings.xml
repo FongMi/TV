@@ -18,7 +18,6 @@
     <string name="detail_director">Director: <xliff:g name="name">%s</xliff:g></string>
     <string name="detail_actor">Actor: <xliff:g name="name">%s</xliff:g></string>
     <string name="detail_content">Summary: <xliff:g name="name">%s</xliff:g></string>
-    <string name="detail_reverse">Reverse</string>
 
     <!-- Play -->
     <string name="play">Play</string>
@@ -28,6 +27,11 @@
     <string name="play_replay">Replay</string>
     <string name="play_reset">Reset</string>
     <string name="play_oped">OP&amp;ED</string>
+    <string name="play_reverse">Reverse</string>
+    <string name="play_forward">→</string>
+    <string name="play_backward">←</string>
+    <string name="play_forward_hint">Normal play switched</string>
+    <string name="play_backward_hint">Reverse play switched</string>
 
     <!-- Parse -->
     <string name="parse">Parse</string>

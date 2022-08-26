@@ -18,7 +18,6 @@
     <string name="detail_director">導演：<xliff:g name="name">%s</xliff:g></string>
     <string name="detail_actor">演員：<xliff:g name="name">%s</xliff:g></string>
     <string name="detail_content">簡介：<xliff:g name="name">%s</xliff:g></string>
-    <string name="detail_reverse">倒序</string>
 
     <!-- Play -->
     <string name="play">播放</string>
@@ -28,6 +27,11 @@
     <string name="play_replay">重播</string>
     <string name="play_reset">重置</string>
     <string name="play_oped">片頭片尾</string>
+    <string name="play_reverse">倒序</string>
+    <string name="play_forward">→</string>
+    <string name="play_backward">←</string>
+    <string name="play_forward_hint">已切換正序播放</string>
+    <string name="play_backward_hint">已切換倒序播放</string>
 
     <!-- Parse -->
     <string name="parse">解析</string>
