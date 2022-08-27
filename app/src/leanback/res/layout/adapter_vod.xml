@@ -4,10 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="150dp"
     android:layout_height="200dp"
-    android:background="@drawable/selector_vod"
     android:focusable="true"
-    android:focusableInTouchMode="true"
-    android:padding="1dp">
+    android:focusableInTouchMode="true">
 
     <com.makeramen.roundedimageview.RoundedImageView
         android:id="@+id/image"
