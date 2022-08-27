@@ -8,6 +8,7 @@ import androidx.leanback.widget.Presenter;
 
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.AdapterEpisodeBinding;
+import com.fongmi.android.tv.utils.ResUtil;
 
 public class EpisodePresenter extends Presenter {
 
@@ -31,6 +32,7 @@ public class EpisodePresenter extends Presenter {
         Vod.Flag.Episode item = (Vod.Flag.Episode) object;
         ViewHolder holder = (ViewHolder) viewHolder;
         holder.binding.text.setText(item.getName());
+        holder.binding.text.setMaxEms(ResUtil.getEms());
         holder.binding.text.setActivated(item.isActivated());
         setOnClickListener(holder, view -> mListener.onItemClick(item));
     }
