@@ -63,7 +63,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     private SiteViewModel mSiteViewModel;
     private CustomKeyDown mKeyDown;
     private boolean mFullscreen;
-    private boolean mReverse;
     private Handler mHandler;
     private History mHistory;
     private int mCurrent;
@@ -258,6 +257,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         getPlayer(false);
     }
 
+    private void reverseEpisode() {
+        for (int i = 0; i < mFlagAdapter.size(); i++) Collections.reverse(((Vod.Flag) mFlagAdapter.get(i)).getEpisodes());
+        mEpisodeAdapter.setItems(getVodFlag().getEpisodes(), null);
+        mBinding.episode.setSelectedPosition(getEpisodePosition());
+    }
+
     private void setParseActivated(Parse item) {
         ApiConfig.get().setParse(item);
         mBinding.error.getRoot().setVisibility(View.GONE);
@@ -270,7 +275,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     private void setGroup(int size) {
         List<String> items = new ArrayList<>();
         items.add(getString(R.string.play_reverse));
-        items.add(getString(R.string.play_forward));
+        items.add(getString(mHistory.getRevPlayText()));
         int itemSize = (int) Math.ceil(size / 20.0f);
         if (itemSize > 1) for (int i = 0; i < itemSize; i++) items.add(String.valueOf(i * 20 + 1));
         mBinding.group.setVisibility(size > 1 ? View.VISIBLE : View.GONE);
@@ -278,16 +283,16 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     }
 
     @Override
-    public void onRevClick() {
-        Collections.reverse(getVodFlag().getEpisodes());
-        mEpisodeAdapter.setItems(getVodFlag().getEpisodes(), null);
+    public void onRevSort() {
+        mHistory.setRevSort(!mHistory.isRevSort());
+        reverseEpisode();
     }
 
     @Override
-    public void onDirClick(TextView view) {
-        mReverse = !mReverse;
-        view.setText(mReverse ? R.string.play_backward : R.string.play_forward);
-        Notify.show(mReverse ? R.string.play_backward_hint : R.string.play_forward_hint);
+    public void onRevPlay(TextView view) {
+        mHistory.setRevPlay(!mHistory.isRevPlay());
+        view.setText(mHistory.getRevPlayText());
+        Notify.show(mHistory.getRevPlayHint());
     }
 
     private boolean shouldEnterFullscreen(Vod.Flag.Episode item) {
@@ -312,12 +317,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     }
 
     private void checkNext() {
-        if (mReverse) onPrev();
+        if (mHistory.isRevPlay()) onPrev();
         else onNext();
     }
 
     private void checkPrev() {
-        if (mReverse) onNext();
+        if (mHistory.isRevPlay()) onNext();
         else onPrev();
     }
 
@@ -326,7 +331,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         int max = mEpisodeAdapter.size() - 1;
         current = ++current > max ? max : current;
         Vod.Flag.Episode item = (Vod.Flag.Episode) mEpisodeAdapter.get(current);
-        if (item.isActivated()) Notify.show(mReverse ? R.string.error_play_prev : R.string.error_play_next);
+        if (item.isActivated()) Notify.show(mHistory.isRevPlay() ? R.string.error_play_prev : R.string.error_play_next);
         else setEpisodeActivated(item);
     }
 
@@ -334,7 +339,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         int current = getEpisodePosition();
         current = --current < 0 ? 0 : current;
         Vod.Flag.Episode item = (Vod.Flag.Episode) mEpisodeAdapter.get(current);
-        if (item.isActivated()) Notify.show(mReverse ? R.string.error_play_next : R.string.error_play_prev);
+        if (item.isActivated()) Notify.show(mHistory.isRevPlay() ? R.string.error_play_next : R.string.error_play_prev);
         else setEpisodeActivated(item);
     }
 
@@ -381,6 +386,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         if (mHistory != null) {
             setFlagActivated(mHistory.getFlag());
             setEpisodeActivated(mHistory.getEpisode());
+            if (mHistory.isRevSort()) reverseEpisode();
             mControl.opening.setText(Players.get().getStringForTime(mHistory.getOpening()));
             mControl.ending.setText(Players.get().getStringForTime(mHistory.getEnding()));
         } else {
