@@ -27,6 +27,10 @@ public class ResUtil {
         return getDisplayMetrics().heightPixels;
     }
 
+    public static int getEms() {
+        return Math.min(getScreenWidthPx() / dp2px(24), 35);
+    }
+
     public static int dp2px(int dpValue) {
         return Math.round(dpValue * getDisplayMetrics().density);
     }
