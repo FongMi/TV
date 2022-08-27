@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.db.AppDatabase;
 
 import java.util.List;
@@ -19,6 +20,8 @@ public class History {
     private String vodFlag;
     private String vodRemarks;
     private String episodeUrl;
+    private boolean revSort;
+    private boolean revPlay;
     private long createTime;
     private long opening;
     private long ending;
@@ -77,6 +80,22 @@ public class History {
         this.episodeUrl = episodeUrl;
     }
 
+    public boolean isRevSort() {
+        return revSort;
+    }
+
+    public void setRevSort(boolean revSort) {
+        this.revSort = revSort;
+    }
+
+    public boolean isRevPlay() {
+        return revPlay;
+    }
+
+    public void setRevPlay(boolean revPlay) {
+        this.revPlay = revPlay;
+    }
+
     public long getCreateTime() {
         return createTime;
     }
@@ -131,6 +150,14 @@ public class History {
 
     public Vod.Flag.Episode getEpisode() {
         return new Vod.Flag.Episode(getVodRemarks(), getEpisodeUrl());
+    }
+
+    public int getRevPlayText() {
+        return isRevPlay() ? R.string.play_backward : R.string.play_forward;
+    }
+
+    public int getRevPlayHint() {
+        return isRevPlay() ? R.string.play_backward_hint : R.string.play_forward_hint;
     }
 
     public static History find(String key) {

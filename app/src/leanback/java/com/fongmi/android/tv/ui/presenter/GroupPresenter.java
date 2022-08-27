@@ -27,9 +27,9 @@ public class GroupPresenter extends Presenter {
 
     public interface OnClickListener {
 
-        void onDirClick(TextView view);
+        void onRevSort();
 
-        void onRevClick();
+        void onRevPlay(TextView view);
     }
 
     @Override
@@ -42,8 +42,8 @@ public class GroupPresenter extends Presenter {
         ViewHolder holder = (ViewHolder) viewHolder;
         String text = object.toString();
         holder.binding.text.setText(text);
-        if (text.equals(reverse)) setOnClickListener(holder, view -> mListener.onRevClick());
-        if (text.equals(backward) || text.equals(forward)) setOnClickListener(holder, view -> mListener.onDirClick(holder.binding.text));
+        if (text.equals(reverse)) setOnClickListener(holder, view -> mListener.onRevSort());
+        if (text.equals(backward) || text.equals(forward)) setOnClickListener(holder, view -> mListener.onRevPlay(holder.binding.text));
     }
 
     @Override
