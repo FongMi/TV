@@ -6,19 +6,19 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.leanback.widget.Presenter;
 
-import com.fongmi.android.tv.databinding.AdapterTitleBinding;
+import com.fongmi.android.tv.databinding.AdapterHeaderBinding;
 import com.fongmi.android.tv.utils.ResUtil;
 
-public class TitlePresenter extends Presenter {
+public class HeaderPresenter extends Presenter {
 
     @Override
     public Presenter.ViewHolder onCreateViewHolder(ViewGroup parent) {
-        return new TitlePresenter.ViewHolder(AdapterTitleBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        return new HeaderPresenter.ViewHolder(AdapterHeaderBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
     }
 
     @Override
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object object) {
-        TitlePresenter.ViewHolder holder = (TitlePresenter.ViewHolder) viewHolder;
+        HeaderPresenter.ViewHolder holder = (HeaderPresenter.ViewHolder) viewHolder;
         holder.binding.text.setText(object instanceof String ? object.toString() : ResUtil.getString((int) object));
     }
 
@@ -28,9 +28,9 @@ public class TitlePresenter extends Presenter {
 
     public static class ViewHolder extends Presenter.ViewHolder {
 
-        private final AdapterTitleBinding binding;
+        private final AdapterHeaderBinding binding;
 
-        public ViewHolder(@NonNull AdapterTitleBinding binding) {
+        public ViewHolder(@NonNull AdapterHeaderBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
         }

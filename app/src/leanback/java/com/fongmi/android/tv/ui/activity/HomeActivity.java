@@ -33,7 +33,7 @@ import com.fongmi.android.tv.ui.custom.CustomSelector;
 import com.fongmi.android.tv.ui.presenter.FuncPresenter;
 import com.fongmi.android.tv.ui.presenter.HistoryPresenter;
 import com.fongmi.android.tv.ui.presenter.ProgressPresenter;
-import com.fongmi.android.tv.ui.presenter.TitlePresenter;
+import com.fongmi.android.tv.ui.presenter.HeaderPresenter;
 import com.fongmi.android.tv.ui.presenter.VodPresenter;
 import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.Notify;
@@ -45,7 +45,6 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class HomeActivity extends BaseActivity implements VodPresenter.OnClickListener, FuncPresenter.OnClickListener, HistoryPresenter.OnClickListener {
@@ -89,14 +88,14 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
         mBinding.recycler.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
-                mBinding.time.setVisibility(position == 1 ? View.VISIBLE : View.GONE);
+                mBinding.toolbar.setVisibility(position == 0 ? View.VISIBLE : View.GONE);
             }
         });
     }
 
     private void setRecyclerView() {
         CustomSelector selector = new CustomSelector();
-        selector.addPresenter(Integer.class, new TitlePresenter());
+        selector.addPresenter(Integer.class, new HeaderPresenter());
         selector.addPresenter(String.class, new ProgressPresenter());
         selector.addPresenter(ListRow.class, new CustomRowPresenter(16), VodPresenter.class);
         selector.addPresenter(ListRow.class, new CustomRowPresenter(16), FuncPresenter.class);
@@ -115,7 +114,6 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
     }
 
     private void setAdapter() {
-        mAdapter.add(R.string.app_name);
         mAdapter.add(getFuncRow());
         mAdapter.add(R.string.home_history);
         mAdapter.add(R.string.home_recommend);
@@ -129,13 +127,11 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
     }
 
     private void addVideo(Result result) {
-        List<ListRow> rows = new ArrayList<>();
         for (List<Vod> items : Lists.partition(result.getList(), 5)) {
             ArrayObjectAdapter adapter = new ArrayObjectAdapter(new VodPresenter(this));
             adapter.setItems(items, null);
-            rows.add(new ListRow(adapter));
+            mAdapter.add(new ListRow(adapter));
         }
-        mAdapter.addAll(mAdapter.size(), rows);
     }
 
     private ListRow getFuncRow() {
@@ -241,8 +237,8 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
         if (mHistoryPresenter.isDelete()) {
             mHistoryPresenter.setDelete(false);
             mHistoryAdapter.notifyArrayItemRangeChanged(0, mHistoryAdapter.size());
-        } else if (mBinding.recycler.getSelectedPosition() != 1) {
-            mBinding.recycler.smoothScrollToPosition(1);
+        } else if (mBinding.recycler.getSelectedPosition() != 0) {
+            mBinding.recycler.smoothScrollToPosition(0);
         } else if (!mConfirmExit) {
             mConfirmExit = true;
             Notify.show(R.string.app_exit);
