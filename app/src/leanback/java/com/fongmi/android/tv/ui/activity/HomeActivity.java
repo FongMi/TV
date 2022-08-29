@@ -25,13 +25,13 @@ import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.ActivityHomeBinding;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.event.ServerEvent;
-import com.fongmi.android.tv.impl.SiteCallback;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.ui.custom.CustomRowPresenter;
 import com.fongmi.android.tv.ui.custom.CustomSelector;
 import com.fongmi.android.tv.ui.custom.CustomTitleView;
+import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
 import com.fongmi.android.tv.ui.presenter.FuncPresenter;
 import com.fongmi.android.tv.ui.presenter.HeaderPresenter;
 import com.fongmi.android.tv.ui.presenter.HistoryPresenter;
@@ -49,7 +49,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
 
-public class HomeActivity extends BaseActivity implements CustomTitleView.Listener, SiteCallback, VodPresenter.OnClickListener, FuncPresenter.OnClickListener, HistoryPresenter.OnClickListener {
+public class HomeActivity extends BaseActivity implements CustomTitleView.Listener, VodPresenter.OnClickListener, FuncPresenter.OnClickListener, HistoryPresenter.OnClickListener {
 
     private ActivityHomeBinding mBinding;
     private ArrayObjectAdapter mAdapter;
@@ -112,7 +112,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         mSiteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mSiteViewModel.result.observe(this, result -> {
             mAdapter.remove("progress");
-            if (result != null) addVideo(result);
+            addVideo(result);
         });
     }
 
@@ -123,7 +123,10 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     }
 
     private void getVideo() {
+        mSiteViewModel.getResult().setValue(Result.empty());
         if (mAdapter.size() > getRecommendIndex()) mAdapter.removeItems(getRecommendIndex(), mAdapter.size() - getRecommendIndex());
+        if (ApiConfig.get().getHome().getName().isEmpty()) mBinding.title.setText(R.string.app_name);
+        else mBinding.title.setText(ApiConfig.getHomeName());
         if (ApiConfig.get().getHome().getKey().isEmpty()) return;
         mSiteViewModel.homeContent();
         mAdapter.add("progress");
@@ -217,23 +220,14 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     }
 
     @Override
-    public void showSite() {
-
+    public void showDialog() {
+        SiteDialog.show(this);
     }
 
     @Override
     public void setSite(Site item) {
-
-    }
-
-    @Override
-    public void nextSite() {
-
-    }
-
-    @Override
-    public void prevSite() {
-       
+        ApiConfig.get().setHome(item);
+        getVideo();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -266,7 +260,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
             mHistoryPresenter.setDelete(false);
             mHistoryAdapter.notifyArrayItemRangeChanged(0, mHistoryAdapter.size());
         } else if (mBinding.recycler.getSelectedPosition() != 0) {
-            mBinding.recycler.smoothScrollToPosition(0);
+            mBinding.recycler.scrollToPosition(0);
         } else if (!mConfirmExit) {
             mConfirmExit = true;
             Notify.show(R.string.app_exit);

@@ -1,6 +1,6 @@
 package com.fongmi.android.tv.ui.custom.dialog;
 
-import android.app.Activity;
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.WindowManager;
 
@@ -8,10 +8,10 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.ItemBridgeAdapter;
 
-import com.fongmi.android.tv.impl.SettingCallback;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.databinding.DialogSiteBinding;
+import com.fongmi.android.tv.impl.SiteCallback;
 import com.fongmi.android.tv.ui.presenter.SitePresenter;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -20,29 +20,28 @@ public class SiteDialog implements SitePresenter.OnClickListener {
 
     private ArrayObjectAdapter adapter;
     private DialogSiteBinding binding;
-    private SettingCallback callback;
+    private SiteCallback callback;
     private AlertDialog dialog;
 
-    public static void show(Activity activity) {
+    public static void show(Context context) {
         if (ApiConfig.get().getSites().isEmpty()) return;
-        new SiteDialog().create(activity);
+        new SiteDialog().create(context);
     }
 
-    public void create(Activity activity) {
-        callback = (SettingCallback) activity;
-        binding = DialogSiteBinding.inflate(LayoutInflater.from(activity));
-        dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).create();
+    public void create(Context context) {
+        callback = (SiteCallback) context;
+        binding = DialogSiteBinding.inflate(LayoutInflater.from(context));
+        dialog = new MaterialAlertDialogBuilder(context).setView(binding.getRoot()).create();
         setRecyclerView();
         setDialog();
     }
 
     private void setRecyclerView() {
-        int position = ApiConfig.get().getSites().indexOf(ApiConfig.get().getHome());
         adapter = new ArrayObjectAdapter(new SitePresenter(this));
         adapter.addAll(0, ApiConfig.get().getSites());
         binding.recycler.setVerticalSpacing(ResUtil.dp2px(16));
         binding.recycler.setAdapter(new ItemBridgeAdapter(adapter));
-        binding.recycler.scrollToPosition(position);
+        binding.recycler.scrollToPosition(ApiConfig.getHomeIndex());
     }
 
     private void setDialog() {

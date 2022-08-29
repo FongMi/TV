@@ -54,6 +54,10 @@ public class ApiConfig {
         return get().getHome().getName();
     }
 
+    public static int getHomeIndex() {
+        return get().getSites().indexOf(get().getHome());
+    }
+
     public static String getSiteName(String key) {
         return get().getSite(key).getName();
     }
