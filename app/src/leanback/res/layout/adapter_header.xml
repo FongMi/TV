@@ -6,4 +6,4 @@
     android:layout_height="wrap_content"
     android:textColor="@color/white"
     android:textSize="24sp"
-    tools:text="@string/app_name" />
+    tools:text="@string/home_recommend" />
