@@ -10,8 +10,8 @@ android {
         applicationId "com.fongmi.android.tv"
         minSdk 21
         targetSdk 32
-        versionCode 15
-        versionName "1.1.5"
+        versionCode 16
+        versionName "1.1.6"
     }
 
     productFlavors {
@@ -66,7 +66,6 @@ dependencies {
     implementation 'com.google.zxing:core:3.5.0'
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
-    implementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:4.10.0'
     implementation 'org.greenrobot:eventbus:3.3.1'
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
     implementation('org.simpleframework:simple-xml:2.7.1') { exclude group: 'stax', module: 'stax-api' exclude group: 'xpp3', module: 'xpp3' }
