@@ -66,7 +66,7 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
     private ExecutorService mService;
     private List<Site> mSites;
     private Handler mHandler;
-    private Animation mBlink;
+    private Animation mFlicker;
 
     private String getKeyword() {
         return getIntent().getStringExtra("keyword");
@@ -96,12 +96,12 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
-        checkKeyword();
+        check();
     }
 
     @Override
     protected void initView() {
-        mBlink = ResUtil.getAnim(R.anim.voice);
+        mFlicker = ResUtil.getAnim(R.anim.flicker);
         mHandler = new Handler(Looper.getMainLooper());
         mRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
         mBinding.voice.setVisibility(hasVoice() ? View.VISIBLE : View.GONE);
@@ -109,15 +109,15 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
         CustomKeyboard.init(mBinding);
         setRecyclerView();
         setViewModel();
-        checkKeyword();
         setSite();
         getHot();
+        check();
     }
 
     @Override
     protected void initEvent() {
         mBinding.voice.setOnClickListener(view -> onVoice());
-        mBinding.search.setOnClickListener(view -> onSearch());
+        mBinding.search.setOnClickListener(view -> startSearch());
         mBinding.clear.setOnClickListener(view -> mBinding.keyword.setText(""));
         mBinding.remote.setOnClickListener(view -> PushActivity.start(this));
         mBinding.keyword.setOnEditorActionListener((textView, actionId, event) -> {
@@ -158,14 +158,6 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
         });
     }
 
-    private void checkKeyword() {
-        if (getKeyword().isEmpty()) return;
-        stopSearch();
-        mAdapter.clear();
-        mBinding.keyword.setText(getKeyword());
-        mHandler.postDelayed(this::onSearch, 250);
-    }
-
     private void setSite() {
         mSites = new ArrayList<>();
         for (Site site : ApiConfig.get().getSites()) if (site.isSearchable()) mSites.add(site);
@@ -175,25 +167,23 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
         mSites.add(0, home);
     }
 
+    private void check() {
+        if (getKeyword().isEmpty()) return;
+        stopSearch();
+        mAdapter.clear();
+        mBinding.keyword.setText(getKeyword());
+        startSearch();
+    }
+
     private void onVoice() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             launcherString.launch(Manifest.permission.RECORD_AUDIO);
         } else {
             Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-            mBinding.voice.startAnimation(mBlink);
+            mBinding.voice.startAnimation(mFlicker);
             mRecognizer.startListening(intent);
         }
-    }
-
-    private void onSearch() {
-        String keyword = mBinding.keyword.getText().toString().trim();
-        mBinding.keyword.setSelection(mBinding.keyword.length());
-        if (TextUtils.isEmpty(keyword)) return;
-        mService = Executors.newFixedThreadPool(5);
-        for (Site site : mSites) mService.execute(() -> mSiteViewModel.searchContent(site.getKey(), keyword));
-        Utils.hideKeyboard(mBinding.keyword);
-        showResult();
     }
 
     private boolean checkLastSize(List<Vod> items) {
@@ -216,6 +206,16 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
         }
         mAdapter.addAll(mAdapter.size(), rows);
         mBinding.progressLayout.showContent();
+    }
+
+    private void startSearch() {
+        String keyword = mBinding.keyword.getText().toString().trim();
+        mBinding.keyword.setSelection(mBinding.keyword.length());
+        if (TextUtils.isEmpty(keyword)) return;
+        mService = Executors.newFixedThreadPool(5);
+        for (Site site : mSites) mService.execute(() -> mSiteViewModel.searchContent(site.getKey(), keyword));
+        Utils.hideKeyboard(mBinding.keyword);
+        showResult();
     }
 
     private void stopSearch() {
@@ -247,9 +247,14 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
     }
 
     @Override
+    public boolean onLongClick(Vod item) {
+        return false;
+    }
+
+    @Override
     public void onItemClick(String text) {
         mBinding.keyword.setText(text);
-        onSearch();
+        startSearch();
     }
 
     private void getHot() {
@@ -274,7 +279,7 @@ public class SearchActivity extends BaseActivity implements VodPresenter.OnClick
 
     @Override
     public void onBackPressed() {
-        if (isResultVisible()) {
+        if (isResultVisible() && getKeyword().isEmpty()) {
             mAdapter.clear();
             hideResult();
             stopSearch();

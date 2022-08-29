@@ -1,6 +1,5 @@
 package com.fongmi.android.tv.ui.activity;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Handler;
@@ -21,19 +20,22 @@ import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Func;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Result;
+import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.ActivityHomeBinding;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.event.ServerEvent;
+import com.fongmi.android.tv.impl.SiteCallback;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.ui.custom.CustomRowPresenter;
 import com.fongmi.android.tv.ui.custom.CustomSelector;
+import com.fongmi.android.tv.ui.custom.CustomTitleView;
 import com.fongmi.android.tv.ui.presenter.FuncPresenter;
+import com.fongmi.android.tv.ui.presenter.HeaderPresenter;
 import com.fongmi.android.tv.ui.presenter.HistoryPresenter;
 import com.fongmi.android.tv.ui.presenter.ProgressPresenter;
-import com.fongmi.android.tv.ui.presenter.HeaderPresenter;
 import com.fongmi.android.tv.ui.presenter.VodPresenter;
 import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.Notify;
@@ -47,7 +49,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.List;
 
-public class HomeActivity extends BaseActivity implements VodPresenter.OnClickListener, FuncPresenter.OnClickListener, HistoryPresenter.OnClickListener {
+public class HomeActivity extends BaseActivity implements CustomTitleView.Listener, SiteCallback, VodPresenter.OnClickListener, FuncPresenter.OnClickListener, HistoryPresenter.OnClickListener {
 
     private ActivityHomeBinding mBinding;
     private ArrayObjectAdapter mAdapter;
@@ -83,6 +85,7 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
     @Override
     protected void initEvent() {
         EventBus.getDefault().register(this);
+        mBinding.title.setListener(this);
         mFuncPresenter.setOnClickListener(this);
         mHistoryPresenter.setOnClickListener(this);
         mBinding.recycler.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
@@ -188,6 +191,12 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
     }
 
     @Override
+    public boolean onLongClick(Vod item) {
+        SearchActivity.start(this, item.getVodName());
+        return true;
+    }
+
+    @Override
     public void onItemClick(History item) {
         DetailActivity.start(this, item.getSiteKey(), item.getVodId());
     }
@@ -200,12 +209,31 @@ public class HomeActivity extends BaseActivity implements VodPresenter.OnClickLi
         mHistoryPresenter.setDelete(false);
     }
 
-    @SuppressLint("RestrictedApi")
     @Override
     public boolean onLongClick() {
         mHistoryPresenter.setDelete(true);
         mHistoryAdapter.notifyArrayItemRangeChanged(0, mHistoryAdapter.size());
         return true;
+    }
+
+    @Override
+    public void showSite() {
+
+    }
+
+    @Override
+    public void setSite(Site item) {
+
+    }
+
+    @Override
+    public void nextSite() {
+
+    }
+
+    @Override
+    public void prevSite() {
+       
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
