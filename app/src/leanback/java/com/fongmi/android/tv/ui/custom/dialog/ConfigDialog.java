@@ -10,9 +10,9 @@ import android.view.inputmethod.EditorInfo;
 import androidx.appcompat.app.AlertDialog;
 
 import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.impl.SettingCallback;
 import com.fongmi.android.tv.databinding.DialogConfigBinding;
 import com.fongmi.android.tv.event.ServerEvent;
+import com.fongmi.android.tv.impl.ConfigCallback;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.QRCode;
@@ -26,7 +26,7 @@ import org.greenrobot.eventbus.ThreadMode;
 public class ConfigDialog implements DialogInterface.OnDismissListener {
 
     private DialogConfigBinding binding;
-    private SettingCallback callback;
+    private ConfigCallback callback;
     private AlertDialog dialog;
 
     public static void show(Activity activity) {
@@ -34,7 +34,7 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
     }
 
     public void create(Activity activity) {
-        callback = (SettingCallback) activity;
+        callback = (ConfigCallback) activity;
         binding = DialogConfigBinding.inflate(LayoutInflater.from(activity));
         dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).create();
         EventBus.getDefault().register(this);

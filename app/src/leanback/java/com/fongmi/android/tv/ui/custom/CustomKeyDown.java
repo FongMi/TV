@@ -2,6 +2,8 @@ package com.fongmi.android.tv.ui.custom;
 
 import android.view.KeyEvent;
 
+import com.fongmi.android.tv.utils.Utils;
+
 public class CustomKeyDown {
 
     private final Listener mListener;
@@ -16,15 +18,13 @@ public class CustomKeyDown {
     }
 
     public boolean onKeyDown(KeyEvent event) {
-        boolean isLeft = isLeftKey(event);
-        boolean isRight = isRightKey(event);
-        if (event.getAction() == KeyEvent.ACTION_DOWN && (isLeft || isRight)) {
-            mListener.onSeeking(isRight ? addTime() : subTime());
-        } else if (event.getAction() == KeyEvent.ACTION_UP && (isLeft || isRight)) {
+        if (event.getAction() == KeyEvent.ACTION_DOWN && (Utils.isLeftKey(event) || Utils.isRightKey(event))) {
+            mListener.onSeeking(Utils.isRightKey(event) ? addTime() : subTime());
+        } else if (event.getAction() == KeyEvent.ACTION_UP && (Utils.isLeftKey(event) || Utils.isRightKey(event))) {
             mListener.onSeekTo(mHoldTime);
-        } else if (event.getAction() == KeyEvent.ACTION_UP && isDownKey(event)) {
+        } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isDownKey(event)) {
             mListener.onKeyDown();
-        } else if (event.getAction() == KeyEvent.ACTION_UP && isEnterKey(event)) {
+        } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isEnterKey(event)) {
             mListener.onKeyCenter();
         }
         return true;
@@ -43,27 +43,7 @@ public class CustomKeyDown {
     }
 
     public boolean hasEvent(KeyEvent event) {
-        return isEnterKey(event) || isUpKey(event) || isDownKey(event) || isLeftKey(event) || isRightKey(event);
-    }
-
-    private boolean isEnterKey(KeyEvent event) {
-        return event.getKeyCode() == KeyEvent.KEYCODE_DPAD_CENTER || event.getKeyCode() == KeyEvent.KEYCODE_ENTER || event.getKeyCode() == KeyEvent.KEYCODE_SPACE || event.getKeyCode() == KeyEvent.KEYCODE_NUMPAD_ENTER;
-    }
-
-    private boolean isUpKey(KeyEvent event) {
-        return event.getKeyCode() == KeyEvent.KEYCODE_DPAD_UP || event.getKeyCode() == KeyEvent.KEYCODE_CHANNEL_UP || event.getKeyCode() == KeyEvent.KEYCODE_PAGE_UP || event.getKeyCode() == KeyEvent.KEYCODE_MEDIA_PREVIOUS;
-    }
-
-    private boolean isDownKey(KeyEvent event) {
-        return event.getKeyCode() == KeyEvent.KEYCODE_DPAD_DOWN || event.getKeyCode() == KeyEvent.KEYCODE_CHANNEL_DOWN || event.getKeyCode() == KeyEvent.KEYCODE_PAGE_DOWN || event.getKeyCode() == KeyEvent.KEYCODE_MEDIA_NEXT;
-    }
-
-    private boolean isLeftKey(KeyEvent event) {
-        return event.getKeyCode() == KeyEvent.KEYCODE_DPAD_LEFT;
-    }
-
-    private boolean isRightKey(KeyEvent event) {
-        return event.getKeyCode() == KeyEvent.KEYCODE_DPAD_RIGHT;
+        return Utils.isEnterKey(event) || Utils.isUpKey(event) || Utils.isDownKey(event) || Utils.isLeftKey(event) || Utils.isRightKey(event);
     }
 
     public interface Listener {

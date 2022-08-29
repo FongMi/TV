@@ -23,7 +23,8 @@ import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.databinding.ActivitySettingBinding;
 import com.fongmi.android.tv.event.RefreshEvent;
-import com.fongmi.android.tv.impl.SettingCallback;
+import com.fongmi.android.tv.impl.ConfigCallback;
+import com.fongmi.android.tv.impl.SiteCallback;
 import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.ui.custom.dialog.ConfigDialog;
 import com.fongmi.android.tv.ui.custom.dialog.HistoryDialog;
@@ -32,7 +33,7 @@ import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 
-public class SettingActivity extends BaseActivity implements SettingCallback {
+public class SettingActivity extends BaseActivity implements ConfigCallback, SiteCallback {
 
     private final ActivityResultLauncher<String> launcherString = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> loadConfig());
     private final ActivityResultLauncher<Intent> launcherIntent = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> loadConfig());

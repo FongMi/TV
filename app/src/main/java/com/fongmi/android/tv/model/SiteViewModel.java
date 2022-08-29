@@ -189,7 +189,7 @@ public class SiteViewModel extends ViewModel {
             } catch (Exception e) {
                 e.printStackTrace();
                 if (e instanceof InterruptedException) return;
-                if (!Thread.interrupted()) result.postValue(new Result());
+                if (!Thread.interrupted()) result.postValue(Result.empty());
             }
         });
     }
