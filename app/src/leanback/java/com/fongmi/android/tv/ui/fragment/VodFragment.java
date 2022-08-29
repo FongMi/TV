@@ -19,6 +19,7 @@ import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.FragmentVodBinding;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.ui.activity.DetailActivity;
+import com.fongmi.android.tv.ui.activity.SearchActivity;
 import com.fongmi.android.tv.ui.custom.CustomRowPresenter;
 import com.fongmi.android.tv.ui.custom.CustomScroller;
 import com.fongmi.android.tv.ui.custom.CustomSelector;
@@ -165,6 +166,12 @@ public class VodFragment extends Fragment implements CustomScroller.Callback, Vo
     @Override
     public void onItemClick(Vod item) {
         DetailActivity.start(getActivity(), item.getVodId());
+    }
+
+    @Override
+    public boolean onLongClick(Vod item) {
+        SearchActivity.start(getActivity(), item.getVodName());
+        return true;
     }
 
     @Override

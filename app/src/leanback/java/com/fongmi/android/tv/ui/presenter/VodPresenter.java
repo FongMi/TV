@@ -22,7 +22,10 @@ public class VodPresenter extends Presenter {
     }
 
     public interface OnClickListener {
+
         void onItemClick(Vod item);
+
+        boolean onLongClick(Vod item);
     }
 
     private void setLayoutSize() {
@@ -53,6 +56,7 @@ public class VodPresenter extends Presenter {
         holder.binding.remark.setVisibility(item.getRemarkVisible());
         ImgUtil.load(item.getVodName(), item.getVodPic(), holder.binding.image);
         setOnClickListener(holder, view -> mListener.onItemClick(item));
+        holder.view.setOnLongClickListener(v -> mListener.onLongClick(item));
     }
 
     @Override
