@@ -1,7 +1,6 @@
 package com.fongmi.android.tv.player;
 
 import android.net.Uri;
-import android.text.TextUtils;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.bean.Result;
@@ -39,8 +38,7 @@ public class ExoUtil {
     }
 
     private static MediaItem.SubtitleConfiguration getConfig(Result result) {
-        if (TextUtils.isEmpty(result.getSub())) return null;
-        return new MediaItem.SubtitleConfiguration.Builder(Uri.parse(result.getSub())).setMimeType(MimeTypes.APPLICATION_SUBRIP).setSelectionFlags(C.SELECTION_FLAG_DEFAULT).build();
+        return result.getSub().isEmpty() ? null : new MediaItem.SubtitleConfiguration.Builder(Uri.parse(result.getSub())).setMimeType(MimeTypes.APPLICATION_SUBRIP).setSelectionFlags(C.SELECTION_FLAG_DEFAULT).build();
     }
 
     private static DataSource.Factory getFactory(Map<String, String> headers, String url) {
