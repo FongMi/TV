@@ -125,7 +125,7 @@ public class Players implements Player.Listener, ParseTask.Callback {
         return getCurrentPosition() >= getDuration();
     }
 
-    public void parse(Result result, boolean useParse) {
+    public void start(Result result, boolean useParse) {
         if (result.getUrl().isEmpty()) {
             PlayerEvent.error(R.string.error_play_load);
         } else if (result.getParse(1) == 1 || result.getJx() == 1) {

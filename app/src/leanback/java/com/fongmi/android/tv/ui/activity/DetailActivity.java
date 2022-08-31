@@ -183,7 +183,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         mSiteViewModel.player.observe(this, result -> {
             boolean useParse = (result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx() == 1;
             mControl.parseLayout.setVisibility(useParse ? View.VISIBLE : View.GONE);
-            Players.get().parse(result, useParse);
+            Players.get().start(result, useParse);
             resetFocus(useParse);
         });
         mSiteViewModel.result.observe(this, result -> {
@@ -268,7 +268,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         mBinding.error.getRoot().setVisibility(View.GONE);
         mBinding.progress.getRoot().setVisibility(View.VISIBLE);
         Result result = mSiteViewModel.getPlayer().getValue();
-        if (result != null) Players.get().parse(result, true);
+        if (result != null) Players.get().start(result, true);
         mParseAdapter.notifyArrayItemRangeChanged(0, mParseAdapter.size());
     }
 
