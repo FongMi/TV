@@ -125,22 +125,27 @@ public class Players implements Player.Listener, ParseTask.Callback {
         return getCurrentPosition() >= getDuration();
     }
 
-    public void setMediaSource(Result result, boolean useParse) {
+    public void parse(Result result, boolean useParse) {
         if (result.getUrl().isEmpty()) {
             PlayerEvent.error(R.string.error_play_load);
         } else if (result.getParse(1) == 1 || result.getJx() == 1) {
             if (parseTask != null) parseTask.cancel();
             parseTask = ParseTask.create(this).run(result, useParse);
         } else {
-            setMediaSource(result.getHeaders(), result.getPlayUrl() + result.getUrl());
+            setMediaSource(result);
         }
     }
 
-    public void setMediaSource(Map<String, String> headers, String url) {
+    private void setMediaSource(Result result) {
+        exoPlayer.setMediaSource(ExoUtil.getSource(result));
+        PlayerEvent.state(0);
+        exoPlayer.prepare();
+    }
+
+    private void setMediaSource(Map<String, String> headers, String url) {
         exoPlayer.setMediaSource(ExoUtil.getSource(headers, url));
         PlayerEvent.state(0);
         exoPlayer.prepare();
-        exoPlayer.play();
     }
 
     public void pause() {

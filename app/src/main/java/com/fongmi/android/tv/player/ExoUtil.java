@@ -1,43 +1,46 @@
 package com.fongmi.android.tv.player;
 
 import android.net.Uri;
+import android.text.TextUtils;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.bean.Result;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.ext.rtmp.RtmpDataSource;
+import com.google.android.exoplayer2.source.DefaultMediaSourceFactory;
 import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.source.ProgressiveMediaSource;
-import com.google.android.exoplayer2.source.dash.DashMediaSource;
-import com.google.android.exoplayer2.source.hls.HlsMediaSource;
-import com.google.android.exoplayer2.source.rtsp.RtspMediaSource;
-import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSource;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
-import com.google.android.exoplayer2.util.Util;
+import com.google.android.exoplayer2.util.MimeTypes;
+import com.google.common.collect.ImmutableList;
 
 import java.util.Map;
 
 public class ExoUtil {
 
+    public static MediaSource getSource(Result result) {
+        return getSource(result.getHeaders(), result.getPlayUrl() + result.getUrl(), getConfig(result));
+    }
+
     public static MediaSource getSource(Map<String, String> headers, String url) {
+        return getSource(headers, url, null);
+    }
+
+    private static MediaSource getSource(Map<String, String> headers, String url, MediaItem.SubtitleConfiguration config) {
         Uri videoUri = Uri.parse(url);
         DataSource.Factory factory = getFactory(headers, url);
-        MediaItem mediaItem = new MediaItem.Builder().setUri(videoUri).build();
-        int type = Util.inferContentType(videoUri);
-        if (type == C.CONTENT_TYPE_HLS || url.contains("php") || url.contains("m3u8")) {
-            return new HlsMediaSource.Factory(factory).createMediaSource(mediaItem);
-        } else if (type == C.CONTENT_TYPE_DASH) {
-            return new DashMediaSource.Factory(factory).createMediaSource(mediaItem);
-        } else if (type == C.CONTENT_TYPE_SS) {
-            return new SsMediaSource.Factory(factory).createMediaSource(mediaItem);
-        } else if (type == C.CONTENT_TYPE_RTSP) {
-            return new RtspMediaSource.Factory().createMediaSource(mediaItem);
-        } else {
-            return new ProgressiveMediaSource.Factory(factory).createMediaSource(mediaItem);
-        }
+        MediaItem.Builder builder = new MediaItem.Builder().setUri(videoUri);
+        if (url.contains("php") || url.contains("m3u8")) builder.setMimeType(MimeTypes.APPLICATION_M3U8);
+        if (config != null) builder.setSubtitleConfigurations(ImmutableList.of(config));
+        return new DefaultMediaSourceFactory(factory).createMediaSource(builder.build());
+    }
+
+    private static MediaItem.SubtitleConfiguration getConfig(Result result) {
+        if (TextUtils.isEmpty(result.getSub())) return null;
+        return new MediaItem.SubtitleConfiguration.Builder(Uri.parse(result.getSub())).setMimeType(MimeTypes.APPLICATION_SUBRIP).setSelectionFlags(C.SELECTION_FLAG_DEFAULT).build();
     }
 
     private static DataSource.Factory getFactory(Map<String, String> headers, String url) {

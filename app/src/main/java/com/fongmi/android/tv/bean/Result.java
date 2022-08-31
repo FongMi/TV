@@ -58,6 +58,8 @@ public class Result {
     private String flag;
     @SerializedName("url")
     private String url;
+    @SerializedName("subt")
+    private String sub;
 
     public static Result fromJson(String str) {
         try {
@@ -156,6 +158,10 @@ public class Result {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getSub() {
+        return sub;
     }
 
     public Map<String, String> getHeaders() {
