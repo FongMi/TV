@@ -63,7 +63,8 @@ public class Result {
 
     public static Result fromJson(String str) {
         try {
-            Type type = new TypeToken<LinkedHashMap<String, List<Filter>>>() {}.getType();
+            Type type = new TypeToken<LinkedHashMap<String, List<Filter>>>() {
+            }.getType();
             Gson gson = new GsonBuilder().registerTypeAdapter(type, new FiltersAdapter()).create();
             Result result = gson.fromJson(str, Result.class);
             return result == null ? empty() : result;
@@ -161,7 +162,7 @@ public class Result {
     }
 
     public String getSub() {
-        return sub;
+        return TextUtils.isEmpty(sub) ? "" : sub;
     }
 
     public Map<String, String> getHeaders() {
