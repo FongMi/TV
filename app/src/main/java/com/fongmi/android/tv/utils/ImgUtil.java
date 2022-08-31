@@ -34,6 +34,7 @@ public class ImgUtil {
         return new RequestListener<>() {
             @Override
             public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
+                view.setScaleType(ImageView.ScaleType.CENTER);
                 ImgUtil.onLoadFailed(vodName, view);
                 return true;
             }
@@ -50,10 +51,8 @@ public class ImgUtil {
         String text = vodName.isEmpty() ? "" : vodName.substring(0, 1);
         if (text.isEmpty()) {
             view.setImageResource(R.drawable.ic_img_error);
-            view.setScaleType(ImageView.ScaleType.CENTER);
         } else {
-            view.setImageDrawable(TextDrawable.builder().buildRect(text, ColorGenerator.MATERIAL.getColor(text)));
-            view.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            view.setImageDrawable(TextDrawable.builder().beginConfig().width(view.getWidth()).height(view.getHeight()).endConfig().buildRect(text, ColorGenerator.MATERIAL.getColor(text)));
         }
     }
 }
