@@ -49,10 +49,7 @@ public class ImgUtil {
 
     private static void onLoadFailed(String vodName, ImageView view) {
         String text = vodName.isEmpty() ? "" : vodName.substring(0, 1);
-        if (text.isEmpty()) {
-            view.setImageResource(R.drawable.ic_img_error);
-        } else {
-            view.setImageDrawable(TextDrawable.builder().beginConfig().width(view.getWidth()).height(view.getHeight()).endConfig().buildRect(text, ColorGenerator.MATERIAL.getColor(text)));
-        }
+        if (text.isEmpty()) view.setImageResource(R.drawable.ic_img_error);
+        else view.setImageDrawable(TextDrawable.builder().beginConfig().width(view.getWidth()).height(view.getHeight()).endConfig().buildRect(text, ColorGenerator.MATERIAL.getColor(text)));
     }
 }

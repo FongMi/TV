@@ -35,16 +35,11 @@ public class CustomViewPager extends ViewPager {
     private void init() {
         this.rect = new Rect();
         this.shake = ResUtil.getAnim(R.anim.shake);
-        setPageTransformer(false, (page, position) -> {
-            page.setTranslationX(page.getWidth() * -position);
-            if (position <= -1 || position >= 1) {
-                page.setAlpha(0);
-            } else if (position == 0) {
-                page.setAlpha(1);
-            } else {
-                page.setAlpha(1 - Math.abs(position));
-            }
-        });
+    }
+
+    @Override
+    public void setCurrentItem(int item) {
+        super.setCurrentItem(item, false);
     }
 
     @Override
