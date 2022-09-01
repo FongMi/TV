@@ -20,7 +20,7 @@ public class KeyboardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private final List<Object> mItems;
 
     public KeyboardAdapter(OnClickListener listener) {
-        this.mItems = Arrays.asList("1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", R.drawable.ic_keyboard_space, R.drawable.ic_keyboard_left, R.drawable.ic_keyboard_right, R.drawable.ic_keyboard_back);
+        this.mItems = Arrays.asList("1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "，", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "。", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", R.drawable.ic_keyboard_remote, "U", "V", "W", "X", "Y", "Z", R.drawable.ic_keyboard_space, R.drawable.ic_keyboard_left, R.drawable.ic_keyboard_right, R.drawable.ic_keyboard_back, R.drawable.ic_keyboard_search);
         this.mListener = listener;
     }
 
@@ -29,6 +29,8 @@ public class KeyboardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         void onTextClick(String text);
 
         void onIconClick(int resId);
+
+        boolean onLongClick(int resId);
     }
 
     class TextHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -47,7 +49,7 @@ public class KeyboardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
-    class IconHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class IconHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
         private final AdapterKeyboardIconBinding binding;
 
@@ -55,11 +57,17 @@ public class KeyboardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             super(binding.getRoot());
             this.binding = binding;
             itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
         }
 
         @Override
         public void onClick(View view) {
             mListener.onIconClick((int) mItems.get(getLayoutPosition()));
+        }
+
+        @Override
+        public boolean onLongClick(View view) {
+            return mListener.onLongClick((int) mItems.get(getLayoutPosition()));
         }
     }
 

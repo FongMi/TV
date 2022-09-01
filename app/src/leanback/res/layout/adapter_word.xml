@@ -7,7 +7,6 @@
     android:background="@drawable/selector_item_round"
     android:focusable="true"
     android:focusableInTouchMode="true"
-    android:nextFocusLeft="@id/word"
     android:singleLine="true"
     android:textColor="@color/white"
     android:textSize="16sp"
