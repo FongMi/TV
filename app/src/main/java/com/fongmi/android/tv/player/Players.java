@@ -78,12 +78,15 @@ public class Players implements Player.Listener, ParseTask.Callback {
         return String.format(Locale.getDefault(), "%.2f", exoPlayer.getPlaybackParameters().speed);
     }
 
-    public String addSpeed() {
+    public void addSpeed() {
         float speed = exoPlayer.getPlaybackParameters().speed;
         float addon = speed >= 2 ? 1f : 0.25f;
         speed = speed >= 5 ? 0.5f : speed + addon;
         exoPlayer.setPlaybackSpeed(speed);
-        return getSpeed();
+    }
+
+    public void resetSpeed() {
+        exoPlayer.setPlaybackSpeed(1f);
     }
 
     public String getTime(long time) {
