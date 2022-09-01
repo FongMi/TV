@@ -11,11 +11,16 @@ import androidx.leanback.widget.OnChildViewHolderSelectedListener;
 import androidx.leanback.widget.VerticalGridView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.fongmi.android.tv.R;
+
+import java.util.Arrays;
+import java.util.List;
+
 public class CustomVerticalGridView extends VerticalGridView {
 
-    private View tabView;
     private boolean pressUp;
     private boolean pressDown;
+    private List<View> views;
 
     public CustomVerticalGridView(@NonNull Context context) {
         super(context);
@@ -35,18 +40,18 @@ public class CustomVerticalGridView extends VerticalGridView {
         setOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable ViewHolder child, int position, int subposition) {
-                if (tabView == null) return;
+                if (views == null) return;
                 if (pressUp && position == 0) {
-                    tabView.setVisibility(View.VISIBLE);
+                    for (View view : views) view.setVisibility(View.VISIBLE);
                 } else if (pressDown && position == 1) {
-                    tabView.setVisibility(View.GONE);
+                    for (View view : views) view.setVisibility(View.GONE);
                 }
             }
         });
     }
 
-    public void setTabView(View tabView) {
-        this.tabView = tabView;
+    public void setHeader(View... views) {
+        this.views = Arrays.asList(views);
     }
 
     @Override
@@ -69,9 +74,9 @@ public class CustomVerticalGridView extends VerticalGridView {
     }
 
     public boolean moveToTop() {
-        if (tabView == null) return false;
-        tabView.setVisibility(View.VISIBLE);
-        tabView.requestFocus();
+        if (views == null) return false;
+        for (View view : views) view.setVisibility(View.VISIBLE);
+        for (View view : views) if (view.getId() == R.id.recycler) view.requestFocus();
         scrollToPosition(0);
         return true;
     }

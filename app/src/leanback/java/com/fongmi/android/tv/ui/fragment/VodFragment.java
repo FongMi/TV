@@ -83,7 +83,7 @@ public class VodFragment extends Fragment implements CustomScroller.Callback, Vo
         selector.addPresenter(ListRow.class, new CustomRowPresenter(8), FilterPresenter.class);
         mBinding.recycler.addOnScrollListener(mScroller = new CustomScroller(this));
         mBinding.recycler.setAdapter(new ItemBridgeAdapter(mAdapter = new ArrayObjectAdapter(selector)));
-        mBinding.recycler.setTabView(getActivity().findViewById(R.id.recycler));
+        mBinding.recycler.setHeader(getActivity().findViewById(R.id.recycler));
         mBinding.recycler.setVerticalSpacing(ResUtil.dp2px(16));
     }
 
