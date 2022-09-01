@@ -56,7 +56,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     private ArrayObjectAdapter mHistoryAdapter;
     private HistoryPresenter mHistoryPresenter;
     private FuncPresenter mFuncPresenter;
-    private SiteViewModel mSiteViewModel;
+    private SiteViewModel mViewModel;
     private boolean mConfirmExit;
 
     public static void start(Activity activity) {
@@ -109,8 +109,8 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     }
 
     private void setViewModel() {
-        mSiteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
-        mSiteViewModel.result.observe(this, result -> {
+        mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
+        mViewModel.result.observe(this, result -> {
             mAdapter.remove("progress");
             addVideo(result);
         });
@@ -123,12 +123,12 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     }
 
     private void getVideo() {
-        mSiteViewModel.getResult().setValue(Result.empty());
+        mViewModel.getResult().setValue(Result.empty());
         if (mAdapter.size() > getRecommendIndex()) mAdapter.removeItems(getRecommendIndex(), mAdapter.size() - getRecommendIndex());
         if (ApiConfig.get().getHome().getName().isEmpty()) mBinding.title.setText(R.string.app_name);
         else mBinding.title.setText(ApiConfig.getHomeName());
         if (ApiConfig.get().getHome().getKey().isEmpty()) return;
-        mSiteViewModel.homeContent();
+        mViewModel.homeContent();
         mAdapter.add("progress");
     }
 
@@ -174,7 +174,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     public void onItemClick(Func item) {
         switch (item.getResId()) {
             case R.string.home_vod:
-                VodActivity.start(this, mSiteViewModel.getResult().getValue());
+                VodActivity.start(this, mViewModel.getResult().getValue());
                 break;
             case R.string.home_search:
                 SearchActivity.start(this);
@@ -195,7 +195,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     public boolean onLongClick(Vod item) {
-        SearchActivity.start(this, item.getVodName());
+        CollectActivity.start(this, item.getVodName());
         return true;
     }
 
@@ -245,7 +245,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     public void onServerEvent(ServerEvent event) {
         switch (event.getType()) {
             case SEARCH:
-                SearchActivity.start(this, event.getText());
+                CollectActivity.start(this, event.getText());
                 break;
             case PUSH:
                 if (ApiConfig.get().getSite("push_agent") == null) return;

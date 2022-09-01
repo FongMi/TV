@@ -51,6 +51,13 @@ public class Site {
         return site;
     }
 
+    public static Site get(String key, String name) {
+        Site site = new Site();
+        site.setKey(key);
+        site.setName(name);
+        return site;
+    }
+
     public String getKey() {
         return TextUtils.isEmpty(key) ? "" : key;
     }

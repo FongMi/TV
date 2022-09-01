@@ -60,7 +60,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     private ArrayObjectAdapter mGroupAdapter;
     private ArrayObjectAdapter mEpisodeAdapter;
     private ArrayObjectAdapter mParseAdapter;
-    private SiteViewModel mSiteViewModel;
+    private SiteViewModel mViewModel;
     private CustomKeyDown mKeyDown;
     private boolean mFullscreen;
     private Handler mHandler;
@@ -179,14 +179,14 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     }
 
     private void setViewModel() {
-        mSiteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
-        mSiteViewModel.player.observe(this, result -> {
+        mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
+        mViewModel.player.observe(this, result -> {
             boolean useParse = (result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx() == 1;
             mControl.parseLayout.setVisibility(useParse ? View.VISIBLE : View.GONE);
             Players.get().start(result, useParse);
             resetFocus(useParse);
         });
-        mSiteViewModel.result.observe(this, result -> {
+        mViewModel.result.observe(this, result -> {
             if (result.getList().isEmpty()) mBinding.progressLayout.showEmpty();
             else setDetail(result.getList().get(0));
         });
@@ -200,13 +200,13 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     }
 
     private void getDetail() {
-        mSiteViewModel.detailContent(getKey(), getId());
+        mViewModel.detailContent(getKey(), getId());
     }
 
     private void getPlayer(boolean replay) {
         Vod.Flag.Episode item = (Vod.Flag.Episode) mEpisodeAdapter.get(getEpisodePosition());
         if (mFullscreen && Players.get().getRetry() == 0) Notify.show(ResUtil.getString(R.string.play_ready, item.getName()));
-        mSiteViewModel.playerContent(getKey(), getVodFlag().getFlag(), item.getUrl());
+        mViewModel.playerContent(getKey(), getVodFlag().getFlag(), item.getUrl());
         mBinding.progress.getRoot().setVisibility(View.VISIBLE);
         mBinding.error.getRoot().setVisibility(View.GONE);
         updateHistory(item, replay);
@@ -267,7 +267,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         ApiConfig.get().setParse(item);
         mBinding.error.getRoot().setVisibility(View.GONE);
         mBinding.progress.getRoot().setVisibility(View.VISIBLE);
-        Result result = mSiteViewModel.getPlayer().getValue();
+        Result result = mViewModel.getPlayer().getValue();
         if (result != null) Players.get().start(result, true);
         mParseAdapter.notifyArrayItemRangeChanged(0, mParseAdapter.size());
     }

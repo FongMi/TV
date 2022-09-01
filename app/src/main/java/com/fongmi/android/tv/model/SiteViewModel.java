@@ -152,9 +152,8 @@ public class SiteViewModel extends ViewModel {
         });
     }
 
-    public void searchContent(String key, String keyword) {
+    public void searchContent(Site site, String keyword) {
         try {
-            Site site = ApiConfig.get().getSite(key);
             if (site.getType() == 3) {
                 Spider spider = ApiConfig.get().getCSP(site);
                 String searchContent = spider.searchContent(keyword, false);

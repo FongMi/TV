@@ -10,9 +10,10 @@
     <string name="home_recommend">更新推荐</string>
 
     <!-- Search -->
-    <string name="search_hint">输入关键字…</string>
+    <string name="search_keyword">输入关键字…</string>
     <string name="search_clear">清空</string>
     <string name="search_remote">远程</string>
+    <string name="search_result">”<xliff:g name="name">%s</xliff:g>”的搜索结果</string>
 
     <!-- Push -->
     <string name="push_info">手机或电脑连接同一个局域网，扫描 QR Code 或浏览器输入地址\n<xliff:g name="name">%s</xliff:g></string>

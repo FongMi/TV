@@ -9,6 +9,7 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
+import com.google.gson.reflect.TypeToken;
 
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
@@ -17,7 +18,9 @@ import org.simpleframework.xml.Path;
 import org.simpleframework.xml.Root;
 import org.simpleframework.xml.Text;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Root(strict = false)
@@ -74,6 +77,12 @@ public class Vod {
     private List<Flag> vodFlags;
 
     private Site site;
+
+    public static List<Vod> arrayFrom(String str) {
+        Type listType = new TypeToken<List<Vod>>() {}.getType();
+        List<Vod> items = new Gson().fromJson(str, listType);
+        return items == null ? Collections.emptyList() : items;
+    }
 
     public String getVodId() {
         return TextUtils.isEmpty(vodId) ? "" : vodId;
