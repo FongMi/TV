@@ -3,6 +3,7 @@ package com.fongmi.android.tv.ui.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -58,6 +59,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     private FuncPresenter mFuncPresenter;
     private SiteViewModel mViewModel;
     private boolean mConfirmExit;
+    private Handler mHandler;
 
     public static void start(Activity activity) {
         activity.startActivity(new Intent(activity, HomeActivity.class));
@@ -72,6 +74,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     protected void initView() {
+        mHandler = new Handler(Looper.getMainLooper());
         Clock.start(mBinding.time);
         Server.get().start();
         Players.get().init();
@@ -80,6 +83,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         setAdapter();
         getHistory();
         getVideo();
+        setFocus();
     }
 
     @Override
@@ -120,6 +124,11 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         mAdapter.add(getFuncRow());
         mAdapter.add(R.string.home_history);
         mAdapter.add(R.string.home_recommend);
+    }
+
+    private void setFocus() {
+        mBinding.recycler.requestFocus();
+        mHandler.postDelayed(() -> mBinding.title.setFocusable(true), 500);
     }
 
     private void getVideo() {
@@ -264,7 +273,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         } else if (!mConfirmExit) {
             mConfirmExit = true;
             Notify.show(R.string.app_exit);
-            new Handler().postDelayed(() -> mConfirmExit = false, 1000);
+            mHandler.postDelayed(() -> mConfirmExit = false, 1000);
         } else {
             super.onBackPressed();
         }
