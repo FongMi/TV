@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:keepScreenOn="true">
+    android:gravity="center|bottom"
+    android:keepScreenOn="true"
+    android:orientation="vertical">
 
     <LinearLayout
         android:id="@+id/bar"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="16dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -38,7 +38,6 @@
             android:inputType="textCapCharacters|textAutoCorrect|textAutoComplete"
             android:letterSpacing="0.02"
             android:maxLength="50"
-            android:nextFocusDown="@id/word"
             android:singleLine="true"
             android:textColor="@color/white"
             android:textColorHint="@color/white"
@@ -47,19 +46,14 @@
 
     </LinearLayout>
 
-    <androidx.leanback.widget.VerticalGridView
+    <com.fongmi.android.tv.ui.custom.CustomHorizontalGridView
         android:id="@+id/word"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/bar"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_toStartOf="@+id/keyboard"
         android:clipChildren="false"
         android:clipToPadding="false"
-        android:nextFocusUp="@id/keyword"
-        android:paddingBottom="24dp"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
         app:focusOutEnd="true"
         app:focusOutFront="true" />
 
@@ -67,70 +61,13 @@
         android:id="@+id/keyboard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/word"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="24dp"
         android:clipChildren="false"
         android:clipToPadding="false"
-        android:nextFocusLeft="@id/word"
-        android:nextFocusUp="@id/keyword"
+        android:padding="24sp"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-        app:spanCount="10"
-        tools:itemCount="40"
+        app:spanCount="11"
+        tools:itemCount="44"
         tools:listitem="@layout/adapter_keyboard_text" />
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/keyboard"
-        android:layout_alignStart="@+id/keyboard"
-        android:layout_alignEnd="@+id/keyboard"
-        android:layout_marginTop="16dp"
-        android:gravity="center"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/clear"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_weight="1"
-            android:background="@drawable/selector_item"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:gravity="center"
-            android:nextFocusLeft="@id/word"
-            android:text="@string/search_clear"
-            android:textColor="@color/white"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/search"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_weight="1"
-            android:background="@drawable/selector_item"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:gravity="center"
-            android:text="@string/home_search"
-            android:textColor="@color/white"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/remote"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@drawable/selector_item"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:gravity="center"
-            android:text="@string/search_remote"
-            android:textColor="@color/white"
-            android:textSize="16sp" />
-
-    </LinearLayout>
-</RelativeLayout>
+</LinearLayout>
 
