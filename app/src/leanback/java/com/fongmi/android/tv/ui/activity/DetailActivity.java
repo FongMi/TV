@@ -130,15 +130,19 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     @Override
     protected void initEvent() {
         EventBus.getDefault().register(this);
+        mControl.replay.setOnClickListener(view -> getPlayer(true));
+        mBinding.video.setOnClickListener(view -> enterFullscreen());
         mControl.next.setOnClickListener(view -> checkNext());
         mControl.prev.setOnClickListener(view -> checkPrev());
         mControl.scale.setOnClickListener(view -> onScale());
         mControl.reset.setOnClickListener(view -> onReset());
+        mControl.speed.setOnClickListener(view -> onSpeed());
         mControl.ending.setOnClickListener(view -> onEnding());
         mControl.opening.setOnClickListener(view -> onOpening());
         mControl.interval.setOnClickListener(view -> onInterval());
-        mControl.replay.setOnClickListener(view -> getPlayer(true));
-        mControl.speed.setOnClickListener(view -> mControl.speed.setText(Players.get().addSpeed()));
+        mControl.speed.setOnLongClickListener(view -> onSpeedReset());
+        mControl.ending.setOnLongClickListener(view -> onEndingReset());
+        mControl.opening.setOnLongClickListener(view -> onOpeningReset());
         mBinding.flag.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
@@ -151,7 +155,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
                 if (mEpisodeAdapter.size() > 20 && position > 1) mBinding.episode.setSelectedPosition((position - 2) * 20);
             }
         });
-        mBinding.video.setOnClickListener(view -> enterFullscreen());
     }
 
     private void setRecyclerView() {
@@ -350,16 +353,41 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         Prefers.putScale(scale);
     }
 
+    public void onSpeed() {
+        Players.get().addSpeed();
+        mControl.speed.setText(Players.get().getSpeed());
+    }
+
+    public boolean onSpeedReset() {
+        Players.get().resetSpeed();
+        mControl.speed.setText(Players.get().getSpeed());
+        return true;
+    }
+
     private void onOpening() {
         mHistory.setOpening(mHistory.getOpening() + Prefers.getInterval() * 1000L);
         if (mHistory.getOpening() > 5 * 60 * 1000) mHistory.setOpening(0);
         mControl.opening.setText(Players.get().getStringForTime(mHistory.getOpening()));
     }
 
+    private boolean onOpeningReset() {
+        mHistory.setOpening(0);
+        mControl.opening.setText(Players.get().getStringForTime(mHistory.getOpening()));
+        mHistory.update();
+        return true;
+    }
+
     private void onEnding() {
         mHistory.setEnding(mHistory.getEnding() + Prefers.getInterval() * 1000L);
         if (mHistory.getEnding() > 5 * 60 * 1000) mHistory.setEnding(0);
         mControl.ending.setText(Players.get().getStringForTime(mHistory.getEnding()));
+    }
+
+    private boolean onEndingReset() {
+        mHistory.setEnding(0);
+        mControl.ending.setText(Players.get().getStringForTime(mHistory.getEnding()));
+        mHistory.update();
+        return true;
     }
 
     private void onInterval() {
