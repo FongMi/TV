@@ -8,7 +8,7 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/hint"
+        android:id="@+id/result"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -17,7 +17,7 @@
         android:singleLine="true"
         android:textColor="@color/white"
         android:textSize="24sp"
-        tools:text="@string/search_result" />
+        tools:text="@string/collect_result" />
 
     <com.fongmi.android.tv.ui.custom.CustomHorizontalGridView
         android:id="@+id/recycler"
