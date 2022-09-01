@@ -83,16 +83,16 @@ public class Server implements Nano.Listener {
 
     @Override
     public void onSearch(String text) {
-        ServerEvent.search(text);
+        if (text.length() > 0) ServerEvent.search(text);
     }
 
     @Override
     public void onPush(String url) {
-        ServerEvent.push(url);
+        if (url.length() > 0) ServerEvent.push(url);
     }
 
     @Override
     public void onApi(String url) {
-        ServerEvent.api(url);
+        if (url.length() > 0) ServerEvent.api(url);
     }
 }

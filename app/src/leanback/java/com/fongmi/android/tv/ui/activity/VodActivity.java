@@ -111,7 +111,7 @@ public class VodActivity extends BaseActivity {
 
     private void updateFilter(Class item) {
         if (item.getFilter() != null) {
-            getVodFragment().toggleFilter(item.toggleFilter().getFilter());
+            getFragment().toggleFilter(item.toggleFilter().getFilter());
             mAdapter.notifyArrayItemRangeChanged(0, mAdapter.size());
         }
     }
@@ -130,7 +130,7 @@ public class VodActivity extends BaseActivity {
         else super.onBackPressed();
     }
 
-    private VodFragment getVodFragment() {
+    private VodFragment getFragment() {
         return (VodFragment) mPageAdapter.instantiateItem(mBinding.pager, mBinding.pager.getCurrentItem());
     }
 

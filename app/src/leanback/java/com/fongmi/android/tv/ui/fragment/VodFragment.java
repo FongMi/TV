@@ -18,8 +18,8 @@ import com.fongmi.android.tv.bean.Filter;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.FragmentVodBinding;
 import com.fongmi.android.tv.model.SiteViewModel;
+import com.fongmi.android.tv.ui.activity.CollectActivity;
 import com.fongmi.android.tv.ui.activity.DetailActivity;
-import com.fongmi.android.tv.ui.activity.SearchActivity;
 import com.fongmi.android.tv.ui.custom.CustomRowPresenter;
 import com.fongmi.android.tv.ui.custom.CustomScroller;
 import com.fongmi.android.tv.ui.custom.CustomSelector;
@@ -38,9 +38,9 @@ public class VodFragment extends Fragment implements CustomScroller.Callback, Vo
 
     private HashMap<String, String> mExtend;
     private FragmentVodBinding mBinding;
-    private SiteViewModel mSiteViewModel;
     private ArrayObjectAdapter mAdapter;
     private ArrayObjectAdapter mLast;
+    private SiteViewModel mViewModel;
     private CustomScroller mScroller;
     private List<Filter> mFilters;
 
@@ -82,14 +82,14 @@ public class VodFragment extends Fragment implements CustomScroller.Callback, Vo
         selector.addPresenter(ListRow.class, new CustomRowPresenter(16), VodPresenter.class);
         selector.addPresenter(ListRow.class, new CustomRowPresenter(8), FilterPresenter.class);
         mBinding.recycler.addOnScrollListener(mScroller = new CustomScroller(this));
+        mBinding.recycler.setAdapter(new ItemBridgeAdapter(mAdapter = new ArrayObjectAdapter(selector)));
         mBinding.recycler.setTabView(getActivity().findViewById(R.id.recycler));
         mBinding.recycler.setVerticalSpacing(ResUtil.dp2px(16));
-        mBinding.recycler.setAdapter(new ItemBridgeAdapter(mAdapter = new ArrayObjectAdapter(selector)));
     }
 
     private void setViewModel() {
-        mSiteViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
-        mSiteViewModel.result.observe(getViewLifecycleOwner(), result -> {
+        mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
+        mViewModel.result.observe(getViewLifecycleOwner(), result -> {
             mScroller.endLoading(result.getList().isEmpty());
             addVideo(result.getList());
             checkPage();
@@ -118,7 +118,7 @@ public class VodFragment extends Fragment implements CustomScroller.Callback, Vo
     private void getVideo(String page) {
         boolean clear = page.equals("1") && mAdapter.size() > mFilters.size();
         if (clear) mAdapter.removeItems(mFilters.size(), mAdapter.size() - mFilters.size());
-        mSiteViewModel.categoryContent(getTypeId(), page, true, mExtend);
+        mViewModel.categoryContent(getTypeId(), page, true, mExtend);
     }
 
     private boolean checkLastSize(List<Vod> items) {
@@ -170,7 +170,7 @@ public class VodFragment extends Fragment implements CustomScroller.Callback, Vo
 
     @Override
     public boolean onLongClick(Vod item) {
-        SearchActivity.start(getActivity(), item.getVodName());
+        CollectActivity.start(getActivity(), item.getVodName());
         return true;
     }
 

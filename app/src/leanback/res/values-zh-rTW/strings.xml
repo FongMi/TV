@@ -10,9 +10,10 @@
     <string name="home_recommend">更新推薦</string>
 
     <!-- Search -->
-    <string name="search_hint">輸入關鍵字…</string>
+    <string name="search_keyword">輸入關鍵字…</string>
     <string name="search_clear">清除</string>
     <string name="search_remote">遠端</string>
+    <string name="search_result">「<xliff:g name="name">%s</xliff:g>」的搜尋結果</string>
 
     <!-- Push -->
     <string name="push_info">手機或電腦連接同一個區域網路，掃描 QR Code 或瀏覽器輸入網址\n<xliff:g name="name">%s</xliff:g></string>
