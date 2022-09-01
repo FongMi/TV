@@ -61,6 +61,7 @@ public class FileUtil {
         fos.write(data);
         fos.flush();
         fos.close();
+        chmod(file);
         return file;
     }
 
@@ -110,5 +111,14 @@ public class FileUtil {
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         intent.setDataAndType(getShareUri(file), FileUtil.getMimeType(file.getName()));
         App.get().startActivity(intent);
+    }
+
+    private static void chmod(File file) {
+        try {
+            Process process = Runtime.getRuntime().exec("chmod 777 " + file);
+            process.waitFor();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
