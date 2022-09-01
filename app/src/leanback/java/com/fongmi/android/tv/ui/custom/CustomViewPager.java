@@ -145,7 +145,7 @@ public class CustomViewPager extends ViewPager {
 
     boolean pageLeft() {
         if (getCurrentItem() > 0) {
-            setCurrentItem(getCurrentItem() - 1, true);
+            setCurrentItem(getCurrentItem() - 1, false);
             return true;
         }
         return false;
@@ -153,7 +153,7 @@ public class CustomViewPager extends ViewPager {
 
     boolean pageRight() {
         if (getAdapter() != null && getCurrentItem() < getAdapter().getCount() - 1) {
-            setCurrentItem(getCurrentItem() + 1, true);
+            setCurrentItem(getCurrentItem() + 1, false);
             return true;
         }
         return false;
