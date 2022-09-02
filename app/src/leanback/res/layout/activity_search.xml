@@ -4,70 +4,102 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center|bottom"
     android:keepScreenOn="true"
-    android:orientation="vertical">
+    android:orientation="horizontal"
+    android:padding="24dp">
 
     <LinearLayout
-        android:id="@+id/bar"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
-
-        <ImageView
-            android:id="@+id/voice"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_gravity="center"
-            android:layout_marginEnd="16dp"
-            android:background="@drawable/selector_mic"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:scaleType="center"
-            android:src="@drawable/ic_voice" />
+        android:layout_height="match_parent"
+        android:layout_marginEnd="24dp"
+        android:orientation="vertical">
 
         <com.fongmi.android.tv.ui.custom.CustomEditText
             android:id="@+id/keyword"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:backgroundTint="@color/white"
+            android:layout_marginBottom="24dp"
+            android:background="@null"
             android:hint="@string/search_keyword"
             android:imeOptions="actionDone"
             android:inputType="textCapCharacters|textAutoCorrect|textAutoComplete"
             android:letterSpacing="0.02"
-            android:maxLength="50"
+            android:maxLength="20"
             android:singleLine="true"
             android:textColor="@color/white"
             android:textColorHint="@color/white"
             android:textCursorDrawable="@drawable/shape_cursor"
             android:textSize="24sp" />
 
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/keyboard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                app:spanCount="6"
+                tools:itemCount="36"
+                tools:listitem="@layout/adapter_keyboard_text" />
+
+            <ImageView
+                android:id="@+id/voice"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:src="@drawable/ic_keyboard_voice"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+        </FrameLayout>
     </LinearLayout>
 
-    <com.fongmi.android.tv.ui.custom.CustomHorizontalGridView
-        android:id="@+id/word"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:clipChildren="false"
-        android:clipToPadding="false"
-        android:paddingStart="24dp"
-        android:paddingEnd="24dp"
-        app:focusOutEnd="true"
-        app:focusOutFront="true" />
+    <LinearLayout
+        android:layout_width="150dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/keyboard"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:clipChildren="false"
-        android:clipToPadding="false"
-        android:padding="24sp"
-        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-        app:spanCount="11"
-        tools:itemCount="44"
-        tools:listitem="@layout/adapter_keyboard_text" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:text="@string/search_history"
+            android:textColor="@color/white"
+            android:textSize="24sp" />
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/history"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:itemCount="10"
+            tools:listitem="@layout/adapter_word" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/hint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:text="@string/search_hot"
+            android:textColor="@color/white"
+            android:textSize="24sp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/word"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:itemCount="10"
+            tools:listitem="@layout/adapter_word" />
+
+    </LinearLayout>
 </LinearLayout>
 

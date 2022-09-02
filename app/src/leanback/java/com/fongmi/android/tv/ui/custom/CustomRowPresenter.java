@@ -2,6 +2,7 @@ package com.fongmi.android.tv.ui.custom;
 
 import android.annotation.SuppressLint;
 
+import androidx.leanback.widget.FocusHighlight;
 import androidx.leanback.widget.HorizontalGridView;
 import androidx.leanback.widget.ListRowPresenter;
 import androidx.leanback.widget.RowPresenter;
@@ -13,6 +14,11 @@ public class CustomRowPresenter extends ListRowPresenter {
     private final int spacing;
 
     public CustomRowPresenter(int spacing) {
+        this(spacing, FocusHighlight.ZOOM_FACTOR_MEDIUM);
+    }
+
+    public CustomRowPresenter(int spacing, int focusZoomFactor) {
+        super(focusZoomFactor);
         this.spacing = spacing;
         setShadowEnabled(false);
         setSelectEffectEnabled(false);

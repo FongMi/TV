@@ -47,6 +47,7 @@ public class ParseTask {
         if (useParse) parse = ApiConfig.get().getParse();
         else if (url.startsWith("json:")) parse = Parse.get(1, url.substring(5));
         else if (url.startsWith("parse:")) parse = ApiConfig.get().getParse(url.substring(6));
+        else if (url.startsWith("magnet:")) parse = Parse.get(99, url);
         if (parse == null) parse = Parse.get(0, url);
     }
 
@@ -63,6 +64,9 @@ public class ParseTask {
                 break;
             case 3: //聚合
                 jsonMix(webUrl, flag);
+                break;
+            case 99: //磁力
+                onParseError();
                 break;
         }
     }

@@ -5,12 +5,12 @@ import android.view.LayoutInflater;
 import android.view.WindowManager;
 
 import androidx.appcompat.app.AlertDialog;
-import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.databinding.DialogHistoryBinding;
 import com.fongmi.android.tv.impl.ConfigCallback;
 import com.fongmi.android.tv.ui.adapter.ConfigAdapter;
+import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -34,7 +34,8 @@ public class HistoryDialog implements ConfigAdapter.OnClickListener {
     }
 
     private void setRecyclerView() {
-        binding.recycler.setLayoutManager(new LinearLayoutManager(dialog.getContext()));
+        binding.recycler.setHasFixedSize(true);
+        binding.recycler.addItemDecoration(new SpaceItemDecoration(1, 16));
         binding.recycler.setAdapter(adapter = new ConfigAdapter(this));
     }
 
