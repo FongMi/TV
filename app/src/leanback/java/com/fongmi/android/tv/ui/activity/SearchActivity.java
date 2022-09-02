@@ -42,7 +42,7 @@ import okhttp3.Response;
 
 public class SearchActivity extends BaseActivity implements WordAdapter.OnClickListener, HistoryAdapter.OnClickListener, CustomKeyboard.Callback {
 
-    private final ActivityResultLauncher<String> launcher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), this::startListening);
+    private final ActivityResultLauncher<String> launcher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), result -> startListening());
 
     private ActivitySearchBinding mBinding;
     private SpeechRecognizer mRecognizer;
@@ -155,19 +155,17 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             launcher.launch(Manifest.permission.RECORD_AUDIO);
         } else {
-            startListening(true);
+            startListening();
         }
     }
 
-    private void startListening(boolean granted) {
-        if (granted) {
-            Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-            mBinding.keyboard.setVisibility(View.INVISIBLE);
-            mBinding.voice.setVisibility(View.VISIBLE);
-            mBinding.voice.startAnimation(mFlicker);
-            mRecognizer.startListening(intent);
-        }
+    private void startListening() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        mBinding.keyboard.setVisibility(View.INVISIBLE);
+        mBinding.voice.setVisibility(View.VISIBLE);
+        mBinding.voice.startAnimation(mFlicker);
+        mRecognizer.startListening(intent);
     }
 
     private void stopListening() {
