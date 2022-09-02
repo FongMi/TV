@@ -165,7 +165,8 @@ public class VodFragment extends Fragment implements CustomScroller.Callback, Vo
 
     @Override
     public void onItemClick(Vod item) {
-        DetailActivity.start(getActivity(), item.getVodId());
+        if (item.getVodId().startsWith("msearch:")) onLongClick(item);
+        else DetailActivity.start(getActivity(), item.getVodId());
     }
 
     @Override
