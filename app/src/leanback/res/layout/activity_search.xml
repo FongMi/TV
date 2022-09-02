@@ -56,8 +56,10 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/historyLayout"
         android:layout_width="150dp"
         android:layout_height="match_parent"
+        android:layout_marginEnd="24dp"
         android:orientation="vertical">
 
         <TextView

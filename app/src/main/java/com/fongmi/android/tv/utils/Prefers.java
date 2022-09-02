@@ -67,6 +67,14 @@ public class Prefers {
         Prefers.put("parse", parse);
     }
 
+    public static String getKeyword() {
+        return Prefers.getString("keyword");
+    }
+
+    public static void putKeyword(String keyword) {
+        Prefers.put("keyword", keyword);
+    }
+
     public static int getScale() {
         return Prefers.getInt("scale");
     }

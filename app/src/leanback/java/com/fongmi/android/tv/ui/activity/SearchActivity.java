@@ -18,8 +18,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
-import androidx.leanback.widget.ArrayObjectAdapter;
-import androidx.leanback.widget.ItemBridgeAdapter;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.R;
@@ -28,28 +26,28 @@ import com.fongmi.android.tv.bean.Suggest;
 import com.fongmi.android.tv.databinding.ActivitySearchBinding;
 import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.net.OKHttp;
+import com.fongmi.android.tv.ui.adapter.HistoryAdapter;
+import com.fongmi.android.tv.ui.adapter.WordAdapter;
 import com.fongmi.android.tv.ui.custom.CustomKeyboard;
 import com.fongmi.android.tv.ui.custom.CustomListener;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
-import com.fongmi.android.tv.ui.presenter.WordPresenter;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Utils;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Response;
 
-public class SearchActivity extends BaseActivity implements WordPresenter.OnClickListener, CustomKeyboard.Callback {
+public class SearchActivity extends BaseActivity implements WordAdapter.OnClickListener, HistoryAdapter.OnClickListener, CustomKeyboard.Callback {
 
     private final ActivityResultLauncher<String> launcherString = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> onVoice());
 
     private ActivitySearchBinding mBinding;
-    private ArrayObjectAdapter mHistoryAdapter;
-    private ArrayObjectAdapter mWordAdapter;
     private SpeechRecognizer mRecognizer;
+    private HistoryAdapter mHistoryAdapter;
+    private WordAdapter mWordAdapter;
     private Animation mFlicker;
     private Handler mHandler;
 
@@ -98,12 +96,11 @@ public class SearchActivity extends BaseActivity implements WordPresenter.OnClic
 
     private void setRecyclerView() {
         mBinding.word.setHasFixedSize(true);
-        mBinding.history.setHasFixedSize(true);
         mBinding.word.addItemDecoration(new SpaceItemDecoration(1, 16));
+        mBinding.word.setAdapter(mWordAdapter = new WordAdapter(this));
+        mBinding.history.setHasFixedSize(true);
         mBinding.history.addItemDecoration(new SpaceItemDecoration(1, 16));
-        mBinding.word.setAdapter(new ItemBridgeAdapter(mWordAdapter = new ArrayObjectAdapter(new WordPresenter(this))));
-        mBinding.history.setAdapter(new ItemBridgeAdapter(mHistoryAdapter = new ArrayObjectAdapter(new WordPresenter(this))));
-        mHistoryAdapter.setItems(Arrays.asList("測試1測試1", "測試2測試2", "測試3"), null);
+        mBinding.history.setAdapter(mHistoryAdapter = new HistoryAdapter(this));
     }
 
     private void getHot() {
@@ -112,7 +109,7 @@ public class SearchActivity extends BaseActivity implements WordPresenter.OnClic
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 List<String> items = Hot.get(response.body().string());
-                mHandler.post(() -> mWordAdapter.setItems(items, null));
+                mHandler.post(() -> mWordAdapter.addAll(items));
             }
         });
     }
@@ -123,7 +120,7 @@ public class SearchActivity extends BaseActivity implements WordPresenter.OnClic
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 List<String> items = Suggest.get(response.body().string());
-                mHandler.post(() -> mWordAdapter.setItems(items, null));
+                mHandler.post(() -> mWordAdapter.addAll(items));
             }
         });
     }
@@ -135,12 +132,20 @@ public class SearchActivity extends BaseActivity implements WordPresenter.OnClic
     }
 
     @Override
+    public void onDataChanged(int size) {
+        int visible = size == 0 ? View.GONE : View.VISIBLE;
+        if (mBinding.historyLayout.getVisibility() == visible) return;
+        mBinding.historyLayout.setVisibility(visible);
+    }
+
+    @Override
     public void onSearch() {
         String keyword = mBinding.keyword.getText().toString().trim();
         mBinding.keyword.setSelection(mBinding.keyword.length());
         Utils.hideKeyboard(mBinding.keyword);
         if (TextUtils.isEmpty(keyword)) return;
         CollectActivity.start(this, keyword);
+        mHandler.postDelayed(() -> mHistoryAdapter.add(keyword), 250);
     }
 
     @Override
