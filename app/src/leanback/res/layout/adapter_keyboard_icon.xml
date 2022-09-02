@@ -2,7 +2,7 @@
 <ImageView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/icon"
-    android:layout_width="match_parent"
+    android:layout_width="40dp"
     android:layout_height="40dp"
     android:background="@drawable/selector_keyboard"
     android:focusable="true"

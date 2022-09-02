@@ -10,9 +10,10 @@
     <string name="home_recommend">更新推薦</string>
 
     <!-- Search -->
-    <string name="search_keyword">輸入關鍵字…</string>
-    <string name="search_clear">清除</string>
-    <string name="search_remote">遠端</string>
+    <string name="search_keyword">關鍵字…</string>
+    <string name="search_history">歷史紀錄</string>
+    <string name="search_suggest">建議搜尋</string>
+    <string name="search_hot">熱門搜尋</string>
 
     <!-- Collect -->
     <string name="collect_result">「<xliff:g name="name">%s</xliff:g>」的搜尋結果</string>

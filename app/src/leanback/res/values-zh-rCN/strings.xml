@@ -10,9 +10,10 @@
     <string name="home_recommend">更新推荐</string>
 
     <!-- Search -->
-    <string name="search_keyword">输入关键字…</string>
-    <string name="search_clear">清空</string>
-    <string name="search_remote">远程</string>
+    <string name="search_keyword">关键字…</string>
+    <string name="search_history">历史纪录</string>
+    <string name="search_suggest">建议搜索</string>
+    <string name="search_hot">热门搜索</string>
 
     <!-- Collect -->
     <string name="collect_result">”<xliff:g name="name">%s</xliff:g>”的搜索结果</string>

@@ -9,7 +9,7 @@ import com.fongmi.android.tv.ui.adapter.KeyboardAdapter;
 public class CustomKeyboard implements KeyboardAdapter.OnClickListener {
 
     private final ActivitySearchBinding binding;
-    private Callback callback;
+    private final Callback callback;
 
     public static void init(Callback callback, ActivitySearchBinding binding) {
         new CustomKeyboard(callback, binding).initView();
@@ -22,7 +22,7 @@ public class CustomKeyboard implements KeyboardAdapter.OnClickListener {
 
     private void initView() {
         binding.keyboard.setHasFixedSize(true);
-        binding.keyboard.addItemDecoration(new SpaceItemDecoration(11, 8));
+        binding.keyboard.addItemDecoration(new SpaceItemDecoration(6, 8));
         binding.keyboard.setAdapter(new KeyboardAdapter(this));
     }
 
@@ -42,11 +42,6 @@ public class CustomKeyboard implements KeyboardAdapter.OnClickListener {
         StringBuilder sb = new StringBuilder(binding.keyword.getText().toString());
         int cursor = binding.keyword.getSelectionStart();
         switch (resId) {
-            case R.drawable.ic_keyboard_space:
-                sb.insert(cursor, " ");
-                binding.keyword.setText(sb.toString());
-                binding.keyword.setSelection(cursor + 1);
-                break;
             case R.drawable.ic_keyboard_left:
                 binding.keyword.setSelection(--cursor < 0 ? 0 : cursor);
                 break;
@@ -58,6 +53,9 @@ public class CustomKeyboard implements KeyboardAdapter.OnClickListener {
                 sb.deleteCharAt(cursor - 1);
                 binding.keyword.setText(sb.toString());
                 binding.keyword.setSelection(cursor - 1);
+                break;
+            case R.drawable.ic_keyboard_voice:
+                callback.onVoice();
                 break;
             case R.drawable.ic_keyboard_remote:
                 callback.onRemote();
@@ -77,8 +75,10 @@ public class CustomKeyboard implements KeyboardAdapter.OnClickListener {
 
     public interface Callback {
 
-        void onSearch();
+        void onVoice();
 
         void onRemote();
+
+        void onSearch();
     }
 }
