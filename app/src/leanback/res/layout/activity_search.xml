@@ -59,6 +59,7 @@
             android:id="@+id/keyword"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignEnd="@+id/keyboard"
             android:layout_marginBottom="16dp"
             android:layout_toEndOf="@+id/mic"
             android:background="@null"

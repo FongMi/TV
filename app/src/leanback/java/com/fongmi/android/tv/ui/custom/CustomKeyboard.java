@@ -30,7 +30,7 @@ public class CustomKeyboard implements KeyboardAdapter.OnClickListener {
     public void onTextClick(String text) {
         StringBuilder sb = new StringBuilder(binding.keyword.getText().toString());
         int cursor = binding.keyword.getSelectionStart();
-        if (binding.keyword.length() > 29) return;
+        if (binding.keyword.length() > 19) return;
         sb.insert(cursor, text);
         binding.keyword.setText(sb.toString());
         binding.keyword.setSelection(cursor + 1);
