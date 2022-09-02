@@ -22,7 +22,7 @@ import java.util.List;
 public class CustomTitleView extends AppCompatTextView {
 
     private Listener mListener;
-    private Animation mFlicker;
+    private Animation flicker;
 
     public CustomTitleView(@NonNull Context context) {
         super(context);
@@ -30,7 +30,7 @@ public class CustomTitleView extends AppCompatTextView {
 
     public CustomTitleView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        mFlicker = ResUtil.getAnim(R.anim.flicker);
+        flicker = ResUtil.getAnim(R.anim.flicker);
     }
 
     public void setListener(Listener listener) {
@@ -40,7 +40,7 @@ public class CustomTitleView extends AppCompatTextView {
     @Override
     protected void onFocusChanged(boolean focused, int direction, Rect previouslyFocusedRect) {
         super.onFocusChanged(focused, direction, previouslyFocusedRect);
-        if (focused) startAnimation(mFlicker);
+        if (focused) startAnimation(flicker);
         else clearAnimation();
     }
 

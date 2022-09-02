@@ -11,9 +11,9 @@
 
     <!-- Search -->
     <string name="search_keyword">關鍵字…</string>
-    <string name="search_history">歷史紀錄</string>
-    <string name="search_suggest">建議搜尋</string>
-    <string name="search_hot">熱門搜尋</string>
+    <string name="search_history">歷史</string>
+    <string name="search_suggest">建議</string>
+    <string name="search_hot">熱搜</string>
 
     <!-- Collect -->
     <string name="collect_result">「<xliff:g name="name">%s</xliff:g>」的搜尋結果</string>
