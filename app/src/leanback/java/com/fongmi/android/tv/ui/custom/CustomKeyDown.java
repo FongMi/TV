@@ -7,7 +7,7 @@ import com.fongmi.android.tv.utils.Utils;
 public class CustomKeyDown {
 
     private final Listener mListener;
-    private int mHoldTime;
+    private int holdTime;
 
     public static CustomKeyDown create(Listener listener) {
         return new CustomKeyDown(listener);
@@ -21,7 +21,7 @@ public class CustomKeyDown {
         if (event.getAction() == KeyEvent.ACTION_DOWN && (Utils.isLeftKey(event) || Utils.isRightKey(event))) {
             mListener.onSeeking(Utils.isRightKey(event) ? addTime() : subTime());
         } else if (event.getAction() == KeyEvent.ACTION_UP && (Utils.isLeftKey(event) || Utils.isRightKey(event))) {
-            mListener.onSeekTo(mHoldTime);
+            mListener.onSeekTo(holdTime);
         } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isDownKey(event)) {
             mListener.onKeyDown();
         } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isEnterKey(event)) {
@@ -31,15 +31,15 @@ public class CustomKeyDown {
     }
 
     private int addTime() {
-        return mHoldTime = mHoldTime + 10000;
+        return holdTime = holdTime + 10000;
     }
 
     private int subTime() {
-        return mHoldTime = mHoldTime - 10000;
+        return holdTime = holdTime - 10000;
     }
 
     public void resetTime() {
-        mHoldTime = 0;
+        holdTime = 0;
     }
 
     public boolean hasEvent(KeyEvent event) {

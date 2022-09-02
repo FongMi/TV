@@ -12,57 +12,10 @@
     android:paddingEnd="24dp">
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_marginEnd="24dp"
-        android:orientation="vertical">
-
-        <com.fongmi.android.tv.ui.custom.CustomEditText
-            android:id="@+id/keyword"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:background="@null"
-            android:hint="@string/search_keyword"
-            android:imeOptions="actionDone"
-            android:inputType="textCapCharacters|textAutoCorrect|textAutoComplete"
-            android:letterSpacing="0.02"
-            android:maxLength="20"
-            android:singleLine="true"
-            android:textColor="@color/white"
-            android:textColorHint="@color/white"
-            android:textCursorDrawable="@drawable/shape_cursor"
-            android:textSize="24sp" />
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/keyboard"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-                app:spanCount="6"
-                tools:itemCount="36"
-                tools:listitem="@layout/adapter_keyboard_text" />
-
-            <ImageView
-                android:id="@+id/voice"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                android:src="@drawable/ic_keyboard_voice"
-                android:visibility="gone"
-                tools:visibility="visible" />
-
-        </FrameLayout>
-    </LinearLayout>
-
-    <LinearLayout
         android:id="@+id/historyLayout"
         android:layout_width="150dp"
         android:layout_height="match_parent"
-        android:layout_marginEnd="24dp"
+        android:layout_marginEnd="36dp"
         android:orientation="vertical">
 
         <TextView
@@ -86,9 +39,56 @@
 
     </LinearLayout>
 
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="36dp"
+        android:orientation="vertical">
+
+        <com.fongmi.android.tv.ui.custom.CustomMic
+            android:id="@+id/mic"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginEnd="12dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_mic" />
+
+        <com.fongmi.android.tv.ui.custom.CustomEditText
+            android:id="@+id/keyword"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:layout_toEndOf="@+id/mic"
+            android:background="@null"
+            android:hint="@string/search_keyword"
+            android:imeOptions="actionDone"
+            android:inputType="textCapCharacters|textAutoCorrect|textAutoComplete"
+            android:letterSpacing="0.02"
+            android:maxLength="20"
+            android:singleLine="true"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
+            android:textCursorDrawable="@drawable/shape_cursor"
+            android:textSize="24sp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/keyboard"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/keyword"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:spanCount="6"
+            tools:itemCount="36"
+            tools:listitem="@layout/adapter_keyboard_text" />
+
+    </RelativeLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginEnd="24dp"
         android:orientation="vertical">
 
         <TextView
