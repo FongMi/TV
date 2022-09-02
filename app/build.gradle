@@ -10,8 +10,8 @@ android {
         applicationId "com.fongmi.android.tv"
         minSdk 21
         targetSdk 32
-        versionCode 18
-        versionName "1.1.8"
+        versionCode 19
+        versionName "1.1.9"
     }
 
     productFlavors {
