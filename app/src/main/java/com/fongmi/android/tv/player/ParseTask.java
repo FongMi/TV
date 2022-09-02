@@ -68,9 +68,6 @@ public class ParseTask {
             case 3: //聚合
                 jsonMix(webUrl, flag);
                 break;
-            case 99: //磁力
-                onParseError();
-                break;
         }
     }
 
