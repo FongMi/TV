@@ -47,11 +47,14 @@ public class ParseTask {
         if (useParse) parse = ApiConfig.get().getParse();
         else if (url.startsWith("json:")) parse = Parse.get(1, url.substring(5));
         else if (url.startsWith("parse:")) parse = ApiConfig.get().getParse(url.substring(6));
-        else if (url.startsWith("magnet:")) parse = Parse.get(99, url);
         if (parse == null) parse = Parse.get(0, url);
     }
 
     private void doInBackground(String webUrl, String flag) {
+        if (webUrl.startsWith("magnet:")) {
+            onParseError();
+            return;
+        }
         switch (parse.getType()) {
             case 0: //嗅探
                 handler.post(() -> Players.get().web().start(parse.getUrl() + webUrl, callback));
