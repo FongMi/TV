@@ -55,8 +55,8 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         public boolean onLongClick(View v) {
             mItems.remove(getLayoutPosition());
             notifyItemRemoved(getLayoutPosition());
-            Prefers.putKeyword(mGson.toJson(mItems));
             mListener.onDataChanged(getItemCount());
+            Prefers.putKeyword(mGson.toJson(mItems));
             return true;
         }
     }
@@ -66,19 +66,26 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         return mGson.fromJson(Prefers.getKeyword(), new TypeToken<List<String>>() {}.getType());
     }
 
-    private void check(String item) {
+    private void checkToAdd(String item) {
         int index = mItems.indexOf(item);
-        if (index == -1) return;
-        mItems.remove(index);
-        notifyItemRemoved(index);
+        if (index == -1) {
+            mItems.add(0, item);
+            notifyItemInserted(0);
+        } else {
+            mItems.remove(index);
+            mItems.add(0, item);
+            notifyItemRangeChanged(0, mItems.size());
+        }
+        if (mItems.size() > 8) {
+            mItems.remove(8);
+            notifyItemRemoved(8);
+        }
     }
 
     public void add(String item) {
-        check(item);
-        mItems.add(0, item);
-        notifyItemInserted(0);
-        Prefers.putKeyword(mGson.toJson(mItems));
+        checkToAdd(item);
         mListener.onDataChanged(getItemCount());
+        Prefers.putKeyword(mGson.toJson(mItems));
     }
 
     @Override

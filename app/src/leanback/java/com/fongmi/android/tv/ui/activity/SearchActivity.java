@@ -66,7 +66,6 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
         mHandler = new Handler(Looper.getMainLooper());
         mRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
         CustomKeyboard.init(this, mBinding);
-        mBinding.keyword.requestFocus();
         setRecyclerView();
         getHot();
     }
@@ -181,9 +180,14 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
     private void destroyRecognizer() {
         try {
             mRecognizer.destroy();
-            mRecognizer = null;
         } catch (Exception ignored) {
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mBinding.keyword.requestFocus();
     }
 
     @Override

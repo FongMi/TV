@@ -40,8 +40,8 @@ public class SplashActivity extends BaseActivity {
         return new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                mBinding.title.setVisibility(View.GONE);
                 mBinding.info.animate().alpha(1).setDuration(500).start();
+                mBinding.title.setVisibility(View.GONE);
                 loadConfig();
             }
         };
