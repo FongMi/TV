@@ -23,6 +23,7 @@ public class CustomMic extends AppCompatImageView {
 
     private SpeechRecognizer recognizer;
     private Animation flicker;
+    private boolean listen;
 
     public CustomMic(@NonNull Context context) {
         super(context);
@@ -38,6 +39,14 @@ public class CustomMic extends AppCompatImageView {
         recognizer = SpeechRecognizer.createSpeechRecognizer(context);
     }
 
+    public boolean isListen() {
+        return listen;
+    }
+
+    public void setListen(boolean listen) {
+        this.listen = listen;
+    }
+
     public void setListener(CustomListener listener) {
         recognizer.setRecognitionListener(listener);
     }
@@ -47,12 +56,14 @@ public class CustomMic extends AppCompatImageView {
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         setColorFilter(MDColor.RED_500, PorterDuff.Mode.SRC_IN);
         recognizer.startListening(intent);
+        setListen(true);
     }
 
     public boolean stop() {
         setColorFilter(MDColor.WHITE, PorterDuff.Mode.SRC_IN);
         recognizer.stopListening();
         clearAnimation();
+        setListen(false);
         return true;
     }
 
@@ -65,7 +76,7 @@ public class CustomMic extends AppCompatImageView {
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (Utils.isBackKey(event) && event.getAction() == KeyEvent.ACTION_UP) return stop();
+        if (isListen() && Utils.isBackKey(event)) return stop();
         else return super.dispatchKeyEvent(event);
     }
 }
