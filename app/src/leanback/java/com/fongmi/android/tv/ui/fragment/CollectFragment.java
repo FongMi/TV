@@ -31,17 +31,15 @@ public class CollectFragment extends Fragment implements VodPresenter.OnClickLis
     private FragmentVodBinding mBinding;
     private ArrayObjectAdapter mAdapter;
     private ArrayObjectAdapter mLast;
-
-    private String getJson() {
-        return getArguments().getString("json");
-    }
+    private String json;
 
     public static CollectFragment newInstance(List<Vod> items) {
-        Bundle args = new Bundle();
-        args.putString("json", new Gson().toJson(items));
-        CollectFragment fragment = new CollectFragment();
-        fragment.setArguments(args);
-        return fragment;
+        return new CollectFragment().setJson(new Gson().toJson(items));
+    }
+
+    private CollectFragment setJson(String json) {
+        this.json = json;
+        return this;
     }
 
     @Nullable
@@ -62,7 +60,7 @@ public class CollectFragment extends Fragment implements VodPresenter.OnClickLis
         mBinding.recycler.setAdapter(new ItemBridgeAdapter(mAdapter = new ArrayObjectAdapter(selector)));
         mBinding.recycler.setHeader(getActivity().findViewById(R.id.result), getActivity().findViewById(R.id.recycler));
         mBinding.recycler.setVerticalSpacing(ResUtil.dp2px(16));
-        addVideo(Vod.arrayFrom(getJson()));
+        addVideo(Vod.arrayFrom(json));
     }
 
     private boolean checkLastSize(List<Vod> items) {
