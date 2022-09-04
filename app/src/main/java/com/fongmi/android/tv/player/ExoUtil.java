@@ -1,5 +1,6 @@
 package com.fongmi.android.tv.player;
 
+import android.graphics.Color;
 import android.net.Uri;
 
 import com.fongmi.android.tv.App;
@@ -9,6 +10,7 @@ import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.ext.rtmp.RtmpDataSource;
 import com.google.android.exoplayer2.source.DefaultMediaSourceFactory;
 import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.ui.CaptionStyleCompat;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSource;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
@@ -19,6 +21,10 @@ import com.google.common.collect.ImmutableList;
 import java.util.Map;
 
 public class ExoUtil {
+
+    public static CaptionStyleCompat getCaptionStyle() {
+        return new CaptionStyleCompat(Color.WHITE, Color.TRANSPARENT, Color.TRANSPARENT, CaptionStyleCompat.EDGE_TYPE_OUTLINE, Color.BLACK, null);
+    }
 
     public static MediaSource getSource(Result result) {
         return getSource(result.getHeaders(), result.getPlayUrl() + result.getUrl(), getConfig(result));
