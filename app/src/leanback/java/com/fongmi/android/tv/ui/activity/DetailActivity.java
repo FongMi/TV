@@ -32,6 +32,7 @@ import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.model.SiteViewModel;
+import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.custom.CustomKeyDown;
 import com.fongmi.android.tv.ui.presenter.EpisodePresenter;
@@ -174,11 +175,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     }
 
     private void setVideoView() {
+        mBinding.video.setPlayer(Players.get().exo());
+        mBinding.video.setResizeMode(Prefers.getScale());
+        mBinding.video.getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
+        mControl.speed.setText(Players.get().getSpeed());
         mControl.scale.setText(ResUtil.getStringArray(R.array.select_scale)[Prefers.getScale()]);
         mControl.interval.setText(ResUtil.getString(R.string.second, Prefers.getInterval()));
-        mControl.speed.setText(Players.get().getSpeed());
-        mBinding.video.setResizeMode(Prefers.getScale());
-        mBinding.video.setPlayer(Players.get().exo());
     }
 
     private void setViewModel() {
