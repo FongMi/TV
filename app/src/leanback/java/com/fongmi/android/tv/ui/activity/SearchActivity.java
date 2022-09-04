@@ -1,9 +1,7 @@
 package com.fongmi.android.tv.ui.activity;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
@@ -11,9 +9,10 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.R;
@@ -46,6 +45,13 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
         activity.startActivity(new Intent(activity, SearchActivity.class));
     }
 
+    private final ActivityResultLauncher<String> launcher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), new ActivityResultCallback<>() {
+        @Override
+        public void onActivityResult(Boolean isGranted) {
+            if (isGranted) mBinding.mic.start();
+        }
+    });
+
     @Override
     protected ViewBinding getBinding() {
         return mBinding = ActivitySearchBinding.inflate(getLayoutInflater());
@@ -61,7 +67,6 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
 
     @Override
     protected void initEvent() {
-        mBinding.mic.setOnClickListener(view -> onMic());
         mBinding.keyword.setOnEditorActionListener((textView, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) onSearch();
             return true;
@@ -73,7 +78,7 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
                 else getSuggest(s.toString());
             }
         });
-        mBinding.mic.setListener(new CustomListener() {
+        mBinding.mic.setListener(launcher, new CustomListener() {
             @Override
             public void onResults(String result) {
                 mBinding.mic.stop();
@@ -112,14 +117,6 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
                 mHandler.post(() -> mWordAdapter.addAll(items));
             }
         });
-    }
-
-    public void onMic() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            registerForActivityResult(new ActivityResultContracts.RequestPermission(), result -> mBinding.mic.start()).launch(Manifest.permission.RECORD_AUDIO);
-        } else {
-            mBinding.mic.start();
-        }
     }
 
     @Override
