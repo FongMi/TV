@@ -53,6 +53,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
     protected void initView() {
         mBinding.url.setText(Prefers.getUrl());
         mBinding.home.setText(ApiConfig.getHomeName());
+        mBinding.type.setText(ResUtil.getStringArray(R.array.select_render)[Prefers.getRender()]);
         mBinding.compress.setText(ResUtil.getStringArray(R.array.select_thumbnail)[Prefers.getThumbnail()]);
     }
 
@@ -62,6 +63,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.config.setOnClickListener(view -> ConfigDialog.show(this));
         mBinding.history.setOnClickListener(view -> HistoryDialog.show(this));
         mBinding.thumbnail.setOnClickListener(this::setThumbnail);
+        mBinding.render.setOnClickListener(this::setRender);
     }
 
     @Override
@@ -128,5 +130,13 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         Prefers.putThumbnail(index);
         mBinding.compress.setText(array[index]);
         RefreshEvent.image();
+    }
+
+    public void setRender(View view) {
+        CharSequence[] array = ResUtil.getStringArray(R.array.select_render);
+        int index = Prefers.getRender();
+        index = index == 1 ? 0 : ++index;
+        Prefers.putRender(index);
+        mBinding.type.setText(array[index]);
     }
 }

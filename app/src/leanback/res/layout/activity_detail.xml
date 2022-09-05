@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:keepScreenOn="true">
 
-    <com.google.android.exoplayer2.ui.StyledPlayerView
+    <FrameLayout
         android:id="@+id/video"
         android:layout_width="360dp"
         android:layout_height="200dp"
@@ -16,13 +16,31 @@
         android:background="@color/black"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        android:foreground="@drawable/selector_video"
-        app:animation_enabled="false"
-        app:auto_show="false"
-        app:controller_layout_id="@layout/view_controller_bottom"
-        app:resize_mode="fit"
-        app:surface_type="surface_view"
-        app:use_controller="false">
+        android:foreground="@drawable/selector_video">
+
+        <com.google.android.exoplayer2.ui.StyledPlayerView
+            android:id="@+id/surface"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            app:animation_enabled="false"
+            app:auto_show="false"
+            app:controller_layout_id="@layout/view_controller_bottom"
+            app:resize_mode="fit"
+            app:surface_type="surface_view"
+            app:use_controller="false" />
+
+        <com.google.android.exoplayer2.ui.StyledPlayerView
+            android:id="@+id/texture"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            app:animation_enabled="false"
+            app:auto_show="false"
+            app:controller_layout_id="@layout/view_controller_bottom"
+            app:resize_mode="fit"
+            app:surface_type="texture_view"
+            app:use_controller="false" />
 
         <include
             android:id="@+id/progress"
@@ -45,7 +63,7 @@
             android:layout_gravity="center"
             android:visibility="gone" />
 
-    </com.google.android.exoplayer2.ui.StyledPlayerView>
+    </FrameLayout>
 
     <TextView
         android:id="@+id/name"

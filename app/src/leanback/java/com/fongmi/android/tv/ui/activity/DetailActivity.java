@@ -43,6 +43,7 @@ import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.ui.StyledPlayerView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -89,6 +90,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         return 0;
     }
 
+    private StyledPlayerView getPlayerView() {
+        return Prefers.getRender() == 0 ? mBinding.surface : mBinding.texture;
+    }
+
     public static void start(Activity activity, String id) {
         start(activity, ApiConfig.get().getHome().getKey(), id);
     }
@@ -104,7 +109,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     @Override
     protected ViewBinding getBinding() {
         mBinding = ActivityDetailBinding.inflate(getLayoutInflater());
-        mControl = ViewControllerBottomBinding.bind(mBinding.video.findViewById(com.google.android.exoplayer2.ui.R.id.exo_controller));
+        mControl = ViewControllerBottomBinding.bind(getPlayerView().findViewById(com.google.android.exoplayer2.ui.R.id.exo_controller));
         return mBinding;
     }
 
@@ -175,9 +180,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     }
 
     private void setVideoView() {
-        mBinding.video.setPlayer(Players.get().exo());
-        mBinding.video.setResizeMode(Prefers.getScale());
-        mBinding.video.getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
+        getPlayerView().setVisibility(View.VISIBLE);
+        getPlayerView().setPlayer(Players.get().exo());
+        getPlayerView().setResizeMode(Prefers.getScale());
+        getPlayerView().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
         mControl.speed.setText(Players.get().getSpeed());
         mControl.scale.setText(ResUtil.getStringArray(R.array.select_scale)[Prefers.getScale()]);
         mControl.interval.setText(ResUtil.getString(R.string.second, Prefers.getInterval()));
@@ -309,7 +315,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     private void enterFullscreen() {
         mBinding.video.setForeground(null);
         mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
-        mHandler.postDelayed(() -> mBinding.video.setUseController(true), 250);
+        mHandler.postDelayed(() -> getPlayerView().setUseController(true), 250);
         mBinding.flag.setSelectedPosition(mCurrent);
         mFullscreen = true;
     }
@@ -317,7 +323,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     private void exitFullscreen() {
         mBinding.video.setForeground(ResUtil.getDrawable(R.drawable.selector_video));
         mBinding.video.setLayoutParams(mFrameParams);
-        mBinding.video.setUseController(false);
+        getPlayerView().setUseController(false);
         mFullscreen = false;
     }
 
@@ -349,8 +355,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     }
 
     private void onScale() {
-        int scale = mBinding.video.getResizeMode();
-        mBinding.video.setResizeMode(scale = scale >= 4 ? 0 : scale + 1);
+        int scale = getPlayerView().getResizeMode();
+        getPlayerView().setResizeMode(scale = scale >= 4 ? 0 : scale + 1);
         mControl.scale.setText(ResUtil.getStringArray(R.array.select_scale)[scale]);
         Prefers.putScale(scale);
     }
@@ -530,7 +536,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (mFullscreen && !mBinding.video.isControllerFullyVisible() && mKeyDown.hasEvent(event)) return mKeyDown.onKeyDown(event);
+        if (mFullscreen && !getPlayerView().isControllerFullyVisible() && mKeyDown.hasEvent(event)) return mKeyDown.onKeyDown(event);
         else return super.dispatchKeyEvent(event);
     }
 
@@ -552,7 +558,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
 
     @Override
     public void onKeyDown() {
-        mBinding.video.showController();
+        getPlayerView().showController();
         mControl.next.requestFocus();
     }
 
@@ -583,8 +589,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
 
     @Override
     public void onBackPressed() {
-        if (mBinding.video.isControllerFullyVisible()) {
-            mBinding.video.hideController();
+        if (getPlayerView().isControllerFullyVisible()) {
+            getPlayerView().hideController();
         } else if (mFullscreen) {
             exitFullscreen();
         } else {

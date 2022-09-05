@@ -1,4 +1,4 @@
-<resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
+<resources xmlns:tools="http://schemas.android.com/tools" xmlns:xliff="http://schemas.android.com/apk/res-auto" tools:ignore="MissingTranslation">
 
     <!-- App -->
     <string name="app_name">TV</string>
@@ -40,6 +40,7 @@
     <!-- Setting -->
     <string name="setting_site">Home site</string>
     <string name="setting_url">Configuration</string>
+    <string name="setting_render">Render</string>
     <string name="setting_thumbnail">Thumbnail</string>
 
     <!-- Dialog -->
@@ -67,6 +68,11 @@
 
     <!-- UNIT -->
     <string name="second"><xliff:g name="name">%s</xliff:g> s</string>
+
+    <string-array name="select_render">
+        <item>Surface</item>
+        <item>Texture</item>
+    </string-array>
 
     <string-array name="select_thumbnail">
         <item>Low</item>

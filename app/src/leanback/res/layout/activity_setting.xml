@@ -60,9 +60,8 @@
 
             <TextView
                 android:id="@+id/url"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:gravity="end"
                 android:singleLine="true"
                 android:textColor="@color/white"
@@ -86,30 +85,68 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/thumbnail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:background="@drawable/selector_item"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
         android:orientation="horizontal">
 
-        <TextView
+        <LinearLayout
+            android:id="@+id/render"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_weight="1"
+            android:background="@drawable/selector_item"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:text="@string/setting_render"
+                android:textColor="@color/white"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/type"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                tools:text="Surface" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/thumbnail"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/setting_thumbnail"
-            android:textColor="@color/white"
-            android:textSize="18sp" />
+            android:background="@drawable/selector_item"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/compress"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            tools:text="High" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:text="@string/setting_thumbnail"
+                android:textColor="@color/white"
+                android:textSize="18sp" />
 
+            <TextView
+                android:id="@+id/compress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                tools:text="High" />
+
+        </LinearLayout>
     </LinearLayout>
 </LinearLayout>
