@@ -40,6 +40,7 @@
     <!-- Setting -->
     <string name="setting_site">首頁</string>
     <string name="setting_url">配置</string>
+    <string name="setting_render">渲染</string>
     <string name="setting_thumbnail">縮圖</string>
 
     <!-- Dialog -->

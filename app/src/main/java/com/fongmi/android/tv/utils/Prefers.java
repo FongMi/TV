@@ -91,6 +91,14 @@ public class Prefers {
         Prefers.put("thumbnail", thumbnail);
     }
 
+    public static int getRender() {
+        return Prefers.getInt("render", 0);
+    }
+
+    public static void putRender(int render) {
+        Prefers.put("render", render);
+    }
+
     public static int getInterval() {
         return Prefers.getInt("interval", 15);
     }
