@@ -16,5 +16,5 @@ https://github.com/CatVodTVOfficial/CatVodTVJarLoader
     ./spider.jar
     
 ### How to build
-just recover this commit  
+just revert this commit  
 https://github.com/FongMi/TV/commit/b655c7ddb8437e1ad7dc02bcbdb25e31ea1694ba
