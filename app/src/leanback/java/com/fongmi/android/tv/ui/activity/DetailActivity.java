@@ -271,7 +271,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     private void reverseEpisode() {
         for (int i = 0; i < mFlagAdapter.size(); i++) Collections.reverse(((Vod.Flag) mFlagAdapter.get(i)).getEpisodes());
         mEpisodeAdapter.setItems(getVodFlag().getEpisodes(), null);
-        mBinding.episode.setSelectedPosition(getEpisodePosition());
     }
 
     private void setParseActivated(Parse item) {
