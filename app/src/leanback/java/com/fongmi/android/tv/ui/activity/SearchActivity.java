@@ -80,8 +80,12 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
         });
         mBinding.mic.setListener(launcher, new CustomListener() {
             @Override
-            public void onResults(String result) {
+            public void onEndOfSpeech() {
                 mBinding.mic.stop();
+            }
+
+            @Override
+            public void onResults(String result) {
                 mBinding.keyword.setText(result);
                 mBinding.keyword.setSelection(mBinding.keyword.length());
             }
