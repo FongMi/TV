@@ -12,6 +12,7 @@ android {
         targetSdk 32
         versionCode 21
         versionName "1.2.1"
+        ndk { abiFilters "armeabi-v7a", "arm64-v8a" }
     }
 
     productFlavors {
@@ -52,6 +53,7 @@ dependencies {
     implementation project(':catvod')
     implementation project(':exoplayer-library')
     implementation project(':exoplayer-extension-rtmp')
+    implementation project(':exoplayer-extension-ffmpeg')
     implementation 'androidx.appcompat:appcompat:1.4.2'
     implementation 'androidx.core:core-splashscreen:1.0.0'
     implementation 'androidx.preference:preference:1.2.0'
