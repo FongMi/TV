@@ -153,7 +153,7 @@ public class Vod {
     }
 
     public int getYearVisible() {
-        return getVodYear().isEmpty() ? View.GONE : View.VISIBLE;
+        return getSite() != null || getVodYear().isEmpty() ? View.GONE : View.VISIBLE;
     }
 
     public int getRemarkVisible() {

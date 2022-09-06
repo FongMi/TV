@@ -1,216 +1,235 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.fongmi.android.tv.ui.custom.ProgressLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/progressLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fillViewport="true"
     android:keepScreenOn="true">
 
-    <FrameLayout
-        android:id="@+id/video"
-        android:layout_width="360dp"
-        android:layout_height="200dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
-        android:background="@color/black"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:foreground="@drawable/selector_video">
+    <com.fongmi.android.tv.ui.custom.ProgressLayout
+        android:id="@+id/progressLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-        <com.google.android.exoplayer2.ui.StyledPlayerView
-            android:id="@+id/surface"
+        <FrameLayout
+            android:id="@+id/video"
+            android:layout_width="360dp"
+            android:layout_height="200dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="24dp"
+            android:background="@color/black"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:foreground="@drawable/selector_video">
+
+            <com.google.android.exoplayer2.ui.StyledPlayerView
+                android:id="@+id/surface"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"
+                app:animation_enabled="false"
+                app:auto_show="false"
+                app:controller_layout_id="@layout/view_controller_bottom"
+                app:resize_mode="fit"
+                app:surface_type="surface_view"
+                app:use_controller="false" />
+
+            <com.google.android.exoplayer2.ui.StyledPlayerView
+                android:id="@+id/texture"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"
+                app:animation_enabled="false"
+                app:auto_show="false"
+                app:controller_layout_id="@layout/view_controller_bottom"
+                app:resize_mode="fit"
+                app:surface_type="texture_view"
+                app:use_controller="false" />
+
+            <include
+                android:id="@+id/progress"
+                layout="@layout/view_progress"
+                android:visibility="gone" />
+
+            <include
+                android:id="@+id/error"
+                layout="@layout/view_error"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="gone" />
+
+            <include
+                android:id="@+id/center"
+                layout="@layout/view_controller_center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="gone" />
+
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="24dp"
+            android:layout_toEndOf="@+id/video"
+            android:singleLine="true"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            tools:text="慶餘年第二季" />
+
+        <LinearLayout
+            android:id="@+id/row"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone"
-            app:animation_enabled="false"
-            app:auto_show="false"
-            app:controller_layout_id="@layout/view_controller_bottom"
-            app:resize_mode="fit"
-            app:surface_type="surface_view"
-            app:use_controller="false" />
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/name"
+            android:layout_alignStart="@+id/name"
+            android:layout_marginEnd="24dp"
+            android:orientation="horizontal">
 
-        <com.google.android.exoplayer2.ui.StyledPlayerView
-            android:id="@+id/texture"
+            <TextView
+                android:id="@+id/site"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="12dp"
+                android:singleLine="true"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                tools:text="站源：泥巴" />
+
+            <TextView
+                android:id="@+id/year"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="12dp"
+                android:singleLine="true"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                tools:text="年份：2022" />
+
+            <TextView
+                android:id="@+id/area"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="12dp"
+                android:singleLine="true"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                tools:text="地區：台灣" />
+
+            <TextView
+                android:id="@+id/type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:singleLine="true"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                tools:text="類型：科幻" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/director"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/row"
+            android:layout_alignStart="@+id/name"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="24dp"
+            android:singleLine="true"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            tools:text="導演：FongMi" />
+
+        <TextView
+            android:id="@+id/actor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/director"
+            android:layout_alignStart="@+id/name"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="24dp"
+            android:singleLine="true"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            tools:text="演員：FongMi" />
+
+        <TextView
+            android:id="@+id/content"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/actor"
+            android:layout_alignStart="@+id/name"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="24dp"
+            android:ellipsize="end"
+            android:lineSpacingExtra="4dp"
+            android:maxLines="3"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            tools:text="簡介：" />
+
+        <com.fongmi.android.tv.ui.custom.CustomHorizontalGridView
+            android:id="@+id/flag"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/video"
+            android:layout_marginTop="12dp"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:paddingStart="24dp"
+            android:paddingTop="12dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="8dp" />
+
+        <com.fongmi.android.tv.ui.custom.CustomHorizontalGridView
+            android:id="@+id/episode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/flag"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:paddingStart="24dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="8dp" />
+
+        <com.fongmi.android.tv.ui.custom.CustomHorizontalGridView
+            android:id="@+id/group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/episode"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:paddingStart="24dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="8dp"
             android:visibility="gone"
-            app:animation_enabled="false"
-            app:auto_show="false"
-            app:controller_layout_id="@layout/view_controller_bottom"
-            app:resize_mode="fit"
-            app:surface_type="texture_view"
-            app:use_controller="false" />
+            tools:visibility="visible" />
 
-        <include
-            android:id="@+id/progress"
-            layout="@layout/view_progress"
-            android:visibility="gone" />
-
-        <include
-            android:id="@+id/error"
-            layout="@layout/view_error"
-            android:layout_width="wrap_content"
+        <com.fongmi.android.tv.ui.custom.CustomHorizontalGridView
+            android:id="@+id/part"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:visibility="gone" />
+            android:layout_below="@+id/group"
+            android:layout_marginBottom="8dp"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:paddingStart="24dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="8dp" />
 
-        <include
-            android:id="@+id/center"
-            layout="@layout/view_controller_center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:visibility="gone" />
-
-    </FrameLayout>
-
-    <TextView
-        android:id="@+id/name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginEnd="24dp"
-        android:layout_toEndOf="@+id/video"
-        android:singleLine="true"
-        android:textColor="@color/white"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        tools:text="慶餘年第二季" />
-
-    <LinearLayout
-        android:id="@+id/row"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/name"
-        android:layout_alignStart="@+id/name"
-        android:layout_marginEnd="24dp"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/site"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="12dp"
-            android:singleLine="true"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            tools:text="站源：泥巴" />
-
-        <TextView
-            android:id="@+id/year"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="12dp"
-            android:singleLine="true"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            tools:text="年份：2022" />
-
-        <TextView
-            android:id="@+id/area"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="12dp"
-            android:singleLine="true"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            tools:text="地區：台灣" />
-
-        <TextView
-            android:id="@+id/type"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:singleLine="true"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            tools:text="類型：科幻" />
-
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/director"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/row"
-        android:layout_alignStart="@+id/name"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="24dp"
-        android:singleLine="true"
-        android:textColor="@color/white"
-        android:textSize="16sp"
-        tools:text="導演：FongMi" />
-
-    <TextView
-        android:id="@+id/actor"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/director"
-        android:layout_alignStart="@+id/name"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="24dp"
-        android:singleLine="true"
-        android:textColor="@color/white"
-        android:textSize="16sp"
-        tools:text="演員：FongMi" />
-
-    <TextView
-        android:id="@+id/content"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/actor"
-        android:layout_alignStart="@+id/name"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="24dp"
-        android:ellipsize="end"
-        android:lineSpacingExtra="4dp"
-        android:maxLines="3"
-        android:textColor="@color/white"
-        android:textSize="16sp"
-        tools:text="簡介：" />
-
-    <com.fongmi.android.tv.ui.custom.CustomHorizontalGridView
-        android:id="@+id/flag"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/video"
-        android:layout_marginTop="12dp"
-        android:clipChildren="false"
-        android:clipToPadding="false"
-        android:paddingStart="24dp"
-        android:paddingTop="12dp"
-        android:paddingEnd="24dp"
-        android:paddingBottom="8dp" />
-
-    <com.fongmi.android.tv.ui.custom.CustomHorizontalGridView
-        android:id="@+id/episode"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/flag"
-        android:clipChildren="false"
-        android:clipToPadding="false"
-        android:paddingStart="24dp"
-        android:paddingTop="8dp"
-        android:paddingEnd="24dp"
-        android:paddingBottom="8dp" />
-
-    <com.fongmi.android.tv.ui.custom.CustomHorizontalGridView
-        android:id="@+id/group"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/episode"
-        android:clipChildren="false"
-        android:clipToPadding="false"
-        android:paddingStart="24dp"
-        android:paddingTop="8dp"
-        android:paddingEnd="24dp"
-        android:paddingBottom="8dp"
-        android:visibility="gone"
-        tools:visibility="visible" />
-
-</com.fongmi.android.tv.ui.custom.ProgressLayout>
+    </com.fongmi.android.tv.ui.custom.ProgressLayout>
+</androidx.core.widget.NestedScrollView>

@@ -24,6 +24,7 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Parse;
+import com.fongmi.android.tv.bean.Part;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.ActivityDetailBinding;
@@ -32,6 +33,8 @@ import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.model.SiteViewModel;
+import com.fongmi.android.tv.net.Callback;
+import com.fongmi.android.tv.net.OKHttp;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.custom.CustomKeyDown;
@@ -39,6 +42,7 @@ import com.fongmi.android.tv.ui.presenter.EpisodePresenter;
 import com.fongmi.android.tv.ui.presenter.FlagPresenter;
 import com.fongmi.android.tv.ui.presenter.GroupPresenter;
 import com.fongmi.android.tv.ui.presenter.ParsePresenter;
+import com.fongmi.android.tv.ui.presenter.PartPresenter;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
@@ -49,9 +53,14 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import okhttp3.Call;
+import okhttp3.Response;
 
 public class DetailActivity extends BaseActivity implements CustomKeyDown.Listener, GroupPresenter.OnClickListener {
 
@@ -62,6 +71,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     private ArrayObjectAdapter mGroupAdapter;
     private ArrayObjectAdapter mEpisodeAdapter;
     private ArrayObjectAdapter mParseAdapter;
+    private ArrayObjectAdapter mPartAdapter;
+    private EpisodePresenter mEpisodePresenter;
+    private PartPresenter mPartPresenter;
     private SiteViewModel mViewModel;
     private CustomKeyDown mKeyDown;
     private boolean mFullscreen;
@@ -100,7 +112,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
 
     public static void start(Activity activity, String key, String id) {
         Intent intent = new Intent(activity, DetailActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra("key", key);
         intent.putExtra("id", id);
         activity.startActivity(intent);
@@ -111,14 +123,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         mBinding = ActivityDetailBinding.inflate(getLayoutInflater());
         mControl = ViewControllerBottomBinding.bind(getPlayerView().findViewById(com.google.android.exoplayer2.ui.R.id.exo_controller));
         return mBinding;
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        mBinding.progressLayout.showProgress();
-        setIntent(intent);
-        getDetail();
     }
 
     @Override
@@ -169,10 +173,13 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         mBinding.flag.setAdapter(new ItemBridgeAdapter(mFlagAdapter = new ArrayObjectAdapter(new FlagPresenter(this::setFlagActivated))));
         mBinding.episode.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.episode.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-        mBinding.episode.setAdapter(new ItemBridgeAdapter(mEpisodeAdapter = new ArrayObjectAdapter(new EpisodePresenter(this::setEpisodeActivated))));
+        mBinding.episode.setAdapter(new ItemBridgeAdapter(mEpisodeAdapter = new ArrayObjectAdapter(mEpisodePresenter = new EpisodePresenter(this::setEpisodeActivated))));
         mBinding.group.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.group.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         mBinding.group.setAdapter(new ItemBridgeAdapter(mGroupAdapter = new ArrayObjectAdapter(new GroupPresenter(this))));
+        mBinding.part.setHorizontalSpacing(ResUtil.dp2px(8));
+        mBinding.part.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+        mBinding.part.setAdapter(new ItemBridgeAdapter(mPartAdapter = new ArrayObjectAdapter(mPartPresenter = new PartPresenter(item -> CollectActivity.start(this, item)))));
         mControl.parse.setHorizontalSpacing(ResUtil.dp2px(8));
         mControl.parse.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         mControl.parse.setAdapter(new ItemBridgeAdapter(mParseAdapter = new ArrayObjectAdapter(new ParsePresenter(this::setParseActivated))));
@@ -237,6 +244,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         setText(mBinding.director, R.string.detail_director, Html.fromHtml(item.getVodDirector()).toString());
         mFlagAdapter.setItems(item.getVodFlags(), null);
         mBinding.video.requestFocus();
+        getPart(item.getVodName());
         checkHistory();
     }
 
@@ -288,6 +296,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         items.add(getString(mHistory.getRevPlayText()));
         int itemSize = (int) Math.ceil(size / 20.0f);
         if (itemSize > 1) for (int i = 0; i < itemSize; i++) items.add(String.valueOf(i * 20 + 1));
+        mEpisodePresenter.setNextFocusDown(size > 1 ? R.id.group : R.id.part);
+        mPartPresenter.setNextFocusUp(size > 1 ? R.id.group : R.id.episode);
         mBinding.group.setVisibility(size > 1 ? View.VISIBLE : View.GONE);
         mGroupAdapter.setItems(items, null);
     }
@@ -410,6 +420,17 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         mControl.ending.setText(Players.get().getStringForTime(mHistory.getEnding()));
         mControl.opening.setText(Players.get().getStringForTime(mHistory.getOpening()));
         mHistory.update();
+    }
+
+    private void getPart(String source) {
+        OKHttp.newCall("http://api.pullword.com/get.php?source=" + URLEncoder.encode(source) + "&param1=0&param2=0&json=1").enqueue(new Callback() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                List<String> items = Part.get(response.body().string());
+                if (!items.contains(source)) items.add(source);
+                mHandler.post(() -> mPartAdapter.setItems(items, null));
+            }
+        });
     }
 
     private void checkHistory() {
