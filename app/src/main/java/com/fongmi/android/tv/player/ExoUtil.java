@@ -6,6 +6,8 @@ import android.net.Uri;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.bean.Result;
 import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.DefaultRenderersFactory;
+import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.ext.rtmp.RtmpDataSource;
 import com.google.android.exoplayer2.source.DefaultMediaSourceFactory;
@@ -21,6 +23,12 @@ import com.google.common.collect.ImmutableList;
 import java.util.Map;
 
 public class ExoUtil {
+
+    static ExoPlayer create() {
+        DefaultRenderersFactory renderersFactory = new DefaultRenderersFactory(App.get());
+        renderersFactory.setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER);
+        return new ExoPlayer.Builder(App.get()).setRenderersFactory(renderersFactory).build();
+    }
 
     public static CaptionStyleCompat getCaptionStyle() {
         return new CaptionStyleCompat(Color.WHITE, Color.TRANSPARENT, Color.TRANSPARENT, CaptionStyleCompat.EDGE_TYPE_OUTLINE, Color.BLACK, null);

@@ -40,8 +40,8 @@ public class Players implements Player.Listener, ParseTask.Callback {
     public void init() {
         builder = new StringBuilder();
         webView = new CustomWebView(App.get());
-        exoPlayer = new ExoPlayer.Builder(App.get()).build();
         formatter = new Formatter(builder, Locale.getDefault());
+        exoPlayer = ExoUtil.create();
         exoPlayer.addListener(this);
     }
 
