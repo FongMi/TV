@@ -168,7 +168,7 @@ public class SiteViewModel extends ViewModel {
                 if (site.getType() == 0) post(site, Result.fromXml(body));
                 else post(site, Result.fromJson(body));
             }
-        } catch (Exception | NoClassDefFoundError e) {
+        } catch (Throwable e) {
             e.printStackTrace();
         }
     }
@@ -185,7 +185,7 @@ public class SiteViewModel extends ViewModel {
         service.execute(() -> {
             try {
                 if (!Thread.interrupted()) result.postValue(service.submit(callable).get(15, TimeUnit.SECONDS));
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 e.printStackTrace();
                 if (e instanceof InterruptedException) return;
                 if (!Thread.interrupted()) result.postValue(Result.empty());
