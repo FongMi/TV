@@ -8,8 +8,7 @@
     android:focusable="true"
     android:focusableInTouchMode="true"
     android:gravity="center"
-    android:nextFocusUp="@id/episode"
-    android:nextFocusDown="@id/part"
+    android:nextFocusUp="@id/group"
     android:textColor="@color/white"
     android:textSize="16sp"
-    tools:text="11" />
+    tools:text="分詞" />
