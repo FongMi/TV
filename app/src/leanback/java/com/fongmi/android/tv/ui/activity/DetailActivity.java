@@ -427,7 +427,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 List<String> items = Part.get(response.body().string());
-                if (!items.contains(source)) items.add(source);
+                if (!items.contains(source)) items.add(0, source);
                 mHandler.post(() -> mPartAdapter.setItems(items, null));
             }
         });
