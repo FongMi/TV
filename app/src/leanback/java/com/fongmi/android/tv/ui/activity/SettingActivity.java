@@ -64,7 +64,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.site.setOnClickListener(view -> SiteDialog.show(this));
         mBinding.config.setOnClickListener(view -> ConfigDialog.show(this));
         mBinding.history.setOnClickListener(view -> HistoryDialog.show(this));
-        mBinding.version.setOnClickListener(view-> Updater.check(this));
+        mBinding.version.setOnClickListener(view-> Updater.create(this).force().start());
         mBinding.thumbnail.setOnClickListener(this::setThumbnail);
         mBinding.render.setOnClickListener(this::setRender);
     }
