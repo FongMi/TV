@@ -24,6 +24,7 @@ import org.json.JSONObject;
 
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -195,19 +196,19 @@ public class ApiConfig {
     }
 
     public List<Site> getSites() {
-        return sites;
+        return sites == null ? Collections.emptyList() : sites;
     }
 
     public List<Parse> getParses() {
-        return parses;
+        return parses == null ? Collections.emptyList() : parses;
     }
 
     public String getAds() {
-        return ads.toString();
+        return ads == null ? "" : ads.toString();
     }
 
     public List<String> getFlags() {
-        return flags;
+        return flags == null ? Collections.emptyList() : flags;
     }
 
     public Site getHome() {
