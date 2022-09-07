@@ -56,13 +56,12 @@ public class FileUtil {
         return TextUtils.isEmpty(mimeType) ? "*/*" : mimeType;
     }
 
-    public static File write(File file, byte[] data) throws Exception {
+    public static void write(File file, byte[] data) throws Exception {
         FileOutputStream fos = new FileOutputStream(file);
         fos.write(data);
         fos.flush();
         fos.close();
         chmod(file);
-        return file;
     }
 
     public static String read(String path) {

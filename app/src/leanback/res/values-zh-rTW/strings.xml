@@ -22,7 +22,4 @@
     <!-- Push -->
     <string name="push_info">手機或電腦連接同一個區域網路，掃描 QR Code 或瀏覽器輸入網址\n<xliff:g name="name">%s</xliff:g></string>
 
-    <!-- Dialog -->
-    <string name="dialog_config_info">手機或電腦連接同一個區域網路\n掃描 QR Code 或瀏覽器輸入網址\n<xliff:g name="name">%s</xliff:g></string>
-
 </resources>
