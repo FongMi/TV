@@ -42,6 +42,7 @@
     <string name="setting_url">Configuration</string>
     <string name="setting_render">Render</string>
     <string name="setting_thumbnail">Thumbnail</string>
+    <string name="setting_version">Version</string>
 
     <!-- Dialog -->
     <string name="dialog_positive">OK</string>
