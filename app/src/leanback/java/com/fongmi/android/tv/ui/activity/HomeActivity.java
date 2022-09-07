@@ -64,7 +64,6 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     public static void start(Activity activity) {
         activity.startActivity(new Intent(activity, HomeActivity.class));
         activity.finish();
-        Updater.check();
     }
 
     @Override
@@ -78,6 +77,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         Clock.start(mBinding.time);
         Server.get().start();
         Players.get().init();
+        Updater.check(this);
         setRecyclerView();
         setViewModel();
         setAdapter();
