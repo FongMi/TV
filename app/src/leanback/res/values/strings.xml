@@ -1,4 +1,4 @@
-<resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
+<resources xmlns:tools="http://schemas.android.com/tools" xmlns:xliff="http://schemas.android.com/apk/res-auto" tools:ignore="MissingTranslation">
 
     <!-- Home -->
     <string name="home_vod">Vod</string>
@@ -21,8 +21,5 @@
 
     <!-- Push -->
     <string name="push_info">Connect phone or pc to LAN and scan QR Code or enter the URL in browser\n<xliff:g name="name">%s</xliff:g></string>
-
-    <!-- Dialog -->
-    <string name="dialog_config_info">Connect phone or pc to LAN and Scan QR Code or enter the URL in browser\n<xliff:g name="name">%s</xliff:g></string>
 
 </resources>

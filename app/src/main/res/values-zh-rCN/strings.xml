@@ -59,6 +59,10 @@
     <string name="error_episode">暂无播放数据</string>
     <string name="error_empty">找不到数据</string>
 
+    <!-- Update -->
+    <string name="update_version">发现新版本 <xliff:g name="name">%s</xliff:g></string>
+    <string name="update_confirm">更新</string>
+
     <!-- Crash -->
     <string name="crash_info">发生意外错误\n抱歉给您带来不便</string>
     <string name="crash_restart">重新启动</string>
