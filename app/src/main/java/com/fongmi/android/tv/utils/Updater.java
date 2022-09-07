@@ -30,26 +30,31 @@ public class Updater implements View.OnClickListener {
     private final Handler handler;
     private AlertDialog dialog;
 
-    public static void check(Activity activity) {
-        new Updater(activity).run();
+    public static Updater create(Activity activity) {
+        return new Updater(activity);
     }
 
-    public Updater(Activity activity) {
+    private Updater(Activity activity) {
         this.executor = Executors.newSingleThreadExecutor();
         this.handler = new Handler(Looper.getMainLooper());
         this.activity = activity;
     }
 
-    private File getApk() {
-        return FileUtil.getCacheFile("update.apk");
+    public Updater force() {
+        Prefers.putUpdate(true);
+        return this;
     }
 
-    public void run() {
+    public void start() {
         executor.submit(this::doInBackground);
     }
 
     private void doInBackground() {
         connect(URL, 0);
+    }
+
+    private File getApk() {
+        return FileUtil.getCacheFile("update.apk");
     }
 
     private void connect(String target, int retry) {
@@ -61,7 +66,7 @@ public class Updater implements View.OnClickListener {
             int code = object.optInt("code");
             if (retry > 0) url = PROXY + url;
             if (code <= BuildConfig.VERSION_CODE) FileUtil.clearDir(getApk());
-            else FileUtil.write(getApk(), OKHttp.newCall(url).execute().body().bytes());
+            else if (Prefers.getUpdate()) FileUtil.write(getApk(), OKHttp.newCall(url).execute().body().bytes());
             if (getApk().exists()) handler.post(() -> showDialog(name, desc));
         } catch (Exception e) {
             if (retry == 0) connect(PROXY + target, 1);
@@ -82,6 +87,7 @@ public class Updater implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.confirm) FileUtil.openFile(getApk());
+        else if (view.getId() == R.id.cancel) Prefers.putUpdate(false);
         dialog.dismiss();
     }
 }

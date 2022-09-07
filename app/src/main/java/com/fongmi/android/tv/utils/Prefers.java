@@ -28,6 +28,14 @@ public class Prefers {
         return getInt(key, 0);
     }
 
+    public static boolean getBoolean(String key, boolean defaultValue) {
+        return getPrefers().getBoolean(key, defaultValue);
+    }
+
+    public static boolean getBoolean(String key) {
+        return getPrefers().getBoolean(key, false);
+    }
+
     public static void put(String key, Object obj) {
         if (obj == null) return;
         if (obj instanceof String) {
@@ -44,66 +52,74 @@ public class Prefers {
     }
 
     public static String getUrl() {
-        return Prefers.getString("url");
+        return getString("url");
     }
 
     public static void putUrl(String url) {
-        Prefers.put("url", url);
+        put("url", url);
     }
 
     public static String getHome() {
-        return Prefers.getString("home");
+        return getString("home");
     }
 
     public static void putHome(String home) {
-        Prefers.put("home", home);
+        put("home", home);
     }
 
     public static String getParse() {
-        return Prefers.getString("parse");
+        return getString("parse");
     }
 
     public static void putParse(String parse) {
-        Prefers.put("parse", parse);
+        put("parse", parse);
     }
 
     public static String getKeyword() {
-        return Prefers.getString("keyword");
+        return getString("keyword");
     }
 
     public static void putKeyword(String keyword) {
-        Prefers.put("keyword", keyword);
+        put("keyword", keyword);
     }
 
     public static int getScale() {
-        return Prefers.getInt("scale");
+        return getInt("scale");
     }
 
     public static void putScale(int scale) {
-        Prefers.put("scale", scale);
+        put("scale", scale);
     }
 
     public static int getThumbnail() {
-        return Prefers.getInt("thumbnail", 1);
+        return getInt("thumbnail", 1);
     }
 
     public static void putThumbnail(int thumbnail) {
-        Prefers.put("thumbnail", thumbnail);
+        put("thumbnail", thumbnail);
     }
 
     public static int getRender() {
-        return Prefers.getInt("render", 0);
+        return getInt("render", 0);
     }
 
     public static void putRender(int render) {
-        Prefers.put("render", render);
+        put("render", render);
     }
 
     public static int getInterval() {
-        return Prefers.getInt("interval", 15);
+        return getInt("interval", 15);
     }
 
     public static void putInterval(int interval) {
-        Prefers.put("interval", interval);
+        put("interval", interval);
+    }
+
+    public static boolean getUpdate() {
+        return getBoolean("update", true);
+    }
+
+    public static void putUpdate(boolean update) {
+        put("update", update);
     }
 }
