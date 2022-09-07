@@ -2,6 +2,5 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:drawable="@drawable/shape_item_focused" android:state_focused="true" />
     <item android:drawable="@drawable/shape_item_activated" android:state_activated="true" />
-    <item android:drawable="@drawable/shape_item_selected" android:state_selected="true" />
     <item android:drawable="@drawable/shape_item_normal" />
 </selector>
