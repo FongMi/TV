@@ -59,6 +59,10 @@
     <string name="error_episode">No episode data</string>
     <string name="error_empty">Not found</string>
 
+    <!-- Update -->
+    <string name="update_version">New version <xliff:g name="name">%s</xliff:g></string>
+    <string name="update_confirm">Update</string>
+
     <!-- Crash -->
     <string name="crash_info">An unexpected error occurred.\nSorry for the inconvenience.</string>
     <string name="crash_restart">Restart app</string>

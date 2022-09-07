@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:padding="16dp">
@@ -19,9 +20,9 @@
         android:lineSpacingExtra="4dp"
         android:paddingStart="4dp"
         android:paddingEnd="4dp"
-        android:text="@string/dialog_config_info"
         android:textColor="@color/grey_700"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        tools:text="@string/push_info" />
 
     <EditText
         android:id="@+id/text"
