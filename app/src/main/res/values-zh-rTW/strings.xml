@@ -42,6 +42,7 @@
     <string name="setting_url">配置</string>
     <string name="setting_render">渲染</string>
     <string name="setting_thumbnail">縮圖</string>
+    <string name="setting_version">版本</string>
 
     <!-- Dialog -->
     <string name="dialog_positive">確定</string>
