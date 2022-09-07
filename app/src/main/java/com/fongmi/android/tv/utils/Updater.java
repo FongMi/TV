@@ -66,8 +66,8 @@ public class Updater implements View.OnClickListener {
             int code = object.optInt("code");
             if (retry > 0) url = PROXY + url;
             if (code <= BuildConfig.VERSION_CODE) FileUtil.clearDir(getApk());
-            else if (Prefers.getUpdate()) FileUtil.write(getApk(), OKHttp.newCall(url).execute().body().bytes());
-            if (getApk().exists()) handler.post(() -> showDialog(name, desc));
+            else FileUtil.write(getApk(), OKHttp.newCall(url).execute().body().bytes());
+            if (getApk().exists() && Prefers.getUpdate()) handler.post(() -> showDialog(name, desc));
         } catch (Exception e) {
             if (retry == 0) connect(PROXY + target, 1);
             e.printStackTrace();
