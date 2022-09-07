@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.fongmi.android.tv.databinding.AdapterWordBinding;
+import com.fongmi.android.tv.databinding.AdapterSearchHistoryBinding;
 import com.fongmi.android.tv.utils.Prefers;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -37,9 +37,9 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
-        private final AdapterWordBinding binding;
+        private final AdapterSearchHistoryBinding binding;
 
-        public ViewHolder(@NonNull AdapterWordBinding binding) {
+        public ViewHolder(@NonNull AdapterSearchHistoryBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
             itemView.setOnClickListener(this);
@@ -96,11 +96,11 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(AdapterWordBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        return new ViewHolder(AdapterSearchHistoryBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.binding.text.setText(mItems.get(position));
+        holder.binding.history.setText(mItems.get(position));
     }
 }
