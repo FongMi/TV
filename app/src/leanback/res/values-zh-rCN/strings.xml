@@ -16,7 +16,7 @@
     <string name="search_hot">热搜</string>
 
     <!-- Collect -->
-    <string name="collect_result">”<xliff:g name="name">%s</xliff:g>”的搜索结果</string>
+    <string name="collect_result">“<xliff:g name="name">%s</xliff:g>”的搜索结果</string>
     <string name="collect_all">全部</string>
 
     <!-- Push -->
