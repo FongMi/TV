@@ -37,7 +37,7 @@ public class CollectActivity extends BaseActivity {
 
     private ActivityCollectBinding mBinding;
     private ArrayObjectAdapter mAdapter;
-    private ExecutorService mService;
+    private ExecutorService mExecutor;
     private SiteViewModel mViewModel;
     private PageAdapter mPageAdapter;
     private List<Site> mSites;
@@ -61,6 +61,7 @@ public class CollectActivity extends BaseActivity {
 
     @Override
     protected void initView() {
+        mExecutor = Executors.newFixedThreadPool(5);
         setRecyclerView();
         setViewModel();
         setPager();
@@ -97,6 +98,7 @@ public class CollectActivity extends BaseActivity {
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mViewModel.result.observe(this, result -> {
+            if (mExecutor == null) return;
             mAdapter.add(Collect.create(result.getList()));
             getFragment().addVideo(result.getList());
             mPageAdapter.notifyDataSetChanged();
@@ -119,9 +121,8 @@ public class CollectActivity extends BaseActivity {
     private void search() {
         mAdapter.add(Collect.all());
         mPageAdapter.notifyDataSetChanged();
-        mService = Executors.newFixedThreadPool(5);
         mBinding.result.setText(getString(R.string.collect_result, getKeyword()));
-        for (Site site : mSites) mService.execute(() -> mViewModel.searchContent(site, getKeyword()));
+        for (Site site : mSites) mExecutor.execute(() -> mViewModel.searchContent(site, getKeyword()));
     }
 
     private CollectFragment getFragment() {
@@ -129,11 +130,11 @@ public class CollectActivity extends BaseActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (mService == null) return;
-        mService.shutdownNow();
-        mService = null;
+    public void onBackPressed() {
+        super.onBackPressed();
+        if (mExecutor == null) return;
+        mExecutor.shutdownNow();
+        mExecutor = null;
     }
 
     class PageAdapter extends FragmentStatePagerAdapter {

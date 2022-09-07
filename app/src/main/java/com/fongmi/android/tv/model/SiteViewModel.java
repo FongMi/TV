@@ -28,7 +28,7 @@ public class SiteViewModel extends ViewModel {
 
     public MutableLiveData<Result> result;
     public MutableLiveData<Result> player;
-    public ExecutorService service;
+    public ExecutorService executor;
 
     public SiteViewModel() {
         this.result = new MutableLiveData<>();
@@ -180,11 +180,11 @@ public class SiteViewModel extends ViewModel {
     }
 
     private void execute(MutableLiveData<Result> result, Callable<Result> callable) {
-        if (service != null) service.shutdownNow();
-        service = Executors.newFixedThreadPool(2);
-        service.execute(() -> {
+        if (executor != null) executor.shutdownNow();
+        executor = Executors.newFixedThreadPool(2);
+        executor.execute(() -> {
             try {
-                if (!Thread.interrupted()) result.postValue(service.submit(callable).get(15, TimeUnit.SECONDS));
+                if (!Thread.interrupted()) result.postValue(executor.submit(callable).get(15, TimeUnit.SECONDS));
             } catch (Throwable e) {
                 e.printStackTrace();
                 if (e instanceof InterruptedException) return;
@@ -195,6 +195,6 @@ public class SiteViewModel extends ViewModel {
 
     @Override
     protected void onCleared() {
-        if (service != null) service.shutdownNow();
+        if (executor != null) executor.shutdownNow();
     }
 }
