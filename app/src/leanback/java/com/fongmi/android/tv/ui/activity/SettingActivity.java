@@ -32,6 +32,7 @@ import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.Updater;
 
 public class SettingActivity extends BaseActivity implements ConfigCallback, SiteCallback {
 
@@ -55,6 +56,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.home.setText(ApiConfig.getHomeName());
         mBinding.type.setText(ResUtil.getStringArray(R.array.select_render)[Prefers.getRender()]);
         mBinding.compress.setText(ResUtil.getStringArray(R.array.select_thumbnail)[Prefers.getThumbnail()]);
+        mBinding.versionName.setText(BuildConfig.VERSION_NAME);
     }
 
     @Override
@@ -62,6 +64,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.site.setOnClickListener(view -> SiteDialog.show(this));
         mBinding.config.setOnClickListener(view -> ConfigDialog.show(this));
         mBinding.history.setOnClickListener(view -> HistoryDialog.show(this));
+        mBinding.version.setOnClickListener(view-> Updater.check(this));
         mBinding.thumbnail.setOnClickListener(this::setThumbnail);
         mBinding.render.setOnClickListener(this::setRender);
     }

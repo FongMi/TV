@@ -30,8 +30,8 @@ public class Updater implements View.OnClickListener {
     private final Handler handler;
     private AlertDialog dialog;
 
-    public static Updater check(Activity activity) {
-        return new Updater(activity);
+    public static void check(Activity activity) {
+        new Updater(activity).run();
     }
 
     public Updater(Activity activity) {

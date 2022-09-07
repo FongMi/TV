@@ -75,9 +75,9 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     protected void initView() {
         mHandler = new Handler(Looper.getMainLooper());
         Clock.start(mBinding.time);
-        Updater.check(this).run();
         Server.get().start();
         Players.get().init();
+        Updater.check(this);
         setRecyclerView();
         setViewModel();
         setAdapter();
