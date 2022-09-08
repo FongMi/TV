@@ -5,6 +5,7 @@ import android.net.Uri;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.bean.Result;
+import com.github.catvod.crawler.SpiderDebug;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -43,6 +44,7 @@ public class ExoUtil {
     }
 
     private static MediaSource getSource(Map<String, String> headers, String url, MediaItem.SubtitleConfiguration config) {
+        SpiderDebug.log(url);
         Uri videoUri = Uri.parse(url);
         DataSource.Factory factory = getFactory(headers, url);
         MediaItem.Builder builder = new MediaItem.Builder().setUri(videoUri);
