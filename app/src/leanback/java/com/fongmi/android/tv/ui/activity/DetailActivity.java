@@ -279,6 +279,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     private void reverseEpisode() {
         for (int i = 0; i < mFlagAdapter.size(); i++) Collections.reverse(((Vod.Flag) mFlagAdapter.get(i)).getEpisodes());
         mEpisodeAdapter.setItems(getVodFlag().getEpisodes(), null);
+        setGroup(mEpisodeAdapter.size());
     }
 
     private void setParseActivated(Parse item) {
@@ -294,11 +295,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         List<String> items = new ArrayList<>();
         items.add(getString(R.string.play_reverse));
         items.add(getString(mHistory.getRevPlayText()));
-        int itemSize = (int) Math.ceil(size / 20.0f);
-        if (itemSize > 1) for (int i = 0; i < itemSize; i++) items.add(String.valueOf(i * 20 + 1));
         mEpisodePresenter.setNextFocusDown(size > 1 ? R.id.group : R.id.part);
         mPartPresenter.setNextFocusUp(size > 1 ? R.id.group : R.id.episode);
         mBinding.group.setVisibility(size > 1 ? View.VISIBLE : View.GONE);
+        if (mHistory.isRevSort()) for (int i = size + 1; i > 0; i -= 20) items.add((i - 1) + "-" + Math.max(i - 20, 1));
+        else for (int i = 0; i < size; i += 20) items.add((i + 1) + "-" + Math.min(i + 20, size));
         mGroupAdapter.setItems(items, null);
     }
 
