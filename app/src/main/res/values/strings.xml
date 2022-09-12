@@ -11,6 +11,7 @@
     <string name="vod_last">Last seen <xliff:g name="name">%s</xliff:g></string>
 
     <!-- Detail -->
+    <string name="detail_title"><xliff:g name="name">%s</xliff:g> : <xliff:g name="name">%s</xliff:g></string>
     <string name="detail_site">Site: <xliff:g name="name">%s</xliff:g></string>
     <string name="detail_year">Year: <xliff:g name="name">%s</xliff:g></string>
     <string name="detail_area">Area: <xliff:g name="name">%s</xliff:g></string>
@@ -26,6 +27,7 @@
     <string name="play_ready">Ready to play: <xliff:g name="name">%s</xliff:g></string>
     <string name="play_replay">Replay</string>
     <string name="play_reset">Reset</string>
+    <string name="play_tracks">Tracks</string>
     <string name="play_oped">OP&amp;ED</string>
     <string name="play_reverse">Reverse</string>
     <string name="play_forward">→</string>
