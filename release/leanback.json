@@ -1,7 +1,7 @@
 {
-  "version": 23,
-  "code": 23,
-  "name": "1.2.3",
+  "version": 24,
+  "code": 24,
+  "name": "1.2.4",
   "url": "https://github.com/FongMi/TV/blob/main/release/leanback.apk?raw=true",
-  "desc": "1. 修正搜尋介面焦點\n2. 修正切換縮放問題"
+  "desc": "1. 支援軌道切換\n2. 支援Alist\n3. 支援多jar參數\n4. 修復T4搜索"
 }
