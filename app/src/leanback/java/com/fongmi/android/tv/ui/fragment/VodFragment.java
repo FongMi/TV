@@ -52,10 +52,15 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         return getArguments().getString("filter");
     }
 
-    public static VodFragment newInstance(String typeId, List<Filter> filter) {
+    private boolean isFolder() {
+        return getArguments().getBoolean("folder");
+    }
+
+    public static VodFragment newInstance(String typeId, List<Filter> filter, boolean folder) {
         Bundle args = new Bundle();
         args.putString("typeId", typeId);
         args.putString("filter", new Gson().toJson(filter));
+        args.putBoolean("folder", folder);
         VodFragment fragment = new VodFragment();
         fragment.setArguments(args);
         return fragment;
@@ -108,7 +113,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     }
 
     private void checkPage() {
-        if (mScroller.getPage() != 1 || mAdapter.size() >= 4) return;
+        if (mScroller.getPage() != 1 || mAdapter.size() >= 4 || isFolder()) return;
         mScroller.addPage();
         getVideo("2");
     }
@@ -175,6 +180,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
 
     @Override
     public void onLoadMore(String page) {
+        if (isFolder()) return;
         mScroller.setLoading(true);
         getVideo(page);
     }
