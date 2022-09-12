@@ -11,6 +11,7 @@
     <string name="vod_last">上次看到<xliff:g name="name">%s</xliff:g></string>
 
     <!-- Detail -->
+    <string name="detail_title"><xliff:g name="name">%s</xliff:g>：<xliff:g name="name">%s</xliff:g></string>
     <string name="detail_site">站源：<xliff:g name="name">%s</xliff:g></string>
     <string name="detail_year">年份：<xliff:g name="name">%s</xliff:g></string>
     <string name="detail_area">地区：<xliff:g name="name">%s</xliff:g></string>
@@ -26,6 +27,7 @@
     <string name="play_ready">准备播放：<xliff:g name="name">%s</xliff:g></string>
     <string name="play_replay">重播</string>
     <string name="play_reset">重置</string>
+    <string name="play_tracks">轨道</string>
     <string name="play_oped">片头片尾</string>
     <string name="play_reverse">倒序</string>
     <string name="play_forward">→</string>
