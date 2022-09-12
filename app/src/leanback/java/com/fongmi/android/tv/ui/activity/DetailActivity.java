@@ -331,10 +331,13 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
         mHandler.postDelayed(() -> getPlayerView().setUseController(true), 250);
         mBinding.flag.setSelectedPosition(mCurrent);
+        Players.get().play();
         mFullscreen = true;
     }
 
     private void exitFullscreen() {
+        mBinding.widget.title.setVisibility(View.GONE);
+        mBinding.widget.center.setVisibility(View.GONE);
         mBinding.video.setForeground(ResUtil.getDrawable(R.drawable.selector_video));
         mBinding.video.setLayoutParams(mFrameParams);
         getPlayerView().setUseController(false);
