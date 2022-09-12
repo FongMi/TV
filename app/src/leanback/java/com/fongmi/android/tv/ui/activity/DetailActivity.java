@@ -331,8 +331,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
         mHandler.postDelayed(() -> getPlayerView().setUseController(true), 250);
         mBinding.flag.setSelectedPosition(mCurrent);
-        Players.get().play();
         mFullscreen = true;
+        onPlay(0);
     }
 
     private void exitFullscreen() {
@@ -570,6 +570,19 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         stopTimer();
     }
 
+    private void onPause(boolean visible) {
+        mBinding.widget.exoPosition.setText(Players.get().getTime(0));
+        mBinding.widget.exoDuration.setText(mControl.exoDuration.getText());
+        mBinding.widget.title.setVisibility(visible ? View.VISIBLE : View.GONE);
+        mBinding.widget.center.setVisibility(visible ? View.VISIBLE : View.GONE);
+        Players.get().pause();
+    }
+
+    private void onPlay(int delay) {
+        mHandler.postDelayed(mHideCenter, delay);
+        Players.get().play();
+    }
+
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (mFullscreen && !getPlayerView().isControllerFullyVisible() && mKeyDown.hasEvent(event)) return mKeyDown.onKeyDown(event);
@@ -586,10 +599,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
 
     @Override
     public void onSeekTo(int time) {
-        mHandler.postDelayed(mHideCenter, 500);
         Players.get().seekTo(time);
-        Players.get().play();
         mKeyDown.resetTime();
+        onPlay(500);
     }
 
     @Override
@@ -600,29 +612,20 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
 
     @Override
     public void onKeyCenter() {
-        if (Players.get().isPlaying()) {
-            Players.get().pause();
-            mBinding.widget.title.setVisibility(View.VISIBLE);
-            mBinding.widget.center.setVisibility(View.VISIBLE);
-            mBinding.widget.exoPosition.setText(Players.get().getTime(0));
-            mBinding.widget.exoDuration.setText(mControl.exoDuration.getText());
-        } else {
-            Players.get().play();
-            mBinding.widget.title.setVisibility(View.GONE);
-            mBinding.widget.center.setVisibility(View.GONE);
-        }
+        if (Players.get().isPlaying()) onPause(true);
+        else onPlay(0);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        Players.get().pause();
+        onPause(false);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Players.get().play();
+        onPlay(0);
     }
 
     @Override
