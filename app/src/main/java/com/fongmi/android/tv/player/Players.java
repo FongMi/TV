@@ -142,12 +142,14 @@ public class Players implements Player.Listener, ParseTask.Callback {
         exo().setMediaSource(ExoUtil.getSource(result));
         PlayerEvent.state(0);
         exo().prepare();
+        exo().play();
     }
 
     private void setMediaSource(Map<String, String> headers, String url) {
         exo().setMediaSource(ExoUtil.getSource(headers, url));
         PlayerEvent.state(0);
         exo().prepare();
+        exo().play();
     }
 
     public void pause() {
