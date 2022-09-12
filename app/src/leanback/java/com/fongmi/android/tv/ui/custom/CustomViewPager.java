@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.animation.Animation;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -99,14 +100,14 @@ public class CustomViewPager extends ViewPager {
                 }
             }
         } else if (direction == FOCUS_LEFT) {
-            if (getCurrentItem() == 0) {
+            if (getCurrentItem() == 0 || currentFocused instanceof TextView) {
                 shake(currentFocused);
                 handled = true;
             } else {
                 handled = pageLeft();
             }
         } else if (direction == FOCUS_RIGHT) {
-            if (getAdapter() != null && getCurrentItem() == getAdapter().getCount() - 1) {
+            if (getAdapter() != null && getCurrentItem() == getAdapter().getCount() - 1 || currentFocused instanceof TextView) {
                 shake(currentFocused);
                 handled = true;
             } else {
