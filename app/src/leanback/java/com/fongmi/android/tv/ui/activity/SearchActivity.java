@@ -93,12 +93,12 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
     }
 
     private void setRecyclerView() {
-        mBinding.word.setHasFixedSize(true);
-        mBinding.word.addItemDecoration(new SpaceItemDecoration(1, 16));
-        mBinding.word.setAdapter(mWordAdapter = new WordAdapter(this));
-        mBinding.history.setHasFixedSize(true);
-        mBinding.history.addItemDecoration(new SpaceItemDecoration(1, 16));
-        mBinding.history.setAdapter(mHistoryAdapter = new HistoryAdapter(this));
+        mBinding.wordRecycler.setHasFixedSize(true);
+        mBinding.wordRecycler.addItemDecoration(new SpaceItemDecoration(1, 16));
+        mBinding.wordRecycler.setAdapter(mWordAdapter = new WordAdapter(this));
+        mBinding.historyRecycler.setHasFixedSize(true);
+        mBinding.historyRecycler.addItemDecoration(new SpaceItemDecoration(1, 16));
+        mBinding.historyRecycler.setAdapter(mHistoryAdapter = new HistoryAdapter(this));
     }
 
     private void getHot() {

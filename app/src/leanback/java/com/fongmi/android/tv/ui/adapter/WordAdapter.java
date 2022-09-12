@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.fongmi.android.tv.databinding.AdapterWordBinding;
+import com.fongmi.android.tv.databinding.AdapterSearchWordBinding;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,9 +29,9 @@ public class WordAdapter extends RecyclerView.Adapter<WordAdapter.ViewHolder> {
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        private final AdapterWordBinding binding;
+        private final AdapterSearchWordBinding binding;
 
-        public ViewHolder(@NonNull AdapterWordBinding binding) {
+        public ViewHolder(@NonNull AdapterSearchWordBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
             itemView.setOnClickListener(this);
@@ -57,11 +57,11 @@ public class WordAdapter extends RecyclerView.Adapter<WordAdapter.ViewHolder> {
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(AdapterWordBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        return new ViewHolder(AdapterSearchWordBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.binding.text.setText(mItems.get(position));
+        holder.binding.word.setText(mItems.get(position));
     }
 }

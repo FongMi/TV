@@ -27,7 +27,7 @@
             android:textSize="24sp" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/history"
+            android:id="@+id/historyRecycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipChildren="false"
@@ -35,7 +35,7 @@
             android:paddingBottom="24dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:itemCount="10"
-            tools:listitem="@layout/adapter_word" />
+            tools:listitem="@layout/adapter_search_history" />
 
     </LinearLayout>
 
@@ -52,6 +52,7 @@
             android:layout_marginEnd="12dp"
             android:focusable="true"
             android:focusableInTouchMode="true"
+            android:nextFocusLeft="@id/history"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_mic" />
 
@@ -103,7 +104,7 @@
             android:textSize="24sp" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/word"
+            android:id="@+id/wordRecycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipChildren="false"
@@ -111,7 +112,7 @@
             android:paddingBottom="24dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:itemCount="10"
-            tools:listitem="@layout/adapter_word" />
+            tools:listitem="@layout/adapter_search_word" />
 
     </LinearLayout>
 </LinearLayout>

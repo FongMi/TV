@@ -43,25 +43,10 @@
             app:use_controller="false" />
 
         <include
-            android:id="@+id/progress"
-            layout="@layout/view_progress"
-            android:visibility="gone" />
-
-        <include
-            android:id="@+id/error"
-            layout="@layout/view_error"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:visibility="gone" />
-
-        <include
-            android:id="@+id/center"
-            layout="@layout/view_controller_center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:visibility="gone" />
+            android:id="@+id/widget"
+            layout="@layout/view_controller_widget"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
     </FrameLayout>
 
