@@ -632,13 +632,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         } else if (mFullscreen) {
             exitFullscreen();
         } else {
+            destroy();
             super.onBackPressed();
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    private void destroy() {
         stopTimer();
         updateHistory();
         Players.get().stop();
