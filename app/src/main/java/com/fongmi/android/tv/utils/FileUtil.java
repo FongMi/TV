@@ -43,6 +43,10 @@ public class FileUtil {
         return getCacheFile("spider.jar");
     }
 
+    public static File getJar(String fileName) {
+        return getCacheFile(fileName.concat(".jar"));
+    }
+
     public static File getLocal(String path) {
         return new File(path.replace("file:/", getRootPath()));
     }
@@ -56,12 +60,13 @@ public class FileUtil {
         return TextUtils.isEmpty(mimeType) ? "*/*" : mimeType;
     }
 
-    public static void write(File file, byte[] data) throws Exception {
+    public static File write(File file, byte[] data) throws Exception {
         FileOutputStream fos = new FileOutputStream(file);
         fos.write(data);
         fos.flush();
         fos.close();
         chmod(file);
+        return file;
     }
 
     public static String read(String path) {
@@ -75,6 +80,16 @@ public class FileUtil {
         } catch (Exception e) {
             return "";
         }
+    }
+
+    public static String convert(String text) {
+        if (TextUtils.isEmpty(text)) return "";
+        if (text.startsWith("clan")) return text.replace("clan", "file");
+        if (text.startsWith(".")) text = text.substring(1);
+        if (text.startsWith("/")) text = text.substring(1);
+        Uri uri = Uri.parse(Prefers.getUrl());
+        if (uri.getLastPathSegment() == null) return uri.getScheme() + "://" + text;
+        return uri.toString().replace(uri.getLastPathSegment(), text);
     }
 
     private static String getMd5(File file) {
