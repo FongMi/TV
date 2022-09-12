@@ -8,8 +8,6 @@
     android:ellipsize="marquee"
     android:focusable="true"
     android:focusableInTouchMode="true"
-    android:marqueeRepeatLimit="marquee_forever"
-    android:scrollHorizontally="true"
     android:singleLine="true"
     android:textColor="@color/white"
     android:textSize="16sp"

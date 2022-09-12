@@ -26,6 +26,7 @@ import com.fongmi.android.tv.databinding.ActivityVodBinding;
 import com.fongmi.android.tv.ui.fragment.VodFragment;
 import com.fongmi.android.tv.ui.presenter.TypePresenter;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -145,7 +146,7 @@ public class VodActivity extends BaseActivity {
         @Override
         public Fragment getItem(int position) {
             Class type = mResult.getTypes().get(position);
-            List<Filter> filter = mResult.getFilters().get(type.getTypeId());
+            String filter = new Gson().toJson(mResult.getFilters().get(type.getTypeId()));
             return VodFragment.newInstance(type.getTypeId(), filter, type.getTypeFlag().equals("1"));
         }
 
