@@ -13,6 +13,7 @@ import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.ext.rtmp.RtmpDataSource;
 import com.google.android.exoplayer2.source.DefaultMediaSourceFactory;
 import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.ui.CaptionStyleCompat;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSource;
@@ -28,7 +29,7 @@ public class ExoUtil {
     static ExoPlayer create() {
         DefaultRenderersFactory renderersFactory = new DefaultRenderersFactory(App.get());
         renderersFactory.setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER);
-        return new ExoPlayer.Builder(App.get()).setRenderersFactory(renderersFactory).build();
+        return new ExoPlayer.Builder(App.get()).setRenderersFactory(renderersFactory).setTrackSelector(new DefaultTrackSelector(App.get())).build();
     }
 
     public static CaptionStyleCompat getCaptionStyle() {
@@ -54,7 +55,7 @@ public class ExoUtil {
     }
 
     private static MediaItem.SubtitleConfiguration getConfig(Result result) {
-        return result.getSub().isEmpty() ? null : new MediaItem.SubtitleConfiguration.Builder(Uri.parse(result.getSub())).setMimeType(MimeTypes.APPLICATION_SUBRIP).setSelectionFlags(C.SELECTION_FLAG_DEFAULT).build();
+        return result.getSub().isEmpty() ? null : new MediaItem.SubtitleConfiguration.Builder(Uri.parse(result.getSub())).setLabel("Spider").setMimeType(MimeTypes.APPLICATION_SUBRIP).setSelectionFlags(C.SELECTION_FLAG_DEFAULT).build();
     }
 
     private static DataSource.Factory getFactory(Map<String, String> headers, String url) {

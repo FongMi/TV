@@ -164,7 +164,7 @@ public class SiteViewModel extends ViewModel {
                 if (site.getType() == 1) params.put("ac", "detail");
                 params.put("wd", keyword);
                 String body = OKHttp.newCall(site.getApi(), params).execute().body().string();
-                SpiderDebug.log(site.getName() +"," +body);
+                SpiderDebug.log(site.getName() + "," + body);
                 if (site.getType() == 0) post(site, Result.fromXml(body));
                 else post(site, Result.fromJson(body));
             }
