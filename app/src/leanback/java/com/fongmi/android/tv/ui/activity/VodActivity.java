@@ -20,7 +20,6 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Class;
-import com.fongmi.android.tv.bean.Filter;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.databinding.ActivityVodBinding;
 import com.fongmi.android.tv.ui.fragment.VodFragment;
@@ -112,10 +111,9 @@ public class VodActivity extends BaseActivity {
     }
 
     private void updateFilter(Class item) {
-        if (item.getFilter() != null) {
-            getFragment().toggleFilter(item.toggleFilter().getFilter());
-            mAdapter.notifyArrayItemRangeChanged(0, mAdapter.size());
-        }
+        if (item.getFilter() == null) return;
+        getFragment().toggleFilter(item.toggleFilter().getFilter());
+        mAdapter.notifyArrayItemRangeChanged(0, mAdapter.size());
     }
 
     @Override
@@ -129,6 +127,7 @@ public class VodActivity extends BaseActivity {
     public void onBackPressed() {
         Class item = mResult.getTypes().get(mBinding.pager.getCurrentItem());
         if (item.getFilter() != null && item.getFilter()) updateFilter(item);
+        else if (getFragment().canGoBack()) getFragment().goBack();
         else super.onBackPressed();
     }
 
