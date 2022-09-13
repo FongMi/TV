@@ -47,7 +47,7 @@ public class Site {
         try {
             return new Gson().fromJson(element, Site.class);
         } catch (Exception e) {
-            return Site.get("error", "Error");
+            return new Site();
         }
     }
 
