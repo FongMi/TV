@@ -72,6 +72,9 @@ public class Vod {
     @SerializedName("vod_play_url")
     private String vodPlayUrl;
 
+    @SerializedName("vod_tag")
+    private String vodTag;
+
     @Path("dl")
     @ElementList(entry = "dd", required = false, inline = true)
     private List<Flag> vodFlags;
@@ -130,6 +133,10 @@ public class Vod {
 
     public String getVodPlayUrl() {
         return TextUtils.isEmpty(vodPlayUrl) ? "" : vodPlayUrl;
+    }
+
+    public String getVodTag() {
+        return TextUtils.isEmpty(vodTag) ? "" : vodTag;
     }
 
     public List<Flag> getVodFlags() {

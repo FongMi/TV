@@ -25,6 +25,7 @@ import com.fongmi.android.tv.databinding.ActivityVodBinding;
 import com.fongmi.android.tv.ui.fragment.VodFragment;
 import com.fongmi.android.tv.ui.presenter.TypePresenter;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -110,10 +111,9 @@ public class VodActivity extends BaseActivity {
     }
 
     private void updateFilter(Class item) {
-        if (item.getFilter() != null) {
-            getFragment().toggleFilter(item.toggleFilter().getFilter());
-            mAdapter.notifyArrayItemRangeChanged(0, mAdapter.size());
-        }
+        if (item.getFilter() == null) return;
+        getFragment().toggleFilter(item.toggleFilter().getFilter());
+        mAdapter.notifyArrayItemRangeChanged(0, mAdapter.size());
     }
 
     @Override
@@ -127,6 +127,7 @@ public class VodActivity extends BaseActivity {
     public void onBackPressed() {
         Class item = mResult.getTypes().get(mBinding.pager.getCurrentItem());
         if (item.getFilter() != null && item.getFilter()) updateFilter(item);
+        else if (getFragment().canGoBack()) getFragment().goBack();
         else super.onBackPressed();
     }
 
@@ -143,7 +144,9 @@ public class VodActivity extends BaseActivity {
         @NonNull
         @Override
         public Fragment getItem(int position) {
-            return VodFragment.newInstance(mResult.getTypes().get(position).getTypeId(), mResult.getFilters().get(mResult.getTypes().get(position).getTypeId()));
+            Class type = mResult.getTypes().get(position);
+            String filter = new Gson().toJson(mResult.getFilters().get(type.getTypeId()));
+            return VodFragment.newInstance(type.getTypeId(), filter, type.getTypeFlag().equals("1"));
         }
 
         @Override
