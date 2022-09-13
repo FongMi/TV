@@ -172,13 +172,8 @@ public class History {
         AppDatabase.get().getHistoryDao().delete(id);
     }
 
-    public History save() {
-        AppDatabase.get().getHistoryDao().insertOrUpdate(this);
-        return this;
-    }
-
     public History update() {
-        AppDatabase.get().getHistoryDao().update(this);
+        AppDatabase.get().getHistoryDao().insertOrUpdate(this);
         return this;
     }
 

@@ -44,6 +44,7 @@ import com.fongmi.android.tv.ui.presenter.FlagPresenter;
 import com.fongmi.android.tv.ui.presenter.GroupPresenter;
 import com.fongmi.android.tv.ui.presenter.ParsePresenter;
 import com.fongmi.android.tv.ui.presenter.PartPresenter;
+import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
@@ -63,7 +64,7 @@ import java.util.List;
 import okhttp3.Call;
 import okhttp3.Response;
 
-public class DetailActivity extends BaseActivity implements CustomKeyDown.Listener, GroupPresenter.OnClickListener {
+public class DetailActivity extends BaseActivity implements CustomKeyDown.Listener, GroupPresenter.OnClickListener, Clock.Callback {
 
     private ActivityDetailBinding mBinding;
     private ViewControllerBottomBinding mControl;
@@ -234,7 +235,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     }
 
     private void setDetail(Vod item) {
-        Players.get().setKey(getHistoryKey());
         mBinding.progressLayout.showContent();
         mBinding.video.setTag(item.getVodPic());
         mBinding.name.setText(item.getVodName());
@@ -275,7 +275,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         for (int i = 0; i < mFlagAdapter.size(); i++) ((Vod.Flag) mFlagAdapter.get(i)).toggle(mCurrent == i, item);
         mEpisodeAdapter.notifyArrayItemRangeChanged(0, mEpisodeAdapter.size());
         mHandler.post(() -> mBinding.episode.setSelectedPosition(getEpisodePosition()));
-        mBinding.widget.title.setText(getString(R.string.detail_title, mBinding.name.getText(), item.getName()));
         if (mEpisodeAdapter.size() == 0) return;
         getPlayer(false);
     }
@@ -336,7 +335,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     }
 
     private void exitFullscreen() {
-        mBinding.widget.title.setVisibility(View.GONE);
+        mBinding.widget.top.setVisibility(View.GONE);
         mBinding.widget.center.setVisibility(View.GONE);
         mBinding.video.setForeground(ResUtil.getDrawable(R.drawable.selector_video));
         mBinding.video.setLayoutParams(mFrameParams);
@@ -398,7 +397,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     private boolean onOpeningReset() {
         mHistory.setOpening(0);
         mControl.opening.setText(Players.get().getStringForTime(mHistory.getOpening()));
-        mHistory.update();
         return true;
     }
 
@@ -411,7 +409,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     private boolean onEndingReset() {
         mHistory.setEnding(0);
         mControl.ending.setText(Players.get().getStringForTime(mHistory.getEnding()));
-        mHistory.update();
         return true;
     }
 
@@ -427,7 +424,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         mHistory.setOpening(0);
         mControl.ending.setText(Players.get().getStringForTime(mHistory.getEnding()));
         mControl.opening.setText(Players.get().getStringForTime(mHistory.getOpening()));
-        mHistory.update();
     }
 
     private void onTracks() {
@@ -450,6 +446,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     private void checkHistory() {
         mHistory = History.find(getHistoryKey());
         if (mFlagAdapter.size() == 0) {
+            mBinding.flag.setVisibility(View.GONE);
+            mBinding.group.setVisibility(View.GONE);
+            mBinding.episode.setVisibility(View.GONE);
             Notify.show(R.string.error_episode);
             return;
         }
@@ -474,7 +473,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         history.setCid(ApiConfig.getCid());
         history.setVodPic(mBinding.video.getTag().toString());
         history.setVodName(mBinding.name.getText().toString());
-        return history.save();
+        return history;
     }
 
     private void updateHistory(Vod.Flag.Episode item, boolean replay) {
@@ -488,9 +487,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     }
 
     private void updateHistory() {
-        if (mHistory == null) return;
-        mHistory.setDuration(Players.get().getCurrentPosition());
-        mHistory.update();
+        if (mHistory != null) mHistory.update();
     }
 
     private final Runnable mHideCenter = new Runnable() {
@@ -498,24 +495,20 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         public void run() {
             mBinding.widget.action.setImageResource(R.drawable.ic_play);
             mBinding.widget.center.setVisibility(View.GONE);
-            mBinding.widget.title.setVisibility(View.GONE);
+            mBinding.widget.top.setVisibility(View.GONE);
         }
     };
 
-    private final Runnable mProgress = new Runnable() {
-        @Override
-        public void run() {
-            boolean keep = true;
-            long duration = Players.get().getDuration();
-            long current = Players.get().getCurrentPosition();
-            if (mHistory.getOpening() >= current) Players.get().seekTo(mHistory.getOpening());
-            if (mHistory.getEnding() > 0 && duration > 0 && mHistory.getEnding() + current >= duration) {
-                keep = false;
-                checkNext();
-            }
-            if (keep) mHandler.postDelayed(mProgress, 1000);
+    @Override
+    public void onTimeChanged() {
+        long duration = Players.get().getDuration();
+        long current = Players.get().getCurrentPosition();
+        if (mHistory.getOpening() >= current) Players.get().seekTo(mHistory.getOpening());
+        if (mHistory.getEnding() > 0 && duration > 0 && mHistory.getEnding() + current >= duration) {
+            Clock.get().setCallback(null);
+            checkNext();
         }
-    };
+    }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onPlayerEvent(PlayerEvent event) {
@@ -545,20 +538,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
 
     private void checkPosition() {
         Players.get().seekTo(mHistory.getDuration());
-        stopTimer();
-        setTimer();
-    }
-
-    private void stopTimer() {
-        mHandler.removeCallbacks(mProgress);
-    }
-
-    private void setTimer() {
-        mHandler.postDelayed(mProgress, 1000);
+        Clock.get().setCallback(this);
     }
 
     private void onRetry() {
-        updateHistory();
+        mHistory.setDuration(Players.get().getCurrentPosition());
         getPlayer(false);
     }
 
@@ -566,14 +550,14 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         mBinding.widget.progress.getRoot().setVisibility(View.GONE);
         mBinding.widget.error.setVisibility(View.VISIBLE);
         mBinding.widget.text.setText(msg);
+        Clock.get().setCallback(null);
         Players.get().stop();
-        stopTimer();
     }
 
     private void onPause(boolean visible) {
         mBinding.widget.exoPosition.setText(Players.get().getTime(0));
         mBinding.widget.exoDuration.setText(mControl.exoDuration.getText());
-        mBinding.widget.title.setVisibility(visible ? View.VISIBLE : View.GONE);
+        mBinding.widget.top.setVisibility(visible ? View.VISIBLE : View.GONE);
         mBinding.widget.center.setVisibility(visible ? View.VISIBLE : View.GONE);
         Players.get().pause();
     }
@@ -617,15 +601,19 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        onPause(false);
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
         onPlay(0);
+        Clock.start(mBinding.widget.time);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        onPause(false);
+        updateHistory();
+        RefreshEvent.history();
+        Clock.get().release();
     }
 
     @Override
@@ -635,16 +623,14 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         } else if (mFullscreen) {
             exitFullscreen();
         } else {
-            destroy();
             super.onBackPressed();
         }
     }
 
-    private void destroy() {
-        stopTimer();
-        updateHistory();
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
         Players.get().stop();
-        RefreshEvent.history();
         EventBus.getDefault().unregister(this);
     }
 }
