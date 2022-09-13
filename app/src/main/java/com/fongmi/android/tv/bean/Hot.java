@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Hot {
@@ -16,9 +17,13 @@ public class Hot {
     }
 
     public static List<String> get(String str) {
-        List<String> items = new ArrayList<>();
-        for (Data.Item item : objectFrom(str).getData().getItemList()) items.add(item.getTitle());
-        return items;
+        try {
+            List<String> items = new ArrayList<>();
+            for (Data.Item item : objectFrom(str).getData().getItemList()) items.add(item.getTitle());
+            return items;
+        } catch (Exception e) {
+            return Collections.emptyList();
+        }
     }
 
     private Data getData() {
