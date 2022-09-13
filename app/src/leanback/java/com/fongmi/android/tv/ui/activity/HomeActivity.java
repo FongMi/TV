@@ -75,7 +75,6 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     protected void initView() {
         mHandler = new Handler(Looper.getMainLooper());
         Updater.create(this).start();
-        Clock.start(mBinding.time);
         Server.get().start();
         Players.get().init();
         setRecyclerView();
@@ -265,6 +264,18 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        Clock.start(mBinding.time);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Clock.get().release();
+    }
+
+    @Override
     public void onBackPressed() {
         if (mHistoryPresenter.isDelete()) {
             mHistoryPresenter.setDelete(false);
@@ -283,7 +294,6 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     private void destroy() {
         Server.get().stop();
-        Clock.get().release();
         Players.get().release();
         EventBus.getDefault().unregister(this);
     }
