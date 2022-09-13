@@ -13,8 +13,10 @@ import java.util.TimerTask;
 public class Clock {
 
     private SimpleDateFormat formatter;
+    private Callback callback;
     private Handler handler;
     private Timer timer;
+    private Date date;
 
     private static class Loader {
         static volatile Clock INSTANCE = new Clock();
@@ -27,6 +29,7 @@ public class Clock {
     public void init() {
         this.formatter = new SimpleDateFormat("MM/dd HH:mm:ss", Locale.getDefault());
         this.handler = new Handler(Looper.getMainLooper());
+        this.date = new Date();
     }
 
     public static void start(TextView view) {
@@ -34,15 +37,27 @@ public class Clock {
         get().run(view);
     }
 
+    public void setCallback(Callback callback) {
+        this.callback = callback;
+    }
+
     private void run(TextView view) {
         timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                if (handler == null || view == null || formatter == null) return;
-                handler.post(() -> view.setText(formatter.format(new Date())));
+                handler.post(() -> doJob(view));
             }
         }, 0, 1000);
+    }
+
+    private void doJob(TextView view) {
+        try {
+            date.setTime(System.currentTimeMillis());
+            view.setText(formatter.format(date));
+            if (callback != null) callback.onTimeChanged();
+        } catch (Exception ignored) {
+        }
     }
 
     public void release() {
@@ -50,5 +65,11 @@ public class Clock {
         formatter = null;
         handler = null;
         timer = null;
+        date = null;
+    }
+
+    public interface Callback {
+
+        void onTimeChanged();
     }
 }
