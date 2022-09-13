@@ -553,6 +553,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         mBinding.widget.progress.getRoot().setVisibility(View.GONE);
         mBinding.widget.error.setVisibility(View.VISIBLE);
         mBinding.widget.text.setText(msg);
+        Clock.get().setCallback(null);
         Players.get().stop();
     }
 
