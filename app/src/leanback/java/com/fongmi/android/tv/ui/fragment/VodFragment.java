@@ -122,6 +122,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     private void getVideo(String typeId, String page) {
         if (page.equals("1")) mLast = null;
         if (isFolder()) mTypeIds.add(typeId);
+        if (isFolder()) mBinding.recycler.moveToTop();
         boolean clear = page.equals("1") && mAdapter.size() > mFilters.size();
         if (clear) mAdapter.removeItems(mFilters.size(), mAdapter.size() - mFilters.size());
         mViewModel.categoryContent(typeId, page, true, mExtend);
