@@ -487,7 +487,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     }
 
     private void updateHistory() {
-        if (mHistory != null) mHistory.update();
+        if (mHistory != null) {
+            mHistory.update(Players.get().getCurrentPosition());
+            RefreshEvent.history();
+        }
     }
 
     private final Runnable mHideCenter = new Runnable() {
@@ -550,7 +553,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         mBinding.widget.progress.getRoot().setVisibility(View.GONE);
         mBinding.widget.error.setVisibility(View.VISIBLE);
         mBinding.widget.text.setText(msg);
-        Clock.get().setCallback(null);
         Players.get().stop();
     }
 
@@ -603,17 +605,16 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     @Override
     protected void onResume() {
         super.onResume();
-        onPlay(0);
         Clock.start(mBinding.widget.time);
+        onPlay(0);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        onPause(false);
-        updateHistory();
-        RefreshEvent.history();
         Clock.get().release();
+        updateHistory();
+        onPause(false);
     }
 
     @Override
