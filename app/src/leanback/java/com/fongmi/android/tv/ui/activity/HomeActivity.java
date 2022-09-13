@@ -276,13 +276,12 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
             Notify.show(R.string.app_exit);
             mHandler.postDelayed(() -> mConfirmExit = false, 1000);
         } else {
+            destroy();
             super.onBackPressed();
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    private void destroy() {
         Server.get().stop();
         Clock.get().release();
         Players.get().release();
