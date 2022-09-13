@@ -9,16 +9,13 @@ import androidx.leanback.widget.Presenter;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.AdapterVodBinding;
 import com.fongmi.android.tv.utils.ImgUtil;
-import com.fongmi.android.tv.utils.ResUtil;
 
 public class VodPresenter extends Presenter {
 
     private final OnClickListener mListener;
-    private int width, height;
 
     public VodPresenter(OnClickListener listener) {
         this.mListener = listener;
-        setLayoutSize();
     }
 
     public interface OnClickListener {
@@ -28,19 +25,9 @@ public class VodPresenter extends Presenter {
         boolean onLongClick(Vod item);
     }
 
-    private void setLayoutSize() {
-        int space = ResUtil.dp2px(112);
-        int base = ResUtil.getScreenWidthPx() - space;
-        width = base / 5;
-        height = (int) (width / 0.75f);
-    }
-
     @Override
     public Presenter.ViewHolder onCreateViewHolder(ViewGroup parent) {
-        ViewHolder holder = new ViewHolder(AdapterVodBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
-        holder.binding.getRoot().getLayoutParams().width = width;
-        holder.binding.getRoot().getLayoutParams().height = height;
-        return holder;
+        return new ViewHolder(AdapterVodBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
     }
 
     @Override

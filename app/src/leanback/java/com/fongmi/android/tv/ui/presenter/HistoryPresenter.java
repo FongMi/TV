@@ -17,12 +17,7 @@ import com.fongmi.android.tv.utils.ResUtil;
 public class HistoryPresenter extends Presenter {
 
     private OnClickListener mListener;
-    private int width, height;
     private boolean delete;
-
-    public HistoryPresenter() {
-        setLayoutSize();
-    }
 
     public interface OnClickListener {
 
@@ -45,19 +40,9 @@ public class HistoryPresenter extends Presenter {
         this.delete = delete;
     }
 
-    private void setLayoutSize() {
-        int space = ResUtil.dp2px(112);
-        int base = ResUtil.getScreenWidthPx() - space;
-        width = base / 5;
-        height = (int) (width / 0.75f);
-    }
-
     @Override
     public Presenter.ViewHolder onCreateViewHolder(ViewGroup parent) {
-        ViewHolder holder = new ViewHolder(AdapterVodBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
-        holder.binding.getRoot().getLayoutParams().width = width;
-        holder.binding.getRoot().getLayoutParams().height = height;
-        return holder;
+        return new ViewHolder(AdapterVodBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
     }
 
     @Override

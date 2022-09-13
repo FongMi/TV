@@ -68,6 +68,7 @@ dependencies {
     implementation 'com.google.zxing:core:3.5.0'
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
+    implementation 'me.jessyan:autosize:1.2.1'
     implementation 'org.greenrobot:eventbus:3.3.1'
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
     implementation('org.simpleframework:simple-xml:2.7.1') { exclude group: 'stax', module: 'stax-api' exclude group: 'xpp3', module: 'xpp3' }
