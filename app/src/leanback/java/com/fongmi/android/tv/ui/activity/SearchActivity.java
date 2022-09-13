@@ -103,7 +103,7 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
 
     private void getHot() {
         mBinding.hint.setText(R.string.search_hot);
-        OKHttp.newCall("https://node.video.qq.com/x/api/hot_mobilesearch?channdlId=0").enqueue(new Callback() {
+        OKHttp.newCall("https://api.web.360kan.com/v1/rank?cat=1").enqueue(new Callback() {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 List<String> items = Hot.get(response.body().string());
