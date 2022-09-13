@@ -62,10 +62,6 @@ public class Clock {
 
     public void release() {
         if (timer != null) timer.cancel();
-        formatter = null;
-        handler = null;
-        timer = null;
-        date = null;
     }
 
     public interface Callback {

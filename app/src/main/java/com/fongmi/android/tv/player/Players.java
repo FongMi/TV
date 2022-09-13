@@ -70,8 +70,7 @@ public class Players implements Player.Listener, ParseTask.Callback {
 
     public void addSpeed() {
         float speed = exo().getPlaybackParameters().speed;
-        float addon = speed >= 2 ? 1f : 0.25f;
-        speed = speed >= 5 ? 0.5f : speed + addon;
+        speed = speed == 2 ? 0.25f : speed + 0.25f;
         exo().setPlaybackSpeed(speed);
     }
 
@@ -161,11 +160,9 @@ public class Players implements Player.Listener, ParseTask.Callback {
         if (exoPlayer != null) {
             exoPlayer.removeListener(this);
             exoPlayer.release();
-            exoPlayer = null;
         }
         if (webView != null) {
             webView.destroy();
-            webView = null;
         }
     }
 

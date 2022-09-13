@@ -172,7 +172,8 @@ public class History {
         AppDatabase.get().getHistoryDao().delete(id);
     }
 
-    public History update() {
+    public History update(long duration) {
+        setDuration(duration);
         AppDatabase.get().getHistoryDao().insertOrUpdate(this);
         return this;
     }
