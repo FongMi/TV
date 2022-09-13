@@ -44,7 +44,11 @@ public class Site {
     private boolean activated;
 
     public static Site objectFrom(JsonElement element) {
-        return new Gson().fromJson(element, Site.class);
+        try {
+            return new Gson().fromJson(element, Site.class);
+        } catch (Exception e) {
+            return Site.get("error", "Error");
+        }
     }
 
     public static Site get(String key) {
