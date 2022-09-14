@@ -48,6 +48,7 @@
             android:background="@drawable/selector_item"
             android:focusable="true"
             android:focusableInTouchMode="true"
+            android:nextFocusDown="@id/render"
             android:orientation="horizontal">
 
             <TextView
@@ -110,7 +111,7 @@
                 android:textSize="18sp" />
 
             <TextView
-                android:id="@+id/type"
+                android:id="@+id/renderText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="end"
@@ -121,7 +122,37 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/thumbnail"
+            android:id="@+id/quality"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_weight="1"
+            android:background="@drawable/selector_item"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:text="@string/setting_quality"
+                android:textColor="@color/white"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/qualityText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                tools:text="High" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/size"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -134,18 +165,18 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
-                android:text="@string/setting_thumbnail"
+                android:text="@string/setting_size"
                 android:textColor="@color/white"
                 android:textSize="18sp" />
 
             <TextView
-                android:id="@+id/compress"
+                android:id="@+id/sizeText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="end"
                 android:textColor="@color/white"
                 android:textSize="18sp"
-                tools:text="High" />
+                tools:text="Medium" />
 
         </LinearLayout>
     </LinearLayout>
@@ -169,7 +200,7 @@
             android:textSize="18sp" />
 
         <TextView
-            android:id="@+id/versionName"
+            android:id="@+id/versionText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/white"

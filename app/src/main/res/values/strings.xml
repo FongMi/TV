@@ -42,8 +42,9 @@
     <!-- Setting -->
     <string name="setting_site">Home site</string>
     <string name="setting_url">Configuration</string>
-    <string name="setting_render">Render</string>
-    <string name="setting_thumbnail">Thumbnail</string>
+    <string name="setting_render">Render type</string>
+    <string name="setting_quality">Image quality</string>
+    <string name="setting_size">Image size</string>
     <string name="setting_version">Version</string>
 
     <!-- Dialog -->
@@ -81,10 +82,16 @@
         <item>Texture</item>
     </string-array>
 
-    <string-array name="select_thumbnail">
+    <string-array name="select_quality">
         <item>Low</item>
         <item>Medium</item>
         <item>High</item>
+    </string-array>
+
+    <string-array name="select_size">
+        <item>Small</item>
+        <item>Medium</item>
+        <item>Large</item>
     </string-array>
 
     <string-array name="select_scale">

@@ -67,6 +67,30 @@ public class Prefers {
         put("home", home);
     }
 
+    public static int getRender() {
+        return getInt("render", 0);
+    }
+
+    public static void putRender(int render) {
+        put("render", render);
+    }
+
+    public static int getQuality() {
+        return getInt("quality", 1);
+    }
+
+    public static void putQuality(int quality) {
+        put("quality", quality);
+    }
+
+    public static int getSize() {
+        return getInt("size", 2);
+    }
+
+    public static void putSize(int size) {
+        put("size", size);
+    }
+
     public static String getParse() {
         return getString("parse");
     }
@@ -91,22 +115,6 @@ public class Prefers {
         put("scale", scale);
     }
 
-    public static int getThumbnail() {
-        return getInt("thumbnail", 1);
-    }
-
-    public static void putThumbnail(int thumbnail) {
-        put("thumbnail", thumbnail);
-    }
-
-    public static int getRender() {
-        return getInt("render", 0);
-    }
-
-    public static void putRender(int render) {
-        put("render", render);
-    }
-
     public static int getInterval() {
         return getInt("interval", 15);
     }
@@ -124,6 +132,6 @@ public class Prefers {
     }
 
     public static int getColumn() {
-        return getInt("column", 6);
+        return Math.abs(getSize() - 7);
     }
 }

@@ -54,9 +54,10 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
     protected void initView() {
         mBinding.url.setText(Prefers.getUrl());
         mBinding.home.setText(ApiConfig.getHomeName());
-        mBinding.type.setText(ResUtil.getStringArray(R.array.select_render)[Prefers.getRender()]);
-        mBinding.compress.setText(ResUtil.getStringArray(R.array.select_thumbnail)[Prefers.getThumbnail()]);
-        mBinding.versionName.setText(BuildConfig.VERSION_NAME);
+        mBinding.sizeText.setText(ResUtil.getStringArray(R.array.select_size)[Prefers.getSize()]);
+        mBinding.renderText.setText(ResUtil.getStringArray(R.array.select_render)[Prefers.getRender()]);
+        mBinding.qualityText.setText(ResUtil.getStringArray(R.array.select_quality)[Prefers.getQuality()]);
+        mBinding.versionText.setText(BuildConfig.VERSION_NAME);
     }
 
     @Override
@@ -64,9 +65,10 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.site.setOnClickListener(view -> SiteDialog.show(this));
         mBinding.config.setOnClickListener(view -> ConfigDialog.show(this));
         mBinding.history.setOnClickListener(view -> HistoryDialog.show(this));
-        mBinding.version.setOnClickListener(view-> Updater.create(this).force().start());
-        mBinding.thumbnail.setOnClickListener(this::setThumbnail);
+        mBinding.version.setOnClickListener(view -> Updater.create(this).force().start());
+        mBinding.quality.setOnClickListener(this::setQuality);
         mBinding.render.setOnClickListener(this::setRender);
+        mBinding.size.setOnClickListener(this::setSize);
     }
 
     @Override
@@ -126,20 +128,26 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         Notify.dismiss();
     }
 
-    public void setThumbnail(View view) {
-        CharSequence[] array = ResUtil.getStringArray(R.array.select_thumbnail);
-        int index = Prefers.getThumbnail();
-        index = index == 2 ? 0 : ++index;
-        Prefers.putThumbnail(index);
-        mBinding.compress.setText(array[index]);
+    public void setQuality(View view) {
+        CharSequence[] array = ResUtil.getStringArray(R.array.select_quality);
+        int index = Prefers.getQuality();
+        Prefers.putQuality(index = index == array.length - 1 ? 0 : ++index);
+        mBinding.qualityText.setText(array[index]);
         RefreshEvent.image();
     }
 
     public void setRender(View view) {
         CharSequence[] array = ResUtil.getStringArray(R.array.select_render);
         int index = Prefers.getRender();
-        index = index == 1 ? 0 : ++index;
-        Prefers.putRender(index);
-        mBinding.type.setText(array[index]);
+        Prefers.putRender(index = index == array.length - 1 ? 0 : ++index);
+        mBinding.renderText.setText(array[index]);
+    }
+
+    public void setSize(View view) {
+        CharSequence[] array = ResUtil.getStringArray(R.array.select_size);
+        int index = Prefers.getSize();
+        Prefers.putSize(index = index == array.length - 1 ? 0 : ++index);
+        mBinding.sizeText.setText(array[index]);
+        RefreshEvent.size();
     }
 }

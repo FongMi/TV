@@ -42,8 +42,9 @@
     <!-- Setting -->
     <string name="setting_site">首页</string>
     <string name="setting_url">配置</string>
-    <string name="setting_render">渲染</string>
-    <string name="setting_thumbnail">缩图</string>
+    <string name="setting_render">渲染方式</string>
+    <string name="setting_quality">图片品質</string>
+    <string name="setting_size">图片尺寸</string>
     <string name="setting_version">版本</string>
 
     <!-- Dialog -->
@@ -76,10 +77,16 @@
     <!-- UNIT -->
     <string name="second"><xliff:g name="name">%s</xliff:g> 秒</string>
 
-    <string-array name="select_thumbnail">
-        <item>低质量</item>
-        <item>中质量</item>
-        <item>高质量</item>
+    <string-array name="select_quality">
+        <item>低</item>
+        <item>中</item>
+        <item>高</item>
+    </string-array>
+
+    <string-array name="select_size">
+        <item>小</item>
+        <item>中</item>
+        <item>大</item>
     </string-array>
 
     <string-array name="select_scale">
