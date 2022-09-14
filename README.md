@@ -15,5 +15,35 @@ https://github.com/CatVodTVOfficial/CatVodTVJarLoader
     /spider.jar
     ./spider.jar
     
+### Local Example
+```json
+{
+   "spider":"spider.jar",
+   "sites":[
+      {
+         "key":"one",
+         "name":"One",
+         "type":3,
+         "api":"csp_Csp",
+         "searchable":1,
+         "quickSearch":1,
+         "filterable":1,
+         "ext":"file://one.json"
+      },
+      {
+         "key":"two",
+         "name":"Two",
+         "type":3,
+         "api":"csp_XPath",
+         "searchable":1,
+         "quickSearch":1,
+         "filterable":1,
+         "ext":"two.json"
+      }
+   ]
+}
+```
+
+
 ### How to build
 Use dev branch
