@@ -156,16 +156,6 @@ public class Players implements Player.Listener, ParseTask.Callback {
         if (webView != null) webView.stop(false);
     }
 
-    public void release() {
-        if (exoPlayer != null) {
-            exoPlayer.removeListener(this);
-            exoPlayer.release();
-        }
-        if (webView != null) {
-            webView.destroy();
-        }
-    }
-
     @Override
     public void onParseSuccess(Map<String, String> headers, String url, String from) {
         if (from.length() > 0) Notify.show(ResUtil.getString(R.string.parse_from, from));
