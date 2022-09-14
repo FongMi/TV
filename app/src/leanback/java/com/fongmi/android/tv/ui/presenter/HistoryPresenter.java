@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.leanback.widget.Presenter;
 
+import com.bumptech.glide.Glide;
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.History;
@@ -82,6 +84,8 @@ public class HistoryPresenter extends Presenter {
 
     @Override
     public void onUnbindViewHolder(Presenter.ViewHolder viewHolder) {
+        ViewHolder holder = (ViewHolder) viewHolder;
+        Glide.with(App.get()).clear(holder.binding.image);
     }
 
     public static class ViewHolder extends Presenter.ViewHolder {

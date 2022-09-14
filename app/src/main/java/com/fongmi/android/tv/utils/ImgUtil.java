@@ -20,28 +20,25 @@ import com.fongmi.android.tv.R;
 public class ImgUtil {
 
     public static void load(String url, ImageView view) {
-        Glide.with(App.get()).load(url).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).into(view);
+        Glide.with(App.get()).load(url).centerCrop().error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).into(view);
     }
 
     public static void load(String vodName, String vodPic, ImageView view) {
         float quality = 0.3f * Prefers.getQuality() + 0.4f;
-        view.setScaleType(ImageView.ScaleType.CENTER);
         if (TextUtils.isEmpty(vodPic)) onLoadFailed(vodName, view);
-        else Glide.with(App.get()).asBitmap().load(vodPic).skipMemoryCache(true).sizeMultiplier(quality).signature(new ObjectKey(vodPic + "_" + Prefers.getQuality())).placeholder(R.drawable.ic_img_loading).listener(getListener(vodName, view)).into(view);
+        else Glide.with(App.get()).asBitmap().load(vodPic).centerCrop().sizeMultiplier(quality).signature(new ObjectKey(vodPic + "_" + Prefers.getQuality())).placeholder(R.drawable.ic_img_loading).listener(getListener(vodName, view)).into(view);
     }
 
     private static RequestListener<Bitmap> getListener(String vodName, ImageView view) {
         return new RequestListener<>() {
             @Override
             public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
-                view.setScaleType(ImageView.ScaleType.CENTER);
                 ImgUtil.onLoadFailed(vodName, view);
                 return true;
             }
 
             @Override
             public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
-                view.setScaleType(ImageView.ScaleType.CENTER_CROP);
                 return false;
             }
         };
@@ -50,6 +47,6 @@ public class ImgUtil {
     private static void onLoadFailed(String vodName, ImageView view) {
         String text = vodName.isEmpty() ? "" : vodName.substring(0, 1);
         if (text.isEmpty()) view.setImageResource(R.drawable.ic_img_error);
-        else view.setImageDrawable(TextDrawable.builder().beginConfig().width(view.getWidth()).height(view.getHeight()).endConfig().buildRect(text, ColorGenerator.MATERIAL.getColor(text)));
+        else view.setImageDrawable(TextDrawable.builder().beginConfig().width(ResUtil.dp2px(150)).height(ResUtil.dp2px(200)).endConfig().buildRect(text, ColorGenerator.MATERIAL.getColor(text)));
     }
 }
