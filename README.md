@@ -7,15 +7,12 @@ https://github.com/CatVodTVOfficial/CatVodTVJarLoader
 [TV](https://github.com/FongMi/TV/blob/main/release/leanback.apk?raw=true "leanback.apk")  
 [Mobile](https://github.com/FongMi/TV/ "mobile.apk")  ...incoming
 
-### Local Format
+### How to build
+Use dev branch
+
+### Local Example
     file://cat.json
 
-### Relative Path
-    spider.jar
-    /spider.jar
-    ./spider.jar
-    
-### Local Example
 ```json
 {
    "spider":"spider.jar",
@@ -43,7 +40,3 @@ https://github.com/CatVodTVOfficial/CatVodTVJarLoader
    ]
 }
 ```
-
-
-### How to build
-Use dev branch
