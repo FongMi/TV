@@ -227,9 +227,10 @@ public class Vod {
 
         public void createEpisode(String data) {
             String[] urls = data.contains("#") ? data.split("#") : new String[]{data};
+            String play = ResUtil.getString(R.string.play);
             for (String url : urls) {
                 String[] split = url.split("\\$");
-                Episode episode = split.length >= 2 ? new Vod.Flag.Episode(split[0], split[1]) : new Vod.Flag.Episode(ResUtil.getString(R.string.play), url);
+                Episode episode = split.length >= 2 ? new Vod.Flag.Episode(split[0].isEmpty() ? play : split[0], split[1]) : new Vod.Flag.Episode(play, url);
                 if (!getEpisodes().contains(episode)) getEpisodes().add(episode);
             }
         }
