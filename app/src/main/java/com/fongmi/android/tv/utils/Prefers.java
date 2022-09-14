@@ -122,4 +122,8 @@ public class Prefers {
     public static void putUpdate(boolean update) {
         put("update", update);
     }
+
+    public static int getColumn() {
+        return getInt("column", 6);
+    }
 }
