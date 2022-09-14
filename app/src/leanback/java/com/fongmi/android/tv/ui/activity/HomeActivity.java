@@ -40,6 +40,7 @@ import com.fongmi.android.tv.ui.presenter.ProgressPresenter;
 import com.fongmi.android.tv.ui.presenter.VodPresenter;
 import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.Notify;
+import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Updater;
 import com.google.common.collect.Lists;
@@ -141,7 +142,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     }
 
     private void addVideo(Result result) {
-        for (List<Vod> items : Lists.partition(result.getList(), 5)) {
+        for (List<Vod> items : Lists.partition(result.getList(), Prefers.getColumn())) {
             ArrayObjectAdapter adapter = new ArrayObjectAdapter(new VodPresenter(this));
             adapter.setItems(items, null);
             mAdapter.add(new ListRow(adapter));
