@@ -24,10 +24,10 @@ public class ImgUtil {
     }
 
     public static void load(String vodName, String vodPic, ImageView view) {
-        float thumbnail = 0.3f * Prefers.getThumbnail() + 0.4f;
+        float quality = 0.3f * Prefers.getQuality() + 0.4f;
         view.setScaleType(ImageView.ScaleType.CENTER);
         if (TextUtils.isEmpty(vodPic)) onLoadFailed(vodName, view);
-        else Glide.with(App.get()).asBitmap().load(vodPic).skipMemoryCache(true).sizeMultiplier(thumbnail).signature(new ObjectKey(vodPic + "_" + Prefers.getThumbnail())).placeholder(R.drawable.ic_img_loading).listener(getListener(vodName, view)).into(view);
+        else Glide.with(App.get()).asBitmap().load(vodPic).skipMemoryCache(true).sizeMultiplier(quality).signature(new ObjectKey(vodPic + "_" + Prefers.getQuality())).placeholder(R.drawable.ic_img_loading).listener(getListener(vodName, view)).into(view);
     }
 
     private static RequestListener<Bitmap> getListener(String vodName, ImageView view) {

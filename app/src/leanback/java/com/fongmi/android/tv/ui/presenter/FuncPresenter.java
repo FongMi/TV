@@ -11,14 +11,14 @@ import com.fongmi.android.tv.databinding.AdapterFuncBinding;
 
 public class FuncPresenter extends Presenter {
 
-    private OnClickListener mListener;
+    private final OnClickListener mListener;
+
+    public FuncPresenter(OnClickListener listener) {
+        this.mListener = listener;
+    }
 
     public interface OnClickListener {
         void onItemClick(Func item);
-    }
-
-    public void setOnClickListener(OnClickListener listener) {
-        this.mListener = listener;
     }
 
     @Override
