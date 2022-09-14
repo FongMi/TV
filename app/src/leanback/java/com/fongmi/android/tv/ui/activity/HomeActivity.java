@@ -105,8 +105,8 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         selector.addPresenter(ListRow.class, new CustomRowPresenter(16), VodPresenter.class);
         selector.addPresenter(ListRow.class, new CustomRowPresenter(16), FuncPresenter.class);
         selector.addPresenter(ListRow.class, new CustomRowPresenter(16), HistoryPresenter.class);
-        mBinding.recycler.setVerticalSpacing(ResUtil.dp2px(16));
         mBinding.recycler.setAdapter(new ItemBridgeAdapter(mAdapter = new ArrayObjectAdapter(selector)));
+        mBinding.recycler.setVerticalSpacing(ResUtil.dp2px(16));
     }
 
     private void setViewModel() {
@@ -309,7 +309,6 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     protected void onDestroy() {
         super.onDestroy();
         Server.get().stop();
-        Players.get().release();
         EventBus.getDefault().unregister(this);
     }
 }
