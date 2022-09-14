@@ -17,11 +17,12 @@ import com.fongmi.android.tv.utils.ResUtil;
 
 public class HistoryPresenter extends Presenter {
 
-    private OnClickListener mListener;
+    private final OnClickListener mListener;
     private int width, height;
     private boolean delete;
 
-    public HistoryPresenter() {
+    public HistoryPresenter(OnClickListener listener) {
+        this.mListener = listener;
         setLayoutSize();
     }
 
@@ -32,10 +33,6 @@ public class HistoryPresenter extends Presenter {
         void onItemDelete(History item);
 
         boolean onLongClick();
-    }
-
-    public void setOnClickListener(OnClickListener listener) {
-        this.mListener = listener;
     }
 
     public boolean isDelete() {
