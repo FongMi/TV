@@ -41,6 +41,8 @@ Use dev branch
 }
 ```
 ### Subtitle Format
+In playerContent put "sub"
+
 #### Single
     title#MIME#url
 #### Multiple
