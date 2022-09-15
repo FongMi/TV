@@ -42,7 +42,7 @@ public class ExoUtil {
     }
 
     public static MediaSource getSource(Map<String, String> headers, String url) {
-        return getSource(headers, url, null);
+        return getSource(headers, url, Collections.emptyList());
     }
 
     private static MediaSource getSource(Map<String, String> headers, String url, List<MediaItem.SubtitleConfiguration> config) {
