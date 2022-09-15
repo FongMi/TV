@@ -6,13 +6,10 @@ import android.net.Uri;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.bean.Result;
 import com.github.catvod.crawler.SpiderDebug;
-import com.google.android.exoplayer2.DefaultRenderersFactory;
-import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.ext.rtmp.RtmpDataSource;
 import com.google.android.exoplayer2.source.DefaultMediaSourceFactory;
 import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.ui.CaptionStyleCompat;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSource;
@@ -26,12 +23,6 @@ import java.util.List;
 import java.util.Map;
 
 public class ExoUtil {
-
-    static ExoPlayer create() {
-        DefaultRenderersFactory renderersFactory = new DefaultRenderersFactory(App.get());
-        renderersFactory.setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER);
-        return new ExoPlayer.Builder(App.get()).setRenderersFactory(renderersFactory).setTrackSelector(new DefaultTrackSelector(App.get())).build();
-    }
 
     public static CaptionStyleCompat getCaptionStyle() {
         return new CaptionStyleCompat(Color.WHITE, Color.TRANSPARENT, Color.TRANSPARENT, CaptionStyleCompat.EDGE_TYPE_OUTLINE, Color.BLACK, null);
