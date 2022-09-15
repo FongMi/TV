@@ -13,14 +13,14 @@ public abstract class HistoryDao extends BaseDao<History> {
     @Query("SELECT * FROM history WHERE cid = :cid ORDER BY createTime DESC")
     public abstract List<History> find(int cid);
 
-    @Query("SELECT * FROM history WHERE `key` = :key")
-    public abstract History find(String key);
+    @Query("SELECT * FROM history WHERE cid = :cid AND `key` = :key")
+    public abstract History find(int cid, String key);
 
-    @Query("SELECT * FROM history WHERE vodName = :vodName")
-    public abstract History findByName(String vodName);
+    @Query("SELECT * FROM history WHERE cid = :cid AND vodName = :vodName")
+    public abstract History findByName(int cid, String vodName);
 
-    @Query("DELETE FROM history WHERE `key` = :key")
-    public abstract void delete(String key);
+    @Query("DELETE FROM history WHERE cid = :cid AND `key` = :key")
+    public abstract void delete(int cid, String key);
 
     @Query("DELETE FROM history WHERE cid = :cid")
     public abstract void delete(int cid);
