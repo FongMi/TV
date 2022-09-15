@@ -25,7 +25,6 @@ public class Players implements Player.Listener, ParseTask.Callback {
     private Formatter formatter;
     private ExoPlayer exoPlayer;
     private ParseTask parseTask;
-    private String key;
     private int retry;
 
     private static class Loader {
@@ -52,14 +51,6 @@ public class Players implements Player.Listener, ParseTask.Callback {
         return webView;
     }
 
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
     public int getRetry() {
         return retry;
     }
@@ -79,8 +70,7 @@ public class Players implements Player.Listener, ParseTask.Callback {
 
     public void addSpeed() {
         float speed = exo().getPlaybackParameters().speed;
-        float addon = speed >= 2 ? 1f : 0.25f;
-        speed = speed >= 5 ? 0.5f : speed + addon;
+        speed = speed == 2 ? 0.25f : speed + 0.25f;
         exo().setPlaybackSpeed(speed);
     }
 
@@ -100,27 +90,27 @@ public class Players implements Player.Listener, ParseTask.Callback {
     }
 
     public long getCurrentPosition() {
-        return exo().getCurrentPosition();
+        return exo() == null ? 0 : exo().getCurrentPosition();
     }
 
     public long getDuration() {
-        return exo().getDuration();
+        return exo() == null ? 0 : exo().getDuration();
     }
 
     public void seekTo(int time) {
-        exo().seekTo(getCurrentPosition() + time);
+        if (exo() != null) exo().seekTo(getCurrentPosition() + time);
     }
 
     public void seekTo(long time) {
-        exo().seekTo(time);
+        if (exo() != null) exo().seekTo(time);
     }
 
     public boolean isPlaying() {
-        return exo().isPlaying();
+        return exo() != null && exo().isPlaying();
     }
 
     public boolean isIdle() {
-        return exo().getPlaybackState() == Player.STATE_IDLE;
+        return exo() != null && exo().getPlaybackState() == Player.STATE_IDLE;
     }
 
     public boolean canNext() {
@@ -142,18 +132,20 @@ public class Players implements Player.Listener, ParseTask.Callback {
         exo().setMediaSource(ExoUtil.getSource(result));
         PlayerEvent.state(0);
         exo().prepare();
-        exo().play();
     }
 
     private void setMediaSource(Map<String, String> headers, String url) {
         exo().setMediaSource(ExoUtil.getSource(headers, url));
         PlayerEvent.state(0);
         exo().prepare();
-        exo().play();
+    }
+
+    public void play() {
+        if (exo() != null) exo().play();
     }
 
     public void pause() {
-        exo().pause();
+        if (exo() != null) exo().pause();
     }
 
     public void stop() {
@@ -162,22 +154,6 @@ public class Players implements Player.Listener, ParseTask.Callback {
         exo().clearMediaItems();
         exo().setPlaybackSpeed(1.0f);
         if (webView != null) webView.stop(false);
-    }
-
-    public void play() {
-        exo().play();
-    }
-
-    public void release() {
-        if (exoPlayer != null) {
-            exoPlayer.removeListener(this);
-            exoPlayer.release();
-            exoPlayer = null;
-        }
-        if (webView != null) {
-            webView.destroy();
-            webView = null;
-        }
     }
 
     @Override
