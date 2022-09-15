@@ -5,6 +5,7 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.db.AppDatabase;
 
 import java.util.List;
@@ -160,12 +161,12 @@ public class History {
         return isRevPlay() ? R.string.play_backward_hint : R.string.play_forward_hint;
     }
 
-    public static History find(String key) {
-        return AppDatabase.get().getHistoryDao().find(key);
+    public static List<History> get() {
+        return AppDatabase.get().getHistoryDao().find(ApiConfig.getCid());
     }
 
-    public static List<History> find(int cid) {
-        return AppDatabase.get().getHistoryDao().find(cid);
+    public static History find(String key) {
+        return AppDatabase.get().getHistoryDao().find(ApiConfig.getCid(), key);
     }
 
     public static void delete(int id) {
@@ -173,8 +174,8 @@ public class History {
     }
 
     public void checkDuplicate() {
-        History history = AppDatabase.get().getHistoryDao().findByName(getVodName());
-        if (history != null) AppDatabase.get().getHistoryDao().delete(history.getKey());
+        History history = AppDatabase.get().getHistoryDao().findByName(ApiConfig.getCid(), getVodName());
+        if (history != null) AppDatabase.get().getHistoryDao().delete(ApiConfig.getCid(), history.getKey());
     }
 
     public History update(long duration) {
@@ -185,7 +186,7 @@ public class History {
     }
 
     public History delete() {
-        AppDatabase.get().getHistoryDao().delete(getKey());
+        AppDatabase.get().getHistoryDao().delete(ApiConfig.getCid(), getKey());
         return this;
     }
 }

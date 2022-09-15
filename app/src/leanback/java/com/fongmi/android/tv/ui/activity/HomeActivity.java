@@ -163,10 +163,10 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     }
 
     private void getHistory(boolean renew) {
+        List<History> items = History.get();
         int historyIndex = getHistoryIndex();
         int recommendIndex = getRecommendIndex();
         boolean exist = recommendIndex - historyIndex == 2;
-        List<History> items = History.find(ApiConfig.getCid());
         if (renew) mHistoryAdapter = new ArrayObjectAdapter(mHistoryPresenter = new HistoryPresenter(this));
         if ((items.isEmpty() && exist) || (renew && exist)) mAdapter.removeItems(historyIndex, 1);
         if ((items.size() > 0 && !exist) || (renew && exist)) mAdapter.add(historyIndex, new ListRow(mHistoryAdapter));
