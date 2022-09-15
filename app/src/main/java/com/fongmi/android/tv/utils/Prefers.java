@@ -91,6 +91,14 @@ public class Prefers {
         put("size", size);
     }
 
+    public static boolean isFFmpeg() {
+        return getBoolean("ffmpeg");
+    }
+
+    public static void putFFmpeg(boolean ffmpeg) {
+        put("ffmpeg", ffmpeg);
+    }
+
     public static String getParse() {
         return getString("parse");
     }

@@ -90,16 +90,15 @@ public class VodActivity extends BaseActivity {
         mBinding.recycler.setAdapter(new ItemBridgeAdapter(mAdapter = new ArrayObjectAdapter(new TypePresenter(this::updateFilter))));
     }
 
-    private List<Class> getNewTypes() {
+    private List<Class> getTypes() {
         List<Class> types = new ArrayList<>();
         for (String cate : ApiConfig.get().getHome().getCategories()) for (Class type : mResult.getTypes()) if (cate.equals(type.getTypeName())) types.add(type);
         return types;
     }
 
     private void setTypes() {
-        List<Class> newTypes = getNewTypes();
-        if (newTypes.size() > 0) mResult.setTypes(newTypes);
-        Boolean filter = ApiConfig.get().getHome().isFilterable() ? true : null;
+        mResult.setTypes(getTypes());
+        Boolean filter = ApiConfig.get().getHome().isFilterable() ? false : null;
         for (Class item : mResult.getTypes()) if (mResult.getFilters().containsKey(item.getTypeId())) item.setFilter(filter);
         mAdapter.setItems(mResult.getTypes(), null);
     }
