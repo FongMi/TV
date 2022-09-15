@@ -18,6 +18,7 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -160,9 +161,9 @@ public class SiteViewModel extends ViewModel {
                 SpiderDebug.log(searchContent);
                 post(site, Result.fromJson(searchContent));
             } else {
-                HashMap<String, String> params = new HashMap<>();
-                if (site.getType() != 0) params.put("ac", "detail");
+                LinkedHashMap<String, String> params = new LinkedHashMap<>();
                 params.put("wd", keyword);
+                if (site.getType() != 0) params.put("ac", "detail");
                 String body = OKHttp.newCall(site.getApi(), params).execute().body().string();
                 SpiderDebug.log(site.getName() + "," + body);
                 if (site.getType() == 0) post(site, Result.fromXml(body));
