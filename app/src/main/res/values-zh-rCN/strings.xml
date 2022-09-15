@@ -46,7 +46,10 @@
     <string name="setting_scale">缩放比例</string>
     <string name="setting_quality">图片品質</string>
     <string name="setting_size">图片尺寸</string>
+    <string name="setting_ffmpeg">FFmpeg</string>
     <string name="setting_version">版本</string>
+    <string name="setting_on">开启</string>
+    <string name="setting_off">关闭</string>
 
     <!-- Dialog -->
     <string name="dialog_positive">确定</string>
