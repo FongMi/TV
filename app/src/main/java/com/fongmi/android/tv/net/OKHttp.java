@@ -1,5 +1,7 @@
 package com.fongmi.android.tv.net;
 
+import android.content.ContentValues;
+
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -42,13 +44,13 @@ public class OKHttp {
         return get().client().newCall(new Request.Builder().url(url).headers(headers).build());
     }
 
-    public static Call newCall(String url, Map<String, String> params) {
-        return get().client().newCall(new Request.Builder().url(buildUrl(url, params)).build());
+    public static Call newCall(String url, ContentValues param) {
+        return get().client().newCall(new Request.Builder().url(buildUrl(url, param)).build());
     }
 
-    private static HttpUrl buildUrl(String url, Map<String, String> params) {
+    private static HttpUrl buildUrl(String url, ContentValues param) {
         HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(url)).newBuilder();
-        for (Map.Entry<String, String> entry : params.entrySet()) builder.addQueryParameter(entry.getKey(), entry.getValue());
+        for (Map.Entry<String, Object> entry : param.valueSet()) builder.addQueryParameter(entry.getKey(), entry.getValue().toString());
         return builder.build();
     }
 }
