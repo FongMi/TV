@@ -10,7 +10,7 @@ https://github.com/CatVodTVOfficial/CatVodTVJarLoader
 ### How to build
 Use dev branch
 
-### Local Example
+### Config Example
     file://cat.json
 
 ```json
@@ -40,3 +40,10 @@ Use dev branch
    ]
 }
 ```
+### Subtitle Format
+#### Single
+    title#MIME#url
+#### Multiple
+    title#MIME#url$$$title#MIME#url
+#### Example
+    Avatar#application/x-subrip#https://github.com/FongMi/TV/subtitle.srt
