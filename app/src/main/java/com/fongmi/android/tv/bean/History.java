@@ -172,13 +172,15 @@ public class History {
         AppDatabase.get().getHistoryDao().delete(id);
     }
 
-    public History save() {
-        AppDatabase.get().getHistoryDao().insertOrUpdate(this);
-        return this;
+    public void checkDuplicate() {
+        History history = AppDatabase.get().getHistoryDao().findByName(getVodName());
+        if (history != null) AppDatabase.get().getHistoryDao().delete(history.getKey());
     }
 
-    public History update() {
-        AppDatabase.get().getHistoryDao().update(this);
+    public History update(long duration) {
+        checkDuplicate();
+        setDuration(duration);
+        AppDatabase.get().getHistoryDao().insertOrUpdate(this);
         return this;
     }
 

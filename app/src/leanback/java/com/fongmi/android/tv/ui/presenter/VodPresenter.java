@@ -6,9 +6,12 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.leanback.widget.Presenter;
 
+import com.bumptech.glide.Glide;
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.AdapterVodBinding;
 import com.fongmi.android.tv.utils.ImgUtil;
+import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 
 public class VodPresenter extends Presenter {
@@ -29,9 +32,9 @@ public class VodPresenter extends Presenter {
     }
 
     private void setLayoutSize() {
-        int space = ResUtil.dp2px(112);
+        int space = ResUtil.dp2px(48) + ResUtil.dp2px(16 * (Prefers.getColumn() - 1));
         int base = ResUtil.getScreenWidthPx() - space;
-        width = base / 5;
+        width = base / Prefers.getColumn();
         height = (int) (width / 0.75f);
     }
 
@@ -61,6 +64,8 @@ public class VodPresenter extends Presenter {
 
     @Override
     public void onUnbindViewHolder(Presenter.ViewHolder viewHolder) {
+        ViewHolder holder = (ViewHolder) viewHolder;
+        Glide.with(App.get()).clear(holder.binding.image);
     }
 
     public static class ViewHolder extends Presenter.ViewHolder {

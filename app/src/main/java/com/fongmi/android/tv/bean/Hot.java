@@ -10,7 +10,7 @@ import java.util.List;
 public class Hot {
 
     @SerializedName("data")
-    private Data data;
+    private List<Data> data;
 
     private static Hot objectFrom(String str) {
         return new Gson().fromJson(str, Hot.class);
@@ -19,34 +19,24 @@ public class Hot {
     public static List<String> get(String str) {
         try {
             List<String> items = new ArrayList<>();
-            for (Data.Item item : objectFrom(str).getData().getItemList()) items.add(item.getTitle());
+            for (Data item : objectFrom(str).getData()) items.add(item.getTitle());
             return items;
         } catch (Exception e) {
             return Collections.emptyList();
         }
     }
 
-    private Data getData() {
+    public List<Data> getData() {
         return data;
     }
 
-    static class Data {
+    public static class Data {
 
-        @SerializedName("itemList")
-        private List<Item> itemList;
+        @SerializedName("title")
+        private String title;
 
-        public List<Item> getItemList() {
-            return itemList;
-        }
-
-        static class Item {
-
-            @SerializedName("title")
-            private String title;
-
-            public String getTitle() {
-                return title;
-            }
+        public String getTitle() {
+            return title;
         }
     }
 }

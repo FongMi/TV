@@ -1,7 +1,6 @@
 {
-  "version": 25,
-  "code": 25,
-  "name": "1.2.5",
+  "code": 26,
+  "name": "1.2.6",
   "url": "https://github.com/FongMi/TV/blob/main/release/leanback.apk?raw=true",
-  "desc": "1. 修正熱搜問題導致閃退"
+  "desc": "1. 調整熱搜API\n2. 播放介面新增時間顯示\n3. 合併歷史紀錄 (同樣劇名只記錄最新)\n4. 修正退出閃退問題\n5. 新增圖片尺寸設定\n6. 適配螢幕尺寸"
 }
