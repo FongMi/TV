@@ -70,7 +70,8 @@ public class Players implements Player.Listener, ParseTask.Callback {
 
     public void addSpeed() {
         float speed = exo().getPlaybackParameters().speed;
-        speed = speed == 2 ? 0.25f : speed + 0.25f;
+        float addon = speed >= 2 ? 1f : 0.25f;
+        speed = speed == 5 ? 0.25f : speed + addon;
         exo().setPlaybackSpeed(speed);
     }
 
