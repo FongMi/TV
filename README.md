@@ -47,3 +47,8 @@ Use dev branch
     title#MIME#url$$$title#MIME#url
 #### Example
     Avatar#application/x-subrip#https://github.com/FongMi/TV/subtitle.srt
+    
+### MIME Type
+    .srt = application/x-subrip
+    .vtt = text/vtt
+    .ass = text/x-ssa
