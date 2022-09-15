@@ -60,7 +60,6 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation 'androidx.room:room-runtime:2.4.3'
     implementation 'cat.ereza:customactivityoncrash:2.4.0'
-    implementation 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
     implementation 'com.github.bassaer:materialdesigncolors:1.0.0'
     implementation 'com.github.bumptech.glide:glide:4.13.2'
     implementation 'com.google.android.material:material:1.6.1'

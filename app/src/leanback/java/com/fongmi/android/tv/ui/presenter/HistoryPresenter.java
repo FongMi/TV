@@ -13,7 +13,6 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.databinding.AdapterVodBinding;
-import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 
@@ -64,14 +63,14 @@ public class HistoryPresenter extends Presenter {
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object object) {
         History item = (History) object;
         ViewHolder holder = (ViewHolder) viewHolder;
+        setClickListener(holder.view, item);
         holder.binding.name.setText(item.getVodName());
         holder.binding.site.setText(ApiConfig.getSiteName(item.getSiteKey()));
         holder.binding.remark.setText(ResUtil.getString(R.string.vod_last, item.getVodRemarks()));
         holder.binding.site.setVisibility(delete ? View.GONE : View.VISIBLE);
         holder.binding.remark.setVisibility(delete ? View.GONE : View.VISIBLE);
         holder.binding.delete.setVisibility(!delete ? View.GONE : View.VISIBLE);
-        ImgUtil.load(item.getVodPic(), holder.binding.image);
-        setClickListener(holder.view, item);
+        Glide.with(App.get()).load(item.getVodPic()).centerCrop().error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).into(holder.binding.image);
     }
 
     private void setClickListener(View root, History item) {
