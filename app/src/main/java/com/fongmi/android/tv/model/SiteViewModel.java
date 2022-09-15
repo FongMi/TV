@@ -161,7 +161,7 @@ public class SiteViewModel extends ViewModel {
                 post(site, Result.fromJson(searchContent));
             } else {
                 HashMap<String, String> params = new HashMap<>();
-                if (site.getType() == 1) params.put("ac", "detail");
+                if (site.getType() != 0) params.put("ac", "detail");
                 params.put("wd", keyword);
                 String body = OKHttp.newCall(site.getApi(), params).execute().body().string();
                 SpiderDebug.log(site.getName() + "," + body);
