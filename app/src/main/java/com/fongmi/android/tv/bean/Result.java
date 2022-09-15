@@ -58,7 +58,7 @@ public class Result {
     private String flag;
     @SerializedName("url")
     private String url;
-    @SerializedName("subt")
+    @SerializedName("sub")
     private String sub;
 
     public static Result fromJson(String str) {
