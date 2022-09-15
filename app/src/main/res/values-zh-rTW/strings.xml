@@ -43,6 +43,7 @@
     <string name="setting_site">首頁</string>
     <string name="setting_url">配置</string>
     <string name="setting_render">渲染方式</string>
+    <string name="setting_scale">縮放比例</string>
     <string name="setting_quality">圖片品質</string>
     <string name="setting_size">圖片尺寸</string>
     <string name="setting_version">版本</string>
@@ -91,10 +92,10 @@
 
     <string-array name="select_scale">
         <item>預設</item>
-        <item>寬度</item>
-        <item>高度</item>
+        <item>16:9</item>
+        <item>4:3</item>
         <item>填充</item>
-        <item>縮放</item>
+        <item>裁剪</item>
     </string-array>
 
 </resources>

@@ -372,7 +372,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
 
     private void onScale() {
         int scale = getPlayerView().getResizeMode();
-        getPlayerView().setResizeMode(scale = scale >= 4 ? 0 : scale + 1);
+        getPlayerView().setResizeMode(scale = scale == 4 ? 0 : scale + 1);
         mControl.scale.setText(ResUtil.getStringArray(R.array.select_scale)[scale]);
         Prefers.putScale(scale);
     }
