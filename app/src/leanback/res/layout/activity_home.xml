@@ -30,7 +30,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:letterSpacing="0.02"
             android:textColor="@color/white"
             android:textSize="24sp"
             tools:text="07/25 09:20:00" />

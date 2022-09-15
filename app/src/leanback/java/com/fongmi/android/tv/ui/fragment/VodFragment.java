@@ -25,6 +25,7 @@ import com.fongmi.android.tv.ui.custom.CustomScroller;
 import com.fongmi.android.tv.ui.custom.CustomSelector;
 import com.fongmi.android.tv.ui.presenter.FilterPresenter;
 import com.fongmi.android.tv.ui.presenter.VodPresenter;
+import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.common.collect.Lists;
 
@@ -122,6 +123,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     private void getVideo(String typeId, String page) {
         if (page.equals("1")) mLast = null;
         if (isFolder()) mTypeIds.add(typeId);
+        if (isFolder()) mBinding.recycler.moveToTop();
         boolean clear = page.equals("1") && mAdapter.size() > mFilters.size();
         if (clear) mAdapter.removeItems(mFilters.size(), mAdapter.size() - mFilters.size());
         mViewModel.categoryContent(typeId, page, true, mExtend);
@@ -129,7 +131,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
 
     private boolean checkLastSize(List<Vod> items) {
         if (mLast == null || items.size() == 0) return false;
-        int size = 5 - mLast.size();
+        int size = Prefers.getColumn() - mLast.size();
         if (size == 0) return false;
         size = Math.min(size, items.size());
         mLast.addAll(mLast.size(), new ArrayList<>(items.subList(0, size)));
@@ -140,7 +142,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     private void addVideo(List<Vod> items) {
         if (checkLastSize(items)) return;
         List<ListRow> rows = new ArrayList<>();
-        for (List<Vod> part : Lists.partition(items, 5)) {
+        for (List<Vod> part : Lists.partition(items, Prefers.getColumn())) {
             mLast = new ArrayObjectAdapter(new VodPresenter(this));
             mLast.setItems(part, null);
             rows.add(new ListRow(mLast));
@@ -181,8 +183,8 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
 
     @Override
     public void onItemClick(Vod item) {
-        if (item.getVodTag().equals("folder")) getVideo(item.getVodId(), "1");
-        else if (item.getVodId().startsWith("msearch:")) onLongClick(item);
+        if (item.shouldSearch()) onLongClick(item);
+        else if (item.getVodTag().equals("folder")) getVideo(item.getVodId(), "1");
         else DetailActivity.start(getActivity(), item.getVodId());
     }
 
