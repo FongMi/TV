@@ -1,6 +1,6 @@
 package com.fongmi.android.tv.net;
 
-import android.content.ContentValues;
+import android.util.ArrayMap;
 
 import java.util.Map;
 import java.util.Objects;
@@ -44,13 +44,13 @@ public class OKHttp {
         return get().client().newCall(new Request.Builder().url(url).headers(headers).build());
     }
 
-    public static Call newCall(String url, ContentValues param) {
-        return get().client().newCall(new Request.Builder().url(buildUrl(url, param)).build());
+    public static Call newCall(String url, ArrayMap<String, String> params) {
+        return get().client().newCall(new Request.Builder().url(buildUrl(url, params)).build());
     }
 
-    private static HttpUrl buildUrl(String url, ContentValues param) {
+    private static HttpUrl buildUrl(String url, ArrayMap<String, String> params) {
         HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(url)).newBuilder();
-        for (Map.Entry<String, Object> entry : param.valueSet()) builder.addQueryParameter(entry.getKey(), entry.getValue().toString());
+        for (Map.Entry<String, String> entry : params.entrySet()) builder.addQueryParameter(entry.getKey(), entry.getValue());
         return builder.build();
     }
 }
