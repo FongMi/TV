@@ -169,17 +169,13 @@ public class History {
         return AppDatabase.get().getHistoryDao().find(ApiConfig.getCid(), key);
     }
 
-    public static void delete(int id) {
-        AppDatabase.get().getHistoryDao().delete(id);
-    }
-
-    public void checkDuplicate() {
-        History history = AppDatabase.get().getHistoryDao().findByName(ApiConfig.getCid(), getVodName());
-        if (history != null) AppDatabase.get().getHistoryDao().delete(ApiConfig.getCid(), history.getKey());
+    public static void delete(int cid) {
+        AppDatabase.get().getHistoryDao().delete(cid);
     }
 
     public History update(long duration) {
-        checkDuplicate();
+        History history = AppDatabase.get().getHistoryDao().findByName(ApiConfig.getCid(), getVodName());
+        if (history != null) AppDatabase.get().getHistoryDao().delete(ApiConfig.getCid(), history.getKey());
         setDuration(duration);
         AppDatabase.get().getHistoryDao().insertOrUpdate(this);
         return this;
