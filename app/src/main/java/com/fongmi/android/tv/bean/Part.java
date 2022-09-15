@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Part {
@@ -14,8 +15,12 @@ public class Part {
     private String t;
 
     private static List<Part> arrayFrom(String str) {
-        Type listType = new TypeToken<ArrayList<Part>>() {}.getType();
-        return new Gson().fromJson(str, listType);
+        try {
+            Type listType = new TypeToken<ArrayList<Part>>() {}.getType();
+            return new Gson().fromJson(str, listType);
+        } catch (Exception e) {
+            return Collections.emptyList();
+        }
     }
 
     public static List<String> get(String str) {
