@@ -43,6 +43,7 @@
     <string name="setting_site">Home site</string>
     <string name="setting_url">Configuration</string>
     <string name="setting_render">Render type</string>
+    <string name="setting_scale">Scale type</string>
     <string name="setting_quality">Image quality</string>
     <string name="setting_size">Image size</string>
     <string name="setting_version">Version</string>
@@ -96,8 +97,8 @@
 
     <string-array name="select_scale">
         <item>Default</item>
-        <item>Width</item>
-        <item>Height</item>
+        <item>16:9</item>
+        <item>4:3</item>
         <item>Fill</item>
         <item>Zoom</item>
     </string-array>
