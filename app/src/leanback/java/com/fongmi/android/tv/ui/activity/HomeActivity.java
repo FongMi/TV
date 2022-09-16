@@ -27,7 +27,6 @@ import com.fongmi.android.tv.databinding.ActivityHomeBinding;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.event.ServerEvent;
 import com.fongmi.android.tv.model.SiteViewModel;
-import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.ui.custom.CustomRowPresenter;
 import com.fongmi.android.tv.ui.custom.CustomSelector;
@@ -77,7 +76,6 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         mHandler = new Handler(Looper.getMainLooper());
         Updater.create(this).start();
         Server.get().start();
-        Players.get().init();
         setRecyclerView();
         setViewModel();
         setAdapter();
