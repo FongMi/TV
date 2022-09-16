@@ -218,34 +218,6 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/ffmpeg"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/selector_item"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/setting_ffmpeg"
-            android:textColor="@color/white"
-            android:textSize="18sp" />
-
-        <TextView
-            android:id="@+id/ffmpegText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            tools:text="On" />
-
-    </LinearLayout>
-
-    <LinearLayout
         android:id="@+id/version"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
