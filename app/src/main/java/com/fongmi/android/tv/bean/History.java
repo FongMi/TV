@@ -173,9 +173,14 @@ public class History {
         AppDatabase.get().getHistoryDao().delete(cid);
     }
 
+    private void copyFrom(History history) {
+        setOpening(history.getOpening());
+        setEnding(history.getEnding());
+    }
+
     public History update(long duration) {
         History history = AppDatabase.get().getHistoryDao().findByName(ApiConfig.getCid(), getVodName());
-        if (history != null) AppDatabase.get().getHistoryDao().delete(ApiConfig.getCid(), history.getKey());
+        if (history != null) copyFrom(history.delete());
         setDuration(duration);
         AppDatabase.get().getHistoryDao().insertOrUpdate(this);
         return this;
