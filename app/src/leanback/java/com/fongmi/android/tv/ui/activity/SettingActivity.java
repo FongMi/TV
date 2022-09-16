@@ -26,7 +26,6 @@ import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.impl.ConfigCallback;
 import com.fongmi.android.tv.impl.SiteCallback;
 import com.fongmi.android.tv.net.Callback;
-import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.custom.dialog.ConfigDialog;
 import com.fongmi.android.tv.ui.custom.dialog.HistoryDialog;
 import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
@@ -46,10 +45,6 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         activity.startActivity(new Intent(activity, SettingActivity.class));
     }
 
-    private String getOption(boolean on) {
-        return getString(on ? R.string.setting_on : R.string.setting_off);
-    }
-
     @Override
     protected ViewBinding getBinding() {
         return mBinding = ActivitySettingBinding.inflate(getLayoutInflater());
@@ -59,7 +54,6 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
     protected void initView() {
         mBinding.url.setText(Prefers.getUrl());
         mBinding.home.setText(ApiConfig.getHomeName());
-        mBinding.ffmpegText.setText(getOption(Prefers.isFFmpeg()));
         mBinding.sizeText.setText(ResUtil.getStringArray(R.array.select_size)[Prefers.getSize()]);
         mBinding.scaleText.setText(ResUtil.getStringArray(R.array.select_scale)[Prefers.getScale()]);
         mBinding.renderText.setText(ResUtil.getStringArray(R.array.select_render)[Prefers.getRender()]);
@@ -75,7 +69,6 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.version.setOnClickListener(view -> Updater.create(this).force().start());
         mBinding.quality.setOnClickListener(this::setQuality);
         mBinding.render.setOnClickListener(this::setRender);
-        mBinding.ffmpeg.setOnClickListener(this::setFFmpeg);
         mBinding.scale.setOnClickListener(this::setScale);
         mBinding.size.setOnClickListener(this::setSize);
     }
@@ -165,11 +158,5 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         Prefers.putSize(index = index == array.length - 1 ? 0 : ++index);
         mBinding.sizeText.setText(array[index]);
         RefreshEvent.size();
-    }
-
-    private void setFFmpeg(View view) {
-        Prefers.putFFmpeg(!Prefers.isFFmpeg());
-        Players.get().setFFmpeg(Prefers.isFFmpeg());
-        mBinding.ffmpegText.setText(getOption(Prefers.isFFmpeg()));
     }
 }
