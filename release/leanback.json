@@ -1,6 +1,6 @@
 {
-  "code": 27,
-  "name": "1.2.7",
+  "code": 28,
+  "name": "1.2.8",
   "url": "https://github.com/FongMi/TV/blob/main/release/leanback.apk?raw=true",
-  "desc": "1. 新增圖片回收機制\n2. 新增縮放比例16:9、4:3\n3. 支援外掛多字幕\n4. 新增 FFmpeg 開關\n5. 優化分類加載\n6. 修復歷史紀錄問題"
+  "desc": "1. 自動判斷FFmpeg\n2. 修正更新視窗"
 }
