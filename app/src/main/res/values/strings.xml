@@ -46,10 +46,7 @@
     <string name="setting_scale">Scale type</string>
     <string name="setting_quality">Image quality</string>
     <string name="setting_size">Image size</string>
-    <string name="setting_ffmpeg">FFmpeg</string>
     <string name="setting_version">Version</string>
-    <string name="setting_on">ON</string>
-    <string name="setting_off">OFF</string>
 
     <!-- Dialog -->
     <string name="dialog_positive">OK</string>

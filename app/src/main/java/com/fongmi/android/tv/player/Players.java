@@ -8,7 +8,6 @@ import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.ui.custom.CustomWebView;
 import com.fongmi.android.tv.utils.Notify;
-import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -47,11 +46,10 @@ public class Players implements Player.Listener, ParseTask.Callback {
         formatter = new Formatter(builder, Locale.getDefault());
         exoPlayer = create();
         exoPlayer.addListener(this);
-        setFFmpeg(Prefers.isFFmpeg());
     }
 
     private ExoPlayer create() {
-        return new ExoPlayer.Builder(App.get()).setRenderersFactory(renderers = new DefaultRenderersFactory(App.get())).setTrackSelector(track = new DefaultTrackSelector(App.get())).build();
+        return new ExoPlayer.Builder(App.get()).setRenderersFactory(renderers = new DefaultRenderersFactory(App.get()).setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON)).setTrackSelector(track = new DefaultTrackSelector(App.get())).build();
     }
 
     public ExoPlayer exo() {
@@ -73,10 +71,6 @@ public class Players implements Player.Listener, ParseTask.Callback {
     public int addRetry() {
         ++retry;
         return retry;
-    }
-
-    public void setFFmpeg(boolean on) {
-        renderers.setExtensionRendererMode(on ? DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER : DefaultRenderersFactory.EXTENSION_RENDERER_MODE_OFF);
     }
 
     public String getSpeed() {
