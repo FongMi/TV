@@ -6,8 +6,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.leanback.widget.Presenter;
 
-import com.bumptech.glide.Glide;
-import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.AdapterVodBinding;
 import com.fongmi.android.tv.utils.ImgUtil;
@@ -64,8 +62,6 @@ public class VodPresenter extends Presenter {
 
     @Override
     public void onUnbindViewHolder(Presenter.ViewHolder viewHolder) {
-        ViewHolder holder = (ViewHolder) viewHolder;
-        Glide.with(App.get()).clear(holder.binding.image);
     }
 
     public static class ViewHolder extends Presenter.ViewHolder {
