@@ -83,8 +83,6 @@ public class HistoryPresenter extends Presenter {
 
     @Override
     public void onUnbindViewHolder(Presenter.ViewHolder viewHolder) {
-        ViewHolder holder = (ViewHolder) viewHolder;
-        Glide.with(App.get()).clear(holder.binding.image);
     }
 
     public static class ViewHolder extends Presenter.ViewHolder {
