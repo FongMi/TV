@@ -123,12 +123,13 @@ public class Players implements Player.Listener, ParseTask.Callback {
     }
 
     public void stop() {
-        this.retry = 0;
+        retry = 0;
         exoPlayer.stop();
         exoPlayer.clearMediaItems();
     }
 
     public void release() {
+        stopParse();
         exoPlayer.stop();
         exoPlayer.clearMediaItems();
         exoPlayer.removeListener(this);
@@ -140,11 +141,15 @@ public class Players implements Player.Listener, ParseTask.Callback {
         if (result.getUrl().isEmpty()) {
             PlayerEvent.error(R.string.error_play_load);
         } else if (result.getParse(1) == 1 || result.getJx() == 1) {
-            if (parseTask != null) parseTask.cancel();
+            stopParse();
             parseTask = ParseTask.create(this).run(result, useParse);
         } else {
             setMediaSource(result);
         }
+    }
+
+    private void stopParse() {
+        if (parseTask != null) parseTask.cancel();
     }
 
     private void setMediaSource(Result result) {
