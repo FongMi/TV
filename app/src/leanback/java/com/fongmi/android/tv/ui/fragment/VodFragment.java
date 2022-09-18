@@ -77,9 +77,10 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
 
     @Override
     protected void initView() {
-        mFilters = Filter.arrayFrom(getFilter());
         mTypeIds = new ArrayList<>();
         mExtend = new HashMap<>();
+        mFilters = Filter.arrayFrom(getFilter());
+        mBinding.progressLayout.showProgress();
         setRecyclerView();
         setViewModel();
         getVideo();
@@ -100,6 +101,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mViewModel.result.observe(getViewLifecycleOwner(), result -> {
             mScroller.endLoading(result.getList().isEmpty());
+            mBinding.progressLayout.showContent();
             addVideo(result.getList());
             checkPage();
         });
