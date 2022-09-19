@@ -26,6 +26,7 @@ public class History {
     private long createTime;
     private long opening;
     private long ending;
+    private long position;
     private long duration;
     private int cid;
 
@@ -121,6 +122,14 @@ public class History {
         this.ending = ending;
     }
 
+    public long getPosition() {
+        return position;
+    }
+
+    public void setPosition(long position) {
+        this.position = position;
+    }
+
     public long getDuration() {
         return duration;
     }
@@ -173,15 +182,19 @@ public class History {
         AppDatabase.get().getHistoryDao().delete(cid);
     }
 
-    private void copyFrom(History history) {
-        setOpening(history.getOpening());
-        setEnding(history.getEnding());
+    private void checkMerge(List<History> items) {
+        for (History item : items) {
+            if (Math.abs(item.getDuration() - getDuration()) > 10 * 60 * 1000) continue;
+            setOpening(item.getOpening());
+            setEnding(item.getEnding());
+            item.delete();
+        }
     }
 
-    public History update(long duration) {
-        History history = AppDatabase.get().getHistoryDao().findByName(ApiConfig.getCid(), getVodName());
-        if (history != null) copyFrom(history.delete());
+    public History update(long position, long duration) {
+        setPosition(position);
         setDuration(duration);
+        checkMerge(AppDatabase.get().getHistoryDao().findByName(ApiConfig.getCid(), getVodName()));
         AppDatabase.get().getHistoryDao().insertOrUpdate(this);
         return this;
     }

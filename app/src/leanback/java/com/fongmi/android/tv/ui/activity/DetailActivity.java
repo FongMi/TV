@@ -480,8 +480,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
 
     private void updateHistory(Vod.Flag.Episode item, boolean replay) {
         replay = replay || !item.equals(mHistory.getEpisode());
-        long duration = replay ? 0 : mHistory.getDuration();
-        mHistory.setDuration(duration);
+        long position = replay ? 0 : mHistory.getPosition();
+        mHistory.setPosition(position);
         mHistory.setEpisodeUrl(item.getUrl());
         mHistory.setVodRemarks(item.getName());
         mHistory.setVodFlag(getVodFlag().getFlag());
@@ -489,10 +489,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     }
 
     private void updateHistory() {
-        if (mHistory != null) {
-            mHistory.update(mPlayers.getCurrentPosition());
-            RefreshEvent.history();
-        }
+        if (mHistory == null || mPlayers.getCurrentPosition() <= 0) return;
+        mHistory.update(mPlayers.getCurrentPosition(), mPlayers.getDuration());
+        RefreshEvent.history();
     }
 
     private final Runnable mHideCenter = new Runnable() {
@@ -542,12 +541,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     }
 
     private void checkPosition() {
-        mPlayers.seekTo(mHistory.getDuration());
+        mPlayers.seekTo(mHistory.getPosition());
         Clock.get().setCallback(this);
     }
 
     private void onRetry() {
-        mHistory.setDuration(mPlayers.getCurrentPosition());
+        mHistory.setPosition(mPlayers.getCurrentPosition());
         getPlayer(false);
     }
 

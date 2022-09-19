@@ -17,7 +17,7 @@ public abstract class HistoryDao extends BaseDao<History> {
     public abstract History find(int cid, String key);
 
     @Query("SELECT * FROM history WHERE cid = :cid AND vodName = :vodName")
-    public abstract History findByName(int cid, String vodName);
+    public abstract List<History> findByName(int cid, String vodName);
 
     @Query("DELETE FROM history WHERE cid = :cid AND `key` = :key")
     public abstract void delete(int cid, String key);
