@@ -19,7 +19,6 @@ import androidx.viewbinding.ViewBinding;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.databinding.FragmentSettingBinding;
-import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.ui.activity.BaseFragment;
@@ -63,7 +62,6 @@ public class SettingFragment extends BaseFragment implements ConfigDialog.Callba
     public void setConfig(String url) {
         mBinding.url.setText(url);
         Notify.progress(getActivity());
-        AppDatabase.clear();
         Prefers.putUrl(url);
         checkUrl(url);
     }
