@@ -3,10 +3,12 @@ package com.fongmi.android.tv.player;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.net.OKHttp;
+import com.fongmi.android.tv.ui.custom.CustomWebView;
 import com.fongmi.android.tv.utils.Json;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -23,6 +25,7 @@ import okhttp3.Response;
 public class ParseTask {
 
     private final Handler handler;
+    private CustomWebView webView;
     private ExecutorService executor;
     private Callback callback;
     private Parse parse;
@@ -34,6 +37,7 @@ public class ParseTask {
     public ParseTask(Callback callback) {
         this.executor = Executors.newSingleThreadExecutor();
         this.handler = new Handler(Looper.getMainLooper());
+        this.webView = new CustomWebView(App.get());
         this.callback = callback;
     }
 
@@ -57,7 +61,7 @@ public class ParseTask {
         }
         switch (parse.getType()) {
             case 0: //嗅探
-                handler.post(() -> Players.get().web().start(parse.getUrl() + webUrl, callback));
+                handler.post(() -> webView.start(parse.getUrl() + webUrl, callback));
                 break;
             case 1: //Json
                 jsonParse(webUrl);
@@ -100,7 +104,7 @@ public class ParseTask {
         if (result.getUrl().isEmpty()) {
             onParseError();
         } else if (result.getParse(0) == 1) {
-            handler.post(() -> Players.get().web().start(result.getUrl(), callback));
+            handler.post(() -> webView.start(result.getUrl(), callback));
         } else {
             onParseSuccess(result.getHeaders(), result.getUrl(), result.getJxFrom());
         }
@@ -120,8 +124,10 @@ public class ParseTask {
 
     public void cancel() {
         if (executor != null) executor.shutdownNow();
+        webView.stop(false);
         executor = null;
         callback = null;
+        webView = null;
     }
 
     public interface Callback {
