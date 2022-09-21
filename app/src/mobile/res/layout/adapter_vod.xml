@@ -1,26 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="150dp"
     android:layout_height="200dp"
-    android:background="@color/black_20">
+    android:foreground="@drawable/shape_vod">
 
-    <ImageView
+    <com.makeramen.roundedimageview.RoundedImageView
         android:id="@+id/image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/black_20"
         android:scaleType="center"
+        app:riv_corner_radius="8dp"
+        app:riv_mutate_background="true"
         tools:src="@drawable/ic_img_loading" />
 
-    <ImageView
+    <com.makeramen.roundedimageview.RoundedImageView
         android:id="@+id/delete"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:background="@color/white_30"
+        android:background="@color/black_50"
         android:scaleType="center"
         android:src="@drawable/ic_delete"
         android:visibility="gone"
+        app:riv_corner_radius="8dp"
+        app:riv_mutate_background="true"
         tools:visibility="visible" />
 
     <TextView
@@ -29,11 +34,10 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:background="#CC2196F3"
-        android:ellipsize="end"
         android:padding="4dp"
         android:singleLine="true"
         android:textColor="@color/white"
-        android:textSize="14sp"
+        android:textSize="12sp"
         android:visibility="gone"
         tools:text="2022"
         tools:visibility="visible" />
@@ -44,11 +48,10 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:background="#CCF44336"
-        android:ellipsize="end"
         android:padding="4dp"
         android:singleLine="true"
         android:textColor="@color/white"
-        android:textSize="14sp"
+        android:textSize="12sp"
         android:visibility="gone"
         tools:text="泥巴"
         tools:visibility="visible" />
@@ -59,11 +62,10 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/name"
         android:background="#CC177535"
-        android:ellipsize="end"
         android:padding="4dp"
         android:singleLine="true"
         android:textColor="@color/white"
-        android:textSize="14sp"
+        android:textSize="12sp"
         tools:text="1080p" />
 
     <TextView
@@ -71,15 +73,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="@color/black_60"
-        android:ellipsize="marquee"
+        android:background="@drawable/shape_vod_name"
         android:gravity="center"
-        android:marqueeRepeatLimit="marquee_forever"
         android:padding="6dp"
-        android:scrollHorizontally="true"
         android:singleLine="true"
         android:textColor="@color/white"
-        android:textSize="16sp"
+        android:textSize="14sp"
         tools:text="蜘蛛人" />
 
 </RelativeLayout>
