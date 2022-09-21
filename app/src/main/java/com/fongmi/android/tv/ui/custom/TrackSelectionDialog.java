@@ -19,8 +19,8 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
-import com.fongmi.android.tv.player.Players;
 import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.Tracks;
 import com.google.android.exoplayer2.source.TrackGroup;
@@ -55,8 +55,8 @@ public final class TrackSelectionDialog extends DialogFragment {
      * Returns whether a track selection dialog will have content to display if initialized with the
      * specified {@link Player}.
      */
-    public static void setVisible(View view) {
-        view.setVisibility(willHaveContent(Players.get().exo().getCurrentTracks()) ? View.VISIBLE : View.GONE);
+    public static void setVisible(ExoPlayer player, View view) {
+        view.setVisibility(willHaveContent(player.getCurrentTracks()) ? View.VISIBLE : View.GONE);
     }
 
     /**
