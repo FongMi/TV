@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.databinding.DialogSiteBinding;
+import com.fongmi.android.tv.impl.SiteCallback;
 import com.fongmi.android.tv.ui.adapter.SiteAdapter;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -16,9 +17,9 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 public class SiteDialog implements SiteAdapter.OnClickListener {
 
     private DialogSiteBinding binding;
+    private SiteCallback callback;
     private SiteAdapter adapter;
     private AlertDialog dialog;
-    private Callback callback;
 
     public static void show(Fragment fragment) {
         if (ApiConfig.get().getSites().isEmpty()) return;
@@ -26,37 +27,43 @@ public class SiteDialog implements SiteAdapter.OnClickListener {
     }
 
     public void create(Fragment fragment) {
-        callback = (Callback) fragment;
+        callback = (SiteCallback) fragment;
         binding = DialogSiteBinding.inflate(LayoutInflater.from(fragment.getContext()));
-        dialog = new MaterialAlertDialogBuilder(fragment.getContext()).setView(binding.getRoot()).create();
-        initDialog();
-        initView();
+        dialog = new MaterialAlertDialogBuilder(fragment.getActivity()).setView(binding.getRoot()).create();
+        setRecyclerView();
+        setDialog();
     }
 
-    private void initDialog() {
+    private void setRecyclerView() {
+        binding.recycler.setHasFixedSize(true);
+        binding.recycler.setAdapter(adapter = new SiteAdapter(this));
+        binding.recycler.addItemDecoration(new SpaceItemDecoration(1, 16));
+        binding.recycler.scrollToPosition(ApiConfig.getHomeIndex());
+    }
+
+    private void setDialog() {
         WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
-        params.height = (int) (ResUtil.getScreenHeightPx() * 0.6f);
+        params.height = (int) (ResUtil.getScreenHeightPx() * 0.615f);
         dialog.getWindow().setAttributes(params);
         dialog.getWindow().setDimAmount(0);
         dialog.show();
     }
 
-    private void initView() {
-        int position = ApiConfig.get().getSites().indexOf(ApiConfig.get().getHome());
-        adapter = new SiteAdapter(this);
-        binding.recycler.setHasFixedSize(true);
-        binding.recycler.setAdapter(adapter);
-        binding.recycler.scrollToPosition(position);
-    }
-
     @Override
-    public void onItemClick(Site item) {
+    public void onTextClick(Site item) {
         callback.setSite(item);
         dialog.dismiss();
     }
 
-    public interface Callback {
+    @Override
+    public void onSearchClick(Site item) {
+        item.setSearchable(!item.isSearchable()).save();
+        adapter.notifyDataSetChanged();
+    }
 
-        void setSite(Site item);
+    @Override
+    public void onFilterClick(Site item) {
+        item.setFilterable(!item.isFilterable()).save();
+        adapter.notifyDataSetChanged();
     }
 }
