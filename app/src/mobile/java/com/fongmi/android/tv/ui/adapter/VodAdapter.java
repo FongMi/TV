@@ -1,7 +1,6 @@
 package com.fongmi.android.tv.ui.adapter;
 
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -30,28 +29,24 @@ public class VodAdapter extends RecyclerView.Adapter<VodAdapter.ViewHolder> {
     public interface OnClickListener {
 
         void onItemClick(Vod item);
+
+        boolean onLongClick(Vod item);
     }
 
     private void setLayoutSize(int spanCount) {
-        int space = ResUtil.dp2px(32 + ((spanCount - 1) * 16));
+        int space = ResUtil.dp2px(32) + ResUtil.dp2px(16 * (spanCount - 1));
         int base = ResUtil.getScreenWidthPx() - space;
         width = base / spanCount;
         height = (int) (width / 0.75f);
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    static class ViewHolder extends RecyclerView.ViewHolder {
 
         private final AdapterVodBinding binding;
 
         ViewHolder(@NonNull AdapterVodBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
-            binding.getRoot().setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View view) {
-            mListener.onItemClick(mItems.get(getLayoutPosition()));
         }
     }
 
@@ -80,9 +75,13 @@ public class VodAdapter extends RecyclerView.Adapter<VodAdapter.ViewHolder> {
         Vod item = mItems.get(position);
         holder.binding.name.setText(item.getVodName());
         holder.binding.year.setText(item.getVodYear());
+        holder.binding.site.setText(item.getSiteName());
         holder.binding.remark.setText(item.getVodRemarks());
+        holder.binding.site.setVisibility(item.getSiteVisible());
         holder.binding.year.setVisibility(item.getYearVisible());
         holder.binding.remark.setVisibility(item.getRemarkVisible());
+        holder.binding.getRoot().setOnClickListener(v -> mListener.onItemClick(item));
+        holder.binding.getRoot().setOnLongClickListener(v -> mListener.onLongClick(item));
         ImgUtil.load(item.getVodPic(), holder.binding.image);
     }
 }
