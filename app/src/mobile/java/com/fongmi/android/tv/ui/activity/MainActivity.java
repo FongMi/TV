@@ -45,6 +45,7 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
     @Override
     protected void initEvent() {
         mBinding.navigation.setOnItemSelectedListener(this);
+        mBinding.navigation.setSelectedItemId(R.id.home);
     }
 
     @Override
