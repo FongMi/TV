@@ -10,7 +10,7 @@ https://github.com/CatVodTVOfficial/CatVodTVJarLoader
 ### How to build
 Use dev branch
 
-### Config Example
+### Local Config Example
     file://cat.json
 
 ```json
