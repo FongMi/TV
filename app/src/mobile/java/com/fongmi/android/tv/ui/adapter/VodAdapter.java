@@ -83,6 +83,6 @@ public class VodAdapter extends RecyclerView.Adapter<VodAdapter.ViewHolder> {
         holder.binding.remark.setText(item.getVodRemarks());
         holder.binding.year.setVisibility(item.getYearVisible());
         holder.binding.remark.setVisibility(item.getRemarkVisible());
-        ImgUtil.load(item.getVodName(), item.getVodPic(), holder.binding.image);
+        ImgUtil.load(item.getVodPic(), holder.binding.image);
     }
 }

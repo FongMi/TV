@@ -12,7 +12,7 @@ public class Collect {
     private final List<Vod> list;
 
     public static Collect all() {
-        return new Collect(Site.get("all", ResUtil.getString(R.string.collect_all)), new ArrayList<>());
+        return new Collect(Site.get("all", ResUtil.getString(R.string.all)), new ArrayList<>());
     }
 
     public static Collect create(List<Vod> list) {
