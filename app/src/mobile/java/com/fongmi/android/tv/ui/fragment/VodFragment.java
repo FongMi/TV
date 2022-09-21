@@ -14,6 +14,10 @@ public class VodFragment extends BaseFragment {
 
     private FragmentVodBinding mBinding;
 
+    public static VodFragment newInstance() {
+        return new VodFragment();
+    }
+
     @Override
     protected ViewBinding getBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
         return mBinding = FragmentVodBinding.inflate(inflater, container, false);

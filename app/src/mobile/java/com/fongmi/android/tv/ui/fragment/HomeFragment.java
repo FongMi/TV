@@ -18,7 +18,6 @@ import com.fongmi.android.tv.ui.activity.BaseFragment;
 import com.fongmi.android.tv.ui.adapter.HistoryAdapter;
 import com.fongmi.android.tv.ui.adapter.VodAdapter;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
-import com.google.android.exoplayer2.util.Log;
 
 public class HomeFragment extends BaseFragment implements VodAdapter.OnClickListener, HistoryAdapter.OnClickListener {
 
@@ -26,6 +25,10 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
     private HistoryAdapter mHistoryAdapter;
     private SiteViewModel mViewModel;
     private VodAdapter mVodAdapter;
+
+    public static HomeFragment newInstance() {
+        return new HomeFragment();
+    }
 
     @Override
     protected ViewBinding getBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
