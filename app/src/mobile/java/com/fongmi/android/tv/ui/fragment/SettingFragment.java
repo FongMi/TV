@@ -44,6 +44,10 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
 
     private FragmentSettingBinding mBinding;
 
+    public static SettingFragment newInstance() {
+        return new SettingFragment();
+    }
+
     @Override
     protected ViewBinding getBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
         return mBinding = FragmentSettingBinding.inflate(inflater, container, false);
