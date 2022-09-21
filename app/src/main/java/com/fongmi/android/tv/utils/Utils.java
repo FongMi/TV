@@ -10,6 +10,9 @@ import android.view.inputmethod.InputMethodManager;
 
 import com.fongmi.android.tv.App;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 public class Utils {
@@ -46,8 +49,13 @@ public class Utils {
     }
 
     public static boolean isVideoFormat(String url) {
-        if (url.contains("=http") || url.contains("=https") || url.contains("=https%3a%2f") || url.contains("=http%3a%2f")) return false;
-        if (url.contains("cdn-tos") || url.contains(".js") || url.contains(".css") || url.contains(".ico")) return false;
+        return isVideoFormat(url, new HashMap<>());
+    }
+
+    public static boolean isVideoFormat(String url, Map<String, String> headers) {
+        if (headers.containsKey("Range")) return true;
+        if (headers.containsKey("Accept") && Objects.requireNonNull(headers.get("Accept")).contains("image")) return false;
+        if (url.contains("=http") || url.contains("=https") || url.contains("=https%3a%2f") || url.contains("=http%3a%2f") || url.contains(".js") || url.contains(".css")) return false;
         return SNIFFER.matcher(url).find();
     }
 

@@ -50,10 +50,10 @@ public class SSLSocketFactoryCompat extends SSLSocketFactory {
 
     private final SSLSocketFactory defaultFactory;
 
-    public SSLSocketFactoryCompat(X509TrustManager tm) {
+    public SSLSocketFactoryCompat() {
         try {
             SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, (tm != null) ? new X509TrustManager[]{tm} : null, null);
+            sslContext.init(null, new X509TrustManager[]{SSLSocketFactoryCompat.trustAllCert}, null);
             defaultFactory = sslContext.getSocketFactory();
             HttpsURLConnection.setDefaultSSLSocketFactory(defaultFactory);
         } catch (GeneralSecurityException e) {
