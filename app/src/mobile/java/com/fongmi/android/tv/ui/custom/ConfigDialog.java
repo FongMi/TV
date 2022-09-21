@@ -8,21 +8,22 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.fongmi.android.tv.databinding.DialogConfigBinding;
+import com.fongmi.android.tv.impl.ConfigCallback;
 import com.fongmi.android.tv.utils.Prefers;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class ConfigDialog {
 
     private DialogConfigBinding binding;
+    private ConfigCallback callback;
     private AlertDialog dialog;
-    private Callback callback;
 
     public static void show(Fragment fragment) {
         new ConfigDialog().create(fragment);
     }
 
     public void create(Fragment fragment) {
-        callback = (Callback) fragment;
+        callback = (ConfigCallback) fragment;
         binding = DialogConfigBinding.inflate(LayoutInflater.from(fragment.getContext()));
         dialog = new MaterialAlertDialogBuilder(fragment.getContext()).setView(binding.getRoot()).create();
         initDialog();
@@ -58,10 +59,5 @@ public class ConfigDialog {
 
     private void onNegative(View view) {
         dialog.dismiss();
-    }
-
-    public interface Callback {
-
-        void setConfig(String url);
     }
 }
