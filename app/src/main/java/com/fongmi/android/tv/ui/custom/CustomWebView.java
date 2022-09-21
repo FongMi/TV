@@ -73,7 +73,7 @@ public class CustomWebView extends WebView {
                 handler.removeCallbacks(mTimer);
                 handler.postDelayed(mTimer, 15 * 1000);
                 Map<String, String> headers = request.getRequestHeaders();
-                if (Utils.isVideoFormat(url) || headers.containsKey("Range")) post(headers, url);
+                if (Utils.isVideoFormat(url, headers)) post(headers, url);
                 return super.shouldInterceptRequest(view, request);
             }
 
