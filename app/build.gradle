@@ -74,8 +74,6 @@ dependencies {
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
     implementation('org.simpleframework:simple-xml:2.7.1') { exclude group: 'stax', module: 'stax-api' exclude group: 'xpp3', module: 'xpp3' }
     leanbackImplementation 'androidx.leanback:leanback:1.2.0-alpha02'
-    mobileImplementation 'androidx.navigation:navigation-fragment:2.5.2'
-    mobileImplementation 'androidx.navigation:navigation-ui:2.5.2'
     annotationProcessor 'androidx.room:room-compiler:2.4.3'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.13.2'
 }
