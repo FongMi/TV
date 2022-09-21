@@ -13,7 +13,6 @@ import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.FragmentHomeBinding;
-import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.ui.activity.BaseFragment;
 import com.fongmi.android.tv.ui.adapter.HistoryAdapter;
@@ -69,7 +68,7 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
     }
 
     private void getHistory() {
-        mHistoryAdapter.addAll(AppDatabase.get().getHistoryDao().getAll());
+        mHistoryAdapter.addAll(History.get());
     }
 
     @Override
