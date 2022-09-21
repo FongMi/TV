@@ -6,8 +6,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.leanback.widget.Presenter;
 
-import com.bumptech.glide.Glide;
-import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.AdapterVodBinding;
 import com.fongmi.android.tv.utils.ImgUtil;
@@ -57,15 +55,13 @@ public class VodPresenter extends Presenter {
         holder.binding.site.setVisibility(item.getSiteVisible());
         holder.binding.year.setVisibility(item.getYearVisible());
         holder.binding.remark.setVisibility(item.getRemarkVisible());
-        ImgUtil.load(item.getVodName(), item.getVodPic(), holder.binding.image);
+        ImgUtil.load(item.getVodPic(), holder.binding.image);
         setOnClickListener(holder, view -> mListener.onItemClick(item));
         holder.view.setOnLongClickListener(v -> mListener.onLongClick(item));
     }
 
     @Override
     public void onUnbindViewHolder(Presenter.ViewHolder viewHolder) {
-        ViewHolder holder = (ViewHolder) viewHolder;
-        Glide.with(App.get()).clear(holder.binding.image);
     }
 
     public static class ViewHolder extends Presenter.ViewHolder {

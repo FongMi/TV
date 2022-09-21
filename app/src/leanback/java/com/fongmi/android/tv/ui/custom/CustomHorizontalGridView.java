@@ -60,18 +60,9 @@ public class CustomHorizontalGridView extends HorizontalGridView {
     }
 
     public boolean executeKeyEvent(@NonNull KeyEvent event) {
-        boolean handled = false;
-        if (event.getAction() == KeyEvent.ACTION_DOWN) {
-            switch (event.getKeyCode()) {
-                case KeyEvent.KEYCODE_DPAD_LEFT:
-                    handled = arrowScroll(FOCUS_LEFT);
-                    break;
-                case KeyEvent.KEYCODE_DPAD_RIGHT:
-                    handled = arrowScroll(FOCUS_RIGHT);
-                    break;
-            }
-        }
-        return handled;
+        if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_DPAD_LEFT) return arrowScroll(FOCUS_LEFT);
+        if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_DPAD_RIGHT) return arrowScroll(FOCUS_RIGHT);
+        return false;
     }
 
     public boolean arrowScroll(int direction) {

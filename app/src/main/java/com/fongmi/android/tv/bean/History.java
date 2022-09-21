@@ -5,6 +5,7 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.db.AppDatabase;
 
 import java.util.List;
@@ -25,6 +26,7 @@ public class History {
     private long createTime;
     private long opening;
     private long ending;
+    private long position;
     private long duration;
     private int cid;
 
@@ -120,6 +122,14 @@ public class History {
         this.ending = ending;
     }
 
+    public long getPosition() {
+        return position;
+    }
+
+    public void setPosition(long position) {
+        this.position = position;
+    }
+
     public long getDuration() {
         return duration;
     }
@@ -160,32 +170,37 @@ public class History {
         return isRevPlay() ? R.string.play_backward_hint : R.string.play_forward_hint;
     }
 
+    public static List<History> get() {
+        return AppDatabase.get().getHistoryDao().find(ApiConfig.getCid());
+    }
+
     public static History find(String key) {
-        return AppDatabase.get().getHistoryDao().find(key);
+        return AppDatabase.get().getHistoryDao().find(ApiConfig.getCid(), key);
     }
 
-    public static List<History> find(int cid) {
-        return AppDatabase.get().getHistoryDao().find(cid);
+    public static void delete(int cid) {
+        AppDatabase.get().getHistoryDao().delete(cid);
     }
 
-    public static void delete(int id) {
-        AppDatabase.get().getHistoryDao().delete(id);
+    private void checkMerge(List<History> items) {
+        for (History item : items) {
+            if (Math.abs(item.getDuration() - getDuration()) > 10 * 60 * 1000) continue;
+            setOpening(item.getOpening());
+            setEnding(item.getEnding());
+            item.delete();
+        }
     }
 
-    public void checkDuplicate() {
-        History history = AppDatabase.get().getHistoryDao().findByName(getVodName());
-        if (history != null) AppDatabase.get().getHistoryDao().delete(history.getKey());
-    }
-
-    public History update(long duration) {
-        checkDuplicate();
+    public History update(long position, long duration) {
+        setPosition(position);
         setDuration(duration);
+        checkMerge(AppDatabase.get().getHistoryDao().findByName(ApiConfig.getCid(), getVodName()));
         AppDatabase.get().getHistoryDao().insertOrUpdate(this);
         return this;
     }
 
     public History delete() {
-        AppDatabase.get().getHistoryDao().delete(getKey());
+        AppDatabase.get().getHistoryDao().delete(ApiConfig.getCid(), getKey());
         return this;
     }
 }

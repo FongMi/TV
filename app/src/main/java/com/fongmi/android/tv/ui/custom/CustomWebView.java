@@ -73,7 +73,7 @@ public class CustomWebView extends WebView {
                 handler.removeCallbacks(mTimer);
                 handler.postDelayed(mTimer, 15 * 1000);
                 Map<String, String> headers = request.getRequestHeaders();
-                if (Utils.isVideoFormat(url) || headers.containsKey("Range")) post(headers, url);
+                if (Utils.isVideoFormat(url, headers)) post(headers, url);
                 return super.shouldInterceptRequest(view, request);
             }
 
@@ -103,7 +103,7 @@ public class CustomWebView extends WebView {
         for (String key : headers.keySet()) if (keys.contains(key.toLowerCase())) news.put(key, headers.get(key));
         handler.removeCallbacks(mTimer);
         handler.post(() -> {
-            callback.onParseSuccess(news, url, "");
+            if (callback != null) callback.onParseSuccess(news, url, "");
             stop(false);
         });
     }
@@ -113,5 +113,6 @@ public class CustomWebView extends WebView {
         loadUrl("about:blank");
         handler.removeCallbacks(mTimer);
         if (error) handler.post(() -> callback.onParseError());
+        else callback = null;
     }
 }
