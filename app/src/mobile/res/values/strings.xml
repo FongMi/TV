@@ -5,4 +5,8 @@
     <string name="nav_vod">Vod</string>
     <string name="nav_setting">Setting</string>
 
+    <!-- Home -->
+    <string name="home_history">History</string>
+    <string name="home_recommend">Recommend</string>
+
 </resources>
