@@ -19,6 +19,8 @@ import com.fongmi.android.tv.ui.adapter.HistoryAdapter;
 import com.fongmi.android.tv.ui.adapter.VodAdapter;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 
+import org.greenrobot.eventbus.EventBus;
+
 public class HomeFragment extends BaseFragment implements VodAdapter.OnClickListener, HistoryAdapter.OnClickListener {
 
     private FragmentHomeBinding mBinding;
@@ -37,6 +39,7 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
 
     @Override
     protected void initView() {
+        mBinding.progressLayout.showProgress();
         setRecyclerView();
         setViewModel();
         getHistory();
@@ -63,6 +66,8 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mViewModel.result.observe(getViewLifecycleOwner(), result -> {
             if (result != null) mVodAdapter.addAll(result.getList());
+            mBinding.progressLayout.showContent();
+            EventBus.getDefault().post(result);
         });
     }
 

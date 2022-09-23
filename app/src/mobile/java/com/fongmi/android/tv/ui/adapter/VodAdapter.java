@@ -51,9 +51,8 @@ public class VodAdapter extends RecyclerView.Adapter<VodAdapter.ViewHolder> {
     }
 
     public void addAll(List<Vod> items) {
-        mItems.clear();
         mItems.addAll(items);
-        notifyDataSetChanged();
+        notifyItemRangeInserted(mItems.size(), items.size());
     }
 
     @Override
