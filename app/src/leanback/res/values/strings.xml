@@ -17,7 +17,6 @@
 
     <!-- Collect -->
     <string name="collect_result">Search results for <xliff:g name="name">%s</xliff:g></string>
-    <string name="collect_all">All</string>
 
     <!-- Push -->
     <string name="push_info">Connect phone or pc to LAN and scan QR Code or enter the URL in browser\n<xliff:g name="name">%s</xliff:g></string>

@@ -11,11 +11,6 @@ import com.fongmi.android.tv.databinding.AdapterFilterBinding;
 
 public class CollectPresenter extends Presenter {
 
-    public interface OnClickListener {
-
-        void onItemClick(Collect item);
-    }
-
     @Override
     public Presenter.ViewHolder onCreateViewHolder(ViewGroup parent) {
         return new ViewHolder(AdapterFilterBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
@@ -26,6 +21,7 @@ public class CollectPresenter extends Presenter {
         Collect item = (Collect) object;
         ViewHolder holder = (ViewHolder) viewHolder;
         holder.binding.text.setText(item.getSite().getName());
+        setOnClickListener(holder, null);
     }
 
     @Override

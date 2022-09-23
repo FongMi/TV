@@ -76,6 +76,7 @@
     <string name="crash_details_close">關閉</string>
 
     <!-- UNIT -->
+    <string name="all">全部</string>
     <string name="second"><xliff:g name="name">%s</xliff:g> 秒</string>
 
     <string-array name="select_quality">

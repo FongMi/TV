@@ -12,6 +12,14 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
 
+        <meta-data
+            android:name="design_width_in_dp"
+            android:value="411" />
+
+        <meta-data
+            android:name="design_height_in_dp"
+            android:value="891" />
+
         <activity
             android:name=".ui.activity.SplashActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
@@ -27,7 +35,8 @@
         <activity
             android:name=".ui.activity.MainActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
-            android:screenOrientation="sensorPortrait" />
+            android:screenOrientation="fullSensor"
+            android:windowSoftInputMode="adjustPan" />
 
     </application>
 </manifest>
