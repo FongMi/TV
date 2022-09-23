@@ -65,9 +65,9 @@ public class HistoryPresenter extends Presenter {
         ViewHolder holder = (ViewHolder) viewHolder;
         setClickListener(holder.view, item);
         holder.binding.name.setText(item.getVodName());
+        holder.binding.site.setVisibility(View.VISIBLE);
         holder.binding.site.setText(ApiConfig.getSiteName(item.getSiteKey()));
         holder.binding.remark.setText(ResUtil.getString(R.string.vod_last, item.getVodRemarks()));
-        holder.binding.site.setVisibility(delete ? View.GONE : View.VISIBLE);
         holder.binding.remark.setVisibility(delete ? View.GONE : View.VISIBLE);
         holder.binding.delete.setVisibility(!delete ? View.GONE : View.VISIBLE);
         Glide.with(App.get()).load(item.getVodPic()).centerCrop().error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).into(holder.binding.image);

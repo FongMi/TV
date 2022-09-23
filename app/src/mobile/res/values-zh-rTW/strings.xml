@@ -5,4 +5,8 @@
     <string name="nav_vod">片庫</string>
     <string name="nav_setting">設定</string>
 
+    <!-- Home -->
+    <string name="home_history">最近觀看</string>
+    <string name="home_recommend">更新推薦</string>
+
 </resources>

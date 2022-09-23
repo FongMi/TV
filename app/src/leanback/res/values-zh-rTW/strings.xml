@@ -17,7 +17,6 @@
 
     <!-- Collect -->
     <string name="collect_result">「<xliff:g name="name">%s</xliff:g>」的搜尋結果</string>
-    <string name="collect_all">全部</string>
 
     <!-- Push -->
     <string name="push_info">手機或電腦連接同一個區域網路，掃描 QR Code 或瀏覽器輸入網址\n<xliff:g name="name">%s</xliff:g></string>

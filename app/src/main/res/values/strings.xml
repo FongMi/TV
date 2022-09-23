@@ -76,6 +76,7 @@
     <string name="crash_details_close">Close</string>
 
     <!-- UNIT -->
+    <string name="all">All</string>
     <string name="second"><xliff:g name="name">%s</xliff:g> s</string>
 
     <string-array name="select_render">
