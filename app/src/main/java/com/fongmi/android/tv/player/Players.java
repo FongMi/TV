@@ -35,8 +35,10 @@ public class Players implements Player.Listener, ParseTask.Callback {
     }
 
     private void setupPlayer() {
+        DefaultTrackSelector selector = new DefaultTrackSelector(App.get());
+        selector.setParameters(selector.getParameters().buildUpon().setPreferredTextLanguage("zh"));
         DefaultRenderersFactory factory = new DefaultRenderersFactory(App.get()).setEnableDecoderFallback(true).setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON);
-        exoPlayer = new ExoPlayer.Builder(App.get()).setRenderersFactory(factory).setTrackSelector(new DefaultTrackSelector(App.get())).build();
+        exoPlayer = new ExoPlayer.Builder(App.get()).setRenderersFactory(factory).setTrackSelector(selector).build();
         exoPlayer.addListener(this);
     }
 
