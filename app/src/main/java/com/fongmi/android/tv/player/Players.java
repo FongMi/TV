@@ -12,7 +12,6 @@ import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.mediacodec.MediaCodecDecoderException;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.util.Util;
 
@@ -26,7 +25,6 @@ public class Players implements Player.Listener, ParseTask.Callback {
     private Formatter formatter;
     private ExoPlayer exoPlayer;
     private ParseTask parseTask;
-    private boolean fallback;
     private int retry;
 
     public Players init() {
@@ -37,8 +35,7 @@ public class Players implements Player.Listener, ParseTask.Callback {
     }
 
     private void setupPlayer() {
-        DefaultRenderersFactory factory = new DefaultRenderersFactory(App.get()).setEnableDecoderFallback(true);
-        factory.setExtensionRendererMode(fallback ? DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER : DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON);
+        DefaultRenderersFactory factory = new DefaultRenderersFactory(App.get()).setEnableDecoderFallback(true).setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON);
         exoPlayer = new ExoPlayer.Builder(App.get()).setRenderersFactory(factory).setTrackSelector(new DefaultTrackSelector(App.get())).build();
         exoPlayer.addListener(this);
     }
@@ -164,12 +161,6 @@ public class Players implements Player.Listener, ParseTask.Callback {
         exoPlayer.prepare();
     }
 
-    private void onFallback() {
-        fallback = true;
-        release();
-        setupPlayer();
-    }
-
     @Override
     public void onParseSuccess(Map<String, String> headers, String url, String from) {
         if (from.length() > 0) Notify.show(ResUtil.getString(R.string.parse_from, from));
@@ -183,7 +174,6 @@ public class Players implements Player.Listener, ParseTask.Callback {
 
     @Override
     public void onPlayerError(@NonNull PlaybackException error) {
-        if (error.getCause() instanceof MediaCodecDecoderException && !fallback) onFallback();
         PlayerEvent.error(R.string.error_play_format, true);
     }
 
