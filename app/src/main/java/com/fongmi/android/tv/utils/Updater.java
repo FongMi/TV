@@ -67,11 +67,16 @@ public class Updater implements View.OnClickListener {
             if (retry > 0) url = PROXY + url;
             if (code <= BuildConfig.VERSION_CODE) FileUtil.clearDir(getApk());
             else FileUtil.write(getApk(), OKHttp.newCall(url).execute().body().bytes());
-            if (getApk().exists() && Prefers.getUpdate()) handler.post(() -> showDialog(name, desc));
+            if (getApk().exists() && Prefers.getUpdate()) handler.post(() -> checkActivity(name, desc));
         } catch (Exception e) {
             if (retry == 0) connect(PROXY + target, 1);
             e.printStackTrace();
         }
+    }
+
+    private void checkActivity(String version, String desc) {
+        if (activity.isFinishing()) FileUtil.openFile(getApk());
+        else showDialog(version, desc);
     }
 
     private void showDialog(String version, String desc) {
