@@ -1,7 +1,6 @@
 package com.fongmi.android.tv.ui.adapter;
 
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -25,22 +24,20 @@ public class SiteAdapter extends RecyclerView.Adapter<SiteAdapter.ViewHolder> {
 
     public interface OnClickListener {
 
-        void onItemClick(Site item);
+        void onTextClick(Site item);
+
+        void onSearchClick(Site item);
+
+        void onFilterClick(Site item);
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    static class ViewHolder extends RecyclerView.ViewHolder {
 
         private final AdapterSiteBinding binding;
 
         ViewHolder(@NonNull AdapterSiteBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
-            binding.getRoot().setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View view) {
-            mListener.onItemClick(mItems.get(getLayoutPosition()));
         }
     }
 
@@ -59,5 +56,10 @@ public class SiteAdapter extends RecyclerView.Adapter<SiteAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Site item = mItems.get(position);
         holder.binding.text.setText(item.getActivatedName());
+        holder.binding.filter.setImageResource(item.getFilterIcon());
+        holder.binding.search.setImageResource(item.getSearchIcon());
+        holder.binding.text.setOnClickListener(v -> mListener.onTextClick(item));
+        holder.binding.search.setOnClickListener(v -> mListener.onSearchClick(item));
+        holder.binding.filter.setOnClickListener(v -> mListener.onFilterClick(item));
     }
 }
