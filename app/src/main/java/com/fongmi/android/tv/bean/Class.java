@@ -24,6 +24,7 @@ public class Class {
     private String typeFlag;
 
     private Boolean filter;
+    private boolean activated;
 
     public String getTypeId() {
         return typeId;
@@ -43,6 +44,14 @@ public class Class {
 
     public Boolean getFilter() {
         return filter;
+    }
+
+    public boolean isActivated() {
+        return activated;
+    }
+
+    public void setActivated(boolean activated) {
+        this.activated = activated;
     }
 
     public Class toggleFilter() {
