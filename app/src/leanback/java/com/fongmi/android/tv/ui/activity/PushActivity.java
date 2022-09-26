@@ -1,7 +1,10 @@
 package com.fongmi.android.tv.ui.activity;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Intent;
+import android.view.View;
 
 import androidx.viewbinding.ViewBinding;
 
@@ -29,5 +32,11 @@ public class PushActivity extends BaseActivity {
         String address = Server.get().getAddress(false);
         mBinding.code.setImageBitmap(QRCode.getBitmap(address, 250, 1));
         mBinding.info.setText(ResUtil.getString(R.string.push_info, address));
+        mBinding.clip.setOnClickListener(this::onClip);
+    }
+
+    private void onClip(View view) {
+        ClipData data = ((ClipboardManager) getSystemService(CLIPBOARD_SERVICE)).getPrimaryClip();
+        if (data.getItemCount() > 0) DetailActivity.start(PushActivity.this, "push_agent", data.getItemAt(0).getText().toString());
     }
 }

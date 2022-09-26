@@ -27,4 +27,14 @@
         android:textColor="@color/white"
         android:textSize="18sp" />
 
+    <TextView
+        android:id="@+id/clip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/shape_item_normal"
+        android:text="@string/push_clip"
+        android:textColor="@color/white"
+        android:textSize="18sp" />
+
 </LinearLayout>

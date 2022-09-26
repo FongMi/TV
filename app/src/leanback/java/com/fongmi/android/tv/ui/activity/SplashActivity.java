@@ -50,9 +50,9 @@ public class SplashActivity extends BaseActivity {
     private void loadConfig() {
         ApiConfig.get().init().loadConfig(new Callback() {
             @Override
-            public void success() {
+            public void success(String json) {
                 HomeActivity.start(getActivity());
-                Config.save();
+                Config.save(json);
             }
 
             @Override

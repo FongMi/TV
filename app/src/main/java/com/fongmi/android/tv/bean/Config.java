@@ -17,6 +17,7 @@ public class Config {
     private int id;
     private long time;
     private String url;
+    private String json;
 
     public static Config create() {
         return new Config(Prefers.getUrl());
@@ -26,11 +27,6 @@ public class Config {
         this.url = url;
         this.time = System.currentTimeMillis();
         this.id = (int) insert();
-    }
-
-    public Config setTime() {
-        setTime(System.currentTimeMillis());
-        return this;
     }
 
     public int getId() {
@@ -49,6 +45,14 @@ public class Config {
         this.url = url;
     }
 
+    public String getJson() {
+        return json;
+    }
+
+    public void setJson(String json) {
+        this.json = json;
+    }
+
     public long getTime() {
         return time;
     }
@@ -65,12 +69,22 @@ public class Config {
 
     public static Config find(String url) {
         Config item = AppDatabase.get().getConfigDao().find(url);
-        return item == null ? Config.create() : item.setTime();
+        return item == null ? Config.create() : item.newTime();
     }
 
-    public static void save() {
-        Config item = find(Prefers.getUrl());
+    public static void save(String json) {
+        Config item = find(Prefers.getUrl()).json(json);
         ApiConfig.get().setCid(item.update().getId());
+    }
+
+    public Config newTime() {
+        setTime(System.currentTimeMillis());
+        return this;
+    }
+
+    public Config json(String json) {
+        setJson(json);
+        return this;
     }
 
     public long insert() {
