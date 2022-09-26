@@ -20,7 +20,7 @@ import com.fongmi.android.tv.db.dao.SiteDao;
 @Database(entities = {Config.class, Site.class, History.class}, version = AppDatabase.VERSION, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
-    public static final int VERSION = 7;
+    public static final int VERSION = 8;
     public static final String SYMBOL = "@@@";
 
     private static volatile AppDatabase instance;
@@ -31,7 +31,7 @@ public abstract class AppDatabase extends RoomDatabase {
     }
 
     private static AppDatabase create(Context context) {
-        return Room.databaseBuilder(context, AppDatabase.class, "tv").addMigrations(MIGRATION_6_7).allowMainThreadQueries().fallbackToDestructiveMigration().build();
+        return Room.databaseBuilder(context, AppDatabase.class, "tv").addMigrations(MIGRATION_7_8).allowMainThreadQueries().fallbackToDestructiveMigration().build();
     }
 
     public abstract SiteDao getSiteDao();
@@ -40,12 +40,10 @@ public abstract class AppDatabase extends RoomDatabase {
 
     public abstract HistoryDao getHistoryDao();
 
-    static final Migration MIGRATION_6_7 = new Migration(6, 7) {
+    static final Migration MIGRATION_7_8 = new Migration(7, 8) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
-            database.execSQL("ALTER TABLE History ADD COLUMN position INTEGER DEFAULT 0 NOT NULL");
-            database.execSQL("UPDATE History set position = duration");
-            database.execSQL("UPDATE History set duration = 0");
+            database.execSQL("ALTER TABLE Config ADD COLUMN json TEXT DEFAULT NULL");
         }
     };
 }

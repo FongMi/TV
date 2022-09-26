@@ -52,7 +52,7 @@ public class ExoUtil {
         String[] subs = result.getSub().split("\\$\\$\\$");
         for (String sub : subs) {
             String[] divide = sub.split("#");
-            items.add(new MediaItem.SubtitleConfiguration.Builder(Uri.parse(divide[2])).setLabel(divide[0]).setMimeType(divide[1]).build());
+            items.add(new MediaItem.SubtitleConfiguration.Builder(Uri.parse(divide[2])).setLabel(divide[0]).setLanguage("zh").setMimeType(divide[1]).build());
         }
         return items;
     }
