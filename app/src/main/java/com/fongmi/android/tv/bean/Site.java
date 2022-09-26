@@ -15,7 +15,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.Collections;
 import java.util.List;
 
-@Entity(ignoredColumns = {"type", "api", "playUrl", "ext", "categories", "jar"})
+@Entity(ignoredColumns = {"type", "api", "playUrl", "ext", "jar", "categories"})
 public class Site {
 
     @NonNull

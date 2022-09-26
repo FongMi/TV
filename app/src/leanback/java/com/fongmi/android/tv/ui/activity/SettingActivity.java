@@ -110,8 +110,8 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
     private void loadConfig() {
         ApiConfig.get().clear().loadConfig(new Callback() {
             @Override
-            public void success() {
-                Config.save();
+            public void success(String json) {
+                Config.save(json);
                 setSite(0);
             }
 
