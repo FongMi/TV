@@ -47,6 +47,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     private CustomScroller mScroller;
     private List<Filter> mFilters;
     private List<String> mTypeIds;
+    private boolean mOpen;
 
     private String getTypeId() {
         return getArguments().getString("typeId");
@@ -112,7 +113,8 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         for (int i = 0; i < adapter.size(); i++) ((Filter.Value) adapter.get(i)).setActivated(item);
         adapter.notifyArrayItemRangeChanged(0, adapter.size());
         mExtend.put(key, item.getV());
-        getVideo();
+        if (isFolder()) refresh(1);
+        else getVideo();
     }
 
     private void getVideo() {
@@ -130,8 +132,9 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         if (page.equals("1")) mLast = null;
         if (isFolder()) mTypeIds.add(typeId);
         if (isFolder()) mBinding.recycler.moveToTop();
-        boolean clear = page.equals("1") && mAdapter.size() > mFilters.size();
-        if (clear) mAdapter.removeItems(mFilters.size(), mAdapter.size() - mFilters.size());
+        int filterSize = mOpen ? mFilters.size() : 0;
+        boolean clear = page.equals("1") && mAdapter.size() > filterSize;
+        if (clear) mAdapter.removeItems(filterSize, mAdapter.size() - filterSize);
         mViewModel.categoryContent(typeId, page, true, mExtend);
     }
 
@@ -166,15 +169,19 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
             rows.add(new ListRow(adapter));
         }
         mAdapter.addAll(0, rows);
+        mBinding.recycler.postDelayed(() -> mBinding.recycler.smoothScrollToPosition(0), 50);
+    }
+
+    private void refresh(int num) {
+        String typeId = mTypeIds.get(mTypeIds.size() - num);
+        mTypeIds = mTypeIds.subList(0, mTypeIds.size() - num);
+        getVideo(typeId, "1");
     }
 
     public void toggleFilter(boolean open) {
-        if (open) {
-            addFilter();
-            mBinding.recycler.postDelayed(() -> mBinding.recycler.smoothScrollToPosition(0), 50);
-        } else {
-            mAdapter.removeItems(0, mFilters.size());
-        }
+        if (open) addFilter();
+        else mAdapter.removeItems(0, mFilters.size());
+        mOpen = open;
     }
 
     public boolean canGoBack() {
@@ -182,9 +189,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     }
 
     public void goBack() {
-        String typeId = mTypeIds.get(mTypeIds.size() - 2);
-        mTypeIds = mTypeIds.subList(0, mTypeIds.size() - 2);
-        getVideo(typeId, "1");
+        refresh(2);
     }
 
     @Override
