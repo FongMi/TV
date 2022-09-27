@@ -72,7 +72,7 @@ public class CollectFragment extends BaseFragment implements VodPresenter.OnClic
     }
 
     public void addVideo(List<Vod> items) {
-        if (checkLastSize(items)) return;
+        if (checkLastSize(items) || getActivity() == null || getActivity().isFinishing()) return;
         List<ListRow> rows = new ArrayList<>();
         for (List<Vod> part : Lists.partition(items, Prefers.getColumn())) {
             mLast = new ArrayObjectAdapter(new VodPresenter(this));
