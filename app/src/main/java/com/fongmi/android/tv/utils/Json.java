@@ -15,11 +15,19 @@ public class Json {
         else return value;
     }
 
-    public static List<String> safeList(JsonObject obj, String key) {
+    public static List<String> safeListString(JsonObject obj, String key) {
         List<String> result = new ArrayList<>();
         if (!obj.has(key)) return result;
         if (obj.get(key).isJsonObject()) result.add(obj.get(key).getAsString());
         else for (JsonElement opt : obj.getAsJsonArray(key)) result.add(opt.getAsString());
+        return result;
+    }
+
+    public static List<JsonElement> safeListElement(JsonObject obj, String key) {
+        List<JsonElement> result = new ArrayList<>();
+        if (!obj.has(key)) return result;
+        if (obj.get(key).isJsonObject()) result.add(obj.get(key).getAsJsonObject());
+        for (JsonElement opt : obj.getAsJsonArray(key)) result.add(opt.getAsJsonObject());
         return result;
     }
 
