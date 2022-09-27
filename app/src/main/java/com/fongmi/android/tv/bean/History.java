@@ -184,9 +184,9 @@ public class History {
 
     private void checkMerge(List<History> items) {
         for (History item : items) {
-            if (Math.abs(item.getDuration() - getDuration()) > 10 * 60 * 1000) continue;
-            setOpening(item.getOpening());
-            setEnding(item.getEnding());
+            if (getKey().equals(item.getKey()) || Math.abs(item.getDuration() - getDuration()) > 10 * 60 * 1000) continue;
+            if (getOpening() == 0) setOpening(item.getOpening());
+            if (getEnding() == 0) setEnding(item.getEnding());
             item.delete();
         }
     }
