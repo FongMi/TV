@@ -1,7 +1,6 @@
 package com.fongmi.android.tv.api;
 
 import android.content.Context;
-import android.text.TextUtils;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.net.OKHttp;
@@ -13,9 +12,6 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.lang.reflect.Method;
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -36,13 +32,6 @@ public class JarLoader {
         this.methods = new ConcurrentHashMap<>();
     }
 
-    public void load(File file) {
-        loaders.clear();
-        spiders.clear();
-        methods.clear();
-        load("", file);
-    }
-
     public void load(String key, File file) {
         try {
             DexClassLoader loader = new DexClassLoader(file.getAbsolutePath(), FileUtil.getCachePath(), null, App.get().getClassLoader());
@@ -57,9 +46,14 @@ public class JarLoader {
         }
     }
 
-    private void parseJar(String key, String jar) throws Exception {
-        if (jar.startsWith("http")) {
-            load(key, FileUtil.write(FileUtil.getJar(MD5(jar)), OKHttp.newCall(jar).execute().body().bytes()));
+    public void parseJar(String key, String jar) throws Exception {
+        String[] texts = jar.split(";md5;");
+        String md5 = jar.startsWith("http") && texts.length > 1 ? texts[1].trim() : "";
+        jar = texts[0];
+        if (md5.length() > 0 && FileUtil.equals(jar, md5)) {
+            load(key, FileUtil.getJar(jar));
+        } else if (jar.startsWith("http")) {
+            load(key, FileUtil.write(FileUtil.getJar(jar), OKHttp.newCall(jar).execute().body().bytes()));
         } else if (jar.startsWith("file")) {
             load(key, FileUtil.getLocal(jar));
         } else if (!jar.isEmpty()) {
@@ -69,7 +63,7 @@ public class JarLoader {
 
     public Spider getSpider(String key, String api, String ext, String jar) {
         try {
-            current = MD5(jar);
+            current = FileUtil.getMD5(jar);
             api = api.replace("csp_", "");
             if (spiders.containsKey(key)) return spiders.get(key);
             if (!loaders.containsKey(current)) parseJar(current, jar);
@@ -117,20 +111,6 @@ public class JarLoader {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
-        }
-    }
-
-    public String MD5(String src) {
-        try {
-            if (TextUtils.isEmpty(src)) return "";
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            byte[] messageDigest = md.digest(src.getBytes());
-            BigInteger no = new BigInteger(1, messageDigest);
-            StringBuilder sb = new StringBuilder(no.toString(16));
-            while (sb.length() < 32) sb.insert(0, "0");
-            return sb.toString().toLowerCase();
-        } catch (NoSuchAlgorithmException e) {
-            return "";
         }
     }
 }

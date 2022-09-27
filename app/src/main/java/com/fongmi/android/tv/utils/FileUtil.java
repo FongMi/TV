@@ -16,8 +16,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
+import java.math.BigInteger;
 import java.net.URLConnection;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class FileUtil {
 
@@ -39,12 +41,8 @@ public class FileUtil {
         return new File(getCacheDir(), fileName);
     }
 
-    public static File getJar() {
-        return getCacheFile("spider.jar");
-    }
-
     public static File getJar(String fileName) {
-        return getCacheFile(fileName.concat(".jar"));
+        return getCacheFile(getMD5(fileName).concat(".jar"));
     }
 
     public static File getLocal(String path) {
@@ -109,8 +107,22 @@ public class FileUtil {
         }
     }
 
-    public static boolean equals(String md5) {
-        return getMd5(FileUtil.getJar()).equalsIgnoreCase(md5);
+    public static String getMD5(String src) {
+        try {
+            if (TextUtils.isEmpty(src)) return "";
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] messageDigest = md.digest(src.getBytes());
+            BigInteger no = new BigInteger(1, messageDigest);
+            StringBuilder sb = new StringBuilder(no.toString(16));
+            while (sb.length() < 32) sb.insert(0, "0");
+            return sb.toString().toLowerCase();
+        } catch (NoSuchAlgorithmException e) {
+            return "";
+        }
+    }
+
+    public static boolean equals(String jar, String md5) {
+        return getMd5(getJar(jar)).equalsIgnoreCase(md5);
     }
 
     public static void clearDir(File dir) {
