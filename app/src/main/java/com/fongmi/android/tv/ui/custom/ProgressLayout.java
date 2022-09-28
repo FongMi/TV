@@ -79,6 +79,11 @@ public class ProgressLayout extends RelativeLayout {
         switchState(State.CONTENT);
     }
 
+    public void showContent(boolean flag, int size) {
+        if (flag && size == 0) showEmpty();
+        else showContent();
+    }
+
     public void switchState(State state) {
         if (mState == state) return;
         mState = state;
