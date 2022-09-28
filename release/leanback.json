@@ -1,6 +1,6 @@
 {
-  "code": 31,
-  "name": "1.3.1",
+  "code": 32,
+  "name": "1.3.2",
   "url": "https://github.com/FongMi/TV/blob/main/release/leanback.apk?raw=true",
-  "desc": "1. 支援 Android 13\n2. 支援推送剪貼版內容\n3. 字幕預設中文\n4. 支援配置緩存\n5. 修正片頭片尾問題\n6. 修正閃退問題"
+  "desc": "1. 支援 Alist 篩選\n2. 優化字幕名稱顯示"
 }
