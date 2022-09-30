@@ -8,6 +8,7 @@ import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.PlaybackException;
@@ -37,8 +38,8 @@ public class Players implements Player.Listener, ParseTask.Callback {
     private void setupPlayer() {
         DefaultTrackSelector selector = new DefaultTrackSelector(App.get());
         selector.setParameters(selector.getParameters().buildUpon().setPreferredTextLanguage("zh").build());
-        DefaultRenderersFactory factory = new DefaultRenderersFactory(App.get()).setEnableDecoderFallback(true).setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON);
-        exoPlayer = new ExoPlayer.Builder(App.get()).setRenderersFactory(factory).setTrackSelector(selector).build();
+        DefaultRenderersFactory factory = new DefaultRenderersFactory(App.get()).experimentalSetSynchronizeCodecInteractionsWithQueueingEnabled(true).setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON);
+        exoPlayer = new ExoPlayer.Builder(App.get()).setLoadControl(new DefaultLoadControl()).setRenderersFactory(factory).setTrackSelector(selector).build();
         exoPlayer.addListener(this);
     }
 
