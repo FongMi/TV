@@ -98,6 +98,7 @@ public class Config {
 
     public void delete() {
         AppDatabase.get().getConfigDao().delete(getUrl());
+        //TODO DELETE KEEP
         History.delete(getId());
     }
 }
