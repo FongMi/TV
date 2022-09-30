@@ -23,6 +23,7 @@ import androidx.viewbinding.ViewBinding;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.History;
+import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Part;
 import com.fongmi.android.tv.bean.Result;
@@ -146,6 +147,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         EventBus.getDefault().register(this);
         mControl.replay.setOnClickListener(view -> getPlayer(true));
         mBinding.video.setOnClickListener(view -> enterFullscreen());
+        mBinding.desc.setOnClickListener(view -> onDesc());
+        mBinding.keep.setOnClickListener(view -> onKeep());
         mControl.next.setOnClickListener(view -> checkNext());
         mControl.prev.setOnClickListener(view -> checkPrev());
         mControl.scale.setOnClickListener(view -> onScale());
@@ -343,6 +346,20 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         mBinding.video.setLayoutParams(mFrameParams);
         getPlayerView().setUseController(false);
         mFullscreen = false;
+    }
+
+    private void onDesc() {
+
+    }
+
+    private void onKeep() {
+        Keep keep = new Keep();
+        keep.setKey(getHistoryKey());
+        keep.setCid(ApiConfig.getCid());
+        keep.setSiteName(ApiConfig.getSiteName(getKey()));
+        keep.setVodPic(mBinding.video.getTag().toString());
+        keep.setVodName(mBinding.name.getText().toString());
+        keep.save();
     }
 
     private void checkNext() {
