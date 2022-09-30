@@ -222,6 +222,7 @@ public class ApiConfig {
         this.lives.clear();
         this.flags.clear();
         this.parses.clear();
+        this.loader.clear();
         this.home = null;
         return this;
     }
