@@ -32,6 +32,12 @@ public class JarLoader {
         this.methods = new ConcurrentHashMap<>();
     }
 
+    public void clear() {
+        this.loaders.clear();
+        this.spiders.clear();
+        this.methods.clear();
+    }
+
     public void load(String key, File file) {
         try {
             DexClassLoader loader = new DexClassLoader(file.getAbsolutePath(), FileUtil.getCachePath(), null, App.get().getClassLoader());
