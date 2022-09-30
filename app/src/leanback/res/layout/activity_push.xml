@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:gravity="center"
-        android:lineSpacingExtra="4dp"
+        android:lineSpacingExtra="8dp"
         android:shadowColor="@color/black"
         android:shadowDx="2"
         android:shadowDy="2"

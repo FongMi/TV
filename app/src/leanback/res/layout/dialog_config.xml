@@ -7,8 +7,8 @@
 
     <ImageView
         android:id="@+id/code"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
+        android:layout_width="170dp"
+        android:layout_height="170dp"
         android:scaleType="fitXY" />
 
     <TextView
@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/bottom"
         android:layout_alignStart="@+id/info"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="10dp"
         android:hint="@string/dialog_config_hint"
         android:imeOptions="actionDone"
         android:importantForAutofill="no"
