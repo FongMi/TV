@@ -35,7 +35,7 @@ public class CustomHorizontalGridView extends HorizontalGridView {
     @Override
     protected void initAttributes(@NonNull Context context, @Nullable AttributeSet attrs) {
         super.initAttributes(context, attrs);
-        this.shake = ResUtil.getAnim(R.anim.shake);
+        this.shake = isInEditMode() ? null : ResUtil.getAnim(R.anim.shake);
     }
 
     @Override

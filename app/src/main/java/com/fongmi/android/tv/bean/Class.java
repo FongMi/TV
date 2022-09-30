@@ -54,9 +54,9 @@ public class Class {
         this.activated = activated;
     }
 
-    public Class toggleFilter() {
+    public boolean toggleFilter() {
         setFilter(!getFilter());
-        return this;
+        return getFilter();
     }
 
     public int getIcon() {

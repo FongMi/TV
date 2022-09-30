@@ -15,7 +15,7 @@ public class CustomRowPresenter extends ListRowPresenter {
     private final int strategy;
 
     public CustomRowPresenter(int spacing) {
-        this(spacing, FocusHighlight.ZOOM_FACTOR_MEDIUM);
+        this(spacing, FocusHighlight.ZOOM_FACTOR_SMALL);
     }
 
     @SuppressLint("RestrictedApi")

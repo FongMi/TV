@@ -125,7 +125,7 @@ public class VodActivity extends BaseActivity {
 
     private void updateFilter(Class item) {
         if (item.getFilter() == null) return;
-        getFragment().toggleFilter(item.toggleFilter().getFilter());
+        getFragment().toggleFilter(item.toggleFilter());
         mAdapter.notifyArrayItemRangeChanged(0, mAdapter.size());
     }
 
