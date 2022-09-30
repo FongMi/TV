@@ -8,6 +8,6 @@ import com.fongmi.android.tv.bean.Site;
 @Dao
 public abstract class SiteDao extends BaseDao<Site> {
 
-    @Query("SELECT * FROM site WHERE `key` = :key")
+    @Query("SELECT * FROM Site WHERE `key` = :key")
     public abstract Site find(String key);
 }
