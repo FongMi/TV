@@ -22,6 +22,8 @@
     <string name="detail_director">导演：<xliff:g name="name">%s</xliff:g></string>
     <string name="detail_actor">演员：<xliff:g name="name">%s</xliff:g></string>
     <string name="detail_content">简介：<xliff:g name="name">%s</xliff:g></string>
+    <string name="detail_desc">简介</string>
+    <string name="detail_keep">收藏</string>
 
     <!-- Play -->
     <string name="play">播放</string>

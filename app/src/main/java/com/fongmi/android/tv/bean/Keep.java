@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.db.AppDatabase;
 
 import java.util.List;
@@ -14,7 +15,6 @@ public class Keep {
     @NonNull
     @PrimaryKey
     private String key;
-    private String siteName;
     private String vodName;
     private String vodPic;
     private long createTime;
@@ -27,14 +27,6 @@ public class Keep {
 
     public void setKey(@NonNull String key) {
         this.key = key;
-    }
-
-    public String getSiteName() {
-        return siteName;
-    }
-
-    public void setSiteName(String siteName) {
-        this.siteName = siteName;
     }
 
     public String getVodName() {
@@ -77,12 +69,17 @@ public class Keep {
         return getKey().substring(getKey().lastIndexOf(AppDatabase.SYMBOL) + AppDatabase.SYMBOL.length());
     }
 
+    public static Keep find(String key) {
+        return AppDatabase.get().getKeepDao().find(ApiConfig.getCid(), key);
+    }
+
     public static List<Keep> getAll() {
         return AppDatabase.get().getKeepDao().getAll();
     }
 
-    public void save() {
+    public Keep save() {
         AppDatabase.get().getKeepDao().insert(this);
+        return this;
     }
 
     public void delete() {

@@ -160,7 +160,7 @@
 
     <LinearLayout
         android:id="@+id/row2"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/name"
         android:layout_alignBottom="@+id/video"
@@ -172,22 +172,28 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:background="@drawable/selector_item"
+            android:drawablePadding="6dp"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            android:text="簡介"
+            android:gravity="center"
+            android:text="@string/detail_desc"
             android:textColor="@color/white"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            app:drawableStartCompat="@drawable/ic_desc" />
 
         <TextView
             android:id="@+id/keep"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/selector_item"
+            android:drawablePadding="6dp"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            android:text="收藏"
+            android:gravity="center"
+            android:text="@string/detail_keep"
             android:textColor="@color/white"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            app:drawableStartCompat="@drawable/ic_keep_added" />
 
     </LinearLayout>
 
