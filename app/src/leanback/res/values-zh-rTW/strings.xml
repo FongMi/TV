@@ -4,6 +4,7 @@
     <string name="home_vod">點播</string>
     <string name="home_live">直播</string>
     <string name="home_search">搜尋</string>
+    <string name="home_keep">收藏</string>
     <string name="home_push">推送</string>
     <string name="home_setting">設定</string>
     <string name="home_history">最近觀看</string>
