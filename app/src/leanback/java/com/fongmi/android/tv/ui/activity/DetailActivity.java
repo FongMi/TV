@@ -40,6 +40,7 @@ import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.custom.CustomKeyDown;
 import com.fongmi.android.tv.ui.custom.TrackSelectionDialog;
+import com.fongmi.android.tv.ui.custom.dialog.DescDialog;
 import com.fongmi.android.tv.ui.presenter.EpisodePresenter;
 import com.fongmi.android.tv.ui.presenter.FlagPresenter;
 import com.fongmi.android.tv.ui.presenter.GroupPresenter;
@@ -254,11 +255,13 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         mBinding.video.requestFocus();
         getPart(item.getVodName());
         checkHistory();
+        checkKeep();
     }
 
     private void setText(TextView view, int resId, String text) {
         if (text.isEmpty()) view.setVisibility(View.GONE);
         else view.setText(ResUtil.getString(resId, text));
+        view.setTag(text);
     }
 
     private void setFlagActivated(Vod.Flag item) {
@@ -349,17 +352,15 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     }
 
     private void onDesc() {
-
+        DescDialog.show(this, mBinding.content.getTag().toString());
     }
 
     private void onKeep() {
-        Keep keep = new Keep();
-        keep.setKey(getHistoryKey());
-        keep.setCid(ApiConfig.getCid());
-        keep.setSiteName(ApiConfig.getSiteName(getKey()));
-        keep.setVodPic(mBinding.video.getTag().toString());
-        keep.setVodName(mBinding.name.getText().toString());
-        keep.save();
+        Keep keep = Keep.find(getHistoryKey());
+        Notify.show(keep != null ? "已取消收藏" : "已加入收藏");
+        if (keep != null) keep.delete();
+        else createKeep();
+        checkKeep();
     }
 
     private void checkNext() {
@@ -509,6 +510,20 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         if (mHistory == null || mPlayers.getCurrentPosition() <= 0) return;
         mHistory.update(mPlayers.getCurrentPosition(), mPlayers.getDuration());
         RefreshEvent.history();
+    }
+
+    private void checkKeep() {
+        mBinding.keep.setCompoundDrawablesRelativeWithIntrinsicBounds(Keep.find(getHistoryKey()) == null ? R.drawable.ic_keep_not_yet : R.drawable.ic_keep_added, 0, 0, 0);
+    }
+
+    private void createKeep() {
+        Keep keep = new Keep();
+        keep.setKey(getHistoryKey());
+        keep.setCid(ApiConfig.getCid());
+        keep.setVodPic(mBinding.video.getTag().toString());
+        keep.setVodName(mBinding.name.getText().toString());
+        keep.setCreateTime(System.currentTimeMillis());
+        keep.save();
     }
 
     private final Runnable mHideCenter = new Runnable() {

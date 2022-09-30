@@ -56,7 +56,7 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
         String address = Server.get().getAddress(false);
         binding.text.setText(Prefers.getUrl());
         binding.text.setSelection(binding.text.getText().length());
-        binding.code.setImageBitmap(QRCode.getBitmap(address, 170, 0));
+        binding.code.setImageBitmap(QRCode.getBitmap(address, 180, 0));
         binding.info.setText(ResUtil.getString(R.string.push_info, address).replace("，", "\n"));
     }
 
