@@ -65,7 +65,7 @@ public class KeepActivity extends BaseActivity implements KeepPresenter.OnClickL
     private void loadConfig(Config config, Keep item) {
         Prefers.putUrl(config.getUrl());
         ApiConfig.get().setCid(config.update().getId());
-        ApiConfig.get().clear().loadConfig(new Callback() {
+        ApiConfig.get().clear().loadConfig(true, new Callback() {
             @Override
             public void success(String json) {
                 DetailActivity.start(getActivity(), item.getSiteKey(), item.getVodId());

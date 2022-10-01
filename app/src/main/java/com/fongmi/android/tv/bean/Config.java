@@ -73,17 +73,12 @@ public class Config {
 
     public static Config find(String url) {
         Config item = AppDatabase.get().getConfigDao().find(url);
-        return item == null ? Config.create() : item.newTime();
+        return item == null ? Config.create() : item;
     }
 
     public static void save(String json) {
         Config item = find(Prefers.getUrl()).json(json);
         ApiConfig.get().setCid(item.update().getId());
-    }
-
-    public Config newTime() {
-        setTime(System.currentTimeMillis());
-        return this;
     }
 
     public Config json(String json) {
@@ -96,6 +91,7 @@ public class Config {
     }
 
     public Config update() {
+        setTime(System.currentTimeMillis());
         AppDatabase.get().getConfigDao().update(this);
         return this;
     }
