@@ -37,6 +37,6 @@ public class PushActivity extends BaseActivity {
 
     private void onClip(View view) {
         ClipData data = ((ClipboardManager) getSystemService(CLIPBOARD_SERVICE)).getPrimaryClip();
-        if (data.getItemCount() > 0) DetailActivity.start(PushActivity.this, "push_agent", data.getItemAt(0).getText().toString());
+        if (data != null && data.getItemCount() > 0) DetailActivity.start(this, "push_agent", data.getItemAt(0).getText().toString());
     }
 }
