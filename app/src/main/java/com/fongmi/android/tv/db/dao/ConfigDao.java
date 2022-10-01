@@ -13,6 +13,9 @@ public abstract class ConfigDao extends BaseDao<Config> {
     @Query("SELECT * FROM Config ORDER BY time DESC")
     public abstract List<Config> getAll();
 
+    @Query("SELECT * FROM Config WHERE id = :id")
+    public abstract Config find(int id);
+
     @Query("SELECT * FROM Config WHERE url = :url")
     public abstract Config find(String url);
 

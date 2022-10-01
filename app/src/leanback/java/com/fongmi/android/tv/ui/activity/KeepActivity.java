@@ -8,8 +8,12 @@ import androidx.leanback.widget.ItemBridgeAdapter;
 import androidx.leanback.widget.ListRow;
 import androidx.viewbinding.ViewBinding;
 
+import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.databinding.ActivityKeepBinding;
+import com.fongmi.android.tv.event.RefreshEvent;
+import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.ui.custom.CustomRowPresenter;
 import com.fongmi.android.tv.ui.custom.CustomSelector;
 import com.fongmi.android.tv.ui.presenter.KeepPresenter;
@@ -58,9 +62,34 @@ public class KeepActivity extends BaseActivity implements KeepPresenter.OnClickL
         mAdapter.addAll(0, rows);
     }
 
+    private void loadConfig(Config config, Keep item) {
+        Prefers.putUrl(config.getUrl());
+        ApiConfig.get().setCid(config.update().getId());
+        ApiConfig.get().clear().loadConfig(new Callback() {
+            @Override
+            public void success(String json) {
+                DetailActivity.start(getActivity(), item.getSiteKey(), item.getVodId());
+                RefreshEvent.history();
+                RefreshEvent.video();
+            }
+
+            @Override
+            public void error(int resId) {
+                CollectActivity.start(getActivity(), item.getVodName());
+            }
+        });
+    }
+
     @Override
     public void onItemClick(Keep item) {
-
+        Config config = Config.find(item.getCid());
+        if (item.getCid() == ApiConfig.getCid()) {
+            DetailActivity.start(this, item.getSiteKey(), item.getVodId());
+        } else if (config == null) {
+            CollectActivity.start(this, item.getVodName());
+        } else {
+            loadConfig(config, item);
+        }
     }
 
     @Override
