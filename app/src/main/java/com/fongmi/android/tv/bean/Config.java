@@ -67,6 +67,10 @@ public class Config {
         return items;
     }
 
+    public static Config find(int id) {
+        return AppDatabase.get().getConfigDao().find(id);
+    }
+
     public static Config find(String url) {
         Config item = AppDatabase.get().getConfigDao().find(url);
         return item == null ? Config.create() : item.newTime();
@@ -98,7 +102,7 @@ public class Config {
 
     public void delete() {
         AppDatabase.get().getConfigDao().delete(getUrl());
-        //TODO DELETE KEEP
         History.delete(getId());
+        Keep.delete(getId());
     }
 }
