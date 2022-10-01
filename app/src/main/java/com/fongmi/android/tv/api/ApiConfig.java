@@ -80,9 +80,14 @@ public class ApiConfig {
     }
 
     public void loadConfig(Callback callback) {
+        loadConfig(false, callback);
+    }
+
+    public void loadConfig(boolean cache, Callback callback) {
         new Thread(() -> {
             String url = Prefers.getUrl();
-            if (url.startsWith("http")) getWebConfig(url, callback);
+            if (cache) getCacheConfig(url, callback);
+            else if (url.startsWith("http")) getWebConfig(url, callback);
             else if (url.startsWith("file")) getFileConfig(url, callback);
             else handler.post(() -> callback.error(0));
         }).start();
