@@ -10,7 +10,6 @@ import androidx.leanback.widget.Presenter;
 import com.bumptech.glide.Glide;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.databinding.AdapterVodBinding;
 import com.fongmi.android.tv.utils.Prefers;
@@ -67,7 +66,7 @@ public class KeepPresenter extends Presenter {
         holder.binding.name.setText(item.getVodName());
         holder.binding.remark.setVisibility(View.GONE);
         holder.binding.site.setVisibility(View.VISIBLE);
-        holder.binding.site.setText(ApiConfig.getSiteName(item.getSiteKey()));
+        holder.binding.site.setText(item.getSiteName());
         holder.binding.delete.setVisibility(!delete ? View.GONE : View.VISIBLE);
         Glide.with(App.get()).load(item.getVodPic()).centerCrop().error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).into(holder.binding.image);
     }

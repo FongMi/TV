@@ -52,6 +52,9 @@ android {
 
 dependencies {
     implementation project(':catvod')
+    implementation project(':exoplayer-library')
+    implementation project(':exoplayer-extension-rtmp')
+    implementation project(':exoplayer-extension-ffmpeg')
     implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation 'androidx.core:core-splashscreen:1.0.0'
     implementation 'androidx.preference:preference:1.2.0'
@@ -62,8 +65,6 @@ dependencies {
     implementation 'com.github.bassaer:materialdesigncolors:1.0.0'
     implementation 'com.github.bumptech.glide:glide:4.14.1'
     implementation 'com.google.android.material:material:1.6.1'
-    implementation 'com.google.android.exoplayer:exoplayer:2.18.1'
-    implementation 'com.google.android.exoplayer:extension-rtmp:2.18.1'
     implementation 'com.google.code.gson:gson:2.9.1'
     implementation 'com.google.zxing:core:3.5.0'
     implementation 'com.makeramen:roundedimageview:2.3.0'

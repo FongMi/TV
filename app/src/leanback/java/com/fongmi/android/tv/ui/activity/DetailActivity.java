@@ -352,7 +352,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     }
 
     private void onDesc() {
-        DescDialog.show(this, mBinding.content.getTag().toString());
+        String desc = mBinding.content.getTag().toString().trim();
+        if (desc.length() > 0) DescDialog.show(this, desc);
     }
 
     private void onKeep() {
@@ -520,6 +521,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         Keep keep = new Keep();
         keep.setKey(getHistoryKey());
         keep.setCid(ApiConfig.getCid());
+        keep.setSiteName(ApiConfig.getSiteName(getKey()));
         keep.setVodPic(mBinding.video.getTag().toString());
         keep.setVodName(mBinding.name.getText().toString());
         keep.setCreateTime(System.currentTimeMillis());
