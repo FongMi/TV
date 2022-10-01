@@ -6,7 +6,6 @@ import android.net.Uri;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.utils.FileUtil;
-import com.github.catvod.crawler.SpiderDebug;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.database.DatabaseProvider;
 import com.google.android.exoplayer2.database.StandaloneDatabaseProvider;
@@ -45,13 +44,10 @@ public class ExoUtil {
     }
 
     private static MediaSource getSource(Map<String, String> headers, String url, List<MediaItem.SubtitleConfiguration> config) {
-        SpiderDebug.log(url);
-        Uri videoUri = Uri.parse(url);
-        DataSource.Factory factory = getDataSourceFactory(headers);
-        MediaItem.Builder builder = new MediaItem.Builder().setUri(videoUri);
+        MediaItem.Builder builder = new MediaItem.Builder().setUri(Uri.parse(url));
         if (url.contains("php") || url.contains("m3u8")) builder.setMimeType(MimeTypes.APPLICATION_M3U8);
         if (config.size() > 0) builder.setSubtitleConfigurations(config);
-        return new DefaultMediaSourceFactory(factory).createMediaSource(builder.build());
+        return new DefaultMediaSourceFactory(getDataSourceFactory(headers)).createMediaSource(builder.build());
     }
 
     private static List<MediaItem.SubtitleConfiguration> getConfig(Result result) {
@@ -60,7 +56,7 @@ public class ExoUtil {
         String[] subs = result.getSub().split("\\$\\$\\$");
         for (String sub : subs) {
             String[] divide = sub.split("#");
-            items.add(new MediaItem.SubtitleConfiguration.Builder(Uri.parse(divide[2])).setLabel(divide[0]).setLanguage("zh").setMimeType(divide[1]).build());
+            items.add(new MediaItem.SubtitleConfiguration.Builder(Uri.parse(divide[2])).setLabel(divide[0]).setMimeType(divide[1]).setLanguage("zh").build());
         }
         return items;
     }
