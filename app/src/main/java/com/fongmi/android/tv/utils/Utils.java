@@ -55,6 +55,7 @@ public class Utils {
     public static boolean isVideoFormat(String url, Map<String, String> headers) {
         if (headers.containsKey("Range")) return true;
         if (headers.containsKey("Accept") && Objects.requireNonNull(headers.get("Accept")).contains("image")) return false;
+        if (url.contains(".js") || url.contains(".css")) return false;
         return SNIFFER.matcher(url).find();
     }
 
