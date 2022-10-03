@@ -1,6 +1,7 @@
 package com.fongmi.android.tv.bean;
 
 import androidx.annotation.NonNull;
+import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
@@ -202,5 +203,23 @@ public class History {
     public History delete() {
         AppDatabase.get().getHistoryDao().delete(ApiConfig.getCid(), getKey());
         return this;
+    }
+
+    public void findEpisode(ArrayObjectAdapter adapter) {
+        Vod.Flag flag = (Vod.Flag) adapter.get(0);
+        setVodFlag(flag.getFlag());
+        setVodRemarks(flag.getEpisodes().get(0).getName());
+        for (History item : AppDatabase.get().getHistoryDao().findByName(ApiConfig.getCid(), getVodName())) {
+            if (getPosition() > 0) break;
+            for (int i = 0; i < adapter.size(); i++) {
+                flag = (Vod.Flag) adapter.get(i);
+                String episode = flag.find(item.getVodRemarks());
+                if (episode.isEmpty()) continue;
+                setPosition(item.getPosition());
+                setVodFlag(flag.getFlag());
+                setVodRemarks(episode);
+                break;
+            }
+        }
     }
 }
