@@ -481,8 +481,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
             mControl.ending.setText(mPlayers.getStringForTime(mHistory.getEnding()));
         } else {
             mHistory = createHistory();
-            setFlagActivated((Vod.Flag) mFlagAdapter.get(0));
-            setEpisodeActivated((Vod.Flag.Episode) mEpisodeAdapter.get(0));
+            setFlagActivated(mHistory.getFlag());
+            setEpisodeActivated(mHistory.getEpisode());
             mControl.opening.setText(mPlayers.getStringForTime(0));
             mControl.ending.setText(mPlayers.getStringForTime(0));
         }
@@ -494,6 +494,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         history.setCid(ApiConfig.getCid());
         history.setVodPic(mBinding.video.getTag().toString());
         history.setVodName(mBinding.name.getText().toString());
+        history.findEpisode(mFlagAdapter);
         return history;
     }
 
