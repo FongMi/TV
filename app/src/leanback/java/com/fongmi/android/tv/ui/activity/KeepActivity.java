@@ -21,6 +21,10 @@ import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.common.collect.Lists;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,8 +44,9 @@ public class KeepActivity extends BaseActivity implements KeepPresenter.OnClickL
 
     @Override
     protected void initView() {
+        EventBus.getDefault().register(this);
         setRecyclerView();
-        getVideo();
+        getKeep();
     }
 
     private void setRecyclerView() {
@@ -52,7 +57,7 @@ public class KeepActivity extends BaseActivity implements KeepPresenter.OnClickL
         mBinding.recycler.setHeader(mBinding.toolbar);
     }
 
-    private void getVideo() {
+    private void getKeep() {
         List<ListRow> rows = new ArrayList<>();
         for (List<Keep> part : Lists.partition(Keep.getAll(), Prefers.getColumn())) {
             ArrayObjectAdapter adapter = new ArrayObjectAdapter(new KeepPresenter(this));
@@ -80,6 +85,14 @@ public class KeepActivity extends BaseActivity implements KeepPresenter.OnClickL
         });
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onRefreshEvent(RefreshEvent event) {
+        if (event.getType() == RefreshEvent.Type.KEEP) {
+            mAdapter.clear();
+            getKeep();
+        }
+    }
+
     @Override
     public void onItemClick(Keep item) {
         Config config = Config.find(item.getCid());
@@ -100,5 +113,11 @@ public class KeepActivity extends BaseActivity implements KeepPresenter.OnClickL
     @Override
     public boolean onLongClick() {
         return true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
     }
 }
