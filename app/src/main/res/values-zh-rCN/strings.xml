@@ -41,7 +41,7 @@
     <string name="play_backward">←</string>
     <string name="play_forward_hint">已切换正序播放</string>
     <string name="play_backward_hint">已切换倒序播放</string>
-    <string name="play_switching">正在切换线路至<xliff:g name="name">%s</xliff:g></string>
+    <string name="play_switching">正在切换线路至「<xliff:g name="name">%s</xliff:g>」</string>
 
     <!-- Parse -->
     <string name="parse">解析</string>
