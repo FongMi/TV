@@ -280,11 +280,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
 
     private void seamless(Vod.Flag flag) {
         Vod.Flag.Episode episode = flag.find(mHistory.getVodRemarks());
-        if (episode != null) {
-            if (mPlayers.getCurrentPosition() > 0) mHistory.setPosition(mPlayers.getCurrentPosition());
-            mHistory.setVodRemarks(episode.getName());
-            setEpisodeActivated(episode.deactivated());
-        }
+        if (episode == null) return;
+        if (mPlayers.getCurrentPosition() > 0) mHistory.setPosition(mPlayers.getCurrentPosition());
+        mHistory.setVodRemarks(episode.getName());
+        setEpisodeActivated(episode.deactivated());
     }
 
     private void setEpisodeActivated(Vod.Flag.Episode item) {
