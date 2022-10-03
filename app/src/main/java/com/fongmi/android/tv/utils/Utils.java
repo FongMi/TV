@@ -55,12 +55,19 @@ public class Utils {
     public static boolean isVideoFormat(String url, Map<String, String> headers) {
         if (headers.containsKey("Range")) return true;
         if (headers.containsKey("Accept") && Objects.requireNonNull(headers.get("Accept")).contains("image")) return false;
-        if (url.contains("=http") || url.contains("=https") || url.contains("=https%3a%2f") || url.contains("=http%3a%2f") || url.contains(".js") || url.contains(".css")) return false;
         return SNIFFER.matcher(url).find();
     }
 
     public static String getBase64(String ext) {
         return Base64.encodeToString(ext.getBytes(), Base64.DEFAULT | Base64.NO_WRAP);
+    }
+
+    public static int getDigit(String text) {
+        try {
+            return Integer.parseInt(text.replaceAll("\\D+", ""));
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     public static void hideKeyboard(View view) {

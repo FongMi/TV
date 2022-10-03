@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
@@ -200,10 +201,6 @@ public class Vod {
 
         private boolean activated;
 
-        public static Flag objectFrom(String str) {
-            return new Gson().fromJson(str, Flag.class);
-        }
-
         public Flag() {
             this.episodes = new ArrayList<>();
         }
@@ -225,6 +222,14 @@ public class Vod {
             return episodes;
         }
 
+        public boolean isActivated() {
+            return activated;
+        }
+
+        public void setActivated(boolean activated) {
+            this.activated = activated;
+        }
+
         public void createEpisode(String data) {
             String[] urls = data.contains("#") ? data.split("#") : new String[]{data};
             String play = ResUtil.getString(R.string.play);
@@ -235,17 +240,16 @@ public class Vod {
             }
         }
 
-        public boolean isActivated() {
-            return activated;
-        }
-
-        public void setActivated(boolean activated) {
-            this.activated = activated;
-        }
-
         public void toggle(boolean activated, Episode episode) {
             if (activated) for (Episode item : getEpisodes()) item.setActivated(episode);
             else for (Episode item : getEpisodes()) item.deactivated();
+        }
+
+        public String find(String remarks) {
+            int number = Utils.getDigit(remarks);
+            for (Vod.Flag.Episode item : getEpisodes()) if (number == item.getNumber()) return item.getName();
+            if (getEpisodes().size() == 1) return getEpisodes().get(0).getName();
+            return "";
         }
 
         @Override
@@ -269,11 +273,14 @@ public class Vod {
             @SerializedName("url")
             private final String url;
 
+            private final int number;
+
             private boolean activated;
 
             public Episode(String name, String url) {
                 this.name = name;
                 this.url = url;
+                this.number = Utils.getDigit(name);
             }
 
             public String getName() {
@@ -282,6 +289,10 @@ public class Vod {
 
             public String getUrl() {
                 return url;
+            }
+
+            public int getNumber() {
+                return number;
             }
 
             public boolean isActivated() {
