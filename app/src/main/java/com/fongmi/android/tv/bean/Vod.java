@@ -245,11 +245,11 @@ public class Vod {
             else for (Episode item : getEpisodes()) item.deactivated();
         }
 
-        public String find(String remarks) {
+        public Episode find(String remarks) {
             int number = Utils.getDigit(remarks);
-            for (Vod.Flag.Episode item : getEpisodes()) if (number == item.getNumber()) return item.getName();
-            if (getEpisodes().size() == 1) return getEpisodes().get(0).getName();
-            return "";
+            for (Vod.Flag.Episode item : getEpisodes()) if (number == item.getNumber()) return item;
+            if (getEpisodes().size() == 1) return getEpisodes().get(0);
+            return null;
         }
 
         @Override
@@ -299,8 +299,9 @@ public class Vod {
                 return activated;
             }
 
-            private void deactivated() {
+            public Episode deactivated() {
                 this.activated = false;
+                return this;
             }
 
             private void setActivated(Episode item) {
