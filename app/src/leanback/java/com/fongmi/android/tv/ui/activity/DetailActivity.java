@@ -368,8 +368,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     private void onKeep() {
         Keep keep = Keep.find(getHistoryKey());
         Notify.show(keep != null ? R.string.detail_keep_del : R.string.detail_keep_add);
-        if (keep != null) keep.delete();
-        else createKeep();
+        if (keep != null) keep.delete(); else createKeep();
+        RefreshEvent.keep();
         checkKeep();
     }
 
