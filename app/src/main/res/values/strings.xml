@@ -24,6 +24,8 @@
     <string name="detail_content">Summary: <xliff:g name="name">%s</xliff:g></string>
     <string name="detail_desc">Summary</string>
     <string name="detail_keep">Keep</string>
+    <string name="detail_keep_add">Added</string>
+    <string name="detail_keep_del">Removed</string>
 
     <!-- Play -->
     <string name="play">Play</string>
@@ -39,6 +41,7 @@
     <string name="play_backward">←</string>
     <string name="play_forward_hint">Normal play switched</string>
     <string name="play_backward_hint">Reverse play switched</string>
+    <string name="play_switching">Switching to <xliff:g name="name">%s</xliff:g></string>
 
     <!-- Parse -->
     <string name="parse">Parse</string>

@@ -213,11 +213,11 @@ public class History {
             if (getPosition() > 0) break;
             for (int i = 0; i < adapter.size(); i++) {
                 flag = (Vod.Flag) adapter.get(i);
-                String episode = flag.find(item.getVodRemarks());
-                if (episode.isEmpty()) continue;
-                setPosition(item.getPosition());
+                Vod.Flag.Episode episode = flag.find(item.getVodRemarks());
+                if (episode == null) continue;
                 setVodFlag(flag.getFlag());
-                setVodRemarks(episode);
+                setPosition(item.getPosition());
+                setVodRemarks(episode.getName());
                 break;
             }
         }

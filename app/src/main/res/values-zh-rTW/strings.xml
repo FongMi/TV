@@ -24,6 +24,8 @@
     <string name="detail_content">簡介：<xliff:g name="name">%s</xliff:g></string>
     <string name="detail_desc">簡介</string>
     <string name="detail_keep">收藏</string>
+    <string name="detail_keep_add">已加入收藏</string>
+    <string name="detail_keep_del">已取消收藏</string>
 
     <!-- Play -->
     <string name="play">播放</string>
@@ -39,6 +41,7 @@
     <string name="play_backward">←</string>
     <string name="play_forward_hint">已切換正序播放</string>
     <string name="play_backward_hint">已切換倒序播放</string>
+    <string name="play_switching">正在切換線路至<xliff:g name="name">%s</xliff:g></string>
 
     <!-- Parse -->
     <string name="parse">解析</string>

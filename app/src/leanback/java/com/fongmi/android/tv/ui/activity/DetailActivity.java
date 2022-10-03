@@ -273,8 +273,18 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
             mBinding.flag.setSelectedPosition(i);
             mEpisodeAdapter.setItems(flag.getEpisodes(), null);
             setGroup(flag.getEpisodes().size());
+            seamless(flag);
         }
         mFlagAdapter.notifyArrayItemRangeChanged(0, mFlagAdapter.size());
+    }
+
+    private void seamless(Vod.Flag flag) {
+        Vod.Flag.Episode episode = flag.find(mHistory.getVodRemarks());
+        if (episode != null) {
+            if (mPlayers.getCurrentPosition() > 0) mHistory.setPosition(mPlayers.getCurrentPosition());
+            mHistory.setVodRemarks(episode.getName());
+            setEpisodeActivated(episode.deactivated());
+        }
     }
 
     private void setEpisodeActivated(Vod.Flag.Episode item) {
@@ -358,7 +368,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
 
     private void onKeep() {
         Keep keep = Keep.find(getHistoryKey());
-        Notify.show(keep != null ? "已取消收藏" : "已加入收藏");
+        Notify.show(keep != null ? R.string.detail_keep_del : R.string.detail_keep_add);
         if (keep != null) keep.delete();
         else createKeep();
         checkKeep();
@@ -475,14 +485,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         }
         if (mHistory != null) {
             setFlagActivated(mHistory.getFlag());
-            setEpisodeActivated(mHistory.getEpisode());
             if (mHistory.isRevSort()) reverseEpisode();
             mControl.opening.setText(mPlayers.getStringForTime(mHistory.getOpening()));
             mControl.ending.setText(mPlayers.getStringForTime(mHistory.getEnding()));
         } else {
             mHistory = createHistory();
             setFlagActivated(mHistory.getFlag());
-            setEpisodeActivated(mHistory.getEpisode());
             mControl.opening.setText(mPlayers.getStringForTime(0));
             mControl.ending.setText(mPlayers.getStringForTime(0));
         }
@@ -570,7 +578,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
                 break;
             default:
                 if (!event.isRetry() || mPlayers.addRetry() > 3) onError(event.getMsg());
-                else onRetry();
+                else getPlayer(false);
                 break;
         }
     }
@@ -580,17 +588,19 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         Clock.get().setCallback(this);
     }
 
-    private void onRetry() {
-        mHistory.setPosition(mPlayers.getCurrentPosition());
-        getPlayer(false);
-    }
-
     private void onError(String msg) {
-        mBinding.widget.progress.getRoot().setVisibility(View.GONE);
-        mBinding.widget.error.setVisibility(View.VISIBLE);
-        mBinding.widget.text.setText(msg);
-        Clock.get().setCallback(null);
-        mPlayers.stop();
+        int position = mBinding.flag.getSelectedPosition();
+        if (position == mFlagAdapter.size() - 1) {
+            mBinding.widget.progress.getRoot().setVisibility(View.GONE);
+            mBinding.widget.error.setVisibility(View.VISIBLE);
+            mBinding.widget.text.setText(msg);
+            Clock.get().setCallback(null);
+            mPlayers.stop();
+        } else {
+            Vod.Flag flag = (Vod.Flag) mFlagAdapter.get(position + 1);
+            Notify.show(ResUtil.getString(R.string.play_switching, flag.getFlag()));
+            setFlagActivated(flag);
+        }
     }
 
     private void onPause(boolean visible) {
