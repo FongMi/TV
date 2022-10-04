@@ -67,7 +67,7 @@ public class Utils {
         try {
             return Integer.parseInt(text.replaceAll("\\D+", ""));
         } catch (Exception e) {
-            return 0;
+            return -1;
         }
     }
 

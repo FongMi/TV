@@ -246,8 +246,7 @@ public class Vod {
         }
 
         public Episode find(String remarks) {
-            int number = Utils.getDigit(remarks);
-            for (Vod.Flag.Episode item : getEpisodes()) if (number == item.getNumber()) return item;
+            for (Vod.Flag.Episode item : getEpisodes()) if (item.like(Utils.getDigit(remarks), remarks)) return item;
             if (getEpisodes().size() == 1) return getEpisodes().get(0);
             return null;
         }
@@ -306,6 +305,13 @@ public class Vod {
 
             private void setActivated(Episode item) {
                 this.activated = item.equals(this);
+            }
+
+            public boolean like(int number, String name) {
+                if (name.equalsIgnoreCase(getName())) return true;
+                if (name.toLowerCase().contains(getName().toLowerCase())) return true;
+                if (getName().toLowerCase().contains(name.toLowerCase())) return true;
+                return number != -1 && number == getNumber();
             }
 
             @Override
