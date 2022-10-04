@@ -35,7 +35,8 @@
     <string name="play_replay">Replay</string>
     <string name="play_reset">Reset</string>
     <string name="play_tracks">Tracks</string>
-    <string name="play_oped">OP&amp;ED</string>
+    <string name="play_op">OP</string>
+    <string name="play_ed">OP</string>
     <string name="play_reverse">Reverse</string>
     <string name="play_forward">→</string>
     <string name="play_backward">←</string>
@@ -85,7 +86,6 @@
 
     <!-- UNIT -->
     <string name="all">All</string>
-    <string name="second"><xliff:g name="name">%s</xliff:g> s</string>
 
     <string-array name="select_render">
         <item>Surface</item>

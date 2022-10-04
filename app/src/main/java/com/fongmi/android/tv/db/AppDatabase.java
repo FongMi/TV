@@ -22,7 +22,7 @@ import com.fongmi.android.tv.db.dao.SiteDao;
 @Database(entities = {Config.class, Site.class, History.class, Keep.class}, version = AppDatabase.VERSION, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
-    public static final int VERSION = 9;
+    public static final int VERSION = 10;
     public static final String SYMBOL = "@@@";
 
     private static volatile AppDatabase instance;
@@ -33,7 +33,7 @@ public abstract class AppDatabase extends RoomDatabase {
     }
 
     private static AppDatabase create(Context context) {
-        return Room.databaseBuilder(context, AppDatabase.class, "tv").addMigrations(MIGRATION_8_9).allowMainThreadQueries().fallbackToDestructiveMigration().build();
+        return Room.databaseBuilder(context, AppDatabase.class, "tv").addMigrations(MIGRATION_8_9).addMigrations(MIGRATION_9_10).allowMainThreadQueries().fallbackToDestructiveMigration().build();
     }
 
     public abstract KeepDao getKeepDao();
@@ -48,6 +48,13 @@ public abstract class AppDatabase extends RoomDatabase {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             database.execSQL("CREATE TABLE IF NOT EXISTS `Keep` (`key` TEXT NOT NULL, `siteName` TEXT, `vodName` TEXT, `vodPic` TEXT, `createTime` INTEGER NOT NULL, `cid` INTEGER NOT NULL, PRIMARY KEY(`key`))");
+        }
+    };
+
+    static final Migration MIGRATION_9_10 = new Migration(9, 10) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("UPDATE `History` SET ending = 0;");
         }
     };
 }

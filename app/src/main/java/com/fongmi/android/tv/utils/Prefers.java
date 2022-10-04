@@ -116,14 +116,6 @@ public class Prefers {
         put("scale", scale);
     }
 
-    public static int getInterval() {
-        return getInt("interval", 15);
-    }
-
-    public static void putInterval(int interval) {
-        put("interval", interval);
-    }
-
     public static boolean getUpdate() {
         return getBoolean("update", true);
     }

@@ -153,12 +153,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         mControl.next.setOnClickListener(view -> checkNext());
         mControl.prev.setOnClickListener(view -> checkPrev());
         mControl.scale.setOnClickListener(view -> onScale());
-        mControl.reset.setOnClickListener(view -> onReset());
         mControl.speed.setOnClickListener(view -> onSpeed());
         mControl.tracks.setOnClickListener(view -> onTracks());
         mControl.ending.setOnClickListener(view -> onEnding());
         mControl.opening.setOnClickListener(view -> onOpening());
-        mControl.interval.setOnClickListener(view -> onInterval());
         mControl.speed.setOnLongClickListener(view -> onSpeedReset());
         mControl.ending.setOnLongClickListener(view -> onEndingReset());
         mControl.opening.setOnLongClickListener(view -> onOpeningReset());
@@ -200,7 +198,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         getPlayerView().setVisibility(View.VISIBLE);
         getPlayerView().setResizeMode(Prefers.getScale());
         getPlayerView().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
-        mControl.interval.setText(ResUtil.getString(R.string.second, Prefers.getInterval()));
         mControl.scale.setText(ResUtil.getStringArray(R.array.select_scale)[Prefers.getScale()]);
         mControl.speed.setText(mPlayers.getSpeed());
     }
@@ -420,8 +417,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     }
 
     private void onOpening() {
-        mHistory.setOpening(mHistory.getOpening() + Prefers.getInterval() * 1000L);
-        if (mHistory.getOpening() > 5 * 60 * 1000) mHistory.setOpening(0);
+        mHistory.setOpening(mPlayers.getCurrentPosition());
         mControl.opening.setText(mPlayers.getStringForTime(mHistory.getOpening()));
     }
 
@@ -432,8 +428,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     }
 
     private void onEnding() {
-        mHistory.setEnding(mHistory.getEnding() + Prefers.getInterval() * 1000L);
-        if (mHistory.getEnding() > 5 * 60 * 1000) mHistory.setEnding(0);
+        mHistory.setEnding(mPlayers.getCurrentPosition());
         mControl.ending.setText(mPlayers.getStringForTime(mHistory.getEnding()));
     }
 
@@ -441,20 +436,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         mHistory.setEnding(0);
         mControl.ending.setText(mPlayers.getStringForTime(mHistory.getEnding()));
         return true;
-    }
-
-    private void onInterval() {
-        int interval = Prefers.getInterval() * 2;
-        if (interval > 60) interval = 15;
-        Prefers.putInterval(interval);
-        mControl.interval.setText(ResUtil.getString(R.string.second, Prefers.getInterval()));
-    }
-
-    private void onReset() {
-        mHistory.setEnding(0);
-        mHistory.setOpening(0);
-        mControl.ending.setText(mPlayers.getStringForTime(mHistory.getEnding()));
-        mControl.opening.setText(mPlayers.getStringForTime(mHistory.getOpening()));
     }
 
     private void onTracks() {
@@ -548,10 +529,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
 
     @Override
     public void onTimeChanged() {
-        long duration = mPlayers.getDuration();
         long current = mPlayers.getCurrentPosition();
         if (mHistory.getOpening() >= current) mPlayers.seekTo(mHistory.getOpening());
-        if (mHistory.getEnding() > 0 && duration > 0 && mHistory.getEnding() + current >= duration) {
+        if (mHistory.getEnding() > 0 && mHistory.getEnding() <= current) {
             Clock.get().setCallback(null);
             checkNext();
         }
