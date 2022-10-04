@@ -7,6 +7,7 @@ public class CustomScroller extends RecyclerView.OnScrollListener {
 
     private final Callback callback;
     private boolean loading;
+    private boolean more;
     private int page;
 
     public CustomScroller(Callback callback) {
@@ -21,11 +22,14 @@ public class CustomScroller extends RecyclerView.OnScrollListener {
     }
 
     public void reset() {
+        more = false;
         page = 1;
     }
 
-    public void addPage() {
+    public boolean addPage() {
+        if (more) return false;
         page++;
+        return more = true;
     }
 
     public int getPage() {
