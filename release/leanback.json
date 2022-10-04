@@ -1,6 +1,6 @@
 {
-  "code": 33,
-  "name": "1.3.3",
+  "code": 34,
+  "name": "1.3.4",
   "url": "https://github.com/FongMi/TV/blob/main/release/leanback.apk?raw=true",
-  "desc": "1. 修正配置切換問題"
+  "desc": "1. 新增無縫收藏\n2. 支援無縫歷史\n3. 支援無縫換線路\n4. 更新 Glide 套件\n5. 調整 okhttp timeout\n6. 修正解析問題"
 }
