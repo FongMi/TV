@@ -124,8 +124,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
 
     private void checkPage() {
         if (mScroller.getPage() != 1 || mAdapter.size() >= 4 || isFolder()) return;
-        mScroller.addPage();
-        getVideo(getTypeId(), "2");
+        if (mScroller.addPage()) getVideo(getTypeId(), "2");
     }
 
     private void getVideo(String typeId, String page) {
