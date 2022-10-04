@@ -368,7 +368,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     private void onKeep() {
         Keep keep = Keep.find(getHistoryKey());
         Notify.show(keep != null ? R.string.detail_keep_del : R.string.detail_keep_add);
-        if (keep != null) keep.delete(); else createKeep();
+        if (keep != null) keep.delete();
+        else createKeep();
         RefreshEvent.keep();
         checkKeep();
     }
@@ -577,7 +578,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
                 break;
             default:
                 if (!event.isRetry() || mPlayers.addRetry() > 3) onError(event.getMsg());
-                else getPlayer(false);
+                else onRetry();
                 break;
         }
     }
@@ -585,6 +586,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     private void checkPosition() {
         mPlayers.seekTo(mHistory.getPosition());
         Clock.get().setCallback(this);
+    }
+
+    private void onRetry() {
+        mHistory.setPosition(mPlayers.getCurrentPosition());
+        getPlayer(false);
     }
 
     private void onError(String msg) {
