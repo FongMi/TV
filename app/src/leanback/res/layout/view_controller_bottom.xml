@@ -121,7 +121,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="12dp"
-                    android:text="@string/play_oped"
+                    android:text="@string/play_op"
                     android:textColor="@color/grey_700"
                     android:textSize="18sp" />
 
@@ -139,6 +139,14 @@
                     tools:text="00:00" />
 
                 <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="12dp"
+                    android:text="@string/play_ed"
+                    android:textColor="@color/grey_700"
+                    android:textSize="18sp" />
+
+                <TextView
                     android:id="@+id/ending"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -147,35 +155,10 @@
                     android:focusable="true"
                     android:focusableInTouchMode="true"
                     android:nextFocusDown="@id/parse"
+                    android:nextFocusRight="@id/ending"
                     android:textColor="@color/white"
                     android:textSize="14sp"
                     tools:text="00:00" />
-
-                <TextView
-                    android:id="@+id/interval"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="12dp"
-                    android:background="@drawable/selector_text"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"
-                    android:nextFocusDown="@id/parse"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
-                    tools:text="15秒" />
-
-                <TextView
-                    android:id="@+id/reset"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/selector_text"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"
-                    android:nextFocusRight="@id/reset"
-                    android:nextFocusDown="@id/parse"
-                    android:text="@string/play_reset"
-                    android:textColor="@color/white"
-                    android:textSize="14sp" />
 
             </LinearLayout>
         </HorizontalScrollView>
