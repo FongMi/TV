@@ -298,9 +298,8 @@ public class Vod {
                 return activated;
             }
 
-            public Episode deactivated() {
+            public void deactivated() {
                 this.activated = false;
-                return this;
             }
 
             private void setActivated(Episode item) {
@@ -311,7 +310,8 @@ public class Vod {
                 if (name.equalsIgnoreCase(getName())) return true;
                 if (name.toLowerCase().contains(getName().toLowerCase())) return true;
                 if (getName().toLowerCase().contains(name.toLowerCase())) return true;
-                return number != -1 && number == getNumber();
+                if (number != -1 && number == getNumber()) return true;
+                return false;
             }
 
             @Override
