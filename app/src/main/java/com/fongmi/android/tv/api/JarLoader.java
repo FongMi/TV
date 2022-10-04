@@ -71,13 +71,12 @@ public class JarLoader {
 
     public Spider getSpider(String key, String api, String ext, String jar) {
         try {
-            current = jar.isEmpty() ? baseJar : jar;
-            if (spiders.containsKey(current + key)) return spiders.get(current + key);
+            String spKey = (current = jar.isEmpty() ? baseJar : jar) + key;
+            if (spiders.containsKey(spKey)) return spiders.get(spKey);
             if (!loaders.containsKey(current)) parseJar(current);
-            api = api.replace("csp_", "");
-            Spider spider = (Spider) loaders.get(current).loadClass("com.github.catvod.spider." + api).newInstance();
+            Spider spider = (Spider) loaders.get(current).loadClass("com.github.catvod.spider." + api.replace("csp_", "")).newInstance();
             spider.init(App.get(), ext);
-            spiders.put(current + key, spider);
+            spiders.put(spKey, spider);
             return spider;
         } catch (Exception e) {
             e.printStackTrace();
@@ -113,7 +112,7 @@ public class JarLoader {
 
     public Object[] proxyInvoke(Map<?, ?> params) {
         try {
-            Method proxyFun = methods.get(current);
+            Method proxyFun = methods.get(current = current.isEmpty() ? baseJar : current);
             if (proxyFun != null) return (Object[]) proxyFun.invoke(null, params);
             else return null;
         } catch (Exception e) {
