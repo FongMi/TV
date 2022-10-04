@@ -120,7 +120,7 @@ public class ApiConfig {
     private void parseConfig(JsonObject object, Callback callback) {
         try {
             parseJson(object);
-            loader.parseJar(Json.safeString(object, "spider", ""));
+            loader.parseJar("", Json.safeString(object, "spider", ""));
             handler.post(() -> callback.success(object.toString()));
         } catch (Exception e) {
             e.printStackTrace();
