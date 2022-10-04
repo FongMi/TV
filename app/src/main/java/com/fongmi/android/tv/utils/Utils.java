@@ -65,6 +65,7 @@ public class Utils {
 
     public static int getDigit(String text) {
         try {
+            if (text.contains(".")) text = text.substring(0, text.lastIndexOf("."));
             return Integer.parseInt(text.replaceAll("\\D+", ""));
         } catch (Exception e) {
             return -1;

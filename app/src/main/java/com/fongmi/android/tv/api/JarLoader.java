@@ -22,60 +22,62 @@ import dalvik.system.DexClassLoader;
 public class JarLoader {
 
     private final ConcurrentHashMap<String, DexClassLoader> loaders;
-    private final ConcurrentHashMap<String, Spider> spiders;
     private final ConcurrentHashMap<String, Method> methods;
+    private final ConcurrentHashMap<String, Spider> spiders;
+    private String baseJar;
     private String current;
 
     public JarLoader() {
         this.loaders = new ConcurrentHashMap<>();
-        this.spiders = new ConcurrentHashMap<>();
         this.methods = new ConcurrentHashMap<>();
+        this.spiders = new ConcurrentHashMap<>();
     }
 
     public void clear() {
         this.loaders.clear();
-        this.spiders.clear();
         this.methods.clear();
+        this.spiders.clear();
     }
 
-    public void load(String key, File file) {
+    public void load(String jar, File file) {
         try {
             DexClassLoader loader = new DexClassLoader(file.getAbsolutePath(), FileUtil.getCachePath(), null, App.get().getClassLoader());
             Class<?> classInit = loader.loadClass("com.github.catvod.spider.Init");
             Method method = classInit.getMethod("init", Context.class);
             method.invoke(classInit, App.get());
-            loaders.put(key, loader);
+            if (loaders.isEmpty()) baseJar = jar;
+            loaders.put(jar, loader);
             Class<?> classProxy = loader.loadClass("com.github.catvod.spider.Proxy");
-            methods.put(key, classProxy.getMethod("proxy", Map.class));
+            methods.put(jar, classProxy.getMethod("proxy", Map.class));
         } catch (Exception ignored) {
             ignored.printStackTrace();
         }
     }
 
-    public void parseJar(String key, String jar) throws Exception {
+    public void parseJar(String jar) throws Exception {
         String[] texts = jar.split(";md5;");
         String md5 = jar.startsWith("http") && texts.length > 1 ? texts[1].trim() : "";
         jar = texts[0];
         if (md5.length() > 0 && FileUtil.equals(jar, md5)) {
-            load(key, FileUtil.getJar(jar));
+            load(jar, FileUtil.getJar(jar));
         } else if (jar.startsWith("http")) {
-            load(key, FileUtil.write(FileUtil.getJar(jar), OKHttp.newCall(jar).execute().body().bytes()));
+            load(jar, FileUtil.write(FileUtil.getJar(jar), OKHttp.newCall(jar).execute().body().bytes()));
         } else if (jar.startsWith("file")) {
-            load(key, FileUtil.getLocal(jar));
+            load(jar, FileUtil.getLocal(jar));
         } else if (!jar.isEmpty()) {
-            parseJar(key, FileUtil.convert(jar));
+            parseJar(FileUtil.convert(jar));
         }
     }
 
     public Spider getSpider(String key, String api, String ext, String jar) {
         try {
-            current = FileUtil.getMD5(jar);
+            current = jar.isEmpty() ? baseJar : jar;
+            if (spiders.containsKey(current + key)) return spiders.get(current + key);
+            if (!loaders.containsKey(current)) parseJar(current);
             api = api.replace("csp_", "");
-            if (spiders.containsKey(key)) return spiders.get(key);
-            if (!loaders.containsKey(current)) parseJar(current, jar);
             Spider spider = (Spider) loaders.get(current).loadClass("com.github.catvod.spider." + api).newInstance();
             spider.init(App.get(), ext);
-            spiders.put(key, spider);
+            spiders.put(current + key, spider);
             return spider;
         } catch (Exception e) {
             e.printStackTrace();
@@ -87,7 +89,7 @@ public class JarLoader {
         try {
             String clsKey = "Json" + key;
             String hotClass = "com.github.catvod.parser." + clsKey;
-            Class<?> jsonParserCls = loaders.get("").loadClass(hotClass);
+            Class<?> jsonParserCls = loaders.get(baseJar).loadClass(hotClass);
             Method mth = jsonParserCls.getMethod("parse", LinkedHashMap.class, String.class);
             return (JSONObject) mth.invoke(null, jxs, url);
         } catch (Exception e) {
@@ -100,7 +102,7 @@ public class JarLoader {
         try {
             String clsKey = "Mix" + key;
             String hotClass = "com.github.catvod.parser." + clsKey;
-            Class<?> jsonParserCls = loaders.get("").loadClass(hotClass);
+            Class<?> jsonParserCls = loaders.get(baseJar).loadClass(hotClass);
             Method mth = jsonParserCls.getMethod("parse", LinkedHashMap.class, String.class, String.class, String.class);
             return (JSONObject) mth.invoke(null, jxs, name, flag, url);
         } catch (Exception e) {
