@@ -35,7 +35,8 @@
     <string name="play_replay">重播</string>
     <string name="play_reset">重置</string>
     <string name="play_tracks">軌道</string>
-    <string name="play_oped">片頭片尾</string>
+    <string name="play_op">片頭</string>
+    <string name="play_ed">片尾</string>
     <string name="play_reverse">倒序</string>
     <string name="play_forward">→</string>
     <string name="play_backward">←</string>
@@ -85,7 +86,6 @@
 
     <!-- UNIT -->
     <string name="all">全部</string>
-    <string name="second"><xliff:g name="name">%s</xliff:g> 秒</string>
 
     <string-array name="select_quality">
         <item>低</item>
