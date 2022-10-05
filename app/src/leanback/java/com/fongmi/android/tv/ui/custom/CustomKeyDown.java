@@ -22,6 +22,8 @@ public class CustomKeyDown {
             mListener.onSeeking(Utils.isRightKey(event) ? addTime() : subTime());
         } else if (event.getAction() == KeyEvent.ACTION_UP && (Utils.isLeftKey(event) || Utils.isRightKey(event))) {
             mListener.onSeekTo(holdTime);
+        } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isUpKey(event)) {
+            mListener.onKeyUp();
         } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isDownKey(event)) {
             mListener.onKeyDown();
         } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isEnterKey(event)) {
@@ -51,6 +53,8 @@ public class CustomKeyDown {
         void onSeeking(int time);
 
         void onSeekTo(int time);
+
+        void onKeyUp();
 
         void onKeyDown();
 
