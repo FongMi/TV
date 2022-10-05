@@ -49,19 +49,27 @@ public class JarLoader {
             loaders.put(key, loader);
             Class<?> classProxy = loader.loadClass("com.github.catvod.spider.Proxy");
             methods.put(key, classProxy.getMethod("proxy", Map.class));
-        } catch (Exception ignored) {
-            ignored.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-    public void parseJar(String key, String jar) throws Exception {
+    private File download(String jar) {
+        try {
+            return FileUtil.write(FileUtil.getJar(jar), OKHttp.newCall(jar).execute().body().bytes());
+        } catch (Exception e) {
+            return FileUtil.getJar(jar);
+        }
+    }
+
+    public void parseJar(String key, String jar) {
         String[] texts = jar.split(";md5;");
         String md5 = jar.startsWith("http") && texts.length > 1 ? texts[1].trim() : "";
         jar = texts[0];
         if (md5.length() > 0 && FileUtil.equals(jar, md5)) {
             load(key, FileUtil.getJar(jar));
         } else if (jar.startsWith("http")) {
-            load(key, FileUtil.write(FileUtil.getJar(jar), OKHttp.newCall(jar).execute().body().bytes()));
+            load(key, download(jar));
         } else if (jar.startsWith("file")) {
             load(key, FileUtil.getLocal(jar));
         } else if (!jar.isEmpty()) {
