@@ -623,6 +623,15 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     }
 
     @Override
+    public void onKeyUp() {
+        long current = mPlayers.getCurrentPosition();
+        long half = mPlayers.getDuration() / 2;
+        if (current < half) mControl.opening.requestFocus();
+        else mControl.ending.requestFocus();
+        getPlayerView().showController();
+    }
+
+    @Override
     public void onKeyDown() {
         getPlayerView().showController();
         mControl.next.requestFocus();
