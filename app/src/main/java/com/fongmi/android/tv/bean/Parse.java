@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 
+import com.fongmi.android.tv.utils.Json;
 import com.fongmi.android.tv.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -11,6 +12,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Parse {
 
@@ -42,6 +44,14 @@ public class Parse {
         return parse;
     }
 
+    public static Parse get(Integer type, String url, JsonElement header) {
+        Parse parse = new Parse();
+        parse.setType(type);
+        parse.setUrl(url);
+        parse.getExt().setHeader(header);
+        return parse;
+    }
+
     public String getName() {
         return TextUtils.isEmpty(name) ? "" : name;
     }
@@ -67,7 +77,7 @@ public class Parse {
     }
 
     public Ext getExt() {
-        return ext == null ? new Ext() : ext;
+        return ext = ext == null ? new Ext() : ext;
     }
 
     public boolean isActivated() {
@@ -82,8 +92,8 @@ public class Parse {
         this.activated = item.equals(this);
     }
 
-    public JsonElement getHeader() {
-        return getExt().getHeader();
+    public Map<String, String> getHeaders() {
+        return Json.toMap(getExt().getHeader());
     }
 
     public String extUrl() {
@@ -121,6 +131,10 @@ public class Parse {
 
         public JsonElement getHeader() {
             return header;
+        }
+
+        public void setHeader(JsonElement header) {
+            this.header = header;
         }
 
         @NonNull
