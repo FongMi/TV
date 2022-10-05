@@ -55,10 +55,9 @@ public class CustomWebView extends WebView {
         setWebViewClient(webViewClient());
     }
 
-    public void start(String url, ParseTask.Callback callback) {
+    public void start(String url, Map<String, String> headers, ParseTask.Callback callback) {
         this.callback = callback;
-        stopLoading();
-        loadUrl(url);
+        loadUrl(url, headers);
         retry = 0;
     }
 
