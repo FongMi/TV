@@ -201,12 +201,8 @@ public class Vod {
 
         private boolean activated;
 
-        public Flag() {
-            this.episodes = new ArrayList<>();
-        }
-
         public Flag(String flag) {
-            this();
+            this.episodes = new ArrayList<>();
             this.flag = flag;
         }
 
@@ -246,8 +242,12 @@ public class Vod {
         }
 
         public Episode find(String remarks) {
-            for (Vod.Flag.Episode item : getEpisodes()) if (item.like(Utils.getDigit(remarks), remarks)) return item;
+            int number = Utils.getDigit(remarks);
             if (getEpisodes().size() == 1) return getEpisodes().get(0);
+            for (Vod.Flag.Episode item : getEpisodes()) if (item.rule1(remarks)) return item;
+            for (Vod.Flag.Episode item : getEpisodes()) if (item.rule2(number)) return item;
+            for (Vod.Flag.Episode item : getEpisodes()) if (item.rule3(remarks)) return item;
+            for (Vod.Flag.Episode item : getEpisodes()) if (item.rule4(remarks)) return item;
             return null;
         }
 
@@ -306,12 +306,20 @@ public class Vod {
                 this.activated = item.equals(this);
             }
 
-            public boolean like(int number, String name) {
-                if (name.equalsIgnoreCase(getName())) return true;
-                if (name.toLowerCase().contains(getName().toLowerCase())) return true;
-                if (getName().toLowerCase().contains(name.toLowerCase())) return true;
-                if (number != -1 && number == getNumber()) return true;
-                return false;
+            public boolean rule1(String name) {
+                return getName().equalsIgnoreCase(name);
+            }
+
+            public boolean rule2(int number) {
+                return getNumber() == number && number != -1;
+            }
+
+            public boolean rule3(String name) {
+                return getName().toLowerCase().contains(name.toLowerCase());
+            }
+
+            public boolean rule4(String name) {
+                return name.toLowerCase().contains(getName().toLowerCase());
             }
 
             @Override
