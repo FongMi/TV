@@ -183,11 +183,15 @@ public class History {
         AppDatabase.get().getHistoryDao().delete(cid);
     }
 
+    private void checkOpEd(History item) {
+        if (getOpening() == 0) setOpening(item.getOpening());
+        if (getEnding() == 0) setEnding(item.getEnding());
+    }
+
     private void checkMerge(List<History> items) {
         for (History item : items) {
             if (getKey().equals(item.getKey()) || Math.abs(item.getDuration() - getDuration()) > 10 * 60 * 1000) continue;
-            if (getOpening() == 0) setOpening(item.getOpening());
-            if (getEnding() == 0) setEnding(item.getEnding());
+            checkOpEd(item);
             item.delete();
         }
     }
@@ -218,6 +222,7 @@ public class History {
                 setVodFlag(flag.getFlag());
                 setPosition(item.getPosition());
                 setVodRemarks(episode.getName());
+                checkOpEd(item);
                 break;
             }
         }
