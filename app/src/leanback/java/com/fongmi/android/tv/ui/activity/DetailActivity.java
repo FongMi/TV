@@ -473,10 +473,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     private void checkHistory() {
         mHistory = History.find(getHistoryKey());
         mHistory = mHistory == null ? createHistory() : mHistory;
+        setFlagActivated(mHistory.getFlag());
+        if (mHistory.isRevSort()) reverseEpisode();
         mControl.opening.setText(mPlayers.getStringForTime(mHistory.getOpening()));
         mControl.ending.setText(mPlayers.getStringForTime(mHistory.getEnding()));
-        if (mHistory.isRevSort()) reverseEpisode();
-        setFlagActivated(mHistory.getFlag());
     }
 
     private History createHistory() {
