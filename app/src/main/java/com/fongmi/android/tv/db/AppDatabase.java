@@ -33,7 +33,7 @@ public abstract class AppDatabase extends RoomDatabase {
     }
 
     private static AppDatabase create(Context context) {
-        return Room.databaseBuilder(context, AppDatabase.class, "tv").addMigrations(MIGRATION_9_11).allowMainThreadQueries().fallbackToDestructiveMigration().build();
+        return Room.databaseBuilder(context, AppDatabase.class, "tv").addMigrations(MIGRATION_8_9).addMigrations(MIGRATION_9_11).allowMainThreadQueries().fallbackToDestructiveMigration().build();
     }
 
     public abstract KeepDao getKeepDao();
@@ -43,6 +43,13 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract ConfigDao getConfigDao();
 
     public abstract HistoryDao getHistoryDao();
+
+    static final Migration MIGRATION_8_9 = new Migration(8, 9) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `Keep` (`key` TEXT NOT NULL, `siteName` TEXT, `vodName` TEXT, `vodPic` TEXT, `createTime` INTEGER NOT NULL, `cid` INTEGER NOT NULL, PRIMARY KEY(`key`))");
+        }
+    };
 
     static final Migration MIGRATION_9_11 = new Migration(9, 11) {
         @Override
