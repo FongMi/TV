@@ -1,6 +1,6 @@
 {
-  "code": 35,
-  "name": "1.3.5",
+  "code": 36,
+  "name": "1.3.6",
   "url": "https://github.com/FongMi/TV/blob/main/release/leanback.apk?raw=true",
-  "desc": "1. 優化片頭片尾設定方式\n2. 修正阿里重新播放問題"
+  "desc": "1. 修正閃退問題\n2. 調整無縫規則\n3. 嗅探支援UA設置\n4.收藏支援刪除\n5.支援無jar配置"
 }
