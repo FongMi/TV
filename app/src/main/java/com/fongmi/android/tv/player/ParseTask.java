@@ -81,6 +81,7 @@ public class ParseTask {
             JsonObject object = JsonParser.parseString(response.body().string()).getAsJsonObject();
             HashMap<String, String> headers = new HashMap<>();
             for (String key : object.keySet()) if (key.equalsIgnoreCase("user-agent") || key.equalsIgnoreCase("referer")) headers.put(key, object.get(key).getAsString());
+            object = object.has("data") ? object.getAsJsonObject("data") : object;
             onParseSuccess(headers, object.get("url").getAsString(), "");
         } catch (Exception e) {
             e.printStackTrace();
