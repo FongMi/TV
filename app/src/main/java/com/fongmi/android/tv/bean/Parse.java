@@ -46,9 +46,9 @@ public class Parse {
 
     public static Parse get(Integer type, String url, JsonElement header) {
         Parse parse = new Parse();
+        parse.setHeader(header);
         parse.setType(type);
         parse.setUrl(url);
-        parse.getExt().setHeader(header);
         return parse;
     }
 
@@ -90,6 +90,10 @@ public class Parse {
 
     public void setActivated(Parse item) {
         this.activated = item.equals(this);
+    }
+
+    private void setHeader(JsonElement header) {
+        getExt().setHeader(header);
     }
 
     public Map<String, String> getHeaders() {
