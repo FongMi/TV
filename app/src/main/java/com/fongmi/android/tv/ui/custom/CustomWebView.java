@@ -55,9 +55,19 @@ public class CustomWebView extends WebView {
         setWebViewClient(webViewClient());
     }
 
+    private void setUserAgent(Map<String, String> headers) {
+        for (String key : headers.keySet()) {
+            if (key.equalsIgnoreCase("user-agent")) {
+                getSettings().setUserAgentString(headers.get(key));
+                break;
+            }
+        }
+    }
+
     public void start(String url, Map<String, String> headers, ParseTask.Callback callback) {
         this.callback = callback;
-        loadUrl(url, headers);
+        setUserAgent(headers);
+        loadUrl(url);
         retry = 0;
     }
 
@@ -79,11 +89,6 @@ public class CustomWebView extends WebView {
             @Override
             public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
                 handler.proceed();
-            }
-
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                return false;
             }
         };
     }
