@@ -48,11 +48,10 @@ public class ParseTask {
     }
 
     private void setParse(Result result, boolean useParse) {
-        String url = result.getPlayUrl();
         if (useParse) parse = ApiConfig.get().getParse();
-        else if (url.startsWith("json:")) parse = Parse.get(1, url.substring(5));
-        else if (url.startsWith("parse:")) parse = ApiConfig.get().getParse(url.substring(6));
-        if (parse == null) parse = Parse.get(0, url, result.getHeader());
+        else if (result.getPlayUrl().startsWith("json:")) parse = Parse.get(1, result.getPlayUrl().substring(5));
+        else if (result.getPlayUrl().startsWith("parse:")) parse = ApiConfig.get().getParse(result.getPlayUrl().substring(6));
+        if (parse == null) parse = Parse.get(0, result.getPlayUrl(), result.getHeader());
     }
 
     private void doInBackground(String webUrl, String flag) {
