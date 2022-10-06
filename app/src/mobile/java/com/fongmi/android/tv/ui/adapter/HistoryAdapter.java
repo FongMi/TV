@@ -81,6 +81,6 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         holder.binding.remark.setText(ResUtil.getString(R.string.vod_last, item.getVodRemarks()));
         holder.binding.getRoot().setOnClickListener(view -> mListener.onItemClick(item));
         holder.binding.getRoot().setOnLongClickListener(view -> mListener.onLongClick(item));
-        Glide.with(App.get()).load(item.getVodPic()).centerCrop().error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).into(holder.binding.image);
+        Glide.with(App.get()).load(item.getVodPic()).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).into(holder.binding.image);
     }
 }
