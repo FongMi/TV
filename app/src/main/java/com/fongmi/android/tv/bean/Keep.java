@@ -94,7 +94,8 @@ public class Keep {
         AppDatabase.get().getKeepDao().insert(this);
     }
 
-    public void delete() {
+    public Keep delete() {
         AppDatabase.get().getKeepDao().delete(getCid(), getKey());
+        return this;
     }
 }
