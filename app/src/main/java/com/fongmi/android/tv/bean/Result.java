@@ -144,6 +144,10 @@ public class Result {
         return jx == null ? 0 : jx;
     }
 
+    public void setJx(Integer jx) {
+        this.jx = jx;
+    }
+
     public String getFlag() {
         return TextUtils.isEmpty(flag) ? "" : flag;
     }

@@ -1,5 +1,6 @@
 package com.fongmi.android.tv.model;
 
+import android.net.Uri;
 import android.text.TextUtils;
 import android.util.ArrayMap;
 
@@ -91,7 +92,8 @@ public class SiteViewModel extends ViewModel {
                 return Result.fromJson(categoryContent);
             } else {
                 ArrayMap<String, String> params = new ArrayMap<>();
-                if (site.getType() == 4) params.put("ext", Utils.getBase64(new Gson().toJson(extend)));
+                if (site.getType() == 1) params.put("f", new Gson().toJson(extend));
+                else if (site.getType() == 4) params.put("ext", Utils.getBase64(new Gson().toJson(extend)));
                 params.put("ac", site.getType() == 0 ? "videolist" : "detail");
                 params.put("t", tid);
                 params.put("pg", page);
@@ -143,11 +145,15 @@ public class SiteViewModel extends ViewModel {
                 SpiderDebug.log(body);
                 return Result.fromJson(body);
             } else {
+                String url = id;
+                String type = Uri.parse(url).getQueryParameter("type");
+                if (type != null && type.equals("json")) url = Result.fromJson(OKHttp.newCall(id).execute().body().string()).getUrl();
                 Result result = new Result();
-                result.setUrl(id);
+                result.setUrl(url);
                 result.setFlag(flag);
                 result.setPlayUrl(site.getPlayUrl());
-                result.setParse(Utils.isVideoFormat(id) ? 0 : 1);
+                result.setJx(Utils.isVip(url) ? 1 : 0);
+                result.setParse(Utils.isVideoFormat(url) ? 0 : 1);
                 return result;
             }
         });
