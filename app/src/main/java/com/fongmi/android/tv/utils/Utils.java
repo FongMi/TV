@@ -10,7 +10,9 @@ import android.view.inputmethod.InputMethodManager;
 
 import com.fongmi.android.tv.App;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -57,6 +59,12 @@ public class Utils {
         if (headers.containsKey("Accept") && Objects.requireNonNull(headers.get("Accept")).contains("image")) return false;
         if (url.contains(".js") || url.contains(".css")) return false;
         return SNIFFER.matcher(url).find();
+    }
+
+    public static boolean isVip(String url) {
+        List<String> hosts = Arrays.asList("iqiyi.com", "v.qq.com", "youku.com", "le.com", "tudou.com", "mgtv.com", "sohu.com", "acfun.cn", "bilibili.com", "baofeng.com", "pptv.com");
+        for (String host : hosts) if (url.contains(host)) return true;
+        return false;
     }
 
     public static String getBase64(String ext) {
