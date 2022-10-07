@@ -13,7 +13,7 @@ android {
         versionCode 36
         versionName "1.3.6"
         resValue "string", "url", ""
-        ndk { abiFilters "armeabi-v7a", "arm64-v8a" }
+        ndk { abiFilters "armeabi-v7a" }
     }
 
     productFlavors {
