@@ -17,6 +17,7 @@ import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.QRCode;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.Utils;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.greenrobot.eventbus.EventBus;
@@ -71,8 +72,7 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
 
     private void onPositive(View view) {
         String url = binding.text.getText().toString().trim();
-        if (url.startsWith("clan")) url = url.replace("clan", "file");
-        callback.setConfig(url);
+        callback.setConfig(Utils.checkClan(url));
         dialog.dismiss();
     }
 

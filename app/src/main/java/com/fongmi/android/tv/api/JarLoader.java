@@ -5,6 +5,7 @@ import android.content.Context;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.net.OKHttp;
 import com.fongmi.android.tv.utils.FileUtil;
+import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderNull;
 
@@ -73,13 +74,13 @@ public class JarLoader {
         } else if (jar.startsWith("file")) {
             load(key, FileUtil.getLocal(jar));
         } else if (!jar.isEmpty()) {
-            parseJar(key, FileUtil.convert(jar));
+            parseJar(key, Utils.convert(jar));
         }
     }
 
     public Spider getSpider(String key, String api, String ext, String jar) {
         try {
-            String spKey = (current = FileUtil.getMD5(jar)) + key;
+            String spKey = (current = Utils.getMD5(jar)) + key;
             if (spiders.containsKey(spKey)) return spiders.get(spKey);
             if (!loaders.containsKey(current)) parseJar(current, jar);
             Spider spider = (Spider) loaders.get(current).loadClass("com.github.catvod.spider." + api.replace("csp_", "")).newInstance();
