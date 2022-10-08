@@ -52,8 +52,7 @@ public class ConfigDialog {
 
     private void onPositive(View view) {
         String url = binding.text.getText().toString().trim();
-        if (url.startsWith("clan")) url = url.replace("clan", "file");
-        callback.setConfig(url);
+        callback.setConfig(Utils.checkClan(url));
         dialog.dismiss();
     }
 
