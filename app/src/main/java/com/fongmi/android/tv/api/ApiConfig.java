@@ -14,6 +14,7 @@ import com.fongmi.android.tv.net.OKHttp;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Json;
 import com.fongmi.android.tv.utils.Prefers;
+import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.crawler.Spider;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -149,7 +150,7 @@ public class ApiConfig {
     private String parseExt(String ext) {
         if (ext.startsWith("http")) return ext;
         else if (ext.startsWith("file")) return FileUtil.read(ext);
-        else if (ext.endsWith(".json")) return parseExt(FileUtil.convert(ext));
+        else if (ext.endsWith(".json")) return parseExt(Utils.convert(ext));
         return ext;
     }
 
