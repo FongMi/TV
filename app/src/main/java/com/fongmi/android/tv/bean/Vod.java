@@ -201,6 +201,10 @@ public class Vod {
 
         private boolean activated;
 
+        public Flag() {
+            this.episodes = new ArrayList<>();
+        }
+
         public Flag(String flag) {
             this.episodes = new ArrayList<>();
             this.flag = flag;
