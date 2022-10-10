@@ -2,6 +2,7 @@ package com.fongmi.android.tv.ui.activity;
 
 import android.app.Activity;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -9,6 +10,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.utils.Utils;
+
+import me.jessyan.autosize.AutoSizeCompat;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
@@ -31,6 +34,12 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     protected void initEvent() {
+    }
+
+    @Override
+    public Resources getResources() {
+        AutoSizeCompat.autoConvertDensityOfGlobal(super.getResources());
+        return super.getResources();
     }
 
     @Override
