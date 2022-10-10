@@ -2,5 +2,5 @@
   "code": 37,
   "name": "1.3.7",
   "url": "https://github.com/FongMi/TV/blob/main/release/leanback.apk?raw=true",
-  "desc": "1. json 解析支援 data 格式\n2. 支援道長 type = 1 格式\n3. 只保留 armeabi-v7a\n4. 更新 ffmpeg 音頻解碼\n5. 修正 xml 源\n6.修正介面跑板"
+  "desc": "1. json 解析支援 data 格式\n2. 支援道長 type = 1 格式\n3. 只保留 armeabi-v7a\n4. 更新 ffmpeg 音頻解碼\n5. 修正 xml 源\n6. 修正介面跑板"
 }
