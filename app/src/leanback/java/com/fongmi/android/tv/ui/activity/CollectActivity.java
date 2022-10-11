@@ -48,7 +48,12 @@ public class CollectActivity extends BaseActivity {
     }
 
     public static void start(Activity activity, String keyword) {
+        start(activity, keyword, false);
+    }
+
+    public static void start(Activity activity, String keyword, boolean clear) {
         Intent intent = new Intent(activity, CollectActivity.class);
+        if (clear) intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra("keyword", keyword);
         activity.startActivityForResult(intent, 1000);
     }
