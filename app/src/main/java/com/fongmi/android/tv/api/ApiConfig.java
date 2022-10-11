@@ -3,7 +3,6 @@ package com.fongmi.android.tv.api;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
-import android.util.Base64;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Config;
@@ -11,8 +10,6 @@ import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.net.Callback;
-import com.fongmi.android.tv.net.OKHttp;
-import com.fongmi.android.tv.utils.AES;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Json;
 import com.fongmi.android.tv.utils.Prefers;
@@ -22,12 +19,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.stream.JsonReader;
 
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -89,106 +83,24 @@ public class ApiConfig {
 
     public void loadConfig(boolean cache, Callback callback) {
         new Thread(() -> {
-            String url = Prefers.getUrl(), pk = ";pk;";
-            if (cache) getCacheConfig(url, callback);
-            else if (url.contains(pk)) {
-                String[] a = url.split(pk);
-                if (url.startsWith("http")) decryptWebConfig(a[0], callback, a[1]);
-                if (url.startsWith("file")) decryptFileConfig(a[0], callback, a[1]);
-            } else if (!url.contains(pk)) {
-                if (url.startsWith("http")) decryptWebConfig(url, callback, null);
-                if (url.startsWith("file")) decryptFileConfig(url, callback, null);
-            } else handler.post(() -> callback.error(0));
+            if (cache) loadCache(Prefers.getUrl(), callback);
+            else loadJson(Prefers.getUrl(), callback);
         }).start();
     }
 
-    private void decryptFileConfig(String url, Callback callback, String FinalKey) {
-        try {
-            String content = "", json = "", line = null, ls = System.getProperty("line.separator");
-            BufferedReader read = new BufferedReader(new FileReader(FileUtil.getLocal(url)));
-            StringBuilder text = new StringBuilder();
-            while ((line = read.readLine()) != null) {
-                text.append(line);
-                text.append(ls);
-            }
-            text.deleteCharAt(text.length() - 1);
-            read.close();
-            String reader = text.toString();
-            if (AES.isJson(reader)) {
-                getFileConfig(reader, callback);
-                return;
-            } else if (!reader.startsWith("2423")) {
-                content = new String(Base64.decode(reader.split("\\*\\*")[1], Base64.DEFAULT));
-            } else {
-                content = reader;
-            }
-            if (content.startsWith("2423")) {
-                String data2 = content.substring(content.indexOf("2324") + 4, content.length() - 26);
-                content = new String(AES.toBytes(content)).toLowerCase();
-                String key = AES.rightPading(content.substring(content.indexOf("$#") + 2, content.indexOf("#$")), "0", 16);
-                String iv = AES.rightPading(content.substring(content.length() - 13), "0", 16);
-                json = AES.CBC(data2, key, iv);
-            } else {
-                json = AES.ECB(content, FinalKey);
-            }
-            parseConfig(new Gson().fromJson(json, JsonObject.class), callback);
-        } catch (Exception e) {
-            e.printStackTrace();
-            handler.post(() -> callback.error(R.string.error_config_get));
-        }
-    }
-
-    private void decryptWebConfig(String url, Callback callback, String FinalKey) {
-        try {
-            String content = "", json = "";
-            String reader = OKHttp.newCall(url).execute().body().string();
-            if (AES.isJson(reader)) {
-                getWebConfig(reader, callback);
-                return;
-            } else if (!reader.startsWith("2423")) {
-                content = new String(Base64.decode(reader.split("\\*\\*")[1], Base64.DEFAULT));
-            } else {
-                content = reader;
-            }
-            if (content.startsWith("2423")) {
-                String data2 = content.substring(content.indexOf("2324") + 4, content.length() - 26);
-                content = new String(AES.toBytes(content)).toLowerCase();
-                String key = AES.rightPading(content.substring(content.indexOf("$#") + 2, content.indexOf("#$")), "0", 16);
-                String iv = AES.rightPading(content.substring(content.length() - 13), "0", 16);
-                json = AES.CBC(data2, key, iv);
-            } else {
-                json = AES.ECB(content, FinalKey);
-            }
-            parseConfig(new Gson().fromJson(json, JsonObject.class), callback);
-        } catch (Exception e) {
-            e.printStackTrace();
-            handler.post(() -> callback.error(R.string.error_config_get));
-        }
-    }
-
-    private void getFileConfig(String url, Callback callback) {
-        try {
-            parseConfig(new Gson().fromJson(new JsonReader(new FileReader(FileUtil.getLocal(url))), JsonObject.class), callback);
-        } catch (Exception e) {
-            e.printStackTrace();
-            getCacheConfig(url, callback);
-        }
-    }
-
-    private void getWebConfig(String url, Callback callback) {
-        try {
-            parseConfig(new Gson().fromJson(OKHttp.newCall(url).execute().body().string(), JsonObject.class), callback);
-        } catch (Exception e) {
-            e.printStackTrace();
-            getCacheConfig(url, callback);
-        }
-    }
-
-    private void getCacheConfig(String url, Callback callback) {
+    private void loadCache(String url, Callback callback) {
         String json = Config.find(url).getJson();
-        if (!TextUtils.isEmpty(json))
-            parseConfig(JsonParser.parseString(json).getAsJsonObject(), callback);
+        if (!TextUtils.isEmpty(json)) parseConfig(JsonParser.parseString(json).getAsJsonObject(), callback);
         else handler.post(() -> callback.error(R.string.error_config_get));
+    }
+
+    private void loadJson(String url, Callback callback) {
+        try {
+            parseConfig(new Gson().fromJson(Decoder.getJson(url), JsonObject.class), callback);
+        } catch (Exception e) {
+            e.printStackTrace();
+            loadCache(url, callback);
+        }
     }
 
     private void parseConfig(JsonObject object, Callback callback) {
