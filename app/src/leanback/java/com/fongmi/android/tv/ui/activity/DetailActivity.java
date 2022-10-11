@@ -116,7 +116,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     }
 
     public static void start(Activity activity, String key, String id) {
+        start(activity, key, id, false);
+    }
+
+    public static void start(Activity activity, String key, String id, boolean clear) {
         Intent intent = new Intent(activity, DetailActivity.class);
+        if (clear) intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra("key", key);
         intent.putExtra("id", id);
         activity.startActivityForResult(intent, 1000);
