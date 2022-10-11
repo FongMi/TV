@@ -20,10 +20,27 @@ public class Decoder {
         url = url.contains(";") ? url.split(";")[0] : url;
         String data = getData(url);
         if (Json.valid(data)) return data;
-        if (key.length() > 0) return ecb(data, key);
         if (data.contains("**")) data = base64(data);
         if (data.startsWith("2423")) data = cbc(data);
-        return data.replace("###", "");
+        if (key.length() > 0) data = ecb(data, key);
+        return data;
+    }
+
+    public static String getExt(String ext) {
+        try {
+            return base64(OKHttp.newCall(ext.substring(4)).execute().body().string());
+        } catch (Exception ignored) {
+            return "";
+        }
+    }
+
+    public static void getSpider(String jar) {
+        try {
+            String data = OKHttp.newCall(jar.substring(4)).execute().body().string();
+            data = data.substring(data.indexOf("**") + 2);
+            FileUtil.write(FileUtil.getJar(jar), Base64.decode(data, Base64.DEFAULT));
+        } catch (Exception ignored) {
+        }
     }
 
     private static String getData(String url) throws Exception {
@@ -64,7 +81,7 @@ public class Decoder {
         return (key + "0000000000000000".substring(key.length())).getBytes(StandardCharsets.UTF_8);
     }
 
-    public static byte[] decodeHex(String hexString) {
-        return BaseEncoding.base16().decode(hexString.toUpperCase());
+    public static byte[] decodeHex(String s) {
+        return BaseEncoding.base16().decode(s.toUpperCase());
     }
 }
