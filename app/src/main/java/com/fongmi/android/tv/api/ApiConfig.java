@@ -135,6 +135,7 @@ public class ApiConfig {
     private String parseExt(String ext) {
         if (ext.startsWith("http")) return ext;
         else if (ext.startsWith("file")) return FileUtil.read(ext);
+        else if (ext.startsWith("img+")) return Decoder.getExt(ext);
         else if (ext.endsWith(".json")) return parseExt(Utils.convert(ext));
         return ext;
     }
