@@ -65,7 +65,7 @@ public class JarLoader {
 
     public void parseJar(String key, String jar) {
         String[] texts = jar.split(";md5;");
-        String md5 = jar.startsWith("http") && texts.length > 1 ? texts[1].trim() : "";
+        String md5 = !jar.startsWith("file") && texts.length > 1 ? texts[1].trim() : "";
         jar = texts[0];
         if (md5.length() > 0 && FileUtil.equals(jar, md5)) {
             load(key, FileUtil.getJar(jar));
