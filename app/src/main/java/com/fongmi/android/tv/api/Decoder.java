@@ -7,6 +7,7 @@ import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Json;
 import com.google.common.io.BaseEncoding;
 
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 
 import javax.crypto.Cipher;
@@ -28,18 +29,21 @@ public class Decoder {
 
     public static String getExt(String ext) {
         try {
-            return base64(OKHttp.newCall(ext.substring(4)).execute().body().string());
+            return base64(getData(ext.substring(4)));
         } catch (Exception ignored) {
             return "";
         }
     }
 
-    public static void getSpider(String jar) {
+    public static File getSpider(String jar, String md5) {
         try {
-            String data = OKHttp.newCall(jar.substring(4)).execute().body().string();
+            File file = FileUtil.getJar(jar);
+            if (md5.length() > 0 && FileUtil.equals(jar, md5)) return file;
+            String data = getData(jar.substring(4));
             data = data.substring(data.indexOf("**") + 2);
-            FileUtil.write(FileUtil.getJar(jar), Base64.decode(data, Base64.DEFAULT));
+            return FileUtil.write(file, Base64.decode(data, Base64.DEFAULT));
         } catch (Exception ignored) {
+            return FileUtil.getJar(jar);
         }
     }
 
@@ -81,7 +85,7 @@ public class Decoder {
         return (key + "0000000000000000".substring(key.length())).getBytes(StandardCharsets.UTF_8);
     }
 
-    public static byte[] decodeHex(String s) {
+    private static byte[] decodeHex(String s) {
         return BaseEncoding.base16().decode(s.toUpperCase());
     }
 }
