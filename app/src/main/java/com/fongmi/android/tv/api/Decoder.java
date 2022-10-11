@@ -5,6 +5,7 @@ import android.util.Base64;
 import com.fongmi.android.tv.net.OKHttp;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Json;
+import com.google.common.io.BaseEncoding;
 
 import java.nio.charset.StandardCharsets;
 
@@ -63,10 +64,7 @@ public class Decoder {
         return (key + "0000000000000000".substring(key.length())).getBytes(StandardCharsets.UTF_8);
     }
 
-    private static byte[] decodeHex(String s) {
-        int len = s.length() / 2;
-        byte[] data = new byte[len];
-        for (int i = 0; i < len; i++) data[i] = Integer.valueOf(s.substring(i * 2, i * 2 + 2), 16).byteValue();
-        return data;
+    public static byte[] decodeHex(String hexString) {
+        return BaseEncoding.base16().decode(hexString.toUpperCase());
     }
 }
