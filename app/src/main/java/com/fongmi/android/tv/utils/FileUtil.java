@@ -70,7 +70,7 @@ public class FileUtil {
             BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(getLocal(path))));
             StringBuilder sb = new StringBuilder();
             String text;
-            while ((text = br.readLine()) != null) sb.append(text).append("\n");
+            while ((text = br.readLine()) != null) sb.append(text);
             br.close();
             return sb.toString();
         } catch (Exception e) {
@@ -86,9 +86,8 @@ public class FileUtil {
             int count;
             while ((count = fis.read(byteArray)) != -1) digest.update(byteArray, 0, count);
             fis.close();
-            byte[] bytes = digest.digest();
             StringBuilder sb = new StringBuilder();
-            for (byte b : bytes) sb.append(Integer.toString((b & 0xff) + 0x100, 16).substring(1));
+            for (byte b : digest.digest()) sb.append(Integer.toString((b & 0xff) + 0x100, 16).substring(1));
             return sb.toString();
         } catch (Exception e) {
             return "";
