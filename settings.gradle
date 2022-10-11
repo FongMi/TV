@@ -16,6 +16,7 @@ dependencyResolutionManagement {
 }
 include ':app'
 include ':catvod'
+include ':pyramid'
 rootProject.name = "TV"
 gradle.ext.exoplayerModulePrefix = 'exoplayer-'
 apply from: file("/exo/core_settings.gradle")
