@@ -45,7 +45,7 @@ public class ExoUtil {
 
     private static MediaSource getSource(Map<String, String> headers, String url, List<MediaItem.SubtitleConfiguration> config) {
         MediaItem.Builder builder = new MediaItem.Builder().setUri(Uri.parse(url));
-        if (url.contains("php") || url.contains("m3u8")) builder.setMimeType(MimeTypes.APPLICATION_M3U8);
+        if (url.contains("m3u8")) builder.setMimeType(MimeTypes.APPLICATION_M3U8);
         if (config.size() > 0) builder.setSubtitleConfigurations(config);
         return new DefaultMediaSourceFactory(getDataSourceFactory(headers)).createMediaSource(builder.build());
     }
