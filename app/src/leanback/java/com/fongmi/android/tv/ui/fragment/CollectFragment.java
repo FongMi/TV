@@ -1,5 +1,6 @@
 package com.fongmi.android.tv.ui.fragment;
 
+import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -84,6 +85,7 @@ public class CollectFragment extends BaseFragment implements VodPresenter.OnClic
 
     @Override
     public void onItemClick(Vod item) {
+        getActivity().setResult(Activity.RESULT_OK);
         DetailActivity.start(getActivity(), item.getSite().getKey(), item.getVodId());
     }
 
