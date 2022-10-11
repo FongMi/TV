@@ -84,7 +84,7 @@ public class ApiConfig {
     public void loadConfig(boolean cache, Callback callback) {
         new Thread(() -> {
             if (cache) loadCache(Prefers.getUrl(), callback);
-            else loadJson(Prefers.getUrl(), callback);
+            else loadConfig(Prefers.getUrl(), callback);
         }).start();
     }
 
@@ -94,7 +94,7 @@ public class ApiConfig {
         else handler.post(() -> callback.error(R.string.error_config_get));
     }
 
-    private void loadJson(String url, Callback callback) {
+    private void loadConfig(String url, Callback callback) {
         try {
             parseConfig(new Gson().fromJson(Decoder.getJson(url), JsonObject.class), callback);
         } catch (Exception e) {
