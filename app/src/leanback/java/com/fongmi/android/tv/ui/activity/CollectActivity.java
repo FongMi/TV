@@ -49,9 +49,8 @@ public class CollectActivity extends BaseActivity {
 
     public static void start(Activity activity, String keyword) {
         Intent intent = new Intent(activity, CollectActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra("keyword", keyword);
-        activity.startActivity(intent);
+        activity.startActivityForResult(intent, 1000);
     }
 
     @Override
@@ -126,6 +125,14 @@ public class CollectActivity extends BaseActivity {
 
     private CollectFragment getFragment() {
         return (CollectFragment) mPageAdapter.instantiateItem(mBinding.pager, 0);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode != RESULT_OK) return;
+        setResult(RESULT_OK);
+        finish();
     }
 
     @Override
