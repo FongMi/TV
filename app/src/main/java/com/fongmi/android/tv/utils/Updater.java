@@ -22,7 +22,7 @@ import java.util.concurrent.Executors;
 
 public class Updater implements View.OnClickListener {
 
-    private static final String URL = "https://github.com/FongMi/TV/raw/main/release/leanback.json";
+    private static final String URL = "https://raw.githubusercontent.com/FongMi/TV/release/release/leanback.json";
     private static final String PROXY = "https://ghproxy.com/";
 
     private final ExecutorService executor;
