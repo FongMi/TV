@@ -101,6 +101,15 @@ public class Utils {
         return Base64.encodeToString(ext.getBytes(), Base64.DEFAULT | Base64.NO_WRAP);
     }
 
+    public static String substring(String text) {
+        return substring(text, 1);
+    }
+
+    public static String substring(String text, int num) {
+        if (text != null && text.length() > num) return text.substring(0, text.length() - num);
+        return text;
+    }
+
     public static int getDigit(String text) {
         try {
             if (text.startsWith("上") || text.startsWith("下")) return -1;
