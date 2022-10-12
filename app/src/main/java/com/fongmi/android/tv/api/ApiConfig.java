@@ -15,6 +15,7 @@ import com.fongmi.android.tv.utils.Json;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.crawler.Spider;
+import com.github.catvod.crawler.SpiderNull;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -36,7 +37,8 @@ public class ApiConfig {
     private List<Parse> parses;
     private List<Live> lives;
     private List<Site> sites;
-    private JarLoader loader;
+    private JarLoader jLoader;
+    private PyLoader pLoader;
     private Handler handler;
     private Parse parse;
     private Site home;
@@ -72,7 +74,8 @@ public class ApiConfig {
         this.lives = new ArrayList<>();
         this.flags = new ArrayList<>();
         this.parses = new ArrayList<>();
-        this.loader = new JarLoader();
+        this.jLoader = new JarLoader();
+        this.pLoader = new PyLoader();
         this.handler = new Handler(Looper.getMainLooper());
         return this;
     }
@@ -107,7 +110,7 @@ public class ApiConfig {
     private void parseConfig(JsonObject object, Callback callback) {
         try {
             parseJson(object);
-            loader.parseJar("", Json.safeString(object, "spider", ""));
+            jLoader.parseJar("", Json.safeString(object, "spider", ""));
             handler.post(() -> callback.success(object.toString()));
         } catch (Exception e) {
             e.printStackTrace();
@@ -142,19 +145,23 @@ public class ApiConfig {
     }
 
     public Spider getCSP(Site site) {
-        return loader.getSpider(site.getKey(), site.getApi(), site.getExt(), site.getJar());
+        boolean py = site.getApi().startsWith("py_");
+        boolean csp = site.getApi().startsWith("csp_");
+        if (py) return pLoader.getSpider(site.getKey(), site.getApi(), site.getExt());
+        else if (csp) return jLoader.getSpider(site.getKey(), site.getApi(), site.getExt(), site.getJar());
+        else return new SpiderNull();
     }
 
     public Object[] proxyLocal(Map<?, ?> param) {
-        return loader.proxyInvoke(param);
+        return jLoader.proxyInvoke(param);
     }
 
     public JSONObject jsonExt(String key, LinkedHashMap<String, String> jxs, String url) {
-        return loader.jsonExt(key, jxs, url);
+        return jLoader.jsonExt(key, jxs, url);
     }
 
     public JSONObject jsonExtMix(String flag, String key, String name, LinkedHashMap<String, HashMap<String, String>> jxs, String url) {
-        return loader.jsonExtMix(flag, key, name, jxs, url);
+        return jLoader.jsonExtMix(flag, key, name, jxs, url);
     }
 
     public Site getSite(String key) {
@@ -215,7 +222,8 @@ public class ApiConfig {
         this.lives.clear();
         this.flags.clear();
         this.parses.clear();
-        this.loader.clear();
+        this.jLoader.clear();
+        this.pLoader.clear();
         this.home = null;
         return this;
     }
