@@ -27,8 +27,6 @@ public class PyLoader {
     private void init() {
         try {
             loader = Class.forName("com.undcover.freedom.pyramid.Loader").newInstance();
-            Method method = loader.getClass().getMethod("init", Context.class);
-            method.invoke(loader, App.get());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -38,8 +36,8 @@ public class PyLoader {
         try {
             if (spiders.containsKey(key)) return spiders.get(key);
             String extend = Uri.parse(ext).getQueryParameter("extend");
-            Method method = loader.getClass().getMethod("spider", String.class);
-            Spider spider = (Spider) method.invoke(loader, ext);
+            Method method = loader.getClass().getMethod("spider", Context.class, String.class);
+            Spider spider = (Spider) method.invoke(loader, App.get(), ext);
             extend = extend == null ? "" : extend;
             spider.init(App.get(), extend);
             spiders.put(key, spider);
