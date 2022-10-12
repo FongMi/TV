@@ -114,7 +114,7 @@ public class CustomWebView extends WebView {
         handler.removeCallbacks(mTimer);
         handler.post(() -> {
             if (callback != null) callback.onParseSuccess(news, url, "");
-            SpiderDebug.log(url);
+            SpiderDebug.log(url + "," + headers);
             stop(false);
         });
     }

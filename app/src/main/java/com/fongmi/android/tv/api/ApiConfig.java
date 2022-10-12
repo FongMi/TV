@@ -88,19 +88,20 @@ public class ApiConfig {
         }).start();
     }
 
-    private void loadCache(String url, Callback callback) {
-        String json = Config.find(url).getJson();
-        if (!TextUtils.isEmpty(json)) parseConfig(JsonParser.parseString(json).getAsJsonObject(), callback);
-        else handler.post(() -> callback.error(R.string.error_config_get));
-    }
-
     private void loadConfig(String url, Callback callback) {
         try {
             parseConfig(new Gson().fromJson(Decoder.getJson(url), JsonObject.class), callback);
         } catch (Exception e) {
+            if (url.isEmpty()) handler.post(() -> callback.error(0));
+            else loadCache(url, callback);
             e.printStackTrace();
-            loadCache(url, callback);
         }
+    }
+
+    private void loadCache(String url, Callback callback) {
+        String json = Config.find(url).getJson();
+        if (!TextUtils.isEmpty(json)) parseConfig(JsonParser.parseString(json).getAsJsonObject(), callback);
+        else handler.post(() -> callback.error(R.string.error_config_get));
     }
 
     private void parseConfig(JsonObject object, Callback callback) {
