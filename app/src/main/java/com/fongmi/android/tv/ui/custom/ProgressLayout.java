@@ -114,9 +114,7 @@ public class ProgressLayout extends RelativeLayout {
     }
 
     private void showView(View view) {
-        view.setAlpha(0f);
         view.setVisibility(VISIBLE);
-        view.animate().alpha(1f).setDuration(250).setListener(null);
     }
 
     private void hideView(View view) {
