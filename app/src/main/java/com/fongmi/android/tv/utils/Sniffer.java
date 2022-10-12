@@ -8,8 +8,6 @@ public class Sniffer {
                     "http((?!http).){12,}?\\.(m3u8|mp4|flv|avi|mkv|rm|wmv|mpg)\\?.*|" +
                     "http((?!http).){12,}\\.(m3u8|mp4|flv|avi|mkv|rm|wmv|mpg)|" +
                     "http((?!http).)*?xg.php\\?id=|" +
-                    "http((?!http).)*?cdn-tos|" +
-                    "http((?!http).)*?obj/tos|" +
                     "http((?!http).)*?video/tos*"
     );
 }
