@@ -20,6 +20,6 @@
     <string name="collect_result">“<xliff:g name="name">%s</xliff:g>”的搜索结果</string>
 
     <!-- Push -->
-    <string name="push_info">请用手机扫描二维码，或于浏览器中访问地址\n<xliff:g name="name">%s</xliff:g></string>
+    <string name="push_info">使用手机扫描二维码，或于浏览器访问地址\n<xliff:g name="name">%s</xliff:g></string>
 
 </resources>

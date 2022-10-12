@@ -11,7 +11,7 @@
         android:layout_height="40dp"
         android:layout_weight="1"
         android:background="@drawable/selector_text"
-        android:ellipsize="marquee"
+        android:ellipsize="middle"
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:gravity="center"
