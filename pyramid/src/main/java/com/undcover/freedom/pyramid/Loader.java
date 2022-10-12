@@ -14,15 +14,14 @@ public class Loader {
     private PyObject app;
     private String cache;
 
-    public void init(Context context) {
-        new Thread(() -> {
-            if (!Python.isStarted()) Python.start(new AndroidPlatform(context));
-            cache = context.getCacheDir().getAbsolutePath();
-            app = Python.getInstance().getModule("app");
-        }).start();
+    private void init(Context context) {
+        if (!Python.isStarted()) Python.start(new AndroidPlatform(context));
+        cache = context.getCacheDir().getAbsolutePath();
+        app = Python.getInstance().getModule("app");
     }
 
-    public Spider spider(String ext) {
+    public Spider spider(Context context, String ext) {
+        if (app == null) init(context);
         String path = app.callAttr("downloadPlugin", cache, ext).toString();
         PyObject pySpider = app.callAttr("loadFromDisk", path);
         List<PyObject> dependencies = app.callAttr("getDependence", pySpider).asList();
