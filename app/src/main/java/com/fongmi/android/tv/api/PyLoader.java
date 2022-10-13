@@ -1,7 +1,6 @@
 package com.fongmi.android.tv.api;
 
 import android.content.Context;
-import android.net.Uri;
 
 import com.fongmi.android.tv.App;
 import com.github.catvod.crawler.Spider;
@@ -35,11 +34,9 @@ public class PyLoader {
     public Spider getSpider(String key, String api, String ext) {
         try {
             if (spiders.containsKey(key)) return spiders.get(key);
-            String extend = Uri.parse(ext).getQueryParameter("extend");
-            Method method = loader.getClass().getMethod("spider", Context.class, String.class);
-            Spider spider = (Spider) method.invoke(loader, App.get(), ext);
-            extend = extend == null ? "" : extend;
-            spider.init(App.get(), extend);
+            Method method = loader.getClass().getMethod("spider", Context.class, String.class, String.class);
+            Spider spider = (Spider) method.invoke(loader, App.get(), api.split("py_")[1], ext);
+            spider.init(App.get());
             spiders.put(key, spider);
             return spider;
         } catch (Exception e) {

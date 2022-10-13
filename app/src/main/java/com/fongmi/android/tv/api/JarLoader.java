@@ -85,7 +85,7 @@ public class JarLoader {
             String spKey = (current = Utils.getMD5(jar)) + key;
             if (spiders.containsKey(spKey)) return spiders.get(spKey);
             if (!loaders.containsKey(current)) parseJar(current, jar);
-            Spider spider = (Spider) loaders.get(current).loadClass("com.github.catvod.spider." + api.replace("csp_", "")).newInstance();
+            Spider spider = (Spider) loaders.get(current).loadClass("com.github.catvod.spider." + api.split("csp_")[1]).newInstance();
             spider.init(App.get(), ext);
             spiders.put(spKey, spider);
             return spider;
