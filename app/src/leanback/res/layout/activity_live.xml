@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:keepScreenOn="true">
+
+    <com.google.android.exoplayer2.ui.StyledPlayerView
+        android:id="@+id/surface"
+        style="@style/LivePlayerStyle"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        app:surface_type="surface_view" />
+
+    <com.google.android.exoplayer2.ui.StyledPlayerView
+        android:id="@+id/texture"
+        style="@style/LivePlayerStyle"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        app:surface_type="texture_view" />
+
+    <LinearLayout
+        android:id="@+id/list"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:background="@drawable/shape_live"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <androidx.leanback.widget.VerticalGridView
+            android:id="@+id/group"
+            android:layout_width="120dp"
+            android:layout_height="match_parent"
+            tools:itemCount="5"
+            tools:listitem="@layout/adapter_live_group" />
+
+        <View
+            android:layout_width="0.3dp"
+            android:layout_height="match_parent"
+            android:background="@color/grey_700" />
+
+        <androidx.leanback.widget.VerticalGridView
+            android:id="@+id/channel"
+            android:layout_width="280dp"
+            android:layout_height="match_parent"
+            tools:itemCount="5"
+            tools:listitem="@layout/adapter_live_channel" />
+
+    </LinearLayout>
+</FrameLayout>
+
