@@ -70,9 +70,9 @@ public class FileUtil {
             BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(getLocal(path))));
             StringBuilder sb = new StringBuilder();
             String text;
-            while ((text = br.readLine()) != null) sb.append(text);
+            while ((text = br.readLine()) != null) sb.append(text).append("\n");
             br.close();
-            return sb.toString();
+            return Utils.substring(sb.toString());
         } catch (Exception e) {
             return "";
         }
