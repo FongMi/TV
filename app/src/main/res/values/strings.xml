@@ -36,7 +36,7 @@
     <string name="play_reset">Reset</string>
     <string name="play_tracks">Tracks</string>
     <string name="play_op">OP</string>
-    <string name="play_ed">OP</string>
+    <string name="play_ed">ED</string>
     <string name="play_reverse">Reverse</string>
     <string name="play_forward">→</string>
     <string name="play_backward">←</string>
