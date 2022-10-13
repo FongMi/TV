@@ -9,13 +9,13 @@
         android:id="@+id/code"
         android:layout_width="180dp"
         android:layout_height="180dp"
-        android:scaleType="fitXY" />
+        android:scaleType="centerCrop" />
 
     <TextView
         android:id="@+id/info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="12dp"
         android:layout_toEndOf="@+id/code"
         android:lineSpacingExtra="4dp"
         android:paddingStart="4dp"
