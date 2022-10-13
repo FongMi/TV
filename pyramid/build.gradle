@@ -13,6 +13,7 @@ android {
         python {
             buildPython "C:/Users/FongMi.DIREK/Anaconda3/python.exe"
             pip {
+                install "pycrypto"
                 install "requests"
                 install "lxml"
             }
