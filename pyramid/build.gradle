@@ -13,10 +13,8 @@ android {
         python {
             buildPython "C:/Users/FongMi.DIREK/Anaconda3/python.exe"
             pip {
+                install "requests"
                 install "lxml"
-                install "requests==2.27.1"
-                install 'pycryptodome'
-                install 'beautifulsoup4'
             }
         }
     }

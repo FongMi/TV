@@ -5,7 +5,6 @@ import android.content.Context;
 import com.chaquo.python.PyObject;
 import com.chaquo.python.Python;
 import com.chaquo.python.android.AndroidPlatform;
-import com.github.catvod.crawler.Spider;
 
 public class Loader {
 
@@ -18,9 +17,9 @@ public class Loader {
         app = Python.getInstance().getModule("app");
     }
 
-    public Spider spider(Context context, String ext) {
+    public com.github.catvod.crawler.Spider spider(Context context, String ext) {
         if (app == null) init(context);
         String path = app.callAttr("downloadPlugin", cache, ext).toString();
-        return new PySpider(app, app.callAttr("loadFromDisk", path));
+        return new Spider(app, app.callAttr("loadFromDisk", path));
     }
 }
