@@ -44,6 +44,7 @@ public class FileUtil {
     }
 
     public static File getLocal(String path) {
+        if (path.contains(getRootPath())) return new File(path);
         return new File(path.replace("file:/", getRootPath()));
     }
 
