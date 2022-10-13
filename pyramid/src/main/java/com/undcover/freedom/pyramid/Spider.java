@@ -3,19 +3,18 @@ package com.undcover.freedom.pyramid;
 import android.content.Context;
 
 import com.chaquo.python.PyObject;
-import com.github.catvod.crawler.Spider;
 import com.google.gson.Gson;
 
 import java.util.HashMap;
 import java.util.List;
 
-public class PySpider extends Spider {
+public class Spider extends com.github.catvod.crawler.Spider {
 
     private final PyObject app;
     private final PyObject obj;
     private final Gson gson;
 
-    public PySpider(PyObject app, PyObject obj) {
+    public Spider(PyObject app, PyObject obj) {
         this.gson = new Gson();
         this.app = app;
         this.obj = obj;
