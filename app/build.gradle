@@ -4,24 +4,30 @@ plugins {
 
 android {
     compileSdk 33
-    flavorDimensions "default"
+    flavorDimensions "mode", "api"
 
     defaultConfig {
         applicationId "com.fongmi.android.tv"
         minSdk 21
         targetSdk 33
-        versionCode 37
-        versionName "1.3.7"
+        versionCode 38
+        versionName "1.3.8"
         resValue "string", "url", ""
         ndk { abiFilters "armeabi-v7a" }
     }
 
     productFlavors {
         leanback {
-            dimension "default"
+            dimension "mode"
         }
         mobile {
-            dimension "default"
+            dimension "mode"
+        }
+        java {
+            dimension = "api"
+        }
+        python {
+            dimension = "api"
         }
     }
 
@@ -45,13 +51,14 @@ android {
 
     android.applicationVariants.all { variant ->
         variant.outputs.all { output ->
-            outputFileName = "${variant.productFlavors[0].name}.apk"
+            outputFileName = "${variant.productFlavors[0].name}-${variant.productFlavors[1].name}.apk"
         }
     }
 }
 
 dependencies {
     implementation project(':catvod')
+    pythonImplementation project(':pyramid')
     implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation 'androidx.core:core-splashscreen:1.0.0'
     implementation 'androidx.preference:preference:1.2.0'
