@@ -13,13 +13,13 @@ public class Loader {
 
     private void init(Context context) {
         if (!Python.isStarted()) Python.start(new AndroidPlatform(context));
-        cache = context.getCacheDir().getAbsolutePath();
+        cache = context.getCacheDir().getAbsolutePath() + "/plugin/";
         app = Python.getInstance().getModule("app");
     }
 
-    public com.github.catvod.crawler.Spider spider(Context context, String ext) {
+    public Spider spider(Context context, String name, String ext) {
         if (app == null) init(context);
-        String path = app.callAttr("downloadPlugin", cache, ext).toString();
-        return new Spider(app, app.callAttr("loadFromDisk", path));
+        PyObject obj = app.callAttr("init_py", cache, name, ext);
+        return new Spider(app, obj);
     }
 }
