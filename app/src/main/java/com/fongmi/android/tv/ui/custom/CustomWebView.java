@@ -5,6 +5,8 @@ import android.content.Context;
 import android.net.http.SslError;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.TextUtils;
+import android.webkit.CookieManager;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
@@ -110,6 +112,8 @@ public class CustomWebView extends WebView {
 
     private void post(Map<String, String> headers, String url) {
         Map<String, String> news = new HashMap<>();
+        String cookie = CookieManager.getInstance().getCookie(url);
+        if (!TextUtils.isEmpty(cookie)) news.put("cookie", cookie);
         for (String key : headers.keySet()) if (keys.contains(key.toLowerCase())) news.put(key, headers.get(key));
         handler.removeCallbacks(mTimer);
         handler.post(() -> {
