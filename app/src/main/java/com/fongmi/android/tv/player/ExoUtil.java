@@ -35,17 +35,18 @@ public class ExoUtil {
         return new CaptionStyleCompat(Color.WHITE, Color.TRANSPARENT, Color.TRANSPARENT, CaptionStyleCompat.EDGE_TYPE_OUTLINE, Color.BLACK, null);
     }
 
-    public static MediaSource getSource(Result result) {
-        return getSource(result.getHeaders(), result.getPlayUrl() + result.getUrl(), getConfig(result));
+    public static MediaSource getSource(Result result, boolean malformed) {
+        return getSource(result.getHeaders(), result.getPlayUrl() + result.getUrl(), malformed, getConfig(result));
     }
 
-    public static MediaSource getSource(Map<String, String> headers, String url) {
-        return getSource(headers, url, Collections.emptyList());
+    public static MediaSource getSource(Map<String, String> headers, String url, boolean malformed) {
+        return getSource(headers, url, malformed, Collections.emptyList());
     }
 
-    private static MediaSource getSource(Map<String, String> headers, String url, List<MediaItem.SubtitleConfiguration> config) {
+    private static MediaSource getSource(Map<String, String> headers, String url, boolean malformed, List<MediaItem.SubtitleConfiguration> config) {
         MediaItem.Builder builder = new MediaItem.Builder().setUri(Uri.parse(url));
         if (url.contains("m3u8")) builder.setMimeType(MimeTypes.APPLICATION_M3U8);
+        if (malformed) builder.setMimeType(MimeTypes.APPLICATION_OCTET);
         if (config.size() > 0) builder.setSubtitleConfigurations(config);
         return new DefaultMediaSourceFactory(getDataSourceFactory(headers)).createMediaSource(builder.build());
     }
