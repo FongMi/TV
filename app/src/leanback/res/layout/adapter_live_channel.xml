@@ -4,6 +4,8 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:background="@drawable/selector_live_channel"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     android:gravity="center"
     android:orientation="horizontal"
     android:paddingStart="20dp"
@@ -23,7 +25,7 @@
         tools:text="01" />
 
     <ImageView
-        android:id="@+id/logo"
+        android:id="@+id/icon"
         android:layout_width="48dp"
         android:layout_height="36dp"
         android:layout_marginEnd="12dp"
