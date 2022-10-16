@@ -33,6 +33,37 @@ public class KeyboardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         boolean onLongClick(int resId);
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        return mItems.get(position) instanceof String ? 0 : 1;
+    }
+
+    @Override
+    public int getItemCount() {
+        return mItems.size();
+    }
+
+    @NonNull
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        if (viewType == 0) return new TextHolder(AdapterKeyboardTextBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        else return new IconHolder(AdapterKeyboardIconBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        switch (getItemViewType(position)) {
+            case 0:
+                TextHolder text = (TextHolder) holder;
+                text.binding.text.setText(mItems.get(position).toString());
+                break;
+            case 1:
+                IconHolder icon = (IconHolder) holder;
+                icon.binding.icon.setImageResource((int) mItems.get(position));
+                break;
+        }
+    }
+
     class TextHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private final AdapterKeyboardTextBinding binding;
@@ -68,37 +99,6 @@ public class KeyboardAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         @Override
         public boolean onLongClick(View view) {
             return mListener.onLongClick((int) mItems.get(getLayoutPosition()));
-        }
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        return mItems.get(position) instanceof String ? 0 : 1;
-    }
-
-    @Override
-    public int getItemCount() {
-        return mItems.size();
-    }
-
-    @NonNull
-    @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        if (viewType == 0) return new TextHolder(AdapterKeyboardTextBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
-        else return new IconHolder(AdapterKeyboardIconBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        switch (getItemViewType(position)) {
-            case 0:
-                TextHolder text = (TextHolder) holder;
-                text.binding.text.setText(mItems.get(position).toString());
-                break;
-            case 1:
-                IconHolder icon = (IconHolder) holder;
-                icon.binding.icon.setImageResource((int) mItems.get(position));
-                break;
         }
     }
 }

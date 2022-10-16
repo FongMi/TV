@@ -28,16 +28,6 @@ public class ConfigAdapter extends RecyclerView.Adapter<ConfigAdapter.ViewHolder
         void onDeleteClick(Config item);
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-
-        private final AdapterConfigBinding binding;
-
-        public ViewHolder(@NonNull AdapterConfigBinding binding) {
-            super(binding.getRoot());
-            this.binding = binding;
-        }
-    }
-
     public int remove(Config item) {
         item.delete();
         mItems.remove(item);
@@ -62,5 +52,15 @@ public class ConfigAdapter extends RecyclerView.Adapter<ConfigAdapter.ViewHolder
         holder.binding.text.setText(item.getUrl());
         holder.binding.text.setOnClickListener(v -> mListener.onTextClick(item));
         holder.binding.delete.setOnClickListener(v -> mListener.onDeleteClick(item));
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+
+        private final AdapterConfigBinding binding;
+
+        public ViewHolder(@NonNull AdapterConfigBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
     }
 }

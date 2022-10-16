@@ -47,16 +47,6 @@ public class KeepAdapter extends RecyclerView.Adapter<KeepAdapter.ViewHolder> {
         boolean onLongClick();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-
-        private final AdapterVodBinding binding;
-
-        public ViewHolder(@NonNull AdapterVodBinding binding) {
-            super(binding.getRoot());
-            this.binding = binding;
-        }
-    }
-
     public void addAll(List<Keep> items) {
         mItems.clear();
         mItems.addAll(items);
@@ -111,5 +101,15 @@ public class KeepAdapter extends RecyclerView.Adapter<KeepAdapter.ViewHolder> {
             if (isDelete()) mListener.onItemDelete(item);
             else mListener.onItemClick(item);
         });
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+
+        private final AdapterVodBinding binding;
+
+        public ViewHolder(@NonNull AdapterVodBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
     }
 }
