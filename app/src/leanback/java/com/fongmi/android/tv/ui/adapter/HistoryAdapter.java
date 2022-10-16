@@ -35,32 +35,6 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         void onDataChanged(int size);
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
-
-        private final AdapterSearchHistoryBinding binding;
-
-        public ViewHolder(@NonNull AdapterSearchHistoryBinding binding) {
-            super(binding.getRoot());
-            this.binding = binding;
-            itemView.setOnClickListener(this);
-            itemView.setOnLongClickListener(this);
-        }
-
-        @Override
-        public void onClick(View view) {
-            mListener.onItemClick(mItems.get(getLayoutPosition()));
-        }
-
-        @Override
-        public boolean onLongClick(View v) {
-            mItems.remove(getLayoutPosition());
-            notifyItemRemoved(getLayoutPosition());
-            mListener.onDataChanged(getItemCount());
-            Prefers.putKeyword(mGson.toJson(mItems));
-            return true;
-        }
-    }
-
     private List<String> getItems() {
         if (Prefers.getKeyword().isEmpty()) return new ArrayList<>();
         return mGson.fromJson(Prefers.getKeyword(), new TypeToken<List<String>>() {}.getType());
@@ -102,5 +76,31 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.binding.history.setText(mItems.get(position));
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+
+        private final AdapterSearchHistoryBinding binding;
+
+        public ViewHolder(@NonNull AdapterSearchHistoryBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+            itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+            mListener.onItemClick(mItems.get(getLayoutPosition()));
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            mItems.remove(getLayoutPosition());
+            notifyItemRemoved(getLayoutPosition());
+            mListener.onDataChanged(getItemCount());
+            Prefers.putKeyword(mGson.toJson(mItems));
+            return true;
+        }
     }
 }

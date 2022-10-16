@@ -6,7 +6,6 @@ import android.text.TextUtils;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Config;
-import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.net.Callback;
@@ -35,7 +34,6 @@ public class ApiConfig {
     private List<String> ads;
     private List<String> flags;
     private List<Parse> parses;
-    private List<Live> lives;
     private List<Site> sites;
     private JarLoader jLoader;
     private PyLoader pLoader;
@@ -71,7 +69,6 @@ public class ApiConfig {
     public ApiConfig init() {
         this.ads = new ArrayList<>();
         this.sites = new ArrayList<>();
-        this.lives = new ArrayList<>();
         this.flags = new ArrayList<>();
         this.parses = new ArrayList<>();
         this.jLoader = new JarLoader();
@@ -219,7 +216,6 @@ public class ApiConfig {
     public ApiConfig clear() {
         this.ads.clear();
         this.sites.clear();
-        this.lives.clear();
         this.flags.clear();
         this.parses.clear();
         this.jLoader.clear();

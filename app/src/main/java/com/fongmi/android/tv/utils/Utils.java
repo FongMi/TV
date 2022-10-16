@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.view.KeyEvent;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import com.fongmi.android.tv.App;
+import com.google.android.exoplayer2.util.Util;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -95,6 +97,14 @@ public class Utils {
         } catch (NoSuchAlgorithmException e) {
             return "";
         }
+    }
+
+    public static String getUserAgent() {
+        return Util.getUserAgent(App.get(), App.get().getPackageName().concat(".").concat(getUUID()));
+    }
+
+    public static String getUUID() {
+        return Settings.Secure.getString(App.get().getContentResolver(), Settings.Secure.ANDROID_ID);
     }
 
     public static String getBase64(String ext) {
