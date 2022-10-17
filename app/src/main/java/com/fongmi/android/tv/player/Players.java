@@ -27,7 +27,7 @@ public class Players implements Player.Listener, AnalyticsListener, ParseTask.Ca
     private Formatter formatter;
     private ExoPlayer exoPlayer;
     private ParseTask parseTask;
-    private boolean malformed;
+    private int errorCode;
     private int retry;
 
     public Players init() {
@@ -156,17 +156,17 @@ public class Players implements Player.Listener, AnalyticsListener, ParseTask.Ca
     }
 
     private void setMediaSource(Result result) {
-        exoPlayer.setMediaSource(ExoUtil.getSource(result, malformed));
+        exoPlayer.setMediaSource(ExoUtil.getSource(result, errorCode));
         PlayerEvent.state(0);
         exoPlayer.prepare();
-        malformed = false;
+        errorCode = 0;
     }
 
     private void setMediaSource(Map<String, String> headers, String url) {
-        exoPlayer.setMediaSource(ExoUtil.getSource(headers, url, malformed));
+        exoPlayer.setMediaSource(ExoUtil.getSource(headers, url, errorCode));
         PlayerEvent.state(0);
         exoPlayer.prepare();
-        malformed = false;
+        errorCode = 0;
     }
 
     @Override
@@ -182,8 +182,8 @@ public class Players implements Player.Listener, AnalyticsListener, ParseTask.Ca
 
     @Override
     public void onPlayerError(@NonNull PlaybackException error) {
-        malformed = error.errorCode == PlaybackException.ERROR_CODE_PARSING_MANIFEST_MALFORMED;
         PlayerEvent.error(R.string.error_play_format, true);
+        errorCode = error.errorCode;
     }
 
     @Override
