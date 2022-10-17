@@ -70,7 +70,7 @@ public class CustomWebView extends WebView {
     public void start(String url, Map<String, String> headers, ParseTask.Callback callback) {
         this.callback = callback;
         setUserAgent(headers);
-        loadUrl(url);
+        loadUrl(url, headers);
         retry = 0;
     }
 
