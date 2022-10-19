@@ -5,19 +5,35 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.fongmi.android.tv.utils.ImgUtil;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
 public class Channel {
 
+    @SerializedName("urls")
     private List<String> urls;
+    @SerializedName("number")
     private String number;
+    @SerializedName("icon")
     private String icon;
+    @SerializedName("name")
     private String name;
+    @SerializedName("type")
     private Group type;
+    @SerializedName("ua")
     private String ua;
+
     private boolean select;
+
+    public static Channel objectFrom(JsonElement element) {
+        return new Gson().fromJson(element, Channel.class);
+    }
 
     public static Channel create(String number) {
         return new Channel(String.format(Locale.getDefault(), "%03d", Integer.valueOf(number)));
@@ -27,9 +43,14 @@ public class Channel {
         this.number = number;
     }
 
-    public Channel(String number, String name) {
-        this.number = number;
+    public Channel(int number, String name, String... urls) {
+        this(number, name, new ArrayList<>(Arrays.asList(urls)));
+    }
+
+    public Channel(int number, String name, List<String> urls) {
+        this.number = String.format(Locale.getDefault(), "%03d", number);
         this.name = name;
+        this.urls = urls;
     }
 
     public List<String> getUrls() {
@@ -101,6 +122,6 @@ public class Channel {
         if (this == obj) return true;
         if (!(obj instanceof Channel)) return false;
         Channel it = (Channel) obj;
-        return getNumber().equals(it.getNumber());
+        return getNumber().equals(it.getNumber()) || getName().equals(it.getName());
     }
 }

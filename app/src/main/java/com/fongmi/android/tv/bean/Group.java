@@ -5,24 +5,31 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.fongmi.android.tv.utils.ImgUtil;
+import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Group {
 
+    @SerializedName("channel")
     private List<Channel> channel;
+    @SerializedName("icon")
     private String icon;
+    @SerializedName("name")
     private String name;
+    @SerializedName("pass")
     private String pass;
     private boolean select;
     private int position;
 
     public Group(String name) {
         this.name = name;
+        if (name.contains("_")) setPass(name.split("_")[1]);
     }
 
     public List<Channel> getChannel() {
-        return channel;
+        return channel = channel == null ? new ArrayList<>() : channel;
     }
 
     public void setChannel(List<Channel> channel) {
