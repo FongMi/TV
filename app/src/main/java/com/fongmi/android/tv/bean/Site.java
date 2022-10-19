@@ -25,7 +25,7 @@ public class Site {
     @SerializedName("name")
     private String name;
     @SerializedName("type")
-    private int type;
+    private Integer type;
     @SerializedName("api")
     private String api;
     @SerializedName("playUrl")
@@ -80,8 +80,8 @@ public class Site {
         this.name = name;
     }
 
-    public int getType() {
-        return type;
+    public Integer getType() {
+        return type == null ? 0 : type;
     }
 
     public void setType(int type) {
