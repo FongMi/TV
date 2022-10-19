@@ -6,32 +6,21 @@ import java.util.List;
 
 public class Live {
 
-    @SerializedName("group")
-    private String group;
-    @SerializedName("channels")
-    private List<Channels> channels;
+    @SerializedName("name")
+    private String name;
+    @SerializedName("groups")
+    private List<Group> groups;
 
-    public String getGroup() {
-        return group;
+    public Live(String name, List<Group> groups) {
+        this.name = name;
+        this.groups = groups;
     }
 
-    public List<Channels> getChannels() {
-        return channels;
+    public String getName() {
+        return name;
     }
 
-    public static class Channels {
-
-        @SerializedName("name")
-        private String name;
-        @SerializedName("urls")
-        private List<String> urls;
-
-        public String getName() {
-            return name;
-        }
-
-        public List<String> getUrls() {
-            return urls;
-        }
+    public List<Group> getGroups() {
+        return groups;
     }
 }
