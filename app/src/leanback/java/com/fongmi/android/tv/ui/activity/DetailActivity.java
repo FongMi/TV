@@ -537,7 +537,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     public void onTimeChanged() {
         long duration = mPlayers.getDuration();
         long current = mPlayers.getCurrentPosition();
-        if (mHistory.getOpening() >= current) mPlayers.seekTo(mHistory.getOpening());
         if (mHistory.getEnding() > 0 && duration > 0 && mHistory.getEnding() + current >= duration) {
             Clock.get().setCallback(null);
             checkNext();
