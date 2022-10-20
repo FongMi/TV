@@ -37,7 +37,7 @@
             android:layout_height="match_parent"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:itemCount="5"
-            tools:listitem="@layout/adapter_live_group" />
+            tools:listitem="@layout/adapter_group" />
 
         <View
             android:layout_width="0.3dp"
@@ -50,7 +50,7 @@
             android:layout_height="match_parent"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:itemCount="5"
-            tools:listitem="@layout/adapter_live_channel" />
+            tools:listitem="@layout/adapter_channel" />
 
     </LinearLayout>
 </FrameLayout>

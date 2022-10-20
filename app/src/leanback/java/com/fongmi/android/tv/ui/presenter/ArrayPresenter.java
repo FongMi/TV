@@ -8,17 +8,17 @@ import androidx.annotation.NonNull;
 import androidx.leanback.widget.Presenter;
 
 import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.databinding.AdapterGroupBinding;
+import com.fongmi.android.tv.databinding.AdapterArrayBinding;
 import com.fongmi.android.tv.utils.ResUtil;
 
-public class GroupPresenter extends Presenter {
+public class ArrayPresenter extends Presenter {
 
     private final OnClickListener mListener;
     private final String backward;
     private final String forward;
     private final String reverse;
 
-    public GroupPresenter(OnClickListener listener) {
+    public ArrayPresenter(OnClickListener listener) {
         this.mListener = listener;
         this.backward = ResUtil.getString(R.string.play_backward);
         this.forward = ResUtil.getString(R.string.play_forward);
@@ -34,7 +34,7 @@ public class GroupPresenter extends Presenter {
 
     @Override
     public Presenter.ViewHolder onCreateViewHolder(ViewGroup parent) {
-        return new ViewHolder(AdapterGroupBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        return new ViewHolder(AdapterArrayBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
     }
 
     @Override
@@ -52,9 +52,9 @@ public class GroupPresenter extends Presenter {
 
     public static class ViewHolder extends Presenter.ViewHolder {
 
-        private final AdapterGroupBinding binding;
+        private final AdapterArrayBinding binding;
 
-        public ViewHolder(@NonNull AdapterGroupBinding binding) {
+        public ViewHolder(@NonNull AdapterArrayBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
         }
