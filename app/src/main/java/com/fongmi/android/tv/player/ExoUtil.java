@@ -46,7 +46,7 @@ public class ExoUtil {
     }
 
     private static MediaSource getSource(Map<String, String> headers, String url, int errorCode, List<MediaItem.SubtitleConfiguration> config) {
-        SpiderDebug.log(url + "," + headers);
+        SpiderDebug.log(errorCode + "," + url + "," + headers);
         MediaItem.Builder builder = new MediaItem.Builder().setUri(Uri.parse(url));
         if (errorCode == PlaybackException.ERROR_CODE_PARSING_MANIFEST_MALFORMED) builder.setMimeType(MimeTypes.APPLICATION_OCTET);
         else if (errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED) builder.setMimeType(MimeTypes.APPLICATION_M3U8);

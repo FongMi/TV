@@ -78,7 +78,7 @@ public class LiveActivity extends BaseActivity implements GroupAdapter.OnItemCli
 
     @Override
     public void onItemClick(Channel item) {
-        mPlayers.start(item, 0);
+        mPlayers.start(item);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -89,27 +89,32 @@ public class LiveActivity extends BaseActivity implements GroupAdapter.OnItemCli
             case Player.STATE_IDLE:
                 break;
             case Player.STATE_BUFFERING:
-                //mBinding.widget.progress.getRoot().setVisibility(View.VISIBLE);
+                mBinding.progress.getRoot().setVisibility(View.VISIBLE);
                 break;
             case Player.STATE_READY:
                 mPlayers.setRetry(0);
-                //mBinding.widget.progress.getRoot().setVisibility(View.GONE);
+                mBinding.progress.getRoot().setVisibility(View.GONE);
                 break;
             case Player.STATE_ENDED:
                 break;
             default:
-                if (!event.isRetry() || mPlayers.addRetry() > 3) onError(event.getMsg());
-                else onRetry();
+                if (!event.isRetry() || mPlayers.addRetry() > 1) onError();
+                else mPlayers.start(mChannelAdapter.getCurrent());
                 break;
         }
     }
 
-    private void onError(String msg) {
-
-    }
-
-    private void onRetry() {
-        mPlayers.start(mChannelAdapter.getCurrent(), 0);
+    private void onError() {
+        int index = mChannelAdapter.getCurrent().getIndex() + 1;
+        int size = mChannelAdapter.getCurrent().getUrls().size();
+        mPlayers.setRetry(0);
+        if (index == size) {
+            //TODO Auto Next
+            mBinding.progress.getRoot().setVisibility(View.GONE);
+        } else {
+            mChannelAdapter.getCurrent().setIndex(index);
+            mPlayers.start(mChannelAdapter.getCurrent());
+        }
     }
 
     @Override
