@@ -11,8 +11,10 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class Channel {
 
@@ -24,8 +26,8 @@ public class Channel {
     private String icon;
     @SerializedName("name")
     private String name;
-    @SerializedName("type")
-    private Group type;
+    @SerializedName("group")
+    private Group group;
     @SerializedName("ua")
     private String ua;
 
@@ -85,12 +87,12 @@ public class Channel {
         this.name = name;
     }
 
-    public Group getType() {
-        return type;
+    public Group getGroup() {
+        return group;
     }
 
-    public void setType(Group type) {
-        this.type = type;
+    public void setGroup(Group group) {
+        this.group = group;
     }
 
     public String getUa() {
@@ -115,6 +117,13 @@ public class Channel {
 
     public void loadIcon(ImageView view) {
         if (!getIcon().isEmpty()) ImgUtil.load(getIcon(), view);
+    }
+
+    public Map<String, String> getHeaders() {
+        HashMap<String, String> map = new HashMap<>();
+        if (getUa().isEmpty()) return map;
+        map.put("User-Agent", getUa());
+        return map;
     }
 
     @Override

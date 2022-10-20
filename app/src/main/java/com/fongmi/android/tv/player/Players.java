@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.utils.Notify;
@@ -140,6 +141,10 @@ public class Players implements Player.Listener, AnalyticsListener, ParseTask.Ca
         exoPlayer = null;
     }
 
+    public void start(Channel channel, int index) {
+        setMediaSource(channel.getHeaders(), channel.getUrls().get(index));
+    }
+
     public void start(Result result, boolean useParse) {
         if (result.getUrl().isEmpty()) {
             PlayerEvent.error(R.string.error_play_load);
@@ -159,6 +164,7 @@ public class Players implements Player.Listener, AnalyticsListener, ParseTask.Ca
         exoPlayer.setMediaSource(ExoUtil.getSource(result, errorCode));
         PlayerEvent.state(0);
         exoPlayer.prepare();
+        exoPlayer.play();
         errorCode = 0;
     }
 
@@ -166,6 +172,7 @@ public class Players implements Player.Listener, AnalyticsListener, ParseTask.Ca
         exoPlayer.setMediaSource(ExoUtil.getSource(headers, url, errorCode));
         PlayerEvent.state(0);
         exoPlayer.prepare();
+        exoPlayer.play();
         errorCode = 0;
     }
 
