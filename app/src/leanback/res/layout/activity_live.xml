@@ -23,6 +23,11 @@
         android:visibility="gone"
         app:surface_type="texture_view" />
 
+    <include
+        android:id="@+id/progress"
+        layout="@layout/view_progress"
+        android:visibility="gone" />
+
     <LinearLayout
         android:id="@+id/recycler"
         android:layout_width="wrap_content"
