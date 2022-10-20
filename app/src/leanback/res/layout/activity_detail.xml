@@ -223,7 +223,7 @@
                 android:paddingBottom="8dp" />
 
             <com.fongmi.android.tv.ui.custom.CustomHorizontalGridView
-                android:id="@+id/group"
+                android:id="@+id/array"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clipChildren="false"
