@@ -570,7 +570,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     }
 
     private void checkPosition() {
-        mPlayers.seekTo(mHistory.getPosition());
+        mPlayers.seekTo(Math.max(mHistory.getOpening(), mHistory.getPosition()));
         Clock.get().setCallback(this);
     }
 
