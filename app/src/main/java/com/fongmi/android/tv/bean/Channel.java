@@ -31,6 +31,7 @@ public class Channel {
     @SerializedName("ua")
     private String ua;
 
+    private int index;
     private boolean select;
 
     public static Channel objectFrom(JsonElement element) {
@@ -103,6 +104,14 @@ public class Channel {
         this.ua = ua;
     }
 
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
     public boolean isSelect() {
         return select;
     }
@@ -117,6 +126,10 @@ public class Channel {
 
     public void loadIcon(ImageView view) {
         if (!getIcon().isEmpty()) ImgUtil.load(getIcon(), view);
+    }
+
+    public String getUrl() {
+        return getUrls().get(getIndex());
     }
 
     public Map<String, String> getHeaders() {
