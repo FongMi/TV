@@ -43,7 +43,7 @@ import com.fongmi.android.tv.ui.custom.TrackSelectionDialog;
 import com.fongmi.android.tv.ui.custom.dialog.DescDialog;
 import com.fongmi.android.tv.ui.presenter.EpisodePresenter;
 import com.fongmi.android.tv.ui.presenter.FlagPresenter;
-import com.fongmi.android.tv.ui.presenter.GroupPresenter;
+import com.fongmi.android.tv.ui.presenter.ArrayPresenter;
 import com.fongmi.android.tv.ui.presenter.ParsePresenter;
 import com.fongmi.android.tv.ui.presenter.PartPresenter;
 import com.fongmi.android.tv.utils.Clock;
@@ -66,13 +66,13 @@ import java.util.List;
 import okhttp3.Call;
 import okhttp3.Response;
 
-public class DetailActivity extends BaseActivity implements CustomKeyDown.Listener, GroupPresenter.OnClickListener, Clock.Callback {
+public class DetailActivity extends BaseActivity implements CustomKeyDown.Listener, ArrayPresenter.OnClickListener, Clock.Callback {
 
     private ActivityDetailBinding mBinding;
     private ViewControllerBottomBinding mControl;
     private ViewGroup.LayoutParams mFrameParams;
     private ArrayObjectAdapter mFlagAdapter;
-    private ArrayObjectAdapter mGroupAdapter;
+    private ArrayObjectAdapter mArrayAdapter;
     private ArrayObjectAdapter mEpisodeAdapter;
     private ArrayObjectAdapter mParseAdapter;
     private ArrayObjectAdapter mPartAdapter;
@@ -170,7 +170,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
                 if (mFlagAdapter.size() > 0) setFlagActivated((Vod.Flag) mFlagAdapter.get(position));
             }
         });
-        mBinding.group.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
+        mBinding.array.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
                 if (mEpisodeAdapter.size() > 20 && position > 1) mBinding.episode.setSelectedPosition((position - 2) * 20);
@@ -185,9 +185,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         mBinding.episode.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.episode.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         mBinding.episode.setAdapter(new ItemBridgeAdapter(mEpisodeAdapter = new ArrayObjectAdapter(mEpisodePresenter = new EpisodePresenter(this::setEpisodeActivated))));
-        mBinding.group.setHorizontalSpacing(ResUtil.dp2px(8));
-        mBinding.group.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-        mBinding.group.setAdapter(new ItemBridgeAdapter(mGroupAdapter = new ArrayObjectAdapter(new GroupPresenter(this))));
+        mBinding.array.setHorizontalSpacing(ResUtil.dp2px(8));
+        mBinding.array.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+        mBinding.array.setAdapter(new ItemBridgeAdapter(mArrayAdapter = new ArrayObjectAdapter(new ArrayPresenter(this))));
         mBinding.part.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.part.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         mBinding.part.setAdapter(new ItemBridgeAdapter(mPartAdapter = new ArrayObjectAdapter(mPartPresenter = new PartPresenter(item -> CollectActivity.start(this, item)))));
@@ -273,7 +273,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
             if (!flag.isActivated()) continue;
             mBinding.flag.setSelectedPosition(i);
             mEpisodeAdapter.setItems(flag.getEpisodes(), null);
-            setGroup(flag.getEpisodes().size());
+            setArray(flag.getEpisodes().size());
             seamless(flag);
         }
         mFlagAdapter.notifyArrayItemRangeChanged(0, mFlagAdapter.size());
@@ -300,7 +300,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     private void reverseEpisode() {
         for (int i = 0; i < mFlagAdapter.size(); i++) Collections.reverse(((Vod.Flag) mFlagAdapter.get(i)).getEpisodes());
         mEpisodeAdapter.setItems(getVodFlag().getEpisodes(), null);
-        setGroup(mEpisodeAdapter.size());
+        setArray(mEpisodeAdapter.size());
     }
 
     private void setParseActivated(Parse item) {
@@ -312,16 +312,16 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         mParseAdapter.notifyArrayItemRangeChanged(0, mParseAdapter.size());
     }
 
-    private void setGroup(int size) {
+    private void setArray(int size) {
         List<String> items = new ArrayList<>();
         items.add(getString(R.string.play_reverse));
         items.add(getString(mHistory.getRevPlayText()));
-        mEpisodePresenter.setNextFocusDown(size > 1 ? R.id.group : R.id.part);
-        mPartPresenter.setNextFocusUp(size > 1 ? R.id.group : R.id.episode);
-        mBinding.group.setVisibility(size > 1 ? View.VISIBLE : View.GONE);
+        mEpisodePresenter.setNextFocusDown(size > 1 ? R.id.array : R.id.part);
+        mPartPresenter.setNextFocusUp(size > 1 ? R.id.array : R.id.episode);
+        mBinding.array.setVisibility(size > 1 ? View.VISIBLE : View.GONE);
         if (mHistory.isRevSort()) for (int i = size + 1; i > 0; i -= 20) items.add((i - 1) + "-" + Math.max(i - 20, 1));
         else for (int i = 0; i < size; i += 20) items.add((i + 1) + "-" + Math.min(i + 20, size));
-        mGroupAdapter.setItems(items, null);
+        mArrayAdapter.setItems(items, null);
     }
 
     @Override
@@ -468,7 +468,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     private boolean hasFlag() {
         if (mFlagAdapter.size() > 0) return true;
         mBinding.flag.setVisibility(View.GONE);
-        mBinding.group.setVisibility(View.GONE);
+        mBinding.array.setVisibility(View.GONE);
         mBinding.episode.setVisibility(View.GONE);
         Notify.show(R.string.error_episode);
         return false;

@@ -5,15 +5,15 @@ import android.view.View;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.fongmi.android.tv.bean.Group;
-import com.fongmi.android.tv.databinding.AdapterLiveGroupBinding;
+import com.fongmi.android.tv.databinding.AdapterGroupBinding;
 import com.fongmi.android.tv.ui.adapter.GroupAdapter;
 
 public class GroupHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-    private final AdapterLiveGroupBinding binding;
+    private final AdapterGroupBinding binding;
     private final GroupAdapter adapter;
 
-    public GroupHolder(GroupAdapter adapter, AdapterLiveGroupBinding binding) {
+    public GroupHolder(GroupAdapter adapter, AdapterGroupBinding binding) {
         super(binding.getRoot());
         this.binding = binding;
         this.adapter = adapter;

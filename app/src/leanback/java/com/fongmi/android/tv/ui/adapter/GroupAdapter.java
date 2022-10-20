@@ -7,7 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.fongmi.android.tv.bean.Group;
-import com.fongmi.android.tv.databinding.AdapterLiveGroupBinding;
+import com.fongmi.android.tv.databinding.AdapterGroupBinding;
 import com.fongmi.android.tv.ui.adapter.holder.GroupHolder;
 
 import java.util.ArrayList;
@@ -80,7 +80,7 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupHolder> {
     @NonNull
     @Override
     public GroupHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new GroupHolder(this, AdapterLiveGroupBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        return new GroupHolder(this, AdapterGroupBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
     }
 
     @Override

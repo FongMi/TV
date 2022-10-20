@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Group;
-import com.fongmi.android.tv.databinding.AdapterLiveChannelBinding;
+import com.fongmi.android.tv.databinding.AdapterChannelBinding;
 import com.fongmi.android.tv.ui.adapter.holder.ChannelHolder;
 
 import java.util.ArrayList;
@@ -100,7 +100,7 @@ public class ChannelAdapter extends RecyclerView.Adapter<ChannelHolder> {
     @NonNull
     @Override
     public ChannelHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ChannelHolder(this, AdapterLiveChannelBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        return new ChannelHolder(this, AdapterChannelBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
     }
 
     @Override

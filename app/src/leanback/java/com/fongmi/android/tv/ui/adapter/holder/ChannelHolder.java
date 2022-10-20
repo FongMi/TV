@@ -6,15 +6,15 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.fongmi.android.tv.bean.Channel;
-import com.fongmi.android.tv.databinding.AdapterLiveChannelBinding;
+import com.fongmi.android.tv.databinding.AdapterChannelBinding;
 import com.fongmi.android.tv.ui.adapter.ChannelAdapter;
 
 public class ChannelHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
-	private final AdapterLiveChannelBinding binding;
+	private final AdapterChannelBinding binding;
 	private final ChannelAdapter adapter;
 
-	public ChannelHolder(ChannelAdapter adapter, @NonNull AdapterLiveChannelBinding binding) {
+	public ChannelHolder(ChannelAdapter adapter, @NonNull AdapterChannelBinding binding) {
 		super(binding.getRoot());
 		this.binding = binding;
 		this.adapter = adapter;
