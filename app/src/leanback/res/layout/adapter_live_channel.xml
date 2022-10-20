@@ -5,7 +5,6 @@
     android:layout_height="wrap_content"
     android:background="@drawable/selector_live_channel"
     android:focusable="true"
-    android:focusableInTouchMode="true"
     android:gravity="center"
     android:orientation="horizontal"
     android:paddingStart="20dp"
@@ -20,7 +19,7 @@
         android:layout_marginEnd="12dp"
         android:letterSpacing="0.05"
         android:textColor="@color/white"
-        android:textSize="14sp"
+        android:textSize="16sp"
         android:textStyle="bold"
         tools:text="01" />
 
@@ -41,7 +40,7 @@
         android:scrollHorizontally="true"
         android:singleLine="true"
         android:textColor="@color/white"
-        android:textSize="14sp"
+        android:textSize="16sp"
         android:textStyle="bold"
         tools:text="CNN" />
 

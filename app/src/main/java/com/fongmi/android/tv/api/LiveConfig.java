@@ -41,8 +41,8 @@ public class LiveConfig {
             Live live = new Live(item.getName(), new ArrayList<>());
             parse(OKHttp.newCall(url).execute().body().string(), live);
             if (live.getGroups().size() > 0) getLives().add(live);
-        } catch (Exception ignored) {
-            ignored.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
