@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:background="@drawable/selector_channel"
     android:focusable="true"
+    android:focusableInTouchMode="true"
     android:gravity="center"
     android:orientation="horizontal"
     android:paddingStart="20dp"
