@@ -20,7 +20,8 @@ public class Group {
     private String name;
     @SerializedName("pass")
     private String pass;
-    private boolean select;
+
+    private boolean activated;
     private int position;
 
     public Group(String name) {
@@ -60,12 +61,12 @@ public class Group {
         this.pass = pass;
     }
 
-    public boolean isSelect() {
-        return select;
+    public boolean isActivated() {
+        return activated;
     }
 
-    public void setSelect(boolean select) {
-        this.select = select;
+    public void setActivated(boolean activated) {
+        this.activated = activated;
     }
 
     public int getPosition() {
