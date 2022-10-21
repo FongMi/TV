@@ -68,6 +68,14 @@ public class Prefers {
         put("home", home);
     }
 
+    public static String getLive() {
+        return getString("live");
+    }
+
+    public static void putLive(String live) {
+        put("live", live);
+    }
+
     public static int getRender() {
         return getInt("render", 0);
     }
