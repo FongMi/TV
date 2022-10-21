@@ -37,7 +37,7 @@
 
         <androidx.leanback.widget.VerticalGridView
             android:id="@+id/group"
-            android:layout_width="160dp"
+            android:layout_width="140dp"
             android:layout_height="match_parent"
             tools:itemCount="5"
             tools:listitem="@layout/adapter_group" />

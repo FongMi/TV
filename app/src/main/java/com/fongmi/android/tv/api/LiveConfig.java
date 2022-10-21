@@ -6,6 +6,8 @@ import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Group;
 import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.net.OKHttp;
+import com.fongmi.android.tv.utils.FileUtil;
+import com.fongmi.android.tv.utils.Prefers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +15,7 @@ import java.util.List;
 public class LiveConfig {
 
     private List<Live> lives;
+    private Live home;
 
     private static class Loader {
         static volatile LiveConfig INSTANCE = new LiveConfig();
@@ -31,23 +34,45 @@ public class LiveConfig {
         return lives;
     }
 
-    public void parse(Channel item) {
-        if (lives == null) init();
-        if (item.getUrls().isEmpty()) return;
-        if (!item.getUrls().get(0).startsWith("proxy://")) return;
+    public Live getHome() {
+        return home;
+    }
+
+    public void setHome() {
+        if (home == null) setHome(lives.isEmpty() ? new Live() : lives.get(0));
+    }
+
+    public void setHome(Live home) {
+        this.home = home;
+        this.home.setActivated(true);
+        Prefers.putLive(home.getName());
+        for (Live item : lives) item.setActivated(home);
+    }
+
+    private boolean isProxy(Live live) {
+        return live.getGroup().equals("redirect") && live.getChannels().size() > 0 && live.getChannels().get(0).getUrls().size() > 0 && live.getChannels().get(0).getUrls().get(0).startsWith("proxy");
+    }
+
+    public void parse(Live live) {
         try {
-            String base64 = item.getUrls().get(0).split("ext=")[1];
-            String url = new String(Base64.decode(base64, Base64.DEFAULT));
-            Live live = new Live(item.getName(), new ArrayList<>());
-            parse(OKHttp.newCall(url).execute().body().string(), live);
+            if (lives == null) init();
+            if (isProxy(live)) live = new Live(live.getChannels().get(0).getName(), live.getChannels().get(0).getUrl().split("ext=")[1]);
+            if (live.getType() == 0) parse(live, getTxt(live.getUrl()));
             if (live.getGroups().size() > 0) getLives().add(live);
+            if (live.getName().equals(Prefers.getLive())) setHome(live);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void parse(String result, Live live) {
-        for (String line : result.split("\n")) {
+    private String getTxt(String url) throws Exception {
+        if (url.startsWith("http")) return OKHttp.newCall(url).execute().body().string();
+        else if (url.startsWith("file")) return FileUtil.read(url);
+        else return getTxt(new String(Base64.decode(url, Base64.DEFAULT)));
+    }
+
+    private void parse(Live live, String txt) {
+        for (String line : txt.split("\n")) {
             String[] split = line.split(",");
             if (split.length < 2) continue;
             if (line.contains("#genre#")) {

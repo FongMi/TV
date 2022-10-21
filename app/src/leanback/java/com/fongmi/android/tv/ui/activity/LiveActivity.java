@@ -55,6 +55,10 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         return (Channel) mChannelAdapter.get(mBinding.channel.getSelectedPosition());
     }
 
+    private boolean isRecyclerVisible() {
+        return mBinding.recycler.getVisibility() == View.VISIBLE;
+    }
+
     @Override
     protected ViewBinding getBinding() {
         return mBinding = ActivityLiveBinding.inflate(getLayoutInflater());
@@ -78,12 +82,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
                 onItemClick((Group) mGroupAdapter.get(position));
             }
         });
-        mBinding.channel.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
-            @Override
-            public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
-                onItemClick((Channel) mChannelAdapter.get(position));
-            }
-        });
     }
 
     private void setRecyclerView() {
@@ -92,7 +90,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void getLive() {
-        mGroupAdapter.setItems(LiveConfig.get().getLives().get(0).getGroups(), null);
+        mGroupAdapter.setItems(LiveConfig.get().getHome().getGroups(), null);
+        mBinding.channel.requestFocus();
     }
 
     private void setVideoView() {
@@ -131,22 +130,31 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
                 break;
             default:
                 if (!event.isRetry() || mPlayers.addRetry() > 1) onError();
-                //else mPlayers.start(mChannelAdapter.getCurrent());
+                else mPlayers.start(getChannel());
                 break;
         }
     }
 
     private void onError() {
-        /*int index = mChannelAdapter.getCurrent().getIndex() + 1;
-        int size = mChannelAdapter.getCurrent().getUrls().size();
+        int index = getChannel().getIndex() + 1;
+        int size = getChannel().getUrls().size();
         mPlayers.setRetry(0);
         if (index == size) {
             //TODO Auto Next
             mBinding.progress.getRoot().setVisibility(View.GONE);
         } else {
-            mChannelAdapter.getCurrent().setIndex(index);
-            mPlayers.start(mChannelAdapter.getCurrent());
-        }*/
+            getChannel().setIndex(index);
+            mPlayers.start(getChannel());
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (isRecyclerVisible()) {
+            mBinding.recycler.setVisibility(View.GONE);
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override
