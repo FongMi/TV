@@ -31,8 +31,8 @@ public class Channel {
     @SerializedName("ua")
     private String ua;
 
+    private boolean activated;
     private int index;
-    private boolean select;
 
     public static Channel objectFrom(JsonElement element) {
         return new Gson().fromJson(element, Channel.class);
@@ -112,12 +112,12 @@ public class Channel {
         this.index = index;
     }
 
-    public boolean isSelect() {
-        return select;
+    public boolean isActivated() {
+        return activated;
     }
 
-    public void setSelect(boolean select) {
-        this.select = select;
+    public void setActivated(boolean activated) {
+        this.activated = activated;
     }
 
     public int getVisible() {

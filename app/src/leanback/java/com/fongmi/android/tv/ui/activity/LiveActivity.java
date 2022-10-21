@@ -6,6 +6,12 @@ import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.leanback.widget.ArrayObjectAdapter;
+import androidx.leanback.widget.ItemBridgeAdapter;
+import androidx.leanback.widget.OnChildViewHolderSelectedListener;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.api.LiveConfig;
@@ -14,8 +20,8 @@ import com.fongmi.android.tv.bean.Group;
 import com.fongmi.android.tv.databinding.ActivityLiveBinding;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.player.Players;
-import com.fongmi.android.tv.ui.adapter.ChannelAdapter;
-import com.fongmi.android.tv.ui.adapter.GroupAdapter;
+import com.fongmi.android.tv.ui.presenter.ChannelPresenter;
+import com.fongmi.android.tv.ui.presenter.GroupPresenter;
 import com.fongmi.android.tv.utils.Prefers;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
@@ -25,11 +31,11 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-public class LiveActivity extends BaseActivity implements GroupAdapter.OnItemClickListener, ChannelAdapter.OnItemClickListener {
+public class LiveActivity extends BaseActivity implements GroupPresenter.OnClickListener, ChannelPresenter.OnClickListener {
 
     private ActivityLiveBinding mBinding;
-    private ChannelAdapter mChannelAdapter;
-    private GroupAdapter mGroupAdapter;
+    private ArrayObjectAdapter mChannelAdapter;
+    private ArrayObjectAdapter mGroupAdapter;
     private Handler mHandler;
     private Players mPlayers;
 
@@ -39,6 +45,14 @@ public class LiveActivity extends BaseActivity implements GroupAdapter.OnItemCli
 
     private StyledPlayerView getPlayerView() {
         return Prefers.getRender() == 0 ? mBinding.surface : mBinding.texture;
+    }
+
+    private Group getGroup() {
+        return (Group) mGroupAdapter.get(mBinding.group.getSelectedPosition());
+    }
+
+    private Channel getChannel() {
+        return (Channel) mChannelAdapter.get(mBinding.channel.getSelectedPosition());
     }
 
     @Override
@@ -52,17 +66,33 @@ public class LiveActivity extends BaseActivity implements GroupAdapter.OnItemCli
         mPlayers = new Players().init();
         setRecyclerView();
         setVideoView();
+        getLive();
     }
 
     @Override
     protected void initEvent() {
         EventBus.getDefault().register(this);
+        mBinding.group.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
+            @Override
+            public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
+                onItemClick((Group) mGroupAdapter.get(position));
+            }
+        });
+        mBinding.channel.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
+            @Override
+            public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
+                onItemClick((Channel) mChannelAdapter.get(position));
+            }
+        });
     }
 
     private void setRecyclerView() {
-        mBinding.group.setAdapter(mGroupAdapter = new GroupAdapter(this));
-        mBinding.channel.setAdapter(mChannelAdapter = new ChannelAdapter(this));
-        mGroupAdapter.addAll(LiveConfig.get().getLives().get(0).getGroups());
+        mBinding.group.setAdapter(new ItemBridgeAdapter(mGroupAdapter = new ArrayObjectAdapter(new GroupPresenter(this))));
+        mBinding.channel.setAdapter(new ItemBridgeAdapter(mChannelAdapter = new ArrayObjectAdapter(new ChannelPresenter(this))));
+    }
+
+    private void getLive() {
+        mGroupAdapter.setItems(LiveConfig.get().getLives().get(0).getGroups(), null);
     }
 
     private void setVideoView() {
@@ -73,11 +103,13 @@ public class LiveActivity extends BaseActivity implements GroupAdapter.OnItemCli
 
     @Override
     public void onItemClick(Group item) {
-        mChannelAdapter.addAll(item);
+        mChannelAdapter.setItems(item.getChannel(), null);
+        mBinding.channel.setSelectedPosition(item.getPosition());
     }
 
     @Override
     public void onItemClick(Channel item) {
+        getGroup().setPosition(mBinding.channel.getSelectedPosition());
         mPlayers.start(item);
     }
 
@@ -99,13 +131,13 @@ public class LiveActivity extends BaseActivity implements GroupAdapter.OnItemCli
                 break;
             default:
                 if (!event.isRetry() || mPlayers.addRetry() > 1) onError();
-                else mPlayers.start(mChannelAdapter.getCurrent());
+                //else mPlayers.start(mChannelAdapter.getCurrent());
                 break;
         }
     }
 
     private void onError() {
-        int index = mChannelAdapter.getCurrent().getIndex() + 1;
+        /*int index = mChannelAdapter.getCurrent().getIndex() + 1;
         int size = mChannelAdapter.getCurrent().getUrls().size();
         mPlayers.setRetry(0);
         if (index == size) {
@@ -114,7 +146,7 @@ public class LiveActivity extends BaseActivity implements GroupAdapter.OnItemCli
         } else {
             mChannelAdapter.getCurrent().setIndex(index);
             mPlayers.start(mChannelAdapter.getCurrent());
-        }
+        }*/
     }
 
     @Override

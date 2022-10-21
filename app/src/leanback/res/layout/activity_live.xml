@@ -33,14 +33,12 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:background="@drawable/shape_live"
-        android:minWidth="400dp"
         android:orientation="horizontal">
 
-        <androidx.recyclerview.widget.RecyclerView
+        <androidx.leanback.widget.VerticalGridView
             android:id="@+id/group"
-            android:layout_width="wrap_content"
+            android:layout_width="160dp"
             android:layout_height="match_parent"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:itemCount="5"
             tools:listitem="@layout/adapter_group" />
 
@@ -49,11 +47,10 @@
             android:layout_height="match_parent"
             android:background="@color/grey_700" />
 
-        <androidx.recyclerview.widget.RecyclerView
+        <androidx.leanback.widget.VerticalGridView
             android:id="@+id/channel"
-            android:layout_width="match_parent"
+            android:layout_width="240dp"
             android:layout_height="match_parent"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:itemCount="5"
             tools:listitem="@layout/adapter_channel" />
 
