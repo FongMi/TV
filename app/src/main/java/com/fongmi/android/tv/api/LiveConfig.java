@@ -66,9 +66,10 @@ public class LiveConfig {
     }
 
     private String getTxt(String url) throws Exception {
-        if (url.startsWith("http")) return OKHttp.newCall(url).execute().body().string();
-        else if (url.startsWith("file")) return FileUtil.read(url);
-        else return getTxt(new String(Base64.decode(url, Base64.DEFAULT)));
+        if (url.startsWith("file")) return FileUtil.read(url);
+        else if (url.startsWith("http")) return OKHttp.newCall(url).execute().body().string();
+        else if (url.length() % 4 == 0) return getTxt(new String(Base64.decode(url, Base64.DEFAULT)));
+        else return "";
     }
 
     private void parse(Live live, String txt) {
