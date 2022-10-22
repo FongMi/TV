@@ -28,6 +28,25 @@
         layout="@layout/view_progress"
         android:visibility="gone" />
 
+    <TextView
+        android:id="@+id/digital"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_margin="16dp"
+        android:includeFontPadding="false"
+        android:letterSpacing="0.05"
+        android:shadowColor="@color/black"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="4"
+        android:textColor="@color/white"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        tools:text="05"
+        tools:visibility="visible" />
+
     <LinearLayout
         android:id="@+id/recycler"
         android:layout_width="wrap_content"

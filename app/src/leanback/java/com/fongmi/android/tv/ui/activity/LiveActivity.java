@@ -107,10 +107,10 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         int[] position = LiveConfig.get().getKeep();
         mGroupAdapter.setItems(LiveConfig.get().getHome().getGroups(), null);
         if (position[0] == -1) mBinding.recycler.setVisibility(View.VISIBLE);
-        else setKeep(position);
+        else setPosition(position);
     }
 
-    private void setKeep(int[] position) {
+    private void setPosition(int[] position) {
         mBinding.group.setSelectedPosition(position[0]);
         getGroup().setPosition(position[1]);
         onItemClick(getGroup());
@@ -139,12 +139,15 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public void onShow(String number) {
-
+        mBinding.digital.setText(number);
+        mBinding.digital.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onFind(String number) {
-
+        mBinding.digital.setVisibility(View.GONE);
+        int[] position = LiveConfig.get().find(number);
+        if (position[0] != -1) setPosition(position);
     }
 
     @Override
@@ -214,8 +217,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         int size = getChannel().getUrls().size();
         mPlayers.setRetry(0);
         if (index == size) {
-            //TODO Auto Next
-            mBinding.progress.getRoot().setVisibility(View.GONE);
+            onKeyDown();
         } else {
             getChannel().setIndex(index);
             mPlayers.start(getChannel());
