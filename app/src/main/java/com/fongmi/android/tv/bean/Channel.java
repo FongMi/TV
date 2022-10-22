@@ -11,6 +11,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -26,8 +27,6 @@ public class Channel {
     private String icon;
     @SerializedName("name")
     private String name;
-    @SerializedName("group")
-    private Group group;
     @SerializedName("ua")
     private String ua;
 
@@ -38,20 +37,22 @@ public class Channel {
         return new Gson().fromJson(element, Channel.class);
     }
 
-    public static Channel create(String number) {
-        return new Channel(String.format(Locale.getDefault(), "%03d", Integer.valueOf(number)));
+    public static Channel create(int number) {
+        return new Channel().setNumber(number);
     }
 
-    public Channel(String number) {
-        this.number = number;
+    public static Channel create(String name) {
+        return new Channel(name, Collections.emptyList());
     }
 
-    public Channel(int number, String name, String... urls) {
-        this(number, name, new ArrayList<>(Arrays.asList(urls)));
+    public Channel() {
     }
 
-    public Channel(int number, String name, List<String> urls) {
-        this.number = String.format(Locale.getDefault(), "%03d", number);
+    public Channel(String name, String... urls) {
+        this(name, new ArrayList<>(Arrays.asList(urls)));
+    }
+
+    public Channel(String name, List<String> urls) {
         this.name = name;
         this.urls = urls;
     }
@@ -65,7 +66,7 @@ public class Channel {
     }
 
     public String getNumber() {
-        return number;
+        return TextUtils.isEmpty(number) ? "" : number;
     }
 
     public void setNumber(String number) {
@@ -86,14 +87,6 @@ public class Channel {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Group getGroup() {
-        return group;
-    }
-
-    public void setGroup(Group group) {
-        this.group = group;
     }
 
     public String getUa() {
@@ -132,6 +125,11 @@ public class Channel {
         return getUrls().get(getIndex());
     }
 
+    public Channel setNumber(int number) {
+        setNumber(String.format(Locale.getDefault(), "%03d", number));
+        return this;
+    }
+
     public Map<String, String> getHeaders() {
         HashMap<String, String> map = new HashMap<>();
         if (getUa().isEmpty()) return map;
@@ -144,6 +142,6 @@ public class Channel {
         if (this == obj) return true;
         if (!(obj instanceof Channel)) return false;
         Channel it = (Channel) obj;
-        return getNumber().equals(it.getNumber()) || getName().equals(it.getName());
+        return getName().equals(it.getName()) || (!getNumber().isEmpty() && getNumber().equals(it.getNumber()));
     }
 }

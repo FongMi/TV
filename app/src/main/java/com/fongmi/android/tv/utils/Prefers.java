@@ -76,6 +76,14 @@ public class Prefers {
         put("live", live);
     }
 
+    public static String getKeep() {
+        return getString("keep");
+    }
+
+    public static void putKeep(String keep) {
+        put("keep", keep);
+    }
+
     public static int getRender() {
         return getInt("render", 0);
     }

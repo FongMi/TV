@@ -4,30 +4,32 @@ import android.view.KeyEvent;
 
 import com.fongmi.android.tv.utils.Utils;
 
-public class CustomKeyDown {
+public class CustomKeyDownVod {
 
-    private final Listener mListener;
+    private final Listener listener;
     private int holdTime;
 
-    public static CustomKeyDown create(Listener listener) {
-        return new CustomKeyDown(listener);
+    public static CustomKeyDownVod create(Listener listener) {
+        return new CustomKeyDownVod(listener);
     }
 
-    private CustomKeyDown(Listener listener) {
-        this.mListener = listener;
+    private CustomKeyDownVod(Listener listener) {
+        this.listener = listener;
     }
 
     public boolean onKeyDown(KeyEvent event) {
-        if (event.getAction() == KeyEvent.ACTION_DOWN && (Utils.isLeftKey(event) || Utils.isRightKey(event))) {
-            mListener.onSeeking(Utils.isRightKey(event) ? addTime() : subTime());
+        if (event.getAction() == KeyEvent.ACTION_DOWN && Utils.isLeftKey(event)) {
+            listener.onSeeking(subTime());
+        } else if (event.getAction() == KeyEvent.ACTION_DOWN && Utils.isRightKey(event)) {
+            listener.onSeeking(addTime());
         } else if (event.getAction() == KeyEvent.ACTION_UP && (Utils.isLeftKey(event) || Utils.isRightKey(event))) {
-            mListener.onSeekTo(holdTime);
+            listener.onSeekTo(holdTime);
         } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isUpKey(event)) {
-            mListener.onKeyUp();
+            listener.onKeyUp();
         } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isDownKey(event)) {
-            mListener.onKeyDown();
+            listener.onKeyDown();
         } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isEnterKey(event)) {
-            mListener.onKeyCenter();
+            listener.onKeyCenter();
         }
         return true;
     }

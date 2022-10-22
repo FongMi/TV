@@ -36,9 +36,16 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected void initEvent() {
     }
 
+    protected void hackResources() {
+        try {
+            AutoSizeCompat.autoConvertDensityOfGlobal(super.getResources());
+        } catch (Exception ignored) {
+        }
+    }
+
     @Override
     public Resources getResources() {
-        AutoSizeCompat.autoConvertDensityOfGlobal(super.getResources());
+        hackResources();
         return super.getResources();
     }
 
