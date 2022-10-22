@@ -6,7 +6,6 @@ import android.text.TextUtils;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Config;
-import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.net.Callback;
@@ -68,6 +67,7 @@ public class ApiConfig {
     }
 
     public ApiConfig init() {
+        LiveConfig.get().init();
         this.ads = new ArrayList<>();
         this.sites = new ArrayList<>();
         this.flags = new ArrayList<>();
@@ -108,6 +108,7 @@ public class ApiConfig {
     private void parseConfig(JsonObject object, Callback callback) {
         try {
             parseJson(object);
+            LiveConfig.get().parse(object);
             jLoader.parseJar("", Json.safeString(object, "spider", ""));
             handler.post(() -> callback.success(object.toString()));
         } catch (Exception e) {
@@ -128,14 +129,10 @@ public class ApiConfig {
             if (parse.getName().equals(Prefers.getParse())) setParse(parse);
             if (!parses.contains(parse)) parses.add(parse);
         }
-        for (JsonElement element : Json.safeListElement(object, "lives")) {
-            LiveConfig.get().parse(Live.objectFrom(element));
-        }
         if (home == null) setHome(sites.isEmpty() ? new Site() : sites.get(0));
         if (parse == null) setParse(parses.isEmpty() ? new Parse() : parses.get(0));
         flags.addAll(Json.safeListString(object, "flags"));
         ads.addAll(Json.safeListString(object, "ads"));
-        LiveConfig.get().setHome();
     }
 
     private String parseExt(String ext) {
@@ -219,13 +216,14 @@ public class ApiConfig {
     }
 
     public ApiConfig clear() {
+        this.home = null;
         this.ads.clear();
         this.sites.clear();
         this.flags.clear();
         this.parses.clear();
         this.jLoader.clear();
         this.pLoader.clear();
-        this.home = null;
+        LiveConfig.get().clear();
         return this;
     }
 }
