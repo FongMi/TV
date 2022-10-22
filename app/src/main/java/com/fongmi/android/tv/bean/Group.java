@@ -89,6 +89,10 @@ public class Group {
         if (!getIcon().isEmpty()) ImgUtil.load(getIcon(), view);
     }
 
+    public int find(int number) {
+        return getChannel().lastIndexOf(Channel.create(number));
+    }
+
     public int find(String name) {
         return getChannel().lastIndexOf(Channel.create(name));
     }
