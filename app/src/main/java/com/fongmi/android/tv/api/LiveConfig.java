@@ -66,6 +66,15 @@ public class LiveConfig {
         return new int[]{-1, -1};
     }
 
+    public int[] find(String number) {
+        List<Group> items = getHome().getGroups();
+        for (int i = 0; i < items.size(); i++) {
+            int j = items.get(i).find(Integer.parseInt(number));
+            if (j != -1) return new int[]{i, j};
+        }
+        return new int[]{-1, -1};
+    }
+
     private boolean isProxy(Live live) {
         return live.getGroup().equals("redirect") && live.getChannels().size() > 0 && live.getChannels().get(0).getUrls().size() > 0 && live.getChannels().get(0).getUrls().get(0).startsWith("proxy");
     }
