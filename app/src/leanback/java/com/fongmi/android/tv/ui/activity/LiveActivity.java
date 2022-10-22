@@ -111,6 +111,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void setPosition(int[] position) {
+        mBinding.progress.getRoot().setVisibility(View.VISIBLE);
         mBinding.group.setSelectedPosition(position[0]);
         getGroup().setPosition(position[1]);
         onItemClick(getGroup());
