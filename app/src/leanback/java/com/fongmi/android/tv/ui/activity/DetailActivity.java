@@ -38,7 +38,7 @@ import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.net.OKHttp;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
-import com.fongmi.android.tv.ui.custom.CustomKeyDown;
+import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
 import com.fongmi.android.tv.ui.custom.TrackSelectionDialog;
 import com.fongmi.android.tv.ui.custom.dialog.DescDialog;
 import com.fongmi.android.tv.ui.presenter.EpisodePresenter;
@@ -66,7 +66,7 @@ import java.util.List;
 import okhttp3.Call;
 import okhttp3.Response;
 
-public class DetailActivity extends BaseActivity implements CustomKeyDown.Listener, ArrayPresenter.OnClickListener, Clock.Callback {
+public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Listener, ArrayPresenter.OnClickListener, Clock.Callback {
 
     private ActivityDetailBinding mBinding;
     private ViewControllerBottomBinding mControl;
@@ -78,8 +78,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     private ArrayObjectAdapter mPartAdapter;
     private EpisodePresenter mEpisodePresenter;
     private PartPresenter mPartPresenter;
+    private CustomKeyDownVod mKeyDown;
     private SiteViewModel mViewModel;
-    private CustomKeyDown mKeyDown;
     private boolean mFullscreen;
     private Handler mHandler;
     private History mHistory;
@@ -136,7 +136,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
 
     @Override
     protected void initView() {
-        mKeyDown = CustomKeyDown.create(this);
+        mKeyDown = CustomKeyDownVod.create(this);
         mHandler = new Handler(Looper.getMainLooper());
         mFrameParams = mBinding.video.getLayoutParams();
         mBinding.progressLayout.showProgress();

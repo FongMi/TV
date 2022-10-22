@@ -15,6 +15,7 @@ import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.analytics.AnalyticsListener;
+import com.google.android.exoplayer2.audio.AudioAttributes;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.util.Util;
 
@@ -41,9 +42,11 @@ public class Players implements Player.Listener, AnalyticsListener, ParseTask.Ca
     private void setupPlayer() {
         DefaultTrackSelector selector = new DefaultTrackSelector(App.get());
         selector.setParameters(selector.getParameters().buildUpon().setPreferredTextLanguage("zh").build());
-        DefaultRenderersFactory factory = new DefaultRenderersFactory(App.get()).experimentalSetSynchronizeCodecInteractionsWithQueueingEnabled(true).setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON);
+        DefaultRenderersFactory factory = new DefaultRenderersFactory(App.get()).setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON);
         exoPlayer = new ExoPlayer.Builder(App.get()).setLoadControl(new DefaultLoadControl()).setRenderersFactory(factory).setTrackSelector(selector).build();
+        exoPlayer.setAudioAttributes(AudioAttributes.DEFAULT, true);
         exoPlayer.addAnalyticsListener(this);
+        exoPlayer.setPlayWhenReady(true);
         exoPlayer.addListener(this);
     }
 
@@ -168,7 +171,6 @@ public class Players implements Player.Listener, AnalyticsListener, ParseTask.Ca
         exoPlayer.setMediaSource(ExoUtil.getSource(result, errorCode));
         PlayerEvent.state(0);
         exoPlayer.prepare();
-        exoPlayer.play();
         setErrorCode(0);
     }
 
@@ -176,7 +178,6 @@ public class Players implements Player.Listener, AnalyticsListener, ParseTask.Ca
         exoPlayer.setMediaSource(ExoUtil.getSource(headers, url, errorCode));
         PlayerEvent.state(0);
         exoPlayer.prepare();
-        exoPlayer.play();
         setErrorCode(0);
     }
 

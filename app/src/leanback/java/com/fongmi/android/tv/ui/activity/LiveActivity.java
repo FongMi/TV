@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.KeyEvent;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -20,6 +21,7 @@ import com.fongmi.android.tv.bean.Group;
 import com.fongmi.android.tv.databinding.ActivityLiveBinding;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.player.Players;
+import com.fongmi.android.tv.ui.custom.CustomKeyDownLive;
 import com.fongmi.android.tv.ui.presenter.ChannelPresenter;
 import com.fongmi.android.tv.ui.presenter.GroupPresenter;
 import com.fongmi.android.tv.utils.Prefers;
@@ -31,11 +33,12 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-public class LiveActivity extends BaseActivity implements GroupPresenter.OnClickListener, ChannelPresenter.OnClickListener {
+public class LiveActivity extends BaseActivity implements GroupPresenter.OnClickListener, ChannelPresenter.OnClickListener, CustomKeyDownLive.Listener {
 
     private ActivityLiveBinding mBinding;
     private ArrayObjectAdapter mChannelAdapter;
     private ArrayObjectAdapter mGroupAdapter;
+    private CustomKeyDownLive mKeyDown;
     private Handler mHandler;
     private Players mPlayers;
 
@@ -55,8 +58,12 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         return (Channel) mChannelAdapter.get(mBinding.channel.getSelectedPosition());
     }
 
-    private boolean isRecyclerVisible() {
-        return mBinding.recycler.getVisibility() == View.VISIBLE;
+    private boolean isVisible(View view) {
+        return view.getVisibility() == View.VISIBLE;
+    }
+
+    private boolean isGone(View view) {
+        return view.getVisibility() == View.GONE;
     }
 
     @Override
@@ -67,6 +74,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     @Override
     protected void initView() {
         mHandler = new Handler(Looper.getMainLooper());
+        mKeyDown = CustomKeyDownLive.create(this);
         mPlayers = new Players().init();
         setRecyclerView();
         setVideoView();
@@ -89,15 +97,24 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.channel.setAdapter(new ItemBridgeAdapter(mChannelAdapter = new ArrayObjectAdapter(new ChannelPresenter(this))));
     }
 
-    private void getLive() {
-        mGroupAdapter.setItems(LiveConfig.get().getHome().getGroups(), null);
-        mBinding.channel.requestFocus();
-    }
-
     private void setVideoView() {
         getPlayerView().setPlayer(mPlayers.exo());
         getPlayerView().setVisibility(View.VISIBLE);
         getPlayerView().setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);
+    }
+
+    private void getLive() {
+        int[] position = LiveConfig.get().getKeep();
+        mGroupAdapter.setItems(LiveConfig.get().getHome().getGroups(), null);
+        if (position[0] == -1) mBinding.recycler.setVisibility(View.VISIBLE);
+        else setKeep(position);
+    }
+
+    private void setKeep(int[] position) {
+        mBinding.group.setSelectedPosition(position[0]);
+        getGroup().setPosition(position[1]);
+        onItemClick(getGroup());
+        onItemClick(getChannel());
     }
 
     @Override
@@ -109,7 +126,64 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     @Override
     public void onItemClick(Channel item) {
         getGroup().setPosition(mBinding.channel.getSelectedPosition());
+        LiveConfig.get().setKeep(getGroup(), item);
+        mBinding.recycler.setVisibility(View.GONE);
         mPlayers.start(item);
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (isGone(mBinding.recycler) && mKeyDown.hasEvent(event)) return mKeyDown.onKeyDown(event);
+        else return super.dispatchKeyEvent(event);
+    }
+
+    @Override
+    public void onShow(String number) {
+
+    }
+
+    @Override
+    public void onFind(String number) {
+
+    }
+
+    @Override
+    public void onKeyUp() {
+        int position = mBinding.channel.getSelectedPosition();
+        position = position > 0 ? --position : mChannelAdapter.size() - 1;
+        mBinding.channel.setSelectedPosition(position);
+        mBinding.channel.scrollToPosition(position);
+        onItemClick(getChannel());
+    }
+
+    @Override
+    public void onKeyDown() {
+        int position = mBinding.channel.getSelectedPosition();
+        position = position < mChannelAdapter.size() - 1 ? ++position : 0;
+        mBinding.channel.setSelectedPosition(position);
+        mBinding.channel.scrollToPosition(position);
+        onItemClick(getChannel());
+    }
+
+    @Override
+    public void onKeyLeft() {
+
+    }
+
+    @Override
+    public void onKeyRight() {
+
+    }
+
+    @Override
+    public void onKeyCenter() {
+        mBinding.recycler.setVisibility(View.VISIBLE);
+        mBinding.channel.requestFocus();
+    }
+
+    @Override
+    public void onLongPress() {
+
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -150,7 +224,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public void onBackPressed() {
-        if (isRecyclerVisible()) {
+        if (isVisible(mBinding.recycler)) {
             mBinding.recycler.setVisibility(View.GONE);
         } else {
             super.onBackPressed();
