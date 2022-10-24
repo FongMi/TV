@@ -87,6 +87,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     @Override
     protected void initEvent() {
         EventBus.getDefault().register(this);
+        getPlayerView().setOnClickListener(view -> toggle());
         mBinding.group.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
@@ -109,7 +110,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private void getLive() {
         int[] position = LiveConfig.get().getKeep();
         mGroupAdapter.setItems(LiveConfig.get().getHome().getGroups(), null);
-        if (position[0] == -1) mBinding.recycler.setVisibility(View.VISIBLE);
+        if (position[0] == -1) showUI();
         else setPosition(position);
     }
 
@@ -119,6 +120,12 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         getGroup().setPosition(position[1]);
         onItemClick(getGroup());
         onItemClick(getChannel());
+    }
+
+    private void toggle() {
+        if (isVisible(mBinding.recycler)) hideUI();
+        else showUI();
+        hideInfo();
     }
 
     @Override
@@ -131,9 +138,22 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     public void onItemClick(Channel item) {
         getGroup().setPosition(mBinding.channel.getSelectedPosition());
         LiveConfig.get().setKeep(getGroup(), item);
-        mBinding.recycler.setVisibility(View.GONE);
-        mPlayers.start(item);
         showInfo(item);
+        getUrl(item);
+        hideUI();
+    }
+
+    private void getUrl(Channel item) {
+        mPlayers.start(item);
+    }
+
+    private void hideUI() {
+        mBinding.recycler.setVisibility(View.GONE);
+    }
+
+    private void showUI() {
+        mBinding.recycler.setVisibility(View.VISIBLE);
+        mBinding.channel.requestFocus();
     }
 
     private void hideInfo() {
@@ -190,7 +210,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     @Override
     public void onKeyLeft() {
         Channel item = getChannel().prevLine();
-        if (item.getUrls().size() > 1) mPlayers.start(item);
+        if (item.getUrls().size() > 1) getUrl(item);
         mBinding.info.getRoot().setVisibility(View.VISIBLE);
         mBinding.info.line.setText(item.getLineText());
     }
@@ -198,16 +218,15 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     @Override
     public void onKeyRight() {
         Channel item = getChannel().nextLine();
-        if (item.getUrls().size() > 1) mPlayers.start(item);
+        if (item.getUrls().size() > 1) getUrl(item);
         mBinding.info.getRoot().setVisibility(View.VISIBLE);
         mBinding.info.line.setText(item.getLineText());
     }
 
     @Override
     public void onKeyCenter() {
-        mBinding.recycler.setVisibility(View.VISIBLE);
-        mBinding.channel.requestFocus();
         hideInfo();
+        showUI();
     }
 
     @Override
@@ -233,15 +252,16 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
                 break;
             default:
                 if (!event.isRetry() || mPlayers.addRetry() > 1) onError();
-                else mPlayers.start(getChannel());
+                else getUrl(getChannel());
                 break;
         }
     }
 
     private void onError() {
         mPlayers.setRetry(0);
+        if (isVisible(mBinding.recycler)) return;
         if (getChannel().isLastLine()) onKeyDown();
-        else mPlayers.start(getChannel().nextLine());
+        else getUrl(getChannel().nextLine());
     }
 
     @Override
@@ -261,9 +281,9 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     @Override
     public void onBackPressed() {
         if (isVisible(mBinding.info.getRoot())) {
-            mBinding.info.getRoot().setVisibility(View.GONE);
+            hideInfo();
         } else if (isVisible(mBinding.recycler)) {
-            mBinding.recycler.setVisibility(View.GONE);
+            hideUI();
         } else {
             super.onBackPressed();
         }
