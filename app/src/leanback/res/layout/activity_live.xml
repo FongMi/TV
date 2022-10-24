@@ -47,6 +47,10 @@
         tools:text="05"
         tools:visibility="visible" />
 
+    <include
+        android:id="@+id/info"
+        layout="@layout/view_live_info" />
+
     <LinearLayout
         android:id="@+id/recycler"
         android:layout_width="wrap_content"

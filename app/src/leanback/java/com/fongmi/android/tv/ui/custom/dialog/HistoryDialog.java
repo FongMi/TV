@@ -16,19 +16,28 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class HistoryDialog implements ConfigAdapter.OnClickListener {
 
-    private DialogHistoryBinding binding;
-    private ConfigCallback callback;
+    private final DialogHistoryBinding binding;
+    private final ConfigCallback callback;
+    private final AlertDialog dialog;
     private ConfigAdapter adapter;
-    private AlertDialog dialog;
+    private int type;
 
-    public static void show(Activity activity) {
-        new HistoryDialog().create(activity);
+    public static HistoryDialog create(Activity activity) {
+        return new HistoryDialog(activity);
     }
 
-    public void create(Activity activity) {
-        callback = (ConfigCallback) activity;
-        binding = DialogHistoryBinding.inflate(LayoutInflater.from(activity));
-        dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).create();
+    public HistoryDialog type(int type) {
+        this.type = type;
+        return this;
+    }
+
+    public HistoryDialog(Activity activity) {
+        this.callback = (ConfigCallback) activity;
+        this.binding = DialogHistoryBinding.inflate(LayoutInflater.from(activity));
+        this.dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).create();
+    }
+
+    public void show() {
         setRecyclerView();
         setDialog();
     }
@@ -36,7 +45,7 @@ public class HistoryDialog implements ConfigAdapter.OnClickListener {
     private void setRecyclerView() {
         binding.recycler.setHasFixedSize(true);
         binding.recycler.addItemDecoration(new SpaceItemDecoration(1, 16));
-        binding.recycler.setAdapter(adapter = new ConfigAdapter(this));
+        binding.recycler.setAdapter(adapter = new ConfigAdapter(this, type));
     }
 
     private void setDialog() {
@@ -50,7 +59,8 @@ public class HistoryDialog implements ConfigAdapter.OnClickListener {
 
     @Override
     public void onTextClick(Config item) {
-        callback.setConfig(item.getUrl());
+        if (type == 0) callback.setVodConfig(item);
+        if (type == 1) callback.setLiveConfig(item);
         dialog.dismiss();
     }
 

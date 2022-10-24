@@ -10,7 +10,7 @@ import androidx.core.splashscreen.SplashScreen;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.api.ApiConfig;
-import com.fongmi.android.tv.bean.Config;
+import com.fongmi.android.tv.api.LiveConfig;
 import com.fongmi.android.tv.databinding.ActivitySplashBinding;
 import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.utils.Notify;
@@ -33,6 +33,8 @@ public class SplashActivity extends BaseActivity {
 
     @Override
     protected void initView() {
+        LiveConfig.get().init().load();
+        ApiConfig.get().init().load(getCallback());
         mBinding.title.animate().alpha(1).setDuration(1000).setListener(onAnimationEnd()).start();
     }
 
@@ -40,19 +42,17 @@ public class SplashActivity extends BaseActivity {
         return new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                mBinding.info.animate().alpha(1).setDuration(500).start();
                 mBinding.title.setVisibility(View.GONE);
-                loadConfig();
+                mBinding.info.animate().alpha(1).setDuration(500).start();
             }
         };
     }
 
-    private void loadConfig() {
-        ApiConfig.get().init().loadConfig(new Callback() {
+    private Callback getCallback() {
+        return new Callback() {
             @Override
-            public void success(String json) {
+            public void success() {
                 HomeActivity.start(getActivity());
-                Config.save(json);
             }
 
             @Override
@@ -60,6 +60,6 @@ public class SplashActivity extends BaseActivity {
                 HomeActivity.start(getActivity());
                 Notify.show(resId);
             }
-        });
+        };
     }
 }

@@ -4,7 +4,9 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.utils.ImgUtil;
+import com.fongmi.android.tv.utils.ResUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
@@ -31,7 +33,7 @@ public class Channel {
     private String ua;
 
     private boolean activated;
-    private int index;
+    private int line;
 
     public static Channel objectFrom(JsonElement element) {
         return new Gson().fromJson(element, Channel.class);
@@ -97,12 +99,12 @@ public class Channel {
         this.ua = ua;
     }
 
-    public int getIndex() {
-        return index;
+    public int getLine() {
+        return line;
     }
 
-    public void setIndex(int index) {
-        this.index = index;
+    public void setLine(int line) {
+        this.line = line;
     }
 
     public boolean isActivated() {
@@ -121,12 +123,30 @@ public class Channel {
         if (!getIcon().isEmpty()) ImgUtil.load(getIcon(), view);
     }
 
+    public boolean isLastLine() {
+        return getLine() == getUrls().size() - 1;
+    }
+
     public String getUrl() {
-        return getUrls().get(getIndex());
+        return getUrls().get(getLine());
+    }
+
+    public String getLineText() {
+        return ResUtil.getString(R.string.live_line, getLine() + 1, getUrls().size());
     }
 
     public Channel setNumber(int number) {
         setNumber(String.format(Locale.getDefault(), "%03d", number));
+        return this;
+    }
+
+    public Channel nextLine() {
+        setLine(getLine() < getUrls().size() - 1 ? getLine() + 1 : 0);
+        return this;
+    }
+
+    public Channel prevLine() {
+        setLine(getLine() > 0 ? getLine() - 1 : getUrls().size() - 1);
         return this;
     }
 

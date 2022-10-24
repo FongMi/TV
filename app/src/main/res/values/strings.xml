@@ -10,6 +10,12 @@
     <!-- Vod -->
     <string name="vod_last">Last seen <xliff:g name="name">%s</xliff:g></string>
 
+    <!-- Live -->
+    <string name="live_epg_now">Playing: <xliff:g name="name">%s</xliff:g>/<xliff:g name="name">%s</xliff:g></string>
+    <string name="live_epg_next">Nex: <xliff:g name="name">%s</xliff:g>/<xliff:g name="name">%s</xliff:g></string>
+    <string name="live_epg_empty">No schedule</string>
+    <string name="live_line">Line <xliff:g name="name">%s</xliff:g>/<xliff:g name="name">%s</xliff:g></string>
+
     <!-- Push -->
     <string name="push_clip">Push clipboard content</string>
 
@@ -49,8 +55,8 @@
     <string name="parse_from">Parse from: <xliff:g name="name">%s</xliff:g></string>
 
     <!-- Setting -->
-    <string name="setting_site">Home site</string>
-    <string name="setting_url">Configuration</string>
+    <string name="setting_vod">Vod</string>
+    <string name="setting_live">Live</string>
     <string name="setting_render">Render type</string>
     <string name="setting_scale">Scale type</string>
     <string name="setting_quality">Image quality</string>
@@ -60,7 +66,7 @@
     <!-- Dialog -->
     <string name="dialog_positive">OK</string>
     <string name="dialog_negative">Cancel</string>
-    <string name="dialog_config_hint">Please enter the configuration url</string>
+    <string name="dialog_config_hint">Please enter the config…</string>
 
     <!-- Error -->
     <string name="error_config_get">Configuration get failed</string>
