@@ -72,7 +72,7 @@
         android:letterSpacing="0.05"
         android:singleLine="true"
         android:text="@string/live_epg_empty"
-        android:textColor="@color/grey_50"
+        android:textColor="@color/grey_200"
         android:textSize="16sp"
         android:textStyle="bold"
         tools:text="下個節目：喜劇之王" />
