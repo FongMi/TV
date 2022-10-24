@@ -37,8 +37,6 @@
         android:layout_height="wrap_content"
         android:ellipsize="marquee"
         android:letterSpacing="0.05"
-        android:marqueeRepeatLimit="marquee_forever"
-        android:scrollHorizontally="true"
         android:singleLine="true"
         android:textColor="@color/white"
         android:textSize="16sp"
