@@ -26,14 +26,18 @@ public class Clock {
         return Loader.INSTANCE;
     }
 
-    public void init() {
-        this.formatter = new SimpleDateFormat("MM/dd HH:mm:ss", Locale.getDefault());
+    public void init(String format) {
+        this.formatter = new SimpleDateFormat(format, Locale.getDefault());
         this.handler = new Handler(Looper.getMainLooper());
         this.date = new Date();
     }
 
     public static void start(TextView view) {
-        get().init();
+        start(view, "MM/dd HH:mm:ss");
+    }
+
+    public static void start(TextView view, String format) {
+        get().init(format);
         get().run(view);
     }
 

@@ -1,7 +1,6 @@
 package com.fongmi.android.tv.ui.activity;
 
 import android.app.Activity;
-import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Intent;
 import android.view.View;
@@ -36,7 +35,7 @@ public class PushActivity extends BaseActivity {
     }
 
     private void onClip(View view) {
-        ClipData data = ((ClipboardManager) getSystemService(CLIPBOARD_SERVICE)).getPrimaryClip();
-        if (data != null && data.getItemCount() > 0) DetailActivity.start(this, "push_agent", data.getItemAt(0).getText().toString());
+        CharSequence text = ((ClipboardManager) getSystemService(CLIPBOARD_SERVICE)).getText();
+        if (text != null) DetailActivity.start(this, "push_agent", text.toString());
     }
 }

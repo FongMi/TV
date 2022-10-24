@@ -16,9 +16,9 @@ public class ConfigAdapter extends RecyclerView.Adapter<ConfigAdapter.ViewHolder
     private final OnClickListener mListener;
     private final List<Config> mItems;
 
-    public ConfigAdapter(OnClickListener listener) {
+    public ConfigAdapter(OnClickListener listener, int type) {
         this.mListener = listener;
-        this.mItems = Config.getAll();
+        this.mItems = Config.getAll(type);
     }
 
     public interface OnClickListener {

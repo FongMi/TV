@@ -19,27 +19,26 @@ import androidx.viewbinding.ViewBinding;
 import com.fongmi.android.tv.BuildConfig;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.api.LiveConfig;
 import com.fongmi.android.tv.bean.Config;
-import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.databinding.ActivitySettingBinding;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.impl.ConfigCallback;
-import com.fongmi.android.tv.impl.SiteCallback;
 import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.ui.custom.dialog.ConfigDialog;
 import com.fongmi.android.tv.ui.custom.dialog.HistoryDialog;
-import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Updater;
 
-public class SettingActivity extends BaseActivity implements ConfigCallback, SiteCallback {
+public class SettingActivity extends BaseActivity implements ConfigCallback {
 
     private final ActivityResultLauncher<String> launcherString = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> loadConfig());
     private final ActivityResultLauncher<Intent> launcherIntent = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> loadConfig());
 
     private ActivitySettingBinding mBinding;
+    private int type;
 
     public static void start(Activity activity) {
         activity.startActivity(new Intent(activity, SettingActivity.class));
@@ -52,8 +51,8 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
 
     @Override
     protected void initView() {
-        mBinding.url.setText(Prefers.getUrl());
-        mBinding.home.setText(ApiConfig.getHomeName());
+        mBinding.vodUrl.setText(ApiConfig.getUrl());
+        mBinding.liveUrl.setText(LiveConfig.getUrl());
         mBinding.sizeText.setText(ResUtil.getStringArray(R.array.select_size)[Prefers.getSize()]);
         mBinding.scaleText.setText(ResUtil.getStringArray(R.array.select_scale)[Prefers.getScale()]);
         mBinding.renderText.setText(ResUtil.getStringArray(R.array.select_render)[Prefers.getRender()]);
@@ -63,9 +62,10 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
 
     @Override
     protected void initEvent() {
-        mBinding.site.setOnClickListener(view -> SiteDialog.show(this));
-        mBinding.config.setOnClickListener(view -> ConfigDialog.show(this));
-        mBinding.history.setOnClickListener(view -> HistoryDialog.show(this));
+        mBinding.vod.setOnClickListener(view -> ConfigDialog.create(this).type(0).show());
+        mBinding.live.setOnClickListener(view -> ConfigDialog.create(this).type(1).show());
+        mBinding.vodHistory.setOnClickListener(view -> HistoryDialog.create(this).type(0).show());
+        mBinding.liveHistory.setOnClickListener(view -> HistoryDialog.create(this).type(1).show());
         mBinding.version.setOnClickListener(view -> Updater.create(this).force().start());
         mBinding.quality.setOnClickListener(this::setQuality);
         mBinding.render.setOnClickListener(this::setRender);
@@ -74,18 +74,19 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
     }
 
     @Override
-    public void setSite(Site item) {
-        mBinding.home.setText(item.getName());
-        ApiConfig.get().setHome(item);
-        RefreshEvent.video();
+    public void setVodConfig(Config config) {
+        mBinding.vodUrl.setText(config.getUrl());
+        ApiConfig.get().setConfig(config);
+        this.type = config.getType();
+        checkUrl(config.getUrl());
     }
 
     @Override
-    public void setConfig(String url) {
-        mBinding.url.setText(url);
-        Notify.progress(this);
-        Prefers.putUrl(url);
-        checkUrl(url);
+    public void setLiveConfig(Config config) {
+        mBinding.liveUrl.setText(config.getUrl());
+        LiveConfig.get().setConfig(config);
+        this.type = config.getType();
+        checkUrl(config.getUrl());
     }
 
     private void checkUrl(String url) {
@@ -108,24 +109,28 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
     }
 
     private void loadConfig() {
-        ApiConfig.get().clear().loadConfig(new Callback() {
+        Notify.progress(this);
+        if (type == 0) ApiConfig.get().clear().load(getCallback());
+        if (type == 1) LiveConfig.get().clear().load(getCallback());
+    }
+
+    private Callback getCallback() {
+        return new Callback() {
             @Override
-            public void success(String json) {
-                Config.save(json);
-                setSite(0);
+            public void success() {
+                refresh(0);
             }
 
             @Override
             public void error(int resId) {
-                setSite(resId);
+                refresh(resId);
             }
-        });
+        };
     }
 
-    private void setSite(int resId) {
-        mBinding.home.setText(ApiConfig.getHomeName());
-        RefreshEvent.history();
-        RefreshEvent.video();
+    private void refresh(int resId) {
+        if (type == 0) RefreshEvent.history();
+        if (type == 0) RefreshEvent.video();
         Notify.show(resId);
         Notify.dismiss();
     }

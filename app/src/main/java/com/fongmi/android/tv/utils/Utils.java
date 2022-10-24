@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.api.ApiConfig;
 import com.google.android.exoplayer2.util.Util;
 
 import java.math.BigInteger;
@@ -84,7 +85,7 @@ public class Utils {
         if (text.startsWith("clan")) return checkClan(text);
         if (text.startsWith(".")) text = text.substring(1);
         if (text.startsWith("/")) text = text.substring(1);
-        Uri uri = Uri.parse(Prefers.getUrl());
+        Uri uri = Uri.parse(ApiConfig.getUrl());
         if (uri.getLastPathSegment() == null) return uri.getScheme() + "://" + text;
         return uri.toString().replace(uri.getLastPathSegment(), text);
     }

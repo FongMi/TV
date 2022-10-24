@@ -15,7 +15,6 @@ import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderNull;
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -38,9 +37,9 @@ public class ApiConfig {
     private JarLoader jLoader;
     private PyLoader pLoader;
     private Handler handler;
+    private Config config;
     private Parse parse;
     private Site home;
-    private int cid;
 
     private static class Loader {
         static volatile ApiConfig INSTANCE = new ApiConfig();
@@ -50,67 +49,71 @@ public class ApiConfig {
         return Loader.INSTANCE;
     }
 
-    public static String getHomeName() {
-        return get().getHome().getName();
+    public static int getCid() {
+        return get().getConfig().getId();
+    }
+
+    public static String getUrl() {
+        return get().getConfig().getUrl();
     }
 
     public static int getHomeIndex() {
         return get().getSites().indexOf(get().getHome());
     }
 
+    public static String getHomeName() {
+        return get().getHome().getName();
+    }
+
     public static String getSiteName(String key) {
         return get().getSite(key).getName();
     }
 
-    public static int getCid() {
-        return get().cid;
-    }
-
     public ApiConfig init() {
-        LiveConfig.get().init();
+        this.config = Config.vod();
         this.ads = new ArrayList<>();
-        this.sites = new ArrayList<>();
         this.flags = new ArrayList<>();
         this.parses = new ArrayList<>();
+        this.sites = new ArrayList<>();
         this.jLoader = new JarLoader();
         this.pLoader = new PyLoader();
         this.handler = new Handler(Looper.getMainLooper());
         return this;
     }
 
-    public void loadConfig(Callback callback) {
-        loadConfig(false, callback);
+    public void load(Callback callback) {
+        load(false, callback);
     }
 
-    public void loadConfig(boolean cache, Callback callback) {
+    public void load(boolean cache, Callback callback) {
         new Thread(() -> {
-            if (cache) loadCache(Prefers.getUrl(), callback);
-            else loadConfig(Prefers.getUrl(), callback);
+            if (cache) loadCache(callback);
+            else loadConfig(callback);
         }).start();
     }
 
-    private void loadConfig(String url, Callback callback) {
+    private void loadConfig(Callback callback) {
         try {
-            parseConfig(new Gson().fromJson(Decoder.getJson(url), JsonObject.class), callback);
+            parseConfig(JsonParser.parseString(Decoder.getJson(config.getUrl())).getAsJsonObject(), callback);
         } catch (Exception e) {
-            if (url.isEmpty()) handler.post(() -> callback.error(0));
-            else loadCache(url, callback);
+            if (config.getUrl().isEmpty()) handler.post(() -> callback.error(0));
+            else loadCache(callback);
             e.printStackTrace();
         }
     }
 
-    private void loadCache(String url, Callback callback) {
-        String json = Config.find(url).getJson();
-        if (!TextUtils.isEmpty(json)) parseConfig(JsonParser.parseString(json).getAsJsonObject(), callback);
+    private void loadCache(Callback callback) {
+        if (!TextUtils.isEmpty(config.getJson())) parseConfig(JsonParser.parseString(config.getJson()).getAsJsonObject(), callback);
         else handler.post(() -> callback.error(R.string.error_config_get));
     }
 
     private void parseConfig(JsonObject object, Callback callback) {
         try {
             parseJson(object);
-            LiveConfig.get().parse(object);
+            LiveConfig.get().parseJson(object);
             jLoader.parseJar("", Json.safeString(object, "spider", ""));
-            handler.post(() -> callback.success(object.toString()));
+            config.json(object.toString()).update();
+            handler.post(callback::success);
         } catch (Exception e) {
             e.printStackTrace();
             handler.post(() -> callback.error(R.string.error_config_parse));
@@ -121,7 +124,7 @@ public class ApiConfig {
         for (JsonElement element : Json.safeListElement(object, "sites")) {
             Site site = Site.objectFrom(element).sync();
             site.setExt(parseExt(site.getExt()));
-            if (site.getKey().equals(Prefers.getHome())) setHome(site);
+            if (site.getKey().equals(config.getHome())) setHome(site);
             if (!sites.contains(site)) sites.add(site);
         }
         for (JsonElement element : Json.safeListElement(object, "parses")) {
@@ -189,15 +192,12 @@ public class ApiConfig {
         return flags == null ? Collections.emptyList() : flags;
     }
 
-    public Site getHome() {
-        return home == null ? new Site() : home;
+    public Config getConfig() {
+        return config;
     }
 
-    public void setHome(Site home) {
-        this.home = home;
-        this.home.setActivated(true);
-        Prefers.putHome(home.getKey());
-        for (Site item : sites) item.setActivated(home);
+    public void setConfig(Config config) {
+        this.config = config;
     }
 
     public Parse getParse() {
@@ -211,8 +211,15 @@ public class ApiConfig {
         for (Parse item : parses) item.setActivated(parse);
     }
 
-    public void setCid(int cid) {
-        this.cid = cid;
+    public Site getHome() {
+        return home == null ? new Site() : home;
+    }
+
+    public void setHome(Site home) {
+        this.home = home;
+        this.home.setActivated(true);
+        config.home(home.getKey()).update();
+        for (Site item : sites) item.setActivated(home);
     }
 
     public ApiConfig clear() {
@@ -223,7 +230,6 @@ public class ApiConfig {
         this.parses.clear();
         this.jLoader.clear();
         this.pLoader.clear();
-        LiveConfig.get().clear();
         return this;
     }
 }
