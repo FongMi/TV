@@ -24,6 +24,7 @@ import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownLive;
 import com.fongmi.android.tv.ui.presenter.ChannelPresenter;
 import com.fongmi.android.tv.ui.presenter.GroupPresenter;
+import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.Prefers;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
@@ -39,6 +40,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private ArrayObjectAdapter mChannelAdapter;
     private ArrayObjectAdapter mGroupAdapter;
     private CustomKeyDownLive mKeyDown;
+    private Runnable mRunnable;
     private Handler mHandler;
     private Players mPlayers;
 
@@ -73,9 +75,10 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     protected void initView() {
+        mRunnable = this::hideInfo;
+        mPlayers = new Players().init();
         mHandler = new Handler(Looper.getMainLooper());
         mKeyDown = CustomKeyDownLive.create(this);
-        mPlayers = new Players().init();
         setRecyclerView();
         setVideoView();
         getLive();
@@ -130,6 +133,21 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         LiveConfig.get().setKeep(getGroup(), item);
         mBinding.recycler.setVisibility(View.GONE);
         mPlayers.start(item);
+        showInfo(item);
+    }
+
+    private void hideInfo() {
+        mBinding.info.getRoot().setVisibility(View.GONE);
+    }
+
+    private void showInfo(Channel item) {
+        mHandler.removeCallbacks(mRunnable);
+        mBinding.info.name.setSelected(true);
+        mBinding.info.name.setText(item.getName());
+        mBinding.info.line.setText(item.getLineText());
+        mBinding.info.number.setText(item.getNumber());
+        mBinding.info.getRoot().setVisibility(View.VISIBLE);
+        mHandler.postDelayed(mRunnable, 5000);
     }
 
     @Override
@@ -171,18 +189,25 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public void onKeyLeft() {
-
+        Channel item = getChannel().prevLine();
+        if (item.getUrls().size() > 1) mPlayers.start(item);
+        mBinding.info.getRoot().setVisibility(View.VISIBLE);
+        mBinding.info.line.setText(item.getLineText());
     }
 
     @Override
     public void onKeyRight() {
-
+        Channel item = getChannel().nextLine();
+        if (item.getUrls().size() > 1) mPlayers.start(item);
+        mBinding.info.getRoot().setVisibility(View.VISIBLE);
+        mBinding.info.line.setText(item.getLineText());
     }
 
     @Override
     public void onKeyCenter() {
         mBinding.recycler.setVisibility(View.VISIBLE);
         mBinding.channel.requestFocus();
+        hideInfo();
     }
 
     @Override
@@ -214,20 +239,30 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void onError() {
-        int index = getChannel().getIndex() + 1;
-        int size = getChannel().getUrls().size();
         mPlayers.setRetry(0);
-        if (index == size) {
-            onKeyDown();
-        } else {
-            getChannel().setIndex(index);
-            mPlayers.start(getChannel());
-        }
+        if (getChannel().isLastLine()) onKeyDown();
+        else mPlayers.start(getChannel().nextLine());
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Clock.start(mBinding.info.time, "HH:mm:ss");
+        mPlayers.play();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Clock.get().release();
+        mPlayers.pause();
     }
 
     @Override
     public void onBackPressed() {
-        if (isVisible(mBinding.recycler)) {
+        if (isVisible(mBinding.info.getRoot())) {
+            mBinding.info.getRoot().setVisibility(View.GONE);
+        } else if (isVisible(mBinding.recycler)) {
             mBinding.recycler.setVisibility(View.GONE);
         } else {
             super.onBackPressed();

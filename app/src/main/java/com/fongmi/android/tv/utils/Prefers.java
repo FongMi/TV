@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import androidx.preference.PreferenceManager;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.R;
 
 public class Prefers {
 
@@ -50,30 +49,6 @@ public class Prefers {
         } else if (obj instanceof Long) {
             getPrefers().edit().putLong(key, (Long) obj).apply();
         }
-    }
-
-    public static String getUrl() {
-        return getString("url", ResUtil.getString(R.string.url));
-    }
-
-    public static void putUrl(String url) {
-        put("url", url);
-    }
-
-    public static String getHome() {
-        return getString("home");
-    }
-
-    public static void putHome(String home) {
-        put("home", home);
-    }
-
-    public static String getLive() {
-        return getString("live");
-    }
-
-    public static void putLive(String live) {
-        put("live", live);
     }
 
     public static String getKeep() {

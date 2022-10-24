@@ -46,6 +46,11 @@ public class Live {
     public Live() {
     }
 
+    public Live(String url) {
+        this.name = url;
+        this.url = url;
+    }
+
     public Live(String name, String url) {
         this.name = name;
         this.url = url;
@@ -97,6 +102,10 @@ public class Live {
 
     public void setActivated(Live item) {
         this.activated = item.equals(this);
+    }
+
+    public boolean isProxy() {
+        return getGroup().equals("redirect") && getChannels().size() > 0 && getChannels().get(0).getUrls().size() > 0 && getChannels().get(0).getUrls().get(0).startsWith("proxy");
     }
 
     @Override

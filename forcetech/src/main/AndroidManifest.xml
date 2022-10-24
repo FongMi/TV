@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.forcetech">
+
+    <application>
+
+        <service
+            android:name="com.forcetech.service.ForceService"
+            android:exported="false"
+            android:process=":force" />
+
+        <service
+            android:name="com.gsoft.mitv.MainActivity"
+            android:exported="false"
+            android:process=":mitv" />
+
+    </application>
+</manifest>

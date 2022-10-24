@@ -1,17 +1,23 @@
 package com.fongmi.android.tv.api;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Base64;
 
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Channel;
+import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Group;
 import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.db.AppDatabase;
+import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.net.OKHttp;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Json;
 import com.fongmi.android.tv.utils.Prefers;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +25,8 @@ import java.util.List;
 public class LiveConfig {
 
     private List<Live> lives;
+    private Handler handler;
+    private Config config;
     private Live home;
 
     private static class Loader {
@@ -29,57 +37,53 @@ public class LiveConfig {
         return Loader.INSTANCE;
     }
 
+    public static String getUrl() {
+        return get().getConfig().getUrl();
+    }
+
     public LiveConfig init() {
+        this.config = Config.live();
         this.lives = new ArrayList<>();
+        this.handler = new Handler(Looper.getMainLooper());
         return this;
     }
 
-    public List<Live> getLives() {
-        return lives;
+    public void load() {
+        load(new Callback());
     }
 
-    public Live getHome() {
-        return home;
+    public void load(Callback callback) {
+        new Thread(() -> loadConfig(callback)).start();
     }
 
-    public void setHome(Live home) {
-        this.home = home;
-        this.home.setActivated(true);
-        Prefers.putLive(home.getName());
-        for (Live item : lives) item.setActivated(home);
-    }
-
-    public void setKeep(Group group, Channel channel) {
-        Prefers.putKeep(getHome().getName() + AppDatabase.SYMBOL + group.getName() + AppDatabase.SYMBOL + channel.getName());
-    }
-
-    public int[] getKeep() {
-        String[] splits = Prefers.getKeep().split(AppDatabase.SYMBOL);
-        if (!getHome().getName().equals(splits[0])) return new int[]{-1, -1};
-        for (int i = 0; i < getHome().getGroups().size(); i++) {
-            Group group = getHome().getGroups().get(i);
-            if (group.getName().equals(splits[1])) {
-                int j = group.find(splits[2]);
-                if (j != -1) return new int[]{i, j};
-            }
+    private void loadConfig(Callback callback) {
+        try {
+            parseConfig(Decoder.getJson(config.getUrl()), callback);
+        } catch (Exception e) {
+            e.printStackTrace();
+            handler.post(() -> callback.error(config.getUrl().isEmpty() ? 0 : R.string.error_config_get));
         }
-        return new int[]{-1, -1};
     }
 
-    public int[] find(String number) {
-        List<Group> items = getHome().getGroups();
-        for (int i = 0; i < items.size(); i++) {
-            int j = items.get(i).find(Integer.parseInt(number));
-            if (j != -1) return new int[]{i, j};
+    private void parseConfig(String json, Callback callback) {
+        try {
+            if (!Json.valid(json)) parseTxt(json);
+            else parseJson(JsonParser.parseString(json).getAsJsonObject());
+            handler.post(callback::success);
+        } catch (Exception e) {
+            e.printStackTrace();
+            handler.post(() -> callback.error(R.string.error_config_parse));
         }
-        return new int[]{-1, -1};
     }
 
-    private boolean isProxy(Live live) {
-        return live.getGroup().equals("redirect") && live.getChannels().size() > 0 && live.getChannels().get(0).getUrls().size() > 0 && live.getChannels().get(0).getUrls().get(0).startsWith("proxy");
+    private void parseTxt(String txt) {
+        Live live = new Live(config.getUrl());
+        parse(live, txt);
+        lives.add(live);
+        setHome(live);
     }
 
-    public void parse(JsonObject object) {
+    public void parseJson(JsonObject object) {
         if (!object.has("lives")) return;
         for (JsonElement element : Json.safeListElement(object, "lives")) parse(Live.objectFrom(element));
         if (home == null) setHome(lives.isEmpty() ? new Live() : lives.get(0));
@@ -87,10 +91,10 @@ public class LiveConfig {
 
     public void parse(Live live) {
         try {
-            if (isProxy(live)) live = new Live(live.getChannels().get(0).getName(), live.getChannels().get(0).getUrl().split("ext=")[1]);
+            if (live.isProxy()) live = new Live(live.getChannels().get(0).getName(), live.getChannels().get(0).getUrl().split("ext=")[1]);
             if (live.getType() == 0) parse(live, getTxt(live.getUrl()));
-            if (live.getGroups().size() > 0) getLives().add(live);
-            if (live.getName().equals(Prefers.getLive())) setHome(live);
+            if (live.getGroups().size() > 0) lives.add(live);
+            if (live.getName().equals(config.getHome())) setHome(live);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -121,8 +125,58 @@ public class LiveConfig {
         }
     }
 
-    public void clear() {
+    public void setKeep(Group group, Channel channel) {
+        Prefers.putKeep(home.getName() + AppDatabase.SYMBOL + group.getName() + AppDatabase.SYMBOL + channel.getName());
+    }
+
+    public int[] getKeep() {
+        String[] splits = Prefers.getKeep().split(AppDatabase.SYMBOL);
+        if (!home.getName().equals(splits[0])) return new int[]{-1, -1};
+        for (int i = 0; i < home.getGroups().size(); i++) {
+            Group group = home.getGroups().get(i);
+            if (group.getName().equals(splits[1])) {
+                int j = group.find(splits[2]);
+                if (j != -1) return new int[]{i, j};
+            }
+        }
+        return new int[]{-1, -1};
+    }
+
+    public int[] find(String number) {
+        List<Group> items = home.getGroups();
+        for (int i = 0; i < items.size(); i++) {
+            int j = items.get(i).find(Integer.parseInt(number));
+            if (j != -1) return new int[]{i, j};
+        }
+        return new int[]{-1, -1};
+    }
+
+    public List<Live> getLives() {
+        return lives;
+    }
+
+    public Config getConfig() {
+        return config;
+    }
+
+    public void setConfig(Config config) {
+        this.config = config;
+    }
+
+    public Live getHome() {
+        return home;
+    }
+
+    public void setHome(Live home) {
+        this.home = home;
+        this.home.setActivated(true);
+        config.home(home.getName()).update();
+        for (Live item : lives) item.setActivated(home);
+    }
+
+    public LiveConfig clear() {
         this.lives.clear();
         this.home = null;
+        return this;
     }
 }
