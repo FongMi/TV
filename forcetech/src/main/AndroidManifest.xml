@@ -5,11 +5,6 @@
     <application>
 
         <service
-            android:name="com.forcetech.service.ForceService"
-            android:exported="false"
-            android:process=":force" />
-
-        <service
             android:name="com.gsoft.mitv.MainActivity"
             android:exported="false"
             android:process=":mitv" />
