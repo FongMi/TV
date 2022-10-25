@@ -18,8 +18,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="12dp"
+        android:duplicateParentState="true"
         android:letterSpacing="0.05"
-        android:textColor="@color/white"
+        android:textColor="@color/channel"
         android:textSize="16sp"
         android:textStyle="bold"
         tools:text="01" />
@@ -35,10 +36,11 @@
         android:id="@+id/name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:duplicateParentState="true"
         android:ellipsize="marquee"
         android:letterSpacing="0.05"
         android:singleLine="true"
-        android:textColor="@color/white"
+        android:textColor="@color/channel"
         android:textSize="16sp"
         android:textStyle="bold"
         tools:text="CNN" />

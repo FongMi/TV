@@ -33,7 +33,8 @@ public class Channel {
     @SerializedName("ua")
     private String ua;
 
-    private boolean activated;
+    private boolean selected;
+    private Group group;
     private String url;
     private int line;
 
@@ -101,6 +102,14 @@ public class Channel {
         this.ua = ua;
     }
 
+    public Group getGroup() {
+        return group;
+    }
+
+    public void setGroup(Group group) {
+        this.group = group;
+    }
+
     public String getUrl() {
         return url;
     }
@@ -117,12 +126,12 @@ public class Channel {
         this.line = line;
     }
 
-    public boolean isActivated() {
-        return activated;
+    public boolean isSelected() {
+        return selected;
     }
 
-    public void setActivated(boolean activated) {
-        this.activated = activated;
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 
     public int getVisible() {
@@ -153,6 +162,11 @@ public class Channel {
 
     public Channel prevLine() {
         setLine(getLine() > 0 ? getLine() - 1 : getUrls().size() - 1);
+        return this;
+    }
+
+    public Channel group(Group group) {
+        setGroup(group);
         return this;
     }
 

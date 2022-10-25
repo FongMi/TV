@@ -21,7 +21,7 @@ public class Group {
     @SerializedName("pass")
     private String pass;
 
-    private boolean activated;
+    private boolean selected;
     private int position;
 
     public Group(String name) {
@@ -61,12 +61,12 @@ public class Group {
         this.pass = pass;
     }
 
-    public boolean isActivated() {
-        return activated;
+    public boolean isSelected() {
+        return selected;
     }
 
-    public void setActivated(boolean activated) {
-        this.activated = activated;
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 
     public int getPosition() {
@@ -95,6 +95,20 @@ public class Group {
 
     public int find(String name) {
         return getChannel().lastIndexOf(Channel.create(name));
+    }
+
+    public Channel next() {
+        setPosition(getPosition() < getChannel().size() - 1 ? getPosition() + 1 : 0);
+        return current();
+    }
+
+    public Channel prev() {
+        setPosition(getPosition() > 0 ? getPosition() - 1 : getChannel().size() - 1);
+        return current();
+    }
+
+    public Channel current() {
+        return getChannel().get(getPosition()).group(this);
     }
 
     @Override
