@@ -5,9 +5,7 @@ import android.text.TextUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
-import com.google.gson.reflect.TypeToken;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,11 +34,6 @@ public class Live {
 
     public static Live objectFrom(JsonElement element) {
         return new Gson().fromJson(element, Live.class);
-    }
-
-    public static List<Live> arrayFrom(String str) {
-        Type listType = new TypeToken<ArrayList<Live>>() {}.getType();
-        return new Gson().fromJson(str, listType);
     }
 
     public Live() {
@@ -104,6 +97,10 @@ public class Live {
         this.activated = item.equals(this);
     }
 
+    public String getActivatedName() {
+        return (isActivated() ? "√ " : "").concat(getName());
+    }
+
     public boolean isProxy() {
         return getGroup().equals("redirect") && getChannels().size() > 0 && getChannels().get(0).getUrls().size() > 0 && getChannels().get(0).getUrls().get(0).startsWith("proxy");
     }
@@ -113,6 +110,6 @@ public class Live {
         if (this == obj) return true;
         if (!(obj instanceof Live)) return false;
         Live it = (Live) obj;
-        return getName().equals(it.getName());
+        return getName().equals(it.getName()) && getUrl().equals(it.getUrl());
     }
 }

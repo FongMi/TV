@@ -41,10 +41,25 @@ public class LiveConfig {
         return get().getConfig().getUrl();
     }
 
+    public static int getHomeIndex() {
+        return get().getLives().indexOf(get().getHome());
+    }
+
     public LiveConfig init() {
         this.config = Config.live();
         this.lives = new ArrayList<>();
         this.handler = new Handler(Looper.getMainLooper());
+        return this;
+    }
+
+    public LiveConfig config(Config config) {
+        this.config = config;
+        return this;
+    }
+
+    public LiveConfig clear() {
+        this.lives.clear();
+        this.home = null;
         return this;
     }
 
@@ -159,10 +174,6 @@ public class LiveConfig {
         return config;
     }
 
-    public void setConfig(Config config) {
-        this.config = config;
-    }
-
     public Live getHome() {
         return home;
     }
@@ -172,11 +183,5 @@ public class LiveConfig {
         this.home.setActivated(true);
         config.home(home.getName()).update();
         for (Live item : lives) item.setActivated(home);
-    }
-
-    public LiveConfig clear() {
-        this.lives.clear();
-        this.home = null;
-        return this;
     }
 }

@@ -44,6 +44,18 @@
         </LinearLayout>
 
         <ImageView
+            android:id="@+id/vodHome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/selector_item"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:padding="8dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_home" />
+
+        <ImageView
             android:id="@+id/vodHistory"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -93,6 +105,18 @@
                 tools:text="https://" />
 
         </LinearLayout>
+
+        <ImageView
+            android:id="@+id/liveHome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/selector_item"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:padding="8dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_home" />
 
         <ImageView
             android:id="@+id/liveHistory"
