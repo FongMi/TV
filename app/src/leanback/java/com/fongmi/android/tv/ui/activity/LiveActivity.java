@@ -243,17 +243,19 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     @Override
     public void onKeyLeft() {
         Channel item = getGroup().current().prevLine();
-        if (item.getUrls().size() > 1) getUrl(item);
+        if (item.getUrls().size() == 1) return;
         mBinding.info.getRoot().setVisibility(View.VISIBLE);
         mBinding.info.line.setText(item.getLineText());
+        getUrl(item);
     }
 
     @Override
     public void onKeyRight() {
         Channel item = getGroup().current().nextLine();
-        if (item.getUrls().size() > 1) getUrl(item);
+        if (item.getUrls().size() == 1) return;
         mBinding.info.getRoot().setVisibility(View.VISIBLE);
         mBinding.info.line.setText(item.getLineText());
+        getUrl(item);
     }
 
     @Override
@@ -264,7 +266,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public void onLongPress() {
-
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
