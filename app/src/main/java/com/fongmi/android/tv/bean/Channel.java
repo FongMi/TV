@@ -1,5 +1,6 @@
 package com.fongmi.android.tv.bean;
 
+import android.net.Uri;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
@@ -33,6 +34,7 @@ public class Channel {
     private String ua;
 
     private boolean activated;
+    private String url;
     private int line;
 
     public static Channel objectFrom(JsonElement element) {
@@ -99,6 +101,14 @@ public class Channel {
         this.ua = ua;
     }
 
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
     public int getLine() {
         return line;
     }
@@ -127,10 +137,6 @@ public class Channel {
         return getLine() == getUrls().size() - 1;
     }
 
-    public String getUrl() {
-        return getUrls().get(getLine());
-    }
-
     public String getLineText() {
         return ResUtil.getString(R.string.live_line, getLine() + 1, getUrls().size());
     }
@@ -148,6 +154,18 @@ public class Channel {
     public Channel prevLine() {
         setLine(getLine() > 0 ? getLine() - 1 : getUrls().size() - 1);
         return this;
+    }
+
+    public String getScheme() {
+        return Uri.parse(getUrls().get(getLine())).getScheme().toLowerCase();
+    }
+
+    public boolean isTVBus() {
+        return getScheme().equals("tvbus");
+    }
+
+    public boolean isForce() {
+        return getScheme().startsWith("p") || getScheme().equals("mitv");
     }
 
     public Map<String, String> getHeaders() {
