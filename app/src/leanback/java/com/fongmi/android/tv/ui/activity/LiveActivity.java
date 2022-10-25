@@ -242,7 +242,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public void onKeyLeft() {
-        Channel item = getGroup().current().prevLine();
+        Channel item = mCurrent.prevLine();
         if (item.getUrls().size() == 1) return;
         mBinding.info.getRoot().setVisibility(View.VISIBLE);
         mBinding.info.line.setText(item.getLineText());
@@ -251,7 +251,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public void onKeyRight() {
-        Channel item = getGroup().current().nextLine();
+        Channel item = mCurrent.nextLine();
         if (item.getUrls().size() == 1) return;
         mBinding.info.getRoot().setVisibility(View.VISIBLE);
         mBinding.info.line.setText(item.getLineText());
@@ -286,15 +286,15 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
                 break;
             default:
                 if (!event.isRetry() || mPlayers.addRetry() > 1) onError();
-                else getUrl(getGroup().current());
+                else getUrl(mCurrent);
                 break;
         }
     }
 
     private void onError() {
         mPlayers.setRetry(0);
-        if (isGone(mBinding.recycler) && getGroup().current().isLastLine()) onKeyDown();
-        else getUrl(getGroup().current().nextLine());
+        if (isGone(mBinding.recycler) && mCurrent.isLastLine()) onKeyDown();
+        else getUrl(mCurrent.nextLine());
     }
 
     @Override
