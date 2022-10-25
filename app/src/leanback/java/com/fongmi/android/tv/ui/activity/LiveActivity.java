@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.ItemBridgeAdapter;
 import androidx.leanback.widget.OnChildViewHolderSelectedListener;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
@@ -20,7 +21,9 @@ import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Group;
 import com.fongmi.android.tv.databinding.ActivityLiveBinding;
 import com.fongmi.android.tv.event.PlayerEvent;
+import com.fongmi.android.tv.model.LiveViewModel;
 import com.fongmi.android.tv.player.Players;
+import com.fongmi.android.tv.player.source.Force;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownLive;
 import com.fongmi.android.tv.ui.presenter.ChannelPresenter;
 import com.fongmi.android.tv.ui.presenter.GroupPresenter;
@@ -40,6 +43,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private ArrayObjectAdapter mChannelAdapter;
     private ArrayObjectAdapter mGroupAdapter;
     private CustomKeyDownLive mKeyDown;
+    private LiveViewModel mViewModel;
     private Runnable mRunnable;
     private Handler mHandler;
     private Players mPlayers;
@@ -80,6 +84,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mHandler = new Handler(Looper.getMainLooper());
         mKeyDown = CustomKeyDownLive.create(this);
         setRecyclerView();
+        setViewModel();
         setVideoView();
         getLive();
     }
@@ -99,6 +104,11 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private void setRecyclerView() {
         mBinding.group.setAdapter(new ItemBridgeAdapter(mGroupAdapter = new ArrayObjectAdapter(new GroupPresenter(this))));
         mBinding.channel.setAdapter(new ItemBridgeAdapter(mChannelAdapter = new ArrayObjectAdapter(new ChannelPresenter(this))));
+    }
+
+    private void setViewModel() {
+        mViewModel = new ViewModelProvider(this).get(LiveViewModel.class);
+        mViewModel.result.observe(this, result -> mPlayers.start(result));
     }
 
     private void setVideoView() {
@@ -144,7 +154,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void getUrl(Channel item) {
-        mPlayers.start(item);
+        mViewModel.getUrl(item);
     }
 
     private void hideUI() {
@@ -293,6 +303,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     protected void onDestroy() {
         super.onDestroy();
         mPlayers.release();
+        Force.get().destroy();
         EventBus.getDefault().unregister(this);
     }
 }

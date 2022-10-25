@@ -91,7 +91,7 @@ public class LiveConfig {
 
     public void parse(Live live) {
         try {
-            if (live.isProxy()) live = new Live(live.getChannels().get(0).getName(), live.getChannels().get(0).getUrl().split("ext=")[1]);
+            if (live.isProxy()) live = new Live(live.getChannels().get(0).getName(), live.getChannels().get(0).getUrls().get(0).split("ext=")[1]);
             if (live.getType() == 0) parse(live, getTxt(live.getUrl()));
             if (live.getGroups().size() > 0) lives.add(live);
             if (live.getName().equals(config.getHome())) setHome(live);
