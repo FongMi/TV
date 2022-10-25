@@ -38,12 +38,13 @@ import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.net.OKHttp;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
+import com.fongmi.android.tv.ui.custom.CustomHorizontalGridView;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
 import com.fongmi.android.tv.ui.custom.TrackSelectionDialog;
 import com.fongmi.android.tv.ui.custom.dialog.DescDialog;
+import com.fongmi.android.tv.ui.presenter.ArrayPresenter;
 import com.fongmi.android.tv.ui.presenter.EpisodePresenter;
 import com.fongmi.android.tv.ui.presenter.FlagPresenter;
-import com.fongmi.android.tv.ui.presenter.ArrayPresenter;
 import com.fongmi.android.tv.ui.presenter.ParsePresenter;
 import com.fongmi.android.tv.ui.presenter.PartPresenter;
 import com.fongmi.android.tv.utils.Clock;
@@ -266,7 +267,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void setFlagActivated(Vod.Flag item) {
-        if (mBinding.flag.isComputingLayout()) return;
         for (int i = 0; i < mFlagAdapter.size(); i++) {
             Vod.Flag flag = (Vod.Flag) mFlagAdapter.get(i);
             flag.setActivated(flag.equals(item));
@@ -276,7 +276,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
             setArray(flag.getEpisodes().size());
             seamless(flag);
         }
-        mFlagAdapter.notifyArrayItemRangeChanged(0, mFlagAdapter.size());
+        notifyItemChanged(mBinding.flag, mFlagAdapter);
     }
 
     private void seamless(Vod.Flag flag) {
@@ -291,8 +291,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         if (shouldEnterFullscreen(item)) return;
         mCurrent = mBinding.flag.getSelectedPosition();
         for (int i = 0; i < mFlagAdapter.size(); i++) ((Vod.Flag) mFlagAdapter.get(i)).toggle(mCurrent == i, item);
-        mEpisodeAdapter.notifyArrayItemRangeChanged(0, mEpisodeAdapter.size());
-        mHandler.post(() -> mBinding.episode.setSelectedPosition(getEpisodePosition()));
+        mBinding.episode.setSelectedPosition(getEpisodePosition());
+        notifyItemChanged(mBinding.episode, mEpisodeAdapter);
         if (mEpisodeAdapter.size() == 0) return;
         getPlayer(false);
     }
@@ -309,7 +309,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.widget.progress.getRoot().setVisibility(View.VISIBLE);
         Result result = mViewModel.getPlayer().getValue();
         if (result != null) mPlayers.start(result, true);
-        mParseAdapter.notifyArrayItemRangeChanged(0, mParseAdapter.size());
+        notifyItemChanged(mControl.parse, mParseAdapter);
     }
 
     private void setArray(int size) {
@@ -322,6 +322,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         if (mHistory.isRevSort()) for (int i = size + 1; i > 0; i -= 20) items.add((i - 1) + "-" + Math.max(i - 20, 1));
         else for (int i = 0; i < size; i += 20) items.add((i + 1) + "-" + Math.min(i + 20, size));
         mArrayAdapter.setItems(items, null);
+    }
+
+    private void notifyItemChanged(CustomHorizontalGridView view, ArrayObjectAdapter adapter) {
+        if (!view.isComputingLayout()) adapter.notifyArrayItemRangeChanged(0, adapter.size());
     }
 
     @Override

@@ -33,7 +33,7 @@ public class ChannelPresenter extends Presenter {
         holder.binding.name.setText(item.getName());
         holder.binding.number.setText(item.getNumber());
         holder.binding.icon.setVisibility(item.getVisible());
-        holder.binding.getRoot().setActivated(item.isActivated());
+        holder.binding.getRoot().setSelected(item.isSelected());
         setOnClickListener(holder, view -> mListener.onItemClick(item));
     }
 
