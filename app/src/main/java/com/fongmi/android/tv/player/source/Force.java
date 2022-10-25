@@ -10,7 +10,6 @@ import android.os.IBinder;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.net.OKHttp;
 import com.forcetech.Port;
-import com.forcetech.service.ForceService;
 import com.gsoft.mitv.MainActivity;
 
 import okhttp3.Headers;
@@ -29,7 +28,6 @@ public class Force {
 
     private void init() {
         App.get().bindService(new Intent(App.get(), MainActivity.class), mConn, Context.BIND_AUTO_CREATE);
-        App.get().bindService(new Intent(App.get(), ForceService.class), mConn, Context.BIND_AUTO_CREATE);
         init = true;
     }
 
@@ -52,6 +50,7 @@ public class Force {
             OKHttp.newCall(cmd, Headers.of("user-agent", "MTV")).execute();
             return result;
         } catch (Exception e) {
+            e.printStackTrace();
             return url;
         }
     }
