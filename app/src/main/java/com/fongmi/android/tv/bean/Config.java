@@ -78,6 +78,29 @@ public class Config {
         this.time = time;
     }
 
+    public Config type(int type) {
+        setType(type);
+        return this;
+    }
+
+    public Config json(String json) {
+        setJson(json);
+        return this;
+    }
+
+    public Config home(String home) {
+        setHome(home);
+        return this;
+    }
+
+    public boolean isVod() {
+        return getType() == 0;
+    }
+
+    public boolean isLive() {
+        return getType() == 1;
+    }
+
     public static List<Config> getAll(int type) {
         List<Config> items = AppDatabase.get().getConfigDao().findByType(type);
         if (items.size() > 0) items.remove(0);
@@ -101,21 +124,6 @@ public class Config {
     public static Config find(String url, int type) {
         Config item = AppDatabase.get().getConfigDao().findByUrl(url);
         return item == null ? create(url, type) : item.type(type);
-    }
-
-    public Config type(int type) {
-        setType(type);
-        return this;
-    }
-
-    public Config json(String json) {
-        setJson(json);
-        return this;
-    }
-
-    public Config home(String home) {
-        setHome(home);
-        return this;
     }
 
     public long insert() {
