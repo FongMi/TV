@@ -131,7 +131,7 @@ public class LiveConfig {
 
     public int[] getKeep() {
         String[] splits = Prefers.getKeep().split(AppDatabase.SYMBOL);
-        if (!home.getName().equals(splits[0])) return new int[]{-1, -1};
+        if (!home.getName().equals(splits[0])) return new int[]{0, 0};
         for (int i = 0; i < home.getGroups().size(); i++) {
             Group group = home.getGroups().get(i);
             if (group.getName().equals(splits[1])) {
@@ -139,7 +139,7 @@ public class LiveConfig {
                 if (j != -1) return new int[]{i, j};
             }
         }
-        return new int[]{-1, -1};
+        return new int[]{0, 0};
     }
 
     public int[] find(String number) {
