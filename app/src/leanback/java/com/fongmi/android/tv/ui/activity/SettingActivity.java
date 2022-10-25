@@ -21,24 +21,30 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.api.LiveConfig;
 import com.fongmi.android.tv.bean.Config;
+import com.fongmi.android.tv.bean.Live;
+import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.databinding.ActivitySettingBinding;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.impl.ConfigCallback;
+import com.fongmi.android.tv.impl.LiveCallback;
+import com.fongmi.android.tv.impl.SiteCallback;
 import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.ui.custom.dialog.ConfigDialog;
 import com.fongmi.android.tv.ui.custom.dialog.HistoryDialog;
+import com.fongmi.android.tv.ui.custom.dialog.LiveDialog;
+import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Updater;
 
-public class SettingActivity extends BaseActivity implements ConfigCallback {
+public class SettingActivity extends BaseActivity implements ConfigCallback, SiteCallback, LiveCallback {
 
     private final ActivityResultLauncher<String> launcherString = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> loadConfig());
     private final ActivityResultLauncher<Intent> launcherIntent = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> loadConfig());
 
     private ActivitySettingBinding mBinding;
-    private int type;
+    private Config config;
 
     public static void start(Activity activity) {
         activity.startActivity(new Intent(activity, SettingActivity.class));
@@ -62,6 +68,8 @@ public class SettingActivity extends BaseActivity implements ConfigCallback {
 
     @Override
     protected void initEvent() {
+        mBinding.vodHome.setOnClickListener(view -> SiteDialog.create(this).show());
+        mBinding.liveHome.setOnClickListener(view -> LiveDialog.create(this).show());
         mBinding.vod.setOnClickListener(view -> ConfigDialog.create(this).type(0).show());
         mBinding.live.setOnClickListener(view -> ConfigDialog.create(this).type(1).show());
         mBinding.vodHistory.setOnClickListener(view -> HistoryDialog.create(this).type(0).show());
@@ -74,25 +82,15 @@ public class SettingActivity extends BaseActivity implements ConfigCallback {
     }
 
     @Override
-    public void setVodConfig(Config config) {
-        mBinding.vodUrl.setText(config.getUrl());
-        ApiConfig.get().setConfig(config);
-        this.type = config.getType();
-        checkUrl(config.getUrl());
+    public void setConfig(Config config) {
+        this.config = config;
+        checkPermission();
     }
 
-    @Override
-    public void setLiveConfig(Config config) {
-        mBinding.liveUrl.setText(config.getUrl());
-        LiveConfig.get().setConfig(config);
-        this.type = config.getType();
-        checkUrl(config.getUrl());
-    }
-
-    private void checkUrl(String url) {
-        if (url.startsWith("file://") && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
+    private void checkPermission() {
+        if (config.getUrl().startsWith("file://") && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
             openSetting();
-        } else if (url.startsWith("file://") && Build.VERSION.SDK_INT < Build.VERSION_CODES.R && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+        } else if (config.getUrl().startsWith("file://") && Build.VERSION.SDK_INT < Build.VERSION_CODES.R && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             launcherString.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
         } else {
             loadConfig();
@@ -109,9 +107,15 @@ public class SettingActivity extends BaseActivity implements ConfigCallback {
     }
 
     private void loadConfig() {
-        Notify.progress(this);
-        if (type == 0) ApiConfig.get().clear().load(getCallback());
-        if (type == 1) LiveConfig.get().clear().load(getCallback());
+        if (config.isVod()) {
+            Notify.progress(this);
+            mBinding.vodUrl.setText(config.getUrl());
+            ApiConfig.get().clear().config(config).load(getCallback());
+        } else {
+            Notify.progress(this);
+            mBinding.liveUrl.setText(config.getUrl());
+            LiveConfig.get().clear().config(config).load(getCallback());
+        }
     }
 
     private Callback getCallback() {
@@ -129,10 +133,23 @@ public class SettingActivity extends BaseActivity implements ConfigCallback {
     }
 
     private void refresh(int resId) {
-        if (type == 0) RefreshEvent.history();
-        if (type == 0) RefreshEvent.video();
-        Notify.show(resId);
         Notify.dismiss();
+        Notify.show(resId);
+        if (resId != 0) config.delete();
+        if (config.isLive()) return;
+        RefreshEvent.history();
+        RefreshEvent.video();
+    }
+
+    @Override
+    public void setSite(Site item) {
+        ApiConfig.get().setHome(item);
+        RefreshEvent.video();
+    }
+
+    @Override
+    public void setLive(Live item) {
+        LiveConfig.get().setHome(item);
     }
 
     private void setQuality(View view) {

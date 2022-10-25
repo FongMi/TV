@@ -72,12 +72,28 @@ public class ApiConfig {
     public ApiConfig init() {
         this.config = Config.vod();
         this.ads = new ArrayList<>();
+        this.sites = new ArrayList<>();
         this.flags = new ArrayList<>();
         this.parses = new ArrayList<>();
-        this.sites = new ArrayList<>();
         this.jLoader = new JarLoader();
         this.pLoader = new PyLoader();
         this.handler = new Handler(Looper.getMainLooper());
+        return this;
+    }
+
+    public ApiConfig config(Config config) {
+        this.config = config;
+        return this;
+    }
+
+    public ApiConfig clear() {
+        this.home = null;
+        this.ads.clear();
+        this.sites.clear();
+        this.flags.clear();
+        this.parses.clear();
+        this.jLoader.clear();
+        this.pLoader.clear();
         return this;
     }
 
@@ -196,10 +212,6 @@ public class ApiConfig {
         return config;
     }
 
-    public void setConfig(Config config) {
-        this.config = config;
-    }
-
     public Parse getParse() {
         return parse == null ? new Parse() : parse;
     }
@@ -220,16 +232,5 @@ public class ApiConfig {
         this.home.setActivated(true);
         config.home(home.getKey()).update();
         for (Site item : sites) item.setActivated(home);
-    }
-
-    public ApiConfig clear() {
-        this.home = null;
-        this.ads.clear();
-        this.sites.clear();
-        this.flags.clear();
-        this.parses.clear();
-        this.jLoader.clear();
-        this.pLoader.clear();
-        return this;
     }
 }
