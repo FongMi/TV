@@ -5,8 +5,9 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -14,7 +15,6 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -26,8 +26,8 @@ public class Channel {
     private List<String> urls;
     @SerializedName("number")
     private String number;
-    @SerializedName("icon")
-    private String icon;
+    @SerializedName("logo")
+    private String logo;
     @SerializedName("name")
     private String name;
     @SerializedName("ua")
@@ -47,23 +47,18 @@ public class Channel {
     }
 
     public static Channel create(String name) {
-        return new Channel(name, Collections.emptyList());
+        return new Channel(name);
     }
 
     public Channel() {
     }
 
-    public Channel(String name, String... urls) {
-        this(name, new ArrayList<>(Arrays.asList(urls)));
-    }
-
-    public Channel(String name, List<String> urls) {
+    public Channel(String name) {
         this.name = name;
-        this.urls = urls;
     }
 
     public List<String> getUrls() {
-        return urls;
+        return urls = urls == null ? new ArrayList<>() : urls;
     }
 
     public void setUrls(List<String> urls) {
@@ -78,12 +73,12 @@ public class Channel {
         this.number = number;
     }
 
-    public String getIcon() {
-        return TextUtils.isEmpty(icon) ? "" : icon;
+    public String getLogo() {
+        return TextUtils.isEmpty(logo) ? "" : logo;
     }
 
-    public void setIcon(String icon) {
-        this.icon = icon;
+    public void setLogo(String logo) {
+        this.logo = logo;
     }
 
     public String getName() {
@@ -135,11 +130,15 @@ public class Channel {
     }
 
     public int getVisible() {
-        return getIcon().isEmpty() ? View.GONE : View.VISIBLE;
+        return getLogo().isEmpty() ? View.GONE : View.VISIBLE;
     }
 
-    public void loadIcon(ImageView view) {
-        if (!getIcon().isEmpty()) ImgUtil.load(getIcon(), view);
+    public void loadLogo(ImageView view) {
+        if (!getLogo().isEmpty()) Glide.with(App.get()).load(getLogo()).into(view);
+    }
+
+    public void addUrls(String... urls) {
+        getUrls().addAll(new ArrayList<>(Arrays.asList(urls)));
     }
 
     public boolean isLastLine() {

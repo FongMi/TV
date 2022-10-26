@@ -14,7 +14,7 @@
     android:paddingBottom="12dp">
 
     <ImageView
-        android:id="@+id/icon"
+        android:id="@+id/logo"
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:layout_marginEnd="12dp"
