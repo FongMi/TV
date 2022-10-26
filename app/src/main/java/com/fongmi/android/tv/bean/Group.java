@@ -4,7 +4,8 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.fongmi.android.tv.utils.ImgUtil;
+import com.bumptech.glide.Glide;
+import com.fongmi.android.tv.App;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
@@ -14,8 +15,8 @@ public class Group {
 
     @SerializedName("channel")
     private List<Channel> channel;
-    @SerializedName("icon")
-    private String icon;
+    @SerializedName("logo")
+    private String logo;
     @SerializedName("name")
     private String name;
     @SerializedName("pass")
@@ -37,12 +38,12 @@ public class Group {
         this.channel = channel;
     }
 
-    public String getIcon() {
-        return TextUtils.isEmpty(icon) ? "" : icon;
+    public String getLogo() {
+        return TextUtils.isEmpty(logo) ? "" : logo;
     }
 
-    public void setIcon(String icon) {
-        this.icon = icon;
+    public void setLogo(String logo) {
+        this.logo = logo;
     }
 
     public String getName() {
@@ -82,11 +83,11 @@ public class Group {
     }
 
     public int getVisible() {
-        return getIcon().isEmpty() ? View.GONE : View.VISIBLE;
+        return getLogo().isEmpty() ? View.GONE : View.VISIBLE;
     }
 
-    public void loadIcon(ImageView view) {
-        if (!getIcon().isEmpty()) ImgUtil.load(getIcon(), view);
+    public void loadLogo(ImageView view) {
+        if (!getLogo().isEmpty()) Glide.with(App.get()).load(getLogo()).into(view);
     }
 
     public int find(int number) {
@@ -95,6 +96,13 @@ public class Group {
 
     public int find(String name) {
         return getChannel().lastIndexOf(Channel.create(name));
+    }
+
+    public Channel find(Channel channel) {
+        int index = getChannel().indexOf(channel);
+        if (index != -1) return getChannel().get(index);
+        getChannel().add(channel);
+        return channel;
     }
 
     public Channel next() {

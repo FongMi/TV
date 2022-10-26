@@ -82,8 +82,8 @@ public class LiveConfig {
 
     private void parseConfig(String json, Callback callback) {
         try {
-            if (!Json.valid(json)) parseTxt(json);
-            else parseJson(JsonParser.parseString(json).getAsJsonObject());
+            if (!Json.valid(json)) parse(json);
+            else parse(JsonParser.parseString(json).getAsJsonObject());
             handler.post(callback::success);
         } catch (Exception e) {
             e.printStackTrace();
@@ -91,28 +91,11 @@ public class LiveConfig {
         }
     }
 
-    private void parseTxt(String txt) {
-        Live live = new Live(config.getUrl());
-        parse(live, txt);
-        addLive(live);
-        setHome(live);
-    }
-
-    public void parseJson(JsonObject object) {
-        if (!object.has("lives")) return;
-        for (JsonElement element : Json.safeListElement(object, "lives")) parse(Live.objectFrom(element));
-        if (home == null) setHome(lives.isEmpty() ? new Live() : lives.get(0));
-    }
-
-    public void parse(Live live) {
-        try {
-            if (live.isProxy()) live = new Live(live.getChannels().get(0).getName(), live.getChannels().get(0).getUrls().get(0).split("ext=")[1]);
-            if (live.getType() == 0) parse(live, getTxt(live.getUrl()));
-            if (live.getGroups().size() > 0) addLive(live);
-            if (live.getName().equals(config.getHome())) setHome(live);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    private String getText(String url) throws Exception {
+        if (url.startsWith("file")) return FileUtil.read(url);
+        else if (url.startsWith("http")) return OKHttp.newCall(url).execute().body().string();
+        else if (url.length() % 4 == 0) return getText(new String(Base64.decode(url, Base64.DEFAULT)));
+        else return "";
     }
 
     private void addLive(Live live) {
@@ -120,28 +103,27 @@ public class LiveConfig {
         lives.add(live);
     }
 
-    private String getTxt(String url) throws Exception {
-        if (url.startsWith("file")) return FileUtil.read(url);
-        else if (url.startsWith("http")) return OKHttp.newCall(url).execute().body().string();
-        else if (url.length() % 4 == 0) return getTxt(new String(Base64.decode(url, Base64.DEFAULT)));
-        else return "";
+    private void parse(String text) {
+        Live live = new Live(config.getUrl());
+        LiveParser.start(live, text);
+        addLive(live);
+        setHome(live);
     }
 
-    private void parse(Live live, String txt) {
-        int number = 0;
-        for (String line : txt.split("\n")) {
-            String[] split = line.split(",");
-            if (split.length < 2) continue;
-            if (line.contains("#genre#")) {
-                live.getGroups().add(new Group(split[0]));
-            }
-            if (split[1].contains("://")) {
-                Group group = live.getGroups().get(live.getGroups().size() - 1);
-                Channel channel = new Channel(split[0], split[1].split("#"));
-                int index = group.getChannel().indexOf(channel);
-                if (index != -1) group.getChannel().get(index).getUrls().addAll(channel.getUrls());
-                else group.getChannel().add(channel.setNumber(++number));
-            }
+    public void parse(JsonObject object) {
+        if (!object.has("lives")) return;
+        for (JsonElement element : Json.safeListElement(object, "lives")) parse(Live.objectFrom(element));
+        if (home == null) setHome(lives.isEmpty() ? new Live() : lives.get(0));
+    }
+
+    private void parse(Live live) {
+        try {
+            if (live.isProxy()) live = new Live(live.getChannels().get(0).getName(), live.getChannels().get(0).getUrls().get(0).split("ext=")[1]);
+            if (live.getType() == 0) LiveParser.start(live, getText(live.getUrl()));
+            if (live.getGroups().size() > 0) addLive(live);
+            if (live.getName().equals(config.getHome())) setHome(live);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

@@ -126,7 +126,7 @@ public class ApiConfig {
     private void parseConfig(JsonObject object, Callback callback) {
         try {
             parseJson(object);
-            LiveConfig.get().parseJson(object);
+            LiveConfig.get().parse(object);
             jLoader.parseJar("", Json.safeString(object, "spider", ""));
             config.json(object.toString()).update();
             handler.post(callback::success);

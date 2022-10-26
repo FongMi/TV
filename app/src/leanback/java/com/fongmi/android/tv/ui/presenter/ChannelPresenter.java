@@ -30,9 +30,10 @@ public class ChannelPresenter extends Presenter {
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object object) {
         Channel item = (Channel) object;
         ViewHolder holder = (ViewHolder) viewHolder;
+        item.loadLogo(holder.binding.logo);
         holder.binding.name.setText(item.getName());
         holder.binding.number.setText(item.getNumber());
-        holder.binding.icon.setVisibility(item.getVisible());
+        holder.binding.logo.setVisibility(item.getVisible());
         holder.binding.getRoot().setSelected(item.isSelected());
         setOnClickListener(holder, view -> mListener.onItemClick(item));
     }

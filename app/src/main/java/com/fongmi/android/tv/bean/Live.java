@@ -107,6 +107,13 @@ public class Live {
         return getGroup().equals("redirect") && getChannels().size() > 0 && getChannels().get(0).getUrls().size() > 0 && getChannels().get(0).getUrls().get(0).startsWith("proxy");
     }
 
+    public Group find(Group group) {
+        int index = getGroups().indexOf(group);
+        if (index != -1) return getGroups().get(index);
+        getGroups().add(group);
+        return group;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
