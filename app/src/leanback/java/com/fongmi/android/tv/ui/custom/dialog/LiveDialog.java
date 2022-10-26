@@ -20,7 +20,7 @@ public class LiveDialog implements LiveAdapter.OnClickListener {
     private final DialogLiveBinding binding;
     private final LiveCallback callback;
     private final AlertDialog dialog;
-    private LiveAdapter adapter;
+    private final LiveAdapter adapter;
 
     public static LiveDialog create(Activity activity) {
         return new LiveDialog(activity);
@@ -30,18 +30,18 @@ public class LiveDialog implements LiveAdapter.OnClickListener {
         this.callback = (LiveCallback) activity;
         this.binding = DialogLiveBinding.inflate(LayoutInflater.from(activity));
         this.dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).create();
+        this.adapter = new LiveAdapter(this);
     }
 
     public void show() {
-        if (LiveConfig.get().getLives().isEmpty()) return;
         setRecyclerView();
         setDialog();
     }
 
     private void setRecyclerView() {
+        binding.recycler.setAdapter(adapter);
         binding.recycler.setHasFixedSize(true);
         binding.recycler.addItemDecoration(new SpaceItemDecoration(1, 16));
-        binding.recycler.setAdapter(adapter = new LiveAdapter(this));
         binding.recycler.scrollToPosition(LiveConfig.getHomeIndex());
     }
 
