@@ -26,7 +26,7 @@
         tools:text="01" />
 
     <ImageView
-        android:id="@+id/icon"
+        android:id="@+id/logo"
         android:layout_width="48dp"
         android:layout_height="36dp"
         android:layout_marginEnd="12dp"

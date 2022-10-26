@@ -17,10 +17,10 @@ import com.fongmi.android.tv.R;
 
 public class ImgUtil {
 
-    public static void load(String vodPic, ImageView view) {
+    public static void load(String url, ImageView view) {
         view.setScaleType(ImageView.ScaleType.CENTER);
-        if (TextUtils.isEmpty(vodPic)) view.setImageResource(R.drawable.ic_img_error);
-        else Glide.with(App.get()).asBitmap().load(vodPic).skipMemoryCache(true).sizeMultiplier(Prefers.getThumbnail()).signature(new ObjectKey(vodPic + "_" + Prefers.getQuality())).placeholder(R.drawable.ic_img_loading).listener(getListener(view)).into(view);
+        if (TextUtils.isEmpty(url)) view.setImageResource(R.drawable.ic_img_error);
+        else Glide.with(App.get()).asBitmap().load(url).skipMemoryCache(true).sizeMultiplier(Prefers.getThumbnail()).signature(new ObjectKey(url + "_" + Prefers.getQuality())).placeholder(R.drawable.ic_img_loading).listener(getListener(view)).into(view);
     }
 
     private static RequestListener<Bitmap> getListener(ImageView view) {
