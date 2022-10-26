@@ -36,7 +36,7 @@ public class PyLoader {
             if (spiders.containsKey(key)) return spiders.get(key);
             Method method = loader.getClass().getMethod("spider", Context.class, String.class, String.class);
             Spider spider = (Spider) method.invoke(loader, App.get(), api.split("py_")[1], ext);
-            spider.init(App.get());
+            spider.init(App.get(), ext);
             spiders.put(key, spider);
             return spider;
         } catch (Exception e) {
