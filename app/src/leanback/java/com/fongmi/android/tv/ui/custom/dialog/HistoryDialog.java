@@ -18,8 +18,8 @@ public class HistoryDialog implements ConfigAdapter.OnClickListener {
 
     private final DialogHistoryBinding binding;
     private final ConfigCallback callback;
+    private final ConfigAdapter adapter;
     private final AlertDialog dialog;
-    private ConfigAdapter adapter;
     private int type;
 
     public static HistoryDialog create(Activity activity) {
@@ -35,6 +35,7 @@ public class HistoryDialog implements ConfigAdapter.OnClickListener {
         this.callback = (ConfigCallback) activity;
         this.binding = DialogHistoryBinding.inflate(LayoutInflater.from(activity));
         this.dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).create();
+        this.adapter = new ConfigAdapter(this);
     }
 
     public void show() {
@@ -45,7 +46,7 @@ public class HistoryDialog implements ConfigAdapter.OnClickListener {
     private void setRecyclerView() {
         binding.recycler.setHasFixedSize(true);
         binding.recycler.addItemDecoration(new SpaceItemDecoration(1, 16));
-        binding.recycler.setAdapter(adapter = new ConfigAdapter(this, type));
+        binding.recycler.setAdapter(adapter.addAll(type));
     }
 
     private void setDialog() {

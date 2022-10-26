@@ -35,7 +35,6 @@ public class SiteDialog implements SitePresenter.OnClickListener {
     }
 
     public void show() {
-        if (ApiConfig.get().getSites().isEmpty()) return;
         setRecyclerView();
         setDialog();
     }
@@ -48,6 +47,7 @@ public class SiteDialog implements SitePresenter.OnClickListener {
     }
 
     private void setDialog() {
+        if (adapter.size() == 0) return;
         WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
         params.width = (int) (ResUtil.getScreenWidthPx() * 0.4f);
         params.height = (int) (ResUtil.getScreenHeightPx() * 0.74f);

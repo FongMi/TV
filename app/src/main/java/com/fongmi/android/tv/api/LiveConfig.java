@@ -94,7 +94,7 @@ public class LiveConfig {
     private void parseTxt(String txt) {
         Live live = new Live(config.getUrl());
         parse(live, txt);
-        lives.add(live);
+        addLive(live);
         setHome(live);
     }
 
@@ -108,11 +108,16 @@ public class LiveConfig {
         try {
             if (live.isProxy()) live = new Live(live.getChannels().get(0).getName(), live.getChannels().get(0).getUrls().get(0).split("ext=")[1]);
             if (live.getType() == 0) parse(live, getTxt(live.getUrl()));
-            if (live.getGroups().size() > 0) lives.add(live);
+            if (live.getGroups().size() > 0) addLive(live);
             if (live.getName().equals(config.getHome())) setHome(live);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void addLive(Live live) {
+        lives.remove(live);
+        lives.add(live);
     }
 
     private String getTxt(String url) throws Exception {
