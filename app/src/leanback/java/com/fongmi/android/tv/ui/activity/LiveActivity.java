@@ -55,6 +55,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private Runnable mR3;
 
     public static void start(Activity activity) {
+        if (LiveConfig.get().getHome().getGroups().isEmpty()) return;
         activity.startActivity(new Intent(activity, LiveActivity.class));
     }
 
@@ -119,6 +120,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void getLive() {
         mGroupAdapter.setItems(LiveConfig.get().getHome().getGroups(), null);
+        mBinding.group.setVisibility(mGroupAdapter.size() == 1 ? View.GONE : View.VISIBLE);
         setPosition(LiveConfig.get().getKeep());
     }
 
