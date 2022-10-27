@@ -1,5 +1,5 @@
 {
   "code": 39,
   "name": "1.3.9",
-  "desc": "1. 支持直播\n2. 優化啟動速度\n3. 修正 py 問題\n4. 修正片頭設定\n5.嗅探支援 referer, cookie, m4a\n6.優化 exo 格式檢查"
+  "desc": "1. 支持直播\n2. 優化啟動速度\n3. 修正 py 問題\n4. 修正片頭設定\n5. 優化 exo 格式檢查\n6. 嗅探支援 referer, cookie, m4a"
 }
