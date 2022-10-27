@@ -107,6 +107,10 @@ public class Config {
         return items;
     }
 
+    public static void delete(int type) {
+        if (getAll(type).size() == 0) AppDatabase.get().getConfigDao().delete(type);
+    }
+
     public static Config vod() {
         Config item = AppDatabase.get().getConfigDao().findOne(0);
         return item == null ? create("", 0) : item;

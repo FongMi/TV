@@ -85,6 +85,7 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
     private void onPositive(View view) {
         String url = binding.text.getText().toString().trim();
         Config item = Config.find(Utils.checkClan(url), type);
+        if (url.isEmpty()) Config.delete(type);
         callback.setConfig(item);
         dialog.dismiss();
     }
