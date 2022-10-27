@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.utils.Notify;
@@ -13,6 +14,8 @@ import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.analytics.AnalyticsListener;
+import com.google.android.exoplayer2.audio.AudioAttributes;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.util.Util;
 
@@ -20,12 +23,13 @@ import java.util.Formatter;
 import java.util.Locale;
 import java.util.Map;
 
-public class Players implements Player.Listener, ParseTask.Callback {
+public class Players implements Player.Listener, AnalyticsListener, ParseTask.Callback {
 
     private StringBuilder builder;
     private Formatter formatter;
     private ExoPlayer exoPlayer;
     private ParseTask parseTask;
+    private int errorCode;
     private int retry;
 
     public Players init() {
@@ -38,13 +42,20 @@ public class Players implements Player.Listener, ParseTask.Callback {
     private void setupPlayer() {
         DefaultTrackSelector selector = new DefaultTrackSelector(App.get());
         selector.setParameters(selector.getParameters().buildUpon().setPreferredTextLanguage("zh").build());
-        DefaultRenderersFactory factory = new DefaultRenderersFactory(App.get()).experimentalSetSynchronizeCodecInteractionsWithQueueingEnabled(true).setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON);
+        DefaultRenderersFactory factory = new DefaultRenderersFactory(App.get()).setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON);
         exoPlayer = new ExoPlayer.Builder(App.get()).setLoadControl(new DefaultLoadControl()).setRenderersFactory(factory).setTrackSelector(selector).build();
+        exoPlayer.setAudioAttributes(AudioAttributes.DEFAULT, true);
+        exoPlayer.addAnalyticsListener(this);
+        exoPlayer.setPlayWhenReady(true);
         exoPlayer.addListener(this);
     }
 
     public ExoPlayer exo() {
         return exoPlayer;
+    }
+
+    private void setErrorCode(int errorCode) {
+        this.errorCode = errorCode;
     }
 
     public int getRetry() {
@@ -123,7 +134,7 @@ public class Players implements Player.Listener, ParseTask.Callback {
     }
 
     public void stop() {
-        retry = 0;
+        setRetry(0);
         exoPlayer.stop();
         exoPlayer.clearMediaItems();
     }
@@ -135,6 +146,10 @@ public class Players implements Player.Listener, ParseTask.Callback {
         exoPlayer.removeListener(this);
         exoPlayer.release();
         exoPlayer = null;
+    }
+
+    public void start(Channel channel) {
+        setMediaSource(channel.getHeaders(), channel.getUrl());
     }
 
     public void start(Result result, boolean useParse) {
@@ -153,15 +168,17 @@ public class Players implements Player.Listener, ParseTask.Callback {
     }
 
     private void setMediaSource(Result result) {
-        exoPlayer.setMediaSource(ExoUtil.getSource(result));
+        exoPlayer.setMediaSource(ExoUtil.getSource(result, errorCode));
         PlayerEvent.state(0);
         exoPlayer.prepare();
+        setErrorCode(0);
     }
 
     private void setMediaSource(Map<String, String> headers, String url) {
-        exoPlayer.setMediaSource(ExoUtil.getSource(headers, url));
+        exoPlayer.setMediaSource(ExoUtil.getSource(headers, url, errorCode));
         PlayerEvent.state(0);
         exoPlayer.prepare();
+        setErrorCode(0);
     }
 
     @Override
@@ -177,11 +194,17 @@ public class Players implements Player.Listener, ParseTask.Callback {
 
     @Override
     public void onPlayerError(@NonNull PlaybackException error) {
+        setErrorCode(error.errorCode);
         PlayerEvent.error(R.string.error_play_format, true);
     }
 
     @Override
     public void onPlaybackStateChanged(int state) {
         PlayerEvent.state(state);
+    }
+
+    @Override
+    public void onAudioSinkError(@NonNull EventTime eventTime, @NonNull Exception audioSinkError) {
+        seekTo(500);
     }
 }

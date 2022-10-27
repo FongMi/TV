@@ -187,6 +187,9 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
             case R.string.home_vod:
                 VodActivity.start(this, mViewModel.getResult().getValue());
                 break;
+            case R.string.home_live:
+                LiveActivity.start(this);
+                break;
             case R.string.home_search:
                 SearchActivity.start(this);
                 break;
@@ -236,7 +239,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     public void showDialog() {
-        SiteDialog.show(this);
+        SiteDialog.create(this).show();
     }
 
     @Override

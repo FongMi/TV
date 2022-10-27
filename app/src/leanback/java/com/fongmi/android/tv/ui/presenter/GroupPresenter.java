@@ -2,34 +2,23 @@ package com.fongmi.android.tv.ui.presenter;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.leanback.widget.Presenter;
 
-import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.bean.Group;
 import com.fongmi.android.tv.databinding.AdapterGroupBinding;
-import com.fongmi.android.tv.utils.ResUtil;
 
 public class GroupPresenter extends Presenter {
 
     private final OnClickListener mListener;
-    private final String backward;
-    private final String forward;
-    private final String reverse;
 
     public GroupPresenter(OnClickListener listener) {
         this.mListener = listener;
-        this.backward = ResUtil.getString(R.string.play_backward);
-        this.forward = ResUtil.getString(R.string.play_forward);
-        this.reverse = ResUtil.getString(R.string.play_reverse);
     }
 
     public interface OnClickListener {
-
-        void onRevSort();
-
-        void onRevPlay(TextView view);
+        void onItemClick(Group item);
     }
 
     @Override
@@ -39,11 +28,13 @@ public class GroupPresenter extends Presenter {
 
     @Override
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object object) {
+        Group item = (Group) object;
         ViewHolder holder = (ViewHolder) viewHolder;
-        String text = object.toString();
-        holder.binding.text.setText(text);
-        if (text.equals(reverse)) setOnClickListener(holder, view -> mListener.onRevSort());
-        if (text.equals(backward) || text.equals(forward)) setOnClickListener(holder, view -> mListener.onRevPlay(holder.binding.text));
+        item.loadLogo(holder.binding.logo);
+        holder.binding.name.setText(item.getName());
+        holder.binding.logo.setVisibility(item.getVisible());
+        holder.binding.getRoot().setSelected(item.isSelected());
+        setOnClickListener(holder, view -> mListener.onItemClick(item));
     }
 
     @Override

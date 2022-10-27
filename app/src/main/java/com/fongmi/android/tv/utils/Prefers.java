@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import androidx.preference.PreferenceManager;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.R;
 
 public class Prefers {
 
@@ -52,20 +51,12 @@ public class Prefers {
         }
     }
 
-    public static String getUrl() {
-        return getString("url", ResUtil.getString(R.string.url));
+    public static String getKeep() {
+        return getString("keep");
     }
 
-    public static void putUrl(String url) {
-        put("url", url);
-    }
-
-    public static String getHome() {
-        return getString("home");
-    }
-
-    public static void putHome(String home) {
-        put("home", home);
+    public static void putKeep(String keep) {
+        put("keep", keep);
     }
 
     public static int getRender() {

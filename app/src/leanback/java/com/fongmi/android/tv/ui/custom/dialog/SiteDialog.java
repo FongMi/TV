@@ -1,6 +1,6 @@
 package com.fongmi.android.tv.ui.custom.dialog;
 
-import android.content.Context;
+import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.WindowManager;
 
@@ -18,26 +18,28 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class SiteDialog implements SitePresenter.OnClickListener {
 
-    private ArrayObjectAdapter adapter;
-    private DialogSiteBinding binding;
-    private SiteCallback callback;
-    private AlertDialog dialog;
+    private final ArrayObjectAdapter adapter;
+    private final DialogSiteBinding binding;
+    private final SiteCallback callback;
+    private final AlertDialog dialog;
 
-    public static void show(Context context) {
-        if (ApiConfig.get().getSites().isEmpty()) return;
-        new SiteDialog().create(context);
+    public static SiteDialog create(Activity activity) {
+        return new SiteDialog(activity);
     }
 
-    public void create(Context context) {
-        callback = (SiteCallback) context;
-        binding = DialogSiteBinding.inflate(LayoutInflater.from(context));
-        dialog = new MaterialAlertDialogBuilder(context).setView(binding.getRoot()).create();
+    public SiteDialog(Activity activity) {
+        this.callback = (SiteCallback) activity;
+        this.binding = DialogSiteBinding.inflate(LayoutInflater.from(activity));
+        this.dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).create();
+        this.adapter = new ArrayObjectAdapter(new SitePresenter(this));
+    }
+
+    public void show() {
         setRecyclerView();
         setDialog();
     }
 
     private void setRecyclerView() {
-        adapter = new ArrayObjectAdapter(new SitePresenter(this));
         adapter.addAll(0, ApiConfig.get().getSites());
         binding.recycler.setVerticalSpacing(ResUtil.dp2px(16));
         binding.recycler.setAdapter(new ItemBridgeAdapter(adapter));
@@ -45,6 +47,7 @@ public class SiteDialog implements SitePresenter.OnClickListener {
     }
 
     private void setDialog() {
+        if (adapter.size() == 0) return;
         WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
         params.width = (int) (ResUtil.getScreenWidthPx() * 0.4f);
         params.height = (int) (ResUtil.getScreenHeightPx() * 0.74f);
