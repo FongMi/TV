@@ -6,6 +6,7 @@ import android.text.TextUtils;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Config;
+import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.net.Callback;
@@ -34,6 +35,7 @@ public class ApiConfig {
     private List<String> flags;
     private List<Parse> parses;
     private List<Site> sites;
+    private List<Live> lives;
     private JarLoader jLoader;
     private PyLoader pLoader;
     private Handler handler;
@@ -73,6 +75,7 @@ public class ApiConfig {
         this.config = Config.vod();
         this.ads = new ArrayList<>();
         this.sites = new ArrayList<>();
+        this.lives = new ArrayList<>();
         this.flags = new ArrayList<>();
         this.parses = new ArrayList<>();
         this.jLoader = new JarLoader();
@@ -94,6 +97,7 @@ public class ApiConfig {
         this.parses.clear();
         this.jLoader.clear();
         this.pLoader.clear();
+        LiveConfig.get().remove(lives);
         return this;
     }
 
@@ -126,7 +130,6 @@ public class ApiConfig {
     private void parseConfig(JsonObject object, Callback callback) {
         try {
             parseJson(object);
-            LiveConfig.get().parse(object);
             jLoader.parseJar("", Json.safeString(object, "spider", ""));
             config.json(object.toString()).update();
             handler.post(callback::success);
@@ -147,6 +150,10 @@ public class ApiConfig {
             Parse parse = Parse.objectFrom(element);
             if (parse.getName().equals(Prefers.getParse())) setParse(parse);
             if (!parses.contains(parse)) parses.add(parse);
+        }
+        for (Live live : LiveConfig.get().parse(object)) {
+            if (live.getGroups().isEmpty()) continue;
+            if (!lives.contains(live)) lives.add(live);
         }
         if (home == null) setHome(sites.isEmpty() ? new Site() : sites.get(0));
         if (parse == null) setParse(parses.isEmpty() ? new Parse() : parses.get(0));
@@ -194,6 +201,14 @@ public class ApiConfig {
 
     public List<Site> getSites() {
         return sites == null ? Collections.emptyList() : sites;
+    }
+
+    public List<Live> getLives() {
+        return lives == null ? Collections.emptyList() : lives;
+    }
+
+    public void setLives(List<Live> lives) {
+        this.lives = lives;
     }
 
     public List<Parse> getParses() {
