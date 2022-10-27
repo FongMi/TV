@@ -85,10 +85,7 @@ public class CollectActivity extends BaseActivity {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
                 mBinding.pager.setCurrentItem(position);
-                if (mOldView != null) mOldView.setActivated(false);
-                if (child == null) return;
-                mOldView = child.itemView;
-                mOldView.setActivated(true);
+                onChildSelected(child);
             }
         });
     }
@@ -126,6 +123,13 @@ public class CollectActivity extends BaseActivity {
         mPageAdapter.notifyDataSetChanged();
         mBinding.result.setText(getString(R.string.collect_result, getKeyword()));
         for (Site site : mSites) mExecutor.execute(() -> mViewModel.searchContent(site, getKeyword()));
+    }
+
+    private void onChildSelected(@Nullable RecyclerView.ViewHolder child) {
+        if (mOldView != null) mOldView.setActivated(false);
+        if (child == null) return;
+        mOldView = child.itemView;
+        mOldView.setActivated(true);
     }
 
     private CollectFragment getFragment() {

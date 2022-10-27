@@ -10,14 +10,17 @@ import java.util.List;
 @Dao
 public abstract class ConfigDao extends BaseDao<Config> {
 
-    @Query("SELECT * FROM Config ORDER BY time DESC")
-    public abstract List<Config> getAll();
+    @Query("SELECT * FROM Config WHERE type = :type ORDER BY time DESC")
+    public abstract List<Config> findByType(int type);
 
     @Query("SELECT * FROM Config WHERE id = :id")
-    public abstract Config find(int id);
+    public abstract Config findById(int id);
 
     @Query("SELECT * FROM Config WHERE url = :url")
-    public abstract Config find(String url);
+    public abstract Config findByUrl(String url);
+
+    @Query("SELECT * FROM Config WHERE type = :type ORDER BY time DESC LIMIT 1")
+    public abstract Config findOne(int type);
 
     @Query("DELETE FROM Config WHERE url = :url")
     public abstract void delete(String url);

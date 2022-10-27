@@ -226,8 +226,9 @@ public class Vod {
             return activated;
         }
 
-        public void setActivated(boolean activated) {
-            this.activated = activated;
+        public void setActivated(Flag item) {
+            this.activated = item.equals(this);
+            if (activated) item.episodes = episodes;
         }
 
         public void createEpisode(String data) {
