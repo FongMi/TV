@@ -15,11 +15,13 @@ import com.fongmi.android.tv.net.OKHttp;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Json;
 import com.fongmi.android.tv.utils.Prefers;
+import com.fongmi.android.tv.utils.Utils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class LiveConfig {
@@ -59,7 +61,7 @@ public class LiveConfig {
 
     public LiveConfig clear() {
         this.lives.clear();
-        this.home = null;
+        this.lives.addAll(ApiConfig.get().getLives());
         return this;
     }
 
@@ -94,36 +96,37 @@ public class LiveConfig {
     private String getText(String url) throws Exception {
         if (url.startsWith("file")) return FileUtil.read(url);
         else if (url.startsWith("http")) return OKHttp.newCall(url).execute().body().string();
+        else if (url.endsWith(".txt") || url.endsWith(".m3u")) return getText(Utils.convert(url));
         else if (url.length() > 0 && url.length() % 4 == 0) return getText(new String(Base64.decode(url, Base64.DEFAULT)));
         else return "";
-    }
-
-    private void addLive(Live live) {
-        lives.remove(live);
-        lives.add(live);
     }
 
     private void parse(String text) {
         Live live = new Live(config.getUrl());
         LiveParser.start(live, text);
-        addLive(live);
+        lives.remove(live);
+        lives.add(live);
         setHome(live);
     }
 
-    public void parse(JsonObject object) {
-        if (!object.has("lives")) return;
-        for (JsonElement element : Json.safeListElement(object, "lives")) parse(Live.objectFrom(element));
+    public List<Live> parse(JsonObject object) {
+        List<Live> items = new ArrayList<>();
+        if (!object.has("lives")) return Collections.emptyList();
+        for (JsonElement element : Json.safeListElement(object, "lives")) items.add(parse(Live.objectFrom(element)));
         if (home == null) setHome(lives.isEmpty() ? new Live() : lives.get(0));
+        return items;
     }
 
-    private void parse(Live live) {
+    private Live parse(Live live) {
         try {
             if (live.isProxy()) live = new Live(live.getChannels().get(0).getName(), live.getChannels().get(0).getUrls().get(0).split("ext=")[1]);
             if (live.getType() == 0) LiveParser.start(live, getText(live.getUrl()));
-            if (live.getGroups().size() > 0) addLive(live);
+            if (live.getGroups().size() > 0 && !lives.contains(live)) lives.add(live);
             if (live.getName().equals(config.getHome())) setHome(live);
+            return live;
         } catch (Exception e) {
             e.printStackTrace();
+            return new Live();
         }
     }
 
@@ -163,6 +166,12 @@ public class LiveConfig {
 
     public Live getHome() {
         return home;
+    }
+
+    public void remove(List<Live> lives) {
+        if (lives.contains(home)) home = null;
+        this.lives.removeAll(lives);
+        lives.clear();
     }
 
     public void setHome(Live home) {
