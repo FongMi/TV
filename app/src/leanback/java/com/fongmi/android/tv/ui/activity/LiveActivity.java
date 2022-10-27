@@ -31,7 +31,6 @@ import com.fongmi.android.tv.ui.presenter.GroupPresenter;
 import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.Prefers;
 import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.ui.StyledPlayerView;
 
 import org.greenrobot.eventbus.EventBus;
@@ -115,7 +114,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private void setVideoView() {
         getPlayerView().setPlayer(mPlayers.exo());
         getPlayerView().setVisibility(View.VISIBLE);
-        getPlayerView().setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);
+        getPlayerView().setResizeMode(Prefers.getScale());
     }
 
     private void getLive() {
