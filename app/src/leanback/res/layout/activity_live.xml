@@ -73,7 +73,7 @@
 
         <androidx.leanback.widget.VerticalGridView
             android:id="@+id/channel"
-            android:layout_width="240dp"
+            android:layout_width="260dp"
             android:layout_height="match_parent"
             tools:itemCount="5"
             tools:listitem="@layout/adapter_channel" />
