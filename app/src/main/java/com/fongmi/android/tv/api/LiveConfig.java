@@ -94,7 +94,7 @@ public class LiveConfig {
     private String getText(String url) throws Exception {
         if (url.startsWith("file")) return FileUtil.read(url);
         else if (url.startsWith("http")) return OKHttp.newCall(url).execute().body().string();
-        else if (url.length() % 4 == 0) return getText(new String(Base64.decode(url, Base64.DEFAULT)));
+        else if (url.length() > 0 && url.length() % 4 == 0) return getText(new String(Base64.decode(url, Base64.DEFAULT)));
         else return "";
     }
 
