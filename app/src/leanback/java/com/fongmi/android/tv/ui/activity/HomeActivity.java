@@ -16,7 +16,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
-import com.fongmi.android.tv.BuildConfig;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Func;
@@ -189,7 +188,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
                 VodActivity.start(this, mViewModel.getResult().getValue());
                 break;
             case R.string.home_live:
-                if (BuildConfig.DEBUG) LiveActivity.start(this);
+                LiveActivity.start(this);
                 break;
             case R.string.home_search:
                 SearchActivity.start(this);

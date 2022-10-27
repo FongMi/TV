@@ -63,6 +63,7 @@ public class Utils {
     }
 
     public static boolean isVideoFormat(String url, Map<String, String> headers) {
+        if (Sniffer.CUSTOM.matcher(url).find()) return true;
         if (headers.containsKey("Accept") && headers.get("Accept").contains("image")) return false;
         if (url.contains(".js") || url.contains(".css")) return false;
         return Sniffer.RULE.matcher(url).find();
