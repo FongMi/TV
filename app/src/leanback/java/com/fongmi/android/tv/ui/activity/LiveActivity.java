@@ -33,6 +33,7 @@ import com.fongmi.android.tv.utils.Prefers;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.ui.StyledPlayerView;
+import com.google.android.exoplayer2.util.Log;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -152,7 +153,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private void setGroupActivated() {
         for (int i = 0; i < mGroupAdapter.size(); i++) ((Group) mGroupAdapter.get(i)).setSelected(mGroup);
         mChannelAdapter.setItems(mGroup.getChannel(), null);
-        mBinding.channel.setSelectedPosition(mGroup.getPosition());
         notifyItemChanged(mBinding.group, mGroupAdapter);
     }
 
@@ -201,6 +201,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         if (item.isSelected()) return;
         mHandler.removeCallbacks(mR2);
         mHandler.postDelayed(mR2, 100);
+        mBinding.channel.setSelectedPosition(mGroup.getPosition());
     }
 
     @Override
@@ -337,6 +338,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         super.onDestroy();
         mPlayers.release();
         Force.get().destroy();
+        mGroup.setSelected(false);
+        mChannel.setSelected(false);
         EventBus.getDefault().unregister(this);
     }
 }

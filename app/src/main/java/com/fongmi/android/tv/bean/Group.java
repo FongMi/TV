@@ -66,6 +66,10 @@ public class Group {
         return selected;
     }
 
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
     public void setSelected(Group item) {
         this.selected = item.equals(this);
     }
