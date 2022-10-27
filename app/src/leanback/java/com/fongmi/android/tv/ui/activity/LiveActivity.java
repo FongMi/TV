@@ -33,7 +33,6 @@ import com.fongmi.android.tv.utils.Prefers;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.ui.StyledPlayerView;
-import com.google.android.exoplayer2.util.Log;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -56,7 +55,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private Runnable mR3;
 
     public static void start(Activity activity) {
-        if (LiveConfig.get().getHome().getGroups().isEmpty()) return;
+        if (LiveConfig.get().isEmpty()) return;
         activity.startActivity(new Intent(activity, LiveActivity.class));
     }
 
