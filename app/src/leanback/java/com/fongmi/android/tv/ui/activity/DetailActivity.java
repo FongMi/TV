@@ -38,12 +38,13 @@ import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.net.OKHttp;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
-import com.fongmi.android.tv.ui.custom.CustomKeyDown;
+import com.fongmi.android.tv.ui.custom.CustomHorizontalGridView;
+import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
 import com.fongmi.android.tv.ui.custom.TrackSelectionDialog;
 import com.fongmi.android.tv.ui.custom.dialog.DescDialog;
+import com.fongmi.android.tv.ui.presenter.ArrayPresenter;
 import com.fongmi.android.tv.ui.presenter.EpisodePresenter;
 import com.fongmi.android.tv.ui.presenter.FlagPresenter;
-import com.fongmi.android.tv.ui.presenter.GroupPresenter;
 import com.fongmi.android.tv.ui.presenter.ParsePresenter;
 import com.fongmi.android.tv.ui.presenter.PartPresenter;
 import com.fongmi.android.tv.utils.Clock;
@@ -66,20 +67,20 @@ import java.util.List;
 import okhttp3.Call;
 import okhttp3.Response;
 
-public class DetailActivity extends BaseActivity implements CustomKeyDown.Listener, GroupPresenter.OnClickListener, Clock.Callback {
+public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Listener, ArrayPresenter.OnClickListener, Clock.Callback {
 
     private ActivityDetailBinding mBinding;
     private ViewControllerBottomBinding mControl;
     private ViewGroup.LayoutParams mFrameParams;
     private ArrayObjectAdapter mFlagAdapter;
-    private ArrayObjectAdapter mGroupAdapter;
+    private ArrayObjectAdapter mArrayAdapter;
     private ArrayObjectAdapter mEpisodeAdapter;
     private ArrayObjectAdapter mParseAdapter;
     private ArrayObjectAdapter mPartAdapter;
     private EpisodePresenter mEpisodePresenter;
     private PartPresenter mPartPresenter;
+    private CustomKeyDownVod mKeyDown;
     private SiteViewModel mViewModel;
-    private CustomKeyDown mKeyDown;
     private boolean mFullscreen;
     private Handler mHandler;
     private History mHistory;
@@ -136,7 +137,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
 
     @Override
     protected void initView() {
-        mKeyDown = CustomKeyDown.create(this);
+        mKeyDown = CustomKeyDownVod.create(this);
         mHandler = new Handler(Looper.getMainLooper());
         mFrameParams = mBinding.video.getLayoutParams();
         mBinding.progressLayout.showProgress();
@@ -170,7 +171,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
                 if (mFlagAdapter.size() > 0) setFlagActivated((Vod.Flag) mFlagAdapter.get(position));
             }
         });
-        mBinding.group.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
+        mBinding.array.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
                 if (mEpisodeAdapter.size() > 20 && position > 1) mBinding.episode.setSelectedPosition((position - 2) * 20);
@@ -185,9 +186,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         mBinding.episode.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.episode.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         mBinding.episode.setAdapter(new ItemBridgeAdapter(mEpisodeAdapter = new ArrayObjectAdapter(mEpisodePresenter = new EpisodePresenter(this::setEpisodeActivated))));
-        mBinding.group.setHorizontalSpacing(ResUtil.dp2px(8));
-        mBinding.group.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-        mBinding.group.setAdapter(new ItemBridgeAdapter(mGroupAdapter = new ArrayObjectAdapter(new GroupPresenter(this))));
+        mBinding.array.setHorizontalSpacing(ResUtil.dp2px(8));
+        mBinding.array.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+        mBinding.array.setAdapter(new ItemBridgeAdapter(mArrayAdapter = new ArrayObjectAdapter(new ArrayPresenter(this))));
         mBinding.part.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.part.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         mBinding.part.setAdapter(new ItemBridgeAdapter(mPartAdapter = new ArrayObjectAdapter(mPartPresenter = new PartPresenter(item -> CollectActivity.start(this, item)))));
@@ -266,17 +267,13 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     }
 
     private void setFlagActivated(Vod.Flag item) {
-        if (mBinding.flag.isComputingLayout()) return;
-        for (int i = 0; i < mFlagAdapter.size(); i++) {
-            Vod.Flag flag = (Vod.Flag) mFlagAdapter.get(i);
-            flag.setActivated(flag.equals(item));
-            if (!flag.isActivated()) continue;
-            mBinding.flag.setSelectedPosition(i);
-            mEpisodeAdapter.setItems(flag.getEpisodes(), null);
-            setGroup(flag.getEpisodes().size());
-            seamless(flag);
-        }
-        mFlagAdapter.notifyArrayItemRangeChanged(0, mFlagAdapter.size());
+        if (item.isActivated()) return;
+        for (int i = 0; i < mFlagAdapter.size(); i++) ((Vod.Flag) mFlagAdapter.get(i)).setActivated(item);
+        mBinding.flag.setSelectedPosition(mFlagAdapter.indexOf(item));
+        mEpisodeAdapter.setItems(item.getEpisodes(), null);
+        notifyItemChanged(mBinding.flag, mFlagAdapter);
+        setArray(item.getEpisodes().size());
+        seamless(item);
     }
 
     private void seamless(Vod.Flag flag) {
@@ -291,8 +288,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         if (shouldEnterFullscreen(item)) return;
         mCurrent = mBinding.flag.getSelectedPosition();
         for (int i = 0; i < mFlagAdapter.size(); i++) ((Vod.Flag) mFlagAdapter.get(i)).toggle(mCurrent == i, item);
-        mEpisodeAdapter.notifyArrayItemRangeChanged(0, mEpisodeAdapter.size());
-        mHandler.post(() -> mBinding.episode.setSelectedPosition(getEpisodePosition()));
+        mBinding.episode.setSelectedPosition(getEpisodePosition());
+        notifyItemChanged(mBinding.episode, mEpisodeAdapter);
         if (mEpisodeAdapter.size() == 0) return;
         getPlayer(false);
     }
@@ -300,7 +297,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     private void reverseEpisode() {
         for (int i = 0; i < mFlagAdapter.size(); i++) Collections.reverse(((Vod.Flag) mFlagAdapter.get(i)).getEpisodes());
         mEpisodeAdapter.setItems(getVodFlag().getEpisodes(), null);
-        setGroup(mEpisodeAdapter.size());
+        setArray(mEpisodeAdapter.size());
     }
 
     private void setParseActivated(Parse item) {
@@ -309,19 +306,23 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
         mBinding.widget.progress.getRoot().setVisibility(View.VISIBLE);
         Result result = mViewModel.getPlayer().getValue();
         if (result != null) mPlayers.start(result, true);
-        mParseAdapter.notifyArrayItemRangeChanged(0, mParseAdapter.size());
+        notifyItemChanged(mControl.parse, mParseAdapter);
     }
 
-    private void setGroup(int size) {
+    private void setArray(int size) {
         List<String> items = new ArrayList<>();
         items.add(getString(R.string.play_reverse));
         items.add(getString(mHistory.getRevPlayText()));
-        mEpisodePresenter.setNextFocusDown(size > 1 ? R.id.group : R.id.part);
-        mPartPresenter.setNextFocusUp(size > 1 ? R.id.group : R.id.episode);
-        mBinding.group.setVisibility(size > 1 ? View.VISIBLE : View.GONE);
+        mEpisodePresenter.setNextFocusDown(size > 1 ? R.id.array : R.id.part);
+        mPartPresenter.setNextFocusUp(size > 1 ? R.id.array : R.id.episode);
+        mBinding.array.setVisibility(size > 1 ? View.VISIBLE : View.GONE);
         if (mHistory.isRevSort()) for (int i = size + 1; i > 0; i -= 20) items.add((i - 1) + "-" + Math.max(i - 20, 1));
         else for (int i = 0; i < size; i += 20) items.add((i + 1) + "-" + Math.min(i + 20, size));
-        mGroupAdapter.setItems(items, null);
+        mArrayAdapter.setItems(items, null);
+    }
+
+    private void notifyItemChanged(CustomHorizontalGridView view, ArrayObjectAdapter adapter) {
+        if (!view.isComputingLayout()) adapter.notifyArrayItemRangeChanged(0, adapter.size());
     }
 
     @Override
@@ -468,7 +469,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     private boolean hasFlag() {
         if (mFlagAdapter.size() > 0) return true;
         mBinding.flag.setVisibility(View.GONE);
-        mBinding.group.setVisibility(View.GONE);
+        mBinding.array.setVisibility(View.GONE);
         mBinding.episode.setVisibility(View.GONE);
         Notify.show(R.string.error_episode);
         return false;
@@ -537,7 +538,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     public void onTimeChanged() {
         long duration = mPlayers.getDuration();
         long current = mPlayers.getCurrentPosition();
-        if (mHistory.getOpening() >= current) mPlayers.seekTo(mHistory.getOpening());
         if (mHistory.getEnding() > 0 && duration > 0 && mHistory.getEnding() + current >= duration) {
             Clock.get().setCallback(null);
             checkNext();
@@ -571,7 +571,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDown.Listen
     }
 
     private void checkPosition() {
-        mPlayers.seekTo(mHistory.getPosition());
+        mPlayers.seekTo(Math.max(mHistory.getOpening(), mHistory.getPosition()));
         Clock.get().setCallback(this);
     }
 

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black"
+    android:keepScreenOn="true">
+
+    <com.google.android.exoplayer2.ui.StyledPlayerView
+        android:id="@+id/surface"
+        style="@style/LivePlayerStyle"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        app:surface_type="surface_view" />
+
+    <com.google.android.exoplayer2.ui.StyledPlayerView
+        android:id="@+id/texture"
+        style="@style/LivePlayerStyle"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        app:surface_type="texture_view" />
+
+    <include
+        android:id="@+id/progress"
+        layout="@layout/view_progress"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/digital"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_margin="16dp"
+        android:includeFontPadding="false"
+        android:letterSpacing="0.05"
+        android:shadowColor="@color/black"
+        android:shadowDx="4"
+        android:shadowDy="4"
+        android:shadowRadius="4"
+        android:textColor="@color/white"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        tools:text="05"
+        tools:visibility="visible" />
+
+    <include
+        android:id="@+id/info"
+        layout="@layout/view_live_info" />
+
+    <LinearLayout
+        android:id="@+id/recycler"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:background="@drawable/shape_live"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <androidx.leanback.widget.VerticalGridView
+            android:id="@+id/group"
+            android:layout_width="140dp"
+            android:layout_height="match_parent"
+            tools:itemCount="5"
+            tools:listitem="@layout/adapter_group" />
+
+        <View
+            android:layout_width="0.3dp"
+            android:layout_height="match_parent"
+            android:background="@color/grey_700" />
+
+        <androidx.leanback.widget.VerticalGridView
+            android:id="@+id/channel"
+            android:layout_width="240dp"
+            android:layout_height="match_parent"
+            tools:itemCount="5"
+            tools:listitem="@layout/adapter_channel" />
+
+    </LinearLayout>
+</FrameLayout>
+

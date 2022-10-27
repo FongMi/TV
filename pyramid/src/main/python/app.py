@@ -40,8 +40,8 @@ def str2json(content):
     return json.loads(content)
 
 
-def init(ru):
-    ru.init()
+def init(ru, extend):
+    ru.init([""])
 
 
 def homeContent(ru, filter):

@@ -1,15 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/text"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/selector_item"
+    android:background="@drawable/selector_group"
     android:focusable="true"
     android:focusableInTouchMode="true"
     android:gravity="center"
-    android:nextFocusUp="@id/episode"
-    android:nextFocusDown="@id/part"
-    android:textColor="@color/white"
-    android:textSize="16sp"
-    tools:text="11" />
+    android:orientation="horizontal"
+    android:paddingStart="20dp"
+    android:paddingTop="12dp"
+    android:paddingEnd="20dp"
+    android:paddingBottom="12dp">
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginEnd="12dp"
+        android:scaleType="fitCenter" />
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:duplicateParentState="true"
+        android:ellipsize="marquee"
+        android:letterSpacing="0.05"
+        android:singleLine="true"
+        android:textColor="@color/group"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        tools:text="收藏" />
+
+</LinearLayout>

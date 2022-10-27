@@ -15,6 +15,8 @@ dependencyResolutionManagement {
     }
 }
 include ':app'
+include ':tvbus'
 include ':catvod'
 include ':pyramid'
+include ':forcetech'
 rootProject.name = "TV"

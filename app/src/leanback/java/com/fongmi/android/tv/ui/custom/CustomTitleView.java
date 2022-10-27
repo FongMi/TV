@@ -21,7 +21,7 @@ import java.util.List;
 
 public class CustomTitleView extends AppCompatTextView {
 
-    private Listener mListener;
+    private Listener listener;
     private Animation flicker;
 
     public CustomTitleView(@NonNull Context context) {
@@ -34,7 +34,7 @@ public class CustomTitleView extends AppCompatTextView {
     }
 
     public void setListener(Listener listener) {
-        this.mListener = listener;
+        this.listener = listener;
     }
 
     @Override
@@ -53,11 +53,11 @@ public class CustomTitleView extends AppCompatTextView {
 
     private boolean onKeyDown(KeyEvent event) {
         if (event.getAction() == KeyEvent.ACTION_UP && Utils.isEnterKey(event)) {
-            mListener.showDialog();
+            listener.showDialog();
         } else if (event.getAction() == KeyEvent.ACTION_DOWN && Utils.isLeftKey(event)) {
-            mListener.setSite(getSite(true));
+            listener.setSite(getSite(true));
         } else if (event.getAction() == KeyEvent.ACTION_DOWN && Utils.isRightKey(event)) {
-            mListener.setSite(getSite(false));
+            listener.setSite(getSite(false));
         }
         return true;
     }

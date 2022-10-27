@@ -14,11 +14,10 @@ import java.util.List;
 public class ConfigAdapter extends RecyclerView.Adapter<ConfigAdapter.ViewHolder> {
 
     private final OnClickListener mListener;
-    private final List<Config> mItems;
+    private List<Config> mItems;
 
     public ConfigAdapter(OnClickListener listener) {
         this.mListener = listener;
-        this.mItems = Config.getAll();
     }
 
     public interface OnClickListener {
@@ -28,14 +27,9 @@ public class ConfigAdapter extends RecyclerView.Adapter<ConfigAdapter.ViewHolder
         void onDeleteClick(Config item);
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-
-        private final AdapterConfigBinding binding;
-
-        public ViewHolder(@NonNull AdapterConfigBinding binding) {
-            super(binding.getRoot());
-            this.binding = binding;
-        }
+    public ConfigAdapter addAll(int type) {
+        this.mItems = Config.getAll(type);
+        return this;
     }
 
     public int remove(Config item) {
@@ -62,5 +56,15 @@ public class ConfigAdapter extends RecyclerView.Adapter<ConfigAdapter.ViewHolder
         holder.binding.text.setText(item.getUrl());
         holder.binding.text.setOnClickListener(v -> mListener.onTextClick(item));
         holder.binding.delete.setOnClickListener(v -> mListener.onDeleteClick(item));
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+
+        private final AdapterConfigBinding binding;
+
+        public ViewHolder(@NonNull AdapterConfigBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
     }
 }

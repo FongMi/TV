@@ -20,27 +20,19 @@
 
         <com.google.android.exoplayer2.ui.StyledPlayerView
             android:id="@+id/surface"
+            style="@style/VodPlayerStyle"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="gone"
-            app:animation_enabled="false"
-            app:auto_show="false"
-            app:controller_layout_id="@layout/view_controller_bottom"
-            app:resize_mode="fit"
-            app:surface_type="surface_view"
-            app:use_controller="false" />
+            app:surface_type="surface_view" />
 
         <com.google.android.exoplayer2.ui.StyledPlayerView
             android:id="@+id/texture"
+            style="@style/VodPlayerStyle"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="gone"
-            app:animation_enabled="false"
-            app:auto_show="false"
-            app:controller_layout_id="@layout/view_controller_bottom"
-            app:resize_mode="fit"
-            app:surface_type="texture_view"
-            app:use_controller="false" />
+            app:surface_type="texture_view" />
 
         <include
             android:id="@+id/widget"
@@ -231,7 +223,7 @@
                 android:paddingBottom="8dp" />
 
             <com.fongmi.android.tv.ui.custom.CustomHorizontalGridView
-                android:id="@+id/group"
+                android:id="@+id/array"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clipChildren="false"

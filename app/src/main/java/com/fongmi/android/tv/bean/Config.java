@@ -4,9 +4,7 @@ import androidx.room.Entity;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.db.AppDatabase;
-import com.fongmi.android.tv.utils.Prefers;
 
 import java.util.List;
 
@@ -15,16 +13,19 @@ public class Config {
 
     @PrimaryKey(autoGenerate = true)
     private int id;
+    private int type;
     private long time;
     private String url;
     private String json;
+    private String home;
 
-    public static Config create() {
-        return new Config(Prefers.getUrl());
+    public static Config create(String url, int type) {
+        return new Config(url, type);
     }
 
-    public Config(String url) {
+    public Config(String url, int type) {
         this.url = url;
+        this.type = type;
         this.time = System.currentTimeMillis();
         this.id = (int) insert();
     }
@@ -35,6 +36,14 @@ public class Config {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 
     public String getUrl() {
@@ -53,6 +62,14 @@ public class Config {
         this.json = json;
     }
 
+    public String getHome() {
+        return home;
+    }
+
+    public void setHome(String home) {
+        this.home = home;
+    }
+
     public long getTime() {
         return time;
     }
@@ -61,24 +78,9 @@ public class Config {
         this.time = time;
     }
 
-    public static List<Config> getAll() {
-        List<Config> items = AppDatabase.get().getConfigDao().getAll();
-        if (items.size() > 0) items.remove(0);
-        return items;
-    }
-
-    public static Config find(int id) {
-        return AppDatabase.get().getConfigDao().find(id);
-    }
-
-    public static Config find(String url) {
-        Config item = AppDatabase.get().getConfigDao().find(url);
-        return item == null ? Config.create() : item;
-    }
-
-    public static void save(String json) {
-        Config item = find(Prefers.getUrl()).json(json);
-        ApiConfig.get().setCid(item.update().getId());
+    public Config type(int type) {
+        setType(type);
+        return this;
     }
 
     public Config json(String json) {
@@ -86,8 +88,46 @@ public class Config {
         return this;
     }
 
+    public Config home(String home) {
+        setHome(home);
+        return this;
+    }
+
+    public boolean isVod() {
+        return getType() == 0;
+    }
+
+    public boolean isLive() {
+        return getType() == 1;
+    }
+
+    public static List<Config> getAll(int type) {
+        List<Config> items = AppDatabase.get().getConfigDao().findByType(type);
+        if (items.size() > 0) items.remove(0);
+        return items;
+    }
+
+    public static Config vod() {
+        Config item = AppDatabase.get().getConfigDao().findOne(0);
+        return item == null ? create("", 0) : item;
+    }
+
+    public static Config live() {
+        Config item = AppDatabase.get().getConfigDao().findOne(1);
+        return item == null ? create("", 1) : item;
+    }
+
+    public static Config find(int id) {
+        return AppDatabase.get().getConfigDao().findById(id);
+    }
+
+    public static Config find(String url, int type) {
+        Config item = AppDatabase.get().getConfigDao().findByUrl(url);
+        return item == null ? create(url, type) : item.type(type);
+    }
+
     public long insert() {
-        return AppDatabase.get().getConfigDao().insert(this);
+        return getUrl().isEmpty() ? -1 : AppDatabase.get().getConfigDao().insert(this);
     }
 
     public Config update() {
