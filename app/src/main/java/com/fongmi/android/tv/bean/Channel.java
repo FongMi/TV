@@ -125,8 +125,8 @@ public class Channel {
         return selected;
     }
 
-    public void setSelected(boolean selected) {
-        this.selected = selected;
+    public void setSelected(Channel item) {
+        this.selected = item.equals(this);
     }
 
     public int getVisible() {

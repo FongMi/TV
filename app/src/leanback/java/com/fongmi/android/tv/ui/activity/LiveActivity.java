@@ -45,10 +45,14 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private ArrayObjectAdapter mGroupAdapter;
     private CustomKeyDownLive mKeyDown;
     private LiveViewModel mViewModel;
-    private Runnable mRunnable;
     private Handler mHandler;
     private Players mPlayers;
-    private Channel mCurrent;
+    private Channel mChannel;
+    private View mOldView;
+    private Group mGroup;
+    private Runnable mR1;
+    private Runnable mR2;
+    private Runnable mR3;
 
     public static void start(Activity activity) {
         activity.startActivity(new Intent(activity, LiveActivity.class));
@@ -56,10 +60,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private StyledPlayerView getPlayerView() {
         return Prefers.getRender() == 0 ? mBinding.surface : mBinding.texture;
-    }
-
-    private Group getGroup() {
-        return (Group) mGroupAdapter.get(mBinding.group.getSelectedPosition());
     }
 
     private boolean isVisible(View view) {
@@ -77,7 +77,9 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     protected void initView() {
-        mRunnable = this::hideInfo;
+        mR1 = this::hideInfo;
+        mR2 = this::setGroupActivated;
+        mR3 = this::setChannelActivated;
         mPlayers = new Players().init();
         mHandler = new Handler(Looper.getMainLooper());
         mKeyDown = CustomKeyDownLive.create(this);
@@ -94,7 +96,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.group.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
-                onItemClick((Group) mGroupAdapter.get(position));
+                onChildSelected(child, mGroup = (Group) mGroupAdapter.get(position));
             }
         });
     }
@@ -116,42 +118,47 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void getLive() {
-        int[] position = LiveConfig.get().getKeep();
         mGroupAdapter.setItems(LiveConfig.get().getHome().getGroups(), null);
-        setPosition(position);
+        setPosition(LiveConfig.get().getKeep());
     }
 
     private void setPosition(int[] position) {
-        Group group = (Group) mGroupAdapter.get(position[0]);
+        mGroup = (Group) mGroupAdapter.get(position[0]);
         mBinding.group.setSelectedPosition(position[0]);
-        group.setPosition(position[1]);
-        onItemClick(group);
-        onItemClick(group.current());
+        mGroup.setPosition(position[1]);
+        onItemClick(mGroup);
+        onItemClick(mGroup.current());
     }
 
     private void setPosition() {
-        mBinding.group.setSelectedPosition(mGroupAdapter.indexOf(mCurrent.getGroup()));
-        mBinding.channel.setSelectedPosition(mCurrent.getGroup().getPosition());
+        mBinding.group.setSelectedPosition(mGroupAdapter.indexOf(mChannel.getGroup()));
+        mBinding.channel.setSelectedPosition(mChannel.getGroup().getPosition());
+    }
+
+    private void onChildSelected(@Nullable RecyclerView.ViewHolder child, Group group) {
+        if (mOldView != null) mOldView.setSelected(false);
+        if (child == null) return;
+        mOldView = child.itemView;
+        mOldView.setSelected(true);
+        onItemClick(group);
     }
 
     private void notifyItemChanged(VerticalGridView view, ArrayObjectAdapter adapter) {
         if (!view.isComputingLayout()) adapter.notifyArrayItemRangeChanged(0, adapter.size());
     }
 
-    private void setGroupActivated(Group item) {
-        for (int i = 0; i < mGroupAdapter.size(); i++) {
-            Group group = (Group) mGroupAdapter.get(i);
-            group.setSelected(item.equals(group));
-        }
+    private void setGroupActivated() {
+        for (int i = 0; i < mGroupAdapter.size(); i++) ((Group) mGroupAdapter.get(i)).setSelected(mGroup);
+        mChannelAdapter.setItems(mGroup.getChannel(), null);
+        mBinding.channel.setSelectedPosition(mGroup.getPosition());
         notifyItemChanged(mBinding.group, mGroupAdapter);
     }
 
-    private void setChannelActivated(Channel item) {
-        for (int i = 0; i < mChannelAdapter.size(); i++) {
-            Channel channel = (Channel) mChannelAdapter.get(i);
-            channel.setSelected(item.equals(channel));
-        }
+    private void setChannelActivated() {
+        for (int i = 0; i < mChannelAdapter.size(); i++) ((Channel) mChannelAdapter.get(i)).setSelected(mChannel);
         notifyItemChanged(mBinding.channel, mChannelAdapter);
+        LiveConfig.get().setKeep(mGroup, mChannel);
+        getUrl(mChannel);
     }
 
     private void toggle() {
@@ -161,11 +168,13 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void hideUI() {
+        if (isGone(mBinding.recycler)) return;
         mBinding.recycler.setVisibility(View.GONE);
         setPosition();
     }
 
     private void showUI() {
+        if (isVisible(mBinding.recycler)) return;
         mBinding.recycler.setVisibility(View.VISIBLE);
         mBinding.channel.requestFocus();
         setPosition();
@@ -176,34 +185,33 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void showInfo(Channel item) {
-        mHandler.removeCallbacks(mRunnable);
+        mHandler.removeCallbacks(mR1);
         mBinding.info.name.setSelected(true);
         mBinding.info.name.setText(item.getName());
         mBinding.info.line.setText(item.getLineText());
         mBinding.info.number.setText(item.getNumber());
         mBinding.info.getRoot().setVisibility(View.VISIBLE);
-        mHandler.postDelayed(mRunnable, 5000);
+        mHandler.postDelayed(mR1, 5000);
     }
 
     @Override
     public void onItemClick(Group item) {
-        mChannelAdapter.setItems(item.getChannel(), null);
-        mBinding.channel.setSelectedPosition(item.getPosition());
-        setGroupActivated(item);
+        if (item.isSelected()) return;
+        mHandler.removeCallbacks(mR2);
+        mHandler.postDelayed(mR2, 100);
     }
 
     @Override
     public void onItemClick(Channel item) {
-        getGroup().setPosition(mBinding.channel.getSelectedPosition());
-        setChannel(mCurrent = item.group(getGroup()));
+        mGroup.setPosition(mBinding.channel.getSelectedPosition());
+        setChannel(mChannel = item.group(mGroup));
         hideUI();
     }
 
     private void setChannel(Channel item) {
-        LiveConfig.get().setKeep(getGroup(), item);
-        setChannelActivated(item);
+        mHandler.removeCallbacks(mR3);
+        mHandler.postDelayed(mR3, 100);
         showInfo(item);
-        getUrl(item);
     }
 
     private void getUrl(Channel item) {
@@ -232,17 +240,17 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public void onKeyUp() {
-        setChannel(mCurrent = getGroup().prev());
+        setChannel(mChannel = mGroup.prev());
     }
 
     @Override
     public void onKeyDown() {
-        setChannel(mCurrent = getGroup().next());
+        setChannel(mChannel = mGroup.next());
     }
 
     @Override
     public void onKeyLeft() {
-        Channel item = mCurrent.prevLine();
+        Channel item = mChannel.prevLine();
         if (item.getUrls().size() == 1) return;
         mBinding.info.getRoot().setVisibility(View.VISIBLE);
         mBinding.info.line.setText(item.getLineText());
@@ -251,7 +259,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public void onKeyRight() {
-        Channel item = mCurrent.nextLine();
+        Channel item = mChannel.nextLine();
         if (item.getUrls().size() == 1) return;
         mBinding.info.getRoot().setVisibility(View.VISIBLE);
         mBinding.info.line.setText(item.getLineText());
@@ -286,15 +294,15 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
                 break;
             default:
                 if (!event.isRetry() || mPlayers.addRetry() > 1) onError();
-                else getUrl(mCurrent);
+                else getUrl(mChannel);
                 break;
         }
     }
 
     private void onError() {
         mPlayers.setRetry(0);
-        if (isGone(mBinding.recycler) && mCurrent.isLastLine()) onKeyDown();
-        else getUrl(mCurrent.nextLine());
+        if (isGone(mBinding.recycler) && mChannel.isLastLine()) onKeyDown();
+        else getUrl(mChannel.nextLine());
     }
 
     @Override
