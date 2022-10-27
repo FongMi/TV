@@ -267,16 +267,13 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void setFlagActivated(Vod.Flag item) {
-        for (int i = 0; i < mFlagAdapter.size(); i++) {
-            Vod.Flag flag = (Vod.Flag) mFlagAdapter.get(i);
-            flag.setActivated(flag.equals(item));
-            if (!flag.isActivated()) continue;
-            mBinding.flag.setSelectedPosition(i);
-            mEpisodeAdapter.setItems(flag.getEpisodes(), null);
-            setArray(flag.getEpisodes().size());
-            seamless(flag);
-        }
+        if (item.isActivated()) return;
+        for (int i = 0; i < mFlagAdapter.size(); i++) ((Vod.Flag) mFlagAdapter.get(i)).setActivated(item);
+        mBinding.flag.setSelectedPosition(mFlagAdapter.indexOf(item));
+        mEpisodeAdapter.setItems(item.getEpisodes(), null);
         notifyItemChanged(mBinding.flag, mFlagAdapter);
+        setArray(item.getEpisodes().size());
+        seamless(item);
     }
 
     private void seamless(Vod.Flag flag) {
