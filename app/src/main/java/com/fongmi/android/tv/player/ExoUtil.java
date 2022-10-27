@@ -8,7 +8,6 @@ import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.github.catvod.crawler.SpiderDebug;
 import com.google.android.exoplayer2.MediaItem;
-import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.database.DatabaseProvider;
 import com.google.android.exoplayer2.database.StandaloneDatabaseProvider;
 import com.google.android.exoplayer2.source.DefaultMediaSourceFactory;
@@ -21,7 +20,6 @@ import com.google.android.exoplayer2.upstream.cache.Cache;
 import com.google.android.exoplayer2.upstream.cache.CacheDataSource;
 import com.google.android.exoplayer2.upstream.cache.NoOpCacheEvictor;
 import com.google.android.exoplayer2.upstream.cache.SimpleCache;
-import com.google.android.exoplayer2.util.MimeTypes;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,8 +46,6 @@ public class ExoUtil {
     private static MediaSource getSource(Map<String, String> headers, String url, int errorCode, List<MediaItem.SubtitleConfiguration> config) {
         SpiderDebug.log(errorCode + "," + url + "," + headers);
         MediaItem.Builder builder = new MediaItem.Builder().setUri(Uri.parse(url.trim()));
-        if (errorCode == PlaybackException.ERROR_CODE_PARSING_MANIFEST_MALFORMED) builder.setMimeType(MimeTypes.APPLICATION_OCTET);
-        else if (errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED) builder.setMimeType(MimeTypes.APPLICATION_M3U8);
         if (config.size() > 0) builder.setSubtitleConfigurations(config);
         return new DefaultMediaSourceFactory(getDataSourceFactory(headers)).createMediaSource(builder.build());
     }
