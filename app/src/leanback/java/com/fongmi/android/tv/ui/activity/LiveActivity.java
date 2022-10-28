@@ -25,7 +25,7 @@ import com.fongmi.android.tv.model.LiveViewModel;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.player.source.Force;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownLive;
-import com.fongmi.android.tv.ui.custom.CustomScrollerLive;
+import com.fongmi.android.tv.ui.custom.CustomLiveGridView;
 import com.fongmi.android.tv.ui.presenter.ChannelPresenter;
 import com.fongmi.android.tv.ui.presenter.GroupPresenter;
 import com.fongmi.android.tv.utils.Clock;
@@ -37,7 +37,10 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-public class LiveActivity extends BaseActivity implements GroupPresenter.OnClickListener, ChannelPresenter.OnClickListener, CustomKeyDownLive.Listener {
+import java.util.ArrayList;
+import java.util.List;
+
+public class LiveActivity extends BaseActivity implements GroupPresenter.OnClickListener, ChannelPresenter.OnClickListener, CustomKeyDownLive.Listener, CustomLiveGridView.Callback {
 
     private ActivityLiveBinding mBinding;
     private ArrayObjectAdapter mChannelAdapter;
@@ -91,10 +94,10 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     protected void initEvent() {
+        mBinding.group.setListener(this);
+        mBinding.channel.setListener(this);
         EventBus.getDefault().register(this);
         getPlayerView().setOnClickListener(view -> toggle());
-        mBinding.group.addOnScrollListener(new CustomScrollerLive(this::setUITimer));
-        mBinding.channel.addOnScrollListener(new CustomScrollerLive(this::setUITimer));
         mBinding.group.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
@@ -122,7 +125,9 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void getLive() {
-        mGroupAdapter.setItems(LiveConfig.get().getHome().getGroups(), null);
+        List<Group> items = new ArrayList<>();
+        items.addAll(LiveConfig.get().getHome().getGroups());
+        mGroupAdapter.setItems(items, null);
         mBinding.group.setVisibility(mGroupAdapter.size() == 1 ? View.GONE : View.VISIBLE);
         setPosition(LiveConfig.get().getKeep());
     }
@@ -146,7 +151,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mOldView = child.itemView;
         mOldView.setSelected(true);
         onItemClick(group);
-        setUITimer();
     }
 
     private void setChannelActivated() {
@@ -162,7 +166,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void hideUI() {
-        mHandler.removeCallbacks(mR0);
         if (isGone(mBinding.recycler)) return;
         mBinding.recycler.setVisibility(View.GONE);
         setPosition();
@@ -173,12 +176,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.recycler.setVisibility(View.VISIBLE);
         mBinding.channel.requestFocus();
         setPosition();
-        setUITimer();
-    }
-
-    private void setUITimer() {
-        mHandler.removeCallbacks(mR0);
-        mHandler.postDelayed(mR0, 5000);
     }
 
     private void hideInfo() {
@@ -242,7 +239,13 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (isGone(mBinding.recycler) && mKeyDown.hasEvent(event)) return mKeyDown.onKeyDown(event);
-        else return super.dispatchKeyEvent(event);
+        return super.dispatchKeyEvent(event);
+    }
+
+    @Override
+    public void setUITimer() {
+        mHandler.removeCallbacks(mR0);
+        mHandler.postDelayed(mR0, 5000);
     }
 
     @Override
@@ -363,8 +366,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         super.onDestroy();
         mPlayers.release();
         Force.get().stop();
-        mGroup.setSelected(false);
-        mChannel.setSelected(false);
         EventBus.getDefault().unregister(this);
     }
 }
