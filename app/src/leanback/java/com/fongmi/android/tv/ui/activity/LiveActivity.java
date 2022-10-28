@@ -49,6 +49,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private Channel mChannel;
     private View mOldView;
     private Group mGroup;
+    private Runnable mR0;
     private Runnable mR1;
     private Runnable mR2;
     private Runnable mR3;
@@ -77,6 +78,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     protected void initView() {
+        mR0 = this::hideUI;
         mR1 = this::hideInfo;
         mR2 = this::setGroupActivated;
         mR3 = this::setChannelActivated;
@@ -97,6 +99,12 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
                 onChildSelected(child, mGroup = (Group) mGroupAdapter.get(position));
+            }
+        });
+        mBinding.channel.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
+            @Override
+            public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
+                setUITimer();
             }
         });
     }
@@ -142,6 +150,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mOldView = child.itemView;
         mOldView.setSelected(true);
         onItemClick(group);
+        setUITimer();
     }
 
     private void notifyItemChanged(VerticalGridView view, ArrayObjectAdapter adapter) {
@@ -168,6 +177,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void hideUI() {
+        mHandler.removeCallbacks(mR0);
         if (isGone(mBinding.recycler)) return;
         mBinding.recycler.setVisibility(View.GONE);
         setPosition();
@@ -178,6 +188,12 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.recycler.setVisibility(View.VISIBLE);
         mBinding.channel.requestFocus();
         setPosition();
+        setUITimer();
+    }
+
+    private void setUITimer() {
+        mHandler.removeCallbacks(mR0);
+        mHandler.postDelayed(mR0, 2000);
     }
 
     private void hideInfo() {
