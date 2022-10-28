@@ -26,6 +26,7 @@ import com.fongmi.android.tv.model.LiveViewModel;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.player.source.Force;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownLive;
+import com.fongmi.android.tv.ui.custom.CustomScrollerLive;
 import com.fongmi.android.tv.ui.presenter.ChannelPresenter;
 import com.fongmi.android.tv.ui.presenter.GroupPresenter;
 import com.fongmi.android.tv.utils.Clock;
@@ -95,16 +96,12 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     protected void initEvent() {
         EventBus.getDefault().register(this);
         getPlayerView().setOnClickListener(view -> toggle());
+        mBinding.group.addOnScrollListener(new CustomScrollerLive(this::setUITimer));
+        mBinding.channel.addOnScrollListener(new CustomScrollerLive(this::setUITimer));
         mBinding.group.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
                 onChildSelected(child, mGroup = (Group) mGroupAdapter.get(position));
-            }
-        });
-        mBinding.channel.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
-            @Override
-            public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
-                setUITimer();
             }
         });
     }
@@ -193,7 +190,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void setUITimer() {
         mHandler.removeCallbacks(mR0);
-        mHandler.postDelayed(mR0, 2000);
+        mHandler.postDelayed(mR0, 5000);
     }
 
     private void hideInfo() {
