@@ -37,7 +37,6 @@ public class CustomLiveGridView extends VerticalGridView {
         if (getSelectedPosition() != getAdapter().getItemCount() - 1) return;
         if (getId() == R.id.channel) setSelectedPosition(0);
         else listener.nextGroup();
-
     }
 
     private void moveBottom() {
