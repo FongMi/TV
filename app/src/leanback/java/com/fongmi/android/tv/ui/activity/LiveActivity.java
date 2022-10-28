@@ -279,7 +279,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         if (item.getUrls().size() == 1) return;
         mBinding.info.getRoot().setVisibility(View.VISIBLE);
         mBinding.info.line.setText(item.getLineText());
-        getUrl(item);
+        getUrl(mChannel = item);
     }
 
     @Override
@@ -288,7 +288,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         if (item.getUrls().size() == 1) return;
         mBinding.info.getRoot().setVisibility(View.VISIBLE);
         mBinding.info.line.setText(item.getLineText());
-        getUrl(item);
+        getUrl(mChannel = item);
     }
 
     @Override
@@ -359,7 +359,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     protected void onDestroy() {
         super.onDestroy();
         mPlayers.release();
-        Force.get().destroy();
+        Force.get().stop();
         mGroup.setSelected(false);
         mChannel.setSelected(false);
         EventBus.getDefault().unregister(this);

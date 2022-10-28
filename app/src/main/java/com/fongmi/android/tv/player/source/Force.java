@@ -6,11 +6,15 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.net.Uri;
 import android.os.IBinder;
+import android.os.SystemClock;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.net.OKHttp;
+import com.fongmi.android.tv.utils.FileUtil;
 import com.forcetech.Port;
 import com.gsoft.mitv.MainActivity;
+
+import java.io.File;
 
 import okhttp3.Headers;
 
@@ -26,22 +30,25 @@ public class Force {
         return Loader.INSTANCE;
     }
 
-    private void init() {
-        App.get().bindService(new Intent(App.get(), MainActivity.class), mConn, Context.BIND_AUTO_CREATE);
-        init = true;
+    private void init() throws Exception {
+        check();
+        start();
     }
 
-    public void destroy() {
-        try {
-            if (init) App.get().unbindService(mConn);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    private void check() throws Exception {
+        File file = FileUtil.getCacheFile("libmitv.so");
+        String url = "https://ghproxy.com/https://raw.githubusercontent.com/FongMi/TV/dev/release/libmitv.so";
+        if (!file.exists()) FileUtil.write(file, OKHttp.newCall(url).execute().body().bytes());
+    }
+
+    private void start() {
+        App.get().bindService(new Intent(App.get(), MainActivity.class), mConn, Context.BIND_AUTO_CREATE);
     }
 
     public String fetch(String url) {
         try {
             if (!init) init();
+            while (!init) SystemClock.sleep(10);
             int port = Port.get(url);
             Uri uri = Uri.parse(url);
             String id = uri.getLastPathSegment();
@@ -55,15 +62,24 @@ public class Force {
         }
     }
 
+    public void stop() {
+        try {
+            if (init) App.get().unbindService(mConn);
+            init = false;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private final ServiceConnection mConn = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-
+            init = true;
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-
+            init = false;
         }
     };
 }
