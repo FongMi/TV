@@ -27,7 +27,9 @@ public class Group {
 
     public Group(String name) {
         this.name = name;
-        if (name.contains("_")) setPass(name.split("_")[1]);
+        if (!name.contains("_")) return;
+        setName(name.split("_")[0]);
+        setPass(name.split("_")[1]);
     }
 
     public List<Channel> getChannel() {
