@@ -12,7 +12,6 @@ import androidx.annotation.Nullable;
 import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.ItemBridgeAdapter;
 import androidx.leanback.widget.OnChildViewHolderSelectedListener;
-import androidx.leanback.widget.VerticalGridView;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
@@ -53,7 +52,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private Runnable mR0;
     private Runnable mR1;
     private Runnable mR2;
-    private Runnable mR3;
 
     public static void start(Activity activity) {
         if (LiveConfig.get().isEmpty()) return;
@@ -81,8 +79,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     protected void initView() {
         mR0 = this::hideUI;
         mR1 = this::hideInfo;
-        mR2 = this::setGroupActivated;
-        mR3 = this::setChannelActivated;
+        mR2 = this::setChannelActivated;
         mPlayers = new Players().init();
         mHandler = new Handler(Looper.getMainLooper());
         mKeyDown = CustomKeyDownLive.create(this);
@@ -107,6 +104,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void setRecyclerView() {
+        mBinding.group.setItemAnimator(null);
+        mBinding.channel.setItemAnimator(null);
         mBinding.group.setAdapter(new ItemBridgeAdapter(mGroupAdapter = new ArrayObjectAdapter(new GroupPresenter(this))));
         mBinding.channel.setAdapter(new ItemBridgeAdapter(mChannelAdapter = new ArrayObjectAdapter(new ChannelPresenter(this))));
     }
@@ -150,20 +149,9 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         setUITimer();
     }
 
-    private void notifyItemChanged(VerticalGridView view, ArrayObjectAdapter adapter) {
-        if (!view.isComputingLayout()) adapter.notifyArrayItemRangeChanged(0, adapter.size());
-    }
-
-    private void setGroupActivated() {
-        for (int i = 0; i < mGroupAdapter.size(); i++) ((Group) mGroupAdapter.get(i)).setSelected(mGroup);
-        mChannelAdapter.setItems(mGroup.getChannel(), null);
-        notifyItemChanged(mBinding.group, mGroupAdapter);
-    }
-
     private void setChannelActivated() {
         for (int i = 0; i < mChannelAdapter.size(); i++) ((Channel) mChannelAdapter.get(i)).setSelected(mChannel);
-        notifyItemChanged(mBinding.channel, mChannelAdapter);
-        LiveConfig.get().setKeep(mGroup, mChannel);
+        if (!mBinding.channel.isComputingLayout()) mChannelAdapter.notifyArrayItemRangeChanged(0, mChannelAdapter.size());
         getUrl();
     }
 
@@ -210,8 +198,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     @Override
     public void onItemClick(Group item) {
         if (item.isSelected()) return;
-        mHandler.removeCallbacks(mR2);
-        mHandler.postDelayed(mR2, 100);
+        mChannelAdapter.setItems(mGroup.getChannel(), null);
         mBinding.channel.setSelectedPosition(mGroup.getPosition());
     }
 
@@ -223,9 +210,9 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void setChannel(Channel item) {
-        mChannel = item;
-        mHandler.removeCallbacks(mR3);
-        mHandler.postDelayed(mR3, 100);
+        mHandler.removeCallbacks(mR2);
+        mHandler.postDelayed(mR2, 100);
+        LiveConfig.get().setKeep(mGroup, mChannel = item);
         showInfo();
     }
 
