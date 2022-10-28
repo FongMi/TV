@@ -119,6 +119,6 @@ public class Group {
         if (this == obj) return true;
         if (!(obj instanceof Group)) return false;
         Group it = (Group) obj;
-        return getName().equals(it.getName());
+        return getName().equals(it.getName()) && getChannel().size() == it.getChannel().size();
     }
 }

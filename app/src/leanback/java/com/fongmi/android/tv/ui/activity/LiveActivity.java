@@ -158,7 +158,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         for (int i = 0; i < mChannelAdapter.size(); i++) ((Channel) mChannelAdapter.get(i)).setSelected(mChannel);
         notifyItemChanged(mBinding.channel, mChannelAdapter);
         LiveConfig.get().setKeep(mGroup, mChannel);
-        getUrl(mChannel);
+        getUrl();
     }
 
     private void toggle() {
@@ -184,12 +184,12 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.info.getRoot().setVisibility(View.GONE);
     }
 
-    private void showInfo(Channel item) {
+    private void showInfo() {
         mHandler.removeCallbacks(mR1);
         mBinding.info.name.setSelected(true);
-        mBinding.info.name.setText(item.getName());
-        mBinding.info.line.setText(item.getLineText());
-        mBinding.info.number.setText(item.getNumber());
+        mBinding.info.name.setText(mChannel.getName());
+        mBinding.info.line.setText(mChannel.getLineText());
+        mBinding.info.number.setText(mChannel.getNumber());
         mBinding.info.getRoot().setVisibility(View.VISIBLE);
         mHandler.postDelayed(mR1, 5000);
     }
@@ -205,14 +205,15 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     @Override
     public void onItemClick(Channel item) {
         mGroup.setPosition(mBinding.channel.getSelectedPosition());
-        setChannel(mChannel = item.group(mGroup));
+        setChannel(item.group(mGroup));
         hideUI();
     }
 
     private void setChannel(Channel item) {
+        mChannel = item;
         mHandler.removeCallbacks(mR3);
         mHandler.postDelayed(mR3, 100);
-        showInfo(item);
+        showInfo();
     }
 
     private void nextGroup() {
@@ -233,9 +234,9 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mGroup.setPosition(mGroup.getChannel().size() - 1);
     }
 
-    private void getUrl(Channel item) {
+    private void getUrl() {
         mBinding.progress.getRoot().setVisibility(View.VISIBLE);
-        mViewModel.getUrl(item);
+        mViewModel.getUrl(mChannel);
     }
 
     @Override
@@ -262,7 +263,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         int position = mGroup.getPosition() - 1;
         if (position < 0) prevGroup();
         else mGroup.setPosition(position);
-        setChannel(mChannel = mGroup.current());
+        setChannel(mGroup.current());
     }
 
     @Override
@@ -270,25 +271,23 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         int position = mGroup.getPosition() + 1;
         if (position > mGroup.getChannel().size() - 1) nextGroup();
         else mGroup.setPosition(position);
-        setChannel(mChannel = mGroup.current());
+        setChannel(mGroup.current());
     }
 
     @Override
     public void onKeyLeft() {
-        Channel item = mChannel.prevLine();
-        if (item.getUrls().size() == 1) return;
+        if (mChannel.getUrls().size() == 1) return;
         mBinding.info.getRoot().setVisibility(View.VISIBLE);
-        mBinding.info.line.setText(item.getLineText());
-        getUrl(mChannel = item);
+        mBinding.info.line.setText(mChannel.prevLine().getLineText());
+        getUrl();
     }
 
     @Override
     public void onKeyRight() {
-        Channel item = mChannel.nextLine();
-        if (item.getUrls().size() == 1) return;
+        if (mChannel.getUrls().size() == 1) return;
         mBinding.info.getRoot().setVisibility(View.VISIBLE);
-        mBinding.info.line.setText(item.getLineText());
-        getUrl(mChannel = item);
+        mBinding.info.line.setText(mChannel.nextLine().getLineText());
+        getUrl();
     }
 
     @Override
@@ -319,15 +318,19 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
                 break;
             default:
                 if (!event.isRetry() || mPlayers.addRetry() > 1) onError();
-                else getUrl(mChannel);
+                else getUrl();
                 break;
         }
     }
 
     private void onError() {
         mPlayers.setRetry(0);
-        if (isGone(mBinding.recycler) && mChannel.isLastLine()) onKeyDown();
-        else getUrl(mChannel.nextLine());
+        if (isGone(mBinding.recycler) && mChannel.isLastLine()) {
+            onKeyDown();
+        } else {
+            mChannel.nextLine();
+            getUrl();
+        }
     }
 
     @Override
