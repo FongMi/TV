@@ -109,16 +109,6 @@ public class Group {
         return channel;
     }
 
-    public Channel next() {
-        setPosition(getPosition() < getChannel().size() - 1 ? getPosition() + 1 : 0);
-        return current();
-    }
-
-    public Channel prev() {
-        setPosition(getPosition() > 0 ? getPosition() - 1 : getChannel().size() - 1);
-        return current();
-    }
-
     public Channel current() {
         return getChannel().get(getPosition()).group(this);
     }
@@ -129,6 +119,6 @@ public class Group {
         if (this == obj) return true;
         if (!(obj instanceof Group)) return false;
         Group it = (Group) obj;
-        return getName().equals(it.getName());
+        return getName().equals(it.getName()) && getChannel().size() == it.getChannel().size();
     }
 }

@@ -80,7 +80,7 @@ public class ExoUtil {
     }
 
     private static synchronized Cache getCache() {
-        if (cache == null) cache = new SimpleCache(FileUtil.getCacheDir(), new NoOpCacheEvictor(), getDatabase());
+        if (cache == null) cache = new SimpleCache(FileUtil.getCacheDir("player"), new NoOpCacheEvictor(), getDatabase());
         return cache;
     }
 }

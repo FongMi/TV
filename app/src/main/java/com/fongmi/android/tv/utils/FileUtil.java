@@ -31,6 +31,10 @@ public class FileUtil {
         return App.get().getCacheDir();
     }
 
+    public static File getCacheDir(String folder) {
+        return new File(getCachePath() + "/" + folder);
+    }
+
     public static String getCachePath() {
         return getCacheDir().getAbsolutePath();
     }
