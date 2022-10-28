@@ -195,7 +195,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public void onItemClick(Group item) {
-        if (item.isSelected()) return;
         mChannelAdapter.setItems(mGroup.getChannel(), null);
         mBinding.channel.setSelectedPosition(mGroup.getPosition());
     }
@@ -214,7 +213,13 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         showInfo();
     }
 
-    private void nextGroup() {
+    private void getUrl() {
+        mBinding.progress.getRoot().setVisibility(View.VISIBLE);
+        mViewModel.getUrl(mChannel);
+    }
+
+    @Override
+    public void nextGroup() {
         int position = mBinding.group.getSelectedPosition() + 1;
         if (position > mGroupAdapter.size() - 1) position = 0;
         mGroup = (Group) mGroupAdapter.get(position);
@@ -223,18 +228,14 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mGroup.setPosition(0);
     }
 
-    private void prevGroup() {
+    @Override
+    public void prevGroup() {
         int position = mBinding.group.getSelectedPosition() - 1;
         if (position < 0) position = mGroupAdapter.size() - 1;
         mGroup = (Group) mGroupAdapter.get(position);
         mBinding.group.setSelectedPosition(position);
         mChannelAdapter.setItems(mGroup.getChannel(), null);
         mGroup.setPosition(mGroup.getChannel().size() - 1);
-    }
-
-    private void getUrl() {
-        mBinding.progress.getRoot().setVisibility(View.VISIBLE);
-        mViewModel.getUrl(mChannel);
     }
 
     @Override
