@@ -31,6 +31,7 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
     private final DialogConfigBinding binding;
     private final ConfigCallback callback;
     private final AlertDialog dialog;
+    private String url;
     private int type;
 
     public static ConfigDialog create(Activity activity) {
@@ -65,7 +66,7 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
 
     private void initView() {
         String address = Server.get().getAddress(false);
-        String url = type == 0 ? ApiConfig.getUrl() : LiveConfig.getUrl();
+        url = type == 0 ? ApiConfig.getUrl() : LiveConfig.getUrl();
         binding.text.setText(url);
         binding.text.setSelection(url.length());
         binding.code.setImageBitmap(QRCode.getBitmap(address, 200, 0));
@@ -83,8 +84,9 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
     }
 
     private void onPositive(View view) {
-        String url = binding.text.getText().toString().trim();
-        Config item = Config.find(Utils.checkClan(url), type);
+        String text = binding.text.getText().toString().trim();
+        Config item = Config.find(Utils.checkClan(text), type);
+        if (text.isEmpty()) Config.delete(url);
         callback.setConfig(item);
         dialog.dismiss();
     }

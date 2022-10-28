@@ -102,9 +102,11 @@ public class Config {
     }
 
     public static List<Config> getAll(int type) {
-        List<Config> items = AppDatabase.get().getConfigDao().findByType(type);
-        if (items.size() > 0) items.remove(0);
-        return items;
+        return AppDatabase.get().getConfigDao().findByType(type);
+    }
+
+    public static void delete(String url) {
+        AppDatabase.get().getConfigDao().delete(url);
     }
 
     public static Config vod() {
@@ -140,5 +142,13 @@ public class Config {
         AppDatabase.get().getConfigDao().delete(getUrl());
         History.delete(getId());
         Keep.delete(getId());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Config)) return false;
+        Config it = (Config) obj;
+        return getId() == it.getId();
     }
 }

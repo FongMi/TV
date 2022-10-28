@@ -168,6 +168,10 @@ public class LiveConfig {
         return home;
     }
 
+    public boolean isEmpty() {
+        return getHome() == null || getHome().getGroups().isEmpty();
+    }
+
     public void remove(List<Live> lives) {
         if (lives.contains(home)) home = null;
         this.lives.removeAll(lives);

@@ -6,6 +6,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.api.LiveConfig;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.databinding.AdapterConfigBinding;
 
@@ -28,7 +30,8 @@ public class ConfigAdapter extends RecyclerView.Adapter<ConfigAdapter.ViewHolder
     }
 
     public ConfigAdapter addAll(int type) {
-        this.mItems = Config.getAll(type);
+        mItems = Config.getAll(type);
+        mItems.remove(type == 0 ? ApiConfig.get().getConfig() : LiveConfig.get().getConfig());
         return this;
     }
 

@@ -1,12 +1,6 @@
 package com.anymediacloud.iptv.standard;
 
-import com.gsoft.mitv.MainActivity;
-
 public class ForceTV {
-
-    static {
-        MainActivity.start();
-    }
 
     public void start(int port) {
         try {

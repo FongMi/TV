@@ -31,9 +31,7 @@ import com.fongmi.android.tv.ui.presenter.GroupPresenter;
 import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.Prefers;
 import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.ui.StyledPlayerView;
-import com.google.android.exoplayer2.util.Log;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -56,7 +54,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private Runnable mR3;
 
     public static void start(Activity activity) {
-        if (LiveConfig.get().getHome().getGroups().isEmpty()) return;
+        if (LiveConfig.get().isEmpty()) return;
         activity.startActivity(new Intent(activity, LiveActivity.class));
     }
 
@@ -116,7 +114,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private void setVideoView() {
         getPlayerView().setPlayer(mPlayers.exo());
         getPlayerView().setVisibility(View.VISIBLE);
-        getPlayerView().setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_FILL);
+        getPlayerView().setResizeMode(Prefers.getScale());
     }
 
     private void getLive() {
@@ -160,7 +158,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         for (int i = 0; i < mChannelAdapter.size(); i++) ((Channel) mChannelAdapter.get(i)).setSelected(mChannel);
         notifyItemChanged(mBinding.channel, mChannelAdapter);
         LiveConfig.get().setKeep(mGroup, mChannel);
-        getUrl(mChannel);
+        getUrl();
     }
 
     private void toggle() {
@@ -186,12 +184,12 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.info.getRoot().setVisibility(View.GONE);
     }
 
-    private void showInfo(Channel item) {
+    private void showInfo() {
         mHandler.removeCallbacks(mR1);
         mBinding.info.name.setSelected(true);
-        mBinding.info.name.setText(item.getName());
-        mBinding.info.line.setText(item.getLineText());
-        mBinding.info.number.setText(item.getNumber());
+        mBinding.info.name.setText(mChannel.getName());
+        mBinding.info.line.setText(mChannel.getLineText());
+        mBinding.info.number.setText(mChannel.getNumber());
         mBinding.info.getRoot().setVisibility(View.VISIBLE);
         mHandler.postDelayed(mR1, 5000);
     }
@@ -207,19 +205,38 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     @Override
     public void onItemClick(Channel item) {
         mGroup.setPosition(mBinding.channel.getSelectedPosition());
-        setChannel(mChannel = item.group(mGroup));
+        setChannel(item.group(mGroup));
         hideUI();
     }
 
     private void setChannel(Channel item) {
+        mChannel = item;
         mHandler.removeCallbacks(mR3);
         mHandler.postDelayed(mR3, 100);
-        showInfo(item);
+        showInfo();
     }
 
-    private void getUrl(Channel item) {
+    private void nextGroup() {
+        int position = mBinding.group.getSelectedPosition() + 1;
+        if (position > mGroupAdapter.size() - 1) position = 0;
+        mGroup = (Group) mGroupAdapter.get(position);
+        mBinding.group.setSelectedPosition(position);
+        mChannelAdapter.setItems(mGroup.getChannel(), null);
+        mGroup.setPosition(0);
+    }
+
+    private void prevGroup() {
+        int position = mBinding.group.getSelectedPosition() - 1;
+        if (position < 0) position = mGroupAdapter.size() - 1;
+        mGroup = (Group) mGroupAdapter.get(position);
+        mBinding.group.setSelectedPosition(position);
+        mChannelAdapter.setItems(mGroup.getChannel(), null);
+        mGroup.setPosition(mGroup.getChannel().size() - 1);
+    }
+
+    private void getUrl() {
         mBinding.progress.getRoot().setVisibility(View.VISIBLE);
-        mViewModel.getUrl(item);
+        mViewModel.getUrl(mChannel);
     }
 
     @Override
@@ -243,30 +260,34 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public void onKeyUp() {
-        setChannel(mChannel = mGroup.prev());
+        int position = mGroup.getPosition() - 1;
+        if (position < 0) prevGroup();
+        else mGroup.setPosition(position);
+        setChannel(mGroup.current());
     }
 
     @Override
     public void onKeyDown() {
-        setChannel(mChannel = mGroup.next());
+        int position = mGroup.getPosition() + 1;
+        if (position > mGroup.getChannel().size() - 1) nextGroup();
+        else mGroup.setPosition(position);
+        setChannel(mGroup.current());
     }
 
     @Override
     public void onKeyLeft() {
-        Channel item = mChannel.prevLine();
-        if (item.getUrls().size() == 1) return;
+        if (mChannel.getUrls().size() == 1) return;
         mBinding.info.getRoot().setVisibility(View.VISIBLE);
-        mBinding.info.line.setText(item.getLineText());
-        getUrl(item);
+        mBinding.info.line.setText(mChannel.prevLine().getLineText());
+        getUrl();
     }
 
     @Override
     public void onKeyRight() {
-        Channel item = mChannel.nextLine();
-        if (item.getUrls().size() == 1) return;
+        if (mChannel.getUrls().size() == 1) return;
         mBinding.info.getRoot().setVisibility(View.VISIBLE);
-        mBinding.info.line.setText(item.getLineText());
-        getUrl(item);
+        mBinding.info.line.setText(mChannel.nextLine().getLineText());
+        getUrl();
     }
 
     @Override
@@ -297,15 +318,19 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
                 break;
             default:
                 if (!event.isRetry() || mPlayers.addRetry() > 1) onError();
-                else getUrl(mChannel);
+                else getUrl();
                 break;
         }
     }
 
     private void onError() {
         mPlayers.setRetry(0);
-        if (isGone(mBinding.recycler) && mChannel.isLastLine()) onKeyDown();
-        else getUrl(mChannel.nextLine());
+        if (isGone(mBinding.recycler) && mChannel.isLastLine()) {
+            onKeyDown();
+        } else {
+            mChannel.nextLine();
+            getUrl();
+        }
     }
 
     @Override
@@ -337,7 +362,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     protected void onDestroy() {
         super.onDestroy();
         mPlayers.release();
-        Force.get().destroy();
+        Force.get().stop();
         mGroup.setSelected(false);
         mChannel.setSelected(false);
         EventBus.getDefault().unregister(this);
