@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.leanback.widget.VerticalGridView;
 
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.utils.Utils;
 
 public class CustomLiveGridView extends VerticalGridView {
@@ -32,17 +33,22 @@ public class CustomLiveGridView extends VerticalGridView {
     }
 
     private void moveTop() {
-        if (getSelectedPosition() == getAdapter().getItemCount() - 1) setSelectedPosition(0);
         listener.setUITimer();
+        if (getSelectedPosition() != getAdapter().getItemCount() - 1) return;
+        if (getId() == R.id.channel) setSelectedPosition(0);
+        else listener.nextGroup();
+
     }
 
     private void moveBottom() {
-        if (getSelectedPosition() == 0) setSelectedPosition(getAdapter().getItemCount());
         listener.setUITimer();
+        if (getSelectedPosition() != 0) return;
+        if (getId() == R.id.channel) setSelectedPosition(getAdapter().getItemCount());
+        else listener.prevGroup();
     }
 
     @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
+    public boolean dispatchKeyEvent(@NonNull KeyEvent event) {
         if (getVisibility() == View.GONE || event.getAction() != KeyEvent.ACTION_DOWN) return super.dispatchKeyEvent(event);
         if (Utils.isUpKey(event)) moveBottom();
         else if (Utils.isDownKey(event)) moveTop();
@@ -52,5 +58,9 @@ public class CustomLiveGridView extends VerticalGridView {
     public interface Callback {
 
         void setUITimer();
+
+        void nextGroup();
+
+        void prevGroup();
     }
 }
