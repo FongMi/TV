@@ -369,7 +369,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void onKeep() {
         Keep keep = Keep.find(getHistoryKey());
-        Notify.show(keep != null ? R.string.detail_keep_del : R.string.detail_keep_add);
+        Notify.show(keep != null ? R.string.keep_del : R.string.keep_add);
         if (keep != null) keep.delete();
         else createKeep();
         RefreshEvent.keep();

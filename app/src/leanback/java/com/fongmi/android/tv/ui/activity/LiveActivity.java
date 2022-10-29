@@ -20,6 +20,7 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.LiveConfig;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Group;
+import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.databinding.ActivityLiveBinding;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.impl.PassCallback;
@@ -32,6 +33,7 @@ import com.fongmi.android.tv.ui.custom.dialog.PassDialog;
 import com.fongmi.android.tv.ui.presenter.ChannelPresenter;
 import com.fongmi.android.tv.ui.presenter.GroupPresenter;
 import com.fongmi.android.tv.utils.Clock;
+import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.exoplayer2.Player;
@@ -133,7 +135,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void getLive() {
         List<Group> items = new ArrayList<>();
-        items.add(new Group(ResUtil.getString(R.string.live_keep)));
+        items.add(new Group(ResUtil.getString(R.string.keep)));
         for (Group group : LiveConfig.get().getHome().getGroups()) (group.isHidden() ? mHides : items).add(group);
         items.add(new Group(ResUtil.getString(R.string.live_setting)));
         mGroupAdapter.setItems(items, null);
@@ -161,6 +163,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mOldView = child.itemView;
         mOldView.setSelected(true);
         onItemClick(group);
+        resetPass();
     }
 
     private void setChannelActivated() {
@@ -223,6 +226,30 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         hideUI();
     }
 
+    @Override
+    public boolean onLongClick(Channel item) {
+        boolean exist = Keep.exist(item.getName());
+        Notify.show(exist ? R.string.keep_del : R.string.keep_add);
+        if (exist) delKeep(item);
+        else addKeep(item);
+        return true;
+    }
+
+    private void addKeep(Channel item) {
+        Group group = (Group) mGroupAdapter.get(0);
+        group.getChannel().add(item);
+        Keep keep = new Keep();
+        keep.setKey(item.getName());
+        keep.setType(1);
+        keep.save();
+    }
+
+    private void delKeep(Channel item) {
+        Keep.delete(item.getName());
+        if (!mGroup.isKeep()) return;
+        mChannelAdapter.remove(item);
+    }
+
     private void setChannel(Channel item) {
         mHandler.removeCallbacks(mR2);
         mHandler.postDelayed(mR2, 100);
@@ -243,7 +270,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.group.setSelectedPosition(position);
         mChannelAdapter.setItems(mGroup.getChannel(), null);
         mGroup.setPosition(0);
-        resetPass();
     }
 
     @Override
@@ -254,7 +280,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.group.setSelectedPosition(position);
         mChannelAdapter.setItems(mGroup.getChannel(), null);
         mGroup.setPosition(mGroup.getChannel().size() - 1);
-        resetPass();
     }
 
     @Override

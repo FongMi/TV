@@ -110,12 +110,12 @@ public class Config {
     }
 
     public static Config vod() {
-        Config item = AppDatabase.get().getConfigDao().findOne(0);
+        Config item = AppDatabase.get().getConfigDao().find(0);
         return item == null ? create("", 0) : item;
     }
 
     public static Config live() {
-        Config item = AppDatabase.get().getConfigDao().findOne(1);
+        Config item = AppDatabase.get().getConfigDao().find(1);
         return item == null ? create("", 1) : item;
     }
 
