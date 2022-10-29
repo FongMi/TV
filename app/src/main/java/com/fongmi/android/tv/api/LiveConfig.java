@@ -131,24 +131,23 @@ public class LiveConfig {
     }
 
     public void setKeep(Group group, Channel channel) {
-        Prefers.putKeep(home.getName() + AppDatabase.SYMBOL + group.getName() + AppDatabase.SYMBOL + channel.getName());
+        if (!group.isHidden()) Prefers.putKeep(home.getName() + AppDatabase.SYMBOL + group.getName() + AppDatabase.SYMBOL + channel.getName());
     }
 
-    public int[] getKeep() {
+    public int[] getKeep(List<Group> items) {
         String[] splits = Prefers.getKeep().split(AppDatabase.SYMBOL);
-        if (!home.getName().equals(splits[0])) return new int[]{0, 0};
-        for (int i = 0; i < home.getGroups().size(); i++) {
-            Group group = home.getGroups().get(i);
+        if (!home.getName().equals(splits[0])) return new int[]{1, 0};
+        for (int i = 0; i < items.size(); i++) {
+            Group group = items.get(i);
             if (group.getName().equals(splits[1])) {
                 int j = group.find(splits[2]);
                 if (j != -1) return new int[]{i, j};
             }
         }
-        return new int[]{0, 0};
+        return new int[]{1, 0};
     }
 
-    public int[] find(String number) {
-        List<Group> items = home.getGroups();
+    public int[] find(String number, List<Group> items) {
         for (int i = 0; i < items.size(); i++) {
             int j = items.get(i).find(Integer.parseInt(number));
             if (j != -1) return new int[]{i, j};

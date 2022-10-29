@@ -16,20 +16,24 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.LiveConfig;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Group;
 import com.fongmi.android.tv.databinding.ActivityLiveBinding;
 import com.fongmi.android.tv.event.PlayerEvent;
+import com.fongmi.android.tv.impl.PassCallback;
 import com.fongmi.android.tv.model.LiveViewModel;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.player.source.Force;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownLive;
 import com.fongmi.android.tv.ui.custom.CustomLiveListView;
+import com.fongmi.android.tv.ui.custom.dialog.PassDialog;
 import com.fongmi.android.tv.ui.presenter.ChannelPresenter;
 import com.fongmi.android.tv.ui.presenter.GroupPresenter;
 import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.Prefers;
+import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.ui.StyledPlayerView;
 
@@ -40,13 +44,14 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LiveActivity extends BaseActivity implements GroupPresenter.OnClickListener, ChannelPresenter.OnClickListener, CustomKeyDownLive.Listener, CustomLiveListView.Callback {
+public class LiveActivity extends BaseActivity implements GroupPresenter.OnClickListener, ChannelPresenter.OnClickListener, CustomKeyDownLive.Listener, CustomLiveListView.Callback, PassCallback {
 
     private ActivityLiveBinding mBinding;
     private ArrayObjectAdapter mChannelAdapter;
     private ArrayObjectAdapter mGroupAdapter;
     private CustomKeyDownLive mKeyDown;
     private LiveViewModel mViewModel;
+    private List<Group> mHides;
     private Handler mHandler;
     private Players mPlayers;
     private Channel mChannel;
@@ -55,6 +60,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private Runnable mR0;
     private Runnable mR1;
     private Runnable mR2;
+    private int count;
 
     public static void start(Activity activity) {
         if (LiveConfig.get().isEmpty()) return;
@@ -86,6 +92,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mPlayers = new Players().init();
         mHandler = new Handler(Looper.getMainLooper());
         mKeyDown = CustomKeyDownLive.create(this);
+        mHides = new ArrayList<>();
         setRecyclerView();
         setViewModel();
         setVideoView();
@@ -126,13 +133,16 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void getLive() {
         List<Group> items = new ArrayList<>();
-        items.addAll(LiveConfig.get().getHome().getGroups());
+        items.add(new Group(ResUtil.getString(R.string.live_keep)));
+        for (Group group : LiveConfig.get().getHome().getGroups()) (group.isHidden() ? mHides : items).add(group);
+        items.add(new Group(ResUtil.getString(R.string.live_setting)));
         mGroupAdapter.setItems(items, null);
         mBinding.group.setVisibility(mGroupAdapter.size() == 1 ? View.GONE : View.VISIBLE);
-        setPosition(LiveConfig.get().getKeep());
+        setPosition(LiveConfig.get().getKeep(mGroupAdapter.unmodifiableList()));
     }
 
     private void setPosition(int[] position) {
+        if (position[0] == -1) return;
         mGroup = (Group) mGroupAdapter.get(position[0]);
         mBinding.group.setSelectedPosition(position[0]);
         mGroup.setPosition(position[1]);
@@ -192,10 +202,18 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.info.getRoot().setVisibility(View.VISIBLE);
     }
 
+    private void resetPass() {
+        this.count = 0;
+    }
+
     @Override
     public void onItemClick(Group item) {
         mChannelAdapter.setItems(mGroup.getChannel(), null);
         mBinding.channel.setSelectedPosition(mGroup.getPosition());
+        if (!item.isKeep() || ++count < 5) return;
+        mHandler.removeCallbacks(mR0);
+        PassDialog.show(this);
+        resetPass();
     }
 
     @Override
@@ -225,6 +243,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.group.setSelectedPosition(position);
         mChannelAdapter.setItems(mGroup.getChannel(), null);
         mGroup.setPosition(0);
+        resetPass();
     }
 
     @Override
@@ -235,6 +254,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.group.setSelectedPosition(position);
         mChannelAdapter.setItems(mGroup.getChannel(), null);
         mGroup.setPosition(mGroup.getChannel().size() - 1);
+        resetPass();
     }
 
     @Override
@@ -258,8 +278,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     @Override
     public void onFind(String number) {
         mBinding.digital.setVisibility(View.GONE);
-        int[] position = LiveConfig.get().find(number);
-        if (position[0] != -1) setPosition(position);
+        setPosition(LiveConfig.get().find(number, mGroupAdapter.unmodifiableList()));
     }
 
     @Override
@@ -302,6 +321,19 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public void onLongPress() {
+    }
+
+    @Override
+    public void setPass(String pass) {
+        int position = mGroupAdapter.size() - 1;
+        for (Group item : mHides) {
+            if (!item.getPass().equals(pass)) continue;
+            mGroupAdapter.add(position, item);
+            mBinding.group.setSelectedPosition(position);
+            mHides.remove(item);
+            onItemClick(item);
+            break;
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
