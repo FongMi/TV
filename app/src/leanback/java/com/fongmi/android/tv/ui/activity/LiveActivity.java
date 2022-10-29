@@ -25,7 +25,7 @@ import com.fongmi.android.tv.model.LiveViewModel;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.player.source.Force;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownLive;
-import com.fongmi.android.tv.ui.custom.CustomLiveGridView;
+import com.fongmi.android.tv.ui.custom.CustomLiveListView;
 import com.fongmi.android.tv.ui.presenter.ChannelPresenter;
 import com.fongmi.android.tv.ui.presenter.GroupPresenter;
 import com.fongmi.android.tv.utils.Clock;
@@ -40,7 +40,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LiveActivity extends BaseActivity implements GroupPresenter.OnClickListener, ChannelPresenter.OnClickListener, CustomKeyDownLive.Listener, CustomLiveGridView.Callback {
+public class LiveActivity extends BaseActivity implements GroupPresenter.OnClickListener, ChannelPresenter.OnClickListener, CustomKeyDownLive.Listener, CustomLiveListView.Callback {
 
     private ActivityLiveBinding mBinding;
     private ArrayObjectAdapter mChannelAdapter;
@@ -185,12 +185,11 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void showInfo() {
         mHandler.removeCallbacks(mR1);
-        mBinding.info.name.setSelected(true);
+        mHandler.postDelayed(mR1, 5000);
         mBinding.info.name.setText(mChannel.getName());
         mBinding.info.line.setText(mChannel.getLineText());
         mBinding.info.number.setText(mChannel.getNumber());
         mBinding.info.getRoot().setVisibility(View.VISIBLE);
-        mHandler.postDelayed(mR1, 5000);
     }
 
     @Override
@@ -282,16 +281,16 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     @Override
     public void onKeyLeft() {
         if (mChannel.getUrls().size() == 1) return;
-        mBinding.info.getRoot().setVisibility(View.VISIBLE);
-        mBinding.info.line.setText(mChannel.prevLine().getLineText());
+        mChannel.prevLine();
+        showInfo();
         getUrl();
     }
 
     @Override
     public void onKeyRight() {
         if (mChannel.getUrls().size() == 1) return;
-        mBinding.info.getRoot().setVisibility(View.VISIBLE);
-        mBinding.info.line.setText(mChannel.nextLine().getLineText());
+        mChannel.nextLine();
+        showInfo();
         getUrl();
     }
 
