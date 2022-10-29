@@ -59,7 +59,7 @@
         android:orientation="horizontal"
         android:visibility="gone">
 
-        <com.fongmi.android.tv.ui.custom.CustomLiveGridView
+        <com.fongmi.android.tv.ui.custom.CustomLiveListView
             android:id="@+id/group"
             android:layout_width="140dp"
             android:layout_height="match_parent"
@@ -71,7 +71,7 @@
             android:layout_height="match_parent"
             android:background="@color/grey_700" />
 
-        <com.fongmi.android.tv.ui.custom.CustomLiveGridView
+        <com.fongmi.android.tv.ui.custom.CustomLiveListView
             android:id="@+id/channel"
             android:layout_width="260dp"
             android:layout_height="match_parent"
