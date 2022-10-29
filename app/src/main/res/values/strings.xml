@@ -11,9 +11,12 @@
     <string name="vod_last">Last seen <xliff:g name="name">%s</xliff:g></string>
 
     <!-- Live -->
+    <string name="live_keep">Keep</string>
+    <string name="live_pass">Pass</string>
+    <string name="live_setting">Setting</string>
+    <string name="live_epg_empty">No schedule</string>
     <string name="live_epg_now">Playing: <xliff:g name="name">%s</xliff:g>/<xliff:g name="name">%s</xliff:g></string>
     <string name="live_epg_next">Nex: <xliff:g name="name">%s</xliff:g>/<xliff:g name="name">%s</xliff:g></string>
-    <string name="live_epg_empty">No schedule</string>
     <string name="live_line">Line <xliff:g name="name">%s</xliff:g>/<xliff:g name="name">%s</xliff:g></string>
 
     <!-- Push -->
