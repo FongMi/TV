@@ -6,6 +6,8 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.utils.ResUtil;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
@@ -22,7 +24,6 @@ public class Group {
     @SerializedName("pass")
     private String pass;
 
-    private boolean selected;
     private int position;
 
     public Group(String name) {
@@ -64,18 +65,6 @@ public class Group {
         this.pass = pass;
     }
 
-    public boolean isSelected() {
-        return selected;
-    }
-
-    public void setSelected(boolean selected) {
-        this.selected = selected;
-    }
-
-    public void setSelected(Group item) {
-        this.selected = item.equals(this);
-    }
-
     public int getPosition() {
         return position;
     }
@@ -86,6 +75,14 @@ public class Group {
 
     public boolean isHidden() {
         return !TextUtils.isEmpty(getPass());
+    }
+
+    public boolean isKeep() {
+        return getName().equals(ResUtil.getString(R.string.live_keep));
+    }
+
+    public boolean isSetting() {
+        return getName().equals(ResUtil.getString(R.string.live_setting));
     }
 
     public int getVisible() {
