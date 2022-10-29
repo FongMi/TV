@@ -12,19 +12,19 @@ import androidx.leanback.widget.VerticalGridView;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.utils.Utils;
 
-public class CustomLiveGridView extends VerticalGridView {
+public class CustomLiveListView extends VerticalGridView {
 
     private Callback listener;
 
-    public CustomLiveGridView(@NonNull Context context) {
+    public CustomLiveListView(@NonNull Context context) {
         super(context);
     }
 
-    public CustomLiveGridView(@NonNull Context context, @Nullable AttributeSet attrs) {
+    public CustomLiveListView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public CustomLiveGridView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyle) {
+    public CustomLiveListView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 
@@ -32,25 +32,27 @@ public class CustomLiveGridView extends VerticalGridView {
         this.listener = listener;
     }
 
-    private void moveTop() {
+    private boolean onKeyDown() {
         listener.setUITimer();
-        if (getSelectedPosition() != getAdapter().getItemCount() - 1) return;
+        if (getSelectedPosition() != getAdapter().getItemCount() - 1) return false;
         if (getId() == R.id.channel) setSelectedPosition(0);
         else listener.nextGroup();
+        return true;
     }
 
-    private void moveBottom() {
+    private boolean onKeyUp() {
         listener.setUITimer();
-        if (getSelectedPosition() != 0) return;
+        if (getSelectedPosition() != 0) return false;
         if (getId() == R.id.channel) setSelectedPosition(getAdapter().getItemCount());
         else listener.prevGroup();
+        return true;
     }
 
     @Override
     public boolean dispatchKeyEvent(@NonNull KeyEvent event) {
         if (getVisibility() == View.GONE || event.getAction() != KeyEvent.ACTION_DOWN) return super.dispatchKeyEvent(event);
-        if (Utils.isUpKey(event)) moveBottom();
-        else if (Utils.isDownKey(event)) moveTop();
+        if (Utils.isDownKey(event)) return onKeyDown();
+        if (Utils.isUpKey(event)) return onKeyUp();
         return super.dispatchKeyEvent(event);
     }
 
