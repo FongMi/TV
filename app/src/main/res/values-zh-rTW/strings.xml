@@ -11,7 +11,6 @@
     <string name="vod_last">上次看到<xliff:g name="name">%s</xliff:g></string>
 
     <!-- Live -->
-    <string name="live_keep">收藏</string>
     <string name="live_pass">密碼</string>
     <string name="live_setting">設定</string>
     <string name="live_epg_empty">暫無頻道資訊</string>
@@ -32,9 +31,11 @@
     <string name="detail_actor">演員：<xliff:g name="name">%s</xliff:g></string>
     <string name="detail_content">簡介：<xliff:g name="name">%s</xliff:g></string>
     <string name="detail_desc">簡介</string>
-    <string name="detail_keep">收藏</string>
-    <string name="detail_keep_add">已加入收藏</string>
-    <string name="detail_keep_del">已取消收藏</string>
+
+    <!-- Keep -->
+    <string name="keep">收藏</string>
+    <string name="keep_add">已加入收藏</string>
+    <string name="keep_del">已取消收藏</string>
 
     <!-- Play -->
     <string name="play">播放</string>
