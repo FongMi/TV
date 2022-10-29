@@ -78,7 +78,7 @@ public class Group {
     }
 
     public boolean isKeep() {
-        return getName().equals(ResUtil.getString(R.string.live_keep));
+        return getName().equals(ResUtil.getString(R.string.keep));
     }
 
     public boolean isSetting() {
