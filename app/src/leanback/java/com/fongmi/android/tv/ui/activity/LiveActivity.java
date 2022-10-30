@@ -141,7 +141,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         List<Group> items = new ArrayList<>();
         items.add(Group.create(ResUtil.getString(R.string.keep)));
         for (Group group : LiveConfig.get().getHome().getGroups()) (group.isHidden() ? mHides : items).add(group);
-        items.add(Group.create(ResUtil.getString(R.string.live_setting)));
+        //items.add(Group.create(ResUtil.getString(R.string.live_setting)));
         mGroupAdapter.setItems(items, null);
         LiveConfig.get().setKeep(items);
         setPosition(LiveConfig.get().getKeep(items));
@@ -253,8 +253,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void delKeep(Channel item) {
-        if (mGroup.isKeep()) mChannelAdapter.remove(item);
-        else getKeep().getChannel().remove(item);
+        if (mGroup.isKeep()) mChannelAdapter.remove(item); else getKeep().getChannel().remove(item);
+        if (mChannelAdapter.size() == 0) mBinding.group.requestFocus();
         Keep.delete(item.getName());
     }
 
