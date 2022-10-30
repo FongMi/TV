@@ -26,6 +26,10 @@ public class Group {
 
     private int position;
 
+    public static Group create(String name) {
+        return new Group(name);
+    }
+
     public Group(String name) {
         this.name = name;
         if (!name.contains("_")) return;
@@ -99,6 +103,12 @@ public class Group {
 
     public int find(String name) {
         return getChannel().lastIndexOf(Channel.create(name));
+    }
+
+    public void add(Channel channel) {
+        int index = getChannel().indexOf(channel);
+        if (index == -1) getChannel().add(Channel.create(channel));
+        else getChannel().get(index).getUrls().addAll(channel.getUrls());
     }
 
     public Channel find(Channel channel) {

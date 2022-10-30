@@ -73,6 +73,10 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         return Prefers.getRender() == 0 ? mBinding.surface : mBinding.texture;
     }
 
+    private Group getKeep() {
+        return (Group) mGroupAdapter.get(0);
+    }
+
     private boolean isVisible(View view) {
         return view.getVisibility() == View.VISIBLE;
     }
@@ -135,12 +139,12 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void getLive() {
         List<Group> items = new ArrayList<>();
-        items.add(new Group(ResUtil.getString(R.string.keep)));
+        items.add(Group.create(ResUtil.getString(R.string.keep)));
         for (Group group : LiveConfig.get().getHome().getGroups()) (group.isHidden() ? mHides : items).add(group);
-        items.add(new Group(ResUtil.getString(R.string.live_setting)));
+        items.add(Group.create(ResUtil.getString(R.string.live_setting)));
         mGroupAdapter.setItems(items, null);
-        mBinding.group.setVisibility(mGroupAdapter.size() == 1 ? View.GONE : View.VISIBLE);
-        setPosition(LiveConfig.get().getKeep(mGroupAdapter.unmodifiableList()));
+        LiveConfig.get().setKeep(items);
+        setPosition(LiveConfig.get().getKeep(items));
     }
 
     private void setPosition(int[] position) {
@@ -228,6 +232,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public boolean onLongClick(Channel item) {
+        if (mGroup.isHidden()) return false;
         boolean exist = Keep.exist(item.getName());
         Notify.show(exist ? R.string.keep_del : R.string.keep_add);
         if (exist) delKeep(item);
@@ -236,8 +241,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void addKeep(Channel item) {
-        Group group = (Group) mGroupAdapter.get(0);
-        group.getChannel().add(item);
+        getKeep().add(item);
         Keep keep = new Keep();
         keep.setKey(item.getName());
         keep.setType(1);
@@ -245,9 +249,9 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void delKeep(Channel item) {
+        if (mGroup.isKeep()) mChannelAdapter.remove(item);
+        else getKeep().getChannel().remove(item);
         Keep.delete(item.getName());
-        if (!mGroup.isKeep()) return;
-        mChannelAdapter.remove(item);
     }
 
     private void setChannel(Channel item) {
