@@ -198,8 +198,8 @@ public class Channel {
         setNumber(item.getNumber());
         setLogo(item.getLogo());
         setName(item.getName());
+        setUrls(item.getUrls());
         setUa(item.getName());
-        setUrl(item.getUrl());
         return this;
     }
 
