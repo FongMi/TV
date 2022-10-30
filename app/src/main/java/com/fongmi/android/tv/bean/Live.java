@@ -108,7 +108,7 @@ public class Live {
     }
 
     public Group find(Group item) {
-        for (Group group:getGroups()) if(group.getName().equals(item.getName())) return group;
+        for (Group group : getGroups()) if (group.getName().equals(item.getName())) return group;
         getGroups().add(item);
         return item;
     }
