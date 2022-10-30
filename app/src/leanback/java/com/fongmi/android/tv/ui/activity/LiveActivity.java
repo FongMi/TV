@@ -253,8 +253,9 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void delKeep(Channel item) {
-        if (mGroup.isKeep()) mChannelAdapter.remove(item); else getKeep().getChannel().remove(item);
+        if (mGroup.isKeep()) mChannelAdapter.remove(item);
         if (mChannelAdapter.size() == 0) mBinding.group.requestFocus();
+        getKeep().getChannel().remove(item);
         Keep.delete(item.getName());
     }
 
