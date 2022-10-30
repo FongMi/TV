@@ -157,8 +157,12 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void setPosition() {
-        mBinding.group.setSelectedPosition(mGroupAdapter.indexOf(mChannel.getGroup()));
-        mBinding.channel.setSelectedPosition(mChannel.getGroup().getPosition());
+        Group group = mChannel.getGroup();
+        int position = mGroupAdapter.indexOf(group);
+        boolean change = mBinding.group.getSelectedPosition() != position;
+        if (change) mBinding.group.setSelectedPosition(position);
+        if (change) mChannelAdapter.setItems(group.getChannel(), null);
+        mBinding.channel.setSelectedPosition(group.getPosition());
     }
 
     private void onChildSelected(@Nullable RecyclerView.ViewHolder child, Group group) {
