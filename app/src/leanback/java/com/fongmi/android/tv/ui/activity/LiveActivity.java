@@ -141,7 +141,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         List<Group> items = new ArrayList<>();
         items.add(Group.create(ResUtil.getString(R.string.keep)));
         for (Group group : LiveConfig.get().getHome().getGroups()) (group.isHidden() ? mHides : items).add(group);
-        items.add(Group.create(ResUtil.getString(R.string.live_setting)));
+        //items.add(Group.create(ResUtil.getString(R.string.live_setting)));
         mGroupAdapter.setItems(items, null);
         LiveConfig.get().setKeep(items);
         setPosition(LiveConfig.get().getKeep(items));
@@ -272,24 +272,24 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     @Override
-    public boolean nextGroup() {
+    public boolean nextGroup(boolean skip) {
         int position = mBinding.group.getSelectedPosition() + 1;
         if (position > mGroupAdapter.size() - 1) position = 0;
         mGroup = (Group) mGroupAdapter.get(position);
         mBinding.group.setSelectedPosition(position);
-        if (mGroup.getChannel().isEmpty()) return nextGroup();
+        if (skip && mGroup.skip()) return nextGroup(true);
         mChannelAdapter.setItems(mGroup.getChannel(), null);
         mGroup.setPosition(0);
         return true;
     }
 
     @Override
-    public boolean prevGroup() {
+    public boolean prevGroup(boolean skip) {
         int position = mBinding.group.getSelectedPosition() - 1;
         if (position < 0) position = mGroupAdapter.size() - 1;
         mGroup = (Group) mGroupAdapter.get(position);
         mBinding.group.setSelectedPosition(position);
-        if (mGroup.getChannel().isEmpty()) return prevGroup();
+        if (skip && mGroup.skip()) return prevGroup(true);
         mChannelAdapter.setItems(mGroup.getChannel(), null);
         mGroup.setPosition(mGroup.getChannel().size() - 1);
         return true;
@@ -322,7 +322,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     @Override
     public void onKeyUp() {
         int position = mGroup.getPosition() - 1;
-        if (position < 0) prevGroup();
+        if (position < 0) prevGroup(true);
         else mGroup.setPosition(position);
         setChannel(mGroup.current());
     }
@@ -330,7 +330,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     @Override
     public void onKeyDown() {
         int position = mGroup.getPosition() + 1;
-        if (position > mGroup.getChannel().size() - 1) nextGroup();
+        if (position > mGroup.getChannel().size() - 1) nextGroup(true);
         else mGroup.setPosition(position);
         setChannel(mGroup.current());
     }
