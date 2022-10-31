@@ -33,7 +33,7 @@ public class Clock {
     }
 
     public static void start(TextView view) {
-        start(view, "MM/dd HH:mm:ss");
+        start(view, "HH:mm:ss");
     }
 
     public static void start(TextView view, String format) {
