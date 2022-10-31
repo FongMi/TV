@@ -36,7 +36,7 @@ public class CustomLiveListView extends VerticalGridView {
         listener.setUITimer();
         if (getSelectedPosition() != getAdapter().getItemCount() - 1) return false;
         if (getId() == R.id.channel) setSelectedPosition(0);
-        else listener.nextGroup();
+        else listener.nextGroup(false);
         return true;
     }
 
@@ -44,7 +44,7 @@ public class CustomLiveListView extends VerticalGridView {
         listener.setUITimer();
         if (getSelectedPosition() != 0) return false;
         if (getId() == R.id.channel) setSelectedPosition(getAdapter().getItemCount());
-        else listener.prevGroup();
+        else listener.prevGroup(false);
         return true;
     }
 
@@ -60,8 +60,8 @@ public class CustomLiveListView extends VerticalGridView {
 
         void setUITimer();
 
-        boolean nextGroup();
+        boolean nextGroup(boolean skip);
 
-        boolean prevGroup();
+        boolean prevGroup(boolean skip);
     }
 }
