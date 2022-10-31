@@ -89,6 +89,10 @@ public class Group {
         return getName().equals(ResUtil.getString(R.string.live_setting));
     }
 
+    public boolean skip() {
+        return isKeep() || isSetting();
+    }
+
     public int getVisible() {
         return getLogo().isEmpty() ? View.GONE : View.VISIBLE;
     }
