@@ -410,7 +410,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     @Override
     protected void onResume() {
         super.onResume();
-        Clock.start(mBinding.info.time, "HH:mm:ss");
+        Clock.start(mBinding.info.time);
         mPlayers.play();
     }
 

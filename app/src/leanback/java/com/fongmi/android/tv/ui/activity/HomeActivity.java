@@ -292,7 +292,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     @Override
     protected void onResume() {
         super.onResume();
-        Clock.start(mBinding.time);
+        Clock.start(mBinding.time, "MM/dd HH:mm:ss");
     }
 
     @Override
