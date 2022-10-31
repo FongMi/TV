@@ -141,7 +141,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         List<Group> items = new ArrayList<>();
         items.add(Group.create(ResUtil.getString(R.string.keep)));
         for (Group group : LiveConfig.get().getHome().getGroups()) (group.isHidden() ? mHides : items).add(group);
-        //items.add(Group.create(ResUtil.getString(R.string.live_setting)));
+        items.add(Group.create(ResUtil.getString(R.string.live_setting)));
         mGroupAdapter.setItems(items, null);
         LiveConfig.get().setKeep(items);
         setPosition(LiveConfig.get().getKeep(items));
@@ -272,23 +272,27 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     @Override
-    public void nextGroup() {
+    public boolean nextGroup() {
         int position = mBinding.group.getSelectedPosition() + 1;
         if (position > mGroupAdapter.size() - 1) position = 0;
         mGroup = (Group) mGroupAdapter.get(position);
         mBinding.group.setSelectedPosition(position);
+        if (mGroup.getChannel().isEmpty()) return nextGroup();
         mChannelAdapter.setItems(mGroup.getChannel(), null);
         mGroup.setPosition(0);
+        return true;
     }
 
     @Override
-    public void prevGroup() {
+    public boolean prevGroup() {
         int position = mBinding.group.getSelectedPosition() - 1;
         if (position < 0) position = mGroupAdapter.size() - 1;
         mGroup = (Group) mGroupAdapter.get(position);
         mBinding.group.setSelectedPosition(position);
+        if (mGroup.getChannel().isEmpty()) return prevGroup();
         mChannelAdapter.setItems(mGroup.getChannel(), null);
         mGroup.setPosition(mGroup.getChannel().size() - 1);
+        return true;
     }
 
     @Override

@@ -60,8 +60,8 @@ public class CustomLiveListView extends VerticalGridView {
 
         void setUITimer();
 
-        void nextGroup();
+        boolean nextGroup();
 
-        void prevGroup();
+        boolean prevGroup();
     }
 }
