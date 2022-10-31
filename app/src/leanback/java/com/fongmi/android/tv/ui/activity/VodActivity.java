@@ -27,6 +27,7 @@ import com.fongmi.android.tv.databinding.ActivityVodBinding;
 import com.fongmi.android.tv.ui.fragment.VodFragment;
 import com.fongmi.android.tv.ui.presenter.TypePresenter;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.Utils;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -131,8 +132,7 @@ public class VodActivity extends BaseActivity {
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        boolean isMenuUp = event.getAction() == KeyEvent.ACTION_UP && event.getKeyCode() == KeyEvent.KEYCODE_MENU;
-        if (isMenuUp) updateFilter(mResult.getTypes().get(mBinding.pager.getCurrentItem()));
+        if (Utils.isMenuKey(event)) updateFilter(mResult.getTypes().get(mBinding.pager.getCurrentItem()));
         return super.dispatchKeyEvent(event);
     }
 
