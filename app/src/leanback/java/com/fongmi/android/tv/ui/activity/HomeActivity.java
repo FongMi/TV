@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.KeyEvent;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -42,6 +43,7 @@ import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Updater;
+import com.fongmi.android.tv.utils.Utils;
 import com.google.common.collect.Lists;
 
 import org.greenrobot.eventbus.EventBus;
@@ -279,6 +281,12 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
                 DetailActivity.start(this, "push_agent", event.getText(), true);
                 break;
         }
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (Utils.isMenuKey(event)) showDialog();
+        return super.dispatchKeyEvent(event);
     }
 
     @Override
