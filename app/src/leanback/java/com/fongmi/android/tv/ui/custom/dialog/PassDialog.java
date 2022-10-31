@@ -55,12 +55,9 @@ public class PassDialog extends BottomSheetDialogFragment {
     }
 
     private void setBehavior(BottomSheetDialog dialog) {
-        WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
         FrameLayout bottomSheet = dialog.findViewById(com.google.android.material.R.id.design_bottom_sheet);
         BottomSheetBehavior<FrameLayout> behavior = BottomSheetBehavior.from(bottomSheet);
         behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-        params.width = ResUtil.dp2px(250);
-        dialog.getWindow().setAttributes(params);
         behavior.setSkipCollapsed(true);
     }
 
@@ -84,6 +81,12 @@ public class PassDialog extends BottomSheetDialogFragment {
         String pass = binding.pass.getText().toString().trim();
         if (pass.length() > 0) callback.setPass(pass);
         dismiss();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getDialog().getWindow().setLayout(ResUtil.dp2px(250), -1);
     }
 
     @Override
