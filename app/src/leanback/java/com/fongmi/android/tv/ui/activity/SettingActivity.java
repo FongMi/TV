@@ -123,7 +123,6 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
                 LiveConfig.get().clear().config(config).load(getCallback());
                 break;
             case 2:
-                Notify.progress(this);
                 mBinding.wallUrl.setText(config.getUrl());
                 WallConfig.get().clear().config(config).load(getCallback());
                 break;
@@ -158,7 +157,6 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
                 Notify.dismiss();
                 break;
             case 2:
-                Notify.dismiss();
                 mBinding.wallUrl.setText(WallConfig.getUrl());
                 break;
         }
@@ -210,6 +208,6 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
     }
 
     private void setWallRefresh() {
-        WallConfig.get().load(new Callback());
+        WallConfig.get().load();
     }
 }
