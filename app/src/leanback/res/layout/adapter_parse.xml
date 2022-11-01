@@ -11,6 +11,6 @@
     android:nextFocusUp="@id/action"
     android:nextFocusDown="@id/exo_progress"
     android:singleLine="true"
-    android:textColor="@color/white"
+    android:textColor="@color/text"
     android:textSize="14sp"
     tools:text="解析" />

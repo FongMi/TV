@@ -2,7 +2,6 @@ package com.gsoft.mitv;
 
 import android.app.Service;
 import android.content.Intent;
-import android.os.Binder;
 import android.os.IBinder;
 
 import com.anymediacloud.iptv.standard.ForceTV;
@@ -10,15 +9,8 @@ import com.forcetech.Port;
 
 public class MainActivity extends Service {
 
-    private final IBinder binder = new LocalBinder();
     private ForceTV forceTV;
-
-    public class LocalBinder extends Binder {
-        MainActivity getService() {
-            // Return this instance of LocalService so clients can call public methods
-            return MainActivity.this;
-        }
-    }
+    private IBinder binder;
 
     static {
         System.loadLibrary("mitv");
@@ -27,7 +19,11 @@ public class MainActivity extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        loadLibrary(1);
+        try {
+            binder = new LocalBinder();
+            loadLibrary(1);
+        } catch (Throwable ignored) {
+        }
     }
 
     @Override

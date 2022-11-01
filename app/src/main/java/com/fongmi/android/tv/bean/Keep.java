@@ -19,6 +19,7 @@ public class Keep {
     private String vodName;
     private String vodPic;
     private long createTime;
+    private int type;
     private int cid;
 
     @NonNull
@@ -62,6 +63,14 @@ public class Keep {
         this.createTime = createTime;
     }
 
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
     public int getCid() {
         return cid;
     }
@@ -82,12 +91,24 @@ public class Keep {
         return AppDatabase.get().getKeepDao().find(ApiConfig.getCid(), key);
     }
 
+    public static boolean exist(String key) {
+        return AppDatabase.get().getKeepDao().find(key) != null;
+    }
+
     public static void delete(int cid) {
         AppDatabase.get().getKeepDao().delete(cid);
     }
 
-    public static List<Keep> getAll() {
-        return AppDatabase.get().getKeepDao().getAll();
+    public static void delete(String key) {
+        AppDatabase.get().getKeepDao().delete(key);
+    }
+
+    public static List<Keep> getVod() {
+        return AppDatabase.get().getKeepDao().getVod();
+    }
+
+    public static List<Keep> getLive() {
+        return AppDatabase.get().getKeepDao().getLive();
     }
 
     public void save() {
