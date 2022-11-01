@@ -36,7 +36,6 @@ public class KeepActivity extends BaseActivity implements KeepAdapter.OnClickLis
 
     @Override
     protected void initView() {
-        EventBus.getDefault().register(this);
         setRecyclerView();
         getKeep();
     }

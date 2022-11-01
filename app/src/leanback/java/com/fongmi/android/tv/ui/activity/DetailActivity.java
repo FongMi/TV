@@ -150,7 +150,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     @Override
     protected void initEvent() {
-        EventBus.getDefault().register(this);
         mControl.replay.setOnClickListener(view -> getPlayer(true));
         mBinding.video.setOnClickListener(view -> enterFullscreen());
         mBinding.desc.setOnClickListener(view -> onDesc());
