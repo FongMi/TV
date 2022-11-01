@@ -40,7 +40,7 @@
             android:shadowRadius="1"
             android:textColor="@color/white"
             android:textSize="20sp"
-            tools:text="07/25 09:20:00" />
+            tools:text="09:20:00" />
 
     </LinearLayout>
 
