@@ -3,14 +3,14 @@ package com.fongmi.android.tv.ui.custom;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class CustomScroller extends RecyclerView.OnScrollListener {
+public class CustomScrollerVod extends RecyclerView.OnScrollListener {
 
     private final Callback callback;
     private boolean loading;
     private boolean more;
     private int page;
 
-    public CustomScroller(Callback callback) {
+    public CustomScrollerVod(Callback callback) {
         this.callback = callback;
         this.page = 1;
     }

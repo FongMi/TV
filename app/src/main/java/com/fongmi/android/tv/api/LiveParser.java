@@ -30,11 +30,11 @@ public class LiveParser {
     }
 
     private static void m3u(Live live, String text) {
-        Channel channel = new Channel("");
+        Channel channel = Channel.create("");
         for (String line : text.split("\n")) {
             if (line.startsWith("#EXTINF:")) {
-                Group group = live.find(new Group(extract(line, GROUP)));
-                channel = group.find(new Channel(extract(line, NAME)));
+                Group group = live.find(Group.create(extract(line, GROUP)));
+                channel = group.find(Channel.create(extract(line, NAME)));
                 channel.setLogo(extract(line, LOGO));
             } else if (line.contains("://")) {
                 channel.getUrls().add(line);
@@ -47,12 +47,11 @@ public class LiveParser {
             String[] split = line.split(",");
             if (split.length < 2) continue;
             if (line.contains("#genre#")) {
-                live.getGroups().add(new Group(split[0]));
+                live.getGroups().add(Group.create(split[0]));
             }
             if (split[1].contains("://")) {
                 Group group = live.getGroups().get(live.getGroups().size() - 1);
-                Channel channel = group.find(new Channel(split[0]));
-                channel.addUrls(split[1].split("#"));
+                group.find(Channel.create(split[0])).addUrls(split[1].split("#"));
             }
         }
     }

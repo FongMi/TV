@@ -8,6 +8,7 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Group;
+import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.net.Callback;
@@ -131,24 +132,36 @@ public class LiveConfig {
     }
 
     public void setKeep(Group group, Channel channel) {
-        Prefers.putKeep(home.getName() + AppDatabase.SYMBOL + group.getName() + AppDatabase.SYMBOL + channel.getName());
+        if (!group.isHidden()) Prefers.putKeep(home.getName() + AppDatabase.SYMBOL + group.getName() + AppDatabase.SYMBOL + channel.getName());
     }
 
-    public int[] getKeep() {
+    public void setKeep(List<Group> items) {
+        List<String> key = new ArrayList<>();
+        for (Keep keep : Keep.getLive()) key.add(keep.getKey());
+        for (Group group : items) {
+            if (group.isKeep()) continue;
+            for (Channel channel : group.getChannel()) {
+                if (key.contains(channel.getName())) {
+                    items.get(0).add(channel);
+                }
+            }
+        }
+    }
+
+    public int[] getKeep(List<Group> items) {
         String[] splits = Prefers.getKeep().split(AppDatabase.SYMBOL);
-        if (!home.getName().equals(splits[0])) return new int[]{0, 0};
-        for (int i = 0; i < home.getGroups().size(); i++) {
-            Group group = home.getGroups().get(i);
+        if (!home.getName().equals(splits[0])) return new int[]{1, 0};
+        for (int i = 0; i < items.size(); i++) {
+            Group group = items.get(i);
             if (group.getName().equals(splits[1])) {
                 int j = group.find(splits[2]);
                 if (j != -1) return new int[]{i, j};
             }
         }
-        return new int[]{0, 0};
+        return new int[]{1, 0};
     }
 
-    public int[] find(String number) {
-        List<Group> items = home.getGroups();
+    public int[] find(String number, List<Group> items) {
         for (int i = 0; i < items.size(); i++) {
             int j = items.get(i).find(Integer.parseInt(number));
             if (j != -1) return new int[]{i, j};

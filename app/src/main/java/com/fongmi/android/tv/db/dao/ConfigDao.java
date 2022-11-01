@@ -20,8 +20,11 @@ public abstract class ConfigDao extends BaseDao<Config> {
     public abstract Config findByUrl(String url);
 
     @Query("SELECT * FROM Config WHERE type = :type ORDER BY time DESC LIMIT 1")
-    public abstract Config findOne(int type);
+    public abstract Config find(int type);
 
     @Query("DELETE FROM Config WHERE url = :url")
     public abstract void delete(String url);
+
+    @Query("DELETE FROM Config WHERE type = :type")
+    public abstract void delete(int type);
 }

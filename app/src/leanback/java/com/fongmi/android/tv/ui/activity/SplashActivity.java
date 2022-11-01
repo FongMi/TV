@@ -11,6 +11,7 @@ import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.api.LiveConfig;
+import com.fongmi.android.tv.api.WallConfig;
 import com.fongmi.android.tv.databinding.ActivitySplashBinding;
 import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.utils.Notify;
@@ -33,6 +34,7 @@ public class SplashActivity extends BaseActivity {
 
     @Override
     protected void initView() {
+        WallConfig.get().init();
         LiveConfig.get().init().load();
         ApiConfig.get().init().load(getCallback());
         mBinding.title.animate().alpha(1).setDuration(1000).setListener(onAnimationEnd()).start();

@@ -11,9 +11,11 @@
     <string name="vod_last">上次看到<xliff:g name="name">%s</xliff:g></string>
 
     <!-- Live -->
+    <string name="live_pass">密碼</string>
+    <string name="live_setting">設定</string>
+    <string name="live_epg_empty">暫無頻道資訊</string>
     <string name="live_epg_now">正在播放：<xliff:g name="name">%s</xliff:g>/<xliff:g name="name">%s</xliff:g></string>
     <string name="live_epg_next">下個節目：<xliff:g name="name">%s</xliff:g>/<xliff:g name="name">%s</xliff:g></string>
-    <string name="live_epg_empty">暫無頻道資訊</string>
     <string name="live_line">來源 <xliff:g name="name">%s</xliff:g>/<xliff:g name="name">%s</xliff:g></string>
 
     <!-- Push -->
@@ -29,9 +31,11 @@
     <string name="detail_actor">演員：<xliff:g name="name">%s</xliff:g></string>
     <string name="detail_content">簡介：<xliff:g name="name">%s</xliff:g></string>
     <string name="detail_desc">簡介</string>
-    <string name="detail_keep">收藏</string>
-    <string name="detail_keep_add">已加入收藏</string>
-    <string name="detail_keep_del">已取消收藏</string>
+
+    <!-- Keep -->
+    <string name="keep">收藏</string>
+    <string name="keep_add">已加入收藏</string>
+    <string name="keep_del">已取消收藏</string>
 
     <!-- Play -->
     <string name="play">播放</string>
@@ -57,6 +61,7 @@
     <!-- Setting -->
     <string name="setting_vod">點播</string>
     <string name="setting_live">直播</string>
+    <string name="setting_wall">壁紙</string>
     <string name="setting_render">渲染方式</string>
     <string name="setting_scale">縮放比例</string>
     <string name="setting_quality">圖片品質</string>

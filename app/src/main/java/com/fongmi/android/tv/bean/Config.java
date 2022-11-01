@@ -93,30 +93,28 @@ public class Config {
         return this;
     }
 
-    public boolean isVod() {
-        return getType() == 0;
-    }
-
-    public boolean isLive() {
-        return getType() == 1;
-    }
-
     public static List<Config> getAll(int type) {
         return AppDatabase.get().getConfigDao().findByType(type);
     }
 
-    public static void delete(String url) {
-        AppDatabase.get().getConfigDao().delete(url);
+    public static void delete(String url, int type) {
+        if (type == 2) AppDatabase.get().getConfigDao().delete(type);
+        else AppDatabase.get().getConfigDao().delete(url);
     }
 
     public static Config vod() {
-        Config item = AppDatabase.get().getConfigDao().findOne(0);
+        Config item = AppDatabase.get().getConfigDao().find(0);
         return item == null ? create("", 0) : item;
     }
 
     public static Config live() {
-        Config item = AppDatabase.get().getConfigDao().findOne(1);
+        Config item = AppDatabase.get().getConfigDao().find(1);
         return item == null ? create("", 1) : item;
+    }
+
+    public static Config wall() {
+        Config item = AppDatabase.get().getConfigDao().find(2);
+        return item == null ? create("", 2) : item;
     }
 
     public static Config find(int id) {

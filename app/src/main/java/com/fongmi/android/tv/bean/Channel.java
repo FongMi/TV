@@ -50,6 +50,10 @@ public class Channel {
         return new Channel(name);
     }
 
+    public static Channel create(Channel channel) {
+        return new Channel().copy(channel);
+    }
+
     public Channel() {
     }
 
@@ -145,6 +149,14 @@ public class Channel {
         getUrls().addAll(new ArrayList<>(Arrays.asList(urls)));
     }
 
+    public void nextLine() {
+        setLine(getLine() < getUrls().size() - 1 ? getLine() + 1 : 0);
+    }
+
+    public void prevLine() {
+        setLine(getLine() > 0 ? getLine() - 1 : getUrls().size() - 1);
+    }
+
     public boolean isLastLine() {
         return getLine() == getUrls().size() - 1;
     }
@@ -155,16 +167,6 @@ public class Channel {
 
     public Channel setNumber(int number) {
         setNumber(String.format(Locale.getDefault(), "%03d", number));
-        return this;
-    }
-
-    public Channel nextLine() {
-        setLine(getLine() < getUrls().size() - 1 ? getLine() + 1 : 0);
-        return this;
-    }
-
-    public Channel prevLine() {
-        setLine(getLine() > 0 ? getLine() - 1 : getUrls().size() - 1);
         return this;
     }
 
@@ -190,6 +192,15 @@ public class Channel {
         if (getUa().isEmpty()) return map;
         map.put("User-Agent", getUa());
         return map;
+    }
+
+    public Channel copy(Channel item) {
+        setNumber(item.getNumber());
+        setLogo(item.getLogo());
+        setName(item.getName());
+        setUrls(item.getUrls());
+        setUa(item.getUa());
+        return this;
     }
 
     @Override
