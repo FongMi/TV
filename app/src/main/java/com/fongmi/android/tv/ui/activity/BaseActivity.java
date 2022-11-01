@@ -34,7 +34,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         setContentView(getBinding().getRoot());
         EventBus.getDefault().register(this);
         Utils.hideSystemUI(this);
-        setWallpaper();
+        setWall();
         initView();
         initEvent();
     }
@@ -49,8 +49,8 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected void initEvent() {
     }
 
-    private void setWallpaper() {
-        File file = FileUtil.getWallpaper(Prefers.getWallpaper());
+    private void setWall() {
+        File file = FileUtil.getWall(Prefers.getWall());
         if (file.exists() && file.length() > 0) getWindow().setBackgroundDrawable(Drawable.createFromPath(file.getPath()));
         else getWindow().setBackgroundDrawableResource(ResUtil.getDrawable(file.getName()));
     }
@@ -64,7 +64,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefreshEvent(RefreshEvent event) {
-        if (event.getType() == RefreshEvent.Type.WALLPAPER) setWallpaper();
+        if (event.getType() == RefreshEvent.Type.WALL) setWall();
     }
 
     @Override
