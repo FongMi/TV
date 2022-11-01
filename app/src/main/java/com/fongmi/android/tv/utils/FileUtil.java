@@ -15,6 +15,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URLConnection;
 import java.security.MessageDigest;
@@ -47,6 +48,10 @@ public class FileUtil {
         return getCacheFile(Utils.getMD5(fileName).concat(".jar"));
     }
 
+    public static File getWallpaper(int index) {
+        return getCacheFile("wallpaper_" + index);
+    }
+
     public static File getLocal(String path) {
         if (path.contains(getRootPath())) return new File(path);
         return new File(path.replace("file:/", getRootPath()));
@@ -61,7 +66,7 @@ public class FileUtil {
         return TextUtils.isEmpty(mimeType) ? "*/*" : mimeType;
     }
 
-    public static File write(File file, byte[] data) throws Exception {
+    public static File write(File file, byte[] data) throws IOException {
         FileOutputStream fos = new FileOutputStream(file);
         fos.write(data);
         fos.flush();

@@ -26,6 +26,10 @@ public class RefreshEvent {
         EventBus.getDefault().post(new RefreshEvent(Type.SIZE));
     }
 
+    public static void wallpaper() {
+        EventBus.getDefault().post(new RefreshEvent(Type.WALLPAPER));
+    }
+
     private RefreshEvent(Type type) {
         this.type = type;
     }
@@ -35,6 +39,6 @@ public class RefreshEvent {
     }
 
     public enum Type {
-        IMAGE, VIDEO, HISTORY, KEEP, SIZE
+        IMAGE, VIDEO, HISTORY, KEEP, SIZE, WALLPAPER
     }
 }

@@ -8,10 +8,12 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.Settings;
+import android.text.TextUtils;
 import android.view.View;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 import androidx.viewbinding.ViewBinding;
@@ -29,14 +31,22 @@ import com.fongmi.android.tv.impl.ConfigCallback;
 import com.fongmi.android.tv.impl.LiveCallback;
 import com.fongmi.android.tv.impl.SiteCallback;
 import com.fongmi.android.tv.net.Callback;
+import com.fongmi.android.tv.net.OKHttp;
 import com.fongmi.android.tv.ui.custom.dialog.ConfigDialog;
 import com.fongmi.android.tv.ui.custom.dialog.HistoryDialog;
 import com.fongmi.android.tv.ui.custom.dialog.LiveDialog;
 import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
+import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Updater;
+
+import java.io.File;
+import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Response;
 
 public class SettingActivity extends BaseActivity implements ConfigCallback, SiteCallback, LiveCallback {
 
@@ -59,15 +69,17 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
     protected void initView() {
         mBinding.vodUrl.setText(ApiConfig.getUrl());
         mBinding.liveUrl.setText(LiveConfig.getUrl());
+        mBinding.versionText.setText(BuildConfig.VERSION_NAME);
+        mBinding.wallpaperUrl.setText(ApiConfig.get().getWallpaper());
         mBinding.sizeText.setText(ResUtil.getStringArray(R.array.select_size)[Prefers.getSize()]);
         mBinding.scaleText.setText(ResUtil.getStringArray(R.array.select_scale)[Prefers.getScale()]);
         mBinding.renderText.setText(ResUtil.getStringArray(R.array.select_render)[Prefers.getRender()]);
         mBinding.qualityText.setText(ResUtil.getStringArray(R.array.select_quality)[Prefers.getQuality()]);
-        mBinding.versionText.setText(BuildConfig.VERSION_NAME);
     }
 
     @Override
     protected void initEvent() {
+        mBinding.wallpaper.setOnClickListener(view -> Notify.show("下個版本見"));
         mBinding.vodHome.setOnClickListener(view -> SiteDialog.create(this).show());
         mBinding.liveHome.setOnClickListener(view -> LiveDialog.create(this).show());
         mBinding.vod.setOnClickListener(view -> ConfigDialog.create(this).type(0).show());
@@ -75,6 +87,8 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.vodHistory.setOnClickListener(view -> HistoryDialog.create(this).type(0).show());
         mBinding.liveHistory.setOnClickListener(view -> HistoryDialog.create(this).type(1).show());
         mBinding.version.setOnClickListener(view -> Updater.create(this).force().start());
+        mBinding.wallpaperDefault.setOnClickListener(this::setWallpaperDefault);
+        mBinding.wallpaperRefresh.setOnClickListener(this::setWallpaperRefresh);
         mBinding.quality.setOnClickListener(this::setQuality);
         mBinding.render.setOnClickListener(this::setRender);
         mBinding.scale.setOnClickListener(this::setScale);
@@ -135,6 +149,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
     private void refresh(int resId) {
         Notify.dismiss();
         Notify.show(resId);
+        mBinding.wallpaperUrl.setText(ApiConfig.get().getWallpaper());
         if (resId != 0) config.delete();
         if (config.isLive()) return;
         RefreshEvent.history();
@@ -180,5 +195,24 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         Prefers.putSize(index = index == array.length - 1 ? 0 : ++index);
         mBinding.sizeText.setText(array[index]);
         RefreshEvent.size();
+    }
+
+    private void setWallpaperDefault(View view) {
+        int index = Prefers.getWallpaper();
+        Prefers.putWallpaper(index == 4 ? 1 : ++index);
+        RefreshEvent.wallpaper();
+    }
+
+    private void setWallpaperRefresh(View view) {
+        if (TextUtils.isEmpty(ApiConfig.get().getWallpaper())) return;
+        OKHttp.newCall(ApiConfig.get().getWallpaper()).enqueue(new Callback() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                File file = FileUtil.write(FileUtil.getWallpaper(0), response.body().bytes());
+                if (!file.exists() || file.length() == 0) return;
+                Prefers.putWallpaper(0);
+                RefreshEvent.wallpaper();
+            }
+        });
     }
 }

@@ -59,6 +59,14 @@ public class Prefers {
         put("keep", keep);
     }
 
+    public static int getWallpaper() {
+        return getInt("wallpaper", 1);
+    }
+
+    public static void putWallpaper(int wallpaper) {
+        put("wallpaper", wallpaper);
+    }
+
     public static int getRender() {
         return getInt("render", 0);
     }
@@ -68,7 +76,7 @@ public class Prefers {
     }
 
     public static int getQuality() {
-        return getInt("quality", 1);
+        return getInt("quality", 2);
     }
 
     public static void putQuality(int quality) {
