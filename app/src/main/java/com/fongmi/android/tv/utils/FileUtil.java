@@ -16,7 +16,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.URLConnection;
 import java.security.MessageDigest;
 
@@ -48,7 +50,7 @@ public class FileUtil {
         return getCacheFile(Utils.getMD5(fileName).concat(".jar"));
     }
 
-    public static File getWallpaper(int index) {
+    public static File getWall(int index) {
         return getCacheFile("wallpaper_" + index);
     }
 
@@ -85,6 +87,16 @@ public class FileUtil {
             return Utils.substring(sb.toString());
         } catch (Exception e) {
             return "";
+        }
+    }
+
+    public static void copy(File src, File dst) throws IOException {
+        try (InputStream in = new FileInputStream(src)) {
+            try (OutputStream out = new FileOutputStream(dst)) {
+                int len;
+                byte[] buf = new byte[1024];
+                while ((len = in.read(buf)) > 0) out.write(buf, 0, len);
+            }
         }
     }
 
