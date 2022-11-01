@@ -38,6 +38,7 @@ public class ApiConfig {
     private List<Live> lives;
     private JarLoader jLoader;
     private PyLoader pLoader;
+    private String wallpaper;
     private Handler handler;
     private Config config;
     private Parse parse;
@@ -97,6 +98,7 @@ public class ApiConfig {
         this.parses.clear();
         this.jLoader.clear();
         this.pLoader.clear();
+        this.wallpaper = null;
         LiveConfig.get().remove(lives);
         return this;
     }
@@ -130,7 +132,7 @@ public class ApiConfig {
     private void parseConfig(JsonObject object, Callback callback) {
         try {
             parseJson(object);
-            jLoader.parseJar("", Json.safeString(object, "spider", ""));
+            jLoader.parseJar("", Json.safeString(object, "spider"));
             config.json(object.toString()).update();
             handler.post(callback::success);
         } catch (Exception e) {
@@ -157,6 +159,7 @@ public class ApiConfig {
         }
         if (home == null) setHome(sites.isEmpty() ? new Site() : sites.get(0));
         if (parse == null) setParse(parses.isEmpty() ? new Parse() : parses.get(0));
+        setWallpaper(Json.safeString(object, "wallpaper"));
         flags.addAll(Json.safeListString(object, "flags"));
         ads.addAll(Json.safeListString(object, "ads"));
     }
@@ -207,20 +210,24 @@ public class ApiConfig {
         return lives == null ? Collections.emptyList() : lives;
     }
 
-    public void setLives(List<Live> lives) {
-        this.lives = lives;
-    }
-
     public List<Parse> getParses() {
         return parses == null ? Collections.emptyList() : parses;
+    }
+
+    public List<String> getFlags() {
+        return flags == null ? Collections.emptyList() : flags;
     }
 
     public String getAds() {
         return ads == null ? "" : ads.toString();
     }
 
-    public List<String> getFlags() {
-        return flags == null ? Collections.emptyList() : flags;
+    public String getWallpaper() {
+        return TextUtils.isEmpty(wallpaper) ? "" : wallpaper;
+    }
+
+    public void setWallpaper(String wallpaper) {
+        this.wallpaper = wallpaper;
     }
 
     public Config getConfig() {
