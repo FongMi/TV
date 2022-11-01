@@ -38,9 +38,9 @@ public class ApiConfig {
     private List<Live> lives;
     private JarLoader jLoader;
     private PyLoader pLoader;
-    private String wallpaper;
     private Handler handler;
     private Config config;
+    private String wall;
     private Parse parse;
     private Site home;
 
@@ -92,13 +92,13 @@ public class ApiConfig {
 
     public ApiConfig clear() {
         this.home = null;
+        this.wall = null;
         this.ads.clear();
         this.sites.clear();
         this.flags.clear();
         this.parses.clear();
         this.jLoader.clear();
         this.pLoader.clear();
-        this.wallpaper = null;
         LiveConfig.get().remove(lives);
         return this;
     }
@@ -159,9 +159,9 @@ public class ApiConfig {
         }
         if (home == null) setHome(sites.isEmpty() ? new Site() : sites.get(0));
         if (parse == null) setParse(parses.isEmpty() ? new Parse() : parses.get(0));
-        setWallpaper(Json.safeString(object, "wallpaper"));
         flags.addAll(Json.safeListString(object, "flags"));
         ads.addAll(Json.safeListString(object, "ads"));
+        setWall(Json.safeString(object, "wallpaper"));
     }
 
     private String parseExt(String ext) {
@@ -222,14 +222,6 @@ public class ApiConfig {
         return ads == null ? "" : ads.toString();
     }
 
-    public String getWallpaper() {
-        return TextUtils.isEmpty(wallpaper) ? "" : wallpaper;
-    }
-
-    public void setWallpaper(String wallpaper) {
-        this.wallpaper = wallpaper;
-    }
-
     public Config getConfig() {
         return config;
     }
@@ -243,6 +235,15 @@ public class ApiConfig {
         this.parse.setActivated(true);
         Prefers.putParse(parse.getName());
         for (Parse item : parses) item.setActivated(parse);
+    }
+
+    public String getWall() {
+        return TextUtils.isEmpty(wall) ? "" : wall;
+    }
+
+    public void setWall(String wall) {
+        if (Config.wall().getUrl().isEmpty()) WallConfig.get().setUrl(wall);
+        this.wall = wall;
     }
 
     public Site getHome() {

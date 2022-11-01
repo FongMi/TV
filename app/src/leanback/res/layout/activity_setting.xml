@@ -138,7 +138,7 @@
         android:orientation="horizontal">
 
         <LinearLayout
-            android:id="@+id/wallpaper"
+            android:id="@+id/wall"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
@@ -151,12 +151,12 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/setting_wallpaper"
+                android:text="@string/setting_wall"
                 android:textColor="@color/white"
                 android:textSize="18sp" />
 
             <TextView
-                android:id="@+id/wallpaperUrl"
+                android:id="@+id/wallUrl"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="end"
@@ -169,7 +169,7 @@
         </LinearLayout>
 
         <ImageView
-            android:id="@+id/wallpaperDefault"
+            android:id="@+id/wallDefault"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
@@ -181,7 +181,7 @@
             android:src="@drawable/ic_home" />
 
         <ImageView
-            android:id="@+id/wallpaperRefresh"
+            android:id="@+id/wallRefresh"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/selector_item"
