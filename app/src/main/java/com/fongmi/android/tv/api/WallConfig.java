@@ -11,6 +11,7 @@ import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Prefers;
 
 import java.io.File;
+import java.io.IOException;
 
 public class WallConfig {
 
@@ -49,16 +50,17 @@ public class WallConfig {
         this.url = url;
     }
 
+    public void load() {
+        load(new Callback());
+    }
+
     public void load(Callback callback) {
         new Thread(() -> parse(callback)).start();
     }
 
     private void parse(Callback callback) {
         try {
-            File file = FileUtil.getWall(0);
-            if (url.startsWith("file")) FileUtil.copy(FileUtil.getLocal(url), file);
-            else if (url.startsWith("http")) FileUtil.write(file, OKHttp.newCall(url).execute().body().bytes());
-            else file.delete();
+            File file = write(FileUtil.getWall(0));
             if (file.exists() && file.length() > 0) refresh(0);
             else setUrl(ApiConfig.get().getWall());
             handler.post(callback::success);
@@ -67,6 +69,13 @@ public class WallConfig {
             handler.post(callback::success);
             e.printStackTrace();
         }
+    }
+
+    private File write(File file) throws IOException {
+        if (url.startsWith("file")) FileUtil.copy(FileUtil.getLocal(url), file);
+        else if (url.startsWith("http")) FileUtil.write(file, OKHttp.newCall(url).execute().body().bytes());
+        else file.delete();
+        return file;
     }
 
     public static void refresh(int index) {
