@@ -12,6 +12,7 @@ import androidx.appcompat.app.AlertDialog;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.api.LiveConfig;
+import com.fongmi.android.tv.api.WallConfig;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.databinding.DialogConfigBinding;
 import com.fongmi.android.tv.event.ServerEvent;
@@ -66,8 +67,7 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
 
     private void initView() {
         String address = Server.get().getAddress(false);
-        url = type == 0 ? ApiConfig.getUrl() : LiveConfig.getUrl();
-        binding.text.setText(url);
+        binding.text.setText(url = getUrl());
         binding.text.setSelection(url.length());
         binding.code.setImageBitmap(QRCode.getBitmap(address, 200, 0));
         binding.info.setText(ResUtil.getString(R.string.push_info, address).replace("，", "\n"));
@@ -83,11 +83,23 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
         });
     }
 
+    private String getUrl() {
+        switch (type) {
+            case 0:
+                return ApiConfig.getUrl();
+            case 1:
+                return LiveConfig.getUrl();
+            case 2:
+                return WallConfig.getUrl();
+            default:
+                return "";
+        }
+    }
+
     private void onPositive(View view) {
-        String text = binding.text.getText().toString().trim();
-        Config item = Config.find(Utils.checkClan(text), type);
-        if (text.isEmpty()) Config.delete(url);
-        callback.setConfig(item);
+        String text = Utils.checkClan(binding.text.getText().toString().trim());
+        if (!url.equals(text)) callback.setConfig(Config.find(text, type));
+        if (text.isEmpty()) Config.delete(url, type);
         dialog.dismiss();
     }
 

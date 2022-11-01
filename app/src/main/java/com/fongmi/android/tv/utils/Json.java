@@ -21,9 +21,9 @@ public class Json {
         }
     }
 
-    public static String safeString(JsonObject obj, String key, String value) {
+    public static String safeString(JsonObject obj, String key) {
         if (obj.has(key)) return obj.getAsJsonPrimitive(key).getAsString().trim();
-        else return value;
+        else return "";
     }
 
     public static List<String> safeListString(JsonObject obj, String key) {

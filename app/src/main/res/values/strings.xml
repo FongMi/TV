@@ -11,9 +11,11 @@
     <string name="vod_last">Last seen <xliff:g name="name">%s</xliff:g></string>
 
     <!-- Live -->
+    <string name="live_pass">Pass</string>
+    <string name="live_setting">Setting</string>
+    <string name="live_epg_empty">No schedule</string>
     <string name="live_epg_now">Playing: <xliff:g name="name">%s</xliff:g>/<xliff:g name="name">%s</xliff:g></string>
     <string name="live_epg_next">Nex: <xliff:g name="name">%s</xliff:g>/<xliff:g name="name">%s</xliff:g></string>
-    <string name="live_epg_empty">No schedule</string>
     <string name="live_line">Line <xliff:g name="name">%s</xliff:g>/<xliff:g name="name">%s</xliff:g></string>
 
     <!-- Push -->
@@ -29,9 +31,11 @@
     <string name="detail_actor">Actor: <xliff:g name="name">%s</xliff:g></string>
     <string name="detail_content">Summary: <xliff:g name="name">%s</xliff:g></string>
     <string name="detail_desc">Summary</string>
-    <string name="detail_keep">Keep</string>
-    <string name="detail_keep_add">Added</string>
-    <string name="detail_keep_del">Removed</string>
+
+    <!-- Keep -->
+    <string name="keep">Keep</string>
+    <string name="keep_add">Added</string>
+    <string name="keep_del">Removed</string>
 
     <!-- Play -->
     <string name="play">Play</string>
@@ -57,6 +61,7 @@
     <!-- Setting -->
     <string name="setting_vod">Vod</string>
     <string name="setting_live">Live</string>
+    <string name="setting_wall">Wallpaper</string>
     <string name="setting_render">Render type</string>
     <string name="setting_scale">Scale type</string>
     <string name="setting_quality">Image quality</string>

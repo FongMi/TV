@@ -6,6 +6,8 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.utils.ResUtil;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
@@ -22,12 +24,17 @@ public class Group {
     @SerializedName("pass")
     private String pass;
 
-    private boolean selected;
     private int position;
+
+    public static Group create(String name) {
+        return new Group(name);
+    }
 
     public Group(String name) {
         this.name = name;
-        if (name.contains("_")) setPass(name.split("_")[1]);
+        if (!name.contains("_")) return;
+        setName(name.split("_")[0]);
+        setPass(name.split("_")[1]);
     }
 
     public List<Channel> getChannel() {
@@ -62,18 +69,6 @@ public class Group {
         this.pass = pass;
     }
 
-    public boolean isSelected() {
-        return selected;
-    }
-
-    public void setSelected(boolean selected) {
-        this.selected = selected;
-    }
-
-    public void setSelected(Group item) {
-        this.selected = item.equals(this);
-    }
-
     public int getPosition() {
         return position;
     }
@@ -84,6 +79,18 @@ public class Group {
 
     public boolean isHidden() {
         return !TextUtils.isEmpty(getPass());
+    }
+
+    public boolean isKeep() {
+        return getName().equals(ResUtil.getString(R.string.keep));
+    }
+
+    public boolean isSetting() {
+        return getName().equals(ResUtil.getString(R.string.live_setting));
+    }
+
+    public boolean skip() {
+        return isKeep() || isSetting();
     }
 
     public int getVisible() {
@@ -100,6 +107,12 @@ public class Group {
 
     public int find(String name) {
         return getChannel().lastIndexOf(Channel.create(name));
+    }
+
+    public void add(Channel channel) {
+        int index = getChannel().indexOf(channel);
+        if (index == -1) getChannel().add(Channel.create(channel));
+        else getChannel().get(index).getUrls().addAll(channel.getUrls());
     }
 
     public Channel find(Channel channel) {

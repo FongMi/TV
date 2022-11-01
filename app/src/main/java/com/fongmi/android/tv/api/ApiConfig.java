@@ -40,6 +40,7 @@ public class ApiConfig {
     private PyLoader pLoader;
     private Handler handler;
     private Config config;
+    private String wall;
     private Parse parse;
     private Site home;
 
@@ -91,6 +92,7 @@ public class ApiConfig {
 
     public ApiConfig clear() {
         this.home = null;
+        this.wall = null;
         this.ads.clear();
         this.sites.clear();
         this.flags.clear();
@@ -130,7 +132,7 @@ public class ApiConfig {
     private void parseConfig(JsonObject object, Callback callback) {
         try {
             parseJson(object);
-            jLoader.parseJar("", Json.safeString(object, "spider", ""));
+            jLoader.parseJar("", Json.safeString(object, "spider"));
             config.json(object.toString()).update();
             handler.post(callback::success);
         } catch (Exception e) {
@@ -159,6 +161,7 @@ public class ApiConfig {
         if (parse == null) setParse(parses.isEmpty() ? new Parse() : parses.get(0));
         flags.addAll(Json.safeListString(object, "flags"));
         ads.addAll(Json.safeListString(object, "ads"));
+        setWall(Json.safeString(object, "wallpaper"));
     }
 
     private String parseExt(String ext) {
@@ -207,20 +210,16 @@ public class ApiConfig {
         return lives == null ? Collections.emptyList() : lives;
     }
 
-    public void setLives(List<Live> lives) {
-        this.lives = lives;
-    }
-
     public List<Parse> getParses() {
         return parses == null ? Collections.emptyList() : parses;
     }
 
-    public String getAds() {
-        return ads == null ? "" : ads.toString();
-    }
-
     public List<String> getFlags() {
         return flags == null ? Collections.emptyList() : flags;
+    }
+
+    public String getAds() {
+        return ads == null ? "" : ads.toString();
     }
 
     public Config getConfig() {
@@ -236,6 +235,15 @@ public class ApiConfig {
         this.parse.setActivated(true);
         Prefers.putParse(parse.getName());
         for (Parse item : parses) item.setActivated(parse);
+    }
+
+    public String getWall() {
+        return TextUtils.isEmpty(wall) ? "" : wall;
+    }
+
+    public void setWall(String wall) {
+        if (Config.wall().getUrl().isEmpty()) WallConfig.get().setUrl(wall);
+        this.wall = wall;
     }
 
     public Site getHome() {
