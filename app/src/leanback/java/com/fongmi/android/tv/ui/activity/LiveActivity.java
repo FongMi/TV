@@ -140,7 +140,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         List<Group> items = new ArrayList<>();
         items.add(Group.create(ResUtil.getString(R.string.keep)));
         for (Group group : LiveConfig.get().getHome().getGroups()) (group.isHidden() ? mHides : items).add(group);
-        //items.add(Group.create(ResUtil.getString(R.string.live_setting)));
         mGroupAdapter.setItems(items, null);
         LiveConfig.get().setKeep(items);
         setPosition(LiveConfig.get().getKeep(items));

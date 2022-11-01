@@ -26,7 +26,6 @@
         android:layout_height="wrap_content"
         android:duplicateParentState="true"
         android:ellipsize="marquee"
-        android:letterSpacing="0.05"
         android:singleLine="true"
         android:textColor="@color/group"
         android:textSize="16sp"
