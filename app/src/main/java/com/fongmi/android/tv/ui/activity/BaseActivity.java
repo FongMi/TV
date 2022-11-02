@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewbinding.ViewBinding;
 
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Prefers;
@@ -52,7 +53,8 @@ public abstract class BaseActivity extends AppCompatActivity {
     private void setWall() {
         File file = FileUtil.getWall(Prefers.getWall());
         if (file.exists() && file.length() > 0) getWindow().setBackgroundDrawable(Drawable.createFromPath(file.getPath()));
-        else getWindow().setBackgroundDrawableResource(ResUtil.getDrawable(file.getName()));
+        else if (Prefers.getWall() > 0) getWindow().setBackgroundDrawableResource(ResUtil.getDrawable(file.getName()));
+        else getWindow().setBackgroundDrawableResource(R.drawable.wallpaper_1);
     }
 
     private void hackResources() {
