@@ -174,7 +174,7 @@ public class LiveConfig {
     }
 
     public Config getConfig() {
-        return config;
+        return config == null ? Config.live() : config;
     }
 
     public Live getHome() {
