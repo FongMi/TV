@@ -223,7 +223,7 @@ public class ApiConfig {
     }
 
     public Config getConfig() {
-        return config;
+        return config == null ? Config.vod() : config;
     }
 
     public Parse getParse() {
