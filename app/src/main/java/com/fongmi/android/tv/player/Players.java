@@ -192,8 +192,8 @@ public class Players implements Player.Listener, ParseTask.Callback {
 
     @Override
     public void onPlayerError(@NonNull PlaybackException error) {
-        setErrorCode(error.errorCode);
         PlayerEvent.error(R.string.error_play_format, true);
+        setErrorCode(error.errorCode);
     }
 
     @Override
