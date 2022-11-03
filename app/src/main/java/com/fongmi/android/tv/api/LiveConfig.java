@@ -49,6 +49,7 @@ public class LiveConfig {
     }
 
     public LiveConfig init() {
+        this.home = null;
         this.config = Config.live();
         this.lives = new ArrayList<>();
         this.handler = new Handler(Looper.getMainLooper());
@@ -61,6 +62,7 @@ public class LiveConfig {
     }
 
     public LiveConfig clear() {
+        this.home = null;
         this.lives.clear();
         this.lives.addAll(ApiConfig.get().getLives());
         return this;
