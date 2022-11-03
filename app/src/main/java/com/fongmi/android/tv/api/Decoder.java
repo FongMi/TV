@@ -88,9 +88,7 @@ public class Decoder {
 
     private static String extract(String data) {
         Matcher matcher = Pattern.compile("[A-Za-z0-9]{8}\\*\\*").matcher(data);
-        if (!matcher.find()) return "";
-        String key = matcher.group();
-        return data.substring(data.indexOf(key) + key.length());
+        return matcher.find() ? data.substring(data.indexOf(matcher.group()) + 10) : "";
     }
 
     private static byte[] padEnd(String key) {
