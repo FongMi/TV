@@ -92,7 +92,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
     }
 
     private void checkPermission() {
-        if (config.getUrl().startsWith("file/") && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
+        if (config.getUrl().startsWith("file") && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
             openSetting();
         } else if (config.getUrl().startsWith("file") && Build.VERSION.SDK_INT < Build.VERSION_CODES.R && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             launcherString.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
