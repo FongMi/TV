@@ -73,6 +73,8 @@ public class ApiConfig {
     }
 
     public ApiConfig init() {
+        this.home = null;
+        this.wall = null;
         this.config = Config.vod();
         this.ads = new ArrayList<>();
         this.sites = new ArrayList<>();
@@ -168,6 +170,7 @@ public class ApiConfig {
         if (ext.startsWith("http")) return ext;
         else if (ext.startsWith("file")) return FileUtil.read(ext);
         else if (ext.startsWith("img+")) return Decoder.getExt(ext);
+        else if (ext.contains("http") || ext.contains("file")) return ext;
         else if (ext.endsWith(".json") || ext.endsWith(".py")) return parseExt(Utils.convert(ext));
         return ext;
     }
@@ -223,7 +226,7 @@ public class ApiConfig {
     }
 
     public Config getConfig() {
-        return config;
+        return config == null ? Config.vod() : config;
     }
 
     public Parse getParse() {
