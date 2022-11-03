@@ -26,6 +26,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
                 android:text="@string/setting_vod"
                 android:textColor="@color/white"
                 android:textSize="18sp" />
@@ -34,6 +35,7 @@
                 android:id="@+id/vodUrl"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:ellipsize="middle"
                 android:gravity="end"
                 android:singleLine="true"
                 android:textColor="@color/white"
@@ -88,6 +90,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
                 android:text="@string/setting_live"
                 android:textColor="@color/white"
                 android:textSize="18sp" />
@@ -96,6 +99,7 @@
                 android:id="@+id/liveUrl"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:ellipsize="middle"
                 android:gravity="end"
                 android:singleLine="true"
                 android:textColor="@color/white"
@@ -151,6 +155,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
                 android:text="@string/setting_wall"
                 android:textColor="@color/white"
                 android:textSize="18sp" />
@@ -159,6 +164,7 @@
                 android:id="@+id/wallUrl"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:ellipsize="middle"
                 android:gravity="end"
                 android:singleLine="true"
                 android:textColor="@color/white"
