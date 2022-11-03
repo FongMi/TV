@@ -73,6 +73,8 @@ public class ApiConfig {
     }
 
     public ApiConfig init() {
+        this.home = null;
+        this.wall = null;
         this.config = Config.vod();
         this.ads = new ArrayList<>();
         this.sites = new ArrayList<>();
