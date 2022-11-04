@@ -87,7 +87,7 @@ public class LiveConfig {
 
     private void parseConfig(String json, Callback callback) {
         try {
-            if (!Json.valid(json)) parse(json);
+            if (Json.invalid(json)) parse(json);
             else parse(JsonParser.parseString(json).getAsJsonObject());
             handler.post(callback::success);
         } catch (Exception e) {
