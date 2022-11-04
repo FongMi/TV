@@ -16,7 +16,6 @@ import com.fongmi.android.tv.ui.adapter.KeepAdapter;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.utils.Prefers;
 
-import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
@@ -101,11 +100,5 @@ public class KeepActivity extends BaseActivity implements KeepAdapter.OnClickLis
     public void onBackPressed() {
         if (mAdapter.isDelete()) mAdapter.setDelete(false);
         else super.onBackPressed();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        EventBus.getDefault().unregister(this);
     }
 }
