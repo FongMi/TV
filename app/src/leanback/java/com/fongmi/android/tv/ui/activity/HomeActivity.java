@@ -46,7 +46,6 @@ import com.fongmi.android.tv.utils.Updater;
 import com.fongmi.android.tv.utils.Utils;
 import com.google.common.collect.Lists;
 
-import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
@@ -321,6 +320,5 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     protected void onDestroy() {
         super.onDestroy();
         Server.get().stop();
-        EventBus.getDefault().unregister(this);
     }
 }

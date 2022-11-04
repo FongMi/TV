@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.api.WallConfig;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Prefers;
@@ -51,10 +52,13 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     private void setWall() {
-        File file = FileUtil.getWall(Prefers.getWall());
-        if (file.exists() && file.length() > 0) getWindow().setBackgroundDrawable(Drawable.createFromPath(file.getPath()));
-        else if (Prefers.getWall() > 0) getWindow().setBackgroundDrawableResource(ResUtil.getDrawable(file.getName()));
-        else getWindow().setBackgroundDrawableResource(R.drawable.wallpaper_1);
+        try {
+            File file = FileUtil.getWall(Prefers.getWall());
+            if (file.exists() && file.length() > 0) getWindow().setBackgroundDrawable(WallConfig.drawable(Drawable.createFromPath(file.getPath())));
+            else getWindow().setBackgroundDrawableResource(ResUtil.getDrawable(file.getName()));
+        } catch (Exception e) {
+            getWindow().setBackgroundDrawableResource(R.drawable.wallpaper_1);
+        }
     }
 
     private void hackResources() {
@@ -66,7 +70,9 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefreshEvent(RefreshEvent event) {
-        if (event.getType() == RefreshEvent.Type.WALL) setWall();
+        if (event.getType() != RefreshEvent.Type.WALL) return;
+        WallConfig.get().setDrawable(null);
+        setWall();
     }
 
     @Override
@@ -85,5 +91,11 @@ public abstract class BaseActivity extends AppCompatActivity {
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus) Utils.hideSystemUI(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
     }
 }
