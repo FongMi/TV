@@ -1,6 +1,8 @@
 package com.fongmi.android.tv.utils;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.text.TextUtils;
 import android.widget.ImageView;
 
@@ -14,6 +16,8 @@ import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.signature.ObjectKey;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
+
+import java.io.ByteArrayOutputStream;
 
 public class ImgUtil {
 
@@ -38,5 +42,18 @@ public class ImgUtil {
                 return false;
             }
         };
+    }
+
+    public static byte[] resize(byte[] bytes) {
+        int width = ResUtil.getScreenWidthPx();
+        int height = ResUtil.getScreenHeightPx();
+        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+        if (bitmap.getWidth() < width && bitmap.getHeight() < height) return bytes;
+        Matrix matrix = new Matrix();
+        matrix.postScale((float) width / bitmap.getWidth(), (float) height / bitmap.getHeight());
+        bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, false);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        return baos.toByteArray();
     }
 }

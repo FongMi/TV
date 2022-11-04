@@ -53,9 +53,7 @@ import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.ui.StyledPlayerView;
-import com.google.android.exoplayer2.util.Log;
 
-import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
@@ -688,6 +686,5 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     protected void onDestroy() {
         super.onDestroy();
         mPlayers.release();
-        EventBus.getDefault().unregister(this);
     }
 }

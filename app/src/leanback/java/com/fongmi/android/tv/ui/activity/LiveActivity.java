@@ -39,7 +39,6 @@ import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.ui.StyledPlayerView;
 
-import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
@@ -435,6 +434,5 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         super.onDestroy();
         mPlayers.release();
         Force.get().stop();
-        EventBus.getDefault().unregister(this);
     }
 }
