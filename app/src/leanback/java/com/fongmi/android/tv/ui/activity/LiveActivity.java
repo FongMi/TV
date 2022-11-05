@@ -173,7 +173,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void setChannelActivated() {
         for (int i = 0; i < mChannelAdapter.size(); i++) ((Channel) mChannelAdapter.get(i)).setSelected(mChannel);
-        if (!mBinding.channel.isComputingLayout()) mChannelAdapter.notifyArrayItemRangeChanged(0, mChannelAdapter.size());
+        notifyItemChanged(mBinding.channel, mChannelAdapter);
         getUrl();
     }
 
