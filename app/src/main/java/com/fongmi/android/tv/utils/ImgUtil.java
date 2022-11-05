@@ -24,7 +24,7 @@ public class ImgUtil {
     public static void load(String url, ImageView view) {
         view.setScaleType(ImageView.ScaleType.CENTER);
         if (TextUtils.isEmpty(url)) view.setImageResource(R.drawable.ic_img_error);
-        else Glide.with(App.get()).asBitmap().load(url).skipMemoryCache(true).sizeMultiplier(Prefers.getThumbnail()).signature(new ObjectKey(url + "_" + Prefers.getQuality())).placeholder(R.drawable.ic_img_loading).listener(getListener(view)).into(view);
+        else Glide.with(App.get()).asBitmap().load(url).skipMemoryCache(true).dontAnimate().sizeMultiplier(Prefers.getThumbnail()).signature(new ObjectKey(url + "_" + Prefers.getQuality())).placeholder(R.drawable.ic_img_loading).listener(getListener(view)).into(view);
     }
 
     private static RequestListener<Bitmap> getListener(ImageView view) {
