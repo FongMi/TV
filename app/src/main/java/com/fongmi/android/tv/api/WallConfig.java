@@ -1,9 +1,8 @@
 package com.fongmi.android.tv.api;
 
 import android.graphics.drawable.Drawable;
-import android.os.Handler;
-import android.os.Looper;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.net.Callback;
@@ -18,7 +17,6 @@ import java.io.IOException;
 public class WallConfig {
 
     private Drawable drawable;
-    private Handler handler;
     private String url;
 
     private static class Loader {
@@ -40,7 +38,6 @@ public class WallConfig {
     }
 
     public WallConfig init() {
-        this.handler = new Handler(Looper.getMainLooper());
         this.url = Config.wall().getUrl();
         return this;
     }
@@ -76,10 +73,10 @@ public class WallConfig {
             File file = write(FileUtil.getWall(0));
             if (file.exists() && file.length() > 0) refresh(0);
             else setUrl(ApiConfig.get().getWall());
-            handler.post(callback::success);
+            App.post(callback::success);
         } catch (Exception e) {
             setUrl(ApiConfig.get().getWall());
-            handler.post(callback::success);
+            App.post(callback::success);
             e.printStackTrace();
         }
     }
