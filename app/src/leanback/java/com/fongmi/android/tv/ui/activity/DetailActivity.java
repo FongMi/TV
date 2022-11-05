@@ -38,7 +38,6 @@ import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.net.OKHttp;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
-import com.fongmi.android.tv.ui.custom.CustomHorizontalGridView;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
 import com.fongmi.android.tv.ui.custom.TrackSelectionDialog;
 import com.fongmi.android.tv.ui.custom.dialog.DescDialog;
@@ -289,6 +288,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.episode.setSelectedPosition(getEpisodePosition());
         notifyItemChanged(mBinding.episode, mEpisodeAdapter);
         if (mEpisodeAdapter.size() == 0) return;
+        Clock.get().setCallback(null);
         getPlayer(false);
     }
 
@@ -317,10 +317,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         if (mHistory.isRevSort()) for (int i = size + 1; i > 0; i -= 20) items.add((i - 1) + "-" + Math.max(i - 20, 1));
         else for (int i = 0; i < size; i += 20) items.add((i + 1) + "-" + Math.min(i + 20, size));
         mArrayAdapter.setItems(items, null);
-    }
-
-    private void notifyItemChanged(CustomHorizontalGridView view, ArrayObjectAdapter adapter) {
-        if (!view.isComputingLayout()) adapter.notifyArrayItemRangeChanged(0, adapter.size());
     }
 
     @Override
@@ -422,7 +418,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void onOpening() {
         long current = mPlayers.getCurrentPosition();
         long duration = mPlayers.getDuration();
-        if (current > duration / 2) return;
+        if (current < 0 || current > duration / 2) return;
         mHistory.setOpening(current);
         mControl.opening.setText(mPlayers.getStringForTime(mHistory.getOpening()));
     }
@@ -436,7 +432,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void onEnding() {
         long current = mPlayers.getCurrentPosition();
         long duration = mPlayers.getDuration();
-        if (current < duration / 2) return;
+        if (current < 0 || current < duration / 2) return;
         mHistory.setEnding(duration - current);
         mControl.ending.setText(mPlayers.getStringForTime(mHistory.getEnding()));
     }
@@ -502,12 +498,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mHistory.setCreateTime(System.currentTimeMillis());
     }
 
-    private void updateHistory() {
-        if (mHistory == null || mPlayers.getCurrentPosition() <= 0) return;
-        mHistory.update(mPlayers.getCurrentPosition(), mPlayers.getDuration());
-        RefreshEvent.history();
-    }
-
     private void checkKeep() {
         mBinding.keep.setCompoundDrawablesRelativeWithIntrinsicBounds(Keep.find(getHistoryKey()) == null ? R.drawable.ic_keep_not_yet : R.drawable.ic_keep_added, 0, 0, 0);
     }
@@ -536,6 +526,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     public void onTimeChanged() {
         long duration = mPlayers.getDuration();
         long current = mPlayers.getCurrentPosition();
+        if (current >= 0 && duration > 0) mHistory.update(current, duration);
         if (mHistory.getEnding() > 0 && duration > 0 && mHistory.getEnding() + current >= duration) {
             Clock.get().setCallback(null);
             checkNext();
@@ -666,8 +657,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     @Override
     protected void onPause() {
         super.onPause();
+        RefreshEvent.history();
         Clock.get().release();
-        updateHistory();
         onPause(false);
     }
 
