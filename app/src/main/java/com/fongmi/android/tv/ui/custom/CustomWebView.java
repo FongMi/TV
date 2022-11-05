@@ -3,8 +3,6 @@ package com.fongmi.android.tv.ui.custom;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.http.SslError;
-import android.os.Handler;
-import android.os.Looper;
 import android.text.TextUtils;
 import android.webkit.CookieManager;
 import android.webkit.SslErrorHandler;
@@ -17,6 +15,7 @@ import android.webkit.WebViewClient;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.player.ParseTask;
 import com.fongmi.android.tv.utils.Utils;
@@ -32,7 +31,6 @@ public class CustomWebView extends WebView {
     private ParseTask.Callback callback;
     private WebResourceResponse empty;
     private List<String> keys;
-    private Handler handler;
     private String ads;
     private int retry;
 
@@ -46,7 +44,6 @@ public class CustomWebView extends WebView {
         this.ads = ApiConfig.get().getAds();
         this.keys = Arrays.asList("user-agent", "referer", "origin");
         this.empty = new WebResourceResponse("text/plain", "utf-8", new ByteArrayInputStream("".getBytes()));
-        this.handler = new Handler(Looper.getMainLooper());
         getSettings().setUseWideViewPort(true);
         getSettings().setDatabaseEnabled(true);
         getSettings().setDomStorageEnabled(true);
@@ -81,8 +78,7 @@ public class CustomWebView extends WebView {
                 String url = request.getUrl().toString();
                 String host = request.getUrl().getHost();
                 if (ads.contains(host)) return empty;
-                handler.removeCallbacks(mTimer);
-                handler.postDelayed(mTimer, 15 * 1000);
+                App.post(mTimer, 15 * 1000);
                 Map<String, String> headers = request.getRequestHeaders();
                 if (Utils.isVideoFormat(url, headers)) post(headers, url);
                 return super.shouldInterceptRequest(view, request);
@@ -114,8 +110,8 @@ public class CustomWebView extends WebView {
         String cookie = CookieManager.getInstance().getCookie(url);
         if (!TextUtils.isEmpty(cookie)) news.put("cookie", cookie);
         for (String key : headers.keySet()) if (keys.contains(key.toLowerCase())) news.put(key, headers.get(key));
-        handler.removeCallbacks(mTimer);
-        handler.post(() -> {
+        App.removeCallbacks(mTimer);
+        App.post(() -> {
             if (callback != null) callback.onParseSuccess(news, url, "");
             stop(false);
         });
@@ -124,8 +120,8 @@ public class CustomWebView extends WebView {
     public void stop(boolean error) {
         stopLoading();
         loadUrl("about:blank");
-        handler.removeCallbacks(mTimer);
-        if (error) handler.post(() -> callback.onParseError());
+        App.removeCallbacks(mTimer);
+        if (error) App.post(() -> callback.onParseError());
         else callback = null;
     }
 }

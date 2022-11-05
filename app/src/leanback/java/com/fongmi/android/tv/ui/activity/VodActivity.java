@@ -2,8 +2,6 @@ package com.fongmi.android.tv.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewpager.widget.ViewPager;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Class;
 import com.fongmi.android.tv.bean.Result;
@@ -39,7 +38,6 @@ public class VodActivity extends BaseActivity {
     private ActivityVodBinding mBinding;
     private ArrayObjectAdapter mAdapter;
     private PageAdapter mPageAdapter;
-    private Handler mHandler;
     private Result mResult;
     private View mOldView;
 
@@ -62,7 +60,6 @@ public class VodActivity extends BaseActivity {
 
     @Override
     protected void initView() {
-        mHandler = new Handler(Looper.getMainLooper());
         mResult = Result.fromJson(getResult());
         setRecyclerView();
         setTypes();
@@ -109,12 +106,11 @@ public class VodActivity extends BaseActivity {
     }
 
     private void onChildSelected(@Nullable RecyclerView.ViewHolder child) {
-        mHandler.removeCallbacks(mRunnable);
-        mHandler.postDelayed(mRunnable, 200);
         if (mOldView != null) mOldView.setActivated(false);
         if (child == null) return;
         mOldView = child.itemView;
         mOldView.setActivated(true);
+        App.post(mRunnable, 200);
     }
 
     private final Runnable mRunnable = new Runnable() {

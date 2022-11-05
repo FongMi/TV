@@ -2,8 +2,6 @@ package com.fongmi.android.tv.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.KeyEvent;
 import android.view.View;
 
@@ -17,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Func;
@@ -59,7 +58,6 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     private HistoryPresenter mHistoryPresenter;
     private SiteViewModel mViewModel;
     private boolean mConfirmExit;
-    private Handler mHandler;
 
     public static void start(Activity activity) {
         activity.startActivity(new Intent(activity, HomeActivity.class));
@@ -73,7 +71,6 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     protected void initView() {
-        mHandler = new Handler(Looper.getMainLooper());
         Updater.create(this).start();
         Server.get().start();
         setRecyclerView();
@@ -123,7 +120,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     private void setFocus() {
         mBinding.recycler.requestFocus();
-        mHandler.postDelayed(() -> mBinding.title.setFocusable(true), 500);
+        App.post(() -> mBinding.title.setFocusable(true), 500);
     }
 
     private void getVideo() {
@@ -310,7 +307,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         } else if (!mConfirmExit) {
             mConfirmExit = true;
             Notify.show(R.string.app_exit);
-            mHandler.postDelayed(() -> mConfirmExit = false, 1000);
+            App.post(() -> mConfirmExit = false, 1000);
         } else {
             super.onBackPressed();
         }

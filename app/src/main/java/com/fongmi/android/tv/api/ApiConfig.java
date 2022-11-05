@@ -1,9 +1,8 @@
 package com.fongmi.android.tv.api;
 
-import android.os.Handler;
-import android.os.Looper;
 import android.text.TextUtils;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Live;
@@ -38,7 +37,6 @@ public class ApiConfig {
     private List<Live> lives;
     private JarLoader jLoader;
     private PyLoader pLoader;
-    private Handler handler;
     private Config config;
     private String wall;
     private Parse parse;
@@ -83,7 +81,6 @@ public class ApiConfig {
         this.parses = new ArrayList<>();
         this.jLoader = new JarLoader();
         this.pLoader = new PyLoader();
-        this.handler = new Handler(Looper.getMainLooper());
         return this;
     }
 
@@ -120,7 +117,7 @@ public class ApiConfig {
         try {
             parseConfig(JsonParser.parseString(Decoder.getJson(config.getUrl())).getAsJsonObject(), callback);
         } catch (Exception e) {
-            if (config.getUrl().isEmpty()) handler.post(() -> callback.error(0));
+            if (config.getUrl().isEmpty()) App.post(() -> callback.error(0));
             else loadCache(callback);
             e.printStackTrace();
         }
@@ -128,7 +125,7 @@ public class ApiConfig {
 
     private void loadCache(Callback callback) {
         if (!TextUtils.isEmpty(config.getJson())) parseConfig(JsonParser.parseString(config.getJson()).getAsJsonObject(), callback);
-        else handler.post(() -> callback.error(R.string.error_config_get));
+        else App.post(() -> callback.error(R.string.error_config_get));
     }
 
     private void parseConfig(JsonObject object, Callback callback) {
@@ -136,10 +133,10 @@ public class ApiConfig {
             parseJson(object);
             jLoader.parseJar("", Json.safeString(object, "spider"));
             config.json(object.toString()).update();
-            handler.post(callback::success);
+            App.post(callback::success);
         } catch (Exception e) {
             e.printStackTrace();
-            handler.post(() -> callback.error(R.string.error_config_parse));
+            App.post(() -> callback.error(R.string.error_config_parse));
         }
     }
 

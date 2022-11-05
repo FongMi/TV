@@ -1,13 +1,12 @@
 package com.fongmi.android.tv.utils;
 
 import android.app.Activity;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 
 import androidx.appcompat.app.AlertDialog;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.BuildConfig;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.DialogUpdateBinding;
@@ -17,8 +16,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class Updater implements View.OnClickListener {
 
@@ -27,9 +24,7 @@ public class Updater implements View.OnClickListener {
     private static final String APK = DEF + BuildConfig.FLAVOR_mode + "-" + BuildConfig.FLAVOR_api + ".apk";
     private static final String PROXY = "https://ghproxy.com/";
 
-    private final ExecutorService executor;
     private final Activity activity;
-    private final Handler handler;
     private AlertDialog dialog;
 
     public static Updater create(Activity activity) {
@@ -37,8 +32,6 @@ public class Updater implements View.OnClickListener {
     }
 
     private Updater(Activity activity) {
-        this.executor = Executors.newSingleThreadExecutor();
-        this.handler = new Handler(Looper.getMainLooper());
         this.activity = activity;
     }
 
@@ -48,7 +41,7 @@ public class Updater implements View.OnClickListener {
     }
 
     public void start() {
-        executor.submit(this::doInBackground);
+        App.execute(this::doInBackground);
     }
 
     private void doInBackground() {
@@ -68,7 +61,7 @@ public class Updater implements View.OnClickListener {
             String url = retry > 0 ? PROXY + APK : APK;
             if (code <= BuildConfig.VERSION_CODE) FileUtil.clearDir(getApk());
             else FileUtil.write(getApk(), OKHttp.newCall(url).execute().body().bytes());
-            if (getApk().exists() && Prefers.getUpdate()) handler.post(() -> checkActivity(name, desc));
+            if (getApk().exists() && Prefers.getUpdate()) App.post(() -> checkActivity(name, desc));
         } catch (Exception e) {
             if (retry == 0) connect(PROXY + target, 1);
             e.printStackTrace();

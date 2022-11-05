@@ -1,9 +1,8 @@
 package com.fongmi.android.tv.api;
 
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Base64;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Config;
@@ -28,7 +27,6 @@ import java.util.List;
 public class LiveConfig {
 
     private List<Live> lives;
-    private Handler handler;
     private Config config;
     private Live home;
 
@@ -52,7 +50,6 @@ public class LiveConfig {
         this.home = null;
         this.config = Config.live();
         this.lives = new ArrayList<>();
-        this.handler = new Handler(Looper.getMainLooper());
         return this;
     }
 
@@ -81,7 +78,7 @@ public class LiveConfig {
             parseConfig(Decoder.getJson(config.getUrl()), callback);
         } catch (Exception e) {
             e.printStackTrace();
-            handler.post(() -> callback.error(config.getUrl().isEmpty() ? 0 : R.string.error_config_get));
+            App.post(() -> callback.error(config.getUrl().isEmpty() ? 0 : R.string.error_config_get));
         }
     }
 
@@ -89,10 +86,10 @@ public class LiveConfig {
         try {
             if (Json.invalid(json)) parse(json);
             else parse(JsonParser.parseString(json).getAsJsonObject());
-            handler.post(callback::success);
+            App.post(callback::success);
         } catch (Exception e) {
             e.printStackTrace();
-            handler.post(() -> callback.error(R.string.error_config_parse));
+            App.post(() -> callback.error(R.string.error_config_parse));
         }
     }
 
