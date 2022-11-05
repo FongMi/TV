@@ -196,13 +196,13 @@ public class ApiConfig {
     }
 
     public Site getSite(String key) {
-        int index = sites.indexOf(Site.get(key));
-        return index == -1 ? new Site() : sites.get(index);
+        int index = getSites().indexOf(Site.get(key));
+        return index == -1 ? new Site() : getSites().get(index);
     }
 
     public Parse getParse(String name) {
-        int index = parses.indexOf(Parse.get(name));
-        return index == -1 ? null : parses.get(index);
+        int index = getParses().indexOf(Parse.get(name));
+        return index == -1 ? null : getParses().get(index);
     }
 
     public List<Site> getSites() {
@@ -257,6 +257,6 @@ public class ApiConfig {
         this.home = home;
         this.home.setActivated(true);
         config.home(home.getKey()).update();
-        for (Site item : sites) item.setActivated(home);
+        for (Site item : getSites()) item.setActivated(home);
     }
 }

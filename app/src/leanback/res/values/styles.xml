@@ -19,6 +19,11 @@
         <item name="postSplashScreenTheme">@style/AppTheme</item>
     </style>
 
+    <style name="VodStyle">
+        <item name="cornerSize">8dp</item>
+        <item name="cornerFamily">rounded</item>
+    </style>
+
     <style name="VodPlayerStyle">
         <item name="auto_show">false</item>
         <item name="resize_mode">fit</item>
