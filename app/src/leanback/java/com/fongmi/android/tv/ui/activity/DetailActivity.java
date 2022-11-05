@@ -277,7 +277,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void seamless(Vod.Flag flag) {
         Vod.Flag.Episode episode = flag.find(mHistory.getVodRemarks());
         if (episode == null || episode.isActivated()) return;
-        if (mPlayers.getCurrentPosition() > 0) mHistory.setPosition(mPlayers.getCurrentPosition());
         mHistory.setVodRemarks(episode.getName());
         setEpisodeActivated(episode);
     }
@@ -285,6 +284,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void setEpisodeActivated(Vod.Flag.Episode item) {
         if (shouldEnterFullscreen(item)) return;
         mCurrent = mBinding.flag.getSelectedPosition();
+        if (mPlayers.getCurrentPosition() > 0) mHistory.update(mPlayers.getCurrentPosition(), mPlayers.getDuration());
         for (int i = 0; i < mFlagAdapter.size(); i++) ((Vod.Flag) mFlagAdapter.get(i)).toggle(mCurrent == i, item);
         mBinding.episode.setSelectedPosition(getEpisodePosition());
         notifyItemChanged(mBinding.episode, mEpisodeAdapter);
