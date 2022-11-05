@@ -2,8 +2,6 @@ package com.fongmi.android.tv.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.KeyEvent;
 import android.view.View;
 
@@ -16,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.LiveConfig;
 import com.fongmi.android.tv.bean.Channel;
@@ -53,7 +52,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private CustomKeyDownLive mKeyDown;
     private LiveViewModel mViewModel;
     private List<Group> mHides;
-    private Handler mHandler;
     private Players mPlayers;
     private Channel mChannel;
     private View mOldView;
@@ -95,7 +93,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mR1 = this::hideInfo;
         mR2 = this::setChannelActivated;
         mPlayers = new Players().init();
-        mHandler = new Handler(Looper.getMainLooper());
         mKeyDown = CustomKeyDownLive.create(this);
         mHides = new ArrayList<>();
         setRecyclerView();
@@ -184,7 +181,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void hideUI() {
-        mHandler.removeCallbacks(mR0);
+        App.removeCallbacks(mR0);
         if (isGone(mBinding.recycler)) return;
         mBinding.recycler.setVisibility(View.GONE);
         setPosition();
@@ -202,8 +199,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void showInfo() {
-        mHandler.removeCallbacks(mR1);
-        mHandler.postDelayed(mR1, 5000);
+        App.post(mR1, 5000);
         mBinding.info.name.setText(mChannel.getName());
         mBinding.info.line.setText(mChannel.getLineText());
         mBinding.info.number.setText(mChannel.getNumber());
@@ -219,7 +215,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mChannelAdapter.setItems(mGroup.getChannel(), null);
         mBinding.channel.setSelectedPosition(mGroup.getPosition());
         if (!item.isKeep() || ++count < 5) return;
-        mHandler.removeCallbacks(mR0);
+        App.removeCallbacks(mR0);
         PassDialog.show(this);
         resetPass();
     }
@@ -257,9 +253,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void setChannel(Channel item) {
-        mHandler.removeCallbacks(mR2);
-        mHandler.postDelayed(mR2, 100);
         LiveConfig.get().setKeep(mGroup, mChannel = item);
+        App.post(mR2, 100);
         showInfo();
     }
 
@@ -300,8 +295,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public void setUITimer() {
-        mHandler.removeCallbacks(mR0);
-        mHandler.postDelayed(mR0, 5000);
+        App.post(mR0, 5000);
     }
 
     @Override

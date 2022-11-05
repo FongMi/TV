@@ -2,8 +2,6 @@ package com.fongmi.android.tv.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Handler;
-import android.os.Looper;
 import android.text.Html;
 import android.view.KeyEvent;
 import android.view.View;
@@ -20,6 +18,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.History;
@@ -80,7 +79,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private CustomKeyDownVod mKeyDown;
     private SiteViewModel mViewModel;
     private boolean mFullscreen;
-    private Handler mHandler;
     private History mHistory;
     private Players mPlayers;
     private int mCurrent;
@@ -136,7 +134,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     @Override
     protected void initView() {
         mKeyDown = CustomKeyDownVod.create(this);
-        mHandler = new Handler(Looper.getMainLooper());
         mFrameParams = mBinding.video.getLayoutParams();
         mBinding.progressLayout.showProgress();
         mPlayers = new Players().init();
@@ -283,7 +280,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void setEpisodeActivated(Vod.Flag.Episode item) {
         if (shouldEnterFullscreen(item)) return;
         mCurrent = mBinding.flag.getSelectedPosition();
-        if (mPlayers.getCurrentPosition() > 0) mHistory.update(mPlayers.getCurrentPosition(), mPlayers.getDuration());
         for (int i = 0; i < mFlagAdapter.size(); i++) ((Vod.Flag) mFlagAdapter.get(i)).toggle(mCurrent == i, item);
         mBinding.episode.setSelectedPosition(getEpisodePosition());
         notifyItemChanged(mBinding.episode, mEpisodeAdapter);
@@ -341,7 +337,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void enterFullscreen() {
         mBinding.video.setForeground(null);
         mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
-        mHandler.postDelayed(() -> getPlayerView().setUseController(true), 250);
+        App.post(() -> getPlayerView().setUseController(true), 250);
         mBinding.flag.setSelectedPosition(mCurrent);
         mFullscreen = true;
         onPlay(0);
@@ -444,7 +440,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onTracks() {
-        mHandler.postDelayed(() -> getPlayerView().hideController(), 150);
+        App.post(() -> getPlayerView().hideController(), 150);
         TrackSelectionDialog.createForPlayer(mPlayers.exo(), dialog -> {
         }).show(getSupportFragmentManager(), "tracks");
     }
@@ -455,7 +451,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 List<String> items = Part.get(response.body().string());
                 if (!items.contains(source)) items.add(0, source);
-                mHandler.post(() -> mPartAdapter.setItems(items, null));
+                App.post(() -> mPartAdapter.setItems(items, null));
             }
         });
     }
@@ -526,7 +522,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     public void onTimeChanged() {
         long duration = mPlayers.getDuration();
         long current = mPlayers.getCurrentPosition();
-        if (current >= 0 && duration > 0) mHistory.update(current, duration);
+        if (current >= 0 && duration > 0) App.execute(() -> mHistory.update(current, duration));
         if (mHistory.getEnding() > 0 && duration > 0 && mHistory.getEnding() + current >= duration) {
             Clock.get().setCallback(null);
             checkNext();
@@ -593,7 +589,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onPlay(int delay) {
-        mHandler.postDelayed(mHideCenter, delay);
+        App.post(mHideCenter, delay);
         mPlayers.play();
     }
 
