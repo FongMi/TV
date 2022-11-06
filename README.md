@@ -4,7 +4,8 @@
 https://github.com/CatVodTVOfficial/CatVodTVJarLoader
 
 ### Download
-[TV](https://github.com/FongMi/TV/blob/main/release/leanback.apk?raw=true "leanback.apk")  
+[TV-Java](https://github.com/FongMi/TV/blob/main/release/leanback-java.apk?raw=true "TV-Java")  
+[TV-Python](https://github.com/FongMi/TV/blob/main/release/leanback-python.apk?raw=true "TV-Python")  
 
 ### Local Config Example
     file://cat.json
