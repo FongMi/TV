@@ -382,7 +382,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
             case Player.STATE_ENDED:
                 break;
             default:
-                if (!event.isRetry() || mPlayers.addRetry() > 1) onError();
+                if (!event.isRetry() || mPlayers.addRetry() > 2) onError();
                 else getUrl();
                 break;
         }
