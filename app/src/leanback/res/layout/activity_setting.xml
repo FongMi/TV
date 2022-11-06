@@ -26,6 +26,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
                 android:text="@string/setting_vod"
                 android:textColor="@color/white"
                 android:textSize="18sp" />
@@ -34,6 +35,7 @@
                 android:id="@+id/vodUrl"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:ellipsize="middle"
                 android:gravity="end"
                 android:singleLine="true"
                 android:textColor="@color/white"
@@ -72,7 +74,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:nextFocusDown="@id/render"
         android:orientation="horizontal">
 
         <LinearLayout
@@ -89,6 +90,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
                 android:text="@string/setting_live"
                 android:textColor="@color/white"
                 android:textSize="18sp" />
@@ -97,6 +99,7 @@
                 android:id="@+id/liveUrl"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:ellipsize="middle"
                 android:gravity="end"
                 android:singleLine="true"
                 android:textColor="@color/white"
@@ -128,6 +131,71 @@
             android:padding="8dp"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_history" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:nextFocusDown="@id/render"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/wall"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_weight="1"
+            android:background="@drawable/selector_item"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:text="@string/setting_wall"
+                android:textColor="@color/white"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/wallUrl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="middle"
+                android:gravity="end"
+                android:singleLine="true"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                tools:ignore="NestedWeights"
+                tools:text="https://" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/wallDefault"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/selector_item"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:padding="8dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_home" />
+
+        <ImageView
+            android:id="@+id/wallRefresh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/selector_item"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:padding="8dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_refresh" />
 
     </LinearLayout>
 

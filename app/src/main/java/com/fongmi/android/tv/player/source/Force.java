@@ -37,7 +37,7 @@ public class Force {
 
     private void check() throws Exception {
         File file = FileUtil.getCacheFile("libmitv.so");
-        String url = "https://ghproxy.com/https://raw.githubusercontent.com/FongMi/TV/dev/release/libmitv.so";
+        String url = "https://ghproxy.com/https://raw.githubusercontent.com/FongMi/TV/release/release/libmitv.so";
         if (!file.exists()) FileUtil.write(file, OKHttp.newCall(url).execute().body().bytes());
     }
 

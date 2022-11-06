@@ -14,7 +14,6 @@ import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.analytics.AnalyticsListener;
 import com.google.android.exoplayer2.audio.AudioAttributes;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.util.Util;
@@ -23,7 +22,7 @@ import java.util.Formatter;
 import java.util.Locale;
 import java.util.Map;
 
-public class Players implements Player.Listener, AnalyticsListener, ParseTask.Callback {
+public class Players implements Player.Listener, ParseTask.Callback {
 
     private StringBuilder builder;
     private Formatter formatter;
@@ -45,7 +44,6 @@ public class Players implements Player.Listener, AnalyticsListener, ParseTask.Ca
         DefaultRenderersFactory factory = new DefaultRenderersFactory(App.get()).setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON);
         exoPlayer = new ExoPlayer.Builder(App.get()).setLoadControl(new DefaultLoadControl()).setRenderersFactory(factory).setTrackSelector(selector).build();
         exoPlayer.setAudioAttributes(AudioAttributes.DEFAULT, true);
-        exoPlayer.addAnalyticsListener(this);
         exoPlayer.setPlayWhenReady(true);
         exoPlayer.addListener(this);
     }
@@ -194,17 +192,12 @@ public class Players implements Player.Listener, AnalyticsListener, ParseTask.Ca
 
     @Override
     public void onPlayerError(@NonNull PlaybackException error) {
-        setErrorCode(error.errorCode);
         PlayerEvent.error(R.string.error_play_format, true);
+        setErrorCode(error.errorCode);
     }
 
     @Override
     public void onPlaybackStateChanged(int state) {
         PlayerEvent.state(state);
-    }
-
-    @Override
-    public void onAudioSinkError(@NonNull EventTime eventTime, @NonNull Exception audioSinkError) {
-        seekTo(500);
     }
 }

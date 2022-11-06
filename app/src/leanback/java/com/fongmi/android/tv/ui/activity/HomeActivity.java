@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.KeyEvent;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -42,6 +43,7 @@ import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Updater;
+import com.fongmi.android.tv.utils.Utils;
 import com.google.common.collect.Lists;
 
 import org.greenrobot.eventbus.EventBus;
@@ -85,7 +87,6 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     protected void initEvent() {
-        EventBus.getDefault().register(this);
         mBinding.title.setListener(this);
         mBinding.recycler.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
@@ -130,7 +131,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         int index = getRecommendIndex();
         mViewModel.getResult().setValue(Result.empty());
         if (mAdapter.size() > index) mAdapter.removeItems(index, mAdapter.size() - index);
-        if (ApiConfig.get().getHome().getName().isEmpty()) mBinding.title.setText(R.string.app_name);
+        if (ApiConfig.getHomeName().isEmpty()) mBinding.title.setText(R.string.app_name);
         else mBinding.title.setText(ApiConfig.getHomeName());
         if (ApiConfig.get().getHome().getKey().isEmpty()) return;
         mViewModel.homeContent();
@@ -250,6 +251,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefreshEvent(RefreshEvent event) {
+        super.onRefreshEvent(event);
         switch (event.getType()) {
             case VIDEO:
                 getVideo();
@@ -282,9 +284,15 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     }
 
     @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (Utils.isMenuKey(event)) showDialog();
+        return super.dispatchKeyEvent(event);
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
-        Clock.start(mBinding.time);
+        Clock.start(mBinding.time, "MM/dd HH:mm:ss");
     }
 
     @Override

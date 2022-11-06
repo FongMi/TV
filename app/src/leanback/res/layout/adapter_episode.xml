@@ -12,6 +12,6 @@
     android:nextFocusUp="@id/flag"
     android:nextFocusDown="@id/array"
     android:singleLine="true"
-    android:textColor="@color/white"
+    android:textColor="@color/text"
     android:textSize="16sp"
     tools:text="20" />

@@ -182,7 +182,7 @@
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:gravity="center"
-            android:text="@string/detail_keep"
+            android:text="@string/keep"
             android:textColor="@color/white"
             android:textSize="16sp"
             app:drawableStartCompat="@drawable/ic_keep_added" />
