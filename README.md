@@ -7,9 +7,6 @@ https://github.com/CatVodTVOfficial/CatVodTVJarLoader
 [TV](https://github.com/FongMi/TV/blob/main/release/leanback.apk?raw=true "leanback.apk")  
 [Mobile](https://github.com/FongMi/TV/ "mobile.apk")  ...incoming
 
-### How to build
-Use dev branch
-
 ### Local Config Example
     file://cat.json
 
