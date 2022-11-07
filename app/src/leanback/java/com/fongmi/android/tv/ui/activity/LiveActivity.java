@@ -41,8 +41,10 @@ import com.google.android.exoplayer2.ui.StyledPlayerView;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class LiveActivity extends BaseActivity implements GroupPresenter.OnClickListener, ChannelPresenter.OnClickListener, CustomKeyDownLive.Listener, CustomLiveListView.Callback, PassCallback {
 
@@ -50,6 +52,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private ArrayObjectAdapter mChannelAdapter;
     private ArrayObjectAdapter mGroupAdapter;
     private CustomKeyDownLive mKeyDown;
+    private SimpleDateFormat mFormat;
     private LiveViewModel mViewModel;
     private List<Group> mHides;
     private Players mPlayers;
@@ -62,8 +65,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private int count;
 
     public static void start(Activity activity) {
-        if (LiveConfig.get().isEmpty()) return;
-        activity.startActivity(new Intent(activity, LiveActivity.class));
+        if (!LiveConfig.isEmpty()) activity.startActivity(new Intent(activity, LiveActivity.class));
     }
 
     private StyledPlayerView getPlayerView() {
@@ -94,6 +96,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mR2 = this::setChannelActivated;
         mPlayers = new Players().init();
         mKeyDown = CustomKeyDownLive.create(this);
+        mFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         mHides = new ArrayList<>();
         setRecyclerView();
         setViewModel();
@@ -204,10 +207,21 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.info.line.setText(mChannel.getLineText());
         mBinding.info.number.setText(mChannel.getNumber());
         mBinding.info.getRoot().setVisibility(View.VISIBLE);
+        getEpg();
     }
 
     private void resetPass() {
         this.count = 0;
+    }
+
+    private void getEpg() {
+        /*String epg = mChannel.getEpg().replace("{date}", mFormat.format(new Date()));
+        OKHttp.newCall(epg).enqueue(new Callback(){
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                Log.e("DDD", response.body().string());
+            }
+        });*/
     }
 
     @Override
