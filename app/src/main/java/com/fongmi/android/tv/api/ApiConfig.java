@@ -5,7 +5,6 @@ import android.text.TextUtils;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Config;
-import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.net.Callback;
@@ -34,7 +33,6 @@ public class ApiConfig {
     private List<String> flags;
     private List<Parse> parses;
     private List<Site> sites;
-    private List<Live> lives;
     private JarLoader jLoader;
     private PyLoader pLoader;
     private Config config;
@@ -76,7 +74,6 @@ public class ApiConfig {
         this.config = Config.vod();
         this.ads = new ArrayList<>();
         this.sites = new ArrayList<>();
-        this.lives = new ArrayList<>();
         this.flags = new ArrayList<>();
         this.parses = new ArrayList<>();
         this.jLoader = new JarLoader();
@@ -98,7 +95,6 @@ public class ApiConfig {
         this.parses.clear();
         this.jLoader.clear();
         this.pLoader.clear();
-        LiveConfig.get().remove(lives);
         return this;
     }
 
@@ -131,6 +127,7 @@ public class ApiConfig {
     private void parseConfig(JsonObject object, Callback callback) {
         try {
             parseJson(object);
+            parseLive(object);
             jLoader.parseJar("", Json.safeString(object, "spider"));
             config.json(object.toString()).update();
             App.post(callback::success);
@@ -152,10 +149,6 @@ public class ApiConfig {
             if (parse.getName().equals(Prefers.getParse())) setParse(parse);
             if (!parses.contains(parse)) parses.add(parse);
         }
-        for (Live live : LiveConfig.get().parse(object)) {
-            if (live.getGroups().isEmpty()) continue;
-            if (!lives.contains(live)) lives.add(live);
-        }
         if (home == null) setHome(sites.isEmpty() ? new Site() : sites.get(0));
         if (parse == null) setParse(parses.isEmpty() ? new Parse() : parses.get(0));
         flags.addAll(Json.safeListString(object, "flags"));
@@ -163,12 +156,20 @@ public class ApiConfig {
         setWall(Json.safeString(object, "wallpaper"));
     }
 
+    private void parseLive(JsonObject object) {
+        boolean hasLive = object.has("lives");
+        if (hasLive) Config.create(config.getUrl(), 1);
+        boolean loadApi = hasLive && LiveConfig.get().isSame(config.getUrl());
+        if (loadApi) LiveConfig.get().clear().config(Config.find(config.getUrl(), 1).update()).parse(object);
+        else if (LiveConfig.get().getHome() == null) LiveConfig.get().load();
+    }
+
     private String parseExt(String ext) {
         if (ext.startsWith("http")) return ext;
         else if (ext.startsWith("file")) return FileUtil.read(ext);
         else if (ext.startsWith("img+")) return Decoder.getExt(ext);
         else if (ext.contains("http") || ext.contains("file")) return ext;
-        else if (ext.endsWith(".json") || ext.endsWith(".py")) return parseExt(Utils.convert(ext));
+        else if (ext.endsWith(".json") || ext.endsWith(".py")) return parseExt(Utils.convert(config.getUrl(), ext));
         return ext;
     }
 
@@ -206,10 +207,6 @@ public class ApiConfig {
         return sites == null ? Collections.emptyList() : sites;
     }
 
-    public List<Live> getLives() {
-        return lives == null ? Collections.emptyList() : lives;
-    }
-
     public List<Parse> getParses() {
         return parses == null ? Collections.emptyList() : parses;
     }
@@ -241,7 +238,7 @@ public class ApiConfig {
         return TextUtils.isEmpty(wall) ? "" : wall;
     }
 
-    public void setWall(String wall) {
+    private void setWall(String wall) {
         if (Config.wall().getUrl().isEmpty()) WallConfig.get().setUrl(wall);
         this.wall = wall;
     }

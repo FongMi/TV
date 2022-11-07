@@ -21,6 +21,7 @@ public class LiveParser {
 
     public static void start(Live live, String text) {
         int number = 0;
+        if (live.getGroups().size() > 0) return;
         if (text.startsWith("#EXTM3U")) m3u(live, text); else txt(live, text);
         for (Group group : live.getGroups()) {
             for (Channel channel : group.getChannel()) {
@@ -35,7 +36,7 @@ public class LiveParser {
             if (line.startsWith("#EXTINF:")) {
                 Group group = live.find(Group.create(extract(line, GROUP)));
                 channel = group.find(Channel.create(extract(line, NAME)));
-                channel.setLogo(extract(line, LOGO));
+                channel.epg(live).setLogo(extract(line, LOGO));
             } else if (line.contains("://")) {
                 channel.getUrls().add(line);
             }
@@ -51,7 +52,7 @@ public class LiveParser {
             }
             if (split[1].contains("://")) {
                 Group group = live.getGroups().get(live.getGroups().size() - 1);
-                group.find(Channel.create(split[0])).addUrls(split[1].split("#"));
+                group.find(Channel.create(split[0]).epg(live)).addUrls(split[1].split("#"));
             }
         }
     }

@@ -28,6 +28,8 @@ public class Channel {
     private String number;
     @SerializedName("logo")
     private String logo;
+    @SerializedName("epg")
+    private String epg;
     @SerializedName("name")
     private String name;
     @SerializedName("ua")
@@ -83,6 +85,14 @@ public class Channel {
 
     public void setLogo(String logo) {
         this.logo = logo;
+    }
+
+    public String getEpg() {
+        return TextUtils.isEmpty(epg) ? "" : epg;
+    }
+
+    public void setEpg(String epg) {
+        this.epg = epg;
     }
 
     public String getName() {
@@ -172,6 +182,11 @@ public class Channel {
 
     public Channel group(Group group) {
         setGroup(group);
+        return this;
+    }
+
+    public Channel epg(Live live) {
+        setEpg(live.getEpg().replace("{name}", getName()).replace("{epg}", getEpg()));
         return this;
     }
 
