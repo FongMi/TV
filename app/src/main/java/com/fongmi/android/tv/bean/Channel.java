@@ -38,6 +38,7 @@ public class Channel {
     private boolean selected;
     private Group group;
     private String url;
+    private Epg data;
     private int line;
 
     public static Channel objectFrom(JsonElement element) {
@@ -125,6 +126,14 @@ public class Channel {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public Epg getData() {
+        return data == null ? new Epg() : data;
+    }
+
+    public void setData(Epg data) {
+        this.data = data;
     }
 
     public int getLine() {

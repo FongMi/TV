@@ -184,5 +184,6 @@ public class LiveConfig {
         this.home.setActivated(true);
         config.home(home.getName()).update();
         for (Live item : lives) item.setActivated(home);
+        App.execute(() -> LiveParser.start(home, getText(home.getUrl())));
     }
 }

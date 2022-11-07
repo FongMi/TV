@@ -17,6 +17,7 @@ import com.google.android.exoplayer2.util.Util;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -130,6 +131,14 @@ public class Utils {
     public static String substring(String text, int num) {
         if (text != null && text.length() > num) return text.substring(0, text.length() - num);
         return text;
+    }
+
+    public static long format(SimpleDateFormat format, String src) {
+        try {
+            return format.parse(src).getTime();
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     public static int getDigit(String text) {
