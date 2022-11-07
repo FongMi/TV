@@ -18,12 +18,15 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.LiveConfig;
 import com.fongmi.android.tv.bean.Channel;
+import com.fongmi.android.tv.bean.Epg;
 import com.fongmi.android.tv.bean.Group;
 import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.databinding.ActivityLiveBinding;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.impl.PassCallback;
 import com.fongmi.android.tv.model.LiveViewModel;
+import com.fongmi.android.tv.net.Callback;
+import com.fongmi.android.tv.net.OKHttp;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.player.source.Force;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownLive;
@@ -41,18 +44,24 @@ import com.google.android.exoplayer2.ui.StyledPlayerView;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+import okhttp3.Call;
+import okhttp3.Response;
 
 public class LiveActivity extends BaseActivity implements GroupPresenter.OnClickListener, ChannelPresenter.OnClickListener, CustomKeyDownLive.Listener, CustomLiveListView.Callback, PassCallback {
 
     private ActivityLiveBinding mBinding;
     private ArrayObjectAdapter mChannelAdapter;
     private ArrayObjectAdapter mGroupAdapter;
+    private SimpleDateFormat mFormatDate;
+    private SimpleDateFormat mFormatTime;
     private CustomKeyDownLive mKeyDown;
-    private SimpleDateFormat mFormat;
     private LiveViewModel mViewModel;
     private List<Group> mHides;
     private Players mPlayers;
@@ -96,7 +105,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mR2 = this::setChannelActivated;
         mPlayers = new Players().init();
         mKeyDown = CustomKeyDownLive.create(this);
-        mFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        mFormatDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        mFormatTime = new SimpleDateFormat("yyyy-MM-ddHH:mm", Locale.getDefault());
         mHides = new ArrayList<>();
         setRecyclerView();
         setViewModel();
@@ -207,21 +217,40 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.info.line.setText(mChannel.getLineText());
         mBinding.info.number.setText(mChannel.getNumber());
         mBinding.info.getRoot().setVisibility(View.VISIBLE);
-        getEpg();
+        checkEpg();
     }
 
     private void resetPass() {
         this.count = 0;
     }
 
-    private void getEpg() {
-        /*String epg = mChannel.getEpg().replace("{date}", mFormat.format(new Date()));
-        OKHttp.newCall(epg).enqueue(new Callback(){
+    private void checkEpg() {
+        if (mChannel.getEpg().isEmpty()) return;
+        String date = mFormatDate.format(new Date());
+        String epg = mChannel.getEpg().replace("{date}", date);
+        if (mChannel.getData().equal(date)) showEpg();
+        else getEpg(epg, mChannel);
+    }
+
+    private void getEpg(String epg, Channel channel) {
+        OKHttp.newCall(epg).enqueue(new Callback() {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                Log.e("DDD", response.body().string());
+                channel.setData(Epg.objectFrom(response.body().string()));
+                channel.getData().initTime(mFormatTime);
+                if (mChannel.equals(channel)) App.post(() -> showEpg());
             }
-        });*/
+        });
+    }
+
+    private void showEpg() {
+        Date now = new Date();
+        for (Epg epg : mChannel.getData().getList()) {
+            if (epg.getStartTime() <= now.getTime() && now.getTime() <= epg.getEndTime()) {
+                mBinding.info.play.setText(epg.getTitle());
+                break;
+            }
+        }
     }
 
     @Override
