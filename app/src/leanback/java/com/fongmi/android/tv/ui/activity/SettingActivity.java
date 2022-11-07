@@ -151,6 +151,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
                 Notify.dismiss();
                 RefreshEvent.video();
                 RefreshEvent.history();
+                mBinding.liveUrl.setText(LiveConfig.getUrl());
                 mBinding.wallUrl.setText(WallConfig.getUrl());
                 break;
             case 1:

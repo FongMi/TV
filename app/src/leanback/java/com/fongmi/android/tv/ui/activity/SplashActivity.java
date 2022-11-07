@@ -35,7 +35,7 @@ public class SplashActivity extends BaseActivity {
     @Override
     protected void initView() {
         WallConfig.get().init();
-        LiveConfig.get().init().load();
+        LiveConfig.get().init();
         ApiConfig.get().init().load(getCallback());
         mBinding.title.animate().alpha(1).setDuration(1000).setListener(onAnimationEnd()).start();
     }
@@ -44,8 +44,8 @@ public class SplashActivity extends BaseActivity {
         return new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                mBinding.title.setVisibility(View.GONE);
                 mBinding.info.animate().alpha(1).setDuration(500).start();
+                mBinding.title.setVisibility(View.GONE);
             }
         };
     }
