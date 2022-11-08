@@ -233,6 +233,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mViewModel.playerContent(getKey(), getVodFlag().getFlag(), item.getUrl());
         mBinding.widget.progress.getRoot().setVisibility(View.VISIBLE);
         mBinding.widget.error.setVisibility(View.GONE);
+        Clock.get().setCallback(null);
         updateHistory(item, replay);
     }
 
@@ -284,7 +285,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.episode.setSelectedPosition(getEpisodePosition());
         notifyItemChanged(mBinding.episode, mEpisodeAdapter);
         if (mEpisodeAdapter.size() == 0) return;
-        Clock.get().setCallback(null);
         getPlayer(false);
     }
 
@@ -550,7 +550,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
                 break;
             default:
                 if (!event.isRetry() || mPlayers.addRetry() > 3) onError(event.getMsg());
-                else onRetry();
+                else getPlayer(false);
                 break;
         }
     }
@@ -558,11 +558,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void checkPosition() {
         mPlayers.seekTo(Math.max(mHistory.getOpening(), mHistory.getPosition()));
         Clock.get().setCallback(this);
-    }
-
-    private void onRetry() {
-        mHistory.setPosition(mPlayers.getCurrentPosition());
-        getPlayer(false);
     }
 
     private void onError(String msg) {
