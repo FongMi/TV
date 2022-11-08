@@ -236,21 +236,14 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         OKHttp.newCall(epg).enqueue(new Callback() {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                channel.setData(Epg.objectFrom(response.body().string()));
-                channel.getData().initTime(mFormatTime);
+                channel.setData(Epg.objectFrom(response.body().string(), mFormatTime));
                 if (mChannel.equals(channel)) App.post(() -> showEpg());
             }
         });
     }
 
     private void showEpg() {
-        Date now = new Date();
-        for (Epg epg : mChannel.getData().getList()) {
-            if (epg.getStartTime() <= now.getTime() && now.getTime() <= epg.getEndTime()) {
-                mBinding.info.play.setText(epg.getTitle());
-                break;
-            }
-        }
+        mBinding.info.play.setText(mChannel.getData().getEpg());
     }
 
     @Override
