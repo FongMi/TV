@@ -75,7 +75,6 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         setRecyclerView();
         setViewModel();
         setAdapter();
-        getHistory();
         setFocus();
     }
 
@@ -125,6 +124,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         return new Callback() {
             @Override
             public void success() {
+                getHistory();
                 getVideo();
             }
 
