@@ -2,6 +2,8 @@ package com.fongmi.android.tv.bean;
 
 import android.text.TextUtils;
 
+import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
@@ -26,9 +28,11 @@ public class Epg {
     private long startTime;
     private long endTime;
 
-    public static Epg objectFrom(String str) {
+    public static Epg objectFrom(String str, SimpleDateFormat format) {
         try {
-            return new Gson().fromJson(str, Epg.class);
+            Epg item = new Gson().fromJson(str, Epg.class);
+            item.setTime(format);
+            return item;
         } catch (Exception e) {
             return new Epg();
         }
@@ -74,10 +78,25 @@ public class Epg {
         return getDate().equals(date);
     }
 
-    public void initTime(SimpleDateFormat format) {
-        for (Epg epg : getList()) {
-            epg.setStartTime(Utils.format(format, getDate().concat(epg.getStart())));
-            epg.setEndTime(Utils.format(format, getDate().concat(epg.getEnd())));
+    private void setTime(SimpleDateFormat format) {
+        for (Epg item : getList()) {
+            item.setStartTime(Utils.format(format, getDate().concat(item.getStart())));
+            item.setEndTime(Utils.format(format, getDate().concat(item.getEnd())));
         }
+    }
+
+    private boolean isInRange() {
+        return getStartTime() <= System.currentTimeMillis() && System.currentTimeMillis() <= getEndTime();
+    }
+
+    private String format() {
+        if (getTitle().isEmpty()) return ResUtil.getString(R.string.live_epg_empty);
+        if (getStart().isEmpty() || getEnd().isEmpty()) return ResUtil.getString(R.string.live_epg_now, getTitle());
+        return getStart() + " ~ " + getEnd() + "  " + getTitle();
+    }
+
+    public String getEpg() {
+        for (Epg item : getList()) if (item.isInRange()) return item.format();
+        return ResUtil.getString(R.string.live_epg_empty);
     }
 }
