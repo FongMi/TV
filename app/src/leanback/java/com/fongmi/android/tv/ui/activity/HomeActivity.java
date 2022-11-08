@@ -1,7 +1,5 @@
 package com.fongmi.android.tv.ui.activity;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.view.KeyEvent;
 import android.view.View;
 
@@ -18,6 +16,8 @@ import androidx.viewbinding.ViewBinding;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.api.LiveConfig;
+import com.fongmi.android.tv.api.WallConfig;
 import com.fongmi.android.tv.bean.Func;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Result;
@@ -27,6 +27,7 @@ import com.fongmi.android.tv.databinding.ActivityHomeBinding;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.event.ServerEvent;
 import com.fongmi.android.tv.model.SiteViewModel;
+import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.ui.custom.CustomRowPresenter;
 import com.fongmi.android.tv.ui.custom.CustomSelector;
@@ -59,11 +60,6 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     private SiteViewModel mViewModel;
     private boolean mConfirmExit;
 
-    public static void start(Activity activity) {
-        activity.startActivity(new Intent(activity, HomeActivity.class));
-        activity.finish();
-    }
-
     @Override
     protected ViewBinding getBinding() {
         return mBinding = ActivityHomeBinding.inflate(getLayoutInflater());
@@ -71,13 +67,15 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     protected void initView() {
+        WallConfig.get().init();
+        LiveConfig.get().init();
+        ApiConfig.get().init().load(getCallback());
         Updater.create(this).start();
         Server.get().start();
         setRecyclerView();
         setViewModel();
         setAdapter();
         getHistory();
-        getVideo();
         setFocus();
     }
 
@@ -123,12 +121,26 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         App.post(() -> mBinding.title.setFocusable(true), 500);
     }
 
+    private Callback getCallback() {
+        return new Callback() {
+            @Override
+            public void success() {
+                getVideo();
+            }
+
+            @Override
+            public void error(int resId) {
+                Notify.show(resId);
+            }
+        };
+    }
+
     private void getVideo() {
         int index = getRecommendIndex();
         mViewModel.getResult().setValue(Result.empty());
+        String home = ApiConfig.get().getHome().getName();
+        mBinding.title.setText(home.isEmpty() ? ResUtil.getString(R.string.app_name) : home);
         if (mAdapter.size() > index) mAdapter.removeItems(index, mAdapter.size() - index);
-        if (ApiConfig.getHomeName().isEmpty()) mBinding.title.setText(R.string.app_name);
-        else mBinding.title.setText(ApiConfig.getHomeName());
         if (ApiConfig.get().getHome().getKey().isEmpty()) return;
         mViewModel.homeContent();
         mAdapter.add("progress");
@@ -316,6 +328,9 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        WallConfig.get().clear();
+        LiveConfig.get().clear();
+        ApiConfig.get().clear();
         Server.get().stop();
     }
 }
