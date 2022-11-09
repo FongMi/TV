@@ -13,7 +13,6 @@
     <!-- Live -->
     <string name="live_pass">密码</string>
     <string name="live_setting">设定</string>
-    <string name="live_epg_empty">暂无节目资讯</string>
     <string name="live_epg_now">正在播放：<xliff:g name="name">%s</xliff:g></string>
     <string name="live_line">线路 <xliff:g name="name">%s</xliff:g></string>
 

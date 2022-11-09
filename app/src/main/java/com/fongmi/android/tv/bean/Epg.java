@@ -90,13 +90,13 @@ public class Epg {
     }
 
     private String format() {
-        if (getTitle().isEmpty()) return ResUtil.getString(R.string.live_epg_empty);
+        if (getTitle().isEmpty()) return "";
         if (getStart().isEmpty() || getEnd().isEmpty()) return ResUtil.getString(R.string.live_epg_now, getTitle());
         return getStart() + " ~ " + getEnd() + "  " + getTitle();
     }
 
     public String getEpg() {
         for (Epg item : getList()) if (item.isInRange()) return item.format();
-        return ResUtil.getString(R.string.live_epg_empty);
+        return "";
     }
 }
