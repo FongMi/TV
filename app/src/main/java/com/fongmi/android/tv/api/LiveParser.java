@@ -25,6 +25,7 @@ public class LiveParser {
     }
 
     public static void start(Live live) {
+        if (live.getGroups().size() > 0) return;
         start(live, getText(live.getUrl()));
     }
 
