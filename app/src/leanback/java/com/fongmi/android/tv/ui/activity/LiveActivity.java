@@ -135,7 +135,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.group.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
-                onChildSelected(child, mGroup = (Group) mGroupAdapter.get(position));
+                if (mGroupAdapter.size() > 0) onChildSelected(child, mGroup = (Group) mGroupAdapter.get(position));
             }
         });
     }
@@ -189,6 +189,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void setPosition() {
+        if (mChannel == null) return;
         Group group = mChannel.getGroup();
         int position = mGroupAdapter.indexOf(group);
         boolean change = mBinding.group.getSelectedPosition() != position;
@@ -383,6 +384,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
+        if (mGroup == null) return false;
         if (Utils.isMenuKey(event)) onLongPress();
         else if (isGone(mBinding.recycler) && !getPlayerView().isControllerFullyVisible() && mKeyDown.hasEvent(event)) return mKeyDown.onKeyDown(event);
         return super.dispatchKeyEvent(event);

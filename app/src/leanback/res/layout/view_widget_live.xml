@@ -45,7 +45,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="12dp"
             android:textColor="@color/white"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:textStyle="bold"
             tools:text="005" />
 
@@ -56,7 +56,7 @@
             android:layout_marginEnd="12dp"
             android:singleLine="true"
             android:textColor="@color/white"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:textStyle="bold"
             tools:text="民視" />
 
@@ -68,7 +68,7 @@
             android:layout_weight="1"
             android:singleLine="true"
             android:textColor="@color/white"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:textStyle="bold"
             tools:text="正在播放：食神" />
 
@@ -78,7 +78,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="12dp"
             android:textColor="@color/white"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:textStyle="bold"
             tools:text="來源 1" />
 
@@ -87,7 +87,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/white"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:textStyle="bold"
             tools:text="16:50" />
 
