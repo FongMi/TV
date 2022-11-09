@@ -7,36 +7,12 @@ https://github.com/CatVodTVOfficial/CatVodTVJarLoader
 [TV-Java](https://github.com/FongMi/TV/blob/main/release/leanback-java.apk?raw=true "TV-Java")  
 [TV-Python](https://github.com/FongMi/TV/blob/main/release/leanback-python.apk?raw=true "TV-Python")  
 
-### Local Config Example
-    file://cat.json
+### Config Example
+[Vod-Online](other/vod-online.json)  
+[Vod-Offline](other/vod-offline.json)  
+[Live-Online](other/live-online.json)  
+[Live-Offline](other/live-offline.json)  
 
-```json
-{
-   "spider":"spider.jar",
-   "sites":[
-      {
-         "key":"one",
-         "name":"One",
-         "type":3,
-         "api":"csp_Csp",
-         "searchable":1,
-         "quickSearch":1,
-         "filterable":1,
-         "ext":"file://one.json"
-      },
-      {
-         "key":"two",
-         "name":"Two",
-         "type":3,
-         "api":"csp_XPath",
-         "searchable":1,
-         "quickSearch":1,
-         "filterable":1,
-         "ext":"two.json"
-      }
-   ]
-}
-```
 ### Subtitle Format
 In playerContent put "sub"
 
