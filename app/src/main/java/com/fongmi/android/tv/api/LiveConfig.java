@@ -65,7 +65,7 @@ public class LiveConfig {
     }
 
     public void load() {
-        load(new Callback());
+        if (isEmpty()) load(new Callback());
     }
 
     public void load(Callback callback) {
