@@ -1,0 +1,31 @@
+{
+  "lives": [
+    {
+      "group": "redirect",
+      "channels": [
+        {
+          "name": "redirect",
+          "urls": [
+            "proxy://do=live&type=txt&ext=ZmlsZTovL0Rvd25sb2FkL3JlZGlyZWN0LnR4dA=="
+          ]
+        }
+      ]
+    },
+    {
+      "name": "TXT",
+      "type": 0,
+      "url": "file://Download/live.txt",
+      "epg": "http://epg.51zmt.top:8000/api/diyp/?ch={name}&date={date}",
+      "logo": "",
+      "ua": ""
+    },
+    {
+      "name": "M3U",
+      "type": 0,
+      "url": "file://Download/live.m3u",
+      "epg": "https://epg.112114.xyz/?ch={name}",
+      "logo": "",
+      "ua": ""
+    }
+  ]
+}
