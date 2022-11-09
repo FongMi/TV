@@ -108,11 +108,7 @@ public class LiveConfig {
         if (!lives.contains(live)) lives.add(live);
     }
 
-    public void setKeep(Group group, Channel channel) {
-        if (!group.isHidden()) Prefers.putKeep(home.getName() + AppDatabase.SYMBOL + group.getName() + AppDatabase.SYMBOL + channel.getName());
-    }
-
-    public void setKeep(List<Group> items) {
+    private void setKeep(List<Group> items) {
         List<String> key = new ArrayList<>();
         for (Keep keep : Keep.getLive()) key.add(keep.getKey());
         for (Group group : items) {
@@ -125,7 +121,7 @@ public class LiveConfig {
         }
     }
 
-    public int[] getKeep(List<Group> items) {
+    private int[] getKeep(List<Group> items) {
         String[] splits = Prefers.getKeep().split(AppDatabase.SYMBOL);
         if (!home.getName().equals(splits[0])) return new int[]{1, 0};
         for (int i = 0; i < items.size(); i++) {
@@ -136,6 +132,15 @@ public class LiveConfig {
             }
         }
         return new int[]{1, 0};
+    }
+
+    public void setKeep(Group group, Channel channel) {
+        if (!group.isHidden()) Prefers.putKeep(home.getName() + AppDatabase.SYMBOL + group.getName() + AppDatabase.SYMBOL + channel.getName());
+    }
+
+    public int[] find(List<Group> items) {
+        setKeep(items);
+        return getKeep(items);
     }
 
     public int[] find(String number, List<Group> items) {
