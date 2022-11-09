@@ -181,7 +181,7 @@ public class Channel {
     }
 
     public String getLineText() {
-        return ResUtil.getString(R.string.live_line, getLine() + 1, getUrls().size());
+        return getUrls().size() == 1 ? "" : ResUtil.getString(R.string.live_line, getLine() + 1);
     }
 
     public Channel setNumber(int number) {

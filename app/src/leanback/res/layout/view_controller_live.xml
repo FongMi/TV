@@ -53,7 +53,6 @@
                 android:layout_marginEnd="12dp"
                 android:layout_weight="1"
                 android:singleLine="true"
-                android:text="@string/live_epg_empty"
                 android:textColor="@color/grey_700"
                 android:textSize="16sp"
                 android:textStyle="bold"
