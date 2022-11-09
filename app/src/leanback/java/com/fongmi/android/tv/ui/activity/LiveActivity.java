@@ -174,9 +174,9 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         items.add(Group.create(ResUtil.getString(R.string.keep)));
         for (Group group : home.getGroups()) (group.isHidden() ? mHides : items).add(group);
         mGroupAdapter.setItems(items, null);
+        setPosition(LiveConfig.get().find(items));
         mControl.home.setText(home.getName());
-        LiveConfig.get().setKeep(items);
-        setPosition(LiveConfig.get().getKeep(items));
+        Notify.dismiss();
     }
 
     private void setPosition(int[] position) {
@@ -464,6 +464,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     public void setLive(Live item) {
         getPlayerView().hideController();
         LiveConfig.get().setHome(item);
+        Notify.progress(this);
         mHides.clear();
         getLive();
     }
