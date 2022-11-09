@@ -2,8 +2,6 @@ package com.fongmi.android.tv.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Handler;
-import android.os.Looper;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.view.View;
@@ -15,6 +13,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.viewbinding.ViewBinding;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Hot;
 import com.fongmi.android.tv.bean.Suggest;
@@ -39,7 +38,6 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
     private ActivitySearchBinding mBinding;
     private HistoryAdapter mHistoryAdapter;
     private WordAdapter mWordAdapter;
-    private Handler mHandler;
 
     public static void start(Activity activity) {
         activity.startActivity(new Intent(activity, SearchActivity.class));
@@ -59,7 +57,6 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
 
     @Override
     protected void initView() {
-        mHandler = new Handler(Looper.getMainLooper());
         CustomKeyboard.init(this, mBinding);
         setRecyclerView();
         getHot();
@@ -107,7 +104,7 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 List<String> items = Hot.get(response.body().string());
-                mHandler.post(() -> mWordAdapter.addAll(items));
+                App.post(() -> mWordAdapter.addAll(items));
             }
         });
     }
@@ -118,7 +115,7 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 List<String> items = Suggest.get(response.body().string());
-                mHandler.post(() -> mWordAdapter.addAll(items));
+                App.post(() -> mWordAdapter.addAll(items));
             }
         });
     }
@@ -141,7 +138,7 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
         Utils.hideKeyboard(mBinding.keyword);
         if (TextUtils.isEmpty(keyword)) return;
         CollectActivity.start(this, keyword);
-        mHandler.postDelayed(() -> mHistoryAdapter.add(keyword), 250);
+        App.post(() -> mHistoryAdapter.add(keyword), 250);
     }
 
     @Override

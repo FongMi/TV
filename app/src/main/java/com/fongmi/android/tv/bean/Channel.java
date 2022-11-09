@@ -28,6 +28,8 @@ public class Channel {
     private String number;
     @SerializedName("logo")
     private String logo;
+    @SerializedName("epg")
+    private String epg;
     @SerializedName("name")
     private String name;
     @SerializedName("ua")
@@ -36,6 +38,7 @@ public class Channel {
     private boolean selected;
     private Group group;
     private String url;
+    private Epg data;
     private int line;
 
     public static Channel objectFrom(JsonElement element) {
@@ -85,6 +88,14 @@ public class Channel {
         this.logo = logo;
     }
 
+    public String getEpg() {
+        return TextUtils.isEmpty(epg) ? "" : epg;
+    }
+
+    public void setEpg(String epg) {
+        this.epg = epg;
+    }
+
     public String getName() {
         return TextUtils.isEmpty(name) ? "" : name;
     }
@@ -115,6 +126,14 @@ public class Channel {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public Epg getData() {
+        return data == null ? new Epg() : data;
+    }
+
+    public void setData(Epg data) {
+        this.data = data;
     }
 
     public int getLine() {
@@ -172,6 +191,11 @@ public class Channel {
 
     public Channel group(Group group) {
         setGroup(group);
+        return this;
+    }
+
+    public Channel epg(Live live) {
+        setEpg(live.getEpg().replace("{name}", getName()).replace("{epg}", getEpg()));
         return this;
     }
 

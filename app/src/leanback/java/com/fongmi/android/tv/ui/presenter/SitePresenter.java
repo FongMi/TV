@@ -24,6 +24,10 @@ public class SitePresenter extends Presenter {
         void onSearchClick(Site item);
 
         void onFilterClick(Site item);
+
+        boolean onSearchLongClick(Site item);
+
+        boolean onFilterLongClick(Site item);
     }
 
     @Override
@@ -41,6 +45,8 @@ public class SitePresenter extends Presenter {
         holder.binding.text.setOnClickListener(v -> mListener.onTextClick(item));
         holder.binding.search.setOnClickListener(v -> mListener.onSearchClick(item));
         holder.binding.filter.setOnClickListener(v -> mListener.onFilterClick(item));
+        holder.binding.search.setOnLongClickListener(v -> mListener.onSearchLongClick(item));
+        holder.binding.filter.setOnLongClickListener(v -> mListener.onFilterLongClick(item));
     }
 
     @Override

@@ -1,8 +1,5 @@
 package com.fongmi.android.tv.player;
 
-import android.os.Handler;
-import android.os.Looper;
-
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Parse;
@@ -24,7 +21,6 @@ import okhttp3.Response;
 
 public class ParseTask {
 
-    private final Handler handler;
     private CustomWebView webView;
     private ExecutorService executor;
     private Callback callback;
@@ -36,14 +32,13 @@ public class ParseTask {
 
     public ParseTask(Callback callback) {
         this.executor = Executors.newSingleThreadExecutor();
-        this.handler = new Handler(Looper.getMainLooper());
         this.webView = new CustomWebView(App.get());
         this.callback = callback;
     }
 
     public ParseTask run(Result result, boolean useParse) {
         setParse(result, useParse);
-        executor.submit(() -> doInBackground(result.getUrl(), result.getFlag()));
+        executor.execute(() -> doInBackground(result.getUrl(), result.getFlag()));
         return this;
     }
 
@@ -61,7 +56,7 @@ public class ParseTask {
         }
         switch (parse.getType()) {
             case 0: //嗅探
-                handler.post(() -> webView.start(parse.getUrl() + webUrl, parse.getHeaders(), callback));
+                App.post(() -> webView.start(parse.getUrl() + webUrl, parse.getHeaders(), callback));
                 break;
             case 1: //Json
                 jsonParse(webUrl);
@@ -105,20 +100,20 @@ public class ParseTask {
         if (result.getUrl().isEmpty()) {
             onParseError();
         } else if (result.getParse(0) == 1) {
-            handler.post(() -> webView.start(Server.proxy(result.getUrl()), result.getHeaders(), callback));
+            App.post(() -> webView.start(Server.proxy(result.getUrl()), result.getHeaders(), callback));
         } else {
             onParseSuccess(result.getHeaders(), result.getUrl(), result.getJxFrom());
         }
     }
 
     private void onParseSuccess(Map<String, String> headers, String url, String from) {
-        handler.post(() -> {
+        App.post(() -> {
             if (callback != null) callback.onParseSuccess(headers, url, from);
         });
     }
 
     private void onParseError() {
-        handler.post(() -> {
+        App.post(() -> {
             if (callback != null) callback.onParseError();
         });
     }
