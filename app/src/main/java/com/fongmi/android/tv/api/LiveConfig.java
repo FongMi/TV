@@ -151,7 +151,7 @@ public class LiveConfig {
     }
 
     public boolean isSame(String url) {
-        return same || url.equals(config.getUrl());
+        return same || config.getUrl().isEmpty() || url.equals(config.getUrl());
     }
 
     public List<Live> getLives() {
