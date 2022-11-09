@@ -1,7 +1,5 @@
 package com.fongmi.android.tv.api;
 
-import android.util.Base64;
-
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Channel;
@@ -11,11 +9,8 @@ import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.net.Callback;
-import com.fongmi.android.tv.net.OKHttp;
-import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Json;
 import com.fongmi.android.tv.utils.Prefers;
-import com.fongmi.android.tv.utils.Utils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -47,7 +42,7 @@ public class LiveConfig {
     }
 
     public static boolean isEmpty() {
-        return get().getHome() == null || get().getHome().getGroups().isEmpty();
+        return get().getHome() == null;
     }
 
     public LiveConfig init() {
@@ -112,19 +107,6 @@ public class LiveConfig {
         if (!lives.contains(live)) lives.add(live);
     }
 
-    private String getText(String url) {
-        try {
-            if (url.startsWith("file")) return FileUtil.read(url);
-            else if (url.startsWith("http")) return OKHttp.newCall(url).execute().body().string();
-            else if (url.endsWith(".txt") || url.endsWith(".m3u")) return getText(Utils.convert(config.getUrl(), url));
-            else if (url.length() > 0 && url.length() % 4 == 0) return getText(new String(Base64.decode(url, Base64.DEFAULT)));
-            else return "";
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "";
-        }
-    }
-
     public void setKeep(Group group, Channel channel) {
         if (!group.isHidden()) Prefers.putKeep(home.getName() + AppDatabase.SYMBOL + group.getName() + AppDatabase.SYMBOL + channel.getName());
     }
@@ -184,6 +166,5 @@ public class LiveConfig {
         this.home.setActivated(true);
         config.home(home.getName()).update();
         for (Live item : lives) item.setActivated(home);
-        App.execute(() -> LiveParser.start(home, getText(home.getUrl())));
     }
 }

@@ -86,6 +86,6 @@ public class CustomKeyDownLive {
 
         void onKeyCenter();
 
-        void onLongPress();
+        boolean onLongPress();
     }
 }
