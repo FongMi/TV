@@ -36,7 +36,7 @@
 
         <include
             android:id="@+id/widget"
-            layout="@layout/view_controller_widget"
+            layout="@layout/view_widget_vod"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 

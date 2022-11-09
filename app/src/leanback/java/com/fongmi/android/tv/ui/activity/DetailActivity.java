@@ -28,7 +28,7 @@ import com.fongmi.android.tv.bean.Part;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.ActivityDetailBinding;
-import com.fongmi.android.tv.databinding.ViewControllerBottomBinding;
+import com.fongmi.android.tv.databinding.ViewControllerVodBinding;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
@@ -49,6 +49,7 @@ import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.Utils;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.ui.StyledPlayerView;
 
@@ -67,7 +68,7 @@ import okhttp3.Response;
 public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Listener, ArrayPresenter.OnClickListener, Clock.Callback {
 
     private ActivityDetailBinding mBinding;
-    private ViewControllerBottomBinding mControl;
+    private ViewControllerVodBinding mControl;
     private ViewGroup.LayoutParams mFrameParams;
     private ArrayObjectAdapter mFlagAdapter;
     private ArrayObjectAdapter mArrayAdapter;
@@ -127,7 +128,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     @Override
     protected ViewBinding getBinding() {
         mBinding = ActivityDetailBinding.inflate(getLayoutInflater());
-        mControl = ViewControllerBottomBinding.bind(getPlayerView().findViewById(com.google.android.exoplayer2.ui.R.id.exo_controller));
+        mControl = ViewControllerVodBinding.bind(getPlayerView().findViewById(com.google.android.exoplayer2.ui.R.id.exo_controller));
         return mBinding;
     }
 
@@ -195,9 +196,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void setVideoView() {
         getPlayerView().setPlayer(mPlayers.exo());
         getPlayerView().setVisibility(View.VISIBLE);
-        getPlayerView().setResizeMode(Prefers.getScale());
+        getPlayerView().setResizeMode(Prefers.getVodScale());
         getPlayerView().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
-        mControl.scale.setText(ResUtil.getStringArray(R.array.select_scale)[Prefers.getScale()]);
+        mControl.scale.setText(ResUtil.getStringArray(R.array.select_scale)[Prefers.getVodScale()]);
         mControl.speed.setText(mPlayers.getSpeed());
     }
 
@@ -397,15 +398,15 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         int scale = getPlayerView().getResizeMode();
         getPlayerView().setResizeMode(scale = scale == 4 ? 0 : scale + 1);
         mControl.scale.setText(ResUtil.getStringArray(R.array.select_scale)[scale]);
-        Prefers.putScale(scale);
+        Prefers.putVodScale(scale);
     }
 
-    public void onSpeed() {
+    private void onSpeed() {
         mPlayers.addSpeed();
         mControl.speed.setText(mPlayers.getSpeed());
     }
 
-    public boolean onSpeedReset() {
+    private boolean onSpeedReset() {
         mPlayers.resetSpeed();
         mControl.speed.setText(mPlayers.getSpeed());
         return true;
@@ -590,8 +591,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (mFullscreen && !getPlayerView().isControllerFullyVisible() && mKeyDown.hasEvent(event)) return mKeyDown.onKeyDown(event);
-        else return super.dispatchKeyEvent(event);
+        if (mFullscreen && mControl.tracks.getVisibility() == View.VISIBLE && Utils.isMenuKey(event)) onTracks();
+        else if (mFullscreen && !getPlayerView().isControllerFullyVisible() && mKeyDown.hasEvent(event)) return mKeyDown.onKeyDown(event);
+        return super.dispatchKeyEvent(event);
     }
 
     @Override
