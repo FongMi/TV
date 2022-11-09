@@ -108,19 +108,19 @@ public class Prefers {
     }
 
     public static int getVodScale() {
-        return getInt("scaleVod");
+        return getInt("vodScale");
     }
 
     public static void putVodScale(int scale) {
-        put("scaleVod", scale);
+        put("vodScale", scale);
     }
 
     public static int getLiveScale() {
-        return getInt("scaleLive", getVodScale());
+        return getInt("liveScale", getVodScale());
     }
 
     public static void putLiveScale(int scale) {
-        put("scaleLive", scale);
+        put("liveScale", scale);
     }
 
     public static boolean getUpdate() {

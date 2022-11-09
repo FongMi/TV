@@ -157,7 +157,7 @@ public class ApiConfig {
         if (hasLive) Config.create(config.getUrl(), 1);
         boolean loadApi = hasLive && LiveConfig.get().isSame(config.getUrl());
         if (loadApi) LiveConfig.get().clear().config(Config.find(config.getUrl(), 1).update()).parse(object);
-        else if (LiveConfig.get().getHome() == null) LiveConfig.get().load();
+        else if (LiveConfig.isEmpty()) LiveConfig.get().load();
     }
 
     private String parseExt(String ext) {
