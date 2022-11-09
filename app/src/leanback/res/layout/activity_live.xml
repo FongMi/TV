@@ -24,38 +24,16 @@
         app:surface_type="texture_view" />
 
     <include
-        android:id="@+id/progress"
-        layout="@layout/view_progress"
-        android:visibility="gone" />
-
-    <TextView
-        android:id="@+id/digital"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top|end"
-        android:layout_margin="16dp"
-        android:includeFontPadding="false"
-        android:letterSpacing="0.05"
-        android:shadowColor="@color/black"
-        android:shadowDx="2"
-        android:shadowDy="2"
-        android:shadowRadius="1"
-        android:textColor="@color/white"
-        android:textSize="30sp"
-        android:textStyle="bold"
-        android:visibility="gone"
-        tools:text="05"
-        tools:visibility="visible" />
-
-    <include
-        android:id="@+id/info"
-        layout="@layout/view_live_info" />
+        android:id="@+id/widget"
+        layout="@layout/view_widget_live"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <LinearLayout
         android:id="@+id/recycler"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:background="@drawable/shape_live"
+        android:background="@drawable/shape_live_list"
         android:orientation="horizontal"
         android:visibility="gone">
 
