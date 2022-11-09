@@ -21,6 +21,10 @@ public class Json {
         }
     }
 
+    public static boolean invalid(String text) {
+        return !valid(text);
+    }
+
     public static String safeString(JsonObject obj, String key) {
         if (obj.has(key)) return obj.getAsJsonPrimitive(key).getAsString().trim();
         else return "";
