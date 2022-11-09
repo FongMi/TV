@@ -82,8 +82,9 @@ public class Players implements Player.Listener, AnalyticsListener, ParseTask.Ca
         exoPlayer.setPlaybackSpeed(speed);
     }
 
-    public void resetSpeed() {
-        exoPlayer.setPlaybackSpeed(1f);
+    public void toggleSpeed() {
+        float speed = exoPlayer.getPlaybackParameters().speed;
+        exoPlayer.setPlaybackSpeed(speed == 1 ? 3f : 1f);
     }
 
     public String getTime(long time) {
