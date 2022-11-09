@@ -196,12 +196,11 @@ public class History {
         }
     }
 
-    public History update(long position, long duration) {
+    public void update(long position, long duration) {
         setPosition(position);
         setDuration(duration);
         checkMerge(AppDatabase.get().getHistoryDao().findByName(ApiConfig.getCid(), getVodName()));
         AppDatabase.get().getHistoryDao().insertOrUpdate(this);
-        return this;
     }
 
     public History delete() {

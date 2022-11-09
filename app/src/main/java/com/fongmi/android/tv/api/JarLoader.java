@@ -76,7 +76,7 @@ public class JarLoader {
         } else if (jar.startsWith("file")) {
             load(key, FileUtil.getLocal(jar));
         } else if (!jar.isEmpty()) {
-            parseJar(key, Utils.convert(jar));
+            parseJar(key, Utils.convert(ApiConfig.getUrl(), jar));
         }
     }
 

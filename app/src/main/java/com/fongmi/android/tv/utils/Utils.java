@@ -12,12 +12,12 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.api.ApiConfig;
 import com.google.android.exoplayer2.util.Util;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -85,14 +85,17 @@ public class Utils {
         return text;
     }
 
-    public static String convert(String text) {
+    public static String convert(String baseUrl, String text) {
         if (TextUtils.isEmpty(text)) return "";
         if (text.startsWith("clan")) return checkClan(text);
         if (text.startsWith(".")) text = text.substring(1);
         if (text.startsWith("/")) text = text.substring(1);
-        Uri uri = Uri.parse(ApiConfig.getUrl());
-        if (uri.getLastPathSegment() == null) return uri.getScheme() + "://" + text;
-        return uri.toString().replace(uri.getLastPathSegment(), text);
+        return convert(Uri.parse(baseUrl), text);
+    }
+
+    private static String convert(Uri uri, String text) {
+        String last = uri.getLastPathSegment();
+        return last == null ? uri.getScheme() + "://" + text : uri.toString().replace(last, text);
     }
 
     public static String getMD5(String src) {
@@ -128,6 +131,14 @@ public class Utils {
     public static String substring(String text, int num) {
         if (text != null && text.length() > num) return text.substring(0, text.length() - num);
         return text;
+    }
+
+    public static long format(SimpleDateFormat format, String src) {
+        try {
+            return format.parse(src).getTime();
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     public static int getDigit(String text) {

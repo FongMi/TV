@@ -1,15 +1,14 @@
 package com.fongmi.android.tv.ui.custom;
 
-import android.os.Handler;
 import android.view.KeyEvent;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.utils.Utils;
 
 public class CustomKeyDownLive {
 
     private final Listener listener;
     private final StringBuilder text;
-    private final Handler handler;
     private boolean press;
 
     private final Runnable runnable = new Runnable() {
@@ -26,16 +25,14 @@ public class CustomKeyDownLive {
 
     private CustomKeyDownLive(Listener listener) {
         this.listener = listener;
-        this.handler = new Handler();
         this.text = new StringBuilder();
     }
 
     public void onKeyDown(int keyCode) {
         if (text.length() >= 4) return;
         text.append(getNumber(keyCode));
-        handler.removeCallbacks(runnable);
-        handler.postDelayed(runnable, 1000);
         listener.onShow(text.toString());
+        App.post(runnable, 1000);
     }
 
     public boolean onKeyDown(KeyEvent event) {
@@ -89,6 +86,6 @@ public class CustomKeyDownLive {
 
         void onKeyCenter();
 
-        void onLongPress();
+        boolean onLongPress();
     }
 }
