@@ -1,0 +1,33 @@
+{
+  "spider": "https://github.com/custom_spider.jar",
+  "sites": [
+    {
+      "key": "one",
+      "name": "One",
+      "type": 3,
+      "api": "csp_Csp",
+      "searchable": 1,
+      "filterable": 1,
+      "ext": "https://github.com/one.json"
+    },
+    {
+      "key": "two",
+      "name": "Two",
+      "type": 3,
+      "api": "csp_Csp",
+      "searchable": 1,
+      "filterable": 1,
+      "ext": "https://github.com/two.json"
+    },
+    {
+      "key": "extend",
+      "name": "Extend",
+      "type": 3,
+      "api": "csp_Csp",
+      "searchable": 1,
+      "filterable": 1,
+      "ext": "https://github.com/extend.json",
+      "jar": "https://github.com/extend.jar"
+    }
+  ]
+}
