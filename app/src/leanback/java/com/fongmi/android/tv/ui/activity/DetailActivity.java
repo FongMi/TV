@@ -157,7 +157,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mControl.tracks.setOnClickListener(view -> onTracks());
         mControl.ending.setOnClickListener(view -> onEnding());
         mControl.opening.setOnClickListener(view -> onOpening());
-        mControl.speed.setOnLongClickListener(view -> onSpeedReset());
+        mControl.speed.setOnLongClickListener(view -> onSpeedLong());
         mControl.ending.setOnLongClickListener(view -> onEndingReset());
         mControl.opening.setOnLongClickListener(view -> onOpeningReset());
         mBinding.flag.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
@@ -406,8 +406,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mControl.speed.setText(mPlayers.getSpeed());
     }
 
-    private boolean onSpeedReset() {
-        mPlayers.resetSpeed();
+    private boolean onSpeedLong() {
+        mPlayers.toggleSpeed();
         mControl.speed.setText(mPlayers.getSpeed());
         return true;
     }

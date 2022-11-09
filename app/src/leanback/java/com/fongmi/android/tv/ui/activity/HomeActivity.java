@@ -71,6 +71,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         LiveConfig.get().init();
         ApiConfig.get().init().load(getCallback());
         Updater.create(this).start();
+        Notify.progress(this);
         Server.get().start();
         setRecyclerView();
         setViewModel();
@@ -124,6 +125,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         return new Callback() {
             @Override
             public void success() {
+                Notify.dismiss();
                 getHistory();
                 getVideo();
             }
@@ -131,6 +133,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
             @Override
             public void error(int resId) {
                 Notify.show(resId);
+                Notify.dismiss();
             }
         };
     }

@@ -29,6 +29,7 @@ public class History {
     private long ending;
     private long position;
     private long duration;
+    private int scale;
     private int cid;
 
     public History() {
@@ -137,6 +138,14 @@ public class History {
 
     public void setDuration(long duration) {
         this.duration = duration;
+    }
+
+    public int getScale() {
+        return scale;
+    }
+
+    public void setScale(int scale) {
+        this.scale = scale;
     }
 
     public int getCid() {

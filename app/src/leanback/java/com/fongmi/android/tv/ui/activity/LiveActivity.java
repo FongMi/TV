@@ -127,11 +127,11 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     protected void initEvent() {
         mBinding.group.setListener(this);
         mBinding.channel.setListener(this);
+        mControl.home.setOnClickListener(view -> onHome());
         mControl.scale.setOnClickListener(view -> onScale());
         mControl.speed.setOnClickListener(view -> onSpeed());
         mControl.tracks.setOnClickListener(view -> onTracks());
-        mControl.speed.setOnLongClickListener(view -> onSpeedReset());
-        mControl.home.setOnClickListener(view -> LiveDialog.create(this).show());
+        mControl.speed.setOnLongClickListener(view -> onSpeedLong());
         mBinding.group.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
@@ -219,6 +219,11 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         hideInfo();
     }
 
+    private void onHome() {
+        App.post(() -> getPlayerView().hideController(), 150);
+        LiveDialog.create(this).show();
+    }
+
     private void onScale() {
         int scale = getPlayerView().getResizeMode();
         getPlayerView().setResizeMode(scale = scale == 4 ? 0 : scale + 1);
@@ -231,8 +236,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mControl.speed.setText(mPlayers.getSpeed());
     }
 
-    private boolean onSpeedReset() {
-        mPlayers.resetSpeed();
+    private boolean onSpeedLong() {
+        mPlayers.toggleSpeed();
         mControl.speed.setText(mPlayers.getSpeed());
         return true;
     }
