@@ -442,19 +442,11 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public void onSeeking(int time) {
-        if (!mPlayers.isVod()) return;
+        if (!mPlayers.isVod() || !mChannel.isOnly()) return;
         mBinding.widget.exoDuration.setText(mControl.exoDuration.getText());
         mBinding.widget.exoPosition.setText(mPlayers.getTime(time));
         mBinding.widget.action.setImageResource(time > 0 ? R.drawable.ic_forward : R.drawable.ic_rewind);
         mBinding.widget.center.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void onSeekTo(int time) {
-        if (!mPlayers.isVod()) return;
-        mPlayers.seekTo(time);
-        mKeyDown.resetTime();
-        App.post(mR2, 500);
     }
 
     @Override
@@ -474,15 +466,19 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     @Override
-    public void onKeyLeft() {
-        if (mChannel.getUrls().size() == 1) return;
-        prevLine(true);
+    public void onKeyLeft(int time) {
+        if (isVisible(mBinding.widget.center)) App.post(mR2, 500);
+        if (mChannel.isOnly() && mPlayers.isVod()) mPlayers.seekTo(time);
+        else if (!mChannel.isOnly()) prevLine(true);
+        mKeyDown.resetTime();
     }
 
     @Override
-    public void onKeyRight() {
-        if (mChannel.getUrls().size() == 1) return;
-        nextLine(true);
+    public void onKeyRight(int time) {
+        if (isVisible(mBinding.widget.center)) App.post(mR2, 500);
+        if (mChannel.isOnly() && mPlayers.isVod()) mPlayers.seekTo(time);
+        else if (!mChannel.isOnly()) nextLine(true);
+        mKeyDown.resetTime();
     }
 
     @Override
