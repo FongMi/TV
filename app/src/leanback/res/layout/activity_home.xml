@@ -21,6 +21,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
+            android:focusable="true"
             android:text="@string/app_name"
             android:textColor="@color/white"
             android:textSize="24sp" />
@@ -36,17 +37,23 @@
 
     </FrameLayout>
 
-    <androidx.leanback.widget.VerticalGridView
-        android:id="@+id/recycler"
+    <com.fongmi.android.tv.ui.custom.ProgressLayout
+        android:id="@+id/progressLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipChildren="false"
-        android:clipToPadding="false"
-        android:paddingStart="24dp"
-        android:paddingTop="8dp"
-        android:paddingEnd="24dp"
-        android:paddingBottom="24dp"
-        app:focusOutEnd="true"
-        app:focusOutFront="true" />
+        android:layout_height="match_parent">
 
+        <androidx.leanback.widget.VerticalGridView
+            android:id="@+id/recycler"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:paddingStart="24dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="24dp"
+            app:focusOutEnd="true"
+            app:focusOutFront="true" />
+
+    </com.fongmi.android.tv.ui.custom.ProgressLayout>
 </LinearLayout>

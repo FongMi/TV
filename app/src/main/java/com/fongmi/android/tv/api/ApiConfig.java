@@ -111,6 +111,7 @@ public class ApiConfig {
         } catch (Exception e) {
             if (config.getUrl().isEmpty()) App.post(() -> callback.error(0));
             else loadCache(callback);
+            LiveConfig.get().load();
             e.printStackTrace();
         }
     }
@@ -157,7 +158,7 @@ public class ApiConfig {
         if (hasLive) Config.create(config.getUrl(), 1);
         boolean loadApi = hasLive && LiveConfig.get().isSame(config.getUrl());
         if (loadApi) LiveConfig.get().clear().config(Config.find(config.getUrl(), 1).update()).parse(object);
-        else if (LiveConfig.get().getHome() == null) LiveConfig.get().load();
+        else LiveConfig.get().load();
     }
 
     private String parseExt(String ext) {

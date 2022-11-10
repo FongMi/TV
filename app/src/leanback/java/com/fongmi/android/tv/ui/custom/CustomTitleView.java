@@ -35,6 +35,7 @@ public class CustomTitleView extends AppCompatTextView {
 
     public void setListener(Listener listener) {
         this.listener = listener;
+        setOnClickListener(v -> listener.showDialog());
     }
 
     @Override
