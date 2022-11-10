@@ -165,6 +165,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         getPlayerView().setResizeMode(Prefers.getLiveScale());
         getPlayerView().setOnClickListener(view -> onToggle());
         getPlayerView().setOnLongClickListener(view -> onLongPress());
+        mControl.home.setVisibility(LiveConfig.isOnly() ? View.GONE : View.VISIBLE);
         mControl.scale.setText(ResUtil.getStringArray(R.array.select_scale)[Prefers.getLiveScale()]);
         mControl.speed.setText(mPlayers.getSpeed());
     }
@@ -181,6 +182,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void setPosition(int[] position) {
         if (position[0] == -1) return;
+        if (mGroupAdapter.size() == 1) return;
         mGroup = (Group) mGroupAdapter.get(position[0]);
         mBinding.group.setSelectedPosition(position[0]);
         mGroup.setPosition(position[1]);

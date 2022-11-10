@@ -41,6 +41,10 @@ public class LiveConfig {
         return get().getLives().indexOf(get().getHome());
     }
 
+    public static boolean isOnly() {
+        return get().getLives().size() == 1;
+    }
+
     public static boolean isEmpty() {
         return get().getHome() == null;
     }
