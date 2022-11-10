@@ -1,10 +1,12 @@
 package com.fongmi.android.tv;
 
-import android.app.Application;
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 
 import androidx.core.os.HandlerCompat;
+import androidx.multidex.MultiDex;
+import androidx.multidex.MultiDexApplication;
 
 import com.fongmi.android.tv.ui.activity.CrashActivity;
 
@@ -13,7 +15,7 @@ import java.util.concurrent.Executors;
 
 import cat.ereza.customactivityoncrash.config.CaocConfig;
 
-public class App extends Application {
+public class App extends MultiDexApplication {
 
     private final ExecutorService executor;
     private final Handler handler;
@@ -44,6 +46,12 @@ public class App extends Application {
 
     public static void removeCallbacks(Runnable runnable) {
         get().handler.removeCallbacks(runnable);
+    }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
     }
 
     @Override
