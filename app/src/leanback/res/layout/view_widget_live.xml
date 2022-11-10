@@ -34,6 +34,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:background="@drawable/shape_live_info"
+        android:gravity="center"
         android:orientation="horizontal"
         android:padding="16dp"
         android:visibility="gone"
@@ -49,11 +50,19 @@
             android:textStyle="bold"
             tools:text="005" />
 
+        <ImageView
+            android:id="@+id/logo"
+            android:layout_width="48dp"
+            android:layout_height="36dp"
+            android:layout_marginEnd="12dp"
+            android:scaleType="fitCenter" />
+
         <TextView
             android:id="@+id/name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="12dp"
+            android:maxEms="34"
             android:singleLine="true"
             android:textColor="@color/white"
             android:textSize="18sp"
