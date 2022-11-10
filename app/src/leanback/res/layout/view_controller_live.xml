@@ -27,9 +27,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="12dp"
-                android:textColor="@color/grey_700"
-                android:textSize="16sp"
-                android:textStyle="bold"
+                android:textColor="@color/grey_800"
+                android:textSize="18sp"
                 tools:text="005" />
 
             <TextView
@@ -40,9 +39,8 @@
                 android:marqueeRepeatLimit="marquee_forever"
                 android:scrollHorizontally="true"
                 android:singleLine="true"
-                android:textColor="@color/grey_700"
-                android:textSize="16sp"
-                android:textStyle="bold"
+                android:textColor="@color/grey_800"
+                android:textSize="18sp"
                 tools:text="民視" />
 
             <TextView
@@ -53,10 +51,8 @@
                 android:layout_marginEnd="12dp"
                 android:layout_weight="1"
                 android:singleLine="true"
-                android:text="@string/live_epg_empty"
-                android:textColor="@color/grey_700"
-                android:textSize="16sp"
-                android:textStyle="bold"
+                android:textColor="@color/grey_800"
+                android:textSize="18sp"
                 tools:text="正在播放：食神" />
 
             <TextView

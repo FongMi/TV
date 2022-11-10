@@ -41,8 +41,12 @@ public class LiveConfig {
         return get().getLives().indexOf(get().getHome());
     }
 
+    public static boolean isOnly() {
+        return get().getLives().size() == 1;
+    }
+
     public static boolean isEmpty() {
-        return get().getHome() == null || get().getHome().getGroups().isEmpty();
+        return get().getHome() == null;
     }
 
     public LiveConfig init() {
@@ -65,7 +69,7 @@ public class LiveConfig {
     }
 
     public void load() {
-        load(new Callback());
+        if (isEmpty()) load(new Callback());
     }
 
     public void load(Callback callback) {
@@ -99,7 +103,6 @@ public class LiveConfig {
         if (!object.has("lives")) return;
         for (JsonElement element : Json.safeListElement(object, "lives")) parse(Live.objectFrom(element));
         if (home == null) setHome(lives.isEmpty() ? new Live() : lives.get(0));
-        LiveParser.start(home);
     }
 
     private void parse(Live live) {
@@ -152,7 +155,7 @@ public class LiveConfig {
     }
 
     public boolean isSame(String url) {
-        return same || url.equals(config.getUrl());
+        return same || config.getUrl().isEmpty() || url.equals(config.getUrl());
     }
 
     public List<Live> getLives() {
