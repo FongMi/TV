@@ -33,6 +33,7 @@ public class History {
     private int cid;
 
     public History() {
+        this.scale = -1;
     }
 
     @NonNull
