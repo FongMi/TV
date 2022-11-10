@@ -349,7 +349,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void exitFullscreen() {
-        mBinding.widget.top.setVisibility(View.GONE);
+        mBinding.widget.info.setVisibility(View.GONE);
         mBinding.widget.center.setVisibility(View.GONE);
         mBinding.video.setForeground(ResUtil.getDrawable(R.drawable.selector_video));
         mBinding.video.setLayoutParams(mFrameParams);
@@ -520,7 +520,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         public void run() {
             mBinding.widget.action.setImageResource(R.drawable.ic_play);
             mBinding.widget.center.setVisibility(View.GONE);
-            mBinding.widget.top.setVisibility(View.GONE);
+            mBinding.widget.info.setVisibility(View.GONE);
         }
     };
 
@@ -584,7 +584,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void onPause(boolean visible) {
         mBinding.widget.exoPosition.setText(mPlayers.getTime(0));
         mBinding.widget.exoDuration.setText(mControl.exoDuration.getText());
-        mBinding.widget.top.setVisibility(visible ? View.VISIBLE : View.GONE);
+        mBinding.widget.info.setVisibility(visible ? View.VISIBLE : View.GONE);
         mBinding.widget.center.setVisibility(visible ? View.VISIBLE : View.GONE);
         mPlayers.pause();
     }
