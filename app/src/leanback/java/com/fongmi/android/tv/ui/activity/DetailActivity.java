@@ -196,10 +196,14 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void setVideoView() {
         getPlayerView().setPlayer(mPlayers.exo());
         getPlayerView().setVisibility(View.VISIBLE);
-        getPlayerView().setResizeMode(Prefers.getVodScale());
         getPlayerView().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
-        mControl.scale.setText(ResUtil.getStringArray(R.array.select_scale)[Prefers.getVodScale()]);
         mControl.speed.setText(mPlayers.getSpeed());
+        setScale(Prefers.getVodScale());
+    }
+
+    private void setScale(int scale) {
+        getPlayerView().setResizeMode(scale);
+        mControl.scale.setText(ResUtil.getStringArray(R.array.select_scale)[scale]);
     }
 
     private void setViewModel() {
@@ -398,7 +402,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         int scale = getPlayerView().getResizeMode();
         getPlayerView().setResizeMode(scale = scale == 4 ? 0 : scale + 1);
         mControl.scale.setText(ResUtil.getStringArray(R.array.select_scale)[scale]);
-        Prefers.putVodScale(scale);
+        mHistory.setScale(scale);
     }
 
     private void onSpeed() {
@@ -471,6 +475,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mHistory = mHistory == null ? createHistory() : mHistory;
         setFlagActivated(mHistory.getFlag());
         if (mHistory.isRevSort()) reverseEpisode();
+        if (mHistory.getScale() != -1) setScale(mHistory.getScale());
         mControl.opening.setText(mPlayers.getStringForTime(mHistory.getOpening()));
         mControl.ending.setText(mPlayers.getStringForTime(mHistory.getEnding()));
     }
