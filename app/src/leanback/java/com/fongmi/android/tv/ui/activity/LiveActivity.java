@@ -127,15 +127,15 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     protected void initEvent() {
         mBinding.group.setListener(this);
         mBinding.channel.setListener(this);
+        mControl.home.setOnClickListener(view -> onHome());
         mControl.scale.setOnClickListener(view -> onScale());
         mControl.speed.setOnClickListener(view -> onSpeed());
         mControl.tracks.setOnClickListener(view -> onTracks());
-        mControl.speed.setOnLongClickListener(view -> onSpeedReset());
-        mControl.home.setOnClickListener(view -> LiveDialog.create(this).show());
+        mControl.speed.setOnLongClickListener(view -> onSpeedLong());
         mBinding.group.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
-                onChildSelected(child, mGroup = (Group) mGroupAdapter.get(position));
+                if (mGroupAdapter.size() > 0) onChildSelected(child, mGroup = (Group) mGroupAdapter.get(position));
             }
         });
     }
@@ -165,6 +165,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         getPlayerView().setResizeMode(Prefers.getLiveScale());
         getPlayerView().setOnClickListener(view -> onToggle());
         getPlayerView().setOnLongClickListener(view -> onLongPress());
+        mControl.home.setVisibility(LiveConfig.isOnly() ? View.GONE : View.VISIBLE);
         mControl.scale.setText(ResUtil.getStringArray(R.array.select_scale)[Prefers.getLiveScale()]);
         mControl.speed.setText(mPlayers.getSpeed());
     }
@@ -181,6 +182,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void setPosition(int[] position) {
         if (position[0] == -1) return;
+        if (mGroupAdapter.size() == 1) return;
         mGroup = (Group) mGroupAdapter.get(position[0]);
         mBinding.group.setSelectedPosition(position[0]);
         mGroup.setPosition(position[1]);
@@ -189,6 +191,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void setPosition() {
+        if (mChannel == null) return;
         Group group = mChannel.getGroup();
         int position = mGroupAdapter.indexOf(group);
         boolean change = mBinding.group.getSelectedPosition() != position;
@@ -219,6 +222,11 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         hideInfo();
     }
 
+    private void onHome() {
+        App.post(() -> getPlayerView().hideController(), 150);
+        LiveDialog.create(this).show();
+    }
+
     private void onScale() {
         int scale = getPlayerView().getResizeMode();
         getPlayerView().setResizeMode(scale = scale == 4 ? 0 : scale + 1);
@@ -231,8 +239,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mControl.speed.setText(mPlayers.getSpeed());
     }
 
-    private boolean onSpeedReset() {
-        mPlayers.resetSpeed();
+    private boolean onSpeedLong() {
+        mPlayers.toggleSpeed();
         mControl.speed.setText(mPlayers.getSpeed());
         return true;
     }
@@ -378,6 +386,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
+        if (mGroup == null) return false;
         if (Utils.isMenuKey(event)) onLongPress();
         else if (isGone(mBinding.recycler) && !getPlayerView().isControllerFullyVisible() && mKeyDown.hasEvent(event)) return mKeyDown.onKeyDown(event);
         return super.dispatchKeyEvent(event);

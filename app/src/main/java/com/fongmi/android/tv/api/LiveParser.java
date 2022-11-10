@@ -14,12 +14,12 @@ import java.util.regex.Pattern;
 
 public class LiveParser {
 
-    private static final Pattern GROUP = Pattern.compile(".*group-title=\"(.?|.+?)\".*", Pattern.CASE_INSENSITIVE);
-    private static final Pattern LOGO = Pattern.compile(".*tvg-logo=\"(.?|.+?)\".*", Pattern.CASE_INSENSITIVE);
-    private static final Pattern NAME = Pattern.compile(".*,(.+?)$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern GROUP = Pattern.compile(".*group-title=\"(.?|.+?)\".*");
+    private static final Pattern LOGO = Pattern.compile(".*tvg-logo=\"(.?|.+?)\".*");
+    private static final Pattern NAME = Pattern.compile(".*,(.+?)$");
 
     private static String extract(String line, Pattern pattern) {
-        Matcher matcher = pattern.matcher(line);
+        Matcher matcher = pattern.matcher(line.trim());
         if (matcher.matches()) return matcher.group(1);
         return "";
     }
@@ -32,7 +32,7 @@ public class LiveParser {
     public static void start(Live live, String text) {
         int number = 0;
         if (live.getGroups().size() > 0) return;
-        if (text.startsWith("#EXTM3U")) m3u(live, text); else txt(live, text);
+        if (text.trim().startsWith("#EXTM3U")) m3u(live, text); else txt(live, text);
         for (Group group : live.getGroups()) {
             for (Channel channel : group.getChannel()) {
                 channel.setNumber(++number);

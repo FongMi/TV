@@ -58,7 +58,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     private ArrayObjectAdapter mHistoryAdapter;
     private HistoryPresenter mHistoryPresenter;
     private SiteViewModel mViewModel;
-    private boolean mConfirmExit;
+    private boolean confirm;
 
     @Override
     protected ViewBinding getBinding() {
@@ -70,12 +70,12 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         WallConfig.get().init();
         LiveConfig.get().init();
         ApiConfig.get().init().load(getCallback());
+        mBinding.progressLayout.showProgress();
         Updater.create(this).start();
         Server.get().start();
         setRecyclerView();
         setViewModel();
         setAdapter();
-        setFocus();
     }
 
     @Override
@@ -115,24 +115,27 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         mHistoryAdapter = new ArrayObjectAdapter(mHistoryPresenter = new HistoryPresenter(this));
     }
 
-    private void setFocus() {
-        mBinding.recycler.requestFocus();
-        App.post(() -> mBinding.title.setFocusable(true), 500);
-    }
-
     private Callback getCallback() {
         return new Callback() {
             @Override
             public void success() {
+                mBinding.progressLayout.showContent();
                 getHistory();
                 getVideo();
+                setFocus();
             }
 
             @Override
             public void error(int resId) {
+                mBinding.progressLayout.showContent();
                 Notify.show(resId);
+                setFocus();
             }
         };
+    }
+
+    private void setFocus() {
+        App.post(() -> mBinding.recycler.requestFocus(), 500);
     }
 
     private void getVideo() {
@@ -316,12 +319,12 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
             mHistoryAdapter.notifyArrayItemRangeChanged(0, mHistoryAdapter.size());
         } else if (mBinding.recycler.getSelectedPosition() != 0) {
             mBinding.recycler.scrollToPosition(0);
-        } else if (!mConfirmExit) {
-            mConfirmExit = true;
+        } else if (!confirm) {
+            confirm = true;
             Notify.show(R.string.app_exit);
-            App.post(() -> mConfirmExit = false, 1000);
+            App.post(() -> confirm = false, 1000);
         } else {
-            super.onBackPressed();
+            finish();
         }
     }
 
@@ -332,5 +335,6 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         LiveConfig.get().clear();
         ApiConfig.get().clear();
         Server.get().stop();
+        System.exit(0);
     }
 }

@@ -43,7 +43,8 @@ public class ArrayPresenter extends Presenter {
         String text = object.toString();
         holder.binding.text.setText(text);
         if (text.equals(reverse)) setOnClickListener(holder, view -> mListener.onRevSort());
-        if (text.equals(backward) || text.equals(forward)) setOnClickListener(holder, view -> mListener.onRevPlay(holder.binding.text));
+        else if (text.equals(backward) || text.equals(forward)) setOnClickListener(holder, view -> mListener.onRevPlay(holder.binding.text));
+        else setOnClickListener(holder, null);
     }
 
     @Override
