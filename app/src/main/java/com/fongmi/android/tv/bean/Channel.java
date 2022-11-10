@@ -153,7 +153,7 @@ public class Channel {
     }
 
     public int getLineVisible() {
-        return getUrls().size() == 1 ? View.GONE : View.VISIBLE;
+        return isOnly() ? View.GONE : View.VISIBLE;
     }
 
     public void loadLogo(ImageView view) {
@@ -172,12 +172,16 @@ public class Channel {
         setLine(getLine() > 0 ? getLine() - 1 : getUrls().size() - 1);
     }
 
+    public boolean isOnly() {
+        return getUrls().size() == 1;
+    }
+
     public boolean isLastLine() {
         return getLine() == getUrls().size() - 1;
     }
 
     public String getLineText() {
-        return getUrls().size() == 1 ? "" : ResUtil.getString(R.string.live_line, getLine() + 1);
+        return isOnly() ? "" : ResUtil.getString(R.string.live_line, getLine() + 1);
     }
 
     public Channel setNumber(int number) {

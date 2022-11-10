@@ -46,11 +46,9 @@ public class CustomKeyDownLive {
         } else if (event.getAction() == KeyEvent.ACTION_DOWN && Utils.isDownKey(event)) {
             listener.onKeyDown();
         } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isLeftKey(event)) {
-            listener.onKeyLeft();
-            listener.onSeekTo(holdTime);
+            listener.onKeyLeft(holdTime);
         } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isRightKey(event)) {
-            listener.onKeyRight();
-            listener.onSeekTo(holdTime);
+            listener.onKeyRight(holdTime);
         } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isDigitKey(event)) {
             onKeyDown(event.getKeyCode());
         } else if (Utils.isEnterKey(event)) {
@@ -97,15 +95,13 @@ public class CustomKeyDownLive {
 
         void onSeeking(int time);
 
-        void onSeekTo(int time);
-
         void onKeyUp();
 
         void onKeyDown();
 
-        void onKeyLeft();
+        void onKeyLeft(int time);
 
-        void onKeyRight();
+        void onKeyRight(int time);
 
         void onKeyCenter();
 
