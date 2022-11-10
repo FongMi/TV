@@ -5,10 +5,10 @@
     android:layout_height="match_parent">
 
     <LinearLayout
-        android:id="@+id/top"
+        android:id="@+id/info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/shape_title"
+        android:background="@drawable/shape_info_vod"
         android:orientation="horizontal"
         android:padding="16dp"
         android:visibility="gone"
