@@ -122,6 +122,10 @@ public class Players implements Player.Listener, AnalyticsListener, ParseTask.Ca
         return exoPlayer != null && exoPlayer.getPlaybackState() == Player.STATE_IDLE;
     }
 
+    public boolean isVod() {
+        return getDuration() > 5 * 60 * 1000;
+    }
+
     public boolean canNext() {
         return getCurrentPosition() >= getDuration();
     }

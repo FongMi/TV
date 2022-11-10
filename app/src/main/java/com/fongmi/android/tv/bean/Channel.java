@@ -144,20 +144,16 @@ public class Channel {
         this.line = line;
     }
 
-    public boolean isSelected() {
-        return selected;
-    }
-
-    public void setSelected(boolean selected) {
-        this.selected = selected;
-    }
-
     public void setSelected(Channel item) {
         this.selected = item.equals(this);
     }
 
-    public int getVisible() {
+    public int getLogoVisible() {
         return getLogo().isEmpty() ? View.GONE : View.VISIBLE;
+    }
+
+    public int getLineVisible() {
+        return getUrls().size() == 1 ? View.GONE : View.VISIBLE;
     }
 
     public void loadLogo(ImageView view) {
