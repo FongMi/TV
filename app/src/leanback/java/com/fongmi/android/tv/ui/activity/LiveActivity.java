@@ -270,12 +270,14 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void showInfo() {
+        mChannel.loadLogo(mBinding.widget.logo);
         mControl.name.setText(mChannel.getName());
         mControl.number.setText(mChannel.getNumber());
         mBinding.widget.name.setText(mChannel.getName());
+        mBinding.widget.info.setVisibility(View.VISIBLE);
         mBinding.widget.line.setText(mChannel.getLineText());
         mBinding.widget.number.setText(mChannel.getNumber());
-        mBinding.widget.info.setVisibility(View.VISIBLE);
+        mBinding.widget.logo.setVisibility(mChannel.getVisible());
         App.post(mR1, 5000);
         checkEpg();
     }
