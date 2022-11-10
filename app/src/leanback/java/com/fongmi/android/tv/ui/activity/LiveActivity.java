@@ -493,8 +493,10 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public boolean onLongPress() {
+        if (isVisible(mControl.home)) mControl.home.requestFocus();
+        else if (isVisible(mControl.line)) mControl.line.requestFocus();
+        else mControl.speed.requestFocus();
         getPlayerView().showController();
-        mControl.home.requestFocus();
         hideInfo();
         hideUI();
         return true;
