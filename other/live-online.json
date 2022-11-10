@@ -1,17 +1,6 @@
 {
   "lives": [
     {
-      "group": "redirect",
-      "channels": [
-        {
-          "name": "redirect",
-          "urls": [
-            "proxy://do=live&type=txt&ext=aHR0cHM6Ly9naXRodWIuY29tL3JlZGlyZWN0LnR4dA=="
-          ]
-        }
-      ]
-    },
-    {
       "name": "TXT",
       "type": 0,
       "url": "https://github.com/live.txt",
