@@ -33,7 +33,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="@drawable/shape_live_info"
+        android:background="@drawable/shape_info_live"
         android:gravity="center"
         android:orientation="horizontal"
         android:padding="16dp"
