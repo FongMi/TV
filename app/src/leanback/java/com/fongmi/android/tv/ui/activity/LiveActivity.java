@@ -536,6 +536,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
                 TrackSelectionDialog.setVisible(mPlayers.exo(), mControl.tracks);
                 break;
             case Player.STATE_ENDED:
+                onKeyDown();
                 break;
             default:
                 if (!event.isRetry() || mPlayers.addRetry() > 2) onError();
