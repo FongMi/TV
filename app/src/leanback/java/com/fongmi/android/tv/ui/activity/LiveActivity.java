@@ -531,7 +531,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
                 mBinding.widget.progress.getRoot().setVisibility(View.VISIBLE);
                 break;
             case Player.STATE_READY:
-                mPlayers.setRetry(0);
+                mPlayers.reset();
                 mBinding.widget.progress.getRoot().setVisibility(View.GONE);
                 TrackSelectionDialog.setVisible(mPlayers.exo(), mControl.tracks);
                 break;
@@ -546,7 +546,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void onError() {
-        mPlayers.setRetry(0);
+        mPlayers.reset();
         if (isGone(mBinding.recycler) && mChannel.isLastLine()) {
             onKeyDown();
         } else {
