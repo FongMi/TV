@@ -34,6 +34,10 @@ public class CustomKeyDownVod {
         return true;
     }
 
+    public boolean hasEvent(KeyEvent event) {
+        return Utils.isEnterKey(event) || Utils.isUpKey(event) || Utils.isDownKey(event) || Utils.isLeftKey(event) || Utils.isRightKey(event);
+    }
+
     private int addTime() {
         return holdTime = holdTime + 10000;
     }
@@ -44,10 +48,6 @@ public class CustomKeyDownVod {
 
     public void resetTime() {
         holdTime = 0;
-    }
-
-    public boolean hasEvent(KeyEvent event) {
-        return Utils.isEnterKey(event) || Utils.isUpKey(event) || Utils.isDownKey(event) || Utils.isLeftKey(event) || Utils.isRightKey(event);
     }
 
     public interface Listener {
