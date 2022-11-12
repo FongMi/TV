@@ -54,16 +54,13 @@ public class Players implements Player.Listener, AnalyticsListener, ParseTask.Ca
         return exoPlayer;
     }
 
-    private void setErrorCode(int errorCode) {
-        this.errorCode = errorCode;
+    public void reset() {
+        this.errorCode = 0;
+        this.retry = 0;
     }
 
     public int getRetry() {
         return retry;
-    }
-
-    public void setRetry(int retry) {
-        this.retry = retry;
     }
 
     public int addRetry() {
@@ -139,7 +136,7 @@ public class Players implements Player.Listener, AnalyticsListener, ParseTask.Ca
     }
 
     public void stop() {
-        setRetry(0);
+        reset();
         exoPlayer.stop();
         exoPlayer.clearMediaItems();
     }
@@ -176,14 +173,12 @@ public class Players implements Player.Listener, AnalyticsListener, ParseTask.Ca
         exoPlayer.setMediaSource(ExoUtil.getSource(result, errorCode));
         PlayerEvent.state(0);
         exoPlayer.prepare();
-        setErrorCode(0);
     }
 
     private void setMediaSource(Map<String, String> headers, String url) {
         exoPlayer.setMediaSource(ExoUtil.getSource(headers, url, errorCode));
         PlayerEvent.state(0);
         exoPlayer.prepare();
-        setErrorCode(0);
     }
 
     @Override
@@ -199,8 +194,8 @@ public class Players implements Player.Listener, AnalyticsListener, ParseTask.Ca
 
     @Override
     public void onPlayerError(@NonNull PlaybackException error) {
+        this.errorCode = error.errorCode;
         PlayerEvent.error(R.string.error_play_format, true);
-        setErrorCode(error.errorCode);
     }
 
     @Override
