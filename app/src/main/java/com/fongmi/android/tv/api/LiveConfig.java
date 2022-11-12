@@ -101,12 +101,11 @@ public class LiveConfig {
 
     public void parse(JsonObject object) {
         if (!object.has("lives")) return;
-        for (JsonElement element : Json.safeListElement(object, "lives")) parse(Live.objectFrom(element));
+        for (JsonElement element : Json.safeListElement(object, "lives")) parse(Live.objectFrom(element).check());
         if (home == null) setHome(lives.isEmpty() ? new Live() : lives.get(0));
     }
 
     private void parse(Live live) {
-        if (live.isProxy()) live = new Live(live.getChannels().get(0).getName(), live.getChannels().get(0).getUrls().get(0).split("ext=")[1]);
         if (live.getName().equals(config.getHome())) setHome(live);
         if (!lives.contains(live)) lives.add(live);
     }
