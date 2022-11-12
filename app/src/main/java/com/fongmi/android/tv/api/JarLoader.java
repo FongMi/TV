@@ -52,6 +52,7 @@ public class JarLoader {
             methods.put(key, classProxy.getMethod("proxy", Map.class));
         } catch (Exception e) {
             e.printStackTrace();
+            file.delete();
         }
     }
 
