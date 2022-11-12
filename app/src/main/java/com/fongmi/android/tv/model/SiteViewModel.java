@@ -191,7 +191,7 @@ public class SiteViewModel extends ViewModel {
         executor = Executors.newFixedThreadPool(2);
         executor.execute(() -> {
             try {
-                if (!Thread.interrupted()) result.postValue(executor.submit(callable).get(15, TimeUnit.SECONDS));
+                if (!Thread.interrupted()) result.postValue(executor.submit(callable).get(30, TimeUnit.SECONDS));
             } catch (Throwable e) {
                 e.printStackTrace();
                 if (e instanceof InterruptedException) return;
