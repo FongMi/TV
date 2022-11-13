@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.db.AppDatabase;
-import com.google.gson.Gson;
+import com.fongmi.android.tv.gson.StringAdapter;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
 
@@ -45,7 +45,7 @@ public class Site {
 
     public static Site objectFrom(JsonElement element) {
         try {
-            return new Gson().fromJson(element, Site.class);
+            return StringAdapter.gson().fromJson(element, Site.class);
         } catch (Exception e) {
             return new Site();
         }
