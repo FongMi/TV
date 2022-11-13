@@ -4,9 +4,9 @@
 
     <gradient
         android:angle="270"
-        android:centerColor="#4D000000"
-        android:endColor="#00000000"
-        android:startColor="#99000000"
+        android:centerColor="@color/black_30"
+        android:endColor="@color/black"
+        android:startColor="@color/black_60"
         android:type="linear" />
 
 </shape>
