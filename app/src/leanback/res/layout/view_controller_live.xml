@@ -36,8 +36,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="12dp"
-                android:marqueeRepeatLimit="marquee_forever"
-                android:scrollHorizontally="true"
+                android:maxEms="30"
                 android:singleLine="true"
                 android:textColor="@color/grey_800"
                 android:textSize="18sp"
@@ -66,6 +65,18 @@
                 android:textColor="@color/white"
                 android:textSize="14sp"
                 tools:text="首頁" />
+
+            <TextView
+                android:id="@+id/line"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="12dp"
+                android:background="@drawable/selector_text"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                tools:text="來源 1" />
 
             <TextView
                 android:id="@+id/speed"

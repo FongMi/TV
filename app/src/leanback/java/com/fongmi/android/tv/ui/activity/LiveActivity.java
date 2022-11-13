@@ -78,6 +78,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private Runnable mR0;
     private Runnable mR1;
     private Runnable mR2;
+    private Runnable mR3;
     private int count;
 
     public static void start(Activity activity) {
@@ -111,7 +112,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     protected void initView() {
         mR0 = this::hideUI;
         mR1 = this::hideInfo;
-        mR2 = this::setChannelActivated;
+        mR2 = this::hideCenter;
+        mR3 = this::setChannelActivated;
         mPlayers = new Players().init();
         mKeyDown = CustomKeyDownLive.create(this);
         mFormatDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
@@ -131,6 +133,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mControl.scale.setOnClickListener(view -> onScale());
         mControl.speed.setOnClickListener(view -> onSpeed());
         mControl.tracks.setOnClickListener(view -> onTracks());
+        mControl.line.setOnClickListener(view -> nextLine(false));
         mControl.speed.setOnLongClickListener(view -> onSpeedLong());
         mBinding.group.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
@@ -270,41 +273,23 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void showInfo() {
-        mControl.name.setText(mChannel.getName());
-        mControl.number.setText(mChannel.getNumber());
-        mBinding.widget.name.setText(mChannel.getName());
-        mBinding.widget.line.setText(mChannel.getLineText());
-        mBinding.widget.number.setText(mChannel.getNumber());
         mBinding.widget.info.setVisibility(View.VISIBLE);
         App.post(mR1, 5000);
-        checkEpg();
-    }
-
-    private void resetPass() {
-        this.count = 0;
-    }
-
-    private void checkEpg() {
-        if (mChannel.getEpg().isEmpty()) return;
-        String date = mFormatDate.format(new Date());
-        String epg = mChannel.getEpg().replace("{date}", date);
-        if (mChannel.getData().equal(date)) showEpg();
-        else getEpg(epg, mChannel);
-    }
-
-    private void getEpg(String epg, Channel channel) {
-        OKHttp.newCall(epg).enqueue(new Callback() {
-            @Override
-            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                channel.setData(Epg.objectFrom(response.body().string(), mFormatTime));
-                if (mChannel.equals(channel)) App.post(() -> showEpg());
-            }
-        });
+        setInfo();
     }
 
     private void showEpg() {
         mControl.play.setText(mChannel.getData().getEpg());
         mBinding.widget.play.setText(mChannel.getData().getEpg());
+    }
+
+    private void hideCenter() {
+        mBinding.widget.action.setImageResource(R.drawable.ic_play);
+        mBinding.widget.center.setVisibility(View.GONE);
+    }
+
+    private void resetPass() {
+        this.count = 0;
     }
 
     @Override
@@ -351,13 +336,59 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void setChannel(Channel item) {
         LiveConfig.get().setKeep(mGroup, mChannel = item);
-        App.post(mR2, 100);
+        App.post(mR3, 100);
         showInfo();
+    }
+
+    private void setInfo() {
+        mChannel.loadLogo(mBinding.widget.logo);
+        mControl.name.setText(mChannel.getName());
+        mControl.line.setText(mChannel.getLineText());
+        mControl.number.setText(mChannel.getNumber());
+        mBinding.widget.name.setText(mChannel.getName());
+        mBinding.widget.line.setText(mChannel.getLineText());
+        mBinding.widget.number.setText(mChannel.getNumber());
+        mControl.line.setVisibility(mChannel.getLineVisible());
+        mBinding.widget.logo.setVisibility(mChannel.getLogoVisible());
+        mBinding.widget.line.setVisibility(mChannel.getLineVisible());
+        checkEpg();
+    }
+
+    private void checkEpg() {
+        if (mChannel.getEpg().isEmpty()) return;
+        String date = mFormatDate.format(new Date());
+        String epg = mChannel.getEpg().replace("{date}", date);
+        if (mChannel.getData().equal(date)) showEpg();
+        else getEpg(epg, mChannel);
+    }
+
+    private void getEpg(String epg, Channel channel) {
+        OKHttp.newCall(epg).enqueue(new Callback() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                channel.setData(Epg.objectFrom(response.body().string(), mFormatTime));
+                if (mChannel.equals(channel)) App.post(() -> showEpg());
+            }
+        });
     }
 
     private void getUrl() {
         mBinding.widget.progress.getRoot().setVisibility(View.VISIBLE);
         mViewModel.getUrl(mChannel);
+    }
+
+    private void prevLine(boolean show) {
+        mChannel.prevLine();
+        if (show) showInfo();
+        else setInfo();
+        getUrl();
+    }
+
+    private void nextLine(boolean show) {
+        mChannel.nextLine();
+        if (show) showInfo();
+        else setInfo();
+        getUrl();
     }
 
     @Override
@@ -410,6 +441,15 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     @Override
+    public void onSeeking(int time) {
+        if (!mPlayers.isVod() || !mChannel.isOnly()) return;
+        mBinding.widget.exoDuration.setText(mControl.exoDuration.getText());
+        mBinding.widget.exoPosition.setText(mPlayers.getTime(time));
+        mBinding.widget.action.setImageResource(time > 0 ? R.drawable.ic_forward : R.drawable.ic_rewind);
+        mBinding.widget.center.setVisibility(View.VISIBLE);
+    }
+
+    @Override
     public void onKeyUp() {
         int position = mGroup.getPosition() - 1;
         if (position < 0) prevGroup(true);
@@ -426,19 +466,19 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     @Override
-    public void onKeyLeft() {
-        if (mChannel.getUrls().size() == 1) return;
-        mChannel.prevLine();
-        showInfo();
-        getUrl();
+    public void onKeyLeft(int time) {
+        if (isVisible(mBinding.widget.center)) App.post(mR2, 500);
+        if (mChannel.isOnly() && mPlayers.isVod()) mPlayers.seekTo(time);
+        else if (!mChannel.isOnly()) prevLine(true);
+        mKeyDown.resetTime();
     }
 
     @Override
-    public void onKeyRight() {
-        if (mChannel.getUrls().size() == 1) return;
-        mChannel.nextLine();
-        showInfo();
-        getUrl();
+    public void onKeyRight(int time) {
+        if (isVisible(mBinding.widget.center)) App.post(mR2, 500);
+        if (mChannel.isOnly() && mPlayers.isVod()) mPlayers.seekTo(time);
+        else if (!mChannel.isOnly()) nextLine(true);
+        mKeyDown.resetTime();
     }
 
     @Override
@@ -449,8 +489,10 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public boolean onLongPress() {
+        if (isVisible(mControl.home)) mControl.home.requestFocus();
+        else if (isVisible(mControl.line)) mControl.line.requestFocus();
+        else mControl.speed.requestFocus();
         getPlayerView().showController();
-        mControl.home.requestFocus();
         hideInfo();
         hideUI();
         return true;
@@ -489,11 +531,12 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
                 mBinding.widget.progress.getRoot().setVisibility(View.VISIBLE);
                 break;
             case Player.STATE_READY:
-                mPlayers.setRetry(0);
+                mPlayers.reset();
                 mBinding.widget.progress.getRoot().setVisibility(View.GONE);
                 TrackSelectionDialog.setVisible(mPlayers.exo(), mControl.tracks);
                 break;
             case Player.STATE_ENDED:
+                onKeyDown();
                 break;
             default:
                 if (!event.isRetry() || mPlayers.addRetry() > 2) onError();
@@ -503,7 +546,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void onError() {
-        mPlayers.setRetry(0);
+        mPlayers.reset();
         if (isGone(mBinding.recycler) && mChannel.isLastLine()) {
             onKeyDown();
         } else {
