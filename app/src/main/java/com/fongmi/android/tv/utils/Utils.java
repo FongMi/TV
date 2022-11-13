@@ -90,12 +90,10 @@ public class Utils {
         if (text.startsWith("clan")) return checkClan(text);
         if (text.startsWith(".")) text = text.substring(1);
         if (text.startsWith("/")) text = text.substring(1);
-        return convert(Uri.parse(baseUrl), text);
-    }
-
-    private static String convert(Uri uri, String text) {
-        String last = uri.getLastPathSegment();
-        return last == null ? uri.getScheme() + "://" + text : uri.toString().replace(last, text);
+        String last = Uri.parse(baseUrl).getLastPathSegment();
+        if (last == null) return Uri.parse(baseUrl).getScheme() + "://" + text;
+        int index = baseUrl.lastIndexOf(last);
+        return baseUrl.substring(0, index) + text;
     }
 
     public static String getMD5(String src) {

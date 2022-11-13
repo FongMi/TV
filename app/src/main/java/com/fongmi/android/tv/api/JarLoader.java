@@ -41,14 +41,18 @@ public class JarLoader {
         this.current = "";
     }
 
-    public void load(String key, File file) {
+    public void load(String key, File file) throws Exception {
+        DexClassLoader loader = new DexClassLoader(file.getAbsolutePath(), FileUtil.getCachePath(), null, App.get().getClassLoader());
+        Class<?> classInit = loader.loadClass("com.github.catvod.spider.Init");
+        Method method = classInit.getMethod("init", Context.class);
+        method.invoke(classInit, App.get());
+        loaders.put(key, loader);
+        putProxy(key);
+    }
+
+    private void putProxy(String key) {
         try {
-            DexClassLoader loader = new DexClassLoader(file.getAbsolutePath(), FileUtil.getCachePath(), null, App.get().getClassLoader());
-            Class<?> classInit = loader.loadClass("com.github.catvod.spider.Init");
-            Method method = classInit.getMethod("init", Context.class);
-            method.invoke(classInit, App.get());
-            loaders.put(key, loader);
-            Class<?> classProxy = loader.loadClass("com.github.catvod.spider.Proxy");
+            Class<?> classProxy = loaders.get(key).loadClass("com.github.catvod.spider.Proxy");
             methods.put(key, classProxy.getMethod("proxy", Map.class));
         } catch (Exception e) {
             e.printStackTrace();
@@ -63,7 +67,7 @@ public class JarLoader {
         }
     }
 
-    public void parseJar(String key, String jar) {
+    public void parseJar(String key, String jar) throws Exception {
         String[] texts = jar.split(";md5;");
         String md5 = !jar.startsWith("file") && texts.length > 1 ? texts[1].trim() : "";
         jar = texts[0];

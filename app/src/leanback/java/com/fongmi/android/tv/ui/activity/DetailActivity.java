@@ -349,7 +349,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void exitFullscreen() {
-        mBinding.widget.top.setVisibility(View.GONE);
+        mBinding.widget.info.setVisibility(View.GONE);
         mBinding.widget.center.setVisibility(View.GONE);
         mBinding.video.setForeground(ResUtil.getDrawable(R.drawable.selector_video));
         mBinding.video.setLayoutParams(mFrameParams);
@@ -520,7 +520,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         public void run() {
             mBinding.widget.action.setImageResource(R.drawable.ic_play);
             mBinding.widget.center.setVisibility(View.GONE);
-            mBinding.widget.top.setVisibility(View.GONE);
+            mBinding.widget.info.setVisibility(View.GONE);
         }
     };
 
@@ -547,7 +547,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
                 mBinding.widget.progress.getRoot().setVisibility(View.VISIBLE);
                 break;
             case Player.STATE_READY:
-                mPlayers.setRetry(0);
+                mPlayers.reset();
                 mBinding.widget.progress.getRoot().setVisibility(View.GONE);
                 TrackSelectionDialog.setVisible(mPlayers.exo(), mControl.tracks);
                 break;
@@ -555,7 +555,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
                 if (mPlayers.canNext()) checkNext();
                 break;
             default:
-                if (!event.isRetry() || mPlayers.addRetry() > 3) onError(event.getMsg());
+                if (!event.isRetry() || mPlayers.addRetry() > 2) onError(event.getMsg());
                 else getPlayer(false);
                 break;
         }
@@ -575,6 +575,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
             Clock.get().setCallback(null);
             mPlayers.stop();
         } else {
+            mPlayers.reset();
             Vod.Flag flag = (Vod.Flag) mFlagAdapter.get(position + 1);
             Notify.show(ResUtil.getString(R.string.play_switching, flag.getFlag()));
             setFlagActivated(flag);
@@ -584,7 +585,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void onPause(boolean visible) {
         mBinding.widget.exoPosition.setText(mPlayers.getTime(0));
         mBinding.widget.exoDuration.setText(mControl.exoDuration.getText());
-        mBinding.widget.top.setVisibility(visible ? View.VISIBLE : View.GONE);
+        mBinding.widget.info.setVisibility(visible ? View.VISIBLE : View.GONE);
         mBinding.widget.center.setVisibility(visible ? View.VISIBLE : View.GONE);
         mPlayers.pause();
     }
