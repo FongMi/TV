@@ -377,6 +377,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private void getUrl() {
         mBinding.widget.progress.getRoot().setVisibility(View.VISIBLE);
         mViewModel.getUrl(mChannel);
+
     }
 
     private void prevLine(boolean show) {
@@ -542,6 +543,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
                 onKeyDown();
                 break;
             default:
+                App.removeCallbacks(mR4);
                 if (!event.isRetry() || mPlayers.addRetry() > 2) onError();
                 else getUrl();
                 break;
@@ -550,7 +552,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void onError() {
         mPlayers.reset();
-        App.removeCallbacks(mR4);
         if (mChannel.isLastLine()) {
             if (isGone(mBinding.recycler)) onKeyDown();
         } else {
