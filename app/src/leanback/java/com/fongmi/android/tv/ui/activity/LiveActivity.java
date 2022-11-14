@@ -527,10 +527,11 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     public void onPlayerEvent(PlayerEvent event) {
         switch (event.getState()) {
             case 0:
+                App.post(mR4, 10000);
+                break;
             case Player.STATE_IDLE:
                 break;
             case Player.STATE_BUFFERING:
-                App.post(mR4, 10000);
                 mBinding.widget.progress.getRoot().setVisibility(View.VISIBLE);
                 break;
             case Player.STATE_READY:
