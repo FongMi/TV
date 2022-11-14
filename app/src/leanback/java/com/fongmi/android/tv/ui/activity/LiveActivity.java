@@ -377,7 +377,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private void getUrl() {
         mBinding.widget.progress.getRoot().setVisibility(View.VISIBLE);
         mViewModel.getUrl(mChannel);
-
     }
 
     private void prevLine(boolean show) {
