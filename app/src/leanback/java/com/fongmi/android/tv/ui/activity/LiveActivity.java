@@ -79,6 +79,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private Runnable mR1;
     private Runnable mR2;
     private Runnable mR3;
+    private Runnable mR4;
     private int count;
 
     public static void start(Activity activity) {
@@ -114,6 +115,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mR1 = this::hideInfo;
         mR2 = this::hideCenter;
         mR3 = this::setChannelActivated;
+        mR4 = this::onError;
         mPlayers = new Players().init();
         mKeyDown = CustomKeyDownLive.create(this);
         mFormatDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
@@ -375,6 +377,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private void getUrl() {
         mBinding.widget.progress.getRoot().setVisibility(View.VISIBLE);
         mViewModel.getUrl(mChannel);
+
     }
 
     private void prevLine(boolean show) {
@@ -524,6 +527,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     public void onPlayerEvent(PlayerEvent event) {
         switch (event.getState()) {
             case 0:
+                App.post(mR4, 10000);
                 break;
             case Player.STATE_IDLE:
                 break;
@@ -532,6 +536,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
                 break;
             case Player.STATE_READY:
                 mPlayers.reset();
+                App.removeCallbacks(mR4);
                 mBinding.widget.progress.getRoot().setVisibility(View.GONE);
                 TrackSelectionDialog.setVisible(mPlayers.exo(), mControl.tracks);
                 break;
@@ -539,6 +544,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
                 onKeyDown();
                 break;
             default:
+                App.removeCallbacks(mR4);
                 if (!event.isRetry() || mPlayers.addRetry() > 2) onError();
                 else getUrl();
                 break;
@@ -547,10 +553,10 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void onError() {
         mPlayers.reset();
-        if (isGone(mBinding.recycler) && mChannel.isLastLine()) {
-            onKeyDown();
+        if (mChannel.isLastLine()) {
+            if (isGone(mBinding.recycler)) onKeyDown();
         } else {
-            mChannel.nextLine();
+            nextLine(true);
             getUrl();
         }
     }
