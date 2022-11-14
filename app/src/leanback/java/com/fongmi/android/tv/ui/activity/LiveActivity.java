@@ -530,7 +530,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
             case Player.STATE_IDLE:
                 break;
             case Player.STATE_BUFFERING:
-                App.post(mR4, 5000);
+                App.post(mR4, 10000);
                 mBinding.widget.progress.getRoot().setVisibility(View.VISIBLE);
                 break;
             case Player.STATE_READY:
