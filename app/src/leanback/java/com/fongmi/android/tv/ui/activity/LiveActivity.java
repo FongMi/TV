@@ -190,6 +190,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         if (mGroupAdapter.size() == 1) return;
         mGroup = (Group) mGroupAdapter.get(position[0]);
         mBinding.group.setSelectedPosition(position[0]);
+        if (mGroup.getChannel().isEmpty()) return;
         mGroup.setPosition(position[1]);
         onItemClick(mGroup);
         onItemClick(mGroup.current());
@@ -419,8 +420,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (mGroup == null) return false;
         if (Utils.isMenuKey(event)) onLongPress();
+        if (mGroup == null || mChannel == null) return super.dispatchKeyEvent(event);
         else if (isGone(mBinding.recycler) && !getPlayerView().isControllerFullyVisible() && mKeyDown.hasEvent(event)) return mKeyDown.onKeyDown(event);
         return super.dispatchKeyEvent(event);
     }
