@@ -54,14 +54,13 @@ public class Json {
             if (element.isJsonPrimitive()) element = JsonParser.parseString(element.getAsJsonPrimitive().getAsString());
             return element.getAsJsonObject();
         } catch (Exception e) {
-            return null;
+            return new JsonObject();
         }
     }
 
     public static HashMap<String, String> toMap(JsonElement element) {
         HashMap<String, String> map = new HashMap<>();
         JsonObject object = safeObject(element);
-        if (object == null) return map;
         for (String key : object.keySet()) map.put(key, safeString(object, key));
         return map;
     }
