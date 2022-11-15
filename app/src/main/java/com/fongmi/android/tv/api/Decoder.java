@@ -8,7 +8,7 @@ import com.fongmi.android.tv.utils.Json;
 import com.google.common.io.BaseEncoding;
 
 import java.io.File;
-import java.nio.charset.Charset;
+import java.io.UnsupportedEncodingException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -60,16 +60,16 @@ public class Decoder {
         SecretKeySpec spec = new SecretKeySpec(padEnd(key), "AES");
         Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
         cipher.init(Cipher.DECRYPT_MODE, spec);
-        return new String(cipher.doFinal(decodeHex(data)), Charset.forName("UTF-8"));
+        return new String(cipher.doFinal(decodeHex(data)), "UTF-8");
     }
 
     private static String cbc(String data) throws Exception {
         int indexKey = data.indexOf("2324") + 4;
-        String key = new String(decodeHex(data.substring(0, indexKey)), Charset.forName("UTF-8"));
+        String key = new String(decodeHex(data.substring(0, indexKey)), "UTF-8");
         key = key.replace("$#", "").replace("#$", "");
         int indexIv = data.length() - 26;
         String iv = data.substring(indexIv).trim();
-        iv = new String(decodeHex(iv), Charset.forName("UTF-8"));
+        iv = new String(decodeHex(iv), "UTF-8");
         SecretKeySpec keySpec = new SecretKeySpec(padEnd(key), "AES");
         IvParameterSpec ivSpec = new IvParameterSpec(padEnd(iv));
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
@@ -77,7 +77,7 @@ public class Decoder {
         data = data.substring(indexKey, indexIv).trim();
         byte[] encryptDataBytes = decodeHex(data);
         byte[] decryptData = cipher.doFinal(encryptDataBytes);
-        return new String(decryptData, Charset.forName("UTF-8"));
+        return new String(decryptData, "UTF-8");
     }
 
     private static String base64(String data) {
@@ -91,8 +91,8 @@ public class Decoder {
         return matcher.find() ? data.substring(data.indexOf(matcher.group()) + 10) : "";
     }
 
-    private static byte[] padEnd(String key) {
-        return (key + "0000000000000000".substring(key.length())).getBytes(Charset.forName("UTF-8"));
+    private static byte[] padEnd(String key) throws UnsupportedEncodingException {
+        return (key + "0000000000000000".substring(key.length())).getBytes("UTF-8");
     }
 
     private static byte[] decodeHex(String s) {
