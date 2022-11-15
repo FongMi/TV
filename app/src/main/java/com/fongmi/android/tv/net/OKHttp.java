@@ -1,7 +1,6 @@
 package com.fongmi.android.tv.net;
 
-import android.util.ArrayMap;
-
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -44,11 +43,11 @@ public class OKHttp {
         return get().client().newCall(new Request.Builder().url(url).headers(headers).build());
     }
 
-    public static Call newCall(String url, ArrayMap<String, String> params) {
+    public static Call newCall(String url, LinkedHashMap<String, String> params) {
         return get().client().newCall(new Request.Builder().url(buildUrl(url, params)).build());
     }
 
-    private static HttpUrl buildUrl(String url, ArrayMap<String, String> params) {
+    private static HttpUrl buildUrl(String url, LinkedHashMap<String, String> params) {
         HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(url)).newBuilder();
         for (Map.Entry<String, String> entry : params.entrySet()) builder.addQueryParameter(entry.getKey(), entry.getValue());
         return builder.build();
