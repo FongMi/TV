@@ -203,10 +203,6 @@ public class Channel {
         return Uri.parse(getUrls().get(getLine())).getScheme().toLowerCase();
     }
 
-    public boolean isTVBus() {
-        return getScheme().equals("tvbus");
-    }
-
     public boolean isForce() {
         return getScheme().startsWith("p") || getScheme().equals("mitv");
     }

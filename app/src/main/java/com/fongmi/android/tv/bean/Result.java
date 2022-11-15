@@ -72,7 +72,7 @@ public class Result {
     }
 
     public static Result fromObject(JSONObject object) {
-        return objectFrom(object.toString());
+        return object == null ? empty() : objectFrom(object.toString());
     }
 
     public static Result objectFrom(String str) {

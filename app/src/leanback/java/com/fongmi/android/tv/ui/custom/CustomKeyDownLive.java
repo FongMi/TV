@@ -9,7 +9,6 @@ public class CustomKeyDownLive {
 
     private final Listener listener;
     private final StringBuilder text;
-    private boolean press;
     private int holdTime;
 
     private final Runnable runnable = new Runnable() {
@@ -51,20 +50,12 @@ public class CustomKeyDownLive {
             listener.onKeyRight(holdTime);
         } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isDigitKey(event)) {
             onKeyDown(event.getKeyCode());
-        } else if (Utils.isEnterKey(event)) {
-            checkPress(event);
+        } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isEnterKey(event)) {
+            listener.onKeyCenter();
+        } else if (event.isLongPress() && Utils.isEnterKey(event)) {
+            listener.onLongPress();
         }
         return true;
-    }
-
-    private void checkPress(KeyEvent event) {
-        if (event.isLongPress()) {
-            press = true;
-            listener.onLongPress();
-        } else if (event.getAction() == KeyEvent.ACTION_UP) {
-            if (press) press = false;
-            else listener.onKeyCenter();
-        }
     }
 
     public boolean hasEvent(KeyEvent event) {
