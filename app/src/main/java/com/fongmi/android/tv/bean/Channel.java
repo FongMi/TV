@@ -144,6 +144,10 @@ public class Channel {
         this.line = line;
     }
 
+    public boolean isSelected() {
+        return selected;
+    }
+
     public void setSelected(Channel item) {
         this.selected = item.equals(this);
     }
