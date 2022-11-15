@@ -320,6 +320,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
             Notify.show(R.string.app_exit);
             App.post(() -> confirm = false, 1000);
         } else {
+            super.onBackPressed();
             finish();
         }
     }
@@ -331,6 +332,5 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         LiveConfig.get().clear();
         ApiConfig.get().clear();
         Server.get().stop();
-        System.exit(0);
     }
 }
