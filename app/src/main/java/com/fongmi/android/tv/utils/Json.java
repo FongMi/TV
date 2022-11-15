@@ -26,14 +26,17 @@ public class Json {
     }
 
     public static String safeString(JsonObject obj, String key) {
-        if (obj.has(key)) return obj.getAsJsonPrimitive(key).getAsString().trim();
-        else return "";
+        try {
+            return obj.getAsJsonPrimitive(key).getAsString().trim();
+        } catch (Exception e) {
+            return "";
+        }
     }
 
     public static List<String> safeListString(JsonObject obj, String key) {
         List<String> result = new ArrayList<>();
         if (!obj.has(key)) return result;
-        if (obj.get(key).isJsonObject()) result.add(obj.get(key).getAsString());
+        if (obj.get(key).isJsonObject()) result.add(safeString(obj, key));
         else for (JsonElement opt : obj.getAsJsonArray(key)) result.add(opt.getAsString());
         return result;
     }
@@ -59,7 +62,7 @@ public class Json {
         HashMap<String, String> map = new HashMap<>();
         JsonObject object = safeObject(element);
         if (object == null) return map;
-        for (String key : object.keySet()) map.put(key, object.get(key).getAsString());
+        for (String key : object.keySet()) map.put(key, safeString(object, key));
         return map;
     }
 }
