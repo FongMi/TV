@@ -6,9 +6,7 @@ import android.net.http.SslError;
 import android.text.TextUtils;
 import android.webkit.CookieManager;
 import android.webkit.SslErrorHandler;
-import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -16,22 +14,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.player.ParseTask;
 import com.fongmi.android.tv.utils.Utils;
 
-import java.io.ByteArrayInputStream;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class CustomWebView extends WebView {
 
     private ParseTask.Callback callback;
-    private WebResourceResponse empty;
-    private List<String> keys;
-    private String ads;
     private int retry;
 
     public CustomWebView(@NonNull Context context) {
@@ -41,16 +32,12 @@ public class CustomWebView extends WebView {
 
     @SuppressLint("SetJavaScriptEnabled")
     public void initSettings() {
-        this.ads = ApiConfig.get().getAds();
-        this.keys = Arrays.asList("user-agent", "referer", "origin");
-        this.empty = new WebResourceResponse("text/plain", "utf-8", new ByteArrayInputStream("".getBytes()));
         getSettings().setUseWideViewPort(true);
         getSettings().setDatabaseEnabled(true);
         getSettings().setDomStorageEnabled(true);
         getSettings().setJavaScriptEnabled(true);
         getSettings().setLoadWithOverviewMode(true);
         getSettings().setJavaScriptCanOpenWindowsAutomatically(false);
-        getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         setWebViewClient(webViewClient());
     }
 
@@ -74,14 +61,10 @@ public class CustomWebView extends WebView {
         return new WebViewClient() {
             @Nullable
             @Override
-            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-                String url = request.getUrl().toString();
-                String host = request.getUrl().getHost();
-                if (ads.contains(host)) return empty;
+            public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
                 App.post(mTimer, 15 * 1000);
-                Map<String, String> headers = request.getRequestHeaders();
-                if (Utils.isVideoFormat(url, headers)) post(headers, url);
-                return super.shouldInterceptRequest(view, request);
+                if (Utils.isVideoFormat(url)) post(url);
+                return super.shouldInterceptRequest(view, url);
             }
 
             @Override
@@ -105,11 +88,10 @@ public class CustomWebView extends WebView {
         }
     };
 
-    private void post(Map<String, String> headers, String url) {
+    private void post(String url) {
         Map<String, String> news = new HashMap<>();
         String cookie = CookieManager.getInstance().getCookie(url);
         if (!TextUtils.isEmpty(cookie)) news.put("cookie", cookie);
-        for (String key : headers.keySet()) if (keys.contains(key.toLowerCase())) news.put(key, headers.get(key));
         App.removeCallbacks(mTimer);
         App.post(() -> {
             if (callback != null) callback.onParseSuccess(news, url, "");
