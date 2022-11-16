@@ -57,7 +57,6 @@ public class LiveParser {
 
     private static void txt(Live live, String text) {
         for (String line : text.split("\n")) {
-            System.out.println(line);
             String[] split = line.split(",");
             if (split.length < 2) continue;
             if (line.contains("#genre#")) live.getGroups().add(Group.create(split[0]));
