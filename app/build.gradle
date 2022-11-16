@@ -58,6 +58,7 @@ android {
 dependencies {
     implementation project(':catvod')
     implementation project(':forcetech')
+    implementation project(':ijkplayer')
     pythonImplementation project(':pyramid')
     implementation project(':exoplayer-library')
     implementation project(':exoplayer-extension-rtmp')
