@@ -162,6 +162,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void getLive() {
         mViewModel.getLive(LiveConfig.get().getHome());
+        showProgress();
     }
 
     private void setVideoView() {
@@ -177,12 +178,12 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void setGroup(Live home) {
         List<Group> items = new ArrayList<>();
-        items.add(Group.create(ResUtil.getString(R.string.keep)));
+        items.add(Group.create(R.string.keep));
         for (Group group : home.getGroups()) (group.isHidden() ? mHides : items).add(group);
         mGroupAdapter.setItems(items, null);
         setPosition(LiveConfig.get().find(items));
         mControl.home.setText(home.getName());
-        Notify.dismiss();
+        hideProgress();
     }
 
     private void setPosition(int[] position) {
@@ -269,6 +270,14 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.recycler.setVisibility(View.VISIBLE);
         mBinding.channel.requestFocus();
         setPosition();
+    }
+
+    private void showProgress() {
+        mBinding.widget.progress.getRoot().setVisibility(View.VISIBLE);
+    }
+
+    private void hideProgress() {
+        mBinding.widget.progress.getRoot().setVisibility(View.GONE);
     }
 
     private void hideInfo() {
@@ -376,8 +385,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void getUrl() {
-        mBinding.widget.progress.getRoot().setVisibility(View.VISIBLE);
         mViewModel.getUrl(mChannel);
+        showProgress();
     }
 
     private void prevLine(boolean show) {
@@ -518,7 +527,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     public void setLive(Live item) {
         getPlayerView().hideController();
         LiveConfig.get().setHome(item);
-        Notify.progress(this);
         mHides.clear();
         getLive();
     }
@@ -532,12 +540,12 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
             case Player.STATE_IDLE:
                 break;
             case Player.STATE_BUFFERING:
-                mBinding.widget.progress.getRoot().setVisibility(View.VISIBLE);
+                showProgress();
                 break;
             case Player.STATE_READY:
+                hideProgress();
                 mPlayers.reset();
                 App.removeCallbacks(mR4);
-                mBinding.widget.progress.getRoot().setVisibility(View.GONE);
                 TrackSelectionDialog.setVisible(mPlayers.exo(), mControl.tracks);
                 break;
             case Player.STATE_ENDED:
