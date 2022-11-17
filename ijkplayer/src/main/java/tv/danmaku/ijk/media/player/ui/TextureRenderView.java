@@ -1,4 +1,4 @@
-package com.lodz.android.mmsplayer.ijk.media;
+package tv.danmaku.ijk.media.player.ui;
 
 import android.content.Context;
 import android.graphics.SurfaceTexture;
