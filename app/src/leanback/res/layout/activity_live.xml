@@ -23,6 +23,12 @@
         android:visibility="gone"
         app:surface_type="texture_view" />
 
+    <tv.danmaku.ijk.media.player.ui.IjkVideoView
+        android:id="@+id/ijk"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
     <include
         android:id="@+id/widget"
         layout="@layout/view_widget_live"
