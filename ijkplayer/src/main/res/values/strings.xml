@@ -1,0 +1,41 @@
+<resources>
+
+    <string name="mmsplayer_vdec">vdec</string>
+    <string name="mmsplayer_fps">fps</string>
+    <string name="mmsplayer_v_cache">v-cache</string>
+    <string name="mmsplayer_a_cache">a-cache</string>
+    <string name="mmsplayer_load_cost">load-cost</string>
+    <string name="mmsplayer_seek_cost">seek_cost</string>
+    <string name="mmsplayer_seek_load_cost">seek_load_cost</string>
+    <string name="mmsplayer_tcp_speed">tcp_speed</string>
+    <string name="mmsplayer_bit_rate">bit_rate</string>
+
+    <string name="mmsplayer_n_a">n/a</string>
+    <string name="mmsplayer_videoview_ar_aspect_fit_parent">aspect / fit parent</string>
+    <string name="mmsplayer_videoview_ar_aspect_fill_parent">aspect / fill parent</string>
+    <string name="mmsplayer_videoview_ar_aspect_wrap_content">aspect / wrap content</string>
+    <string name="mmsplayer_videoview_ar_match_parent">free / fill parent</string>
+    <string name="mmsplayer_videoview_ar_16_9_fit_parent">16:9 / fit parent</string>
+    <string name="mmsplayer_videoview_ar_4_3_fit_parent">4:3 / fit parent</string>
+
+    <string name="mmsplayer_videoview_error_text_invalid_progressive_playback">invalid progressive playback</string>
+    <string name="mmsplayer_videoview_error_text_io">file or network related operation errors</string>
+    <string name="mmsplayer_videoview_error_text_unknown">unknown</string>
+
+    <string name="mmsplayer_videoview_render_none">render: none</string>
+    <string name="mmsplayer_videoview_render_surface_view">render: surfaceview</string>
+    <string name="mmsplayer_videoview_render_texture_view">render: textureview</string>
+
+    <string name="mmsplayer_videoview_player_none">player: none</string>
+    <string name="mmsplayer_videoview_player_androidmediaplayer">player: androidmediaplayer</string>
+    <string name="mmsplayer_videoview_player_ijkmediaplayer">player: ijkmediaplayer</string>
+    <string name="mmsplayer_videoview_player_ijkexomediaplayer">player: ijkexomediaplayer</string>
+
+    <string name="mmsplayer_tracktype_video">video</string>
+    <string name="mmsplayer_tracktype_audio">audio</string>
+    <string name="mmsplayer_tracktype_subtitle">subtitle</string>
+    <string name="mmsplayer_tracktype_timedtext">timed text</string>
+    <string name="mmsplayer_tracktype_metadata">meta data</string>
+    <string name="mmsplayer_tracktype_unknown">unknown</string>
+
+</resources>
