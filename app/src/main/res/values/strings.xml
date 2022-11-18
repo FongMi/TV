@@ -97,6 +97,11 @@
     <!-- UNIT -->
     <string name="all">All</string>
 
+    <string-array name="select_player">
+        <item>Exo</item>
+        <item>Ijk</item>
+    </string-array>
+
     <string-array name="select_render">
         <item>Surface</item>
         <item>Texture</item>
