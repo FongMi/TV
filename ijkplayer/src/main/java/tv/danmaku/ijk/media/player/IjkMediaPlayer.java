@@ -370,15 +370,12 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
                 setDataSource(fd.getFileDescriptor(), fd.getStartOffset(), fd.getDeclaredLength());
             }
             return;
-        } catch (SecurityException ignored) {
-        } catch (IOException ignored) {
+        } catch (SecurityException | IOException ignored) {
         } finally {
             if (fd != null) {
                 fd.close();
             }
         }
-
-        Log.d(TAG, "Couldn't open file on client side, trying server side");
 
         setDataSource(uri.toString(), headers);
     }
@@ -749,8 +746,8 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         _setPropertyFloat(FFP_PROP_FLOAT_PLAYBACK_RATE, speed);
     }
 
-    public float getSpeed(float speed) {
-        return _getPropertyFloat(FFP_PROP_FLOAT_PLAYBACK_RATE, .0f);
+    public float getSpeed() {
+        return _getPropertyFloat(FFP_PROP_FLOAT_PLAYBACK_RATE, 0);
     }
 
     public int getVideoDecoder() {
