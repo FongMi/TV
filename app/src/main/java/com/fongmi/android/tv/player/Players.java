@@ -8,6 +8,7 @@ import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.utils.Notify;
+import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
@@ -23,26 +24,44 @@ import java.util.Locale;
 import java.util.Map;
 
 import tv.danmaku.ijk.media.player.IMediaPlayer;
-import tv.danmaku.ijk.media.player.IjkMediaPlayer;
+import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
 public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IMediaPlayer.OnErrorListener, IMediaPlayer.OnPreparedListener, IMediaPlayer.OnCompletionListener, AnalyticsListener, ParseTask.Callback {
 
-    private IjkMediaPlayer ijkPlayer;
+    private IjkVideoView ijkPlayer;
     private StringBuilder builder;
     private Formatter formatter;
     private ParseTask parseTask;
     private ExoPlayer exoPlayer;
     private int errorCode;
     private int retry;
+    private float speed;
+
+    public boolean isExo() {
+        return Prefers.getPlayer() == 0;
+    }
+
+    public boolean isIjk() {
+        return Prefers.getPlayer() == 1;
+    }
 
     public Players init() {
+        speed = 1;
         builder = new StringBuilder();
         formatter = new Formatter(builder, Locale.getDefault());
-        setupPlayer();
+        setupExo();
         return this;
     }
 
-    private void setupPlayer() {
+    public void setupIjk(IjkVideoView view) {
+        ijkPlayer = view;
+        ijkPlayer.setOnInfoListener(this);
+        ijkPlayer.setOnErrorListener(this);
+        ijkPlayer.setOnPreparedListener(this);
+        ijkPlayer.setOnCompletionListener(this);
+    }
+
+    public void setupExo() {
         DefaultTrackSelector selector = new DefaultTrackSelector(App.get());
         selector.setParameters(selector.getParameters().buildUpon().setPreferredTextLanguage("zh").build());
         DefaultRenderersFactory factory = new DefaultRenderersFactory(App.get()).setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON);
@@ -50,19 +69,10 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         exoPlayer.addAnalyticsListener(this);
         exoPlayer.setPlayWhenReady(true);
         exoPlayer.addListener(this);
-        ijkPlayer = IjkUtil.createPlayer();
-        ijkPlayer.setOnInfoListener(this);
-        ijkPlayer.setOnErrorListener(this);
-        ijkPlayer.setOnPreparedListener(this);
-        ijkPlayer.setOnCompletionListener(this);
     }
 
     public ExoPlayer exo() {
         return exoPlayer;
-    }
-
-    public IjkMediaPlayer ijk() {
-        return ijkPlayer;
     }
 
     public void reset() {
@@ -80,19 +90,20 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     }
 
     public String getSpeed() {
-        return String.format(Locale.getDefault(), "%.2f", exoPlayer.getPlaybackParameters().speed);
+        return String.format(Locale.getDefault(), "%.2f", speed);
     }
 
     public void addSpeed() {
-        float speed = exoPlayer.getPlaybackParameters().speed;
         float addon = speed >= 2 ? 1f : 0.25f;
         speed = speed == 5 ? 0.25f : speed + addon;
         exoPlayer.setPlaybackSpeed(speed);
+        ijkPlayer.setSpeed(speed);
     }
 
     public void toggleSpeed() {
-        float speed = exoPlayer.getPlaybackParameters().speed;
-        exoPlayer.setPlaybackSpeed(speed == 1 ? 3f : 1f);
+        speed = speed == 1 ? 3f : 1f;
+        exoPlayer.setPlaybackSpeed(speed);
+        ijkPlayer.setSpeed(speed);
     }
 
     public String getTime(long time) {
@@ -107,27 +118,27 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     }
 
     public long getCurrentPosition() {
-        return exoPlayer == null ? 0 : exoPlayer.getCurrentPosition();
+        return isExo() ? exoPlayer.getCurrentPosition() : ijkPlayer.getCurrentPosition();
     }
 
     public long getDuration() {
-        return exoPlayer == null ? 0 : exoPlayer.getDuration();
+        return isExo() ? exoPlayer.getDuration() : ijkPlayer.getDuration();
     }
 
     public void seekTo(int time) {
-        if (time != 0) exoPlayer.seekTo(getCurrentPosition() + time);
+        if (time == 0) return;
+        if (isExo()) exoPlayer.seekTo(getCurrentPosition() + time);
+        else if (isIjk()) ijkPlayer.seekTo(getCurrentPosition() + time);
     }
 
     public void seekTo(long time) {
-        if (time != 0) exoPlayer.seekTo(time);
+        if (time == 0) return;
+        if (isExo()) exoPlayer.seekTo(time);
+        else if (isIjk()) ijkPlayer.seekTo(time);
     }
 
     public boolean isPlaying() {
-        return exoPlayer != null && exoPlayer.isPlaying();
-    }
-
-    public boolean isIdle() {
-        return exoPlayer != null && exoPlayer.getPlaybackState() == Player.STATE_IDLE;
+        return isExo() ? exoPlayer.isPlaying() : ijkPlayer.isPlaying();
     }
 
     public boolean isVod() {
@@ -139,26 +150,25 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     }
 
     public void play() {
-        exoPlayer.play();
+        if (isExo()) exoPlayer.play();
+        else if (isIjk()) ijkPlayer.start();
     }
 
     public void pause() {
-        exoPlayer.pause();
+        if (isExo()) exoPlayer.pause();
+        else if (isIjk()) ijkPlayer.pause();
     }
 
     public void stop() {
         reset();
-        exoPlayer.stop();
-        exoPlayer.clearMediaItems();
+        if (isExo()) stopExo();
+        else if (isIjk()) stopIjk();
     }
 
     public void release() {
         stopParse();
-        exoPlayer.stop();
-        exoPlayer.clearMediaItems();
-        exoPlayer.removeListener(this);
-        exoPlayer.release();
-        exoPlayer = null;
+        if (isExo()) relExo();
+        else if (isIjk()) relIjk();
     }
 
     public void start(Channel channel) {
@@ -176,48 +186,44 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         }
     }
 
+    private void stopExo() {
+        exoPlayer.stop();
+        exoPlayer.clearMediaItems();
+    }
+
+    private void stopIjk() {
+        ijkPlayer.stopPlayback();
+    }
+
+    private void relExo() {
+        stopExo();
+        exoPlayer.removeListener(this);
+        exoPlayer.release();
+        exoPlayer = null;
+    }
+
+    private void relIjk() {
+        stopIjk();
+        ijkPlayer.release(true);
+        ijkPlayer = null;
+    }
+
     private void stopParse() {
         if (parseTask != null) parseTask.cancel();
     }
 
     private void setMediaSource(Result result) {
-        exoPlayer.setMediaSource(ExoUtil.getSource(result, errorCode));
+        if (isExo()) exoPlayer.setMediaSource(ExoUtil.getSource(result, errorCode));
+        if (isIjk()) ijkPlayer.setMediaSource(result.getPlayUrl() + result.getUrl(), result.getHeaders());
+        if (isExo()) exoPlayer.prepare();
         PlayerEvent.state(0);
-        exoPlayer.prepare();
     }
 
     private void setMediaSource(Map<String, String> headers, String url) {
-        exoPlayer.setMediaSource(ExoUtil.getSource(headers, url, errorCode));
+        if (isExo()) exoPlayer.setMediaSource(ExoUtil.getSource(headers, url, errorCode));
+        if (isIjk()) ijkPlayer.setMediaSource(url, headers);
+        if (isExo()) exoPlayer.prepare();
         PlayerEvent.state(0);
-        exoPlayer.prepare();
-    }
-
-    public int getResizeMode() {
-        return 0;
-    }
-
-    public void setResizeMode() {
-
-    }
-
-    public void setRender() {
-
-    }
-
-    public void setPlayer() {
-
-    }
-
-    public void setVisibility() {
-
-    }
-
-    public void setOnClickListener() {
-
-    }
-
-    public void setOnLongClickListener() {
-
     }
 
     @Override
@@ -249,21 +255,31 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
 
     @Override
     public boolean onInfo(IMediaPlayer mp, int what, int extra) {
-        return false;
+        switch (what) {
+            case IMediaPlayer.MEDIA_INFO_BUFFERING_START:
+                PlayerEvent.state(Player.STATE_BUFFERING);
+                return true;
+            case IMediaPlayer.MEDIA_INFO_BUFFERING_END:
+                PlayerEvent.state(Player.STATE_READY);
+                return true;
+            default:
+                return true;
+        }
     }
 
     @Override
     public boolean onError(IMediaPlayer mp, int what, int extra) {
+        PlayerEvent.error(R.string.error_play_format, true);
         return false;
     }
 
     @Override
     public void onPrepared(IMediaPlayer mp) {
-
+        PlayerEvent.state(Player.STATE_READY);
     }
 
     @Override
     public void onCompletion(IMediaPlayer mp) {
-
+        PlayerEvent.state(Player.STATE_ENDED);
     }
 }

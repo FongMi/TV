@@ -334,7 +334,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private boolean shouldEnterFullscreen(Vod.Flag.Episode item) {
-        boolean enter = !mFullscreen && item.isActivated() && !mPlayers.isIdle();
+        boolean enter = !mFullscreen && item.isActivated();
         if (enter) enterFullscreen();
         return enter;
     }
