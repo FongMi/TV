@@ -165,6 +165,11 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         else if (isIjk()) stopIjk();
     }
 
+    public void toggle() {
+        stopExo();
+        stopIjk();
+    }
+
     public void release() {
         stopParse();
         if (isExo()) relExo();
