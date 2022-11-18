@@ -490,31 +490,37 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     private void setOption() {
-        int player = IjkMediaPlayer.OPT_CATEGORY_PLAYER;
         int codec = IjkMediaPlayer.OPT_CATEGORY_CODEC;
         int format = IjkMediaPlayer.OPT_CATEGORY_FORMAT;
+        int player = IjkMediaPlayer.OPT_CATEGORY_PLAYER;
         mMediaPlayer.setOption(codec, "skip_loop_filter", 48);
-        mMediaPlayer.setOption(format, "probesize", 1024 * 800);
-        mMediaPlayer.setOption(player, "max-buffer-size", 1024 * 800);
         mMediaPlayer.setOption(format, "analyzeduration", 30 * 1000 * 1000);
         mMediaPlayer.setOption(format, "analyzemaxduration", 30 * 1000 * 1000);
-        mMediaPlayer.setOption(player, "soundtouch", 1);
-        mMediaPlayer.setOption(format, "flush_packets", 1);
-        mMediaPlayer.setOption(player, "packet-buffering", 0);
-        mMediaPlayer.setOption(player, "reconnect", 1);
-        mMediaPlayer.setOption(player, "framedrop", 1);
-        mMediaPlayer.setOption(player, "max-fps", 60);
-        mMediaPlayer.setOption(player, "enable-accurate-seek", 0);
-        mMediaPlayer.setOption(format, "fflags", "fastseek");
-        mMediaPlayer.setOption(format, "dns_cache_clear", 1);
-        mMediaPlayer.setOption(format, "timeout", 30 * 1000 * 1000);
-        mMediaPlayer.setOption(format, "rtsp_transport", "tcp");
-        mMediaPlayer.setOption(format, "rtsp_flags", "prefer_tcp");
         mMediaPlayer.setOption(format, "buffer_size", 1024 * 800);
+        mMediaPlayer.setOption(format, "dns_cache_clear", 1);
+        mMediaPlayer.setOption(format, "dns_cache_timeout", 600000000);
+        mMediaPlayer.setOption(format, "fflags", "fastseek");
+        mMediaPlayer.setOption(format, "flush_packets", 1);
+        mMediaPlayer.setOption(format, "http-detect-range-support", 0);
         mMediaPlayer.setOption(format, "infbuf", 1);
-        mMediaPlayer.setOption(player, "videotoolbox", 0);
+        mMediaPlayer.setOption(format, "probesize", 1024 * 800);
+        mMediaPlayer.setOption(format, "rtsp_flags", "prefer_tcp");
+        mMediaPlayer.setOption(format, "rtsp_transport", "tcp");
+        mMediaPlayer.setOption(format, "timeout", 30 * 1000 * 1000);
+        mMediaPlayer.setOption(player, "enable-accurate-seek", 0);
+        mMediaPlayer.setOption(player, "framedrop", 1);
+        mMediaPlayer.setOption(player, "max-buffer-size", 1024 * 800);
+        mMediaPlayer.setOption(player, "max-fps", 60);
         mMediaPlayer.setOption(player, "mediacodec", 0);
         mMediaPlayer.setOption(player, "mediacodec-auto-rotate", 0);
         mMediaPlayer.setOption(player, "mediacodec-handle-resolution-change", 0);
+        mMediaPlayer.setOption(player, "mediacodec-hevc", 0);
+        mMediaPlayer.setOption(player, "opensles", 0);
+        mMediaPlayer.setOption(player, "overlay-format", IjkMediaPlayer.SDL_FCC_RV32);
+        mMediaPlayer.setOption(player, "packet-buffering", 0);
+        mMediaPlayer.setOption(player, "reconnect", 1);
+        mMediaPlayer.setOption(player, "soundtouch", 1);
+        mMediaPlayer.setOption(player, "start-on-prepared", 1);
+        mMediaPlayer.setOption(player, "videotoolbox", 0);
     }
 }
