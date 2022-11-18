@@ -12,12 +12,12 @@ import tv.danmaku.ijk.media.player.IMediaPlayer;
 
 public interface IRenderView {
 
-    int AR_ASPECT_WRAP_CONTENT = 0;
+    int AR_MATCH_PARENT = 0;
     int AR_16_9_FIT_PARENT = 1;
     int AR_4_3_FIT_PARENT = 2;
     int AR_ASPECT_FIT_PARENT = 3;
     int AR_ASPECT_FILL_PARENT = 4;
-    int AR_MATCH_PARENT = 5;
+    int AR_ASPECT_WRAP_CONTENT = 5;
 
     View getView();
 
