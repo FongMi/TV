@@ -123,6 +123,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mFormatTime = new SimpleDateFormat("yyyy-MM-ddHH:mm", Locale.getDefault());
         mHides = new ArrayList<>();
         setRecyclerView();
+        setVideoVisible();
         setViewModel();
         setVideoView();
         getLive();
@@ -173,16 +174,19 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         getExo().setResizeMode(Prefers.getLiveScale());
         getExo().setOnClickListener(view -> onToggle());
         getExo().setOnLongClickListener(view -> onLongPress());
-        getExo().setVisibility(mPlayers.isExo() ? View.VISIBLE : View.GONE);
         getIjk().setResizeMode(Prefers.getLiveScale());
         getIjk().setRender(Prefers.getRender());
         getIjk().setOnClickListener(view -> onToggle());
         getIjk().setOnLongClickListener(view -> onLongPress());
-        getIjk().setVisibility(mPlayers.isIjk() ? View.VISIBLE : View.GONE);
         mBinding.control.home.setVisibility(LiveConfig.isOnly() ? View.GONE : View.VISIBLE);
         mBinding.control.player.setText(ResUtil.getStringArray(R.array.select_player)[Prefers.getPlayer()]);
         mBinding.control.scale.setText(ResUtil.getStringArray(R.array.select_scale)[Prefers.getLiveScale()]);
         mBinding.control.speed.setText(mPlayers.getSpeed());
+    }
+
+    private void setVideoVisible() {
+        getExo().setVisibility(mPlayers.isExo() ? View.VISIBLE : View.GONE);
+        getIjk().setVisibility(mPlayers.isIjk() ? View.VISIBLE : View.GONE);
     }
 
     private void setGroup(Live home) {
@@ -274,6 +278,9 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         CharSequence[] array = ResUtil.getStringArray(R.array.select_player);
         Prefers.putPlayer(index = index == array.length - 1 ? 0 : ++index);
         mBinding.control.player.setText(array[index]);
+        setVideoVisible();
+        mPlayers.toggle();
+        getUrl();
     }
 
     private void hideUI() {

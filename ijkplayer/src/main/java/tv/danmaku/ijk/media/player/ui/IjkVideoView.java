@@ -38,6 +38,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     private static final int STATE_PAUSED = 4;
     private static final int STATE_PLAYBACK_COMPLETED = 5;
 
+    public static final int RENDER_NONE = -1;
     public static final int RENDER_SURFACE_VIEW = 0;
     public static final int RENDER_TEXTURE_VIEW = 1;
 
@@ -135,14 +136,18 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     public void setRender(int render) {
-        mCurrentRender = render;
         switch (render) {
+            case RENDER_NONE:
+                setRenderView(null);
+                break;
             case RENDER_TEXTURE_VIEW:
                 TextureRenderView texture = new TextureRenderView(getContext());
                 if (mMediaPlayer != null) texture.getSurfaceHolder().bindToMediaPlayer(mMediaPlayer);
+                mCurrentRender = render;
                 setRenderView(texture);
                 break;
             case RENDER_SURFACE_VIEW:
+                mCurrentRender = render;
                 setRenderView(new SurfaceRenderView(getContext()));
                 break;
         }
@@ -171,6 +176,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     public void stopPlayback() {
         if (mMediaPlayer == null) return;
         mMediaPlayer.stop();
+        setRender(RENDER_NONE);
         mCurrentState = STATE_IDLE;
         mTargetState = STATE_IDLE;
         AudioManager am = (AudioManager) mAppContext.getSystemService(Context.AUDIO_SERVICE);
