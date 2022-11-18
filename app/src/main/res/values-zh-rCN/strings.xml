@@ -98,8 +98,8 @@
     <string name="all">全部</string>
 
     <string-array name="select_player">
-        <item>Exo</item>
-        <item>Ijk</item>
+        <item>硬解</item>
+        <item>软解</item>
     </string-array>
 
     <string-array name="select_quality">

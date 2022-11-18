@@ -168,18 +168,19 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void setVideoView() {
+        mPlayers.setupIjk(mBinding.ijk);
         getExo().setPlayer(mPlayers.exo());
         getExo().setResizeMode(Prefers.getLiveScale());
         getExo().setOnClickListener(view -> onToggle());
         getExo().setOnLongClickListener(view -> onLongPress());
-        getIjk().setPlayer(mPlayers.ijk());
-        getIjk().setRender(Prefers.getRender());
+        getExo().setVisibility(mPlayers.isExo() ? View.VISIBLE : View.GONE);
         getIjk().setResizeMode(Prefers.getLiveScale());
+        getIjk().setRender(Prefers.getRender());
         getIjk().setOnClickListener(view -> onToggle());
         getIjk().setOnLongClickListener(view -> onLongPress());
-        getExo().setVisibility(Prefers.getPlayer() == 0 ? View.VISIBLE : View.GONE);
-        getIjk().setVisibility(Prefers.getPlayer() == 1 ? View.VISIBLE : View.GONE);
+        getIjk().setVisibility(mPlayers.isIjk() ? View.VISIBLE : View.GONE);
         mBinding.control.home.setVisibility(LiveConfig.isOnly() ? View.GONE : View.VISIBLE);
+        mBinding.control.player.setText(ResUtil.getStringArray(R.array.select_player)[Prefers.getPlayer()]);
         mBinding.control.scale.setText(ResUtil.getStringArray(R.array.select_scale)[Prefers.getLiveScale()]);
         mBinding.control.speed.setText(mPlayers.getSpeed());
     }
@@ -243,10 +244,12 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void onScale() {
-        //int scale = getPlayerView().getResizeMode();
-       // getPlayerView().setResizeMode(scale = scale == 4 ? 0 : scale + 1);
-        //mBinding.control.scale.setText(ResUtil.getStringArray(R.array.select_scale)[scale]);
-        //Prefers.putLiveScale(scale);
+        int index = Prefers.getLiveScale();
+        CharSequence[] array = ResUtil.getStringArray(R.array.select_scale);
+        Prefers.putLiveScale(index = index == array.length - 1 ? 0 : ++index);
+        mBinding.control.scale.setText(array[index]);
+        getExo().setResizeMode(index);
+        getIjk().setResizeMode(index);
     }
 
     private void onSpeed() {
@@ -267,8 +270,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void onPlayer() {
-        CharSequence[] array = ResUtil.getStringArray(R.array.select_player);
         int index = Prefers.getPlayer();
+        CharSequence[] array = ResUtil.getStringArray(R.array.select_player);
         Prefers.putPlayer(index = index == array.length - 1 ? 0 : ++index);
         mBinding.control.player.setText(array[index]);
     }
@@ -596,6 +599,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     protected void onResume() {
         super.onResume();
         Clock.start(mBinding.widget.time);
+        mBinding.ijk.start();
         mPlayers.play();
     }
 
