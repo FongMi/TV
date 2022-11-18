@@ -422,10 +422,9 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         showProgress();
     }
 
-    private void prevLine(boolean show) {
+    private void prevLine() {
         mChannel.prevLine();
-        if (show) showInfo();
-        else setInfo();
+        showInfo();
         getUrl();
     }
 
@@ -514,7 +513,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     public void onKeyLeft(int time) {
         if (isVisible(mBinding.widget.center)) App.post(mR2, 500);
         if (mChannel.isOnly() && mPlayers.isVod()) mPlayers.seekTo(time);
-        else if (!mChannel.isOnly()) prevLine(true);
+        else if (!mChannel.isOnly()) prevLine();
         mKeyDown.resetTime();
     }
 
