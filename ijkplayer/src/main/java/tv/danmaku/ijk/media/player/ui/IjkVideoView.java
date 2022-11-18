@@ -176,7 +176,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     public void stopPlayback() {
         if (mMediaPlayer == null) return;
         mMediaPlayer.stop();
-        setRender(RENDER_NONE);
         mCurrentState = STATE_IDLE;
         mTargetState = STATE_IDLE;
         AudioManager am = (AudioManager) mAppContext.getSystemService(Context.AUDIO_SERVICE);
