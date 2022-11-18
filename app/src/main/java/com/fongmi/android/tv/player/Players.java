@@ -22,12 +22,16 @@ import java.util.Formatter;
 import java.util.Locale;
 import java.util.Map;
 
-public class Players implements Player.Listener, AnalyticsListener, ParseTask.Callback {
+import tv.danmaku.ijk.media.player.IMediaPlayer;
+import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 
+public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IMediaPlayer.OnErrorListener, IMediaPlayer.OnPreparedListener, IMediaPlayer.OnCompletionListener, AnalyticsListener, ParseTask.Callback {
+
+    private IjkMediaPlayer ijkPlayer;
     private StringBuilder builder;
     private Formatter formatter;
-    private ExoPlayer exoPlayer;
     private ParseTask parseTask;
+    private ExoPlayer exoPlayer;
     private int errorCode;
     private int retry;
 
@@ -46,10 +50,19 @@ public class Players implements Player.Listener, AnalyticsListener, ParseTask.Ca
         exoPlayer.addAnalyticsListener(this);
         exoPlayer.setPlayWhenReady(true);
         exoPlayer.addListener(this);
+        ijkPlayer = IjkUtil.createPlayer();
+        ijkPlayer.setOnInfoListener(this);
+        ijkPlayer.setOnErrorListener(this);
+        ijkPlayer.setOnPreparedListener(this);
+        ijkPlayer.setOnCompletionListener(this);
     }
 
     public ExoPlayer exo() {
         return exoPlayer;
+    }
+
+    public IjkMediaPlayer ijk() {
+        return ijkPlayer;
     }
 
     public void reset() {
@@ -179,6 +192,34 @@ public class Players implements Player.Listener, AnalyticsListener, ParseTask.Ca
         exoPlayer.prepare();
     }
 
+    public int getResizeMode() {
+        return 0;
+    }
+
+    public void setResizeMode() {
+
+    }
+
+    public void setRender() {
+
+    }
+
+    public void setPlayer() {
+
+    }
+
+    public void setVisibility() {
+
+    }
+
+    public void setOnClickListener() {
+
+    }
+
+    public void setOnLongClickListener() {
+
+    }
+
     @Override
     public void onParseSuccess(Map<String, String> headers, String url, String from) {
         if (from.length() > 0) Notify.show(ResUtil.getString(R.string.parse_from, from));
@@ -204,5 +245,25 @@ public class Players implements Player.Listener, AnalyticsListener, ParseTask.Ca
     @Override
     public void onAudioSinkError(@NonNull EventTime eventTime, @NonNull Exception audioSinkError) {
         seekTo(200);
+    }
+
+    @Override
+    public boolean onInfo(IMediaPlayer mp, int what, int extra) {
+        return false;
+    }
+
+    @Override
+    public boolean onError(IMediaPlayer mp, int what, int extra) {
+        return false;
+    }
+
+    @Override
+    public void onPrepared(IMediaPlayer mp) {
+
+    }
+
+    @Override
+    public void onCompletion(IMediaPlayer mp) {
+
     }
 }
