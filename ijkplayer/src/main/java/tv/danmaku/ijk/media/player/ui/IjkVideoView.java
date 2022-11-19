@@ -47,6 +47,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     public static final int RENDER_TEXTURE_VIEW = 1;
 
     private int mCurrentAspectRatio;
+    private int mCurrentRender;
 
     private int mCurrentState = STATE_IDLE;
     private int mTargetState = STATE_IDLE;
@@ -132,11 +133,13 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
                 setRenderView(null);
                 break;
             case RENDER_TEXTURE_VIEW:
+                mCurrentRender = render;
                 TextureRenderView texture = new TextureRenderView(getContext());
                 if (mMediaPlayer != null) texture.getSurfaceHolder().bindToMediaPlayer(mMediaPlayer);
                 setRenderView(texture);
                 break;
             case RENDER_SURFACE_VIEW:
+                mCurrentRender = render;
                 setRenderView(new SurfaceRenderView(getContext()));
                 break;
         }
@@ -161,6 +164,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     public void stopPlayback() {
         if (mMediaPlayer == null) return;
+        setRender(RENDER_NONE);
         mMediaPlayer.stop();
         mMediaPlayer.release();
         mMediaPlayer = null;
@@ -178,6 +182,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         am.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
         try {
             createPlayer();
+            setRender(mCurrentRender);
             mCurrentBufferPercentage = 0;
             mMediaPlayer.setDataSource(mAppContext, mUri, mHeaders);
             bindSurfaceHolder(mMediaPlayer, mSurfaceHolder);
