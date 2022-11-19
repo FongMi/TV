@@ -38,12 +38,15 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     private static final int STATE_PAUSED = 4;
     private static final int STATE_PLAYBACK_COMPLETED = 5;
 
+    private static final int codec = IjkMediaPlayer.OPT_CATEGORY_CODEC;
+    private static final int format = IjkMediaPlayer.OPT_CATEGORY_FORMAT;
+    private static final int player = IjkMediaPlayer.OPT_CATEGORY_PLAYER;
+
     public static final int RENDER_NONE = -1;
     public static final int RENDER_SURFACE_VIEW = 0;
     public static final int RENDER_TEXTURE_VIEW = 1;
 
     private int mCurrentAspectRatio;
-    private int mCurrentRender;
 
     private int mCurrentState = STATE_IDLE;
     private int mTargetState = STATE_IDLE;
@@ -100,18 +103,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         subtitleDisplay.setGravity(Gravity.CENTER);
         FrameLayout.LayoutParams layoutParams_txt = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM);
         addView(subtitleDisplay, layoutParams_txt);
-        setPlayer();
-    }
-
-    private void setPlayer() {
-        mMediaPlayer = new IjkMediaPlayer();
-        mMediaPlayer.setOnPreparedListener(mPreparedListener);
-        mMediaPlayer.setOnVideoSizeChangedListener(mSizeChangedListener);
-        mMediaPlayer.setOnCompletionListener(mCompletionListener);
-        mMediaPlayer.setOnErrorListener(mErrorListener);
-        mMediaPlayer.setOnInfoListener(mInfoListener);
-        mMediaPlayer.setOnBufferingUpdateListener(mBufferingUpdateListener);
-        mMediaPlayer.setOnTimedTextListener(mOnTimedTextListener);
     }
 
     private void setRenderView(IRenderView renderView) {
@@ -143,11 +134,9 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
             case RENDER_TEXTURE_VIEW:
                 TextureRenderView texture = new TextureRenderView(getContext());
                 if (mMediaPlayer != null) texture.getSurfaceHolder().bindToMediaPlayer(mMediaPlayer);
-                mCurrentRender = render;
                 setRenderView(texture);
                 break;
             case RENDER_SURFACE_VIEW:
-                mCurrentRender = render;
                 setRenderView(new SurfaceRenderView(getContext()));
                 break;
         }
@@ -165,9 +154,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     public void setVideoURI(Uri uri, Map<String, String> headers) {
         mUri = uri;
         mHeaders = headers;
-        mMediaPlayer.reset();
-        setRender(mCurrentRender);
-        setOption();
         openVideo();
         requestLayout();
         invalidate();
@@ -176,6 +162,8 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     public void stopPlayback() {
         if (mMediaPlayer == null) return;
         mMediaPlayer.stop();
+        mMediaPlayer.release();
+        mMediaPlayer = null;
         mCurrentState = STATE_IDLE;
         mTargetState = STATE_IDLE;
         AudioManager am = (AudioManager) mAppContext.getSystemService(Context.AUDIO_SERVICE);
@@ -185,9 +173,11 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     @TargetApi(Build.VERSION_CODES.M)
     private void openVideo() {
         if (mUri == null || mSurfaceHolder == null) return;
+        release(false);
         AudioManager am = (AudioManager) mAppContext.getSystemService(Context.AUDIO_SERVICE);
         am.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
         try {
+            createPlayer();
             mCurrentBufferPercentage = 0;
             mMediaPlayer.setDataSource(mAppContext, mUri, mHeaders);
             bindSurfaceHolder(mMediaPlayer, mSurfaceHolder);
@@ -489,10 +479,15 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         return 0;
     }
 
-    private void setOption() {
-        int codec = IjkMediaPlayer.OPT_CATEGORY_CODEC;
-        int format = IjkMediaPlayer.OPT_CATEGORY_FORMAT;
-        int player = IjkMediaPlayer.OPT_CATEGORY_PLAYER;
+    private void createPlayer() {
+        mMediaPlayer = new IjkMediaPlayer();
+        mMediaPlayer.setOnPreparedListener(mPreparedListener);
+        mMediaPlayer.setOnVideoSizeChangedListener(mSizeChangedListener);
+        mMediaPlayer.setOnCompletionListener(mCompletionListener);
+        mMediaPlayer.setOnErrorListener(mErrorListener);
+        mMediaPlayer.setOnInfoListener(mInfoListener);
+        mMediaPlayer.setOnBufferingUpdateListener(mBufferingUpdateListener);
+        mMediaPlayer.setOnTimedTextListener(mOnTimedTextListener);
         mMediaPlayer.setOption(codec, "skip_loop_filter", 48);
         mMediaPlayer.setOption(format, "dns_cache_timeout", 600000000);
         mMediaPlayer.setOption(format, "fflags", "fastseek");
