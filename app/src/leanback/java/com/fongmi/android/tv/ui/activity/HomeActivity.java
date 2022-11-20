@@ -120,18 +120,23 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
             @Override
             public void success() {
                 mBinding.progressLayout.showContent();
-                mBinding.recycler.requestFocus();
                 getHistory();
                 getVideo();
+                setFocus();
             }
 
             @Override
             public void error(int resId) {
                 mBinding.progressLayout.showContent();
-                mBinding.recycler.requestFocus();
                 Notify.show(resId);
+                setFocus();
             }
         };
+    }
+
+    private void setFocus() {
+        mBinding.recycler.requestFocus();
+        App.post(() -> mBinding.title.setFocusable(true), 500);
     }
 
     private void getVideo() {
