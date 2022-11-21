@@ -458,6 +458,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
                 if (!items.contains(source)) items.add(0, source);
                 App.post(() -> mPartAdapter.setItems(items, null));
             }
+
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                List<String> items = List.of(source);
+                App.post(() -> mPartAdapter.setItems(items, null));
+            }
         });
     }
 
