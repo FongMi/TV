@@ -137,6 +137,10 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         return isExo() ? exoPlayer.getDuration() : ijkPlayer.getDuration();
     }
 
+    public long getBuffered() {
+        return isExo() ? exoPlayer.getBufferedPosition() : ijkPlayer.getBufferedPosition();
+    }
+
     public void seekTo(int time) {
         if (time == 0) return;
         if (isExo()) exoPlayer.seekTo(getPosition() + time);

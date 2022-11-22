@@ -155,6 +155,9 @@ public interface IMediaPlayer {
     }
 
     interface OnBufferingUpdateListener {
+
+        void onBufferingUpdate(IMediaPlayer mp, long position);
+
         void onBufferingUpdate(IMediaPlayer mp, int percent);
     }
 

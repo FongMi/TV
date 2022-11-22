@@ -85,6 +85,11 @@ public abstract class AbstractMediaPlayer implements IMediaPlayer {
             mOnCompletionListener.onCompletion(this);
     }
 
+    protected final void notifyOnBufferingUpdate(long position) {
+        if (mOnBufferingUpdateListener != null)
+            mOnBufferingUpdateListener.onBufferingUpdate(this, position);
+    }
+
     protected final void notifyOnBufferingUpdate(int percent) {
         if (mOnBufferingUpdateListener != null)
             mOnBufferingUpdateListener.onBufferingUpdate(this, percent);

@@ -52,6 +52,9 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     private int mCurrentState = STATE_IDLE;
     private int mTargetState = STATE_IDLE;
 
+    private int mCurrentBufferPercentage;
+    private long mCurrentBufferPosition;
+
     // All the stuff we need for playing and showing a video
     private IRenderView.ISurfaceHolder mSurfaceHolder = null;
     private IjkMediaPlayer mMediaPlayer = null;
@@ -62,7 +65,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     private int mVideoRotationDegree;
     private IMediaPlayer.OnCompletionListener mOnCompletionListener;
     private IMediaPlayer.OnPreparedListener mOnPreparedListener;
-    private int mCurrentBufferPercentage;
     private IMediaPlayer.OnErrorListener mOnErrorListener;
     private IMediaPlayer.OnInfoListener mOnInfoListener;
 
@@ -183,6 +185,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         try {
             createPlayer();
             setRender(mCurrentRender);
+            mCurrentBufferPosition = 0;
             mCurrentBufferPercentage = 0;
             mMediaPlayer.setDataSource(mAppContext, mUri, mHeaders);
             bindSurfaceHolder(mMediaPlayer, mSurfaceHolder);
@@ -312,6 +315,12 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     };
 
     private final IMediaPlayer.OnBufferingUpdateListener mBufferingUpdateListener = new IMediaPlayer.OnBufferingUpdateListener() {
+        @Override
+        public void onBufferingUpdate(IMediaPlayer mp, long position) {
+            mCurrentBufferPosition = position;
+        }
+
+        @Override
         public void onBufferingUpdate(IMediaPlayer mp, int percent) {
             mCurrentBufferPercentage = percent;
         }
@@ -452,6 +461,11 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     @Override
     public boolean isPlaying() {
         return isInPlaybackState() && mMediaPlayer.isPlaying();
+    }
+
+    public long getBufferedPosition() {
+        if (mMediaPlayer != null) return mCurrentBufferPosition;
+        return 0;
     }
 
     @Override
