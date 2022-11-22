@@ -299,7 +299,7 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     @Override
     public boolean onError(IMediaPlayer mp, int what, int extra) {
         PlayerEvent.error(R.string.error_play_format, true);
-        return false;
+        return true;
     }
 
     @Override
