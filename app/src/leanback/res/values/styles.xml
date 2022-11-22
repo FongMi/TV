@@ -25,7 +25,6 @@
         <item name="use_controller">false</item>
         <item name="animation_enabled">false</item>
         <item name="default_artwork">@drawable/radio</item>
-        <item name="controller_layout_id">@layout/view_control_vod</item>
     </style>
 
     <style name="LivePlayerStyle">
