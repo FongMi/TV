@@ -197,7 +197,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         getPlayerView().setPlayer(mPlayers.exo());
         getPlayerView().setVisibility(View.VISIBLE);
         getPlayerView().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
-        mControl.speed.setText(mPlayers.getSpeed());
+        mControl.speed.setText(mPlayers.getSpeedText());
         setScale(Prefers.getVodScale());
     }
 
@@ -406,41 +406,39 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onSpeed() {
-        mPlayers.addSpeed();
-        mControl.speed.setText(mPlayers.getSpeed());
+        mControl.speed.setText(mPlayers.addSpeed());
     }
 
     private boolean onSpeedLong() {
-        mPlayers.toggleSpeed();
-        mControl.speed.setText(mPlayers.getSpeed());
+        mControl.speed.setText(mPlayers.toggleSpeed());
         return true;
     }
 
     private void onOpening() {
-        long current = mPlayers.getCurrentPosition();
+        long current = mPlayers.getPosition();
         long duration = mPlayers.getDuration();
         if (current < 0 || current > duration / 2) return;
         mHistory.setOpening(current);
-        mControl.opening.setText(mPlayers.getStringForTime(mHistory.getOpening()));
+        mControl.opening.setText(mPlayers.stringToTime(mHistory.getOpening()));
     }
 
     private boolean onOpeningReset() {
         mHistory.setOpening(0);
-        mControl.opening.setText(mPlayers.getStringForTime(mHistory.getOpening()));
+        mControl.opening.setText(mPlayers.stringToTime(mHistory.getOpening()));
         return true;
     }
 
     private void onEnding() {
-        long current = mPlayers.getCurrentPosition();
+        long current = mPlayers.getPosition();
         long duration = mPlayers.getDuration();
         if (current < 0 || current < duration / 2) return;
         mHistory.setEnding(duration - current);
-        mControl.ending.setText(mPlayers.getStringForTime(mHistory.getEnding()));
+        mControl.ending.setText(mPlayers.stringToTime(mHistory.getEnding()));
     }
 
     private boolean onEndingReset() {
         mHistory.setEnding(0);
-        mControl.ending.setText(mPlayers.getStringForTime(mHistory.getEnding()));
+        mControl.ending.setText(mPlayers.stringToTime(mHistory.getEnding()));
         return true;
     }
 
@@ -482,8 +480,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         setFlagActivated(mHistory.getFlag());
         if (mHistory.isRevSort()) reverseEpisode();
         if (mHistory.getScale() != -1) setScale(mHistory.getScale());
-        mControl.opening.setText(mPlayers.getStringForTime(mHistory.getOpening()));
-        mControl.ending.setText(mPlayers.getStringForTime(mHistory.getEnding()));
+        mControl.opening.setText(mPlayers.stringToTime(mHistory.getOpening()));
+        mControl.ending.setText(mPlayers.stringToTime(mHistory.getEnding()));
     }
 
     private History createHistory() {
@@ -532,8 +530,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     @Override
     public void onTimeChanged() {
+        long current = mPlayers.getPosition();
         long duration = mPlayers.getDuration();
-        long current = mPlayers.getCurrentPosition();
         if (current >= 0 && duration > 0) App.execute(() -> mHistory.update(current, duration));
         if (mHistory.getEnding() > 0 && duration > 0 && mHistory.getEnding() + current >= duration) {
             Clock.get().setCallback(null);
@@ -589,8 +587,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onPause(boolean visible) {
-        mBinding.widget.exoPosition.setText(mPlayers.getTime(0));
-        mBinding.widget.exoDuration.setText(mControl.exoDuration.getText());
+        mBinding.widget.exoDuration.setText(mPlayers.getDurationTime());
+        mBinding.widget.exoPosition.setText(mPlayers.getPositionTime(0));
         mBinding.widget.info.setVisibility(visible ? View.VISIBLE : View.GONE);
         mBinding.widget.center.setVisibility(visible ? View.VISIBLE : View.GONE);
         mPlayers.pause();
@@ -610,8 +608,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     @Override
     public void onSeeking(int time) {
-        mBinding.widget.exoDuration.setText(mControl.exoDuration.getText());
-        mBinding.widget.exoPosition.setText(mPlayers.getTime(time));
+        mBinding.widget.exoDuration.setText(mPlayers.getDurationTime());
+        mBinding.widget.exoPosition.setText(mPlayers.getPositionTime(time));
         mBinding.widget.action.setImageResource(time > 0 ? R.drawable.ic_forward : R.drawable.ic_rewind);
         mBinding.widget.center.setVisibility(View.VISIBLE);
     }
@@ -625,7 +623,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     @Override
     public void onKeyUp() {
-        long current = mPlayers.getCurrentPosition();
+        long current = mPlayers.getPosition();
         long half = mPlayers.getDuration() / 2;
         if (current < half) mControl.opening.requestFocus();
         else mControl.ending.requestFocus();

@@ -89,35 +89,47 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         return retry;
     }
 
-    public String getSpeed() {
+    public float getSpeed() {
+        return speed;
+    }
+
+    public String getSpeedText() {
         return String.format(Locale.getDefault(), "%.2f", speed);
     }
 
-    public void addSpeed() {
+    public String addSpeed() {
         float addon = speed >= 2 ? 1f : 0.25f;
         speed = speed == 5 ? 0.25f : speed + addon;
         exoPlayer.setPlaybackSpeed(speed);
         ijkPlayer.setSpeed(speed);
+        return getSpeedText();
     }
 
-    public void toggleSpeed() {
+    public String toggleSpeed() {
         speed = speed == 1 ? 3f : 1f;
         exoPlayer.setPlaybackSpeed(speed);
         ijkPlayer.setSpeed(speed);
+        return getSpeedText();
     }
 
-    public String getTime(long time) {
-        time = getCurrentPosition() + time;
+    public String getPositionTime(long time) {
+        time = getPosition() + time;
         if (time > getDuration()) time = getDuration();
         else if (time < 0) time = 0;
-        return getStringForTime(time);
+        return stringToTime(time);
     }
 
-    public String getStringForTime(long time) {
+    public String getDurationTime() {
+        long time = getDuration();
+        if (time < 0) time = 0;
+        return stringToTime(time);
+    }
+
+    public String stringToTime(long time) {
         return Util.getStringForTime(builder, formatter, time);
     }
 
-    public long getCurrentPosition() {
+    public long getPosition() {
         return isExo() ? exoPlayer.getCurrentPosition() : ijkPlayer.getCurrentPosition();
     }
 
@@ -127,8 +139,8 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
 
     public void seekTo(int time) {
         if (time == 0) return;
-        if (isExo()) exoPlayer.seekTo(getCurrentPosition() + time);
-        else if (isIjk()) ijkPlayer.seekTo(getCurrentPosition() + time);
+        if (isExo()) exoPlayer.seekTo(getPosition() + time);
+        else if (isIjk()) ijkPlayer.seekTo(getPosition() + time);
     }
 
     public void seekTo(long time) {
@@ -146,7 +158,7 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     }
 
     public boolean canNext() {
-        return getCurrentPosition() >= getDuration();
+        return getPosition() >= getDuration();
     }
 
     public void play() {
@@ -240,6 +252,15 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     @Override
     public void onParseError() {
         PlayerEvent.error(R.string.error_play_parse);
+    }
+
+    @Override
+    public void onEvents(@NonNull Player player, @NonNull Player.Events events) {
+        if (events.containsAny(EVENT_PLAYBACK_STATE_CHANGED, EVENT_PLAY_WHEN_READY_CHANGED, EVENT_IS_PLAYING_CHANGED)) {
+            //updateProgress();
+        } else if (events.containsAny(EVENT_POSITION_DISCONTINUITY, EVENT_TIMELINE_CHANGED)) {
+            //updateTimeline();
+        }
     }
 
     @Override
