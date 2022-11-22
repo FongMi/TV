@@ -84,31 +84,28 @@ public class CustomSeekView extends FrameLayout implements TimeBar.OnScrubListen
         boolean durationChanged = duration != currentDuration;
         currentDuration = duration;
         currentPosition = position;
-        if (durationView != null && durationChanged) {
+        if (durationChanged) {
+            timeBar.setDuration(duration);
             durationView.setText(listener.stringToTime(duration));
         }
-        if (timeBar != null && durationChanged) {
-            timeBar.setDuration(duration);
-        }
-        if (positionView != null && !scrubbing && positionChanged) {
-            positionView.setText(listener.stringToTime(position));
-        }
-        if (timeBar != null) {
+        if (positionChanged && !scrubbing) {
             timeBar.setPosition(position);
             timeBar.setBufferedPosition(buffered);
+            positionView.setText(listener.stringToTime(position));
         }
         removeCallbacks(runnable);
         if (listener.isPlaying()) {
-            long mediaTimeDelayMs = timeBar != null ? timeBar.getPreferredUpdateDelay() : MAX_UPDATE_INTERVAL_MS;
-            long mediaTimeUntilNextFullSecondMs = 1000 - position % 1000;
-            mediaTimeDelayMs = Math.min(mediaTimeDelayMs, mediaTimeUntilNextFullSecondMs);
-            float playbackSpeed = listener.getSpeed();
-            long delayMs = playbackSpeed > 0 ? (long) (mediaTimeDelayMs / playbackSpeed) : MAX_UPDATE_INTERVAL_MS;
-            delayMs = Util.constrainValue(delayMs, MIN_UPDATE_INTERVAL_MS, MAX_UPDATE_INTERVAL_MS);
-            postDelayed(runnable, delayMs);
+            postDelayed(runnable, delayMs(position));
         } else {
             postDelayed(runnable, MAX_UPDATE_INTERVAL_MS);
         }
+    }
+
+    private long delayMs(long position) {
+        long mediaTimeUntilNextFullSecondMs = 1000 - position % 1000;
+        long mediaTimeDelayMs = Math.min(timeBar.getPreferredUpdateDelay(), mediaTimeUntilNextFullSecondMs);
+        long delayMs = (long) (mediaTimeDelayMs / listener.getSpeed());
+        return Util.constrainValue(delayMs, MIN_UPDATE_INTERVAL_MS, MAX_UPDATE_INTERVAL_MS);
     }
 
     @Override
@@ -120,16 +117,12 @@ public class CustomSeekView extends FrameLayout implements TimeBar.OnScrubListen
     @Override
     public void onScrubStart(@NonNull TimeBar timeBar, long position) {
         scrubbing = true;
-        if (positionView != null) {
-            positionView.setText(listener.stringToTime(position));
-        }
+        positionView.setText(listener.stringToTime(position));
     }
 
     @Override
     public void onScrubMove(@NonNull TimeBar timeBar, long position) {
-        if (positionView != null) {
-            positionView.setText(listener.stringToTime(position));
-        }
+        positionView.setText(listener.stringToTime(position));
     }
 
     @Override
