@@ -171,8 +171,8 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     }
 
     public void pause() {
-        if (isExo()) exoPlayer.pause();
-        else if (isIjk()) ijkPlayer.pause();
+        if (isExo()) pauseExo();
+        else if (isIjk()) pauseIjk();
     }
 
     public void stop() {
@@ -182,14 +182,14 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     }
 
     public void toggle() {
-        if (isIjk()) stopExo();
         if (isExo()) stopIjk();
+        else if (isIjk()) stopExo();
     }
 
     public void release() {
         stopParse();
-        if (isExo()) relExo();
-        else if (isIjk()) relIjk();
+        if (isExo()) releaseExo();
+        else if (isIjk()) releaseIjk();
     }
 
     public void start(Channel channel) {
@@ -207,6 +207,14 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         }
     }
 
+    private void pauseExo() {
+        exoPlayer.pause();
+    }
+
+    private void pauseIjk() {
+        ijkPlayer.pause();
+    }
+
     private void stopExo() {
         exoPlayer.stop();
         exoPlayer.clearMediaItems();
@@ -216,14 +224,14 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         ijkPlayer.stopPlayback();
     }
 
-    private void relExo() {
+    private void releaseExo() {
         stopExo();
         exoPlayer.removeListener(this);
         exoPlayer.release();
         exoPlayer = null;
     }
 
-    private void relIjk() {
+    private void releaseIjk() {
         stopIjk();
         ijkPlayer.release(true);
         ijkPlayer = null;
@@ -256,15 +264,6 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     @Override
     public void onParseError() {
         PlayerEvent.error(R.string.error_play_parse);
-    }
-
-    @Override
-    public void onEvents(@NonNull Player player, @NonNull Player.Events events) {
-        if (events.containsAny(EVENT_PLAYBACK_STATE_CHANGED, EVENT_PLAY_WHEN_READY_CHANGED, EVENT_IS_PLAYING_CHANGED)) {
-            //updateProgress();
-        } else if (events.containsAny(EVENT_POSITION_DISCONTINUITY, EVENT_TIMELINE_CHANGED)) {
-            //updateTimeline();
-        }
     }
 
     @Override
