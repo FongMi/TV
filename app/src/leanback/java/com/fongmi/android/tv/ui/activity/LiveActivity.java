@@ -125,8 +125,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mHides = new ArrayList<>();
         setRecyclerView();
         setVideoVisible();
-        setViewModel();
         setVideoView();
+        setViewModel();
         getLive();
     }
 
@@ -138,8 +138,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.control.home.setOnClickListener(view -> onHome());
         mBinding.control.scale.setOnClickListener(view -> onScale());
         mBinding.control.speed.setOnClickListener(view -> onSpeed());
-        mBinding.control.tracks.setOnClickListener(view -> onTracks());
         mBinding.control.player.setOnClickListener(view -> onPlayer());
+        mBinding.control.tracks.setOnClickListener(view -> onTracks());
         mBinding.control.line.setOnClickListener(view -> nextLine(false));
         mBinding.control.speed.setOnLongClickListener(view -> onSpeedLong());
         mBinding.group.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
@@ -157,17 +157,9 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.channel.setAdapter(new ItemBridgeAdapter(mChannelAdapter = new ArrayObjectAdapter(new ChannelPresenter(this))));
     }
 
-    private void setViewModel() {
-        mViewModel = new ViewModelProvider(this).get(LiveViewModel.class);
-        mViewModel.result.observe(this, result -> {
-            if (result instanceof Live) setGroup((Live) result);
-            else if (result instanceof Channel) mPlayers.start((Channel) result);
-        });
-    }
-
-    private void getLive() {
-        mViewModel.getLive(LiveConfig.get().getHome());
-        showProgress();
+    private void setVideoVisible() {
+        getExo().setVisibility(mPlayers.isExo() ? View.VISIBLE : View.GONE);
+        getIjk().setVisibility(mPlayers.isIjk() ? View.VISIBLE : View.GONE);
     }
 
     private void setVideoView() {
@@ -186,9 +178,17 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.control.speed.setText(mPlayers.getSpeedText());
     }
 
-    private void setVideoVisible() {
-        getExo().setVisibility(mPlayers.isExo() ? View.VISIBLE : View.GONE);
-        getIjk().setVisibility(mPlayers.isIjk() ? View.VISIBLE : View.GONE);
+    private void setViewModel() {
+        mViewModel = new ViewModelProvider(this).get(LiveViewModel.class);
+        mViewModel.result.observe(this, result -> {
+            if (result instanceof Live) setGroup((Live) result);
+            else if (result instanceof Channel) mPlayers.start((Channel) result);
+        });
+    }
+
+    private void getLive() {
+        mViewModel.getLive(LiveConfig.get().getHome());
+        showProgress();
     }
 
     private void setGroup(Live home) {
@@ -267,12 +267,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         return true;
     }
 
-    private void onTracks() {
-        TrackSelectionDialog.createForPlayer(mPlayers.exo(), dialog -> {
-        }).show(getSupportFragmentManager(), "tracks");
-        hideControl();
-    }
-
     private void onPlayer() {
         int index = Prefers.getPlayer();
         CharSequence[] array = ResUtil.getStringArray(R.array.select_player);
@@ -281,6 +275,12 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         App.post(this::getUrl,250);
         setVideoVisible();
         mPlayers.toggle();
+    }
+
+    private void onTracks() {
+        TrackSelectionDialog.createForPlayer(mPlayers.exo(), dialog -> {
+        }).show(getSupportFragmentManager(), "tracks");
+        hideControl();
     }
 
     private void hideUI() {
@@ -463,7 +463,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (Utils.isMenuKey(event)) onLongPress();
         if (mGroup == null || mChannel == null) return super.dispatchKeyEvent(event);
-        else if (isGone(mBinding.recycler) && !isVisible(mBinding.control.getRoot()) && mKeyDown.hasEvent(event)) return mKeyDown.onKeyDown(event);
+        else if (isGone(mBinding.recycler) && isGone(mBinding.control.getRoot()) && mKeyDown.hasEvent(event)) return mKeyDown.onKeyDown(event);
         return super.dispatchKeyEvent(event);
     }
 
