@@ -23,8 +23,8 @@ import android.annotation.TargetApi;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
-import android.graphics.SurfaceTexture;
 import android.graphics.Rect;
+import android.graphics.SurfaceTexture;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
 import android.media.RingtoneManager;
@@ -997,7 +997,8 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
                 }
 
                 // DebugLog.efmt(TAG, "Buffer (%d%%) %d/%d",  percent, bufferPosition, duration);
-                player.notifyOnBufferingUpdate((int)percent);
+                player.notifyOnBufferingUpdate(bufferPosition);
+                player.notifyOnBufferingUpdate((int) percent);
                 return;
 
             case MEDIA_SEEK_COMPLETE:
