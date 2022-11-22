@@ -182,8 +182,8 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     }
 
     public void toggle() {
-        stopExo();
-        stopIjk();
+        if (isIjk()) stopExo();
+        if (isExo()) stopIjk();
     }
 
     public void release() {
