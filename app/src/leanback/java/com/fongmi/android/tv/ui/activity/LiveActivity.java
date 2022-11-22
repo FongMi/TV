@@ -278,9 +278,9 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         CharSequence[] array = ResUtil.getStringArray(R.array.select_player);
         Prefers.putPlayer(index = index == array.length - 1 ? 0 : ++index);
         mBinding.control.player.setText(array[index]);
+        App.post(this::getUrl,250);
         setVideoVisible();
         mPlayers.toggle();
-        getUrl();
     }
 
     private void hideUI() {
