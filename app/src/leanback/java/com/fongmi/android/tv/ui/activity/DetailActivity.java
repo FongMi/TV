@@ -241,7 +241,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void resetFocus(boolean useParse) {
-        mBinding.control.seek.setNextFocusUpId(useParse ? R.id.parse : R.id.next);
+        findViewById(R.id.timeBar).setNextFocusUpId(useParse ? R.id.parse : R.id.next);
         for (int i = 0; i < mBinding.control.actionLayout.getChildCount(); i++) {
             mBinding.control.actionLayout.getChildAt(i).setNextFocusDownId(useParse ? R.id.parse : R.id.timeBar);
         }

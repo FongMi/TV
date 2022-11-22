@@ -9,7 +9,7 @@
     android:focusableInTouchMode="true"
     android:gravity="center"
     android:nextFocusUp="@id/action"
-    android:nextFocusDown="@id/exo_progress"
+    android:nextFocusDown="@id/timeBar"
     android:singleLine="true"
     android:textColor="@color/text"
     android:textSize="14sp"
