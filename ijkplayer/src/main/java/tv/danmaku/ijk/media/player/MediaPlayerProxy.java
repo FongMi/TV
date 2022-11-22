@@ -213,6 +213,11 @@ public class MediaPlayerProxy implements IMediaPlayer {
             final OnBufferingUpdateListener finalListener = listener;
             mBackEndMediaPlayer.setOnBufferingUpdateListener(new OnBufferingUpdateListener() {
                 @Override
+                public void onBufferingUpdate(IMediaPlayer mp, long position) {
+                    finalListener.onBufferingUpdate(MediaPlayerProxy.this, position);
+                }
+
+                @Override
                 public void onBufferingUpdate(IMediaPlayer mp, int percent) {
                     finalListener.onBufferingUpdate(MediaPlayerProxy.this, percent);
                 }

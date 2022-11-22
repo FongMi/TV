@@ -13,16 +13,23 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.player.Players;
 import com.google.android.exoplayer2.ui.DefaultTimeBar;
 import com.google.android.exoplayer2.ui.TimeBar;
+import com.google.android.exoplayer2.util.Util;
 
 public class CustomSeekView extends FrameLayout implements TimeBar.OnScrubListener {
 
-    private Players listener;
+    private static final int MAX_UPDATE_INTERVAL_MS = 1000;
+    private static final int MIN_UPDATE_INTERVAL_MS = 200;
+
     private TextView positionView;
     private TextView durationView;
     private DefaultTimeBar timeBar;
 
+    private Runnable runnable;
+    private Players listener;
+
+    private long currentDuration;
+    private long currentPosition;
     private boolean scrubbing;
-    private boolean postProgress;
 
     public CustomSeekView(Context context) {
         this(context, null);
@@ -35,11 +42,20 @@ public class CustomSeekView extends FrameLayout implements TimeBar.OnScrubListen
     public CustomSeekView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         LayoutInflater.from(context).inflate(R.layout.view_control_seek, this);
+        initView();
+        initEvent();
+        startProgress();
+    }
+
+    private void initView() {
         positionView = findViewById(R.id.position);
         durationView = findViewById(R.id.duration);
         timeBar = findViewById(R.id.timeBar);
+        runnable = this::updateProgress;
+    }
+
+    private void initEvent() {
         timeBar.addListener(this);
-        startProgress();
     }
 
     public void setListener(Players listener) {
@@ -48,38 +64,51 @@ public class CustomSeekView extends FrameLayout implements TimeBar.OnScrubListen
 
     private void seekToTimeBarPosition(long positionMs) {
         listener.seekTo(positionMs);
+        updateProgress();
     }
 
     public void startProgress() {
         stopProgress();
-        postProgress = true;
         post(runnable);
     }
 
     public void stopProgress() {
-        postProgress = false;
         removeCallbacks(runnable);
     }
 
-    private final Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            if (listener.isPlaying()) {
-                setProgress();
-            }
-            if (postProgress) {
-                postDelayed(this, getDelay());
-            }
+    private void updateProgress() {
+        long duration = listener.getDuration();
+        long position = listener.getPosition();
+        long buffered = listener.getBuffered();
+        boolean positionChanged = position != currentPosition;
+        boolean durationChanged = duration != currentDuration;
+        currentDuration = duration;
+        currentPosition = position;
+        if (durationView != null && durationChanged) {
+            durationView.setText(listener.stringToTime(duration));
         }
-    };
-
-    private long getDelay() {
-        return (long) ((1000 - listener.getPosition() % 1000) / listener.getSpeed());
-    }
-
-    private void setProgress() {
-        positionView.setText(listener.stringToTime(listener.getPosition()));
-        durationView.setText(listener.stringToTime(listener.getDuration()));
+        if (timeBar != null && durationChanged) {
+            timeBar.setDuration(duration);
+        }
+        if (positionView != null && !scrubbing && positionChanged) {
+            positionView.setText(listener.stringToTime(position));
+        }
+        if (timeBar != null) {
+            timeBar.setPosition(position);
+            timeBar.setBufferedPosition(buffered);
+        }
+        removeCallbacks(runnable);
+        if (listener.isPlaying()) {
+            long mediaTimeDelayMs = timeBar != null ? timeBar.getPreferredUpdateDelay() : MAX_UPDATE_INTERVAL_MS;
+            long mediaTimeUntilNextFullSecondMs = 1000 - position % 1000;
+            mediaTimeDelayMs = Math.min(mediaTimeDelayMs, mediaTimeUntilNextFullSecondMs);
+            float playbackSpeed = listener.getSpeed();
+            long delayMs = playbackSpeed > 0 ? (long) (mediaTimeDelayMs / playbackSpeed) : MAX_UPDATE_INTERVAL_MS;
+            delayMs = Util.constrainValue(delayMs, MIN_UPDATE_INTERVAL_MS, MAX_UPDATE_INTERVAL_MS);
+            postDelayed(runnable, delayMs);
+        } else {
+            postDelayed(runnable, MAX_UPDATE_INTERVAL_MS);
+        }
     }
 
     @Override
