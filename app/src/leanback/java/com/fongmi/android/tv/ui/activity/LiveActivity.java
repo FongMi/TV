@@ -53,6 +53,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -133,6 +134,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     protected void initEvent() {
         mBinding.group.setListener(this);
         mBinding.channel.setListener(this);
+        mBinding.control.seek.setListener(mPlayers);
         mBinding.control.home.setOnClickListener(view -> onHome());
         mBinding.control.scale.setOnClickListener(view -> onScale());
         mBinding.control.speed.setOnClickListener(view -> onSpeed());
@@ -181,7 +183,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.control.home.setVisibility(LiveConfig.isOnly() ? View.GONE : View.VISIBLE);
         mBinding.control.player.setText(ResUtil.getStringArray(R.array.select_player)[Prefers.getPlayer()]);
         mBinding.control.scale.setText(ResUtil.getStringArray(R.array.select_scale)[Prefers.getLiveScale()]);
-        mBinding.control.speed.setText(mPlayers.getSpeed());
+        mBinding.control.speed.setText(mPlayers.getSpeedText());
     }
 
     private void setVideoVisible() {
@@ -257,13 +259,11 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void onSpeed() {
-        mPlayers.addSpeed();
-        mBinding.control.speed.setText(mPlayers.getSpeed());
+        mBinding.control.speed.setText(mPlayers.addSpeed());
     }
 
     private boolean onSpeedLong() {
-        mPlayers.toggleSpeed();
-        mBinding.control.speed.setText(mPlayers.getSpeed());
+        mBinding.control.speed.setText(mPlayers.toggleSpeed());
         return true;
     }
 
@@ -487,8 +487,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     @Override
     public void onSeeking(int time) {
         if (!mPlayers.isVod() || !mChannel.isOnly()) return;
-        mBinding.widget.exoDuration.setText(mBinding.control.duration.getText());
-        mBinding.widget.exoPosition.setText(mPlayers.getTime(time));
+        mBinding.widget.exoDuration.setText(mPlayers.getDurationTime());
+        mBinding.widget.exoPosition.setText(mPlayers.getPositionTime(time));
         mBinding.widget.action.setImageResource(time > 0 ? R.drawable.ic_forward : R.drawable.ic_rewind);
         mBinding.widget.center.setVisibility(View.VISIBLE);
     }
@@ -544,14 +544,17 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public void setPass(String pass) {
-        int position = mGroupAdapter.size() - 1;
-        for (Group item : mHides) {
+        boolean first = true;
+        int position = mGroupAdapter.size();
+        Iterator<Group> iterator = mHides.iterator();
+        while (iterator.hasNext()) {
+            Group item = iterator.next();
             if (!item.getPass().equals(pass)) continue;
-            mGroupAdapter.add(position, item);
-            mBinding.group.setSelectedPosition(position);
-            mHides.remove(item);
-            onItemClick(item);
-            break;
+            mGroupAdapter.add(mGroupAdapter.size(), item);
+            if (first) mBinding.group.setSelectedPosition(position);
+            if (first) onItemClick(mGroup = item);
+            iterator.remove();
+            first = false;
         }
     }
 
