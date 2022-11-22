@@ -86,7 +86,7 @@
             android:focusableInTouchMode="true"
             android:textColor="@color/white"
             android:textSize="14sp"
-            tools:text="EXO" />
+            tools:text="硬解" />
 
         <TextView
             android:id="@+id/speed"
