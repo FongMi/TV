@@ -44,7 +44,7 @@ public class CustomSeekView extends FrameLayout implements TimeBar.OnScrubListen
         LayoutInflater.from(context).inflate(R.layout.view_control_seek, this);
         initView();
         initEvent();
-        startProgress();
+        start();
     }
 
     private void initView() {
@@ -58,8 +58,10 @@ public class CustomSeekView extends FrameLayout implements TimeBar.OnScrubListen
         timeBar.addListener(this);
     }
 
-    public void setListener(Players listener) {
-        this.listener = listener;
+    public void setListener(Players players) {
+        listener = players;
+        positionView.setText(listener.stringToTime(0));
+        durationView.setText(listener.stringToTime(0));
     }
 
     private void seekToTimeBarPosition(long positionMs) {
@@ -67,13 +69,9 @@ public class CustomSeekView extends FrameLayout implements TimeBar.OnScrubListen
         updateProgress();
     }
 
-    public void startProgress() {
-        stopProgress();
-        post(runnable);
-    }
-
-    public void stopProgress() {
+    public void start() {
         removeCallbacks(runnable);
+        post(runnable);
     }
 
     private void updateProgress() {
@@ -86,12 +84,12 @@ public class CustomSeekView extends FrameLayout implements TimeBar.OnScrubListen
         currentPosition = position;
         if (durationChanged) {
             timeBar.setDuration(duration);
-            durationView.setText(listener.stringToTime(duration));
+            durationView.setText(listener.stringToTime(duration < 0 ? 0 : duration));
         }
         if (positionChanged && !scrubbing) {
             timeBar.setPosition(position);
             timeBar.setBufferedPosition(buffered);
-            positionView.setText(listener.stringToTime(position));
+            positionView.setText(listener.stringToTime(position < 0 ? 0 : position));
         }
         removeCallbacks(runnable);
         if (listener.isPlaying()) {
@@ -111,7 +109,7 @@ public class CustomSeekView extends FrameLayout implements TimeBar.OnScrubListen
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        stopProgress();
+        removeCallbacks(runnable);
     }
 
     @Override
