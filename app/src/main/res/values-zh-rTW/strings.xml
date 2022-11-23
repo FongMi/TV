@@ -12,6 +12,7 @@
 
     <!-- Live -->
     <string name="live_pass">密碼</string>
+    <string name="live_group">未分類</string>
     <string name="live_setting">設定</string>
     <string name="live_epg_now">正在播放：<xliff:g name="name">%s</xliff:g></string>
     <string name="live_line">來源 <xliff:g name="name">%s</xliff:g></string>
@@ -95,6 +96,11 @@
 
     <!-- UNIT -->
     <string name="all">全部</string>
+
+    <string-array name="select_player">
+        <item>硬解</item>
+        <item>軟解</item>
+    </string-array>
 
     <string-array name="select_quality">
         <item>低</item>

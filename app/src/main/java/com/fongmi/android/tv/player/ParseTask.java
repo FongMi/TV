@@ -7,6 +7,7 @@ import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.net.OKHttp;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.ui.custom.CustomWebView;
+import com.fongmi.android.tv.utils.Json;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -77,7 +78,7 @@ public class ParseTask {
             HashMap<String, String> headers = new HashMap<>();
             for (String key : object.keySet()) if (key.equalsIgnoreCase("user-agent") || key.equalsIgnoreCase("referer")) headers.put(key, object.get(key).getAsString());
             object = object.has("data") ? object.getAsJsonObject("data") : object;
-            onParseSuccess(headers, object.get("url").getAsString(), "");
+            onParseSuccess(headers, Json.safeString(object, "url"), "");
         } catch (Exception e) {
             e.printStackTrace();
             onParseError();

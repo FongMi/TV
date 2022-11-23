@@ -144,6 +144,10 @@ public class Channel {
         this.line = line;
     }
 
+    public boolean isSelected() {
+        return selected;
+    }
+
     public void setSelected(Channel item) {
         this.selected = item.equals(this);
     }
@@ -195,16 +199,13 @@ public class Channel {
     }
 
     public Channel epg(Live live) {
+        if (live.getEpg().isEmpty()) return this;
         setEpg(live.getEpg().replace("{name}", getName()).replace("{epg}", getEpg()));
         return this;
     }
 
     public String getScheme() {
         return Uri.parse(getUrls().get(getLine())).getScheme().toLowerCase();
-    }
-
-    public boolean isTVBus() {
-        return getScheme().equals("tvbus");
     }
 
     public boolean isForce() {

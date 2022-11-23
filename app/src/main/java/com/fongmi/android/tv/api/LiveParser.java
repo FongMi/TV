@@ -2,6 +2,7 @@ package com.fongmi.android.tv.api;
 
 import android.util.Base64;
 
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Group;
 import com.fongmi.android.tv.bean.Live;
@@ -32,7 +33,8 @@ public class LiveParser {
     public static void start(Live live, String text) {
         int number = 0;
         if (live.getGroups().size() > 0) return;
-        if (text.trim().startsWith("#EXTM3U")) m3u(live, text); else txt(live, text);
+        if (text.trim().startsWith("#EXTM3U")) m3u(live, text);
+        else txt(live, text);
         for (Group group : live.getGroups()) {
             for (Channel channel : group.getChannel()) {
                 channel.setNumber(++number);
@@ -57,9 +59,8 @@ public class LiveParser {
         for (String line : text.split("\n")) {
             String[] split = line.split(",");
             if (split.length < 2) continue;
-            if (line.contains("#genre#")) {
-                live.getGroups().add(Group.create(split[0]));
-            }
+            if (line.contains("#genre#")) live.getGroups().add(Group.create(split[0]));
+            if (live.getGroups().isEmpty()) live.getGroups().add(Group.create(R.string.live_group));
             if (split[1].contains("://")) {
                 Group group = live.getGroups().get(live.getGroups().size() - 1);
                 group.find(Channel.create(split[0]).epg(live)).addUrls(split[1].split("#"));

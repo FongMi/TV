@@ -24,7 +24,7 @@ import com.fongmi.android.tv.ui.activity.BaseFragment;
 import com.fongmi.android.tv.ui.activity.CollectActivity;
 import com.fongmi.android.tv.ui.activity.DetailActivity;
 import com.fongmi.android.tv.ui.custom.CustomRowPresenter;
-import com.fongmi.android.tv.ui.custom.CustomScrollerVod;
+import com.fongmi.android.tv.ui.custom.CustomScroller;
 import com.fongmi.android.tv.ui.custom.CustomSelector;
 import com.fongmi.android.tv.ui.presenter.FilterPresenter;
 import com.fongmi.android.tv.ui.presenter.VodPresenter;
@@ -37,11 +37,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
-public class VodFragment extends BaseFragment implements CustomScrollerVod.Callback, VodPresenter.OnClickListener {
+public class VodFragment extends BaseFragment implements CustomScroller.Callback, VodPresenter.OnClickListener {
 
     private HashMap<String, String> mExtend;
     private FragmentVodBinding mBinding;
-    private CustomScrollerVod mScroller;
+    private CustomScroller mScroller;
     private ArrayObjectAdapter mAdapter;
     private ArrayObjectAdapter mLast;
     private SiteViewModel mViewModel;
@@ -92,7 +92,7 @@ public class VodFragment extends BaseFragment implements CustomScrollerVod.Callb
         CustomSelector selector = new CustomSelector();
         selector.addPresenter(ListRow.class, new CustomRowPresenter(16), VodPresenter.class);
         selector.addPresenter(ListRow.class, new CustomRowPresenter(8, FocusHighlight.ZOOM_FACTOR_NONE, HorizontalGridView.FOCUS_SCROLL_ALIGNED), FilterPresenter.class);
-        mBinding.recycler.addOnScrollListener(mScroller = new CustomScrollerVod(this));
+        mBinding.recycler.addOnScrollListener(mScroller = new CustomScroller(this));
         mBinding.recycler.setAdapter(new ItemBridgeAdapter(mAdapter = new ArrayObjectAdapter(selector)));
         mBinding.recycler.setHeader(getActivity().findViewById(R.id.recycler));
         mBinding.recycler.setVerticalSpacing(ResUtil.dp2px(16));
@@ -194,7 +194,7 @@ public class VodFragment extends BaseFragment implements CustomScrollerVod.Callb
     @Override
     public void onItemClick(Vod item) {
         if (item.shouldSearch()) onLongClick(item);
-        else if (item.getVodTag().equals("folder")) getVideo(item.getVodId(), "1");
+        else if (item.isFolder()) getVideo(item.getVodId(), "1");
         else DetailActivity.start(getActivity(), item.getVodId());
     }
 

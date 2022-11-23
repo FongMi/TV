@@ -25,18 +25,16 @@
         <item name="use_controller">false</item>
         <item name="animation_enabled">false</item>
         <item name="default_artwork">@drawable/radio</item>
-        <item name="controller_layout_id">@layout/view_controller_vod</item>
     </style>
 
     <style name="LivePlayerStyle">
         <item name="auto_show">false</item>
         <item name="resize_mode">fit</item>
         <item name="use_artwork">true</item>
-        <item name="use_controller">true</item>
+        <item name="use_controller">false</item>
         <item name="animation_enabled">false</item>
         <item name="default_artwork">@drawable/radio</item>
         <item name="keep_content_on_player_reset">true</item>
-        <item name="controller_layout_id">@layout/view_controller_live</item>
     </style>
 
 </resources>

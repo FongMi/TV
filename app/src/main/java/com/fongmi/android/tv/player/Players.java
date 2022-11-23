@@ -1,5 +1,7 @@
 package com.fongmi.android.tv.player;
 
+import android.util.Size;
+
 import androidx.annotation.NonNull;
 
 import com.fongmi.android.tv.App;
@@ -8,13 +10,15 @@ import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.utils.Notify;
+import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.github.catvod.crawler.SpiderDebug;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.audio.AudioAttributes;
+import com.google.android.exoplayer2.analytics.AnalyticsListener;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.util.Util;
 
@@ -22,28 +26,48 @@ import java.util.Formatter;
 import java.util.Locale;
 import java.util.Map;
 
-public class Players implements Player.Listener, ParseTask.Callback {
+import tv.danmaku.ijk.media.player.IMediaPlayer;
+import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
+public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IMediaPlayer.OnErrorListener, IMediaPlayer.OnPreparedListener, IMediaPlayer.OnCompletionListener, AnalyticsListener, ParseTask.Callback {
+
+    private IjkVideoView ijkPlayer;
     private StringBuilder builder;
     private Formatter formatter;
-    private ExoPlayer exoPlayer;
     private ParseTask parseTask;
+    private ExoPlayer exoPlayer;
     private int errorCode;
     private int retry;
+
+    public boolean isExo() {
+        return Prefers.getPlayer() == 0;
+    }
+
+    public boolean isIjk() {
+        return Prefers.getPlayer() == 1;
+    }
 
     public Players init() {
         builder = new StringBuilder();
         formatter = new Formatter(builder, Locale.getDefault());
-        setupPlayer();
+        setupExo();
         return this;
     }
 
-    private void setupPlayer() {
+    public void setupIjk(IjkVideoView view) {
+        ijkPlayer = view;
+        ijkPlayer.setOnInfoListener(this);
+        ijkPlayer.setOnErrorListener(this);
+        ijkPlayer.setOnPreparedListener(this);
+        ijkPlayer.setOnCompletionListener(this);
+    }
+
+    public void setupExo() {
         DefaultTrackSelector selector = new DefaultTrackSelector(App.get());
         selector.setParameters(selector.getParameters().buildUpon().setPreferredTextLanguage("zh").build());
         DefaultRenderersFactory factory = new DefaultRenderersFactory(App.get()).setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON);
         exoPlayer = new ExoPlayer.Builder(App.get()).setLoadControl(new DefaultLoadControl()).setRenderersFactory(factory).setTrackSelector(selector).build();
-        exoPlayer.setAudioAttributes(AudioAttributes.DEFAULT, true);
+        exoPlayer.addAnalyticsListener(this);
         exoPlayer.setPlayWhenReady(true);
         exoPlayer.addListener(this);
     }
@@ -66,55 +90,83 @@ public class Players implements Player.Listener, ParseTask.Callback {
         return retry;
     }
 
-    public String getSpeed() {
-        return String.format(Locale.getDefault(), "%.2f", exoPlayer.getPlaybackParameters().speed);
-    }
-
-    public void addSpeed() {
-        float speed = exoPlayer.getPlaybackParameters().speed;
-        float addon = speed >= 2 ? 1f : 0.25f;
-        speed = speed == 5 ? 0.25f : speed + addon;
-        exoPlayer.setPlaybackSpeed(speed);
-    }
-
-    public void toggleSpeed() {
-        float speed = exoPlayer.getPlaybackParameters().speed;
-        exoPlayer.setPlaybackSpeed(speed == 1 ? 3f : 1f);
-    }
-
-    public String getTime(long time) {
-        time = getCurrentPosition() + time;
-        if (time > getDuration()) time = getDuration();
-        else if (time < 0) time = 0;
-        return getStringForTime(time);
-    }
-
-    public String getStringForTime(long time) {
+    public String stringToTime(long time) {
         return Util.getStringForTime(builder, formatter, time);
     }
 
-    public long getCurrentPosition() {
-        return exoPlayer == null ? 0 : exoPlayer.getCurrentPosition();
+    public float getSpeed() {
+        return isExo() ? exoPlayer.getPlaybackParameters().speed : ijkPlayer.getSpeed();
+    }
+
+    public long getPosition() {
+        return isExo() ? exoPlayer.getCurrentPosition() : ijkPlayer.getCurrentPosition();
     }
 
     public long getDuration() {
-        return exoPlayer == null ? 0 : exoPlayer.getDuration();
+        return isExo() ? exoPlayer.getDuration() : ijkPlayer.getDuration();
     }
 
-    public void seekTo(int time) {
-        if (time != 0) exoPlayer.seekTo(getCurrentPosition() + time);
-    }
-
-    public void seekTo(long time) {
-        if (time != 0) exoPlayer.seekTo(time);
+    public long getBuffered() {
+        return isExo() ? exoPlayer.getBufferedPosition() : ijkPlayer.getBufferedPosition();
     }
 
     public boolean isPlaying() {
-        return exoPlayer != null && exoPlayer.isPlaying();
+        return isExo() ? exoPlayer.isPlaying() : ijkPlayer.isPlaying();
     }
 
-    public boolean isIdle() {
-        return exoPlayer != null && exoPlayer.getPlaybackState() == Player.STATE_IDLE;
+    public Size getSize() {
+        return isExo() ? new Size(exoPlayer.getVideoSize().width, exoPlayer.getVideoSize().height) : ijkPlayer.getSize();
+    }
+
+    public String getSizeText() {
+        Size size = getSize();
+        return size.getWidth() + " x " + size.getHeight();
+    }
+
+    public String getSpeedText() {
+        return String.format(Locale.getDefault(), "%.2f", getSpeed());
+    }
+
+    public String addSpeed() {
+        float speed = getSpeed();
+        float addon = speed >= 2 ? 1f : 0.25f;
+        speed = speed == 5 ? 0.25f : speed + addon;
+        exoPlayer.setPlaybackSpeed(speed);
+        ijkPlayer.setSpeed(speed);
+        return getSpeedText();
+    }
+
+    public String toggleSpeed() {
+        float speed = getSpeed();
+        speed = speed == 1 ? 3f : 1f;
+        exoPlayer.setPlaybackSpeed(speed);
+        ijkPlayer.setSpeed(speed);
+        return getSpeedText();
+    }
+
+    public String getPositionTime(long time) {
+        time = getPosition() + time;
+        if (time > getDuration()) time = getDuration();
+        else if (time < 0) time = 0;
+        return stringToTime(time);
+    }
+
+    public String getDurationTime() {
+        long time = getDuration();
+        if (time < 0) time = 0;
+        return stringToTime(time);
+    }
+
+    public void seekTo(int time) {
+        if (time == 0) return;
+        if (isExo()) exoPlayer.seekTo(getPosition() + time);
+        else if (isIjk()) ijkPlayer.seekTo(getPosition() + time);
+    }
+
+    public void seekTo(long time) {
+        if (time == 0) return;
+        if (isExo()) exoPlayer.seekTo(time);
+        else if (isIjk()) ijkPlayer.seekTo(time);
     }
 
     public boolean isVod() {
@@ -122,30 +174,34 @@ public class Players implements Player.Listener, ParseTask.Callback {
     }
 
     public boolean canNext() {
-        return getCurrentPosition() >= getDuration();
+        return getPosition() >= getDuration();
     }
 
     public void play() {
-        exoPlayer.play();
+        if (isExo()) exoPlayer.play();
+        else if (isIjk()) ijkPlayer.start();
     }
 
     public void pause() {
-        exoPlayer.pause();
+        if (isExo()) pauseExo();
+        else if (isIjk()) pauseIjk();
     }
 
     public void stop() {
         reset();
-        exoPlayer.stop();
-        exoPlayer.clearMediaItems();
+        if (isExo()) stopExo();
+        else if (isIjk()) stopIjk();
+    }
+
+    public void toggle() {
+        if (isExo()) stopIjk();
+        else if (isIjk()) stopExo();
     }
 
     public void release() {
         stopParse();
-        exoPlayer.stop();
-        exoPlayer.clearMediaItems();
-        exoPlayer.removeListener(this);
-        exoPlayer.release();
-        exoPlayer = null;
+        if (isExo()) releaseExo();
+        else if (isIjk()) releaseIjk();
     }
 
     public void start(Channel channel) {
@@ -163,20 +219,58 @@ public class Players implements Player.Listener, ParseTask.Callback {
         }
     }
 
+    private void pauseExo() {
+        exoPlayer.pause();
+    }
+
+    private void pauseIjk() {
+        ijkPlayer.pause();
+    }
+
+    private void stopExo() {
+        exoPlayer.stop();
+        exoPlayer.clearMediaItems();
+    }
+
+    private void stopIjk() {
+        ijkPlayer.stopPlayback();
+    }
+
+    private void releaseExo() {
+        stopExo();
+        exoPlayer.removeListener(this);
+        exoPlayer.release();
+        exoPlayer = null;
+    }
+
+    private void releaseIjk() {
+        stopIjk();
+        ijkPlayer.release(true);
+        ijkPlayer = null;
+    }
+
     private void stopParse() {
         if (parseTask != null) parseTask.cancel();
     }
 
     private void setMediaSource(Result result) {
-        exoPlayer.setMediaSource(ExoUtil.getSource(result, errorCode));
-        PlayerEvent.state(0);
-        exoPlayer.prepare();
+        SpiderDebug.log(errorCode + "," + result.getUrl() + "," + result.getHeaders());
+        if (isIjk()) ijkPlayer.setMediaSource(result.getPlayUrl() + result.getUrl(), result.getHeaders());
+        else if (isExo()) {
+            exoPlayer.setMediaSource(ExoUtil.getSource(result, errorCode));
+            exoPlayer.prepare();
+            PlayerEvent.state(0);
+        }
     }
 
     private void setMediaSource(Map<String, String> headers, String url) {
-        exoPlayer.setMediaSource(ExoUtil.getSource(headers, url, errorCode));
-        PlayerEvent.state(0);
-        exoPlayer.prepare();
+        SpiderDebug.log(errorCode + "," + url + "," + headers);
+        if (isIjk()) ijkPlayer.setMediaSource(url, headers);
+        else if (isExo()) {
+            exoPlayer.setMediaSource(ExoUtil.getSource(headers, url, errorCode));
+            exoPlayer.prepare();
+            PlayerEvent.state(0);
+        }
     }
 
     @Override
@@ -199,5 +293,44 @@ public class Players implements Player.Listener, ParseTask.Callback {
     @Override
     public void onPlaybackStateChanged(int state) {
         PlayerEvent.state(state);
+    }
+
+    @Override
+    public void onAudioSinkError(@NonNull EventTime eventTime, @NonNull Exception audioSinkError) {
+        seekTo(200);
+    }
+
+    @Override
+    public boolean onInfo(IMediaPlayer mp, int what, int extra) {
+        switch (what) {
+            case IMediaPlayer.MEDIA_INFO_AUDIO_DECODED_START:
+                PlayerEvent.state(0);
+                return true;
+            case IMediaPlayer.MEDIA_INFO_BUFFERING_START:
+                PlayerEvent.state(Player.STATE_BUFFERING);
+                return true;
+            case IMediaPlayer.MEDIA_INFO_BUFFERING_END:
+            case IMediaPlayer.MEDIA_INFO_AUDIO_SEEK_RENDERING_START:
+                PlayerEvent.state(Player.STATE_READY);
+                return true;
+            default:
+                return true;
+        }
+    }
+
+    @Override
+    public boolean onError(IMediaPlayer mp, int what, int extra) {
+        PlayerEvent.error(R.string.error_play_format, true);
+        return true;
+    }
+
+    @Override
+    public void onPrepared(IMediaPlayer mp) {
+        PlayerEvent.state(Player.STATE_READY);
+    }
+
+    @Override
+    public void onCompletion(IMediaPlayer mp) {
+        PlayerEvent.state(Player.STATE_ENDED);
     }
 }

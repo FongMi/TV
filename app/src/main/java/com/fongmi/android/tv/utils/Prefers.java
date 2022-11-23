@@ -67,6 +67,14 @@ public class Prefers {
         put("wall", wall);
     }
 
+    public static int getPlayer() {
+        return getInt("player", 0);
+    }
+
+    public static void putPlayer(int player) {
+        put("player", player);
+    }
+
     public static int getRender() {
         return getInt("render", 0);
     }
