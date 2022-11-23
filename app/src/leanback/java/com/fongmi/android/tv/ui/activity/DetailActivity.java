@@ -368,11 +368,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void exitFullscreen() {
-        mBinding.widget.info.setVisibility(View.GONE);
-        mBinding.widget.center.setVisibility(View.GONE);
         mBinding.video.setForeground(ResUtil.getDrawable(R.drawable.selector_video));
         mBinding.video.setLayoutParams(mFrameParams);
         mFullscreen = false;
+        hideInfo();
     }
 
     private void onDesc() {
@@ -503,6 +502,17 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.widget.error.setVisibility(View.GONE);
     }
 
+    private void showInfo() {
+        mBinding.widget.size.setText(mPlayers.getSizeText());
+        mBinding.widget.center.setVisibility(View.VISIBLE);
+        mBinding.widget.info.setVisibility(View.VISIBLE);
+    }
+
+    private void hideInfo() {
+        mBinding.widget.center.setVisibility(View.GONE);
+        mBinding.widget.info.setVisibility(View.GONE);
+    }
+
     private void showControl() {
         mBinding.control.getRoot().setVisibility(View.VISIBLE);
     }
@@ -587,7 +597,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         public void run() {
             mBinding.widget.action.setImageResource(R.drawable.ic_play);
             mBinding.widget.center.setVisibility(View.GONE);
-            mBinding.widget.info.setVisibility(View.GONE);
+            hideInfo();
         }
     };
 
@@ -652,8 +662,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void onPause(boolean visible) {
         mBinding.widget.exoDuration.setText(mPlayers.getDurationTime());
         mBinding.widget.exoPosition.setText(mPlayers.getPositionTime(0));
-        mBinding.widget.info.setVisibility(visible ? View.VISIBLE : View.GONE);
-        mBinding.widget.center.setVisibility(visible ? View.VISIBLE : View.GONE);
+        if (visible) showInfo(); else hideInfo();
         mPlayers.pause();
     }
 
@@ -664,7 +673,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (mFullscreen && mBinding.control.tracks.getVisibility() == View.VISIBLE && Utils.isMenuKey(event)) onTracks();
+        if (mFullscreen && mBinding.control.tracks.getVisibility() == View.VISIBLE && Utils.isMenuKey(event)) onToggle();
         else if (mFullscreen && isGone(mBinding.control.getRoot()) && mKeyDown.hasEvent(event)) return mKeyDown.onKeyDown(event);
         return super.dispatchKeyEvent(event);
     }
