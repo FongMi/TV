@@ -159,7 +159,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.seek.setListener(mPlayers);
         mBinding.desc.setOnClickListener(view -> onDesc());
         mBinding.keep.setOnClickListener(view -> onKeep());
-        mBinding.video.setOnClickListener(view -> enterFullscreen());
+        mBinding.video.setOnClickListener(view -> onVideo());
         mBinding.control.next.setOnClickListener(view -> checkNext());
         mBinding.control.prev.setOnClickListener(view -> checkPrev());
         mBinding.control.scale.setOnClickListener(view -> onScale());
@@ -389,6 +389,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         checkKeep();
     }
 
+    private void onVideo() {
+        if (mFullscreen) onToggle();
+        else enterFullscreen();
+    }
+
     private void checkNext() {
         if (mHistory.isRevPlay()) onPrev();
         else onNext();
@@ -475,6 +480,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         TrackSelectionDialog.createForPlayer(mPlayers.exo(), dialog -> {
         }).show(getSupportFragmentManager(), "tracks");
         hideControl();
+    }
+
+    private void onToggle() {
+        if (isVisible(mBinding.control.getRoot())) hideControl();
+        else showControl();
     }
 
     private void showProgress() {
