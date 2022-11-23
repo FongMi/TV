@@ -10,6 +10,7 @@ import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.github.catvod.crawler.SpiderDebug;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -242,6 +243,7 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     }
 
     private void setMediaSource(Result result) {
+        SpiderDebug.log(errorCode + "," + result.getUrl() + "," + result.getHeaders());
         if (isExo()) exoPlayer.setMediaSource(ExoUtil.getSource(result, errorCode));
         if (isIjk()) ijkPlayer.setMediaSource(result.getPlayUrl() + result.getUrl(), result.getHeaders());
         if (isExo()) exoPlayer.prepare();
@@ -249,6 +251,7 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     }
 
     private void setMediaSource(Map<String, String> headers, String url) {
+        SpiderDebug.log(errorCode + "," + url + "," + headers);
         if (isExo()) exoPlayer.setMediaSource(ExoUtil.getSource(headers, url, errorCode));
         if (isIjk()) ijkPlayer.setMediaSource(url, headers);
         if (isExo()) exoPlayer.prepare();
