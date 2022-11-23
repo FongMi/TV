@@ -184,11 +184,10 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     public static void loadLibrariesOnce(IjkLibLoader libLoader) {
         synchronized (IjkMediaPlayer.class) {
             if (!mIsLibLoaded) {
-                if (libLoader == null)
-                    libLoader = sLocalLibLoader;
-
-                libLoader.loadLibrary("avffmpeg");
-                libLoader.loadLibrary("avffmpeg-player");
+                if (libLoader == null) libLoader = sLocalLibLoader;
+                libLoader.loadLibrary("ijkffmpeg");
+                libLoader.loadLibrary("ijksdl");
+                libLoader.loadLibrary("player");
                 mIsLibLoaded = true;
             }
         }
@@ -199,6 +198,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         synchronized (IjkMediaPlayer.class) {
             if (!mIsNativeInitialized) {
                 native_init();
+                native_setDot(dotOpen ? dotPort : 0);
                 mIsNativeInitialized = true;
             }
         }
@@ -1278,8 +1278,23 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         }
     }
 
+    private static volatile int dotPort = 0;
+    private static volatile boolean dotOpen = false;
+
+    public static void setDotPort(boolean open, int p) {
+        dotOpen = open;
+        dotPort = p;
+    }
+
+    public static void toggleDotPort(boolean open) {
+        dotOpen = open;
+        if (mIsNativeInitialized) {
+            native_setDot(dotOpen ? dotPort : 0);
+        }
+    }
+
     public static native void native_profileBegin(String libName);
     public static native void native_profileEnd();
     public static native void native_setLogLevel(int level);
-    public static native void native_setLogger(boolean enable);
+    public static native void native_setDot(int port);
 }
