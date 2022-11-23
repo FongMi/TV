@@ -471,7 +471,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     private void createPlayer() {
         mIjkPlayer = new IjkMediaPlayer();
-        mIjkPlayer.native_setLogLevel(IjkMediaPlayer.IJK_LOG_INFO);
+        IjkMediaPlayer.native_setLogLevel(IjkMediaPlayer.IJK_LOG_SILENT);
         mIjkPlayer.setOnPreparedListener(mPreparedListener);
         mIjkPlayer.setOnVideoSizeChangedListener(mSizeChangedListener);
         mIjkPlayer.setOnCompletionListener(mCompletionListener);
@@ -479,18 +479,31 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         mIjkPlayer.setOnInfoListener(mInfoListener);
         mIjkPlayer.setOnBufferingUpdateListener(mBufferingUpdateListener);
         mIjkPlayer.setOnTimedTextListener(mOnTimedTextListener);
+        mIjkPlayer.setOption(codec, "skip_frame", 0);
         mIjkPlayer.setOption(codec, "skip_loop_filter", 48);
+        mIjkPlayer.setOption(format, "analyzeduration", 1);
+        mIjkPlayer.setOption(format, "analyzemaxduration", 10);
+        mIjkPlayer.setOption(format, "buffer_size", 1024 * 1024);
         mIjkPlayer.setOption(format, "dns_cache_clear", 1);
         mIjkPlayer.setOption(format, "dns_cache_timeout", -1);
         mIjkPlayer.setOption(format, "fflags", "fastseek");
+        mIjkPlayer.setOption(format, "flush_packets", 1);
+        mIjkPlayer.setOption(format, "http-detect-range-support", 0);
+        mIjkPlayer.setOption(format, "probesize", 2048 * 1024);
+        mIjkPlayer.setOption(format, "rtbufsize", 60);
+        mIjkPlayer.setOption(format, "timeout", 30 * 1000 * 1000);
         mIjkPlayer.setOption(player, "enable-accurate-seek", 0);
+        mIjkPlayer.setOption(player, "fast", 1);
         mIjkPlayer.setOption(player, "framedrop", 1);
+        mIjkPlayer.setOption(player, "max-buffer-size", 2048 * 1024);
         mIjkPlayer.setOption(player, "mediacodec", 0);
         mIjkPlayer.setOption(player, "mediacodec-auto-rotate", 0);
         mIjkPlayer.setOption(player, "mediacodec-handle-resolution-change", 0);
         mIjkPlayer.setOption(player, "mediacodec-hevc", 0);
+        mIjkPlayer.setOption(player, "min-frames", 1024);
         mIjkPlayer.setOption(player, "opensles", 0);
         mIjkPlayer.setOption(player, "overlay-format", IjkMediaPlayer.SDL_FCC_RV32);
+        mIjkPlayer.setOption(player, "packet-buffering", 0);
         mIjkPlayer.setOption(player, "reconnect", 1);
         mIjkPlayer.setOption(player, "soundtouch", 1);
         mIjkPlayer.setOption(player, "start-on-prepared", 1);
