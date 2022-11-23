@@ -31,3 +31,8 @@
 
 # Pyramid
 -keep class com.undcover.freedom.pyramid.** { *; }
+
+# IJK
+-keep class tv.danmaku.ijk.media.player.** { *; }
+-keep class tv.danmaku.ijk.media.player.IjkMediaPlayer { *; }
+-keep class tv.danmaku.ijk.media.player.ffmpeg.FFmpegApi { *; }
