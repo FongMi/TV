@@ -168,6 +168,10 @@ public class Vod {
         return getVodRemarks().isEmpty() ? View.GONE : View.VISIBLE;
     }
 
+    public boolean isFolder() {
+        return getVodTag().equals("folder");
+    }
+
     public boolean shouldSearch() {
         return getVodId().isEmpty() || getVodId().startsWith("msearch:");
     }
