@@ -1,5 +1,7 @@
 package com.fongmi.android.tv.player;
 
+import android.util.Size;
+
 import androidx.annotation.NonNull;
 
 import com.fongmi.android.tv.App;
@@ -36,7 +38,6 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     private ExoPlayer exoPlayer;
     private int errorCode;
     private int retry;
-    private float speed;
 
     public boolean isExo() {
         return Prefers.getPlayer() == 0;
@@ -47,7 +48,6 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     }
 
     public Players init() {
-        speed = 1;
         builder = new StringBuilder();
         formatter = new Formatter(builder, Locale.getDefault());
         setupExo();
@@ -90,15 +90,45 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         return retry;
     }
 
+    public String stringToTime(long time) {
+        return Util.getStringForTime(builder, formatter, time);
+    }
+
     public float getSpeed() {
-        return speed;
+        return isExo() ? exoPlayer.getPlaybackParameters().speed : ijkPlayer.getSpeed();
+    }
+
+    public long getPosition() {
+        return isExo() ? exoPlayer.getCurrentPosition() : ijkPlayer.getCurrentPosition();
+    }
+
+    public long getDuration() {
+        return isExo() ? exoPlayer.getDuration() : ijkPlayer.getDuration();
+    }
+
+    public long getBuffered() {
+        return isExo() ? exoPlayer.getBufferedPosition() : ijkPlayer.getBufferedPosition();
+    }
+
+    public boolean isPlaying() {
+        return isExo() ? exoPlayer.isPlaying() : ijkPlayer.isPlaying();
+    }
+
+    public Size getSize() {
+        return isExo() ? new Size(exoPlayer.getVideoSize().width, exoPlayer.getVideoSize().height) : ijkPlayer.getSize();
+    }
+
+    public String getSizeText() {
+        Size size = getSize();
+        return size.getWidth() + " x " + size.getHeight();
     }
 
     public String getSpeedText() {
-        return String.format(Locale.getDefault(), "%.2f", speed);
+        return String.format(Locale.getDefault(), "%.2f", getSpeed());
     }
 
     public String addSpeed() {
+        float speed = getSpeed();
         float addon = speed >= 2 ? 1f : 0.25f;
         speed = speed == 5 ? 0.25f : speed + addon;
         exoPlayer.setPlaybackSpeed(speed);
@@ -107,6 +137,7 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     }
 
     public String toggleSpeed() {
+        float speed = getSpeed();
         speed = speed == 1 ? 3f : 1f;
         exoPlayer.setPlaybackSpeed(speed);
         ijkPlayer.setSpeed(speed);
@@ -126,22 +157,6 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         return stringToTime(time);
     }
 
-    public String stringToTime(long time) {
-        return Util.getStringForTime(builder, formatter, time);
-    }
-
-    public long getPosition() {
-        return isExo() ? exoPlayer.getCurrentPosition() : ijkPlayer.getCurrentPosition();
-    }
-
-    public long getDuration() {
-        return isExo() ? exoPlayer.getDuration() : ijkPlayer.getDuration();
-    }
-
-    public long getBuffered() {
-        return isExo() ? exoPlayer.getBufferedPosition() : ijkPlayer.getBufferedPosition();
-    }
-
     public void seekTo(int time) {
         if (time == 0) return;
         if (isExo()) exoPlayer.seekTo(getPosition() + time);
@@ -152,10 +167,6 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         if (time == 0) return;
         if (isExo()) exoPlayer.seekTo(time);
         else if (isIjk()) ijkPlayer.seekTo(time);
-    }
-
-    public boolean isPlaying() {
-        return isExo() ? exoPlayer.isPlaying() : ijkPlayer.isPlaying();
     }
 
     public boolean isVod() {

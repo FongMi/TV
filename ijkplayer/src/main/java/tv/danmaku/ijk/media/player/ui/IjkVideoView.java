@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.Size;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -46,6 +47,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     public static final int RENDER_SURFACE_VIEW = 0;
     public static final int RENDER_TEXTURE_VIEW = 1;
 
+    private float mCurrentSpeed = 1;
     private int mCurrentAspectRatio;
     private int mCurrentRender;
 
@@ -185,6 +187,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         try {
             createPlayer();
             fixUserAgent();
+            setSpeed(mCurrentSpeed);
             setRender(mCurrentRender);
             mCurrentBufferPosition = 0;
             mCurrentBufferPercentage = 0;
@@ -428,7 +431,17 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     public void setSpeed(float speed) {
-        mIjkPlayer.setSpeed(speed);
+        if (mIjkPlayer != null) mIjkPlayer.setSpeed(speed);
+        mCurrentSpeed = speed;
+    }
+
+    public float getSpeed() {
+        if (mIjkPlayer != null) return mIjkPlayer.getSpeed();
+        return mCurrentSpeed;
+    }
+
+    public Size getSize() {
+        return new Size(mVideoWidth, mVideoHeight);
     }
 
     @Override
