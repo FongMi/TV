@@ -19,4 +19,5 @@ include ':tvbus'
 include ':catvod'
 include ':pyramid'
 include ':forcetech'
+include ':ijkplayer'
 rootProject.name = "TV"

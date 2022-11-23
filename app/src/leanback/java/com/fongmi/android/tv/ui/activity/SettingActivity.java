@@ -175,30 +175,30 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
     }
 
     private void setQuality() {
-        CharSequence[] array = ResUtil.getStringArray(R.array.select_quality);
         int index = Prefers.getQuality();
+        CharSequence[] array = ResUtil.getStringArray(R.array.select_quality);
         Prefers.putQuality(index = index == array.length - 1 ? 0 : ++index);
         mBinding.qualityText.setText(array[index]);
         RefreshEvent.image();
     }
 
     private void setRender() {
-        CharSequence[] array = ResUtil.getStringArray(R.array.select_render);
         int index = Prefers.getRender();
+        CharSequence[] array = ResUtil.getStringArray(R.array.select_render);
         Prefers.putRender(index = index == array.length - 1 ? 0 : ++index);
         mBinding.renderText.setText(array[index]);
     }
 
     private void setScale() {
-        CharSequence[] array = ResUtil.getStringArray(R.array.select_scale);
         int index = Prefers.getVodScale();
+        CharSequence[] array = ResUtil.getStringArray(R.array.select_scale);
         Prefers.putVodScale(index = index == array.length - 1 ? 0 : ++index);
         mBinding.scaleText.setText(array[index]);
     }
 
     private void setSize() {
-        CharSequence[] array = ResUtil.getStringArray(R.array.select_size);
         int index = Prefers.getSize();
+        CharSequence[] array = ResUtil.getStringArray(R.array.select_size);
         Prefers.putSize(index = index == array.length - 1 ? 0 : ++index);
         mBinding.sizeText.setText(array[index]);
         RefreshEvent.size();

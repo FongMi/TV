@@ -12,10 +12,12 @@ import androidx.leanback.widget.ListRow;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.FragmentVodBinding;
 import com.fongmi.android.tv.ui.activity.BaseFragment;
 import com.fongmi.android.tv.ui.activity.DetailActivity;
+import com.fongmi.android.tv.ui.activity.VodActivity;
 import com.fongmi.android.tv.ui.custom.CustomRowPresenter;
 import com.fongmi.android.tv.ui.custom.CustomSelector;
 import com.fongmi.android.tv.ui.presenter.VodPresenter;
@@ -86,7 +88,8 @@ public class CollectFragment extends BaseFragment implements VodPresenter.OnClic
     @Override
     public void onItemClick(Vod item) {
         getActivity().setResult(Activity.RESULT_OK);
-        DetailActivity.start(getActivity(), item.getSite().getKey(), item.getVodId());
+        if (item.isFolder()) VodActivity.start(getActivity(), Result.folder(item));
+        else DetailActivity.start(getActivity(), item.getSite().getKey(), item.getVodId());
     }
 
     @Override
