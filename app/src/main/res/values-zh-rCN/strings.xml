@@ -73,6 +73,7 @@
     <string name="dialog_config_hint">请输入接口…</string>
 
     <!-- Error -->
+    <string name="error_so_load">FFmpeg 加载失败</string>
     <string name="error_config_get">配置取得失败</string>
     <string name="error_config_parse">配置解析失败</string>
     <string name="error_play_next">已经是最后一集了！</string>

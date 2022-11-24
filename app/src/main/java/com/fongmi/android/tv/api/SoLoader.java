@@ -1,8 +1,10 @@
 package com.fongmi.android.tv.api;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.net.OKHttp;
 import com.fongmi.android.tv.utils.FileUtil;
+import com.fongmi.android.tv.utils.Notify;
 
 import java.io.File;
 
@@ -35,6 +37,7 @@ public class SoLoader {
             if (!file.exists()) FileUtil.write(file, OKHttp.newCall(url + name).execute().body().bytes());
             System.load(file.getAbsolutePath());
         } catch (Throwable e) {
+            App.post(() -> Notify.show(R.string.error_so_load));
             e.printStackTrace();
         }
     }
