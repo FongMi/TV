@@ -256,21 +256,17 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     private void setMediaSource(Result result) {
         SpiderDebug.log(errorCode + "," + result.getUrl() + "," + result.getHeaders());
         if (isIjk()) ijkPlayer.setMediaSource(result.getPlayUrl() + result.getUrl(), result.getHeaders());
-        else if (isExo()) {
-            exoPlayer.setMediaSource(ExoUtil.getSource(result, errorCode));
-            exoPlayer.prepare();
-            PlayerEvent.state(0);
-        }
+        if (isExo()) exoPlayer.setMediaSource(ExoUtil.getSource(result, errorCode));
+        if (isExo()) exoPlayer.prepare();
+        PlayerEvent.state(0);
     }
 
     private void setMediaSource(Map<String, String> headers, String url) {
         SpiderDebug.log(errorCode + "," + url + "," + headers);
         if (isIjk()) ijkPlayer.setMediaSource(url, headers);
-        else if (isExo()) {
-            exoPlayer.setMediaSource(ExoUtil.getSource(headers, url, errorCode));
-            exoPlayer.prepare();
-            PlayerEvent.state(0);
-        }
+        if (isExo()) exoPlayer.setMediaSource(ExoUtil.getSource(headers, url, errorCode));
+        if (isExo()) exoPlayer.prepare();
+        PlayerEvent.state(0);
     }
 
     @Override
@@ -303,9 +299,6 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     @Override
     public boolean onInfo(IMediaPlayer mp, int what, int extra) {
         switch (what) {
-            case IMediaPlayer.MEDIA_INFO_AUDIO_DECODED_START:
-                PlayerEvent.state(0);
-                return true;
             case IMediaPlayer.MEDIA_INFO_BUFFERING_START:
                 PlayerEvent.state(Player.STATE_BUFFERING);
                 return true;
