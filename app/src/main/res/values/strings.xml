@@ -98,9 +98,14 @@
     <!-- UNIT -->
     <string name="all">All</string>
 
+    <string-array name="select_decode">
+        <item>Soft</item>
+        <item>Hard</item>
+    </string-array>
+
     <string-array name="select_player">
-        <item>Hardware</item>
-        <item>Software</item>
+        <item>EXO</item>
+        <item>IJK</item>
     </string-array>
 
     <string-array name="select_render">

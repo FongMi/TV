@@ -157,6 +157,10 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         return stringToTime(time);
     }
 
+    public void setDecode(int decode) {
+        if (isIjk()) ijkPlayer.setDecode(decode);
+    }
+
     public void seekTo(int time) {
         if (time == 0) return;
         if (isExo()) exoPlayer.seekTo(getPosition() + time);
@@ -167,14 +171,6 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         if (time == 0) return;
         if (isExo()) exoPlayer.seekTo(time);
         else if (isIjk()) ijkPlayer.seekTo(time);
-    }
-
-    public boolean isVod() {
-        return getDuration() > 5 * 60 * 1000;
-    }
-
-    public boolean canNext() {
-        return getPosition() >= getDuration();
     }
 
     public void play() {
@@ -202,6 +198,14 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         stopParse();
         if (isExo()) releaseExo();
         else if (isIjk()) releaseIjk();
+    }
+
+    public boolean isVod() {
+        return getDuration() > 5 * 60 * 1000;
+    }
+
+    public boolean canNext() {
+        return getPosition() >= getDuration();
     }
 
     public void start(Channel channel) {

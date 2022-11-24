@@ -50,6 +50,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     private float mCurrentSpeed = 1;
     private int mCurrentAspectRatio;
     private int mCurrentRender;
+    private int mCurrentDecode;
     private int mStartPosition;
 
     private int mCurrentState = STATE_IDLE;
@@ -449,6 +450,10 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         return mCurrentSpeed;
     }
 
+    public void setDecode(int decode) {
+        this.mCurrentDecode = decode;
+    }
+
     public Size getSize() {
         return new Size(mVideoWidth, mVideoHeight);
     }
@@ -520,10 +525,10 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         mIjkPlayer.setOption(player, "fast", 1);
         mIjkPlayer.setOption(player, "framedrop", 1);
         mIjkPlayer.setOption(player, "max-buffer-size", 1024 * 1024);
-        mIjkPlayer.setOption(player, "mediacodec", 0);
-        mIjkPlayer.setOption(player, "mediacodec-auto-rotate", 0);
-        mIjkPlayer.setOption(player, "mediacodec-handle-resolution-change", 0);
-        mIjkPlayer.setOption(player, "mediacodec-hevc", 0);
+        mIjkPlayer.setOption(player, "mediacodec", mCurrentDecode);
+        mIjkPlayer.setOption(player, "mediacodec-auto-rotate", mCurrentDecode);
+        mIjkPlayer.setOption(player, "mediacodec-handle-resolution-change", mCurrentDecode);
+        mIjkPlayer.setOption(player, "mediacodec-hevc", mCurrentDecode);
         mIjkPlayer.setOption(player, "min-frames", 1024);
         mIjkPlayer.setOption(player, "opensles", 0);
         mIjkPlayer.setOption(player, "overlay-format", IjkMediaPlayer.SDL_FCC_RV32);

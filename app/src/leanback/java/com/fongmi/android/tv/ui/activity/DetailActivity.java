@@ -153,7 +153,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mR1 = this::hideControl;
         mR2 = this::hideCenter;
         setRecyclerView();
-        setVideoVisible();
+        setPlayerView();
         setVideoView();
         setViewModel();
         getDetail();
@@ -170,6 +170,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.scale.setOnClickListener(view -> onScale());
         mBinding.control.speed.setOnClickListener(view -> onSpeed());
         mBinding.control.player.setOnClickListener(view -> onPlayer());
+        mBinding.control.decode.setOnClickListener(view -> onDecode());
         mBinding.control.tracks.setOnClickListener(view -> onTracks());
         mBinding.control.ending.setOnClickListener(view -> onEnding());
         mBinding.control.opening.setOnClickListener(view -> onOpening());
@@ -210,18 +211,21 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mParseAdapter.setItems(ApiConfig.get().getParses(), null);
     }
 
-    private void setVideoVisible() {
+    private void setPlayerView() {
         getExo().setVisibility(mPlayers.isExo() ? View.VISIBLE : View.GONE);
         getIjk().setVisibility(mPlayers.isIjk() ? View.VISIBLE : View.GONE);
+        mBinding.control.decode.setVisibility(mPlayers.isExo() ? View.GONE : View.VISIBLE);
     }
 
     private void setVideoView() {
-        mPlayers.setupIjk(mBinding.ijk);
+        mPlayers.setupIjk(getIjk());
         setScale(Prefers.getVodScale());
         getExo().setPlayer(mPlayers.exo());
         getIjk().setRender(Prefers.getRender());
+        getIjk().setDecode(Prefers.getDecode());
         getExo().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
         mBinding.control.player.setText(ResUtil.getStringArray(R.array.select_player)[Prefers.getPlayer()]);
+        mBinding.control.decode.setText(ResUtil.getStringArray(R.array.select_decode)[Prefers.getDecode()]);
         mBinding.control.speed.setText(mPlayers.getSpeedText());
     }
 
@@ -474,11 +478,21 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         if (SoLoader.isFail()) return;
         int index = Prefers.getPlayer();
         CharSequence[] array = ResUtil.getStringArray(R.array.select_player);
-        Prefers.putPlayer(index = index == array.length - 1 ? 0 : ++index);
+        Prefers.putPlayer(index = index == 0 ? 1 : 0);
         mBinding.control.player.setText(array[index]);
         App.post(() -> getPlayer(false), 250);
-        setVideoVisible();
         mPlayers.toggle();
+        setPlayerView();
+    }
+
+    private void onDecode() {
+        if (mPlayers.isExo()) return;
+        int index = Prefers.getDecode();
+        CharSequence[] array = ResUtil.getStringArray(R.array.select_decode);
+        Prefers.putDecode(index = index == 0 ? 1 : 0);
+        mBinding.control.decode.setText(array[index]);
+        mPlayers.setDecode(index);
+        getPlayer(false);
     }
 
     private void onTracks() {
