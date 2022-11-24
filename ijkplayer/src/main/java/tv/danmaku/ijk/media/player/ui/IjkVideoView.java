@@ -50,6 +50,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     private float mCurrentSpeed = 1;
     private int mCurrentAspectRatio;
     private int mCurrentRender;
+    private int mStartPosition;
 
     private int mCurrentState = STATE_IDLE;
     private int mTargetState = STATE_IDLE;
@@ -266,9 +267,15 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
             if (mOnInfoListener != null) {
                 mOnInfoListener.onInfo(mp, what, extra);
             }
-            if (what == IMediaPlayer.MEDIA_INFO_VIDEO_ROTATION_CHANGED) {
-                mVideoRotationDegree = extra;
-                if (mRenderView != null) mRenderView.setVideoRotation(extra);
+            switch (what) {
+                case IMediaPlayer.MEDIA_INFO_AUDIO_DECODED_START:
+                    if (mStartPosition > 0) seekTo(mStartPosition);
+                    mStartPosition = 0;
+                    break;
+                case IMediaPlayer.MEDIA_INFO_VIDEO_ROTATION_CHANGED:
+                    mVideoRotationDegree = extra;
+                    if (mRenderView != null) mRenderView.setVideoRotation(extra);
+                    break;
             }
             return true;
         }
@@ -420,14 +427,16 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     @Override
-    public void seekTo(int msec) {
+    public void seekTo(int positionMs) {
         if (!isInPlaybackState()) return;
         mInfoListener.onInfo(mIjkPlayer, IMediaPlayer.MEDIA_INFO_BUFFERING_START, 0);
-        mIjkPlayer.seekTo(msec);
+        mIjkPlayer.seekTo(positionMs);
+        mStartPosition = 0;
     }
 
-    public void seekTo(long msec) {
-        seekTo((int) msec);
+    public void seekTo(long positionMs) {
+        mStartPosition = (int) positionMs;
+        seekTo(mStartPosition);
     }
 
     public void setSpeed(float speed) {
