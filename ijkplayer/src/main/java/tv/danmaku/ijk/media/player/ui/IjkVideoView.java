@@ -171,6 +171,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     @TargetApi(Build.VERSION_CODES.M)
     private void openVideo() {
+        if (mUri == null) return;
         release(false);
         AudioManager am = (AudioManager) mAppContext.getSystemService(Context.AUDIO_SERVICE);
         am.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
