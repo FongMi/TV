@@ -592,6 +592,28 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         keep.save();
     }
 
+    private final Runnable SeekTime = new Runnable() {
+        @Override
+        public void run() {
+            //获取视频播放的当前时间
+            int getCurrentPosition = (int) (mPlayers.getPosition() / 1000.0);
+            //获取视频的总时间
+            int getDuration = (int) (mPlayers.getDuration() / 1000.0);
+            //设置播放进度
+            if (getDuration  >= 3600 && getCurrentPosition  >= 3600 ) {
+                mBinding.widget.exoSeektime.setText(String.format(Locale.getDefault(), "%d:%02d:%02d", getCurrentPosition / 3600, (getCurrentPosition / 60) % 60, getCurrentPosition % 60 ) + " | " + String.format(Locale.getDefault(), "%d:%02d:%02d", getDuration / 3600, (getDuration / 60) % 60, getDuration % 60 ) );
+            }
+            else if (getDuration > 3600 && getCurrentPosition  < 3600) {
+                mBinding.widget.exoSeektime.setText(String.format(Locale.getDefault(), "%02d:%02d",  (getCurrentPosition / 60) % 60, getCurrentPosition % 60 ) + " | " + String.format(Locale.getDefault(), "%d:%02d:%02d", getDuration / 3600, (getDuration / 60) % 60, getDuration % 60 ) );
+            } else {
+                mBinding.widget.exoSeektime.setText(String.format(Locale.getDefault(), "%02d:%02d", (getCurrentPosition / 60) % 60, getCurrentPosition % 60 ) + " | " + String.format(Locale.getDefault(), "%02d:%02d" , (getDuration / 60) % 60, getDuration % 60 ) );
+            }
+            //自己通知自己更新
+            App.post(this, 1000);
+        }
+
+    };//运行播放进度时间    
+    
     private final Runnable mHideCenter = new Runnable() {
         @Override
         public void run() {
@@ -624,6 +646,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
                 showProgress();
                 break;
             case Player.STATE_READY:
+                mBinding.widget.topr.setVisibility(View.VISIBLE);//播放视频显示进度时间 实时时间
                 hideProgress();
                 mPlayers.reset();
                 TrackSelectionDialog.setVisible(mPlayers.exo(), mBinding.control.tracks);
@@ -668,6 +691,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void onPlay(int delay) {
         App.post(mHideCenter, delay);
+        App.post(SeekTime, delay);//运行播放进度时间
         mPlayers.play();
     }
 

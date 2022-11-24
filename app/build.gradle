@@ -59,7 +59,7 @@ dependencies {
     implementation project(':catvod')
     implementation project(':forcetech')
     implementation project(':ijkplayer')
-    pythonImplementation project(':pyramid')
+    //pythonImplementation project(':pyramid')
     implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation 'androidx.preference:preference:1.2.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.5.1'
