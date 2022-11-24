@@ -73,6 +73,7 @@
     <string name="dialog_config_hint">Please enter the config…</string>
 
     <!-- Error -->
+    <string name="error_so_load">Failed to load FFmpeg</string>
     <string name="error_config_get">Configuration get failed</string>
     <string name="error_config_parse">Configuration parse failed</string>
     <string name="error_play_next">It\'s the last episode!</string>
@@ -97,9 +98,14 @@
     <!-- UNIT -->
     <string name="all">All</string>
 
+    <string-array name="select_decode">
+        <item>Soft</item>
+        <item>Hard</item>
+    </string-array>
+
     <string-array name="select_player">
-        <item>Hardware</item>
-        <item>Software</item>
+        <item>EXO</item>
+        <item>IJK</item>
     </string-array>
 
     <string-array name="select_render">

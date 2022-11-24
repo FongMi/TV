@@ -49,6 +49,21 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     private List<String> mTypeIds;
     private boolean mOpen;
 
+    public static VodFragment newInstance(String key, String typeId, String filter, boolean folder) {
+        Bundle args = new Bundle();
+        args.putString("key", key);
+        args.putString("typeId", typeId);
+        args.putString("filter", filter);
+        args.putBoolean("folder", folder);
+        VodFragment fragment = new VodFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    private String getKey() {
+        return getArguments().getString("key");
+    }
+
     private String getTypeId() {
         return getArguments().getString("typeId");
     }
@@ -59,16 +74,6 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
 
     private boolean isFolder() {
         return getArguments().getBoolean("folder");
-    }
-
-    public static VodFragment newInstance(String typeId, String filter, boolean folder) {
-        Bundle args = new Bundle();
-        args.putString("typeId", typeId);
-        args.putString("filter", filter);
-        args.putBoolean("folder", folder);
-        VodFragment fragment = new VodFragment();
-        fragment.setArguments(args);
-        return fragment;
     }
 
     @Override
@@ -134,7 +139,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         int filterSize = mOpen ? mFilters.size() : 0;
         boolean clear = page.equals("1") && mAdapter.size() > filterSize;
         if (clear) mAdapter.removeItems(filterSize, mAdapter.size() - filterSize);
-        mViewModel.categoryContent(typeId, page, true, mExtend);
+        mViewModel.categoryContent(getKey(), typeId, page, true, mExtend);
     }
 
     private boolean checkLastSize(List<Vod> items) {
@@ -195,7 +200,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     public void onItemClick(Vod item) {
         if (item.shouldSearch()) onLongClick(item);
         else if (item.isFolder()) getVideo(item.getVodId(), "1");
-        else DetailActivity.start(getActivity(), item.getVodId());
+        else DetailActivity.start(getActivity(), getKey(), item.getVodId());
     }
 
     @Override

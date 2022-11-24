@@ -50,6 +50,8 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     private float mCurrentSpeed = 1;
     private int mCurrentAspectRatio;
     private int mCurrentRender;
+    private int mCurrentDecode;
+    private int mStartPosition;
 
     private int mCurrentState = STATE_IDLE;
     private int mTargetState = STATE_IDLE;
@@ -266,9 +268,15 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
             if (mOnInfoListener != null) {
                 mOnInfoListener.onInfo(mp, what, extra);
             }
-            if (what == IMediaPlayer.MEDIA_INFO_VIDEO_ROTATION_CHANGED) {
-                mVideoRotationDegree = extra;
-                if (mRenderView != null) mRenderView.setVideoRotation(extra);
+            switch (what) {
+                case IMediaPlayer.MEDIA_INFO_AUDIO_DECODED_START:
+                    if (mStartPosition > 0) seekTo(mStartPosition);
+                    mStartPosition = 0;
+                    break;
+                case IMediaPlayer.MEDIA_INFO_VIDEO_ROTATION_CHANGED:
+                    mVideoRotationDegree = extra;
+                    if (mRenderView != null) mRenderView.setVideoRotation(extra);
+                    break;
             }
             return true;
         }
@@ -420,14 +428,16 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     @Override
-    public void seekTo(int msec) {
+    public void seekTo(int positionMs) {
         if (!isInPlaybackState()) return;
         mInfoListener.onInfo(mIjkPlayer, IMediaPlayer.MEDIA_INFO_BUFFERING_START, 0);
-        mIjkPlayer.seekTo(msec);
+        mIjkPlayer.seekTo(positionMs);
+        mStartPosition = 0;
     }
 
-    public void seekTo(long msec) {
-        seekTo((int) msec);
+    public void seekTo(long positionMs) {
+        mStartPosition = (int) positionMs;
+        seekTo(mStartPosition);
     }
 
     public void setSpeed(float speed) {
@@ -438,6 +448,10 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     public float getSpeed() {
         if (mIjkPlayer != null) return mIjkPlayer.getSpeed();
         return mCurrentSpeed;
+    }
+
+    public void setDecode(int decode) {
+        this.mCurrentDecode = decode;
     }
 
     public Size getSize() {
@@ -511,10 +525,10 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         mIjkPlayer.setOption(player, "fast", 1);
         mIjkPlayer.setOption(player, "framedrop", 1);
         mIjkPlayer.setOption(player, "max-buffer-size", 1024 * 1024);
-        mIjkPlayer.setOption(player, "mediacodec", 0);
-        mIjkPlayer.setOption(player, "mediacodec-auto-rotate", 0);
-        mIjkPlayer.setOption(player, "mediacodec-handle-resolution-change", 0);
-        mIjkPlayer.setOption(player, "mediacodec-hevc", 0);
+        mIjkPlayer.setOption(player, "mediacodec", mCurrentDecode);
+        mIjkPlayer.setOption(player, "mediacodec-auto-rotate", mCurrentDecode);
+        mIjkPlayer.setOption(player, "mediacodec-handle-resolution-change", mCurrentDecode);
+        mIjkPlayer.setOption(player, "mediacodec-hevc", mCurrentDecode);
         mIjkPlayer.setOption(player, "min-frames", 1024);
         mIjkPlayer.setOption(player, "opensles", 0);
         mIjkPlayer.setOption(player, "overlay-format", IjkMediaPlayer.SDL_FCC_RV32);
@@ -523,7 +537,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         mIjkPlayer.setOption(player, "soundtouch", 1);
         mIjkPlayer.setOption(player, "start-on-prepared", 1);
         mIjkPlayer.setOption(player, "subtitle", 1);
-        if (mUri.getScheme().startsWith("rtsp")) {
+        if (mUri.getScheme() != null && mUri.getScheme().startsWith("rtsp")) {
             mIjkPlayer.setOption(format, "infbuf", 1);
             mIjkPlayer.setOption(format, "rtsp_transport", "tcp");
             mIjkPlayer.setOption(format, "rtsp_flags", "prefer_tcp");

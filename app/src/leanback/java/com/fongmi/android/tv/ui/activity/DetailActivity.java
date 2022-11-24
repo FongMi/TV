@@ -21,6 +21,7 @@ import androidx.viewbinding.ViewBinding;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.api.SoLoader;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.bean.Parse;
@@ -82,6 +83,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private History mHistory;
     private Players mPlayers;
     private int mCurrent;
+    private Runnable mR1;
+    private Runnable mR2;
 
     public static void start(Activity activity, String id) {
         start(activity, ApiConfig.get().getHome().getKey(), id);
@@ -147,8 +150,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mFrameParams = mBinding.video.getLayoutParams();
         mBinding.progressLayout.showProgress();
         mPlayers = new Players().init();
+        mR1 = this::hideControl;
+        mR2 = this::hideCenter;
         setRecyclerView();
-        setVideoVisible();
+        setPlayerView();
         setVideoView();
         setViewModel();
         getDetail();
@@ -165,6 +170,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.scale.setOnClickListener(view -> onScale());
         mBinding.control.speed.setOnClickListener(view -> onSpeed());
         mBinding.control.player.setOnClickListener(view -> onPlayer());
+        mBinding.control.decode.setOnClickListener(view -> onDecode());
         mBinding.control.tracks.setOnClickListener(view -> onTracks());
         mBinding.control.ending.setOnClickListener(view -> onEnding());
         mBinding.control.opening.setOnClickListener(view -> onOpening());
@@ -205,18 +211,21 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mParseAdapter.setItems(ApiConfig.get().getParses(), null);
     }
 
-    private void setVideoVisible() {
+    private void setPlayerView() {
         getExo().setVisibility(mPlayers.isExo() ? View.VISIBLE : View.GONE);
         getIjk().setVisibility(mPlayers.isIjk() ? View.VISIBLE : View.GONE);
+        mBinding.control.decode.setVisibility(mPlayers.isExo() ? View.GONE : View.VISIBLE);
     }
 
     private void setVideoView() {
-        mPlayers.setupIjk(mBinding.ijk);
+        mPlayers.setupIjk(getIjk());
         setScale(Prefers.getVodScale());
         getExo().setPlayer(mPlayers.exo());
         getIjk().setRender(Prefers.getRender());
+        getIjk().setDecode(Prefers.getDecode());
         getExo().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
         mBinding.control.player.setText(ResUtil.getStringArray(R.array.select_player)[Prefers.getPlayer()]);
+        mBinding.control.decode.setText(ResUtil.getStringArray(R.array.select_decode)[Prefers.getDecode()]);
         mBinding.control.speed.setText(mPlayers.getSpeedText());
     }
 
@@ -466,13 +475,24 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onPlayer() {
+        if (SoLoader.isFail()) return;
         int index = Prefers.getPlayer();
         CharSequence[] array = ResUtil.getStringArray(R.array.select_player);
-        Prefers.putPlayer(index = index == array.length - 1 ? 0 : ++index);
+        Prefers.putPlayer(index = index == 0 ? 1 : 0);
         mBinding.control.player.setText(array[index]);
         App.post(() -> getPlayer(false), 250);
-        setVideoVisible();
         mPlayers.toggle();
+        setPlayerView();
+    }
+
+    private void onDecode() {
+        if (mPlayers.isExo()) return;
+        int index = Prefers.getDecode();
+        CharSequence[] array = ResUtil.getStringArray(R.array.select_decode);
+        Prefers.putDecode(index = index == 0 ? 1 : 0);
+        mBinding.control.decode.setText(array[index]);
+        mPlayers.setDecode(index);
+        getPlayer(false);
     }
 
     private void onTracks() {
@@ -515,10 +535,22 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void showControl() {
         mBinding.control.getRoot().setVisibility(View.VISIBLE);
+        setR1Callback();
     }
 
     private void hideControl() {
         mBinding.control.getRoot().setVisibility(View.GONE);
+        App.removeCallbacks(mR1);
+    }
+
+    private void hideCenter() {
+        mBinding.widget.action.setImageResource(R.drawable.ic_play);
+        hideInfo();
+    }
+
+    private void setR1Callback() {
+        App.removeCallbacks(mR1);
+        App.post(mR1, 5000);
     }
 
     private void getPart(String source) {
@@ -592,15 +624,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         keep.save();
     }
 
-    private final Runnable mHideCenter = new Runnable() {
-        @Override
-        public void run() {
-            mBinding.widget.action.setImageResource(R.drawable.ic_play);
-            mBinding.widget.center.setVisibility(View.GONE);
-            hideInfo();
-        }
-    };
-
     @Override
     public void onTimeChanged() {
         long current = mPlayers.getPosition();
@@ -667,14 +690,15 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onPlay(int delay) {
-        App.post(mHideCenter, delay);
+        App.post(mR2, delay);
         mPlayers.play();
     }
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (mFullscreen && mBinding.control.tracks.getVisibility() == View.VISIBLE && Utils.isMenuKey(event)) onToggle();
-        else if (mFullscreen && isGone(mBinding.control.getRoot()) && mKeyDown.hasEvent(event)) return mKeyDown.onKeyDown(event);
+        if (mFullscreen && Utils.isMenuKey(event)) onToggle();
+        if (isVisible(mBinding.control.getRoot())) setR1Callback();
+        if (mFullscreen && isGone(mBinding.control.getRoot()) && mKeyDown.hasEvent(event)) return mKeyDown.onKeyDown(event);
         return super.dispatchKeyEvent(event);
     }
 
