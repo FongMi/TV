@@ -696,9 +696,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
+        if (mFullscreen && Utils.isMenuKey(event)) onToggle();
         if (isVisible(mBinding.control.getRoot())) setR1Callback();
-        if (mFullscreen && mBinding.control.tracks.getVisibility() == View.VISIBLE && Utils.isMenuKey(event)) onToggle();
-        else if (mFullscreen && isGone(mBinding.control.getRoot()) && mKeyDown.hasEvent(event)) return mKeyDown.onKeyDown(event);
+        if (mFullscreen && isGone(mBinding.control.getRoot()) && mKeyDown.hasEvent(event)) return mKeyDown.onKeyDown(event);
         return super.dispatchKeyEvent(event);
     }
 
