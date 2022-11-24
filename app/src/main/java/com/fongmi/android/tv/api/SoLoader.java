@@ -40,15 +40,19 @@ public class SoLoader {
     private void checkSo(String name) {
         try {
             File file = new File(FileUtil.getLibDir(), name);
-            if (!file.exists()) remove(name.split("-")[0]);
-            if (!file.exists()) FileUtil.write(file, OKHttp.newCall(url + name).execute().body().bytes());
+            if (!file.exists() || file.length() < 1000) download(name, file);
+            if (file.length() < 1000) throw new Throwable();
             System.load(file.getAbsolutePath());
         } catch (Throwable e) {
             App.post(() -> Notify.show(R.string.error_so_load));
             Prefers.putPlayer(0);
-            e.printStackTrace();
             fail = true;
         }
+    }
+
+    private void download(String name, File file) throws Throwable {
+        remove(name.split("-")[0]);
+        FileUtil.write(file, OKHttp.newCall(url + name).execute().body().bytes());
     }
 
     private void remove(String name) {
