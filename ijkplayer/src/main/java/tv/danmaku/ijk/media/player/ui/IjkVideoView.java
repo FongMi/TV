@@ -532,7 +532,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         mIjkPlayer.setOption(player, "soundtouch", 1);
         mIjkPlayer.setOption(player, "start-on-prepared", 1);
         mIjkPlayer.setOption(player, "subtitle", 1);
-        if (mUri.getScheme().startsWith("rtsp")) {
+        if (mUri.getScheme() != null && mUri.getScheme().startsWith("rtsp")) {
             mIjkPlayer.setOption(format, "infbuf", 1);
             mIjkPlayer.setOption(format, "rtsp_transport", "tcp");
             mIjkPlayer.setOption(format, "rtsp_flags", "prefer_tcp");

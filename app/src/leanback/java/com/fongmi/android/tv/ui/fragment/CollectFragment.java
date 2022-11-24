@@ -88,7 +88,7 @@ public class CollectFragment extends BaseFragment implements VodPresenter.OnClic
     @Override
     public void onItemClick(Vod item) {
         getActivity().setResult(Activity.RESULT_OK);
-        if (item.isFolder()) VodActivity.start(getActivity(), Result.folder(item));
+        if (item.isFolder()) VodActivity.start(getActivity(), item.getSite().getKey(), Result.folder(item));
         else DetailActivity.start(getActivity(), item.getSite().getKey(), item.getVodId());
     }
 
