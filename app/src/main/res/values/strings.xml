@@ -73,6 +73,7 @@
     <string name="dialog_config_hint">Please enter the config…</string>
 
     <!-- Error -->
+    <string name="error_so_load">Failed to load FFmpeg</string>
     <string name="error_config_get">Configuration get failed</string>
     <string name="error_config_parse">Configuration parse failed</string>
     <string name="error_play_next">It\'s the last episode!</string>
