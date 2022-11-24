@@ -43,10 +43,6 @@ public class CollectActivity extends BaseActivity {
     private List<Site> mSites;
     private View mOldView;
 
-    private String getKeyword() {
-        return getIntent().getStringExtra("keyword");
-    }
-
     public static void start(Activity activity, String keyword) {
         start(activity, keyword, false);
     }
@@ -56,6 +52,10 @@ public class CollectActivity extends BaseActivity {
         if (clear) intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra("keyword", keyword);
         activity.startActivityForResult(intent, 1000);
+    }
+
+    private String getKeyword() {
+        return getIntent().getStringExtra("keyword");
     }
 
     @Override
