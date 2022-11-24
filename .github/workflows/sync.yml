@@ -13,6 +13,6 @@ jobs:
       - uses: tgymnich/fork-sync@v1.4
         with:
           github_token: ${{ secrets.SYNC_TOKEN }}
-          owner:  FongMi # fork 的上游仓库 user
+          owner: FongMi # fork 的上游仓库 user
           head: release # fork 的上游仓库 branch
           base: release # 本地仓库 branch
