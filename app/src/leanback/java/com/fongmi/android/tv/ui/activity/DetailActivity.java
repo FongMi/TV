@@ -82,6 +82,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private History mHistory;
     private Players mPlayers;
     private int mCurrent;
+    private Runnable mR1;
+    private Runnable mR2;
 
     public static void start(Activity activity, String id) {
         start(activity, ApiConfig.get().getHome().getKey(), id);
@@ -147,6 +149,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mFrameParams = mBinding.video.getLayoutParams();
         mBinding.progressLayout.showProgress();
         mPlayers = new Players().init();
+        mR1 = this::hideControl;
+        mR2 = this::hideCenter;
         setRecyclerView();
         setVideoVisible();
         setVideoView();
@@ -515,10 +519,22 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void showControl() {
         mBinding.control.getRoot().setVisibility(View.VISIBLE);
+        setR1Callback();
     }
 
     private void hideControl() {
         mBinding.control.getRoot().setVisibility(View.GONE);
+        App.removeCallbacks(mR1);
+    }
+
+    private void hideCenter() {
+        mBinding.widget.action.setImageResource(R.drawable.ic_play);
+        hideInfo();
+    }
+
+    private void setR1Callback() {
+        App.removeCallbacks(mR1);
+        App.post(mR1, 5000);
     }
 
     private void getPart(String source) {
@@ -592,15 +608,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         keep.save();
     }
 
-    private final Runnable mHideCenter = new Runnable() {
-        @Override
-        public void run() {
-            mBinding.widget.action.setImageResource(R.drawable.ic_play);
-            mBinding.widget.center.setVisibility(View.GONE);
-            hideInfo();
-        }
-    };
-
     @Override
     public void onTimeChanged() {
         long current = mPlayers.getPosition();
@@ -667,12 +674,13 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onPlay(int delay) {
-        App.post(mHideCenter, delay);
+        App.post(mR2, delay);
         mPlayers.play();
     }
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
+        if (isVisible(mBinding.control.getRoot())) setR1Callback();
         if (mFullscreen && mBinding.control.tracks.getVisibility() == View.VISIBLE && Utils.isMenuKey(event)) onToggle();
         else if (mFullscreen && isGone(mBinding.control.getRoot()) && mKeyDown.hasEvent(event)) return mKeyDown.onKeyDown(event);
         return super.dispatchKeyEvent(event);

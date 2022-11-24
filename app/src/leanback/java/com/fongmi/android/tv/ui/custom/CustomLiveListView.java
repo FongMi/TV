@@ -33,7 +33,6 @@ public class CustomLiveListView extends VerticalGridView {
     }
 
     private boolean onKeyDown() {
-        listener.setUITimer();
         if (getSelectedPosition() != getAdapter().getItemCount() - 1) return false;
         if (getId() == R.id.channel) setSelectedPosition(0);
         else listener.nextGroup(false);
@@ -41,7 +40,6 @@ public class CustomLiveListView extends VerticalGridView {
     }
 
     private boolean onKeyUp() {
-        listener.setUITimer();
         if (getSelectedPosition() != 0) return false;
         if (getId() == R.id.channel) setSelectedPosition(getAdapter().getItemCount());
         else listener.prevGroup(false);
@@ -51,6 +49,7 @@ public class CustomLiveListView extends VerticalGridView {
     @Override
     public boolean dispatchKeyEvent(@NonNull KeyEvent event) {
         if (getVisibility() == View.GONE || event.getAction() != KeyEvent.ACTION_DOWN) return super.dispatchKeyEvent(event);
+        if (getVisibility() == View.VISIBLE) listener.setUITimer();
         if (Utils.isDownKey(event)) return onKeyDown();
         if (Utils.isUpKey(event)) return onKeyUp();
         return super.dispatchKeyEvent(event);
