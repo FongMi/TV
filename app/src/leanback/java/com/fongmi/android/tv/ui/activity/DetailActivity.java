@@ -596,7 +596,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         @Override
         public void run() {
             //获取视频播放的当前时间
-            int getCurrentPosition = (int) (mPlayers.getCurrentPosition() / 1000.0);
+            int getCurrentPosition = (int) (mPlayers.getPosition() / 1000.0);
             //获取视频的总时间
             int getDuration = (int) (mPlayers.getDuration() / 1000.0);
             //设置播放进度
