@@ -75,6 +75,14 @@ public class Prefers {
         put("player", player);
     }
 
+    public static int getDecode() {
+        return getInt("decode", 0);
+    }
+
+    public static void putDecode(int decode) {
+        put("decode", decode);
+    }
+
     public static int getRender() {
         return getInt("render", 0);
     }
