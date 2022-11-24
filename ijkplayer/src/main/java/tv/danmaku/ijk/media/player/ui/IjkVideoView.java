@@ -362,13 +362,8 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
                 return;
             }
             mSurfaceHolder = null;
-            releaseWithoutStop();
         }
     };
-
-    public void releaseWithoutStop() {
-        if (mIjkPlayer != null) mIjkPlayer.setDisplay(null);
-    }
 
     public void release(boolean clearState) {
         if (mIjkPlayer == null) return;
