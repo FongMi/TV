@@ -5,7 +5,6 @@ import com.fongmi.android.tv.net.OKHttp;
 import com.fongmi.android.tv.utils.FileUtil;
 
 import java.io.File;
-import java.io.IOException;
 
 public class SoLoader {
 
@@ -25,24 +24,19 @@ public class SoLoader {
     }
 
     public void load() {
-        App.execute(() -> {
-            checkSo(exo);
-            checkSo(ijk);
-        });
+        App.execute(() -> checkSo(exo));
+        App.execute(() -> checkSo(ijk));
     }
 
     private void checkSo(String name) {
         try {
             File file = new File(FileUtil.getLibDir(), name);
-            if (!file.exists()) download(file, name);
+            if (!file.exists()) remove(name.split("-")[0]);
+            if (!file.exists()) FileUtil.write(file, OKHttp.newCall(url + name).execute().body().bytes());
             System.load(file.getAbsolutePath());
-        } catch (Exception ignored) {
+        } catch (Throwable e) {
+            e.printStackTrace();
         }
-    }
-
-    private void download(File file, String name) throws IOException {
-        remove(name.split("-")[0]);
-        FileUtil.write(file, OKHttp.newCall(url + name).execute().body().bytes());
     }
 
     private void remove(String name) {
