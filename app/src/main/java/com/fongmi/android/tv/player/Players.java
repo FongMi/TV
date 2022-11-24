@@ -307,6 +307,7 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
                 PlayerEvent.state(Player.STATE_BUFFERING);
                 return true;
             case IMediaPlayer.MEDIA_INFO_BUFFERING_END:
+            case IMediaPlayer.MEDIA_INFO_VIDEO_SEEK_RENDERING_START:
             case IMediaPlayer.MEDIA_INFO_AUDIO_SEEK_RENDERING_START:
                 PlayerEvent.state(Player.STATE_READY);
                 return true;
