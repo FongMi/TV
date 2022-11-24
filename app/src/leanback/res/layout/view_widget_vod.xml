@@ -45,7 +45,6 @@
 
     </RelativeLayout>
     
-    </LinearLayout>
     //右上角增加进度时间和实时时间现行
     <LinearLayout
         android:id="@+id/topr"
