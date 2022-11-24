@@ -10,7 +10,6 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.util.Size;
 import android.view.Gravity;
-import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.MediaController;
 import android.widget.TextView;
@@ -43,13 +42,11 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     private static final int format = IjkMediaPlayer.OPT_CATEGORY_FORMAT;
     private static final int player = IjkMediaPlayer.OPT_CATEGORY_PLAYER;
 
-    public static final int RENDER_NONE = -1;
     public static final int RENDER_SURFACE_VIEW = 0;
     public static final int RENDER_TEXTURE_VIEW = 1;
 
     private float mCurrentSpeed = 1;
     private int mCurrentAspectRatio;
-    private int mCurrentRender;
     private int mCurrentDecode;
     private int mStartPosition;
 
@@ -108,44 +105,34 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         subtitleDisplay = new TextView(context);
         subtitleDisplay.setTextSize(24);
         subtitleDisplay.setGravity(Gravity.CENTER);
-        FrameLayout.LayoutParams layoutParams_txt = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM);
-        addView(subtitleDisplay, layoutParams_txt);
+        addView(subtitleDisplay, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM));
     }
 
     private void setRenderView(IRenderView renderView) {
-        if (mRenderView != null) {
-            if (mIjkPlayer != null) mIjkPlayer.setDisplay(null);
-            View renderUIView = mRenderView.getView();
-            mRenderView.removeRenderCallback(mSHCallback);
-            mRenderView = null;
-            removeView(renderUIView);
-        }
-        if (renderView == null) return;
         mRenderView = renderView;
         setResizeMode(mCurrentAspectRatio);
-        if (mVideoWidth > 0 && mVideoHeight > 0) renderView.setVideoSize(mVideoWidth, mVideoHeight);
-        if (mVideoSarNum > 0 && mVideoSarDen > 0) renderView.setVideoSampleAspectRatio(mVideoSarNum, mVideoSarDen);
-        View renderUIView = mRenderView.getView();
-        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.CENTER);
-        renderUIView.setLayoutParams(lp);
-        addView(renderUIView);
+        addView(mRenderView.getView(), new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER));
         mRenderView.addRenderCallback(mSHCallback);
         mRenderView.setVideoRotation(mVideoRotationDegree);
     }
 
+    private void clearRender() {
+        if (mRenderView != null) {
+            removeView(mRenderView.getView());
+            mRenderView.removeRenderCallback(mSHCallback);
+            mRenderView = null;
+        }
+    }
+
     public void setRender(int render) {
+        clearRender();
         switch (render) {
-            case RENDER_NONE:
-                setRenderView(null);
-                break;
             case RENDER_TEXTURE_VIEW:
-                mCurrentRender = render;
                 TextureRenderView texture = new TextureRenderView(getContext());
                 if (mIjkPlayer != null) texture.getSurfaceHolder().bindToMediaPlayer(mIjkPlayer);
                 setRenderView(texture);
                 break;
             case RENDER_SURFACE_VIEW:
-                mCurrentRender = render;
                 setRenderView(new SurfaceRenderView(getContext()));
                 break;
         }
@@ -169,8 +156,8 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     public void stopPlayback() {
+        if (mRenderView != null) mRenderView.getView().invalidate();
         if (mIjkPlayer == null) return;
-        setRender(RENDER_NONE);
         mIjkPlayer.stop();
         mIjkPlayer.release();
         mIjkPlayer = null;
@@ -190,7 +177,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
             createPlayer();
             fixUserAgent();
             setSpeed(mCurrentSpeed);
-            setRender(mCurrentRender);
             mCurrentBufferPosition = 0;
             mCurrentBufferPercentage = 0;
             mIjkPlayer.setDataSource(mAppContext, mUri, mHeaders);
