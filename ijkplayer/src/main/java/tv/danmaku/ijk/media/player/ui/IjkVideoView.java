@@ -47,6 +47,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     private float mCurrentSpeed = 1;
     private int mCurrentAspectRatio;
+    private int mCurrentRender;
     private int mCurrentDecode;
     private int mStartPosition;
 
@@ -109,6 +110,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     private void setRenderView(IRenderView renderView) {
+        clearRender();
         mRenderView = renderView;
         setResizeMode(mCurrentAspectRatio);
         addView(mRenderView.getView(), new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER));
@@ -125,7 +127,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     public void setRender(int render) {
-        clearRender();
+        mCurrentRender = render;
         switch (render) {
             case RENDER_TEXTURE_VIEW:
                 TextureRenderView texture = new TextureRenderView(getContext());
@@ -156,8 +158,8 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     public void stopPlayback() {
-        if (mRenderView != null) mRenderView.getView().invalidate();
         if (mIjkPlayer == null) return;
+        clearRender();
         mIjkPlayer.stop();
         mIjkPlayer.release();
         mIjkPlayer = null;
@@ -177,6 +179,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
             createPlayer();
             fixUserAgent();
             setSpeed(mCurrentSpeed);
+            setRender(mCurrentRender);
             mCurrentBufferPosition = 0;
             mCurrentBufferPercentage = 0;
             mIjkPlayer.setDataSource(mAppContext, mUri, mHeaders);
@@ -362,8 +365,13 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
                 return;
             }
             mSurfaceHolder = null;
+            releaseWithoutStop();
         }
     };
+
+    public void releaseWithoutStop() {
+        if (mIjkPlayer != null) mIjkPlayer.setDisplay(null);
+    }
 
     public void release(boolean clearState) {
         if (mIjkPlayer == null) return;
@@ -491,8 +499,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         mIjkPlayer.setOnTimedTextListener(mOnTimedTextListener);
         mIjkPlayer.setOption(codec, "skip_frame", 0);
         mIjkPlayer.setOption(codec, "skip_loop_filter", 48);
-        mIjkPlayer.setOption(format, "analyzeduration", 1);
-        mIjkPlayer.setOption(format, "analyzemaxduration", 10);
         mIjkPlayer.setOption(format, "buffer_size", 1024 * 1024);
         mIjkPlayer.setOption(format, "dns_cache_clear", 1);
         mIjkPlayer.setOption(format, "dns_cache_timeout", -1);
