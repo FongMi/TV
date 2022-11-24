@@ -98,9 +98,14 @@
     <!-- UNIT -->
     <string name="all">全部</string>
 
-    <string-array name="select_player">
-        <item>硬解</item>
+    <string-array name="select_decode">
         <item>软解</item>
+        <item>硬解</item>
+    </string-array>
+
+    <string-array name="select_player">
+        <item>EXO</item>
+        <item>IJK</item>
     </string-array>
 
     <string-array name="select_quality">
