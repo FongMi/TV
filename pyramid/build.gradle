@@ -29,5 +29,5 @@ android {
 
 dependencies {
     implementation project(':catvod')
-    implementation 'com.google.code.gson:gson:2.10'
+    implementation 'com.google.code.gson:gson:2.8.9'
 }
