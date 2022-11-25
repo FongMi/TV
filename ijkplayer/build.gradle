@@ -3,19 +3,15 @@ plugins {
 }
 
 android {
-    compileSdk 34
+    compileSdk 33
 
     defaultConfig {
-        minSdk 21
-        targetSdk 28
-    }
-
-    lint {
-        disable 'UnsafeOptInUsageError'
+        minSdk 17
+        targetSdk 33
+        ndk { abiFilters "armeabi-v7a" }
     }
 }
 
 dependencies {
-    implementation project(':catvod')
-    implementation project(':media-lib-ui')
+    implementation 'androidx.annotation:annotation:1.5.0'
 }
