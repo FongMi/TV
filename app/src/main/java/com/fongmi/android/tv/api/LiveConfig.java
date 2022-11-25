@@ -137,7 +137,7 @@ public class LiveConfig {
     }
 
     public void setKeep(Group group, Channel channel) {
-        if (!group.isHidden()) Prefers.putKeep(home.getName() + AppDatabase.SYMBOL + group.getName() + AppDatabase.SYMBOL + channel.getName());
+        if (!group.isHidden() && home != null) Prefers.putKeep(home.getName() + AppDatabase.SYMBOL + group.getName() + AppDatabase.SYMBOL + channel.getName());
     }
 
     public int[] find(List<Group> items) {

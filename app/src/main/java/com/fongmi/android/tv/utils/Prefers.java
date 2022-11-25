@@ -67,6 +67,22 @@ public class Prefers {
         put("wall", wall);
     }
 
+    public static int getPlayer() {
+        return getInt("player", 0);
+    }
+
+    public static void putPlayer(int player) {
+        put("player", player);
+    }
+
+    public static int getDecode() {
+        return getInt("decode", 0);
+    }
+
+    public static void putDecode(int decode) {
+        put("decode", decode);
+    }
+
     public static int getRender() {
         return getInt("render", 0);
     }
@@ -137,5 +153,13 @@ public class Prefers {
 
     public static int getColumn() {
         return Math.abs(getSize() - 7);
+    }
+
+    public static boolean isExo() {
+        return getPlayer() == 0;
+    }
+
+    public static boolean isIjk() {
+        return getPlayer() == 1;
     }
 }

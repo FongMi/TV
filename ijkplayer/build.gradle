@@ -1,0 +1,17 @@
+plugins {
+    id 'com.android.library'
+}
+
+android {
+    compileSdk 33
+
+    defaultConfig {
+        minSdk 21
+        targetSdk 33
+        ndk { abiFilters "armeabi-v7a" }
+    }
+}
+
+dependencies {
+    implementation 'androidx.annotation:annotation:1.5.0'
+}

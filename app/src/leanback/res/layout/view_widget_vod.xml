@@ -4,22 +4,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/info"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/shape_info_vod"
-        android:orientation="horizontal"
-        android:padding="16dp"
-        android:visibility="gone"
-        tools:visibility="visible">
+        android:layout_height="wrap_content">
 
         <TextView
             android:id="@+id/title"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
-            android:layout_weight="1"
+            android:layout_toStartOf="@+id/time"
             android:letterSpacing="0.02"
             android:shadowColor="@color/grey_700"
             android:shadowDx="2"
@@ -27,22 +24,41 @@
             android:shadowRadius="1"
             android:singleLine="true"
             android:textColor="@color/white"
-            android:textSize="20sp"
+            android:textSize="18sp"
             tools:text="慶餘年第一季：第一集" />
 
         <TextView
-            android:id="@+id/time"
-            android:layout_width="wrap_content"
+            android:id="@+id/size"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/title"
+            android:layout_alignStart="@+id/title"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="16dp"
             android:shadowColor="@color/grey_700"
             android:shadowDx="2"
             android:shadowDy="2"
             android:shadowRadius="1"
             android:textColor="@color/white"
-            android:textSize="20sp"
+            android:textSize="14sp"
+            tools:text="1920 x 1080" />
+
+        <TextView
+            android:id="@+id/time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:shadowColor="@color/grey_700"
+            android:shadowDx="2"
+            android:shadowDy="2"
+            android:shadowRadius="1"
+            android:textColor="@color/white"
+            android:textSize="18sp"
             tools:text="09:20:00" />
 
-    </LinearLayout>
+    </RelativeLayout>
 
     <include
         android:id="@+id/progress"
