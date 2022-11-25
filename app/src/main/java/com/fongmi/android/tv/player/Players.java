@@ -40,11 +40,11 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     private int retry;
 
     public boolean isExo() {
-        return Prefers.getPlayer() == 0;
+        return Prefers.isExo();
     }
 
     public boolean isIjk() {
-        return Prefers.getPlayer() == 1;
+        return Prefers.isIjk();
     }
 
     public Players init() {
@@ -144,6 +144,19 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         return getSpeedText();
     }
 
+    public String togglePlayer() {
+        stop();
+        int index = Prefers.getPlayer();
+        Prefers.putPlayer(index = index == 0 ? 1 : 0);
+        return ResUtil.getStringArray(R.array.select_player)[index].toString();
+    }
+
+    public String toggleDecode() {
+        int index = Prefers.getDecode();
+        setDecode(index = index == 0 ? 1 : 0);
+        return ResUtil.getStringArray(R.array.select_decode)[index].toString();
+    }
+
     public String getPositionTime(long time) {
         time = getPosition() + time;
         if (time > getDuration()) time = getDuration();
@@ -157,6 +170,11 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         return stringToTime(time);
     }
 
+    public void setDecode(int decode) {
+        ijkPlayer.setDecode(decode);
+        Prefers.putDecode(decode);
+    }
+
     public void seekTo(int time) {
         if (time == 0) return;
         if (isExo()) exoPlayer.seekTo(getPosition() + time);
@@ -167,14 +185,6 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         if (time == 0) return;
         if (isExo()) exoPlayer.seekTo(time);
         else if (isIjk()) ijkPlayer.seekTo(time);
-    }
-
-    public boolean isVod() {
-        return getDuration() > 5 * 60 * 1000;
-    }
-
-    public boolean canNext() {
-        return getPosition() >= getDuration();
     }
 
     public void play() {
@@ -193,15 +203,14 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         else if (isIjk()) stopIjk();
     }
 
-    public void toggle() {
-        if (isExo()) stopIjk();
-        else if (isIjk()) stopExo();
-    }
-
     public void release() {
         stopParse();
         if (isExo()) releaseExo();
         else if (isIjk()) releaseIjk();
+    }
+
+    public boolean isVod() {
+        return getDuration() > 5 * 60 * 1000;
     }
 
     public void start(Channel channel) {
@@ -303,6 +312,7 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
                 PlayerEvent.state(Player.STATE_BUFFERING);
                 return true;
             case IMediaPlayer.MEDIA_INFO_BUFFERING_END:
+            case IMediaPlayer.MEDIA_INFO_VIDEO_SEEK_RENDERING_START:
             case IMediaPlayer.MEDIA_INFO_AUDIO_SEEK_RENDERING_START:
                 PlayerEvent.state(Player.STATE_READY);
                 return true;
