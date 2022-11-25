@@ -63,6 +63,8 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.versionText.setText(BuildConfig.VERSION_NAME);
         mBinding.sizeText.setText(ResUtil.getStringArray(R.array.select_size)[Prefers.getSize()]);
         mBinding.scaleText.setText(ResUtil.getStringArray(R.array.select_scale)[Prefers.getVodScale()]);
+        mBinding.playerText.setText(ResUtil.getStringArray(R.array.select_player)[Prefers.getPlayer()]);
+        mBinding.decodeText.setText(ResUtil.getStringArray(R.array.select_decode)[Prefers.getDecode()]);
         mBinding.renderText.setText(ResUtil.getStringArray(R.array.select_render)[Prefers.getRender()]);
         mBinding.qualityText.setText(ResUtil.getStringArray(R.array.select_quality)[Prefers.getQuality()]);
     }
@@ -80,6 +82,8 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.wallDefault.setOnClickListener(view -> setWallDefault());
         mBinding.wallRefresh.setOnClickListener(view -> setWallRefresh());
         mBinding.quality.setOnClickListener(view -> setQuality());
+        mBinding.player.setOnClickListener(view -> setPlayer());
+        mBinding.decode.setOnClickListener(view -> setDecode());
         mBinding.render.setOnClickListener(view -> setRender());
         mBinding.scale.setOnClickListener(view -> setScale());
         mBinding.size.setOnClickListener(view -> setSize());
@@ -182,6 +186,22 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         RefreshEvent.image();
     }
 
+    private void setPlayer() {
+        int index = Prefers.getPlayer();
+        CharSequence[] array = ResUtil.getStringArray(R.array.select_player);
+        Prefers.putPlayer(index = index == array.length - 1 ? 0 : ++index);
+        mBinding.playerText.setText(array[index]);
+        if (Prefers.isExo()) forceHardDecode();
+    }
+
+    private void setDecode() {
+        if (Prefers.isExo()) return;
+        int index = Prefers.getDecode();
+        CharSequence[] array = ResUtil.getStringArray(R.array.select_decode);
+        Prefers.putDecode(index = index == array.length - 1 ? 0 : ++index);
+        mBinding.decodeText.setText(array[index]);
+    }
+
     private void setRender() {
         int index = Prefers.getRender();
         CharSequence[] array = ResUtil.getStringArray(R.array.select_render);
@@ -210,5 +230,11 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
 
     private void setWallRefresh() {
         WallConfig.get().load();
+    }
+
+    private void forceHardDecode() {
+        CharSequence[] array = ResUtil.getStringArray(R.array.select_decode);
+        mBinding.decodeText.setText(array[1]);
+        Prefers.putDecode(1);
     }
 }
