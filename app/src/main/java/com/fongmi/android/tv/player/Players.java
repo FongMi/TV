@@ -204,10 +204,6 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         return getDuration() > 5 * 60 * 1000;
     }
 
-    public boolean canNext() {
-        return getPosition() >= getDuration();
-    }
-
     public void start(Channel channel) {
         setMediaSource(channel.getHeaders(), channel.getUrl());
     }

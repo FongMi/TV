@@ -503,7 +503,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void onToggle() {
         if (isVisible(mBinding.control.getRoot())) hideControl();
-        else showControl();
+        else showControl(mBinding.control.next);
     }
 
     private void showProgress() {
@@ -533,8 +533,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.widget.info.setVisibility(View.GONE);
     }
 
-    private void showControl() {
+    private void showControl(View view) {
         mBinding.control.getRoot().setVisibility(View.VISIBLE);
+        view.requestFocus();
         setR1Callback();
     }
 
@@ -652,7 +653,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
                 TrackSelectionDialog.setVisible(mPlayers.exo(), mBinding.control.tracks);
                 break;
             case Player.STATE_ENDED:
-                if (mPlayers.canNext()) checkNext();
+                checkNext();
                 break;
             default:
                 if (!event.isRetry() || mPlayers.addRetry() > 2) onError(event.getMsg());
@@ -721,15 +722,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     public void onKeyUp() {
         long current = mPlayers.getPosition();
         long half = mPlayers.getDuration() / 2;
-        if (current < half) mBinding.control.opening.requestFocus();
-        else mBinding.control.ending.requestFocus();
-        showControl();
+        showControl(current < half ? mBinding.control.opening : mBinding.control.ending);
     }
 
     @Override
     public void onKeyDown() {
-        mBinding.control.next.requestFocus();
-        showControl();
+        showControl(mBinding.control.next);
     }
 
     @Override
