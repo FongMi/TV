@@ -12,6 +12,7 @@ android {
         targetSdk 33
         versionCode 45
         versionName "1.4.5"
+        multiDexEnabled true
         ndk { abiFilters "armeabi-v7a" }
     }
 
