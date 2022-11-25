@@ -154,4 +154,12 @@ public class Prefers {
     public static int getColumn() {
         return Math.abs(getSize() - 7);
     }
+
+    public static boolean isExo() {
+        return getPlayer() == 0;
+    }
+
+    public static boolean isIjk() {
+        return getPlayer() == 1;
+    }
 }
