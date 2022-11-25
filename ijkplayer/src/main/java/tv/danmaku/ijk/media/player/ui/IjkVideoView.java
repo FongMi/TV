@@ -10,7 +10,6 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.util.Size;
 import android.view.Gravity;
-import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.MediaController;
 import android.widget.TextView;
@@ -43,13 +42,13 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     private static final int format = IjkMediaPlayer.OPT_CATEGORY_FORMAT;
     private static final int player = IjkMediaPlayer.OPT_CATEGORY_PLAYER;
 
-    public static final int RENDER_NONE = -1;
     public static final int RENDER_SURFACE_VIEW = 0;
     public static final int RENDER_TEXTURE_VIEW = 1;
 
     private float mCurrentSpeed = 1;
     private int mCurrentAspectRatio;
     private int mCurrentRender;
+    private int mCurrentDecode;
     private int mStartPosition;
 
     private int mCurrentState = STATE_IDLE;
@@ -107,44 +106,35 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         subtitleDisplay = new TextView(context);
         subtitleDisplay.setTextSize(24);
         subtitleDisplay.setGravity(Gravity.CENTER);
-        FrameLayout.LayoutParams layoutParams_txt = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM);
-        addView(subtitleDisplay, layoutParams_txt);
+        addView(subtitleDisplay, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM));
     }
 
     private void setRenderView(IRenderView renderView) {
-        if (mRenderView != null) {
-            if (mIjkPlayer != null) mIjkPlayer.setDisplay(null);
-            View renderUIView = mRenderView.getView();
-            mRenderView.removeRenderCallback(mSHCallback);
-            mRenderView = null;
-            removeView(renderUIView);
-        }
-        if (renderView == null) return;
+        clearRender();
         mRenderView = renderView;
         setResizeMode(mCurrentAspectRatio);
-        if (mVideoWidth > 0 && mVideoHeight > 0) renderView.setVideoSize(mVideoWidth, mVideoHeight);
-        if (mVideoSarNum > 0 && mVideoSarDen > 0) renderView.setVideoSampleAspectRatio(mVideoSarNum, mVideoSarDen);
-        View renderUIView = mRenderView.getView();
-        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.CENTER);
-        renderUIView.setLayoutParams(lp);
-        addView(renderUIView);
+        addView(mRenderView.getView(), new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER));
         mRenderView.addRenderCallback(mSHCallback);
         mRenderView.setVideoRotation(mVideoRotationDegree);
     }
 
+    private void clearRender() {
+        if (mRenderView != null) {
+            removeView(mRenderView.getView());
+            mRenderView.removeRenderCallback(mSHCallback);
+            mRenderView = null;
+        }
+    }
+
     public void setRender(int render) {
+        mCurrentRender = render;
         switch (render) {
-            case RENDER_NONE:
-                setRenderView(null);
-                break;
             case RENDER_TEXTURE_VIEW:
-                mCurrentRender = render;
                 TextureRenderView texture = new TextureRenderView(getContext());
                 if (mIjkPlayer != null) texture.getSurfaceHolder().bindToMediaPlayer(mIjkPlayer);
                 setRenderView(texture);
                 break;
             case RENDER_SURFACE_VIEW:
-                mCurrentRender = render;
                 setRenderView(new SurfaceRenderView(getContext()));
                 break;
         }
@@ -169,7 +159,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     public void stopPlayback() {
         if (mIjkPlayer == null) return;
-        setRender(RENDER_NONE);
+        clearRender();
         mIjkPlayer.stop();
         mIjkPlayer.release();
         mIjkPlayer = null;
@@ -181,7 +171,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     @TargetApi(Build.VERSION_CODES.M)
     private void openVideo() {
-        if (mUri == null || mSurfaceHolder == null) return;
+        if (mUri == null) return;
         release(false);
         AudioManager am = (AudioManager) mAppContext.getSystemService(Context.AUDIO_SERVICE);
         am.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
@@ -449,6 +439,10 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         return mCurrentSpeed;
     }
 
+    public void setDecode(int decode) {
+        this.mCurrentDecode = decode;
+    }
+
     public Size getSize() {
         return new Size(mVideoWidth, mVideoHeight);
     }
@@ -503,36 +497,26 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         mIjkPlayer.setOnInfoListener(mInfoListener);
         mIjkPlayer.setOnBufferingUpdateListener(mBufferingUpdateListener);
         mIjkPlayer.setOnTimedTextListener(mOnTimedTextListener);
-        mIjkPlayer.setOption(codec, "skip_frame", 0);
         mIjkPlayer.setOption(codec, "skip_loop_filter", 48);
-        mIjkPlayer.setOption(format, "analyzeduration", 1);
-        mIjkPlayer.setOption(format, "analyzemaxduration", 10);
-        mIjkPlayer.setOption(format, "buffer_size", 1024 * 1024);
         mIjkPlayer.setOption(format, "dns_cache_clear", 1);
         mIjkPlayer.setOption(format, "dns_cache_timeout", -1);
         mIjkPlayer.setOption(format, "fflags", "fastseek");
-        mIjkPlayer.setOption(format, "flush_packets", 1);
         mIjkPlayer.setOption(format, "http-detect-range-support", 0);
-        mIjkPlayer.setOption(format, "probesize", 1024 * 1024);
-        mIjkPlayer.setOption(format, "rtbufsize", 60);
         mIjkPlayer.setOption(format, "timeout", 30 * 1000 * 1000);
         mIjkPlayer.setOption(player, "enable-accurate-seek", 0);
         mIjkPlayer.setOption(player, "fast", 1);
         mIjkPlayer.setOption(player, "framedrop", 1);
-        mIjkPlayer.setOption(player, "max-buffer-size", 1024 * 1024);
-        mIjkPlayer.setOption(player, "mediacodec", 0);
-        mIjkPlayer.setOption(player, "mediacodec-auto-rotate", 0);
-        mIjkPlayer.setOption(player, "mediacodec-handle-resolution-change", 0);
-        mIjkPlayer.setOption(player, "mediacodec-hevc", 0);
-        mIjkPlayer.setOption(player, "min-frames", 1024);
+        mIjkPlayer.setOption(player, "mediacodec", mCurrentDecode);
+        mIjkPlayer.setOption(player, "mediacodec-auto-rotate", mCurrentDecode);
+        mIjkPlayer.setOption(player, "mediacodec-handle-resolution-change", mCurrentDecode);
+        mIjkPlayer.setOption(player, "mediacodec-hevc", mCurrentDecode);
         mIjkPlayer.setOption(player, "opensles", 0);
         mIjkPlayer.setOption(player, "overlay-format", IjkMediaPlayer.SDL_FCC_RV32);
-        mIjkPlayer.setOption(player, "packet-buffering", 0);
         mIjkPlayer.setOption(player, "reconnect", 1);
         mIjkPlayer.setOption(player, "soundtouch", 1);
         mIjkPlayer.setOption(player, "start-on-prepared", 1);
         mIjkPlayer.setOption(player, "subtitle", 1);
-        if (mUri.getScheme().startsWith("rtsp")) {
+        if (mUri.getScheme() != null && mUri.getScheme().startsWith("rtsp")) {
             mIjkPlayer.setOption(format, "infbuf", 1);
             mIjkPlayer.setOption(format, "rtsp_transport", "tcp");
             mIjkPlayer.setOption(format, "rtsp_flags", "prefer_tcp");

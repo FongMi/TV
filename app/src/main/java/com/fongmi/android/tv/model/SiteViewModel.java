@@ -82,8 +82,8 @@ public class SiteViewModel extends ViewModel {
         });
     }
 
-    public void categoryContent(String tid, String page, boolean filter, HashMap<String, String> extend) {
-        Site site = ApiConfig.get().getHome();
+    public void categoryContent(String key, String tid, String page, boolean filter, HashMap<String, String> extend) {
+        Site site = ApiConfig.get().getSite(key);
         execute(result, () -> {
             if (site.getType() == 3) {
                 Spider spider = ApiConfig.get().getCSP(site);
