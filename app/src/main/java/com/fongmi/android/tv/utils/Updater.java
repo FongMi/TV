@@ -19,7 +19,7 @@ import java.io.File;
 
 public class Updater implements View.OnClickListener {
 
-    private static final String DEF = "https://raw.githubusercontent.com/FongMi/TV/release/release/";
+    private static final String DEF = "https://raw.githubusercontent.com/FongMi/TV/kitkat/release/";
     private static final String URL = DEF + BuildConfig.FLAVOR_mode + ".json";
     private static final String APK = DEF + BuildConfig.FLAVOR_mode + "-" + BuildConfig.FLAVOR_api + ".apk";
     private static final String PROXY = "https://ghproxy.com/";
