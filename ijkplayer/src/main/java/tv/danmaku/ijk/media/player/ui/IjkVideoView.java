@@ -8,7 +8,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.util.Size;
 import android.view.Gravity;
 import android.widget.FrameLayout;
 import android.widget.MediaController;
@@ -443,8 +442,12 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         this.mCurrentDecode = decode;
     }
 
-    public Size getSize() {
-        return new Size(mVideoWidth, mVideoHeight);
+    public int getVideoWidth() {
+        return mVideoWidth;
+    }
+
+    public int getVideoHeight() {
+        return mVideoHeight;
     }
 
     @Override
