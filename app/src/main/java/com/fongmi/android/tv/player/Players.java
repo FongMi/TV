@@ -112,6 +112,10 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         return isExo() ? exoPlayer.isPlaying() : ijkPlayer.isPlaying();
     }
 
+    public boolean isRelease() {
+        return exoPlayer == null || ijkPlayer == null;
+    }
+
     private int getVideoWidth() {
         return isExo() ? exoPlayer.getVideoSize().width : ijkPlayer.getVideoWidth();
     }

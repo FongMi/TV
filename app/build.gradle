@@ -62,6 +62,7 @@ dependencies {
     implementation project(':ijkplayer')
     pythonImplementation project(':pyramid')
     implementation project(':exoplayer-library')
+    implementation project(':exoplayer-extension-av1')
     implementation project(':exoplayer-extension-rtmp')
     implementation project(':exoplayer-extension-ffmpeg')
     implementation 'androidx.multidex:multidex:2.0.1'
