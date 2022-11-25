@@ -17,7 +17,6 @@ import androidx.viewbinding.ViewBinding;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.LiveConfig;
-import com.fongmi.android.tv.api.SoLoader;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Epg;
 import com.fongmi.android.tv.bean.Group;
@@ -275,24 +274,15 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void onPlayer() {
-        if (SoLoader.isFail()) return;
-        int index = Prefers.getPlayer();
-        CharSequence[] array = ResUtil.getStringArray(R.array.select_player);
-        Prefers.putPlayer(index = index == 0 ? 1 : 0);
         mBinding.control.tracks.setVisibility(View.GONE);
-        mBinding.control.player.setText(array[index]);
+        mBinding.control.player.setText(mPlayers.togglePlayer());
         App.post(this::getUrl, 250);
-        mPlayers.toggle();
         setPlayerView();
     }
 
     private void onDecode() {
         if (mPlayers.isExo()) return;
-        int index = Prefers.getDecode();
-        CharSequence[] array = ResUtil.getStringArray(R.array.select_decode);
-        Prefers.putDecode(index = index == 0 ? 1 : 0);
-        mBinding.control.decode.setText(array[index]);
-        mPlayers.setDecode(index);
+        mBinding.control.decode.setText(mPlayers.toggleDecode());
         getUrl();
     }
 

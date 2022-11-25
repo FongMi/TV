@@ -21,7 +21,6 @@ import androidx.viewbinding.ViewBinding;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
-import com.fongmi.android.tv.api.SoLoader;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.bean.Parse;
@@ -475,24 +474,15 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onPlayer() {
-        if (SoLoader.isFail()) return;
-        int index = Prefers.getPlayer();
-        CharSequence[] array = ResUtil.getStringArray(R.array.select_player);
-        Prefers.putPlayer(index = index == 0 ? 1 : 0);
         mBinding.control.tracks.setVisibility(View.GONE);
-        mBinding.control.player.setText(array[index]);
+        mBinding.control.player.setText(mPlayers.togglePlayer());
         App.post(() -> getPlayer(false), 250);
-        mPlayers.toggle();
         setPlayerView();
     }
 
     private void onDecode() {
         if (mPlayers.isExo()) return;
-        int index = Prefers.getDecode();
-        CharSequence[] array = ResUtil.getStringArray(R.array.select_decode);
-        Prefers.putDecode(index = index == 0 ? 1 : 0);
-        mBinding.control.decode.setText(array[index]);
-        mPlayers.setDecode(index);
+        mBinding.control.decode.setText(mPlayers.toggleDecode());
         getPlayer(false);
     }
 

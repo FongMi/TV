@@ -144,6 +144,19 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         return getSpeedText();
     }
 
+    public String togglePlayer() {
+        stop();
+        int index = Prefers.getPlayer();
+        Prefers.putPlayer(index = index == 0 ? 1 : 0);
+        return ResUtil.getStringArray(R.array.select_player)[index].toString();
+    }
+
+    public String toggleDecode() {
+        int index = Prefers.getDecode();
+        setDecode(index = index == 0 ? 1 : 0);
+        return ResUtil.getStringArray(R.array.select_decode)[index].toString();
+    }
+
     public String getPositionTime(long time) {
         time = getPosition() + time;
         if (time > getDuration()) time = getDuration();
@@ -158,7 +171,8 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     }
 
     public void setDecode(int decode) {
-        if (isIjk()) ijkPlayer.setDecode(decode);
+        ijkPlayer.setDecode(decode);
+        Prefers.putDecode(decode);
     }
 
     public void seekTo(int time) {
@@ -187,11 +201,6 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         reset();
         if (isExo()) stopExo();
         else if (isIjk()) stopIjk();
-    }
-
-    public void toggle() {
-        if (isExo()) stopIjk();
-        else if (isIjk()) stopExo();
     }
 
     public void release() {

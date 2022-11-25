@@ -17,7 +17,6 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.api.LiveConfig;
-import com.fongmi.android.tv.api.SoLoader;
 import com.fongmi.android.tv.api.WallConfig;
 import com.fongmi.android.tv.bean.Func;
 import com.fongmi.android.tv.bean.History;
@@ -73,7 +72,6 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         ApiConfig.get().init().load(getCallback());
         mBinding.progressLayout.showProgress();
         Updater.create(this).start();
-        SoLoader.get().load();
         Server.get().start();
         setRecyclerView();
         setViewModel();
