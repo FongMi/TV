@@ -75,6 +75,7 @@ public class CustomSeekView extends FrameLayout implements TimeBar.OnScrubListen
     }
 
     private void updateProgress() {
+        if (listener.isRelease()) return;
         long duration = listener.getDuration();
         long position = listener.getPosition();
         long buffered = listener.getBuffered();
