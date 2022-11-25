@@ -323,8 +323,9 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.widget.progress.getRoot().setVisibility(View.GONE);
     }
 
-    private void showControl() {
+    private void showControl(View view) {
         mBinding.control.getRoot().setVisibility(View.VISIBLE);
+        view.requestFocus();
         setR3Callback();
     }
 
@@ -571,10 +572,9 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public boolean onLongPress() {
-        if (isVisible(mBinding.control.home)) mBinding.control.home.requestFocus();
-        else if (isVisible(mBinding.control.line)) mBinding.control.line.requestFocus();
-        else mBinding.control.speed.requestFocus();
-        showControl();
+        if (isVisible(mBinding.control.home)) showControl(mBinding.control.home);
+        else if (isVisible(mBinding.control.line)) showControl(mBinding.control.line);
+        else showControl(mBinding.control.player);
         hideInfo();
         hideUI();
         return true;

@@ -21,7 +21,6 @@
             android:id="@+id/actionLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:animateLayoutChanges="true"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
