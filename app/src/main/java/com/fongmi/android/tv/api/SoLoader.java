@@ -33,8 +33,8 @@ public class SoLoader {
     }
 
     public void load() {
-        App.execute(() -> checkSo(exo));
-        App.execute(() -> checkSo(ijk));
+        new Thread(() -> checkSo(exo)).start();
+        new Thread(() -> checkSo(ijk)).start();
     }
 
     private void checkSo(String name) {
