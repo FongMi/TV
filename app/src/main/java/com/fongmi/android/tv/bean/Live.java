@@ -104,7 +104,7 @@ public class Live {
     }
 
     public Live check() {
-        boolean proxy = getGroup().equals("redirect") && getChannels().size() > 0 && getChannels().get(0).getUrls().size() > 0 && getChannels().get(0).getUrls().get(0).startsWith("proxy");
+        boolean proxy = getGroup().equals("redirect") && getChannels().size() > 0 && getChannels().get(0).getUrls().size() > 0 && getChannels().get(0).getUrls().get(0).startsWith("proxy") && getChannels().get(0).getUrls().get(0).contains("ext=");
         if (proxy) this.url = getChannels().get(0).getUrls().get(0).split("ext=")[1];
         if (proxy) this.name = getChannels().get(0).getName();
         return this;

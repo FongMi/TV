@@ -10,8 +10,8 @@ android {
         applicationId "com.fongmi.android.tv"
         minSdk 17
         targetSdk 33
-        versionCode 44
-        versionName "1.4.4"
+        versionCode 45
+        versionName "1.4.5"
         ndk { abiFilters "armeabi-v7a" }
     }
 
@@ -58,6 +58,7 @@ android {
 dependencies {
     implementation project(':catvod')
     implementation project(':forcetech')
+    implementation project(':ijkplayer')
     pythonImplementation project(':pyramid')
     implementation project(':exoplayer-library')
     implementation project(':exoplayer-extension-rtmp')
@@ -72,7 +73,7 @@ dependencies {
     implementation 'com.github.bassaer:materialdesigncolors:1.0.0'
     implementation 'com.github.bumptech.glide:glide:4.14.2'
     implementation 'com.google.android.material:material:1.7.0'
-    implementation 'com.google.code.gson:gson:2.9.1'
+    implementation 'com.google.code.gson:gson:2.10'
     implementation 'com.google.zxing:core:3.3.0'
     implementation 'com.squareup.okhttp3:okhttp:3.12.13'
     implementation 'me.jessyan:autosize:1.2.1'

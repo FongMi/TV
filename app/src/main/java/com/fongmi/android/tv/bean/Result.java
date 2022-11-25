@@ -87,6 +87,16 @@ public class Result {
         return new Result();
     }
 
+    public static Result folder(Vod item) {
+        Result result = new Result();
+        Class type = new Class();
+        type.setTypeFlag("1");
+        type.setTypeId(item.getVodId());
+        type.setTypeName(item.getVodName());
+        result.setTypes(List.of(type));
+        return result;
+    }
+
     public List<Class> getTypes() {
         return types == null ? Collections.emptyList() : types;
     }

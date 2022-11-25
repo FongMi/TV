@@ -22,6 +22,7 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Class;
 import com.fongmi.android.tv.bean.Result;
+import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.databinding.ActivityVodBinding;
 import com.fongmi.android.tv.ui.fragment.VodFragment;
 import com.fongmi.android.tv.ui.presenter.TypePresenter;
@@ -41,16 +42,29 @@ public class VodActivity extends BaseActivity {
     private Result mResult;
     private View mOldView;
 
+    public static void start(Activity activity, Result result) {
+        result.setList(Collections.emptyList());
+        start(activity, ApiConfig.get().getHome().getKey(), result);
+    }
+
+    public static void start(Activity activity, String key, Result result) {
+        if (result == null || result.getTypes().isEmpty()) return;
+        Intent intent = new Intent(activity, VodActivity.class);
+        intent.putExtra("key", key);
+        intent.putExtra("result", result.toString());
+        activity.startActivity(intent);
+    }
+
+    private String getKey() {
+        return getIntent().getStringExtra("key");
+    }
+
     private String getResult() {
         return getIntent().getStringExtra("result");
     }
 
-    public static void start(Activity activity, Result result) {
-        if (result == null || result.getTypes().isEmpty()) return;
-        Intent intent = new Intent(activity, VodActivity.class);
-        result.setList(Collections.emptyList());
-        intent.putExtra("result", result.toString());
-        activity.startActivity(intent);
+    private Site getSite() {
+        return ApiConfig.get().getSite(getKey());
     }
 
     @Override
@@ -90,13 +104,13 @@ public class VodActivity extends BaseActivity {
 
     private List<Class> getTypes() {
         List<Class> types = new ArrayList<>();
-        for (String cate : ApiConfig.get().getHome().getCategories()) for (Class type : mResult.getTypes()) if (cate.equals(type.getTypeName())) types.add(type);
+        for (String cate : getSite().getCategories()) for (Class type : mResult.getTypes()) if (cate.equals(type.getTypeName())) types.add(type);
         return types;
     }
 
     private void setTypes() {
         mResult.setTypes(getTypes());
-        Boolean filter = ApiConfig.get().getHome().isFilterable() ? false : null;
+        Boolean filter = getSite().isFilterable() ? false : null;
         for (Class item : mResult.getTypes()) if (mResult.getFilters().containsKey(item.getTypeId())) item.setFilter(filter);
         mAdapter.setItems(mResult.getTypes(), null);
     }
@@ -155,7 +169,7 @@ public class VodActivity extends BaseActivity {
         public Fragment getItem(int position) {
             Class type = mResult.getTypes().get(position);
             String filter = new Gson().toJson(mResult.getFilters().get(type.getTypeId()));
-            return VodFragment.newInstance(type.getTypeId(), filter, type.getTypeFlag().equals("1"));
+            return VodFragment.newInstance(getKey(), type.getTypeId(), filter, type.getTypeFlag().equals("1"));
         }
 
         @Override

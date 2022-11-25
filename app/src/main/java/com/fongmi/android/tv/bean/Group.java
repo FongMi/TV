@@ -4,6 +4,8 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 
+import androidx.annotation.StringRes;
+
 import com.bumptech.glide.Glide;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
@@ -28,6 +30,10 @@ public class Group {
 
     public static Group create(String name) {
         return new Group(name);
+    }
+
+    public static Group create(@StringRes int resId) {
+        return new Group(ResUtil.getString(resId));
     }
 
     public Group(String name) {

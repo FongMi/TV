@@ -43,7 +43,7 @@ public class LiveViewModel extends ViewModel {
         executor = Executors.newFixedThreadPool(2);
         executor.execute(() -> {
             try {
-                if (!Thread.interrupted()) result.postValue(executor.submit(callable).get(10, TimeUnit.SECONDS));
+                if (!Thread.interrupted()) result.postValue(executor.submit(callable).get(30, TimeUnit.SECONDS));
             } catch (Throwable e) {
                 e.printStackTrace();
             }
