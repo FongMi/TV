@@ -61,6 +61,7 @@ dependencies {
     implementation project(':ijkplayer')
     pythonImplementation project(':pyramid')
     implementation project(':exoplayer-library')
+    implementation project(':exoplayer-extension-av1')
     implementation project(':exoplayer-extension-rtmp')
     implementation project(':exoplayer-extension-ffmpeg')
     implementation 'androidx.appcompat:appcompat:1.5.1'

@@ -1,7 +1,5 @@
 package com.fongmi.android.tv.player;
 
-import android.util.Size;
-
 import androidx.annotation.NonNull;
 
 import com.fongmi.android.tv.App;
@@ -114,13 +112,16 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         return isExo() ? exoPlayer.isPlaying() : ijkPlayer.isPlaying();
     }
 
-    public Size getSize() {
-        return isExo() ? new Size(exoPlayer.getVideoSize().width, exoPlayer.getVideoSize().height) : ijkPlayer.getSize();
+    private int getVideoWidth() {
+        return isExo() ? exoPlayer.getVideoSize().width : ijkPlayer.getVideoWidth();
+    }
+
+    private int getVideoHeight() {
+        return isExo() ? exoPlayer.getVideoSize().height : ijkPlayer.getVideoHeight();
     }
 
     public String getSizeText() {
-        Size size = getSize();
-        return size.getWidth() + " x " + size.getHeight();
+        return getVideoWidth() + " x " + getVideoHeight();
     }
 
     public String getSpeedText() {
