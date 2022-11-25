@@ -40,11 +40,11 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     private int retry;
 
     public boolean isExo() {
-        return Prefers.getPlayer() == 0;
+        return Prefers.isExo();
     }
 
     public boolean isIjk() {
-        return Prefers.getPlayer() == 1;
+        return Prefers.isIjk();
     }
 
     public Players init() {
