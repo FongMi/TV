@@ -24,3 +24,4 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew build
+[![Android CI](https://github.com/xinyi1984/TV/actions/workflows/android.yml/badge.svg?branch=sjxs)](https://github.com/xinyi1984/TV/actions/workflows/android.yml)
