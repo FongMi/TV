@@ -166,7 +166,7 @@ public class ApiConfig {
         else if (ext.startsWith("file")) return FileUtil.read(ext);
         else if (ext.startsWith("img+")) return Decoder.getExt(ext);
         else if (ext.contains("http") || ext.contains("file")) return ext;
-        else if (ext.endsWith(".json") || ext.endsWith(".py")) return parseExt(Utils.convert(config.getUrl(), ext));
+        else if (ext.endsWith(".txt") || ext.endsWith(".json") || ext.endsWith(".py")) return parseExt(Utils.convert(config.getUrl(), ext));
         return ext;
     }
 
