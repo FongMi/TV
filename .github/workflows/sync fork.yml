@@ -16,4 +16,4 @@ jobs:
         with:
           owner: FongMi
           base: release
-          head: release
+          head: sjxs
