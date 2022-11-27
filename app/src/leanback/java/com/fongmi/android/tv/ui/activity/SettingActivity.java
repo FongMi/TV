@@ -194,7 +194,6 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
     }
 
     private void setDecode() {
-        if (Prefers.isExo()) return;
         int index = Prefers.getDecode();
         CharSequence[] array = ResUtil.getStringArray(R.array.select_decode);
         Prefers.putDecode(index = index == array.length - 1 ? 0 : ++index);
