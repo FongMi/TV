@@ -163,7 +163,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private void setPlayerView() {
         getExo().setVisibility(mPlayers.isExo() ? View.VISIBLE : View.GONE);
         getIjk().setVisibility(mPlayers.isIjk() ? View.VISIBLE : View.GONE);
-        mBinding.control.decode.setVisibility(mPlayers.isExo() ? View.GONE : View.VISIBLE);
     }
 
     private void setVideoView() {
@@ -281,8 +280,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void onDecode() {
-        if (mPlayers.isExo()) return;
         mBinding.control.decode.setText(mPlayers.toggleDecode());
+        if (mPlayers.isExo()) getExo().setPlayer(mPlayers.exo());
         getUrl();
     }
 

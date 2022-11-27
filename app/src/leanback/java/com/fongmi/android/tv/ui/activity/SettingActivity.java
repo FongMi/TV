@@ -191,7 +191,6 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         CharSequence[] array = ResUtil.getStringArray(R.array.select_player);
         Prefers.putPlayer(index = index == array.length - 1 ? 0 : ++index);
         mBinding.playerText.setText(array[index]);
-        if (Prefers.isExo()) forceHardDecode();
     }
 
     private void setDecode() {
@@ -230,11 +229,5 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
 
     private void setWallRefresh() {
         WallConfig.get().load();
-    }
-
-    private void forceHardDecode() {
-        CharSequence[] array = ResUtil.getStringArray(R.array.select_decode);
-        mBinding.decodeText.setText(array[1]);
-        Prefers.putDecode(1);
     }
 }
