@@ -59,6 +59,7 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     }
 
     public void setupExo() {
+        if (exoPlayer != null) releaseExo();
         exoPlayer = new ExoPlayer.Builder(App.get()).setLoadControl(new DefaultLoadControl()).setRenderersFactory(ExoUtil.buildRenderersFactory()).setTrackSelector(ExoUtil.buildTrackSelector()).build();
         exoPlayer.addAnalyticsListener(this);
         exoPlayer.setPlayWhenReady(true);
@@ -167,8 +168,9 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     }
 
     public void setDecode(int decode) {
-        ijkPlayer.setDecode(decode);
         Prefers.putDecode(decode);
+        ijkPlayer.setDecode(decode);
+        if (isExo()) setupExo();
     }
 
     public void seekTo(int time) {
