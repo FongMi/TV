@@ -224,7 +224,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         getExo().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
         mBinding.control.player.setText(ResUtil.getStringArray(R.array.select_player)[Prefers.getPlayer()]);
         mBinding.control.decode.setText(ResUtil.getStringArray(R.array.select_decode)[Prefers.getDecode()]);
-        mBinding.control.speed.setText(mPlayers.getSpeedText());
     }
 
     private void setScale(int scale) {
@@ -437,10 +436,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void onSpeed() {
         mBinding.control.speed.setText(mPlayers.addSpeed());
+        mHistory.setSpeed(mPlayers.getSpeed());
     }
 
     private boolean onSpeedLong() {
         mBinding.control.speed.setText(mPlayers.toggleSpeed());
+        mHistory.setSpeed(mPlayers.getSpeed());
         return true;
     }
 
@@ -577,6 +578,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         if (mHistory.getScale() != -1) setScale(mHistory.getScale());
         mBinding.control.opening.setText(mPlayers.stringToTime(mHistory.getOpening()));
         mBinding.control.ending.setText(mPlayers.stringToTime(mHistory.getEnding()));
+        mBinding.control.speed.setText(mPlayers.setSpeed(mHistory.getSpeed()));
     }
 
     private History createHistory() {
@@ -676,7 +678,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void onPause(boolean visible) {
         mBinding.widget.exoDuration.setText(mPlayers.getDurationTime());
         mBinding.widget.exoPosition.setText(mPlayers.getPositionTime(0));
-        if (visible) showInfo(); else hideInfo();
+        if (visible) showInfo();
+        else hideInfo();
         mPlayers.pause();
     }
 
