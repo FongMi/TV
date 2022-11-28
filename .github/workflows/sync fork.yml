@@ -15,5 +15,5 @@ jobs:
       - uses: tgymnich/fork-sync@v1.6.3
         with:
           owner: FongMi
-          base: sjxs
+          base: release
           head: release
