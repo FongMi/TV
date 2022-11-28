@@ -31,6 +31,7 @@ public class History {
     private long duration;
     private float speed;
     private int player;
+    private int decode;
     private int scale;
     private int cid;
 
@@ -38,6 +39,7 @@ public class History {
         this.speed = 1;
         this.scale = -1;
         this.player = -1;
+        this.decode = -1;
     }
 
     @NonNull
@@ -159,6 +161,14 @@ public class History {
 
     public void setPlayer(int player) {
         this.player = player;
+    }
+
+    public int getDecode() {
+        return decode;
+    }
+
+    public void setDecode(int decode) {
+        this.decode = decode;
     }
 
     public int getScale() {

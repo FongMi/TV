@@ -87,6 +87,7 @@ public abstract class AppDatabase extends RoomDatabase {
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             database.execSQL("ALTER TABLE History ADD COLUMN speed REAL DEFAULT 1 NOT NULL");
             database.execSQL("ALTER TABLE History ADD COLUMN player INTEGER DEFAULT -1 NOT NULL");
+            database.execSQL("ALTER TABLE History ADD COLUMN decode INTEGER DEFAULT -1 NOT NULL");
         }
     };
 }
