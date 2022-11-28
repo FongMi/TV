@@ -22,7 +22,7 @@ import com.fongmi.android.tv.db.dao.SiteDao;
 @Database(entities = {Config.class, Site.class, History.class, Keep.class}, version = AppDatabase.VERSION, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
-    public static final int VERSION = 15;
+    public static final int VERSION = 16;
     public static final String SYMBOL = "@@@";
 
     private static volatile AppDatabase instance;
@@ -33,7 +33,15 @@ public abstract class AppDatabase extends RoomDatabase {
     }
 
     private static AppDatabase create(Context context) {
-        return Room.databaseBuilder(context, AppDatabase.class, "tv").addMigrations(MIGRATION_11_12).addMigrations(MIGRATION_12_13).addMigrations(MIGRATION_13_14).addMigrations(MIGRATION_14_15).allowMainThreadQueries().fallbackToDestructiveMigration().build();
+        return Room.databaseBuilder(context, AppDatabase.class, "tv")
+                .addMigrations(MIGRATION_11_12)
+                .addMigrations(MIGRATION_12_13)
+                .addMigrations(MIGRATION_13_14)
+                .addMigrations(MIGRATION_14_15)
+                .addMigrations(MIGRATION_15_16)
+                .allowMainThreadQueries()
+                .fallbackToDestructiveMigration()
+                .build();
     }
 
     public abstract KeepDao getKeepDao();
@@ -71,6 +79,14 @@ public abstract class AppDatabase extends RoomDatabase {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             database.execSQL("ALTER TABLE History ADD COLUMN scale INTEGER DEFAULT -1 NOT NULL");
+        }
+    };
+
+    static final Migration MIGRATION_15_16 = new Migration(15, 16) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE History ADD COLUMN speed REAL DEFAULT 1 NOT NULL");
+            database.execSQL("ALTER TABLE History ADD COLUMN player INTEGER DEFAULT -1 NOT NULL");
         }
     };
 }

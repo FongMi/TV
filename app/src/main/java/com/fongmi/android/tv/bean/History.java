@@ -29,11 +29,15 @@ public class History {
     private long ending;
     private long position;
     private long duration;
+    private float speed;
+    private int player;
     private int scale;
     private int cid;
 
     public History() {
+        this.speed = 1;
         this.scale = -1;
+        this.player = -1;
     }
 
     @NonNull
@@ -139,6 +143,22 @@ public class History {
 
     public void setDuration(long duration) {
         this.duration = duration;
+    }
+
+    public float getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(float speed) {
+        this.speed = speed;
+    }
+
+    public int getPlayer() {
+        return player;
+    }
+
+    public void setPlayer(int player) {
+        this.player = player;
     }
 
     public int getScale() {

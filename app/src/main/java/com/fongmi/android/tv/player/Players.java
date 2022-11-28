@@ -124,6 +124,12 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         return String.format(Locale.getDefault(), "%.2f", getSpeed());
     }
 
+    public String setSpeed(float speed) {
+        exoPlayer.setPlaybackSpeed(speed);
+        ijkPlayer.setSpeed(speed);
+        return getSpeedText();
+    }
+
     public String addSpeed() {
         float speed = getSpeed();
         float addon = speed >= 2 ? 1f : 0.25f;
