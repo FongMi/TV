@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:alpha="0"
-        android:shadowColor="@color/grey_700"
+        android:shadowColor="@color/grey_900"
         android:shadowDx="2"
         android:shadowDy="2"
         android:shadowRadius="1"
