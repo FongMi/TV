@@ -66,12 +66,19 @@ public class CustomMic extends AppCompatImageView {
         else launcher.launch(Manifest.permission.RECORD_AUDIO);
     }
 
+    private void startListening() {
+        try {
+            Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+            recognizer.startListening(intent);
+        } catch (Exception ignored) {
+        }
+    }
+
     public void start() {
-        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         setColorFilter(MDColor.RED_500, PorterDuff.Mode.SRC_IN);
-        recognizer.startListening(intent);
         startAnimation(flicker);
+        startListening();
         setListen(true);
     }
 
