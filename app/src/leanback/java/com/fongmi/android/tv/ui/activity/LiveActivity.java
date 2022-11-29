@@ -139,6 +139,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.control.home.setOnClickListener(view -> onHome());
         mBinding.control.scale.setOnClickListener(view -> onScale());
         mBinding.control.speed.setOnClickListener(view -> onSpeed());
+        mBinding.control.invert.setOnClickListener(view -> onInvert());
         mBinding.control.player.setOnClickListener(view -> onPlayer());
         mBinding.control.decode.setOnClickListener(view -> onDecode());
         mBinding.control.tracks.setOnClickListener(view -> onTracks());
@@ -180,6 +181,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         getIjk().setOnLongClickListener(view -> onLongPress());
         mBinding.control.speed.setText(mPlayers.getSpeedText());
         mBinding.control.home.setVisibility(LiveConfig.isOnly() ? View.GONE : View.VISIBLE);
+        mBinding.control.invert.setActivated(Prefers.isInvert());
         setPlayerView();
         setDecodeView();
     }
@@ -275,6 +277,11 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private boolean onSpeedLong() {
         mBinding.control.speed.setText(mPlayers.toggleSpeed());
         return true;
+    }
+
+    private void onInvert() {
+        Prefers.putInvert(!Prefers.isInvert());
+        mBinding.control.invert.setActivated(Prefers.isInvert());
     }
 
     private void onPlayer() {
@@ -572,7 +579,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     public boolean onLongPress() {
         if (isVisible(mBinding.control.home)) showControl(mBinding.control.home);
         else if (isVisible(mBinding.control.line)) showControl(mBinding.control.line);
-        else showControl(mBinding.control.player);
+        else showControl(mBinding.control.invert);
         hideInfo();
         hideUI();
         return true;

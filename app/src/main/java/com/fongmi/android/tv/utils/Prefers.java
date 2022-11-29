@@ -139,6 +139,14 @@ public class Prefers {
         put("liveScale", scale);
     }
 
+    public static boolean isInvert() {
+        return getBoolean("invert", false);
+    }
+
+    public static void putInvert(boolean invert) {
+        put("invert", invert);
+    }
+
     public static boolean getUpdate() {
         return getBoolean("update", true);
     }

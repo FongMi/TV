@@ -3,6 +3,7 @@ package com.fongmi.android.tv.ui.custom;
 import android.view.KeyEvent;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.Utils;
 
 public class CustomKeyDownLive {
@@ -41,9 +42,9 @@ public class CustomKeyDownLive {
         } else if (event.getAction() == KeyEvent.ACTION_DOWN && Utils.isRightKey(event)) {
             listener.onSeeking(addTime());
         } else if (event.getAction() == KeyEvent.ACTION_DOWN && Utils.isUpKey(event)) {
-            listener.onKeyUp();
+            if (Prefers.isInvert()) listener.onKeyDown(); else listener.onKeyUp();
         } else if (event.getAction() == KeyEvent.ACTION_DOWN && Utils.isDownKey(event)) {
-            listener.onKeyDown();
+            if (Prefers.isInvert()) listener.onKeyUp(); else listener.onKeyDown();
         } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isLeftKey(event)) {
             listener.onKeyLeft(holdTime);
         } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isRightKey(event)) {

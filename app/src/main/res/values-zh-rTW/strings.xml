@@ -44,6 +44,7 @@
     <string name="play_replay">重播</string>
     <string name="play_reset">重置</string>
     <string name="play_tracks">軌道</string>
+    <string name="play_invert">反轉</string>
     <string name="play_op">片頭</string>
     <string name="play_ed">片尾</string>
     <string name="play_reverse">倒序</string>
