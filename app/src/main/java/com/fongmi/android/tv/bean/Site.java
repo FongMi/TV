@@ -102,10 +102,6 @@ public class Site {
         return playUrl;
     }
 
-    public Integer getPlayerType() {
-        return playerType;
-    }
-
     public Integer getSearchable() {
         return searchable;
     }
@@ -178,6 +174,12 @@ public class Site {
 
     public int getFilterIcon() {
         return isFilterable() ? R.drawable.ic_filter_on : R.drawable.ic_filter_off;
+    }
+
+    public int getPlayerType() {
+        if (playerType == null) return -1;
+        if (playerType == 1) return 1;
+        return 0;
     }
 
     public static Site find(String key) {

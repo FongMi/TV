@@ -16,6 +16,7 @@ import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.analytics.AnalyticsListener;
+import com.google.android.exoplayer2.ui.StyledPlayerView;
 import com.google.android.exoplayer2.util.Util;
 
 import java.util.Formatter;
@@ -34,40 +35,53 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     private ExoPlayer exoPlayer;
     private int errorCode;
     private int retry;
+    private int decode;
+    private int player;
 
     public boolean isExo() {
-        return Prefers.isExo();
+        return player == 0;
     }
 
     public boolean isIjk() {
-        return Prefers.isIjk();
+        return player == 1;
     }
 
     public Players init() {
+        player = Prefers.getPlayer();
+        decode = Prefers.getDecode();
         builder = new StringBuilder();
         formatter = new Formatter(builder, Locale.getDefault());
-        setupExo();
         return this;
     }
 
     public void setupIjk(IjkVideoView view) {
         ijkPlayer = view;
+        ijkPlayer.setDecode(decode);
         ijkPlayer.setOnInfoListener(this);
         ijkPlayer.setOnErrorListener(this);
         ijkPlayer.setOnPreparedListener(this);
         ijkPlayer.setOnCompletionListener(this);
     }
 
-    public void setupExo() {
+    public void setupExo(StyledPlayerView view) {
         if (exoPlayer != null) releaseExo();
-        exoPlayer = new ExoPlayer.Builder(App.get()).setLoadControl(new DefaultLoadControl()).setRenderersFactory(ExoUtil.buildRenderersFactory()).setTrackSelector(ExoUtil.buildTrackSelector()).build();
+        exoPlayer = new ExoPlayer.Builder(App.get()).setLoadControl(new DefaultLoadControl()).setRenderersFactory(ExoUtil.buildRenderersFactory(decode)).setTrackSelector(ExoUtil.buildTrackSelector()).build();
         exoPlayer.addAnalyticsListener(this);
         exoPlayer.setPlayWhenReady(true);
         exoPlayer.addListener(this);
+        view.setPlayer(exoPlayer);
     }
 
     public ExoPlayer exo() {
         return exoPlayer;
+    }
+
+    public int getPlayer() {
+        return player;
+    }
+
+    public int getDecode() {
+        return decode;
     }
 
     public void reset() {
@@ -124,6 +138,14 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         return String.format(Locale.getDefault(), "%.2f", getSpeed());
     }
 
+    public String getPlayerText() {
+        return ResUtil.getStringArray(R.array.select_player)[player];
+    }
+
+    public String getDecodeText() {
+        return ResUtil.getStringArray(R.array.select_decode)[decode];
+    }
+
     public String setSpeed(float speed) {
         exoPlayer.setPlaybackSpeed(speed);
         ijkPlayer.setSpeed(speed);
@@ -147,17 +169,22 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         return getSpeedText();
     }
 
-    public String togglePlayer() {
-        stop();
-        int index = Prefers.getPlayer();
-        Prefers.putPlayer(index = index == 0 ? 1 : 0);
-        return ResUtil.getStringArray(R.array.select_player)[index].toString();
+    public void setPlayer(int player) {
+        this.player = player;
+        Prefers.putPlayer(player);
     }
 
-    public String toggleDecode() {
-        int index = Prefers.getDecode();
-        setDecode(index = index == 0 ? 1 : 0);
-        return ResUtil.getStringArray(R.array.select_decode)[index].toString();
+    public void togglePlayer() {
+        setPlayer(player == 0 ? 1 : 0);
+    }
+
+    public void setDecode(int decode) {
+        this.decode = decode;
+        Prefers.putDecode(decode);
+    }
+
+    public void toggleDecode() {
+        setDecode(decode == 0 ? 1 : 0);
     }
 
     public String getPositionTime(long time) {
@@ -171,12 +198,6 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         long time = getDuration();
         if (time < 0) time = 0;
         return stringToTime(time);
-    }
-
-    public void setDecode(int decode) {
-        Prefers.putDecode(decode);
-        ijkPlayer.setDecode(decode);
-        if (isExo()) setupExo();
     }
 
     public void seekTo(int time) {
