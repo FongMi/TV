@@ -52,7 +52,7 @@ public class ResUtil {
         return App.get().getString(resId, formatArgs);
     }
 
-    public static CharSequence[] getStringArray(@ArrayRes int resId) {
+    public static String[] getStringArray(@ArrayRes int resId) {
         return App.get().getResources().getStringArray(resId);
     }
 

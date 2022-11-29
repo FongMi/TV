@@ -7,7 +7,6 @@ import android.text.TextUtils;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.utils.FileUtil;
-import com.fongmi.android.tv.utils.Prefers;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.PlaybackException;
@@ -51,8 +50,8 @@ public class ExoUtil {
         return trackSelector;
     }
 
-    public static RenderersFactory buildRenderersFactory() {
-        return new DefaultRenderersFactory(App.get()).setExtensionRendererMode(Math.abs(Prefers.getDecode() - 2));
+    public static RenderersFactory buildRenderersFactory(int decode) {
+        return new DefaultRenderersFactory(App.get()).setExtensionRendererMode(Math.abs(decode - 2));
     }
 
     public static CaptionStyleCompat getCaptionStyle() {
