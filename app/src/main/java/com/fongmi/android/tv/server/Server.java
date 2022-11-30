@@ -34,11 +34,6 @@ public class Server implements Nano.Listener {
         return "http://" + (local ? "127.0.0.1" : getIP()) + ":" + port;
     }
 
-    public static String proxy(String url) {
-        if (url.startsWith("proxy://")) return url.replace("proxy://", get().getAddress(true) + "/proxy?");
-        return url;
-    }
-
     public void start() {
         if (nano != null) return;
         do {

@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.server.Server;
 import com.google.android.exoplayer2.util.Util;
 
 import java.math.BigInteger;
@@ -77,6 +78,11 @@ public class Utils {
         List<String> hosts = Arrays.asList("iqiyi.com", "v.qq.com", "youku.com", "le.com", "tudou.com", "mgtv.com", "sohu.com", "acfun.cn", "bilibili.com", "baofeng.com", "pptv.com");
         for (String host : hosts) if (url.contains(host)) return true;
         return false;
+    }
+
+    public static String checkProxy(String url) {
+        if (url.startsWith("proxy://")) return url.replace("proxy://", Server.get().getAddress(true) + "/proxy?");
+        return url;
     }
 
     public static String checkClan(String text) {

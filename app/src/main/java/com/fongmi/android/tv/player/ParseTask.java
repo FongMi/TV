@@ -5,9 +5,9 @@ import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.net.OKHttp;
-import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.ui.custom.CustomWebView;
 import com.fongmi.android.tv.utils.Json;
+import com.fongmi.android.tv.utils.Utils;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -101,7 +101,7 @@ public class ParseTask {
         if (result.getUrl().isEmpty()) {
             onParseError();
         } else if (result.getParse(0) == 1) {
-            App.post(() -> webView.start(Server.proxy(result.getUrl()), result.getHeaders(), callback));
+            App.post(() -> webView.start(Utils.checkProxy(result.getUrl()), result.getHeaders(), callback));
         } else {
             onParseSuccess(result.getHeaders(), result.getUrl(), result.getJxFrom());
         }
