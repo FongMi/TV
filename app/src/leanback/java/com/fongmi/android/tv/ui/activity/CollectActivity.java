@@ -120,7 +120,7 @@ public class CollectActivity extends BaseActivity {
     private void search() {
         mAdapter.add(Collect.all());
         mPageAdapter.notifyDataSetChanged();
-        mExecutor = Executors.newFixedThreadPool(mSites.size() / 3);
+        mExecutor = Executors.newFixedThreadPool(5);
         mBinding.result.setText(getString(R.string.collect_result, getKeyword()));
         for (Site site : mSites) mExecutor.execute(() -> search(site));
     }
