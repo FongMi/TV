@@ -288,6 +288,9 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
             case SEARCH:
                 CollectActivity.start(this, event.getText(), true);
                 break;
+            case UPDATE:
+                Updater.create(this).force().branch(event.getText()).start();
+                break;
             case PUSH:
                 if (ApiConfig.get().getSite("push_agent") == null) return;
                 DetailActivity.start(this, "push_agent", event.getText(), true);
