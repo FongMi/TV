@@ -1,0 +1,5 @@
+version: "1"
+rules:
+  - base: dev
+    upstream: FongMi:dev    # change `wei` to the owner of upstream repo
+    mergeMethod: hardreset
