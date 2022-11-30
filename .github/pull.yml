@@ -1,0 +1,11 @@
+version: "1"
+rules:
+  - base: release
+    upstream: FongMi:release
+    mergeMethod: hardreset
+  - base: dev
+    upstream: FongMi:dev
+    mergeMethod: hardreset
+  - base: yyds
+    upstream: FongMi:release
+    mergeMethod: hardreset
