@@ -1,5 +1,5 @@
 version: "1"
 rules:
   - base: release
-    upstream: FongMi:release
+    upstream: FongMi:release    # change `wei` to the owner of upstream repo
     mergeMethod: hardreset
