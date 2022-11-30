@@ -11,6 +11,7 @@ import com.fongmi.android.tv.BuildConfig;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.DialogUpdateBinding;
 import com.fongmi.android.tv.net.OKHttp;
+import com.google.android.exoplayer2.util.Log;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.json.JSONObject;
@@ -19,13 +20,12 @@ import java.io.File;
 
 public class Updater implements View.OnClickListener {
 
-    private static final String DEF = "https://raw.githubusercontent.com/FongMi/TV/release/release/";
-    private static final String URL = DEF + BuildConfig.FLAVOR_mode + ".json";
-    private static final String APK = DEF + BuildConfig.FLAVOR_mode + "-" + BuildConfig.FLAVOR_api + ".apk";
     private static final String PROXY = "https://ghproxy.com/";
 
     private final Activity activity;
     private AlertDialog dialog;
+    private String branch;
+    private boolean force;
 
     public static Updater create(Activity activity) {
         return new Updater(activity);
@@ -33,10 +33,16 @@ public class Updater implements View.OnClickListener {
 
     private Updater(Activity activity) {
         this.activity = activity;
+        this.branch = "release";
     }
 
     public Updater force() {
-        Prefers.putUpdate(true);
+        this.force = true;
+        return this;
+    }
+
+    public Updater branch(String branch) {
+        this.branch = branch;
         return this;
     }
 
@@ -45,31 +51,42 @@ public class Updater implements View.OnClickListener {
     }
 
     private void doInBackground() {
-        connect(URL, 0);
+        Log.e("DDD", getJson());
+        connect(getJson());
     }
 
-    private File getApk() {
+    private File getFile() {
         return FileUtil.getCacheFile("update.apk");
     }
 
-    private void connect(String target, int retry) {
+    private String getPath() {
+        return "https://raw.githubusercontent.com/FongMi/TV/" + branch + "/release/";
+    }
+
+    private String getJson() {
+        return PROXY + getPath() + BuildConfig.FLAVOR_mode + ".json";
+    }
+
+    private String getApk() {
+        return PROXY + getPath() + BuildConfig.FLAVOR_mode + "-" + BuildConfig.FLAVOR_api + ".apk";
+    }
+
+    private void connect(String target) {
         try {
             JSONObject object = new JSONObject(OKHttp.newCall(target).execute().body().string());
             String name = object.optString("name");
             String desc = object.optString("desc");
             int code = object.optInt("code");
-            String url = retry > 0 ? PROXY + APK : APK;
-            if (code <= BuildConfig.VERSION_CODE) FileUtil.clearDir(getApk());
-            else FileUtil.write(getApk(), OKHttp.newCall(url).execute().body().bytes());
-            if (getApk().exists() && Prefers.getUpdate()) App.post(() -> checkActivity(name, desc));
+            if (code <= BuildConfig.VERSION_CODE) FileUtil.clearDir(getFile());
+            if (code > BuildConfig.VERSION_CODE || force) FileUtil.write(getFile(), OKHttp.newCall(getApk()).execute().body().bytes());
+            if (getFile().exists() && (Prefers.getUpdate() || force)) App.post(() -> checkActivity(name, desc));
         } catch (Exception e) {
-            if (retry == 0) connect(PROXY + target, 1);
             e.printStackTrace();
         }
     }
 
     private void checkActivity(String version, String desc) {
-        if (activity.isFinishing()) FileUtil.openFile(getApk());
+        if (activity.isFinishing()) FileUtil.openFile(getFile());
         else showDialog(version, desc);
     }
 
@@ -85,7 +102,7 @@ public class Updater implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.confirm) FileUtil.openFile(getApk());
+        if (view.getId() == R.id.confirm) FileUtil.openFile(getFile());
         else if (view.getId() == R.id.cancel) Prefers.putUpdate(false);
         dialog.dismiss();
     }
