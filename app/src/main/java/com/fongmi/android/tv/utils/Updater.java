@@ -11,7 +11,6 @@ import com.fongmi.android.tv.BuildConfig;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.DialogUpdateBinding;
 import com.fongmi.android.tv.net.OKHttp;
-import com.google.android.exoplayer2.util.Log;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.json.JSONObject;
@@ -36,6 +35,11 @@ public class Updater implements View.OnClickListener {
         this.branch = "release";
     }
 
+    public Updater reset() {
+        Prefers.putUpdate(true);
+        return this;
+    }
+
     public Updater force() {
         this.force = true;
         return this;
@@ -51,7 +55,6 @@ public class Updater implements View.OnClickListener {
     }
 
     private void doInBackground() {
-        Log.e("DDD", getJson());
         connect(getJson());
     }
 
