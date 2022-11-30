@@ -7,10 +7,10 @@ import java.util.List;
 
 public abstract class Spider {
 
-    public void init(Context context) {
+    public void init(Context context) throws Exception {
     }
 
-    public void init(Context context, String extend) {
+    public void init(Context context, String extend) throws Exception {
         init(context);
     }
 
