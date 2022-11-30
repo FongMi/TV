@@ -171,20 +171,20 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
 
     public void setPlayer(int player) {
         this.player = player;
-        Prefers.putPlayer(player);
     }
 
     public void togglePlayer() {
         setPlayer(player == 0 ? 1 : 0);
+        Prefers.putPlayer(player);
     }
 
     public void setDecode(int decode) {
         this.decode = decode;
-        Prefers.putDecode(decode);
     }
 
     public void toggleDecode() {
         setDecode(decode == 0 ? 1 : 0);
+        Prefers.putDecode(decode);
     }
 
     public String getPositionTime(long time) {
