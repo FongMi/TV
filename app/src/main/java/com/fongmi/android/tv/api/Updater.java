@@ -80,7 +80,7 @@ public class Updater implements View.OnClickListener {
     }
 
     private String getJson() {
-        return PROXY + getPath() + BuildConfig.FLAVOR_mode + ".json";
+        return PROXY + getPath() + BuildConfig.FLAVOR_mode + "-" + branch + ".json";
     }
 
     private String getApk() {
