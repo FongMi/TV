@@ -282,6 +282,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.progressLayout.showContent();
         mBinding.video.setTag(item.getVodPic());
         mBinding.name.setText(item.getVodName());
+        setText(mBinding.remark, 0, item.getVodRemarks());
         setText(mBinding.year, R.string.detail_year, item.getVodYear());
         setText(mBinding.area, R.string.detail_area, item.getVodArea());
         setText(mBinding.type, R.string.detail_type, item.getTypeName());
@@ -289,6 +290,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         setText(mBinding.actor, R.string.detail_actor, Html.fromHtml(item.getVodActor()).toString());
         setText(mBinding.content, R.string.detail_content, Html.fromHtml(item.getVodContent()).toString());
         setText(mBinding.director, R.string.detail_director, Html.fromHtml(item.getVodDirector()).toString());
+        mBinding.content.setMaxLines(isVisible(mBinding.remark) ? 2 : 3);
         mFlagAdapter.setItems(item.getVodFlags(), null);
         mBinding.video.requestFocus();
         if (hasFlag()) checkHistory();
@@ -298,7 +300,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void setText(TextView view, int resId, String text) {
         if (text.isEmpty()) view.setVisibility(View.GONE);
-        else view.setText(ResUtil.getString(resId, text));
+        else if (resId > 0) view.setText(ResUtil.getString(resId, text));
+        else view.setText(text);
         view.setTag(text);
     }
 
