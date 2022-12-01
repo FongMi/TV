@@ -17,7 +17,7 @@
         android:layout_margin="16dp"
         android:includeFontPadding="false"
         android:letterSpacing="0.05"
-        android:shadowColor="@color/black"
+        android:shadowColor="@color/grey_900"
         android:shadowDx="2"
         android:shadowDy="2"
         android:shadowRadius="1"

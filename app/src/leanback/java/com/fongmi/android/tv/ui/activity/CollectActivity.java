@@ -65,7 +65,6 @@ public class CollectActivity extends BaseActivity {
 
     @Override
     protected void initView() {
-        mExecutor = Executors.newFixedThreadPool(5);
         setRecyclerView();
         setViewModel();
         setPager();
@@ -121,8 +120,16 @@ public class CollectActivity extends BaseActivity {
     private void search() {
         mAdapter.add(Collect.all());
         mPageAdapter.notifyDataSetChanged();
+        mExecutor = Executors.newFixedThreadPool(5);
         mBinding.result.setText(getString(R.string.collect_result, getKeyword()));
-        for (Site site : mSites) mExecutor.execute(() -> mViewModel.searchContent(site, getKeyword()));
+        for (Site site : mSites) mExecutor.execute(() -> search(site));
+    }
+
+    private void search(Site site) {
+        try {
+            mViewModel.searchContent(site, getKeyword());
+        } catch (Throwable ignored) {
+        }
     }
 
     private void onChildSelected(@Nullable RecyclerView.ViewHolder child) {

@@ -44,6 +44,7 @@
     <string name="play_replay">重播</string>
     <string name="play_reset">重置</string>
     <string name="play_tracks">軌道</string>
+    <string name="play_invert">反轉</string>
     <string name="play_op">片頭</string>
     <string name="play_ed">片尾</string>
     <string name="play_reverse">倒序</string>
@@ -88,6 +89,7 @@
 
     <!-- Update -->
     <string name="update_version">發現新版本 <xliff:g name="name">%s</xliff:g></string>
+    <string name="update_check">正在檢查更新…</string>
     <string name="update_confirm">更新</string>
 
     <!-- Crash -->
