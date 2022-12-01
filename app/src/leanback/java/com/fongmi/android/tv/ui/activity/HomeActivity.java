@@ -42,7 +42,7 @@ import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
-import com.fongmi.android.tv.utils.Updater;
+import com.fongmi.android.tv.api.Updater;
 import com.fongmi.android.tv.utils.Utils;
 import com.google.common.collect.Lists;
 
@@ -71,7 +71,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         LiveConfig.get().init();
         ApiConfig.get().init().load(getCallback());
         mBinding.progressLayout.showProgress();
-        Updater.create(this).start();
+        Updater.get().start(this);
         Server.get().start();
         setRecyclerView();
         setViewModel();
@@ -289,7 +289,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
                 CollectActivity.start(this, event.getText(), true);
                 break;
             case UPDATE:
-                Updater.create(this).force().branch(event.getText()).start();
+                Updater.get().force().branch(event.getText()).start(this);
                 break;
             case PUSH:
                 if (ApiConfig.get().getSite("push_agent") == null) return;

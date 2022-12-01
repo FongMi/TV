@@ -102,7 +102,7 @@ public class Utils {
         return baseUrl.substring(0, index) + text;
     }
 
-    public static String getMD5(String src) {
+    public static String getMd5(String src) {
         try {
             if (TextUtils.isEmpty(src)) return "";
             MessageDigest digest = MessageDigest.getInstance("MD5");
