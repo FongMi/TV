@@ -159,24 +159,20 @@ public class SiteViewModel extends ViewModel {
         });
     }
 
-    public void searchContent(Site site, String keyword) {
-        try {
-            if (site.getType() == 3) {
-                Spider spider = ApiConfig.get().getCSP(site);
-                String searchContent = spider.searchContent(keyword, false);
-                SpiderDebug.log(searchContent);
-                post(site, Result.fromJson(searchContent));
-            } else {
-                ArrayMap<String, String> params = new ArrayMap<>();
-                params.put("wd", keyword);
-                if (site.getType() != 0) params.put("ac", "detail");
-                String body = OKHttp.newCall(site.getApi(), params).execute().body().string();
-                SpiderDebug.log(site.getName() + "," + body);
-                if (site.getType() == 0) post(site, Result.fromXml(body));
-                else post(site, Result.fromJson(body));
-            }
-        } catch (Throwable e) {
-            e.printStackTrace();
+    public void searchContent(Site site, String keyword) throws Throwable {
+        if (site.getType() == 3) {
+            Spider spider = ApiConfig.get().getCSP(site);
+            String searchContent = spider.searchContent(keyword, false);
+            SpiderDebug.log(searchContent);
+            post(site, Result.fromJson(searchContent));
+        } else {
+            ArrayMap<String, String> params = new ArrayMap<>();
+            params.put("wd", keyword);
+            if (site.getType() != 0) params.put("ac", "detail");
+            String body = OKHttp.newCall(site.getApi(), params).execute().body().string();
+            SpiderDebug.log(site.getName() + "," + body);
+            if (site.getType() == 0) post(site, Result.fromXml(body));
+            else post(site, Result.fromJson(body));
         }
     }
 

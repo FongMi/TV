@@ -44,6 +44,7 @@
     <string name="play_replay">Replay</string>
     <string name="play_reset">Reset</string>
     <string name="play_tracks">Tracks</string>
+    <string name="play_invert">Invert</string>
     <string name="play_op">OP</string>
     <string name="play_ed">ED</string>
     <string name="play_reverse">Reverse</string>
@@ -88,6 +89,7 @@
 
     <!-- Update -->
     <string name="update_version">New version <xliff:g name="name">%s</xliff:g></string>
+    <string name="update_check">Checking for updates…</string>
     <string name="update_confirm">Update</string>
 
     <!-- Crash -->

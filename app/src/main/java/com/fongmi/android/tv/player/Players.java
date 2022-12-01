@@ -12,12 +12,11 @@ import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.github.catvod.crawler.SpiderDebug;
 import com.google.android.exoplayer2.DefaultLoadControl;
-import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.analytics.AnalyticsListener;
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.ui.StyledPlayerView;
 import com.google.android.exoplayer2.util.Util;
 
 import java.util.Formatter;
@@ -36,42 +35,53 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     private ExoPlayer exoPlayer;
     private int errorCode;
     private int retry;
+    private int decode;
+    private int player;
 
     public boolean isExo() {
-        return Prefers.isExo();
+        return player == 0;
     }
 
     public boolean isIjk() {
-        return Prefers.isIjk();
+        return player == 1;
     }
 
     public Players init() {
+        player = Prefers.getPlayer();
+        decode = Prefers.getDecode();
         builder = new StringBuilder();
         formatter = new Formatter(builder, Locale.getDefault());
-        setupExo();
         return this;
     }
 
     public void setupIjk(IjkVideoView view) {
         ijkPlayer = view;
+        ijkPlayer.setDecode(decode);
         ijkPlayer.setOnInfoListener(this);
         ijkPlayer.setOnErrorListener(this);
         ijkPlayer.setOnPreparedListener(this);
         ijkPlayer.setOnCompletionListener(this);
     }
 
-    public void setupExo() {
-        DefaultTrackSelector selector = new DefaultTrackSelector(App.get());
-        selector.setParameters(selector.getParameters().buildUpon().setPreferredTextLanguage("zh").build());
-        DefaultRenderersFactory factory = new DefaultRenderersFactory(App.get()).setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON);
-        exoPlayer = new ExoPlayer.Builder(App.get()).setLoadControl(new DefaultLoadControl()).setRenderersFactory(factory).setTrackSelector(selector).build();
+    public void setupExo(StyledPlayerView view) {
+        if (exoPlayer != null) releaseExo();
+        exoPlayer = new ExoPlayer.Builder(App.get()).setLoadControl(new DefaultLoadControl()).setRenderersFactory(ExoUtil.buildRenderersFactory(decode)).setTrackSelector(ExoUtil.buildTrackSelector()).build();
         exoPlayer.addAnalyticsListener(this);
         exoPlayer.setPlayWhenReady(true);
         exoPlayer.addListener(this);
+        view.setPlayer(exoPlayer);
     }
 
     public ExoPlayer exo() {
         return exoPlayer;
+    }
+
+    public int getPlayer() {
+        return player;
+    }
+
+    public int getDecode() {
+        return decode;
     }
 
     public void reset() {
@@ -128,6 +138,20 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         return String.format(Locale.getDefault(), "%.2f", getSpeed());
     }
 
+    public String getPlayerText() {
+        return ResUtil.getStringArray(R.array.select_player)[player];
+    }
+
+    public String getDecodeText() {
+        return ResUtil.getStringArray(R.array.select_decode)[decode];
+    }
+
+    public String setSpeed(float speed) {
+        exoPlayer.setPlaybackSpeed(speed);
+        ijkPlayer.setSpeed(speed);
+        return getSpeedText();
+    }
+
     public String addSpeed() {
         float speed = getSpeed();
         float addon = speed >= 2 ? 1f : 0.25f;
@@ -145,17 +169,22 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         return getSpeedText();
     }
 
-    public String togglePlayer() {
-        stop();
-        int index = Prefers.getPlayer();
-        Prefers.putPlayer(index = index == 0 ? 1 : 0);
-        return ResUtil.getStringArray(R.array.select_player)[index].toString();
+    public void setPlayer(int player) {
+        this.player = player;
     }
 
-    public String toggleDecode() {
-        int index = Prefers.getDecode();
-        setDecode(index = index == 0 ? 1 : 0);
-        return ResUtil.getStringArray(R.array.select_decode)[index].toString();
+    public void togglePlayer() {
+        setPlayer(player == 0 ? 1 : 0);
+        Prefers.putPlayer(player);
+    }
+
+    public void setDecode(int decode) {
+        this.decode = decode;
+    }
+
+    public void toggleDecode() {
+        setDecode(decode == 0 ? 1 : 0);
+        Prefers.putDecode(decode);
     }
 
     public String getPositionTime(long time) {
@@ -169,11 +198,6 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         long time = getDuration();
         if (time < 0) time = 0;
         return stringToTime(time);
-    }
-
-    public void setDecode(int decode) {
-        ijkPlayer.setDecode(decode);
-        Prefers.putDecode(decode);
     }
 
     public void seekTo(int time) {
