@@ -16,6 +16,7 @@ import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.google.android.exoplayer2.util.Log;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.json.JSONObject;
@@ -102,12 +103,12 @@ public class Updater implements View.OnClickListener {
     }
 
     private void checkActivity(String version, String desc) {
+        if (dialog != null) dialog.dismiss();
         if (activity.get().isFinishing()) install();
         else showDialog(version, desc);
     }
 
     private void showDialog(String version, String desc) {
-        if (dialog != null) dialog.dismiss();
         DialogUpdateBinding binding = DialogUpdateBinding.inflate(LayoutInflater.from(activity.get()));
         dialog = new MaterialAlertDialogBuilder(activity.get()).setView(binding.getRoot()).create();
         binding.version.setText(ResUtil.getString(R.string.update_version, version));
@@ -122,10 +123,17 @@ public class Updater implements View.OnClickListener {
         if (!TextUtils.isEmpty(md5)) Prefers.putApkMD5(md5);
     }
 
+    private void dismiss() {
+        if (dialog != null) dialog.dismiss();
+        this.branch = "release";
+        this.force = false;
+        this.md5 = null;
+    }
+
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.cancel) Prefers.putUpdate(false);
         if (view.getId() == R.id.confirm) install();
-        dialog.dismiss();
+        dismiss();
     }
 }
