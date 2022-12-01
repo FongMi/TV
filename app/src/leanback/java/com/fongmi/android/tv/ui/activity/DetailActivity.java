@@ -290,12 +290,20 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         setText(mBinding.actor, R.string.detail_actor, Html.fromHtml(item.getVodActor()).toString());
         setText(mBinding.content, R.string.detail_content, Html.fromHtml(item.getVodContent()).toString());
         setText(mBinding.director, R.string.detail_director, Html.fromHtml(item.getVodDirector()).toString());
-        mBinding.content.setMaxLines(isVisible(mBinding.remark) ? 2 : 3);
         mFlagAdapter.setItems(item.getVodFlags(), null);
+        mBinding.content.setMaxLines(getMaxLines());
         mBinding.video.requestFocus();
         if (hasFlag()) checkHistory();
         getPart(item.getVodName());
         checkKeep();
+    }
+
+    private int getMaxLines() {
+        int lines = 1;
+        if (isGone(mBinding.actor)) ++lines;
+        if (isGone(mBinding.remark)) ++lines;
+        if (isGone(mBinding.director)) ++lines;
+        return lines;
     }
 
     private void setText(TextView view, int resId, String text) {
