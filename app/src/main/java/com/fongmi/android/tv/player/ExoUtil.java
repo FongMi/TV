@@ -72,8 +72,7 @@ public class ExoUtil {
 
     private static MediaItem getMediaItem(String url, String sub, int errorCode) {
         MediaItem.Builder builder = new MediaItem.Builder().setUri(Uri.parse(url.trim()));
-        if (errorCode == PlaybackException.ERROR_CODE_PARSING_MANIFEST_MALFORMED) builder.setMimeType(MimeTypes.APPLICATION_OCTET);
-        else if (errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED) builder.setMimeType(MimeTypes.APPLICATION_M3U8);
+        if (errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED) builder.setMimeType(MimeTypes.APPLICATION_M3U8);
         if (!TextUtils.isEmpty(sub)) builder.setSubtitleConfigurations(getSubtitles(sub));
         return builder.build();
     }
