@@ -25,13 +25,16 @@ public class InputRequestProcess implements RequestProcess {
         Map<String, String> params = session.getParms();
         switch (params.get("do")) {
             case "search":
-                nano.getListener().onSearch(params.get("word").trim());
+                nano.getListener().onSearch(params.get("text").trim());
+                break;
+            case "update":
+                nano.getListener().onUpdate(params.get("text").trim());
                 break;
             case "push":
-                nano.getListener().onPush(params.get("url").trim());
+                nano.getListener().onPush(params.get("text").trim());
                 break;
             case "api":
-                nano.getListener().onApi(params.get("url").trim());
+                nano.getListener().onApi(params.get("text").trim());
                 break;
         }
         return Nano.createPlainTextResponse(NanoHTTPD.Response.Status.OK, "ok");

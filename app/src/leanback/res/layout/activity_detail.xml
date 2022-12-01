@@ -70,12 +70,26 @@
         android:textStyle="bold"
         tools:text="慶餘年第二季" />
 
-    <LinearLayout
-        android:id="@+id/row1"
+    <TextView
+        android:id="@+id/remark"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/name"
         android:layout_alignStart="@+id/name"
+        android:layout_marginTop="6dp"
+        android:layout_marginEnd="24dp"
+        android:singleLine="true"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        tools:text="更新到第二季" />
+
+    <LinearLayout
+        android:id="@+id/row1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/remark"
+        android:layout_alignStart="@+id/remark"
+        android:layout_marginTop="6dp"
         android:layout_marginEnd="24dp"
         android:orientation="horizontal">
 
@@ -83,7 +97,6 @@
             android:id="@+id/site"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:layout_marginEnd="12dp"
             android:singleLine="true"
             android:textColor="@color/white"
@@ -94,7 +107,6 @@
             android:id="@+id/year"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:layout_marginEnd="12dp"
             android:singleLine="true"
             android:textColor="@color/white"
@@ -105,7 +117,6 @@
             android:id="@+id/area"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:layout_marginEnd="12dp"
             android:singleLine="true"
             android:textColor="@color/white"
@@ -116,7 +127,6 @@
             android:id="@+id/type"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:singleLine="true"
             android:textColor="@color/white"
             android:textSize="16sp"
@@ -130,7 +140,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/row1"
         android:layout_alignStart="@+id/name"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="6dp"
         android:layout_marginEnd="24dp"
         android:singleLine="true"
         android:textColor="@color/white"
@@ -143,7 +153,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/director"
         android:layout_alignStart="@+id/name"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="6dp"
         android:layout_marginEnd="24dp"
         android:singleLine="true"
         android:textColor="@color/white"
@@ -156,10 +166,11 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/actor"
         android:layout_alignStart="@+id/name"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="6dp"
         android:layout_marginEnd="24dp"
         android:ellipsize="end"
-        android:maxLines="2"
+        android:lineSpacingExtra="4dp"
+        android:maxLines="1"
         android:textColor="@color/white"
         android:textSize="16sp"
         tools:text="簡介：" />

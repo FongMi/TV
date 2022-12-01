@@ -139,6 +139,14 @@ public class Prefers {
         put("liveScale", scale);
     }
 
+    public static boolean isInvert() {
+        return getBoolean("invert", false);
+    }
+
+    public static void putInvert(boolean invert) {
+        put("invert", invert);
+    }
+
     public static boolean getUpdate() {
         return getBoolean("update", true);
     }
@@ -147,19 +155,19 @@ public class Prefers {
         put("update", update);
     }
 
+    public static String getApkMd5() {
+        return getString("apk_md5");
+    }
+
+    public static void putApkMD5(String apkMd5) {
+        put("apk_md5", apkMd5);
+    }
+
     public static float getThumbnail() {
         return 0.3f * getQuality() + 0.4f;
     }
 
     public static int getColumn() {
         return Math.abs(getSize() - 7);
-    }
-
-    public static boolean isExo() {
-        return getPlayer() == 0;
-    }
-
-    public static boolean isIjk() {
-        return getPlayer() == 1;
     }
 }

@@ -126,7 +126,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mFormatTime = new SimpleDateFormat("yyyy-MM-ddHH:mm", Locale.getDefault());
         mHides = new ArrayList<>();
         setRecyclerView();
-        setPlayerView();
         setVideoView();
         setViewModel();
         getLive();
@@ -140,6 +139,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.control.home.setOnClickListener(view -> onHome());
         mBinding.control.scale.setOnClickListener(view -> onScale());
         mBinding.control.speed.setOnClickListener(view -> onSpeed());
+        mBinding.control.invert.setOnClickListener(view -> onInvert());
         mBinding.control.player.setOnClickListener(view -> onPlayer());
         mBinding.control.decode.setOnClickListener(view -> onDecode());
         mBinding.control.tracks.setOnClickListener(view -> onTracks());
@@ -161,27 +161,35 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void setPlayerView() {
+        mBinding.control.player.setText(mPlayers.getPlayerText());
         getExo().setVisibility(mPlayers.isExo() ? View.VISIBLE : View.GONE);
         getIjk().setVisibility(mPlayers.isIjk() ? View.VISIBLE : View.GONE);
-        mBinding.control.decode.setVisibility(mPlayers.isExo() ? View.GONE : View.VISIBLE);
+    }
+
+    private void setDecodeView() {
+        mBinding.control.decode.setText(mPlayers.getDecodeText());
     }
 
     private void setVideoView() {
         mPlayers.setupIjk(getIjk());
-        getExo().setPlayer(mPlayers.exo());
-        getExo().setResizeMode(Prefers.getLiveScale());
-        getExo().setOnClickListener(view -> onToggle());
-        getExo().setOnLongClickListener(view -> onLongPress());
-        getIjk().setResizeMode(Prefers.getLiveScale());
+        mPlayers.setupExo(getExo());
+        setScale(Prefers.getLiveScale());
         getIjk().setRender(Prefers.getRender());
-        getIjk().setDecode(Prefers.getDecode());
+        getExo().setOnClickListener(view -> onToggle());
         getIjk().setOnClickListener(view -> onToggle());
+        getExo().setOnLongClickListener(view -> onLongPress());
         getIjk().setOnLongClickListener(view -> onLongPress());
         mBinding.control.speed.setText(mPlayers.getSpeedText());
         mBinding.control.home.setVisibility(LiveConfig.isOnly() ? View.GONE : View.VISIBLE);
-        mBinding.control.player.setText(ResUtil.getStringArray(R.array.select_player)[Prefers.getPlayer()]);
-        mBinding.control.decode.setText(ResUtil.getStringArray(R.array.select_decode)[Prefers.getDecode()]);
-        mBinding.control.scale.setText(ResUtil.getStringArray(R.array.select_scale)[Prefers.getLiveScale()]);
+        mBinding.control.invert.setActivated(Prefers.isInvert());
+        setPlayerView();
+        setDecodeView();
+    }
+
+    private void setScale(int scale) {
+        getExo().setResizeMode(scale);
+        getIjk().setResizeMode(scale);
+        mBinding.control.scale.setText(ResUtil.getStringArray(R.array.select_scale)[scale]);
     }
 
     private void setViewModel() {
@@ -257,11 +265,9 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void onScale() {
         int index = Prefers.getLiveScale();
-        CharSequence[] array = ResUtil.getStringArray(R.array.select_scale);
+        String[] array = ResUtil.getStringArray(R.array.select_scale);
         Prefers.putLiveScale(index = index == array.length - 1 ? 0 : ++index);
-        mBinding.control.scale.setText(array[index]);
-        getExo().setResizeMode(index);
-        getIjk().setResizeMode(index);
+        setScale(index);
     }
 
     private void onSpeed() {
@@ -273,16 +279,24 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         return true;
     }
 
+    private void onInvert() {
+        Prefers.putInvert(!Prefers.isInvert());
+        mBinding.control.invert.setActivated(Prefers.isInvert());
+    }
+
     private void onPlayer() {
+        mPlayers.stop();
+        mPlayers.togglePlayer();
         mBinding.control.tracks.setVisibility(View.GONE);
-        mBinding.control.player.setText(mPlayers.togglePlayer());
-        App.post(this::getUrl, 250);
         setPlayerView();
+        getUrl();
     }
 
     private void onDecode() {
-        if (mPlayers.isExo()) return;
-        mBinding.control.decode.setText(mPlayers.toggleDecode());
+        mPlayers.toggleDecode();
+        mPlayers.setupIjk(getIjk());
+        mPlayers.setupExo(getExo());
+        setDecodeView();
         getUrl();
     }
 
@@ -565,7 +579,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     public boolean onLongPress() {
         if (isVisible(mBinding.control.home)) showControl(mBinding.control.home);
         else if (isVisible(mBinding.control.line)) showControl(mBinding.control.line);
-        else showControl(mBinding.control.player);
+        else showControl(mBinding.control.invert);
         hideInfo();
         hideUI();
         return true;

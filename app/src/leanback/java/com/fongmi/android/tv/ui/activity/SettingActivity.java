@@ -36,7 +36,7 @@ import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
-import com.fongmi.android.tv.utils.Updater;
+import com.fongmi.android.tv.api.Updater;
 
 public class SettingActivity extends BaseActivity implements ConfigCallback, SiteCallback, LiveCallback {
 
@@ -78,7 +78,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.wall.setOnClickListener(view -> ConfigDialog.create(this).type(2).show());
         mBinding.vodHistory.setOnClickListener(view -> HistoryDialog.create(this).type(0).show());
         mBinding.liveHistory.setOnClickListener(view -> HistoryDialog.create(this).type(1).show());
-        mBinding.version.setOnClickListener(view -> Updater.create(this).force().start());
+        mBinding.version.setOnClickListener(view -> Updater.get().reset().start(this));
         mBinding.wallDefault.setOnClickListener(view -> setWallDefault());
         mBinding.wallRefresh.setOnClickListener(view -> setWallRefresh());
         mBinding.quality.setOnClickListener(view -> setQuality());
@@ -180,7 +180,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
 
     private void setQuality() {
         int index = Prefers.getQuality();
-        CharSequence[] array = ResUtil.getStringArray(R.array.select_quality);
+        String[] array = ResUtil.getStringArray(R.array.select_quality);
         Prefers.putQuality(index = index == array.length - 1 ? 0 : ++index);
         mBinding.qualityText.setText(array[index]);
         RefreshEvent.image();
@@ -188,37 +188,35 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
 
     private void setPlayer() {
         int index = Prefers.getPlayer();
-        CharSequence[] array = ResUtil.getStringArray(R.array.select_player);
+        String[] array = ResUtil.getStringArray(R.array.select_player);
         Prefers.putPlayer(index = index == array.length - 1 ? 0 : ++index);
         mBinding.playerText.setText(array[index]);
-        if (Prefers.isExo()) forceHardDecode();
     }
 
     private void setDecode() {
-        if (Prefers.isExo()) return;
         int index = Prefers.getDecode();
-        CharSequence[] array = ResUtil.getStringArray(R.array.select_decode);
+        String[] array = ResUtil.getStringArray(R.array.select_decode);
         Prefers.putDecode(index = index == array.length - 1 ? 0 : ++index);
         mBinding.decodeText.setText(array[index]);
     }
 
     private void setRender() {
         int index = Prefers.getRender();
-        CharSequence[] array = ResUtil.getStringArray(R.array.select_render);
+        String[] array = ResUtil.getStringArray(R.array.select_render);
         Prefers.putRender(index = index == array.length - 1 ? 0 : ++index);
         mBinding.renderText.setText(array[index]);
     }
 
     private void setScale() {
         int index = Prefers.getVodScale();
-        CharSequence[] array = ResUtil.getStringArray(R.array.select_scale);
+        String[] array = ResUtil.getStringArray(R.array.select_scale);
         Prefers.putVodScale(index = index == array.length - 1 ? 0 : ++index);
         mBinding.scaleText.setText(array[index]);
     }
 
     private void setSize() {
         int index = Prefers.getSize();
-        CharSequence[] array = ResUtil.getStringArray(R.array.select_size);
+        String[] array = ResUtil.getStringArray(R.array.select_size);
         Prefers.putSize(index = index == array.length - 1 ? 0 : ++index);
         mBinding.sizeText.setText(array[index]);
         RefreshEvent.size();
@@ -230,11 +228,5 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
 
     private void setWallRefresh() {
         WallConfig.get().load();
-    }
-
-    private void forceHardDecode() {
-        CharSequence[] array = ResUtil.getStringArray(R.array.select_decode);
-        mBinding.decodeText.setText(array[1]);
-        Prefers.putDecode(1);
     }
 }

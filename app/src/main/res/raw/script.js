@@ -1,13 +1,18 @@
 function search() {
-    doAction('search', {word: $('#search_key_word').val()});
+    doAction('search', { text: $('#keyword').val() });
 }
 
-function api() {
-    doAction('api', {url: $('#diy_api_url').val()});
+function update() {
+    doAction('update', { text: "dev" });
+    $('#dev').attr("disabled", true);
 }
 
 function push() {
-    doAction('push', {url: $('#push_url').val()});
+    doAction('push', { text: $('#push_url').val() });
+}
+
+function api() {
+    doAction('api', { text: $('#api_url').val() });
 }
 
 function doAction(action, kv) {
