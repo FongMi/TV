@@ -2,8 +2,9 @@ function search() {
     doAction('search', { text: $('#keyword').val() });
 }
 
-function update(branch) {
-    doAction('update', { text: branch });
+function update() {
+    doAction('update', { text: "dev" });
+    $('#dev').attr("disabled", true);
 }
 
 function push() {
