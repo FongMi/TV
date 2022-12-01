@@ -89,6 +89,7 @@
 
     <!-- Update -->
     <string name="update_version">發現新版本 <xliff:g name="name">%s</xliff:g></string>
+    <string name="update_check">正在檢查更新…</string>
     <string name="update_confirm">更新</string>
 
     <!-- Crash -->

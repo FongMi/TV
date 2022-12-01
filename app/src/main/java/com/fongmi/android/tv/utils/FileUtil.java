@@ -52,7 +52,7 @@ public class FileUtil {
     }
 
     public static File getJar(String fileName) {
-        return getCacheFile(Utils.getMD5(fileName).concat(".jar"));
+        return getCacheFile(Utils.getMd5(fileName).concat(".jar"));
     }
 
     public static File getWall(int index) {

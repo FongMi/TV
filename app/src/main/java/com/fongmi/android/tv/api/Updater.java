@@ -1,6 +1,7 @@
-package com.fongmi.android.tv.utils;
+package com.fongmi.android.tv.api;
 
 import android.app.Activity;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -11,27 +12,36 @@ import com.fongmi.android.tv.BuildConfig;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.DialogUpdateBinding;
 import com.fongmi.android.tv.net.OKHttp;
+import com.fongmi.android.tv.utils.FileUtil;
+import com.fongmi.android.tv.utils.Notify;
+import com.fongmi.android.tv.utils.Prefers;
+import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.json.JSONObject;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 
 public class Updater implements View.OnClickListener {
 
     private static final String PROXY = "https://ghproxy.com/";
 
-    private final Activity activity;
+    private WeakReference<Activity> activity;
     private AlertDialog dialog;
     private String branch;
     private boolean force;
+    private String md5;
 
-    public static Updater create(Activity activity) {
-        return new Updater(activity);
+    private static class Loader {
+        static volatile Updater INSTANCE = new Updater();
     }
 
-    private Updater(Activity activity) {
-        this.activity = activity;
+    public static Updater get() {
+        return Loader.INSTANCE;
+    }
+
+    private Updater() {
         this.branch = "release";
     }
 
@@ -41,6 +51,7 @@ public class Updater implements View.OnClickListener {
     }
 
     public Updater force() {
+        Notify.show(R.string.update_check);
         this.force = true;
         return this;
     }
@@ -50,16 +61,18 @@ public class Updater implements View.OnClickListener {
         return this;
     }
 
-    public void start() {
+    public void start(Activity activity) {
+        this.activity = new WeakReference<>(activity);
         App.execute(this::doInBackground);
     }
 
     private void doInBackground() {
+        FileUtil.clearDir(getFile());
         connect(getJson());
     }
 
     private File getFile() {
-        return FileUtil.getCacheFile("update.apk");
+        return FileUtil.getCacheFile(branch + ".apk");
     }
 
     private String getPath() {
@@ -80,22 +93,23 @@ public class Updater implements View.OnClickListener {
             String name = object.optString("name");
             String desc = object.optString("desc");
             int code = object.optInt("code");
-            if (code <= BuildConfig.VERSION_CODE) FileUtil.clearDir(getFile());
             if (code > BuildConfig.VERSION_CODE || force) FileUtil.write(getFile(), OKHttp.newCall(getApk()).execute().body().bytes());
-            if (getFile().exists() && (Prefers.getUpdate() || force)) App.post(() -> checkActivity(name, desc));
+            boolean show = Prefers.getUpdate() || !Prefers.getApkMd5().equals(md5 = FileUtil.getMd5(getFile()));
+            if (getFile().exists() && show) App.post(() -> checkActivity(name, desc));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     private void checkActivity(String version, String desc) {
-        if (activity.isFinishing()) FileUtil.openFile(getFile());
+        if (activity.get().isFinishing()) install();
         else showDialog(version, desc);
     }
 
     private void showDialog(String version, String desc) {
-        DialogUpdateBinding binding = DialogUpdateBinding.inflate(LayoutInflater.from(activity));
-        dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).create();
+        if (dialog != null) dialog.dismiss();
+        DialogUpdateBinding binding = DialogUpdateBinding.inflate(LayoutInflater.from(activity.get()));
+        dialog = new MaterialAlertDialogBuilder(activity.get()).setView(binding.getRoot()).create();
         binding.version.setText(ResUtil.getString(R.string.update_version, version));
         binding.confirm.setOnClickListener(this);
         binding.cancel.setOnClickListener(this);
@@ -103,10 +117,15 @@ public class Updater implements View.OnClickListener {
         dialog.show();
     }
 
+    private void install() {
+        FileUtil.openFile(getFile());
+        if (!TextUtils.isEmpty(md5)) Prefers.putApkMD5(md5);
+    }
+
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.confirm) FileUtil.openFile(getFile());
-        else if (view.getId() == R.id.cancel) Prefers.putUpdate(false);
+        if (view.getId() == R.id.cancel) Prefers.putUpdate(false);
+        if (view.getId() == R.id.confirm) install();
         dialog.dismiss();
     }
 }
