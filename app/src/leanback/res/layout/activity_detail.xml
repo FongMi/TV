@@ -9,8 +9,8 @@
 
     <FrameLayout
         android:id="@+id/video"
-        android:layout_width="420dp"
-        android:layout_height="236.25dp"
+        android:layout_width="400dp"
+        android:layout_height="225dp"
         android:layout_marginStart="24dp"
         android:layout_marginTop="24dp"
         android:background="@color/black"
@@ -168,9 +168,9 @@
         android:layout_alignStart="@+id/name"
         android:layout_marginTop="6dp"
         android:layout_marginEnd="24dp"
-        android:lineSpacingExtra="2dp"
         android:ellipsize="end"
-        android:maxLines="2"
+        android:lineSpacingExtra="4dp"
+        android:maxLines="1"
         android:textColor="@color/white"
         android:textSize="16sp"
         tools:text="簡介：" />
