@@ -105,6 +105,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         mViewModel.result.observe(this, result -> {
             mAdapter.remove("progress");
             addVideo(result);
+            result.clear();
         });
     }
 
