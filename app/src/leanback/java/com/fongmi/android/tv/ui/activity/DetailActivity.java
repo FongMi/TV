@@ -45,6 +45,7 @@ import com.fongmi.android.tv.ui.presenter.EpisodePresenter;
 import com.fongmi.android.tv.ui.presenter.FlagPresenter;
 import com.fongmi.android.tv.ui.presenter.ParsePresenter;
 import com.fongmi.android.tv.ui.presenter.PartPresenter;
+import com.fongmi.android.tv.ui.presenter.SuggestPresenter;
 import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
@@ -60,7 +61,10 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import okhttp3.Call;
 import okhttp3.Response;
@@ -75,9 +79,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private ArrayObjectAdapter mEpisodeAdapter;
     private ArrayObjectAdapter mParseAdapter;
     private ArrayObjectAdapter mPartAdapter;
+    private ArrayObjectAdapter mSuggestAdapter;
     private EpisodePresenter mEpisodePresenter;
     private PartPresenter mPartPresenter;
     private CustomKeyDownVod mKeyDown;
+    private ExecutorService mExecutor;
     private SiteViewModel mViewModel;
     private boolean mFullscreen;
     private History mHistory;
@@ -211,7 +217,15 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.array.setAdapter(new ItemBridgeAdapter(mArrayAdapter = new ArrayObjectAdapter(new ArrayPresenter(this))));
         mBinding.part.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.part.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-        mBinding.part.setAdapter(new ItemBridgeAdapter(mPartAdapter = new ArrayObjectAdapter(mPartPresenter = new PartPresenter(item -> CollectActivity.start(this, item)))));
+        mBinding.part.setAdapter(new ItemBridgeAdapter(mPartAdapter = new ArrayObjectAdapter(mPartPresenter = new PartPresenter(this::initSearch))));
+        mBinding.suggest.setHorizontalSpacing(ResUtil.dp2px(8));
+        mBinding.suggest.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+        mBinding.suggest.setAdapter(new ItemBridgeAdapter(mSuggestAdapter = new ArrayObjectAdapter(new SuggestPresenter(new SuggestPresenter.OnClickListener() {
+            @Override
+            public void onItemClick(Vod item) {
+
+            }
+        }))));
         mBinding.control.parse.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.control.parse.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         mBinding.control.parse.setAdapter(new ItemBridgeAdapter(mParseAdapter = new ArrayObjectAdapter(new ParsePresenter(this::setParseActivated))));
@@ -251,7 +265,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
             resetFocus(useParse);
         });
         mViewModel.result.observe(this, result -> {
-            if (result.getList().isEmpty()) mBinding.progressLayout.showEmpty();
+            if (mExecutor != null) setSuggest(result.getList());
+            else if (result.getList().isEmpty()) mBinding.progressLayout.showEmpty();
             else setDetail(result.getList().get(0));
         });
     }
@@ -366,6 +381,36 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         if (mHistory.isRevSort()) for (int i = size + 1; i > 0; i -= 20) items.add((i - 1) + "-" + Math.max(i - 20, 1));
         else for (int i = 0; i < size; i += 20) items.add((i + 1) + "-" + Math.min(i + 20, size));
         mArrayAdapter.setItems(items, null);
+    }
+
+    private void stopSearch() {
+        if (mExecutor != null) mExecutor.shutdownNow();
+    }
+
+    private void initSearch(String keyword) {
+        stopSearch();
+        startSearch(keyword);
+        mBinding.part.setTag(keyword);
+    }
+
+    private void startSearch(String keyword) {
+        mExecutor = Executors.newFixedThreadPool(5);
+        for (Site site : ApiConfig.get().getSites()) if (site.isSearchable() && !site.getKey().equals(getKey())) mExecutor.execute(() -> search(site, keyword));
+    }
+
+    private void search(Site site, String keyword) {
+        try {
+            mViewModel.searchContent(site, keyword);
+        } catch (Throwable ignored) {
+        }
+    }
+
+    private void setSuggest(List<Vod> items) {
+        String keyword = mBinding.part.getTag().toString();
+        Iterator<Vod> iterator = items.iterator();
+        while (iterator.hasNext()) if (!iterator.next().getVodName().equals(keyword)) iterator.remove();
+        mSuggestAdapter.addAll(mSuggestAdapter.size(), items);
+        mBinding.suggest.setVisibility(View.VISIBLE);
     }
 
     @Override
