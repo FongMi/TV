@@ -65,7 +65,7 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
 
     public void setupExo(StyledPlayerView view) {
         if (exoPlayer != null) releaseExo();
-        exoPlayer = new ExoPlayer.Builder(App.get()).setLoadControl(new DefaultLoadControl()).setRenderersFactory(ExoUtil.buildRenderersFactory(decode)).setTrackSelector(ExoUtil.buildTrackSelector()).build();
+        exoPlayer = new ExoPlayer.Builder(App.get()).setLoadControl(new DefaultLoadControl()).setRenderersFactory(ExoUtil.buildRenderersFactory()).setTrackSelector(ExoUtil.buildTrackSelector()).build();
         exoPlayer.addAnalyticsListener(this);
         exoPlayer.setPlayWhenReady(true);
         exoPlayer.addListener(this);
