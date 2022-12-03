@@ -45,12 +45,16 @@ import android.view.SurfaceHolder;
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
+import java.net.URLEncoder;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import tv.danmaku.ijk.media.player.annotations.AccessedByNative;
 import tv.danmaku.ijk.media.player.annotations.CalledByNative;
@@ -372,7 +376,16 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
             }
         }
 
-        setDataSource(uri.toString(), headers);
+        setDataSource(encodeSpaceChinese(uri.toString()), headers);
+    }
+
+    private String encodeSpaceChinese(String str) throws UnsupportedEncodingException {
+        Pattern p = Pattern.compile("[\u4e00-\u9fa5 ]+");
+        Matcher m = p.matcher(str);
+        StringBuffer b = new StringBuffer();
+        while (m.find()) m.appendReplacement(b, URLEncoder.encode(m.group(0), "UTF-8"));
+        m.appendTail(b);
+        return b.toString();
     }
 
     /**
