@@ -7,15 +7,15 @@ import androidx.annotation.NonNull;
 import androidx.leanback.widget.Presenter;
 
 import com.fongmi.android.tv.bean.Vod;
-import com.fongmi.android.tv.databinding.AdapterSuggestBinding;
+import com.fongmi.android.tv.databinding.AdapterSearchBinding;
 import com.fongmi.android.tv.utils.ResUtil;
 
-public class SuggestPresenter extends Presenter {
+public class SearchPresenter extends Presenter {
 
     private final OnClickListener mListener;
     private int width;
 
-    public SuggestPresenter(OnClickListener listener) {
+    public SearchPresenter(OnClickListener listener) {
         this.mListener = listener;
         setLayoutSize();
     }
@@ -33,7 +33,7 @@ public class SuggestPresenter extends Presenter {
 
     @Override
     public Presenter.ViewHolder onCreateViewHolder(ViewGroup parent) {
-        ViewHolder holder = new ViewHolder(AdapterSuggestBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        ViewHolder holder = new ViewHolder(AdapterSearchBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
         holder.binding.getRoot().getLayoutParams().width = width;
         return holder;
     }
@@ -54,9 +54,9 @@ public class SuggestPresenter extends Presenter {
 
     public static class ViewHolder extends Presenter.ViewHolder {
 
-        private final AdapterSuggestBinding binding;
+        private final AdapterSearchBinding binding;
 
-        public ViewHolder(@NonNull AdapterSuggestBinding binding) {
+        public ViewHolder(@NonNull AdapterSearchBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
         }

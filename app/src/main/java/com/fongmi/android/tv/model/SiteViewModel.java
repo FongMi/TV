@@ -30,11 +30,13 @@ public class SiteViewModel extends ViewModel {
 
     public MutableLiveData<Result> result;
     public MutableLiveData<Result> player;
+    public MutableLiveData<Result> search;
     public ExecutorService executor;
 
     public SiteViewModel() {
         this.result = new MutableLiveData<>();
         this.player = new MutableLiveData<>();
+        this.search = new MutableLiveData<>();
     }
 
     public MutableLiveData<Result> getResult() {
@@ -179,7 +181,7 @@ public class SiteViewModel extends ViewModel {
     private void post(Site site, Result result) {
         if (result.getList().isEmpty()) return;
         for (Vod vod : result.getList()) vod.setSite(site);
-        this.result.postValue(result);
+        this.search.postValue(result);
     }
 
     private void execute(MutableLiveData<Result> result, Callable<Result> callable) {

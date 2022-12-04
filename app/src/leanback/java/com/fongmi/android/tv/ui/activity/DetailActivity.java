@@ -45,7 +45,7 @@ import com.fongmi.android.tv.ui.presenter.EpisodePresenter;
 import com.fongmi.android.tv.ui.presenter.FlagPresenter;
 import com.fongmi.android.tv.ui.presenter.ParsePresenter;
 import com.fongmi.android.tv.ui.presenter.PartPresenter;
-import com.fongmi.android.tv.ui.presenter.SuggestPresenter;
+import com.fongmi.android.tv.ui.presenter.SearchPresenter;
 import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
@@ -79,7 +79,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private ArrayObjectAdapter mEpisodeAdapter;
     private ArrayObjectAdapter mParseAdapter;
     private ArrayObjectAdapter mPartAdapter;
-    private ArrayObjectAdapter mSuggestAdapter;
+    private ArrayObjectAdapter mSearchAdapter;
     private EpisodePresenter mEpisodePresenter;
     private PartPresenter mPartPresenter;
     private CustomKeyDownVod mKeyDown;
@@ -218,12 +218,15 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.part.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.part.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         mBinding.part.setAdapter(new ItemBridgeAdapter(mPartAdapter = new ArrayObjectAdapter(mPartPresenter = new PartPresenter(this::initSearch))));
-        mBinding.suggest.setHorizontalSpacing(ResUtil.dp2px(8));
-        mBinding.suggest.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-        mBinding.suggest.setAdapter(new ItemBridgeAdapter(mSuggestAdapter = new ArrayObjectAdapter(new SuggestPresenter(new SuggestPresenter.OnClickListener() {
+        mBinding.search.setHorizontalSpacing(ResUtil.dp2px(8));
+        mBinding.search.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+        mBinding.search.setAdapter(new ItemBridgeAdapter(mSearchAdapter = new ArrayObjectAdapter(new SearchPresenter(new SearchPresenter.OnClickListener() {
             @Override
             public void onItemClick(Vod item) {
-
+                getIntent().putExtra("key", item.getSite().getKey());
+                getIntent().putExtra("id", item.getVodId());
+                Clock.get().setCallback(null);
+                getDetail();
             }
         }))));
         mBinding.control.parse.setHorizontalSpacing(ResUtil.dp2px(8));
@@ -265,9 +268,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
             resetFocus(useParse);
         });
         mViewModel.result.observe(this, result -> {
-            if (mExecutor != null) setSuggest(result.getList());
-            else if (result.getList().isEmpty()) mBinding.progressLayout.showEmpty();
+            if (result.getList().isEmpty()) mBinding.progressLayout.showEmpty();
             else setDetail(result.getList().get(0));
+        });
+        mViewModel.search.observe(this, result -> {
+            setSearch(result.getList());
         });
     }
 
@@ -385,6 +390,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void stopSearch() {
         if (mExecutor != null) mExecutor.shutdownNow();
+        mSearchAdapter.clear();
     }
 
     private void initSearch(String keyword) {
@@ -405,12 +411,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         }
     }
 
-    private void setSuggest(List<Vod> items) {
+    private void setSearch(List<Vod> items) {
         String keyword = mBinding.part.getTag().toString();
         Iterator<Vod> iterator = items.iterator();
-        while (iterator.hasNext()) if (!iterator.next().getVodName().equals(keyword)) iterator.remove();
-        mSuggestAdapter.addAll(mSuggestAdapter.size(), items);
-        mBinding.suggest.setVisibility(View.VISIBLE);
+        while (iterator.hasNext()) if (!iterator.next().getVodName().contains(keyword)) iterator.remove();
+        mSearchAdapter.addAll(mSearchAdapter.size(), items);
+        mBinding.search.setVisibility(View.VISIBLE);
     }
 
     @Override
