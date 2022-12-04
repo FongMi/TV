@@ -283,7 +283,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void getDetail(Vod item) {
         getIntent().putExtra("key", item.getSite().getKey());
         getIntent().putExtra("id", item.getVodId());
-        mBinding.scroll.scrollTo(0,0);
+        mBinding.scroll.scrollTo(0, 0);
         Clock.get().setCallback(null);
         Notify.progress(this);
         getDetail();
@@ -418,11 +418,17 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void setSearch(List<Vod> items) {
-        String keyword = mBinding.part.getTag().toString();
         Iterator<Vod> iterator = items.iterator();
-        while (iterator.hasNext()) if (!iterator.next().getVodName().contains(keyword)) iterator.remove();
+        while (iterator.hasNext()) if (mismatch(iterator.next())) iterator.remove();
         mSearchAdapter.addAll(mSearchAdapter.size(), items);
         mBinding.search.setVisibility(View.VISIBLE);
+    }
+
+    private boolean mismatch(Vod item) {
+        String name = mBinding.name.getText().toString();
+        String keyword = mBinding.part.getTag().toString();
+        boolean accurate = keyword.equals(name) && isVisible(mBinding.widget.error);
+        return accurate && !item.getVodName().equals(keyword) || !item.getVodName().contains(keyword);
     }
 
     @Override
@@ -745,6 +751,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void onError(String msg) {
         int position = mBinding.flag.getSelectedPosition();
         if (position == mFlagAdapter.size() - 1) {
+            initSearch(mBinding.name.getText().toString());
             mBinding.widget.text.setText(msg);
             Clock.get().setCallback(null);
             mPlayers.stop();
