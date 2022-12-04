@@ -16,7 +16,8 @@
         android:background="@color/black"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        android:foreground="@drawable/selector_video">
+        android:foreground="@drawable/selector_video"
+        android:nextFocusDown="@id/flag">
 
         <com.google.android.exoplayer2.ui.StyledPlayerView
             android:id="@+id/surface"
@@ -258,9 +259,7 @@
                 android:paddingStart="24dp"
                 android:paddingTop="8dp"
                 android:paddingEnd="24dp"
-                android:paddingBottom="8dp"
-                android:visibility="gone"
-                tools:visibility="visible" />
+                android:paddingBottom="8dp" />
 
             <com.fongmi.android.tv.ui.custom.CustomHorizontalGridView
                 android:id="@+id/part"
