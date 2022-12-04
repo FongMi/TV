@@ -27,7 +27,6 @@ public class Config {
     public Config(String url, int type) {
         this.url = url;
         this.type = type;
-        this.time = System.currentTimeMillis();
         this.id = (int) insert();
     }
 
