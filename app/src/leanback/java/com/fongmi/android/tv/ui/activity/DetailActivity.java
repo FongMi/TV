@@ -286,6 +286,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.scroll.scrollTo(0, 0);
         Clock.get().setCallback(null);
         Notify.progress(this);
+        mPlayers.stop();
+        hideProgress();
         getDetail();
     }
 
