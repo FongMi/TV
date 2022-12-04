@@ -329,9 +329,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void setText(TextView view, int resId, String text) {
-        if (text.isEmpty()) view.setVisibility(View.GONE);
-        else if (resId > 0) view.setText(ResUtil.getString(resId, text));
-        else view.setText(text);
+        view.setVisibility(text.isEmpty() ? View.GONE : View.VISIBLE);
+        view.setText(resId > 0 ? ResUtil.getString(resId, text) : text);
         view.setTag(text);
     }
 
@@ -341,8 +340,14 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.flag.setSelectedPosition(mFlagAdapter.indexOf(item));
         mEpisodeAdapter.setItems(item.getEpisodes(), null);
         notifyItemChanged(mBinding.flag, mFlagAdapter);
-        setArray(item.getEpisodes().size());
+        setEpisodeAdapter(item.getEpisodes());
         seamless(item);
+    }
+
+    private void setEpisodeAdapter(List<Vod.Flag.Episode> items) {
+        mBinding.episode.setVisibility(items.isEmpty() ? View.GONE : View.VISIBLE);
+        mEpisodeAdapter.setItems(items, null);
+        setArray(items.size());
     }
 
     private void seamless(Vod.Flag flag) {
@@ -364,9 +369,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void reverseEpisode() {
         for (int i = 0; i < mFlagAdapter.size(); i++) Collections.reverse(((Vod.Flag) mFlagAdapter.get(i)).getEpisodes());
-        mEpisodeAdapter.setItems(getVodFlag().getEpisodes(), null);
+        setEpisodeAdapter(getVodFlag().getEpisodes());
         mBinding.episode.setSelectedPosition(getEpisodePosition());
-        setArray(mEpisodeAdapter.size());
     }
 
     private void setParseActivated(Parse item) {
@@ -641,12 +645,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private boolean hasFlag() {
-        if (mFlagAdapter.size() > 0) return true;
-        mBinding.flag.setVisibility(View.GONE);
-        mBinding.array.setVisibility(View.GONE);
-        mBinding.episode.setVisibility(View.GONE);
-        Notify.show(R.string.error_episode);
-        return false;
+        mBinding.flag.setVisibility(mFlagAdapter.size() > 0 ? View.VISIBLE : View.GONE);
+        if (mFlagAdapter.size() == 0) Notify.show(R.string.error_episode);
+        return mFlagAdapter.size() > 0;
     }
 
     private void checkHistory() {
