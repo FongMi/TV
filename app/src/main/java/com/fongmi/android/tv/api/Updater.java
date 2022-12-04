@@ -93,8 +93,9 @@ public class Updater implements View.OnClickListener {
             String name = object.optString("name");
             String desc = object.optString("desc");
             int code = object.optInt("code");
-            if (code > BuildConfig.VERSION_CODE || force) FileUtil.write(getFile(), OKHttp.newCall(getApk()).execute().body().bytes());
-            boolean show = Prefers.getUpdate() || !Prefers.getApkMd5().equals(md5 = FileUtil.getMd5(getFile()));
+            boolean need = code > BuildConfig.VERSION_CODE;
+            if (need || force) FileUtil.write(getFile(), OKHttp.newCall(getApk()).execute().body().bytes());
+            boolean show = need && Prefers.getUpdate() || force && !Prefers.getApkMd5().equals(md5 = FileUtil.getMd5(getFile()));
             if (getFile().exists() && show) App.post(() -> checkActivity(name, desc));
         } catch (Exception e) {
             e.printStackTrace();
