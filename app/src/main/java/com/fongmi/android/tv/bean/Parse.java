@@ -69,7 +69,7 @@ public class Parse {
     }
 
     public String getUrl() {
-        return TextUtils.isEmpty(url) ? "" : url;
+        return TextUtils.isEmpty(url) ? "" : Utils.checkProxy(url);
     }
 
     public void setUrl(String url) {
@@ -102,7 +102,7 @@ public class Parse {
 
     public String extUrl() {
         int index = getUrl().indexOf("?");
-        if (index == -1) return getUrl();
+        if (getExt().isEmpty() || index == -1) return getUrl();
         return getUrl().substring(0, index + 1) + "cat_ext=" + Utils.getBase64(getExt().toString()) + "&" + getUrl().substring(index + 1);
     }
 
@@ -139,6 +139,10 @@ public class Parse {
 
         public void setHeader(JsonElement header) {
             this.header = header;
+        }
+
+        public boolean isEmpty() {
+            return flag == null && header == null;
         }
 
         @NonNull

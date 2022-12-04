@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.server.Server;
 import com.google.android.exoplayer2.util.Util;
 
 import java.math.BigInteger;
@@ -79,6 +80,11 @@ public class Utils {
         return false;
     }
 
+    public static String checkProxy(String url) {
+        if (url.startsWith("proxy://")) return url.replace("proxy://", Server.get().getAddress(true) + "/proxy?");
+        return url;
+    }
+
     public static String checkClan(String text) {
         if (text.contains("/localhost/")) text = text.replace("/localhost/", "/");
         if (text.startsWith("clan")) text = text.replace("clan", "file");
@@ -96,7 +102,7 @@ public class Utils {
         return baseUrl.substring(0, index) + text;
     }
 
-    public static String getMD5(String src) {
+    public static String getMd5(String src) {
         try {
             if (TextUtils.isEmpty(src)) return "";
             MessageDigest digest = MessageDigest.getInstance("MD5");

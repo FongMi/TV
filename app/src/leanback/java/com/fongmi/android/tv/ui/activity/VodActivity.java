@@ -31,7 +31,6 @@ import com.fongmi.android.tv.utils.Utils;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class VodActivity extends BaseActivity {
@@ -43,7 +42,6 @@ public class VodActivity extends BaseActivity {
     private View mOldView;
 
     public static void start(Activity activity, Result result) {
-        result.setList(Collections.emptyList());
         start(activity, ApiConfig.get().getHome().getKey(), result);
     }
 
