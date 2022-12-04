@@ -851,6 +851,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         } else if (mFullscreen) {
             exitFullscreen();
         } else {
+            stopSearch();
             super.onBackPressed();
         }
     }
