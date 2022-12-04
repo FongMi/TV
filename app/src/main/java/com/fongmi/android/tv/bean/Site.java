@@ -15,7 +15,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.Collections;
 import java.util.List;
 
-@Entity(ignoredColumns = {"type", "api", "playUrl", "ext", "jar", "categories"})
+@Entity(ignoredColumns = {"type", "api", "playUrl", "playerType", "ext", "jar", "categories"})
 public class Site {
 
     @NonNull
@@ -30,6 +30,8 @@ public class Site {
     private String api;
     @SerializedName("playUrl")
     private String playUrl;
+    @SerializedName("playerType")
+    private Integer playerType;
     @SerializedName("searchable")
     private Integer searchable;
     @SerializedName("filterable")
@@ -172,6 +174,12 @@ public class Site {
 
     public int getFilterIcon() {
         return isFilterable() ? R.drawable.ic_filter_on : R.drawable.ic_filter_off;
+    }
+
+    public int getPlayerType() {
+        if (playerType == null) return -1;
+        if (playerType == 1) return 1;
+        return 0;
     }
 
     public static Site find(String key) {

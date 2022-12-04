@@ -169,6 +169,10 @@ public class Result {
         return TextUtils.isEmpty(sub) ? "" : sub;
     }
 
+    public void clear() {
+        getList().clear();
+    }
+
     public Map<String, String> getHeaders() {
         return Json.toMap(getHeader());
     }
