@@ -220,15 +220,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.part.setAdapter(new ItemBridgeAdapter(mPartAdapter = new ArrayObjectAdapter(mPartPresenter = new PartPresenter(this::initSearch))));
         mBinding.search.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.search.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-        mBinding.search.setAdapter(new ItemBridgeAdapter(mSearchAdapter = new ArrayObjectAdapter(new SearchPresenter(new SearchPresenter.OnClickListener() {
-            @Override
-            public void onItemClick(Vod item) {
-                getIntent().putExtra("key", item.getSite().getKey());
-                getIntent().putExtra("id", item.getVodId());
-                Clock.get().setCallback(null);
-                getDetail();
-            }
-        }))));
+        mBinding.search.setAdapter(new ItemBridgeAdapter(mSearchAdapter = new ArrayObjectAdapter(new SearchPresenter(this::getDetail))));
         mBinding.control.parse.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.control.parse.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         mBinding.control.parse.setAdapter(new ItemBridgeAdapter(mParseAdapter = new ArrayObjectAdapter(new ParsePresenter(this::setParseActivated))));
@@ -270,6 +262,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mViewModel.result.observe(this, result -> {
             if (result.getList().isEmpty()) mBinding.progressLayout.showEmpty();
             else setDetail(result.getList().get(0));
+            Notify.dismiss();
         });
         mViewModel.search.observe(this, result -> {
             setSearch(result.getList());
@@ -285,6 +278,15 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void getDetail() {
         mViewModel.detailContent(getKey(), getId());
+    }
+
+    private void getDetail(Vod item) {
+        getIntent().putExtra("key", item.getSite().getKey());
+        getIntent().putExtra("id", item.getVodId());
+        mBinding.scroll.scrollTo(0,0);
+        Clock.get().setCallback(null);
+        Notify.progress(this);
+        getDetail();
     }
 
     private void getPlayer(boolean replay) {
