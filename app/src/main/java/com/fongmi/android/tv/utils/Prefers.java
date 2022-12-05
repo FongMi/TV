@@ -76,7 +76,7 @@ public class Prefers {
     }
 
     public static int getDecode() {
-        return getInt("decode", 0);
+        return getInt("decode", 1);
     }
 
     public static void putDecode(int decode) {
