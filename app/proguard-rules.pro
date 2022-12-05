@@ -36,3 +36,11 @@
 -keep class tv.danmaku.ijk.media.player.** { *; }
 -keep class tv.danmaku.ijk.media.player.IjkMediaPlayer { *; }
 -keep class tv.danmaku.ijk.media.player.ffmpeg.FFmpegApi { *; }
+
+# XWalk
+-keep class org.xwalk.core.** { *; }
+-keep class org.crosswalk.engine.** { *; }
+-keep class org.chromium.** { *; }
+-dontwarn android.view.**
+-dontwarn android.media.**
+-dontwarn org.chromium.**
