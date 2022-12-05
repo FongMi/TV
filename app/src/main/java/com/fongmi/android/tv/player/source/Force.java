@@ -9,6 +9,7 @@ import android.os.IBinder;
 import android.os.SystemClock;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.net.OKHttp;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.forcetech.Port;
@@ -37,7 +38,7 @@ public class Force {
 
     private void check() throws Exception {
         File file = FileUtil.getCacheFile("libmitv.so");
-        String url = "https://ghproxy.com/https://raw.githubusercontent.com/FongMi/TV/release/other/libmitv.so";
+        String url = Constant.getReleasePath("/other/libmitv.so");
         if (!file.exists()) FileUtil.write(file, OKHttp.newCall(url).execute().body().bytes());
     }
 

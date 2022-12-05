@@ -16,7 +16,8 @@
         android:background="@color/black"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        android:foreground="@drawable/selector_video">
+        android:foreground="@drawable/selector_video"
+        android:nextFocusDown="@id/flag">
 
         <com.google.android.exoplayer2.ui.StyledPlayerView
             android:id="@+id/surface"
@@ -215,10 +216,12 @@
     </LinearLayout>
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/video"
-        android:layout_marginTop="12dp">
+        android:layout_marginTop="12dp"
+        android:overScrollMode="never">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -256,12 +259,21 @@
                 android:paddingStart="24dp"
                 android:paddingTop="8dp"
                 android:paddingEnd="24dp"
-                android:paddingBottom="8dp"
-                android:visibility="gone"
-                tools:visibility="visible" />
+                android:paddingBottom="8dp" />
 
             <com.fongmi.android.tv.ui.custom.CustomHorizontalGridView
                 android:id="@+id/part"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:paddingStart="24dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="24dp"
+                android:paddingBottom="8dp" />
+
+            <androidx.leanback.widget.HorizontalGridView
+                android:id="@+id/search"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
@@ -270,7 +282,8 @@
                 android:paddingStart="24dp"
                 android:paddingTop="8dp"
                 android:paddingEnd="24dp"
-                android:paddingBottom="8dp" />
+                android:paddingBottom="8dp"
+                android:visibility="gone" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
