@@ -49,7 +49,7 @@ public class Updater implements View.OnClickListener {
     }
 
     private String getApk() {
-        return Constant.getBranchPath("/release/", BuildConfig.FLAVOR_mode + "-" + BuildConfig.FLAVOR_api + ".apk");
+        return Constant.getBranchPath(branch, "/release/" + BuildConfig.FLAVOR_mode + "-" + BuildConfig.FLAVOR_api + ".apk");
     }
 
     private Updater() {
