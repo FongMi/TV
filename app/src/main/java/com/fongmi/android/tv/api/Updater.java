@@ -9,6 +9,7 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.BuildConfig;
+import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.DialogUpdateBinding;
 import com.fongmi.android.tv.net.OKHttp;
@@ -43,20 +44,16 @@ public class Updater implements View.OnClickListener {
         return FileUtil.getCacheFile(branch + ".apk");
     }
 
-    private String getPath() {
-        return "https://raw.githubusercontent.com/FongMi/TV/" + branch + "/release/";
-    }
-
     private String getJson() {
-        return "https://ghproxy.com/" + getPath() + BuildConfig.FLAVOR_mode + "-" + branch + ".json";
+        return Constant.getBranchPath(branch, "/release/" + BuildConfig.FLAVOR_mode + "-" + branch + ".json");
     }
 
     private String getApk() {
-        return "https://ghproxy.com/" + getPath() + BuildConfig.FLAVOR_mode + "-" + BuildConfig.FLAVOR_api + ".apk";
+        return Constant.getBranchPath("/release/", BuildConfig.FLAVOR_mode + "-" + BuildConfig.FLAVOR_api + ".apk");
     }
 
     private Updater() {
-        this.branch = "release";
+        this.branch = Constant.RELEASE;
     }
 
     public Updater reset() {
@@ -123,7 +120,7 @@ public class Updater implements View.OnClickListener {
 
     private void dismiss() {
         if (dialog != null) dialog.dismiss();
-        this.branch = "release";
+        this.branch = Constant.RELEASE;
         this.force = false;
         this.md5 = null;
     }
