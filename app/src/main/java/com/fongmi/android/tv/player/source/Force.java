@@ -38,7 +38,7 @@ public class Force {
 
     private void check() throws Exception {
         File file = FileUtil.getCacheFile("libmitv.so");
-        String url = Constant.getReleasePath("/other/so/libmitv.so");
+        String url = Constant.getReleasePath("/other/libmitv.so");
         if (!file.exists()) FileUtil.write(file, OKHttp.newCall(url).execute().body().bytes());
     }
 
