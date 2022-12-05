@@ -38,21 +38,6 @@ public class Updater implements View.OnClickListener {
         return Loader.INSTANCE;
     }
 
-    public Updater reset() {
-        Prefers.putUpdate(true);
-        return this;
-    }
-
-    public void start(Activity activity) {
-        this.activity = new WeakReference<>(activity);
-        App.execute(this::doInBackground);
-    }
-
-    private void doInBackground() {
-        FileUtil.clearDir(getFile());
-        connect(getJson());
-    }
-
     private File getFile() {
         return FileUtil.getCacheFile("kitkat.apk");
     }
@@ -67,6 +52,21 @@ public class Updater implements View.OnClickListener {
 
     private String getApk() {
         return PROXY + getPath() + "leanback.apk";
+    }
+
+    public Updater reset() {
+        Prefers.putUpdate(true);
+        return this;
+    }
+
+    public void start(Activity activity) {
+        this.activity = new WeakReference<>(activity);
+        App.execute(this::doInBackground);
+    }
+
+    private void doInBackground() {
+        FileUtil.clearDir(getFile());
+        connect(getJson());
     }
 
     private void connect(String target) {
