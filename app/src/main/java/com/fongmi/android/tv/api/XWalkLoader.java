@@ -5,6 +5,7 @@ import android.content.Context;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.net.OKHttp;
 import com.fongmi.android.tv.utils.FileUtil;
+import com.fongmi.android.tv.utils.Notify;
 
 import org.xwalk.core.XWalkInitializer;
 
@@ -26,8 +27,7 @@ public class XWalkLoader {
     private String getRuntimeAbi() {
         try {
             Class<?> cls = Class.forName("org.xwalk.core.XWalkEnvironment");
-            Method method = cls.getMethod("getRuntimeAbi");
-            return (String) method.invoke(null);
+            return (String) cls.getMethod("getRuntimeAbi").invoke(null);
         } catch (Exception e) {
             return "armeabi-v7a";
         }
@@ -54,10 +54,12 @@ public class XWalkLoader {
 
     private void download() {
         try {
+            App.post(() -> Notify.show("正在下載 XWalk 插件..."));
             FileUtil.write(getFile(), OKHttp.newCall(getUrl()).execute().body().bytes());
             Class<?> cls = Class.forName("org.xwalk.core.XWalkDecompressor");
             Method method = cls.getMethod("extractResource", String.class, String.class);
             method.invoke(null, getFile().getAbsolutePath(), getLibPath());
+            App.post(() -> Notify.show("XWalk 插件已安裝"));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -79,7 +81,6 @@ public class XWalkLoader {
 
             @Override
             public void onXWalkInitCompleted() {
-
             }
         }, App.get());
     }
