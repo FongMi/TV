@@ -97,7 +97,7 @@ public class CollectActivity extends BaseActivity {
 
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
-        mViewModel.result.observe(this, result -> {
+        mViewModel.search.observe(this, result -> {
             mAdapter.add(Collect.create(result.getList()));
             getFragment().addVideo(result.getList());
             mPageAdapter.notifyDataSetChanged();

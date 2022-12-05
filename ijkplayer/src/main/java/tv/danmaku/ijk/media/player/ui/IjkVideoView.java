@@ -507,7 +507,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         mIjkPlayer.setOption(format, "http-detect-range-support", 0);
         mIjkPlayer.setOption(player, "enable-accurate-seek", 0);
         mIjkPlayer.setOption(player, "framedrop", 1);
-        mIjkPlayer.setOption(player, "max-buffer-size", 5242880);
+        mIjkPlayer.setOption(player, "max-buffer-size", 15 * 1024 * 1024);
         mIjkPlayer.setOption(player, "mediacodec", mCurrentDecode);
         mIjkPlayer.setOption(player, "mediacodec-auto-rotate", mCurrentDecode);
         mIjkPlayer.setOption(player, "mediacodec-handle-resolution-change", mCurrentDecode);

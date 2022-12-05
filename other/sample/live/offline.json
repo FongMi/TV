@@ -1,0 +1,20 @@
+{
+  "lives": [
+    {
+      "name": "TXT",
+      "type": 0,
+      "url": "file://Download/live.txt",
+      "epg": "http://epg.51zmt.top:8000/api/diyp/?ch={name}&date={date}",
+      "logo": "",
+      "ua": ""
+    },
+    {
+      "name": "M3U",
+      "type": 0,
+      "url": "file://Download/live.m3u",
+      "epg": "https://epg.112114.xyz/?ch={name}",
+      "logo": "",
+      "ua": ""
+    }
+  ]
+}
