@@ -10,8 +10,8 @@ android {
         applicationId "com.fongmi.android.tv"
         minSdk 17
         targetSdk 33
-        versionCode 45
-        versionName "1.4.5"
+        versionCode 47
+        versionName "1.4.7"
         multiDexEnabled true
         ndk { abiFilters "armeabi-v7a" }
     }
@@ -56,6 +56,7 @@ dependencies {
     implementation project(':ijkplayer')
     implementation project(':pyramid')
     implementation project(':exoplayer-library')
+    implementation project(':exoplayer-extension-av1')
     implementation project(':exoplayer-extension-rtmp')
     implementation project(':exoplayer-extension-ffmpeg')
     implementation 'androidx.multidex:multidex:2.0.1'
@@ -68,7 +69,7 @@ dependencies {
     implementation 'com.github.bassaer:materialdesigncolors:1.0.0'
     implementation 'com.github.bumptech.glide:glide:4.14.2'
     implementation 'com.google.android.material:material:1.7.0'
-    implementation 'com.google.code.gson:gson:2.10'
+    implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'com.google.zxing:core:3.3.0'
     implementation 'com.squareup.okhttp3:okhttp:3.12.13'
     implementation 'me.jessyan:autosize:1.2.1'
