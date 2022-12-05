@@ -45,6 +45,14 @@
             android:name="android.max_aspect"
             android:value="2.5" />
 
+        <meta-data
+            android:name="xwalk_enable_download_mode"
+            android:value="enable" />
+
+        <meta-data
+            android:name="xwalk_verify"
+            android:value="disable" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"

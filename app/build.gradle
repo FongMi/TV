@@ -4,7 +4,7 @@ plugins {
 
 android {
     compileSdk 33
-    flavorDimensions "mode", "api"
+    flavorDimensions "mode"
 
     defaultConfig {
         applicationId "com.fongmi.android.tv"
@@ -22,12 +22,6 @@ android {
         }
         mobile {
             dimension "mode"
-        }
-        java {
-            dimension = "api"
-        }
-        python {
-            dimension = "api"
         }
     }
 
@@ -51,7 +45,7 @@ android {
 
     android.applicationVariants.all { variant ->
         variant.outputs.all { output ->
-            outputFileName = "${variant.productFlavors[0].name}-${variant.productFlavors[1].name}.apk"
+            outputFileName = "${variant.productFlavors[0].name}.apk"
         }
     }
 }
@@ -60,7 +54,7 @@ dependencies {
     implementation project(':catvod')
     implementation project(':forcetech')
     implementation project(':ijkplayer')
-    pythonImplementation project(':pyramid')
+    implementation project(':pyramid')
     implementation project(':exoplayer-library')
     implementation project(':exoplayer-extension-rtmp')
     implementation project(':exoplayer-extension-ffmpeg')
@@ -74,12 +68,13 @@ dependencies {
     implementation 'com.github.bassaer:materialdesigncolors:1.0.0'
     implementation 'com.github.bumptech.glide:glide:4.14.2'
     implementation 'com.google.android.material:material:1.7.0'
-    implementation 'com.google.code.gson:gson:2.8.9'
+    implementation 'com.google.code.gson:gson:2.10'
     implementation 'com.google.zxing:core:3.3.0'
     implementation 'com.squareup.okhttp3:okhttp:3.12.13'
     implementation 'me.jessyan:autosize:1.2.1'
     implementation 'org.greenrobot:eventbus:3.3.1'
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
+    implementation 'org.xwalk:xwalk_core_library:23.53.589.4'
     implementation('org.simpleframework:simple-xml:2.7.1') { exclude group: 'stax', module: 'stax-api' exclude group: 'xpp3', module: 'xpp3' }
     leanbackImplementation 'androidx.leanback:leanback:1.2.0-alpha02'
     annotationProcessor 'androidx.room:room-compiler:2.4.3'

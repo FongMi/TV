@@ -9,6 +9,7 @@ pluginManagement {
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
+        maven { url 'https://download.01.org/crosswalk/releases/crosswalk/android/maven2' }
         mavenCentral()
         jcenter()
         google()
