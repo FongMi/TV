@@ -9,6 +9,7 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.BuildConfig;
+import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.DialogUpdateBinding;
 import com.fongmi.android.tv.net.OKHttp;
@@ -24,8 +25,6 @@ import java.lang.ref.WeakReference;
 
 public class Updater implements View.OnClickListener {
 
-    private static final String PROXY = "https://ghproxy.com/";
-
     private WeakReference<Activity> activity;
     private AlertDialog dialog;
     private String md5;
@@ -39,19 +38,15 @@ public class Updater implements View.OnClickListener {
     }
 
     private File getFile() {
-        return FileUtil.getCacheFile("kitkat.apk");
-    }
-
-    private String getPath() {
-        return "https://raw.githubusercontent.com/FongMi/TV/kitkat/release/";
+        return FileUtil.getCacheFile(BuildConfig.FLAVOR + ".apk");
     }
 
     private String getJson() {
-        return PROXY + getPath() + "leanback.json";
+        return Constant.getKitkatPath("/release/" + BuildConfig.FLAVOR + ".json");
     }
 
     private String getApk() {
-        return PROXY + getPath() + "leanback.apk";
+        return Constant.getKitkatPath("/release/" + BuildConfig.FLAVOR + ".apk");
     }
 
     public Updater reset() {
