@@ -13,7 +13,6 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.DialogUpdateBinding;
 import com.fongmi.android.tv.net.OKHttp;
 import com.fongmi.android.tv.utils.FileUtil;
-import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -29,8 +28,6 @@ public class Updater implements View.OnClickListener {
 
     private WeakReference<Activity> activity;
     private AlertDialog dialog;
-    private String branch;
-    private boolean force;
     private String md5;
 
     private static class Loader {
@@ -41,23 +38,8 @@ public class Updater implements View.OnClickListener {
         return Loader.INSTANCE;
     }
 
-    private Updater() {
-        this.branch = "release";
-    }
-
     public Updater reset() {
         Prefers.putUpdate(true);
-        return this;
-    }
-
-    public Updater force() {
-        Notify.show(R.string.update_check);
-        this.force = true;
-        return this;
-    }
-
-    public Updater branch(String branch) {
-        this.branch = branch;
         return this;
     }
 
@@ -72,19 +54,19 @@ public class Updater implements View.OnClickListener {
     }
 
     private File getFile() {
-        return FileUtil.getCacheFile(branch + ".apk");
+        return FileUtil.getCacheFile("kitkat.apk");
     }
 
     private String getPath() {
-        return "https://raw.githubusercontent.com/FongMi/TV/" + branch + "/release/";
+        return "https://raw.githubusercontent.com/FongMi/TV/kitkat/release/";
     }
 
     private String getJson() {
-        return PROXY + getPath() + BuildConfig.FLAVOR_mode + "-" + branch + ".json";
+        return PROXY + getPath() + "leanback.json";
     }
 
     private String getApk() {
-        return PROXY + getPath() + BuildConfig.FLAVOR_mode + "-" + BuildConfig.FLAVOR_api + ".apk";
+        return PROXY + getPath() + "leanback.apk";
     }
 
     private void connect(String target) {
@@ -94,9 +76,8 @@ public class Updater implements View.OnClickListener {
             String desc = object.optString("desc");
             int code = object.optInt("code");
             boolean need = code > BuildConfig.VERSION_CODE;
-            if (need || force) FileUtil.write(getFile(), OKHttp.newCall(getApk()).execute().body().bytes());
-            boolean show = need && Prefers.getUpdate() || force && !Prefers.getApkMd5().equals(md5 = FileUtil.getMd5(getFile()));
-            if (getFile().exists() && show) App.post(() -> checkActivity(name, desc));
+            if (need) FileUtil.write(getFile(), OKHttp.newCall(getApk()).execute().body().bytes());
+            if (getFile().exists() && need && Prefers.getUpdate()) App.post(() -> checkActivity(name, desc));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -125,8 +106,6 @@ public class Updater implements View.OnClickListener {
 
     private void dismiss() {
         if (dialog != null) dialog.dismiss();
-        this.branch = "release";
-        this.force = false;
         this.md5 = null;
     }
 

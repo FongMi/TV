@@ -2,11 +2,6 @@ function search() {
     doAction('search', { text: $('#keyword').val() });
 }
 
-function update() {
-    doAction('update', { text: "dev" });
-    $('#dev').attr("disabled", true);
-}
-
 function push() {
     doAction('push', { text: $('#push_url').val() });
 }
