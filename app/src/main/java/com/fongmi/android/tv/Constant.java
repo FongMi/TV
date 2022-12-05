@@ -6,13 +6,12 @@ public class Constant {
     public static final String REPO = "https://raw.githubusercontent.com/FongMi/TV/";
     public static final String RELEASE = "release";
     public static final String KITKAT = "kitkat";
-    public static final String DEV = "dev";
 
     public static String getReleasePath(String path) {
         return PROXY + REPO + RELEASE + path;
     }
 
-    public static String getBranchPath(String branch, String path) {
-        return PROXY + REPO + branch + path;
+    public static String getKitkatPath(String path) {
+        return PROXY + REPO + KITKAT + path;
     }
 }
