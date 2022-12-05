@@ -3,6 +3,7 @@ package com.fongmi.android.tv.api;
 import android.content.Context;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.net.OKHttp;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Notify;
@@ -34,7 +35,7 @@ public class XWalkLoader {
     }
 
     private String getUrl() {
-        return String.format("https://ghproxy.com/https://raw.githubusercontent.com/FongMi/TV/kitkat/other/xwalk/XWalkRuntimeLib-%s.apk", getRuntimeAbi());
+        return String.format(Constant.getKitkatPath("/other/xwalk/XWalkRuntimeLib-%s.apk"), getRuntimeAbi());
     }
 
     private File getFile() {
