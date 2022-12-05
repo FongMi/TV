@@ -8,10 +8,10 @@ https://github.com/CatVodTVOfficial/CatVodTVJarLoader
 [TV-Python](https://github.com/FongMi/TV/blob/main/release/leanback-python.apk?raw=true "TV-Python")  
 
 ### Config Example
-[Vod-Online](other/example/vod/online.json)  
-[Vod-Offline](other/example/vod/offline.json)  
-[Live-Online](other/example/live/online.json)  
-[Live-Offline](other/example/live/offline.json)  
+[Vod-Online](other/sample/vod/online.json)  
+[Vod-Offline](other/sample/vod/offline.json)  
+[Live-Online](other/sample/live/online.json)  
+[Live-Offline](other/sample/live/offline.json)  
 
 ### Subtitle Format
 In playerContent put "sub"
