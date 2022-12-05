@@ -25,8 +25,6 @@ import java.lang.ref.WeakReference;
 
 public class Updater implements View.OnClickListener {
 
-    private static final String PROXY = "https://ghproxy.com/";
-
     private WeakReference<Activity> activity;
     private AlertDialog dialog;
     private String branch;
@@ -39,6 +37,22 @@ public class Updater implements View.OnClickListener {
 
     public static Updater get() {
         return Loader.INSTANCE;
+    }
+
+    private File getFile() {
+        return FileUtil.getCacheFile(branch + ".apk");
+    }
+
+    private String getPath() {
+        return "https://raw.githubusercontent.com/FongMi/TV/" + branch + "/release/";
+    }
+
+    private String getJson() {
+        return "https://ghproxy.com/" + getPath() + BuildConfig.FLAVOR_mode + "-" + branch + ".json";
+    }
+
+    private String getApk() {
+        return "https://ghproxy.com/" + getPath() + BuildConfig.FLAVOR_mode + "-" + BuildConfig.FLAVOR_api + ".apk";
     }
 
     private Updater() {
@@ -69,22 +83,6 @@ public class Updater implements View.OnClickListener {
     private void doInBackground() {
         FileUtil.clearDir(getFile());
         connect(getJson());
-    }
-
-    private File getFile() {
-        return FileUtil.getCacheFile(branch + ".apk");
-    }
-
-    private String getPath() {
-        return "https://raw.githubusercontent.com/FongMi/TV/" + branch + "/release/";
-    }
-
-    private String getJson() {
-        return PROXY + getPath() + BuildConfig.FLAVOR_mode + "-" + branch + ".json";
-    }
-
-    private String getApk() {
-        return PROXY + getPath() + BuildConfig.FLAVOR_mode + "-" + BuildConfig.FLAVOR_api + ".apk";
     }
 
     private void connect(String target) {
