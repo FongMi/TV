@@ -9,6 +9,7 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.BuildConfig;
+import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.DialogUpdateBinding;
 import com.fongmi.android.tv.net.OKHttp;
@@ -25,8 +26,6 @@ import java.lang.ref.WeakReference;
 
 public class Updater implements View.OnClickListener {
 
-    private static final String PROXY = "https://ghproxy.com/";
-
     private WeakReference<Activity> activity;
     private AlertDialog dialog;
     private String branch;
@@ -41,8 +40,20 @@ public class Updater implements View.OnClickListener {
         return Loader.INSTANCE;
     }
 
+    private File getFile() {
+        return FileUtil.getCacheFile(branch + ".apk");
+    }
+
+    private String getJson() {
+        return Constant.getBranchPath(branch, "/release/" + BuildConfig.FLAVOR_mode + "-" + branch + ".json");
+    }
+
+    private String getApk() {
+        return Constant.getBranchPath(branch, "/release/" + BuildConfig.FLAVOR_mode + "-" + BuildConfig.FLAVOR_api + ".apk");
+    }
+
     private Updater() {
-        this.branch = "release";
+        this.branch = Constant.RELEASE;
     }
 
     public Updater reset() {
@@ -71,30 +82,15 @@ public class Updater implements View.OnClickListener {
         connect(getJson());
     }
 
-    private File getFile() {
-        return FileUtil.getCacheFile(branch + ".apk");
-    }
-
-    private String getPath() {
-        return "https://raw.githubusercontent.com/FongMi/TV/" + branch + "/release/";
-    }
-
-    private String getJson() {
-        return PROXY + getPath() + BuildConfig.FLAVOR_mode + "-" + branch + ".json";
-    }
-
-    private String getApk() {
-        return PROXY + getPath() + BuildConfig.FLAVOR_mode + "-" + BuildConfig.FLAVOR_api + ".apk";
-    }
-
     private void connect(String target) {
         try {
             JSONObject object = new JSONObject(OKHttp.newCall(target).execute().body().string());
             String name = object.optString("name");
             String desc = object.optString("desc");
             int code = object.optInt("code");
-            if (code > BuildConfig.VERSION_CODE || force) FileUtil.write(getFile(), OKHttp.newCall(getApk()).execute().body().bytes());
-            boolean show = Prefers.getUpdate() || !Prefers.getApkMd5().equals(md5 = FileUtil.getMd5(getFile()));
+            boolean need = code > BuildConfig.VERSION_CODE;
+            if (need || force) FileUtil.write(getFile(), OKHttp.newCall(getApk()).execute().body().bytes());
+            boolean show = need && Prefers.getUpdate() || force && !Prefers.getApkMd5().equals(md5 = FileUtil.getMd5(getFile()));
             if (getFile().exists() && show) App.post(() -> checkActivity(name, desc));
         } catch (Exception e) {
             e.printStackTrace();
@@ -124,7 +120,7 @@ public class Updater implements View.OnClickListener {
 
     private void dismiss() {
         if (dialog != null) dialog.dismiss();
-        this.branch = "release";
+        this.branch = Constant.RELEASE;
         this.force = false;
         this.md5 = null;
     }
