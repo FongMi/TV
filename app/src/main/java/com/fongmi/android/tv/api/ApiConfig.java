@@ -35,6 +35,7 @@ public class ApiConfig {
     private List<Site> sites;
     private JarLoader jLoader;
     private PyLoader pLoader;
+    private JsLoader sLoader;
     private Config config;
     private String wall;
     private Parse parse;
@@ -74,6 +75,7 @@ public class ApiConfig {
         this.parses = new ArrayList<>();
         this.jLoader = new JarLoader();
         this.pLoader = new PyLoader();
+        this.sLoader = new JsLoader();
         return this;
     }
 
