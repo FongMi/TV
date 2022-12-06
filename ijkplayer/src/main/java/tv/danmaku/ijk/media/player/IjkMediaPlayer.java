@@ -197,7 +197,6 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         synchronized (IjkMediaPlayer.class) {
             if (!mIsNativeInitialized) {
                 native_init();
-                native_setDot(dotOpen ? dotPort : 0);
                 mIsNativeInitialized = true;
             }
         }
@@ -1284,21 +1283,6 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
 
             Log.i(TAG, String.format(Locale.US, "selected codec: %s rank=%d", bestCodec.mCodecInfo.getName(), bestCodec.mRank));
             return bestCodec.mCodecInfo.getName();
-        }
-    }
-
-    private static volatile int dotPort = 0;
-    private static volatile boolean dotOpen = false;
-
-    public static void setDotPort(boolean open, int p) {
-        dotOpen = open;
-        dotPort = p;
-    }
-
-    public static void toggleDotPort(boolean open) {
-        dotOpen = open;
-        if (mIsNativeInitialized) {
-            native_setDot(dotOpen ? dotPort : 0);
         }
     }
 
