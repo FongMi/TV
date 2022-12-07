@@ -33,9 +33,9 @@ public class ApiConfig {
     private List<String> flags;
     private List<Parse> parses;
     private List<Site> sites;
-    private JarLoader jLoader;
-    private PyLoader pLoader;
-    private JsLoader sLoader;
+    private JarLoader jarLoader;
+    private PyLoader pyLoader;
+    private JsLoader jsLoader;
     private Config config;
     private String wall;
     private Parse parse;
@@ -73,9 +73,9 @@ public class ApiConfig {
         this.sites = new ArrayList<>();
         this.flags = new ArrayList<>();
         this.parses = new ArrayList<>();
-        this.jLoader = new JarLoader();
-        this.pLoader = new PyLoader();
-        this.sLoader = new JsLoader();
+        this.jarLoader = new JarLoader();
+        this.pyLoader = new PyLoader();
+        this.jsLoader = new JsLoader();
         return this;
     }
 
@@ -91,8 +91,9 @@ public class ApiConfig {
         this.sites.clear();
         this.flags.clear();
         this.parses.clear();
-        this.jLoader.clear();
-        this.pLoader.clear();
+        this.jarLoader.clear();
+        this.pyLoader.clear();
+        this.jsLoader.clear();
         return this;
     }
 
@@ -127,7 +128,7 @@ public class ApiConfig {
         try {
             parseJson(object);
             parseLive(object);
-            jLoader.parseJar("", Json.safeString(object, "spider"));
+            jarLoader.parseJar("", Json.safeString(object, "spider"));
             config.json(object.toString()).update();
             App.post(callback::success);
         } catch (Exception e) {
@@ -173,23 +174,25 @@ public class ApiConfig {
     }
 
     public Spider getCSP(Site site) {
+        boolean js = site.getApi().contains(".js");
         boolean py = site.getApi().startsWith("py_");
         boolean csp = site.getApi().startsWith("csp_");
-        if (py) return pLoader.getSpider(site.getKey(), site.getApi(), site.getExt());
-        else if (csp) return jLoader.getSpider(site.getKey(), site.getApi(), site.getExt(), site.getJar());
+        if (js) return jsLoader.getSpider(site.getKey(), site.getApi(), site.getExt());
+        if (py) return pyLoader.getSpider(site.getKey(), site.getApi(), site.getExt());
+        if (csp) return jarLoader.getSpider(site.getKey(), site.getApi(), site.getExt(), site.getJar());
         else return new SpiderNull();
     }
 
     public Object[] proxyLocal(Map<?, ?> param) {
-        return jLoader.proxyInvoke(param);
+        return jarLoader.proxyInvoke(param);
     }
 
     public JSONObject jsonExt(String key, LinkedHashMap<String, String> jxs, String url) {
-        return jLoader.jsonExt(key, jxs, url);
+        return jarLoader.jsonExt(key, jxs, url);
     }
 
     public JSONObject jsonExtMix(String flag, String key, String name, LinkedHashMap<String, HashMap<String, String>> jxs, String url) {
-        return jLoader.jsonExtMix(flag, key, name, jxs, url);
+        return jarLoader.jsonExtMix(flag, key, name, jxs, url);
     }
 
     public Site getSite(String key) {
