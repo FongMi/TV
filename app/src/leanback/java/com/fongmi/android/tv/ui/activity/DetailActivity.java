@@ -871,5 +871,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     protected void onDestroy() {
         super.onDestroy();
         mPlayers.release();
+        App.removeCallbacks(mR1, mR2, mR3);
     }
 }
