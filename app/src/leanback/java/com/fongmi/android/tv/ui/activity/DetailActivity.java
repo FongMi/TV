@@ -50,6 +50,7 @@ import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.Traffic;
 import com.fongmi.android.tv.utils.Utils;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.ui.StyledPlayerView;
@@ -91,6 +92,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private int mCurrent;
     private Runnable mR1;
     private Runnable mR2;
+    private Runnable mR3;
 
     public static void start(Activity activity, String id) {
         start(activity, ApiConfig.get().getHome().getKey(), id);
@@ -166,6 +168,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mPlayers = new Players().init();
         mR1 = this::hideControl;
         mR2 = this::hideCenter;
+        mR3 = this::setTraffic;
         setRecyclerView();
         setVideoView();
         setViewModel();
@@ -589,11 +592,14 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void showProgress() {
-        mBinding.widget.progress.getRoot().setVisibility(View.VISIBLE);
+        mBinding.widget.progress.setVisibility(View.VISIBLE);
+        App.post(mR3, 250);
     }
 
     private void hideProgress() {
-        mBinding.widget.progress.getRoot().setVisibility(View.GONE);
+        mBinding.widget.progress.setVisibility(View.GONE);
+        App.removeCallbacks(mR3);
+        Traffic.reset();
     }
 
     private void showError() {
@@ -628,6 +634,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void hideCenter() {
         mBinding.widget.action.setImageResource(R.drawable.ic_play);
         hideInfo();
+    }
+
+    private void setTraffic() {
+        mBinding.widget.traffic.setText(Traffic.get());
+        App.post(mR3, 250);
     }
 
     private void setR1Callback() {
