@@ -42,6 +42,7 @@ import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.Traffic;
 import com.fongmi.android.tv.utils.Utils;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.ui.StyledPlayerView;
@@ -81,6 +82,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private Runnable mR3;
     private Runnable mR4;
     private Runnable mR5;
+    private Runnable mR6;
     private int count;
 
     public static void start(Activity activity) {
@@ -119,7 +121,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mR2 = this::hideCenter;
         mR3 = this::hideControl;
         mR4 = this::setChannelActivated;
-        mR5 = this::onError;
+        mR5 = this::setTraffic;
+        mR6 = this::onError;
         mPlayers = new Players().init();
         mKeyDown = CustomKeyDownLive.create(this);
         mFormatDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
@@ -251,6 +254,11 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         getUrl();
     }
 
+    private void setTraffic() {
+        mBinding.widget.traffic.setText(Traffic.get());
+        App.post(mR5, 250);
+    }
+
     private void onToggle() {
         if (isVisible(mBinding.recycler)) hideUI();
         else showUI();
@@ -321,11 +329,14 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void showProgress() {
-        mBinding.widget.progress.getRoot().setVisibility(View.VISIBLE);
+        mBinding.widget.progress.setVisibility(View.VISIBLE);
+        App.post(mR5, 250);
     }
 
     private void hideProgress() {
-        mBinding.widget.progress.getRoot().setVisibility(View.GONE);
+        mBinding.widget.progress.setVisibility(View.GONE);
+        App.removeCallbacks(mR5);
+        Traffic.reset();
     }
 
     private void showControl(View view) {
@@ -370,9 +381,9 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         App.post(mR3, 5000);
     }
 
-    private void setR5Callback() {
-        App.removeCallbacks(mR5);
-        App.post(mR5, 10000);
+    private void setR6Callback() {
+        App.removeCallbacks(mR6);
+        App.post(mR6, 10000);
     }
 
     private void resetPass() {
@@ -613,7 +624,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     public void onPlayerEvent(PlayerEvent event) {
         switch (event.getState()) {
             case 0:
-                setR5Callback();
+                setR6Callback();
                 break;
             case Player.STATE_IDLE:
                 break;
@@ -623,14 +634,14 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
             case Player.STATE_READY:
                 hideProgress();
                 mPlayers.reset();
-                App.removeCallbacks(mR5);
+                App.removeCallbacks(mR6);
                 TrackSelectionDialog.setVisible(mPlayers.exo(), mBinding.control.tracks);
                 break;
             case Player.STATE_ENDED:
                 onKeyDown();
                 break;
             default:
-                App.removeCallbacks(mR5);
+                App.removeCallbacks(mR6);
                 if (!event.isRetry() || mPlayers.addRetry() > 2) onError();
                 else getUrl();
                 break;
