@@ -28,7 +28,7 @@ import com.fongmi.android.tv.impl.LiveCallback;
 import com.fongmi.android.tv.impl.PassCallback;
 import com.fongmi.android.tv.model.LiveViewModel;
 import com.fongmi.android.tv.net.Callback;
-import com.fongmi.android.tv.net.OKHttp;
+import com.fongmi.android.tv.net.OkHttp;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.player.source.Force;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownLive;
@@ -461,7 +461,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void getEpg(String epg, Channel channel) {
-        OKHttp.newCall(epg).enqueue(new Callback() {
+        OkHttp.newCall(epg).enqueue(new Callback() {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 channel.setData(Epg.objectFrom(response.body().string(), mFormatTime));

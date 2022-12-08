@@ -2,7 +2,7 @@ package com.fongmi.android.tv.api;
 
 import android.util.Base64;
 
-import com.fongmi.android.tv.net.OKHttp;
+import com.fongmi.android.tv.net.OkHttp;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Json;
 import com.google.common.io.BaseEncoding;
@@ -51,7 +51,7 @@ public class Decoder {
     }
 
     private static String getData(String url) throws Exception {
-        if (url.startsWith("http")) return OKHttp.newCall(url).execute().body().string();
+        if (url.startsWith("http")) return OkHttp.newCall(url).execute().body().string();
         else if (url.startsWith("file")) return FileUtil.read(url);
         throw new Exception();
     }
