@@ -3,7 +3,7 @@ package com.fongmi.android.tv.api;
 import android.content.Context;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.net.OKHttp;
+import com.fongmi.android.tv.net.OkHttp;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.crawler.Spider;
@@ -61,7 +61,7 @@ public class JarLoader {
 
     private File download(String jar) {
         try {
-            return FileUtil.write(FileUtil.getJar(jar), OKHttp.newCall(jar).execute().body().bytes());
+            return FileUtil.write(FileUtil.getJar(jar), OkHttp.newCall(jar).execute().body().bytes());
         } catch (Exception e) {
             return FileUtil.getJar(jar);
         }
