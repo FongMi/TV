@@ -42,6 +42,15 @@ public class OkHttp {
         return noRedirect;
     }
 
+    public String module(String url) {
+        try {
+            return client().newCall(new Request.Builder().url(url).header("User-Agent", "Mozilla/5.0").build()).execute().body().string();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
     public Call newCall(String url, JSONObject object) {
         int redirect = object.optInt("redirect", 1);
         int timeout = object.optInt("timeout", 10000);
