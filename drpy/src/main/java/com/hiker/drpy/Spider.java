@@ -43,7 +43,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
     }
 
     private String post(String func, Object... args) throws ExecutionException, InterruptedException {
-        return (String) Worker.submit(() -> (String) jsObject.getJSFunction(func).call(args)).get();
+        return Worker.submit(() -> (String) jsObject.getJSFunction(func).call(args)).get();
     }
 
     @Override
@@ -58,6 +58,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
     @Override
     public String categoryContent(String tid, String pg, boolean filter, HashMap<String, String> extend) throws Exception {
+        //TODO extend
         return post("category", tid, pg, filter, null);
     }
 
@@ -73,6 +74,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
     @Override
     public String playerContent(String flag, String id, List<String> vipFlags) throws Exception {
+        //TODO vipFlags
         return post("play", flag, id, null);
     }
 }

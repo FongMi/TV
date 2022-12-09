@@ -25,7 +25,7 @@ public class Worker {
         get().executor.submit(runnable);
     }
 
-    public static Future<?> submit(Callable<String> callable) {
+    public static <T> Future<T> submit(Callable<T> callable) {
         return get().executor.submit(callable);
     }
 }
