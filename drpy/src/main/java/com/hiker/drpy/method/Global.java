@@ -3,13 +3,13 @@ package com.hiker.drpy.method;
 import android.text.TextUtils;
 import android.util.Base64;
 
-import com.github.tvbox.quickjs.JSArray;
-import com.github.tvbox.quickjs.JSMethod;
-import com.github.tvbox.quickjs.JSObject;
-import com.github.tvbox.quickjs.QuickJSContext;
 import com.google.gson.Gson;
 import com.hiker.drpy.Parser;
 import com.hiker.drpy.net.OkHttp;
+import com.whl.quickjs.wrapper.JSArray;
+import com.whl.quickjs.wrapper.JSMethod;
+import com.whl.quickjs.wrapper.JSObject;
+import com.whl.quickjs.wrapper.QuickJSContext;
 
 import org.json.JSONObject;
 
