@@ -1,23 +1,31 @@
 package com.hiker.drpy;
 
-import com.github.tvbox.quickjs.JSModule;
-import com.github.tvbox.quickjs.QuickJSContext;
 import com.hiker.drpy.method.Console;
 import com.hiker.drpy.method.Global;
 import com.hiker.drpy.method.Local;
+import com.whl.quickjs.android.QuickJSLoader;
+import com.whl.quickjs.wrapper.JSModule;
+import com.whl.quickjs.wrapper.QuickJSContext;
 
 public class Loader {
 
     private QuickJSContext ctx;
 
     static {
-        System.loadLibrary("quickjs");
+        QuickJSLoader.init();
     }
 
     public Loader() {
-        Worker.submit(() -> {
-            JSModule.setModuleLoader(name -> Module.get().load(name));
-            initCtx();
+        setModuleLoader();
+        Worker.submit(this::initCtx);
+    }
+
+    private void setModuleLoader() {
+        JSModule.setModuleLoader(new JSModule.ModuleLoader() {
+            @Override
+            public String getModuleScript(String moduleName) {
+                return Module.get().load(moduleName);
+            }
         });
     }
 

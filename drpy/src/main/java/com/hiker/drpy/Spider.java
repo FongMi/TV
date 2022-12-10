@@ -2,8 +2,9 @@ package com.hiker.drpy;
 
 import android.content.Context;
 
-import com.github.tvbox.quickjs.JSObject;
-import com.github.tvbox.quickjs.QuickJSContext;
+import com.whl.quickjs.wrapper.JSArray;
+import com.whl.quickjs.wrapper.JSObject;
+import com.whl.quickjs.wrapper.QuickJSContext;
 
 import java.util.HashMap;
 import java.util.List;
@@ -58,8 +59,8 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
     @Override
     public String categoryContent(String tid, String pg, boolean filter, HashMap<String, String> extend) throws Exception {
-        //TODO extend
-        return post("category", tid, pg, filter, null);
+        JSObject obj = Worker.submit(() -> convert(extend)).get();
+        return post("category", tid, pg, filter, obj);
     }
 
     @Override
@@ -74,7 +75,21 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
     @Override
     public String playerContent(String flag, String id, List<String> vipFlags) throws Exception {
-        //TODO vipFlags
-        return post("play", flag, id, null);
+        JSArray array = Worker.submit(() -> convert(vipFlags)).get();
+        return post("play", flag, id, array);
+    }
+
+    private JSObject convert(HashMap<String, String> map) {
+        JSObject obj = ctx.createNewJSObject();
+        if (map == null || map.isEmpty()) return obj;
+        for (String s : map.keySet()) obj.setProperty(s, map.get(s));
+        return obj;
+    }
+
+    private JSArray convert(List<String> items) {
+        JSArray array = ctx.createNewJSArray();
+        if (items == null || items.isEmpty()) return array;
+        for (int i = 0; i < items.size(); i++) array.set(items.get(i), i);
+        return array;
     }
 }

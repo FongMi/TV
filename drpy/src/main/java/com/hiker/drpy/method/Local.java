@@ -1,6 +1,6 @@
 package com.hiker.drpy.method;
 
-import com.github.tvbox.quickjs.JSMethod;
+import com.whl.quickjs.wrapper.JSMethod;
 
 import java.util.HashMap;
 import java.util.Map;
