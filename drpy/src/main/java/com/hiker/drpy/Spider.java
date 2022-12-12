@@ -8,26 +8,25 @@ import com.whl.quickjs.wrapper.QuickJSContext;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 public class Spider extends com.github.catvod.crawler.Spider {
 
     private QuickJSContext ctx;
     private JSObject jsObject;
-    private String api;
     private String ext;
     private String key;
+    private String api;
 
-    public Spider(QuickJSContext ctx, String api, String ext) {
-        this.key = "__" + UUID.randomUUID().toString().replace("-", "") + "__";
+    public Spider(QuickJSContext ctx, String key, String api, String ext) {
         this.ctx = ctx;
-        this.api = api;
+        this.key = key;
         this.ext = ext;
+        this.api = api;
     }
 
-    private String getContent() {
-        return Module.get().load(api)
+    private String getContent(Context context) {
+        return Module.get().load(context, api)
                 .replace("export default{", "globalThis." + key + " ={")
                 .replace("export default {", "globalThis." + key + " ={")
                 .replace("__JS_SPIDER__", "globalThis." + key);
@@ -37,7 +36,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
     public void init(Context context, String extend) throws Exception {
         super.init(context, extend);
         Worker.submit(() -> {
-            ctx.evaluateModule(getContent(), api);
+            ctx.evaluateModule(getContent(context), api);
             jsObject = (JSObject) ctx.getProperty(ctx.getGlobalObject(), key);
             jsObject.getJSFunction("init").call(ext);
         });
