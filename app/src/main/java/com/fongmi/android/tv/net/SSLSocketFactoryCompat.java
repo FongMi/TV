@@ -8,6 +8,7 @@ import java.security.cert.X509Certificate;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
@@ -15,6 +16,8 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.X509TrustManager;
 
 public class SSLSocketFactoryCompat extends SSLSocketFactory {
+
+    public static final HostnameVerifier hostnameVerifier = (hostname, session) -> true;
 
     public static final X509TrustManager trustAllCert = new X509TrustManager() {
 
