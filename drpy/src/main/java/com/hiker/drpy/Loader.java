@@ -1,5 +1,7 @@
 package com.hiker.drpy;
 
+import android.content.Context;
+
 import com.hiker.drpy.method.Console;
 import com.hiker.drpy.method.Global;
 import com.hiker.drpy.method.Local;
@@ -15,28 +17,33 @@ public class Loader {
         QuickJSLoader.init();
     }
 
-    public Loader() {
-        setModuleLoader();
-        Worker.submit(this::initCtx);
+    public void init(Context context) {
+        setModuleLoader(context);
+        Worker.submit(this::initJS);
     }
 
-    private void setModuleLoader() {
+    private void setModuleLoader(Context context) {
         JSModule.setModuleLoader(new JSModule.ModuleLoader() {
             @Override
+            public String convertModuleName(String moduleBaseName, String moduleName) {
+                return Module.convertModuleName(moduleBaseName, moduleName);
+            }
+
+            @Override
             public String getModuleScript(String moduleName) {
-                return Module.get().load(moduleName);
+                return Module.get().load(context, moduleName);
             }
         });
     }
 
-    private void initCtx() {
+    private void initJS() {
         ctx = QuickJSContext.create();
         ctx.getGlobalObject().setProperty("console", Console.class);
         ctx.getGlobalObject().setProperty("local", Local.class);
         Global.create(ctx).setProperty();
     }
 
-    public Spider spider(String api, String ext) {
-        return new Spider(ctx, api, ext);
+    public Spider spider(String key, String api, String ext) {
+        return new Spider(ctx, key, api, ext);
     }
 }

@@ -52,7 +52,7 @@ public class Decoder {
 
     private static String getData(String url) throws Exception {
         if (url.startsWith("http")) return OkHttp.newCall(url).execute().body().string();
-        else if (url.startsWith("file")) return FileUtil.read(url);
+        if (url.startsWith("file")) return FileUtil.read(url);
         throw new Exception();
     }
 

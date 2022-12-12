@@ -71,10 +71,10 @@ public class LiveParser {
     private static String getText(String url) {
         try {
             if (url.startsWith("file")) return FileUtil.read(url);
-            else if (url.startsWith("http")) return OkHttp.newCall(url).execute().body().string();
-            else if (url.endsWith(".txt") || url.endsWith(".m3u")) return getText(Utils.convert(LiveConfig.getUrl(), url));
-            else if (url.length() > 0 && url.length() % 4 == 0) return getText(new String(Base64.decode(url, Base64.DEFAULT)));
-            else return "";
+            if (url.startsWith("http")) return OkHttp.newCall(url).execute().body().string();
+            if (url.endsWith(".txt") || url.endsWith(".m3u")) return getText(Utils.convert(LiveConfig.getUrl(), url));
+            if (url.length() > 0 && url.length() % 4 == 0) return getText(new String(Base64.decode(url, Base64.DEFAULT)));
+            return "";
         } catch (Exception e) {
             e.printStackTrace();
             return "";

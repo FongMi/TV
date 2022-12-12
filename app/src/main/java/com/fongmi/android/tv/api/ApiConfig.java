@@ -8,7 +8,6 @@ import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.net.Callback;
-import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Json;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.Utils;
@@ -140,6 +139,7 @@ public class ApiConfig {
     private void parseJson(JsonObject object) {
         for (JsonElement element : Json.safeListElement(object, "sites")) {
             Site site = Site.objectFrom(element).sync();
+            site.setApi(parseApi(site.getApi()));
             site.setExt(parseExt(site.getExt()));
             if (site.getKey().equals(config.getHome())) setHome(site);
             if (!sites.contains(site)) sites.add(site);
@@ -164,13 +164,21 @@ public class ApiConfig {
         else LiveConfig.get().load();
     }
 
+    private String parseApi(String api) {
+        if (TextUtils.isEmpty(api)) return api;
+        if (api.startsWith("http")) return api;
+        if (api.startsWith("file")) return Utils.convert(api);
+        if (api.endsWith(".js")) return parseApi(Utils.convert(config.getUrl(), api));
+        return api;
+    }
+
     private String parseExt(String ext) {
+        if (TextUtils.isEmpty(ext)) return ext;
         if (ext.startsWith("http")) return ext;
-        else if (ext.startsWith("file")) return FileUtil.read(ext);
-        else if (ext.startsWith("img+")) return Decoder.getExt(ext);
-        else if (ext.contains("http") || ext.contains("file")) return ext;
-        else if (ext.endsWith(".txt") || ext.endsWith(".json") || ext.endsWith(".py")) return parseExt(Utils.convert(config.getUrl(), ext));
-        return ext;
+        if (ext.startsWith("file")) return Utils.convert(ext);
+        if (ext.startsWith("img+")) return Decoder.getExt(ext);
+        if (ext.contains("http") || ext.contains("file")) return ext;
+        return parseExt(Utils.convert(config.getUrl(), ext));
     }
 
     public Spider getCSP(Site site) {
