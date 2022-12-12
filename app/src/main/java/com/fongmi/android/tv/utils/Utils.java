@@ -91,6 +91,10 @@ public class Utils {
         return text;
     }
 
+    public static String convert(String text) {
+        return Server.get().getAddress(true) + "/" + text;
+    }
+
     public static String convert(String baseUrl, String text) {
         if (TextUtils.isEmpty(text)) return "";
         if (text.startsWith("clan")) return checkClan(text);
