@@ -92,8 +92,13 @@ public class Global {
     }
 
     @JSMethod
-    public JSObject pdfl(String html, String p1, String list_text, String list_url, String urlKey) {
-        return null;
+    public JSObject pdfl(String html, String rule, String texts, String urls, String urlKey) {
+        try {
+            return ctx.parseJSON(new Gson().toJson(Parser.parseDomForList(html, rule, texts, urls, urlKey)));
+        } catch (Throwable e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @JSMethod
