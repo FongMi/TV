@@ -4,16 +4,10 @@ import android.content.Context;
 
 import androidx.annotation.Keep;
 
-import com.hiker.drpy.method.Console;
-import com.hiker.drpy.method.Global;
-import com.hiker.drpy.method.Local;
 import com.whl.quickjs.android.QuickJSLoader;
 import com.whl.quickjs.wrapper.JSModule;
-import com.whl.quickjs.wrapper.QuickJSContext;
 
 public class Loader {
-
-    private QuickJSContext ctx;
 
     static {
         QuickJSLoader.init();
@@ -22,17 +16,11 @@ public class Loader {
     @Keep
     public void init(Context context) {
         setModuleLoader(context);
-        Worker.submit(this::initJS);
     }
 
     @Keep
     public Spider spider(String api, String ext) {
-        return new Spider(ctx, api, ext);
-    }
-
-    @Keep
-    public void destroy() {
-        Worker.submit(() -> ctx.destroy());
+        return new Spider(api, ext);
     }
 
     private void setModuleLoader(Context context) {
@@ -48,12 +36,4 @@ public class Loader {
             }
         });
     }
-
-    private void initJS() {
-        ctx = QuickJSContext.create();
-        ctx.getGlobalObject().setProperty("console", Console.class);
-        ctx.getGlobalObject().setProperty("local", Local.class);
-        Global.create(ctx).setProperty();
-    }
-
 }
