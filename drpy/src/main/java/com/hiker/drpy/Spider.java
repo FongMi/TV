@@ -8,6 +8,7 @@ import com.whl.quickjs.wrapper.QuickJSContext;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 public class Spider extends com.github.catvod.crawler.Spider {
@@ -18,9 +19,9 @@ public class Spider extends com.github.catvod.crawler.Spider {
     private final String key;
     private final String api;
 
-    public Spider(QuickJSContext ctx, String key, String api, String ext) {
+    public Spider(QuickJSContext ctx, String api, String ext) {
+        this.key = "__" + UUID.randomUUID().toString().replace("-", "") + "__";
         this.ctx = ctx;
-        this.key = key;
         this.ext = ext;
         this.api = api;
     }

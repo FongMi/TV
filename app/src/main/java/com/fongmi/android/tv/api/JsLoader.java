@@ -36,8 +36,8 @@ public class JsLoader {
     public Spider getSpider(String key, String api, String ext) {
         try {
             if (spiders.containsKey(key)) return spiders.get(key);
-            Method method = loader.getClass().getMethod("spider", String.class, String.class, String.class);
-            Spider spider = (Spider) method.invoke(loader, key, api, ext);
+            Method method = loader.getClass().getMethod("spider", String.class, String.class);
+            Spider spider = (Spider) method.invoke(loader, api, ext);
             spider.init(App.get(), ext);
             spiders.put(key, spider);
             return spider;

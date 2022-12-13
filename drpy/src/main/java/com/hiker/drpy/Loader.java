@@ -26,8 +26,8 @@ public class Loader {
     }
 
     @Keep
-    public Spider spider(String key, String api, String ext) {
-        return new Spider(ctx, key, api, ext);
+    public Spider spider(String api, String ext) {
+        return new Spider(ctx, api, ext);
     }
 
     @Keep
