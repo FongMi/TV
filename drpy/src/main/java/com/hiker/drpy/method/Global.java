@@ -15,11 +15,13 @@ import com.whl.quickjs.wrapper.QuickJSContext;
 
 import org.json.JSONObject;
 
-import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.Iterator;
 
+import okhttp3.Headers;
 import okhttp3.Response;
 
 public class Global {
@@ -54,10 +56,11 @@ public class Global {
             JSObject jsObject = ctx.createNewJSObject();
             JSObject jsHeader = ctx.createNewJSObject();
             JSONObject obj = new JSONObject(ctx.stringify(object));
-            Response response = OkHttp.get().newCall(url, obj).execute();
+            Headers headers = getHeader(obj.optJSONObject("headers"));
+            Response response = OkHttp.get().newCall(url, obj, headers).execute();
             for (String name : response.headers().names()) jsHeader.setProperty(name, response.header(name));
             jsObject.setProperty("headers", jsHeader);
-            setReqContent(jsObject, obj, response);
+            setContent(jsObject, headers, obj.optInt("buffer"), response.body().bytes());
             return jsObject;
         } catch (Throwable e) {
             return null;
@@ -120,20 +123,36 @@ public class Global {
         }
     }
 
-    private void setReqContent(JSObject jsObject, JSONObject obj, Response response) throws IOException {
-        switch (obj.optInt("buffer")) {
+    private Headers getHeader(JSONObject object) {
+        Headers.Builder builder = new Headers.Builder();
+        if (object == null) return builder.build();
+        for (Iterator<String> iterator = object.keys(); iterator.hasNext(); ) {
+            String key = iterator.next();
+            builder.add(key, object.optString(key));
+        }
+        return builder.build();
+    }
+
+    private void setContent(JSObject jsObject, Headers headers, int buffer, byte[] bytes) throws UnsupportedEncodingException {
+        switch (buffer) {
             case 1:
-                byte[] bytes = response.body().bytes();
                 JSArray array = ctx.createNewJSArray();
                 for (int i = 0; i < bytes.length; i++) array.set(bytes[i], i);
                 jsObject.setProperty("content", array);
                 break;
             case 2:
-                jsObject.setProperty("content", Base64.encodeToString(response.body().bytes(), Base64.DEFAULT));
+                jsObject.setProperty("content", Base64.encodeToString(bytes, Base64.DEFAULT));
                 break;
             default:
-                jsObject.setProperty("content", response.body().string());
+                jsObject.setProperty("content", new String(bytes, getCharset(headers)));
                 break;
         }
+    }
+
+    private String getCharset(Headers headers) {
+        String contentType = headers.get("Content-Type");
+        if (TextUtils.isEmpty(contentType)) return "UTF-8";
+        for (String text : contentType.split(";")) if (text.contains("charset=")) return text.split("=")[1];
+        return "UTF-8";
     }
 }
