@@ -5,6 +5,7 @@ import android.util.Base64;
 import com.fongmi.android.tv.net.OkHttp;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Json;
+import com.fongmi.android.tv.utils.Utils;
 import com.google.common.io.BaseEncoding;
 
 import java.io.File;
@@ -22,11 +23,17 @@ public class Decoder {
         String key = url.contains(";") ? url.split(";")[2] : "";
         url = url.contains(";") ? url.split(";")[0] : url;
         String data = getData(url);
-        if (Json.valid(data)) return data;
+        if (Json.valid(data)) return fix(url, data);
         if (data.isEmpty()) throw new Exception();
         if (data.contains("**")) data = base64(data);
         if (data.startsWith("2423")) data = cbc(data);
         if (key.length() > 0) data = ecb(data, key);
+        return fix(url, data);
+    }
+
+    private static String fix(String url, String data) {
+        if (url.startsWith("file://")) url = Utils.convert(url);
+        data = data.replace("./", url.substring(0, url.lastIndexOf("/") + 1));
         return data;
     }
 
