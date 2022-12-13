@@ -16,6 +16,6 @@ public class Sniffer {
                     "http((?!http).)*?_playback/\\?video_id=|" +
                     "http((?!http).)*huoshan.com(.*)?item_id=|" +
                     "http((?!http).)*qianpailive.com(.*)&vid=|"+
-                    "http((?!http).)*?/play.{0,3}\\\\?[^url]{2,8}=.*"
+                    "http((?!http).)*douyin.com(.*)&is_play_url="
     );
 }
