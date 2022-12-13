@@ -2,6 +2,8 @@ package com.hiker.drpy;
 
 import android.content.Context;
 
+import androidx.annotation.Keep;
+
 import com.hiker.drpy.method.Console;
 import com.hiker.drpy.method.Global;
 import com.hiker.drpy.method.Local;
@@ -17,9 +19,20 @@ public class Loader {
         QuickJSLoader.init();
     }
 
+    @Keep
     public void init(Context context) {
         setModuleLoader(context);
         Worker.submit(this::initJS);
+    }
+
+    @Keep
+    public Spider spider(String key, String api, String ext) {
+        return new Spider(ctx, key, api, ext);
+    }
+
+    @Keep
+    public void destroy() {
+        Worker.submit(() -> ctx.destroy());
     }
 
     private void setModuleLoader(Context context) {
@@ -43,7 +56,4 @@ public class Loader {
         Global.create(ctx).setProperty();
     }
 
-    public Spider spider(String key, String api, String ext) {
-        return new Spider(ctx, key, api, ext);
-    }
 }
