@@ -57,7 +57,7 @@ public class ParseTask {
         }
         switch (parse.getType()) {
             case 0: //嗅探
-                App.post(() -> webView.start(parse.getUrl() + webUrl, parse.getHeaders(), callback));
+                App.post(() -> startWeb(parse.getUrl() + webUrl, parse.getHeaders(), callback));
                 break;
             case 1: //Json
                 jsonParse(webUrl);
@@ -101,10 +101,14 @@ public class ParseTask {
         if (result.getUrl().isEmpty()) {
             onParseError();
         } else if (result.getParse(0) == 1) {
-            App.post(() -> webView.start(Utils.checkProxy(result.getUrl()), result.getHeaders(), callback));
+            App.post(() -> startWeb(Utils.checkProxy(result.getUrl()), result.getHeaders(), callback));
         } else {
             onParseSuccess(result.getHeaders(), result.getUrl(), result.getJxFrom());
         }
+    }
+
+    private void startWeb(String url, Map<String, String> headers, Callback callback) {
+        if (webView != null) webView.start(url, headers, callback);
     }
 
     private void onParseSuccess(Map<String, String> headers, String url, String from) {
