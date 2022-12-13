@@ -178,7 +178,8 @@ public class ApiConfig {
         if (ext.startsWith("file")) return Utils.convert(ext);
         if (ext.startsWith("img+")) return Decoder.getExt(ext);
         if (ext.contains("http") || ext.contains("file")) return ext;
-        return parseExt(Utils.convert(config.getUrl(), ext));
+        if (ext.endsWith(".txt") || ext.endsWith(".json") || ext.endsWith(".py") || ext.endsWith(".js")) return parseExt(Utils.convert(config.getUrl(), ext));
+        return ext;
     }
 
     public Spider getCSP(Site site) {
