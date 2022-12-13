@@ -133,6 +133,13 @@ public class Global {
         return builder.build();
     }
 
+    private String getCharset(Headers headers) {
+        String contentType = headers.get("Content-Type");
+        if (TextUtils.isEmpty(contentType)) return "UTF-8";
+        for (String text : contentType.split(";")) if (text.contains("charset=")) return text.split("=")[1];
+        return "UTF-8";
+    }
+
     private void setContent(JSObject jsObject, Headers headers, int buffer, byte[] bytes) throws UnsupportedEncodingException {
         switch (buffer) {
             case 1:
@@ -147,12 +154,5 @@ public class Global {
                 jsObject.setProperty("content", new String(bytes, getCharset(headers)));
                 break;
         }
-    }
-
-    private String getCharset(Headers headers) {
-        String contentType = headers.get("Content-Type");
-        if (TextUtils.isEmpty(contentType)) return "UTF-8";
-        for (String text : contentType.split(";")) if (text.contains("charset=")) return text.split("=")[1];
-        return "UTF-8";
     }
 }
