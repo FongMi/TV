@@ -3,6 +3,8 @@ package com.hiker.drpy.method;
 import android.text.TextUtils;
 import android.util.Base64;
 
+import androidx.annotation.Keep;
+
 import com.google.gson.Gson;
 import com.hiker.drpy.Parser;
 import com.hiker.drpy.net.OkHttp;
@@ -45,6 +47,7 @@ public class Global {
         }
     }
 
+    @Keep
     @JSMethod
     public JSObject req(String url, JSObject object) {
         try {
@@ -61,6 +64,7 @@ public class Global {
         }
     }
 
+    @Keep
     @JSMethod
     public String pd(String html, String rule, String urlKey) {
         try {
@@ -71,6 +75,7 @@ public class Global {
         }
     }
 
+    @Keep
     @JSMethod
     public JSObject pdfa(String html, String rule) {
         try {
@@ -81,6 +86,7 @@ public class Global {
         }
     }
 
+    @Keep
     @JSMethod
     public String pdfh(String html, String rule) {
         try {
@@ -91,6 +97,7 @@ public class Global {
         }
     }
 
+    @Keep
     @JSMethod
     public JSObject pdfl(String html, String rule, String texts, String urls, String urlKey) {
         try {
@@ -101,6 +108,7 @@ public class Global {
         }
     }
 
+    @Keep
     @JSMethod
     public String joinUrl(String parent, String child) {
         try {

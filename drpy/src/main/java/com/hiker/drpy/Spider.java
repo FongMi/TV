@@ -12,11 +12,11 @@ import java.util.concurrent.ExecutionException;
 
 public class Spider extends com.github.catvod.crawler.Spider {
 
-    private QuickJSContext ctx;
+    private final QuickJSContext ctx;
     private JSObject jsObject;
-    private String ext;
-    private String key;
-    private String api;
+    private final String ext;
+    private final String key;
+    private final String api;
 
     public Spider(QuickJSContext ctx, String key, String api, String ext) {
         this.ctx = ctx;
