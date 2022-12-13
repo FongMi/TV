@@ -12,7 +12,10 @@ public class Sniffer {
 
     public static final Pattern CUSTOM = Pattern.compile(
                     "http((?!http).)*?xg.php\\?id=|" +
+                    "http((?!http).)*?/m3/(.*)\\.css|" +
                     "http((?!http).)*?_playback/\\?video_id=|" +
-                    "http((?!http).)*?/m3/(.*)\\.css"
+                    "http((?!http).)*huoshan.com(.*)?item_id=|" +
+                    "http((?!http).)*qianpailive.com(.*)&vid=|"+
+                    "http((?!http).)*?/play.{0,3}\\\\?[^url]{2,8}=.*"
     );
 }
