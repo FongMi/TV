@@ -642,7 +642,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
                 break;
             default:
                 App.removeCallbacks(mR6);
-                if (!event.isRetry() || mPlayers.addRetry() > 2) onError();
+                if (!event.isRetry() || mPlayers.addRetry() > 3) onError();
                 else getUrl();
                 break;
         }

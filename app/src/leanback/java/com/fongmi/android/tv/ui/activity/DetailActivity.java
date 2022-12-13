@@ -750,7 +750,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
                 checkNext();
                 break;
             default:
-                if (!event.isRetry() || mPlayers.addRetry() > 2) onError(event.getMsg());
+                if (!event.isRetry() || mPlayers.addRetry() > 3) onError(event.getMsg());
                 else getPlayer(false);
                 break;
         }
