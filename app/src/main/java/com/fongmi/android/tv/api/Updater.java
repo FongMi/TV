@@ -12,7 +12,7 @@ import com.fongmi.android.tv.BuildConfig;
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.DialogUpdateBinding;
-import com.fongmi.android.tv.net.OKHttp;
+import com.fongmi.android.tv.net.OkHttp;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
@@ -66,12 +66,12 @@ public class Updater implements View.OnClickListener {
 
     private void connect(String target) {
         try {
-            JSONObject object = new JSONObject(OKHttp.newCall(target).execute().body().string());
+            JSONObject object = new JSONObject(OkHttp.newCall(target).execute().body().string());
             String name = object.optString("name");
             String desc = object.optString("desc");
             int code = object.optInt("code");
             boolean need = code > BuildConfig.VERSION_CODE;
-            if (need) FileUtil.write(getFile(), OKHttp.newCall(getApk()).execute().body().bytes());
+            if (need) FileUtil.write(getFile(), OkHttp.newCall(getApk()).execute().body().bytes());
             if (getFile().exists() && need && Prefers.getUpdate()) App.post(() -> checkActivity(name, desc));
         } catch (Exception e) {
             e.printStackTrace();
