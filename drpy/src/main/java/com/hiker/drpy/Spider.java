@@ -2,9 +2,9 @@ package com.hiker.drpy;
 
 import android.content.Context;
 
-import com.hiker.drpy.method.Console;
 import com.hiker.drpy.method.Global;
 import com.hiker.drpy.method.Local;
+import com.whl.quickjs.android.QuickJSLoader;
 import com.whl.quickjs.wrapper.JSArray;
 import com.whl.quickjs.wrapper.JSObject;
 import com.whl.quickjs.wrapper.QuickJSContext;
@@ -22,15 +22,13 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
     private final ExecutorService executor;
     private final String key;
-    private final String ext;
     private final String api;
     private QuickJSContext ctx;
     private JSObject jsObject;
 
-    public Spider(String api, String ext) {
+    public Spider(String api) {
         this.executor = Executors.newSingleThreadExecutor();
         this.key = "__" + UUID.randomUUID().toString().replace("-", "") + "__";
-        this.ext = ext;
         this.api = api;
     }
 
@@ -49,7 +47,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
     @Override
     public void init(Context context, String extend) throws Exception {
         super.init(context, extend);
-        submit(() -> createJS(context));
+        submit(() -> initJS(context, extend));
     }
 
     @Override
@@ -85,21 +83,24 @@ public class Spider extends com.github.catvod.crawler.Spider {
     }
 
     public void destroy() {
-        submit(() -> ctx.destroy());
+        submit(() -> {
+            QuickJSContext.destroy(ctx);
+            QuickJSContext.destroyRuntime(ctx);
+        });
     }
 
-    private void createJS(Context context) {
-        if (jsObject == null) setProperty();
+    private void initJS(Context context, String extend) {
+        if (ctx == null) createCtx();
         ctx.evaluateModule(getContent(context), api);
         jsObject = (JSObject) ctx.getProperty(ctx.getGlobalObject(), key);
-        jsObject.getJSFunction("init").call(ext);
+        jsObject.getJSFunction("init").call(extend);
     }
 
-    private void setProperty() {
+    private void createCtx() {
         ctx = QuickJSContext.create();
-        ctx.getGlobalObject().setProperty("console", Console.class);
-        ctx.getGlobalObject().setProperty("local", Local.class);
         Global.create(ctx).setProperty();
+        QuickJSLoader.initConsoleLog(ctx);
+        ctx.getGlobalObject().setProperty("local", Local.class);
     }
 
     private String getContent(Context context) {
