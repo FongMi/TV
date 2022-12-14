@@ -8,7 +8,6 @@ import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.net.Callback;
-import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Json;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.Utils;
@@ -33,8 +32,9 @@ public class ApiConfig {
     private List<String> flags;
     private List<Parse> parses;
     private List<Site> sites;
-    private JarLoader jLoader;
-    private PyLoader pLoader;
+    private JarLoader jarLoader;
+    private PyLoader pyLoader;
+    private JsLoader jsLoader;
     private Config config;
     private String wall;
     private Parse parse;
@@ -72,8 +72,9 @@ public class ApiConfig {
         this.sites = new ArrayList<>();
         this.flags = new ArrayList<>();
         this.parses = new ArrayList<>();
-        this.jLoader = new JarLoader();
-        this.pLoader = new PyLoader();
+        this.jarLoader = new JarLoader();
+        this.pyLoader = new PyLoader();
+        this.jsLoader = new JsLoader();
         return this;
     }
 
@@ -89,8 +90,9 @@ public class ApiConfig {
         this.sites.clear();
         this.flags.clear();
         this.parses.clear();
-        this.jLoader.clear();
-        this.pLoader.clear();
+        this.jarLoader.clear();
+        this.pyLoader.clear();
+        this.jsLoader.clear();
         return this;
     }
 
@@ -125,7 +127,7 @@ public class ApiConfig {
         try {
             parseJson(object);
             parseLive(object);
-            jLoader.parseJar("", Json.safeString(object, "spider"));
+            jarLoader.parseJar("", Json.safeString(object, "spider"));
             config.json(object.toString()).update();
             App.post(callback::success);
         } catch (Exception e) {
@@ -137,6 +139,7 @@ public class ApiConfig {
     private void parseJson(JsonObject object) {
         for (JsonElement element : Json.safeListElement(object, "sites")) {
             Site site = Site.objectFrom(element).sync();
+            site.setApi(parseApi(site.getApi()));
             site.setExt(parseExt(site.getExt()));
             if (site.getKey().equals(config.getHome())) setHome(site);
             if (!sites.contains(site)) sites.add(site);
@@ -161,33 +164,44 @@ public class ApiConfig {
         else LiveConfig.get().load();
     }
 
+    private String parseApi(String api) {
+        if (TextUtils.isEmpty(api)) return api;
+        if (api.startsWith("http")) return api;
+        if (api.startsWith("file")) return Utils.convert(api);
+        if (api.endsWith(".js")) return parseApi(Utils.convert(config.getUrl(), api));
+        return api;
+    }
+
     private String parseExt(String ext) {
+        if (TextUtils.isEmpty(ext)) return ext;
         if (ext.startsWith("http")) return ext;
-        else if (ext.startsWith("file")) return FileUtil.read(ext);
-        else if (ext.startsWith("img+")) return Decoder.getExt(ext);
-        else if (ext.contains("http") || ext.contains("file")) return ext;
-        else if (ext.endsWith(".txt") || ext.endsWith(".json") || ext.endsWith(".py")) return parseExt(Utils.convert(config.getUrl(), ext));
+        if (ext.startsWith("file")) return Utils.convert(ext);
+        if (ext.startsWith("img+")) return Decoder.getExt(ext);
+        if (ext.contains("http") || ext.contains("file")) return ext;
+        if (ext.endsWith(".txt") || ext.endsWith(".json") || ext.endsWith(".py") || ext.endsWith(".js")) return parseExt(Utils.convert(config.getUrl(), ext));
         return ext;
     }
 
     public Spider getCSP(Site site) {
+        boolean js = site.getApi().contains(".js");
         boolean py = site.getApi().startsWith("py_");
         boolean csp = site.getApi().startsWith("csp_");
-        if (py) return pLoader.getSpider(site.getKey(), site.getApi(), site.getExt());
-        else if (csp) return jLoader.getSpider(site.getKey(), site.getApi(), site.getExt(), site.getJar());
+        if (js) return jsLoader.getSpider(site.getKey(), site.getApi(), site.getExt());
+        if (py) return pyLoader.getSpider(site.getKey(), site.getApi(), site.getExt());
+        if (csp) return jarLoader.getSpider(site.getKey(), site.getApi(), site.getExt(), site.getJar());
         else return new SpiderNull();
     }
 
     public Object[] proxyLocal(Map<?, ?> param) {
-        return jLoader.proxyInvoke(param);
+        return jarLoader.proxyInvoke(param);
     }
 
     public JSONObject jsonExt(String key, LinkedHashMap<String, String> jxs, String url) {
-        return jLoader.jsonExt(key, jxs, url);
+        return jarLoader.jsonExt(key, jxs, url);
     }
 
     public JSONObject jsonExtMix(String flag, String key, String name, LinkedHashMap<String, HashMap<String, String>> jxs, String url) {
-        return jLoader.jsonExtMix(flag, key, name, jxs, url);
+        return jarLoader.jsonExtMix(flag, key, name, jxs, url);
     }
 
     public Site getSite(String key) {

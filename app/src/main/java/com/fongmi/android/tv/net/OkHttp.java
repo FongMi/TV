@@ -11,24 +11,24 @@ import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 
-public class OKHttp {
+public class OkHttp {
 
     private final OkHttpClient mOk;
 
     private static class Loader {
-        static volatile OKHttp INSTANCE = new OKHttp();
+        static volatile OkHttp INSTANCE = new OkHttp();
     }
 
-    public static OKHttp get() {
+    public static OkHttp get() {
         return Loader.INSTANCE;
     }
 
-    public OKHttp() {
+    public OkHttp() {
         mOk = getBuilder().build();
     }
 
     private OkHttpClient.Builder getBuilder() {
-        return new OkHttpClient.Builder().callTimeout(30, TimeUnit.SECONDS).readTimeout(30, TimeUnit.SECONDS).writeTimeout(30, TimeUnit.SECONDS).connectTimeout(30, TimeUnit.SECONDS).sslSocketFactory(new SSLSocketFactoryCompat(), SSLSocketFactoryCompat.trustAllCert);
+        return new OkHttpClient.Builder().callTimeout(30, TimeUnit.SECONDS).readTimeout(30, TimeUnit.SECONDS).writeTimeout(30, TimeUnit.SECONDS).connectTimeout(30, TimeUnit.SECONDS).hostnameVerifier(SSLSocketFactoryCompat.hostnameVerifier).sslSocketFactory(new SSLSocketFactoryCompat(), SSLSocketFactoryCompat.trustAllCert);
     }
 
     private OkHttpClient client() {

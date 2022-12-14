@@ -49,6 +49,10 @@ public class App extends MultiDexApplication {
         get().handler.removeCallbacks(runnable);
     }
 
+    public static void removeCallbacks(Runnable... runnable) {
+        for (Runnable r : runnable) get().handler.removeCallbacks(r);
+    }
+
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
