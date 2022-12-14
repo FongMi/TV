@@ -99,7 +99,7 @@ public class Updater implements View.OnClickListener {
 
     private void checkActivity(String version, String desc) {
         if (dialog != null) dialog.dismiss();
-        if (activity.get().isFinishing()) install();
+        if (activity.get() == null || activity.get().isFinishing()) install();
         else showDialog(version, desc);
     }
 

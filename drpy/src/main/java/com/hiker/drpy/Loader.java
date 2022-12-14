@@ -8,7 +8,10 @@ import com.whl.quickjs.wrapper.JSModule;
 public class Loader {
 
     static {
-        QuickJSLoader.init();
+        try {
+            QuickJSLoader.init();
+        } catch (Throwable ignored) {
+        }
     }
 
     public void init(Context context) {
