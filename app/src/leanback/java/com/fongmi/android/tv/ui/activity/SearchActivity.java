@@ -19,7 +19,7 @@ import com.fongmi.android.tv.bean.Hot;
 import com.fongmi.android.tv.bean.Suggest;
 import com.fongmi.android.tv.databinding.ActivitySearchBinding;
 import com.fongmi.android.tv.net.Callback;
-import com.fongmi.android.tv.net.OKHttp;
+import com.fongmi.android.tv.net.OkHttp;
 import com.fongmi.android.tv.ui.adapter.HistoryAdapter;
 import com.fongmi.android.tv.ui.adapter.WordAdapter;
 import com.fongmi.android.tv.ui.custom.CustomKeyboard;
@@ -100,7 +100,7 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
 
     private void getHot() {
         mBinding.hint.setText(R.string.search_hot);
-        OKHttp.newCall("https://api.web.360kan.com/v1/rank?cat=1").enqueue(new Callback() {
+        OkHttp.newCall("https://api.web.360kan.com/v1/rank?cat=1").enqueue(new Callback() {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 List<String> items = Hot.get(response.body().string());
@@ -111,7 +111,7 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
 
     private void getSuggest(String text) {
         mBinding.hint.setText(R.string.search_suggest);
-        OKHttp.newCall("https://suggest.video.iqiyi.com/?if=mobile&key=" + text).enqueue(new Callback() {
+        OkHttp.newCall("https://suggest.video.iqiyi.com/?if=mobile&key=" + text).enqueue(new Callback() {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 List<String> items = Suggest.get(response.body().string());
