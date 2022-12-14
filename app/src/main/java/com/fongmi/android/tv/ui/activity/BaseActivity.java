@@ -1,12 +1,10 @@
 package com.fongmi.android.tv.ui.activity;
 
 import android.app.Activity;
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,7 +16,6 @@ import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
-import com.fongmi.android.tv.utils.Utils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -37,7 +34,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(getBinding().getRoot());
         EventBus.getDefault().register(this);
-        Utils.hideSystemUI(this);
         setWall();
         initView();
         initEvent();
@@ -85,18 +81,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     public Resources getResources() {
         hackResources();
         return super.getResources();
-    }
-
-    @Override
-    public void onConfigurationChanged(@NonNull Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        Utils.hideSystemUI(this);
-    }
-
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-        if (hasFocus) Utils.hideSystemUI(this);
     }
 
     @Override
