@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
-import com.fongmi.android.tv.net.OKHttp;
+import com.fongmi.android.tv.net.OkHttp;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Notify;
 
@@ -56,7 +56,7 @@ public class XWalkLoader {
     private void download() {
         try {
             App.post(() -> Notify.show("正在下載 XWalk 插件..."));
-            FileUtil.write(getFile(), OKHttp.newCall(getUrl()).execute().body().bytes());
+            FileUtil.write(getFile(), OkHttp.newCall(getUrl()).execute().body().bytes());
             Class<?> cls = Class.forName("org.xwalk.core.XWalkDecompressor");
             Method method = cls.getMethod("extractResource", String.class, String.class);
             method.invoke(null, getFile().getAbsolutePath(), getLibPath());
