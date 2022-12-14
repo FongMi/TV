@@ -5,7 +5,10 @@ import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.server.process.InputRequestProcess;
 import com.fongmi.android.tv.server.process.RawRequestProcess;
 import com.fongmi.android.tv.server.process.RequestProcess;
+import com.fongmi.android.tv.utils.FileUtil;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,17 +58,25 @@ public class Nano extends NanoHTTPD {
                 return process.doResponse(session, url);
             }
         }
-        if (session.getMethod() == Method.GET && url.equals("/proxy")) {
-            Map<String, String> params = session.getParms();
-            if (params.containsKey("do")) {
-                Object[] rs = ApiConfig.get().proxyLocal(params);
+        if (session.getMethod() == Method.GET) {
+            if (url.equals("/proxy")) {
+                Map<String, String> params = session.getParms();
+                if (params.containsKey("do")) {
+                    Object[] rs = ApiConfig.get().proxyLocal(params);
+                    try {
+                        int code = (int) rs[0];
+                        String mime = (String) rs[1];
+                        InputStream stream = rs[2] != null ? (InputStream) rs[2] : null;
+                        return NanoHTTPD.newChunkedResponse(Response.Status.lookup(code), mime, stream);
+                    } catch (Exception e) {
+                        return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.INTERNAL_ERROR, NanoHTTPD.MIME_PLAINTEXT, "500");
+                    }
+                }
+            } else if (url.startsWith("/file")) {
                 try {
-                    int code = (int) rs[0];
-                    String mime = (String) rs[1];
-                    InputStream stream = rs[2] != null ? (InputStream) rs[2] : null;
-                    return NanoHTTPD.newChunkedResponse(Response.Status.lookup(code), mime, stream);
-                } catch (Exception e) {
-                    return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.INTERNAL_ERROR, NanoHTTPD.MIME_PLAINTEXT, "500");
+                    return NanoHTTPD.newChunkedResponse(Response.Status.OK, "application/octet-stream", new FileInputStream(FileUtil.getLocal(url.substring(1))));
+                } catch (FileNotFoundException e) {
+                    return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.INTERNAL_ERROR, NanoHTTPD.MIME_PLAINTEXT, e.getMessage());
                 }
             }
         }

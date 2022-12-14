@@ -15,6 +15,7 @@ dependencyResolutionManagement {
     }
 }
 include ':app'
+include ':drpy'
 include ':tvbus'
 include ':catvod'
 include ':pyramid'
