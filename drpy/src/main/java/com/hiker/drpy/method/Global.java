@@ -18,7 +18,6 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URL;
 import java.util.Iterator;
 
 import okhttp3.Headers;
@@ -27,12 +26,14 @@ import okhttp3.Response;
 public class Global {
 
     private final QuickJSContext ctx;
+    private final Parser parser;
 
     public static Global create(QuickJSContext jsContext) {
         return new Global(jsContext);
     }
 
     private Global(QuickJSContext ctx) {
+        this.parser = new Parser();
         this.ctx = ctx;
     }
 
@@ -63,64 +64,42 @@ public class Global {
             setContent(jsObject, headers, obj.optInt("buffer"), response.body().bytes());
             return jsObject;
         } catch (Throwable e) {
-            return null;
+            JSObject jsObject = ctx.createNewJSObject();
+            JSObject jsHeader = ctx.createNewJSObject();
+            jsObject.setProperty("headers", jsHeader);
+            jsObject.setProperty("content", "");
+            return jsObject;
         }
     }
 
     @Keep
     @JSMethod
     public String pd(String html, String rule, String urlKey) {
-        try {
-            return Parser.parseDomForUrl(html, rule, urlKey);
-        } catch (Throwable e) {
-            e.printStackTrace();
-            return "";
-        }
+        return parser.pdfh(html, rule, urlKey);
     }
 
     @Keep
     @JSMethod
     public JSObject pdfa(String html, String rule) {
-        try {
-            return ctx.parseJSON(new Gson().toJson(Parser.parseDomForList(html, rule)));
-        } catch (Throwable e) {
-            e.printStackTrace();
-            return null;
-        }
+        return ctx.parseJSON(new Gson().toJson(parser.pdfa(html, rule)));
     }
 
     @Keep
     @JSMethod
     public String pdfh(String html, String rule) {
-        try {
-            return Parser.parseDomForUrl(html, rule, "");
-        } catch (Throwable e) {
-            e.printStackTrace();
-            return "";
-        }
+        return parser.pdfh(html, rule, "");
     }
 
     @Keep
     @JSMethod
     public JSObject pdfl(String html, String rule, String texts, String urls, String urlKey) {
-        try {
-            return ctx.parseJSON(new Gson().toJson(Parser.parseDomForList(html, rule, texts, urls, urlKey)));
-        } catch (Throwable e) {
-            e.printStackTrace();
-            return null;
-        }
+        return ctx.parseJSON(new Gson().toJson(parser.pdfl(html, rule, texts, urls, urlKey)));
     }
 
     @Keep
     @JSMethod
     public String joinUrl(String parent, String child) {
-        try {
-            if (TextUtils.isEmpty(parent)) return child;
-            return new URL(new URL(parent), child).toString();
-        } catch (Throwable e) {
-            e.printStackTrace();
-            return "";
-        }
+        return parser.joinUrl(parent, child);
     }
 
     private Headers getHeader(JSONObject object) {
