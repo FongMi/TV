@@ -1,0 +1,21 @@
+plugins {
+    id 'com.android.library'
+}
+
+android {
+    compileSdk 33
+
+    defaultConfig {
+        minSdk 21
+        targetSdk 33
+    }
+}
+
+dependencies {
+    implementation project(':catvod')
+    implementation 'androidx.annotation:annotation:1.5.0'
+    implementation 'com.google.code.gson:gson:2.10'
+    implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.10'
+    implementation 'org.jsoup:jsoup:1.15.3'
+    implementation 'wang.harlon.quickjs:wrapper-android:0.12.0'
+}
