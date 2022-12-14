@@ -23,7 +23,7 @@ public class JsLoader {
     private void init() {
         try {
             new Loader().init(App.get());
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
         }
     }
@@ -35,7 +35,7 @@ public class JsLoader {
             spider.init(App.get(), ext);
             spiders.put(key, spider);
             return spider;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
             return null;
         }
