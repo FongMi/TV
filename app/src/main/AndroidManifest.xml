@@ -26,6 +26,8 @@
         </intent>
     </queries>
 
+    <uses-sdk tools:overrideLibrary="com.whl.quickjs.android" />
+
     <application
         android:name=".App"
         android:allowBackup="false"

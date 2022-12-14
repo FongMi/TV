@@ -11,11 +11,12 @@ android {
         targetSdk 33
         ndk { abiFilters "armeabi-v7a" }
         python {
-            buildPython "C:/Users/FongMi.DIREK/Anaconda3/python.exe"
+            buildPython "C:/Users/FongMi.DIREK/Anaconda3/envs/py38/python.exe"
             pip {
-                install "pycrypto"
-                install "requests"
                 install "lxml"
+                install 'pycryptodome'
+                install 'beautifulsoup4'
+                install "requests==2.27.1"
             }
         }
     }
@@ -29,5 +30,6 @@ android {
 
 dependencies {
     implementation project(':catvod')
-    implementation 'com.google.code.gson:gson:2.8.9'
+    implementation 'androidx.annotation:annotation:1.5.0'
+    implementation 'com.google.code.gson:gson:2.8.6'
 }
