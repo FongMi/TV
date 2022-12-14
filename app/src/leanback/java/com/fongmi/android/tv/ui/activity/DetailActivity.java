@@ -34,7 +34,7 @@ import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.net.Callback;
-import com.fongmi.android.tv.net.OKHttp;
+import com.fongmi.android.tv.net.OkHttp;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
@@ -50,6 +50,7 @@ import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.Traffic;
 import com.fongmi.android.tv.utils.Utils;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.ui.StyledPlayerView;
@@ -91,6 +92,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private int mCurrent;
     private Runnable mR1;
     private Runnable mR2;
+    private Runnable mR3;
 
     public static void start(Activity activity, String id) {
         start(activity, ApiConfig.get().getHome().getKey(), id);
@@ -166,6 +168,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mPlayers = new Players().init();
         mR1 = this::hideControl;
         mR2 = this::hideCenter;
+        mR3 = this::setTraffic;
         setRecyclerView();
         setVideoView();
         setViewModel();
@@ -589,11 +592,14 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void showProgress() {
-        mBinding.widget.progress.getRoot().setVisibility(View.VISIBLE);
+        mBinding.widget.progress.setVisibility(View.VISIBLE);
+        App.post(mR3, 250);
     }
 
     private void hideProgress() {
-        mBinding.widget.progress.getRoot().setVisibility(View.GONE);
+        mBinding.widget.progress.setVisibility(View.GONE);
+        App.removeCallbacks(mR3);
+        Traffic.reset();
     }
 
     private void showError() {
@@ -630,13 +636,18 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         hideInfo();
     }
 
+    private void setTraffic() {
+        mBinding.widget.traffic.setText(Traffic.get());
+        App.post(mR3, 250);
+    }
+
     private void setR1Callback() {
         App.removeCallbacks(mR1);
         App.post(mR1, 5000);
     }
 
     private void getPart(String source) {
-        OKHttp.newCall("http://api.pullword.com/get.php?source=" + URLEncoder.encode(source.trim()) + "&param1=0&param2=0&json=1").enqueue(new Callback() {
+        OkHttp.newCall("http://api.pullword.com/get.php?source=" + URLEncoder.encode(source.trim()) + "&param1=0&param2=0&json=1").enqueue(new Callback() {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 List<String> items = Part.get(response.body().string());
@@ -739,7 +750,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
                 checkNext();
                 break;
             default:
-                if (!event.isRetry() || mPlayers.addRetry() > 2) onError(event.getMsg());
+                if (!event.isRetry() || mPlayers.addRetry() > 3) onError(event.getMsg());
                 else getPlayer(false);
                 break;
         }
@@ -860,5 +871,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     protected void onDestroy() {
         super.onDestroy();
         mPlayers.release();
+        App.removeCallbacks(mR1, mR2, mR3);
     }
 }

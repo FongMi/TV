@@ -4,10 +4,26 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include
+    <LinearLayout
         android:id="@+id/progress"
-        layout="@layout/view_progress"
-        android:visibility="gone" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <include layout="@layout/view_progress" />
+
+        <TextView
+            android:id="@+id/traffic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            tools:text="120KB/s" />
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/digital"
