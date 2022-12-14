@@ -26,7 +26,7 @@ public class PyLoader {
     private void init() {
         try {
             loader = Class.forName("com.undcover.freedom.pyramid.Loader").newInstance();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
         }
     }
@@ -39,7 +39,7 @@ public class PyLoader {
             spider.init(App.get(), ext);
             spiders.put(key, spider);
             return spider;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
             return new SpiderNull();
         }

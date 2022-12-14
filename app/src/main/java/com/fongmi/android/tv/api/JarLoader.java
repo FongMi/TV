@@ -93,7 +93,7 @@ public class JarLoader {
             spider.init(App.get(), ext);
             spiders.put(spKey, spider);
             return spider;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
             return new SpiderNull();
         }
