@@ -72,8 +72,8 @@ public class OkHttp {
     private RequestBody getPostBody(JSONObject object, String contentType) {
         String body = object.optString("body").trim();
         String data = object.optString("data").trim();
-        if (data.length() > 0) return RequestBody.create(data, MediaType.get("application/json"));
-        if (body.length() > 0 && contentType != null) return RequestBody.create(body, MediaType.get(contentType));
-        return RequestBody.create("", null);
+        if (data.length() > 0) return RequestBody.create(MediaType.get("application/json"), data);
+        if (body.length() > 0 && contentType != null) return RequestBody.create(MediaType.get(contentType), body);
+        return RequestBody.create(null, "");
     }
 }

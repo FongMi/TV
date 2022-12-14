@@ -5,6 +5,8 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -45,6 +47,12 @@ public class SSLSocketFactoryCompat extends SSLSocketFactory {
                 List<String> protocols = new LinkedList<>();
                 for (String protocol : socket.getSupportedProtocols()) if (!protocol.toUpperCase().contains("SSL")) protocols.add(protocol);
                 SSLSocketFactoryCompat.protocols = protocols.toArray(new String[protocols.size()]);
+                List<String> allowedCiphers = Arrays.asList("TLS_RSA_WITH_AES_256_GCM_SHA384", "TLS_RSA_WITH_AES_128_GCM_SHA256", "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256", "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256", "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256", "TLS_ECHDE_RSA_WITH_AES_128_GCM_SHA256", "TLS_RSA_WITH_3DES_EDE_CBC_SHA", "TLS_RSA_WITH_AES_128_CBC_SHA", "TLS_RSA_WITH_AES_256_CBC_SHA", "TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA", "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA", "TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA", "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA");
+                List<String> availableCiphers = Arrays.asList(socket.getSupportedCipherSuites());
+                HashSet<String> preferredCiphers = new HashSet<>(allowedCiphers);
+                preferredCiphers.retainAll(availableCiphers);
+                preferredCiphers.addAll(new HashSet<>(Arrays.asList(socket.getEnabledCipherSuites())));
+                SSLSocketFactoryCompat.cipherSuites = preferredCiphers.toArray(new String[preferredCiphers.size()]);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -60,13 +68,16 @@ public class SSLSocketFactoryCompat extends SSLSocketFactory {
             defaultFactory = sslContext.getSocketFactory();
             HttpsURLConnection.setDefaultSSLSocketFactory(defaultFactory);
         } catch (GeneralSecurityException e) {
-            throw new AssertionError(); // The system has no TLS. Just give up.
+            throw new AssertionError();
         }
     }
 
     private void upgradeTLS(SSLSocket ssl) {
         if (protocols != null) {
             ssl.setEnabledProtocols(protocols);
+        }
+        if (cipherSuites != null) {
+            ssl.setEnabledCipherSuites(cipherSuites);
         }
     }
 
