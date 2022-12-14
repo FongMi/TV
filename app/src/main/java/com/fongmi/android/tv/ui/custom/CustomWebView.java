@@ -112,7 +112,7 @@ public class CustomWebView extends WebView {
         for (String key : headers.keySet()) if (keys.contains(key.toLowerCase())) news.put(key, headers.get(key));
         App.removeCallbacks(mTimer);
         App.post(() -> {
-            if (callback != null) callback.onParseSuccess(news, url, "");
+            onSuccess(news, url);
             stop(false);
         });
     }
@@ -121,7 +121,17 @@ public class CustomWebView extends WebView {
         stopLoading();
         loadUrl("about:blank");
         App.removeCallbacks(mTimer);
-        if (error) App.post(() -> callback.onParseError());
+        if (error) App.post(this::onError);
         else callback = null;
+    }
+
+    private void onSuccess(Map<String, String> news, String url) {
+        if (callback != null) callback.onParseSuccess(news, url, "");
+        callback = null;
+    }
+
+    private void onError() {
+        if (callback != null) callback.onParseError();
+        callback = null;
     }
 }

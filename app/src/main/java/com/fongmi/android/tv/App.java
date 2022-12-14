@@ -46,6 +46,10 @@ public class App extends Application {
         get().handler.removeCallbacks(runnable);
     }
 
+    public static void removeCallbacks(Runnable... runnable) {
+        for (Runnable r : runnable) get().handler.removeCallbacks(r);
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();

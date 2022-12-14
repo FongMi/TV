@@ -28,9 +28,10 @@
 
 # CatVod
 -keep class com.github.catvod.crawler.** { *; }
+-keep class * extends com.github.catvod.crawler.Spider
 
-# Pyramid
--keep class com.undcover.freedom.pyramid.** { *; }
+# QuickJS
+-keep class com.whl.quickjs.wrapper.** { *; }
 
 # IJK
 -keep class tv.danmaku.ijk.media.player.** { *; }
