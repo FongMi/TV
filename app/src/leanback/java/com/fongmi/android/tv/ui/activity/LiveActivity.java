@@ -330,7 +330,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void showProgress() {
         mBinding.widget.progress.setVisibility(View.VISIBLE);
-        App.post(mR5, 500);
+        App.post(mR5, 0);
     }
 
     private void hideProgress() {
