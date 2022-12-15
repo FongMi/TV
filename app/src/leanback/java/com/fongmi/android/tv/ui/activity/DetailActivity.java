@@ -593,7 +593,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void showProgress() {
         mBinding.widget.progress.setVisibility(View.VISIBLE);
-        App.post(mR3, 500);
+        App.post(mR3, 0);
     }
 
     private void hideProgress() {
