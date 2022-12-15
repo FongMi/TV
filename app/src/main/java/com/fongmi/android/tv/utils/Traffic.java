@@ -1,7 +1,8 @@
 package com.fongmi.android.tv.utils;
 
-import android.content.pm.PackageManager;
 import android.net.TrafficStats;
+import android.view.View;
+import android.widget.TextView;
 
 import com.fongmi.android.tv.App;
 
@@ -12,8 +13,18 @@ public class Traffic {
     private static long lastTotalRxBytes = 0;
     private static long lastTimeStamp = 0;
 
-    public static String get() {
-        long total = getTotalRxBytes(getUid());
+    public static void setSpeed(TextView view) {
+        if (unsupported()) return;
+        view.setText(getSpeed());
+        view.setVisibility(View.VISIBLE);
+    }
+
+    private static boolean unsupported() {
+        return TrafficStats.getUidRxBytes(App.get().getApplicationInfo().uid) == TrafficStats.UNSUPPORTED;
+    }
+
+    private static String getSpeed() {
+        long total = TrafficStats.getTotalRxBytes() / 1024;
         long time = System.currentTimeMillis();
         long diff = (total - lastTotalRxBytes) * 1000;
         long speed = diff / Math.max(time - lastTimeStamp, 1);
@@ -26,17 +37,5 @@ public class Traffic {
     public static void reset() {
         lastTotalRxBytes = 0;
         lastTimeStamp = 0;
-    }
-
-    private static long getTotalRxBytes(int uid) {
-        return TrafficStats.getUidRxBytes(uid) == TrafficStats.UNSUPPORTED ? 0 : (TrafficStats.getTotalRxBytes() / 1024);
-    }
-
-    private static int getUid() {
-        try {
-            return App.get().getPackageManager().getApplicationInfo(App.get().getPackageName(), PackageManager.GET_META_DATA).uid;
-        } catch (Exception e) {
-            return 0;
-        }
     }
 }

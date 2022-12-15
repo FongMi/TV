@@ -75,31 +75,51 @@ public class Global {
     @Keep
     @JSMethod
     public String pd(String html, String rule, String urlKey) {
-        return parser.pdfh(html, rule, urlKey);
+        try {
+            return parser.pdfh(html, rule, urlKey);
+        } catch (Exception e) {
+            return "";
+        }
     }
 
     @Keep
     @JSMethod
     public JSObject pdfa(String html, String rule) {
-        return ctx.parseJSON(new Gson().toJson(parser.pdfa(html, rule)));
+        try {
+            return ctx.parseJSON(new Gson().toJson(parser.pdfa(html, rule)));
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @Keep
     @JSMethod
     public String pdfh(String html, String rule) {
-        return parser.pdfh(html, rule, "");
+        try {
+            return parser.pdfh(html, rule, "");
+        } catch (Exception e) {
+            return "";
+        }
     }
 
     @Keep
     @JSMethod
     public JSObject pdfl(String html, String rule, String texts, String urls, String urlKey) {
-        return ctx.parseJSON(new Gson().toJson(parser.pdfl(html, rule, texts, urls, urlKey)));
+        try {
+            return ctx.parseJSON(new Gson().toJson(parser.pdfl(html, rule, texts, urls, urlKey)));
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @Keep
     @JSMethod
     public String joinUrl(String parent, String child) {
-        return parser.joinUrl(parent, child);
+        try {
+            return parser.joinUrl(parent, child);
+        } catch (Exception e) {
+            return "";
+        }
     }
 
     private Headers getHeader(JSONObject object) {
