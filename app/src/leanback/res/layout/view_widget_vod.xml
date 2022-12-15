@@ -73,9 +73,10 @@
             android:id="@+id/traffic"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="8dp"
             android:textColor="@color/white"
             android:textSize="16sp"
+            android:visibility="gone"
             tools:text="120KB/s" />
 
     </LinearLayout>

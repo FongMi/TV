@@ -255,8 +255,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void setTraffic() {
-        mBinding.widget.traffic.setText(Traffic.get());
-        App.post(mR5, 250);
+        Traffic.setSpeed(mBinding.widget.traffic);
+        App.post(mR5, 500);
     }
 
     private void onToggle() {
@@ -330,7 +330,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void showProgress() {
         mBinding.widget.progress.setVisibility(View.VISIBLE);
-        App.post(mR5, 250);
+        App.post(mR5, 0);
     }
 
     private void hideProgress() {
