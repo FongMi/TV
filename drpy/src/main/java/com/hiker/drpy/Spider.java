@@ -84,8 +84,8 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
     public void destroy() {
         submit(() -> {
+            executor.shutdownNow();
             QuickJSContext.destroy(ctx);
-            QuickJSContext.destroyRuntime(ctx);
         });
     }
 
