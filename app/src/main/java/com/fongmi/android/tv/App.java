@@ -53,6 +53,9 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Config.create(url:"https://codeberg.org/kvymin/TV/raw/branch/main/maoys.json",type:0).update()；
+        Config.create(url:"https://codeberg.org/kvymin/TV/raw/branch/main/Pandora.json",type:1).update()；
+        Config.create(url:"https://codeberg.org/kvymin/TV/raw/branch/main/Box.json",type:2).update()；
         CaocConfig.Builder.create().backgroundMode(CaocConfig.BACKGROUND_MODE_SILENT).errorActivity(CrashActivity.class).apply();
     }
 }
