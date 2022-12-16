@@ -165,11 +165,13 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     private PowerManager.WakeLock mWakeLock = null;
     private boolean mScreenOnWhilePlaying;
     private boolean mStayAwake;
+    private boolean dotOpen;
 
     private int mVideoWidth;
     private int mVideoHeight;
     private int mVideoSarNum;
     private int mVideoSarDen;
+    private int dotPort;
 
     private String mDataSource;
 
@@ -379,7 +381,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     }
 
     private String encodeSpaceChinese(String str) throws UnsupportedEncodingException {
-        Pattern p = Pattern.compile("[\u4e00-\u9fa5 ]+");
+        Pattern p = Pattern.compile("[\u4e00-\u9fa5]");
         Matcher m = p.matcher(str);
         StringBuffer b = new StringBuffer();
         while (m.find()) m.appendReplacement(b, URLEncoder.encode(m.group(0), "UTF-8"));
