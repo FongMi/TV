@@ -199,7 +199,6 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         synchronized (IjkMediaPlayer.class) {
             if (!mIsNativeInitialized) {
                 native_init();
-                native_setDot(0);
                 mIsNativeInitialized = true;
             }
         }
