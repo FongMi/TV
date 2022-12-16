@@ -145,7 +145,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     public void setMediaSource(String path, Map<String, String> headers) {
-        setVideoURI(Uri.parse(path), headers);
+        setVideoURI(Uri.parse(path.trim()), headers);
     }
 
     public void setVideoURI(Uri uri, Map<String, String> headers) {
