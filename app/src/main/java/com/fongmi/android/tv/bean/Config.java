@@ -4,11 +4,12 @@ import androidx.room.Entity;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
+import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.db.AppDatabase;
 
 import java.util.List;
 
-@Entity(indices = @Index(value = {"url"}, unique = true))
+@Entity(indices = @Index(value = {"url", "type"}, unique = true))
 public class Config {
 
     @PrimaryKey(autoGenerate = true)
@@ -26,7 +27,6 @@ public class Config {
     public Config(String url, int type) {
         this.url = url;
         this.type = type;
-        this.time = System.currentTimeMillis();
         this.id = (int) insert();
     }
 
@@ -99,21 +99,21 @@ public class Config {
 
     public static void delete(String url, int type) {
         if (type == 2) AppDatabase.get().getConfigDao().delete(type);
-        else AppDatabase.get().getConfigDao().delete(url);
+        else AppDatabase.get().getConfigDao().delete(url, type);
     }
 
     public static Config vod() {
-        Config item = AppDatabase.get().getConfigDao().find(0);
+        Config item = AppDatabase.get().getConfigDao().findOne(0);
         return item == null ? create("", 0) : item;
     }
 
     public static Config live() {
-        Config item = AppDatabase.get().getConfigDao().find(1);
-        return item == null ? create("", 1) : item;
+        Config item = AppDatabase.get().getConfigDao().findOne(1);
+        return item == null ? create(ApiConfig.getUrl(), 1) : item;
     }
 
     public static Config wall() {
-        Config item = AppDatabase.get().getConfigDao().find(2);
+        Config item = AppDatabase.get().getConfigDao().findOne(2);
         return item == null ? create("", 2) : item;
     }
 
@@ -122,7 +122,7 @@ public class Config {
     }
 
     public static Config find(String url, int type) {
-        Config item = AppDatabase.get().getConfigDao().findByUrl(url);
+        Config item = AppDatabase.get().getConfigDao().find(url, type);
         return item == null ? create(url, type) : item.type(type);
     }
 
@@ -137,7 +137,7 @@ public class Config {
     }
 
     public void delete() {
-        AppDatabase.get().getConfigDao().delete(getUrl());
+        AppDatabase.get().getConfigDao().delete(getUrl(), getType());
         History.delete(getId());
         Keep.delete(getId());
     }

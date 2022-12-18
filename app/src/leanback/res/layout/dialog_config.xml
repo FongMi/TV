@@ -17,6 +17,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
         android:layout_toEndOf="@+id/code"
+        android:focusable="true"
         android:lineSpacingExtra="4dp"
         android:paddingStart="4dp"
         android:paddingEnd="4dp"

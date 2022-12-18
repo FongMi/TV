@@ -36,7 +36,7 @@ import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
-import com.fongmi.android.tv.utils.Updater;
+import com.fongmi.android.tv.api.Updater;
 
 public class SettingActivity extends BaseActivity implements ConfigCallback, SiteCallback, LiveCallback {
 
@@ -62,7 +62,9 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.wallUrl.setText(WallConfig.getUrl());
         mBinding.versionText.setText(BuildConfig.VERSION_NAME);
         mBinding.sizeText.setText(ResUtil.getStringArray(R.array.select_size)[Prefers.getSize()]);
-        mBinding.scaleText.setText(ResUtil.getStringArray(R.array.select_scale)[Prefers.getScale()]);
+        mBinding.scaleText.setText(ResUtil.getStringArray(R.array.select_scale)[Prefers.getVodScale()]);
+        mBinding.playerText.setText(ResUtil.getStringArray(R.array.select_player)[Prefers.getPlayer()]);
+        mBinding.decodeText.setText(ResUtil.getStringArray(R.array.select_decode)[Prefers.getDecode()]);
         mBinding.renderText.setText(ResUtil.getStringArray(R.array.select_render)[Prefers.getRender()]);
         mBinding.qualityText.setText(ResUtil.getStringArray(R.array.select_quality)[Prefers.getQuality()]);
     }
@@ -76,10 +78,12 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.wall.setOnClickListener(view -> ConfigDialog.create(this).type(2).show());
         mBinding.vodHistory.setOnClickListener(view -> HistoryDialog.create(this).type(0).show());
         mBinding.liveHistory.setOnClickListener(view -> HistoryDialog.create(this).type(1).show());
-        mBinding.version.setOnClickListener(view -> Updater.create(this).force().start());
+        mBinding.version.setOnClickListener(view -> Updater.get().reset().start(this));
         mBinding.wallDefault.setOnClickListener(view -> setWallDefault());
         mBinding.wallRefresh.setOnClickListener(view -> setWallRefresh());
         mBinding.quality.setOnClickListener(view -> setQuality());
+        mBinding.player.setOnClickListener(view -> setPlayer());
+        mBinding.decode.setOnClickListener(view -> setDecode());
         mBinding.render.setOnClickListener(view -> setRender());
         mBinding.scale.setOnClickListener(view -> setScale());
         mBinding.size.setOnClickListener(view -> setSize());
@@ -151,6 +155,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
                 Notify.dismiss();
                 RefreshEvent.video();
                 RefreshEvent.history();
+                mBinding.liveUrl.setText(LiveConfig.getUrl());
                 mBinding.wallUrl.setText(WallConfig.getUrl());
                 break;
             case 1:
@@ -174,30 +179,44 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
     }
 
     private void setQuality() {
-        CharSequence[] array = ResUtil.getStringArray(R.array.select_quality);
         int index = Prefers.getQuality();
+        String[] array = ResUtil.getStringArray(R.array.select_quality);
         Prefers.putQuality(index = index == array.length - 1 ? 0 : ++index);
         mBinding.qualityText.setText(array[index]);
         RefreshEvent.image();
     }
 
+    private void setPlayer() {
+        int index = Prefers.getPlayer();
+        String[] array = ResUtil.getStringArray(R.array.select_player);
+        Prefers.putPlayer(index = index == array.length - 1 ? 0 : ++index);
+        mBinding.playerText.setText(array[index]);
+    }
+
+    private void setDecode() {
+        int index = Prefers.getDecode();
+        String[] array = ResUtil.getStringArray(R.array.select_decode);
+        Prefers.putDecode(index = index == array.length - 1 ? 0 : ++index);
+        mBinding.decodeText.setText(array[index]);
+    }
+
     private void setRender() {
-        CharSequence[] array = ResUtil.getStringArray(R.array.select_render);
         int index = Prefers.getRender();
+        String[] array = ResUtil.getStringArray(R.array.select_render);
         Prefers.putRender(index = index == array.length - 1 ? 0 : ++index);
         mBinding.renderText.setText(array[index]);
     }
 
     private void setScale() {
-        CharSequence[] array = ResUtil.getStringArray(R.array.select_scale);
-        int index = Prefers.getScale();
-        Prefers.putScale(index = index == array.length - 1 ? 0 : ++index);
+        int index = Prefers.getVodScale();
+        String[] array = ResUtil.getStringArray(R.array.select_scale);
+        Prefers.putVodScale(index = index == array.length - 1 ? 0 : ++index);
         mBinding.scaleText.setText(array[index]);
     }
 
     private void setSize() {
-        CharSequence[] array = ResUtil.getStringArray(R.array.select_size);
         int index = Prefers.getSize();
+        String[] array = ResUtil.getStringArray(R.array.select_size);
         Prefers.putSize(index = index == array.length - 1 ? 0 : ++index);
         mBinding.sizeText.setText(array[index]);
         RefreshEvent.size();

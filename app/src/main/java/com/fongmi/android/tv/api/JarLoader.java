@@ -3,7 +3,7 @@ package com.fongmi.android.tv.api;
 import android.content.Context;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.net.OKHttp;
+import com.fongmi.android.tv.net.OkHttp;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.crawler.Spider;
@@ -41,14 +41,18 @@ public class JarLoader {
         this.current = "";
     }
 
-    public void load(String key, File file) {
+    public void load(String key, File file) throws Exception {
+        DexClassLoader loader = new DexClassLoader(file.getAbsolutePath(), FileUtil.getCachePath(), null, App.get().getClassLoader());
+        Class<?> classInit = loader.loadClass("com.github.catvod.spider.Init");
+        Method method = classInit.getMethod("init", Context.class);
+        method.invoke(classInit, App.get());
+        loaders.put(key, loader);
+        putProxy(key);
+    }
+
+    private void putProxy(String key) {
         try {
-            DexClassLoader loader = new DexClassLoader(file.getAbsolutePath(), FileUtil.getCachePath(), null, App.get().getClassLoader());
-            Class<?> classInit = loader.loadClass("com.github.catvod.spider.Init");
-            Method method = classInit.getMethod("init", Context.class);
-            method.invoke(classInit, App.get());
-            loaders.put(key, loader);
-            Class<?> classProxy = loader.loadClass("com.github.catvod.spider.Proxy");
+            Class<?> classProxy = loaders.get(key).loadClass("com.github.catvod.spider.Proxy");
             methods.put(key, classProxy.getMethod("proxy", Map.class));
         } catch (Exception e) {
             e.printStackTrace();
@@ -57,13 +61,13 @@ public class JarLoader {
 
     private File download(String jar) {
         try {
-            return FileUtil.write(FileUtil.getJar(jar), OKHttp.newCall(jar).execute().body().bytes());
+            return FileUtil.write(FileUtil.getJar(jar), OkHttp.newCall(jar).execute().body().bytes());
         } catch (Exception e) {
             return FileUtil.getJar(jar);
         }
     }
 
-    public void parseJar(String key, String jar) {
+    public void parseJar(String key, String jar) throws Exception {
         String[] texts = jar.split(";md5;");
         String md5 = !jar.startsWith("file") && texts.length > 1 ? texts[1].trim() : "";
         jar = texts[0];
@@ -76,20 +80,20 @@ public class JarLoader {
         } else if (jar.startsWith("file")) {
             load(key, FileUtil.getLocal(jar));
         } else if (!jar.isEmpty()) {
-            parseJar(key, Utils.convert(jar));
+            parseJar(key, Utils.convert(ApiConfig.getUrl(), jar));
         }
     }
 
     public Spider getSpider(String key, String api, String ext, String jar) {
         try {
-            String spKey = (current = Utils.getMD5(jar)) + key;
+            String spKey = (current = Utils.getMd5(jar)) + key;
             if (spiders.containsKey(spKey)) return spiders.get(spKey);
             if (!loaders.containsKey(current)) parseJar(current, jar);
             Spider spider = (Spider) loaders.get(current).loadClass("com.github.catvod.spider." + api.split("csp_")[1]).newInstance();
             spider.init(App.get(), ext);
             spiders.put(spKey, spider);
             return spider;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
             return new SpiderNull();
         }

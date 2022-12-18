@@ -1,5 +1,6 @@
 package com.fongmi.android.tv.utils;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
@@ -30,6 +31,10 @@ public class FileUtil {
         return Environment.getExternalStorageDirectory().getAbsolutePath();
     }
 
+    public static File getLibDir() {
+        return App.get().getDir("libs", Context.MODE_PRIVATE);
+    }
+
     public static File getCacheDir() {
         return App.get().getCacheDir();
     }
@@ -47,7 +52,7 @@ public class FileUtil {
     }
 
     public static File getJar(String fileName) {
-        return getCacheFile(Utils.getMD5(fileName).concat(".jar"));
+        return getCacheFile(Utils.getMd5(fileName).concat(".jar"));
     }
 
     public static File getWall(int index) {

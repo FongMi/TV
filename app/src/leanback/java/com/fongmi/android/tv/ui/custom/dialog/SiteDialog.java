@@ -73,4 +73,20 @@ public class SiteDialog implements SitePresenter.OnClickListener {
         item.setFilterable(!item.isFilterable()).save();
         adapter.notifyArrayItemRangeChanged(0, adapter.size());
     }
+
+    @Override
+    public boolean onSearchLongClick(Site item) {
+        boolean result = !item.isSearchable();
+        for (Site site : ApiConfig.get().getSites()) site.setSearchable(result).save();
+        adapter.notifyArrayItemRangeChanged(0, adapter.size());
+        return true;
+    }
+
+    @Override
+    public boolean onFilterLongClick(Site item) {
+        boolean result = !item.isFilterable();
+        for (Site site : ApiConfig.get().getSites()) site.setFilterable(result).save();
+        adapter.notifyArrayItemRangeChanged(0, adapter.size());
+        return true;
+    }
 }

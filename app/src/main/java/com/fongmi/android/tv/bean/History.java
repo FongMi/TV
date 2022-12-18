@@ -29,9 +29,15 @@ public class History {
     private long ending;
     private long position;
     private long duration;
+    private float speed;
+    private int player;
+    private int scale;
     private int cid;
 
     public History() {
+        this.speed = 1;
+        this.scale = -1;
+        this.player = -1;
     }
 
     @NonNull
@@ -139,6 +145,30 @@ public class History {
         this.duration = duration;
     }
 
+    public float getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(float speed) {
+        this.speed = speed;
+    }
+
+    public int getPlayer() {
+        return player;
+    }
+
+    public void setPlayer(int player) {
+        this.player = player;
+    }
+
+    public int getScale() {
+        return scale;
+    }
+
+    public void setScale(int scale) {
+        this.scale = scale;
+    }
+
     public int getCid() {
         return cid;
     }
@@ -196,12 +226,11 @@ public class History {
         }
     }
 
-    public History update(long position, long duration) {
+    public void update(long position, long duration) {
         setPosition(position);
         setDuration(duration);
         checkMerge(AppDatabase.get().getHistoryDao().findByName(ApiConfig.getCid(), getVodName()));
         AppDatabase.get().getHistoryDao().insertOrUpdate(this);
-        return this;
     }
 
     public History delete() {

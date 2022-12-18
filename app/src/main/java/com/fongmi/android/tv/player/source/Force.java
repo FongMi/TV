@@ -9,7 +9,8 @@ import android.os.IBinder;
 import android.os.SystemClock;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.net.OKHttp;
+import com.fongmi.android.tv.Constant;
+import com.fongmi.android.tv.net.OkHttp;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.forcetech.Port;
 import com.gsoft.mitv.MainActivity;
@@ -37,8 +38,8 @@ public class Force {
 
     private void check() throws Exception {
         File file = FileUtil.getCacheFile("libmitv.so");
-        String url = "https://ghproxy.com/https://raw.githubusercontent.com/FongMi/TV/release/release/libmitv.so";
-        if (!file.exists()) FileUtil.write(file, OKHttp.newCall(url).execute().body().bytes());
+        String url = Constant.getReleasePath("/other/libmitv.so");
+        if (!file.exists()) FileUtil.write(file, OkHttp.newCall(url).execute().body().bytes());
     }
 
     private void start() {
@@ -54,7 +55,7 @@ public class Force {
             String id = uri.getLastPathSegment();
             String cmd = "http://127.0.0.1:" + port + "/cmd.xml?cmd=switch_chan&server=" + uri.getHost() + ":" + uri.getPort() + "&id=" + id;
             String result = "http://127.0.0.1:" + port + "/" + id;
-            OKHttp.newCall(cmd, Headers.of("user-agent", "MTV")).execute();
+            OkHttp.newCall(cmd, Headers.of("user-agent", "MTV")).execute();
             return result;
         } catch (Exception e) {
             e.printStackTrace();

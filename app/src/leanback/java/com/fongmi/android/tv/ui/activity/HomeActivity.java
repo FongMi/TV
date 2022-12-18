@@ -1,9 +1,5 @@
 package com.fongmi.android.tv.ui.activity;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.KeyEvent;
 import android.view.View;
 
@@ -17,8 +13,11 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.api.LiveConfig;
+import com.fongmi.android.tv.api.WallConfig;
 import com.fongmi.android.tv.bean.Func;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Result;
@@ -28,6 +27,7 @@ import com.fongmi.android.tv.databinding.ActivityHomeBinding;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.event.ServerEvent;
 import com.fongmi.android.tv.model.SiteViewModel;
+import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.ui.custom.CustomRowPresenter;
 import com.fongmi.android.tv.ui.custom.CustomSelector;
@@ -42,11 +42,10 @@ import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
-import com.fongmi.android.tv.utils.Updater;
+import com.fongmi.android.tv.api.Updater;
 import com.fongmi.android.tv.utils.Utils;
 import com.google.common.collect.Lists;
 
-import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
@@ -59,13 +58,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     private ArrayObjectAdapter mHistoryAdapter;
     private HistoryPresenter mHistoryPresenter;
     private SiteViewModel mViewModel;
-    private boolean mConfirmExit;
-    private Handler mHandler;
-
-    public static void start(Activity activity) {
-        activity.startActivity(new Intent(activity, HomeActivity.class));
-        activity.finish();
-    }
+    private boolean confirm;
 
     @Override
     protected ViewBinding getBinding() {
@@ -74,15 +67,15 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     protected void initView() {
-        mHandler = new Handler(Looper.getMainLooper());
-        Updater.create(this).start();
+        WallConfig.get().init();
+        LiveConfig.get().init();
+        ApiConfig.get().init().load(getCallback());
+        mBinding.progressLayout.showProgress();
+        Updater.get().start(this);
         Server.get().start();
         setRecyclerView();
         setViewModel();
         setAdapter();
-        getHistory();
-        getVideo();
-        setFocus();
     }
 
     @Override
@@ -112,6 +105,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         mViewModel.result.observe(this, result -> {
             mAdapter.remove("progress");
             addVideo(result);
+            result.clear();
         });
     }
 
@@ -122,17 +116,36 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         mHistoryAdapter = new ArrayObjectAdapter(mHistoryPresenter = new HistoryPresenter(this));
     }
 
+    private Callback getCallback() {
+        return new Callback() {
+            @Override
+            public void success() {
+                mBinding.progressLayout.showContent();
+                getHistory();
+                getVideo();
+                setFocus();
+            }
+
+            @Override
+            public void error(int resId) {
+                mBinding.progressLayout.showContent();
+                Notify.show(resId);
+                setFocus();
+            }
+        };
+    }
+
     private void setFocus() {
         mBinding.recycler.requestFocus();
-        mHandler.postDelayed(() -> mBinding.title.setFocusable(true), 500);
+        App.post(() -> mBinding.title.setFocusable(true), 500);
     }
 
     private void getVideo() {
         int index = getRecommendIndex();
         mViewModel.getResult().setValue(Result.empty());
+        String home = ApiConfig.get().getHome().getName();
+        mBinding.title.setText(home.isEmpty() ? ResUtil.getString(R.string.app_name) : home);
         if (mAdapter.size() > index) mAdapter.removeItems(index, mAdapter.size() - index);
-        if (ApiConfig.getHomeName().isEmpty()) mBinding.title.setText(R.string.app_name);
-        else mBinding.title.setText(ApiConfig.getHomeName());
         if (ApiConfig.get().getHome().getKey().isEmpty()) return;
         mViewModel.homeContent();
         mAdapter.add("progress");
@@ -276,6 +289,9 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
             case SEARCH:
                 CollectActivity.start(this, event.getText(), true);
                 break;
+            case UPDATE:
+                Updater.get().force().branch(event.getText()).start(this);
+                break;
             case PUSH:
                 if (ApiConfig.get().getSite("push_agent") == null) return;
                 DetailActivity.start(this, "push_agent", event.getText(), true);
@@ -308,19 +324,22 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
             mHistoryAdapter.notifyArrayItemRangeChanged(0, mHistoryAdapter.size());
         } else if (mBinding.recycler.getSelectedPosition() != 0) {
             mBinding.recycler.scrollToPosition(0);
-        } else if (!mConfirmExit) {
-            mConfirmExit = true;
+        } else if (!confirm) {
+            confirm = true;
             Notify.show(R.string.app_exit);
-            mHandler.postDelayed(() -> mConfirmExit = false, 1000);
+            App.post(() -> confirm = false, 1000);
         } else {
             super.onBackPressed();
+            finish();
         }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        WallConfig.get().clear();
+        LiveConfig.get().clear();
+        ApiConfig.get().clear();
         Server.get().stop();
-        EventBus.getDefault().unregister(this);
     }
 }

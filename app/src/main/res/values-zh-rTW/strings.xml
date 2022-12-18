@@ -12,11 +12,10 @@
 
     <!-- Live -->
     <string name="live_pass">密碼</string>
+    <string name="live_group">未分類</string>
     <string name="live_setting">設定</string>
-    <string name="live_epg_empty">暫無頻道資訊</string>
-    <string name="live_epg_now">正在播放：<xliff:g name="name">%s</xliff:g>/<xliff:g name="name">%s</xliff:g></string>
-    <string name="live_epg_next">下個節目：<xliff:g name="name">%s</xliff:g>/<xliff:g name="name">%s</xliff:g></string>
-    <string name="live_line">來源 <xliff:g name="name">%s</xliff:g>/<xliff:g name="name">%s</xliff:g></string>
+    <string name="live_epg_now">正在播放：<xliff:g name="name">%s</xliff:g></string>
+    <string name="live_line">來源 <xliff:g name="name">%s</xliff:g></string>
 
     <!-- Push -->
     <string name="push_clip">推送剪貼簿內容</string>
@@ -45,6 +44,7 @@
     <string name="play_replay">重播</string>
     <string name="play_reset">重置</string>
     <string name="play_tracks">軌道</string>
+    <string name="play_invert">反轉</string>
     <string name="play_op">片頭</string>
     <string name="play_ed">片尾</string>
     <string name="play_reverse">倒序</string>
@@ -62,6 +62,8 @@
     <string name="setting_vod">點播</string>
     <string name="setting_live">直播</string>
     <string name="setting_wall">壁紙</string>
+    <string name="setting_player">播放器</string>
+    <string name="setting_decode">解碼方式</string>
     <string name="setting_render">渲染方式</string>
     <string name="setting_scale">縮放比例</string>
     <string name="setting_quality">圖片品質</string>
@@ -74,6 +76,7 @@
     <string name="dialog_config_hint">請輸入接口…</string>
 
     <!-- Error -->
+    <string name="error_so_load">FFmpeg 載入失敗</string>
     <string name="error_config_get">配置取得失敗</string>
     <string name="error_config_parse">配置解析失敗</string>
     <string name="error_play_next">已經是最後一集了！</string>
@@ -86,6 +89,7 @@
 
     <!-- Update -->
     <string name="update_version">發現新版本 <xliff:g name="name">%s</xliff:g></string>
+    <string name="update_check">正在檢查更新…</string>
     <string name="update_confirm">更新</string>
 
     <!-- Crash -->
@@ -97,6 +101,16 @@
 
     <!-- UNIT -->
     <string name="all">全部</string>
+
+    <string-array name="select_decode">
+        <item>軟解</item>
+        <item>硬解</item>
+    </string-array>
+
+    <string-array name="select_player">
+        <item>EXO</item>
+        <item>IJK</item>
+    </string-array>
 
     <string-array name="select_quality">
         <item>低</item>
