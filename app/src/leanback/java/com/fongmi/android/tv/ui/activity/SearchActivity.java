@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.text.Editable;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 
@@ -25,6 +26,7 @@ import com.fongmi.android.tv.ui.adapter.WordAdapter;
 import com.fongmi.android.tv.ui.custom.CustomKeyboard;
 import com.fongmi.android.tv.ui.custom.CustomListener;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
+import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
 import com.fongmi.android.tv.utils.Utils;
 
 import java.io.IOException;
@@ -139,6 +141,12 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
         if (TextUtils.isEmpty(keyword)) return;
         CollectActivity.start(this, keyword);
         App.post(() -> mHistoryAdapter.add(keyword), 250);
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (Utils.isMenuKey(event)) SiteDialog.create(this).search(true).show();
+        return super.dispatchKeyEvent(event);
     }
 
     @Override
