@@ -1,6 +1,7 @@
 package com.fongmi.android.tv.ui.presenter;
 
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -12,9 +13,21 @@ import com.fongmi.android.tv.databinding.AdapterSiteBinding;
 public class SitePresenter extends Presenter {
 
     private final OnClickListener mListener;
+    private boolean search;
+    private boolean filter;
 
     public SitePresenter(OnClickListener listener) {
         this.mListener = listener;
+    }
+
+    public SitePresenter search(boolean search) {
+        this.search = search;
+        return this;
+    }
+
+    public SitePresenter filter(boolean filter) {
+        this.filter = filter;
+        return this;
     }
 
     public interface OnClickListener {
@@ -42,6 +55,8 @@ public class SitePresenter extends Presenter {
         holder.binding.text.setText(item.getActivatedName());
         holder.binding.filter.setImageResource(item.getFilterIcon());
         holder.binding.search.setImageResource(item.getSearchIcon());
+        holder.binding.search.setVisibility(search ? View.VISIBLE : View.GONE);
+        holder.binding.filter.setVisibility(filter ? View.VISIBLE : View.GONE);
         holder.binding.text.setOnClickListener(v -> mListener.onTextClick(item));
         holder.binding.search.setOnClickListener(v -> mListener.onSearchClick(item));
         holder.binding.filter.setOnClickListener(v -> mListener.onFilterClick(item));
