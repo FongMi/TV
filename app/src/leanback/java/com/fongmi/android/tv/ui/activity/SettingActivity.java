@@ -71,7 +71,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
 
     @Override
     protected void initEvent() {
-        mBinding.vodHome.setOnClickListener(view -> SiteDialog.create(this).show());
+        mBinding.vodHome.setOnClickListener(view -> SiteDialog.create(this).all().show());
         mBinding.liveHome.setOnClickListener(view -> LiveDialog.create(this).show());
         mBinding.vod.setOnClickListener(view -> ConfigDialog.create(this).type(0).show());
         mBinding.live.setOnClickListener(view -> ConfigDialog.create(this).type(1).show());
