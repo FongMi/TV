@@ -12,36 +12,8 @@
     android:paddingEnd="24dp">
 
     <LinearLayout
-        android:id="@+id/siteLayout"
-        android:layout_width="120dp"
-        android:layout_height="match_parent"
-        android:layout_marginEnd="36dp"
-        android:orientation="vertical">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:text="站點"
-            android:textColor="@color/white"
-            android:textSize="24sp" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/siteRecycler"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipChildren="false"
-            android:clipToPadding="false"
-            android:paddingBottom="24dp"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:itemCount="10"
-            tools:listitem="@layout/adapter_search_site" />
-
-    </LinearLayout>
-
-    <LinearLayout
         android:id="@+id/historyLayout"
-        android:layout_width="120dp"
+        android:layout_width="128dp"
         android:layout_height="match_parent"
         android:layout_marginEnd="36dp"
         android:orientation="vertical">
