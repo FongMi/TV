@@ -45,6 +45,7 @@
     <string name="play_reset">重置</string>
     <string name="play_tracks">轨道</string>
     <string name="play_invert">反转</string>
+    <string name="play_across">跨类</string>
     <string name="play_op">片头</string>
     <string name="play_ed">片尾</string>
     <string name="play_reverse">倒序</string>
