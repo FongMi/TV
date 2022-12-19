@@ -20,11 +20,9 @@ public class SiteDialog implements SitePresenter.OnClickListener {
 
     private final ArrayObjectAdapter adapter;
     private final DialogSiteBinding binding;
+    private final SitePresenter presenter;
     private final SiteCallback callback;
     private final AlertDialog dialog;
-    private SitePresenter presenter;
-    private boolean search;
-    private boolean filter;
 
     public static SiteDialog create(Activity activity) {
         return new SiteDialog(activity);
@@ -38,18 +36,18 @@ public class SiteDialog implements SitePresenter.OnClickListener {
     }
 
     public SiteDialog search(boolean search) {
-        this.presenter.search(this.search = search);
+        this.presenter.search(search);
         return this;
     }
 
     public SiteDialog filter(boolean filter) {
-        this.presenter.filter(this.filter = filter);
+        this.presenter.filter(filter);
         return this;
     }
 
     public SiteDialog all() {
-        this.presenter.search(this.search = true);
-        this.presenter.filter(this.filter = true);
+        this.presenter.search(true);
+        this.presenter.filter(true);
         return this;
     }
 
