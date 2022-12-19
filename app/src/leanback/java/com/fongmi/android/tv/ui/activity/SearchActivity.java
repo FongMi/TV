@@ -145,8 +145,13 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (Utils.isMenuKey(event)) SiteDialog.create(this).search(true).show();
+        if (Utils.isMenuKey(event)) showDialog();
         return super.dispatchKeyEvent(event);
+    }
+
+    @Override
+    public void showDialog() {
+        SiteDialog.create(this).search(true).show();
     }
 
     @Override
