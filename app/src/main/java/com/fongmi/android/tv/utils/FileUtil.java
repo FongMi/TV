@@ -1,6 +1,5 @@
 package com.fongmi.android.tv.utils;
 
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
@@ -31,8 +30,8 @@ public class FileUtil {
         return Environment.getExternalStorageDirectory().getAbsolutePath();
     }
 
-    public static File getLibDir() {
-        return App.get().getDir("libs", Context.MODE_PRIVATE);
+    public static File getRootFile(String path) {
+        return new File(getRootPath() + File.separator + path);
     }
 
     public static File getCacheDir() {
@@ -40,7 +39,7 @@ public class FileUtil {
     }
 
     public static File getCacheDir(String folder) {
-        return new File(getCachePath() + "/" + folder);
+        return new File(getCachePath() + File.separator + folder);
     }
 
     public static String getCachePath() {
@@ -95,13 +94,14 @@ public class FileUtil {
         }
     }
 
-    public static void copy(File src, File dst) throws IOException {
+    public static void copy(File src, File dst) {
         try (InputStream in = new FileInputStream(src)) {
             try (OutputStream out = new FileOutputStream(dst)) {
                 int len;
                 byte[] buf = new byte[1024];
                 while ((len = in.read(buf)) > 0) out.write(buf, 0, len);
             }
+        } catch (Exception ignored) {
         }
     }
 
