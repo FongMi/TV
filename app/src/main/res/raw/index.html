@@ -83,7 +83,7 @@
                             <div class="button-sp-area" style="margin-top: 10px;">
                                 <a href="javascript:void(0)" role="button" class="weui-btn weui-btn_mini weui-btn_default weui-wa-hotarea" href="javascript:void(0)" onclick="uploadFile()">上傳檔案</a>&nbsp;
                                 <a href="javascript:void(0)" role="button" class="weui-btn weui-btn_mini weui-btn_default weui-wa-hotarea" href="javascript:void(0)" onclick="newFolder()">新增資料夾</a>&nbsp;
-                                <a id="delCurFolder" href="javascript:void(0)" role="button" class="weui-btn weui-btn_mini weui-btn_warn weui-wa-hotarea" href="javascript:void(0)" onclick="delFolder()" style="display: none;">刪除當前文件夾</a>
+                                <a id="delCurFolder" href="javascript:void(0)" role="button" class="weui-btn weui-btn_mini weui-btn_warn weui-wa-hotarea" href="javascript:void(0)" onclick="delFolder()" style="display: none;">刪除資料夾</a>
                             </div>
                         </div>
                         <div class="weui-cells" id="file_list">
@@ -111,9 +111,7 @@
         <div role="button" class="weui-mask"></div>
         <div class="weui-half-screen-dialog">
             <div class="weui-half-screen-dialog__hd">
-                <div class="weui-half-screen-dialog__hd__main">
-                    點擊「使用」時請打開接口視窗
-                </div>
+                <div class="weui-half-screen-dialog__hd__main">請開啟接口設定</div>
             </div>
             <div class="weui-half-screen-dialog__bd" id="fileInfo">
                 <div class="weui-form__control-area" style="margin-bottom: 0px !important;">
@@ -121,24 +119,11 @@
                         <div class="weui-cells">
                             <div class="weui-cell weui-cell_active weui-cell_vcode weui-cell_wrap">
                                 <div class="weui-cell__hd"><label class="weui-label">本機地址</label></div>
-                                <div class="weui-cell__bd weui-flex"><button onclick="fileToApi(1); return false;" class="weui-cell__control weui-btn weui-btn_default weui-vcode-btn">使用</button>
-                                </div>
+                                <div class="weui-cell__bd weui-flex"><button onclick="fileToApi(); return false;" class="weui-cell__control weui-btn weui-btn_default weui-vcode-btn">使用</button></div>
                             </div>
                             <div class="weui-cell weui-cell_active weui-cell_vcode weui-cell_wrap">
                                 <div class="weui-cell__bd weui-flex">
                                     <input id="fileUrl1" class="weui-input weui-cell__control weui-cell__control_flex" type="text" value="" readonly />
-
-                                </div>
-                            </div>
-                            <div class="weui-cell weui-cell_active weui-cell_vcode weui-cell_wrap">
-                                <div class="weui-cell__hd"><label class="weui-label">局域網地址</label></div>
-                                <div class="weui-cell__bd weui-flex"><button onclick="fileToApi(2); return false;" class="weui-cell__control weui-btn weui-btn_default weui-vcode-btn">使用</button>
-                                </div>
-                            </div>
-                            <div class="weui-cell weui-cell_active weui-cell_vcode weui-cell_wrap">
-                                <div class="weui-cell__bd weui-flex">
-                                    <input id="fileUrl2" class="weui-input weui-cell__control weui-cell__control_flex" type="text" value="" readonly />
-
                                 </div>
                             </div>
                         </div>
@@ -148,7 +133,7 @@
             <div class="weui-half-screen-dialog__ft" style="padding-bottom: 30px;">
                 <div class="weui-half-screen-dialog__btn-area">
                     <a href="javascript:void(0)" class="weui-btn weui-btn_default" onclick="hideFileInfo()">關閉</a>
-                    <a href="javascript:void(0)" id="delFileBtn" class="weui-btn weui-btn_warn" onclick="delFile()">刪除檔案</a>
+                    <a href="javascript:void(0)" id="delFileBtn" class="weui-btn weui-btn_warn" onclick="delFile()">刪除</a>
                 </div>
             </div>
         </div>
