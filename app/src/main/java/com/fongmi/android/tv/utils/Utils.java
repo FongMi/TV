@@ -1,8 +1,13 @@
 package com.fongmi.android.tv.utils;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.text.TextUtils;
@@ -11,9 +16,15 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import androidx.annotation.RequiresApi;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentActivity;
+
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.BuildConfig;
 import com.fongmi.android.tv.server.Server;
 import com.google.android.exoplayer2.util.Util;
+import com.permissionx.guolindev.PermissionX;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -164,6 +175,23 @@ public class Utils {
         IBinder windowToken = view.getWindowToken();
         if (imm != null && windowToken != null) {
             imm.hideSoftInputFromWindow(windowToken, 0);
+        }
+    }
+
+    public static void checkStoragePermission(FragmentActivity activity) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
+            Utils.openManageFileAccess();
+        } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R && ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            PermissionX.init(activity).permissions(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE).request(null);
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.R)
+    public static void openManageFileAccess() {
+        try {
+            App.get().startActivity(new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + BuildConfig.APPLICATION_ID)));
+        } catch (Exception e) {
+            App.get().startActivity(new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION));
         }
     }
 }
