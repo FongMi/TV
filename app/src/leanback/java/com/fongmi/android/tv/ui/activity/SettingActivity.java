@@ -3,16 +3,7 @@ package com.fongmi.android.tv.ui.activity;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Environment;
-import android.provider.Settings;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.RequiresApi;
-import androidx.core.content.ContextCompat;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.BuildConfig;
@@ -26,7 +17,6 @@ import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.databinding.ActivitySettingBinding;
 import com.fongmi.android.tv.event.RefreshEvent;
-import com.fongmi.android.tv.event.ServerEvent;
 import com.fongmi.android.tv.impl.ConfigCallback;
 import com.fongmi.android.tv.impl.LiveCallback;
 import com.fongmi.android.tv.impl.SiteCallback;
@@ -38,15 +28,10 @@ import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
-import com.fongmi.android.tv.utils.Utils;
 import com.permissionx.guolindev.PermissionX;
-
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 public class SettingActivity extends BaseActivity implements ConfigCallback, SiteCallback, LiveCallback {
 
-    private final ActivityResultLauncher<Intent> launcherIntent = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> loadConfig());
     private ActivitySettingBinding mBinding;
     private Config config;
 
@@ -100,21 +85,10 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
     }
 
     private void checkPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
-            openSetting();
-        } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            PermissionX.init(this).permissions(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> loadConfig());
+        if (config.getUrl().startsWith("file") && !PermissionX.isGranted(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            PermissionX.init(this).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> loadConfig());
         } else {
             loadConfig();
-        }
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.R)
-    private void openSetting() {
-        try {
-            launcherIntent.launch(new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + BuildConfig.APPLICATION_ID)));
-        } catch (Exception e) {
-            launcherIntent.launch(new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION));
         }
     }
 
@@ -169,11 +143,6 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
                 mBinding.wallUrl.setText(WallConfig.getUrl());
                 break;
         }
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onServerEvent(ServerEvent event) {
-        if (event.getType() == ServerEvent.Type.FILE) Utils.checkStoragePermission(this);
     }
 
     @Override

@@ -9,7 +9,7 @@ android {
     defaultConfig {
         applicationId "com.fongmi.android.tv"
         minSdk 21
-        targetSdk 33
+        targetSdk 29
         versionCode 52
         versionName "1.5.2"
         ndk { abiFilters "armeabi-v7a" }
