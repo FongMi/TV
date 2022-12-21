@@ -1,7 +1,5 @@
 package com.fongmi.android.tv.server;
 
-import android.os.Environment;
-
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.server.process.InputRequestProcess;
@@ -11,16 +9,10 @@ import com.fongmi.android.tv.utils.FileUtil;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
-import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
-
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -126,28 +118,10 @@ public class Nano extends NanoHTTPD {
     private Response doUpload(Map<String, String> params, Map<String, String> files) {
         String path = params.get("path");
         for (String k : files.keySet()) {
-            if (k.startsWith("files-")) {
-                String fn = params.get(k);
-                String tmpFile = files.get(k);
-                File tmp = new File(tmpFile);
-                String root = Environment.getExternalStorageDirectory().getAbsolutePath();
-                File file = new File(root + "/" + path + "/" + fn);
-                if (file.exists())
-                    file.delete();
-                if (tmp.exists()) {
-                    if (fn.toLowerCase().endsWith(".zip")) {
-                        try {
-                            unzip(tmp, root + "/" + path);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-                        FileUtil.copy(tmp, file);
-                    }
-                }
-                if (tmp.exists())
-                    tmp.delete();
-            }
+            String fn = params.get(k);
+            File temp = new File(files.get(k));
+            if (fn.toLowerCase().endsWith(".zip")) FileUtil.unzip(temp, FileUtil.getRootPath() + File.separator + path);
+            else FileUtil.copy(temp, FileUtil.getRootFile(path + File.separator + fn));
         }
         return newFixedLengthResponse(Response.Status.OK, MIME_PLAINTEXT, "OK");
     }
@@ -194,29 +168,6 @@ public class Nano extends NanoHTTPD {
             files.add(obj);
         }
         return info.toString();
-    }
-
-    private void unzip(File file, String path) throws Exception {
-        try (ZipArchiveInputStream is = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(file)))) {
-            ZipArchiveEntry entry;
-            while ((entry = is.getNextZipEntry()) != null) {
-                if (entry.isDirectory()) {
-                    new File(path, entry.getName()).mkdirs();
-                } else {
-                    extractFile(is, path + File.separator + entry.getName());
-                }
-            }
-        }
-    }
-
-    private void extractFile(InputStream is, String path) {
-        try (OutputStream out = new FileOutputStream(path)) {
-            int len;
-            byte[] buf = new byte[2048];
-            while ((len = is.read(buf)) > 0) out.write(buf, 0, len);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public static Response createPlainTextResponse(Response.IStatus status, String text) {

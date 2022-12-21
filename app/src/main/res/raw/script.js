@@ -126,12 +126,12 @@ function uploadFile() {
 
 function uploadTip() {
     let files = $('#file_uploader')[0].files;
-    if (files.length <= 0)
-        return false;
+    if (files.length <= 0) return false;
     let tip = '';
     for (var i = 0; i < files.length; i++) {
         tip += (files[i].name) + ',';
     }
+    tip = tip.substring(0, tip.length - 1);
     $('#uploadTipContent').html(tip);
     $('#uploadTip').show();
 }
