@@ -2,7 +2,6 @@ package com.fongmi.android.tv.server;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
-import com.fongmi.android.tv.event.ServerEvent;
 import com.fongmi.android.tv.server.process.InputRequestProcess;
 import com.fongmi.android.tv.server.process.RawRequestProcess;
 import com.fongmi.android.tv.server.process.RequestProcess;
@@ -150,7 +149,6 @@ public class Nano extends NanoHTTPD {
         JsonObject info = new JsonObject();
         info.addProperty("parent", parent);
         if (list == null || list.length == 0) {
-            if (parent.equals(".")) ServerEvent.file();
             info.add("files", new JsonArray());
             return info.toString();
         }

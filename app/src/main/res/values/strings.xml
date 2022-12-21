@@ -70,6 +70,7 @@
     <string name="setting_quality">Image quality</string>
     <string name="setting_size">Image size</string>
     <string name="setting_version">Version</string>
+    <string name="setting_storage">Permission</string>
 
     <!-- Dialog -->
     <string name="dialog_positive">OK</string>

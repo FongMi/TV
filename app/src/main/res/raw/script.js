@@ -74,7 +74,7 @@ function selectFile(path, canDel) {
     current_file = path;
     if (canDel) $("#delFileBtn").show();
     else $("#delFileBtn").hide();
-    $("#fileUrl1")[0].value = "file://" + current_file;
+    $("#fileUrl")[0].value = "file://" + current_file;
     $("#fileInfoDialog").show();
 }
 

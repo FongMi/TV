@@ -5,7 +5,7 @@ import org.greenrobot.eventbus.EventBus;
 public class ServerEvent {
 
     private final Type type;
-    private String text;
+    private final String text;
 
     public static void search(String text) {
         EventBus.getDefault().post(new ServerEvent(Type.SEARCH, text));
@@ -23,14 +23,6 @@ public class ServerEvent {
         EventBus.getDefault().post(new ServerEvent(Type.API, text));
     }
 
-    public static void file() {
-        EventBus.getDefault().post(new ServerEvent(Type.FILE));
-    }
-
-    public ServerEvent(Type type) {
-        this.type = type;
-    }
-
     private ServerEvent(Type type, String text) {
         this.type = type;
         this.text = text;
@@ -45,6 +37,6 @@ public class ServerEvent {
     }
 
     public enum Type {
-        SEARCH, UPDATE, PUSH, API, FILE
+        SEARCH, UPDATE, PUSH, API
     }
 }

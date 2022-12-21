@@ -1,6 +1,6 @@
 package com.fongmi.android.tv.ui.custom.dialog;
 
-import android.app.Activity;
+import android.Manifest;
 import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +8,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.FragmentActivity;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
@@ -22,6 +23,7 @@ import com.fongmi.android.tv.utils.QRCode;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Utils;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.permissionx.guolindev.PermissionX;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -30,12 +32,13 @@ import org.greenrobot.eventbus.ThreadMode;
 public class ConfigDialog implements DialogInterface.OnDismissListener {
 
     private final DialogConfigBinding binding;
+    private final FragmentActivity activity;
     private final ConfigCallback callback;
     private final AlertDialog dialog;
     private String url;
     private int type;
 
-    public static ConfigDialog create(Activity activity) {
+    public static ConfigDialog create(FragmentActivity activity) {
         return new ConfigDialog(activity);
     }
 
@@ -44,7 +47,8 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
         return this;
     }
 
-    public ConfigDialog(Activity activity) {
+    public ConfigDialog(FragmentActivity activity) {
+        this.activity = activity;
         this.callback = (ConfigCallback) activity;
         this.binding = DialogConfigBinding.inflate(LayoutInflater.from(activity));
         this.dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).create();
@@ -75,6 +79,7 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
 
     private void initEvent() {
         EventBus.getDefault().register(this);
+        binding.storage.setOnClickListener(this::onStorage);
         binding.positive.setOnClickListener(this::onPositive);
         binding.negative.setOnClickListener(this::onNegative);
         binding.text.setOnEditorActionListener((textView, actionId, event) -> {
@@ -94,6 +99,11 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
             default:
                 return "";
         }
+    }
+
+    private void onStorage(View view) {
+        if (PermissionX.isGranted(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE)) return;
+        PermissionX.init(activity).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request(null);
     }
 
     private void onPositive(View view) {
