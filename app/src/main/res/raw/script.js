@@ -21,6 +21,10 @@ function api() {
     doAction('api', { text: $('#api_url').val() });
 }
 
+function api(text) {
+    doAction('api', { text: text });
+}
+
 function doAction(action, kv) {
     kv['do'] = action;
     $.post('/action', kv, function (data) {
@@ -79,7 +83,7 @@ function selectFile(path, canDel) {
 }
 
 function fileToApi() {
-    doAction('api', { text: "file://" + current_file });
+    api("file://" + current_file);
     hideFileInfo();
 }
 

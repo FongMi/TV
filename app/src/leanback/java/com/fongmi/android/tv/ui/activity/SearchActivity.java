@@ -8,9 +8,6 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.viewbinding.ViewBinding;
 
@@ -45,13 +42,6 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
         activity.startActivity(new Intent(activity, SearchActivity.class));
     }
 
-    private final ActivityResultLauncher<String> launcher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), new ActivityResultCallback<>() {
-        @Override
-        public void onActivityResult(Boolean isGranted) {
-            if (isGranted) mBinding.mic.start();
-        }
-    });
-
     @Override
     protected ViewBinding getBinding() {
         return mBinding = ActivitySearchBinding.inflate(getLayoutInflater());
@@ -77,7 +67,7 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
                 else getSuggest(s.toString());
             }
         });
-        mBinding.mic.setListener(launcher, new CustomListener() {
+        mBinding.mic.setListener(this, new CustomListener() {
             @Override
             public void onEndOfSpeech() {
                 mBinding.mic.stop();
