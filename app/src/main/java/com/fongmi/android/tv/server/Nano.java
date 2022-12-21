@@ -2,6 +2,7 @@ package com.fongmi.android.tv.server;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.event.ServerEvent;
 import com.fongmi.android.tv.server.process.InputRequestProcess;
 import com.fongmi.android.tv.server.process.RawRequestProcess;
 import com.fongmi.android.tv.server.process.RequestProcess;
@@ -11,7 +12,6 @@ import com.google.gson.JsonObject;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -101,7 +101,7 @@ public class Nano extends NanoHTTPD {
             File file = FileUtil.getRootFile(path);
             if (file.isFile()) return newChunkedResponse(Response.Status.OK, "application/octet-stream", new FileInputStream(file));
             else return newFixedLengthResponse(Response.Status.OK, MIME_PLAINTEXT, listFiles(file));
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
             return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, e.getMessage());
         }
     }
@@ -150,6 +150,7 @@ public class Nano extends NanoHTTPD {
         JsonObject info = new JsonObject();
         info.addProperty("parent", parent);
         if (list == null || list.length == 0) {
+            if (parent.equals(".")) ServerEvent.file();
             info.add("files", new JsonArray());
             return info.toString();
         }
