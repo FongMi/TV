@@ -136,7 +136,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private int getPlayerType() {
-        return mHistory != null && mHistory.getPlayer() != -1 ? mHistory.getPlayer() : getSite().getPlayerType() != -1 ? getSite().getPlayerType() : Prefers.getPlayer();
+        return mHistory != null && mHistory.getPlayer() != -1 ? mHistory.getPlayer() : Prefers.getPlayer();
     }
 
     private StyledPlayerView getExo() {
