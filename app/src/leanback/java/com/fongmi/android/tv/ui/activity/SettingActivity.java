@@ -28,6 +28,7 @@ import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.Utils;
 import com.permissionx.guolindev.PermissionX;
 
 public class SettingActivity extends BaseActivity implements ConfigCallback, SiteCallback, LiveCallback {
@@ -85,7 +86,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
     }
 
     private void checkPermission() {
-        if (config.getUrl().startsWith("file") && !PermissionX.isGranted(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+        if (config.getUrl().startsWith("file") && !Utils.hasPermission(this)) {
             PermissionX.init(this).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> loadConfig());
         } else {
             loadConfig();

@@ -74,6 +74,7 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
         binding.text.setText(url = getUrl());
         binding.text.setSelection(url.length());
         binding.code.setImageBitmap(QRCode.getBitmap(address, 200, 0));
+        binding.storage.setVisibility(Utils.hasPermission(activity) ? View.GONE : View.VISIBLE);
         binding.info.setText(ResUtil.getString(R.string.push_info, address).replace("，", "\n"));
     }
 
@@ -102,8 +103,7 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
     }
 
     private void onStorage(View view) {
-        if (PermissionX.isGranted(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE)) return;
-        PermissionX.init(activity).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request(null);
+        PermissionX.init(activity).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> binding.storage.setVisibility(allGranted ? View.GONE : View.VISIBLE));
     }
 
     private void onPositive(View view) {
