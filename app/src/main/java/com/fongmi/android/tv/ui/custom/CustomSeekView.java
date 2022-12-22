@@ -65,7 +65,7 @@ public class CustomSeekView extends FrameLayout implements TimeBar.OnScrubListen
     }
 
     private void seekToTimeBarPosition(long positionMs) {
-        listener.seekTo(positionMs);
+        listener.seekTo(positionMs, true);
         updateProgress();
     }
 
