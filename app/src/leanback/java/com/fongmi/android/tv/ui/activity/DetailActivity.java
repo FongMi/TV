@@ -256,6 +256,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
+        mViewModel.search.observe(this, result -> setSearch(result.getList()));
         mViewModel.player.observe(this, result -> {
             boolean useParse = (result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx() == 1;
             mBinding.control.parseLayout.setVisibility(useParse ? View.VISIBLE : View.GONE);
@@ -266,9 +267,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
             if (result.getList().isEmpty()) mBinding.progressLayout.showEmpty();
             else setDetail(result.getList().get(0));
             Notify.dismiss();
-        });
-        mViewModel.search.observe(this, result -> {
-            setSearch(result.getList());
         });
     }
 
