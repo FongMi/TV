@@ -1,9 +1,13 @@
 package com.fongmi.android.tv;
 
+import android.app.Activity;
 import android.content.Context;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.os.HandlerCompat;
 import androidx.multidex.MultiDex;
 import androidx.multidex.MultiDexApplication;
@@ -21,6 +25,7 @@ public class App extends MultiDexApplication {
     private final ExecutorService executor;
     private final Handler handler;
     private static App instance;
+    private Activity activity;
 
     public App() {
         instance = this;
@@ -30,6 +35,10 @@ public class App extends MultiDexApplication {
 
     public static App get() {
         return instance;
+    }
+
+    public static Activity getActivity() {
+        return get().activity;
     }
 
     public static void execute(Runnable runnable) {
@@ -49,6 +58,14 @@ public class App extends MultiDexApplication {
         get().handler.removeCallbacks(runnable);
     }
 
+    public static void removeCallbacks(Runnable... runnable) {
+        for (Runnable r : runnable) get().handler.removeCallbacks(r);
+    }
+
+    private void setActivity(Activity activity) {
+        this.activity = activity;
+    }
+
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
@@ -60,5 +77,40 @@ public class App extends MultiDexApplication {
         super.onCreate();
         execute(() -> XWalkLoader.get().load());
         CaocConfig.Builder.create().backgroundMode(CaocConfig.BACKGROUND_MODE_SILENT).errorActivity(CrashActivity.class).apply();
+        registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
+            @Override
+            public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
+                if (activity != getActivity()) setActivity(activity);
+            }
+
+            @Override
+            public void onActivityStarted(@NonNull Activity activity) {
+                if (activity != getActivity()) setActivity(activity);
+            }
+
+            @Override
+            public void onActivityResumed(@NonNull Activity activity) {
+                if (activity != getActivity()) setActivity(activity);
+            }
+
+            @Override
+            public void onActivityPaused(@NonNull Activity activity) {
+                if (activity == getActivity()) setActivity(null);
+            }
+
+            @Override
+            public void onActivityStopped(@NonNull Activity activity) {
+                if (activity == getActivity()) setActivity(null);
+            }
+
+            @Override
+            public void onActivityDestroyed(@NonNull Activity activity) {
+                if (activity == getActivity()) setActivity(null);
+            }
+
+            @Override
+            public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {
+            }
+        });
     }
 }
