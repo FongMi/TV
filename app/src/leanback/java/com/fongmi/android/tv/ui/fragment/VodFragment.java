@@ -35,7 +35,6 @@ import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 
 public class VodFragment extends BaseFragment implements CustomScroller.Callback, VodPresenter.OnClickListener {
 
@@ -114,7 +113,6 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     }
 
     private void setClick(ArrayObjectAdapter adapter, String key, Filter.Value item) {
-        if (mExtend.get(key) != null && Objects.equals(mExtend.get(key), item.getV())) return;
         for (int i = 0; i < adapter.size(); i++) ((Filter.Value) adapter.get(i)).setActivated(item);
         adapter.notifyArrayItemRangeChanged(0, adapter.size());
         mExtend.put(key, item.getV());
