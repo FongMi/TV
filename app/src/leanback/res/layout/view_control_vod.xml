@@ -136,7 +136,8 @@
                 android:text="@string/play_tracks"
                 android:textColor="@color/white"
                 android:textSize="14sp"
-                android:visibility="gone" />
+                android:visibility="gone"
+                tools:visibility="visible" />
 
             <TextView
                 android:layout_width="wrap_content"

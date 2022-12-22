@@ -143,6 +143,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.control.scale.setOnClickListener(view -> onScale());
         mBinding.control.speed.setOnClickListener(view -> onSpeed());
         mBinding.control.invert.setOnClickListener(view -> onInvert());
+        mBinding.control.across.setOnClickListener(view -> onAcross());
         mBinding.control.player.setOnClickListener(view -> onPlayer());
         mBinding.control.decode.setOnClickListener(view -> onDecode());
         mBinding.control.tracks.setOnClickListener(view -> onTracks());
@@ -185,6 +186,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.control.speed.setText(mPlayers.getSpeedText());
         mBinding.control.home.setVisibility(LiveConfig.isOnly() ? View.GONE : View.VISIBLE);
         mBinding.control.invert.setActivated(Prefers.isInvert());
+        mBinding.control.across.setActivated(Prefers.isAcross());
         setPlayerView();
         setDecodeView();
     }
@@ -290,6 +292,11 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private void onInvert() {
         Prefers.putInvert(!Prefers.isInvert());
         mBinding.control.invert.setActivated(Prefers.isInvert());
+    }
+
+    private void onAcross() {
+        Prefers.putAcross(!Prefers.isAcross());
+        mBinding.control.across.setActivated(Prefers.isAcross());
     }
 
     private void onPlayer() {
@@ -551,16 +558,18 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     @Override
     public void onKeyUp() {
         int position = mGroup.getPosition() - 1;
-        if (position < 0) prevGroup(true);
-        else mGroup.setPosition(position);
+        boolean limit = position < 0;
+        if (Prefers.isAcross() & limit) prevGroup(true);
+        else mGroup.setPosition(limit ? mChannelAdapter.size() - 1 : position);
         setChannel(mGroup.current());
     }
 
     @Override
     public void onKeyDown() {
         int position = mGroup.getPosition() + 1;
-        if (position > mGroup.getChannel().size() - 1) nextGroup(true);
-        else mGroup.setPosition(position);
+        boolean limit = position > mChannelAdapter.size() - 1;
+        if (Prefers.isAcross() && limit) nextGroup(true);
+        else mGroup.setPosition(limit ? 0 : position);
         setChannel(mGroup.current());
     }
 
@@ -590,7 +599,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     public boolean onLongPress() {
         if (isVisible(mBinding.control.home)) showControl(mBinding.control.home);
         else if (isVisible(mBinding.control.line)) showControl(mBinding.control.line);
-        else showControl(mBinding.control.invert);
+        else showControl(mBinding.control.player);
         hideInfo();
         hideUI();
         return true;

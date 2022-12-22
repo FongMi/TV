@@ -17,6 +17,7 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.api.LiveConfig;
+import com.fongmi.android.tv.api.Updater;
 import com.fongmi.android.tv.api.WallConfig;
 import com.fongmi.android.tv.bean.Func;
 import com.fongmi.android.tv.bean.History;
@@ -42,7 +43,6 @@ import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
-import com.fongmi.android.tv.api.Updater;
 import com.fongmi.android.tv.utils.Utils;
 import com.google.common.collect.Lists;
 
@@ -253,7 +253,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     public void showDialog() {
-        SiteDialog.create(this).show();
+        SiteDialog.create(this).filter(true).show();
     }
 
     @Override

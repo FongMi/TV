@@ -45,6 +45,7 @@
     <string name="play_reset">重置</string>
     <string name="play_tracks">轨道</string>
     <string name="play_invert">反转</string>
+    <string name="play_across">跨类</string>
     <string name="play_op">片头</string>
     <string name="play_ed">片尾</string>
     <string name="play_reverse">倒序</string>
@@ -69,6 +70,7 @@
     <string name="setting_quality">图片品质</string>
     <string name="setting_size">图片尺寸</string>
     <string name="setting_version">版本</string>
+    <string name="setting_storage">权限</string>
 
     <!-- Dialog -->
     <string name="dialog_positive">确定</string>
