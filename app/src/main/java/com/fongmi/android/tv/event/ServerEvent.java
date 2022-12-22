@@ -4,8 +4,8 @@ import org.greenrobot.eventbus.EventBus;
 
 public class ServerEvent {
 
-    private final String text;
     private final Type type;
+    private final String text;
 
     public static void search(String text) {
         EventBus.getDefault().post(new ServerEvent(Type.SEARCH, text));
