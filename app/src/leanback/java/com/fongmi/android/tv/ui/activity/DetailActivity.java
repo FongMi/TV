@@ -256,6 +256,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
+        mViewModel.search.observe(this, result -> setSearch(result.getList()));
         mViewModel.player.observe(this, result -> {
             boolean useParse = (result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx() == 1;
             mBinding.control.parseLayout.setVisibility(useParse ? View.VISIBLE : View.GONE);
@@ -266,9 +267,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
             if (result.getList().isEmpty()) mBinding.progressLayout.showEmpty();
             else setDetail(result.getList().get(0));
             Notify.dismiss();
-        });
-        mViewModel.search.observe(this, result -> {
-            setSearch(result.getList());
         });
     }
 
@@ -343,7 +341,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         if (mFlagAdapter.size() == 0 || item.isActivated()) return;
         for (int i = 0; i < mFlagAdapter.size(); i++) ((Vod.Flag) mFlagAdapter.get(i)).setActivated(item);
         mBinding.flag.setSelectedPosition(mFlagAdapter.indexOf(item));
-        mEpisodeAdapter.setItems(item.getEpisodes(), null);
         notifyItemChanged(mBinding.flag, mFlagAdapter);
         setEpisodeAdapter(item.getEpisodes());
         seamless(item);
@@ -757,7 +754,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void checkPosition() {
-        mPlayers.seekTo(Math.max(mHistory.getOpening(), mHistory.getPosition()));
+        mPlayers.seekTo(Math.max(mHistory.getOpening(), mHistory.getPosition()), false);
         Clock.get().setCallback(this);
     }
 

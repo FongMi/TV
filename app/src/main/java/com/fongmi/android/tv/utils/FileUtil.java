@@ -1,6 +1,5 @@
 package com.fongmi.android.tv.utils;
 
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
@@ -12,6 +11,11 @@ import androidx.core.content.FileProvider;
 
 import com.fongmi.android.tv.App;
 
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
+import org.apache.commons.compress.utils.IOUtils;
+
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,7 +23,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.URLConnection;
 import java.security.MessageDigest;
 
@@ -31,8 +34,8 @@ public class FileUtil {
         return Environment.getExternalStorageDirectory().getAbsolutePath();
     }
 
-    public static File getLibDir() {
-        return App.get().getDir("libs", Context.MODE_PRIVATE);
+    public static File getRootFile(String path) {
+        return new File(getRootPath() + File.separator + path);
     }
 
     public static File getCacheDir() {
@@ -40,7 +43,7 @@ public class FileUtil {
     }
 
     public static File getCacheDir(String folder) {
-        return new File(getCachePath() + "/" + folder);
+        return new File(getCachePath() + File.separator + folder);
     }
 
     public static String getCachePath() {
@@ -95,13 +98,29 @@ public class FileUtil {
         }
     }
 
-    public static void copy(File src, File dst) throws IOException {
-        try (InputStream in = new FileInputStream(src)) {
-            try (OutputStream out = new FileOutputStream(dst)) {
-                int len;
-                byte[] buf = new byte[1024];
-                while ((len = in.read(buf)) > 0) out.write(buf, 0, len);
+    public static void unzip(File target, String path) {
+        try (ZipArchiveInputStream in = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(target)))) {
+            ZipArchiveEntry entry;
+            while ((entry = in.getNextZipEntry()) != null) {
+                File out = new File(path, entry.getName());
+                if (entry.isDirectory()) out.mkdirs();
+                else copy(in, out);
             }
+        } catch (Exception ignored) {
+        }
+    }
+
+    public static void copy(File in, File out) {
+        try {
+            IOUtils.copy(new FileInputStream(in), new FileOutputStream(out));
+        } catch (Exception ignored) {
+        }
+    }
+
+    public static void copy(InputStream in, File out) {
+        try {
+            IOUtils.copy(in, new FileOutputStream(out));
+        } catch (Exception ignored) {
         }
     }
 
