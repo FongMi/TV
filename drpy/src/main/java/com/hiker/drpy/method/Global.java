@@ -88,7 +88,7 @@ public class Global {
         try {
             return ctx.parseJSON(new Gson().toJson(parser.pdfa(html, rule)));
         } catch (Exception e) {
-            return null;
+            return ctx.createNewJSObject();
         }
     }
 
@@ -108,7 +108,7 @@ public class Global {
         try {
             return ctx.parseJSON(new Gson().toJson(parser.pdfl(html, rule, texts, urls, urlKey)));
         } catch (Exception e) {
-            return null;
+            return ctx.createNewJSObject();
         }
     }
 
