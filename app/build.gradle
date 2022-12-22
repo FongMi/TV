@@ -9,9 +9,9 @@ android {
     defaultConfig {
         applicationId "com.fongmi.android.tv"
         minSdk 17
-        targetSdk 33
-        versionCode 52
-        versionName "1.5.2"
+        targetSdk 29
+        versionCode 53
+        versionName "1.5.3"
         multiDexEnabled true
         ndk { abiFilters "armeabi-v7a" }
     }
@@ -77,6 +77,7 @@ dependencies {
     implementation 'org.greenrobot:eventbus:3.3.1'
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
     implementation 'org.xwalk:xwalk_shared_library:23.53.589.4'
+	implementation 'org.apache.commons:commons-compress:1.18'
     implementation('org.simpleframework:simple-xml:2.7.1') { exclude group: 'stax', module: 'stax-api' exclude group: 'xpp3', module: 'xpp3' }
     leanbackImplementation 'androidx.leanback:leanback:1.2.0-alpha02'
     annotationProcessor 'androidx.room:room-compiler:2.4.3'

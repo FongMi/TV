@@ -3,22 +3,14 @@ package com.fongmi.android.tv.ui.activity;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Environment;
-import android.provider.Settings;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.RequiresApi;
-import androidx.core.content.ContextCompat;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.BuildConfig;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.api.LiveConfig;
+import com.fongmi.android.tv.api.Updater;
 import com.fongmi.android.tv.api.WallConfig;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Live;
@@ -36,12 +28,10 @@ import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
-import com.fongmi.android.tv.api.Updater;
+import com.fongmi.android.tv.utils.Utils;
+import com.permissionx.guolindev.PermissionX;
 
 public class SettingActivity extends BaseActivity implements ConfigCallback, SiteCallback, LiveCallback {
-
-    private final ActivityResultLauncher<String> launcherString = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> loadConfig());
-    private final ActivityResultLauncher<Intent> launcherIntent = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> loadConfig());
 
     private ActivitySettingBinding mBinding;
     private Config config;
@@ -71,7 +61,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
 
     @Override
     protected void initEvent() {
-        mBinding.vodHome.setOnClickListener(view -> SiteDialog.create(this).show());
+        mBinding.vodHome.setOnClickListener(view -> SiteDialog.create(this).all().show());
         mBinding.liveHome.setOnClickListener(view -> LiveDialog.create(this).show());
         mBinding.vod.setOnClickListener(view -> ConfigDialog.create(this).type(0).show());
         mBinding.live.setOnClickListener(view -> ConfigDialog.create(this).type(1).show());
@@ -96,21 +86,10 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
     }
 
     private void checkPermission() {
-        if (config.getUrl().startsWith("file") && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager()) {
-            openSetting();
-        } else if (config.getUrl().startsWith("file") && Build.VERSION.SDK_INT < Build.VERSION_CODES.R && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            launcherString.launch(Manifest.permission.READ_EXTERNAL_STORAGE);
+        if (config.getUrl().startsWith("file") && !Utils.hasPermission(this)) {
+            PermissionX.init(this).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> loadConfig());
         } else {
             loadConfig();
-        }
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.R)
-    private void openSetting() {
-        try {
-            launcherIntent.launch(new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:" + BuildConfig.APPLICATION_ID)));
-        } catch (Exception e) {
-            launcherIntent.launch(new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION));
         }
     }
 

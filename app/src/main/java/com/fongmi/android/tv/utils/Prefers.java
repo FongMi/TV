@@ -147,6 +147,14 @@ public class Prefers {
         put("invert", invert);
     }
 
+    public static boolean isAcross() {
+        return getBoolean("across", true);
+    }
+
+    public static void putAcross(boolean across) {
+        put("across", across);
+    }
+
     public static boolean getUpdate() {
         return getBoolean("update", true);
     }

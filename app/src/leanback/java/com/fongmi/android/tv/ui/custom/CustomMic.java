@@ -3,7 +3,6 @@ package com.fongmi.android.tv.ui.custom;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.speech.RecognizerIntent;
@@ -12,21 +11,21 @@ import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.animation.Animation;
 
-import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
-import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentActivity;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.bassaer.library.MDColor;
+import com.permissionx.guolindev.PermissionX;
 
 public class CustomMic extends AppCompatImageView {
 
-    private ActivityResultLauncher<String> launcher;
     private SpeechRecognizer recognizer;
+    private FragmentActivity activity;
     private Animation flicker;
     private boolean listen;
 
@@ -44,10 +43,6 @@ public class CustomMic extends AppCompatImageView {
         recognizer = SpeechRecognizer.createSpeechRecognizer(context);
     }
 
-    private boolean hasPermission() {
-        return ContextCompat.checkSelfPermission(getContext(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED;
-    }
-
     private boolean isListen() {
         return listen;
     }
@@ -56,14 +51,15 @@ public class CustomMic extends AppCompatImageView {
         this.listen = listen;
     }
 
-    public void setListener(ActivityResultLauncher<String> launcher, CustomListener listener) {
+    public void setListener(FragmentActivity activity, CustomListener listener) {
         this.recognizer.setRecognitionListener(listener);
-        this.launcher = launcher;
+        this.activity = activity;
     }
 
-    private void check() {
-        if (hasPermission()) start();
-        else launcher.launch(Manifest.permission.RECORD_AUDIO);
+    private void checkPermission() {
+        PermissionX.init(activity).permissions(Manifest.permission.RECORD_AUDIO).request((allGranted, grantedList, deniedList) -> {
+            if (allGranted) start();
+        });
     }
 
     private void startListening() {
@@ -93,7 +89,7 @@ public class CustomMic extends AppCompatImageView {
     @Override
     protected void onFocusChanged(boolean gainFocus, int direction, @Nullable Rect previouslyFocusedRect) {
         super.onFocusChanged(gainFocus, direction, previouslyFocusedRect);
-        if (gainFocus) check();
+        if (gainFocus) checkPermission();
         else stop();
     }
 

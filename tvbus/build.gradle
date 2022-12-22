@@ -7,6 +7,6 @@ android {
 
     defaultConfig {
         minSdk 17
-        targetSdk 33
+        targetSdk 29
     }
 }

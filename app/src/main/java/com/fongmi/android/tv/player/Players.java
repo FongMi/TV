@@ -201,13 +201,12 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     }
 
     public void seekTo(int time) {
-        if (time == 0) return;
         if (isExo()) exoPlayer.seekTo(getPosition() + time);
         else if (isIjk()) ijkPlayer.seekTo(getPosition() + time);
     }
 
-    public void seekTo(long time) {
-        if (time == 0) return;
+    public void seekTo(long time, boolean force) {
+        if (time == 0 && !force) return;
         if (isExo()) exoPlayer.seekTo(time);
         else if (isIjk()) ijkPlayer.seekTo(time);
     }
