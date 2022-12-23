@@ -7,11 +7,15 @@ import android.os.IBinder;
 
 public class TVService extends Service {
 
-    private TVCore tvCore;
+    private TVCore tvcore;
 
-    public static void start(Context context) {
+    public static void start(Context context, String auth, String name, String pass) {
         try {
-            context.startService(new Intent(context, TVService.class));
+            Intent intent = new Intent(context, TVService.class);
+            intent.putExtra("auth", auth);
+            intent.putExtra("name", name);
+            intent.putExtra("pass", pass);
+            context.startService(intent);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -27,22 +31,22 @@ public class TVService extends Service {
 
     @Override
     public void onCreate() {
-        tvCore = TVCore.getInstance();
-        tvCore.setServPort(0);
-        tvCore.setPlayPort(8902);
-        tvCore.setRunningMode(1);
-        tvCore.init(this);
+        tvcore = TVCore.getInstance();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        tvcore.auth(intent.getStringExtra("auth")).name(intent.getStringExtra("name")).pass(intent.getStringExtra("pass"));
+        tvcore.serv(0).play(8902).mode(1);
+        tvcore.init(this);
         return START_NOT_STICKY;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        tvCore.quit();
+        tvcore.stop();
+        tvcore.quit();
     }
 
     @Override
