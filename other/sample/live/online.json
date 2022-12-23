@@ -6,7 +6,12 @@
       "url": "https://github.com/live.txt",
       "epg": "http://epg.51zmt.top:8000/api/diyp/?ch={name}&date={date}",
       "logo": "",
-      "ua": ""
+      "ua": "",
+      "core": {
+        "auth": "",
+        "name": "",
+        "pass": ""
+      }
     },
     {
       "name": "M3U",
