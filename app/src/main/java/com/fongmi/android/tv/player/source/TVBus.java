@@ -1,8 +1,5 @@
 package com.fongmi.android.tv.player.source;
 
-import android.os.SystemClock;
-import android.text.TextUtils;
-
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.bean.Core;
 import com.google.gson.Gson;
@@ -34,12 +31,22 @@ public class TVBus implements TVListener {
         TVService.start(App.get(), core.getAuth(), core.getName(), core.getPass());
     }
 
-    public String fetch(String url) {
+    public String fetch(String url) throws InterruptedException {
         tvcore.start(url);
-        while (TextUtils.isEmpty(hls)) SystemClock.sleep(50);
-        String temp = hls;
-        hls = null;
-        return temp;
+        onWait();
+        return hls;
+    }
+
+    private void onWait() throws InterruptedException {
+        synchronized (this) {
+            wait();
+        }
+    }
+
+    private void onNotify() {
+        synchronized (this) {
+            notify();
+        }
     }
 
     public void stop() {
@@ -51,6 +58,7 @@ public class TVBus implements TVListener {
         JsonObject json = gson.fromJson(result, JsonObject.class);
         if (json.get("hls") == null) return;
         hls = json.get("hls").getAsString();
+        onNotify();
     }
 
     @Override
