@@ -31,6 +31,8 @@ public class Live {
     private List<Channel> channels;
     @SerializedName("groups")
     private List<Group> groups;
+    @SerializedName("core")
+    private Core core;
 
     private boolean activated;
 
@@ -85,6 +87,10 @@ public class Live {
 
     public List<Group> getGroups() {
         return groups = groups == null ? new ArrayList<>() : groups;
+    }
+
+    public Core getCore() {
+        return core == null ? new Core() : core;
     }
 
     public boolean isActivated() {

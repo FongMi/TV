@@ -216,6 +216,10 @@ public class Channel {
         return getScheme().startsWith("zlive");
     }
 
+    public boolean isTVBus() {
+        return getScheme().startsWith("tvbus");
+    }
+
     public Map<String, String> getHeaders() {
         HashMap<String, String> map = new HashMap<>();
         if (getUa().isEmpty()) return map;
