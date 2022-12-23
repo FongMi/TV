@@ -38,6 +38,7 @@ public class LiveParser {
         for (Group group : live.getGroups()) {
             for (Channel channel : group.getChannel()) {
                 channel.setNumber(++number);
+                channel.setUa(live.getUa());
             }
         }
     }
