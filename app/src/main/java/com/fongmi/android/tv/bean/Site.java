@@ -154,8 +154,13 @@ public class Site {
         return getSearchable() == null || getSearchable() == 1;
     }
 
+    public boolean unSearchable() {
+        return getSearchable() != null && getSearchable() == 0;
+    }
+
     public Site setSearchable(boolean searchable) {
-        setSearchable(searchable ? 1 : 0);
+        if (unSearchable()) return this;
+        setSearchable(searchable ? 1 : 2);
         return this;
     }
 
@@ -193,8 +198,8 @@ public class Site {
     public Site sync() {
         Site item = find(getKey());
         if (item == null) return this;
-        setSearchable(item.getSearchable());
         setFilterable(item.getFilterable());
+        setSearchable(item.getSearchable());
         return this;
     }
 
