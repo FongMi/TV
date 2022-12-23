@@ -7,6 +7,7 @@ import com.fongmi.android.tv.api.LiveParser;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.player.source.Force;
+import com.fongmi.android.tv.player.source.TVBus;
 import com.fongmi.android.tv.player.source.ZLive;
 
 import java.util.concurrent.Callable;
@@ -34,7 +35,8 @@ public class LiveViewModel extends ViewModel {
         execute(() -> {
             String url = item.getUrls().get(item.getLine());
             if (item.isForce()) item.setUrl(Force.get().fetch(url));
-            if (item.isZLive()) item.setUrl(ZLive.get().fetch(url));
+            else if (item.isZLive()) item.setUrl(ZLive.get().fetch(url));
+            else if (item.isTVBus()) item.setUrl(TVBus.get().fetch(url));
             else item.setUrl(url);
             return item;
         });

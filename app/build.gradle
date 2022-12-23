@@ -57,6 +57,7 @@ android {
 
 dependencies {
     implementation project(':drpy')
+    implementation project(':tvbus')
     implementation project(':zlive')
     implementation project(':catvod')
     implementation project(':forcetech')
