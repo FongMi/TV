@@ -9,7 +9,6 @@ import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.net.Callback;
-import com.fongmi.android.tv.player.source.TVBus;
 import com.fongmi.android.tv.utils.Json;
 import com.fongmi.android.tv.utils.Prefers;
 import com.google.gson.JsonElement;
@@ -173,7 +172,6 @@ public class LiveConfig {
     public void setHome(Live home) {
         this.home = home;
         this.home.setActivated(true);
-        TVBus.get().init(home.getCore());
         config.home(home.getName()).update();
         for (Live item : lives) item.setActivated(home);
     }
