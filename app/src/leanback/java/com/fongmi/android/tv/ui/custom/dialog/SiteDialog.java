@@ -20,6 +20,7 @@ public class SiteDialog implements SitePresenter.OnClickListener {
 
     private final ArrayObjectAdapter adapter;
     private final DialogSiteBinding binding;
+    private final SitePresenter presenter;
     private final SiteCallback callback;
     private final AlertDialog dialog;
 
@@ -28,10 +29,26 @@ public class SiteDialog implements SitePresenter.OnClickListener {
     }
 
     public SiteDialog(Activity activity) {
-        this.callback = (SiteCallback) activity;
+        this.callback = (activity instanceof SiteCallback) ? (SiteCallback) activity : null;
         this.binding = DialogSiteBinding.inflate(LayoutInflater.from(activity));
         this.dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).create();
-        this.adapter = new ArrayObjectAdapter(new SitePresenter(this));
+        this.adapter = new ArrayObjectAdapter(presenter = new SitePresenter(this));
+    }
+
+    public SiteDialog search(boolean search) {
+        this.presenter.search(search);
+        return this;
+    }
+
+    public SiteDialog filter(boolean filter) {
+        this.presenter.filter(filter);
+        return this;
+    }
+
+    public SiteDialog all() {
+        this.presenter.search(true);
+        this.presenter.filter(true);
+        return this;
     }
 
     public void show() {
@@ -58,6 +75,7 @@ public class SiteDialog implements SitePresenter.OnClickListener {
 
     @Override
     public void onTextClick(Site item) {
+        if (callback == null) return;
         callback.setSite(item);
         dialog.dismiss();
     }

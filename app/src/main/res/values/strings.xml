@@ -45,6 +45,7 @@
     <string name="play_reset">Reset</string>
     <string name="play_tracks">Tracks</string>
     <string name="play_invert">Invert</string>
+    <string name="play_across">Across</string>
     <string name="play_op">OP</string>
     <string name="play_ed">ED</string>
     <string name="play_reverse">Reverse</string>
@@ -69,6 +70,7 @@
     <string name="setting_quality">Image quality</string>
     <string name="setting_size">Image size</string>
     <string name="setting_version">Version</string>
+    <string name="setting_storage">Permission</string>
 
     <!-- Dialog -->
     <string name="dialog_positive">OK</string>
