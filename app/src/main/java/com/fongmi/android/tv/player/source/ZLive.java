@@ -48,6 +48,7 @@ public class ZLive {
     public void stop() {
         try {
             if (init) com.east.android.zlive.ZLive.INSTANCE.OnLiveStop();
+            init = false;
         } catch (Throwable e) {
             e.printStackTrace();
         }

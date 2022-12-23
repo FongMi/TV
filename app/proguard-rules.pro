@@ -37,3 +37,10 @@
 -keep class tv.danmaku.ijk.media.player.** { *; }
 -keep class tv.danmaku.ijk.media.player.IjkMediaPlayer { *; }
 -keep class tv.danmaku.ijk.media.player.ffmpeg.FFmpegApi { *; }
+
+# TVBus
+-keep class com.tvbus.engine.** { *; }
+
+# ZLive
+-keep class com.sun.jna.** { *; }
+-keep class com.east.android.zlive.** { *; }

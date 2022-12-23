@@ -26,6 +26,7 @@ public class LiveViewModel extends ViewModel {
 
     public void getLive(Live home) {
         execute(() -> {
+            TVBus.get().init(home.getCore());
             LiveParser.start(home);
             return home;
         });
