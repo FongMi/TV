@@ -212,6 +212,10 @@ public class Channel {
         return getScheme().startsWith("p") || getScheme().equals("mitv");
     }
 
+    public boolean isZLive() {
+        return getScheme().startsWith("zlive");
+    }
+
     public Map<String, String> getHeaders() {
         HashMap<String, String> map = new HashMap<>();
         if (getUa().isEmpty()) return map;

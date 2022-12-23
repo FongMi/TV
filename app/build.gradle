@@ -57,6 +57,7 @@ android {
 
 dependencies {
     implementation project(':drpy')
+    implementation project(':zlive')
     implementation project(':catvod')
     implementation project(':forcetech')
     implementation project(':ijkplayer')
@@ -79,6 +80,7 @@ dependencies {
     implementation 'com.guolindev.permissionx:permissionx:1.7.1'
     implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.10'
     implementation 'me.jessyan:autosize:1.2.1'
+    implementation 'net.java.dev.jna:jna:5.12.1'
     implementation 'org.greenrobot:eventbus:3.3.1'
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
     implementation 'org.apache.commons:commons-compress:1.20'
