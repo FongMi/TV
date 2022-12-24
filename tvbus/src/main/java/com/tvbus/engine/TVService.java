@@ -9,12 +9,13 @@ public class TVService extends Service {
 
     private TVCore tvcore;
 
-    public static void start(Context context, String auth, String name, String pass) {
+    public static void start(Context context, String auth, String name, String pass, String broker) {
         try {
             Intent intent = new Intent(context, TVService.class);
             intent.putExtra("auth", auth);
             intent.putExtra("name", name);
             intent.putExtra("pass", pass);
+            intent.putExtra("broker", broker);
             context.startService(intent);
         } catch (Exception e) {
             e.printStackTrace();
@@ -30,13 +31,8 @@ public class TVService extends Service {
     }
 
     @Override
-    public void onCreate() {
-        tvcore = TVCore.getInstance();
-    }
-
-    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        tvcore.auth(intent.getStringExtra("auth")).name(intent.getStringExtra("name")).pass(intent.getStringExtra("pass"));
+        tvcore = TVCore.getInstance().auth(intent.getStringExtra("auth")).name(intent.getStringExtra("name")).pass(intent.getStringExtra("pass")).broker(intent.getStringExtra("broker"));
         tvcore.serv(0).play(8902).mode(1);
         tvcore.init(this);
         return START_NOT_STICKY;

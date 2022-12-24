@@ -28,7 +28,7 @@ public class TVBus implements TVListener {
 
     public void init(Core core) {
         tvcore = TVCore.getInstance().listener(this);
-        TVService.start(App.get(), core.getAuth(), core.getName(), core.getPass());
+        TVService.start(App.get(), core.getAuth(), core.getName(), core.getPass(), core.getBroker());
     }
 
     public String fetch(String url) throws InterruptedException {

@@ -49,6 +49,11 @@ public class TVCore {
         return this;
     }
 
+    public TVCore broker(String str) {
+        if (!TextUtils.isEmpty(str)) setMKBroker(nativeHandle, str);
+        return this;
+    }
+
     public TVCore name(String str) {
         if (!TextUtils.isEmpty(str)) setUsername(nativeHandle, str);
         return this;
@@ -104,6 +109,8 @@ public class TVCore {
     private native void setRunningMode(long handle, int mode);
 
     private native void setAuthUrl(long handle, String str);
+
+    private native void setMKBroker(long handle, String str);
 
     private native void setPassword(long handle, String str);
 
