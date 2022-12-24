@@ -10,6 +10,8 @@ public class Core {
     private String name;
     @SerializedName("pass")
     private String pass;
+    @SerializedName("broker")
+    private String broker;
 
     public String getAuth() {
         return auth;
@@ -21,5 +23,9 @@ public class Core {
 
     public String getPass() {
         return pass;
+    }
+
+    public String getBroker() {
+        return broker;
     }
 }
