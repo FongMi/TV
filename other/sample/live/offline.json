@@ -6,13 +6,7 @@
       "url": "file://Download/live.txt",
       "epg": "http://epg.51zmt.top:8000/api/diyp/?ch={name}&date={date}",
       "logo": "",
-      "ua": "",
-      "core": {
-        "auth": "",
-        "name": "",
-        "pass": "",
-        "broker": ""
-      }
+      "ua": ""
     },
     {
       "name": "M3U",
