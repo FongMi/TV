@@ -6,9 +6,8 @@ import android.widget.ImageView;
 
 import androidx.annotation.StringRes;
 
-import com.bumptech.glide.Glide;
-import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.gson.annotations.SerializedName;
 
@@ -104,7 +103,7 @@ public class Group {
     }
 
     public void loadLogo(ImageView view) {
-        if (!getLogo().isEmpty()) Glide.with(App.get()).load(getLogo()).into(view);
+        if (!getLogo().isEmpty()) ImgUtil.loadLive(getLogo(), view);
     }
 
     public int find(int number) {

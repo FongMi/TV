@@ -5,9 +5,8 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
-import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -161,7 +160,7 @@ public class Channel {
     }
 
     public void loadLogo(ImageView view) {
-        if (!getLogo().isEmpty()) Glide.with(App.get()).load(getLogo()).placeholder(R.drawable.ic_img_loading).error(R.drawable.ic_img_error).into(view);
+        if (!getLogo().isEmpty()) ImgUtil.loadLive(getLogo(), view);
     }
 
     public void addUrls(String... urls) {
