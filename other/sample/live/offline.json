@@ -12,7 +12,7 @@
       "name": "M3U",
       "type": 0,
       "url": "file://Download/live.m3u",
-      "epg": "https://epg.112114.xyz/?ch={name}",
+      "epg": "https://epg.112114.xyz/?ch={name}&date={date}",
       "logo": "",
       "ua": ""
     }
