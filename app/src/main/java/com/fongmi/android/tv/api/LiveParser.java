@@ -49,7 +49,8 @@ public class LiveParser {
             if (line.startsWith("#EXTINF:")) {
                 Group group = live.find(Group.create(extract(line, GROUP)));
                 channel = group.find(Channel.create(extract(line, NAME)));
-                channel.epg(live).setLogo(extract(line, LOGO));
+                channel.setLogo(extract(line, LOGO));
+                channel.epg(live).logo(live);
             } else if (line.contains("://")) {
                 channel.getUrls().add(line);
             }
@@ -64,7 +65,7 @@ public class LiveParser {
             if (live.getGroups().isEmpty()) live.getGroups().add(Group.create(R.string.live_group));
             if (split[1].contains("://")) {
                 Group group = live.getGroups().get(live.getGroups().size() - 1);
-                group.find(Channel.create(split[0]).epg(live)).addUrls(split[1].split("#"));
+                group.find(Channel.create(split[0]).epg(live).logo(live)).addUrls(split[1].split("#"));
             }
         }
     }
