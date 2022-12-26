@@ -161,7 +161,7 @@ public class Channel {
     }
 
     public void loadLogo(ImageView view) {
-        if (!getLogo().isEmpty()) Glide.with(App.get()).load(getLogo()).into(view);
+        if (!getLogo().isEmpty()) Glide.with(App.get()).load(getLogo()).placeholder(R.drawable.ic_img_loading).error(R.drawable.ic_img_error).into(view);
     }
 
     public void addUrls(String... urls) {
@@ -199,8 +199,14 @@ public class Channel {
     }
 
     public Channel epg(Live live) {
-        if (live.getEpg().isEmpty()) return this;
+        if (live.getEpg().isEmpty() || getEpg().startsWith("http")) return this;
         setEpg(live.getEpg().replace("{name}", getName()).replace("{epg}", getEpg()));
+        return this;
+    }
+
+    public Channel logo(Live live) {
+        if (live.getLogo().isEmpty() || getLogo().startsWith("http")) return this;
+        setLogo(live.getLogo().replace("{name}", getName()).replace("{logo}", getLogo()));
         return this;
     }
 
