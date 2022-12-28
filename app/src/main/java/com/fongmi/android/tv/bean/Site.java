@@ -103,7 +103,7 @@ public class Site {
     }
 
     public int getPlayerType() {
-        return playerType == null ? -1 : playerType;
+        return playerType == null ? -1 : playerType == 1 ? 1 : 0;
     }
 
     public Integer getSearchable() {
