@@ -9,9 +9,13 @@ import androidx.annotation.StringRes;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Group {
@@ -26,6 +30,12 @@ public class Group {
     private String pass;
 
     private int position;
+
+    public static List<Group> arrayFrom(String str) {
+        Type listType = new TypeToken<List<Group>>() {}.getType();
+        List<Group> items = new Gson().fromJson(str, listType);
+        return items == null ? Collections.emptyList() : items;
+    }
 
     public static Group create(String name) {
         return new Group(name);
