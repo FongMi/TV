@@ -197,16 +197,10 @@ public class Channel {
         return this;
     }
 
-    public Channel epg(Live live) {
-        if (live.getEpg().isEmpty() || getEpg().startsWith("http")) return this;
-        setEpg(live.getEpg().replace("{name}", getName()).replace("{epg}", getEpg()));
-        return this;
-    }
-
-    public Channel logo(Live live) {
-        if (live.getLogo().isEmpty() || getLogo().startsWith("http")) return this;
-        setLogo(live.getLogo().replace("{name}", getName()).replace("{logo}", getLogo()));
-        return this;
+    public void live(Live live) {
+        if (live.getUa().length() > 0 && getUa().isEmpty()) setUa(live.getUa());
+        if (!getEpg().startsWith("http")) setEpg(live.getEpg().replace("{name}", getName()).replace("{epg}", getEpg()));
+        if (!getLogo().startsWith("http")) setLogo(live.getLogo().replace("{name}", getName()).replace("{logo}", getLogo()));
     }
 
     public String getScheme() {

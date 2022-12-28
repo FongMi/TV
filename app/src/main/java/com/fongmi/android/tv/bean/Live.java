@@ -81,7 +81,7 @@ public class Live {
         return TextUtils.isEmpty(ua) ? "" : ua;
     }
 
-    public List<Channel> getChannels() {
+    private List<Channel> getChannels() {
         return channels = channels == null ? new ArrayList<>() : channels;
     }
 

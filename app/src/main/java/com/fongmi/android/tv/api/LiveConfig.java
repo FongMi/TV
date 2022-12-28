@@ -93,7 +93,7 @@ public class LiveConfig {
 
     private void parse(String text) {
         Live live = new Live(config.getUrl());
-        LiveParser.start(live, text);
+        LiveParser.text(live, text);
         lives.remove(live);
         lives.add(live);
         setHome(live);
