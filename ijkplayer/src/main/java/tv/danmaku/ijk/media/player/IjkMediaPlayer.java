@@ -619,7 +619,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
             } else if (streamMeta.mType.equalsIgnoreCase(IjkMediaMeta.IJKM_VAL_TYPE__AUDIO)) {
                 trackInfo.setTrackType(ITrackInfo.MEDIA_TRACK_TYPE_AUDIO);
             } else if (streamMeta.mType.equalsIgnoreCase(IjkMediaMeta.IJKM_VAL_TYPE__TIMEDTEXT)) {
-                trackInfo.setTrackType(ITrackInfo.MEDIA_TRACK_TYPE_TIMEDTEXT);
+                trackInfo.setTrackType(ITrackInfo.MEDIA_TRACK_TYPE_TEXT);
             }
             trackInfos.add(trackInfo);
         }
@@ -634,7 +634,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
                 return (int)_getPropertyLong(FFP_PROP_INT64_SELECTED_VIDEO_STREAM, -1);
             case ITrackInfo.MEDIA_TRACK_TYPE_AUDIO:
                 return (int)_getPropertyLong(FFP_PROP_INT64_SELECTED_AUDIO_STREAM, -1);
-            case ITrackInfo.MEDIA_TRACK_TYPE_TIMEDTEXT:
+            case ITrackInfo.MEDIA_TRACK_TYPE_TEXT:
                 return (int)_getPropertyLong(FFP_PROP_INT64_SELECTED_TIMEDTEXT_STREAM, -1);
             default:
                 return -1;
