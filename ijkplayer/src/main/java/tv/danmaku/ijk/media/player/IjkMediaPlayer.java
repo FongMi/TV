@@ -51,6 +51,7 @@ import java.lang.reflect.Field;
 import java.net.URLEncoder;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -607,7 +608,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         if (bundle == null) return null;
         IjkMediaMeta mediaMeta = IjkMediaMeta.parse(bundle);
         if (mediaMeta == null) return null;
-        ArrayList<IjkTrackInfo> trackInfos = new ArrayList<>();
+        List<IjkTrackInfo> trackInfos = new ArrayList<>();
         for (IjkMediaMeta.IjkStreamMeta streamMeta : mediaMeta.mStreams) {
             IjkTrackInfo trackInfo = new IjkTrackInfo(streamMeta);
             if (streamMeta.mType.equalsIgnoreCase(IjkMediaMeta.IJKM_VAL_TYPE__VIDEO)) {
@@ -619,7 +620,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
             }
             trackInfos.add(trackInfo);
         }
-        return trackInfos.toArray(new IjkTrackInfo[trackInfos.size()]);
+        return trackInfos.toArray(new IjkTrackInfo[0]);
     }
 
     // TODO: @Override
