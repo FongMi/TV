@@ -604,15 +604,11 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     @Override
     public IjkTrackInfo[] getTrackInfo() {
         Bundle bundle = getMediaMeta();
-        if (bundle == null)
-            return null;
-
+        if (bundle == null) return null;
         IjkMediaMeta mediaMeta = IjkMediaMeta.parse(bundle);
-        if (mediaMeta == null || mediaMeta.mStreams == null)
-            return null;
-
-        ArrayList<IjkTrackInfo> trackInfos = new ArrayList<IjkTrackInfo>();
-        for (IjkMediaMeta.IjkStreamMeta streamMeta: mediaMeta.mStreams) {
+        if (mediaMeta == null) return null;
+        ArrayList<IjkTrackInfo> trackInfos = new ArrayList<>();
+        for (IjkMediaMeta.IjkStreamMeta streamMeta : mediaMeta.mStreams) {
             IjkTrackInfo trackInfo = new IjkTrackInfo(streamMeta);
             if (streamMeta.mType.equalsIgnoreCase(IjkMediaMeta.IJKM_VAL_TYPE__VIDEO)) {
                 trackInfo.setTrackType(ITrackInfo.MEDIA_TRACK_TYPE_VIDEO);
@@ -623,7 +619,6 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
             }
             trackInfos.add(trackInfo);
         }
-
         return trackInfos.toArray(new IjkTrackInfo[trackInfos.size()]);
     }
 
