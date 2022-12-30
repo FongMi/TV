@@ -3,6 +3,7 @@ package com.fongmi.android.tv.api;
 import android.graphics.drawable.Drawable;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.net.Callback;
@@ -65,18 +66,18 @@ public class WallConfig {
     }
 
     public void load(Callback callback) {
-        new Thread(() -> parse(callback)).start();
+        new Thread(() -> loadConfig(callback)).start();
     }
 
-    private void parse(Callback callback) {
+    private void loadConfig(Callback callback) {
         try {
             File file = write(FileUtil.getWall(0));
             if (file.exists() && file.length() > 0) refresh(0);
             else setUrl(ApiConfig.get().getWall());
             App.post(callback::success);
         } catch (Exception e) {
+            App.post(() -> callback.error(R.string.error_config_parse));
             setUrl(ApiConfig.get().getWall());
-            App.post(callback::success);
             e.printStackTrace();
         }
     }

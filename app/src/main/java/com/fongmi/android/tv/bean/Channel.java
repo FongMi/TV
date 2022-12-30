@@ -5,9 +5,8 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
-import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -161,7 +160,7 @@ public class Channel {
     }
 
     public void loadLogo(ImageView view) {
-        if (!getLogo().isEmpty()) Glide.with(App.get()).load(getLogo()).into(view);
+        if (!getLogo().isEmpty()) ImgUtil.loadLive(getLogo(), view);
     }
 
     public void addUrls(String... urls) {
@@ -198,10 +197,10 @@ public class Channel {
         return this;
     }
 
-    public Channel epg(Live live) {
-        if (live.getEpg().isEmpty()) return this;
-        setEpg(live.getEpg().replace("{name}", getName()).replace("{epg}", getEpg()));
-        return this;
+    public void live(Live live) {
+        if (live.getUa().length() > 0 && getUa().isEmpty()) setUa(live.getUa());
+        if (!getEpg().startsWith("http")) setEpg(live.getEpg().replace("{name}", getName()).replace("{epg}", getEpg()));
+        if (!getLogo().startsWith("http")) setLogo(live.getLogo().replace("{name}", getName()).replace("{logo}", getLogo()));
     }
 
     public String getScheme() {
@@ -210,6 +209,14 @@ public class Channel {
 
     public boolean isForce() {
         return getScheme().startsWith("p") || getScheme().equals("mitv");
+    }
+
+    public boolean isZLive() {
+        return getScheme().startsWith("zlive");
+    }
+
+    public boolean isTVBus() {
+        return getScheme().startsWith("tvbus");
     }
 
     public Map<String, String> getHeaders() {

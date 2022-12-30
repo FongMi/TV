@@ -27,10 +27,11 @@ public class LiveParser {
 
     public static void start(Live live) {
         if (live.getGroups().size() > 0) return;
-        start(live, getText(live.getUrl()));
+        if (live.getType() == 0) text(live, getText(live.getUrl()));
+        if (live.getType() == 1) json(live, getText(live.getUrl()));
     }
 
-    public static void start(Live live, String text) {
+    public static void text(Live live, String text) {
         int number = 0;
         if (live.getGroups().size() > 0) return;
         if (text.trim().startsWith("#EXTM3U")) m3u(live, text);
@@ -38,6 +39,16 @@ public class LiveParser {
         for (Group group : live.getGroups()) {
             for (Channel channel : group.getChannel()) {
                 channel.setNumber(++number);
+                channel.live(live);
+            }
+        }
+    }
+
+    private static void json(Live live, String text) {
+        live.getGroups().addAll(Group.arrayFrom(text));
+        for (Group group : live.getGroups()) {
+            for (Channel channel : group.getChannel()) {
+                channel.live(live);
             }
         }
     }
@@ -48,7 +59,7 @@ public class LiveParser {
             if (line.startsWith("#EXTINF:")) {
                 Group group = live.find(Group.create(extract(line, GROUP)));
                 channel = group.find(Channel.create(extract(line, NAME)));
-                channel.epg(live).setLogo(extract(line, LOGO));
+                channel.setLogo(extract(line, LOGO));
             } else if (line.contains("://")) {
                 channel.getUrls().add(line);
             }
@@ -63,7 +74,7 @@ public class LiveParser {
             if (live.getGroups().isEmpty()) live.getGroups().add(Group.create(R.string.live_group));
             if (split[1].contains("://")) {
                 Group group = live.getGroups().get(live.getGroups().size() - 1);
-                group.find(Channel.create(split[0]).epg(live)).addUrls(split[1].split("#"));
+                group.find(Channel.create(split[0])).addUrls(split[1].split("#"));
             }
         }
     }
