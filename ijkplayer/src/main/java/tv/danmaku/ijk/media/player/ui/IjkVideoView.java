@@ -93,12 +93,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         initSubtitleView(context);
     }
 
-    public IjkVideoView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
-        initVideoView(context);
-        initSubtitleView(context);
-    }
-
     private void initVideoView(Context context) {
         mAppContext = context.getApplicationContext();
         mVideoWidth = 0;

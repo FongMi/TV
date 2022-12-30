@@ -36,7 +36,6 @@ public class SubtitleView extends TextView {
         setTypeface(Typeface.DEFAULT_BOLD);
         setGravity(Gravity.CENTER);
         setTextSize(16);
-        setZ(99);
     }
 
     @Override
