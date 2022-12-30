@@ -31,6 +31,8 @@ import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.net.OkHttp;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.player.source.Force;
+import com.fongmi.android.tv.player.source.TVBus;
+import com.fongmi.android.tv.player.source.ZLive;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownLive;
 import com.fongmi.android.tv.ui.custom.CustomLiveListView;
 import com.fongmi.android.tv.ui.custom.TrackSelectionDialog;
@@ -699,6 +701,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         super.onDestroy();
         mPlayers.release();
         Force.get().stop();
+        ZLive.get().stop();
+        TVBus.get().stop();
         App.removeCallbacks(mR1, mR2, mR3, mR4, mR5, mR6);
     }
 }
