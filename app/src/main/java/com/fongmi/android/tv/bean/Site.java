@@ -100,10 +100,6 @@ public class Site {
         return playUrl;
     }
 
-    public int getPlayerType() {
-        return playerType == null ? -1 : playerType == 1 ? 1 : 0;
-    }
-
     public Integer getSearchable() {
         return searchable == null ? 1 : searchable;
     }
