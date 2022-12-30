@@ -10,8 +10,8 @@ android {
         applicationId "com.fongmi.android.tv"
         minSdk 21
         targetSdk 29
-        versionCode 53
-        versionName "1.5.3"
+        versionCode 54
+        versionName "1.5.4"
         ndk { abiFilters "armeabi-v7a" }
     }
 
@@ -57,28 +57,33 @@ android {
 
 dependencies {
     implementation project(':drpy')
+    implementation project(':tvbus')
+    implementation project(':zlive')
     implementation project(':catvod')
     implementation project(':forcetech')
     implementation project(':ijkplayer')
     pythonImplementation project(':pyramid')
     implementation 'androidx.appcompat:appcompat:1.5.1'
-    implementation 'androidx.preference:preference:1.2.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel:2.5.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel:2.5.1'
+    implementation 'androidx.preference:preference:1.2.0'
     implementation 'androidx.room:room-runtime:2.4.3'
     implementation 'cat.ereza:customactivityoncrash:2.4.0'
     implementation 'com.github.bassaer:materialdesigncolors:1.0.0'
     implementation 'com.github.bumptech.glide:glide:4.14.2'
     implementation 'com.google.android.exoplayer:exoplayer:2.18.2'
+    implementation 'com.google.android.gms:play-services-cronet:18.0.1'
     implementation 'com.google.android.material:material:1.7.0'
     implementation 'com.google.code.gson:gson:2.10'
+    implementation 'com.google.net.cronet:cronet-okhttp:0.1.0'
     implementation 'com.google.zxing:core:3.5.1'
     implementation 'com.guolindev.permissionx:permissionx:1.7.1'
     implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.10'
     implementation 'me.jessyan:autosize:1.2.1'
+    implementation 'net.java.dev.jna:jna:5.12.1'
+    implementation 'org.apache.commons:commons-compress:1.20'
     implementation 'org.greenrobot:eventbus:3.3.1'
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
-    implementation 'org.apache.commons:commons-compress:1.18'
     implementation('org.simpleframework:simple-xml:2.7.1') { exclude group: 'stax', module: 'stax-api' exclude group: 'xpp3', module: 'xpp3' }
     leanbackImplementation 'androidx.leanback:leanback:1.2.0-alpha02'
     annotationProcessor 'androidx.room:room-compiler:2.4.3'
