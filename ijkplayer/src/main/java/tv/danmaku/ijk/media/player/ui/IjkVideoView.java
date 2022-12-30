@@ -11,7 +11,6 @@ import android.util.Log;
 import android.view.Gravity;
 import android.widget.FrameLayout;
 import android.widget.MediaController;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
@@ -74,26 +73,30 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     private int mVideoSarNum;
     private int mVideoSarDen;
 
-    private TextView subtitleDisplay;
+    private SubtitleView subtitleView;
 
     public IjkVideoView(Context context) {
         super(context);
         initVideoView(context);
+        initSubtitleView(context);
     }
 
     public IjkVideoView(Context context, AttributeSet attrs) {
         super(context, attrs);
         initVideoView(context);
+        initSubtitleView(context);
     }
 
     public IjkVideoView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initVideoView(context);
+        initSubtitleView(context);
     }
 
     public IjkVideoView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         initVideoView(context);
+        initSubtitleView(context);
     }
 
     private void initVideoView(Context context) {
@@ -102,10 +105,14 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         mVideoHeight = 0;
         mCurrentState = STATE_IDLE;
         mTargetState = STATE_IDLE;
-        subtitleDisplay = new TextView(context);
-        subtitleDisplay.setTextSize(24);
-        subtitleDisplay.setGravity(Gravity.CENTER);
-        addView(subtitleDisplay, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM));
+    }
+
+    private void initSubtitleView(Context context) {
+        subtitleView = new SubtitleView(context);
+        LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM);
+        int space = Math.round(Utils.dp2px(context, 16));
+        params.setMargins(space, 0, space, space);
+        addView(subtitleView, params);
     }
 
     private void setRenderView(IRenderView renderView) {
@@ -300,7 +307,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         @Override
         public void onTimedText(IMediaPlayer mp, IjkTimedText text) {
             if (text != null) {
-                subtitleDisplay.setText(text.getText());
+                subtitleView.setText(text.getText());
             }
         }
     };
@@ -448,6 +455,10 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     public int getVideoHeight() {
         return mVideoHeight;
+    }
+
+    public SubtitleView getSubtitleView() {
+        return subtitleView;
     }
 
     @Override

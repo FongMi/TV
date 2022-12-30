@@ -51,6 +51,7 @@ import java.lang.reflect.Field;
 import java.net.URLEncoder;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -604,27 +605,22 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     @Override
     public IjkTrackInfo[] getTrackInfo() {
         Bundle bundle = getMediaMeta();
-        if (bundle == null)
-            return null;
-
+        if (bundle == null) return null;
         IjkMediaMeta mediaMeta = IjkMediaMeta.parse(bundle);
-        if (mediaMeta == null || mediaMeta.mStreams == null)
-            return null;
-
-        ArrayList<IjkTrackInfo> trackInfos = new ArrayList<IjkTrackInfo>();
-        for (IjkMediaMeta.IjkStreamMeta streamMeta: mediaMeta.mStreams) {
+        if (mediaMeta == null) return null;
+        List<IjkTrackInfo> trackInfos = new ArrayList<>();
+        for (IjkMediaMeta.IjkStreamMeta streamMeta : mediaMeta.mStreams) {
             IjkTrackInfo trackInfo = new IjkTrackInfo(streamMeta);
             if (streamMeta.mType.equalsIgnoreCase(IjkMediaMeta.IJKM_VAL_TYPE__VIDEO)) {
                 trackInfo.setTrackType(ITrackInfo.MEDIA_TRACK_TYPE_VIDEO);
             } else if (streamMeta.mType.equalsIgnoreCase(IjkMediaMeta.IJKM_VAL_TYPE__AUDIO)) {
                 trackInfo.setTrackType(ITrackInfo.MEDIA_TRACK_TYPE_AUDIO);
             } else if (streamMeta.mType.equalsIgnoreCase(IjkMediaMeta.IJKM_VAL_TYPE__TIMEDTEXT)) {
-                trackInfo.setTrackType(ITrackInfo.MEDIA_TRACK_TYPE_TIMEDTEXT);
+                trackInfo.setTrackType(ITrackInfo.MEDIA_TRACK_TYPE_TEXT);
             }
             trackInfos.add(trackInfo);
         }
-
-        return trackInfos.toArray(new IjkTrackInfo[trackInfos.size()]);
+        return trackInfos.toArray(new IjkTrackInfo[0]);
     }
 
     // TODO: @Override
@@ -634,7 +630,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
                 return (int)_getPropertyLong(FFP_PROP_INT64_SELECTED_VIDEO_STREAM, -1);
             case ITrackInfo.MEDIA_TRACK_TYPE_AUDIO:
                 return (int)_getPropertyLong(FFP_PROP_INT64_SELECTED_AUDIO_STREAM, -1);
-            case ITrackInfo.MEDIA_TRACK_TYPE_TIMEDTEXT:
+            case ITrackInfo.MEDIA_TRACK_TYPE_TEXT:
                 return (int)_getPropertyLong(FFP_PROP_INT64_SELECTED_TIMEDTEXT_STREAM, -1);
             default:
                 return -1;
