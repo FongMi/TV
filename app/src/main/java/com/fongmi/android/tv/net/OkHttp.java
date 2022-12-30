@@ -1,9 +1,6 @@
 package com.fongmi.android.tv.net;
 
-
-import com.fongmi.android.tv.App;
 import java.util.LinkedHashMap;
-
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
