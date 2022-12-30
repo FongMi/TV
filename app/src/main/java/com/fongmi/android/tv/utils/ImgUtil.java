@@ -29,6 +29,18 @@ public class ImgUtil {
         else Glide.with(App.get()).asBitmap().load(getUrl(url)).skipMemoryCache(true).dontAnimate().sizeMultiplier(Prefers.getThumbnail()).signature(new ObjectKey(url + "_" + Prefers.getQuality())).placeholder(R.drawable.ic_img_loading).listener(getListener(view)).into(view);
     }
 
+    public static void loadKeep(String url, ImageView view) {
+        Glide.with(App.get()).load(url).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).into(view);
+    }
+
+    public static void loadHistory(String url, ImageView view) {
+        Glide.with(App.get()).load(url).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).into(view);
+    }
+
+    public static void loadLive(String url, ImageView view) {
+        Glide.with(App.get()).asBitmap().load(url).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).dontAnimate().into(view);
+    }
+
     public static GlideUrl getUrl(String url) {
         LazyHeaders.Builder builder = new LazyHeaders.Builder();
         if (url.contains("@Cookie=")) builder.addHeader("Cookie", url.split("@Cookie=")[1].split("@")[0]);

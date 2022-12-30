@@ -55,9 +55,9 @@ public class VodPresenter extends Presenter {
         holder.binding.site.setVisibility(item.getSiteVisible());
         holder.binding.year.setVisibility(item.getYearVisible());
         holder.binding.remark.setVisibility(item.getRemarkVisible());
-        ImgUtil.load(item.getVodPic(), holder.binding.image);
         setOnClickListener(holder, view -> mListener.onItemClick(item));
         holder.view.setOnLongClickListener(v -> mListener.onLongClick(item));
+        ImgUtil.load(item.getVodPic(), holder.binding.image);
     }
 
     @Override
