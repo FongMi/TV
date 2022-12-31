@@ -1,6 +1,7 @@
 package com.tvbus.engine;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 public class TVCore {
 
@@ -23,60 +24,44 @@ public class TVCore {
         }
     }
 
-    public void setTVListener(TVListener listener) {
-        try {
-            setListener(nativeHandle, listener);
-        } catch (Throwable ignored) {
-        }
+    public TVCore listener(TVListener listener) {
+        setListener(nativeHandle, listener);
+        return this;
     }
 
-    public void setPlayPort(int iPort) {
-        try {
-            setPlayPort(nativeHandle, iPort);
-        } catch (Throwable ignored) {
-        }
+    public TVCore play(int port) {
+        setPlayPort(nativeHandle, port);
+        return this;
     }
 
-    public void setServPort(int iPort) {
-        try {
-            setServPort(nativeHandle, iPort);
-        } catch (Throwable ignored) {
-        }
+    public TVCore serv(int port) {
+        setServPort(nativeHandle, port);
+        return this;
     }
 
-    public void setRunningMode(int mode) {
-        try {
-            setRunningMode(nativeHandle, mode);
-        } catch (Throwable ignored) {
-        }
+    public TVCore mode(int mode) {
+        setRunningMode(nativeHandle, mode);
+        return this;
     }
 
-    public void setAuthUrl(String str) {
-        try {
-            setAuthUrl(nativeHandle, str);
-        } catch (Throwable ignored) {
-        }
+    public TVCore auth(String str) {
+        if (!TextUtils.isEmpty(str)) setAuthUrl(nativeHandle, str);
+        return this;
     }
 
-    public void setMKBroker(String str) {
-        try {
-            setMKBroker(nativeHandle, str);
-        } catch (Throwable ignored) {
-        }
+    public TVCore broker(String str) {
+        if (!TextUtils.isEmpty(str)) setMKBroker(nativeHandle, str);
+        return this;
     }
 
-    public void setPassword(String str) {
-        try {
-            setPassword(nativeHandle, str);
-        } catch (Throwable ignored) {
-        }
+    public TVCore name(String str) {
+        if (!TextUtils.isEmpty(str)) setUsername(nativeHandle, str);
+        return this;
     }
 
-    public void setUsername(String str) {
-        try {
-            setUsername(nativeHandle, str);
-        } catch (Throwable ignored) {
-        }
+    public TVCore pass(String str) {
+        if (!TextUtils.isEmpty(str)) setPassword(nativeHandle, str);
+        return this;
     }
 
     public void start(String url) {

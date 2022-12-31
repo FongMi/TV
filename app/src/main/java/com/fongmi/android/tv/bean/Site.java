@@ -102,8 +102,12 @@ public class Site {
         return playUrl;
     }
 
+    public int getPlayerType() {
+        return playerType == null ? -1 : playerType == 1 ? 1 : 0;
+    }
+
     public Integer getSearchable() {
-        return searchable;
+        return searchable == null ? 1 : searchable;
     }
 
     public void setSearchable(Integer searchable) {
@@ -111,7 +115,7 @@ public class Site {
     }
 
     public Integer getFilterable() {
-        return filterable;
+        return filterable == null ? 1 : filterable;
     }
 
     public void setFilterable(Integer filterable) {
@@ -151,16 +155,16 @@ public class Site {
     }
 
     public boolean isSearchable() {
-        return getSearchable() == null || getSearchable() == 1;
+        return getSearchable() == 1;
     }
 
     public Site setSearchable(boolean searchable) {
-        setSearchable(searchable ? 1 : 0);
+        if (getSearchable() != 0) setSearchable(searchable ? 1 : 2);
         return this;
     }
 
     public boolean isFilterable() {
-        return getFilterable() == null || getFilterable() == 1;
+        return getFilterable() == 1;
     }
 
     public Site setFilterable(boolean filterable) {
@@ -176,12 +180,6 @@ public class Site {
         return isFilterable() ? R.drawable.ic_filter_on : R.drawable.ic_filter_off;
     }
 
-    public int getPlayerType() {
-        if (playerType == null) return -1;
-        if (playerType == 1) return 1;
-        return 0;
-    }
-
     public static Site find(String key) {
         return AppDatabase.get().getSiteDao().find(key);
     }
@@ -193,8 +191,9 @@ public class Site {
     public Site sync() {
         Site item = find(getKey());
         if (item == null) return this;
-        setSearchable(item.getSearchable());
         setFilterable(item.getFilterable());
+        if (getSearchable() == 0) return this;
+        if (getSearchable() == 1) setSearchable(Math.max(item.getSearchable(), 1));
         return this;
     }
 
