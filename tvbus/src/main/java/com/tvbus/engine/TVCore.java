@@ -103,11 +103,10 @@ public class TVCore {
     }
 
     void init(Context context) {
-        try {
+        new Thread(() -> {
             init(nativeHandle, context);
             run(nativeHandle);
-        } catch (Throwable ignored) {
-        }
+        }).start();
     }
 
     void quit() {
