@@ -456,7 +456,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.widget.line.setText(mChannel.getLineText());
         mBinding.widget.number.setText(mChannel.getNumber());
         mBinding.control.line.setVisibility(mChannel.getLineVisible());
-        mBinding.widget.logo.setVisibility(mChannel.getLogoVisible());
         mBinding.widget.line.setVisibility(mChannel.getLineVisible());
         checkEpg();
     }

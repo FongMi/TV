@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.text.TextUtils;
+import android.view.View;
 import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
@@ -38,7 +39,8 @@ public class ImgUtil {
     }
 
     public static void loadLive(String url, ImageView view) {
-        Glide.with(App.get()).asBitmap().load(url).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).dontAnimate().into(view);
+        view.setVisibility(TextUtils.isEmpty(url) ? View.GONE : View.VISIBLE);
+        Glide.with(App.get()).load(url).error(R.drawable.ic_live).dontAnimate().signature(new ObjectKey(url)).into(view);
     }
 
     public static GlideUrl getUrl(String url) {
