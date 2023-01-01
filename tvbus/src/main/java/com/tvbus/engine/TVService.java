@@ -17,7 +17,7 @@ public class TVService extends Service {
             intent.putExtra("pass", pass);
             intent.putExtra("broker", broker);
             context.startService(intent);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
         }
     }
@@ -33,8 +33,7 @@ public class TVService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         tvcore = TVCore.getInstance().auth(intent.getStringExtra("auth")).name(intent.getStringExtra("name")).pass(intent.getStringExtra("pass")).broker(intent.getStringExtra("broker"));
-        tvcore.serv(0).play(8902).mode(1);
-        tvcore.init(this);
+        tvcore.serv(0).play(8902).mode(1).init(this);
         return START_NOT_STICKY;
     }
 
