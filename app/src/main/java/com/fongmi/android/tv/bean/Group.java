@@ -1,7 +1,6 @@
 package com.fongmi.android.tv.bean;
 
 import android.text.TextUtils;
-import android.view.View;
 import android.widget.ImageView;
 
 import androidx.annotation.StringRes;
@@ -108,12 +107,8 @@ public class Group {
         return isKeep() || isSetting();
     }
 
-    public int getVisible() {
-        return getLogo().isEmpty() ? View.GONE : View.VISIBLE;
-    }
-
     public void loadLogo(ImageView view) {
-        if (!getLogo().isEmpty()) ImgUtil.loadLive(getLogo(), view);
+        ImgUtil.loadLive(getLogo(), view);
     }
 
     public int find(int number) {
