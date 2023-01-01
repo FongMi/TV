@@ -1,6 +1,6 @@
 package com.tvbus.engine;
 
-public interface TVListener {
+public interface Listener {
 
     void onInited(String result);
 
