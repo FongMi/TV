@@ -25,42 +25,66 @@ public class TVCore {
     }
 
     public TVCore listener(TVListener listener) {
-        setListener(nativeHandle, listener);
+        try {
+            setListener(nativeHandle, listener);
+        } catch (Throwable ignored) {
+        }
         return this;
     }
 
     public TVCore play(int port) {
-        setPlayPort(nativeHandle, port);
+        try {
+            setPlayPort(nativeHandle, port);
+        } catch (Throwable ignored) {
+        }
         return this;
     }
 
     public TVCore serv(int port) {
-        setServPort(nativeHandle, port);
+        try {
+            setServPort(nativeHandle, port);
+        } catch (Throwable ignored) {
+        }
         return this;
     }
 
     public TVCore mode(int mode) {
-        setRunningMode(nativeHandle, mode);
+        try {
+            setRunningMode(nativeHandle, mode);
+        } catch (Throwable ignored) {
+        }
         return this;
     }
 
     public TVCore auth(String str) {
-        if (!TextUtils.isEmpty(str)) setAuthUrl(nativeHandle, str);
+        try {
+            if (!TextUtils.isEmpty(str)) setAuthUrl(nativeHandle, str);
+        } catch (Throwable ignored) {
+        }
         return this;
     }
 
     public TVCore broker(String str) {
-        if (!TextUtils.isEmpty(str)) setMKBroker(nativeHandle, str);
+        try {
+            if (!TextUtils.isEmpty(str)) setMKBroker(nativeHandle, str);
+        } catch (Throwable ignored) {
+        }
         return this;
     }
 
     public TVCore name(String str) {
-        if (!TextUtils.isEmpty(str)) setUsername(nativeHandle, str);
+        try {
+            if (!TextUtils.isEmpty(str)) setUsername(nativeHandle, str);
+        } catch (Throwable ignored) {
+        }
         return this;
     }
 
     public TVCore pass(String str) {
-        if (!TextUtils.isEmpty(str)) setPassword(nativeHandle, str);
+        try {
+            if (!TextUtils.isEmpty(str)) setPassword(nativeHandle, str);
+        } catch (Throwable ignored) {
+        }
         return this;
     }
 
@@ -79,10 +103,11 @@ public class TVCore {
     }
 
     void init(Context context) {
-        new Thread(() -> {
+        try {
             init(nativeHandle, context);
             run(nativeHandle);
-        }).start();
+        } catch (Throwable ignored) {
+        }
     }
 
     void quit() {
