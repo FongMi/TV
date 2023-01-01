@@ -90,7 +90,7 @@ public class Live {
     }
 
     public Core getCore() {
-        return core == null ? new Core() : core;
+        return core;
     }
 
     public boolean isActivated() {
