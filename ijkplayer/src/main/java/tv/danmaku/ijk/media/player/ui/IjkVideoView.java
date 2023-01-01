@@ -9,6 +9,7 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.widget.FrameLayout;
 import android.widget.MediaController;
 
@@ -20,6 +21,7 @@ import java.util.Map;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkTimedText;
+import tv.danmaku.ijk.media.player.R;
 
 public class IjkVideoView extends FrameLayout implements MediaController.MediaPlayerControl {
 
@@ -73,60 +75,47 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     private int mVideoSarNum;
     private int mVideoSarDen;
 
+    private FrameLayout contentFrame;
     private SubtitleView subtitleView;
 
     public IjkVideoView(Context context) {
         super(context);
         initVideoView(context);
-        initSubtitleView(context);
     }
 
     public IjkVideoView(Context context, AttributeSet attrs) {
         super(context, attrs);
         initVideoView(context);
-        initSubtitleView(context);
     }
 
     public IjkVideoView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initVideoView(context);
-        initSubtitleView(context);
-    }
-
-    public IjkVideoView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
-        initVideoView(context);
-        initSubtitleView(context);
     }
 
     private void initVideoView(Context context) {
+        LayoutInflater.from(context).inflate(R.layout.ijk_player_view, this);
         mAppContext = context.getApplicationContext();
+        contentFrame = findViewById(R.id.ijk_content_frame);
+        subtitleView = findViewById(R.id.ijk_subtitle);
         mVideoWidth = 0;
         mVideoHeight = 0;
         mCurrentState = STATE_IDLE;
         mTargetState = STATE_IDLE;
     }
 
-    private void initSubtitleView(Context context) {
-        subtitleView = new SubtitleView(context);
-        LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM);
-        int space = Math.round(Utils.dp2px(context, 16));
-        params.setMargins(space, 0, space, space);
-        addView(subtitleView, params);
-    }
-
     private void setRenderView(IRenderView renderView) {
         clearRender();
         mRenderView = renderView;
         setResizeMode(mCurrentAspectRatio);
-        addView(mRenderView.getView(), new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER));
+        contentFrame.addView(mRenderView.getView(), 0, new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER));
         mRenderView.addRenderCallback(mSHCallback);
         mRenderView.setVideoRotation(mVideoRotationDegree);
     }
 
     private void clearRender() {
         if (mRenderView != null) {
-            removeView(mRenderView.getView());
+            contentFrame.removeView(mRenderView.getView());
             mRenderView.removeRenderCallback(mSHCallback);
             mRenderView = null;
         }

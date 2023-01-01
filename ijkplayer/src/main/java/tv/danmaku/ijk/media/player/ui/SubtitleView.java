@@ -4,9 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Typeface;
 import android.util.AttributeSet;
-import android.view.Gravity;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -33,10 +31,6 @@ public class SubtitleView extends TextView {
 
     private void init() {
         strokeWidth = Utils.dp2px(getContext(), 0.6f);
-        setTypeface(Typeface.DEFAULT_BOLD);
-        setGravity(Gravity.CENTER);
-        setTextSize(16);
-        setZ(99);
     }
 
     @Override
