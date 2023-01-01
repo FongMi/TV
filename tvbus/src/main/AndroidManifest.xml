@@ -1,12 +1,2 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.tvbus.engine">
-
-    <application>
-
-        <service
-            android:name="com.tvbus.engine.TVService"
-            android:exported="false" />
-
-    </application>
-</manifest>
+<manifest package="com.tvbus.engine" />
