@@ -27,6 +27,7 @@ public class TVBus implements TVListener {
     }
 
     public void init(Core core) {
+        if (core == null) return;
         tvcore = TVCore.getInstance().listener(this);
         TVService.start(App.get(), core.getAuth(), core.getName(), core.getPass(), core.getBroker());
     }
