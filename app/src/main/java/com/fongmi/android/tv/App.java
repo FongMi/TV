@@ -66,6 +66,9 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Config.create( url: "http://43.139.33.114:1935/py.json", type: 0).update();
+        Config.create( url: "http://43.139.33.114:1935/py.json", type: 1).update();
+        Config.create( url: "https://picsum.photos/1280/720/?blur=5", type: 2).update();
         CaocConfig.Builder.create().backgroundMode(CaocConfig.BACKGROUND_MODE_SILENT).errorActivity(CrashActivity.class).apply();
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
             @Override
