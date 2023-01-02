@@ -52,7 +52,7 @@ public class Result {
     @SerializedName("url")
     private String url;
     @SerializedName("sub")
-    private String sub;
+    private List<Sub> sub;
 
     public static Result fromJson(String str) {
         try {
@@ -165,8 +165,8 @@ public class Result {
         this.url = url;
     }
 
-    public String getSub() {
-        return TextUtils.isEmpty(sub) ? "" : sub;
+    public List<Sub> getSub() {
+        return sub == null ? Collections.emptyList() : sub;
     }
 
     public void clear() {
