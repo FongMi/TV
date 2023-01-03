@@ -76,6 +76,10 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         return exoPlayer;
     }
 
+    public IjkVideoView ijk() {
+        return ijkPlayer;
+    }
+
     public int getPlayer() {
         return player;
     }

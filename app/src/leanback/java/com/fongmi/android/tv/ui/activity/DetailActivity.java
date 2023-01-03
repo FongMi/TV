@@ -40,6 +40,7 @@ import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
 import com.fongmi.android.tv.ui.custom.TrackSelectionDialog;
+import com.fongmi.android.tv.ui.custom.TrackSelectionDialog2;
 import com.fongmi.android.tv.ui.custom.dialog.DescDialog;
 import com.fongmi.android.tv.ui.presenter.ArrayPresenter;
 import com.fongmi.android.tv.ui.presenter.EpisodePresenter;
@@ -184,11 +185,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.video.setOnClickListener(view -> onVideo());
         mBinding.control.next.setOnClickListener(view -> checkNext());
         mBinding.control.prev.setOnClickListener(view -> checkPrev());
+        mBinding.control.text.setOnClickListener(view -> onTracks());
+        mBinding.control.audio.setOnClickListener(view -> onTracks());
         mBinding.control.scale.setOnClickListener(view -> onScale());
         mBinding.control.speed.setOnClickListener(view -> onSpeed());
         mBinding.control.player.setOnClickListener(view -> onPlayer());
         mBinding.control.decode.setOnClickListener(view -> onDecode());
-        mBinding.control.tracks.setOnClickListener(view -> onTracks());
         mBinding.control.ending.setOnClickListener(view -> onEnding());
         mBinding.control.opening.setOnClickListener(view -> onOpening());
         mBinding.control.replay.setOnClickListener(view -> getPlayer(true));
@@ -567,7 +569,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mPlayers.stop();
         mPlayers.togglePlayer();
         mHistory.setPlayer(mPlayers.getPlayer());
-        mBinding.control.tracks.setVisibility(View.GONE);
         getPlayer(false);
         setPlayerView();
     }
@@ -743,8 +744,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
             case Player.STATE_READY:
                 hideProgress();
                 mPlayers.reset();
+                setTrackVisible();
                 mBinding.widget.size.setText(mPlayers.getSizeText());
-                TrackSelectionDialog.setVisible(mPlayers.exo(), mBinding.control.tracks);
                 break;
             case Player.STATE_ENDED:
                 checkNext();
@@ -759,6 +760,13 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void checkPosition() {
         mPlayers.seekTo(Math.max(mHistory.getOpening(), mHistory.getPosition()), false);
         Clock.get().setCallback(this);
+    }
+
+    private void setTrackVisible() {
+        boolean textVisible = TrackSelectionDialog2.haveTrack(mPlayers, 3);
+        boolean audioVisible = TrackSelectionDialog2.haveTrack(mPlayers, 1);
+        mBinding.control.text.setVisibility(textVisible ? View.VISIBLE : View.GONE);
+        mBinding.control.audio.setVisibility(audioVisible ? View.VISIBLE : View.GONE);
     }
 
     private void onError(String msg) {
