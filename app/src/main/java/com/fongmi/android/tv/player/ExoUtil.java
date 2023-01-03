@@ -67,29 +67,29 @@ public class ExoUtil {
     }
 
     public static MediaSource getSource(Result result, int errorCode) {
-        return getSource(result.getHeaders(), result.getPlayUrl() + result.getUrl(), result.getSub(), errorCode);
+        return getSource(result.getHeaders(), result.getPlayUrl() + result.getUrl(), result.getSubs(), errorCode);
     }
 
     public static MediaSource getSource(Map<String, String> headers, String url, int errorCode) {
         return getSource(headers, url, Collections.emptyList(), errorCode);
     }
 
-    private static MediaSource getSource(Map<String, String> headers, String url, List<Sub> sub, int errorCode) {
-        return new DefaultMediaSourceFactory(getDataSourceFactory(headers), getExtractorsFactory()).createMediaSource(getMediaItem(url, sub, errorCode));
+    private static MediaSource getSource(Map<String, String> headers, String url, List<Sub> subs, int errorCode) {
+        return new DefaultMediaSourceFactory(getDataSourceFactory(headers), getExtractorsFactory()).createMediaSource(getMediaItem(url, subs, errorCode));
     }
 
-    private static MediaItem getMediaItem(String url, List<Sub> sub, int errorCode) {
+    private static MediaItem getMediaItem(String url, List<Sub> subs, int errorCode) {
         MediaItem.Builder builder = new MediaItem.Builder().setUri(Uri.parse(url.trim()));
         if (errorCode == PlaybackException.ERROR_CODE_PARSING_MANIFEST_MALFORMED) builder.setMimeType(MimeTypes.APPLICATION_OCTET);
         else if (errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED) builder.setMimeType(MimeTypes.APPLICATION_M3U8);
-        if (sub.size() > 0) builder.setSubtitleConfigurations(getSubtitles(sub));
+        if (subs.size() > 0) builder.setSubtitleConfigurations(getSubtitles(subs));
         builder.setAllowChunklessPreparation(Prefers.getDecode() == 1);
         return builder.build();
     }
 
-    private static List<MediaItem.SubtitleConfiguration> getSubtitles(List<Sub> sub) {
+    private static List<MediaItem.SubtitleConfiguration> getSubtitles(List<Sub> subs) {
         List<MediaItem.SubtitleConfiguration> items = new ArrayList<>();
-        for (Sub item : sub) items.add(item.getExoSub());
+        for (Sub sub : subs) items.add(sub.getExo());
         return items;
     }
 

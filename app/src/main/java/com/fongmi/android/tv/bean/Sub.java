@@ -33,7 +33,7 @@ public class Sub {
         return TextUtils.isEmpty(format) ? "" : format;
     }
 
-    public MediaItem.SubtitleConfiguration getExoSub() {
+    public MediaItem.SubtitleConfiguration getExo() {
         return new MediaItem.SubtitleConfiguration.Builder(Uri.parse(getUrl())).setLabel(getName()).setMimeType(getFormat()).setLanguage(getLang()).build();
     }
 }
