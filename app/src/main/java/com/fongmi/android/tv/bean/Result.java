@@ -51,8 +51,8 @@ public class Result {
     private String flag;
     @SerializedName("url")
     private String url;
-    @SerializedName("sub")
-    private List<Sub> sub;
+    @SerializedName("subs")
+    private List<Sub> subs;
 
     public static Result fromJson(String str) {
         try {
@@ -165,8 +165,8 @@ public class Result {
         this.url = url;
     }
 
-    public List<Sub> getSub() {
-        return sub == null ? Collections.emptyList() : sub;
+    public List<Sub> getSubs() {
+        return subs == null ? Collections.emptyList() : subs;
     }
 
     public void clear() {
