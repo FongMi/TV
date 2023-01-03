@@ -36,6 +36,7 @@ import com.fongmi.android.tv.player.source.ZLive;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownLive;
 import com.fongmi.android.tv.ui.custom.CustomLiveListView;
 import com.fongmi.android.tv.ui.custom.TrackSelectionDialog;
+import com.fongmi.android.tv.ui.custom.TrackSelectionDialog2;
 import com.fongmi.android.tv.ui.custom.dialog.LiveDialog;
 import com.fongmi.android.tv.ui.custom.dialog.PassDialog;
 import com.fongmi.android.tv.ui.presenter.ChannelPresenter;
@@ -144,11 +145,12 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.control.home.setOnClickListener(view -> onHome());
         mBinding.control.scale.setOnClickListener(view -> onScale());
         mBinding.control.speed.setOnClickListener(view -> onSpeed());
+        mBinding.control.text.setOnClickListener(view -> onTracks());
+        mBinding.control.audio.setOnClickListener(view -> onTracks());
         mBinding.control.invert.setOnClickListener(view -> onInvert());
         mBinding.control.across.setOnClickListener(view -> onAcross());
         mBinding.control.player.setOnClickListener(view -> onPlayer());
         mBinding.control.decode.setOnClickListener(view -> onDecode());
-        mBinding.control.tracks.setOnClickListener(view -> onTracks());
         mBinding.control.line.setOnClickListener(view -> nextLine(false));
         mBinding.control.speed.setOnLongClickListener(view -> onSpeedLong());
         mBinding.group.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
@@ -304,7 +306,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private void onPlayer() {
         mPlayers.stop();
         mPlayers.togglePlayer();
-        mBinding.control.tracks.setVisibility(View.GONE);
         setPlayerView();
         getUrl();
     }
@@ -644,8 +645,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
             case Player.STATE_READY:
                 hideProgress();
                 mPlayers.reset();
+                setTrackVisible();
                 App.removeCallbacks(mR6);
-                TrackSelectionDialog.setVisible(mPlayers.exo(), mBinding.control.tracks);
                 break;
             case Player.STATE_ENDED:
                 onKeyDown();
@@ -656,6 +657,13 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
                 else getUrl();
                 break;
         }
+    }
+
+    private void setTrackVisible() {
+        boolean textVisible = TrackSelectionDialog2.haveTrack(mPlayers, 3);
+        boolean audioVisible = TrackSelectionDialog2.haveTrack(mPlayers, 1);
+        mBinding.control.text.setVisibility(textVisible ? View.VISIBLE : View.GONE);
+        mBinding.control.audio.setVisibility(audioVisible ? View.VISIBLE : View.GONE);
     }
 
     private void onError() {
