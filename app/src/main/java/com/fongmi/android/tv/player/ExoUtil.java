@@ -12,6 +12,7 @@ import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.RenderersFactory;
+import com.google.android.exoplayer2.Tracks;
 import com.google.android.exoplayer2.database.DatabaseProvider;
 import com.google.android.exoplayer2.database.StandaloneDatabaseProvider;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
@@ -58,6 +59,11 @@ public class ExoUtil {
 
     public static CaptionStyleCompat getCaptionStyle() {
         return new CaptionStyleCompat(Color.WHITE, Color.TRANSPARENT, Color.TRANSPARENT, CaptionStyleCompat.EDGE_TYPE_OUTLINE, Color.BLACK, null);
+    }
+
+    public static boolean haveTrack(Tracks tracks, int type) {
+        for (Tracks.Group trackGroup : tracks.getGroups()) if (type == trackGroup.getType()) return true;
+        return false;
     }
 
     public static MediaSource getSource(Result result, int errorCode) {

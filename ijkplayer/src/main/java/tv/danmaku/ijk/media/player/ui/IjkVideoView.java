@@ -22,6 +22,7 @@ import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkTimedText;
 import tv.danmaku.ijk.media.player.R;
+import tv.danmaku.ijk.media.player.misc.IjkTrackInfo;
 
 public class IjkVideoView extends FrameLayout implements MediaController.MediaPlayerControl {
 
@@ -488,6 +489,13 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     @Override
     public int getAudioSessionId() {
         return 0;
+    }
+
+    public boolean haveTrack(int type) {
+        IjkTrackInfo[] trackInfo = mIjkPlayer.getTrackInfo();
+        if (trackInfo == null) return false;
+        for (IjkTrackInfo info : trackInfo) if (info.getTrackType() == type) return true;
+        return false;
     }
 
     private void createPlayer() {
