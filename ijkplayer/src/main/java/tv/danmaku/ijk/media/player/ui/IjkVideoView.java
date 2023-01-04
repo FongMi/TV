@@ -494,8 +494,17 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     public boolean haveTrack(int type) {
         IjkTrackInfo[] trackInfo = mIjkPlayer.getTrackInfo();
         if (trackInfo == null) return false;
-        for (IjkTrackInfo info : trackInfo) if (info.getTrackType() == type) return true;
-        return false;
+        int count = 0;
+        for (IjkTrackInfo info : trackInfo) if (info.getTrackType() == type) ++count;
+        return count > 1;
+    }
+
+    public IjkTrackInfo[] getTrackInfo() {
+        return mIjkPlayer.getTrackInfo();
+    }
+
+    public int getSelectedTrack(int type) {
+        return mIjkPlayer.getSelectedTrack(type);
     }
 
     private void createPlayer() {

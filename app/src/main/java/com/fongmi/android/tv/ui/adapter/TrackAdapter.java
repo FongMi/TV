@@ -28,10 +28,10 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
         void onItemClick(Track item);
     }
 
-    public void addAll(List<Track> items) {
-        mItems.clear();
+    public TrackAdapter addAll(List<Track> items) {
         mItems.addAll(items);
         notifyDataSetChanged();
+        return this;
     }
 
     @Override
