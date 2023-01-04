@@ -45,7 +45,7 @@
     <string name="play_reset">重置</string>
     <string name="play_track">軌道</string>
     <string name="play_track_text">字幕</string>
-    <string name="play_track_audio">音訊</string>
+    <string name="play_track_audio">音軌</string>
     <string name="play_invert">反轉</string>
     <string name="play_across">跨類</string>
     <string name="play_op">片頭</string>

@@ -8,18 +8,25 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.fongmi.android.tv.bean.Track;
 import com.fongmi.android.tv.databinding.DialogTrackBinding;
-import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.adapter.TrackAdapter;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.google.android.exoplayer2.Tracks;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import tv.danmaku.ijk.media.player.misc.IjkTrackInfo;
 
 public final class TrackSelectionDialog2 implements TrackAdapter.OnClickListener {
 
     private final DialogTrackBinding binding;
+    private final TrackNameProvider provider;
     private final TrackAdapter adapter;
     private final AlertDialog dialog;
-    private int trackType;
+    private Players player;
+    private int type;
 
     public static TrackSelectionDialog2 create(Activity activity) {
         return new TrackSelectionDialog2(activity);
@@ -29,6 +36,17 @@ public final class TrackSelectionDialog2 implements TrackAdapter.OnClickListener
         this.binding = DialogTrackBinding.inflate(LayoutInflater.from(activity));
         this.dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).create();
         this.adapter = new TrackAdapter(this);
+        this.provider = new TrackNameProvider();
+    }
+
+    public TrackSelectionDialog2 type(int type) {
+        this.type = type;
+        return this;
+    }
+
+    public TrackSelectionDialog2 player(Players player) {
+        this.player = player;
+        return this;
     }
 
     public void show() {
@@ -39,11 +57,11 @@ public final class TrackSelectionDialog2 implements TrackAdapter.OnClickListener
     private void setRecyclerView() {
         binding.recycler.setHasFixedSize(true);
         binding.recycler.addItemDecoration(new SpaceItemDecoration(1, 16));
-        binding.recycler.setAdapter(adapter);
+        binding.recycler.setAdapter(adapter.addAll(getTrack()));
     }
 
     private void setDialog() {
-        if (adapter.getItemCount() == 0) return;
+        if (adapter.getItemCount() == 1) return;
         WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
         params.width = (int) (ResUtil.getScreenWidthPx() * 0.4f);
         dialog.getWindow().setAttributes(params);
@@ -51,11 +69,26 @@ public final class TrackSelectionDialog2 implements TrackAdapter.OnClickListener
         dialog.show();
     }
 
-    public static boolean haveTrack(Players player, int type) {
-        if (player.isExo()) {
-            return ExoUtil.haveTrack(player.exo().getCurrentTracks(), type);
-        } else {
-            return player.ijk().haveTrack(type);
+    private List<Track> getTrack() {
+        List<Track> items = new ArrayList<>();
+        if (player.isExo()) addExoTrack(items);
+        if (player.isIjk()) addIjkTrack(items);
+        return items;
+    }
+
+    private void addExoTrack(List<Track> items) {
+        for (Tracks.Group trackGroup : player.exo().getCurrentTracks().getGroups()) {
+            if (trackGroup.getType() != type) continue;
+            for (int i = 0; i < trackGroup.length; i++) {
+                items.add(new Track(provider.getTrackName(trackGroup.getTrackFormat(i))));
+            }
+        }
+    }
+
+    private void addIjkTrack(List<Track> items) {
+        for (IjkTrackInfo trackInfo : player.ijk().getTrackInfo()) {
+            if (trackInfo.getTrackType() != type) continue;
+            items.add(new Track(provider.getTrackName(trackInfo)));
         }
     }
 
