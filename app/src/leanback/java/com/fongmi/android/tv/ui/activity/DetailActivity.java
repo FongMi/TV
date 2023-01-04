@@ -54,6 +54,7 @@ import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Traffic;
 import com.fongmi.android.tv.utils.Utils;
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.ui.StyledPlayerView;
 
@@ -183,16 +184,17 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.desc.setOnClickListener(view -> onDesc());
         mBinding.keep.setOnClickListener(view -> onKeep());
         mBinding.video.setOnClickListener(view -> onVideo());
+        mBinding.control.text.setOnClickListener(this::onTracks);
+        mBinding.control.audio.setOnClickListener(this::onTracks);
         mBinding.control.next.setOnClickListener(view -> checkNext());
         mBinding.control.prev.setOnClickListener(view -> checkPrev());
-        mBinding.control.text.setOnClickListener(view -> onTracks());
-        mBinding.control.audio.setOnClickListener(view -> onTracks());
         mBinding.control.scale.setOnClickListener(view -> onScale());
         mBinding.control.speed.setOnClickListener(view -> onSpeed());
         mBinding.control.player.setOnClickListener(view -> onPlayer());
         mBinding.control.decode.setOnClickListener(view -> onDecode());
         mBinding.control.ending.setOnClickListener(view -> onEnding());
-        mBinding.control.opening.setOnClickListener(view -> onOpening());
+        //mBinding.control.opening.setOnClickListener(view -> onOpening());
+        mBinding.control.opening.setOnClickListener(view -> onTracks());
         mBinding.control.replay.setOnClickListener(view -> getPlayer(true));
         mBinding.control.speed.setOnLongClickListener(view -> onSpeedLong());
         mBinding.control.ending.setOnLongClickListener(view -> onEndingReset());
@@ -581,6 +583,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         setDecodeView();
     }
 
+    private void onTracks(View view) {
+        int type = Integer.parseInt(view.getTag().toString());
+        TrackSelectionDialog2.create(this).player(mPlayers).type(type).show();
+        hideControl();
+    }
+
     private void onTracks() {
         TrackSelectionDialog.createForPlayer(mPlayers.exo(), dialog -> {
         }).show(getSupportFragmentManager(), "tracks");
@@ -763,10 +771,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void setTrackVisible() {
-        boolean textVisible = TrackSelectionDialog2.haveTrack(mPlayers, 3);
-        boolean audioVisible = TrackSelectionDialog2.haveTrack(mPlayers, 1);
-        mBinding.control.text.setVisibility(textVisible ? View.VISIBLE : View.GONE);
-        mBinding.control.audio.setVisibility(audioVisible ? View.VISIBLE : View.GONE);
+        mBinding.control.text.setVisibility(mPlayers.haveTrack(C.TRACK_TYPE_TEXT) ? View.VISIBLE : View.GONE);
+        mBinding.control.audio.setVisibility(mPlayers.haveTrack(C.TRACK_TYPE_AUDIO) ? View.VISIBLE : View.GONE);
     }
 
     private void onError(String msg) {

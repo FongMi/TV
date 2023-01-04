@@ -133,6 +133,7 @@
                 android:focusable="true"
                 android:focusableInTouchMode="true"
                 android:nextFocusDown="@id/parse"
+                android:tag="3"
                 android:text="@string/play_track_text"
                 android:textColor="@color/white"
                 android:textSize="14sp"
@@ -148,6 +149,7 @@
                 android:focusable="true"
                 android:focusableInTouchMode="true"
                 android:nextFocusDown="@id/parse"
+                android:tag="1"
                 android:text="@string/play_track_audio"
                 android:textColor="@color/white"
                 android:textSize="14sp"
@@ -223,7 +225,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clipChildren="false"
-            android:clipToPadding="false" />
+            android:clipToPadding="false"
+            tools:layout_height="36dp" />
 
     </LinearLayout>
 
