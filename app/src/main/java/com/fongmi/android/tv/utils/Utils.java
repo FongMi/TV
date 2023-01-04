@@ -97,7 +97,7 @@ public class Utils {
     }
 
     public static String convert(String text) {
-        return Server.get().getAddress(true) + "/" + text;
+        return text.startsWith("file") ? Server.get().getAddress(true) + "/" + text : text;
     }
 
     public static String convert(String baseUrl, String text) {
