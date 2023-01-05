@@ -11,18 +11,4 @@ https://github.com/CatVodTVOfficial/CatVodTVJarLoader
 [Vod-Online](other/sample/vod/online.json)  
 [Vod-Offline](other/sample/vod/offline.json)  
 [Live-Online](other/sample/live/online.json)  
-[Live-Offline](other/sample/live/offline.json)  
-
-### Subtitle Format
-In playerContent put "sub"
-
-#### Single
-    title#MIME#url
-#### Multiple
-    title#MIME#url$$$title#MIME#url
-#### MIME Type
-    .srt = application/x-subrip
-    .vtt = text/vtt
-    .ass = text/x-ssa
-#### Example
-    Avatar#application/x-subrip#https://github.com/FongMi/TV/subtitle.srt
+[Live-Offline](other/sample/live/offline.json)

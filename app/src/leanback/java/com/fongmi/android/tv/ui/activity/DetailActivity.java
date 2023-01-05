@@ -40,6 +40,7 @@ import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
 import com.fongmi.android.tv.ui.custom.TrackSelectionDialog;
+import com.fongmi.android.tv.ui.custom.TrackSelectionDialog2;
 import com.fongmi.android.tv.ui.custom.dialog.DescDialog;
 import com.fongmi.android.tv.ui.presenter.ArrayPresenter;
 import com.fongmi.android.tv.ui.presenter.EpisodePresenter;
@@ -53,6 +54,7 @@ import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Traffic;
 import com.fongmi.android.tv.utils.Utils;
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.ui.StyledPlayerView;
 
@@ -182,15 +184,17 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.desc.setOnClickListener(view -> onDesc());
         mBinding.keep.setOnClickListener(view -> onKeep());
         mBinding.video.setOnClickListener(view -> onVideo());
+        mBinding.control.text.setOnClickListener(this::onTracks);
+        mBinding.control.audio.setOnClickListener(this::onTracks);
         mBinding.control.next.setOnClickListener(view -> checkNext());
         mBinding.control.prev.setOnClickListener(view -> checkPrev());
         mBinding.control.scale.setOnClickListener(view -> onScale());
         mBinding.control.speed.setOnClickListener(view -> onSpeed());
         mBinding.control.player.setOnClickListener(view -> onPlayer());
         mBinding.control.decode.setOnClickListener(view -> onDecode());
-        mBinding.control.tracks.setOnClickListener(view -> onTracks());
         mBinding.control.ending.setOnClickListener(view -> onEnding());
-        mBinding.control.opening.setOnClickListener(view -> onOpening());
+        //mBinding.control.opening.setOnClickListener(view -> onOpening());
+        mBinding.control.opening.setOnClickListener(view -> onTracks());
         mBinding.control.replay.setOnClickListener(view -> getPlayer(true));
         mBinding.control.speed.setOnLongClickListener(view -> onSpeedLong());
         mBinding.control.ending.setOnLongClickListener(view -> onEndingReset());
@@ -567,7 +571,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mPlayers.stop();
         mPlayers.togglePlayer();
         mHistory.setPlayer(mPlayers.getPlayer());
-        mBinding.control.tracks.setVisibility(View.GONE);
         getPlayer(false);
         setPlayerView();
     }
@@ -578,6 +581,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mPlayers.setupExo(getExo());
         getPlayer(false);
         setDecodeView();
+    }
+
+    private void onTracks(View view) {
+        int type = Integer.parseInt(view.getTag().toString());
+        TrackSelectionDialog2.create(this).player(mPlayers).type(type).show();
+        hideControl();
     }
 
     private void onTracks() {
@@ -743,8 +752,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
             case Player.STATE_READY:
                 hideProgress();
                 mPlayers.reset();
+                setTrackVisible();
                 mBinding.widget.size.setText(mPlayers.getSizeText());
-                TrackSelectionDialog.setVisible(mPlayers.exo(), mBinding.control.tracks);
                 break;
             case Player.STATE_ENDED:
                 checkNext();
@@ -759,6 +768,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void checkPosition() {
         mPlayers.seekTo(Math.max(mHistory.getOpening(), mHistory.getPosition()), false);
         Clock.get().setCallback(this);
+    }
+
+    private void setTrackVisible() {
+        mBinding.control.text.setVisibility(mPlayers.haveTrack(C.TRACK_TYPE_TEXT) ? View.VISIBLE : View.GONE);
+        mBinding.control.audio.setVisibility(mPlayers.haveTrack(C.TRACK_TYPE_AUDIO) ? View.VISIBLE : View.GONE);
     }
 
     private void onError(String msg) {

@@ -151,16 +151,12 @@ public class Channel {
         this.selected = item.equals(this);
     }
 
-    public int getLogoVisible() {
-        return getLogo().isEmpty() ? View.GONE : View.VISIBLE;
-    }
-
     public int getLineVisible() {
         return isOnly() ? View.GONE : View.VISIBLE;
     }
 
     public void loadLogo(ImageView view) {
-        if (!getLogo().isEmpty()) ImgUtil.loadLive(getLogo(), view);
+        ImgUtil.loadLive(getLogo(), view);
     }
 
     public void addUrls(String... urls) {

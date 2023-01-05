@@ -32,7 +32,7 @@ public class Decoder {
     }
 
     private static String fix(String url, String data) {
-        if (url.startsWith("file://")) url = Utils.convert(url);
+        if (url.startsWith("file")) url = Utils.convert(url);
         data = data.replace("./", url.substring(0, url.lastIndexOf("/") + 1));
         return data;
     }

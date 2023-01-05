@@ -76,6 +76,10 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         return exoPlayer;
     }
 
+    public IjkVideoView ijk() {
+        return ijkPlayer;
+    }
+
     public int getPlayer() {
         return player;
     }
@@ -239,6 +243,14 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
 
     public boolean isVod() {
         return getDuration() > 5 * 60 * 1000;
+    }
+
+    public boolean haveTrack(int type) {
+        if (isExo()) {
+            return ExoUtil.haveTrack(exoPlayer.getCurrentTracks(), type);
+        } else {
+            return ijkPlayer.haveTrack(type);
+        }
     }
 
     public void start(Channel channel) {
