@@ -8,7 +8,7 @@
     <TextView
         android:id="@+id/text"
         android:layout_width="0dp"
-        android:layout_height="40dp"
+        android:layout_height="wrap_content"
         android:layout_weight="1"
         android:background="@drawable/selector_text"
         android:ellipsize="middle"
@@ -22,14 +22,14 @@
 
     <ImageView
         android:id="@+id/delete"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
         android:background="@drawable/selector_text"
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:padding="8dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_delete" />
+        android:src="@drawable/ic_delete_config" />
 
 </LinearLayout>

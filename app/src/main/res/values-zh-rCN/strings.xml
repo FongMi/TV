@@ -43,7 +43,9 @@
     <string name="play_ready">准备播放：<xliff:g name="name">%s</xliff:g></string>
     <string name="play_replay">重播</string>
     <string name="play_reset">重置</string>
-    <string name="play_tracks">轨道</string>
+    <string name="play_track">轨道</string>
+    <string name="play_track_text">字幕</string>
+    <string name="play_track_audio">音轨</string>
     <string name="play_invert">反转</string>
     <string name="play_across">跨类</string>
     <string name="play_op">片头</string>

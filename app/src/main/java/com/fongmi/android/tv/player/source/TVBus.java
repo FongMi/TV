@@ -1,14 +1,14 @@
 package com.fongmi.android.tv.player.source;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.api.LiveConfig;
 import com.fongmi.android.tv.bean.Core;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.tvbus.engine.Listener;
 import com.tvbus.engine.TVCore;
-import com.tvbus.engine.TVListener;
-import com.tvbus.engine.TVService;
 
-public class TVBus implements TVListener {
+public class TVBus implements Listener {
 
     private final Gson gson;
     private TVCore tvcore;
@@ -26,12 +26,16 @@ public class TVBus implements TVListener {
         this.gson = new Gson();
     }
 
-    public void init(Core core) {
-        tvcore = TVCore.getInstance().listener(this);
-        TVService.start(App.get(), core.getAuth(), core.getName(), core.getPass(), core.getBroker());
+    private void init(Core core) {
+        if (core == null) return;
+        tvcore = new TVCore().listener(this);
+        tvcore.auth(core.getAuth()).name(core.getName()).pass(core.getPass()).broker(core.getBroker());
+        tvcore.serv(0).play(8902).mode(1).init(App.get());
     }
 
     public String fetch(String url) throws InterruptedException {
+        if (tvcore == null) init(LiveConfig.get().getHome().getCore());
+        if (tvcore == null) return "";
         tvcore.start(url);
         onWait();
         return hls;
@@ -50,7 +54,14 @@ public class TVBus implements TVListener {
     }
 
     public void stop() {
-        TVService.stop(App.get());
+        if (tvcore == null) return;
+        tvcore.stop();
+    }
+
+    public void quit() {
+        if (tvcore == null) return;
+        tvcore.quit();
+        tvcore = null;
     }
 
     @Override
