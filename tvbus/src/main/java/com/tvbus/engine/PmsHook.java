@@ -8,15 +8,12 @@ import android.util.Base64;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 public class PmsHook implements InvocationHandler {
-
-    private static final int GET_SIGNATURES = 0x00000040;
 
     private byte[][] sign;
     private String name;
@@ -26,7 +23,7 @@ public class PmsHook implements InvocationHandler {
         new PmsHook().hook();
     }
 
-    private Context getContext() throws Exception {
+    private Context getContext() throws Throwable {
         Class<?> activityThreadClass = Class.forName("android.app.ActivityThread");
         Method method = activityThreadClass.getMethod("currentApplication");
         return (Context) method.invoke(null);
@@ -49,35 +46,27 @@ public class PmsHook implements InvocationHandler {
             Field mPmField = pm.getClass().getDeclaredField("mPM");
             mPmField.setAccessible(true);
             mPmField.set(pm, proxy);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
         }
     }
 
-    private byte[][] getSign(Context context) throws IOException {
+    private byte[][] getSign(Context context) throws Throwable {
         DataInputStream is = new DataInputStream(new ByteArrayInputStream(Base64.decode(context.getString(R.string.data), Base64.DEFAULT)));
         byte[][] sign = new byte[is.read() & 0xFF][];
-        for (int i = 0; i < sign.length; i++) {
-            sign[i] = new byte[is.readInt()];
-            is.readFully(sign[i]);
-        }
+        for (int i = 0; i < sign.length; i++) is.readFully(sign[i] = new byte[is.readInt()]);
         return sign;
     }
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        if (method.getName().equals("getPackageInfo")) {
-            String pkgName = (String) args[0];
-            Integer flag = (Integer) args[1];
-            if ((flag & GET_SIGNATURES) != 0 && this.name.equals(pkgName)) {
-                PackageInfo info = (PackageInfo) method.invoke(base, args);
-                info.signatures = new Signature[this.sign.length];
-                for (int i = 0; i < info.signatures.length; i++) {
-                    info.signatures[i] = new Signature(this.sign[i]);
-                }
-                return info;
-            }
-        }
-        return method.invoke(base, args);
+        if (!method.getName().equals("getPackageInfo")) return method.invoke(base, args);
+        String pkg = (String) args[0];
+        int flag = (Integer) args[1];
+        if (flag != 64 || !name.equals(pkg)) return method.invoke(base, args);
+        PackageInfo info = (PackageInfo) method.invoke(base, args);
+        info.signatures = new Signature[this.sign.length];
+        for (int i = 0; i < info.signatures.length; i++) info.signatures[i] = new Signature(this.sign[i]);
+        return info;
     }
 }
