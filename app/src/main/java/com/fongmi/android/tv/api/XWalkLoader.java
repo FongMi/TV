@@ -38,10 +38,6 @@ public class XWalkLoader {
         return String.format(Constant.getKitkatPath("/other/xwalk/XWalkRuntimeLib-%s.apk"), getRuntimeAbi());
     }
 
-    private File getFile() {
-        return FileUtil.getCacheFile("XWalkRuntimeLib.apk");
-    }
-
     private static String getLibPath() {
         return App.get().getDir("extracted_xwalkcore", Context.MODE_PRIVATE).getAbsolutePath();
     }
@@ -56,11 +52,12 @@ public class XWalkLoader {
     private void download() {
         try {
             App.post(() -> Notify.show("正在下載 XWalk 插件..."));
-            FileUtil.write(getFile(), OkHttp.newCall(getUrl()).execute().body().bytes());
+            File file = FileUtil.getCacheFile("XWalkRuntimeLib.apk");
+            FileUtil.write(file, OkHttp.newCall(getUrl()).execute().body().bytes());
             Class<?> cls = Class.forName("org.xwalk.core.XWalkDecompressor");
             Method method = cls.getMethod("extractResource", String.class, String.class);
-            method.invoke(null, getFile().getAbsolutePath(), getLibPath());
-            App.post(() -> Notify.show("XWalk 插件已安裝"));
+            method.invoke(null, file.getAbsolutePath(), getLibPath());
+            if (file.delete()) App.post(() -> Notify.show("XWalk 插件已安裝"));
         } catch (Exception e) {
             e.printStackTrace();
         }
