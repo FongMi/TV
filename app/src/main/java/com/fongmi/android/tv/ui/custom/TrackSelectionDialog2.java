@@ -58,10 +58,10 @@ public final class TrackSelectionDialog2 implements TrackAdapter.OnClickListener
         binding.recycler.setHasFixedSize(true);
         binding.recycler.addItemDecoration(new SpaceItemDecoration(1, 16));
         binding.recycler.setAdapter(adapter.addAll(getTrack()));
+        binding.recycler.scrollToPosition(adapter.getSelected());
     }
 
     private void setDialog() {
-        if (adapter.getItemCount() == 1) return;
         WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
         params.width = (int) (ResUtil.getScreenWidthPx() * 0.4f);
         dialog.getWindow().setAttributes(params);
@@ -80,20 +80,32 @@ public final class TrackSelectionDialog2 implements TrackAdapter.OnClickListener
         for (Tracks.Group trackGroup : player.exo().getCurrentTracks().getGroups()) {
             if (trackGroup.getType() != type) continue;
             for (int i = 0; i < trackGroup.length; i++) {
-                items.add(new Track(provider.getTrackName(trackGroup.getTrackFormat(i))));
+                items.add(new Track(player.getPlayer(), provider.getTrackName(trackGroup.getTrackFormat(i))));
             }
         }
     }
 
     private void addIjkTrack(List<Track> items) {
-        for (IjkTrackInfo trackInfo : player.ijk().getTrackInfo()) {
+        int track = player.ijk().getSelectedTrack(type);
+        IjkTrackInfo[] trackInfos = player.ijk().getTrackInfo();
+        for (int index = 0; index < trackInfos.length; index++) {
+            IjkTrackInfo trackInfo = trackInfos[index];
             if (trackInfo.getTrackType() != type) continue;
-            items.add(new Track(provider.getTrackName(trackInfo)));
+            Track item = new Track(player.getPlayer(), provider.getTrackName(trackInfo));
+            item.setSelected(track == index);
+            item.setIndex(index);
+            items.add(item);
         }
     }
 
     @Override
     public void onItemClick(Track item) {
+        if (player.isExo()) {
 
+        }
+        if (player.isIjk()) {
+            player.ijk().selectTrack(item.getIndex());
+        }
+        dialog.dismiss();
     }
 }

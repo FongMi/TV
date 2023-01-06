@@ -34,6 +34,17 @@ public class CustomRecyclerView extends RecyclerView {
         a.recycle();
     }
 
+    private void focus(int position) {
+        ViewHolder holder = findViewHolderForLayoutPosition(position);
+        if (holder != null) holder.itemView.requestFocus();
+    }
+
+    @Override
+    public void scrollToPosition(int position) {
+        super.scrollToPosition(position);
+        postDelayed(() -> focus(position), 50);
+    }
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         if (maxHeight > 0) heightMeasureSpec = MeasureSpec.makeMeasureSpec(maxHeight, MeasureSpec.AT_MOST);

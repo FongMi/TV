@@ -743,6 +743,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         switch (event.getState()) {
             case 0:
                 checkPosition();
+                setTrackVisible();
                 break;
             case Player.STATE_IDLE:
                 break;
