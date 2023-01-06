@@ -193,8 +193,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.player.setOnClickListener(view -> onPlayer());
         mBinding.control.decode.setOnClickListener(view -> onDecode());
         mBinding.control.ending.setOnClickListener(view -> onEnding());
-        //mBinding.control.opening.setOnClickListener(view -> onOpening());
-        mBinding.control.opening.setOnClickListener(view -> onTracks());
+        mBinding.control.opening.setOnClickListener(view -> onOpening());
+        //mBinding.control.opening.setOnClickListener(view -> onTracks());
         mBinding.control.replay.setOnClickListener(view -> getPlayer(true));
         mBinding.control.speed.setOnLongClickListener(view -> onSpeedLong());
         mBinding.control.ending.setOnLongClickListener(view -> onEndingReset());
