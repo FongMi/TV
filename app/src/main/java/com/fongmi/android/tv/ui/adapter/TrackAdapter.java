@@ -34,6 +34,11 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
         return this;
     }
 
+    public int getSelected() {
+        for (int i = 0; i < mItems.size(); i++) if (mItems.get(i).isSelected()) return i;
+        return 0;
+    }
+
     @Override
     public int getItemCount() {
         return mItems.size();
@@ -49,6 +54,7 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Track item = mItems.get(position);
         holder.binding.text.setText(item.getName());
+        holder.binding.text.setActivated(item.isSelected());
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -63,7 +69,9 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
 
         @Override
         public void onClick(View view) {
+            for (int i = 0; i < mItems.size(); i++) mItems.get(i).setSelected(i == getLayoutPosition());
             mListener.onItemClick(mItems.get(getLayoutPosition()));
+            notifyItemRangeChanged(0, mItems.size());
         }
     }
 }

@@ -35,7 +35,7 @@ import com.fongmi.android.tv.player.source.TVBus;
 import com.fongmi.android.tv.player.source.ZLive;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownLive;
 import com.fongmi.android.tv.ui.custom.CustomLiveListView;
-import com.fongmi.android.tv.ui.custom.TrackSelectionDialog;
+import com.fongmi.android.tv.ui.custom.TrackSelectionDialog2;
 import com.fongmi.android.tv.ui.custom.dialog.LiveDialog;
 import com.fongmi.android.tv.ui.custom.dialog.PassDialog;
 import com.fongmi.android.tv.ui.presenter.ChannelPresenter;
@@ -142,11 +142,11 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.group.setListener(this);
         mBinding.channel.setListener(this);
         mBinding.control.seek.setListener(mPlayers);
+        mBinding.control.text.setOnClickListener(this::onTracks);
+        mBinding.control.audio.setOnClickListener(this::onTracks);
         mBinding.control.home.setOnClickListener(view -> onHome());
         mBinding.control.scale.setOnClickListener(view -> onScale());
         mBinding.control.speed.setOnClickListener(view -> onSpeed());
-        mBinding.control.text.setOnClickListener(view -> onTracks());
-        mBinding.control.audio.setOnClickListener(view -> onTracks());
         mBinding.control.invert.setOnClickListener(view -> onInvert());
         mBinding.control.across.setOnClickListener(view -> onAcross());
         mBinding.control.player.setOnClickListener(view -> onPlayer());
@@ -318,9 +318,9 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         getUrl();
     }
 
-    private void onTracks() {
-        TrackSelectionDialog.createForPlayer(mPlayers.exo(), dialog -> {
-        }).show(getSupportFragmentManager(), "tracks");
+    private void onTracks(View view) {
+        int type = Integer.parseInt(view.getTag().toString());
+        TrackSelectionDialog2.create(this).player(mPlayers).type(type).show();
         hideControl();
     }
 
@@ -636,6 +636,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         switch (event.getState()) {
             case 0:
                 setR6Callback();
+                setTrackVisible();
                 break;
             case Player.STATE_IDLE:
                 break;

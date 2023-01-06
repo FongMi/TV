@@ -22,6 +22,7 @@ import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkTimedText;
 import tv.danmaku.ijk.media.player.R;
+import tv.danmaku.ijk.media.player.misc.ITrackInfo;
 import tv.danmaku.ijk.media.player.misc.IjkTrackInfo;
 
 public class IjkVideoView extends FrameLayout implements MediaController.MediaPlayerControl {
@@ -199,6 +200,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     IMediaPlayer.OnVideoSizeChangedListener mSizeChangedListener = new IMediaPlayer.OnVideoSizeChangedListener() {
+        @Override
         public void onVideoSizeChanged(IMediaPlayer mp, int width, int height, int sarNum, int sarDen) {
             mVideoWidth = mp.getVideoWidth();
             mVideoHeight = mp.getVideoHeight();
@@ -215,9 +217,11 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     };
 
     IMediaPlayer.OnPreparedListener mPreparedListener = new IMediaPlayer.OnPreparedListener() {
+        @Override
         public void onPrepared(IMediaPlayer mp) {
             mCurrentState = STATE_PREPARED;
             if (mOnPreparedListener != null) {
+                setPreferredTextLanguage();
                 mOnPreparedListener.onPrepared(mIjkPlayer);
             }
             mVideoWidth = mp.getVideoWidth();
@@ -239,6 +243,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     };
 
     private final IMediaPlayer.OnCompletionListener mCompletionListener = new IMediaPlayer.OnCompletionListener() {
+        @Override
         public void onCompletion(IMediaPlayer mp) {
             mCurrentState = STATE_PLAYBACK_COMPLETED;
             mTargetState = STATE_PLAYBACK_COMPLETED;
@@ -249,6 +254,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     };
 
     private final IMediaPlayer.OnInfoListener mInfoListener = new IMediaPlayer.OnInfoListener() {
+        @Override
         public boolean onInfo(IMediaPlayer mp, int what, int extra) {
             if (mOnInfoListener != null) {
                 mOnInfoListener.onInfo(mp, what, extra);
@@ -268,6 +274,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     };
 
     private final IMediaPlayer.OnErrorListener mErrorListener = new IMediaPlayer.OnErrorListener() {
+        @Override
         public boolean onError(IMediaPlayer mp, int framework_err, int impl_err) {
             Log.d(TAG, "Error: " + framework_err + "," + impl_err);
             mCurrentState = STATE_ERROR;
@@ -492,10 +499,10 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     public boolean haveTrack(int type) {
-        IjkTrackInfo[] trackInfo = mIjkPlayer.getTrackInfo();
-        if (trackInfo == null) return false;
+        IjkTrackInfo[] trackInfos = mIjkPlayer.getTrackInfo();
+        if (trackInfos == null) return false;
         int count = 0;
-        for (IjkTrackInfo info : trackInfo) if (info.getTrackType() == type) ++count;
+        for (IjkTrackInfo trackInfo : trackInfos) if (trackInfo.getTrackType() == type) ++count;
         return count > 1;
     }
 
@@ -505,6 +512,25 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     public int getSelectedTrack(int type) {
         return mIjkPlayer.getSelectedTrack(type);
+    }
+
+    public void selectTrack(int track) {
+        long position = getCurrentPosition();
+        mIjkPlayer.selectTrack(track);
+        seekTo(position);
+    }
+
+    private void setPreferredTextLanguage() {
+        IjkTrackInfo[] trackInfos = mIjkPlayer.getTrackInfo();
+        if (trackInfos == null) return;
+        for (int index = 0; index < trackInfos.length; index++) {
+            IjkTrackInfo trackInfo = trackInfos[index];
+            if (trackInfo.getTrackType() != ITrackInfo.MEDIA_TRACK_TYPE_TEXT) continue;
+            if (trackInfo.getLanguage().equals("zh")) {
+                selectTrack(index);
+                break;
+            }
+        }
     }
 
     private void createPlayer() {
