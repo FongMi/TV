@@ -48,8 +48,7 @@
     <string name="play_track_audio">Audio</string>
     <string name="play_invert">Invert</string>
     <string name="play_across">Across</string>
-    <string name="play_op">OP</string>
-    <string name="play_ed">ED</string>
+    <string name="play_oped">OP&amp;ED</string>
     <string name="play_reverse">Reverse</string>
     <string name="play_forward">→</string>
     <string name="play_backward">←</string>
