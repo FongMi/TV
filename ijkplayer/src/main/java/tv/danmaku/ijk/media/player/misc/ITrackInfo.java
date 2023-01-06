@@ -19,20 +19,20 @@ package tv.danmaku.ijk.media.player.misc;
 
 public interface ITrackInfo {
 
-	int MEDIA_TRACK_TYPE_UNKNOWN = 0;
-	int MEDIA_TRACK_TYPE_AUDIO = 1;
-	int MEDIA_TRACK_TYPE_VIDEO = 2;
-	int MEDIA_TRACK_TYPE_TEXT = 3;
+    int MEDIA_TRACK_TYPE_UNKNOWN = 0;
+    int MEDIA_TRACK_TYPE_AUDIO = 1;
+    int MEDIA_TRACK_TYPE_VIDEO = 2;
+    int MEDIA_TRACK_TYPE_TEXT = 3;
 
-	IMediaFormat getFormat();
+    IMediaFormat getFormat();
 
-	String getLanguage();
+    String getLanguage();
 
-	int getTrackType();
+    int getTrackType();
 
-	int getChannelCount();
+    int getChannelCount();
 
-	int getBitrate();
+    int getBitrate();
 
-	String getInfoInline();
+    String getInfoInline();
 }
