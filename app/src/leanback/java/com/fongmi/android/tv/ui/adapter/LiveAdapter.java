@@ -10,7 +10,6 @@ import com.fongmi.android.tv.api.LiveConfig;
 import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.databinding.AdapterLiveBinding;
 
-import java.util.Collections;
 import java.util.List;
 
 public class LiveAdapter extends RecyclerView.Adapter<LiveAdapter.ViewHolder> {
@@ -21,7 +20,6 @@ public class LiveAdapter extends RecyclerView.Adapter<LiveAdapter.ViewHolder> {
     public LiveAdapter(OnClickListener listener) {
         this.mListener = listener;
         this.mItems = LiveConfig.get().getLives();
-        Collections.sort(mItems, new Live.Sorter());
     }
 
     public interface OnClickListener {
