@@ -189,12 +189,13 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.prev.setOnClickListener(view -> checkPrev());
         mBinding.control.scale.setOnClickListener(view -> onScale());
         mBinding.control.speed.setOnClickListener(view -> onSpeed());
+        mBinding.control.replay.setOnClickListener(view -> onReplay());
         mBinding.control.player.setOnClickListener(view -> onPlayer());
         mBinding.control.decode.setOnClickListener(view -> onDecode());
         mBinding.control.ending.setOnClickListener(view -> onEnding());
         mBinding.control.opening.setOnClickListener(view -> onOpening());
-        mBinding.control.replay.setOnClickListener(view -> getPlayer(true));
         mBinding.control.speed.setOnLongClickListener(view -> onSpeedLong());
+        mBinding.control.replay.setOnLongClickListener(view -> onReplayLong());
         mBinding.control.ending.setOnLongClickListener(view -> onEndingReset());
         mBinding.control.opening.setOnLongClickListener(view -> onOpeningReset());
         mBinding.flag.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
@@ -534,6 +535,15 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private boolean onSpeedLong() {
         mBinding.control.speed.setText(mPlayers.toggleSpeed());
         mHistory.setSpeed(mPlayers.getSpeed());
+        return true;
+    }
+
+    private void onReplay() {
+        getPlayer(true);
+    }
+
+    private boolean onReplayLong() {
+        getPlayer(false);
         return true;
     }
 
