@@ -138,6 +138,7 @@ public class SiteViewModel extends ViewModel {
                 SpiderDebug.log(playerContent);
                 Result result = Result.objectFrom(playerContent);
                 if (result.getFlag().isEmpty()) result.setFlag(flag);
+                result.setKey(key);
                 return result;
             } else if (site.getType() == 4) {
                 ArrayMap<String, String> params = new ArrayMap<>();
