@@ -127,8 +127,6 @@ public class IjkMediaMeta {
     public long mBitrate;
 
     public final ArrayList<IjkStreamMeta> mStreams = new ArrayList<>();
-    public IjkStreamMeta mVideoStream;
-    public IjkStreamMeta mAudioStream;
 
     public String getString(String key) {
         return mMediaMeta.getString(key);
@@ -200,10 +198,6 @@ public class IjkMediaMeta {
         meta.mStartUS = meta.getLong(IJKM_KEY_START_US);
         meta.mBitrate = meta.getLong(IJKM_KEY_BITRATE);
 
-        int videoStreamIndex = meta.getInt(IJKM_KEY_VIDEO_STREAM, -1);
-        int audioStreamIndex = meta.getInt(IJKM_KEY_AUDIO_STREAM, -1);
-        int subtitleStreamIndex = meta.getInt(IJKM_KEY_TIMEDTEXT_STREAM, -1);
-
         ArrayList<Bundle> streams = meta.getParcelableArrayList(IJKM_KEY_STREAMS);
         if (streams == null) return meta;
 
@@ -232,12 +226,13 @@ public class IjkMediaMeta {
                 streamMeta.mTbrDen = streamMeta.getInt(IJKM_KEY_TBR_DEN);
                 streamMeta.mSarNum = streamMeta.getInt(IJKM_KEY_SAR_NUM);
                 streamMeta.mSarDen = streamMeta.getInt(IJKM_KEY_SAR_DEN);
-                if (videoStreamIndex == index) meta.mVideoStream = streamMeta;
             } else if (streamMeta.mType.equalsIgnoreCase(IJKM_VAL_TYPE__AUDIO)) {
                 streamMeta.mSampleRate = streamMeta.getInt(IJKM_KEY_SAMPLE_RATE);
                 streamMeta.mChannelLayout = streamMeta.getLong(IJKM_KEY_CHANNEL_LAYOUT);
-                if (audioStreamIndex == index) meta.mAudioStream = streamMeta;
+            } else if (streamMeta.mType.equalsIgnoreCase(IJKM_VAL_TYPE__TIMEDTEXT)) {
+                if (streamMeta.mCodecName.equals("hdmv_pgs_subtitle")) continue;
             }
+
             meta.mStreams.add(streamMeta);
         }
         return meta;
