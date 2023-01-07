@@ -150,10 +150,6 @@ public class Site {
         this.activated = item.equals(this);
     }
 
-    public String getActivatedName() {
-        return (isActivated() ? "√ " : "").concat(getName());
-    }
-
     public boolean isSearchable() {
         return getSearchable() == 1;
     }
