@@ -96,6 +96,8 @@ public class IjkTrackInfo implements ITrackInfo {
             case MEDIA_TRACK_TYPE_TEXT:
                 out.append("TIMEDTEXT");
                 out.append(", ");
+                out.append(mStreamMeta.getCodecShortNameInline());
+                out.append(", ");
                 out.append(mStreamMeta.mLanguage);
                 break;
             default:
