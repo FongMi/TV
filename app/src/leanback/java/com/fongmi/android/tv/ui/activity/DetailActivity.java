@@ -183,8 +183,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.desc.setOnClickListener(view -> onDesc());
         mBinding.keep.setOnClickListener(view -> onKeep());
         mBinding.video.setOnClickListener(view -> onVideo());
-        mBinding.control.text.setOnClickListener(this::onTracks);
-        mBinding.control.audio.setOnClickListener(this::onTracks);
+        mBinding.control.text.setOnClickListener(this::onTrack);
+        mBinding.control.audio.setOnClickListener(this::onTrack);
         mBinding.control.next.setOnClickListener(view -> checkNext());
         mBinding.control.prev.setOnClickListener(view -> checkPrev());
         mBinding.control.scale.setOnClickListener(view -> onScale());
@@ -591,7 +591,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         setDecodeView();
     }
 
-    private void onTracks(View view) {
+    private void onTrack(View view) {
         int type = Integer.parseInt(view.getTag().toString());
         TrackSelectionDialog.create(this).player(mPlayers).type(type).show();
         hideControl();
