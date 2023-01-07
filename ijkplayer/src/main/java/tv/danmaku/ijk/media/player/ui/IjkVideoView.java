@@ -13,7 +13,6 @@ import android.widget.MediaController;
 
 import androidx.annotation.NonNull;
 
-import java.io.IOException;
 import java.util.Map;
 
 import tv.danmaku.ijk.media.player.IMediaPlayer;
@@ -57,7 +56,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     private int mCurrentBufferPercentage;
     private long mCurrentBufferPosition;
 
-    // All the stuff we need for playing and showing a video
     private IRenderView.ISurfaceHolder mSurfaceHolder = null;
     private IjkMediaPlayer mIjkPlayer = null;
     private int mVideoWidth;
@@ -105,7 +103,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     private void setRenderView(IRenderView renderView) {
-        clearRender();
         mRenderView = renderView;
         setResizeMode(mCurrentAspectRatio);
         contentFrame.addView(mRenderView.getView(), 0, new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER));
@@ -113,21 +110,11 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         mRenderView.setVideoRotation(mVideoRotationDegree);
     }
 
-    private void clearRender() {
-        if (mRenderView != null) {
-            contentFrame.removeView(mRenderView.getView());
-            mRenderView.removeRenderCallback(mSHCallback);
-            mRenderView = null;
-        }
-    }
-
     public void setRender(int render) {
         mCurrentRender = render;
         switch (render) {
             case RENDER_TEXTURE_VIEW:
-                TextureRenderView texture = new TextureRenderView(getContext());
-                if (mIjkPlayer != null) texture.getSurfaceHolder().bindToMediaPlayer(mIjkPlayer);
-                setRenderView(texture);
+                setRenderView(new TextureRenderView(getContext()));
                 break;
             case RENDER_SURFACE_VIEW:
                 setRenderView(new SurfaceRenderView(getContext()));
@@ -154,7 +141,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     public void stopPlayback() {
         if (mIjkPlayer == null) return;
-        clearRender();
         mIjkPlayer.stop();
         mIjkPlayer.release();
         mIjkPlayer = null;
@@ -172,8 +158,8 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         try {
             createPlayer();
             fixUserAgent();
+            fixTextureView();
             setSpeed(mCurrentSpeed);
-            setRender(mCurrentRender);
             mCurrentBufferPosition = 0;
             mCurrentBufferPercentage = 0;
             mIjkPlayer.setDataSource(mAppContext, mUri, mHeaders);
@@ -182,12 +168,21 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
             mIjkPlayer.setScreenOnWhilePlaying(true);
             mIjkPlayer.prepareAsync();
             mCurrentState = STATE_PREPARING;
-        } catch (IOException | IllegalArgumentException ex) {
-            Log.w(TAG, "Unable to open content: " + mUri, ex);
+        } catch (Throwable e) {
+            Log.e(TAG, "Unable to open content: " + mUri, e);
             mCurrentState = STATE_ERROR;
             mTargetState = STATE_ERROR;
             mErrorListener.onError(mIjkPlayer, MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
         }
+    }
+
+    private void fixTextureView() {
+        if (mCurrentRender != RENDER_TEXTURE_VIEW) return;
+        mRenderView.removeRenderCallback(mSHCallback);
+        TextureRenderView texture = new TextureRenderView(getContext());
+        texture.getSurfaceHolder().bindToMediaPlayer(mIjkPlayer);
+        contentFrame.removeView(mRenderView.getView());
+        setRenderView(texture);
     }
 
     private void fixUserAgent() {
@@ -330,10 +325,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     IRenderView.IRenderCallback mSHCallback = new IRenderView.IRenderCallback() {
         @Override
         public void onSurfaceChanged(@NonNull IRenderView.ISurfaceHolder holder, int format, int w, int h) {
-            if (holder.getRenderView() != mRenderView) {
-                Log.e(TAG, "onSurfaceChanged: unmatched render callback\n");
-                return;
-            }
             mSurfaceWidth = w;
             mSurfaceHeight = h;
             boolean isValidState = (mTargetState == STATE_PLAYING);
@@ -345,10 +336,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
         @Override
         public void onSurfaceCreated(@NonNull IRenderView.ISurfaceHolder holder, int width, int height) {
-            if (holder.getRenderView() != mRenderView) {
-                Log.e(TAG, "onSurfaceCreated: unmatched render callback\n");
-                return;
-            }
             mSurfaceHolder = holder;
             if (mIjkPlayer != null) bindSurfaceHolder(mIjkPlayer, holder);
             else openVideo();
@@ -356,18 +343,10 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
         @Override
         public void onSurfaceDestroyed(@NonNull IRenderView.ISurfaceHolder holder) {
-            if (holder.getRenderView() != mRenderView) {
-                Log.e(TAG, "onSurfaceDestroyed: unmatched render callback\n");
-                return;
-            }
+            if (mIjkPlayer != null) mIjkPlayer.setDisplay(null);
             mSurfaceHolder = null;
-            releaseWithoutStop();
         }
     };
-
-    public void releaseWithoutStop() {
-        if (mIjkPlayer != null) mIjkPlayer.setDisplay(null);
-    }
 
     public void release(boolean clearState) {
         if (mIjkPlayer == null) return;
