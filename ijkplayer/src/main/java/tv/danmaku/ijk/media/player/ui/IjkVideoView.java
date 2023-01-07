@@ -179,9 +179,9 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     private void fixTextureView() {
         if (mCurrentRender != RENDER_TEXTURE_VIEW) return;
         mRenderView.removeRenderCallback(mSHCallback);
+        contentFrame.removeView(mRenderView.getView());
         TextureRenderView texture = new TextureRenderView(getContext());
         texture.getSurfaceHolder().bindToMediaPlayer(mIjkPlayer);
-        contentFrame.removeView(mRenderView.getView());
         setRenderView(texture);
     }
 

@@ -183,6 +183,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.desc.setOnClickListener(view -> onDesc());
         mBinding.keep.setOnClickListener(view -> onKeep());
         mBinding.video.setOnClickListener(view -> onVideo());
+        mBinding.video.setOnLongClickListener(view -> onLong());
         mBinding.control.text.setOnClickListener(this::onTrack);
         mBinding.control.audio.setOnClickListener(this::onTrack);
         mBinding.control.next.setOnClickListener(view -> checkNext());
@@ -488,8 +489,14 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onVideo() {
-        if (mFullscreen) onToggle();
+        if (isVisible(mBinding.control.getRoot())) hideControl();
+        else if (mFullscreen) onKeyCenter();
         else enterFullscreen();
+    }
+
+    private boolean onLong() {
+        if (mFullscreen) onKeyDown();
+        return true;
     }
 
     private void checkNext() {
@@ -847,6 +854,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     public void onKeyCenter() {
         if (mPlayers.isPlaying()) onPause(true);
         else onPlay(0);
+        hideControl();
     }
 
     @Override
