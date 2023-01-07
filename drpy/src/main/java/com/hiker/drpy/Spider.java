@@ -20,11 +20,14 @@ import java.util.concurrent.Future;
 
 public class Spider extends com.github.catvod.crawler.Spider {
 
-    private final ExecutorService executor;
-    private final String key;
-    private final String api;
+    private ExecutorService executor;
+    private String key;
+    private String api;
     private QuickJSContext ctx;
     private JSObject jsObject;
+
+    public Spider() {
+    }
 
     public Spider(String api) {
         this.executor = Executors.newSingleThreadExecutor();
