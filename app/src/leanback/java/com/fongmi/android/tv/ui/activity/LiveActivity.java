@@ -142,8 +142,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.group.setListener(this);
         mBinding.channel.setListener(this);
         mBinding.control.seek.setListener(mPlayers);
-        mBinding.control.text.setOnClickListener(this::onTracks);
-        mBinding.control.audio.setOnClickListener(this::onTracks);
+        mBinding.control.text.setOnClickListener(this::onTrack);
+        mBinding.control.audio.setOnClickListener(this::onTrack);
         mBinding.control.home.setOnClickListener(view -> onHome());
         mBinding.control.scale.setOnClickListener(view -> onScale());
         mBinding.control.speed.setOnClickListener(view -> onSpeed());
@@ -318,7 +318,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         getUrl();
     }
 
-    private void onTracks(View view) {
+    private void onTrack(View view) {
         int type = Integer.parseInt(view.getTag().toString());
         TrackSelectionDialog.create(this).player(mPlayers).type(type).show();
         hideControl();
