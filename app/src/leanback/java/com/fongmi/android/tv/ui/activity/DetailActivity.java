@@ -40,7 +40,6 @@ import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
 import com.fongmi.android.tv.ui.custom.TrackSelectionDialog;
-import com.fongmi.android.tv.ui.custom.TrackSelectionDialog2;
 import com.fongmi.android.tv.ui.custom.dialog.DescDialog;
 import com.fongmi.android.tv.ui.presenter.ArrayPresenter;
 import com.fongmi.android.tv.ui.presenter.EpisodePresenter;
@@ -194,7 +193,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.decode.setOnClickListener(view -> onDecode());
         mBinding.control.ending.setOnClickListener(view -> onEnding());
         mBinding.control.opening.setOnClickListener(view -> onOpening());
-        //mBinding.control.opening.setOnClickListener(view -> onTracks());
         mBinding.control.replay.setOnClickListener(view -> getPlayer(true));
         mBinding.control.speed.setOnLongClickListener(view -> onSpeedLong());
         mBinding.control.ending.setOnLongClickListener(view -> onEndingReset());
@@ -585,13 +583,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void onTracks(View view) {
         int type = Integer.parseInt(view.getTag().toString());
-        TrackSelectionDialog2.create(this).player(mPlayers).type(type).show();
-        hideControl();
-    }
-
-    private void onTracks() {
-        TrackSelectionDialog.createForPlayer(mPlayers.exo(), dialog -> {
-        }).show(getSupportFragmentManager(), "tracks");
+        TrackSelectionDialog.create(this).player(mPlayers).type(type).show();
         hideControl();
     }
 
