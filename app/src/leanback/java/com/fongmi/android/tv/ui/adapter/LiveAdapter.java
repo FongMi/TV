@@ -41,7 +41,8 @@ public class LiveAdapter extends RecyclerView.Adapter<LiveAdapter.ViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Live item = mItems.get(position);
-        holder.binding.text.setText(item.getActivatedName());
+        holder.binding.text.setText(item.getName());
+        holder.binding.text.setActivated(item.isActivated());
         holder.binding.getRoot().setSelected(item.isActivated());
         holder.binding.text.setOnClickListener(v -> mListener.onItemClick(item));
     }
