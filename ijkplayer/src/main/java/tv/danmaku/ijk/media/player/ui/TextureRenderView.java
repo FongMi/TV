@@ -18,8 +18,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import tv.danmaku.ijk.media.player.IMediaPlayer;
-import tv.danmaku.ijk.media.player.ISurfaceTextureHolder;
-import tv.danmaku.ijk.media.player.ISurfaceTextureHost;
 
 public class TextureRenderView extends TextureView implements IRenderView {
 
@@ -117,20 +115,7 @@ public class TextureRenderView extends TextureView implements IRenderView {
         }
 
         public void bindToMediaPlayer(IMediaPlayer mp) {
-            if (mp == null) return;
-            if (mp instanceof ISurfaceTextureHolder) {
-                ISurfaceTextureHolder textureHolder = (ISurfaceTextureHolder) mp;
-                mTextureView.mSurfaceCallback.setOwnSurfaceTexture(false);
-                SurfaceTexture surfaceTexture = textureHolder.getSurfaceTexture();
-                if (surfaceTexture != null) {
-                    mTextureView.setSurfaceTexture(surfaceTexture);
-                } else {
-                    textureHolder.setSurfaceTexture(mSurfaceTexture);
-                    textureHolder.setSurfaceTextureHost(mTextureView.mSurfaceCallback);
-                }
-            } else {
-                mp.setSurface(openSurface());
-            }
+            mp.setSurface(openSurface());
         }
 
         @NonNull
@@ -171,7 +156,7 @@ public class TextureRenderView extends TextureView implements IRenderView {
 
     private SurfaceCallback mSurfaceCallback;
 
-    private static final class SurfaceCallback implements SurfaceTextureListener, ISurfaceTextureHost {
+    private static final class SurfaceCallback implements SurfaceTextureListener {
 
         private SurfaceTexture mSurfaceTexture;
         private boolean mIsFormatChanged;
@@ -243,30 +228,6 @@ public class TextureRenderView extends TextureView implements IRenderView {
 
         @Override
         public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-        }
-
-        @Override
-        public void releaseSurfaceTexture(SurfaceTexture surfaceTexture) {
-            if (surfaceTexture == null) return;
-            if (mDidDetachFromWindow) {
-                if (surfaceTexture != mSurfaceTexture) {
-                    surfaceTexture.release();
-                } else if (!mOwnSurfaceTexture) {
-                    surfaceTexture.release();
-                }
-            } else if (mWillDetachFromWindow) {
-                if (surfaceTexture != mSurfaceTexture) {
-                    surfaceTexture.release();
-                } else if (!mOwnSurfaceTexture) {
-                    setOwnSurfaceTexture(true);
-                }
-            } else {
-                if (surfaceTexture != mSurfaceTexture) {
-                    surfaceTexture.release();
-                } else if (!mOwnSurfaceTexture) {
-                    setOwnSurfaceTexture(true);
-                }
-            }
         }
 
         private void willDetachFromWindow() {

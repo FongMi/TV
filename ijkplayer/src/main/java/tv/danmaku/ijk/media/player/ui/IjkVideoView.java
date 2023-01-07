@@ -323,11 +323,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     private void bindSurfaceHolder(IMediaPlayer mp, IRenderView.ISurfaceHolder holder) {
-        if (mp == null) return;
-        if (holder == null) {
-            mp.setDisplay(null);
-            return;
-        }
+        if (mp == null || holder == null) return;
         holder.bindToMediaPlayer(mp);
     }
 
