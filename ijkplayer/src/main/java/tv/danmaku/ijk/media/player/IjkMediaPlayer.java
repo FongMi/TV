@@ -23,7 +23,6 @@ import android.annotation.TargetApi;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
-import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
@@ -1040,7 +1039,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
                 if (msg.obj == null) {
                     player.notifyOnTimedText(null);
                 } else {
-                    IjkTimedText text = new IjkTimedText(new Rect(0, 0, 1, 1), (String)msg.obj);
+                    IjkTimedText text = new IjkTimedText((String) msg.obj);
                     player.notifyOnTimedText(text);
                 }
                 return;
