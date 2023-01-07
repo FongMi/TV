@@ -2,14 +2,13 @@ package com.fongmi.android.tv.bean;
 
 public class Track {
 
+    private int group;
+    private int track;
     private String name;
-    private int index;
-    private int playerType;
     private boolean selected;
 
-    public Track(int playerType, String name) {
+    public Track(String name) {
         this.name = name;
-        this.playerType = playerType;
     }
 
     public String getName() {
@@ -20,20 +19,20 @@ public class Track {
         this.name = name;
     }
 
-    public int getIndex() {
-        return index;
+    public int getGroup() {
+        return group;
     }
 
-    public void setIndex(int index) {
-        this.index = index;
+    public void setGroup(int group) {
+        this.group = group;
     }
 
-    public int getPlayerType() {
-        return playerType;
+    public int getTrack() {
+        return track;
     }
 
-    public void setPlayerType(int playerType) {
-        this.playerType = playerType;
+    public void setTrack(int track) {
+        this.track = track;
     }
 
     public boolean isSelected() {

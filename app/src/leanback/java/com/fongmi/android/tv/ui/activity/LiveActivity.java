@@ -35,7 +35,7 @@ import com.fongmi.android.tv.player.source.TVBus;
 import com.fongmi.android.tv.player.source.ZLive;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownLive;
 import com.fongmi.android.tv.ui.custom.CustomLiveListView;
-import com.fongmi.android.tv.ui.custom.TrackSelectionDialog2;
+import com.fongmi.android.tv.ui.custom.TrackSelectionDialog;
 import com.fongmi.android.tv.ui.custom.dialog.LiveDialog;
 import com.fongmi.android.tv.ui.custom.dialog.PassDialog;
 import com.fongmi.android.tv.ui.presenter.ChannelPresenter;
@@ -320,7 +320,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void onTracks(View view) {
         int type = Integer.parseInt(view.getTag().toString());
-        TrackSelectionDialog2.create(this).player(mPlayers).type(type).show();
+        TrackSelectionDialog.create(this).player(mPlayers).type(type).show();
         hideControl();
     }
 
