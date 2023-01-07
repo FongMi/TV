@@ -104,10 +104,6 @@ public class Live {
         this.activated = item.equals(this);
     }
 
-    public String getActivatedName() {
-        return (isActivated() ? "√ " : "").concat(getName());
-    }
-
     public Live check() {
         boolean proxy = getGroup().equals("redirect") && getChannels().size() > 0 && getChannels().get(0).getUrls().size() > 0 && getChannels().get(0).getUrls().get(0).startsWith("proxy") && getChannels().get(0).getUrls().get(0).contains("ext=");
         if (proxy) this.url = getChannels().get(0).getUrls().get(0).split("ext=")[1];
