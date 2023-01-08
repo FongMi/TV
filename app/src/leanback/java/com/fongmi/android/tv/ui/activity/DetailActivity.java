@@ -1,5 +1,6 @@
 package com.fongmi.android.tv.ui.activity;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.text.Html;
@@ -178,12 +179,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     @Override
+    @SuppressLint("ClickableViewAccessibility")
     protected void initEvent() {
         mBinding.control.seek.setListener(mPlayers);
         mBinding.desc.setOnClickListener(view -> onDesc());
         mBinding.keep.setOnClickListener(view -> onKeep());
         mBinding.video.setOnClickListener(view -> onVideo());
-        mBinding.video.setOnLongClickListener(view -> onLong());
         mBinding.control.text.setOnClickListener(this::onTrack);
         mBinding.control.audio.setOnClickListener(this::onTrack);
         mBinding.control.next.setOnClickListener(view -> checkNext());
@@ -199,6 +200,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.replay.setOnLongClickListener(view -> onReplayLong());
         mBinding.control.ending.setOnLongClickListener(view -> onEndingReset());
         mBinding.control.opening.setOnLongClickListener(view -> onOpeningReset());
+        mBinding.video.setOnTouchListener((view, event) -> mKeyDown.onTouchEvent(event));
         mBinding.flag.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
@@ -462,7 +464,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 24);
         mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
         mBinding.flag.setSelectedPosition(mCurrent);
-        mFullscreen = true;
+        App.post(() -> mFullscreen = true, 500);
         onPlay(0);
     }
 
@@ -489,14 +491,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onVideo() {
-        if (isVisible(mBinding.control.getRoot())) hideControl();
-        else if (mFullscreen) onKeyCenter();
-        else enterFullscreen();
-    }
-
-    private boolean onLong() {
-        if (mFullscreen) onKeyDown();
-        return true;
+        if (!mFullscreen) enterFullscreen();
     }
 
     private void checkNext() {
@@ -855,6 +850,16 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         if (mPlayers.isPlaying()) onPause(true);
         else onPlay(0);
         hideControl();
+    }
+
+    @Override
+    public void onSingleTap() {
+        if (mFullscreen) onToggle();
+    }
+
+    @Override
+    public void onDoubleTap() {
+        if (mFullscreen) onKeyCenter();
     }
 
     @Override
