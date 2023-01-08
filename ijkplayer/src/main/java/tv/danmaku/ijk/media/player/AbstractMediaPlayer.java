@@ -21,6 +21,7 @@ import tv.danmaku.ijk.media.player.misc.IMediaDataSource;
 
 @SuppressWarnings("WeakerAccess")
 public abstract class AbstractMediaPlayer implements IMediaPlayer {
+
     private OnPreparedListener mOnPreparedListener;
     private OnCompletionListener mOnCompletionListener;
     private OnBufferingUpdateListener mOnBufferingUpdateListener;
@@ -38,8 +39,7 @@ public abstract class AbstractMediaPlayer implements IMediaPlayer {
         mOnCompletionListener = listener;
     }
 
-    public final void setOnBufferingUpdateListener(
-            OnBufferingUpdateListener listener) {
+    public final void setOnBufferingUpdateListener(OnBufferingUpdateListener listener) {
         mOnBufferingUpdateListener = listener;
     }
 
@@ -47,8 +47,7 @@ public abstract class AbstractMediaPlayer implements IMediaPlayer {
         mOnSeekCompleteListener = listener;
     }
 
-    public final void setOnVideoSizeChangedListener(
-            OnVideoSizeChangedListener listener) {
+    public final void setOnVideoSizeChangedListener(OnVideoSizeChangedListener listener) {
         mOnVideoSizeChangedListener = listener;
     }
 
@@ -76,48 +75,39 @@ public abstract class AbstractMediaPlayer implements IMediaPlayer {
     }
 
     protected final void notifyOnPrepared() {
-        if (mOnPreparedListener != null)
-            mOnPreparedListener.onPrepared(this);
+        if (mOnPreparedListener != null) mOnPreparedListener.onPrepared(this);
     }
 
     protected final void notifyOnCompletion() {
-        if (mOnCompletionListener != null)
-            mOnCompletionListener.onCompletion(this);
+        if (mOnCompletionListener != null) mOnCompletionListener.onCompletion(this);
     }
 
     protected final void notifyOnBufferingUpdate(long position) {
-        if (mOnBufferingUpdateListener != null)
-            mOnBufferingUpdateListener.onBufferingUpdate(this, position);
+        if (mOnBufferingUpdateListener != null) mOnBufferingUpdateListener.onBufferingUpdate(this, position);
     }
 
     protected final void notifyOnBufferingUpdate(int percent) {
-        if (mOnBufferingUpdateListener != null)
-            mOnBufferingUpdateListener.onBufferingUpdate(this, percent);
+        if (mOnBufferingUpdateListener != null) mOnBufferingUpdateListener.onBufferingUpdate(this, percent);
     }
 
     protected final void notifyOnSeekComplete() {
-        if (mOnSeekCompleteListener != null)
-            mOnSeekCompleteListener.onSeekComplete(this);
+        if (mOnSeekCompleteListener != null) mOnSeekCompleteListener.onSeekComplete(this);
     }
 
-    protected final void notifyOnVideoSizeChanged(int width, int height,
-                                                  int sarNum, int sarDen) {
-        if (mOnVideoSizeChangedListener != null)
-            mOnVideoSizeChangedListener.onVideoSizeChanged(this, width, height,
-                    sarNum, sarDen);
+    protected final void notifyOnVideoSizeChanged(int width, int height, int sarNum, int sarDen) {
+        if (mOnVideoSizeChangedListener != null) mOnVideoSizeChangedListener.onVideoSizeChanged(this, width, height, sarNum, sarDen);
     }
 
     protected final boolean notifyOnError(int what, int extra) {
         return mOnErrorListener != null && mOnErrorListener.onError(this, what, extra);
     }
 
-    protected final boolean notifyOnInfo(int what, int extra) {
-        return mOnInfoListener != null && mOnInfoListener.onInfo(this, what, extra);
+    protected final void notifyOnInfo(int what, int extra) {
+        if (mOnInfoListener != null) mOnInfoListener.onInfo(this, what, extra);
     }
 
     protected final void notifyOnTimedText(IjkTimedText text) {
-        if (mOnTimedTextListener != null)
-            mOnTimedTextListener.onTimedText(this, text);
+        if (mOnTimedTextListener != null) mOnTimedTextListener.onTimedText(this, text);
     }
 
     public void setDataSource(IMediaDataSource mediaDataSource) {
