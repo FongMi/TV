@@ -1,5 +1,6 @@
 package com.fongmi.android.tv.ui.activity;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.view.KeyEvent;
@@ -138,6 +139,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     @Override
+    @SuppressLint("ClickableViewAccessibility")
     protected void initEvent() {
         mBinding.group.setListener(this);
         mBinding.channel.setListener(this);
@@ -153,6 +155,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.control.decode.setOnClickListener(view -> onDecode());
         mBinding.control.line.setOnClickListener(view -> nextLine(false));
         mBinding.control.speed.setOnLongClickListener(view -> onSpeedLong());
+        mBinding.video.setOnTouchListener((view, event) -> mKeyDown.onTouchEvent(event));
         mBinding.group.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
@@ -183,10 +186,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mPlayers.setupExo(getExo());
         setScale(Prefers.getLiveScale());
         getIjk().setRender(Prefers.getRender());
-        getExo().setOnClickListener(view -> onToggle());
-        getIjk().setOnClickListener(view -> onToggle());
-        getExo().setOnLongClickListener(view -> onLongPress());
-        getIjk().setOnLongClickListener(view -> onLongPress());
         mBinding.control.speed.setText(mPlayers.getSpeedText());
         mBinding.control.home.setVisibility(LiveConfig.isOnly() ? View.GONE : View.VISIBLE);
         mBinding.control.invert.setActivated(Prefers.isInvert());
@@ -605,6 +604,17 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         hideInfo();
         hideUI();
         return true;
+    }
+
+    @Override
+    public void onSingleTap() {
+        onToggle();
+    }
+
+    @Override
+    public void onDoubleTap() {
+        if (isVisible(mBinding.control.getRoot())) hideControl();
+        else onLongPress();
     }
 
     @Override
