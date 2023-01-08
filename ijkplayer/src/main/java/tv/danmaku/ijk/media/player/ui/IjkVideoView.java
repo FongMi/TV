@@ -212,10 +212,8 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         @Override
         public void onPrepared(IMediaPlayer mp) {
             mCurrentState = STATE_PREPARED;
-            if (mOnPreparedListener != null) {
-                setPreferredTextLanguage();
-                mOnPreparedListener.onPrepared(mIjkPlayer);
-            }
+            if (mOnPreparedListener != null) mOnPreparedListener.onPrepared(mIjkPlayer);
+            setPreferredTextLanguage();
             mVideoWidth = mp.getVideoWidth();
             mVideoHeight = mp.getVideoHeight();
             if (mVideoWidth != 0 && mVideoHeight != 0) {
@@ -499,7 +497,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
             IjkTrackInfo trackInfo = trackInfos[index];
             if (trackInfo.getTrackType() != ITrackInfo.MEDIA_TRACK_TYPE_TEXT) continue;
             if (trackInfo.getLanguage().equals("zh")) {
-                selectTrack(index);
+                mIjkPlayer.selectTrack(index);
                 break;
             }
         }
