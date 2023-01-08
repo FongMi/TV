@@ -533,10 +533,12 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         mIjkPlayer.setOption(player, "soundtouch", 1);
         mIjkPlayer.setOption(player, "start-on-prepared", 1);
         mIjkPlayer.setOption(player, "subtitle", 1);
-        if (mUri.getScheme() != null && mUri.getScheme().startsWith("rtsp")) {
+        if (mUri.getScheme() != null && mUri.getScheme().startsWith("rtsp") || mUri.getPath().contains("/udp/")) {
             mIjkPlayer.setOption(format, "infbuf", 1);
             mIjkPlayer.setOption(format, "rtsp_transport", "tcp");
             mIjkPlayer.setOption(format, "rtsp_flags", "prefer_tcp");
+            mIjkPlayer.setOption(format, "probesize", 1024 * 1000);
+            mIjkPlayer.setOption(format, "analyzeduration", 2048 * 1000);
         }
     }
 }
