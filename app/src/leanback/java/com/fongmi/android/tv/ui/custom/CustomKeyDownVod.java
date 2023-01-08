@@ -1,20 +1,31 @@
 package com.fongmi.android.tv.ui.custom;
 
+import android.content.Context;
+import android.view.GestureDetector;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
+
+import androidx.annotation.NonNull;
 
 import com.fongmi.android.tv.utils.Utils;
 
-public class CustomKeyDownVod {
+public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
 
+    private final GestureDetector detector;
     private final Listener listener;
     private int holdTime;
 
-    public static CustomKeyDownVod create(Listener listener) {
-        return new CustomKeyDownVod(listener);
+    public static CustomKeyDownVod create(Context context) {
+        return new CustomKeyDownVod(context);
     }
 
-    private CustomKeyDownVod(Listener listener) {
-        this.listener = listener;
+    private CustomKeyDownVod(Context context) {
+        this.listener = (Listener) context;
+        this.detector = new GestureDetector(context, this);
+    }
+
+    public boolean onTouchEvent(MotionEvent e) {
+        return detector.onTouchEvent(e);
     }
 
     public boolean onKeyDown(KeyEvent event) {
@@ -31,6 +42,18 @@ public class CustomKeyDownVod {
         } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isEnterKey(event)) {
             listener.onKeyCenter();
         }
+        return true;
+    }
+
+    @Override
+    public boolean onDoubleTap(@NonNull MotionEvent e) {
+        listener.onDoubleTap();
+        return true;
+    }
+
+    @Override
+    public boolean onSingleTapConfirmed(@NonNull MotionEvent e) {
+        listener.onSingleTap();
         return true;
     }
 
@@ -61,5 +84,9 @@ public class CustomKeyDownVod {
         void onKeyDown();
 
         void onKeyCenter();
+
+        void onSingleTap();
+
+        void onDoubleTap();
     }
 }
