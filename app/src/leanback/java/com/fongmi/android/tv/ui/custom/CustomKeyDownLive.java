@@ -1,15 +1,24 @@
 package com.fongmi.android.tv.ui.custom;
 
+import android.content.Context;
+import android.view.GestureDetector;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
+
+import androidx.annotation.NonNull;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.Utils;
 
-public class CustomKeyDownLive {
+public class CustomKeyDownLive extends GestureDetector.SimpleOnGestureListener {
 
-    private final Listener listener;
+    private static final int DISTANCE = 100;
+    private static final int VELOCITY = 10;
+
+    private final GestureDetector detector;
     private final StringBuilder text;
+    private final Listener listener;
     private int holdTime;
 
     private final Runnable runnable = new Runnable() {
@@ -20,13 +29,18 @@ public class CustomKeyDownLive {
         }
     };
 
-    public static CustomKeyDownLive create(Listener listener) {
-        return new CustomKeyDownLive(listener);
+    public static CustomKeyDownLive create(Context context) {
+        return new CustomKeyDownLive(context);
     }
 
-    private CustomKeyDownLive(Listener listener) {
-        this.listener = listener;
+    private CustomKeyDownLive(Context context) {
         this.text = new StringBuilder();
+        this.listener = (Listener) context;
+        this.detector = new GestureDetector(context, this);
+    }
+
+    public boolean onTouchEvent(MotionEvent e) {
+        return detector.onTouchEvent(e);
     }
 
     public void onKeyDown(int keyCode) {
@@ -42,9 +56,11 @@ public class CustomKeyDownLive {
         } else if (event.getAction() == KeyEvent.ACTION_DOWN && Utils.isRightKey(event)) {
             listener.onSeeking(addTime());
         } else if (event.getAction() == KeyEvent.ACTION_DOWN && Utils.isUpKey(event)) {
-            if (Prefers.isInvert()) listener.onKeyDown(); else listener.onKeyUp();
+            if (Prefers.isInvert()) listener.onKeyDown();
+            else listener.onKeyUp();
         } else if (event.getAction() == KeyEvent.ACTION_DOWN && Utils.isDownKey(event)) {
-            if (Prefers.isInvert()) listener.onKeyUp(); else listener.onKeyDown();
+            if (Prefers.isInvert()) listener.onKeyUp();
+            else listener.onKeyDown();
         } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isLeftKey(event)) {
             listener.onKeyLeft(holdTime);
         } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isRightKey(event)) {
@@ -57,6 +73,37 @@ public class CustomKeyDownLive {
             listener.onLongPress();
         }
         return true;
+    }
+
+    @Override
+    public boolean onDoubleTap(@NonNull MotionEvent e) {
+        listener.onDoubleTap();
+        return true;
+    }
+
+    @Override
+    public boolean onSingleTapConfirmed(@NonNull MotionEvent e) {
+        listener.onSingleTap();
+        return true;
+    }
+
+    @Override
+    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+        if (e1.getX() - e2.getX() > DISTANCE && Math.abs(velocityX) > VELOCITY) {
+            listener.onKeyLeft(30 * 1000);
+            return true;
+        } else if (e2.getX() - e1.getX() > DISTANCE && Math.abs(velocityX) > VELOCITY) {
+            listener.onKeyRight(30 * 1000);
+            return true;
+        } else if (e1.getY() - e2.getY() > DISTANCE && Math.abs(velocityY) > VELOCITY) {
+            listener.onKeyUp();
+            return true;
+        } else if (e2.getY() - e1.getY() > DISTANCE && Math.abs(velocityY) > VELOCITY) {
+            listener.onKeyDown();
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public boolean hasEvent(KeyEvent event) {
@@ -98,5 +145,9 @@ public class CustomKeyDownLive {
         void onKeyCenter();
 
         boolean onLongPress();
+
+        void onSingleTap();
+
+        void onDoubleTap();
     }
 }
