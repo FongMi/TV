@@ -9,8 +9,8 @@ import android.os.IBinder;
 import android.os.SystemClock;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.net.OkHttp;
+import com.fongmi.android.tv.Github;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.forcetech.Port;
 import com.gsoft.mitv.MainActivity;
@@ -38,7 +38,7 @@ public class Force {
 
     private void check() throws Exception {
         File file = FileUtil.getCacheFile("libmitv.so");
-        String url = Constant.getReleasePath("/other/libmitv.so");
+        String url = Github.get().getReleasePath("/other/libmitv.so");
         if (!file.exists()) FileUtil.write(file, OkHttp.newCall(url).execute().body().bytes());
     }
 
