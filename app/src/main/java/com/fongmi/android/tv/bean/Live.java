@@ -8,7 +8,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public class Live {
@@ -105,10 +104,6 @@ public class Live {
         this.activated = item.equals(this);
     }
 
-    public String getActivatedName() {
-        return (isActivated() ? "√ " : "").concat(getName());
-    }
-
     public Live check() {
         boolean proxy = getGroup().equals("redirect") && getChannels().size() > 0 && getChannels().get(0).getUrls().size() > 0 && getChannels().get(0).getUrls().get(0).startsWith("proxy") && getChannels().get(0).getUrls().get(0).contains("ext=");
         if (proxy) this.url = getChannels().get(0).getUrls().get(0).split("ext=")[1];
@@ -128,13 +123,5 @@ public class Live {
         if (!(obj instanceof Live)) return false;
         Live it = (Live) obj;
         return getName().equals(it.getName()) && getUrl().equals(it.getUrl());
-    }
-
-    public static class Sorter implements Comparator<Live> {
-
-        @Override
-        public int compare(Live live1, Live live2) {
-            return Boolean.compare(live2.isActivated(), live1.isActivated());
-        }
     }
 }
