@@ -41,8 +41,6 @@
     <string name="play_next">Next</string>
     <string name="play_prev">Prev</string>
     <string name="play_ready">Ready to play: <xliff:g name="name">%s</xliff:g></string>
-    <string name="play_reset">Reset</string>
-    <string name="play_track">Tracks</string>
     <string name="play_track_text">Text</string>
     <string name="play_track_audio">Audio</string>
     <string name="play_invert">Invert</string>
@@ -137,6 +135,11 @@
         <item>4:3</item>
         <item>Fill</item>
         <item>Zoom</item>
+    </string-array>
+
+    <string-array name="select_reset">
+        <item>Reset</item>
+        <item>Replay</item>
     </string-array>
 
 </resources>

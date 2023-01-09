@@ -67,6 +67,14 @@ public class Prefers {
         put("wall", wall);
     }
 
+    public static int getReset() {
+        return getInt("reset", 0);
+    }
+
+    public static void putReset(int reset) {
+        put("reset", reset);
+    }
+
     public static int getPlayer() {
         return getInt("player", 0);
     }
