@@ -545,15 +545,14 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         return true;
     }
 
-    private boolean onReset() {
+    private void onReset() {
         getPlayer(isReplay());
-        return true;
     }
 
     private boolean onResetToggle() {
         Prefers.putReset(Math.abs(Prefers.getReset() - 1));
         mBinding.control.reset.setText(ResUtil.getStringArray(R.array.select_reset)[Prefers.getReset()]);
-        return onReset();
+        return true;
     }
 
     private void onOpening() {
