@@ -14,6 +14,7 @@ public class Constant {
     public static final String D = "https://raw.iqiq.io/";
     public static final String E = "https://raw.fastgit.org/";
     public static final String REPO = "FongMi/TV/";
+    public static final String RELEASE = "release";
     public static final String KITKAT = "kitkat";
     private static final int TIME = 2;
 
@@ -34,11 +35,11 @@ public class Constant {
         }
     }
 
-	public static String getKitkatPath(String path) {
-        return getProxy() + KITKAT + path;
+    public static String getReleasePath(String path) {
+        return getProxy() + RELEASE + path;
     }
 
-    public static String getBranchPath(String branch, String path) {
-        return getProxy() + branch + path;
+	public static String getKitkatPath(String path) {
+        return getProxy() + KITKAT + path;
     }
 }
