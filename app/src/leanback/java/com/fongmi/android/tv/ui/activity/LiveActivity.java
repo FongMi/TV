@@ -558,6 +558,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public void onKeyUp() {
+        if (mGroup == null || mChannel == null) return;
         int position = mGroup.getPosition() - 1;
         boolean limit = position < 0;
         if (Prefers.isAcross() & limit) prevGroup(true);
@@ -567,6 +568,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public void onKeyDown() {
+        if (mGroup == null || mChannel == null) return;
         int position = mGroup.getPosition() + 1;
         boolean limit = position > mChannelAdapter.size() - 1;
         if (Prefers.isAcross() && limit) nextGroup(true);
@@ -576,6 +578,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public void onKeyLeft(int time) {
+        if (mGroup == null || mChannel == null) return;
         if (isVisible(mBinding.widget.center)) App.post(mR2, 500);
         if (mChannel.isOnly() && mPlayers.isVod()) mPlayers.seekTo(time);
         else if (!mChannel.isOnly()) prevLine();
@@ -584,6 +587,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public void onKeyRight(int time) {
+        if (mGroup == null || mChannel == null) return;
         if (isVisible(mBinding.widget.center)) App.post(mR2, 500);
         if (mChannel.isOnly() && mPlayers.isVod()) mPlayers.seekTo(time);
         else if (!mChannel.isOnly()) nextLine(true);
