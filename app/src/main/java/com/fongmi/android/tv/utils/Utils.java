@@ -74,7 +74,7 @@ public class Utils {
     public static boolean isVideoFormat(String url, Map<String, String> headers) {
         if (Sniffer.CUSTOM.matcher(url).find()) return true;
         if (headers.containsKey("Accept") && headers.get("Accept").startsWith("image")) return false;
-        if (url.contains("=http") || url.contains(".js") || url.contains(".css") || url.contains(".html")) return false;
+        if (url.contains("url=http") || url.contains(".js") || url.contains(".css") || url.contains(".html")) return false;
         return Sniffer.RULE.matcher(url).find();
     }
 
@@ -96,7 +96,7 @@ public class Utils {
     }
 
     public static String convert(String text) {
-        return Server.get().getAddress(true) + "/" + text;
+        return text.startsWith("file") ? Server.get().getAddress(true) + "/" + text : text;
     }
 
     public static String convert(String baseUrl, String text) {

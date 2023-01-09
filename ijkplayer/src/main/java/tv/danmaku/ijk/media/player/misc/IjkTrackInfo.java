@@ -22,6 +22,7 @@ import android.text.TextUtils;
 import tv.danmaku.ijk.media.player.IjkMediaMeta;
 
 public class IjkTrackInfo implements ITrackInfo {
+
     private int mTrackType = MEDIA_TRACK_TYPE_UNKNOWN;
     private IjkMediaMeta.IjkStreamMeta mStreamMeta;
 
@@ -40,10 +41,18 @@ public class IjkTrackInfo implements ITrackInfo {
 
     @Override
     public String getLanguage() {
-        if (mStreamMeta == null || TextUtils.isEmpty(mStreamMeta.mLanguage))
-            return "und";
-
+        if (mStreamMeta == null || TextUtils.isEmpty(mStreamMeta.mLanguage)) return "und";
         return mStreamMeta.mLanguage;
+    }
+
+    @Override
+    public int getChannelCount() {
+        return mStreamMeta.getChannelCount();
+    }
+
+    @Override
+    public int getBitrate() {
+        return (int) mStreamMeta.mBitrate;
     }
 
     @Override
@@ -81,9 +90,13 @@ public class IjkTrackInfo implements ITrackInfo {
                 out.append(mStreamMeta.getBitrateInline());
                 out.append(", ");
                 out.append(mStreamMeta.getSampleRateInline());
+                out.append(", ");
+                out.append(mStreamMeta.getChannelLayoutInline());
                 break;
             case MEDIA_TRACK_TYPE_TEXT:
                 out.append("TIMEDTEXT");
+                out.append(", ");
+                out.append(mStreamMeta.getCodecShortNameInline());
                 out.append(", ");
                 out.append(mStreamMeta.mLanguage);
                 break;

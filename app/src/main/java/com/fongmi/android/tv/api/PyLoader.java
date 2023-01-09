@@ -26,8 +26,7 @@ public class PyLoader {
     private void init() {
         try {
             loader = Class.forName("com.undcover.freedom.pyramid.Loader").newInstance();
-        } catch (Throwable e) {
-            e.printStackTrace();
+        } catch (Throwable ignored) {
         }
     }
 

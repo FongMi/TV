@@ -2,16 +2,17 @@ package com.fongmi.android.tv.player;
 
 import android.graphics.Color;
 import android.net.Uri;
-import android.text.TextUtils;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.bean.Result;
+import com.fongmi.android.tv.bean.Sub;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Prefers;
 import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.RenderersFactory;
+import com.google.android.exoplayer2.Tracks;
 import com.google.android.exoplayer2.database.DatabaseProvider;
 import com.google.android.exoplayer2.database.StandaloneDatabaseProvider;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
@@ -34,6 +35,7 @@ import com.google.android.exoplayer2.upstream.cache.SimpleCache;
 import com.google.android.exoplayer2.util.MimeTypes;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -59,33 +61,35 @@ public class ExoUtil {
         return new CaptionStyleCompat(Color.WHITE, Color.TRANSPARENT, Color.TRANSPARENT, CaptionStyleCompat.EDGE_TYPE_OUTLINE, Color.BLACK, null);
     }
 
+    public static boolean haveTrack(Tracks tracks, int type) {
+        int count = 0;
+        for (Tracks.Group trackGroup : tracks.getGroups()) if (trackGroup.getType() == type) count += trackGroup.length;
+        return count > 1;
+    }
+
     public static MediaSource getSource(Result result, int errorCode) {
-        return getSource(result.getHeaders(), result.getPlayUrl() + result.getUrl(), result.getSub(), errorCode);
+        return getSource(result.getHeaders(), result.getPlayUrl() + result.getUrl(), result.getSubs(), errorCode);
     }
 
     public static MediaSource getSource(Map<String, String> headers, String url, int errorCode) {
-        return getSource(headers, url, null, errorCode);
+        return getSource(headers, url, Collections.emptyList(), errorCode);
     }
 
-    private static MediaSource getSource(Map<String, String> headers, String url, String sub, int errorCode) {
-        return new DefaultMediaSourceFactory(getDataSourceFactory(headers), getExtractorsFactory()).createMediaSource(getMediaItem(url, sub, errorCode));
+    private static MediaSource getSource(Map<String, String> headers, String url, List<Sub> subs, int errorCode) {
+        return new DefaultMediaSourceFactory(getDataSourceFactory(headers), getExtractorsFactory()).createMediaSource(getMediaItem(url, subs, errorCode));
     }
 
-    private static MediaItem getMediaItem(String url, String sub, int errorCode) {
+    private static MediaItem getMediaItem(String url, List<Sub> subs, int errorCode) {
         MediaItem.Builder builder = new MediaItem.Builder().setUri(Uri.parse(url.trim()));
         if (errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED) builder.setMimeType(MimeTypes.APPLICATION_M3U8);
-        if (!TextUtils.isEmpty(sub)) builder.setSubtitleConfigurations(getSubtitles(sub));
+        if (subs.size() > 0) builder.setSubtitleConfigurations(getSubtitles(subs));
         return builder.build();
     }
 
-    private static List<MediaItem.SubtitleConfiguration> getSubtitles(String sub) {
+    private static List<MediaItem.SubtitleConfiguration> getSubtitles(List<Sub> subs) {
         List<MediaItem.SubtitleConfiguration> items = new ArrayList<>();
-        for (String text : sub.split("\\$\\$\\$")) items.add(getSubtitle(text.split("#")));
+        for (Sub sub : subs) items.add(sub.getExo());
         return items;
-    }
-
-    private static MediaItem.SubtitleConfiguration getSubtitle(String[] split) {
-        return new MediaItem.SubtitleConfiguration.Builder(Uri.parse(split[2])).setLabel(split[0]).setMimeType(split[1]).setLanguage("zh").build();
     }
 
     private static synchronized ExtractorsFactory getExtractorsFactory() {

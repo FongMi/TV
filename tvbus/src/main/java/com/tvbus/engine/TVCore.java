@@ -5,92 +5,74 @@ import android.text.TextUtils;
 
 public class TVCore {
 
-    private long nativeHandle;
+    private final long handle;
 
-    private static class Loader {
-        static volatile TVCore INSTANCE = new TVCore();
+    public TVCore() {
+        PmsHook.inject();
+        System.loadLibrary("tvcore");
+        handle = initialise();
     }
 
-    public static TVCore getInstance() {
-        return Loader.INSTANCE;
-    }
-
-    private TVCore() {
-        try {
-            PmsHook.inject();
-            System.loadLibrary("tvcore");
-            nativeHandle = initialise();
-        } catch (Throwable ignored) {
-        }
-    }
-
-    public TVCore listener(TVListener listener) {
-        setListener(nativeHandle, listener);
+    public TVCore listener(Listener listener) {
+        setListener(handle, listener);
         return this;
     }
 
     public TVCore play(int port) {
-        setPlayPort(nativeHandle, port);
+        setPlayPort(handle, port);
         return this;
     }
 
     public TVCore serv(int port) {
-        setServPort(nativeHandle, port);
+        setServPort(handle, port);
         return this;
     }
 
     public TVCore mode(int mode) {
-        setRunningMode(nativeHandle, mode);
+        setRunningMode(handle, mode);
         return this;
     }
 
     public TVCore auth(String str) {
-        if (!TextUtils.isEmpty(str)) setAuthUrl(nativeHandle, str);
+        if (!TextUtils.isEmpty(str)) setAuthUrl(handle, str);
         return this;
     }
 
     public TVCore broker(String str) {
-        if (!TextUtils.isEmpty(str)) setMKBroker(nativeHandle, str);
+        if (!TextUtils.isEmpty(str)) setMKBroker(handle, str);
         return this;
     }
 
     public TVCore name(String str) {
-        if (!TextUtils.isEmpty(str)) setUsername(nativeHandle, str);
+        if (!TextUtils.isEmpty(str)) setUsername(handle, str);
         return this;
     }
 
     public TVCore pass(String str) {
-        if (!TextUtils.isEmpty(str)) setPassword(nativeHandle, str);
+        if (!TextUtils.isEmpty(str)) setPassword(handle, str);
         return this;
     }
 
-    public void start(String url) {
-        try {
-            start(nativeHandle, url);
-        } catch (Throwable ignored) {
-        }
-    }
-
-    public void stop() {
-        try {
-            stop(nativeHandle);
-        } catch (Throwable ignored) {
-        }
-    }
-
-    void init(Context context) {
+    public void init(Context context) {
         new Thread(() -> {
-            init(nativeHandle, context);
-            run(nativeHandle);
+            init(handle, context);
+            run(handle);
         }).start();
     }
 
-    void quit() {
-        try {
-            quit(nativeHandle);
-        } catch (Throwable ignored) {
-        }
+    public void start(String url) {
+        start(handle, url);
     }
+
+    public void stop() {
+        stop(handle);
+    }
+
+    public void quit() {
+        quit(handle);
+    }
+
+    private native long initialise();
 
     private native int init(long handle, Context context);
 
@@ -116,7 +98,5 @@ public class TVCore {
 
     private native void setUsername(long handle, String str);
 
-    private native void setListener(long handle, TVListener listener);
-
-    private native long initialise();
+    private native void setListener(long handle, Listener listener);
 }

@@ -76,12 +76,24 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         return exoPlayer;
     }
 
+    public IjkVideoView ijk() {
+        return ijkPlayer;
+    }
+
     public int getPlayer() {
         return player;
     }
 
+    public void setPlayer(int player) {
+        this.player = player;
+    }
+
     public int getDecode() {
         return decode;
+    }
+
+    public void setDecode(int decode) {
+        this.decode = decode;
     }
 
     public void reset() {
@@ -169,17 +181,9 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         return getSpeedText();
     }
 
-    public void setPlayer(int player) {
-        this.player = player;
-    }
-
     public void togglePlayer() {
         setPlayer(player == 0 ? 1 : 0);
         Prefers.putPlayer(player);
-    }
-
-    public void setDecode(int decode) {
-        this.decode = decode;
     }
 
     public void toggleDecode() {
@@ -239,6 +243,14 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
 
     public boolean isVod() {
         return getDuration() > 5 * 60 * 1000;
+    }
+
+    public boolean haveTrack(int type) {
+        if (isExo()) {
+            return ExoUtil.haveTrack(exoPlayer.getCurrentTracks(), type);
+        } else {
+            return ijkPlayer.haveTrack(type);
+        }
     }
 
     public void start(Channel channel) {
