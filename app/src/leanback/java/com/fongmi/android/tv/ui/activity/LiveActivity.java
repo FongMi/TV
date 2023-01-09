@@ -46,7 +46,6 @@ import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Traffic;
-import com.fongmi.android.tv.utils.Utils;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.ui.StyledPlayerView;
@@ -522,10 +521,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (Utils.isMenuKey(event)) onLongPress();
         if (isVisible(mBinding.control.getRoot())) setR3Callback();
-        if (mGroup == null || mChannel == null) return super.dispatchKeyEvent(event);
-        else if (isGone(mBinding.recycler) && isGone(mBinding.control.getRoot()) && mKeyDown.hasEvent(event)) return mKeyDown.onKeyDown(event);
+        if (mKeyDown.hasEvent(event)) mKeyDown.onKeyDown(event);
         return super.dispatchKeyEvent(event);
     }
 
@@ -557,8 +554,14 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     @Override
+    public boolean dispatch(boolean check) {
+        boolean condition1 = mGroup != null && mChannel != null;
+        boolean condition2 = isGone(mBinding.recycler) && isGone(mBinding.control.getRoot());
+        return check ? condition1 && condition2 : condition1;
+    }
+
+    @Override
     public void onKeyUp() {
-        if (mGroup == null || mChannel == null) return;
         int position = mGroup.getPosition() - 1;
         boolean limit = position < 0;
         if (Prefers.isAcross() & limit) prevGroup(true);
@@ -568,7 +571,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public void onKeyDown() {
-        if (mGroup == null || mChannel == null) return;
         int position = mGroup.getPosition() + 1;
         boolean limit = position > mChannelAdapter.size() - 1;
         if (Prefers.isAcross() && limit) nextGroup(true);
@@ -578,7 +580,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public void onKeyLeft(int time) {
-        if (mGroup == null || mChannel == null) return;
         if (isVisible(mBinding.widget.center)) App.post(mR2, 500);
         if (mChannel.isOnly() && mPlayers.isVod()) mPlayers.seekTo(time);
         else if (!mChannel.isOnly()) prevLine();
@@ -587,7 +588,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public void onKeyRight(int time) {
-        if (mGroup == null || mChannel == null) return;
         if (isVisible(mBinding.widget.center)) App.post(mR2, 500);
         if (mChannel.isOnly() && mPlayers.isVod()) mPlayers.seekTo(time);
         else if (!mChannel.isOnly()) nextLine(true);
@@ -601,13 +601,12 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     @Override
-    public boolean onLongPress() {
+    public void onMenu() {
         if (isVisible(mBinding.control.home)) showControl(mBinding.control.home);
         else if (isVisible(mBinding.control.line)) showControl(mBinding.control.line);
         else showControl(mBinding.control.player);
         hideInfo();
         hideUI();
-        return true;
     }
 
     @Override
@@ -618,7 +617,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     @Override
     public void onDoubleTap() {
         if (isVisible(mBinding.control.getRoot())) hideControl();
-        else onLongPress();
+        else onMenu();
     }
 
     @Override
