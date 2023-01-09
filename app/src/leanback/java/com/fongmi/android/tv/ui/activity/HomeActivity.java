@@ -327,7 +327,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         } else if (!confirm) {
             confirm = true;
             Notify.show(R.string.app_exit);
-            App.post(() -> confirm = false, 1000);
+            App.post(() -> confirm = false, 2000);
         } else {
             super.onBackPressed();
             finish();
