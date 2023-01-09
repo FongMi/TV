@@ -41,7 +41,6 @@
     <string name="play_next">Next</string>
     <string name="play_prev">Prev</string>
     <string name="play_ready">Ready to play: <xliff:g name="name">%s</xliff:g></string>
-    <string name="play_replay">Replay</string>
     <string name="play_reset">Reset</string>
     <string name="play_track">Tracks</string>
     <string name="play_track_text">Text</string>

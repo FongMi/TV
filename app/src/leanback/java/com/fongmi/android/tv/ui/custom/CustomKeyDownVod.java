@@ -28,7 +28,16 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
         return detector.onTouchEvent(e);
     }
 
+    public boolean hasEvent(KeyEvent event) {
+        return Utils.isEnterKey(event) || Utils.isUpKey(event) || Utils.isDownKey(event) || Utils.isLeftKey(event) || Utils.isRightKey(event);
+    }
+
     public boolean onKeyDown(KeyEvent event) {
+        check(event);
+        return true;
+    }
+
+    private void check(KeyEvent event) {
         if (event.getAction() == KeyEvent.ACTION_DOWN && Utils.isLeftKey(event)) {
             listener.onSeeking(subTime());
         } else if (event.getAction() == KeyEvent.ACTION_DOWN && Utils.isRightKey(event)) {
@@ -42,7 +51,6 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
         } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isEnterKey(event)) {
             listener.onKeyCenter();
         }
-        return true;
     }
 
     @Override
@@ -55,10 +63,6 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
     public boolean onSingleTapConfirmed(@NonNull MotionEvent e) {
         listener.onSingleTap();
         return true;
-    }
-
-    public boolean hasEvent(KeyEvent event) {
-        return Utils.isEnterKey(event) || Utils.isUpKey(event) || Utils.isDownKey(event) || Utils.isLeftKey(event) || Utils.isRightKey(event);
     }
 
     private int addTime() {
