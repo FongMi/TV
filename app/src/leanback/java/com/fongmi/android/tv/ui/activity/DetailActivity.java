@@ -158,6 +158,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         return view.getVisibility() == View.GONE;
     }
 
+    private boolean isReplay() {
+        return Prefers.getReset() == 1;
+    }
+
     @Override
     protected ViewBinding getBinding() {
         return mBinding = ActivityDetailBinding.inflate(getLayoutInflater());
@@ -197,7 +201,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.ending.setOnClickListener(view -> onEnding());
         mBinding.control.opening.setOnClickListener(view -> onOpening());
         mBinding.control.speed.setOnLongClickListener(view -> onSpeedLong());
-        mBinding.control.reset.setOnLongClickListener(view -> onResetLong());
+        mBinding.control.reset.setOnLongClickListener(view -> onResetToggle());
         mBinding.control.ending.setOnLongClickListener(view -> onEndingReset());
         mBinding.control.opening.setOnLongClickListener(view -> onOpeningReset());
         mBinding.video.setOnTouchListener((view, event) -> mKeyDown.onTouchEvent(event));
@@ -241,6 +245,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.player.setText(mPlayers.getPlayerText());
         getExo().setVisibility(mPlayers.isExo() ? View.VISIBLE : View.GONE);
         getIjk().setVisibility(mPlayers.isIjk() ? View.VISIBLE : View.GONE);
+        mBinding.control.reset.setText(ResUtil.getStringArray(R.array.select_reset)[Prefers.getReset()]);
     }
 
     private void setDecodeView() {
@@ -540,13 +545,15 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         return true;
     }
 
-    private void onReset() {
-        getPlayer(false);
+    private boolean onReset() {
+        getPlayer(isReplay());
+        return true;
     }
 
-    private boolean onResetLong() {
-        getPlayer(true);
-        return true;
+    private boolean onResetToggle() {
+        Prefers.putReset(Math.abs(Prefers.getReset() - 1));
+        mBinding.control.reset.setText(ResUtil.getStringArray(R.array.select_reset)[Prefers.getReset()]);
+        return onReset();
     }
 
     private void onOpening() {
