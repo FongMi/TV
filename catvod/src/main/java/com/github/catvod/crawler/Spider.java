@@ -38,11 +38,11 @@ public abstract class Spider {
         return "";
     }
 
-    public boolean isVideoFormat(String url) {
+    public boolean manualVideoCheck() {
         return false;
     }
 
-    public boolean manualVideoCheck() {
+    public boolean isVideoFormat(String url) {
         return false;
     }
 }

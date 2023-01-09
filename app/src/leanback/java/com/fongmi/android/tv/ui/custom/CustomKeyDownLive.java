@@ -56,11 +56,9 @@ public class CustomKeyDownLive extends GestureDetector.SimpleOnGestureListener {
         } else if (event.getAction() == KeyEvent.ACTION_DOWN && Utils.isRightKey(event)) {
             listener.onSeeking(addTime());
         } else if (event.getAction() == KeyEvent.ACTION_DOWN && Utils.isUpKey(event)) {
-            if (Prefers.isInvert()) listener.onKeyDown();
-            else listener.onKeyUp();
+            if (Prefers.isInvert()) listener.onKeyDown(); else listener.onKeyUp();
         } else if (event.getAction() == KeyEvent.ACTION_DOWN && Utils.isDownKey(event)) {
-            if (Prefers.isInvert()) listener.onKeyUp();
-            else listener.onKeyDown();
+            if (Prefers.isInvert()) listener.onKeyUp(); else listener.onKeyDown();
         } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isLeftKey(event)) {
             listener.onKeyLeft(holdTime);
         } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isRightKey(event)) {
