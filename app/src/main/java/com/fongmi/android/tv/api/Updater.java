@@ -78,14 +78,17 @@ public class Updater {
         App.execute(this::doInBackground);
     }
 
+    private boolean need(int code, String name) {
+        return (branch.equals(Github.DEV) ? !name.equals(BuildConfig.VERSION_NAME) : code > BuildConfig.VERSION_CODE) && Prefers.getUpdate();
+    }
+
     private void doInBackground() {
         try {
             JSONObject object = new JSONObject(OkHttp.newCall(getJson()).execute().body().string());
             String name = object.optString("name");
             String desc = object.optString("desc");
             int code = object.optInt("code");
-            boolean need = code > BuildConfig.VERSION_CODE && Prefers.getUpdate();
-            if (need || force) App.post(() -> show(name, desc));
+            if (need(code, name) || force) App.post(() -> show(name, desc));
         } catch (Exception e) {
             e.printStackTrace();
         }
