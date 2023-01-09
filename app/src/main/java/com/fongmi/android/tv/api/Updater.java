@@ -1,7 +1,6 @@
 package com.fongmi.android.tv.api;
 
 import android.app.Activity;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -9,9 +8,11 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.BuildConfig;
-import com.fongmi.android.tv.Constant;
+import com.fongmi.android.tv.Github;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.DialogUpdateBinding;
+import com.fongmi.android.tv.net.Callback;
+import com.fongmi.android.tv.net.Download;
 import com.fongmi.android.tv.net.OkHttp;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Prefers;
@@ -21,13 +22,12 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.lang.ref.WeakReference;
+import java.util.Locale;
 
-public class Updater implements View.OnClickListener {
+public class Updater {
 
-    private WeakReference<Activity> activity;
+    private DialogUpdateBinding binding;
     private AlertDialog dialog;
-    private String md5;
 
     private static class Loader {
         static volatile Updater INSTANCE = new Updater();
@@ -42,11 +42,11 @@ public class Updater implements View.OnClickListener {
     }
 
     private String getJson() {
-        return Constant.getKitkatPath("/release/" + BuildConfig.FLAVOR + ".json");
+        return Github.get().getKitkatPath("/release/" + BuildConfig.FLAVOR + ".json");
     }
 
     private String getApk() {
-        return Constant.getKitkatPath("/release/" + BuildConfig.FLAVOR + ".apk");
+        return Github.get().getKitkatPath("/release/" + BuildConfig.FLAVOR + ".apk");
     }
 
     public Updater reset() {
@@ -55,59 +55,67 @@ public class Updater implements View.OnClickListener {
     }
 
     public void start(Activity activity) {
-        this.activity = new WeakReference<>(activity);
+        this.binding = DialogUpdateBinding.inflate(LayoutInflater.from(activity));
+        this.dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).setCancelable(false).create();
         App.execute(this::doInBackground);
     }
 
     private void doInBackground() {
-        FileUtil.clearDir(getFile());
-        connect(getJson());
-    }
-
-    private void connect(String target) {
         try {
-            JSONObject object = new JSONObject(OkHttp.newCall(target).execute().body().string());
+            JSONObject object = new JSONObject(OkHttp.newCall(getJson()).execute().body().string());
             String name = object.optString("name");
             String desc = object.optString("desc");
             int code = object.optInt("code");
-            boolean need = code > BuildConfig.VERSION_CODE;
-            if (need) FileUtil.write(getFile(), OkHttp.newCall(getApk()).execute().body().bytes());
-            if (getFile().exists() && need && Prefers.getUpdate()) App.post(() -> checkActivity(name, desc));
+            boolean need = code > BuildConfig.VERSION_CODE && Prefers.getUpdate();
+            if (need) App.post(() -> show(name, desc));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void checkActivity(String version, String desc) {
-        if (dialog != null) dialog.dismiss();
-        if (activity.get().isFinishing()) install();
-        else showDialog(version, desc);
-    }
-
-    private void showDialog(String version, String desc) {
-        DialogUpdateBinding binding = DialogUpdateBinding.inflate(LayoutInflater.from(activity.get()));
-        dialog = new MaterialAlertDialogBuilder(activity.get()).setView(binding.getRoot()).create();
+    private void show(String version, String desc) {
         binding.version.setText(ResUtil.getString(R.string.update_version, version));
-        binding.confirm.setOnClickListener(this);
-        binding.cancel.setOnClickListener(this);
+        binding.confirm.setOnClickListener(this::confirm);
+        binding.cancel.setOnClickListener(this::cancel);
         binding.desc.setText(desc);
         dialog.show();
     }
 
-    private void install() {
-        FileUtil.openFile(getFile());
-        if (!TextUtils.isEmpty(md5)) Prefers.putApkMD5(md5);
-    }
-
     private void dismiss() {
         if (dialog != null) dialog.dismiss();
-        this.md5 = null;
     }
 
-    @Override
-    public void onClick(View view) {
-        if (view.getId() == R.id.cancel) Prefers.putUpdate(false);
-        if (view.getId() == R.id.confirm) install();
+    private void cancel(View view) {
+        Prefers.putUpdate(false);
         dismiss();
+    }
+
+    private void confirm(View view) {
+        binding.confirm.setEnabled(false);
+        download();
+    }
+
+    private void download() {
+        Download.create(getApk(), getFile(), getCallback()).start();
+    }
+
+    private Callback getCallback() {
+        return new Callback() {
+            @Override
+            public void progress(int progress) {
+                binding.confirm.setText(String.format(Locale.getDefault(), "%1$d%%", progress));
+            }
+
+            @Override
+            public void success() {
+                FileUtil.openFile(getFile());
+                dismiss();
+            }
+
+            @Override
+            public void error() {
+                dismiss();
+            }
+        };
     }
 }
