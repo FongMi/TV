@@ -37,7 +37,7 @@ public class JsLoader {
             return spider;
         } catch (Throwable e) {
             e.printStackTrace();
-            return null;
+            return new Spider();
         }
     }
 }

@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import tv.danmaku.ijk.media.player.IMediaPlayer;
-import tv.danmaku.ijk.media.player.ISurfaceTextureHolder;
 
 public class SurfaceRenderView extends SurfaceView implements IRenderView {
 
@@ -105,13 +104,7 @@ public class SurfaceRenderView extends SurfaceView implements IRenderView {
         }
 
         public void bindToMediaPlayer(IMediaPlayer mp) {
-            if (mp != null) {
-                if (mp instanceof ISurfaceTextureHolder) {
-                    ISurfaceTextureHolder textureHolder = (ISurfaceTextureHolder) mp;
-                    textureHolder.setSurfaceTexture(null);
-                }
-                mp.setDisplay(mSurfaceHolder);
-            }
+            mp.setDisplay(mSurfaceHolder);
         }
 
         @NonNull

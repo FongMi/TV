@@ -1,5 +1,6 @@
 package com.fongmi.android.tv.ui.activity;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.text.Html;
@@ -40,7 +41,6 @@ import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
 import com.fongmi.android.tv.ui.custom.TrackSelectionDialog;
-import com.fongmi.android.tv.ui.custom.TrackSelectionDialog2;
 import com.fongmi.android.tv.ui.custom.dialog.DescDialog;
 import com.fongmi.android.tv.ui.presenter.ArrayPresenter;
 import com.fongmi.android.tv.ui.presenter.EpisodePresenter;
@@ -179,26 +179,28 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     @Override
+    @SuppressLint("ClickableViewAccessibility")
     protected void initEvent() {
         mBinding.control.seek.setListener(mPlayers);
         mBinding.desc.setOnClickListener(view -> onDesc());
         mBinding.keep.setOnClickListener(view -> onKeep());
         mBinding.video.setOnClickListener(view -> onVideo());
-        mBinding.control.text.setOnClickListener(this::onTracks);
-        mBinding.control.audio.setOnClickListener(this::onTracks);
+        mBinding.control.text.setOnClickListener(this::onTrack);
+        mBinding.control.audio.setOnClickListener(this::onTrack);
         mBinding.control.next.setOnClickListener(view -> checkNext());
         mBinding.control.prev.setOnClickListener(view -> checkPrev());
         mBinding.control.scale.setOnClickListener(view -> onScale());
         mBinding.control.speed.setOnClickListener(view -> onSpeed());
+        mBinding.control.reset.setOnClickListener(view -> onReset());
         mBinding.control.player.setOnClickListener(view -> onPlayer());
         mBinding.control.decode.setOnClickListener(view -> onDecode());
         mBinding.control.ending.setOnClickListener(view -> onEnding());
-        //mBinding.control.opening.setOnClickListener(view -> onOpening());
-        mBinding.control.opening.setOnClickListener(view -> onTracks());
-        mBinding.control.replay.setOnClickListener(view -> getPlayer(true));
+        mBinding.control.opening.setOnClickListener(view -> onOpening());
         mBinding.control.speed.setOnLongClickListener(view -> onSpeedLong());
+        mBinding.control.reset.setOnLongClickListener(view -> onResetLong());
         mBinding.control.ending.setOnLongClickListener(view -> onEndingReset());
         mBinding.control.opening.setOnLongClickListener(view -> onOpeningReset());
+        mBinding.video.setOnTouchListener((view, event) -> mKeyDown.onTouchEvent(event));
         mBinding.flag.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
@@ -462,7 +464,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 24);
         mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
         mBinding.flag.setSelectedPosition(mCurrent);
-        mFullscreen = true;
+        App.post(() -> mFullscreen = true, 250);
         onPlay(0);
     }
 
@@ -489,8 +491,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onVideo() {
-        if (mFullscreen) onToggle();
-        else enterFullscreen();
+        if (!mFullscreen) enterFullscreen();
     }
 
     private void checkNext() {
@@ -539,6 +540,15 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         return true;
     }
 
+    private void onReset() {
+        getPlayer(false);
+    }
+
+    private boolean onResetLong() {
+        getPlayer(true);
+        return true;
+    }
+
     private void onOpening() {
         long current = mPlayers.getPosition();
         long duration = mPlayers.getDuration();
@@ -583,15 +593,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         setDecodeView();
     }
 
-    private void onTracks(View view) {
+    private void onTrack(View view) {
         int type = Integer.parseInt(view.getTag().toString());
-        TrackSelectionDialog2.create(this).player(mPlayers).type(type).show();
-        hideControl();
-    }
-
-    private void onTracks() {
-        TrackSelectionDialog.createForPlayer(mPlayers.exo(), dialog -> {
-        }).show(getSupportFragmentManager(), "tracks");
+        TrackSelectionDialog.create(this).player(mPlayers).type(type).show();
         hideControl();
     }
 
@@ -743,6 +747,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         switch (event.getState()) {
             case 0:
                 checkPosition();
+                setTrackVisible();
                 break;
             case Player.STATE_IDLE:
                 break;
@@ -844,6 +849,17 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     public void onKeyCenter() {
         if (mPlayers.isPlaying()) onPause(true);
         else onPlay(0);
+        hideControl();
+    }
+
+    @Override
+    public void onSingleTap() {
+        if (mFullscreen) onToggle();
+    }
+
+    @Override
+    public void onDoubleTap() {
+        if (mFullscreen) onKeyCenter();
     }
 
     @Override

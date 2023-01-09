@@ -11,8 +11,10 @@ import androidx.annotation.NonNull;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.player.ParseTask;
 import com.fongmi.android.tv.utils.Utils;
+import com.github.catvod.crawler.Spider;
 
 import org.xwalk.core.XWalkResourceClient;
 import org.xwalk.core.XWalkView;
@@ -29,6 +31,7 @@ public class CustomWebView extends XWalkView {
 
     private ParseTask.Callback callback;
     private List<String> keys;
+    private String key;
     private String ads;
     private int retry;
 
@@ -59,10 +62,11 @@ public class CustomWebView extends XWalkView {
         }
     }
 
-    public void start(String url, Map<String, String> headers, ParseTask.Callback callback) {
+    public void start(String key, String url, Map<String, String> headers, ParseTask.Callback callback) {
         this.callback = callback;
         setUserAgent(headers);
         loadUrl(url, headers);
+        this.key = key;
         retry = 0;
     }
 
@@ -75,8 +79,8 @@ public class CustomWebView extends XWalkView {
                 if (ads.contains(host)) return createXWalkWebResourceResponse("text/plain", "utf-8", new ByteArrayInputStream("".getBytes()));
                 App.post(mTimer, 15 * 1000);
                 Map<String, String> headers = request.getRequestHeaders();
-                if (Utils.isVideoFormat(url, headers)) post(headers, url);
-                return super.shouldInterceptLoadRequest(view, request);
+                if (isVideoFormat(url, headers)) post(headers, url);
+                return super.shouldInterceptRequest(view, request);
             }
 
             @Override
@@ -89,6 +93,13 @@ public class CustomWebView extends XWalkView {
                 return false;
             }
         };
+    }
+
+    private boolean isVideoFormat(String url, Map<String, String> headers) {
+        Site site = ApiConfig.get().getSite(key);
+        Spider spider = ApiConfig.get().getCSP(site);
+        if (spider.manualVideoCheck()) return spider.isVideoFormat(url);
+        return Utils.isVideoFormat(url, headers);
     }
 
     private final Runnable mTimer = new Runnable() {

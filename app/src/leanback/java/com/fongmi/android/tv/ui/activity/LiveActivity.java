@@ -1,5 +1,6 @@
 package com.fongmi.android.tv.ui.activity;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.view.KeyEvent;
@@ -45,7 +46,6 @@ import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Traffic;
-import com.fongmi.android.tv.utils.Utils;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.ui.StyledPlayerView;
@@ -138,21 +138,23 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     @Override
+    @SuppressLint("ClickableViewAccessibility")
     protected void initEvent() {
         mBinding.group.setListener(this);
         mBinding.channel.setListener(this);
         mBinding.control.seek.setListener(mPlayers);
+        mBinding.control.text.setOnClickListener(this::onTrack);
+        mBinding.control.audio.setOnClickListener(this::onTrack);
         mBinding.control.home.setOnClickListener(view -> onHome());
         mBinding.control.scale.setOnClickListener(view -> onScale());
         mBinding.control.speed.setOnClickListener(view -> onSpeed());
-        mBinding.control.text.setOnClickListener(view -> onTracks());
-        mBinding.control.audio.setOnClickListener(view -> onTracks());
         mBinding.control.invert.setOnClickListener(view -> onInvert());
         mBinding.control.across.setOnClickListener(view -> onAcross());
         mBinding.control.player.setOnClickListener(view -> onPlayer());
         mBinding.control.decode.setOnClickListener(view -> onDecode());
         mBinding.control.line.setOnClickListener(view -> nextLine(false));
         mBinding.control.speed.setOnLongClickListener(view -> onSpeedLong());
+        mBinding.video.setOnTouchListener((view, event) -> mKeyDown.onTouchEvent(event));
         mBinding.group.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
@@ -183,10 +185,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mPlayers.setupExo(getExo());
         setScale(Prefers.getLiveScale());
         getIjk().setRender(Prefers.getRender());
-        getExo().setOnClickListener(view -> onToggle());
-        getIjk().setOnClickListener(view -> onToggle());
-        getExo().setOnLongClickListener(view -> onLongPress());
-        getIjk().setOnLongClickListener(view -> onLongPress());
         mBinding.control.speed.setText(mPlayers.getSpeedText());
         mBinding.control.home.setVisibility(LiveConfig.isOnly() ? View.GONE : View.VISIBLE);
         mBinding.control.invert.setActivated(Prefers.isInvert());
@@ -266,9 +264,9 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void onToggle() {
-        if (isVisible(mBinding.recycler)) hideUI();
+        if (isVisible(mBinding.control.getRoot())) hideControl();
+        else if (isVisible(mBinding.recycler)) hideUI();
         else showUI();
-        hideControl();
         hideInfo();
     }
 
@@ -318,9 +316,9 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         getUrl();
     }
 
-    private void onTracks() {
-        TrackSelectionDialog.createForPlayer(mPlayers.exo(), dialog -> {
-        }).show(getSupportFragmentManager(), "tracks");
+    private void onTrack(View view) {
+        int type = Integer.parseInt(view.getTag().toString());
+        TrackSelectionDialog.create(this).player(mPlayers).type(type).show();
         hideControl();
     }
 
@@ -523,10 +521,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (Utils.isMenuKey(event)) onLongPress();
         if (isVisible(mBinding.control.getRoot())) setR3Callback();
-        if (mGroup == null || mChannel == null) return super.dispatchKeyEvent(event);
-        else if (isGone(mBinding.recycler) && isGone(mBinding.control.getRoot()) && mKeyDown.hasEvent(event)) return mKeyDown.onKeyDown(event);
+        if (mKeyDown.hasEvent(event)) mKeyDown.onKeyDown(event);
         return super.dispatchKeyEvent(event);
     }
 
@@ -555,6 +551,13 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.widget.exoPosition.setText(mPlayers.getPositionTime(time));
         mBinding.widget.action.setImageResource(time > 0 ? R.drawable.ic_forward : R.drawable.ic_rewind);
         mBinding.widget.center.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public boolean dispatch(boolean check) {
+        boolean condition1 = mGroup != null && mChannel != null;
+        boolean condition2 = isGone(mBinding.recycler) && isGone(mBinding.control.getRoot());
+        return check ? condition1 && condition2 : condition1;
     }
 
     @Override
@@ -598,13 +601,23 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     @Override
-    public boolean onLongPress() {
+    public void onMenu() {
         if (isVisible(mBinding.control.home)) showControl(mBinding.control.home);
         else if (isVisible(mBinding.control.line)) showControl(mBinding.control.line);
         else showControl(mBinding.control.player);
         hideInfo();
         hideUI();
-        return true;
+    }
+
+    @Override
+    public void onSingleTap() {
+        onToggle();
+    }
+
+    @Override
+    public void onDoubleTap() {
+        if (isVisible(mBinding.control.getRoot())) hideControl();
+        else onMenu();
     }
 
     @Override
@@ -636,6 +649,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         switch (event.getState()) {
             case 0:
                 setR6Callback();
+                setTrackVisible();
                 break;
             case Player.STATE_IDLE:
                 break;
