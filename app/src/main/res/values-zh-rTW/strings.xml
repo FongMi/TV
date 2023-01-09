@@ -41,13 +41,13 @@
     <string name="play_next">下一集</string>
     <string name="play_prev">上一集</string>
     <string name="play_ready">準備播放：<xliff:g name="name">%s</xliff:g></string>
-    <string name="play_replay">重播</string>
-    <string name="play_reset">重置</string>
-    <string name="play_tracks">軌道</string>
+    <string name="play_reset">刷新</string>
+    <string name="play_track">軌道</string>
+    <string name="play_track_text">字幕</string>
+    <string name="play_track_audio">音軌</string>
     <string name="play_invert">反轉</string>
     <string name="play_across">跨類</string>
-    <string name="play_op">片頭</string>
-    <string name="play_ed">片尾</string>
+    <string name="play_oped">片頭片尾</string>
     <string name="play_reverse">倒序</string>
     <string name="play_forward">→</string>
     <string name="play_backward">←</string>

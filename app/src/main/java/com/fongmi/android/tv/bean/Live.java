@@ -8,7 +8,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public class Live {
@@ -90,7 +89,7 @@ public class Live {
     }
 
     public Core getCore() {
-        return core == null ? new Core() : core;
+        return core;
     }
 
     public boolean isActivated() {
@@ -103,10 +102,6 @@ public class Live {
 
     public void setActivated(Live item) {
         this.activated = item.equals(this);
-    }
-
-    public String getActivatedName() {
-        return (isActivated() ? "√ " : "").concat(getName());
     }
 
     public Live check() {
@@ -128,13 +123,5 @@ public class Live {
         if (!(obj instanceof Live)) return false;
         Live it = (Live) obj;
         return getName().equals(it.getName()) && getUrl().equals(it.getUrl());
-    }
-
-    public static class Sorter implements Comparator<Live> {
-
-        @Override
-        public int compare(Live live1, Live live2) {
-            return Boolean.compare(live2.isActivated(), live1.isActivated());
-        }
     }
 }
