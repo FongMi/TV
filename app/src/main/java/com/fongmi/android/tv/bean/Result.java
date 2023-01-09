@@ -51,6 +51,8 @@ public class Result {
     private String flag;
     @SerializedName("url")
     private String url;
+    @SerializedName("key")
+    private String key;
     @SerializedName("subs")
     private List<Sub> subs;
 
@@ -163,6 +165,14 @@ public class Result {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getKey() {
+        return TextUtils.isEmpty(key) ? "" : key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public List<Sub> getSubs() {
