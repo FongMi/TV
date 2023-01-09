@@ -43,18 +43,23 @@ public class CustomKeyDownLive extends GestureDetector.SimpleOnGestureListener {
         return detector.onTouchEvent(e);
     }
 
+    public boolean hasEvent(KeyEvent event) {
+        return Utils.isEnterKey(event) || Utils.isUpKey(event) || Utils.isDownKey(event) || Utils.isLeftKey(event) || Utils.isRightKey(event) || Utils.isDigitKey(event) || Utils.isMenuKey(event) || event.isLongPress();
+    }
+
     public void onKeyDown(KeyEvent event) {
-        if (!listener.dispatch(true)) return;
+        if (listener.dispatch(true)) check(event);
+    }
+
+    private void check(KeyEvent event) {
         if (event.getAction() == KeyEvent.ACTION_DOWN && Utils.isLeftKey(event)) {
             listener.onSeeking(subTime());
         } else if (event.getAction() == KeyEvent.ACTION_DOWN && Utils.isRightKey(event)) {
             listener.onSeeking(addTime());
         } else if (event.getAction() == KeyEvent.ACTION_DOWN && Utils.isUpKey(event)) {
-            if (Prefers.isInvert()) listener.onKeyDown();
-            else listener.onKeyUp();
+            if (Prefers.isInvert()) listener.onKeyDown(); else listener.onKeyUp();
         } else if (event.getAction() == KeyEvent.ACTION_DOWN && Utils.isDownKey(event)) {
-            if (Prefers.isInvert()) listener.onKeyUp();
-            else listener.onKeyDown();
+            if (Prefers.isInvert()) listener.onKeyUp(); else listener.onKeyDown();
         } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isLeftKey(event)) {
             listener.onKeyLeft(holdTime);
         } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isRightKey(event)) {
@@ -89,25 +94,20 @@ public class CustomKeyDownLive extends GestureDetector.SimpleOnGestureListener {
 
     @Override
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-        if (e1.getX() - e2.getX() > DISTANCE && Math.abs(velocityX) > VELOCITY) {
-            if (listener.dispatch(true)) listener.onKeyLeft(30 * 1000);
-            return true;
-        } else if (e2.getX() - e1.getX() > DISTANCE && Math.abs(velocityX) > VELOCITY) {
-            if (listener.dispatch(true)) listener.onKeyRight(30 * 1000);
-            return true;
-        } else if (e1.getY() - e2.getY() > DISTANCE && Math.abs(velocityY) > VELOCITY) {
-            if (listener.dispatch(true)) listener.onKeyUp();
-            return true;
-        } else if (e2.getY() - e1.getY() > DISTANCE && Math.abs(velocityY) > VELOCITY) {
-            if (listener.dispatch(true)) listener.onKeyDown();
-            return true;
-        } else {
-            return false;
-        }
+        if (listener.dispatch(true)) check(e1, e2, velocityX, velocityY);
+        return true;
     }
 
-    public boolean hasEvent(KeyEvent event) {
-        return Utils.isEnterKey(event) || Utils.isUpKey(event) || Utils.isDownKey(event) || Utils.isLeftKey(event) || Utils.isRightKey(event) || Utils.isDigitKey(event) || Utils.isMenuKey(event) || event.isLongPress();
+    private void check(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+        if (e1.getX() - e2.getX() > DISTANCE && Math.abs(velocityX) > VELOCITY) {
+            listener.onKeyLeft(30 * 1000);
+        } else if (e2.getX() - e1.getX() > DISTANCE && Math.abs(velocityX) > VELOCITY) {
+            listener.onKeyRight(30 * 1000);
+        } else if (e1.getY() - e2.getY() > DISTANCE && Math.abs(velocityY) > VELOCITY) {
+            listener.onKeyUp();
+        } else if (e2.getY() - e1.getY() > DISTANCE && Math.abs(velocityY) > VELOCITY) {
+            listener.onKeyDown();
+        }
     }
 
     private int getNumber(int keyCode) {
