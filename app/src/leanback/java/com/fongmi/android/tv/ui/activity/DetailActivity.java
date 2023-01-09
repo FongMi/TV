@@ -464,7 +464,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 24);
         mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
         mBinding.flag.setSelectedPosition(mCurrent);
-        App.post(() -> mFullscreen = true, 500);
+        App.post(() -> mFullscreen = true, 250);
         onPlay(0);
     }
 
