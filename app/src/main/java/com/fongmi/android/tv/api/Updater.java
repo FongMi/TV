@@ -15,7 +15,6 @@ import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.net.Download;
 import com.fongmi.android.tv.net.OkHttp;
 import com.fongmi.android.tv.utils.FileUtil;
-import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -29,8 +28,6 @@ public class Updater {
 
     private DialogUpdateBinding binding;
     private AlertDialog dialog;
-    private String branch;
-    private boolean force;
 
     private static class Loader {
         static volatile Updater INSTANCE = new Updater();
@@ -41,34 +38,19 @@ public class Updater {
     }
 
     private File getFile() {
-        return FileUtil.getCacheFile(branch + ".apk");
+        return FileUtil.getCacheFile(BuildConfig.FLAVOR + ".apk");
     }
 
     private String getJson() {
-        return Github.get().getBranchPath(branch, "/release/" + BuildConfig.FLAVOR_mode + "-" + branch + ".json");
+        return Github.get().getKitkatPath("/release/" + BuildConfig.FLAVOR + ".json");
     }
 
     private String getApk() {
-        return Github.get().getBranchPath(branch, "/release/" + BuildConfig.FLAVOR_mode + "-" + BuildConfig.FLAVOR_api + ".apk");
-    }
-
-    private Updater() {
-        this.branch = Github.RELEASE;
+        return Github.get().getKitkatPath("/release/" + BuildConfig.FLAVOR + ".apk");
     }
 
     public Updater reset() {
         Prefers.putUpdate(true);
-        return this;
-    }
-
-    public Updater force() {
-        Notify.show(R.string.update_check);
-        this.force = true;
-        return this;
-    }
-
-    public Updater branch(String branch) {
-        this.branch = branch;
         return this;
     }
 
@@ -78,17 +60,14 @@ public class Updater {
         App.execute(this::doInBackground);
     }
 
-    private boolean need(int code, String name) {
-        return (branch.equals(Github.DEV) ? !name.equals(BuildConfig.VERSION_NAME) : code > BuildConfig.VERSION_CODE) && Prefers.getUpdate();
-    }
-
     private void doInBackground() {
         try {
             JSONObject object = new JSONObject(OkHttp.newCall(getJson()).execute().body().string());
             String name = object.optString("name");
             String desc = object.optString("desc");
             int code = object.optInt("code");
-            if (need(code, name) || force) App.post(() -> show(name, desc));
+            boolean need = code > BuildConfig.VERSION_CODE && Prefers.getUpdate();
+            if (need) App.post(() -> show(name, desc));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -104,8 +83,6 @@ public class Updater {
 
     private void dismiss() {
         if (dialog != null) dialog.dismiss();
-        this.branch = Github.RELEASE;
-        this.force = false;
     }
 
     private void cancel(View view) {
