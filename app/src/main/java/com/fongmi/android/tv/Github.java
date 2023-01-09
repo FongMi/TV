@@ -15,6 +15,7 @@ public class Github {
     public static final String C = "https://raw.iqiq.io/";
     public static final String REPO = "FongMi/TV/";
     public static final String RELEASE = "release";
+    public static final String DEV = "dev";
     public static final int TIME = 5;
 
     private String proxy;
