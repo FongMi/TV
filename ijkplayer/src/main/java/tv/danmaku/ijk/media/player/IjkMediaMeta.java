@@ -8,6 +8,7 @@ import java.util.Locale;
 
 @SuppressWarnings("SameParameterValue")
 public class IjkMediaMeta {
+
     // media meta
     public static final String IJKM_KEY_FORMAT = "format";
     public static final String IJKM_KEY_DURATION_US = "duration_us";
@@ -81,52 +82,41 @@ public class IjkMediaMeta {
     public static final long AV_CH_LAYOUT_3POINT1 = (AV_CH_LAYOUT_SURROUND | AV_CH_LOW_FREQUENCY);
     public static final long AV_CH_LAYOUT_4POINT0 = (AV_CH_LAYOUT_SURROUND | AV_CH_BACK_CENTER);
     public static final long AV_CH_LAYOUT_4POINT1 = (AV_CH_LAYOUT_4POINT0 | AV_CH_LOW_FREQUENCY);
-    public static final long AV_CH_LAYOUT_2_2 = (AV_CH_LAYOUT_STEREO
-            | AV_CH_SIDE_LEFT | AV_CH_SIDE_RIGHT);
-    public static final long AV_CH_LAYOUT_QUAD = (AV_CH_LAYOUT_STEREO
-            | AV_CH_BACK_LEFT | AV_CH_BACK_RIGHT);
-    public static final long AV_CH_LAYOUT_5POINT0 = (AV_CH_LAYOUT_SURROUND
-            | AV_CH_SIDE_LEFT | AV_CH_SIDE_RIGHT);
+    public static final long AV_CH_LAYOUT_2_2 = (AV_CH_LAYOUT_STEREO | AV_CH_SIDE_LEFT | AV_CH_SIDE_RIGHT);
+    public static final long AV_CH_LAYOUT_QUAD = (AV_CH_LAYOUT_STEREO | AV_CH_BACK_LEFT | AV_CH_BACK_RIGHT);
+    public static final long AV_CH_LAYOUT_5POINT0 = (AV_CH_LAYOUT_SURROUND | AV_CH_SIDE_LEFT | AV_CH_SIDE_RIGHT);
     public static final long AV_CH_LAYOUT_5POINT1 = (AV_CH_LAYOUT_5POINT0 | AV_CH_LOW_FREQUENCY);
-    public static final long AV_CH_LAYOUT_5POINT0_BACK = (AV_CH_LAYOUT_SURROUND
-            | AV_CH_BACK_LEFT | AV_CH_BACK_RIGHT);
+    public static final long AV_CH_LAYOUT_5POINT0_BACK = (AV_CH_LAYOUT_SURROUND | AV_CH_BACK_LEFT | AV_CH_BACK_RIGHT);
     public static final long AV_CH_LAYOUT_5POINT1_BACK = (AV_CH_LAYOUT_5POINT0_BACK | AV_CH_LOW_FREQUENCY);
     public static final long AV_CH_LAYOUT_6POINT0 = (AV_CH_LAYOUT_5POINT0 | AV_CH_BACK_CENTER);
-    public static final long AV_CH_LAYOUT_6POINT0_FRONT = (AV_CH_LAYOUT_2_2
-            | AV_CH_FRONT_LEFT_OF_CENTER | AV_CH_FRONT_RIGHT_OF_CENTER);
+    public static final long AV_CH_LAYOUT_6POINT0_FRONT = (AV_CH_LAYOUT_2_2 | AV_CH_FRONT_LEFT_OF_CENTER | AV_CH_FRONT_RIGHT_OF_CENTER);
     public static final long AV_CH_LAYOUT_HEXAGONAL = (AV_CH_LAYOUT_5POINT0_BACK | AV_CH_BACK_CENTER);
     public static final long AV_CH_LAYOUT_6POINT1 = (AV_CH_LAYOUT_5POINT1 | AV_CH_BACK_CENTER);
     public static final long AV_CH_LAYOUT_6POINT1_BACK = (AV_CH_LAYOUT_5POINT1_BACK | AV_CH_BACK_CENTER);
     public static final long AV_CH_LAYOUT_6POINT1_FRONT = (AV_CH_LAYOUT_6POINT0_FRONT | AV_CH_LOW_FREQUENCY);
-    public static final long AV_CH_LAYOUT_7POINT0 = (AV_CH_LAYOUT_5POINT0
-            | AV_CH_BACK_LEFT | AV_CH_BACK_RIGHT);
-    public static final long AV_CH_LAYOUT_7POINT0_FRONT = (AV_CH_LAYOUT_5POINT0
-            | AV_CH_FRONT_LEFT_OF_CENTER | AV_CH_FRONT_RIGHT_OF_CENTER);
-    public static final long AV_CH_LAYOUT_7POINT1 = (AV_CH_LAYOUT_5POINT1
-            | AV_CH_BACK_LEFT | AV_CH_BACK_RIGHT);
-    public static final long AV_CH_LAYOUT_7POINT1_WIDE = (AV_CH_LAYOUT_5POINT1
-            | AV_CH_FRONT_LEFT_OF_CENTER | AV_CH_FRONT_RIGHT_OF_CENTER);
-    public static final long AV_CH_LAYOUT_7POINT1_WIDE_BACK = (AV_CH_LAYOUT_5POINT1_BACK
-            | AV_CH_FRONT_LEFT_OF_CENTER | AV_CH_FRONT_RIGHT_OF_CENTER);
-    public static final long AV_CH_LAYOUT_OCTAGONAL = (AV_CH_LAYOUT_5POINT0
-            | AV_CH_BACK_LEFT | AV_CH_BACK_CENTER | AV_CH_BACK_RIGHT);
+    public static final long AV_CH_LAYOUT_7POINT0 = (AV_CH_LAYOUT_5POINT0 | AV_CH_BACK_LEFT | AV_CH_BACK_RIGHT);
+    public static final long AV_CH_LAYOUT_7POINT0_FRONT = (AV_CH_LAYOUT_5POINT0 | AV_CH_FRONT_LEFT_OF_CENTER | AV_CH_FRONT_RIGHT_OF_CENTER);
+    public static final long AV_CH_LAYOUT_7POINT1 = (AV_CH_LAYOUT_5POINT1 | AV_CH_BACK_LEFT | AV_CH_BACK_RIGHT);
+    public static final long AV_CH_LAYOUT_7POINT1_WIDE = (AV_CH_LAYOUT_5POINT1 | AV_CH_FRONT_LEFT_OF_CENTER | AV_CH_FRONT_RIGHT_OF_CENTER);
+    public static final long AV_CH_LAYOUT_7POINT1_WIDE_BACK = (AV_CH_LAYOUT_5POINT1_BACK | AV_CH_FRONT_LEFT_OF_CENTER | AV_CH_FRONT_RIGHT_OF_CENTER);
+    public static final long AV_CH_LAYOUT_OCTAGONAL = (AV_CH_LAYOUT_5POINT0 | AV_CH_BACK_LEFT | AV_CH_BACK_CENTER | AV_CH_BACK_RIGHT);
     public static final long AV_CH_LAYOUT_STEREO_DOWNMIX = (AV_CH_STEREO_LEFT | AV_CH_STEREO_RIGHT);
 
-    public static final int FF_PROFILE_H264_CONSTRAINED = (1<<9);  // 8+1; constraint_set1_flag
-    public static final int FF_PROFILE_H264_INTRA = (1<<11);       // 8+3; constraint_set3_flag
+    public static final int FF_PROFILE_H264_CONSTRAINED = (1 << 9);  // 8+1; constraint_set1_flag
+    public static final int FF_PROFILE_H264_INTRA = (1 << 11);       // 8+3; constraint_set3_flag
 
     public static final int FF_PROFILE_H264_BASELINE = 66;
-    public static final int FF_PROFILE_H264_CONSTRAINED_BASELINE = (66|FF_PROFILE_H264_CONSTRAINED);
+    public static final int FF_PROFILE_H264_CONSTRAINED_BASELINE = (66 | FF_PROFILE_H264_CONSTRAINED);
     public static final int FF_PROFILE_H264_MAIN = 77;
     public static final int FF_PROFILE_H264_EXTENDED = 88;
     public static final int FF_PROFILE_H264_HIGH = 100;
     public static final int FF_PROFILE_H264_HIGH_10 = 110;
-    public static final int FF_PROFILE_H264_HIGH_10_INTRA = (110|FF_PROFILE_H264_INTRA);
+    public static final int FF_PROFILE_H264_HIGH_10_INTRA = (110 | FF_PROFILE_H264_INTRA);
     public static final int FF_PROFILE_H264_HIGH_422 = 122;
-    public static final int FF_PROFILE_H264_HIGH_422_INTRA = (122|FF_PROFILE_H264_INTRA);
+    public static final int FF_PROFILE_H264_HIGH_422_INTRA = (122 | FF_PROFILE_H264_INTRA);
     public static final int FF_PROFILE_H264_HIGH_444 = 144;
     public static final int FF_PROFILE_H264_HIGH_444_PREDICTIVE = 244;
-    public static final int FF_PROFILE_H264_HIGH_444_INTRA = (244|FF_PROFILE_H264_INTRA);
+    public static final int FF_PROFILE_H264_HIGH_444_INTRA = (244 | FF_PROFILE_H264_INTRA);
     public static final int FF_PROFILE_H264_CAVLC_444 = 44;
 
     public Bundle mMediaMeta;
@@ -136,9 +126,7 @@ public class IjkMediaMeta {
     public long mStartUS;
     public long mBitrate;
 
-    public final ArrayList<IjkStreamMeta> mStreams = new ArrayList<IjkStreamMeta>();
-    public IjkStreamMeta mVideoStream;
-    public IjkStreamMeta mAudioStream;
+    public final ArrayList<IjkStreamMeta> mStreams = new ArrayList<>();
 
     public String getString(String key) {
         return mMediaMeta.getString(key);
@@ -150,9 +138,7 @@ public class IjkMediaMeta {
 
     public int getInt(String key, int defaultValue) {
         String value = getString(key);
-        if (TextUtils.isEmpty(value))
-            return defaultValue;
-
+        if (TextUtils.isEmpty(value)) return defaultValue;
         try {
             return Integer.parseInt(value);
         } catch (NumberFormatException e) {
@@ -166,9 +152,7 @@ public class IjkMediaMeta {
 
     public long getLong(String key, long defaultValue) {
         String value = getString(key);
-        if (TextUtils.isEmpty(value))
-            return defaultValue;
-
+        if (TextUtils.isEmpty(value)) return defaultValue;
         try {
             return Long.parseLong(value);
         } catch (NumberFormatException e) {
@@ -190,9 +174,21 @@ public class IjkMediaMeta {
         return String.format(Locale.US, "%02d:%02d:%02d", hours, mins, secs);
     }
 
+    private static String convertLang(String text) {
+        if (text == null) return null;
+        if (text.equals("chi")) return "zh";
+        if (text.equals("cze")) return "cs";
+        if (text.equals("dut")) return "nl";
+        if (text.equals("fre")) return "fr";
+        if (text.equals("ger")) return "de";
+        if (text.equals("gre")) return "el";
+        if (text.equals("ice")) return "is";
+        if (text.equals("rum")) return "ro";
+        return text;
+    }
+
     public static IjkMediaMeta parse(Bundle mediaMeta) {
-        if (mediaMeta == null)
-            return null;
+        if (mediaMeta == null) return null;
 
         IjkMediaMeta meta = new IjkMediaMeta();
         meta.mMediaMeta = mediaMeta;
@@ -202,35 +198,23 @@ public class IjkMediaMeta {
         meta.mStartUS = meta.getLong(IJKM_KEY_START_US);
         meta.mBitrate = meta.getLong(IJKM_KEY_BITRATE);
 
-        int videoStreamIndex = meta.getInt(IJKM_KEY_VIDEO_STREAM, -1);
-        int audioStreamIndex = meta.getInt(IJKM_KEY_AUDIO_STREAM, -1);
-        int subtitleStreamIndex = meta.getInt(IJKM_KEY_TIMEDTEXT_STREAM, -1);
-
-        ArrayList<Bundle> streams = meta
-                .getParcelableArrayList(IJKM_KEY_STREAMS);
-        if (streams == null)
-            return meta;
+        ArrayList<Bundle> streams = meta.getParcelableArrayList(IJKM_KEY_STREAMS);
+        if (streams == null) return meta;
 
         int index = -1;
         for (Bundle streamBundle : streams) {
             index++;
-
-            if (streamBundle == null) {
-                continue;
-            }
-
+            if (streamBundle == null) continue;
             IjkStreamMeta streamMeta = new IjkStreamMeta(index);
             streamMeta.mMeta = streamBundle;
             streamMeta.mType = streamMeta.getString(IJKM_KEY_TYPE);
-            streamMeta.mLanguage = streamMeta.getString(IJKM_KEY_LANGUAGE);
-            if (TextUtils.isEmpty(streamMeta.mType))
-                continue;
+            streamMeta.mLanguage = convertLang(streamMeta.getString(IJKM_KEY_LANGUAGE));
+
+            if (TextUtils.isEmpty(streamMeta.mType)) continue;
 
             streamMeta.mCodecName = streamMeta.getString(IJKM_KEY_CODEC_NAME);
-            streamMeta.mCodecProfile = streamMeta
-                    .getString(IJKM_KEY_CODEC_PROFILE);
-            streamMeta.mCodecLongName = streamMeta
-                    .getString(IJKM_KEY_CODEC_LONG_NAME);
+            streamMeta.mCodecProfile = streamMeta.getString(IJKM_KEY_CODEC_PROFILE);
+            streamMeta.mCodecLongName = streamMeta.getString(IJKM_KEY_CODEC_LONG_NAME);
             streamMeta.mBitrate = streamMeta.getInt(IJKM_KEY_BITRATE);
 
             if (streamMeta.mType.equalsIgnoreCase(IJKM_VAL_TYPE__VIDEO)) {
@@ -242,27 +226,20 @@ public class IjkMediaMeta {
                 streamMeta.mTbrDen = streamMeta.getInt(IJKM_KEY_TBR_DEN);
                 streamMeta.mSarNum = streamMeta.getInt(IJKM_KEY_SAR_NUM);
                 streamMeta.mSarDen = streamMeta.getInt(IJKM_KEY_SAR_DEN);
-
-                if (videoStreamIndex == index) {
-                    meta.mVideoStream = streamMeta;
-                }
             } else if (streamMeta.mType.equalsIgnoreCase(IJKM_VAL_TYPE__AUDIO)) {
-                streamMeta.mSampleRate = streamMeta
-                        .getInt(IJKM_KEY_SAMPLE_RATE);
-                streamMeta.mChannelLayout = streamMeta
-                        .getLong(IJKM_KEY_CHANNEL_LAYOUT);
-
-                if (audioStreamIndex == index) {
-                    meta.mAudioStream = streamMeta;
-                }
+                streamMeta.mSampleRate = streamMeta.getInt(IJKM_KEY_SAMPLE_RATE);
+                streamMeta.mChannelLayout = streamMeta.getLong(IJKM_KEY_CHANNEL_LAYOUT);
+            } else if (streamMeta.mType.equalsIgnoreCase(IJKM_VAL_TYPE__TIMEDTEXT)) {
+                if (streamMeta.mCodecName.equals("hdmv_pgs_subtitle")) continue;
             }
+
             meta.mStreams.add(streamMeta);
         }
-
         return meta;
     }
 
     public static class IjkStreamMeta {
+
         public Bundle mMeta;
 
         public final int mIndex;
@@ -303,9 +280,7 @@ public class IjkMediaMeta {
 
         public int getInt(String key, int defaultValue) {
             String value = getString(key);
-            if (TextUtils.isEmpty(value))
-                return defaultValue;
-
+            if (TextUtils.isEmpty(value)) return defaultValue;
             try {
                 return Integer.parseInt(value);
             } catch (NumberFormatException e) {
@@ -319,9 +294,7 @@ public class IjkMediaMeta {
 
         public long getLong(String key, long defaultValue) {
             String value = getString(key);
-            if (TextUtils.isEmpty(value))
-                return defaultValue;
-
+            if (TextUtils.isEmpty(value)) return defaultValue;
             try {
                 return Long.parseLong(value);
             } catch (NumberFormatException e) {
@@ -353,8 +326,7 @@ public class IjkMediaMeta {
             } else if (mSarNum <= 0 || mSarDen <= 0) {
                 return String.format(Locale.US, "%d x %d", mWidth, mHeight);
             } else {
-                return String.format(Locale.US, "%d x %d [SAR %d:%d]", mWidth,
-                        mHeight, mSarNum, mSarDen);
+                return String.format(Locale.US, "%d x %d [SAR %d:%d]", mWidth, mHeight, mSarNum, mSarDen);
             }
         }
 
@@ -384,6 +356,24 @@ public class IjkMediaMeta {
             }
         }
 
+        public int getChannelCount() {
+            if (mChannelLayout <= 0) {
+                return 0;
+            } else if (mChannelLayout == AV_CH_LAYOUT_MONO) {
+                return 1;
+            } else if (mChannelLayout == AV_CH_LAYOUT_STEREO || mChannelLayout == AV_CH_LAYOUT_STEREO_DOWNMIX) {
+                return 2;
+            } else if (mChannelLayout == AV_CH_LAYOUT_5POINT1 || mChannelLayout == AV_CH_LAYOUT_5POINT1_BACK || mChannelLayout == AV_CH_LAYOUT_6POINT0 || mChannelLayout == AV_CH_LAYOUT_6POINT0_FRONT || mChannelLayout == AV_CH_LAYOUT_HEXAGONAL) {
+                return 6;
+            } else if (mChannelLayout == AV_CH_LAYOUT_6POINT1 || mChannelLayout == AV_CH_LAYOUT_6POINT1_BACK || mChannelLayout == AV_CH_LAYOUT_7POINT0 || mChannelLayout == AV_CH_LAYOUT_6POINT1_FRONT || mChannelLayout == AV_CH_LAYOUT_7POINT0_FRONT) {
+                return 7;
+            } else if (mChannelLayout == AV_CH_LAYOUT_7POINT1 || mChannelLayout == AV_CH_LAYOUT_7POINT1_WIDE_BACK || mChannelLayout == AV_CH_LAYOUT_7POINT1_WIDE || mChannelLayout == AV_CH_LAYOUT_OCTAGONAL) {
+                return 8;
+            } else {
+                return (int) mChannelLayout;
+            }
+        }
+
         public String getChannelLayoutInline() {
             if (mChannelLayout <= 0) {
                 return "N/A";
@@ -392,6 +382,16 @@ public class IjkMediaMeta {
                     return "mono";
                 } else if (mChannelLayout == AV_CH_LAYOUT_STEREO) {
                     return "stereo";
+                } else if (mChannelLayout == AV_CH_LAYOUT_5POINT1) {
+                    return "AV_CH_LAYOUT_5POINT1";
+                } else if (mChannelLayout == AV_CH_LAYOUT_5POINT0) {
+                    return "AV_CH_LAYOUT_5POINT0";
+                } else if (mChannelLayout == AV_CH_LAYOUT_7POINT1) {
+                    return "AV_CH_LAYOUT_7POINT1";
+                } else if (mChannelLayout == AV_CH_LAYOUT_7POINT0) {
+                    return "AV_CH_LAYOUT_7POINT0";
+                } else if (mChannelLayout == AV_CH_LAYOUT_7POINT1_WIDE) {
+                    return "AV_CH_LAYOUT_7POINT1_WIDE";
                 } else {
                     return String.format(Locale.US, "%x", mChannelLayout);
                 }

@@ -30,5 +30,9 @@ public interface ITrackInfo {
 
     int getTrackType();
 
+    int getChannelCount();
+
+    int getBitrate();
+
     String getInfoInline();
 }

@@ -52,8 +52,11 @@ public class SitePresenter extends Presenter {
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object object) {
         Site item = (Site) object;
         ViewHolder holder = (ViewHolder) viewHolder;
+        holder.binding.text.setText(item.getName());
         holder.binding.text.setFocusable(!search || filter);
-        holder.binding.text.setText(item.getActivatedName());
+        holder.binding.text.setActivated(item.isActivated());
+        holder.binding.filter.setActivated(item.isActivated());
+        holder.binding.search.setActivated(item.isActivated());
         holder.binding.filter.setImageResource(item.getFilterIcon());
         holder.binding.search.setImageResource(item.getSearchIcon());
         holder.binding.search.setVisibility(search ? View.VISIBLE : View.GONE);
