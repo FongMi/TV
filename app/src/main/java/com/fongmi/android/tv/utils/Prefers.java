@@ -67,6 +67,14 @@ public class Prefers {
         put("wall", wall);
     }
 
+    public static int getReset() {
+        return getInt("reset", 0);
+    }
+
+    public static void putReset(int reset) {
+        put("reset", reset);
+    }
+
     public static int getPlayer() {
         return getInt("player", 1);
     }
@@ -161,14 +169,6 @@ public class Prefers {
 
     public static void putUpdate(boolean update) {
         put("update", update);
-    }
-
-    public static String getApkMd5() {
-        return getString("apk_md5");
-    }
-
-    public static void putApkMD5(String apkMd5) {
-        put("apk_md5", apkMd5);
     }
 
     public static float getThumbnail() {
