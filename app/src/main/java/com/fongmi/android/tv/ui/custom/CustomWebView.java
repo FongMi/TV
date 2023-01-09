@@ -80,7 +80,7 @@ public class CustomWebView extends XWalkView {
                 App.post(mTimer, 15 * 1000);
                 Map<String, String> headers = request.getRequestHeaders();
                 if (isVideoFormat(url, headers)) post(headers, url);
-                return super.shouldInterceptRequest(view, request);
+                return super.shouldInterceptLoadRequest(view, request);
             }
 
             @Override
