@@ -15,7 +15,7 @@ public class Github {
     public static final String C = "https://raw.iqiq.io/";
     public static final String REPO = "FongMi/TV/";
     public static final String RELEASE = "release";
-    public static final String DEV = "dev";
+    public static final String KITKAT = "kitkat";
     public static final int TIME = 5;
 
     private String proxy;
@@ -55,7 +55,7 @@ public class Github {
         return getProxy() + RELEASE + path;
     }
 
-    public String getBranchPath(String branch, String path) {
-        return getProxy() + branch + path;
+    public String getKitkatPath(String path) {
+        return getProxy() + KITKAT + path;
     }
 }
