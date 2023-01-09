@@ -68,9 +68,9 @@
                 android:focusable="true"
                 android:focusableInTouchMode="true"
                 android:nextFocusDown="@id/parse"
-                android:text="@string/play_reset"
                 android:textColor="@color/white"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                tools:text="刷新" />
 
             <TextView
                 android:id="@+id/player"
