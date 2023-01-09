@@ -60,7 +60,7 @@
                 android:textSize="14sp" />
 
             <TextView
-                android:id="@+id/replay"
+                android:id="@+id/reset"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="12dp"
@@ -68,7 +68,7 @@
                 android:focusable="true"
                 android:focusableInTouchMode="true"
                 android:nextFocusDown="@id/parse"
-                android:text="@string/play_replay"
+                android:text="@string/play_reset"
                 android:textColor="@color/white"
                 android:textSize="14sp" />
 
