@@ -17,7 +17,6 @@ import com.github.catvod.crawler.Spider;
 
 import org.xwalk.core.XWalkCookieManager;
 import org.xwalk.core.XWalkResourceClient;
-import org.xwalk.core.XWalkUIClient;
 import org.xwalk.core.XWalkView;
 import org.xwalk.core.XWalkWebResourceRequest;
 import org.xwalk.core.XWalkWebResourceResponse;
@@ -53,7 +52,7 @@ public class CustomWebView extends XWalkView {
         getSettings().setLoadWithOverviewMode(true);
         getSettings().setJavaScriptCanOpenWindowsAutomatically(false);
         setResourceClient(webViewClient());
-        setUIClient(uiClient());
+        setCookieManager();
     }
 
     private void setUserAgent(Map<String, String> headers) {
@@ -65,24 +64,18 @@ public class CustomWebView extends XWalkView {
         }
     }
 
+    private void setCookieManager() {
+        cookieManager = new XWalkCookieManager();
+        cookieManager.setAcceptFileSchemeCookies(true);
+        cookieManager.setAcceptCookie(true);
+    }
+
     public void start(String key, String url, Map<String, String> headers, ParseTask.Callback callback) {
         this.callback = callback;
         setUserAgent(headers);
         loadUrl(url, headers);
         this.key = key;
         retry = 0;
-    }
-
-    private XWalkUIClient uiClient() {
-        return new XWalkUIClient(this) {
-            @Override
-            public void onPageLoadStarted(XWalkView view, String url) {
-                super.onPageLoadStarted(view, url);
-                cookieManager = new XWalkCookieManager();
-                cookieManager.setAcceptFileSchemeCookies(true);
-                cookieManager.setAcceptCookie(true);
-            }
-        };
     }
 
     private XWalkResourceClient webViewClient() {
