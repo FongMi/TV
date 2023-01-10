@@ -11,10 +11,10 @@ import com.fongmi.android.tv.BuildConfig;
 import com.fongmi.android.tv.Github;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.DialogUpdateBinding;
-import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.net.Download;
 import com.fongmi.android.tv.net.OkHttp;
 import com.fongmi.android.tv.utils.FileUtil;
+import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -24,7 +24,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.Locale;
 
-public class Updater {
+public class Updater implements Download.Callback {
 
     private DialogUpdateBinding binding;
     private AlertDialog dialog;
@@ -92,30 +92,23 @@ public class Updater {
 
     private void confirm(View view) {
         binding.confirm.setEnabled(false);
-        download();
+        Download.create(getApk(), getFile(), this).start();
     }
 
-    private void download() {
-        Download.create(getApk(), getFile(), getCallback()).start();
+    @Override
+    public void progress(int progress) {
+        binding.confirm.setText(String.format(Locale.getDefault(), "%1$d%%", progress));
     }
 
-    private Callback getCallback() {
-        return new Callback() {
-            @Override
-            public void progress(int progress) {
-                binding.confirm.setText(String.format(Locale.getDefault(), "%1$d%%", progress));
-            }
+    @Override
+    public void error(String message) {
+        Notify.show(message);
+        dismiss();
+    }
 
-            @Override
-            public void success() {
-                FileUtil.openFile(getFile());
-                dismiss();
-            }
-
-            @Override
-            public void error() {
-                dismiss();
-            }
-        };
+    @Override
+    public void success(File file) {
+        FileUtil.openFile(getFile());
+        dismiss();
     }
 }
