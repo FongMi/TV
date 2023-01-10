@@ -2,6 +2,7 @@ package com.fongmi.android.tv.player;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.api.XWalk;
 import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.net.OkHttp;
@@ -22,8 +23,8 @@ import okhttp3.Response;
 
 public class ParseTask {
 
-    private CustomWebView webView;
     private ExecutorService executor;
+    private CustomWebView webView;
     private Callback callback;
     private Parse parse;
 
@@ -33,7 +34,6 @@ public class ParseTask {
 
     public ParseTask(Callback callback) {
         this.executor = Executors.newSingleThreadExecutor();
-        this.webView = new CustomWebView(App.get());
         this.callback = callback;
     }
 
@@ -112,7 +112,17 @@ public class ParseTask {
     }
 
     private void startWeb(String key, String url, Map<String, String> headers, Callback callback) {
-        if (webView != null) webView.start(key, url, headers, callback);
+        XWalk.get().init(new XWalk.State() {
+            @Override
+            public void success() {
+                webView = CustomWebView.create(App.get()).start(key, url, headers, callback);
+            }
+
+            @Override
+            public void fail() {
+                onParseError();
+            }
+        });
     }
 
     private void onParseSuccess(Map<String, String> headers, String url, String from) {
@@ -129,7 +139,7 @@ public class ParseTask {
 
     public void cancel() {
         if (executor != null) executor.shutdownNow();
-        webView.stop(false);
+        if (webView != null) webView.stop(false);
         executor = null;
         callback = null;
         webView = null;

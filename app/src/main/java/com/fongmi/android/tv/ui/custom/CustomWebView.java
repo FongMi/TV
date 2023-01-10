@@ -3,7 +3,6 @@ package com.fongmi.android.tv.ui.custom;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.http.SslError;
-import android.text.TextUtils;
 import android.webkit.ValueCallback;
 
 import androidx.annotation.NonNull;
@@ -15,7 +14,6 @@ import com.fongmi.android.tv.player.ParseTask;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.crawler.Spider;
 
-import org.xwalk.core.XWalkCookieManager;
 import org.xwalk.core.XWalkResourceClient;
 import org.xwalk.core.XWalkView;
 import org.xwalk.core.XWalkWebResourceRequest;
@@ -29,12 +27,15 @@ import java.util.Map;
 
 public class CustomWebView extends XWalkView {
 
-    private XWalkCookieManager cookieManager;
     private ParseTask.Callback callback;
     private List<String> keys;
     private String key;
     private String ads;
     private int retry;
+
+    public static CustomWebView create(@NonNull Context context) {
+        return new CustomWebView(context);
+    }
 
     public CustomWebView(@NonNull Context context) {
         super(context);
@@ -45,14 +46,17 @@ public class CustomWebView extends XWalkView {
     public void initSettings() {
         this.ads = ApiConfig.get().getAds();
         this.keys = Arrays.asList("user-agent", "referer", "origin");
+        setResourceClient(webViewClient());
+        getSettings().setAllowFileAccess(true);
         getSettings().setUseWideViewPort(true);
         getSettings().setDatabaseEnabled(true);
         getSettings().setDomStorageEnabled(true);
         getSettings().setJavaScriptEnabled(true);
+        getSettings().setAllowContentAccess(true);
         getSettings().setLoadWithOverviewMode(true);
+        getSettings().setAllowFileAccessFromFileURLs(true);
+        getSettings().setAllowUniversalAccessFromFileURLs(true);
         getSettings().setJavaScriptCanOpenWindowsAutomatically(false);
-        setResourceClient(webViewClient());
-        setCookieManager();
     }
 
     private void setUserAgent(Map<String, String> headers) {
@@ -64,18 +68,12 @@ public class CustomWebView extends XWalkView {
         }
     }
 
-    private void setCookieManager() {
-        cookieManager = new XWalkCookieManager();
-        cookieManager.setAcceptFileSchemeCookies(true);
-        cookieManager.setAcceptCookie(true);
-    }
-
-    public void start(String key, String url, Map<String, String> headers, ParseTask.Callback callback) {
+    public CustomWebView start(String key, String url, Map<String, String> headers, ParseTask.Callback callback) {
         this.callback = callback;
         setUserAgent(headers);
         loadUrl(url, headers);
         this.key = key;
-        retry = 0;
+        return this;
     }
 
     private XWalkResourceClient webViewClient() {
@@ -121,8 +119,6 @@ public class CustomWebView extends XWalkView {
 
     private void post(Map<String, String> headers, String url) {
         Map<String, String> news = new HashMap<>();
-        String cookie = cookieManager.getCookie(url);
-        if (!TextUtils.isEmpty(cookie)) news.put("cookie", cookie);
         for (String key : headers.keySet()) if (keys.contains(key.toLowerCase())) news.put(key, headers.get(key));
         App.removeCallbacks(mTimer);
         App.post(() -> {
@@ -135,7 +131,6 @@ public class CustomWebView extends XWalkView {
         stopLoading();
         loadUrl("about:blank");
         App.removeCallbacks(mTimer);
-        cookieManager.flushCookieStore();
         if (error) App.post(this::onError);
         else callback = null;
     }

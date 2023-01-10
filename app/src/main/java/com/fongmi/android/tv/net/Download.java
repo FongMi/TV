@@ -7,8 +7,9 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.util.Objects;
 
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.Response;
 
 public class Download {
@@ -34,12 +35,11 @@ public class Download {
     private void doInBackground() {
         try {
             FileUtil.clearDir(file);
-            Response response = OkHttp.newCall(url).execute();
-            download(response.body().byteStream(), Double.parseDouble(Objects.requireNonNull(response.header("Content-Length", "1"))));
-            App.post(callback::success);
+            Response response = new OkHttpClient.Builder().build().newCall(new Request.Builder().url(url).build()).execute();
+            download(response.body().byteStream(), Double.parseDouble(response.header("Content-Length", "1")));
+            App.post(() -> callback.success(file));
         } catch (Exception e) {
-            App.post(callback::error);
-            e.printStackTrace();
+            App.post(() -> callback.error(e.getMessage()));
         }
     }
 
@@ -56,5 +56,14 @@ public class Download {
                 App.post(() -> callback.progress(progress));
             }
         }
+    }
+
+    public interface Callback {
+
+        void progress(int progress);
+
+        void error(String message);
+
+        void success(File file);
     }
 }
