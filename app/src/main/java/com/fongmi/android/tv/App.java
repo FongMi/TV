@@ -12,7 +12,6 @@ import androidx.core.os.HandlerCompat;
 import androidx.multidex.MultiDex;
 import androidx.multidex.MultiDexApplication;
 
-import com.fongmi.android.tv.api.XWalkLoader;
 import com.fongmi.android.tv.ui.activity.CrashActivity;
 
 import java.util.concurrent.ExecutorService;
@@ -29,7 +28,7 @@ public class App extends MultiDexApplication {
 
     public App() {
         instance = this;
-        executor = Executors.newFixedThreadPool(4);
+        executor = Executors.newFixedThreadPool(5);
         handler = HandlerCompat.createAsync(Looper.getMainLooper());
     }
 
@@ -75,7 +74,6 @@ public class App extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
-        execute(() -> XWalkLoader.get().load());
         CaocConfig.Builder.create().backgroundMode(CaocConfig.BACKGROUND_MODE_SILENT).errorActivity(CrashActivity.class).apply();
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
             @Override
