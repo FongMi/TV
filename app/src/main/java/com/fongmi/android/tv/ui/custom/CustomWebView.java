@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.http.SslError;
 import android.text.TextUtils;
-import android.webkit.CookieManager;
 import android.webkit.ValueCallback;
 
 import androidx.annotation.NonNull;
@@ -16,7 +15,9 @@ import com.fongmi.android.tv.player.ParseTask;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.crawler.Spider;
 
+import org.xwalk.core.XWalkCookieManager;
 import org.xwalk.core.XWalkResourceClient;
+import org.xwalk.core.XWalkUIClient;
 import org.xwalk.core.XWalkView;
 import org.xwalk.core.XWalkWebResourceRequest;
 import org.xwalk.core.XWalkWebResourceResponse;
@@ -29,6 +30,7 @@ import java.util.Map;
 
 public class CustomWebView extends XWalkView {
 
+    private XWalkCookieManager cookieManager;
     private ParseTask.Callback callback;
     private List<String> keys;
     private String key;
@@ -51,6 +53,7 @@ public class CustomWebView extends XWalkView {
         getSettings().setLoadWithOverviewMode(true);
         getSettings().setJavaScriptCanOpenWindowsAutomatically(false);
         setResourceClient(webViewClient());
+        setUIClient(uiClient());
     }
 
     private void setUserAgent(Map<String, String> headers) {
@@ -68,6 +71,18 @@ public class CustomWebView extends XWalkView {
         loadUrl(url, headers);
         this.key = key;
         retry = 0;
+    }
+
+    private XWalkUIClient uiClient() {
+        return new XWalkUIClient(this) {
+            @Override
+            public void onPageLoadStarted(XWalkView view, String url) {
+                super.onPageLoadStarted(view, url);
+                cookieManager = new XWalkCookieManager();
+                cookieManager.setAcceptFileSchemeCookies(true);
+                cookieManager.setAcceptCookie(true);
+            }
+        };
     }
 
     private XWalkResourceClient webViewClient() {
@@ -113,7 +128,7 @@ public class CustomWebView extends XWalkView {
 
     private void post(Map<String, String> headers, String url) {
         Map<String, String> news = new HashMap<>();
-        String cookie = CookieManager.getInstance().getCookie(url);
+        String cookie = cookieManager.getCookie(url);
         if (!TextUtils.isEmpty(cookie)) news.put("cookie", cookie);
         for (String key : headers.keySet()) if (keys.contains(key.toLowerCase())) news.put(key, headers.get(key));
         App.removeCallbacks(mTimer);
@@ -127,6 +142,7 @@ public class CustomWebView extends XWalkView {
         stopLoading();
         loadUrl("about:blank");
         App.removeCallbacks(mTimer);
+        cookieManager.flushCookieStore();
         if (error) App.post(this::onError);
         else callback = null;
     }
