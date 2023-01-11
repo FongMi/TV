@@ -54,22 +54,28 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         return this;
     }
 
-    public void setupIjk(IjkVideoView view) {
+    public void set(StyledPlayerView exo, IjkVideoView ijk) {
+        releaseExo();
+        releaseIjk();
+        setupExo(exo);
+        setupIjk(ijk);
+    }
+
+    private void setupExo(StyledPlayerView view) {
+        exoPlayer = new ExoPlayer.Builder(App.get()).setLoadControl(new DefaultLoadControl()).setRenderersFactory(ExoUtil.buildRenderersFactory()).setTrackSelector(ExoUtil.buildTrackSelector()).build();
+        exoPlayer.addAnalyticsListener(this);
+        exoPlayer.setPlayWhenReady(true);
+        exoPlayer.addListener(this);
+        view.setPlayer(exoPlayer);
+    }
+
+    private void setupIjk(IjkVideoView view) {
         ijkPlayer = view;
         ijkPlayer.setDecode(decode);
         ijkPlayer.setOnInfoListener(this);
         ijkPlayer.setOnErrorListener(this);
         ijkPlayer.setOnPreparedListener(this);
         ijkPlayer.setOnCompletionListener(this);
-    }
-
-    public void setupExo(StyledPlayerView view) {
-        if (exoPlayer != null) releaseExo();
-        exoPlayer = new ExoPlayer.Builder(App.get()).setLoadControl(new DefaultLoadControl()).setRenderersFactory(ExoUtil.buildRenderersFactory()).setTrackSelector(ExoUtil.buildTrackSelector()).build();
-        exoPlayer.addAnalyticsListener(this);
-        exoPlayer.setPlayWhenReady(true);
-        exoPlayer.addListener(this);
-        view.setPlayer(exoPlayer);
     }
 
     public ExoPlayer exo() {
@@ -282,19 +288,19 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     }
 
     private void stopIjk() {
-        ijkPlayer.stopPlayback();
+        ijkPlayer.release();
     }
 
     private void releaseExo() {
-        stopExo();
+        if (exoPlayer == null) return;
         exoPlayer.removeListener(this);
         exoPlayer.release();
         exoPlayer = null;
     }
 
     private void releaseIjk() {
-        stopIjk();
-        ijkPlayer.release(true);
+        if (ijkPlayer == null) return;
+        ijkPlayer.release();
         ijkPlayer = null;
     }
 

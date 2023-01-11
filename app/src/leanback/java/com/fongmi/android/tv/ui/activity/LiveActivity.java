@@ -181,8 +181,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void setVideoView() {
-        mPlayers.setupIjk(getIjk());
-        mPlayers.setupExo(getExo());
+        mPlayers.set(getExo(), getIjk());
         setScale(Prefers.getLiveScale());
         getIjk().setRender(Prefers.getRender());
         mBinding.control.speed.setText(mPlayers.getSpeedText());
@@ -310,8 +309,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void onDecode() {
         mPlayers.toggleDecode();
-        mPlayers.setupIjk(getIjk());
-        mPlayers.setupExo(getExo());
+        mPlayers.set(getExo(), getIjk());
         setDecodeView();
         getUrl();
     }

@@ -104,7 +104,7 @@ public class SurfaceRenderView extends SurfaceView implements IRenderView {
         }
 
         public void bindToMediaPlayer(IMediaPlayer mp) {
-            mp.setDisplay(mSurfaceHolder);
+            if (mp != null) mp.setDisplay(mSurfaceHolder);
         }
 
         @NonNull
