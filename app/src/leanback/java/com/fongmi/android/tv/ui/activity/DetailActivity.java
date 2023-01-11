@@ -253,9 +253,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void setVideoView() {
-        mPlayers.setupIjk(getIjk());
-        mPlayers.setupExo(getExo());
-        setScale(Prefers.getVodScale());
+        mPlayers.set(getExo(), getIjk());
         getIjk().setRender(Prefers.getRender());
         getExo().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
     }
@@ -299,7 +297,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.scroll.scrollTo(0, 0);
         Clock.get().setCallback(null);
         Notify.progress(this);
-        mPlayers.stop();
         hideProgress();
         getDetail();
     }
@@ -593,8 +590,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void onDecode() {
         mPlayers.toggleDecode();
-        mPlayers.setupIjk(getIjk());
-        mPlayers.setupExo(getExo());
+        mPlayers.set(getExo(), getIjk());
         getPlayer(false);
         setDecodeView();
     }
@@ -693,7 +689,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mHistory = mHistory == null ? createHistory() : mHistory;
         setFlagActivated(mHistory.getFlag());
         if (mHistory.isRevSort()) reverseEpisode();
-        if (mHistory.getScale() != -1) setScale(mHistory.getScale());
+        setScale(mHistory.getScale() == -1 ? Prefers.getVodScale() : mHistory.getScale());
         mBinding.control.opening.setText(mPlayers.stringToTime(mHistory.getOpening()));
         mBinding.control.ending.setText(mPlayers.stringToTime(mHistory.getEnding()));
         mBinding.control.speed.setText(mPlayers.setSpeed(mHistory.getSpeed()));
