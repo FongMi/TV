@@ -37,6 +37,10 @@ public class CustomWebView extends WebView {
     private String ads;
     private int retry;
 
+    public static CustomWebView create(@NonNull Context context) {
+        return new CustomWebView(context);
+    }
+
     public CustomWebView(@NonNull Context context) {
         super(context);
         initSettings();
@@ -66,12 +70,12 @@ public class CustomWebView extends WebView {
         }
     }
 
-    public void start(String key, String url, Map<String, String> headers, ParseTask.Callback callback) {
+    public CustomWebView start(String key, String url, Map<String, String> headers, ParseTask.Callback callback) {
         this.callback = callback;
         setUserAgent(headers);
         loadUrl(url, headers);
         this.key = key;
-        retry = 0;
+        return this;
     }
 
     private WebViewClient webViewClient() {

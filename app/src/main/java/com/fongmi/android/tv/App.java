@@ -26,7 +26,7 @@ public class App extends Application {
 
     public App() {
         instance = this;
-        executor = Executors.newFixedThreadPool(4);
+        executor = Executors.newFixedThreadPool(5);
         handler = HandlerCompat.createAsync(Looper.getMainLooper());
     }
 
