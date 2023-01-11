@@ -467,7 +467,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         if (trackInfos == null) return false;
         int count = 0;
         for (IjkTrackInfo trackInfo : trackInfos) if (trackInfo.getTrackType() == type) ++count;
-        return count > 1;
+        return count > 0;
     }
 
     public IjkTrackInfo[] getTrackInfo() {
@@ -481,6 +481,13 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     public void selectTrack(int track) {
         long position = getCurrentPosition();
         mIjkPlayer.selectTrack(track);
+        seekTo(position);
+    }
+
+    public void deselectTrack(int track) {
+        long position = getCurrentPosition();
+        mIjkPlayer.deselectTrack(track);
+        subtitleView.setText("");
         seekTo(position);
     }
 
