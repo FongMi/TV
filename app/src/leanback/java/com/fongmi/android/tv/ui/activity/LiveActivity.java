@@ -678,7 +678,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void onError() {
         mPlayers.reset();
-        if (mChannel.isLastLine()) {
+        if (mChannel.isOnly()) {
             if (isGone(mBinding.recycler)) onKeyDown();
         } else {
             nextLine(true);

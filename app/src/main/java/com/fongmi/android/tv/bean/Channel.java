@@ -175,10 +175,6 @@ public class Channel {
         return getUrls().size() == 1;
     }
 
-    public boolean isLastLine() {
-        return getLine() == getUrls().size() - 1;
-    }
-
     public String getLineText() {
         return isOnly() ? "" : ResUtil.getString(R.string.live_line, getLine() + 1);
     }
