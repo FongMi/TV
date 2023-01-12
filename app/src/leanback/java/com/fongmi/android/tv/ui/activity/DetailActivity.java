@@ -768,6 +768,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
                 hideProgress();
                 mPlayers.reset();
                 setTrackVisible();
+                mPlayers.setTrack(Track.find(getHistoryKey()));
                 mBinding.widget.size.setText(mPlayers.getSizeText());
                 break;
             case Player.STATE_ENDED:

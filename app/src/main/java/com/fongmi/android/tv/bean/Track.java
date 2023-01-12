@@ -97,7 +97,7 @@ public class Track {
     }
 
     public void save() {
-        AppDatabase.get().getTrackDao().insertOrUpdate(this);
+        AppDatabase.get().getTrackDao().insert(this);
     }
 
     public static List<Track> find(String key) {
