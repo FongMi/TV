@@ -91,6 +91,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private ExecutorService mExecutor;
     private SiteViewModel mViewModel;
     private boolean mFullscreen;
+    private boolean mInitTrack;
     private History mHistory;
     private Players mPlayers;
     private int mCurrent;
@@ -757,7 +758,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         switch (event.getState()) {
             case 0:
                 checkPosition();
-                setTrackVisible();
+                setTrackVisible(false);
                 break;
             case Player.STATE_IDLE:
                 break;
@@ -767,8 +768,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
             case Player.STATE_READY:
                 hideProgress();
                 mPlayers.reset();
-                setTrackVisible();
-                mPlayers.setTrack(Track.find(getHistoryKey()));
+                setDefaultTrack();
+                setTrackVisible(true);
                 mBinding.widget.size.setText(mPlayers.getSizeText());
                 break;
             case Player.STATE_ENDED:
@@ -784,11 +785,19 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void checkPosition() {
         mPlayers.seekTo(Math.max(mHistory.getOpening(), mHistory.getPosition()), false);
         Clock.get().setCallback(this);
+        mInitTrack = true;
     }
 
-    private void setTrackVisible() {
-        mBinding.control.text.setVisibility(mPlayers.haveTrack(C.TRACK_TYPE_TEXT) ? View.VISIBLE : View.GONE);
-        mBinding.control.audio.setVisibility(mPlayers.haveTrack(C.TRACK_TYPE_AUDIO) ? View.VISIBLE : View.GONE);
+    private void setTrackVisible(boolean visible) {
+        mBinding.control.text.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_TEXT) ? View.VISIBLE : View.GONE);
+        mBinding.control.audio.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_AUDIO) ? View.VISIBLE : View.GONE);
+    }
+
+    private void setDefaultTrack() {
+        if (mInitTrack) {
+            mInitTrack = false;
+            mPlayers.setTrack(Track.find(getHistoryKey()));
+        }
     }
 
     private void onError(String msg) {
