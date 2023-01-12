@@ -12,9 +12,7 @@ import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.adapter.TrackAdapter;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.exoplayer2.Tracks;
-import com.google.android.exoplayer2.trackselection.TrackSelectionOverride;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.common.collect.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -112,27 +110,10 @@ public final class TrackSelectionDialog implements TrackAdapter.OnClickListener 
         }
     }
 
-    private void setExoTrack(Track item) {
-        if (item.isSelected()) {
-            player.exo().setTrackSelectionParameters(player.exo().getTrackSelectionParameters().buildUpon().setOverrideForType(new TrackSelectionOverride(player.exo().getCurrentTracks().getGroups().get(item.getGroup()).getMediaTrackGroup(), item.getTrack())).build());
-        } else {
-            player.exo().setTrackSelectionParameters(player.exo().getTrackSelectionParameters().buildUpon().setOverrideForType(new TrackSelectionOverride(player.exo().getCurrentTracks().getGroups().get(item.getGroup()).getMediaTrackGroup(), ImmutableList.of())).build());
-        }
-    }
-
-    private void setIjkTrack(Track item) {
-        if (item.isSelected()) {
-            player.ijk().selectTrack(item.getTrack());
-        } else {
-            player.ijk().deselectTrack(item.getTrack());
-        }
-    }
-
     @Override
     public void onItemClick(Track item) {
         if (listener != null) listener.onTrackClick(item);
-        if (player.isExo()) setExoTrack(item);
-        if (player.isIjk()) setIjkTrack(item);
+        player.setTrack(List.of(item));
         dialog.dismiss();
     }
 

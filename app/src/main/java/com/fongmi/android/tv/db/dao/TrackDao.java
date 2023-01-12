@@ -4,7 +4,6 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
-import androidx.room.Transaction;
 
 import com.fongmi.android.tv.bean.Track;
 
@@ -18,10 +17,4 @@ public abstract class TrackDao extends BaseDao<Track> {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public abstract Long insert(Track item);
-
-    @Transaction
-    public void insertOrUpdate(Track item) {
-        long id = insert(item);
-        if (id == -1) update(item);
-    }
 }

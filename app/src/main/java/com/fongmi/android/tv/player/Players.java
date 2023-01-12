@@ -6,6 +6,7 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Result;
+import com.fongmi.android.tv.bean.Track;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
@@ -16,10 +17,13 @@ import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.analytics.AnalyticsListener;
+import com.google.android.exoplayer2.trackselection.TrackSelectionOverride;
 import com.google.android.exoplayer2.ui.StyledPlayerView;
 import com.google.android.exoplayer2.util.Util;
+import com.google.common.collect.ImmutableList;
 
 import java.util.Formatter;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -140,14 +144,6 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         return isExo() ? exoPlayer.isPlaying() : ijkPlayer.isPlaying();
     }
 
-    private int getVideoWidth() {
-        return isExo() ? exoPlayer.getVideoSize().width : ijkPlayer.getVideoWidth();
-    }
-
-    private int getVideoHeight() {
-        return isExo() ? exoPlayer.getVideoSize().height : ijkPlayer.getVideoHeight();
-    }
-
     public String getSizeText() {
         return getVideoWidth() + " x " + getVideoHeight();
     }
@@ -251,6 +247,13 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         return getDuration() > 5 * 60 * 1000;
     }
 
+    public void setTrack(List<Track> tracks) {
+        for (Track track : tracks) {
+            if (isExo()) setTrackExo(track);
+            else setTrackIjk(track);
+        }
+    }
+
     public boolean haveTrack(int type) {
         if (isExo()) {
             return ExoUtil.haveTrack(exoPlayer.getCurrentTracks(), type);
@@ -272,6 +275,14 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         } else {
             setMediaSource(result);
         }
+    }
+
+    private int getVideoWidth() {
+        return isExo() ? exoPlayer.getVideoSize().width : ijkPlayer.getVideoWidth();
+    }
+
+    private int getVideoHeight() {
+        return isExo() ? exoPlayer.getVideoSize().height : ijkPlayer.getVideoHeight();
     }
 
     private void pauseExo() {
@@ -322,6 +333,22 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         if (isExo()) exoPlayer.setMediaSource(ExoUtil.getSource(headers, url, errorCode));
         if (isExo()) exoPlayer.prepare();
         PlayerEvent.state(0);
+    }
+
+    private void setTrackExo(Track item) {
+        if (item.isSelected()) {
+            exo().setTrackSelectionParameters(exo().getTrackSelectionParameters().buildUpon().setOverrideForType(new TrackSelectionOverride(exo().getCurrentTracks().getGroups().get(item.getGroup()).getMediaTrackGroup(), item.getTrack())).build());
+        } else {
+            exo().setTrackSelectionParameters(exo().getTrackSelectionParameters().buildUpon().setOverrideForType(new TrackSelectionOverride(exo().getCurrentTracks().getGroups().get(item.getGroup()).getMediaTrackGroup(), ImmutableList.of())).build());
+        }
+    }
+
+    private void setTrackIjk(Track item) {
+        if (item.isSelected()) {
+            ijk().selectTrack(item.getTrack());
+        } else {
+            ijk().deselectTrack(item.getTrack());
+        }
     }
 
     @Override
