@@ -31,7 +31,7 @@ public class OkHttp {
     }
 
     private OkHttpClient.Builder getBuilder() {
-        return new OkHttpClient.Builder().connectionPool(new ConnectionPool(32, 10, TimeUnit.MINUTES)).hostnameVerifier(SSLSocketFactoryCompat.hostnameVerifier).sslSocketFactory(new SSLSocketFactoryCompat(), SSLSocketFactoryCompat.trustAllCert);
+        return new OkHttpClient.Builder().connectionPool(new ConnectionPool(15, 5, TimeUnit.MINUTES)).hostnameVerifier(SSLSocketFactoryCompat.hostnameVerifier).sslSocketFactory(new SSLSocketFactoryCompat(), SSLSocketFactoryCompat.trustAllCert);
     }
 
     private OkHttpClient client() {

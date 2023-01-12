@@ -31,7 +31,7 @@ public class OkHttp {
     }
 
     public static OkHttpClient client(int timeout) {
-        return new OkHttpClient.Builder().connectionPool(new ConnectionPool(32, 10, TimeUnit.MINUTES)).connectTimeout(timeout, TimeUnit.SECONDS).hostnameVerifier(SSLSocketFactoryCompat.hostnameVerifier).sslSocketFactory(new SSLSocketFactoryCompat(), SSLSocketFactoryCompat.trustAllCert).build();
+        return new OkHttpClient.Builder().connectionPool(new ConnectionPool(15, 5, TimeUnit.MINUTES)).connectTimeout(timeout, TimeUnit.SECONDS).hostnameVerifier(SSLSocketFactoryCompat.hostnameVerifier).sslSocketFactory(new SSLSocketFactoryCompat(), SSLSocketFactoryCompat.trustAllCert).build();
     }
 
     public static Call newCall(String url) {
