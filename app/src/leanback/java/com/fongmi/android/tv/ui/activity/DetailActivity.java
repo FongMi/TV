@@ -29,6 +29,7 @@ import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Part;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
+import com.fongmi.android.tv.bean.Track;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.ActivityDetailBinding;
 import com.fongmi.android.tv.db.AppDatabase;
@@ -74,7 +75,7 @@ import okhttp3.Call;
 import okhttp3.Response;
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Listener, ArrayPresenter.OnClickListener, Clock.Callback {
+public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Listener, TrackSelectionDialog.Listener, ArrayPresenter.OnClickListener, Clock.Callback {
 
     private ActivityDetailBinding mBinding;
     private ViewGroup.LayoutParams mFrameParams;
@@ -597,7 +598,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void onTrack(View view) {
         int type = Integer.parseInt(view.getTag().toString());
-        TrackSelectionDialog.create(this).player(mPlayers).type(type).show();
+        TrackSelectionDialog.create(this).player(mPlayers).type(type).listener(this).show();
         hideControl();
     }
 
@@ -731,6 +732,13 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         keep.setVodName(mBinding.name.getText().toString());
         keep.setCreateTime(System.currentTimeMillis());
         keep.save();
+    }
+
+    @Override
+    public void onTrackClick(Track item) {
+        item.setPlayer(mPlayers.getPlayer());
+        item.setKey(getHistoryKey());
+        item.save();
     }
 
     @Override

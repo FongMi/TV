@@ -27,6 +27,7 @@ public final class TrackSelectionDialog implements TrackAdapter.OnClickListener 
     private final TrackNameProvider provider;
     private final TrackAdapter adapter;
     private final AlertDialog dialog;
+    private Listener listener;
     private Players player;
     private int type;
 
@@ -48,6 +49,11 @@ public final class TrackSelectionDialog implements TrackAdapter.OnClickListener 
 
     public TrackSelectionDialog player(Players player) {
         this.player = player;
+        return this;
+    }
+
+    public TrackSelectionDialog listener(Listener listener) {
+        this.listener = listener;
         return this;
     }
 
@@ -84,7 +90,7 @@ public final class TrackSelectionDialog implements TrackAdapter.OnClickListener 
             Tracks.Group trackGroup = groups.get(i);
             if (trackGroup.getType() != type) continue;
             for (int j = 0; j < trackGroup.length; j++) {
-                Track item = new Track(provider.getTrackName(trackGroup.getTrackFormat(j)));
+                Track item = new Track(type, provider.getTrackName(trackGroup.getTrackFormat(j)));
                 item.setSelected(trackGroup.isTrackSelected(j));
                 item.setGroup(i);
                 item.setTrack(j);
@@ -99,7 +105,7 @@ public final class TrackSelectionDialog implements TrackAdapter.OnClickListener 
         for (int i = 0; i < trackInfos.length; i++) {
             IjkTrackInfo trackInfo = trackInfos[i];
             if (trackInfo.getTrackType() != type) continue;
-            Track item = new Track(provider.getTrackName(trackInfo));
+            Track item = new Track(type, provider.getTrackName(trackInfo));
             item.setSelected(track == i);
             item.setTrack(i);
             items.add(item);
@@ -108,24 +114,30 @@ public final class TrackSelectionDialog implements TrackAdapter.OnClickListener 
 
     private void setExoTrack(Track item) {
         if (item.isSelected()) {
-            player.exo().setTrackSelectionParameters(player.exo().getTrackSelectionParameters().buildUpon().setOverrideForType(new TrackSelectionOverride(player.exo().getCurrentTracks().getGroups().get(item.getGroup()).getMediaTrackGroup(), ImmutableList.of())).build());
-        } else {
             player.exo().setTrackSelectionParameters(player.exo().getTrackSelectionParameters().buildUpon().setOverrideForType(new TrackSelectionOverride(player.exo().getCurrentTracks().getGroups().get(item.getGroup()).getMediaTrackGroup(), item.getTrack())).build());
+        } else {
+            player.exo().setTrackSelectionParameters(player.exo().getTrackSelectionParameters().buildUpon().setOverrideForType(new TrackSelectionOverride(player.exo().getCurrentTracks().getGroups().get(item.getGroup()).getMediaTrackGroup(), ImmutableList.of())).build());
         }
     }
 
     private void setIjkTrack(Track item) {
         if (item.isSelected()) {
-            player.ijk().deselectTrack(item.getTrack());
-        } else {
             player.ijk().selectTrack(item.getTrack());
+        } else {
+            player.ijk().deselectTrack(item.getTrack());
         }
     }
 
     @Override
     public void onItemClick(Track item) {
+        if (listener != null) listener.onTrackClick(item);
         if (player.isExo()) setExoTrack(item);
         if (player.isIjk()) setIjkTrack(item);
         dialog.dismiss();
+    }
+
+    public interface Listener {
+
+        void onTrackClick(Track item);
     }
 }
