@@ -248,10 +248,7 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     }
 
     public void setTrack(List<Track> tracks) {
-        for (Track track : tracks) {
-            if (isExo()) setTrackExo(track);
-            else setTrackIjk(track);
-        }
+        for (Track track : tracks) setTrack(track);
     }
 
     public boolean haveTrack(int type) {
@@ -335,19 +332,24 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         PlayerEvent.state(0);
     }
 
+    private void setTrack(Track item) {
+        if (item.isExo(player)) setTrackExo(item);
+        if (item.isIjk(player)) setTrackIjk(item);
+    }
+
     private void setTrackExo(Track item) {
         if (item.isSelected()) {
-            exo().setTrackSelectionParameters(exo().getTrackSelectionParameters().buildUpon().setOverrideForType(new TrackSelectionOverride(exo().getCurrentTracks().getGroups().get(item.getGroup()).getMediaTrackGroup(), item.getTrack())).build());
+            exoPlayer.setTrackSelectionParameters(exoPlayer.getTrackSelectionParameters().buildUpon().setOverrideForType(new TrackSelectionOverride(exoPlayer.getCurrentTracks().getGroups().get(item.getGroup()).getMediaTrackGroup(), item.getTrack())).build());
         } else {
-            exo().setTrackSelectionParameters(exo().getTrackSelectionParameters().buildUpon().setOverrideForType(new TrackSelectionOverride(exo().getCurrentTracks().getGroups().get(item.getGroup()).getMediaTrackGroup(), ImmutableList.of())).build());
+            exoPlayer.setTrackSelectionParameters(exoPlayer.getTrackSelectionParameters().buildUpon().setOverrideForType(new TrackSelectionOverride(exoPlayer.getCurrentTracks().getGroups().get(item.getGroup()).getMediaTrackGroup(), ImmutableList.of())).build());
         }
     }
 
     private void setTrackIjk(Track item) {
         if (item.isSelected()) {
-            ijk().selectTrack(item.getTrack());
+            ijkPlayer.selectTrack(item.getTrack());
         } else {
-            ijk().deselectTrack(item.getTrack());
+            ijkPlayer.deselectTrack(item.getTrack());
         }
     }
 

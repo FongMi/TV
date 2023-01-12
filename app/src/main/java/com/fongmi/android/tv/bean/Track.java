@@ -91,6 +91,14 @@ public class Track {
         this.selected = selected;
     }
 
+    public boolean isExo(int player) {
+        return getPlayer() == player && player == 0;
+    }
+
+    public boolean isIjk(int player) {
+        return getPlayer() == player && player == 1;
+    }
+
     public Track toggle() {
         setSelected(!isSelected());
         return this;
