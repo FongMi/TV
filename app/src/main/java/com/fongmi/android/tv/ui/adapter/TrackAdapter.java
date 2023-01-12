@@ -69,9 +69,7 @@ public class TrackAdapter extends RecyclerView.Adapter<TrackAdapter.ViewHolder> 
 
         @Override
         public void onClick(View view) {
-            for (int i = 0; i < mItems.size(); i++) mItems.get(i).setSelected(i == getLayoutPosition());
-            mListener.onItemClick(mItems.get(getLayoutPosition()));
-            notifyItemRangeChanged(0, mItems.size());
+            mListener.onItemClick(mItems.get(getLayoutPosition()).toggle());
         }
     }
 }
