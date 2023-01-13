@@ -176,6 +176,8 @@ public class Channel {
     }
 
     public String getLineText() {
+        String current = getUrls().get(getLine());
+        if (current.contains("$")) return current.split("\\$")[1];
         return isOnly() ? "" : ResUtil.getString(R.string.live_line, getLine() + 1);
     }
 
