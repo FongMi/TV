@@ -36,6 +36,6 @@ public class PushActivity extends BaseActivity {
 
     private void onClip(View view) {
         CharSequence text = ((ClipboardManager) getSystemService(CLIPBOARD_SERVICE)).getText();
-        if (text != null) DetailActivity.start(this, "push_agent", text.toString());
+        if (text != null) DetailActivity.start(this, "push_agent", text.toString(), "");
     }
 }

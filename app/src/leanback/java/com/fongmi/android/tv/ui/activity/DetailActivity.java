@@ -101,20 +101,25 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private Runnable mR2;
     private Runnable mR3;
 
-    public static void start(Activity activity, String id) {
-        start(activity, ApiConfig.get().getHome().getKey(), id);
+    public static void start(Activity activity, String id, String name) {
+        start(activity, ApiConfig.get().getHome().getKey(), id, name);
     }
 
-    public static void start(Activity activity, String key, String id) {
-        start(activity, key, id, false);
+    public static void start(Activity activity, String key, String id, String name) {
+        start(activity, key, id, name, false);
     }
 
-    public static void start(Activity activity, String key, String id, boolean clear) {
+    public static void start(Activity activity, String key, String id, String name, boolean clear) {
         Intent intent = new Intent(activity, DetailActivity.class);
         if (clear) intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra("name", name);
         intent.putExtra("key", key);
         intent.putExtra("id", id);
         activity.startActivityForResult(intent, 1000);
+    }
+
+    private String getName() {
+        return getIntent().getStringExtra("name");
     }
 
     private String getKey() {
@@ -278,7 +283,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
             resetFocus(useParse);
         });
         mViewModel.result.observe(this, result -> {
-            if (result.getList().isEmpty()) mBinding.progressLayout.showEmpty();
+            if (result.getList().isEmpty()) setEmpty();
             else setDetail(result.getList().get(0));
             Notify.dismiss();
         });
@@ -314,6 +319,15 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         updateHistory(item, replay);
         showProgress();
         hideError();
+    }
+
+    private void setEmpty() {
+        if (getName().isEmpty()) {
+            mBinding.progressLayout.showEmpty();
+        } else {
+            CollectActivity.start(this, getName(), true);
+            finish();
+        }
     }
 
     private void setDetail(Vod item) {

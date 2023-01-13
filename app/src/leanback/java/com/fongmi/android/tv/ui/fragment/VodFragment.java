@@ -198,7 +198,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     public void onItemClick(Vod item) {
         if (item.shouldSearch()) onLongClick(item);
         else if (item.isFolder()) getVideo(item.getVodId(), "1");
-        else DetailActivity.start(getActivity(), getKey(), item.getVodId());
+        else DetailActivity.start(getActivity(), getKey(), item.getVodId(), item.getVodName());
     }
 
     @Override
