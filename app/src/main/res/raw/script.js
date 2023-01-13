@@ -79,7 +79,7 @@ function selectFile(path, canDel) {
 }
 
 function fileToApi() {
-    doAction('api', { text: "file://" + current_file });
+    doAction('api', { url: "file://" + current_file });
     hideFileInfo();
 }
 
