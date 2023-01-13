@@ -37,7 +37,7 @@ public class Download {
             FileUtil.clearDir(file);
             Response response = OkHttp.newCall(url).execute();
             download(response.body().byteStream(), Double.parseDouble(response.header("Content-Length", "1")));
-            App.post(() -> callback.success(file));
+            App.post(() -> callback.success(FileUtil.chmod(file)));
         } catch (Exception e) {
             App.post(() -> callback.error(e.getMessage()));
         }

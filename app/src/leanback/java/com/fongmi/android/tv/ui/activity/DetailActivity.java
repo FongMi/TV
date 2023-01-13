@@ -432,6 +432,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         stopSearch();
         startSearch(keyword);
         setAccurate(accurate);
+        setAutoMode(accurate);
         mBinding.part.setTag(keyword);
     }
 
@@ -700,6 +701,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private boolean hasFlag() {
         mBinding.flag.setVisibility(mFlagAdapter.size() > 0 ? View.VISIBLE : View.GONE);
         if (mFlagAdapter.size() == 0) Notify.show(R.string.error_episode);
+        if (mFlagAdapter.size() == 0) initSearch(getName(), true);
         return mFlagAdapter.size() > 0;
     }
 
@@ -823,7 +825,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
             initSearch(mBinding.name.getText().toString(), true);
             mBinding.widget.text.setText(msg);
             Clock.get().setCallback(null);
-            setAutoMode(true);
             mPlayers.stop();
             hideProgress();
             showError();
