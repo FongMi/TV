@@ -182,8 +182,7 @@ public class Site {
         Site item = find(getKey());
         if (item == null) return this;
         setFilterable(item.getFilterable());
-        if (getSearchable() == 0) return this;
-        if (getSearchable() == 1) setSearchable(Math.max(item.getSearchable(), 1));
+        if (getSearchable() != 0) setSearchable(item.getSearchable());
         return this;
     }
 

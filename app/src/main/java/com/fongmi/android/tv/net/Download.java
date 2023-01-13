@@ -35,7 +35,7 @@ public class Download {
     private void doInBackground() {
         try {
             FileUtil.clearDir(file);
-            Response response = new OkHttpClient.Builder().build().newCall(new Request.Builder().url(url).build()).execute();
+            Response response = OkHttp.newCall(url).execute();
             download(response.body().byteStream(), Double.parseDouble(response.header("Content-Length", "1")));
             App.post(() -> callback.success(file));
         } catch (Exception e) {

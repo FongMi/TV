@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
+import okhttp3.ConnectionPool;
 import okhttp3.Headers;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
@@ -13,7 +14,7 @@ import okhttp3.Request;
 
 public class OkHttp {
 
-    private final OkHttpClient mOk;
+    private OkHttpClient mOk;
 
     private static class Loader {
         static volatile OkHttp INSTANCE = new OkHttp();
@@ -23,28 +24,26 @@ public class OkHttp {
         return Loader.INSTANCE;
     }
 
-    public OkHttp() {
-        mOk = getBuilder().build();
+    public static OkHttpClient client() {
+        if (get().mOk != null) return get().mOk;
+        return get().mOk = client(30);
     }
 
-    private OkHttpClient.Builder getBuilder() {
-        return new OkHttpClient.Builder().connectTimeout(30, TimeUnit.SECONDS).hostnameVerifier(SSLSocketFactoryCompat.hostnameVerifier).sslSocketFactory(new SSLSocketFactoryCompat(), SSLSocketFactoryCompat.trustAllCert);
-    }
+    public static OkHttpClient client(int timeout) {
+        return new OkHttpClient.Builder().connectionPool(new ConnectionPool(20, 5, TimeUnit.MINUTES)).connectTimeout(timeout, TimeUnit.SECONDS).hostnameVerifier(SSLSocketFactoryCompat.hostnameVerifier).sslSocketFactory(new SSLSocketFactoryCompat(), SSLSocketFactoryCompat.trustAllCert).build();
 
-    private OkHttpClient client() {
-        return mOk;
     }
 
     public static Call newCall(String url) {
-        return get().client().newCall(new Request.Builder().url(url).build());
+        return client().newCall(new Request.Builder().url(url).build());
     }
 
     public static Call newCall(String url, Headers headers) {
-        return get().client().newCall(new Request.Builder().url(url).headers(headers).build());
+        return client().newCall(new Request.Builder().url(url).headers(headers).build());
     }
 
     public static Call newCall(String url, LinkedHashMap<String, String> params) {
-        return get().client().newCall(new Request.Builder().url(buildUrl(url, params)).build());
+        return client().newCall(new Request.Builder().url(buildUrl(url, params)).build());
     }
 
     private static HttpUrl buildUrl(String url, LinkedHashMap<String, String> params) {

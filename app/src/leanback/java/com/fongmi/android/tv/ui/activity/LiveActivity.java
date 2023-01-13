@@ -181,8 +181,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void setVideoView() {
-        mPlayers.setupIjk(getIjk());
-        mPlayers.setupExo(getExo());
+        mPlayers.set(getExo(), getIjk());
         setScale(Prefers.getLiveScale());
         getIjk().setRender(Prefers.getRender());
         mBinding.control.speed.setText(mPlayers.getSpeedText());
@@ -310,8 +309,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void onDecode() {
         mPlayers.toggleDecode();
-        mPlayers.setupIjk(getIjk());
-        mPlayers.setupExo(getExo());
+        mPlayers.set(getExo(), getIjk());
         setDecodeView();
         getUrl();
     }
@@ -581,7 +579,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     @Override
     public void onKeyLeft(int time) {
         if (isVisible(mBinding.widget.center)) App.post(mR2, 500);
-        if (mChannel.isOnly() && mPlayers.isVod()) mPlayers.seekTo(time);
+        if (mChannel.isOnly() && mPlayers.isVod()) App.post(() -> mPlayers.seekTo(time), 500);
         else if (!mChannel.isOnly()) prevLine();
         mKeyDown.resetTime();
     }
@@ -589,7 +587,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     @Override
     public void onKeyRight(int time) {
         if (isVisible(mBinding.widget.center)) App.post(mR2, 500);
-        if (mChannel.isOnly() && mPlayers.isVod()) mPlayers.seekTo(time);
+        if (mChannel.isOnly() && mPlayers.isVod()) App.post(() -> mPlayers.seekTo(time), 500);
         else if (!mChannel.isOnly()) nextLine(true);
         mKeyDown.resetTime();
     }
@@ -649,7 +647,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         switch (event.getState()) {
             case 0:
                 setR6Callback();
-                setTrackVisible();
+                setTrackVisible(false);
                 break;
             case Player.STATE_IDLE:
                 break;
@@ -659,7 +657,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
             case Player.STATE_READY:
                 hideProgress();
                 mPlayers.reset();
-                setTrackVisible();
+                setTrackVisible(true);
                 App.removeCallbacks(mR6);
                 break;
             case Player.STATE_ENDED:
@@ -673,14 +671,14 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         }
     }
 
-    private void setTrackVisible() {
-        mBinding.control.text.setVisibility(mPlayers.haveTrack(C.TRACK_TYPE_TEXT) ? View.VISIBLE : View.GONE);
-        mBinding.control.audio.setVisibility(mPlayers.haveTrack(C.TRACK_TYPE_AUDIO) ? View.VISIBLE : View.GONE);
+    private void setTrackVisible(boolean visible) {
+        mBinding.control.text.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_TEXT) ? View.VISIBLE : View.GONE);
+        mBinding.control.audio.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_AUDIO) ? View.VISIBLE : View.GONE);
     }
 
     private void onError() {
         mPlayers.reset();
-        if (mChannel.isLastLine()) {
+        if (mChannel.isOnly()) {
             if (isGone(mBinding.recycler)) onKeyDown();
         } else {
             nextLine(true);
