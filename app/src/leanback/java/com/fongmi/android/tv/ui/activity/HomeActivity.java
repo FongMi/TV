@@ -224,7 +224,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     @Override
     public void onItemClick(Vod item) {
         if (item.shouldSearch()) onLongClick(item);
-        else DetailActivity.start(this, item.getVodId());
+        else DetailActivity.start(this, item.getVodId(), item.getVodName());
     }
 
     @Override
@@ -235,7 +235,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     public void onItemClick(History item) {
-        DetailActivity.start(this, item.getSiteKey(), item.getVodId());
+        DetailActivity.start(this, item.getSiteKey(), item.getVodId(), item.getVodName());
     }
 
     @Override
@@ -293,7 +293,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
                 break;
             case PUSH:
                 if (ApiConfig.get().getSite("push_agent") == null) return;
-                DetailActivity.start(this, "push_agent", event.getText(), true);
+                DetailActivity.start(this, "push_agent", event.getText(), "", true);
                 break;
         }
     }
