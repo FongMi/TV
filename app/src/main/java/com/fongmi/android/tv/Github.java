@@ -2,10 +2,10 @@ package com.fongmi.android.tv;
 
 import android.text.TextUtils;
 
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
+import com.fongmi.android.tv.net.OkHttp;
 
-import okhttp3.OkHttpClient;
+import java.io.IOException;
+
 import okhttp3.Request;
 
 public class Github {
@@ -37,7 +37,7 @@ public class Github {
     private void check(String url) {
         try {
             if (getProxy().length() > 0) return;
-            int code = new OkHttpClient.Builder().connectTimeout(TIME, TimeUnit.SECONDS).build().newCall(new Request.Builder().url(url).build()).execute().code();
+            int code = OkHttp.client(TIME).newCall(new Request.Builder().url(url).build()).execute().code();
             if (code == 200) setProxy(url);
         } catch (IOException ignored) {
         }

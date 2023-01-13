@@ -60,7 +60,7 @@ public class KeepActivity extends BaseActivity implements KeepAdapter.OnClickLis
     public void onItemClick(Keep item) {
         Config config = Config.find(item.getCid());
         if (item.getCid() == ApiConfig.getCid()) {
-            DetailActivity.start(this, item.getSiteKey(), item.getVodId());
+            DetailActivity.start(this, item.getSiteKey(), item.getVodId(), item.getVodName());
         } else {
             loadConfig(config, item);
         }
@@ -70,7 +70,7 @@ public class KeepActivity extends BaseActivity implements KeepAdapter.OnClickLis
         ApiConfig.get().clear().config(config).load(true, new Callback() {
             @Override
             public void success() {
-                DetailActivity.start(getActivity(), item.getSiteKey(), item.getVodId());
+                DetailActivity.start(getActivity(), item.getSiteKey(), item.getVodId(), item.getVodName());
                 RefreshEvent.history();
                 RefreshEvent.video();
             }

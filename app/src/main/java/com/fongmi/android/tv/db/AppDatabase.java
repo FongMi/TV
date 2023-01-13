@@ -14,15 +14,17 @@ import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.bean.Site;
+import com.fongmi.android.tv.bean.Track;
 import com.fongmi.android.tv.db.dao.ConfigDao;
 import com.fongmi.android.tv.db.dao.HistoryDao;
 import com.fongmi.android.tv.db.dao.KeepDao;
 import com.fongmi.android.tv.db.dao.SiteDao;
+import com.fongmi.android.tv.db.dao.TrackDao;
 
-@Database(entities = {Config.class, Site.class, History.class, Keep.class}, version = AppDatabase.VERSION, exportSchema = false)
+@Database(entities = {Keep.class, Site.class, Track.class, Config.class, History.class}, version = AppDatabase.VERSION)
 public abstract class AppDatabase extends RoomDatabase {
 
-    public static final int VERSION = 16;
+    public static final int VERSION = 17;
     public static final String SYMBOL = "@@@";
 
     private static volatile AppDatabase instance;
@@ -39,6 +41,7 @@ public abstract class AppDatabase extends RoomDatabase {
                 .addMigrations(MIGRATION_13_14)
                 .addMigrations(MIGRATION_14_15)
                 .addMigrations(MIGRATION_15_16)
+                .addMigrations(MIGRATION_16_17)
                 .allowMainThreadQueries()
                 .fallbackToDestructiveMigration()
                 .build();
@@ -47,6 +50,8 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract KeepDao getKeepDao();
 
     public abstract SiteDao getSiteDao();
+
+    public abstract TrackDao getTrackDao();
 
     public abstract ConfigDao getConfigDao();
 
@@ -87,6 +92,14 @@ public abstract class AppDatabase extends RoomDatabase {
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             database.execSQL("ALTER TABLE History ADD COLUMN speed REAL DEFAULT 1 NOT NULL");
             database.execSQL("ALTER TABLE History ADD COLUMN player INTEGER DEFAULT -1 NOT NULL");
+        }
+    };
+
+    static final Migration MIGRATION_16_17 = new Migration(16, 17) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `Track` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` INTEGER NOT NULL, `group` INTEGER NOT NULL, `track` INTEGER NOT NULL, `player` INTEGER NOT NULL, `key` TEXT, `name` TEXT, `selected` INTEGER NOT NULL)");
+            database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_Track_key_player_type` ON `Track` (`key`, `player`, `type`)");
         }
     };
 }

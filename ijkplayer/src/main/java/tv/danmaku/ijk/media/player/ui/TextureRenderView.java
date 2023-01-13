@@ -115,7 +115,7 @@ public class TextureRenderView extends TextureView implements IRenderView {
         }
 
         public void bindToMediaPlayer(IMediaPlayer mp) {
-            mp.setSurface(openSurface());
+            if (mp != null) mp.setSurface(openSurface());
         }
 
         @NonNull

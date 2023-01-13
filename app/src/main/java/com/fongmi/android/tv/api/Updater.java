@@ -55,30 +55,34 @@ public class Updater implements Download.Callback {
     }
 
     public void start(Activity activity) {
-        this.binding = DialogUpdateBinding.inflate(LayoutInflater.from(activity));
-        this.dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).setCancelable(false).create();
-        App.execute(this::doInBackground);
+        App.execute(() -> doInBackground(activity));
     }
 
-    private void doInBackground() {
+    private void doInBackground(Activity activity) {
         try {
             JSONObject object = new JSONObject(OkHttp.newCall(getJson()).execute().body().string());
             String name = object.optString("name");
             String desc = object.optString("desc");
             int code = object.optInt("code");
             boolean need = code > BuildConfig.VERSION_CODE && Prefers.getUpdate();
-            if (need) App.post(() -> show(name, desc));
+            if (need) App.post(() -> show(activity, name, desc));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void show(String version, String desc) {
+    private void show(Activity activity, String version, String desc) {
+        binding = DialogUpdateBinding.inflate(LayoutInflater.from(activity));
         binding.version.setText(ResUtil.getString(R.string.update_version, version));
         binding.confirm.setOnClickListener(this::confirm);
         binding.cancel.setOnClickListener(this::cancel);
         binding.desc.setText(desc);
-        dialog.show();
+        create(activity).show();
+    }
+
+    private AlertDialog create(Activity activity) {
+        if (dialog != null) dialog.dismiss();
+        return dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).setCancelable(false).create();
     }
 
     private void dismiss() {
