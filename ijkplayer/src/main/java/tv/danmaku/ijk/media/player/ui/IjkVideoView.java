@@ -508,7 +508,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     private void createPlayer() {
         String url = mUri.toString();
         mIjkPlayer = new IjkMediaPlayer();
-        IjkMediaPlayer.native_setLogLevel(IjkMediaPlayer.IJK_LOG_SILENT);
         mIjkPlayer.setOnPreparedListener(mPreparedListener);
         mIjkPlayer.setOnVideoSizeChangedListener(mSizeChangedListener);
         mIjkPlayer.setOnCompletionListener(mCompletionListener);
