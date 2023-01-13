@@ -34,7 +34,7 @@ public class LiveViewModel extends ViewModel {
     public void getUrl(Channel item) {
         execute(() -> {
             TVBus.get().stop();
-            String url = item.getUrls().get(item.getLine());
+            String url = item.getUrls().get(item.getLine()).split("\\$")[0];
             if (item.isForce()) item.setUrl(Force.get().fetch(url));
             else if (item.isZLive()) item.setUrl(ZLive.get().fetch(url));
             else if (item.isTVBus()) item.setUrl(TVBus.get().fetch(url));
