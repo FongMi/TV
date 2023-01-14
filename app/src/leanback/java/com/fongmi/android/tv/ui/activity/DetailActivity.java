@@ -828,7 +828,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void startSearch(String keyword) {
         mSearchAdapter.clear();
-        mExecutor = Executors.newFixedThreadPool(2);
+        mExecutor = Executors.newFixedThreadPool(5);
         for (Site site : ApiConfig.get().getSites()) if (site.isSearchable() && !site.getKey().equals(getKey())) mExecutor.execute(() -> search(site, keyword));
     }
 
