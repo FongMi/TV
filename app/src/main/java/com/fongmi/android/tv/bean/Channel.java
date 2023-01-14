@@ -171,14 +171,18 @@ public class Channel {
         setLine(getLine() > 0 ? getLine() - 1 : getUrls().size() - 1);
     }
 
+    public String getCurrent() {
+        return getUrls().get(getLine());
+    }
+
     public boolean isOnly() {
         return getUrls().size() == 1;
     }
 
     public String getLineText() {
-        String current = getUrls().get(getLine());
-        if (current.contains("$")) return current.split("\\$")[1];
-        return isOnly() ? "" : ResUtil.getString(R.string.live_line, getLine() + 1);
+        if (getUrls().size() <= 1) return "";
+        if (getCurrent().contains("$")) return getCurrent().split("\\$")[1];
+        return ResUtil.getString(R.string.live_line, getLine() + 1);
     }
 
     public Channel setNumber(int number) {
@@ -198,7 +202,7 @@ public class Channel {
     }
 
     public String getScheme() {
-        return Uri.parse(getUrls().get(getLine())).getScheme().toLowerCase();
+        return Uri.parse(getCurrent()).getScheme().toLowerCase();
     }
 
     public boolean isForce() {
