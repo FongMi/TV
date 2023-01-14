@@ -746,6 +746,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
                 showProgress();
                 break;
             case Player.STATE_READY:
+                stopSearch();
                 hideProgress();
                 mPlayers.reset();
                 setDefaultTrack();
@@ -812,13 +813,13 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void startSearch(String keyword) {
-        mExecutor = Executors.newSingleThreadExecutor();
+        mSearchAdapter.clear();
+        mExecutor = Executors.newFixedThreadPool(2);
         for (Site site : ApiConfig.get().getSites()) if (site.isSearchable() && !site.getKey().equals(getKey())) mExecutor.execute(() -> search(site, keyword));
     }
 
     private void stopSearch() {
         if (mExecutor != null) mExecutor.shutdownNow();
-        mSearchAdapter.clear();
     }
 
     private void search(Site site, String keyword) {
