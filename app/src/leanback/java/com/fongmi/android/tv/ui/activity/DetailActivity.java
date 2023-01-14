@@ -100,6 +100,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private Runnable mR1;
     private Runnable mR2;
     private Runnable mR3;
+    private Runnable mR4;
 
     public static void start(Activity activity, String id, String name) {
         start(activity, ApiConfig.get().getHome().getKey(), id, name);
@@ -185,6 +186,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mR1 = this::hideControl;
         mR2 = this::hideCenter;
         mR3 = this::setTraffic;
+        mR4 = this::onError;
         setRecyclerView();
         setVideoView();
         setViewModel();
@@ -317,6 +319,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mViewModel.playerContent(getKey(), getVodFlag().getFlag(), item.getUrl());
         Clock.get().setCallback(null);
         updateHistory(item, replay);
+        setR4Callback();
         showProgress();
         hideError();
     }
@@ -642,6 +645,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         App.post(mR1, 5000);
     }
 
+    private void setR4Callback() {
+        App.removeCallbacks(mR4);
+        App.post(mR4, 15000);
+    }
+
     private void getPart(String source) {
         OkHttp.newCall("http://api.pullword.com/get.php?source=" + URLEncoder.encode(source.trim()) + "&param1=0&param2=0&json=1").enqueue(new Callback() {
             @Override
@@ -751,12 +759,14 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
                 mPlayers.reset();
                 setDefaultTrack();
                 setTrackVisible(true);
+                App.removeCallbacks(mR4);
                 mBinding.widget.size.setText(mPlayers.getSizeText());
                 break;
             case Player.STATE_ENDED:
                 checkNext();
                 break;
             default:
+                App.removeCallbacks(mR4);
                 if (!event.isRetry() || mPlayers.addRetry() > 3) onError(event.getMsg());
                 else getPlayer(false);
                 break;
@@ -779,6 +789,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
             setInitTrack(false);
             mPlayers.setTrack(Track.find(getHistoryKey()));
         }
+    }
+
+    private void onError() {
+        onError("");
     }
 
     private void onError(String msg) {
@@ -994,6 +1008,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     protected void onDestroy() {
         super.onDestroy();
         mPlayers.release();
-        App.removeCallbacks(mR1, mR2, mR3);
+        App.removeCallbacks(mR1, mR2, mR3, mR4);
     }
 }
