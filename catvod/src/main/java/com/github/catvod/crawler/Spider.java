@@ -37,4 +37,12 @@ public abstract class Spider {
     public String playerContent(String flag, String id, List<String> vipFlags) throws Exception {
         return "";
     }
+
+    public boolean manualVideoCheck() {
+        return false;
+    }
+
+    public boolean isVideoFormat(String url) {
+        return false;
+    }
 }

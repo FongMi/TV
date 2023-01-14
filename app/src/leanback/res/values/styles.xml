@@ -18,16 +18,7 @@
         <item name="cornerFamily">rounded</item>
     </style>
 
-    <style name="VodPlayerStyle">
-        <item name="auto_show">false</item>
-        <item name="resize_mode">fit</item>
-        <item name="use_artwork">true</item>
-        <item name="use_controller">false</item>
-        <item name="animation_enabled">false</item>
-        <item name="default_artwork">@drawable/radio</item>
-    </style>
-
-    <style name="LivePlayerStyle">
+    <style name="ExoStyle">
         <item name="auto_show">false</item>
         <item name="resize_mode">fit</item>
         <item name="use_artwork">true</item>

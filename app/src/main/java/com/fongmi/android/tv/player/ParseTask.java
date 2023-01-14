@@ -39,7 +39,7 @@ public class ParseTask {
 
     public ParseTask run(Result result, boolean useParse) {
         setParse(result, useParse);
-        executor.execute(() -> doInBackground(result.getUrl(), result.getFlag()));
+        executor.execute(() -> doInBackground(result.getKey(), result.getUrl(), result.getFlag()));
         return this;
     }
 
@@ -50,14 +50,14 @@ public class ParseTask {
         if (parse == null) parse = Parse.get(0, result.getPlayUrl(), result.getHeader());
     }
 
-    private void doInBackground(String webUrl, String flag) {
+    private void doInBackground(String key, String webUrl, String flag) {
         if (webUrl.startsWith("magnet:")) {
             onParseError();
             return;
         }
         switch (parse.getType()) {
             case 0: //嗅探
-                App.post(() -> startWeb(parse.getUrl() + webUrl, parse.getHeaders(), callback));
+                App.post(() -> startWeb(key, parse.getUrl() + webUrl, parse.getHeaders(), callback));
                 break;
             case 1: //Json
                 jsonParse(webUrl);
@@ -108,7 +108,11 @@ public class ParseTask {
     }
 
     private void startWeb(String url, Map<String, String> headers, Callback callback) {
-        if (webView != null) webView.start(url, headers, callback);
+        startWeb("", url, headers, callback);
+    }
+
+    private void startWeb(String key, String url, Map<String, String> headers, Callback callback) {
+        if (webView != null) webView.start(key, url, headers, callback);
     }
 
     private void onParseSuccess(Map<String, String> headers, String url, String from) {

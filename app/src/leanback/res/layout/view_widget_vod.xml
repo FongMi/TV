@@ -126,7 +126,6 @@
             android:id="@+id/action"
             android:layout_width="56dp"
             android:layout_height="56dp"
-            android:background="?attr/selectableItemBackground"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_play" />
 

@@ -17,8 +17,10 @@ import androidx.annotation.Nullable;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.player.ParseTask;
 import com.fongmi.android.tv.utils.Utils;
+import com.github.catvod.crawler.Spider;
 
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
@@ -31,6 +33,7 @@ public class CustomWebView extends WebView {
     private ParseTask.Callback callback;
     private WebResourceResponse empty;
     private List<String> keys;
+    private String key;
     private String ads;
     private int retry;
 
@@ -63,10 +66,11 @@ public class CustomWebView extends WebView {
         }
     }
 
-    public void start(String url, Map<String, String> headers, ParseTask.Callback callback) {
+    public void start(String key, String url, Map<String, String> headers, ParseTask.Callback callback) {
         this.callback = callback;
         setUserAgent(headers);
         loadUrl(url, headers);
+        this.key = key;
         retry = 0;
     }
 
@@ -80,7 +84,7 @@ public class CustomWebView extends WebView {
                 if (ads.contains(host)) return empty;
                 App.post(mTimer, 15 * 1000);
                 Map<String, String> headers = request.getRequestHeaders();
-                if (Utils.isVideoFormat(url, headers)) post(headers, url);
+                if (isVideoFormat(url, headers)) post(headers, url);
                 return super.shouldInterceptRequest(view, request);
             }
 
@@ -94,6 +98,13 @@ public class CustomWebView extends WebView {
                 return false;
             }
         };
+    }
+
+    private boolean isVideoFormat(String url, Map<String, String> headers) {
+        Site site = ApiConfig.get().getSite(key);
+        Spider spider = ApiConfig.get().getCSP(site);
+        if (spider.manualVideoCheck()) return spider.isVideoFormat(url);
+        return Utils.isVideoFormat(url, headers);
     }
 
     private final Runnable mTimer = new Runnable() {
