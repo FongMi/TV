@@ -376,11 +376,6 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     }
 
     @Override
-    public void onAudioSinkError(@NonNull EventTime eventTime, @NonNull Exception audioSinkError) {
-        seekTo(200);
-    }
-
-    @Override
     public boolean onInfo(IMediaPlayer mp, int what, int extra) {
         switch (what) {
             case IMediaPlayer.MEDIA_INFO_BUFFERING_START:
