@@ -92,8 +92,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private SiteViewModel mViewModel;
     private boolean mFullscreen;
     private boolean mInitTrack;
+    private boolean mInitAuto;
     private boolean mAutoMode;
-    private boolean mAccurate;
     private History mHistory;
     private Players mPlayers;
     private int mCurrent;
@@ -421,45 +421,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         if (mHistory.isRevSort()) for (int i = size + 1; i > 0; i -= 20) items.add((i - 1) + "-" + Math.max(i - 20, 1));
         else for (int i = 0; i < size; i += 20) items.add((i + 1) + "-" + Math.min(i + 20, size));
         mArrayAdapter.setItems(items, null);
-    }
-
-    private void stopSearch() {
-        if (mExecutor != null) mExecutor.shutdownNow();
-        mSearchAdapter.clear();
-    }
-
-    private void initSearch(String keyword, boolean accurate) {
-        stopSearch();
-        startSearch(keyword);
-        setAccurate(accurate);
-        setAutoMode(accurate);
-        mBinding.part.setTag(keyword);
-    }
-
-    private void startSearch(String keyword) {
-        mExecutor = Executors.newFixedThreadPool(5);
-        for (Site site : ApiConfig.get().getSites()) if (site.isSearchable() && !site.getKey().equals(getKey())) mExecutor.execute(() -> search(site, keyword));
-    }
-
-    private void search(Site site, String keyword) {
-        try {
-            mViewModel.searchContent(site, keyword);
-        } catch (Throwable ignored) {
-        }
-    }
-
-    private void setSearch(List<Vod> items) {
-        Iterator<Vod> iterator = items.iterator();
-        while (iterator.hasNext()) if (mismatch(iterator.next())) iterator.remove();
-        mSearchAdapter.addAll(mSearchAdapter.size(), items);
-        mBinding.search.setVisibility(View.VISIBLE);
-        if (isAutoMode()) nextSite();
-    }
-
-    private boolean mismatch(Vod item) {
-        String keyword = mBinding.part.getTag().toString();
-        if (isAccurate()) return !item.getVodName().equals(keyword);
-        else return !item.getVodName().contains(keyword);
     }
 
     @Override
@@ -822,16 +783,63 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void onError(String msg) {
         int position = mBinding.flag.getSelectedPosition();
         if (position == mFlagAdapter.size() - 1) {
-            initSearch(mBinding.name.getText().toString(), true);
             mBinding.widget.text.setText(msg);
             Clock.get().setCallback(null);
             mPlayers.stop();
             hideProgress();
+            checkSearch();
             showError();
         } else {
             mPlayers.reset();
             nextFlag(position);
         }
+    }
+
+    private void checkSearch() {
+        if (mSearchAdapter.size() > 0 && isAutoMode()) {
+            nextSite();
+        } else {
+            initSearch(getName(), true);
+        }
+    }
+
+    private void initSearch(String keyword, boolean auto) {
+        stopSearch();
+        setAutoMode(auto);
+        setInitAuto(auto);
+        startSearch(keyword);
+        mBinding.part.setTag(keyword);
+    }
+
+    private void startSearch(String keyword) {
+        mExecutor = Executors.newSingleThreadExecutor();
+        for (Site site : ApiConfig.get().getSites()) if (site.isSearchable() && !site.getKey().equals(getKey())) mExecutor.execute(() -> search(site, keyword));
+    }
+
+    private void stopSearch() {
+        if (mExecutor != null) mExecutor.shutdownNow();
+        mSearchAdapter.clear();
+    }
+
+    private void search(Site site, String keyword) {
+        try {
+            mViewModel.searchContent(site, keyword);
+        } catch (Throwable ignored) {
+        }
+    }
+
+    private void setSearch(List<Vod> items) {
+        Iterator<Vod> iterator = items.iterator();
+        while (iterator.hasNext()) if (mismatch(iterator.next())) iterator.remove();
+        mSearchAdapter.addAll(mSearchAdapter.size(), items);
+        mBinding.search.setVisibility(View.VISIBLE);
+        if (isInitAuto()) nextSite();
+    }
+
+    private boolean mismatch(Vod item) {
+        String keyword = mBinding.part.getTag().toString();
+        if (isAutoMode()) return !item.getVodName().equals(keyword);
+        else return !item.getVodName().contains(keyword);
     }
 
     private void nextFlag(int position) {
@@ -845,7 +853,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         Vod vod = (Vod) mSearchAdapter.get(0);
         Notify.show(ResUtil.getString(R.string.play_switch_site, vod.getSiteName()));
         mSearchAdapter.removeItems(0, 1);
-        setAutoMode(false);
+        setInitAuto(false);
         getDetail(vod);
     }
 
@@ -878,20 +886,20 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         this.mInitTrack = initTrack;
     }
 
+    public boolean isInitAuto() {
+        return mInitAuto;
+    }
+
+    public void setInitAuto(boolean initAuto) {
+        this.mInitAuto = initAuto;
+    }
+
     private boolean isAutoMode() {
         return mAutoMode;
     }
 
     private void setAutoMode(boolean autoMode) {
         this.mAutoMode = autoMode;
-    }
-
-    private boolean isAccurate() {
-        return mAccurate;
-    }
-
-    private void setAccurate(boolean accurate) {
-        this.mAccurate = accurate;
     }
 
     @Override
