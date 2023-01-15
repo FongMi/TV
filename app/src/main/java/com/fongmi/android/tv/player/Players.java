@@ -185,7 +185,6 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
 
     public void togglePlayer() {
         setPlayer(player == 0 ? 1 : 0);
-        Prefers.putPlayer(player);
     }
 
     public void toggleDecode() {

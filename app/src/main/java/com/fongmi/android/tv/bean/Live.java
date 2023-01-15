@@ -28,6 +28,8 @@ public class Live {
     private String epg;
     @SerializedName("ua")
     private String ua;
+    @SerializedName("playerType")
+    private Integer playerType;
     @SerializedName("channels")
     private List<Channel> channels;
     @SerializedName("groups")
@@ -84,6 +86,10 @@ public class Live {
 
     public String getUa() {
         return TextUtils.isEmpty(ua) ? "" : ua;
+    }
+
+    public int getPlayerType() {
+        return playerType == null ? -1 : playerType == 1 ? 1 : 0;
     }
 
     private List<Channel> getChannels() {
