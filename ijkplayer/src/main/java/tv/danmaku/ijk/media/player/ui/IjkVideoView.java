@@ -282,9 +282,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     private final IMediaPlayer.OnTimedTextListener mOnTimedTextListener = new IMediaPlayer.OnTimedTextListener() {
         @Override
         public void onTimedText(IMediaPlayer mp, IjkTimedText text) {
-            if (text != null) {
-                subtitleView.setText(text.getText());
-            }
+            subtitleView.onSubtitleChanged(text.getText());
         }
     };
 
@@ -479,17 +477,15 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     public void selectTrack(int track) {
-        long position = getCurrentPosition();
+        long position = Math.max(mStartPosition, getCurrentPosition());
         mIjkPlayer.selectTrack(track);
-        subtitleView.setText("");
-        if (position != 0) seekTo(position);
+        if (position != 0) postDelayed(() -> seekTo(position), 500);
     }
 
     public void deselectTrack(int track) {
-        long position = getCurrentPosition();
+        long position = Math.max(mStartPosition, getCurrentPosition());
         mIjkPlayer.deselectTrack(track);
-        subtitleView.setText("");
-        if (position != 0) seekTo(position);
+        if (position != 0) postDelayed(() -> seekTo(position), 500);
     }
 
     private void setPreferredTextLanguage() {
