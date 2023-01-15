@@ -477,6 +477,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void getUrl() {
         mViewModel.getUrl(mChannel);
+        setR6Callback();
         showProgress();
     }
 
@@ -646,7 +647,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     public void onPlayerEvent(PlayerEvent event) {
         switch (event.getState()) {
             case 0:
-                setR6Callback();
                 setTrackVisible(false);
                 break;
             case Player.STATE_IDLE:
@@ -664,7 +664,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
                 onKeyDown();
                 break;
             default:
-                App.removeCallbacks(mR6);
                 if (!event.isRetry() || mPlayers.addRetry() > 3) onError();
                 else getUrl();
                 break;
@@ -677,7 +676,12 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void onError() {
+        App.removeCallbacks(mR6);
         mPlayers.reset();
+        checkNext();
+    }
+
+    private void checkNext() {
         if (mChannel.isOnly()) {
             if (isGone(mBinding.recycler)) onKeyDown();
         } else {
