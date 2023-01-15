@@ -104,6 +104,14 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         return (Group) mGroupAdapter.get(0);
     }
 
+    private Live getHome() {
+        return LiveConfig.get().getHome();
+    }
+
+    private int getPlayerType() {
+        return getHome().getPlayerType() != -1 ? getHome().getPlayerType() : Prefers.getLivePlayer();
+    }
+
     private boolean isVisible(View view) {
         return view.getVisibility() == View.VISIBLE;
     }
@@ -171,6 +179,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void setPlayerView() {
+        mPlayers.setPlayer(getPlayerType());
         mBinding.control.player.setText(mPlayers.getPlayerText());
         getExo().setVisibility(mPlayers.isExo() ? View.VISIBLE : View.GONE);
         getIjk().setVisibility(mPlayers.isIjk() ? View.VISIBLE : View.GONE);
@@ -207,7 +216,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void getLive() {
-        mViewModel.getLive(LiveConfig.get().getHome());
+        mViewModel.getLive(getHome());
         showProgress();
     }
 
@@ -303,6 +312,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private void onPlayer() {
         mPlayers.stop();
         mPlayers.togglePlayer();
+        Prefers.putLivePlayer(mPlayers.getPlayer());
         setPlayerView();
         getUrl();
     }
@@ -638,6 +648,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     @Override
     public void setLive(Live item) {
         LiveConfig.get().setHome(item);
+        setPlayerView();
         mHides.clear();
         hideControl();
         getLive();

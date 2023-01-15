@@ -509,7 +509,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void onScale() {
         int index = mHistory.getScale();
-        if (index == -1) index = Prefers.getVodScale();
+        if (index == -1) index = Prefers.getScale();
         String[] array = ResUtil.getStringArray(R.array.select_scale);
         mHistory.setScale(index = index == array.length - 1 ? 0 : ++index);
         setScale(index);
@@ -567,6 +567,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void onPlayer() {
         mPlayers.stop();
         mPlayers.togglePlayer();
+        Prefers.putPlayer(mPlayers.getPlayer());
         mHistory.setPlayer(mPlayers.getPlayer());
         getPlayer(false);
         setPlayerView();
@@ -681,7 +682,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mHistory = mHistory == null ? createHistory() : mHistory;
         setFlagActivated(mHistory.getFlag());
         if (mHistory.isRevSort()) reverseEpisode();
-        setScale(mHistory.getScale() == -1 ? Prefers.getVodScale() : mHistory.getScale());
+        setScale(mHistory.getScale() == -1 ? Prefers.getScale() : mHistory.getScale());
         mBinding.control.opening.setText(mPlayers.stringToTime(mHistory.getOpening()));
         mBinding.control.ending.setText(mPlayers.stringToTime(mHistory.getEnding()));
         mBinding.control.speed.setText(mPlayers.setSpeed(mHistory.getSpeed()));

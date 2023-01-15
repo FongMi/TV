@@ -11,7 +11,7 @@ import okhttp3.Request;
 public class Github {
 
     public static final String A = "https://raw.githubusercontent.com/";
-    public static final String B = "https://ghproxy.com/";
+    public static final String B = "https://gh-proxy.com/";
     public static final String C = "https://raw.iqiq.io/";
     public static final String REPO = "FongMi/TV/";
     public static final String RELEASE = "release";
