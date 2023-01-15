@@ -477,15 +477,17 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     public void selectTrack(int track) {
-        long position = Math.max(mStartPosition, getCurrentPosition());
+        long position = getCurrentPosition();
         mIjkPlayer.selectTrack(track);
-        if (position != 0) postDelayed(() -> seekTo(position), 500);
+        subtitleView.setText("");
+        if (position != 0) seekTo(position);
     }
 
     public void deselectTrack(int track) {
-        long position = Math.max(mStartPosition, getCurrentPosition());
+        long position = getCurrentPosition();
         mIjkPlayer.deselectTrack(track);
-        if (position != 0) postDelayed(() -> seekTo(position), 500);
+        subtitleView.setText("");
+        if (position != 0) seekTo(position);
     }
 
     private void setPreferredTextLanguage() {

@@ -199,7 +199,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
             if (!mIsNativeInitialized) {
                 native_init();
                 native_setDot(0);
-                native_setLogLevel(BuildConfig.DEBUG ? IjkMediaPlayer.IJK_LOG_INFO : IjkMediaPlayer.IJK_LOG_SILENT);
+                native_setLogLevel(IjkMediaPlayer.IJK_LOG_SILENT);
                 mIsNativeInitialized = true;
             }
         }
