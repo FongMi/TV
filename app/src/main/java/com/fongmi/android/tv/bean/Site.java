@@ -125,7 +125,7 @@ public class Site {
     }
 
     public Integer getSwitchable() {
-        return switchable == null ? 0 : switchable;
+        return switchable == null ? 1 : switchable;
     }
 
     public String getExt() {
