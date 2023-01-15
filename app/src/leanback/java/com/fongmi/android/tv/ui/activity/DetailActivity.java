@@ -601,11 +601,13 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         Traffic.reset();
     }
 
-    private void showError() {
+    private void showError(String text) {
+        mBinding.widget.text.setText(text);
         mBinding.widget.error.setVisibility(View.VISIBLE);
     }
 
     private void hideError() {
+        mBinding.widget.text.setText("");
         mBinding.widget.error.setVisibility(View.GONE);
     }
 
@@ -766,7 +768,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
                 checkNext();
                 break;
             default:
-                App.removeCallbacks(mR4);
                 if (!event.isRetry() || mPlayers.addRetry() > 3) onError(event.getMsg());
                 else getPlayer(false);
                 break;
@@ -792,18 +793,21 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onError() {
-        onError("");
+        onError(getString(R.string.error_play_timeout));
     }
 
     private void onError(String msg) {
-        int position = mBinding.flag.getSelectedPosition();
+        showError(msg);
+        hideProgress();
+        App.removeCallbacks(mR4);
+        Clock.get().setCallback(null);
+        checkNext(mBinding.flag.getSelectedPosition());
+    }
+
+    private void checkNext(int position) {
         if (position == mFlagAdapter.size() - 1) {
-            mBinding.widget.text.setText(msg);
-            Clock.get().setCallback(null);
             mPlayers.stop();
-            hideProgress();
             checkSearch();
-            showError();
         } else {
             mPlayers.reset();
             nextFlag(position);
@@ -814,7 +818,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         if (mSearchAdapter.size() > 0 && isAutoMode()) {
             nextSite();
         } else {
-            initSearch(getName(), true);
+            initSearch(getName(), getSite().isSwitchable());
         }
     }
 
