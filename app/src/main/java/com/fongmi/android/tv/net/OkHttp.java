@@ -2,6 +2,8 @@ package com.fongmi.android.tv.net;
 
 import android.util.ArrayMap;
 
+import com.fongmi.android.tv.Constant;
+
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -26,11 +28,11 @@ public class OkHttp {
 
     public static OkHttpClient client() {
         if (get().mOk != null) return get().mOk;
-        return get().mOk = client(30);
+        return get().mOk = client(Constant.TIMEOUT_HTTP);
     }
 
     public static OkHttpClient client(int timeout) {
-        return new OkHttpClient.Builder().connectTimeout(timeout, TimeUnit.SECONDS).hostnameVerifier(SSLSocketFactoryCompat.hostnameVerifier).sslSocketFactory(new SSLSocketFactoryCompat(), SSLSocketFactoryCompat.trustAllCert).build();
+        return new OkHttpClient.Builder().connectTimeout(timeout, TimeUnit.MILLISECONDS).hostnameVerifier(SSLSocketFactoryCompat.hostnameVerifier).sslSocketFactory(new SSLSocketFactoryCompat(), SSLSocketFactoryCompat.trustAllCert).build();
     }
 
     public static Call newCall(String url) {

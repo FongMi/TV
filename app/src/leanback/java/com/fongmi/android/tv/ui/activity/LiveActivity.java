@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.LiveConfig;
 import com.fongmi.android.tv.bean.Channel;
@@ -268,7 +269,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void setTraffic() {
         Traffic.setSpeed(mBinding.widget.traffic);
-        App.post(mR5, 500);
+        App.post(mR5, Constant.INTERVAL_SPEED);
     }
 
     private void onToggle() {
@@ -389,17 +390,17 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void setR1Callback() {
         App.removeCallbacks(mR1);
-        App.post(mR1, 5000);
+        App.post(mR1, Constant.HIDE_TIME);
     }
 
     private void setR3Callback() {
         App.removeCallbacks(mR3);
-        App.post(mR3, 5000);
+        App.post(mR3, Constant.HIDE_TIME);
     }
 
     private void setR6Callback() {
         App.removeCallbacks(mR6);
-        App.post(mR6, 10000);
+        App.post(mR6, Constant.TIMEOUT_LIVE);
     }
 
     private void resetPass() {
@@ -538,7 +539,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     @Override
     public void setUITimer() {
         App.removeCallbacks(mR0);
-        App.post(mR0, 5000);
+        App.post(mR0, Constant.HIDE_TIME);
     }
 
     @Override
