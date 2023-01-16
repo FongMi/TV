@@ -6,7 +6,8 @@
       "url": "file://Download/live.txt",
       "epg": "http://epg.51zmt.top:8000/api/diyp/?ch={name}&date={date}",
       "logo": "https://epg.112114.xyz/logo/{name}.png",
-      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36",
+      "boot": false
     },
     {
       "name": "M3U",
@@ -14,14 +15,22 @@
       "url": "file://Download/live.m3u",
       "epg": "https://epg.112114.xyz/?ch={name}&date={date}",
       "logo": "https://epg.112114.xyz/logo/{name}.png",
-      "ua": "okhttp/3.15"
+      "ua": "okhttp/3.15",
+      "boot": false
+    },
+    {
+      "name": "IJK",
+      "type": 0,
+      "url": "file://Download/live.m3u",
+      "playerType": 1
     },
     {
       "name": "JSON",
       "type": 1,
       "url": "file://Download/live.json",
       "epg": "http://epg.51zmt.top:8000/api/diyp/?ch={epg}&date={date}",
-      "logo": "http://epg.51zmt.top:8000/{logo}"
+      "logo": "http://epg.51zmt.top:8000/{logo}",
+      "boot": false
     }
   ]
 }
