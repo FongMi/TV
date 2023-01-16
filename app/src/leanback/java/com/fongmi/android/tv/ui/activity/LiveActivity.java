@@ -269,7 +269,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void setTraffic() {
         Traffic.setSpeed(mBinding.widget.traffic);
-        App.post(mR5, Constant.INTERVAL_SPEED);
+        App.post(mR5, Constant.INTERVAL_TRAFFIC);
     }
 
     private void onToggle() {
@@ -390,12 +390,12 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void setR1Callback() {
         App.removeCallbacks(mR1);
-        App.post(mR1, Constant.HIDE_TIME);
+        App.post(mR1, Constant.INTERVAL_HIDE);
     }
 
     private void setR3Callback() {
         App.removeCallbacks(mR3);
-        App.post(mR3, Constant.HIDE_TIME);
+        App.post(mR3, Constant.INTERVAL_HIDE);
     }
 
     private void setR6Callback() {
@@ -539,7 +539,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     @Override
     public void setUITimer() {
         App.removeCallbacks(mR0);
-        App.post(mR0, Constant.HIDE_TIME);
+        App.post(mR0, Constant.INTERVAL_HIDE);
     }
 
     @Override
