@@ -139,7 +139,7 @@ public class ParseTask {
 
     public void cancel() {
         if (executor != null) executor.shutdownNow();
-        if (webView != null) webView.stop(false);
+        if (webView != null) webView.stop();
         executor = null;
         callback = null;
         webView = null;

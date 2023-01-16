@@ -83,6 +83,14 @@ public class Prefers {
         put("player", player);
     }
 
+    public static int getLivePlayer() {
+        return getInt("player_live", getPlayer());
+    }
+
+    public static void putLivePlayer(int player) {
+        put("player_live", player);
+    }
+
     public static int getDecode() {
         return getInt("decode", 1);
     }
@@ -131,24 +139,24 @@ public class Prefers {
         put("keyword", keyword);
     }
 
-    public static int getVodScale() {
-        return getInt("vodScale");
+    public static int getScale() {
+        return getInt("scale");
     }
 
-    public static void putVodScale(int scale) {
-        put("vodScale", scale);
+    public static void putScale(int scale) {
+        put("scale", scale);
     }
 
     public static int getLiveScale() {
-        return getInt("liveScale", getVodScale());
+        return getInt("scale_live", getScale());
     }
 
     public static void putLiveScale(int scale) {
-        put("liveScale", scale);
+        put("scale_live", scale);
     }
 
     public static boolean isInvert() {
-        return getBoolean("invert", false);
+        return getBoolean("invert");
     }
 
     public static void putInvert(boolean invert) {

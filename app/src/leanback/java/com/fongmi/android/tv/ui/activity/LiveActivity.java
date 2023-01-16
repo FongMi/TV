@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.LiveConfig;
 import com.fongmi.android.tv.bean.Channel;
@@ -104,6 +105,14 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         return (Group) mGroupAdapter.get(0);
     }
 
+    private Live getHome() {
+        return LiveConfig.get().getHome();
+    }
+
+    private int getPlayerType() {
+        return getHome().getPlayerType() != -1 ? getHome().getPlayerType() : Prefers.getLivePlayer();
+    }
+
     private boolean isVisible(View view) {
         return view.getVisibility() == View.VISIBLE;
     }
@@ -171,6 +180,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void setPlayerView() {
+        mPlayers.setPlayer(getPlayerType());
         mBinding.control.player.setText(mPlayers.getPlayerText());
         getExo().setVisibility(mPlayers.isExo() ? View.VISIBLE : View.GONE);
         getIjk().setVisibility(mPlayers.isIjk() ? View.VISIBLE : View.GONE);
@@ -207,7 +217,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void getLive() {
-        mViewModel.getLive(LiveConfig.get().getHome());
+        mViewModel.getLive(getHome());
         showProgress();
     }
 
@@ -259,7 +269,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void setTraffic() {
         Traffic.setSpeed(mBinding.widget.traffic);
-        App.post(mR5, 500);
+        App.post(mR5, Constant.INTERVAL_TRAFFIC);
     }
 
     private void onToggle() {
@@ -303,6 +313,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private void onPlayer() {
         mPlayers.stop();
         mPlayers.togglePlayer();
+        Prefers.putLivePlayer(mPlayers.getPlayer());
         setPlayerView();
         getUrl();
     }
@@ -379,17 +390,17 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void setR1Callback() {
         App.removeCallbacks(mR1);
-        App.post(mR1, 5000);
+        App.post(mR1, Constant.INTERVAL_HIDE);
     }
 
     private void setR3Callback() {
         App.removeCallbacks(mR3);
-        App.post(mR3, 5000);
+        App.post(mR3, Constant.INTERVAL_HIDE);
     }
 
     private void setR6Callback() {
         App.removeCallbacks(mR6);
-        App.post(mR6, 10000);
+        App.post(mR6, Constant.TIMEOUT_LIVE);
     }
 
     private void resetPass() {
@@ -477,6 +488,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void getUrl() {
         mViewModel.getUrl(mChannel);
+        setR6Callback();
         showProgress();
     }
 
@@ -527,7 +539,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     @Override
     public void setUITimer() {
         App.removeCallbacks(mR0);
-        App.post(mR0, 5000);
+        App.post(mR0, Constant.INTERVAL_HIDE);
     }
 
     @Override
@@ -637,6 +649,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     @Override
     public void setLive(Live item) {
         LiveConfig.get().setHome(item);
+        setPlayerView();
         mHides.clear();
         hideControl();
         getLive();
@@ -646,7 +659,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     public void onPlayerEvent(PlayerEvent event) {
         switch (event.getState()) {
             case 0:
-                setR6Callback();
                 setTrackVisible(false);
                 break;
             case Player.STATE_IDLE:
@@ -664,7 +676,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
                 onKeyDown();
                 break;
             default:
-                App.removeCallbacks(mR6);
                 if (!event.isRetry() || mPlayers.addRetry() > 3) onError();
                 else getUrl();
                 break;
@@ -677,7 +688,12 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void onError() {
+        App.removeCallbacks(mR6);
         mPlayers.reset();
+        checkNext();
+    }
+
+    private void checkNext() {
         if (mChannel.isOnly()) {
             if (isGone(mBinding.recycler)) onKeyDown();
         } else {
