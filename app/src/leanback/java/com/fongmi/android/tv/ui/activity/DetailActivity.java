@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.History;
@@ -640,17 +641,17 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void setTraffic() {
         Traffic.setSpeed(mBinding.widget.traffic);
-        App.post(mR3, 500);
+        App.post(mR3, Constant.INTERVAL_SPEED);
     }
 
     private void setR1Callback() {
         App.removeCallbacks(mR1);
-        App.post(mR1, 5000);
+        App.post(mR1, Constant.HIDE_TIME);
     }
 
     private void setR4Callback() {
         App.removeCallbacks(mR4);
-        App.post(mR4, 15000);
+        App.post(mR4, Constant.TIMEOUT_VOD);
     }
 
     private void getPart(String source) {
@@ -832,7 +833,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void startSearch(String keyword) {
         mSearchAdapter.clear();
-        mExecutor = Executors.newFixedThreadPool(5);
+        mExecutor = Executors.newFixedThreadPool(Constant.THREAD_POOL);
         for (Site site : ApiConfig.get().getSites()) if (site.isSearchable() && !site.getKey().equals(getKey())) mExecutor.execute(() -> search(site, keyword));
     }
 
