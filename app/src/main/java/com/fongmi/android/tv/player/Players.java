@@ -109,6 +109,7 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     public void reset() {
         this.errorCode = 0;
         this.retry = 0;
+        stopParse();
     }
 
     public int getRetry() {

@@ -115,26 +115,18 @@ public class CustomWebView extends WebView {
         String cookie = CookieManager.getInstance().getCookie(url);
         if (!TextUtils.isEmpty(cookie)) news.put("cookie", cookie);
         for (String key : headers.keySet()) if (keys.contains(key.toLowerCase())) news.put(key, headers.get(key));
-        App.post(() -> {
-            onSuccess(news, url);
-            stop(false);
-        });
+        App.post(() -> onSuccess(news, url));
     }
 
-    public void stop(boolean error) {
+    public void stop() {
         stopLoading();
         loadUrl("about:blank");
-        if (error) App.post(this::onError);
-        else callback = null;
+        callback = null;
     }
 
     private void onSuccess(Map<String, String> news, String url) {
         if (callback != null) callback.onParseSuccess(news, url, "");
         callback = null;
-    }
-
-    private void onError() {
-        if (callback != null) callback.onParseError();
-        callback = null;
+        stop();
     }
 }
