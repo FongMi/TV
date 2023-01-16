@@ -2,7 +2,6 @@ package com.fongmi.android.tv.player;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.api.ApiConfig;
-import com.fongmi.android.tv.api.XWalk;
 import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.net.OkHttp;
@@ -112,17 +111,7 @@ public class ParseTask {
     }
 
     private void startWeb(String key, String url, Map<String, String> headers, Callback callback) {
-        XWalk.get().init(new XWalk.State() {
-            @Override
-            public void success() {
-                webView = CustomWebView.create(App.get()).start(key, url, headers, callback);
-            }
-
-            @Override
-            public void fail() {
-                onParseError();
-            }
-        });
+        webView = CustomWebView.create(App.get()).start(key, url, headers, callback);
     }
 
     private void onParseSuccess(Map<String, String> headers, String url, String from) {
