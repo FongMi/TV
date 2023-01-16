@@ -800,6 +800,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void onError(String msg) {
         showError(msg);
         hideProgress();
+        mPlayers.reset();
         App.removeCallbacks(mR4);
         Clock.get().setCallback(null);
         checkNext(mBinding.flag.getSelectedPosition());
@@ -807,10 +808,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void checkNext(int position) {
         if (position == mFlagAdapter.size() - 1) {
-            mPlayers.stop();
             checkSearch();
         } else {
-            mPlayers.reset();
             nextFlag(position);
         }
     }
