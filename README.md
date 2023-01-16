@@ -18,7 +18,7 @@ playerType：播放器  (1：IJK、2：EXO)</code></pre>
 
 ### 直播欄位
 
-<pre><code>ua：UA設置
+<pre><code>ua：用戶代理
 epg：節目網址
 logo：台標網址
 boot：是否自動開啟
