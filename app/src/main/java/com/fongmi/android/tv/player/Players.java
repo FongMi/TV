@@ -347,9 +347,9 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
 
     private void setTrackIjk(Track item) {
         if (item.isSelected()) {
-            ijkPlayer.selectTrack(item.getTrack());
+            ijkPlayer.selectTrack(item.getType(), item.getTrack());
         } else {
-            ijkPlayer.deselectTrack(item.getTrack());
+            ijkPlayer.deselectTrack(item.getType(), item.getTrack());
         }
     }
 
