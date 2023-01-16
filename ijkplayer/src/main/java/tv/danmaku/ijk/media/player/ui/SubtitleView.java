@@ -39,7 +39,7 @@ public class SubtitleView extends TextView {
         if (TextUtils.isEmpty(text)) {
             setText("");
         } else {
-            setText(Html.fromHtml(text.replaceAll("(?:\\r\\n)", "<br>").replaceAll("(?:\\r)", "<br>").replaceAll("(?:\\n)", "<br>").replaceAll("\\{[\\s\\S]*\\}", "")));
+            setText(Html.fromHtml(text.replaceAll("\\{\\\\.*?\\}", "")));
         }
     }
 
