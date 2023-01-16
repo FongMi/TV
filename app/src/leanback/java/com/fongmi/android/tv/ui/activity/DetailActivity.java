@@ -641,12 +641,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void setTraffic() {
         Traffic.setSpeed(mBinding.widget.traffic);
-        App.post(mR3, Constant.INTERVAL_SPEED);
+        App.post(mR3, Constant.INTERVAL_TRAFFIC);
     }
 
     private void setR1Callback() {
         App.removeCallbacks(mR1);
-        App.post(mR1, Constant.HIDE_TIME);
+        App.post(mR1, Constant.INTERVAL_HIDE);
     }
 
     private void setR4Callback() {
