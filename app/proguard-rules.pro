@@ -48,11 +48,3 @@
 # ZLive
 -keep class com.sun.jna.** { *; }
 -keep class com.east.android.zlive.** { *; }
-
-# XWalk
--keep class org.xwalk.core.** { *; }
--keep class org.crosswalk.engine.** { *; }
--keep class org.chromium.** { *; }
--dontwarn android.view.**
--dontwarn android.media.**
--dontwarn org.chromium.**
