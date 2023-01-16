@@ -1,5 +1,7 @@
 package com.fongmi.android.tv.net;
 
+import com.fongmi.android.tv.Constant;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -13,7 +15,7 @@ import okhttp3.Request;
 
 public class OkHttp {
 
-    private final OkHttpClient mOk;
+    private OkHttpClient mOk;
 
     private static class Loader {
         static volatile OkHttp INSTANCE = new OkHttp();
@@ -23,28 +25,25 @@ public class OkHttp {
         return Loader.INSTANCE;
     }
 
-    public OkHttp() {
-        mOk = getBuilder().build();
+    public static OkHttpClient client() {
+        if (get().mOk != null) return get().mOk;
+        return get().mOk = client(Constant.TIMEOUT_HTTP);
     }
 
-    private OkHttpClient.Builder getBuilder() {
-        return new OkHttpClient.Builder().connectTimeout(30, TimeUnit.SECONDS).hostnameVerifier(SSLSocketFactoryCompat.hostnameVerifier).sslSocketFactory(new SSLSocketFactoryCompat(), SSLSocketFactoryCompat.trustAllCert);
-    }
-
-    private OkHttpClient client() {
-        return mOk;
+    public static OkHttpClient client(int timeout) {
+        return new OkHttpClient.Builder().connectTimeout(timeout, TimeUnit.MILLISECONDS).hostnameVerifier(SSLSocketFactoryCompat.hostnameVerifier).sslSocketFactory(new SSLSocketFactoryCompat(), SSLSocketFactoryCompat.trustAllCert).build();
     }
 
     public static Call newCall(String url) {
-        return get().client().newCall(new Request.Builder().url(url).build());
+        return client().newCall(new Request.Builder().url(url).build());
     }
 
     public static Call newCall(String url, Headers headers) {
-        return get().client().newCall(new Request.Builder().url(url).headers(headers).build());
+        return client().newCall(new Request.Builder().url(url).headers(headers).build());
     }
 
     public static Call newCall(String url, LinkedHashMap<String, String> params) {
-        return get().client().newCall(new Request.Builder().url(buildUrl(url, params)).build());
+        return client().newCall(new Request.Builder().url(buildUrl(url, params)).build());
     }
 
     private static HttpUrl buildUrl(String url, LinkedHashMap<String, String> params) {
