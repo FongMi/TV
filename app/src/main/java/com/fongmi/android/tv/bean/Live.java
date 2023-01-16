@@ -14,6 +14,8 @@ public class Live {
 
     @SerializedName("type")
     private int type;
+    @SerializedName("boot")
+    private boolean boot;
     @SerializedName("name")
     private String name;
     @SerializedName("group")
@@ -26,6 +28,8 @@ public class Live {
     private String epg;
     @SerializedName("ua")
     private String ua;
+    @SerializedName("playerType")
+    private Integer playerType;
     @SerializedName("channels")
     private List<Channel> channels;
     @SerializedName("groups")
@@ -56,6 +60,10 @@ public class Live {
         return type;
     }
 
+    public boolean isBoot() {
+        return boot;
+    }
+
     public String getName() {
         return TextUtils.isEmpty(name) ? "" : name;
     }
@@ -78,6 +86,10 @@ public class Live {
 
     public String getUa() {
         return TextUtils.isEmpty(ua) ? "" : ua;
+    }
+
+    public int getPlayerType() {
+        return playerType == null ? -1 : playerType == 1 ? 1 : 0;
     }
 
     private List<Channel> getChannels() {

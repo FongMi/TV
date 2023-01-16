@@ -3,9 +3,17 @@ package com.fongmi.android.tv.ui.custom;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.http.SslError;
-import android.webkit.ValueCallback;
+import android.text.TextUtils;
+import android.webkit.CookieManager;
+import android.webkit.SslErrorHandler;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.api.ApiConfig;
@@ -14,24 +22,19 @@ import com.fongmi.android.tv.player.ParseTask;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.crawler.Spider;
 
-import org.xwalk.core.XWalkResourceClient;
-import org.xwalk.core.XWalkView;
-import org.xwalk.core.XWalkWebResourceRequest;
-import org.xwalk.core.XWalkWebResourceResponse;
-
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CustomWebView extends XWalkView {
+public class CustomWebView extends WebView {
 
     private ParseTask.Callback callback;
+    private WebResourceResponse empty;
     private List<String> keys;
     private String key;
     private String ads;
-    private int retry;
 
     public static CustomWebView create(@NonNull Context context) {
         return new CustomWebView(context);
@@ -46,17 +49,15 @@ public class CustomWebView extends XWalkView {
     public void initSettings() {
         this.ads = ApiConfig.get().getAds();
         this.keys = Arrays.asList("user-agent", "referer", "origin");
-        setResourceClient(webViewClient());
-        getSettings().setAllowFileAccess(true);
+        this.empty = new WebResourceResponse("text/plain", "utf-8", new ByteArrayInputStream("".getBytes()));
         getSettings().setUseWideViewPort(true);
         getSettings().setDatabaseEnabled(true);
         getSettings().setDomStorageEnabled(true);
         getSettings().setJavaScriptEnabled(true);
-        getSettings().setAllowContentAccess(true);
         getSettings().setLoadWithOverviewMode(true);
-        getSettings().setAllowFileAccessFromFileURLs(true);
-        getSettings().setAllowUniversalAccessFromFileURLs(true);
         getSettings().setJavaScriptCanOpenWindowsAutomatically(false);
+        getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        setWebViewClient(webViewClient());
     }
 
     private void setUserAgent(Map<String, String> headers) {
@@ -76,26 +77,27 @@ public class CustomWebView extends XWalkView {
         return this;
     }
 
-    private XWalkResourceClient webViewClient() {
-        return new XWalkResourceClient(this) {
+    private WebViewClient webViewClient() {
+        return new WebViewClient() {
+            @Nullable
             @Override
-            public XWalkWebResourceResponse shouldInterceptLoadRequest(XWalkView view, XWalkWebResourceRequest request) {
+            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
                 String url = request.getUrl().toString();
                 String host = request.getUrl().getHost();
-                if (ads.contains(host)) return createXWalkWebResourceResponse("text/plain", "utf-8", new ByteArrayInputStream("".getBytes()));
-                App.post(mTimer, 15 * 1000);
+                if (ads.contains(host)) return empty;
                 Map<String, String> headers = request.getRequestHeaders();
                 if (isVideoFormat(url, headers)) post(headers, url);
-                return super.shouldInterceptLoadRequest(view, request);
+                return super.shouldInterceptRequest(view, request);
             }
 
             @Override
-            public void onReceivedSslError(XWalkView view, ValueCallback<Boolean> callback, SslError error) {
-                callback.onReceiveValue(true);
+            @SuppressLint("WebViewClientOnReceivedSslError")
+            public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+                handler.proceed();
             }
 
             @Override
-            public boolean shouldOverrideUrlLoading(XWalkView view, String url) {
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 return false;
             }
         };
@@ -108,40 +110,23 @@ public class CustomWebView extends XWalkView {
         return Utils.isVideoFormat(url, headers);
     }
 
-    private final Runnable mTimer = new Runnable() {
-        @Override
-        public void run() {
-            if (retry > 3) return;
-            if (retry++ == 3) stop(true);
-            else reload(RELOAD_NORMAL);
-        }
-    };
-
     private void post(Map<String, String> headers, String url) {
         Map<String, String> news = new HashMap<>();
+        String cookie = CookieManager.getInstance().getCookie(url);
+        if (!TextUtils.isEmpty(cookie)) news.put("cookie", cookie);
         for (String key : headers.keySet()) if (keys.contains(key.toLowerCase())) news.put(key, headers.get(key));
-        App.removeCallbacks(mTimer);
-        App.post(() -> {
-            onSuccess(news, url);
-            stop(false);
-        });
+        App.post(() -> onSuccess(news, url));
     }
 
-    public void stop(boolean error) {
+    public void stop() {
         stopLoading();
         loadUrl("about:blank");
-        App.removeCallbacks(mTimer);
-        if (error) App.post(this::onError);
-        else callback = null;
+        callback = null;
     }
 
     private void onSuccess(Map<String, String> news, String url) {
         if (callback != null) callback.onParseSuccess(news, url, "");
         callback = null;
-    }
-
-    private void onError() {
-        if (callback != null) callback.onParseError();
-        callback = null;
+        stop();
     }
 }
