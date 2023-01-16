@@ -1,12 +1,14 @@
 package com.fongmi.android.tv.net;
 
 import java.util.LinkedHashMap;
+
+import com.fongmi.android.tv.Constant;
+
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
-import okhttp3.ConnectionPool;
 import okhttp3.Headers;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
@@ -26,12 +28,11 @@ public class OkHttp {
 
     public static OkHttpClient client() {
         if (get().mOk != null) return get().mOk;
-        return get().mOk = client(30);
+        return get().mOk = client(Constant.TIMEOUT_HTTP);
     }
 
     public static OkHttpClient client(int timeout) {
-        return new OkHttpClient.Builder().connectionPool(new ConnectionPool(20, 5, TimeUnit.MINUTES)).connectTimeout(timeout, TimeUnit.SECONDS).hostnameVerifier(SSLSocketFactoryCompat.hostnameVerifier).sslSocketFactory(new SSLSocketFactoryCompat(), SSLSocketFactoryCompat.trustAllCert).build();
-
+        return new OkHttpClient.Builder().connectTimeout(timeout, TimeUnit.MILLISECONDS).hostnameVerifier(SSLSocketFactoryCompat.hostnameVerifier).sslSocketFactory(new SSLSocketFactoryCompat(), SSLSocketFactoryCompat.trustAllCert).build();
     }
 
     public static Call newCall(String url) {

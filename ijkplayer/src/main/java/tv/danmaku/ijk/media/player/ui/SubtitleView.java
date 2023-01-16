@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.text.Html;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
@@ -31,6 +33,14 @@ public class SubtitleView extends TextView {
 
     private void init() {
         strokeWidth = Utils.dp2px(getContext(), 0.6f);
+    }
+
+    public void onSubtitleChanged(String text) {
+        if (TextUtils.isEmpty(text)) {
+            setText("");
+        } else {
+            setText(Html.fromHtml(text.replaceAll("\\{\\\\.*?\\}", "")));
+        }
     }
 
     @Override

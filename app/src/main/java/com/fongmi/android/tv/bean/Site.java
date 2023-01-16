@@ -15,7 +15,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.Collections;
 import java.util.List;
 
-@Entity(ignoredColumns = {"type", "api", "playUrl", "ext", "jar", "categories"})
+@Entity(ignoredColumns = {"type", "api", "playUrl", "switchable", "ext", "jar", "categories"})
 public class Site {
 
     @NonNull
@@ -34,6 +34,8 @@ public class Site {
     private Integer searchable;
     @SerializedName("filterable")
     private Integer filterable;
+    @SerializedName("switchable")
+    private Integer switchable;
     @SerializedName("ext")
     private String ext;
     @SerializedName("jar")
@@ -116,6 +118,10 @@ public class Site {
         this.filterable = filterable;
     }
 
+    public Integer getSwitchable() {
+        return switchable == null ? 1 : switchable;
+    }
+
     public String getExt() {
         return TextUtils.isEmpty(ext) ? "" : ext;
     }
@@ -142,6 +148,10 @@ public class Site {
 
     public void setActivated(Site item) {
         this.activated = item.equals(this);
+    }
+
+    public boolean isSwitchable() {
+        return getSwitchable() == 1;
     }
 
     public boolean isSearchable() {

@@ -109,6 +109,7 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     public void reset() {
         this.errorCode = 0;
         this.retry = 0;
+        stopParse();
     }
 
     public int getRetry() {
@@ -185,7 +186,6 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
 
     public void togglePlayer() {
         setPlayer(player == 0 ? 1 : 0);
-        Prefers.putPlayer(player);
     }
 
     public void toggleDecode() {
@@ -347,9 +347,9 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
 
     private void setTrackIjk(Track item) {
         if (item.isSelected()) {
-            ijkPlayer.selectTrack(item.getTrack());
+            ijkPlayer.selectTrack(item.getType(), item.getTrack());
         } else {
-            ijkPlayer.deselectTrack(item.getTrack());
+            ijkPlayer.deselectTrack(item.getType(), item.getTrack());
         }
     }
 
@@ -373,11 +373,6 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     @Override
     public void onPlaybackStateChanged(int state) {
         PlayerEvent.state(state);
-    }
-
-    @Override
-    public void onAudioSinkError(@NonNull EventTime eventTime, @NonNull Exception audioSinkError) {
-        seekTo(200);
     }
 
     @Override

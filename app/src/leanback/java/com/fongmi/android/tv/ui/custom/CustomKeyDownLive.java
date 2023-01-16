@@ -8,6 +8,7 @@ import android.view.MotionEvent;
 import androidx.annotation.NonNull;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.Utils;
 
@@ -115,11 +116,11 @@ public class CustomKeyDownLive extends GestureDetector.SimpleOnGestureListener {
     }
 
     private int addTime() {
-        return holdTime = holdTime + 10000;
+        return holdTime = holdTime + Constant.INTERVAL_SEEK;
     }
 
     private int subTime() {
-        return holdTime = holdTime - 10000;
+        return holdTime = holdTime - Constant.INTERVAL_SEEK;
     }
 
     public void resetTime() {
