@@ -125,7 +125,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     private void removeRenderView() {
-        if (mRenderView != null) return;
+        if (mRenderView == null) return;
         mContentFrame.removeView(mRenderView.getView());
         mRenderView.removeRenderCallback(mSHCallback);
         mRenderView = null;
