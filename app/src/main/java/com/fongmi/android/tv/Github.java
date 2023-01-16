@@ -17,7 +17,6 @@ public class Github {
     public static final String REPO = "FongMi/TV/";
     public static final String RELEASE = "release";
     public static final String DEV = "dev";
-    public static final int TIME = 5;
 
     private String proxy;
 
@@ -39,7 +38,7 @@ public class Github {
     private void check(String url) {
         try {
             if (getProxy().length() > 0) return;
-            int code = OkHttp.client(TIME).newCall(new Request.Builder().url(url).build()).execute().code();
+            int code = OkHttp.client(Constant.TIMEOUT_GITHUB).newCall(new Request.Builder().url(url).build()).execute().code();
             if (code == 200) setProxy(url);
         } catch (IOException ignored) {
         }
