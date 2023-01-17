@@ -14,6 +14,10 @@ public class ErrorEvent {
         EventBus.getDefault().post(new ErrorEvent(Type.URL, false));
     }
 
+    public static void ads() {
+        EventBus.getDefault().post(new ErrorEvent(Type.ADS, false));
+    }
+
     public static void parse() {
         EventBus.getDefault().post(new ErrorEvent(Type.PARSE, false));
     }
@@ -47,8 +51,8 @@ public class ErrorEvent {
         return retry;
     }
 
-    public boolean isUrl() {
-        return getType() == Type.URL;
+    public boolean isAds() {
+        return getType() == Type.ADS;
     }
 
     public boolean isParse() {
@@ -60,6 +64,6 @@ public class ErrorEvent {
     }
 
     public enum Type {
-        URL, PARSE, FORMAT, TIMEOUT
+        ADS, URL, PARSE, FORMAT, TIMEOUT
     }
 }
