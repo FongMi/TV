@@ -90,6 +90,7 @@ public final class TrackSelectionDialog implements TrackAdapter.OnClickListener 
             for (int j = 0; j < trackGroup.length; j++) {
                 Track item = new Track(type, provider.getTrackName(trackGroup.getTrackFormat(j)));
                 item.setSelected(trackGroup.isTrackSelected(j));
+                item.setPlayer(player.getPlayer());
                 item.setGroup(i);
                 item.setTrack(j);
                 items.add(item);
@@ -104,6 +105,7 @@ public final class TrackSelectionDialog implements TrackAdapter.OnClickListener 
             IjkTrackInfo trackInfo = trackInfos[i];
             if (trackInfo.getTrackType() != type) continue;
             Track item = new Track(type, provider.getTrackName(trackInfo));
+            item.setPlayer(player.getPlayer());
             item.setSelected(track == i);
             item.setTrack(i);
             items.add(item);
