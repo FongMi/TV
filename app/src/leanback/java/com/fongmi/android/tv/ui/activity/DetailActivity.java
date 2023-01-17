@@ -817,34 +817,25 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void checkError(ErrorEvent event) {
-        if (event.isParse() && mParseAdapter.size() > 0) {
-            checkParse();
-        } else {
-            checkFlag();
-        }
+        if (event.isParse() && mParseAdapter.size() > 0) checkParse();
+        else checkFlag();
     }
 
     private void checkParse() {
         int position = getParsePosition();
-        position = position < mParseAdapter.size() - 1 ? ++position : 0;
-        setParseActivated((Parse) mParseAdapter.get(position));
+        if (position == mParseAdapter.size() - 1) checkFlag();
+        else nextParse(position);
     }
 
     private void checkFlag() {
         int position = mBinding.flag.getSelectedPosition();
-        if (position == mFlagAdapter.size() - 1) {
-            checkSearch();
-        } else {
-            nextFlag(position);
-        }
+        if (position == mFlagAdapter.size() - 1 || !getSite().isSwitchable()) checkSearch();
+        else nextFlag(position);
     }
 
     private void checkSearch() {
-        if (mSearchAdapter.size() > 0 && isAutoMode()) {
-            nextSite();
-        } else {
-            initSearch(getName(), getSite().isSwitchable());
-        }
+        if (isAutoMode() && mSearchAdapter.size() > 0) nextSite();
+        else initSearch(getName(), getSite().isSwitchable());
     }
 
     private void initSearch(String keyword, boolean auto) {
@@ -884,6 +875,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         String keyword = mBinding.part.getTag().toString();
         if (isAutoMode()) return !item.getVodName().equals(keyword);
         else return !item.getVodName().contains(keyword);
+    }
+
+    private void nextParse(int position) {
+        Parse parse = (Parse) mParseAdapter.get(position + 1);
+        Notify.show(ResUtil.getString(R.string.play_switch_parse, parse.getName()));
+        setParseActivated(parse);
     }
 
     private void nextFlag(int position) {
