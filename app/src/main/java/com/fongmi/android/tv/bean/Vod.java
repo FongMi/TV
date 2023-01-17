@@ -156,6 +156,10 @@ public class Vod {
         return getSite() == null ? "" : getSite().getName();
     }
 
+    public String getSiteKey() {
+        return getSite() == null ? "" : getSite().getKey();
+    }
+
     public int getSiteVisible() {
         return getSite() == null ? View.GONE : View.VISIBLE;
     }

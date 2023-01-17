@@ -199,6 +199,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
             if (!mIsNativeInitialized) {
                 native_init();
                 native_setDot(0);
+                native_setLogLevel(IjkMediaPlayer.IJK_LOG_SILENT);
                 mIsNativeInitialized = true;
             }
         }
@@ -573,11 +574,17 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     }
 
     public void selectTrack(int track) {
-        _setStreamSelected(track, true);
+        try {
+            _setStreamSelected(track, true);
+        } catch (Throwable ignored) {
+        }
     }
 
     public void deselectTrack(int track) {
-        _setStreamSelected(track, false);
+        try {
+            _setStreamSelected(track, false);
+        } catch (Throwable ignored) {
+        }
     }
 
     private native void _setStreamSelected(int stream, boolean select);

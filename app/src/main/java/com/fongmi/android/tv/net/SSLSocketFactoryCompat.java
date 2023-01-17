@@ -60,7 +60,7 @@ public class SSLSocketFactoryCompat extends SSLSocketFactory {
             defaultFactory = sslContext.getSocketFactory();
             HttpsURLConnection.setDefaultSSLSocketFactory(defaultFactory);
         } catch (GeneralSecurityException e) {
-            throw new AssertionError(); // The system has no TLS. Just give up.
+            throw new AssertionError();
         }
     }
 

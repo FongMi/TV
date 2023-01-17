@@ -22,8 +22,8 @@ import okhttp3.Response;
 
 public class ParseTask {
 
-    private CustomWebView webView;
     private ExecutorService executor;
+    private CustomWebView webView;
     private Callback callback;
     private Parse parse;
 
@@ -33,7 +33,6 @@ public class ParseTask {
 
     public ParseTask(Callback callback) {
         this.executor = Executors.newSingleThreadExecutor();
-        this.webView = new CustomWebView(App.get());
         this.callback = callback;
     }
 
@@ -112,7 +111,7 @@ public class ParseTask {
     }
 
     private void startWeb(String key, String url, Map<String, String> headers, Callback callback) {
-        if (webView != null) webView.start(key, url, headers, callback);
+        webView = CustomWebView.create(App.get()).start(key, url, headers, callback);
     }
 
     private void onParseSuccess(Map<String, String> headers, String url, String from) {
@@ -129,7 +128,7 @@ public class ParseTask {
 
     public void cancel() {
         if (executor != null) executor.shutdownNow();
-        webView.stop(false);
+        if (webView != null) webView.stop();
         executor = null;
         callback = null;
         webView = null;

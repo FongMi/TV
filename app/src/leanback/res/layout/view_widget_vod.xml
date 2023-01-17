@@ -24,7 +24,7 @@
             android:shadowRadius="1"
             android:singleLine="true"
             android:textColor="@color/white"
-            android:textSize="18sp"
+            android:textSize="20sp"
             tools:text="慶餘年第一季：第一集" />
 
         <TextView
@@ -39,7 +39,7 @@
             android:shadowDy="2"
             android:shadowRadius="1"
             android:textColor="@color/white"
-            android:textSize="14sp"
+            android:textSize="16sp"
             tools:text="1920 x 1080" />
 
         <TextView
@@ -54,7 +54,7 @@
             android:shadowDy="2"
             android:shadowRadius="1"
             android:textColor="@color/white"
-            android:textSize="18sp"
+            android:textSize="20sp"
             tools:text="09:20:00" />
 
     </RelativeLayout>

@@ -1,22 +1,46 @@
 package com.fongmi.android.tv.bean;
 
+import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.Index;
+import androidx.room.PrimaryKey;
+
+import com.fongmi.android.tv.db.AppDatabase;
+
+import java.util.List;
+
+@Entity(indices = @Index(value = {"key", "player", "type"}, unique = true))
 public class Track {
 
+    @PrimaryKey(autoGenerate = true)
+    private int id;
+    private int type;
     private int group;
     private int track;
+    private int player;
+    private String key;
     private String name;
     private boolean selected;
 
-    public Track(String name) {
+    public Track(int type, String name) {
+        this.type = type;
         this.name = name;
     }
 
-    public String getName() {
-        return name;
+    public int getId() {
+        return id;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 
     public int getGroup() {
@@ -35,11 +59,56 @@ public class Track {
         this.track = track;
     }
 
+    public int getPlayer() {
+        return player;
+    }
+
+    public void setPlayer(int player) {
+        this.player = player;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(@NonNull String key) {
+        this.key = key;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public boolean isSelected() {
         return selected;
     }
 
     public void setSelected(boolean selected) {
         this.selected = selected;
+    }
+
+    public boolean isExo(int player) {
+        return getPlayer() == player && player == 0;
+    }
+
+    public boolean isIjk(int player) {
+        return getPlayer() == player && player == 1;
+    }
+
+    public Track toggle() {
+        setSelected(!isSelected());
+        return this;
+    }
+
+    public void save() {
+        AppDatabase.get().getTrackDao().insert(this);
+    }
+
+    public static List<Track> find(String key) {
+        return AppDatabase.get().getTrackDao().find(key);
     }
 }
