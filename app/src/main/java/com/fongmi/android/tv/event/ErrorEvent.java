@@ -47,6 +47,10 @@ public class ErrorEvent {
         return retry;
     }
 
+    public boolean isUrl() {
+        return getType() == Type.URL;
+    }
+
     public boolean isParse() {
         return getType() == Type.PARSE;
     }
