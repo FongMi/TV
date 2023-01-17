@@ -4,7 +4,6 @@ import android.graphics.Color;
 import android.net.Uri;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Sub;
 import com.fongmi.android.tv.utils.FileUtil;
@@ -99,7 +98,7 @@ public class ExoUtil {
     }
 
     private static synchronized HttpDataSource.Factory getHttpDataSourceFactory() {
-        if (httpDataSourceFactory == null) httpDataSourceFactory = new DefaultHttpDataSource.Factory().setConnectTimeoutMs(5000).setReadTimeoutMs(5000).setBlackList(ApiConfig.get().getAds()).setAllowCrossProtocolRedirects(true);
+        if (httpDataSourceFactory == null) httpDataSourceFactory = new DefaultHttpDataSource.Factory().setConnectTimeoutMs(5000).setReadTimeoutMs(5000).setAllowCrossProtocolRedirects(true);
         return httpDataSourceFactory;
     }
 
