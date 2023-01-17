@@ -7,6 +7,7 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Track;
+import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
@@ -265,7 +266,7 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
 
     public void start(Result result, boolean useParse) {
         if (result.getUrl().isEmpty()) {
-            PlayerEvent.error(R.string.error_play_load);
+            ErrorEvent.url();
         } else if (result.getParse(1) == 1 || result.getJx() == 1) {
             stopParse();
             parseTask = ParseTask.create(this).run(result, useParse);
@@ -361,13 +362,13 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
 
     @Override
     public void onParseError() {
-        PlayerEvent.error(R.string.error_play_parse);
+        ErrorEvent.parse();
     }
 
     @Override
     public void onPlayerError(@NonNull PlaybackException error) {
         this.errorCode = error.errorCode;
-        PlayerEvent.error(R.string.error_play_format, true);
+        ErrorEvent.format();
     }
 
     @Override
@@ -393,7 +394,7 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
 
     @Override
     public boolean onError(IMediaPlayer mp, int what, int extra) {
-        PlayerEvent.error(R.string.error_play_format, true);
+        ErrorEvent.format();
         return true;
     }
 

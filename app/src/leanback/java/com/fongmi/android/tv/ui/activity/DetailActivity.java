@@ -34,6 +34,7 @@ import com.fongmi.android.tv.bean.Track;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.ActivityDetailBinding;
 import com.fongmi.android.tv.db.AppDatabase;
+import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.model.SiteViewModel;
@@ -148,6 +149,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         return 0;
     }
 
+    private int getParsePosition() {
+        for (int i = 0; i < mParseAdapter.size(); i++) if (((Parse) mParseAdapter.get(i)).isActivated()) return i;
+        return 0;
+    }
+
     private int getPlayerType() {
         return mHistory != null && mHistory.getPlayer() != -1 ? mHistory.getPlayer() : getSite().getPlayerType() != -1 ? getSite().getPlayerType() : Prefers.getPlayer();
     }
@@ -183,9 +189,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mFrameParams = mBinding.video.getLayoutParams();
         mBinding.progressLayout.showProgress();
         mPlayers = new Players().init();
+        mR3 = ErrorEvent::timeout;
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
-        mR3 = this::onError;
         setRecyclerView();
         setVideoView();
         setViewModel();
@@ -767,10 +773,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
             case Player.STATE_ENDED:
                 checkNext();
                 break;
-            default:
-                if (!event.isRetry() || mPlayers.addRetry() > 3) onError(event.getMsg());
-                else getPlayer(false);
-                break;
         }
     }
 
@@ -792,20 +794,37 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         }
     }
 
-    private void onError() {
-        onError(getString(R.string.error_play_timeout));
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onErrorEvent(ErrorEvent event) {
+        if (!event.isRetry() || mPlayers.addRetry() > 3) onError(event);
+        else getPlayer(false);
     }
 
-    private void onError(String msg) {
-        showError(msg);
+    private void onError(ErrorEvent event) {
+        Clock.get().setCallback(null);
+        showError(event.getMsg());
+        App.removeCallbacks(mR3);
         hideProgress();
         mPlayers.reset();
-        App.removeCallbacks(mR3);
-        Clock.get().setCallback(null);
-        checkNext(mBinding.flag.getSelectedPosition());
+        checkError(event);
     }
 
-    private void checkNext(int position) {
+    private void checkError(ErrorEvent event) {
+        if (event.isParse() && mParseAdapter.size() > 0) {
+            checkParse();
+        } else {
+            checkFlag();
+        }
+    }
+
+    private void checkParse() {
+        int position = getParsePosition();
+        position = position < mParseAdapter.size() - 1 ? ++position : 0;
+        setParseActivated((Parse) mParseAdapter.get(position));
+    }
+
+    private void checkFlag() {
+        int position = mBinding.flag.getSelectedPosition();
         if (position == mFlagAdapter.size() - 1) {
             checkSearch();
         } else {

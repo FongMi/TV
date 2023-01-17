@@ -12,6 +12,8 @@ public class Constant {
     public static final int TIMEOUT_VOD = 30 * 1000;
     //直播超時時間 10 秒
     public static final int TIMEOUT_LIVE = 10 * 1000;
+    //解析超時時間 5 秒
+    public static final int TIMEOUT_PARSE = 5 * 1000;
     //網路超時時間 30 秒
     public static final int TIMEOUT_HTTP = 30 * 1000;
     //代理超時時間 5 秒
