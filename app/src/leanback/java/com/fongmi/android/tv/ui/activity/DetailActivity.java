@@ -286,7 +286,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mViewModel.player.observe(this, result -> {
             boolean useParse = (result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx() == 1;
             mBinding.control.parseLayout.setVisibility(useParse ? View.VISIBLE : View.GONE);
-            mPlayers.start(result, useParse);
+            startPlay(result, useParse);
             resetFocus(useParse);
         });
         mViewModel.result.observe(this, result -> {
@@ -325,9 +325,17 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mViewModel.playerContent(getKey(), getVodFlag().getFlag(), item.getUrl());
         Clock.get().setCallback(null);
         updateHistory(item, replay);
-        setR3Callback();
         showProgress();
         hideError();
+    }
+
+    private void startPlay(Result result, boolean useParse) {
+        if (result != null) {
+            mPlayers.start(result, useParse);
+            setR3Callback();
+        } else {
+            ErrorEvent.url();
+        }
     }
 
     private void setEmpty() {
@@ -413,9 +421,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void setParseActivated(Parse item) {
         ApiConfig.get().setParse(item);
-        Result result = mViewModel.getPlayer().getValue();
-        if (result != null) mPlayers.start(result, true);
         notifyItemChanged(mBinding.control.parse, mParseAdapter);
+        startPlay(mViewModel.getPlayer().getValue(), true);
         showProgress();
         hideError();
     }

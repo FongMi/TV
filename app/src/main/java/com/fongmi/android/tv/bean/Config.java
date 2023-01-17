@@ -19,6 +19,7 @@ public class Config {
     private String url;
     private String json;
     private String home;
+    private String parse;
 
     public static Config create(String url, int type) {
         return new Config(url, type);
@@ -70,6 +71,14 @@ public class Config {
         this.home = home;
     }
 
+    public String getParse() {
+        return parse;
+    }
+
+    public void setParse(String parse) {
+        this.parse = parse;
+    }
+
     public long getTime() {
         return time;
     }
@@ -90,6 +99,11 @@ public class Config {
 
     public Config home(String home) {
         setHome(home);
+        return this;
+    }
+
+    public Config parse(String parse) {
+        setParse(parse);
         return this;
     }
 
