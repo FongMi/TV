@@ -123,14 +123,6 @@ public class Prefers {
         put("size", size);
     }
 
-    public static String getParse() {
-        return getString("parse");
-    }
-
-    public static void putParse(String parse) {
-        put("parse", parse);
-    }
-
     public static String getKeyword() {
         return getString("keyword");
     }
