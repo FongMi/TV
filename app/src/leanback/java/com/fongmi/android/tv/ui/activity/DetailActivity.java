@@ -728,7 +728,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     @Override
     public void onTrackClick(Track item) {
-        item.setPlayer(mPlayers.getPlayer());
         item.setKey(getHistoryKey());
         item.save();
     }
