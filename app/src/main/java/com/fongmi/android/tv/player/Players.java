@@ -268,8 +268,10 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     }
 
     public void start(Result result, boolean useParse) {
-        if (result.getUrl().isEmpty() || isAds(result.getUrl())) {
+        if (result.getUrl().isEmpty()) {
             ErrorEvent.url();
+        } else if (isAds(result.getUrl())) {
+            ErrorEvent.ads();
         } else if (result.getParse(1) == 1 || result.getJx() == 1) {
             stopParse();
             parseTask = ParseTask.create(this).run(result, useParse);
