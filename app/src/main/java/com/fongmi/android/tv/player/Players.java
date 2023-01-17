@@ -1,9 +1,12 @@
 package com.fongmi.android.tv.player;
 
+import android.net.Uri;
+
 import androidx.annotation.NonNull;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Track;
@@ -265,7 +268,7 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     }
 
     public void start(Result result, boolean useParse) {
-        if (result.getUrl().isEmpty()) {
+        if (result.getUrl().isEmpty() || isAds(result.getUrl())) {
             ErrorEvent.url();
         } else if (result.getParse(1) == 1 || result.getJx() == 1) {
             stopParse();
@@ -315,6 +318,10 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
 
     private void stopParse() {
         if (parseTask != null) parseTask.cancel();
+    }
+
+    private boolean isAds(String url) {
+        return ApiConfig.get().getAds().contains(Uri.parse(url).getHost());
     }
 
     private void setMediaSource(Result result) {
