@@ -941,9 +941,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     @Override
     public void onSeekTo(int time) {
-        App.post(() -> mPlayers.seekTo(time), 500);
+        App.post(() -> mPlayers.seekTo(time), 250);
         mKeyDown.resetTime();
-        onPlay(500);
+        onPlay(250);
     }
 
     @Override
