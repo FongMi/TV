@@ -146,7 +146,7 @@ public class ApiConfig {
         }
         for (JsonElement element : Json.safeListElement(object, "parses")) {
             Parse parse = Parse.objectFrom(element);
-            if (parse.getName().equals(Prefers.getParse())) setParse(parse);
+            if (parse.getName().equals(config.getParse())) setParse(parse);
             if (!parses.contains(parse)) parses.add(parse);
         }
         if (home == null) setHome(sites.isEmpty() ? new Site() : sites.get(0));
@@ -241,7 +241,7 @@ public class ApiConfig {
     public void setParse(Parse parse) {
         this.parse = parse;
         this.parse.setActivated(true);
-        Prefers.putParse(parse.getName());
+        config.parse(parse.getName()).update();
         for (Parse item : parses) item.setActivated(parse);
     }
 

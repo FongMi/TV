@@ -9,7 +9,7 @@ public class Constant {
     //網路偵測間隔 0.5 秒
     public static final int INTERVAL_TRAFFIC = 500;
     //點播超時時間 30 秒
-    public static final int TIMEOUT_VOD = 30 * 1000;
+    public static final int TIMEOUT_VOD = 10 * 1000;
     //直播超時時間 10 秒
     public static final int TIMEOUT_LIVE = 10 * 1000;
     //解析超時時間 5 秒
