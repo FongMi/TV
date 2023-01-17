@@ -39,7 +39,7 @@
             android:shadowDy="2"
             android:shadowRadius="1"
             android:textColor="@color/white"
-            android:textSize="18sp"
+            android:textSize="16sp"
             tools:text="1920 x 1080" />
 
         <TextView

@@ -101,7 +101,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private Runnable mR1;
     private Runnable mR2;
     private Runnable mR3;
-    private Runnable mR4;
 
     public static void start(Activity activity, String id, String name) {
         start(activity, ApiConfig.get().getHome().getKey(), id, name);
@@ -185,9 +184,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.progressLayout.showProgress();
         mPlayers = new Players().init();
         mR1 = this::hideControl;
-        mR2 = this::hideCenter;
-        mR3 = this::setTraffic;
-        mR4 = this::onError;
+        mR2 = this::setTraffic;
+        mR3 = this::onError;
         setRecyclerView();
         setVideoView();
         setViewModel();
@@ -309,6 +307,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.scroll.scrollTo(0, 0);
         Clock.get().setCallback(null);
         Notify.progress(this);
+        mPlayers.stop();
         hideProgress();
         getDetail();
     }
@@ -320,7 +319,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mViewModel.playerContent(getKey(), getVodFlag().getFlag(), item.getUrl());
         Clock.get().setCallback(null);
         updateHistory(item, replay);
-        setR4Callback();
+        setR3Callback();
         showProgress();
         hideError();
     }
@@ -452,7 +451,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
         mBinding.flag.setSelectedPosition(mCurrent);
         App.post(() -> setFullscreen(true), 250);
-        onPlay(0);
+        onPlay();
     }
 
     private void exitFullscreen() {
@@ -594,12 +593,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void showProgress() {
         mBinding.widget.progress.setVisibility(View.VISIBLE);
-        App.post(mR3, 0);
+        App.post(mR2, 0);
     }
 
     private void hideProgress() {
         mBinding.widget.progress.setVisibility(View.GONE);
-        App.removeCallbacks(mR3);
+        App.removeCallbacks(mR2);
         Traffic.reset();
     }
 
@@ -641,7 +640,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void setTraffic() {
         Traffic.setSpeed(mBinding.widget.traffic);
-        App.post(mR3, Constant.INTERVAL_TRAFFIC);
+        App.post(mR2, Constant.INTERVAL_TRAFFIC);
     }
 
     private void setR1Callback() {
@@ -649,9 +648,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         App.post(mR1, Constant.INTERVAL_HIDE);
     }
 
-    private void setR4Callback() {
-        App.removeCallbacks(mR4);
-        App.post(mR4, Constant.TIMEOUT_VOD);
+    private void setR3Callback() {
+        App.removeCallbacks(mR3);
+        App.post(mR3, Constant.TIMEOUT_VOD);
     }
 
     private void getPart(String source) {
@@ -763,7 +762,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
                 mPlayers.reset();
                 setDefaultTrack();
                 setTrackVisible(true);
-                App.removeCallbacks(mR4);
+                App.removeCallbacks(mR3);
                 mBinding.widget.size.setText(mPlayers.getSizeText());
                 break;
             case Player.STATE_ENDED:
@@ -802,7 +801,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         showError(msg);
         hideProgress();
         mPlayers.reset();
-        App.removeCallbacks(mR4);
+        App.removeCallbacks(mR3);
         Clock.get().setCallback(null);
         checkNext(mBinding.flag.getSelectedPosition());
     }
@@ -885,9 +884,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mPlayers.pause();
     }
 
-    private void onPlay(int delay) {
-        App.post(mR2, delay);
+    private void onPlay() {
         mPlayers.play();
+        hideCenter();
     }
 
     private boolean isFullscreen() {
@@ -941,9 +940,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     @Override
     public void onSeekTo(int time) {
-        App.post(() -> mPlayers.seekTo(time), 250);
         mKeyDown.resetTime();
-        onPlay(250);
+        mPlayers.seekTo(time);
+        showProgress();
+        onPlay();
     }
 
     @Override
@@ -961,7 +961,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     @Override
     public void onKeyCenter() {
         if (mPlayers.isPlaying()) onPause(true);
-        else onPlay(0);
+        else onPlay();
         hideControl();
     }
 
@@ -987,7 +987,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     protected void onResume() {
         super.onResume();
         Clock.start(mBinding.widget.time);
-        onPlay(0);
+        onPlay();
     }
 
     @Override
@@ -1014,6 +1014,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     protected void onDestroy() {
         super.onDestroy();
         mPlayers.release();
-        App.removeCallbacks(mR1, mR2, mR3, mR4);
+        App.removeCallbacks(mR1, mR2, mR3);
     }
 }
