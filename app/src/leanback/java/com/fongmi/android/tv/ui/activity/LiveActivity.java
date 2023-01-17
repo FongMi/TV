@@ -25,6 +25,7 @@ import com.fongmi.android.tv.bean.Group;
 import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.databinding.ActivityLiveBinding;
+import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.impl.LiveCallback;
 import com.fongmi.android.tv.impl.PassCallback;
@@ -678,16 +679,18 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
             case Player.STATE_ENDED:
                 onKeyDown();
                 break;
-            default:
-                if (!event.isRetry() || mPlayers.addRetry() > 3) onError();
-                else getUrl();
-                break;
         }
     }
 
     private void setTrackVisible(boolean visible) {
         mBinding.control.text.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_TEXT) ? View.VISIBLE : View.GONE);
         mBinding.control.audio.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_AUDIO) ? View.VISIBLE : View.GONE);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onErrorEvent(ErrorEvent event) {
+        if (!event.isRetry() || mPlayers.addRetry() > 3) onError();
+        else getUrl();
     }
 
     private void onError() {
