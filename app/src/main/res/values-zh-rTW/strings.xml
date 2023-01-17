@@ -51,7 +51,8 @@
     <string name="play_backward">←</string>
     <string name="play_forward_hint">已切換正序播放</string>
     <string name="play_backward_hint">已切換倒序播放</string>
-    <string name="play_switching">正在切換線路至「<xliff:g name="name">%s</xliff:g>」</string>
+    <string name="play_switch_flag">正在切換線路至「<xliff:g name="name">%s</xliff:g>」</string>
+    <string name="play_switch_site">正在切換站源至「<xliff:g name="name">%s</xliff:g>」</string>
 
     <!-- Parse -->
     <string name="parse">解析</string>
@@ -84,6 +85,7 @@
     <string name="error_play_parse">播放網址解析失敗</string>
     <string name="error_play_load">播放資料載入失敗</string>
     <string name="error_play_format">不支援的影片格式</string>
+    <string name="error_play_timeout">連線逾時</string>
     <string name="error_episode">暫無播放資料</string>
     <string name="error_empty">找不到資料</string>
 
