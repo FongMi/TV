@@ -590,16 +590,16 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public void onKeyLeft(int time) {
-        if (isVisible(mBinding.widget.center)) App.post(mR2, 500);
-        if (mChannel.isOnly() && mPlayers.isVod()) App.post(() -> mPlayers.seekTo(time), 500);
+        if (isVisible(mBinding.widget.center)) App.post(mR2, 250);
+        if (mChannel.isOnly() && mPlayers.isVod()) App.post(() -> mPlayers.seekTo(time), 250);
         else if (!mChannel.isOnly()) prevLine();
         mKeyDown.resetTime();
     }
 
     @Override
     public void onKeyRight(int time) {
-        if (isVisible(mBinding.widget.center)) App.post(mR2, 500);
-        if (mChannel.isOnly() && mPlayers.isVod()) App.post(() -> mPlayers.seekTo(time), 500);
+        if (isVisible(mBinding.widget.center)) App.post(mR2, 250);
+        if (mChannel.isOnly() && mPlayers.isVod()) App.post(() -> mPlayers.seekTo(time), 250);
         else if (!mChannel.isOnly()) nextLine(true);
         mKeyDown.resetTime();
     }
