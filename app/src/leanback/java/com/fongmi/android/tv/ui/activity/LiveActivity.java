@@ -86,7 +86,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private Runnable mR3;
     private Runnable mR4;
     private Runnable mR5;
-    private Runnable mR6;
     private int count;
 
     public static void start(Activity activity) {
@@ -130,11 +129,10 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     protected void initView() {
         mR0 = this::hideUI;
         mR1 = this::hideInfo;
-        mR2 = this::hideCenter;
-        mR3 = this::hideControl;
-        mR4 = this::setChannelActivated;
-        mR5 = this::setTraffic;
-        mR6 = this::onError;
+        mR2 = this::hideControl;
+        mR3 = this::setChannelActivated;
+        mR4 = this::setTraffic;
+        mR5 = this::onError;
         mPlayers = new Players().init();
         mKeyDown = CustomKeyDownLive.create(this);
         mFormatDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
@@ -269,7 +267,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void setTraffic() {
         Traffic.setSpeed(mBinding.widget.traffic);
-        App.post(mR5, Constant.INTERVAL_TRAFFIC);
+        App.post(mR4, Constant.INTERVAL_TRAFFIC);
     }
 
     private void onToggle() {
@@ -347,24 +345,24 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void showProgress() {
         mBinding.widget.progress.setVisibility(View.VISIBLE);
-        App.post(mR5, 0);
+        App.post(mR4, 0);
     }
 
     private void hideProgress() {
         mBinding.widget.progress.setVisibility(View.GONE);
-        App.removeCallbacks(mR5);
+        App.removeCallbacks(mR4);
         Traffic.reset();
     }
 
     private void showControl(View view) {
         mBinding.control.getRoot().setVisibility(View.VISIBLE);
         view.requestFocus();
-        setR3Callback();
+        setR2Callback();
     }
 
     private void hideControl() {
         mBinding.control.getRoot().setVisibility(View.GONE);
-        App.removeCallbacks(mR3);
+        App.removeCallbacks(mR2);
     }
 
     private void showInfo() {
@@ -393,14 +391,14 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         App.post(mR1, Constant.INTERVAL_HIDE);
     }
 
-    private void setR3Callback() {
-        App.removeCallbacks(mR3);
-        App.post(mR3, Constant.INTERVAL_HIDE);
+    private void setR2Callback() {
+        App.removeCallbacks(mR2);
+        App.post(mR2, Constant.INTERVAL_HIDE);
     }
 
-    private void setR6Callback() {
-        App.removeCallbacks(mR6);
-        App.post(mR6, Constant.TIMEOUT_LIVE);
+    private void setR5Callback() {
+        App.removeCallbacks(mR5);
+        App.post(mR5, Constant.TIMEOUT_LIVE);
     }
 
     private void resetPass() {
@@ -451,7 +449,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void setChannel(Channel item) {
         LiveConfig.get().setKeep(mGroup, mChannel = item);
-        App.post(mR4, 100);
+        App.post(mR3, 100);
         showInfo();
     }
 
@@ -488,7 +486,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void getUrl() {
         mViewModel.getUrl(mChannel);
-        setR6Callback();
+        setR5Callback();
         showProgress();
     }
 
@@ -531,7 +529,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (isVisible(mBinding.control.getRoot())) setR3Callback();
+        if (isVisible(mBinding.control.getRoot())) setR2Callback();
         if (mKeyDown.hasEvent(event)) mKeyDown.onKeyDown(event);
         return super.dispatchKeyEvent(event);
     }
@@ -561,6 +559,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.widget.exoPosition.setText(mPlayers.getPositionTime(time));
         mBinding.widget.action.setImageResource(time > 0 ? R.drawable.ic_forward : R.drawable.ic_rewind);
         mBinding.widget.center.setVisibility(View.VISIBLE);
+        hideProgress();
     }
 
     @Override
@@ -590,18 +589,22 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public void onKeyLeft(int time) {
-        if (isVisible(mBinding.widget.center)) App.post(mR2, 500);
-        if (mChannel.isOnly() && mPlayers.isVod()) App.post(() -> mPlayers.seekTo(time), 500);
+        if (mChannel.isOnly() && mPlayers.isVod()) App.post(() -> seekTo(time), 250);
         else if (!mChannel.isOnly()) prevLine();
         mKeyDown.resetTime();
     }
 
     @Override
     public void onKeyRight(int time) {
-        if (isVisible(mBinding.widget.center)) App.post(mR2, 500);
-        if (mChannel.isOnly() && mPlayers.isVod()) App.post(() -> mPlayers.seekTo(time), 500);
+        if (mChannel.isOnly() && mPlayers.isVod()) App.post(() -> seekTo(time), 250);
         else if (!mChannel.isOnly()) nextLine(true);
         mKeyDown.resetTime();
+    }
+
+    private void seekTo(int time) {
+        mPlayers.seekTo(time);
+        showProgress();
+        hideCenter();
     }
 
     @Override
@@ -670,7 +673,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
                 hideProgress();
                 mPlayers.reset();
                 setTrackVisible(true);
-                App.removeCallbacks(mR6);
+                App.removeCallbacks(mR5);
                 break;
             case Player.STATE_ENDED:
                 onKeyDown();
@@ -688,7 +691,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void onError() {
-        App.removeCallbacks(mR6);
+        App.removeCallbacks(mR5);
         mPlayers.reset();
         checkNext();
     }
@@ -736,6 +739,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         Force.get().stop();
         ZLive.get().stop();
         TVBus.get().quit();
-        App.removeCallbacks(mR1, mR2, mR3, mR4, mR5, mR6);
+        App.removeCallbacks(mR1, mR2, mR3, mR4, mR5);
     }
 }
