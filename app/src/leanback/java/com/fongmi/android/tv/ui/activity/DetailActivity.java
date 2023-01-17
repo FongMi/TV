@@ -817,6 +817,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void checkError(ErrorEvent event) {
+        if (event.isUrl()) onNext();
         if (event.isParse() && mParseAdapter.size() > 0) checkParse();
         else checkFlag();
     }
