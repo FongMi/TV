@@ -196,11 +196,11 @@ public class ApiConfig {
         return jarLoader.proxyInvoke(param);
     }
 
-    public JSONObject jsonExt(String key, LinkedHashMap<String, String> jxs, String url) {
+    public JSONObject jsonExt(String key, LinkedHashMap<String, String> jxs, String url) throws Exception {
         return jarLoader.jsonExt(key, jxs, url);
     }
 
-    public JSONObject jsonExtMix(String flag, String key, String name, LinkedHashMap<String, HashMap<String, String>> jxs, String url) {
+    public JSONObject jsonExtMix(String flag, String key, String name, LinkedHashMap<String, HashMap<String, String>> jxs, String url) throws Exception {
         return jarLoader.jsonExtMix(flag, key, name, jxs, url);
     }
 
