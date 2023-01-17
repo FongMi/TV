@@ -51,7 +51,8 @@
     <string name="play_backward">←</string>
     <string name="play_forward_hint">Normal play switched</string>
     <string name="play_backward_hint">Reverse play switched</string>
-    <string name="play_switching">Switching to <xliff:g name="name">%s</xliff:g></string>
+    <string name="play_switch_flag">Switching flag to <xliff:g name="name">%s</xliff:g></string>
+    <string name="play_switch_site">Switching site to <xliff:g name="name">%s</xliff:g></string>
 
     <!-- Parse -->
     <string name="parse">Parse</string>
@@ -84,6 +85,7 @@
     <string name="error_play_parse">Unable to parse url</string>
     <string name="error_play_load">Unable to load url</string>
     <string name="error_play_format">Unsupported video format</string>
+    <string name="error_play_timeout">Timed out</string>
     <string name="error_episode">No episode data</string>
     <string name="error_empty">Not found</string>
 
