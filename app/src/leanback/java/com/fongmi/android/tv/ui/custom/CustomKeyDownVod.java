@@ -7,6 +7,7 @@ import android.view.MotionEvent;
 
 import androidx.annotation.NonNull;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.utils.Utils;
 
@@ -44,7 +45,7 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
         } else if (event.getAction() == KeyEvent.ACTION_DOWN && Utils.isRightKey(event)) {
             listener.onSeeking(addTime());
         } else if (event.getAction() == KeyEvent.ACTION_UP && (Utils.isLeftKey(event) || Utils.isRightKey(event))) {
-            listener.onSeekTo(holdTime);
+            App.post(() -> listener.onSeekTo(holdTime), 250);
         } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isUpKey(event)) {
             listener.onKeyUp();
         } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isDownKey(event)) {
