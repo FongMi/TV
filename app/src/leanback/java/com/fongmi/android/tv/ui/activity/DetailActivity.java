@@ -823,6 +823,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void checkParse() {
         int position = getParsePosition();
+        if (position == mParseAdapter.size() - 1) initParse();
         if (position == mParseAdapter.size() - 1) checkFlag();
         else nextParse(position);
     }
@@ -836,6 +837,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void checkSearch() {
         if (isAutoMode() && mSearchAdapter.size() > 0) nextSite();
         else initSearch(getName(), getSite().isSwitchable());
+    }
+
+    private void initParse() {
+        if (mParseAdapter.size() == 0) return;
+        ApiConfig.get().setParse((Parse) mParseAdapter.get(0));
+        notifyItemChanged(mBinding.control.parse, mParseAdapter);
     }
 
     private void initSearch(String keyword, boolean auto) {
