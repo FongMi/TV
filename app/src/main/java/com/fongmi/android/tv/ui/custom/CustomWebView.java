@@ -34,7 +34,7 @@ public class CustomWebView extends WebView {
     private ParseTask.Callback callback;
     private WebResourceResponse empty;
     private List<String> keys;
-    private Runnable mTimer;
+    private Runnable timer;
     private String key;
 
     public static CustomWebView create(@NonNull Context context) {
@@ -48,6 +48,7 @@ public class CustomWebView extends WebView {
 
     @SuppressLint("SetJavaScriptEnabled")
     public void initSettings() {
+        this.timer = () -> stop(true);
         this.keys = Arrays.asList("user-agent", "referer", "origin");
         this.empty = new WebResourceResponse("text/plain", "utf-8", new ByteArrayInputStream("".getBytes()));
         getSettings().setUseWideViewPort(true);
@@ -70,7 +71,7 @@ public class CustomWebView extends WebView {
     }
 
     public CustomWebView start(String key, String url, Map<String, String> headers, ParseTask.Callback callback) {
-        App.post(mTimer = () -> stop(true), Constant.TIMEOUT_PARSE_WEB);
+        App.post(timer, Constant.TIMEOUT_PARSE_WEB);
         this.callback = callback;
         setUserAgent(headers);
         loadUrl(url, headers);
@@ -126,7 +127,7 @@ public class CustomWebView extends WebView {
     public void stop(boolean error) {
         stopLoading();
         loadUrl("about:blank");
-        App.removeCallbacks(mTimer);
+        App.removeCallbacks(timer);
         if (error) App.post(this::onError);
     }
 
