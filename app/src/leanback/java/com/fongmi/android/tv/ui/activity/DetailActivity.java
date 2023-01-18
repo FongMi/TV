@@ -28,7 +28,6 @@ import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Part;
-import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Track;
 import com.fongmi.android.tv.bean.Vod;
@@ -283,7 +282,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mViewModel.search.observe(this, result -> setSearch(result.getList()));
         mViewModel.player.observe(this, result -> {
             boolean useParse = (result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx() == 1;
-            startPlay(result, useParse);
+            mBinding.control.parseLayout.setVisibility(mParseAdapter.size() > 0 && useParse ? View.VISIBLE : View.GONE);
+            mPlayers.start(result, useParse);
             resetFocus();
         });
         mViewModel.result.observe(this, result -> {
@@ -318,22 +318,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void getPlayer(boolean replay) {
         Vod.Flag.Episode item = (Vod.Flag.Episode) mEpisodeAdapter.get(getEpisodePosition());
-        if (isFullscreen() && mPlayers.getRetry() == 0) Notify.show(ResUtil.getString(R.string.play_ready, item.getName()));
         mBinding.widget.title.setText(getString(R.string.detail_title, mBinding.name.getText(), item.getName()));
         mViewModel.playerContent(getKey(), getVodFlag().getFlag(), item.getUrl());
         Clock.get().setCallback(null);
         updateHistory(item, replay);
         showProgress();
-        hideError();
-    }
-
-    private void startPlay(Result result, boolean useParse) {
-        if (result != null) {
-            mBinding.control.parseLayout.setVisibility(mParseAdapter.size() > 0 && useParse ? View.VISIBLE : View.GONE);
-            mPlayers.start(result, useParse);
-        } else {
-            ErrorEvent.url();
-        }
     }
 
     private void setEmpty() {
@@ -375,7 +364,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void setText(TextView view, int resId, String text) {
         view.setVisibility(text.isEmpty() ? View.GONE : View.VISIBLE);
-        view.setText(resId > 0 ? ResUtil.getString(resId, text) : text);
+        view.setText(resId > 0 ? getString(resId, text) : text);
         view.setTag(text);
     }
 
@@ -408,7 +397,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.episode.setSelectedPosition(getEpisodePosition());
         notifyItemChanged(mBinding.episode, mEpisodeAdapter);
         if (mEpisodeAdapter.size() == 0) return;
-        getPlayer(false);
+        if (isFullscreen()) Notify.show(getString(R.string.play_ready, item.getName()));
+        onRefresh();
     }
 
     private void reverseEpisode() {
@@ -420,9 +410,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void setParseActivated(Parse item) {
         ApiConfig.get().setParse(item);
         notifyItemChanged(mBinding.control.parse, mParseAdapter);
-        startPlay(mViewModel.getPlayer().getValue(), true);
-        showProgress();
-        hideError();
+        onRefresh();
     }
 
     private void setArray(int size) {
@@ -537,6 +525,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         return true;
     }
 
+    private void onRefresh() {
+        getPlayer(false);
+    }
+
     private void onReset() {
         getPlayer(isReplay());
     }
@@ -576,19 +568,18 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onPlayer() {
-        mPlayers.stop();
         mPlayers.togglePlayer();
         Prefers.putPlayer(mPlayers.getPlayer());
         mHistory.setPlayer(mPlayers.getPlayer());
-        getPlayer(false);
         setPlayerView();
+        onRefresh();
     }
 
     private void onDecode() {
         mPlayers.toggleDecode();
         mPlayers.set(getExo(), getIjk());
-        getPlayer(false);
         setDecodeView();
+        onRefresh();
     }
 
     private void onTrack(View view) {
@@ -605,6 +596,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void showProgress() {
         mBinding.widget.progress.setVisibility(View.VISIBLE);
         App.post(mR2, 0);
+        hideError();
     }
 
     private void hideProgress() {
@@ -655,7 +647,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void setR1Callback() {
-        App.removeCallbacks(mR1);
         App.post(mR1, Constant.INTERVAL_HIDE);
     }
 
@@ -796,7 +787,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onErrorEvent(ErrorEvent event) {
         if (!event.isRetry() || mPlayers.addRetry() > 3) onError(event);
-        else getPlayer(false);
+        else onRefresh();
     }
 
     private void onError(ErrorEvent event) {
@@ -877,20 +868,20 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void nextParse(int position) {
         Parse parse = (Parse) mParseAdapter.get(position + 1);
-        Notify.show(ResUtil.getString(R.string.play_switch_parse, parse.getName()));
+        Notify.show(getString(R.string.play_switch_parse, parse.getName()));
         setParseActivated(parse);
     }
 
     private void nextFlag(int position) {
         Vod.Flag flag = (Vod.Flag) mFlagAdapter.get(position + 1);
-        Notify.show(ResUtil.getString(R.string.play_switch_flag, flag.getFlag()));
+        Notify.show(getString(R.string.play_switch_flag, flag.getFlag()));
         setFlagActivated(flag);
     }
 
     private void nextSite() {
         if (mSearchAdapter.size() == 0) return;
         Vod vod = (Vod) mSearchAdapter.get(0);
-        Notify.show(ResUtil.getString(R.string.play_switch_site, vod.getSiteName()));
+        Notify.show(getString(R.string.play_switch_site, vod.getSiteName()));
         mSearchAdapter.removeItems(0, 1);
         setInitAuto(false);
         getDetail(vod);
