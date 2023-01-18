@@ -100,9 +100,9 @@ public final class TrackSelectionDialog implements TrackAdapter.OnClickListener 
 
     private void addIjkTrack(List<Track> items) {
         int track = player.ijk().getSelectedTrack(type);
-        IjkTrackInfo[] trackInfos = player.ijk().getTrackInfo();
-        for (int i = 0; i < trackInfos.length; i++) {
-            IjkTrackInfo trackInfo = trackInfos[i];
+        List<IjkTrackInfo> trackInfos = player.ijk().getTrackInfo();
+        for (int i = 0; i < trackInfos.size(); i++) {
+            IjkTrackInfo trackInfo = trackInfos.get(i);
             if (trackInfo.getTrackType() != type) continue;
             Track item = new Track(type, provider.getTrackName(trackInfo));
             item.setPlayer(player.getPlayer());

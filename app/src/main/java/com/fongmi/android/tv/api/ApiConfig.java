@@ -9,7 +9,6 @@ import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.utils.Json;
-import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderNull;
@@ -28,7 +27,6 @@ import java.util.Map;
 
 public class ApiConfig {
 
-    private List<String> ads;
     private List<String> flags;
     private List<Parse> parses;
     private List<Site> sites;
@@ -36,9 +34,10 @@ public class ApiConfig {
     private PyLoader pyLoader;
     private JsLoader jsLoader;
     private Config config;
-    private String wall;
     private Parse parse;
     private Site home;
+    private String wall;
+    private String ads;
 
     private static class Loader {
         static volatile ApiConfig INSTANCE = new ApiConfig();
@@ -65,10 +64,10 @@ public class ApiConfig {
     }
 
     public ApiConfig init() {
+        this.ads = null;
         this.home = null;
         this.wall = null;
         this.config = Config.vod();
-        this.ads = new ArrayList<>();
         this.sites = new ArrayList<>();
         this.flags = new ArrayList<>();
         this.parses = new ArrayList<>();
@@ -84,9 +83,9 @@ public class ApiConfig {
     }
 
     public ApiConfig clear() {
+        this.ads = null;
         this.home = null;
         this.wall = null;
-        this.ads.clear();
         this.sites.clear();
         this.flags.clear();
         this.parses.clear();
@@ -146,14 +145,14 @@ public class ApiConfig {
         }
         for (JsonElement element : Json.safeListElement(object, "parses")) {
             Parse parse = Parse.objectFrom(element);
-            if (parse.getName().equals(Prefers.getParse())) setParse(parse);
+            if (parse.getName().equals(config.getParse())) setParse(parse);
             if (!parses.contains(parse)) parses.add(parse);
         }
         if (home == null) setHome(sites.isEmpty() ? new Site() : sites.get(0));
         if (parse == null) setParse(parses.isEmpty() ? new Parse() : parses.get(0));
         flags.addAll(Json.safeListString(object, "flags"));
-        ads.addAll(Json.safeListString(object, "ads"));
         setWall(Json.safeString(object, "wallpaper"));
+        setAds(Json.safeListString(object, "ads"));
     }
 
     private void parseLive(JsonObject object) {
@@ -196,11 +195,11 @@ public class ApiConfig {
         return jarLoader.proxyInvoke(param);
     }
 
-    public JSONObject jsonExt(String key, LinkedHashMap<String, String> jxs, String url) {
+    public JSONObject jsonExt(String key, LinkedHashMap<String, String> jxs, String url) throws Exception {
         return jarLoader.jsonExt(key, jxs, url);
     }
 
-    public JSONObject jsonExtMix(String flag, String key, String name, LinkedHashMap<String, HashMap<String, String>> jxs, String url) {
+    public JSONObject jsonExtMix(String flag, String key, String name, LinkedHashMap<String, HashMap<String, String>> jxs, String url) throws Exception {
         return jarLoader.jsonExtMix(flag, key, name, jxs, url);
     }
 
@@ -227,22 +226,15 @@ public class ApiConfig {
     }
 
     public String getAds() {
-        return ads == null ? "" : ads.toString();
+        return ads;
+    }
+
+    private void setAds(List<String> ads) {
+        this.ads = TextUtils.join(",", ads);
     }
 
     public Config getConfig() {
         return config == null ? Config.vod() : config;
-    }
-
-    public Parse getParse() {
-        return parse == null ? new Parse() : parse;
-    }
-
-    public void setParse(Parse parse) {
-        this.parse = parse;
-        this.parse.setActivated(true);
-        Prefers.putParse(parse.getName());
-        for (Parse item : parses) item.setActivated(parse);
     }
 
     public String getWall() {
@@ -263,5 +255,16 @@ public class ApiConfig {
         this.home.setActivated(true);
         config.home(home.getKey()).update();
         for (Site item : getSites()) item.setActivated(home);
+    }
+
+    public Parse getParse() {
+        return parse == null ? new Parse() : parse;
+    }
+
+    public void setParse(Parse parse) {
+        this.parse = parse;
+        this.parse.setActivated(true);
+        config.parse(parse.getName()).update();
+        for (Parse item : parses) item.setActivated(parse);
     }
 }

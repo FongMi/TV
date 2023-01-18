@@ -13,6 +13,7 @@ import android.widget.MediaController;
 
 import androidx.annotation.NonNull;
 
+import java.util.List;
 import java.util.Map;
 
 import tv.danmaku.ijk.media.player.IMediaPlayer;
@@ -104,11 +105,10 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     public void setRender(int render) {
         mCurrentRender = render;
+        if (mIjkPlayer == null) return;
         switch (render) {
             case RENDER_TEXTURE_VIEW:
-                TextureRenderView texture = new TextureRenderView(getContext());
-                texture.getSurfaceHolder().bindToMediaPlayer(mIjkPlayer);
-                setRenderView(texture);
+                setRenderView(new TextureRenderView(getContext()));
                 break;
             case RENDER_SURFACE_VIEW:
                 setRenderView(new SurfaceRenderView(getContext()));
@@ -117,6 +117,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     private void setRenderView(IRenderView renderView) {
+        removeRenderView();
         mRenderView = renderView;
         setResizeMode(mCurrentAspectRatio);
         mContentFrame.addView(mRenderView.getView(), 0, new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER));
@@ -316,9 +317,8 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
         @Override
         public void onSurfaceCreated(@NonNull IRenderView.ISurfaceHolder holder, int width, int height) {
-            mSurfaceHolder = holder;
             if (mIjkPlayer != null) bindSurfaceHolder(mIjkPlayer, holder);
-            else openVideo();
+            mSurfaceHolder = holder;
         }
 
         @Override
@@ -457,14 +457,12 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     public boolean haveTrack(int type) {
-        IjkTrackInfo[] trackInfos = mIjkPlayer.getTrackInfo();
-        if (trackInfos == null) return false;
         int count = 0;
-        for (IjkTrackInfo trackInfo : trackInfos) if (trackInfo.getTrackType() == type) ++count;
+        for (IjkTrackInfo trackInfo : getTrackInfo()) if (trackInfo.getTrackType() == type) ++count;
         return count > 0;
     }
 
-    public IjkTrackInfo[] getTrackInfo() {
+    public List<IjkTrackInfo> getTrackInfo() {
         return mIjkPlayer.getTrackInfo();
     }
 
@@ -474,28 +472,39 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     public void selectTrack(int type, int track) {
         int selected = getSelectedTrack(type);
-        if (selected == track) return;
-        long position = getCurrentPosition();
-        mIjkPlayer.selectTrack(track);
-        mSubtitleView.setText("");
-        if (position != 0) seekTo(position);
+        List<IjkTrackInfo> trackInfos = getTrackInfo();
+        for (int index = 0; index < trackInfos.size(); index++) {
+            IjkTrackInfo trackInfo = trackInfos.get(index);
+            if (trackInfo.getTrackType() != type) continue;
+            if (index == track && selected != track) {
+                long position = getCurrentPosition();
+                mSubtitleView.setText("");
+                mIjkPlayer.selectTrack(index);
+                if (position != 0) seekTo(position);
+            }
+        }
     }
 
     public void deselectTrack(int type, int track) {
         int selected = getSelectedTrack(type);
-        if (selected != track) return;
-        long position = getCurrentPosition();
-        mIjkPlayer.deselectTrack(track);
-        mSubtitleView.setText("");
-        if (position != 0) seekTo(position);
+        List<IjkTrackInfo> trackInfos = getTrackInfo();
+        for (int index = 0; index < trackInfos.size(); index++) {
+            IjkTrackInfo trackInfo = trackInfos.get(index);
+            if (trackInfo.getTrackType() != type) continue;
+            if (index == track && selected == track) {
+                long position = getCurrentPosition();
+                mSubtitleView.setText("");
+                mIjkPlayer.deselectTrack(track);
+                if (position != 0) seekTo(position);
+            }
+        }
     }
 
     private void setPreferredTextLanguage() {
-        IjkTrackInfo[] trackInfos = mIjkPlayer.getTrackInfo();
-        if (trackInfos == null) return;
+        List<IjkTrackInfo> trackInfos = getTrackInfo();
         int selected = getSelectedTrack(ITrackInfo.MEDIA_TRACK_TYPE_TEXT);
-        for (int index = 0; index < trackInfos.length; index++) {
-            IjkTrackInfo trackInfo = trackInfos[index];
+        for (int index = 0; index < trackInfos.size(); index++) {
+            IjkTrackInfo trackInfo = trackInfos.get(index);
             if (trackInfo.getTrackType() != ITrackInfo.MEDIA_TRACK_TYPE_TEXT) continue;
             if (trackInfo.getLanguage().equals("zh") && index != selected) {
                 mIjkPlayer.selectTrack(index);
