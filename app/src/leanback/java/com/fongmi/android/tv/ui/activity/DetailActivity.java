@@ -34,6 +34,7 @@ import com.fongmi.android.tv.bean.Track;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.ActivityDetailBinding;
 import com.fongmi.android.tv.db.AppDatabase;
+import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.model.SiteViewModel;
@@ -100,7 +101,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private int mCurrent;
     private Runnable mR1;
     private Runnable mR2;
-    private Runnable mR3;
 
     public static void start(Activity activity, String id, String name) {
         start(activity, ApiConfig.get().getHome().getKey(), id, name);
@@ -148,6 +148,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         return 0;
     }
 
+    private int getParsePosition() {
+        for (int i = 0; i < mParseAdapter.size(); i++) if (((Parse) mParseAdapter.get(i)).isActivated()) return i;
+        return 0;
+    }
+
     private int getPlayerType() {
         return mHistory != null && mHistory.getPlayer() != -1 ? mHistory.getPlayer() : getSite().getPlayerType() != -1 ? getSite().getPlayerType() : Prefers.getPlayer();
     }
@@ -185,7 +190,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mPlayers = new Players().init();
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
-        mR3 = this::onError;
         setRecyclerView();
         setVideoView();
         setViewModel();
@@ -279,9 +283,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mViewModel.search.observe(this, result -> setSearch(result.getList()));
         mViewModel.player.observe(this, result -> {
             boolean useParse = (result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx() == 1;
-            mBinding.control.parseLayout.setVisibility(useParse ? View.VISIBLE : View.GONE);
-            mPlayers.start(result, useParse);
-            resetFocus(useParse);
+            startPlay(result, useParse);
+            resetFocus();
         });
         mViewModel.result.observe(this, result -> {
             if (result.getList().isEmpty()) setEmpty();
@@ -290,7 +293,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         });
     }
 
-    private void resetFocus(boolean useParse) {
+    private void resetFocus() {
+        boolean useParse = isVisible(mBinding.control.parseLayout);
         findViewById(R.id.timeBar).setNextFocusUpId(useParse ? R.id.parse : R.id.next);
         for (int i = 0; i < mBinding.control.actionLayout.getChildCount(); i++) {
             mBinding.control.actionLayout.getChildAt(i).setNextFocusDownId(useParse ? R.id.parse : R.id.timeBar);
@@ -319,9 +323,17 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mViewModel.playerContent(getKey(), getVodFlag().getFlag(), item.getUrl());
         Clock.get().setCallback(null);
         updateHistory(item, replay);
-        setR3Callback();
         showProgress();
         hideError();
+    }
+
+    private void startPlay(Result result, boolean useParse) {
+        if (result != null) {
+            mBinding.control.parseLayout.setVisibility(mParseAdapter.size() > 0 && useParse ? View.VISIBLE : View.GONE);
+            mPlayers.start(result, useParse);
+        } else {
+            ErrorEvent.url();
+        }
     }
 
     private void setEmpty() {
@@ -407,9 +419,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void setParseActivated(Parse item) {
         ApiConfig.get().setParse(item);
-        Result result = mViewModel.getPlayer().getValue();
-        if (result != null) mPlayers.start(result, true);
         notifyItemChanged(mBinding.control.parse, mParseAdapter);
+        startPlay(mViewModel.getPlayer().getValue(), true);
         showProgress();
         hideError();
     }
@@ -648,11 +659,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         App.post(mR1, Constant.INTERVAL_HIDE);
     }
 
-    private void setR3Callback() {
-        App.removeCallbacks(mR3);
-        App.post(mR3, Constant.TIMEOUT_VOD);
-    }
-
     private void getPart(String source) {
         OkHttp.newCall("http://api.pullword.com/get.php?source=" + URLEncoder.encode(source.trim()) + "&param1=0&param2=0&json=1").enqueue(new Callback() {
             @Override
@@ -761,15 +767,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
                 mPlayers.reset();
                 setDefaultTrack();
                 setTrackVisible(true);
-                App.removeCallbacks(mR3);
                 mBinding.widget.size.setText(mPlayers.getSizeText());
                 break;
             case Player.STATE_ENDED:
                 checkNext();
-                break;
-            default:
-                if (!event.isRetry() || mPlayers.addRetry() > 3) onError(event.getMsg());
-                else getPlayer(false);
                 break;
         }
     }
@@ -792,33 +793,47 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         }
     }
 
-    private void onError() {
-        onError(getString(R.string.error_play_timeout));
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onErrorEvent(ErrorEvent event) {
+        if (!event.isRetry() || mPlayers.addRetry() > 3) onError(event);
+        else getPlayer(false);
     }
 
-    private void onError(String msg) {
-        showError(msg);
-        hideProgress();
-        mPlayers.reset();
-        App.removeCallbacks(mR3);
+    private void onError(ErrorEvent event) {
         Clock.get().setCallback(null);
-        checkNext(mBinding.flag.getSelectedPosition());
+        showError(event.getMsg());
+        mPlayers.reset();
+        hideProgress();
+        statFlow();
     }
 
-    private void checkNext(int position) {
-        if (position == mFlagAdapter.size() - 1) {
-            checkSearch();
-        } else {
-            nextFlag(position);
-        }
+    private void statFlow() {
+        if (isVisible(mBinding.control.parseLayout)) checkParse();
+        else checkFlag();
+    }
+
+    private void checkParse() {
+        int position = getParsePosition();
+        if (position == mParseAdapter.size() - 1) initParse();
+        if (position == mParseAdapter.size() - 1) checkFlag();
+        else nextParse(position);
+    }
+
+    private void checkFlag() {
+        int position = mBinding.flag.getSelectedPosition();
+        if (position == mFlagAdapter.size() - 1 || !getSite().isSwitchable()) checkSearch();
+        else nextFlag(position);
     }
 
     private void checkSearch() {
-        if (mSearchAdapter.size() > 0 && isAutoMode()) {
-            nextSite();
-        } else {
-            initSearch(getName(), getSite().isSwitchable());
-        }
+        if (isAutoMode() && mSearchAdapter.size() > 0) nextSite();
+        else initSearch(getName(), getSite().isSwitchable());
+    }
+
+    private void initParse() {
+        if (mParseAdapter.size() == 0) return;
+        ApiConfig.get().setParse((Parse) mParseAdapter.get(0));
+        notifyItemChanged(mBinding.control.parse, mParseAdapter);
     }
 
     private void initSearch(String keyword, boolean auto) {
@@ -858,6 +873,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         String keyword = mBinding.part.getTag().toString();
         if (isAutoMode()) return !item.getVodName().equals(keyword);
         else return !item.getVodName().contains(keyword);
+    }
+
+    private void nextParse(int position) {
+        Parse parse = (Parse) mParseAdapter.get(position + 1);
+        Notify.show(ResUtil.getString(R.string.play_switch_parse, parse.getName()));
+        setParseActivated(parse);
     }
 
     private void nextFlag(int position) {
@@ -1013,6 +1034,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     protected void onDestroy() {
         super.onDestroy();
         mPlayers.release();
-        App.removeCallbacks(mR1, mR2, mR3);
+        App.removeCallbacks(mR1, mR2);
     }
 }

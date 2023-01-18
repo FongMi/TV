@@ -10,8 +10,8 @@ android {
         applicationId "com.fongmi.android.tv"
         minSdk 21
         targetSdk 29
-        versionCode 58
-        versionName "1.5.8"
+        versionCode 59
+        versionName "1.5.9"
         ndk { abiFilters "armeabi-v7a" }
     }
 
