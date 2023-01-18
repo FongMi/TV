@@ -398,7 +398,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         notifyItemChanged(mBinding.episode, mEpisodeAdapter);
         if (mEpisodeAdapter.size() == 0) return;
         if (isFullscreen()) Notify.show(getString(R.string.play_ready, item.getName()));
-        getPlayer(false);
+        onRefresh();
     }
 
     private void reverseEpisode() {
@@ -410,7 +410,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void setParseActivated(Parse item) {
         ApiConfig.get().setParse(item);
         notifyItemChanged(mBinding.control.parse, mParseAdapter);
-        getPlayer(false);
+        onRefresh();
     }
 
     private void setArray(int size) {
@@ -525,6 +525,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         return true;
     }
 
+    private void onRefresh() {
+        getPlayer(false);
+    }
+
     private void onReset() {
         getPlayer(isReplay());
     }
@@ -567,15 +571,15 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mPlayers.togglePlayer();
         Prefers.putPlayer(mPlayers.getPlayer());
         mHistory.setPlayer(mPlayers.getPlayer());
-        getPlayer(false);
         setPlayerView();
+        onRefresh();
     }
 
     private void onDecode() {
         mPlayers.toggleDecode();
         mPlayers.set(getExo(), getIjk());
-        getPlayer(false);
         setDecodeView();
+        onRefresh();
     }
 
     private void onTrack(View view) {
@@ -783,7 +787,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onErrorEvent(ErrorEvent event) {
         if (!event.isRetry() || mPlayers.addRetry() > 3) onError(event);
-        else getPlayer(false);
+        else onRefresh();
     }
 
     private void onError(ErrorEvent event) {
