@@ -1,21 +1,32 @@
 package com.fongmi.android.tv;
 
 public class Constant {
-
-    //快進時間單位 10 秒
+    //快進時間單位
     public static final int INTERVAL_SEEK = 10 * 1000;
-    //控件隱藏時間 5 秒
+    //控件隱藏時間
     public static final int INTERVAL_HIDE = 5 * 1000;
-    //網路偵測間隔 0.5 秒
+    //網路偵測間隔
     public static final int INTERVAL_TRAFFIC = 500;
-    //點播超時時間 30 秒
+    //點播爬蟲時間
     public static final int TIMEOUT_VOD = 30 * 1000;
-    //直播超時時間 10 秒
+    //直播解析時間
     public static final int TIMEOUT_LIVE = 10 * 1000;
-    //網路超時時間 30 秒
+    //播放超時時間
+    public static final int TIMEOUT_PLAY = 15 * 1000;
+    //解析預設時間
+    public static final int TIMEOUT_PARSE_DEF = 5 * 1000;
+    //嗅探超時時間
+    public static final int TIMEOUT_PARSE_WEB = 15 * 1000;
+    //解析超時時間
+    public static final int TIMEOUT_PARSE_JSON = 10 * 1000;
+    //解析超時時間
+    public static final int TIMEOUT_PARSE_JSON_EXT = 15 * 1000;
+    //聚合超時時間
+    public static final int TIMEOUT_PARSE_JSON_MIX = 15 * 1000;
+    //網路超時時間
     public static final int TIMEOUT_HTTP = 30 * 1000;
-    //代理超時時間 5 秒
+    //代理超時時間
     public static final int TIMEOUT_GITHUB = 5 * 1000;
-    //搜尋線程數量 5 個
+    //搜尋線程數量
     public static final int THREAD_POOL = 5;
 }

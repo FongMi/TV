@@ -3,10 +3,12 @@ package com.fongmi.android.tv.player;
 import androidx.annotation.NonNull;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Track;
+import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
@@ -37,6 +39,7 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     private Formatter formatter;
     private ParseTask parseTask;
     private ExoPlayer exoPlayer;
+    private Runnable timeout;
     private int errorCode;
     private int retry;
     private int decode;
@@ -53,6 +56,7 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     public Players init() {
         player = Prefers.getPlayer();
         decode = Prefers.getDecode();
+        timeout = ErrorEvent::timeout;
         builder = new StringBuilder();
         formatter = new Formatter(builder, Locale.getDefault());
         return this;
@@ -260,12 +264,16 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     }
 
     public void start(Channel channel) {
-        setMediaSource(channel.getHeaders(), channel.getUrl());
+        if (channel.getUrl().isEmpty()) {
+            ErrorEvent.url();
+        } else {
+            setMediaSource(channel.getHeaders(), channel.getUrl());
+        }
     }
 
     public void start(Result result, boolean useParse) {
         if (result.getUrl().isEmpty()) {
-            PlayerEvent.error(R.string.error_play_load);
+            ErrorEvent.url();
         } else if (result.getParse(1) == 1 || result.getJx() == 1) {
             stopParse();
             parseTask = ParseTask.create(this).run(result, useParse);
@@ -313,7 +321,7 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     }
 
     private void stopParse() {
-        if (parseTask != null) parseTask.cancel();
+        if (parseTask != null) parseTask.stop();
     }
 
     private void setMediaSource(Result result) {
@@ -321,7 +329,7 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         if (isIjk()) ijkPlayer.setMediaSource(result.getPlayUrl() + result.getUrl(), result.getHeaders());
         if (isExo()) exoPlayer.setMediaSource(ExoUtil.getSource(result, errorCode));
         if (isExo()) exoPlayer.prepare();
-        PlayerEvent.state(0);
+        setTimeoutCheck();
     }
 
     private void setMediaSource(Map<String, String> headers, String url) {
@@ -329,7 +337,13 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         if (isIjk()) ijkPlayer.setMediaSource(url, headers);
         if (isExo()) exoPlayer.setMediaSource(ExoUtil.getSource(headers, url, errorCode));
         if (isExo()) exoPlayer.prepare();
+        setTimeoutCheck();
+    }
+
+    private void setTimeoutCheck() {
         PlayerEvent.state(0);
+        App.removeCallbacks(timeout);
+        App.post(timeout, Constant.TIMEOUT_PLAY);
     }
 
     private void setTrack(Track item) {
@@ -361,17 +375,19 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
 
     @Override
     public void onParseError() {
-        PlayerEvent.error(R.string.error_play_parse);
+        ErrorEvent.parse();
     }
 
     @Override
     public void onPlayerError(@NonNull PlaybackException error) {
         this.errorCode = error.errorCode;
-        PlayerEvent.error(R.string.error_play_format, true);
+        App.removeCallbacks(timeout);
+        ErrorEvent.format();
     }
 
     @Override
     public void onPlaybackStateChanged(int state) {
+        if (state == Player.STATE_READY) App.removeCallbacks(timeout);
         PlayerEvent.state(state);
     }
 
@@ -385,6 +401,7 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
             case IMediaPlayer.MEDIA_INFO_VIDEO_SEEK_RENDERING_START:
             case IMediaPlayer.MEDIA_INFO_AUDIO_SEEK_RENDERING_START:
                 PlayerEvent.state(Player.STATE_READY);
+                App.removeCallbacks(timeout);
                 return true;
             default:
                 return true;
@@ -393,13 +410,15 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
 
     @Override
     public boolean onError(IMediaPlayer mp, int what, int extra) {
-        PlayerEvent.error(R.string.error_play_format, true);
+        App.removeCallbacks(timeout);
+        ErrorEvent.format();
         return true;
     }
 
     @Override
     public void onPrepared(IMediaPlayer mp) {
         PlayerEvent.state(Player.STATE_READY);
+        App.removeCallbacks(timeout);
     }
 
     @Override
