@@ -101,7 +101,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private int mCurrent;
     private Runnable mR1;
     private Runnable mR2;
-    private Runnable mR3;
 
     public static void start(Activity activity, String id, String name) {
         start(activity, ApiConfig.get().getHome().getKey(), id, name);
@@ -189,7 +188,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mFrameParams = mBinding.video.getLayoutParams();
         mBinding.progressLayout.showProgress();
         mPlayers = new Players().init();
-        mR3 = ErrorEvent::timeout;
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
         setRecyclerView();
@@ -333,7 +331,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         if (result != null) {
             mBinding.control.parseLayout.setVisibility(mParseAdapter.size() > 0 && useParse ? View.VISIBLE : View.GONE);
             mPlayers.start(result, useParse);
-            setR3Callback();
         } else {
             ErrorEvent.url();
         }
@@ -662,11 +659,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         App.post(mR1, Constant.INTERVAL_HIDE);
     }
 
-    private void setR3Callback() {
-        App.removeCallbacks(mR3);
-        App.post(mR3, Constant.TIMEOUT_VOD);
-    }
-
     private void getPart(String source) {
         OkHttp.newCall("http://api.pullword.com/get.php?source=" + URLEncoder.encode(source.trim()) + "&param1=0&param2=0&json=1").enqueue(new Callback() {
             @Override
@@ -775,7 +767,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
                 mPlayers.reset();
                 setDefaultTrack();
                 setTrackVisible(true);
-                App.removeCallbacks(mR3);
                 mBinding.widget.size.setText(mPlayers.getSizeText());
                 break;
             case Player.STATE_ENDED:
@@ -811,7 +802,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void onError(ErrorEvent event) {
         Clock.get().setCallback(null);
         showError(event.getMsg());
-        App.removeCallbacks(mR3);
         hideProgress();
         mPlayers.reset();
         checkError(event);
@@ -1045,6 +1035,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     protected void onDestroy() {
         super.onDestroy();
         mPlayers.release();
-        App.removeCallbacks(mR1, mR2, mR3);
+        App.removeCallbacks(mR1, mR2);
     }
 }

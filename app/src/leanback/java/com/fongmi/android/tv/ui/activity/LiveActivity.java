@@ -86,7 +86,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private Runnable mR2;
     private Runnable mR3;
     private Runnable mR4;
-    private Runnable mR5;
     private int count;
 
     public static void start(Activity activity) {
@@ -133,7 +132,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mR2 = this::hideControl;
         mR3 = this::setChannelActivated;
         mR4 = this::setTraffic;
-        mR5 = this::onError;
         mPlayers = new Players().init();
         mKeyDown = CustomKeyDownLive.create(this);
         mFormatDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
@@ -209,10 +207,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(LiveViewModel.class);
-        mViewModel.result.observe(this, result -> {
-            if (result instanceof Live) setGroup((Live) result);
-            else if (result instanceof Channel) mPlayers.start((Channel) result);
-        });
+        mViewModel.channel.observe(this, result -> mPlayers.start(result));
+        mViewModel.live.observe(this, this::setGroup);
     }
 
     private void getLive() {
@@ -397,11 +393,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         App.post(mR2, Constant.INTERVAL_HIDE);
     }
 
-    private void setR5Callback() {
-        App.removeCallbacks(mR5);
-        App.post(mR5, Constant.TIMEOUT_LIVE);
-    }
-
     private void resetPass() {
         this.count = 0;
     }
@@ -487,7 +478,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void getUrl() {
         mViewModel.getUrl(mChannel);
-        setR5Callback();
         showProgress();
     }
 
@@ -674,7 +664,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
                 hideProgress();
                 mPlayers.reset();
                 setTrackVisible(true);
-                App.removeCallbacks(mR5);
                 break;
             case Player.STATE_ENDED:
                 onKeyDown();
@@ -694,7 +683,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void onError() {
-        App.removeCallbacks(mR5);
         mPlayers.reset();
         checkNext();
     }
@@ -742,6 +730,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         Force.get().stop();
         ZLive.get().stop();
         TVBus.get().quit();
-        App.removeCallbacks(mR1, mR2, mR3, mR4, mR5);
+        App.removeCallbacks(mR1, mR2, mR3, mR4);
     }
 }
