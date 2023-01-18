@@ -189,6 +189,7 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     }
 
     public void togglePlayer() {
+        stop();
         setPlayer(player == 0 ? 1 : 0);
     }
 
@@ -341,9 +342,12 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     }
 
     private void setTimeoutCheck() {
-        PlayerEvent.state(0);
-        App.removeCallbacks(timeout);
         App.post(timeout, Constant.TIMEOUT_PLAY);
+        PlayerEvent.state(0);
+    }
+
+    private void removeTimeoutCheck() {
+        App.removeCallbacks(timeout);
     }
 
     private void setTrack(Track item) {
@@ -381,14 +385,23 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     @Override
     public void onPlayerError(@NonNull PlaybackException error) {
         this.errorCode = error.errorCode;
-        App.removeCallbacks(timeout);
+        removeTimeoutCheck();
         ErrorEvent.format();
     }
 
     @Override
     public void onPlaybackStateChanged(int state) {
-        if (state == Player.STATE_READY) App.removeCallbacks(timeout);
-        PlayerEvent.state(state);
+        switch (state) {
+            case Player.STATE_READY:
+                removeTimeoutCheck();
+                PlayerEvent.ready();
+                break;
+            case Player.STATE_BUFFERING:
+            case Player.STATE_ENDED:
+            case Player.STATE_IDLE:
+                PlayerEvent.state(state);
+                break;
+        }
     }
 
     @Override
@@ -400,8 +413,8 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
             case IMediaPlayer.MEDIA_INFO_BUFFERING_END:
             case IMediaPlayer.MEDIA_INFO_VIDEO_SEEK_RENDERING_START:
             case IMediaPlayer.MEDIA_INFO_AUDIO_SEEK_RENDERING_START:
-                PlayerEvent.state(Player.STATE_READY);
-                App.removeCallbacks(timeout);
+                removeTimeoutCheck();
+                PlayerEvent.ready();
                 return true;
             default:
                 return true;
@@ -410,15 +423,15 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
 
     @Override
     public boolean onError(IMediaPlayer mp, int what, int extra) {
-        App.removeCallbacks(timeout);
+        removeTimeoutCheck();
         ErrorEvent.format();
         return true;
     }
 
     @Override
     public void onPrepared(IMediaPlayer mp) {
-        PlayerEvent.state(Player.STATE_READY);
-        App.removeCallbacks(timeout);
+        removeTimeoutCheck();
+        PlayerEvent.ready();
     }
 
     @Override
