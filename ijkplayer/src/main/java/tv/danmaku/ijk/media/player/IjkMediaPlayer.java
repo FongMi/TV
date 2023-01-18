@@ -46,6 +46,7 @@ import java.lang.ref.WeakReference;
 import java.net.URLEncoder;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -539,25 +540,18 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         }
     }
 
-    @Override
-    public IjkTrackInfo[] getTrackInfo() {
+    private List<IjkMediaMeta.IjkStreamMeta> getStreams() {
         Bundle bundle = getMediaMeta();
-        if (bundle == null) return null;
+        if (bundle == null) return Collections.emptyList();
         IjkMediaMeta mediaMeta = IjkMediaMeta.parse(bundle);
-        if (mediaMeta == null) return null;
+        if (mediaMeta == null) return Collections.emptyList();
+        return mediaMeta.mStreams;
+    }
+
+    public List<IjkTrackInfo> getTrackInfo() {
         List<IjkTrackInfo> trackInfos = new ArrayList<>();
-        for (IjkMediaMeta.IjkStreamMeta streamMeta : mediaMeta.mStreams) {
-            IjkTrackInfo trackInfo = new IjkTrackInfo(streamMeta);
-            if (streamMeta.mType.equalsIgnoreCase(IjkMediaMeta.IJKM_VAL_TYPE__VIDEO)) {
-                trackInfo.setTrackType(ITrackInfo.MEDIA_TRACK_TYPE_VIDEO);
-            } else if (streamMeta.mType.equalsIgnoreCase(IjkMediaMeta.IJKM_VAL_TYPE__AUDIO)) {
-                trackInfo.setTrackType(ITrackInfo.MEDIA_TRACK_TYPE_AUDIO);
-            } else if (streamMeta.mType.equalsIgnoreCase(IjkMediaMeta.IJKM_VAL_TYPE__TIMEDTEXT)) {
-                trackInfo.setTrackType(ITrackInfo.MEDIA_TRACK_TYPE_TEXT);
-            }
-            trackInfos.add(trackInfo);
-        }
-        return trackInfos.toArray(new IjkTrackInfo[0]);
+        for (IjkMediaMeta.IjkStreamMeta streamMeta : getStreams()) trackInfos.add(new IjkTrackInfo(streamMeta));
+        return trackInfos;
     }
 
     public int getSelectedTrack(int trackType) {
