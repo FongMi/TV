@@ -24,7 +24,7 @@ import com.fongmi.android.tv.db.dao.TrackDao;
 @Database(entities = {Keep.class, Site.class, Track.class, Config.class, History.class}, version = AppDatabase.VERSION)
 public abstract class AppDatabase extends RoomDatabase {
 
-    public static final int VERSION = 17;
+    public static final int VERSION = 18;
     public static final String SYMBOL = "@@@";
 
     private static volatile AppDatabase instance;
@@ -42,6 +42,7 @@ public abstract class AppDatabase extends RoomDatabase {
                 .addMigrations(MIGRATION_14_15)
                 .addMigrations(MIGRATION_15_16)
                 .addMigrations(MIGRATION_16_17)
+                .addMigrations(MIGRATION_17_18)
                 .allowMainThreadQueries()
                 .fallbackToDestructiveMigration()
                 .build();
@@ -100,6 +101,13 @@ public abstract class AppDatabase extends RoomDatabase {
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             database.execSQL("CREATE TABLE IF NOT EXISTS `Track` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` INTEGER NOT NULL, `group` INTEGER NOT NULL, `track` INTEGER NOT NULL, `player` INTEGER NOT NULL, `key` TEXT, `name` TEXT, `selected` INTEGER NOT NULL)");
             database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_Track_key_player_type` ON `Track` (`key`, `player`, `type`)");
+        }
+    };
+
+    static final Migration MIGRATION_17_18 = new Migration(17, 18) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE Config ADD COLUMN parse TEXT DEFAULT NULL");
         }
     };
 }

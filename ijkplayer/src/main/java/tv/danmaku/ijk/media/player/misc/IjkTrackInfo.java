@@ -19,19 +19,27 @@ package tv.danmaku.ijk.media.player.misc;
 
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
+
 import tv.danmaku.ijk.media.player.IjkMediaMeta;
 
 public class IjkTrackInfo implements ITrackInfo {
 
+    private final IjkMediaMeta.IjkStreamMeta mStreamMeta;
     private int mTrackType = MEDIA_TRACK_TYPE_UNKNOWN;
-    private IjkMediaMeta.IjkStreamMeta mStreamMeta;
 
     public IjkTrackInfo(IjkMediaMeta.IjkStreamMeta streamMeta) {
-        mStreamMeta = streamMeta;
+        initTrackType(mStreamMeta = streamMeta);
     }
 
-    public void setMediaMeta(IjkMediaMeta.IjkStreamMeta streamMeta) {
-        mStreamMeta = streamMeta;
+    private void initTrackType(IjkMediaMeta.IjkStreamMeta streamMeta) {
+        if (streamMeta.mType.equalsIgnoreCase(IjkMediaMeta.IJKM_VAL_TYPE__VIDEO)) {
+            setTrackType(ITrackInfo.MEDIA_TRACK_TYPE_VIDEO);
+        } else if (streamMeta.mType.equalsIgnoreCase(IjkMediaMeta.IJKM_VAL_TYPE__AUDIO)) {
+            setTrackType(ITrackInfo.MEDIA_TRACK_TYPE_AUDIO);
+        } else if (streamMeta.mType.equalsIgnoreCase(IjkMediaMeta.IJKM_VAL_TYPE__TIMEDTEXT)) {
+            setTrackType(ITrackInfo.MEDIA_TRACK_TYPE_TEXT);
+        }
     }
 
     @Override
@@ -64,6 +72,7 @@ public class IjkTrackInfo implements ITrackInfo {
         mTrackType = trackType;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return getClass().getSimpleName() + '{' + getInfoInline() + "}";
