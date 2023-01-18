@@ -189,6 +189,7 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     }
 
     public void togglePlayer() {
+        stop();
         setPlayer(player == 0 ? 1 : 0);
     }
 
