@@ -324,7 +324,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         Clock.get().setCallback(null);
         updateHistory(item, replay);
         showProgress();
-        hideError();
     }
 
     private void startPlay(Result result, boolean useParse) {
@@ -422,7 +421,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         notifyItemChanged(mBinding.control.parse, mParseAdapter);
         startPlay(mViewModel.getPlayer().getValue(), true);
         showProgress();
-        hideError();
     }
 
     private void setArray(int size) {
@@ -605,6 +603,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void showProgress() {
         mBinding.widget.progress.setVisibility(View.VISIBLE);
         App.post(mR2, 0);
+        hideError();
     }
 
     private void hideProgress() {
