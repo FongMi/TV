@@ -11,7 +11,7 @@ android {
         minSdk 21
         targetSdk 29
         versionCode 58
-        versionName "20230118#3"
+        versionName "20230118#4"
         ndk { abiFilters "armeabi-v7a" }
     }
 
