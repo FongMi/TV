@@ -58,6 +58,7 @@ public class ParseTask {
             try {
                 executor.submit(getTask(result)).get(getTimeout(), TimeUnit.MILLISECONDS);
             } catch (Throwable e) {
+                ;
                 onParseError();
             }
         });
@@ -75,8 +76,6 @@ public class ParseTask {
 
     private int getTimeout() {
         switch (parse.getType()) {
-            case 0: //嗅探
-                return Constant.TIMEOUT_PARSE_WEB;
             case 1: //Json
                 return Constant.TIMEOUT_PARSE_JSON;
             case 2: //Json 擴展
@@ -84,7 +83,7 @@ public class ParseTask {
             case 3: //聚合
                 return Constant.TIMEOUT_PARSE_JSON_MIX;
             default:
-                return Constant.TIMEOUT_VOD;
+                return Constant.TIMEOUT_PARSE_DEF;
         }
     }
 
@@ -152,18 +151,20 @@ public class ParseTask {
     private void onParseSuccess(Map<String, String> headers, String url, String from) {
         App.post(() -> {
             if (callback != null) callback.onParseSuccess(headers, url, from);
+            stop();
         });
     }
 
     private void onParseError() {
         App.post(() -> {
             if (callback != null) callback.onParseError();
+            stop();
         });
     }
 
-    public void cancel() {
+    public void stop() {
         if (executor != null) executor.shutdownNow();
-        if (webView != null) webView.stop();
+        if (webView != null) webView.stop(false);
         executor = null;
         callback = null;
         webView = null;
