@@ -58,7 +58,6 @@ public class ParseTask {
             try {
                 executor.submit(getTask(result)).get(getTimeout(), TimeUnit.MILLISECONDS);
             } catch (Throwable e) {
-                ;
                 onParseError();
             }
         });
