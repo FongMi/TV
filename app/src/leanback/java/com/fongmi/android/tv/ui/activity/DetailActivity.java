@@ -802,18 +802,14 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void onError(ErrorEvent event) {
         Clock.get().setCallback(null);
         showError(event.getMsg());
-        hideProgress();
         mPlayers.reset();
-        checkError(event);
+        hideProgress();
+        statFlow();
     }
 
-    private void checkError(ErrorEvent event) {
-        if (event.getType() == ErrorEvent.Type.ADS) {
-            onNext();
-        } else {
-            if (isVisible(mBinding.control.parseLayout)) checkParse();
-            else checkFlag();
-        }
+    private void statFlow() {
+        if (isVisible(mBinding.control.parseLayout)) checkParse();
+        else checkFlag();
     }
 
     private void checkParse() {
