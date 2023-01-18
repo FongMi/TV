@@ -78,7 +78,7 @@ public class CustomWebView extends WebView {
             @Nullable
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
-                if (ApiConfig.get().getAds().contains(Uri.parse(url).getHost())) return empty;
+                if (isAds(url)) return empty;
                 if (isVideoFormat(url)) post(url);
                 return super.shouldInterceptRequest(view, url);
             }
@@ -94,6 +94,14 @@ public class CustomWebView extends WebView {
                 return false;
             }
         };
+    }
+
+    private boolean isAds(String url) {
+        try {
+            return ApiConfig.get().getAds().contains(Uri.parse(url).getHost());
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private boolean isVideoFormat(String url) {
