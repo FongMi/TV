@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.player.ParseTask;
@@ -33,6 +34,7 @@ public class CustomWebView extends WebView {
     private ParseTask.Callback callback;
     private WebResourceResponse empty;
     private List<String> keys;
+    private Runnable mTimer;
     private String key;
 
     public static CustomWebView create(@NonNull Context context) {
@@ -68,6 +70,7 @@ public class CustomWebView extends WebView {
     }
 
     public CustomWebView start(String key, String url, Map<String, String> headers, ParseTask.Callback callback) {
+        App.post(mTimer = () -> stop(true), Constant.TIMEOUT_PARSE_WEB);
         this.callback = callback;
         setUserAgent(headers);
         loadUrl(url, headers);
@@ -116,15 +119,21 @@ public class CustomWebView extends WebView {
         App.post(() -> onSuccess(news, url));
     }
 
-    public void stop() {
+    public void stop(boolean error) {
         stopLoading();
         loadUrl("about:blank");
-        callback = null;
+        App.removeCallbacks(mTimer);
+        if (error) App.post(this::onError);
     }
 
     private void onSuccess(Map<String, String> news, String url) {
         if (callback != null) callback.onParseSuccess(news, url, "");
         callback = null;
-        stop();
+        stop(false);
+    }
+
+    private void onError() {
+        if (callback != null) callback.onParseError();
+        callback = null;
     }
 }

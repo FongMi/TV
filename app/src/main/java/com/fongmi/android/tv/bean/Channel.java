@@ -120,7 +120,7 @@ public class Channel {
     }
 
     public String getUrl() {
-        return url;
+        return TextUtils.isEmpty(url) ? "" : url;
     }
 
     public void setUrl(String url) {
