@@ -808,9 +808,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void checkError(ErrorEvent event) {
-        if (event.isParse() && isVisible(mBinding.control.parseLayout)) checkParse();
-        else if (event.isAds()) onNext();
-        else checkFlag();
+        if (event.getType() == ErrorEvent.Type.ADS) {
+            onNext();
+        } else {
+            if (isVisible(mBinding.control.parseLayout)) checkParse();
+            else checkFlag();
+        }
     }
 
     private void checkParse() {
