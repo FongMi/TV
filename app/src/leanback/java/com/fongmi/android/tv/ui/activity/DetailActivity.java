@@ -396,8 +396,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         for (int i = 0; i < mFlagAdapter.size(); i++) ((Vod.Flag) mFlagAdapter.get(i)).toggle(mCurrent == i, item);
         mBinding.episode.setSelectedPosition(getEpisodePosition());
         notifyItemChanged(mBinding.episode, mEpisodeAdapter);
-        if (mEpisodeAdapter.size() > 0 && isFullscreen()) Notify.show(getString(R.string.play_ready, item.getName()));
-        if (mEpisodeAdapter.size() > 0) getPlayer(false);
+        if (mEpisodeAdapter.size() == 0) return;
+        if (isFullscreen()) Notify.show(getString(R.string.play_ready, item.getName()));
+        getPlayer(false);
     }
 
     private void reverseEpisode() {
