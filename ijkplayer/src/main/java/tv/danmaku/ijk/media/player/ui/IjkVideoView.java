@@ -105,11 +105,10 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     public void setRender(int render) {
         mCurrentRender = render;
+        if (mIjkPlayer == null) return;
         switch (render) {
             case RENDER_TEXTURE_VIEW:
-                TextureRenderView texture = new TextureRenderView(getContext());
-                texture.getSurfaceHolder().bindToMediaPlayer(mIjkPlayer);
-                setRenderView(texture);
+                setRenderView(new TextureRenderView(getContext()));
                 break;
             case RENDER_SURFACE_VIEW:
                 setRenderView(new SurfaceRenderView(getContext()));
@@ -118,6 +117,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     private void setRenderView(IRenderView renderView) {
+        removeRenderView();
         mRenderView = renderView;
         setResizeMode(mCurrentAspectRatio);
         mContentFrame.addView(mRenderView.getView(), 0, new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER));
@@ -317,9 +317,8 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
         @Override
         public void onSurfaceCreated(@NonNull IRenderView.ISurfaceHolder holder, int width, int height) {
-            mSurfaceHolder = holder;
             if (mIjkPlayer != null) bindSurfaceHolder(mIjkPlayer, holder);
-            else openVideo();
+            mSurfaceHolder = holder;
         }
 
         @Override
