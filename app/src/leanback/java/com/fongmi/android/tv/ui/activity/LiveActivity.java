@@ -384,12 +384,10 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void setR1Callback() {
-        App.removeCallbacks(mR1);
         App.post(mR1, Constant.INTERVAL_HIDE);
     }
 
     private void setR2Callback() {
-        App.removeCallbacks(mR2);
         App.post(mR2, Constant.INTERVAL_HIDE);
     }
 
@@ -527,7 +525,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public void setUITimer() {
-        App.removeCallbacks(mR0);
         App.post(mR0, Constant.INTERVAL_HIDE);
     }
 
