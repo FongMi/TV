@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.util.Map;
 
 import tv.danmaku.ijk.media.player.misc.IMediaDataSource;
-import tv.danmaku.ijk.media.player.misc.ITrackInfo;
 
 public interface IMediaPlayer {
     /*
@@ -200,11 +199,6 @@ public interface IMediaPlayer {
     void setLooping(boolean looping);
 
     boolean isLooping();
-
-    /*--------------------
-     * AndroidMediaPlayer: JELLY_BEAN
-     */
-    ITrackInfo[] getTrackInfo();
 
     /*--------------------
      * AndroidMediaPlayer: ICE_CREAM_SANDWICH:

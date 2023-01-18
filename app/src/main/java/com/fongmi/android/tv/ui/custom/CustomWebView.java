@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.player.ParseTask;
@@ -33,8 +34,8 @@ public class CustomWebView extends WebView {
     private ParseTask.Callback callback;
     private WebResourceResponse empty;
     private List<String> keys;
+    private Runnable timer;
     private String key;
-    private String ads;
 
     public static CustomWebView create(@NonNull Context context) {
         return new CustomWebView(context);
@@ -47,7 +48,7 @@ public class CustomWebView extends WebView {
 
     @SuppressLint("SetJavaScriptEnabled")
     public void initSettings() {
-        this.ads = ApiConfig.get().getAds();
+        this.timer = () -> stop(true);
         this.keys = Arrays.asList("user-agent", "referer", "origin");
         this.empty = new WebResourceResponse("text/plain", "utf-8", new ByteArrayInputStream("".getBytes()));
         getSettings().setUseWideViewPort(true);
@@ -70,6 +71,7 @@ public class CustomWebView extends WebView {
     }
 
     public CustomWebView start(String key, String url, Map<String, String> headers, ParseTask.Callback callback) {
+        App.post(timer, Constant.TIMEOUT_PARSE_WEB);
         this.callback = callback;
         setUserAgent(headers);
         loadUrl(url, headers);
@@ -84,7 +86,7 @@ public class CustomWebView extends WebView {
             public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
                 String url = request.getUrl().toString();
                 String host = request.getUrl().getHost();
-                if (ads.contains(host)) return empty;
+                if (ApiConfig.get().getAds().contains(host)) return empty;
                 Map<String, String> headers = request.getRequestHeaders();
                 if (isVideoFormat(url, headers)) post(headers, url);
                 return super.shouldInterceptRequest(view, request);
@@ -104,10 +106,14 @@ public class CustomWebView extends WebView {
     }
 
     private boolean isVideoFormat(String url, Map<String, String> headers) {
-        Site site = ApiConfig.get().getSite(key);
-        Spider spider = ApiConfig.get().getCSP(site);
-        if (spider.manualVideoCheck()) return spider.isVideoFormat(url);
-        return Utils.isVideoFormat(url, headers);
+        try {
+            Site site = ApiConfig.get().getSite(key);
+            Spider spider = ApiConfig.get().getCSP(site);
+            if (spider.manualVideoCheck()) return spider.isVideoFormat(url);
+            return Utils.isVideoFormat(url, headers);
+        } catch (Exception ignored) {
+            return Utils.isVideoFormat(url, headers);
+        }
     }
 
     private void post(Map<String, String> headers, String url) {
@@ -118,15 +124,21 @@ public class CustomWebView extends WebView {
         App.post(() -> onSuccess(news, url));
     }
 
-    public void stop() {
+    public void stop(boolean error) {
         stopLoading();
         loadUrl("about:blank");
-        callback = null;
+        App.removeCallbacks(timer);
+        if (error) App.post(this::onError);
     }
 
     private void onSuccess(Map<String, String> news, String url) {
         if (callback != null) callback.onParseSuccess(news, url, "");
         callback = null;
-        stop();
+        stop(false);
+    }
+
+    private void onError() {
+        if (callback != null) callback.onParseError();
+        callback = null;
     }
 }

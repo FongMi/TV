@@ -18,22 +18,27 @@ import java.util.concurrent.TimeUnit;
 
 public class LiveViewModel extends ViewModel {
 
-    public MutableLiveData<Object> result;
+    private static final int LIVE = 1;
+    private static final int CHANNEL = 2;
+
+    public MutableLiveData<Channel> channel;
+    public MutableLiveData<Live> live;
     public ExecutorService executor;
 
     public LiveViewModel() {
-        this.result = new MutableLiveData<>();
+        this.channel = new MutableLiveData<>();
+        this.live = new MutableLiveData<>();
     }
 
-    public void getLive(Live home) {
-        execute(() -> {
-            LiveParser.start(home);
-            return home;
+    public void getLive(Live item) {
+        execute(LIVE, () -> {
+            LiveParser.start(item);
+            return item;
         });
     }
 
     public void getUrl(Channel item) {
-        execute(() -> {
+        execute(CHANNEL, () -> {
             TVBus.get().stop();
             String url = item.getCurrent().split("\\$")[0];
             if (item.isForce()) item.setUrl(Force.get().fetch(url));
@@ -44,14 +49,18 @@ public class LiveViewModel extends ViewModel {
         });
     }
 
-    private void execute(Callable<?> callable) {
+    private void execute(int type, Callable<?> callable) {
         if (executor != null) executor.shutdownNow();
         executor = Executors.newFixedThreadPool(2);
         executor.execute(() -> {
             try {
-                if (!Thread.interrupted()) result.postValue(executor.submit(callable).get(Constant.TIMEOUT_LIVE, TimeUnit.MILLISECONDS));
+                if (!Thread.interrupted() && type == LIVE) live.postValue((Live) executor.submit(callable).get(Constant.TIMEOUT_HTTP, TimeUnit.MILLISECONDS));
+                if (!Thread.interrupted() && type == CHANNEL) channel.postValue((Channel) executor.submit(callable).get(Constant.TIMEOUT_LIVE, TimeUnit.MILLISECONDS));
             } catch (Throwable e) {
                 e.printStackTrace();
+                if (e instanceof InterruptedException) return;
+                if (!Thread.interrupted() && type == LIVE) live.postValue(new Live());
+                if (!Thread.interrupted() && type == CHANNEL) channel.postValue(new Channel());
             }
         });
     }
