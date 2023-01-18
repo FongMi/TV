@@ -8,12 +8,18 @@ public class Constant {
     public static final int INTERVAL_HIDE = 5 * 1000;
     //網路偵測間隔 0.5 秒
     public static final int INTERVAL_TRAFFIC = 500;
-    //點播超時時間 30 秒
-    public static final int TIMEOUT_VOD = 10 * 1000;
+    //點播超時時間 15 秒
+    public static final int TIMEOUT_VOD = 15 * 1000;
     //直播超時時間 10 秒
     public static final int TIMEOUT_LIVE = 10 * 1000;
-    //解析超時時間 5 秒
-    public static final int TIMEOUT_PARSE = 5 * 1000;
+    //解析超時時間 30 秒
+    public static final int TIMEOUT_PARSE_WEB = 15 * 1000;
+    //解析超時時間 10 秒
+    public static final int TIMEOUT_PARSE_JSON = 10 * 1000;
+    //解析超時時間 15 秒
+    public static final int TIMEOUT_PARSE_JSON_EXT = 15 * 1000;
+    //解析超時時間 15 秒
+    public static final int TIMEOUT_PARSE_JSON_MIX = 15 * 1000;
     //網路超時時間 30 秒
     public static final int TIMEOUT_HTTP = 30 * 1000;
     //代理超時時間 5 秒

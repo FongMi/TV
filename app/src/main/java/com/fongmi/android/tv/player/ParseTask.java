@@ -56,7 +56,7 @@ public class ParseTask {
     private void execute(Result result) {
         executor.execute(() -> {
             try {
-                executor.submit(getTask(result)).get(Constant.TIMEOUT_PARSE, TimeUnit.MILLISECONDS);
+                executor.submit(getTask(result)).get(getTimeout(), TimeUnit.MILLISECONDS);
             } catch (Throwable e) {
                 onParseError();
             }
@@ -71,6 +71,21 @@ public class ParseTask {
                 onParseError();
             }
         };
+    }
+
+    private int getTimeout() {
+        switch (parse.getType()) {
+            case 0: //嗅探
+                return Constant.TIMEOUT_PARSE_WEB;
+            case 1: //Json
+                return Constant.TIMEOUT_PARSE_JSON;
+            case 2: //Json 擴展
+                return Constant.TIMEOUT_PARSE_JSON_EXT;
+            case 3: //聚合
+                return Constant.TIMEOUT_PARSE_JSON_MIX;
+            default:
+                return Constant.TIMEOUT_VOD;
+        }
     }
 
     private void doInBackground(String key, String webUrl, String flag) throws Exception {

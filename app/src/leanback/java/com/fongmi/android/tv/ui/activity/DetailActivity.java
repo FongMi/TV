@@ -285,9 +285,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mViewModel.search.observe(this, result -> setSearch(result.getList()));
         mViewModel.player.observe(this, result -> {
             boolean useParse = (result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx() == 1;
-            mBinding.control.parseLayout.setVisibility(useParse ? View.VISIBLE : View.GONE);
             startPlay(result, useParse);
-            resetFocus(useParse);
+            resetFocus();
         });
         mViewModel.result.observe(this, result -> {
             if (result.getList().isEmpty()) setEmpty();
@@ -296,7 +295,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         });
     }
 
-    private void resetFocus(boolean useParse) {
+    private void resetFocus() {
+        boolean useParse = isVisible(mBinding.control.parseLayout);
         findViewById(R.id.timeBar).setNextFocusUpId(useParse ? R.id.parse : R.id.next);
         for (int i = 0; i < mBinding.control.actionLayout.getChildCount(); i++) {
             mBinding.control.actionLayout.getChildAt(i).setNextFocusDownId(useParse ? R.id.parse : R.id.timeBar);
@@ -331,6 +331,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void startPlay(Result result, boolean useParse) {
         if (result != null) {
+            mBinding.control.parseLayout.setVisibility(mParseAdapter.size() > 0 && useParse ? View.VISIBLE : View.GONE);
             mPlayers.start(result, useParse);
             setR3Callback();
         } else {
@@ -817,7 +818,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void checkError(ErrorEvent event) {
-        if (event.isParse() && mParseAdapter.size() > 0) checkParse();
+        if (event.isParse() && isVisible(mBinding.control.parseLayout)) checkParse();
         else if (event.isAds()) onNext();
         else checkFlag();
     }
