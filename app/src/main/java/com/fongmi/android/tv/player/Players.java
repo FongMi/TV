@@ -39,8 +39,9 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     private Formatter formatter;
     private ParseTask parseTask;
     private ExoPlayer exoPlayer;
-    private Runnable timeout;
+    private Runnable runnable;
     private int errorCode;
+    private int timeout;
     private int retry;
     private int decode;
     private int player;
@@ -56,8 +57,9 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     public Players init() {
         player = Prefers.getPlayer();
         decode = Prefers.getDecode();
-        timeout = ErrorEvent::timeout;
         builder = new StringBuilder();
+        runnable = ErrorEvent::timeout;
+        timeout = Constant.TIMEOUT_PLAY;
         formatter = new Formatter(builder, Locale.getDefault());
         return this;
     }
@@ -114,10 +116,6 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         this.errorCode = 0;
         this.retry = 0;
         stopParse();
-    }
-
-    public int getRetry() {
-        return retry;
     }
 
     public int addRetry() {
@@ -264,6 +262,10 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         }
     }
 
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
+    }
+
     public void start(Channel channel) {
         if (channel.getUrl().isEmpty()) {
             ErrorEvent.url();
@@ -342,12 +344,12 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     }
 
     private void setTimeoutCheck() {
-        App.post(timeout, Constant.TIMEOUT_PLAY);
+        if (timeout > 0) App.post(runnable, timeout);
         PlayerEvent.state(0);
     }
 
     private void removeTimeoutCheck() {
-        App.removeCallbacks(timeout);
+        App.removeCallbacks(runnable);
     }
 
     private void setTrack(Track item) {
