@@ -283,6 +283,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mViewModel.player.observe(this, result -> {
             boolean useParse = (result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx() == 1;
             mBinding.control.parseLayout.setVisibility(mParseAdapter.size() > 0 && useParse ? View.VISIBLE : View.GONE);
+            mPlayers.setTimeout(getSite().isSwitchable() ? Constant.TIMEOUT_PLAY : -1);
             mPlayers.start(result, useParse);
             resetFocus();
         });
@@ -669,9 +670,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private boolean hasFlag() {
         mBinding.flag.setVisibility(mFlagAdapter.size() > 0 ? View.VISIBLE : View.GONE);
-        if (mFlagAdapter.size() == 0) Notify.show(R.string.error_episode);
-        if (mFlagAdapter.size() == 0) initSearch(getName(), true);
-        return mFlagAdapter.size() > 0;
+        if (mFlagAdapter.size() > 0) return true;
+        Notify.show(R.string.error_episode);
+        initSearch(getName(), true);
+        hideProgress();
+        return false;
     }
 
     private void checkHistory() {
