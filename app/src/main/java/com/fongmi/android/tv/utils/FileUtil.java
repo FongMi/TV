@@ -158,12 +158,14 @@ public class FileUtil {
         App.get().startActivity(intent);
     }
 
-    private static void chmod(File file) {
+    public static File chmod(File file) {
         try {
             Process process = Runtime.getRuntime().exec("chmod 777 " + file);
             process.waitFor();
+            return file;
         } catch (Exception e) {
             e.printStackTrace();
+            return file;
         }
     }
 }

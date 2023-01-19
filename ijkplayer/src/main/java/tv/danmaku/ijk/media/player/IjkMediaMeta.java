@@ -229,8 +229,6 @@ public class IjkMediaMeta {
             } else if (streamMeta.mType.equalsIgnoreCase(IJKM_VAL_TYPE__AUDIO)) {
                 streamMeta.mSampleRate = streamMeta.getInt(IJKM_KEY_SAMPLE_RATE);
                 streamMeta.mChannelLayout = streamMeta.getLong(IJKM_KEY_CHANNEL_LAYOUT);
-            } else if (streamMeta.mType.equalsIgnoreCase(IJKM_VAL_TYPE__TIMEDTEXT)) {
-                if (streamMeta.mCodecName.equals("hdmv_pgs_subtitle")) continue;
             }
 
             meta.mStreams.add(streamMeta);

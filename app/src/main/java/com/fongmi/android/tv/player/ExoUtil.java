@@ -64,7 +64,7 @@ public class ExoUtil {
     public static boolean haveTrack(Tracks tracks, int type) {
         int count = 0;
         for (Tracks.Group trackGroup : tracks.getGroups()) if (trackGroup.getType() == type) count += trackGroup.length;
-        return count > 1;
+        return count > 0;
     }
 
     public static MediaSource getSource(Result result, int errorCode) {

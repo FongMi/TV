@@ -85,6 +85,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
                 mBinding.toolbar.setVisibility(position == 0 ? View.VISIBLE : View.GONE);
+                if (mHistoryPresenter.isDelete()) setHistoryDelete(false);
             }
         });
     }
@@ -185,6 +186,11 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         mHistoryAdapter.setItems(items, null);
     }
 
+    private void setHistoryDelete(boolean delete) {
+        mHistoryPresenter.setDelete(delete);
+        mHistoryAdapter.notifyArrayItemRangeChanged(0, mHistoryAdapter.size());
+    }
+
     private int getHistoryIndex() {
         for (int i = 0; i < mAdapter.size(); i++) if (mAdapter.get(i).equals(R.string.home_history)) return i + 1;
         return -1;
@@ -222,7 +228,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     @Override
     public void onItemClick(Vod item) {
         if (item.shouldSearch()) onLongClick(item);
-        else DetailActivity.start(this, item.getVodId());
+        else DetailActivity.start(this, item.getVodId(), item.getVodName());
     }
 
     @Override
@@ -233,7 +239,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     public void onItemClick(History item) {
-        DetailActivity.start(this, item.getSiteKey(), item.getVodId());
+        DetailActivity.start(this, item.getSiteKey(), item.getVodId(), item.getVodName());
     }
 
     @Override
@@ -246,8 +252,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     public boolean onLongClick() {
-        mHistoryPresenter.setDelete(true);
-        mHistoryAdapter.notifyArrayItemRangeChanged(0, mHistoryAdapter.size());
+        setHistoryDelete(true);
         return true;
     }
 
@@ -294,7 +299,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
                 break;
             case PUSH:
                 if (ApiConfig.get().getSite("push_agent") == null) return;
-                DetailActivity.start(this, "push_agent", event.getText(), true);
+                DetailActivity.start(this, "push_agent", event.getText(), "", true);
                 break;
         }
     }
@@ -320,8 +325,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     @Override
     public void onBackPressed() {
         if (mHistoryPresenter.isDelete()) {
-            mHistoryPresenter.setDelete(false);
-            mHistoryAdapter.notifyArrayItemRangeChanged(0, mHistoryAdapter.size());
+            setHistoryDelete(false);
         } else if (mBinding.recycler.getSelectedPosition() != 0) {
             mBinding.recycler.scrollToPosition(0);
         } else if (!confirm) {

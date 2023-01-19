@@ -12,7 +12,6 @@ import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.adapter.TrackAdapter;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.exoplayer2.Tracks;
-import com.google.android.exoplayer2.trackselection.TrackSelectionOverride;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.ArrayList;
@@ -26,6 +25,7 @@ public final class TrackSelectionDialog implements TrackAdapter.OnClickListener 
     private final TrackNameProvider provider;
     private final TrackAdapter adapter;
     private final AlertDialog dialog;
+    private Listener listener;
     private Players player;
     private int type;
 
@@ -47,6 +47,11 @@ public final class TrackSelectionDialog implements TrackAdapter.OnClickListener 
 
     public TrackSelectionDialog player(Players player) {
         this.player = player;
+        return this;
+    }
+
+    public TrackSelectionDialog listener(Listener listener) {
+        this.listener = listener;
         return this;
     }
 
@@ -83,8 +88,9 @@ public final class TrackSelectionDialog implements TrackAdapter.OnClickListener 
             Tracks.Group trackGroup = groups.get(i);
             if (trackGroup.getType() != type) continue;
             for (int j = 0; j < trackGroup.length; j++) {
-                Track item = new Track(provider.getTrackName(trackGroup.getTrackFormat(j)));
+                Track item = new Track(type, provider.getTrackName(trackGroup.getTrackFormat(j)));
                 item.setSelected(trackGroup.isTrackSelected(j));
+                item.setPlayer(player.getPlayer());
                 item.setGroup(i);
                 item.setTrack(j);
                 items.add(item);
@@ -94,11 +100,12 @@ public final class TrackSelectionDialog implements TrackAdapter.OnClickListener 
 
     private void addIjkTrack(List<Track> items) {
         int track = player.ijk().getSelectedTrack(type);
-        IjkTrackInfo[] trackInfos = player.ijk().getTrackInfo();
-        for (int i = 0; i < trackInfos.length; i++) {
-            IjkTrackInfo trackInfo = trackInfos[i];
+        List<IjkTrackInfo> trackInfos = player.ijk().getTrackInfo();
+        for (int i = 0; i < trackInfos.size(); i++) {
+            IjkTrackInfo trackInfo = trackInfos.get(i);
             if (trackInfo.getTrackType() != type) continue;
-            Track item = new Track(provider.getTrackName(trackInfo));
+            Track item = new Track(type, provider.getTrackName(trackInfo));
+            item.setPlayer(player.getPlayer());
             item.setSelected(track == i);
             item.setTrack(i);
             items.add(item);
@@ -107,8 +114,13 @@ public final class TrackSelectionDialog implements TrackAdapter.OnClickListener 
 
     @Override
     public void onItemClick(Track item) {
-        if (player.isExo()) player.exo().setTrackSelectionParameters(player.exo().getTrackSelectionParameters().buildUpon().setOverrideForType(new TrackSelectionOverride(player.exo().getCurrentTracks().getGroups().get(item.getGroup()).getMediaTrackGroup(), item.getTrack())).build());
-        if (player.isIjk()) player.ijk().selectTrack(item.getTrack());
+        if (listener != null) listener.onTrackClick(item);
+        player.setTrack(List.of(item));
         dialog.dismiss();
+    }
+
+    public interface Listener {
+
+        void onTrackClick(Track item);
     }
 }
