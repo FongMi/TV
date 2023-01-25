@@ -43,6 +43,7 @@
     <string name="play_ready">準備播放：<xliff:g name="name">%s</xliff:g></string>
     <string name="play_track_text">字幕</string>
     <string name="play_track_audio">音軌</string>
+    <string name="play_track_video">視軌</string>
     <string name="play_invert">反轉</string>
     <string name="play_across">跨類</string>
     <string name="play_oped">片頭片尾</string>
