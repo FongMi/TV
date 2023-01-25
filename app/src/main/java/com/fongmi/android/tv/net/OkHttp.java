@@ -32,7 +32,7 @@ public class OkHttp {
     }
 
     public static OkHttpClient client(int timeout) {
-        return new OkHttpClient.Builder().connectTimeout(timeout, TimeUnit.MILLISECONDS).hostnameVerifier(SSLSocketFactoryCompat.hostnameVerifier).sslSocketFactory(new SSLSocketFactoryCompat(), SSLSocketFactoryCompat.trustAllCert).build();
+        return new OkHttpClient.Builder().connectTimeout(timeout, TimeUnit.MILLISECONDS).retryOnConnectionFailure(true).hostnameVerifier(SSLSocketFactoryCompat.hostnameVerifier).sslSocketFactory(new SSLSocketFactoryCompat(), SSLSocketFactoryCompat.trustAllCert).build();
     }
 
     public static Call newCall(String url) {
