@@ -25,23 +25,25 @@ public class JarLoader {
     private final ConcurrentHashMap<String, DexClassLoader> loaders;
     private final ConcurrentHashMap<String, Method> methods;
     private final ConcurrentHashMap<String, Spider> spiders;
-    private String current;
+    private String jar;
 
     public JarLoader() {
         this.loaders = new ConcurrentHashMap<>();
         this.methods = new ConcurrentHashMap<>();
         this.spiders = new ConcurrentHashMap<>();
-        this.current = "";
     }
 
     public void clear() {
         this.loaders.clear();
         this.methods.clear();
         this.spiders.clear();
-        this.current = "";
     }
 
-    public void load(String key, File file) throws Exception {
+    public void setJar(String jar) {
+        this.jar = jar;
+    }
+
+    private void load(String key, File file) throws Exception {
         DexClassLoader loader = new DexClassLoader(file.getAbsolutePath(), FileUtil.getCachePath(), null, App.get().getClassLoader());
         Class<?> classInit = loader.loadClass("com.github.catvod.spider.Init");
         Method method = classInit.getMethod("init", Context.class);
@@ -86,10 +88,11 @@ public class JarLoader {
 
     public Spider getSpider(String key, String api, String ext, String jar) {
         try {
-            String spKey = (current = Utils.getMd5(jar)) + key;
+            String jaKey = Utils.getMd5(jar);
+            String spKey = jaKey + key;
             if (spiders.containsKey(spKey)) return spiders.get(spKey);
-            if (!loaders.containsKey(current)) parseJar(current, jar);
-            Spider spider = (Spider) loaders.get(current).loadClass("com.github.catvod.spider." + api.split("csp_")[1]).newInstance();
+            if (!loaders.containsKey(jaKey)) parseJar(jaKey, jar);
+            Spider spider = (Spider) loaders.get(jaKey).loadClass("com.github.catvod.spider." + api.split("csp_")[1]).newInstance();
             spider.init(App.get(), ext);
             spiders.put(spKey, spider);
             return spider;
@@ -117,7 +120,7 @@ public class JarLoader {
 
     public Object[] proxyInvoke(Map<?, ?> params) {
         try {
-            Method proxyFun = methods.get(current);
+            Method proxyFun = methods.get(Utils.getMd5(jar));
             if (proxyFun != null) return (Object[]) proxyFun.invoke(null, params);
             else return null;
         } catch (Exception e) {
