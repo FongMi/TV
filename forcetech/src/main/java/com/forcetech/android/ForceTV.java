@@ -1,9 +1,10 @@
-package com.anymediacloud.iptv.standard;
+package com.forcetech.android;
 
 public class ForceTV {
 
-    public void start(int port) {
+    public void start(String lib, int port) {
         try {
+            System.load(lib);
             start(port, 20 * 1024 * 1024);
         } catch (Throwable ignored) {
         }
