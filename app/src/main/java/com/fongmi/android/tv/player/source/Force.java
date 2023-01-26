@@ -72,19 +72,12 @@ public class Force {
     private final ServiceConnection mConn = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            set.add(get(name));
+            set.add(Util.trans(name));
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            set.remove(get(name));
-        }
-
-        private String get(ComponentName o) {
-            String name = o.getClassName().toLowerCase();
-            name = name.substring(name.lastIndexOf(".") + 1);
-            name = name.replace("service", "");
-            return name;
+            set.remove(Util.trans(name));
         }
     };
 }
