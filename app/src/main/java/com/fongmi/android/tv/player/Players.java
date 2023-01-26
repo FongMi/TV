@@ -262,10 +262,6 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         }
     }
 
-    public void setTimeout(int timeout) {
-        this.timeout = timeout;
-    }
-
     public void start(Channel channel) {
         if (channel.getUrl().isEmpty()) {
             ErrorEvent.url();
@@ -274,13 +270,14 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         }
     }
 
-    public void start(Result result, boolean useParse) {
+    public void start(Result result, boolean useParse, int timeout) {
         if (result.getUrl().isEmpty()) {
             ErrorEvent.url();
         } else if (result.getParse(1) == 1 || result.getJx() == 1) {
             stopParse();
             parseTask = ParseTask.create(this).run(result, useParse);
         } else {
+            this.timeout = timeout;
             setMediaSource(result);
         }
     }
@@ -344,7 +341,7 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     }
 
     private void setTimeoutCheck() {
-        if (timeout > 0) App.post(runnable, timeout);
+        App.post(runnable, timeout);
         PlayerEvent.state(0);
     }
 
