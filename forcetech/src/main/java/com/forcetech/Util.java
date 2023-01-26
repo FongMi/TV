@@ -1,5 +1,6 @@
 package com.forcetech;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -36,6 +37,14 @@ public class Util {
 
     public static String so(String url) {
         return "lib" + scheme(url) + ".so";
+    }
+
+    public static String trans(ComponentName o) {
+        String name = o.getClassName();
+        name = name.substring(name.lastIndexOf(".") + 1);
+        name = name.replace("Service", "");
+        name = name.replace("MainActivity", "mitv");
+        return name.toLowerCase();
     }
 
     public static Intent intent(Context context, String url, File file) {
