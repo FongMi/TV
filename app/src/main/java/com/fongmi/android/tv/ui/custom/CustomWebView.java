@@ -129,6 +129,7 @@ public class CustomWebView extends WebView {
         loadUrl("about:blank");
         App.removeCallbacks(timer);
         if (error) App.post(this::onError);
+        else callback = null;
     }
 
     private void onSuccess(Map<String, String> news, String url) {
