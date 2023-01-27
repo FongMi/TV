@@ -29,6 +29,7 @@ public class LiveParser {
         if (live.getGroups().size() > 0) return;
         if (live.getType() == 0) text(live, getText(live.getUrl()));
         if (live.getType() == 1) json(live, getText(live.getUrl()));
+        if (live.getType() == 2) proxy(live, getText(live.getUrl()));
     }
 
     public static void text(Live live, String text) {
@@ -75,6 +76,18 @@ public class LiveParser {
             if (split[1].contains("://")) {
                 Group group = live.getGroups().get(live.getGroups().size() - 1);
                 group.find(Channel.create(split[0])).addUrls(split[1].split("#"));
+            }
+        }
+    }
+
+    private static void proxy(Live live, String text) {
+        int number = 0;
+        for (Live item : Live.arrayFrom(text)) {
+            Group group = live.find(Group.create(item.getGroup()));
+            for (Channel channel : item.getChannels()) {
+                channel.setNumber(++number);
+                channel.live(live);
+                group.add(channel);
             }
         }
     }
