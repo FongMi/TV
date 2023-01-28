@@ -113,6 +113,7 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     }
 
     public void reset() {
+        removeTimeoutCheck();
         this.errorCode = 0;
         this.retry = 0;
         stopParse();
@@ -384,7 +385,6 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     @Override
     public void onPlayerError(@NonNull PlaybackException error) {
         this.errorCode = error.errorCode;
-        removeTimeoutCheck();
         ErrorEvent.format();
     }
 
@@ -392,7 +392,6 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     public void onPlaybackStateChanged(int state) {
         switch (state) {
             case Player.STATE_READY:
-                removeTimeoutCheck();
                 PlayerEvent.ready();
                 break;
             case Player.STATE_BUFFERING:
@@ -412,7 +411,6 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
             case IMediaPlayer.MEDIA_INFO_BUFFERING_END:
             case IMediaPlayer.MEDIA_INFO_VIDEO_SEEK_RENDERING_START:
             case IMediaPlayer.MEDIA_INFO_AUDIO_SEEK_RENDERING_START:
-                removeTimeoutCheck();
                 PlayerEvent.ready();
                 return true;
             default:
@@ -422,14 +420,12 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
 
     @Override
     public boolean onError(IMediaPlayer mp, int what, int extra) {
-        removeTimeoutCheck();
         ErrorEvent.format();
         return true;
     }
 
     @Override
     public void onPrepared(IMediaPlayer mp) {
-        removeTimeoutCheck();
         PlayerEvent.ready();
     }
 
