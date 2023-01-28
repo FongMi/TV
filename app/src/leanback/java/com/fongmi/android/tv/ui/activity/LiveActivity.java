@@ -685,7 +685,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void onError() {
-        mPlayers.reset();
+        mPlayers.stop();
         checkNext();
     }
 
