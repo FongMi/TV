@@ -5,8 +5,6 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 
-import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
@@ -23,6 +21,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 @Root(strict = false)
 public class Vod {
@@ -241,10 +240,10 @@ public class Vod {
 
         public void createEpisode(String data) {
             String[] urls = data.contains("#") ? data.split("#") : new String[]{data};
-            String play = ResUtil.getString(R.string.play);
-            for (String url : urls) {
-                String[] split = url.split("\\$");
-                Episode episode = split.length >= 2 ? new Vod.Flag.Episode(split[0].isEmpty() ? play : split[0], split[1]) : new Vod.Flag.Episode(play, url);
+            for (int i = 0; i < urls.length; i++) {
+                String[] split = urls[i].split("\\$");
+                String number = String.format(Locale.getDefault(), "%02d", i + 1);
+                Episode episode = split.length > 1 ? new Vod.Flag.Episode(split[0].isEmpty() ? number : split[0], split[1]) : new Vod.Flag.Episode(number, urls[i]);
                 if (!getEpisodes().contains(episode)) getEpisodes().add(episode);
             }
         }
