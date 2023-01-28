@@ -57,6 +57,7 @@ public class LiveParser {
     private static void m3u(Live live, String text) {
         Channel channel = Channel.create("");
         for (String line : text.split("\n")) {
+            if (Thread.interrupted()) break;
             if (line.startsWith("#EXTINF:")) {
                 Group group = live.find(Group.create(extract(line, GROUP)));
                 channel = group.find(Channel.create(extract(line, NAME)));
@@ -71,6 +72,7 @@ public class LiveParser {
         for (String line : text.split("\n")) {
             String[] split = line.split(",");
             if (split.length < 2) continue;
+            if (Thread.interrupted()) break;
             if (line.contains("#genre#")) live.getGroups().add(Group.create(split[0]));
             if (live.getGroups().isEmpty()) live.getGroups().add(Group.create(R.string.live_group));
             if (split[1].contains("://")) {
