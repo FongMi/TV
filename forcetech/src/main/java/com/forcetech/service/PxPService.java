@@ -1,35 +1,29 @@
-package com.gsoft.mitv;
+package com.forcetech.service;
 
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
-import com.anymediacloud.iptv.standard.ForceTV;
-import com.forcetech.Util;
+import com.forcetech.android.ForceTV;
+import com.gsoft.mitv.LocalBinder;
 
-public class MainActivity extends Service {
+public abstract class PxPService extends Service {
 
     private ForceTV forceTV;
     private IBinder binder;
 
-    static {
-        System.loadLibrary("mitv");
-    }
+    public abstract int getPort();
 
     @Override
     public void onCreate() {
         super.onCreate();
-        try {
-            binder = new LocalBinder();
-            loadLibrary(1);
-        } catch (Throwable ignored) {
-        }
+        binder = new LocalBinder();
     }
 
     @Override
     public IBinder onBind(Intent intent) {
         forceTV = new ForceTV();
-        forceTV.start(Util.MTV);
+        forceTV.start(intent.getStringExtra("path"), getPort());
         return binder;
     }
 
@@ -38,6 +32,4 @@ public class MainActivity extends Service {
         if (forceTV != null) forceTV.stop();
         return super.onUnbind(intent);
     }
-
-    private native void loadLibrary(int type);
 }

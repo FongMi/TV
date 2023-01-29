@@ -204,6 +204,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.video.setOnClickListener(view -> onVideo());
         mBinding.control.text.setOnClickListener(this::onTrack);
         mBinding.control.audio.setOnClickListener(this::onTrack);
+        mBinding.control.video.setOnClickListener(this::onTrack);
         mBinding.control.next.setOnClickListener(view -> checkNext());
         mBinding.control.prev.setOnClickListener(view -> checkPrev());
         mBinding.control.scale.setOnClickListener(view -> onScale());
@@ -283,7 +284,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mViewModel.player.observe(this, result -> {
             boolean useParse = (result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx() == 1;
             mBinding.control.parseLayout.setVisibility(mParseAdapter.size() > 0 && useParse ? View.VISIBLE : View.GONE);
-            mPlayers.start(result, useParse);
+            mPlayers.start(result, useParse, getSite().isSwitchable() ? Constant.TIMEOUT_PLAY : -1);
             resetFocus();
         });
         mViewModel.result.observe(this, result -> {
@@ -669,9 +670,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private boolean hasFlag() {
         mBinding.flag.setVisibility(mFlagAdapter.size() > 0 ? View.VISIBLE : View.GONE);
-        if (mFlagAdapter.size() == 0) Notify.show(R.string.error_episode);
-        if (mFlagAdapter.size() == 0) initSearch(getName(), true);
-        return mFlagAdapter.size() > 0;
+        if (mFlagAdapter.size() > 0) return true;
+        Notify.show(R.string.error_episode);
+        initSearch(getName(), true);
+        hideProgress();
+        return false;
     }
 
     private void checkHistory() {
@@ -775,6 +778,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void setTrackVisible(boolean visible) {
         mBinding.control.text.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_TEXT) ? View.VISIBLE : View.GONE);
         mBinding.control.audio.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_AUDIO) ? View.VISIBLE : View.GONE);
+        mBinding.control.video.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_VIDEO) ? View.VISIBLE : View.GONE);
     }
 
     private void setDefaultTrack() {
@@ -793,7 +797,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void onError(ErrorEvent event) {
         Clock.get().setCallback(null);
         showError(event.getMsg());
-        mPlayers.reset();
+        mPlayers.stop();
         hideProgress();
         statFlow();
     }

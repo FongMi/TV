@@ -3,11 +3,15 @@ package com.fongmi.android.tv.bean;
 import android.net.Uri;
 import android.text.TextUtils;
 
+import com.fongmi.android.tv.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Live {
@@ -41,6 +45,12 @@ public class Live {
 
     public static Live objectFrom(JsonElement element) {
         return new Gson().fromJson(element, Live.class);
+    }
+
+    public static List<Live> arrayFrom(String str) {
+        Type listType = new TypeToken<List<Live>>() {}.getType();
+        List<Live> items = new Gson().fromJson(str, listType);
+        return items == null ? Collections.emptyList() : items;
     }
 
     public Live() {
@@ -92,7 +102,7 @@ public class Live {
         return playerType == null ? -1 : playerType == 1 ? 1 : 0;
     }
 
-    private List<Channel> getChannels() {
+    public List<Channel> getChannels() {
         return channels = channels == null ? new ArrayList<>() : channels;
     }
 
@@ -117,10 +127,15 @@ public class Live {
     }
 
     public Live check() {
-        boolean proxy = getGroup().equals("redirect") && getChannels().size() > 0 && getChannels().get(0).getUrls().size() > 0 && getChannels().get(0).getUrls().get(0).startsWith("proxy") && getChannels().get(0).getUrls().get(0).contains("ext=");
-        if (proxy) this.url = getChannels().get(0).getUrls().get(0).split("ext=")[1];
-        if (proxy) this.name = getChannels().get(0).getName();
+        boolean proxy = getGroup().equals("redirect") && getChannels().size() > 0 && getChannels().get(0).getUrls().size() > 0 && getChannels().get(0).getUrls().get(0).startsWith("proxy");
+        if (proxy) setProxy();
         return this;
+    }
+
+    private void setProxy() {
+        this.url = Utils.checkProxy(getChannels().get(0).getUrls().get(0));
+        this.name = getChannels().get(0).getName();
+        this.type = 2;
     }
 
     public Group find(Group item) {
