@@ -50,7 +50,7 @@ public class App extends MultiDexApplication {
 
     public static void post(Runnable runnable, long delayMillis) {
         get().handler.removeCallbacks(runnable);
-        get().handler.postDelayed(runnable, delayMillis);
+        if (delayMillis >= 0) get().handler.postDelayed(runnable, delayMillis);
     }
 
     public static void removeCallbacks(Runnable runnable) {

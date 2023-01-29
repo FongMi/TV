@@ -43,6 +43,7 @@
     <string name="play_ready">Ready to play: <xliff:g name="name">%s</xliff:g></string>
     <string name="play_track_text">Text</string>
     <string name="play_track_audio">Audio</string>
+    <string name="play_track_video">Video</string>
     <string name="play_invert">Invert</string>
     <string name="play_across">Across</string>
     <string name="play_oped">OP&amp;ED</string>
