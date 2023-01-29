@@ -41,7 +41,9 @@ public class TrackNameProvider {
     public String getTrackName(IjkTrackInfo trackInfo) {
         String trackName;
         int trackType = trackInfo.getTrackType();
-        if (trackType == C.TRACK_TYPE_AUDIO) {
+        if (trackType == C.TRACK_TYPE_VIDEO) {
+            trackName = joinWithSeparator(buildResolutionString(trackInfo.getWidth(), trackInfo.getHeight()), buildBitrateString(trackInfo.getBitrate()));
+        } else if (trackType == C.TRACK_TYPE_AUDIO) {
             trackName = joinWithSeparator(buildLanguageString(trackInfo.getLanguage()), buildAudioChannelString(trackInfo.getChannelCount()), buildBitrateString(trackInfo.getBitrate()));
         } else {
             trackName = buildLanguageString(trackInfo.getLanguage());
@@ -50,8 +52,10 @@ public class TrackNameProvider {
     }
 
     private String buildResolutionString(Format format) {
-        int width = format.width;
-        int height = format.height;
+        return buildResolutionString(format.width, format.height);
+    }
+
+    private String buildResolutionString(int width, int height) {
         return width == Format.NO_VALUE || height == Format.NO_VALUE ? "" : resources.getString(R.string.exo_track_resolution, width, height);
     }
 
