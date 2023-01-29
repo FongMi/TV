@@ -191,6 +191,10 @@ public class ApiConfig {
         else return new SpiderNull();
     }
 
+    public void setJar(String key) {
+        jarLoader.setJar(key);
+    }
+
     public Object[] proxyLocal(Map<?, ?> param) {
         return jarLoader.proxyInvoke(param);
     }

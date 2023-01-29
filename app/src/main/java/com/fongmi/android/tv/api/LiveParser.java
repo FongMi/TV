@@ -29,6 +29,7 @@ public class LiveParser {
         if (live.getGroups().size() > 0) return;
         if (live.getType() == 0) text(live, getText(live.getUrl()));
         if (live.getType() == 1) json(live, getText(live.getUrl()));
+        if (live.getType() == 2) proxy(live, getText(live.getUrl()));
     }
 
     public static void text(Live live, String text) {
@@ -56,6 +57,7 @@ public class LiveParser {
     private static void m3u(Live live, String text) {
         Channel channel = Channel.create("");
         for (String line : text.split("\n")) {
+            if (Thread.interrupted()) break;
             if (line.startsWith("#EXTINF:")) {
                 Group group = live.find(Group.create(extract(line, GROUP)));
                 channel = group.find(Channel.create(extract(line, NAME)));
@@ -70,11 +72,24 @@ public class LiveParser {
         for (String line : text.split("\n")) {
             String[] split = line.split(",");
             if (split.length < 2) continue;
+            if (Thread.interrupted()) break;
             if (line.contains("#genre#")) live.getGroups().add(Group.create(split[0]));
             if (live.getGroups().isEmpty()) live.getGroups().add(Group.create(R.string.live_group));
             if (split[1].contains("://")) {
                 Group group = live.getGroups().get(live.getGroups().size() - 1);
                 group.find(Channel.create(split[0])).addUrls(split[1].split("#"));
+            }
+        }
+    }
+
+    private static void proxy(Live live, String text) {
+        int number = 0;
+        for (Live item : Live.arrayFrom(text)) {
+            Group group = live.find(Group.create(item.getGroup()));
+            for (Channel channel : item.getChannels()) {
+                channel.setNumber(++number);
+                channel.live(live);
+                group.add(channel);
             }
         }
     }
