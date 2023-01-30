@@ -22,6 +22,10 @@ public class ErrorEvent {
         EventBus.getDefault().post(new ErrorEvent(Type.FORMAT, true));
     }
 
+    public static void episode() {
+        EventBus.getDefault().post(new ErrorEvent(Type.EPISODE, false));
+    }
+
     public static void timeout() {
         EventBus.getDefault().post(new ErrorEvent(Type.TIMEOUT, false));
     }
@@ -35,6 +39,7 @@ public class ErrorEvent {
         if (type == Type.URL) return R.string.error_play_url;
         if (type == Type.PARSE) return R.string.error_play_parse;
         if (type == Type.FORMAT) return R.string.error_play_format;
+        if (type == Type.EPISODE) return R.string.error_play_episode;
         if (type == Type.TIMEOUT) return R.string.error_play_timeout;
         return -1;
     }
@@ -56,6 +61,6 @@ public class ErrorEvent {
     }
 
     public enum Type {
-        URL, PARSE, FORMAT, TIMEOUT
+        URL, PARSE, FORMAT, EPISODE, TIMEOUT
     }
 }
