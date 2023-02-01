@@ -532,9 +532,10 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         mIjkPlayer.setOption(player, "framedrop", 1);
         mIjkPlayer.setOption(player, "max-buffer-size", 15 * 1024 * 1024);
         mIjkPlayer.setOption(player, "mediacodec", mCurrentDecode);
+        mIjkPlayer.setOption(player, "mediacodec-hevc", mCurrentDecode);
+        mIjkPlayer.setOption(player, "mediacodec-all-videos", mCurrentDecode);
         mIjkPlayer.setOption(player, "mediacodec-auto-rotate", mCurrentDecode);
         mIjkPlayer.setOption(player, "mediacodec-handle-resolution-change", mCurrentDecode);
-        mIjkPlayer.setOption(player, "mediacodec-hevc", mCurrentDecode);
         mIjkPlayer.setOption(player, "opensles", 0);
         mIjkPlayer.setOption(player, "overlay-format", IjkMediaPlayer.SDL_FCC_RV32);
         mIjkPlayer.setOption(player, "reconnect", 1);
@@ -544,7 +545,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         if (url.contains("rtsp") || url.contains("udp") || url.contains("rtp")) {
             mIjkPlayer.setOption(format, "infbuf", 1);
             mIjkPlayer.setOption(format, "rtsp_transport", "tcp");
-            mIjkPlayer.setOption(format, "rtsp_flags", "prefer_tcp");
             mIjkPlayer.setOption(format, "probesize", 512 * 1000);
             mIjkPlayer.setOption(format, "analyzeduration", 2 * 1000 * 1000);
         }

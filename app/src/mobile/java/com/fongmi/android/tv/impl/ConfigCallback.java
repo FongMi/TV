@@ -1,6 +1,8 @@
 package com.fongmi.android.tv.impl;
 
+import com.fongmi.android.tv.bean.Config;
+
 public interface ConfigCallback {
 
-    void setConfig(String url);
+    void setConfig(Config config);
 }

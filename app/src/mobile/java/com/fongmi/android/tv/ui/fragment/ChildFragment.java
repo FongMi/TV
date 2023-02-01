@@ -105,7 +105,7 @@ public class ChildFragment extends BaseFragment implements CustomScroller.Callba
         if (isFolder()) mBinding.recycler.scrollToPosition(0);
         boolean clear = page.equals("1") && mAdapter.getItemCount() > mFilters.size();
         //if (clear) mAdapter.removeItems(mFilters.size(), mAdapter.size() - mFilters.size());
-        mViewModel.categoryContent(typeId, page, true, mExtend);
+        //mViewModel.categoryContent(typeId, page, true, mExtend);
     }
 
     @Override
