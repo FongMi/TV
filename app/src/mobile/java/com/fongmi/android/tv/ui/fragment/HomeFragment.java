@@ -36,6 +36,7 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
     private HistoryAdapter mHistoryAdapter;
     private SiteViewModel mViewModel;
     private VodAdapter mVodAdapter;
+    private Result result;
 
     public static HomeFragment newInstance() {
         return new HomeFragment();
@@ -77,7 +78,7 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
         mViewModel.result.observe(getViewLifecycleOwner(), result -> {
             mBinding.progressLayout.showContent();
             mVodAdapter.addAll(result.getList());
-            result.clear();
+            this.result = result;
         });
     }
 
@@ -99,6 +100,7 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
 
     private void getVideo() {
         mVodAdapter.clear();
+        result = Result.empty();
         String home = ApiConfig.get().getHome().getName();
         mBinding.title.setText(home.isEmpty() ? ResUtil.getString(R.string.app_name) : home);
         if (ApiConfig.get().getHome().getKey().isEmpty()) return;
