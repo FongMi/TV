@@ -21,6 +21,7 @@ package tv.danmaku.ijk.media.player;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
+import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
@@ -187,7 +188,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
                 if (libLoader == null) libLoader = sLocalLibLoader;
                 libLoader.loadLibrary("ijkffmpeg");
                 libLoader.loadLibrary("ijksdl");
-                libLoader.loadLibrary("player");
+                libLoader.loadLibrary("ijkplayer");
                 mIsLibLoaded = true;
             }
         }
@@ -199,7 +200,6 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         synchronized (IjkMediaPlayer.class) {
             if (!mIsNativeInitialized) {
                 native_init();
-                native_setDot(0);
                 native_setLogLevel(IjkMediaPlayer.IJK_LOG_SILENT);
                 mIsNativeInitialized = true;
             }
@@ -410,7 +410,6 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
                 if (!TextUtils.isEmpty(value)) sb.append(entry.getValue());
                 sb.append("\r\n");
                 setOption(OPT_CATEGORY_FORMAT, "headers", sb.toString());
-                setOption(OPT_CATEGORY_FORMAT, "allowed_extensions", "ALL");
                 setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "protocol_whitelist", "async,cache,crypto,file,http,https,ijkhttphook,ijkinject,ijklivehook,ijklongurl,ijksegment,ijktcphook,pipe,rtp,tcp,tls,udp,ijkurlhook,data");
             }
         }
@@ -608,6 +607,9 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
 
     @Override
     public native void seekTo(long msec) throws IllegalStateException;
+
+    @Override
+    public native boolean getCurrentFrame(Bitmap bitmap);
 
     @Override
     public native long getCurrentPosition();
@@ -1154,6 +1156,4 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     public static native void native_profileEnd();
 
     public static native void native_setLogLevel(int level);
-
-    public static native void native_setDot(int port);
 }
