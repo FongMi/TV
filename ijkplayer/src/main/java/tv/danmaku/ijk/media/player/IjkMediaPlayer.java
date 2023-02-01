@@ -200,6 +200,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         synchronized (IjkMediaPlayer.class) {
             if (!mIsNativeInitialized) {
                 native_init();
+                native_setDot(0);
                 native_setLogLevel(IjkMediaPlayer.IJK_LOG_SILENT);
                 mIsNativeInitialized = true;
             }
@@ -1156,4 +1157,6 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     public static native void native_profileEnd();
 
     public static native void native_setLogLevel(int level);
+
+    public static native void native_setDot(int port);
 }
