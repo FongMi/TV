@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -12,15 +11,16 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:background="@drawable/shape_text"
+        android:ellipsize="middle"
         android:foreground="?android:attr/selectableItemBackground"
         android:gravity="center"
         android:singleLine="true"
-        android:textColor="@color/text"
+        android:textColor="@color/white"
         android:textSize="16sp"
-        tools:text="泥巴" />
+        tools:text="https://fongmi.github.io/cat.json" />
 
     <ImageView
-        android:id="@+id/search"
+        android:id="@+id/delete"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
@@ -28,19 +28,6 @@
         android:foreground="?android:attr/selectableItemBackground"
         android:padding="7dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_search_on"
-        app:tint="@color/text" />
-
-    <ImageView
-        android:id="@+id/filter"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:background="@drawable/shape_text"
-        android:foreground="?android:attr/selectableItemBackground"
-        android:padding="7dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/ic_filter_on"
-        app:tint="@color/text" />
+        android:src="@drawable/ic_delete_config" />
 
 </LinearLayout>
