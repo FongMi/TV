@@ -523,7 +523,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         mIjkPlayer.setOnInfoListener(mInfoListener);
         mIjkPlayer.setOnBufferingUpdateListener(mBufferingUpdateListener);
         mIjkPlayer.setOnTimedTextListener(mOnTimedTextListener);
-        mIjkPlayer.setOption(codec, "skip_loop_filter", 0);
+        mIjkPlayer.setOption(codec, "skip_loop_filter", 48);
         mIjkPlayer.setOption(format, "dns_cache_clear", 1);
         mIjkPlayer.setOption(format, "dns_cache_timeout", -1);
         mIjkPlayer.setOption(format, "fflags", "fastseek");
