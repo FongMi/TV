@@ -42,8 +42,8 @@ import com.fongmi.android.tv.net.OkHttp;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
-import com.fongmi.android.tv.ui.custom.TrackSelectionDialog;
 import com.fongmi.android.tv.ui.custom.dialog.DescDialog;
+import com.fongmi.android.tv.ui.custom.dialog.TrackDialog;
 import com.fongmi.android.tv.ui.presenter.ArrayPresenter;
 import com.fongmi.android.tv.ui.presenter.EpisodePresenter;
 import com.fongmi.android.tv.ui.presenter.FlagPresenter;
@@ -76,7 +76,7 @@ import okhttp3.Call;
 import okhttp3.Response;
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Listener, TrackSelectionDialog.Listener, ArrayPresenter.OnClickListener, Clock.Callback {
+public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Listener, TrackDialog.Listener, ArrayPresenter.OnClickListener, Clock.Callback {
 
     private ActivityDetailBinding mBinding;
     private ViewGroup.LayoutParams mFrameParams;
@@ -350,8 +350,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mFlagAdapter.setItems(item.getVodFlags(), null);
         mBinding.content.setMaxLines(getMaxLines());
         mBinding.video.requestFocus();
-        if (hasFlag()) checkHistory();
         getPart(item.getVodName());
+        checkFlag(item);
         checkKeep();
     }
 
@@ -585,7 +585,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void onTrack(View view) {
         int type = Integer.parseInt(view.getTag().toString());
-        TrackSelectionDialog.create(this).player(mPlayers).type(type).listener(this).show();
+        TrackDialog.create(this).player(mPlayers).type(type).listener(this).show();
         hideControl();
     }
 
@@ -668,18 +668,15 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         });
     }
 
-    private boolean hasFlag() {
-        mBinding.flag.setVisibility(mFlagAdapter.size() > 0 ? View.VISIBLE : View.GONE);
-        if (mFlagAdapter.size() > 0) return true;
-        Notify.show(R.string.error_episode);
-        initSearch(getName(), true);
-        hideProgress();
-        return false;
+    private void checkFlag(Vod item) {
+        mBinding.flag.setVisibility(item.getVodFlags().isEmpty() ? View.GONE : View.VISIBLE);
+        if (isVisible(mBinding.flag)) checkHistory(item);
+        else ErrorEvent.episode();
     }
 
-    private void checkHistory() {
+    private void checkHistory(Vod item) {
         mHistory = History.find(getHistoryKey());
-        mHistory = mHistory == null ? createHistory() : mHistory;
+        mHistory = mHistory == null ? createHistory(item) : mHistory;
         setFlagActivated(mHistory.getFlag());
         if (mHistory.isRevSort()) reverseEpisode();
         setScale(mHistory.getScale() == -1 ? Prefers.getScale() : mHistory.getScale());
@@ -691,13 +688,13 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         setDecodeView();
     }
 
-    private History createHistory() {
+    private History createHistory(Vod item) {
         History history = new History();
         history.setKey(getHistoryKey());
         history.setCid(ApiConfig.getCid());
-        history.setVodPic(mBinding.video.getTag().toString());
-        history.setVodName(mBinding.name.getText().toString());
-        history.findEpisode(mFlagAdapter);
+        history.setVodPic(item.getVodPic());
+        history.setVodName(item.getVodName());
+        history.findEpisode(item.getVodFlags());
         return history;
     }
 
@@ -920,11 +917,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         this.mInitTrack = initTrack;
     }
 
-    public boolean isInitAuto() {
+    private boolean isInitAuto() {
         return mInitAuto;
     }
 
-    public void setInitAuto(boolean initAuto) {
+    private void setInitAuto(boolean initAuto) {
         this.mInitAuto = initAuto;
     }
 
@@ -934,6 +931,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void setAutoMode(boolean autoMode) {
         this.mAutoMode = autoMode;
+    }
+
+    private void notifyItemChanged(RecyclerView view, ArrayObjectAdapter adapter) {
+        if (!view.isComputingLayout()) adapter.notifyArrayItemRangeChanged(0, adapter.size());
     }
 
     @Override

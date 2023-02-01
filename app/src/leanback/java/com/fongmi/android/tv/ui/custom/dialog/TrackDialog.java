@@ -1,4 +1,4 @@
-package com.fongmi.android.tv.ui.custom;
+package com.fongmi.android.tv.ui.custom.dialog;
 
 import android.app.Activity;
 import android.view.LayoutInflater;
@@ -10,6 +10,8 @@ import com.fongmi.android.tv.bean.Track;
 import com.fongmi.android.tv.databinding.DialogTrackBinding;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.adapter.TrackAdapter;
+import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
+import com.fongmi.android.tv.ui.custom.TrackNameProvider;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.exoplayer2.Tracks;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -19,7 +21,7 @@ import java.util.List;
 
 import tv.danmaku.ijk.media.player.misc.IjkTrackInfo;
 
-public final class TrackSelectionDialog implements TrackAdapter.OnClickListener {
+public final class TrackDialog implements TrackAdapter.OnClickListener {
 
     private final DialogTrackBinding binding;
     private final TrackNameProvider provider;
@@ -29,28 +31,28 @@ public final class TrackSelectionDialog implements TrackAdapter.OnClickListener 
     private Players player;
     private int type;
 
-    public static TrackSelectionDialog create(Activity activity) {
-        return new TrackSelectionDialog(activity);
+    public static TrackDialog create(Activity activity) {
+        return new TrackDialog(activity);
     }
 
-    public TrackSelectionDialog(Activity activity) {
+    public TrackDialog(Activity activity) {
         this.binding = DialogTrackBinding.inflate(LayoutInflater.from(activity));
         this.dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).create();
         this.adapter = new TrackAdapter(this);
         this.provider = new TrackNameProvider();
     }
 
-    public TrackSelectionDialog type(int type) {
+    public TrackDialog type(int type) {
         this.type = type;
         return this;
     }
 
-    public TrackSelectionDialog player(Players player) {
+    public TrackDialog player(Players player) {
         this.player = player;
         return this;
     }
 
-    public TrackSelectionDialog listener(Listener listener) {
+    public TrackDialog listener(Listener listener) {
         this.listener = listener;
         return this;
     }

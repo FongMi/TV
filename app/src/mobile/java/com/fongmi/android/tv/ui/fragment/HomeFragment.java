@@ -10,14 +10,18 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.api.LiveConfig;
+import com.fongmi.android.tv.api.WallConfig;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.FragmentHomeBinding;
 import com.fongmi.android.tv.model.SiteViewModel;
+import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.ui.activity.BaseFragment;
 import com.fongmi.android.tv.ui.adapter.HistoryAdapter;
 import com.fongmi.android.tv.ui.adapter.VodAdapter;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
+import com.fongmi.android.tv.utils.Notify;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -39,11 +43,12 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
 
     @Override
     protected void initView() {
+        WallConfig.get().init();
+        LiveConfig.get().init();
+        ApiConfig.get().init().load(getCallback());
         mBinding.progressLayout.showProgress();
         setRecyclerView();
         setViewModel();
-        getHistory();
-        getVideo();
     }
 
     @Override
@@ -69,6 +74,23 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
             mBinding.progressLayout.showContent();
             EventBus.getDefault().post(result);
         });
+    }
+
+    private Callback getCallback() {
+        return new Callback() {
+            @Override
+            public void success() {
+                mBinding.progressLayout.showContent();
+                getHistory();
+                getVideo();
+            }
+
+            @Override
+            public void error(int resId) {
+                mBinding.progressLayout.showContent();
+                Notify.show(resId);
+            }
+        };
     }
 
     private void getVideo() {
