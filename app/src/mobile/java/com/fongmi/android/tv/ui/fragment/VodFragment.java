@@ -19,7 +19,6 @@ import com.fongmi.android.tv.ui.activity.BaseFragment;
 import com.fongmi.android.tv.ui.adapter.TypeAdapter;
 import com.google.gson.Gson;
 
-import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
@@ -50,7 +49,6 @@ public class VodFragment extends BaseFragment {
 
     @Override
     protected void initEvent() {
-        EventBus.getDefault().register(this);
         mAdapter.setListener(item -> mBinding.pager.setCurrentItem(mAdapter.setActivated(item)));
         mBinding.pager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
