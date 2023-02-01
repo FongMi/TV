@@ -54,7 +54,6 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.liveUrl.setText(LiveConfig.getUrl());
         mBinding.wallUrl.setText(WallConfig.getUrl());
         mBinding.versionText.setText(BuildConfig.VERSION_NAME);
-        mBinding.sizeText.setText(ResUtil.getStringArray(R.array.select_size)[Prefers.getSize()]);
         mBinding.scaleText.setText(ResUtil.getStringArray(R.array.select_scale)[Prefers.getScale()]);
         mBinding.playerText.setText(ResUtil.getStringArray(R.array.select_player)[Prefers.getPlayer()]);
         mBinding.decodeText.setText(ResUtil.getStringArray(R.array.select_decode)[Prefers.getDecode()]);
@@ -79,7 +78,6 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.decode.setOnClickListener(view -> setDecode());
         mBinding.render.setOnClickListener(view -> setRender());
         mBinding.scale.setOnClickListener(view -> setScale());
-        mBinding.size.setOnClickListener(view -> setSize());
     }
 
     @Override
@@ -194,14 +192,6 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         String[] array = ResUtil.getStringArray(R.array.select_scale);
         Prefers.putScale(index = index == array.length - 1 ? 0 : ++index);
         mBinding.scaleText.setText(array[index]);
-    }
-
-    private void setSize() {
-        int index = Prefers.getSize();
-        String[] array = ResUtil.getStringArray(R.array.select_size);
-        Prefers.putSize(index = index == array.length - 1 ? 0 : ++index);
-        mBinding.sizeText.setText(array[index]);
-        RefreshEvent.size();
     }
 
     private void setWallDefault() {

@@ -55,6 +55,11 @@ public class VodAdapter extends RecyclerView.Adapter<VodAdapter.ViewHolder> {
         notifyItemRangeInserted(mItems.size(), items.size());
     }
 
+    public void clear() {
+        notifyItemRangeInserted(0, mItems.size());
+        mItems.clear();
+    }
+
     @Override
     public int getItemCount() {
         return mItems.size();

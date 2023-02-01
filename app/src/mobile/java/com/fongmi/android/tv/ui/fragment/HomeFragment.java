@@ -9,12 +9,15 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.viewbinding.ViewBinding;
 
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.api.LiveConfig;
 import com.fongmi.android.tv.api.WallConfig;
 import com.fongmi.android.tv.bean.History;
+import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.FragmentHomeBinding;
+import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.ui.activity.BaseFragment;
@@ -22,8 +25,10 @@ import com.fongmi.android.tv.ui.adapter.HistoryAdapter;
 import com.fongmi.android.tv.ui.adapter.VodAdapter;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.utils.Notify;
+import com.fongmi.android.tv.utils.ResUtil;
 
-import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 public class HomeFragment extends BaseFragment implements VodAdapter.OnClickListener, HistoryAdapter.OnClickListener {
 
@@ -70,9 +75,9 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mViewModel.result.observe(getViewLifecycleOwner(), result -> {
-            if (result != null) mVodAdapter.addAll(result.getList());
             mBinding.progressLayout.showContent();
-            EventBus.getDefault().post(result);
+            mVodAdapter.addAll(result.getList());
+            result.clear();
         });
     }
 
@@ -80,7 +85,6 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
         return new Callback() {
             @Override
             public void success() {
-                mBinding.progressLayout.showContent();
                 getHistory();
                 getVideo();
             }
@@ -94,7 +98,11 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
     }
 
     private void getVideo() {
+        mVodAdapter.clear();
+        String home = ApiConfig.get().getHome().getName();
+        mBinding.title.setText(home.isEmpty() ? ResUtil.getString(R.string.app_name) : home);
         if (ApiConfig.get().getHome().getKey().isEmpty()) return;
+        mBinding.progressLayout.showProgress();
         mViewModel.homeContent();
     }
 
@@ -119,5 +127,17 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
     @Override
     public boolean onLongClick(History item) {
         return false;
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onRefreshEvent(RefreshEvent event) {
+        switch (event.getType()) {
+            case VIDEO:
+                getVideo();
+                break;
+            case HISTORY:
+                getHistory();
+                break;
+        }
     }
 }
