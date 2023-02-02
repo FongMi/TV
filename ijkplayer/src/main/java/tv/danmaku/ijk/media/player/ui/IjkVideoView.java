@@ -545,6 +545,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         if (url.contains("rtsp") || url.contains("udp") || url.contains("rtp")) {
             mIjkPlayer.setOption(format, "infbuf", 1);
             mIjkPlayer.setOption(format, "rtsp_transport", "tcp");
+            mIjkPlayer.setOption(format, "rtsp_flags", "prefer_tcp");
             mIjkPlayer.setOption(format, "probesize", 512 * 1000);
             mIjkPlayer.setOption(format, "analyzeduration", 2 * 1000 * 1000);
         }
