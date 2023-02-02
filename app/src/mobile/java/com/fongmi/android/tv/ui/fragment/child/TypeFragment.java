@@ -10,9 +10,10 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.viewbinding.ViewBinding;
 
+import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Filter;
 import com.fongmi.android.tv.bean.Vod;
-import com.fongmi.android.tv.databinding.FragmentChildBinding;
+import com.fongmi.android.tv.databinding.FragmentTypeBinding;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.ui.activity.BaseFragment;
 import com.fongmi.android.tv.ui.adapter.VodAdapter;
@@ -23,15 +24,26 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class ChildFragment extends BaseFragment implements CustomScroller.Callback, VodAdapter.OnClickListener {
+public class TypeFragment extends BaseFragment implements CustomScroller.Callback, VodAdapter.OnClickListener {
 
-    private FragmentChildBinding mBinding;
     private HashMap<String, String> mExtend;
-    private SiteViewModel mViewModel;
+    private FragmentTypeBinding mBinding;
     private CustomScroller mScroller;
+    private SiteViewModel mViewModel;
     private List<Filter> mFilters;
     private List<String> mTypeIds;
     private VodAdapter mAdapter;
+    private boolean mOpen;
+
+    public static TypeFragment newInstance(String typeId, String filter, boolean folder) {
+        Bundle args = new Bundle();
+        args.putString("typeId", typeId);
+        args.putString("filter", filter);
+        args.putBoolean("folder", folder);
+        TypeFragment fragment = new TypeFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     private String getTypeId() {
         return getArguments().getString("typeId");
@@ -45,19 +57,9 @@ public class ChildFragment extends BaseFragment implements CustomScroller.Callba
         return getArguments().getBoolean("folder");
     }
 
-    public static ChildFragment newInstance(String typeId, String filter, boolean folder) {
-        Bundle args = new Bundle();
-        args.putString("typeId", typeId);
-        args.putString("filter", filter);
-        args.putBoolean("folder", folder);
-        ChildFragment fragment = new ChildFragment();
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     protected ViewBinding getBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
-        return mBinding = FragmentChildBinding.inflate(inflater, container, false);
+        return mBinding = FragmentTypeBinding.inflate(inflater, container, false);
     }
 
     @Override
@@ -82,8 +84,8 @@ public class ChildFragment extends BaseFragment implements CustomScroller.Callba
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mViewModel.result.observe(getViewLifecycleOwner(), result -> {
+            mBinding.progressLayout.showContent(isFolder(), result.getList().size());
             mScroller.endLoading(result.getList().isEmpty());
-            mBinding.progressLayout.showContent();
             mAdapter.addAll(result.getList());
             checkPage();
         });
@@ -96,16 +98,14 @@ public class ChildFragment extends BaseFragment implements CustomScroller.Callba
 
     private void checkPage() {
         if (mScroller.getPage() != 1 || mAdapter.getItemCount() >= 4 || isFolder()) return;
-        mScroller.addPage();
-        getVideo(getTypeId(), "2");
+        if (mScroller.addPage()) getVideo(getTypeId(), "2");
     }
 
     private void getVideo(String typeId, String page) {
         if (isFolder()) mTypeIds.add(typeId);
-        if (isFolder()) mBinding.recycler.scrollToPosition(0);
-        boolean clear = page.equals("1") && mAdapter.getItemCount() > mFilters.size();
-        //if (clear) mAdapter.removeItems(mFilters.size(), mAdapter.size() - mFilters.size());
-        //mViewModel.categoryContent(typeId, page, true, mExtend);
+        if (isFolder() && !mOpen) mBinding.recycler.scrollToPosition(0);
+        if (page.equals("1")) mAdapter.clear();
+        mViewModel.categoryContent(ApiConfig.get().getHome().getKey(), typeId, page, true, mExtend);
     }
 
     @Override
@@ -123,5 +123,11 @@ public class ChildFragment extends BaseFragment implements CustomScroller.Callba
     @Override
     public boolean onLongClick(Vod item) {
         return false;
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (mBinding != null && !isVisibleToUser) mBinding.recycler.scrollToPosition(0);
     }
 }
