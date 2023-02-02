@@ -20,6 +20,7 @@ public class TypeAdapter extends RecyclerView.Adapter<TypeAdapter.ViewHolder> {
 
     public TypeAdapter() {
         this.mItems = new ArrayList<>();
+        this.mItems.add(home());
     }
 
     public void setListener(OnClickListener listener) {
@@ -49,9 +50,13 @@ public class TypeAdapter extends RecyclerView.Adapter<TypeAdapter.ViewHolder> {
         return type;
     }
 
-    public void addAll(List<Class> items) {
+    public void clear() {
         mItems.clear();
         mItems.add(home());
+        notifyDataSetChanged();
+    }
+
+    public void addAll(List<Class> items) {
         mItems.addAll(items);
         notifyDataSetChanged();
     }
