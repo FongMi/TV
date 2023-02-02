@@ -37,7 +37,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VodFragment extends BaseFragment implements SiteCallback {
+public class VodFragment extends BaseFragment implements SiteCallback, TypeAdapter.OnClickListener {
 
     private FragmentVodBinding mBinding;
     private SiteViewModel mViewModel;
@@ -74,8 +74,8 @@ public class VodFragment extends BaseFragment implements SiteCallback {
 
     @Override
     protected void initEvent() {
+        mTypeAdapter.setListener(this);
         mBinding.title.setOnClickListener(this::onTitle);
-        mTypeAdapter.setListener(item -> mBinding.pager.setCurrentItem(mTypeAdapter.setActivated(item)));
         mBinding.pager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
@@ -127,6 +127,21 @@ public class VodFragment extends BaseFragment implements SiteCallback {
         RefreshEvent.video();
     }
 
+    @Override
+    public void onItemClick(int position, Class item) {
+        if (position == mBinding.pager.getCurrentItem()) {
+            updateFilter(position, item);
+        } else {
+            mBinding.pager.setCurrentItem(mTypeAdapter.setActivated(item));
+        }
+    }
+
+    private void updateFilter(int position, Class item) {
+        if (item.getFilter() == null) return;
+        getFragment().toggleFilter(item.toggleFilter());
+        mTypeAdapter.notifyItemChanged(position);
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefreshEvent(RefreshEvent event) {
         if (event.getType() == RefreshEvent.Type.VIDEO) homeContent();
@@ -139,6 +154,10 @@ public class VodFragment extends BaseFragment implements SiteCallback {
         String home = getSite().getName();
         mBinding.title.setText(home.isEmpty() ? ResUtil.getString(R.string.app_name) : home);
         if (!getSite().getKey().isEmpty()) mViewModel.homeContent();
+    }
+
+    private TypeFragment getFragment() {
+        return (TypeFragment) mPageAdapter.instantiateItem(mBinding.pager, mBinding.pager.getCurrentItem());
     }
 
     class PageAdapter extends FragmentStatePagerAdapter {

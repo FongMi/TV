@@ -29,7 +29,7 @@ public class TypeAdapter extends RecyclerView.Adapter<TypeAdapter.ViewHolder> {
 
     public interface OnClickListener {
 
-        void onItemClick(Class item);
+        void onItemClick(int position, Class item);
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -99,6 +99,6 @@ public class TypeAdapter extends RecyclerView.Adapter<TypeAdapter.ViewHolder> {
         holder.binding.text.setActivated(item.isActivated());
         holder.binding.text.setCompoundDrawablePadding(ResUtil.dp2px(4));
         holder.binding.text.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, item.getIcon(), 0);
-        holder.binding.getRoot().setOnClickListener(v -> mListener.onItemClick(item));
+        holder.binding.getRoot().setOnClickListener(v -> mListener.onItemClick(position, item));
     }
 }
