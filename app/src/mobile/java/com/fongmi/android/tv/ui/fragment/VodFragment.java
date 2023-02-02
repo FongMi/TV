@@ -25,8 +25,8 @@ import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.ui.activity.BaseFragment;
 import com.fongmi.android.tv.ui.adapter.TypeAdapter;
 import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
-import com.fongmi.android.tv.ui.fragment.child.ChildFragment;
 import com.fongmi.android.tv.ui.fragment.child.SiteFragment;
+import com.fongmi.android.tv.ui.fragment.child.TypeFragment;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.gson.Gson;
 
@@ -43,6 +43,7 @@ public class VodFragment extends BaseFragment implements SiteCallback {
     private SiteViewModel mViewModel;
     private TypeAdapter mTypeAdapter;
     private PageAdapter mPageAdapter;
+    private boolean destroy;
 
     public static VodFragment newInstance() {
         return new VodFragment();
@@ -50,6 +51,14 @@ public class VodFragment extends BaseFragment implements SiteCallback {
 
     private Site getSite() {
         return ApiConfig.get().getHome();
+    }
+
+    public boolean isDestroy() {
+        return destroy;
+    }
+
+    public void setDestroy(boolean destroy) {
+        this.destroy = destroy;
     }
 
     @Override
@@ -89,6 +98,7 @@ public class VodFragment extends BaseFragment implements SiteCallback {
             EventBus.getDefault().post(result);
             mPageAdapter.setResult(result);
             setAdapter(result);
+            setDestroy(false);
         });
     }
 
@@ -107,7 +117,7 @@ public class VodFragment extends BaseFragment implements SiteCallback {
         mBinding.pager.setCurrentItem(0);
     }
 
-    public void onTitle(View view) {
+    private void onTitle(View view) {
         SiteDialog.create(this).filter(true).show();
     }
 
@@ -123,12 +133,12 @@ public class VodFragment extends BaseFragment implements SiteCallback {
     }
 
     private void homeContent() {
+        setDestroy(true);
         mTypeAdapter.clear();
         mPageAdapter.notifyDataSetChanged();
         String home = getSite().getName();
         mBinding.title.setText(home.isEmpty() ? ResUtil.getString(R.string.app_name) : home);
-        if (getSite().getKey().isEmpty()) return;
-        mViewModel.homeContent();
+        if (!getSite().getKey().isEmpty()) mViewModel.homeContent();
     }
 
     class PageAdapter extends FragmentStatePagerAdapter {
@@ -149,7 +159,7 @@ public class VodFragment extends BaseFragment implements SiteCallback {
             Class type = mTypeAdapter.get(position);
             if (position == 0) return SiteFragment.newInstance();
             String filter = new Gson().toJson(result.getFilters().get(type.getTypeId()));
-            return ChildFragment.newInstance(type.getTypeId(), filter, type.getTypeFlag().equals("1"));
+            return TypeFragment.newInstance(type.getTypeId(), filter, type.getTypeFlag().equals("1"));
         }
 
         @Override
@@ -164,7 +174,7 @@ public class VodFragment extends BaseFragment implements SiteCallback {
 
         @Override
         public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
-            if (position != 0) super.destroyItem(container, position, object);
+            if (position != 0 && isDestroy()) super.destroyItem(container, position, object);
         }
     }
 }

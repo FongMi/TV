@@ -35,7 +35,6 @@
             android:paddingTop="8dp"
             android:paddingEnd="8dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_scrollFlags="scroll|enterAlways"
             tools:listitem="@layout/adapter_type" />
 
     </com.google.android.material.appbar.AppBarLayout>
