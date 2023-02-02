@@ -21,7 +21,8 @@
             android:id="@+id/history"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="16dp"
+            android:nestedScrollingEnabled="false" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -40,7 +41,8 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recommend"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:nestedScrollingEnabled="false" />
 
         </com.fongmi.android.tv.ui.custom.ProgressLayout>
     </LinearLayout>
