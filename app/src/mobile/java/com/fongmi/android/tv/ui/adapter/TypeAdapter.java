@@ -41,11 +41,18 @@ public class TypeAdapter extends RecyclerView.Adapter<TypeAdapter.ViewHolder> {
         }
     }
 
+    private Class home() {
+        Class type = new Class();
+        type.setTypeName("首頁");
+        type.setTypeId("home");
+        type.setActivated(true);
+        return type;
+    }
+
     public void addAll(List<Class> items) {
-        if (items.isEmpty()) return;
         mItems.clear();
+        mItems.add(home());
         mItems.addAll(items);
-        mItems.get(0).setActivated(true);
         notifyDataSetChanged();
     }
 

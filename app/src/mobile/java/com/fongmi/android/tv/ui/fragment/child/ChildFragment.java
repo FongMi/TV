@@ -1,4 +1,4 @@
-package com.fongmi.android.tv.ui.fragment;
+package com.fongmi.android.tv.ui.fragment.child;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
