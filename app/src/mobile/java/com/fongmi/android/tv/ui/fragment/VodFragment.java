@@ -30,6 +30,7 @@ import com.fongmi.android.tv.ui.fragment.child.SiteFragment;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.gson.Gson;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
@@ -85,6 +86,7 @@ public class VodFragment extends BaseFragment implements SiteCallback {
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mViewModel.result.observe(getViewLifecycleOwner(), result -> {
+            EventBus.getDefault().post(result);
             mPageAdapter.setResult(result);
             setAdapter(result);
         });
@@ -112,7 +114,7 @@ public class VodFragment extends BaseFragment implements SiteCallback {
     @Override
     public void setSite(Site item) {
         ApiConfig.get().setHome(item);
-        homeContent();
+        RefreshEvent.video();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -121,6 +123,8 @@ public class VodFragment extends BaseFragment implements SiteCallback {
     }
 
     private void homeContent() {
+        mTypeAdapter.clear();
+        mPageAdapter.notifyDataSetChanged();
         String home = getSite().getName();
         mBinding.title.setText(home.isEmpty() ? ResUtil.getString(R.string.app_name) : home);
         if (getSite().getKey().isEmpty()) return;
@@ -143,7 +147,7 @@ public class VodFragment extends BaseFragment implements SiteCallback {
         @Override
         public Fragment getItem(int position) {
             Class type = mTypeAdapter.get(position);
-            if (position == 0) return SiteFragment.newInstance(result.getList());
+            if (position == 0) return SiteFragment.newInstance();
             String filter = new Gson().toJson(result.getFilters().get(type.getTypeId()));
             return ChildFragment.newInstance(type.getTypeId(), filter, type.getTypeFlag().equals("1"));
         }
@@ -156,6 +160,11 @@ public class VodFragment extends BaseFragment implements SiteCallback {
         @Override
         public int getItemPosition(@NonNull Object object) {
             return POSITION_NONE;
+        }
+
+        @Override
+        public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
+            if (position != 0) super.destroyItem(container, position, object);
         }
     }
 }
