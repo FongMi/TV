@@ -28,7 +28,7 @@ import java.util.List;
 
 public class TypeFragment extends BaseFragment implements CustomScroller.Callback, ValueAdapter.OnClickListener, VodAdapter.OnClickListener {
 
-    private HashMap<String, String> mExtend;
+    private HashMap<String, String> mExtends;
     private FragmentTypeBinding mBinding;
     private FilterAdapter mFilterAdapter;
     private CustomScroller mScroller;
@@ -68,7 +68,8 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     @Override
     protected void initView() {
         mTypeIds = new ArrayList<>();
-        mExtend = new HashMap<>();
+        mExtends = new HashMap<>();
+        mScroller = new CustomScroller(this);
         mFilters = Filter.arrayFrom(getFilter());
         mBinding.progressLayout.showProgress();
         setRecyclerView();
@@ -76,12 +77,16 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         getVideo();
     }
 
+    @Override
+    protected void initEvent() {
+        mBinding.scroller.setOnScrollChangeListener(mScroller);
+    }
+
     private void setRecyclerView() {
         mBinding.filter.setHasFixedSize(true);
         mBinding.filter.setAdapter(mFilterAdapter = new FilterAdapter(this));
         mBinding.recycler.setHasFixedSize(true);
         mBinding.recycler.setAdapter(mVodAdapter = new VodAdapter(this));
-        mBinding.recycler.addOnScrollListener(mScroller = new CustomScroller(this));
         mBinding.recycler.setLayoutManager(new GridLayoutManager(getContext(), 3));
         mBinding.recycler.addItemDecoration(new SpaceItemDecoration(3, 16));
     }
@@ -110,43 +115,28 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         if (isFolder()) mTypeIds.add(typeId);
         if (isFolder() && !mOpen) mBinding.recycler.scrollToPosition(0);
         if (page.equals("1")) mVodAdapter.clear();
-        mViewModel.categoryContent(ApiConfig.get().getHome().getKey(), typeId, page, true, mExtend);
+        mViewModel.categoryContent(ApiConfig.get().getHome().getKey(), typeId, page, true, mExtends);
     }
 
-    private void addFilter() {
+    private void showFilter() {
+        mBinding.scroller.smoothScrollTo(0, 0);
         mFilterAdapter.addAll(mFilters);
     }
 
-    private void clearFilter() {
+    private void hideFilter() {
         mFilterAdapter.clear();
     }
 
-    /*private void setClick(ArrayObjectAdapter adapter, String key, Filter.Value item) {
-        for (int i = 0; i < adapter.size(); i++) ((Filter.Value) adapter.get(i)).setActivated(item);
-        adapter.notifyArrayItemRangeChanged(0, adapter.size());
-        mExtend.put(key, item.getV());
-        if (isFolder()) refresh(1);
-        else getVideo();
-    }*/
+    public void toggleFilter(boolean open) {
+        if (open) showFilter();
+        else hideFilter();
+        mOpen = open;
+    }
 
     private void refresh(int num) {
         String typeId = mTypeIds.get(mTypeIds.size() - num);
         mTypeIds = mTypeIds.subList(0, mTypeIds.size() - num);
         getVideo(typeId, "1");
-    }
-
-    public void toggleFilter(boolean open) {
-        if (open) addFilter();
-        else clearFilter();
-        mOpen = open;
-    }
-
-    public boolean canGoBack() {
-        return mTypeIds.size() > 1;
-    }
-
-    public void goBack() {
-        refresh(2);
     }
 
     @Override
@@ -158,6 +148,9 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     @Override
     public void onItemClick(String key, Filter.Value item) {
+        mExtends.put(key, item.getV());
+        if (isFolder()) refresh(1);
+        else getVideo();
     }
 
     @Override
