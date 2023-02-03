@@ -78,7 +78,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.8.0'
     implementation 'com.google.code.gson:gson:2.10'
     implementation 'com.google.net.cronet:cronet-okhttp:0.1.0'
-    implementation 'com.google.zxing:core:3.5.1'
+    implementation 'com.google.zxing:core:3.3.0'
     implementation 'com.guolindev.permissionx:permissionx:1.7.1'
     implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.10'
     implementation 'me.jessyan:autosize:1.2.1'
