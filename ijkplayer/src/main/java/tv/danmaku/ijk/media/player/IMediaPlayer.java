@@ -19,6 +19,7 @@ package tv.danmaku.ijk.media.player;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.view.Surface;
@@ -101,6 +102,8 @@ public interface IMediaPlayer {
     boolean isPlaying();
 
     void seekTo(long msec) throws IllegalStateException;
+
+    boolean getCurrentFrame(Bitmap bitmap);
 
     long getCurrentPosition();
 

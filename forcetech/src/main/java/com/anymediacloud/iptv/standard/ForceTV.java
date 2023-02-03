@@ -4,7 +4,7 @@ public class ForceTV {
 
     public void start(int port) {
         try {
-            start(port, 20971520);
+            start(port, 20 * 1024 * 1024);
         } catch (Throwable ignored) {
         }
     }

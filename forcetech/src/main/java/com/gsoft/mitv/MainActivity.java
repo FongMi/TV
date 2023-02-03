@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.IBinder;
 
 import com.anymediacloud.iptv.standard.ForceTV;
-import com.forcetech.Port;
+import com.forcetech.Util;
 
 public class MainActivity extends Service {
 
@@ -29,7 +29,7 @@ public class MainActivity extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         forceTV = new ForceTV();
-        forceTV.start(Port.MTV);
+        forceTV.start(Util.MTV);
         return binder;
     }
 

@@ -4,9 +4,6 @@
     <string name="app_name">TV</string>
     <string name="app_exit">Press back again to exit</string>
 
-    <!-- Splash -->
-    <string name="splash_info">Loading configuration</string>
-
     <!-- Vod -->
     <string name="vod_last">Last seen <xliff:g name="name">%s</xliff:g></string>
 
@@ -43,6 +40,7 @@
     <string name="play_ready">Ready to play: <xliff:g name="name">%s</xliff:g></string>
     <string name="play_track_text">Text</string>
     <string name="play_track_audio">Audio</string>
+    <string name="play_track_video">Video</string>
     <string name="play_invert">Invert</string>
     <string name="play_across">Across</string>
     <string name="play_oped">OP&amp;ED</string>
@@ -87,7 +85,7 @@
     <string name="error_play_url">Unable to load url</string>
     <string name="error_play_format">Unsupported video format</string>
     <string name="error_play_timeout">Timed out</string>
-    <string name="error_episode">No episode data</string>
+    <string name="error_play_episode">No episode data</string>
     <string name="error_empty">Not found</string>
 
     <!-- Update -->
