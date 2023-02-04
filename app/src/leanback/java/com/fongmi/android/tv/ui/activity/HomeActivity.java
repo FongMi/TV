@@ -69,7 +69,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     @Override
     protected void initView() {
         mBinding.progressLayout.showProgress();
-        Updater.get().start(this);
+        Updater.get().start();
         Server.get().start();
         setRecyclerView();
         setViewModel();
@@ -299,7 +299,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
                 CollectActivity.start(this, event.getText(), true);
                 break;
             case UPDATE:
-                Updater.get().force().branch(event.getText()).start(this);
+                Updater.get().force().branch(event.getText()).start();
                 break;
             case PUSH:
                 if (ApiConfig.get().getSite("push_agent") == null) return;
