@@ -9,10 +9,12 @@ import androidx.viewbinding.ViewBinding;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.api.LiveConfig;
+import com.fongmi.android.tv.api.Updater;
 import com.fongmi.android.tv.api.WallConfig;
 import com.fongmi.android.tv.databinding.ActivityMainBinding;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.net.Callback;
+import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.ui.fragment.SettingFragment;
 import com.fongmi.android.tv.ui.fragment.VodFragment;
 import com.fongmi.android.tv.utils.Notify;
@@ -54,6 +56,8 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
         WallConfig.get().init();
         LiveConfig.get().init();
         ApiConfig.get().init().load(getCallback());
+        Updater.get().start(this);
+        Server.get().start();
     }
 
     private Callback getCallback() {
@@ -82,5 +86,20 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
             default:
                 return false;
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        WallConfig.get().clear();
+        LiveConfig.get().clear();
+        ApiConfig.get().clear();
+        Server.get().stop();
     }
 }
