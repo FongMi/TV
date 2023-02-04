@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.fongmi.android.tv.bean.Filter;
 import com.fongmi.android.tv.databinding.AdapterFilterBinding;
-import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +59,6 @@ public class FilterAdapter extends RecyclerView.Adapter<FilterAdapter.ViewHolder
         Filter item = mItems.get(position);
         holder.binding.recycler.setHasFixedSize(true);
         holder.binding.recycler.setItemAnimator(null);
-        holder.binding.recycler.addItemDecoration(new SpaceItemDecoration(item.getValue().size(), 8));
         holder.binding.recycler.setLayoutManager(new LinearLayoutManager(holder.itemView.getContext(), LinearLayoutManager.HORIZONTAL, false));
         holder.binding.recycler.setAdapter(new ValueAdapter(mListener, item));
     }
