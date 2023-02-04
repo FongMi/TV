@@ -22,6 +22,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
     private final OnClickListener mListener;
     private final List<History> mItems;
     private int width, height;
+    private boolean delete;
 
     public HistoryAdapter(OnClickListener listener) {
         this.mListener = listener;
@@ -33,7 +34,24 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
         void onItemClick(History item);
 
-        boolean onLongClick(History item);
+        void onItemDelete(History item);
+
+        boolean onLongClick();
+    }
+
+    public boolean isDelete() {
+        return delete;
+    }
+
+    public void setDelete(boolean delete) {
+        this.delete = delete;
+    }
+
+    public void remove(History item) {
+        int position = mItems.indexOf(item);
+        if (position == -1) return;
+        mItems.remove(position);
+        notifyItemRemoved(position);
     }
 
     private void setLayoutSize(int spanCount) {
@@ -80,10 +98,17 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         holder.binding.site.setVisibility(View.VISIBLE);
         holder.binding.site.setText(ApiConfig.getSiteName(item.getSiteKey()));
         holder.binding.remark.setText(ResUtil.getString(R.string.vod_last, item.getVodRemarks()));
-        //holder.binding.remark.setVisibility(delete ? View.GONE : View.VISIBLE);
-        //holder.binding.delete.setVisibility(!delete ? View.GONE : View.VISIBLE);
-        holder.binding.getRoot().setOnClickListener(view -> mListener.onItemClick(item));
-        holder.binding.getRoot().setOnLongClickListener(view -> mListener.onLongClick(item));
+        holder.binding.remark.setVisibility(delete ? View.GONE : View.VISIBLE);
+        holder.binding.delete.setVisibility(!delete ? View.GONE : View.VISIBLE);
         ImgUtil.loadHistory(item.getVodPic(), holder.binding.image);
+        setClickListener(holder.binding.getRoot(), item);
+    }
+
+    private void setClickListener(View root, History item) {
+        root.setOnLongClickListener(view -> mListener.onLongClick());
+        root.setOnClickListener(view -> {
+            if (isDelete()) mListener.onItemDelete(item);
+            else mListener.onItemClick(item);
+        });
     }
 }
