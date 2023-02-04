@@ -35,6 +35,8 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
 
     @Override
     protected void initView() {
+        Updater.get().start(this);
+        Server.get().start();
         initFragment();
         initConfig();
     }
@@ -56,8 +58,6 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
         WallConfig.get().init();
         LiveConfig.get().init();
         ApiConfig.get().init().load(getCallback());
-        Updater.get().start(this);
-        Server.get().start();
     }
 
     private Callback getCallback() {
