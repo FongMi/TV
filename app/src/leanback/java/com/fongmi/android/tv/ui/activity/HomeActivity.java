@@ -68,15 +68,13 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     protected void initView() {
-        WallConfig.get().init();
-        LiveConfig.get().init();
-        ApiConfig.get().init().load(getCallback());
         mBinding.progressLayout.showProgress();
         Updater.get().start(this);
         Server.get().start();
         setRecyclerView();
         setViewModel();
         setAdapter();
+        initConfig();
     }
 
     @Override
@@ -115,6 +113,12 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         mAdapter.add(R.string.home_history);
         mAdapter.add(R.string.home_recommend);
         mHistoryAdapter = new ArrayObjectAdapter(mHistoryPresenter = new HistoryPresenter(this));
+    }
+
+    private void initConfig() {
+        WallConfig.get().init();
+        LiveConfig.get().init();
+        ApiConfig.get().init().load(getCallback());
     }
 
     private Callback getCallback() {
