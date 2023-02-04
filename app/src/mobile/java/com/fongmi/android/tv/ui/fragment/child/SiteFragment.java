@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.bean.History;
@@ -44,12 +45,12 @@ public class SiteFragment extends BaseFragment implements VodAdapter.OnClickList
 
     private void setRecyclerView() {
         mBinding.history.setHasFixedSize(true);
-        mBinding.history.setLayoutManager(new GridLayoutManager(getContext(), 3));
-        mBinding.history.addItemDecoration(new SpaceItemDecoration(3, 16));
+        mBinding.history.addItemDecoration(new SpaceItemDecoration(16));
+        mBinding.history.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         mBinding.history.setAdapter(mHistoryAdapter = new HistoryAdapter(this));
         mBinding.recommend.setHasFixedSize(true);
-        mBinding.recommend.setLayoutManager(new GridLayoutManager(getContext(), 3));
         mBinding.recommend.addItemDecoration(new SpaceItemDecoration(3, 16));
+        mBinding.recommend.setLayoutManager(new GridLayoutManager(getContext(), 3));
         mBinding.recommend.setAdapter(mVodAdapter = new VodAdapter(this));
     }
 
