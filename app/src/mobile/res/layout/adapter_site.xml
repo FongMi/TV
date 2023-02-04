@@ -9,7 +9,7 @@
     <TextView
         android:id="@+id/text"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_weight="1"
         android:background="@drawable/shape_text"
         android:gravity="center"
@@ -21,10 +21,10 @@
     <ImageView
         android:id="@+id/search"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginStart="12dp"
         android:background="@drawable/shape_text"
-        android:padding="7dp"
+        android:padding="8dp"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_search_on"
         app:tint="@color/text" />
@@ -32,10 +32,10 @@
     <ImageView
         android:id="@+id/filter"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginStart="12dp"
         android:background="@drawable/shape_text"
-        android:padding="7dp"
+        android:padding="8dp"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_filter_on"
         app:tint="@color/text" />
