@@ -70,7 +70,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.wall.setOnClickListener(view -> ConfigDialog.create(this).type(2).show());
         mBinding.vodHistory.setOnClickListener(view -> HistoryDialog.create(this).type(0).show());
         mBinding.liveHistory.setOnClickListener(view -> HistoryDialog.create(this).type(1).show());
-        mBinding.version.setOnClickListener(view -> Updater.get().reset().start(getActivity()));
+        mBinding.version.setOnClickListener(view -> Updater.get().force().start());
         mBinding.wallDefault.setOnClickListener(view -> setWallDefault());
         mBinding.wallRefresh.setOnClickListener(view -> setWallRefresh());
         mBinding.quality.setOnClickListener(view -> setQuality());
