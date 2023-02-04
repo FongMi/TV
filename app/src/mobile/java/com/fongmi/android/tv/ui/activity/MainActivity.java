@@ -64,6 +64,7 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
         return new Callback() {
             @Override
             public void success() {
+                RefreshEvent.history();
                 RefreshEvent.video();
             }
 
@@ -78,10 +79,10 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.vod:
-                getSupportFragmentManager().beginTransaction().show(mFragments.get(0)).hide(mFragments.get(1)).commit();
+                getSupportFragmentManager().beginTransaction().hide(mFragments.get(1)).show(mFragments.get(0)).commit();
                 return true;
             case R.id.setting:
-                getSupportFragmentManager().beginTransaction().show(mFragments.get(1)).hide(mFragments.get(0)).commit();
+                getSupportFragmentManager().beginTransaction().hide(mFragments.get(0)).show(mFragments.get(1)).commit();
                 return true;
             default:
                 return false;

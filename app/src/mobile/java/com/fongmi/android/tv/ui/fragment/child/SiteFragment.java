@@ -15,6 +15,7 @@ import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.FragmentSiteBinding;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.ui.activity.BaseFragment;
+import com.fongmi.android.tv.ui.activity.DetailActivity;
 import com.fongmi.android.tv.ui.adapter.HistoryAdapter;
 import com.fongmi.android.tv.ui.adapter.VodAdapter;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
@@ -40,11 +41,11 @@ public class SiteFragment extends BaseFragment implements VodAdapter.OnClickList
     @Override
     protected void initView() {
         setRecyclerView();
-        getHistory();
     }
 
     private void setRecyclerView() {
         mBinding.history.setHasFixedSize(true);
+        mBinding.history.getItemAnimator().setChangeDuration(0);
         mBinding.history.addItemDecoration(new SpaceItemDecoration(16));
         mBinding.history.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         mBinding.history.setAdapter(mHistoryAdapter = new HistoryAdapter(this));
@@ -60,20 +61,36 @@ public class SiteFragment extends BaseFragment implements VodAdapter.OnClickList
 
     @Override
     public void onItemClick(Vod item) {
+        if (item.shouldSearch()) onLongClick(item);
+        else DetailActivity.start(getActivity(), item.getVodId(), item.getVodName());
     }
 
     @Override
     public boolean onLongClick(Vod item) {
+        //CollectActivity.start(this, item.getVodName());
         return true;
     }
 
     @Override
     public void onItemClick(History item) {
+        DetailActivity.start(getActivity(), item.getSiteKey(), item.getVodId(), item.getVodName());
     }
 
     @Override
-    public boolean onLongClick(History item) {
-        return false;
+    public void onItemDelete(History item) {
+        mHistoryAdapter.remove(item.delete());
+        mBinding.history.requestLayout();
+    }
+
+    @Override
+    public boolean onLongClick() {
+        setHistoryDelete(true);
+        return true;
+    }
+
+    private void setHistoryDelete(boolean delete) {
+        mHistoryAdapter.setDelete(delete);
+        mHistoryAdapter.notifyItemRangeChanged(0, mHistoryAdapter.getItemCount());
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
