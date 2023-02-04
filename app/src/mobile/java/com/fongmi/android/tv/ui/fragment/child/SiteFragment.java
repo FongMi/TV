@@ -89,7 +89,7 @@ public class SiteFragment extends BaseFragment implements VodAdapter.OnClickList
                 mBinding.progressLayout.showProgress();
                 break;
             case IMAGE:
-                mVodAdapter.notifyItemRangeChanged(0, mVodAdapter.getItemCount());
+                mVodAdapter.notifyDataSetChanged();
                 break;
             case HISTORY:
                 getHistory();
