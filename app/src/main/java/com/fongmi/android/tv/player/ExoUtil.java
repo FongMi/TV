@@ -101,7 +101,7 @@ public class ExoUtil {
     }
 
     private static synchronized HttpDataSource.Factory getHttpDataSourceFactory() {
-        if (httpDataSourceFactory == null) httpDataSourceFactory = new DefaultHttpDataSource.Factory().setConnectTimeoutMs(5000).setReadTimeoutMs(5000).setBlackList(ApiConfig.get().getAds()).setAllowCrossProtocolRedirects(true);
+        if (httpDataSourceFactory == null) httpDataSourceFactory = new DefaultHttpDataSource.Factory().setBlackList(ApiConfig.get().getAds()).setAllowCrossProtocolRedirects(true);
         return httpDataSourceFactory;
     }
 
