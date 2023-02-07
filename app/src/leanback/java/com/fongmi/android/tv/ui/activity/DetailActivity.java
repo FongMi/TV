@@ -142,6 +142,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         return (Vod.Flag) mFlagAdapter.get(mBinding.flag.getSelectedPosition());
     }
 
+    private Vod.Flag getFlag() {
+        return (Vod.Flag) mFlagAdapter.get(mBinding.flag.getSelectedPosition());
+    }
+
     private int getEpisodePosition() {
         for (int i = 0; i < mEpisodeAdapter.size(); i++) if (((Vod.Flag.Episode) mEpisodeAdapter.get(i)).isActivated()) return i;
         return 0;
@@ -320,7 +324,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void getPlayer(boolean replay) {
         Vod.Flag.Episode item = (Vod.Flag.Episode) mEpisodeAdapter.get(getEpisodePosition());
         mBinding.widget.title.setText(getString(R.string.detail_title, mBinding.name.getText(), item.getName()));
-        mViewModel.playerContent(getKey(), getVodFlag().getFlag(), item.getUrl());
+        mViewModel.playerContent(getKey(), getFlag().getFlag(), item.getUrl());
         Clock.get().setCallback(null);
         updateHistory(item, replay);
         showProgress();
@@ -404,7 +408,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void reverseEpisode() {
         for (int i = 0; i < mFlagAdapter.size(); i++) Collections.reverse(((Vod.Flag) mFlagAdapter.get(i)).getEpisodes());
-        setEpisodeAdapter(getVodFlag().getEpisodes());
+        setEpisodeAdapter(getFlag().getEpisodes());
         mBinding.episode.setSelectedPosition(getEpisodePosition());
     }
 
@@ -704,7 +708,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mHistory.setPosition(position);
         mHistory.setEpisodeUrl(item.getUrl());
         mHistory.setVodRemarks(item.getName());
-        mHistory.setVodFlag(getVodFlag().getFlag());
+        mHistory.setVodFlag(getFlag().getFlag());
         mHistory.setCreateTime(System.currentTimeMillis());
     }
 
