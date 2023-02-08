@@ -53,7 +53,7 @@ public class ValueAdapter extends RecyclerView.Adapter<ValueAdapter.ViewHolder> 
         Filter.Value item = mItems.get(position);
         holder.binding.text.setText(item.getN());
         holder.binding.text.setActivated(item.isActivated());
-        holder.binding.getRoot().setOnClickListener(view -> onItemClick(item));
+        holder.binding.getRoot().setOnClickListener(v -> onItemClick(item));
     }
 
     private void onItemClick(Filter.Value value) {

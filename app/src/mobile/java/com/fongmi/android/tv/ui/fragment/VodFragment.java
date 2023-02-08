@@ -74,7 +74,6 @@ public class VodFragment extends BaseFragment implements SiteCallback, TypeAdapt
 
     @Override
     protected void initEvent() {
-        mTypeAdapter.setListener(this);
         mBinding.title.setOnClickListener(this::onTitle);
         mBinding.pager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
@@ -88,7 +87,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, TypeAdapt
     private void setRecyclerView() {
         mBinding.recycler.setHasFixedSize(true);
         mBinding.recycler.setItemAnimator(null);
-        mBinding.recycler.setAdapter(mTypeAdapter = new TypeAdapter());
+        mBinding.recycler.setAdapter(mTypeAdapter = new TypeAdapter(this));
         mBinding.pager.setAdapter(mPageAdapter = new PageAdapter(getChildFragmentManager()));
     }
 
@@ -132,7 +131,8 @@ public class VodFragment extends BaseFragment implements SiteCallback, TypeAdapt
         if (position == mBinding.pager.getCurrentItem()) {
             updateFilter(position, item);
         } else {
-            mBinding.pager.setCurrentItem(mTypeAdapter.setActivated(item));
+            mTypeAdapter.setActivated(position);
+            mBinding.pager.setCurrentItem(position);
         }
     }
 

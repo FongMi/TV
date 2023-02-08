@@ -15,16 +15,12 @@ import java.util.List;
 
 public class TypeAdapter extends RecyclerView.Adapter<TypeAdapter.ViewHolder> {
 
-    private OnClickListener mListener;
+    private final OnClickListener mListener;
     private final List<Class> mItems;
 
-    public TypeAdapter() {
-        this.mItems = new ArrayList<>();
-        this.mItems.add(home());
-    }
-
-    public void setListener(OnClickListener listener) {
+    public TypeAdapter(OnClickListener listener) {
         this.mListener = listener;
+        this.mItems = new ArrayList<>(List.of(home()));
     }
 
     public interface OnClickListener {
@@ -61,12 +57,6 @@ public class TypeAdapter extends RecyclerView.Adapter<TypeAdapter.ViewHolder> {
         notifyDataSetChanged();
     }
 
-    public int setActivated(Class item) {
-        int position = mItems.indexOf(item);
-        setActivated(position);
-        return position;
-    }
-
     public void setActivated(int position) {
         for (Class item : mItems) item.setActivated(false);
         mItems.get(position).setActivated(true);
@@ -99,6 +89,6 @@ public class TypeAdapter extends RecyclerView.Adapter<TypeAdapter.ViewHolder> {
         holder.binding.text.setActivated(item.isActivated());
         holder.binding.text.setCompoundDrawablePadding(ResUtil.dp2px(4));
         holder.binding.text.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, item.getIcon(), 0);
-        holder.binding.getRoot().setOnClickListener(view -> mListener.onItemClick(position, item));
+        holder.binding.getRoot().setOnClickListener(v -> mListener.onItemClick(position, item));
     }
 }
