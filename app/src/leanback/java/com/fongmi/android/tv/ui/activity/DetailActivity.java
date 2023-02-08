@@ -138,10 +138,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         return ApiConfig.get().getSite(getKey());
     }
 
-    private Vod.Flag getVodFlag() {
-        return (Vod.Flag) mFlagAdapter.get(mBinding.flag.getSelectedPosition());
-    }
-
     private Vod.Flag getFlag() {
         return (Vod.Flag) mFlagAdapter.get(mBinding.flag.getSelectedPosition());
     }
