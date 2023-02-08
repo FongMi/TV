@@ -17,6 +17,7 @@ import com.fongmi.android.tv.databinding.FragmentTypeBinding;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.ui.activity.BaseFragment;
+import com.fongmi.android.tv.ui.activity.DetailActivity;
 import com.fongmi.android.tv.ui.adapter.FilterAdapter;
 import com.fongmi.android.tv.ui.adapter.ValueAdapter;
 import com.fongmi.android.tv.ui.adapter.VodAdapter;
@@ -159,11 +160,15 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     @Override
     public void onItemClick(Vod item) {
+        if (item.shouldSearch()) onLongClick(item);
+        else if (item.isFolder()) getVideo(item.getVodId(), "1");
+        else DetailActivity.start(getActivity(), item.getVodId(), item.getVodName());
     }
 
     @Override
     public boolean onLongClick(Vod item) {
-        return false;
+        //CollectActivity.start(getActivity(), item.getVodName());
+        return true;
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
