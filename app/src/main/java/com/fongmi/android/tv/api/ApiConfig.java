@@ -27,17 +27,17 @@ import java.util.Map;
 
 public class ApiConfig {
 
-    private List<String> flags;
-    private List<Parse> parses;
     private List<Site> sites;
+    private List<Parse> parses;
+    private List<String> flags;
     private JarLoader jarLoader;
     private PyLoader pyLoader;
     private JsLoader jsLoader;
     private Config config;
     private Parse parse;
-    private Site home;
     private String wall;
     private String ads;
+    private Site home;
 
     private static class Loader {
         static volatile ApiConfig INSTANCE = new ApiConfig();
@@ -65,8 +65,9 @@ public class ApiConfig {
 
     public ApiConfig init() {
         this.ads = null;
-        this.home = null;
         this.wall = null;
+        this.home = null;
+        this.parse = null;
         this.config = Config.vod();
         this.sites = new ArrayList<>();
         this.flags = new ArrayList<>();
@@ -84,8 +85,9 @@ public class ApiConfig {
 
     public ApiConfig clear() {
         this.ads = null;
-        this.home = null;
         this.wall = null;
+        this.home = null;
+        this.parse = null;
         this.sites.clear();
         this.flags.clear();
         this.parses.clear();
@@ -145,7 +147,6 @@ public class ApiConfig {
         }
         for (JsonElement element : Json.safeListElement(object, "parses")) {
             Parse parse = Parse.objectFrom(element);
-            if (parse.getName().equals(config.getParse())) setParse(parse);
             if (!parses.contains(parse)) parses.add(parse);
         }
         if (home == null) setHome(sites.isEmpty() ? new Site() : sites.get(0));
