@@ -147,11 +147,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         return 0;
     }
 
-    private int getParsePosition() {
-        for (int i = 0; i < mParseAdapter.size(); i++) if (((Parse) mParseAdapter.get(i)).isActivated()) return i;
-        return 0;
-    }
-
     private int getPlayerType() {
         return mHistory != null && mHistory.getPlayer() != -1 ? mHistory.getPlayer() : getSite().getPlayerType() != -1 ? getSite().getPlayerType() : Prefers.getPlayer();
     }
@@ -174,6 +169,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private boolean isReplay() {
         return Prefers.getReset() == 1;
+    }
+
+    private boolean isFromCollect() {
+        return getCallingActivity().getShortClassName().contains(CollectActivity.class.getSimpleName());
     }
 
     @Override
@@ -278,13 +277,15 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.scale.setText(ResUtil.getStringArray(R.array.select_scale)[scale]);
     }
 
+    boolean test = false;
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mViewModel.search.observe(this, result -> setSearch(result.getList()));
         mViewModel.player.observe(this, result -> {
             boolean useParse = (result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx() == 1;
             mBinding.control.parseLayout.setVisibility(mParseAdapter.size() > 0 && useParse ? View.VISIBLE : View.GONE);
-            mPlayers.start(result, useParse, getSite().isSwitchable() ? Constant.TIMEOUT_PLAY : -1);
+            int timeout = getSite().isSwitchable() ? Constant.TIMEOUT_PLAY : -1;
+            mPlayers.start(result, useParse, timeout);
             resetFocus();
         });
         mViewModel.result.observe(this, result -> {
@@ -327,11 +328,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void setEmpty() {
-        if (getName().isEmpty()) {
+        if (isFromCollect()) {
+            finish();
+        } else if (getName().isEmpty()) {
             mBinding.progressLayout.showEmpty();
         } else {
-            CollectActivity.start(this, getName(), true);
-            finish();
+            checkSearch();
         }
     }
 
@@ -800,32 +802,15 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void statFlow() {
-        if (isVisible(mBinding.control.parseLayout)) checkParse();
-        else checkFlag();
-    }
-
-    private void checkParse() {
-        int position = getParsePosition();
-        if (position == mParseAdapter.size() - 1) initParse();
-        if (position == mParseAdapter.size() - 1) checkFlag();
-        else nextParse(position);
-    }
-
-    private void checkFlag() {
+        if (!getSite().isSwitchable()) return;
         int position = mBinding.flag.getSelectedPosition();
-        if (position == mFlagAdapter.size() - 1 || !getSite().isSwitchable()) checkSearch();
+        if (position == mFlagAdapter.size() - 1) checkSearch();
         else nextFlag(position);
     }
 
     private void checkSearch() {
         if (isAutoMode() && mSearchAdapter.size() > 0) nextSite();
-        else initSearch(getName(), getSite().isSwitchable());
-    }
-
-    private void initParse() {
-        if (mParseAdapter.size() == 0) return;
-        ApiConfig.get().setParse((Parse) mParseAdapter.get(0));
-        notifyItemChanged(mBinding.control.parse, mParseAdapter);
+        else initSearch(getName(), true);
     }
 
     private void initSearch(String keyword, boolean auto) {
@@ -839,7 +824,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void startSearch(String keyword) {
         mSearchAdapter.clear();
         mExecutor = Executors.newFixedThreadPool(Constant.THREAD_POOL);
-        for (Site site : ApiConfig.get().getSites()) if (site.isSearchable() && !site.getKey().equals(getKey())) mExecutor.execute(() -> search(site, keyword));
+        for (Site site : ApiConfig.get().getSites()) {
+            if (site.getKey().equals(getKey())) continue;
+            if (isAutoMode() && !site.isSwitchable()) continue;
+            if (site.isSearchable()) mExecutor.execute(() -> search(site, keyword));
+        }
     }
 
     private void stopSearch() {
@@ -865,12 +854,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         String keyword = mBinding.part.getTag().toString();
         if (isAutoMode()) return !item.getVodName().equals(keyword);
         else return !item.getVodName().contains(keyword);
-    }
-
-    private void nextParse(int position) {
-        Parse parse = (Parse) mParseAdapter.get(position + 1);
-        Notify.show(getString(R.string.play_switch_parse, parse.getName()));
-        setParseActivated(parse);
     }
 
     private void nextFlag(int position) {
