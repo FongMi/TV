@@ -694,7 +694,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void checkNext() {
-        if (mChannel.isOnly()) {
+        if (mChannel.isLast()) {
             if (isGone(mBinding.recycler)) onKeyDown();
         } else {
             nextLine(true);
