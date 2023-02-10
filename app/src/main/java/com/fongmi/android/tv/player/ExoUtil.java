@@ -34,6 +34,8 @@ import com.google.android.exoplayer2.upstream.cache.CacheDataSource;
 import com.google.android.exoplayer2.upstream.cache.NoOpCacheEvictor;
 import com.google.android.exoplayer2.upstream.cache.SimpleCache;
 import com.google.android.exoplayer2.util.MimeTypes;
+import com.google.android.exoplayer2.util.Util;
+import com.google.common.net.HttpHeaders;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -106,6 +108,7 @@ public class ExoUtil {
     }
 
     private static synchronized DataSource.Factory getDataSourceFactory(Map<String, String> headers) {
+        if (!headers.containsKey(HttpHeaders.USER_AGENT)) headers.put(HttpHeaders.USER_AGENT, Util.getUserAgent(App.get(), App.get().getPackageName()));
         if (dataSourceFactory == null) dataSourceFactory = buildReadOnlyCacheDataSource(new DefaultDataSource.Factory(App.get(), getHttpDataSourceFactory()), getCache());
         httpDataSourceFactory.setDefaultRequestProperties(headers);
         return dataSourceFactory;

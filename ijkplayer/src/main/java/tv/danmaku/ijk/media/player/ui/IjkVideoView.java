@@ -176,9 +176,9 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     private void fixUserAgent() {
-        if (mHeaders == null || !mHeaders.containsKey("User-Agent")) return;
-        mIjkPlayer.setOption(format, "user_agent", mHeaders.get("User-Agent"));
-        mHeaders.remove("User-Agent");
+        if (!mHeaders.containsKey(Utils.USER_AGENT)) mHeaders.put(Utils.USER_AGENT, Utils.getUserAgent(mAppContext));
+        mIjkPlayer.setOption(format, "user_agent", mHeaders.get(Utils.USER_AGENT));
+        mHeaders.remove(Utils.USER_AGENT);
     }
 
     IMediaPlayer.OnVideoSizeChangedListener mSizeChangedListener = new IMediaPlayer.OnVideoSizeChangedListener() {
