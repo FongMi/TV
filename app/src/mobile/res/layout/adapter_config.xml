@@ -8,11 +8,10 @@
     <TextView
         android:id="@+id/text"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_weight="1"
         android:background="@drawable/shape_text"
         android:ellipsize="middle"
-        android:foreground="?android:attr/selectableItemBackground"
         android:gravity="center"
         android:singleLine="true"
         android:textColor="@color/white"
@@ -22,11 +21,10 @@
     <ImageView
         android:id="@+id/delete"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginStart="12dp"
         android:background="@drawable/shape_text"
-        android:foreground="?android:attr/selectableItemBackground"
-        android:padding="7dp"
+        android:padding="8dp"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_delete_config" />
 

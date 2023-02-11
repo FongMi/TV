@@ -29,7 +29,6 @@ public class Updater implements Download.Callback {
     private DialogUpdateBinding binding;
     private AlertDialog dialog;
     private String branch;
-    private boolean force;
 
     private static class Loader {
         static volatile Updater INSTANCE = new Updater();
@@ -55,14 +54,9 @@ public class Updater implements Download.Callback {
         this.branch = Github.RELEASE;
     }
 
-    public Updater reset() {
-        Prefers.putUpdate(true);
-        return this;
-    }
-
     public Updater force() {
         Notify.show(R.string.update_check);
-        this.force = true;
+        Prefers.putUpdate(true);
         return this;
     }
 
@@ -71,21 +65,26 @@ public class Updater implements Download.Callback {
         return this;
     }
 
-    public void start(Activity activity) {
-        App.execute(() -> doInBackground(activity));
+    private Updater check() {
+        dismiss();
+        return this;
+    }
+
+    public void start() {
+        App.execute(this::doInBackground);
     }
 
     private boolean need(int code, String name) {
         return (branch.equals(Github.DEV) ? !name.equals(BuildConfig.VERSION_NAME) : code > BuildConfig.VERSION_CODE) && Prefers.getUpdate();
     }
 
-    private void doInBackground(Activity activity) {
+    private void doInBackground() {
         try {
             JSONObject object = new JSONObject(OkHttp.newCall(getJson()).execute().body().string());
             String name = object.optString("name");
             String desc = object.optString("desc");
             int code = object.optInt("code");
-            if (need(code, name) || force) App.post(() -> show(activity, name, desc));
+            if (need(code, name)) App.post(() -> show(App.activity(), name, desc));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -97,18 +96,11 @@ public class Updater implements Download.Callback {
         binding.confirm.setOnClickListener(this::confirm);
         binding.cancel.setOnClickListener(this::cancel);
         binding.desc.setText(desc);
-        create(activity).show();
+        check().create(activity).show();
     }
 
     private AlertDialog create(Activity activity) {
-        if (dialog != null) dialog.dismiss();
         return dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).setCancelable(false).create();
-    }
-
-    private void dismiss() {
-        if (dialog != null) dialog.dismiss();
-        this.branch = Github.RELEASE;
-        this.force = false;
     }
 
     private void cancel(View view) {
@@ -119,6 +111,13 @@ public class Updater implements Download.Callback {
     private void confirm(View view) {
         binding.confirm.setEnabled(false);
         Download.create(getApk(), getFile(), this).start();
+    }
+
+    private void dismiss() {
+        try {
+            if (dialog != null) dialog.dismiss();
+        } catch (Exception ignored) {
+        }
     }
 
     @Override

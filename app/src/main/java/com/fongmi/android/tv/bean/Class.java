@@ -72,7 +72,7 @@ public class Class {
     }
 
     public int getIcon() {
-        return getFilter() == null ? 0 : getFilter() ? R.drawable.ic_filter_off_small : R.drawable.ic_filter_on_small;
+        return getFilter() == null ? 0 : getFilter() ? R.drawable.ic_type_filter_off : R.drawable.ic_type_filter_on;
     }
 
     @Override
