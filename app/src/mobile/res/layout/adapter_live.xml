@@ -6,7 +6,6 @@
     android:layout_height="wrap_content"
     android:background="@drawable/shape_text"
     android:ellipsize="middle"
-    android:foreground="?android:attr/selectableItemBackground"
     android:gravity="center"
     android:singleLine="true"
     android:textColor="@color/text"

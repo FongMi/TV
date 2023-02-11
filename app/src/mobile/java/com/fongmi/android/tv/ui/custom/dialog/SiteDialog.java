@@ -54,6 +54,7 @@ public class SiteDialog implements SiteAdapter.OnClickListener {
 
     private void setRecyclerView() {
         binding.recycler.setAdapter(adapter);
+        binding.recycler.setItemAnimator(null);
         binding.recycler.setHasFixedSize(true);
         binding.recycler.addItemDecoration(new SpaceItemDecoration(1, 16));
         binding.recycler.scrollToPosition(ApiConfig.getHomeIndex());
