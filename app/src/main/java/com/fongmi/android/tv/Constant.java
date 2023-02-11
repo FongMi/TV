@@ -18,11 +18,9 @@ public class Constant {
     //嗅探超時時間
     public static final int TIMEOUT_PARSE_WEB = 15 * 1000;
     //解析超時時間
-    public static final int TIMEOUT_PARSE_JSON = 10 * 1000;
-    //解析超時時間
-    public static final int TIMEOUT_PARSE_JSON_EXT = 15 * 1000;
+    public static final int TIMEOUT_PARSE_JSON = 15 * 1000;
     //聚合超時時間
-    public static final int TIMEOUT_PARSE_JSON_MIX = 15 * 1000;
+    public static final int TIMEOUT_PARSE_MIX = 15 * 1000;
     //網路超時時間
     public static final int TIMEOUT_HTTP = 30 * 1000;
     //代理超時時間

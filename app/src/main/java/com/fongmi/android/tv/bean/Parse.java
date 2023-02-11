@@ -52,6 +52,13 @@ public class Parse {
         return parse;
     }
 
+    public static Parse mix() {
+        Parse parse = new Parse();
+        parse.setName("超級解析");
+        parse.setType(3);
+        return parse;
+    }
+
     public String getName() {
         return TextUtils.isEmpty(name) ? "" : name;
     }
