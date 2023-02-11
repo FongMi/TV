@@ -19,9 +19,9 @@ import java.util.regex.Pattern;
 
 public class Parser {
 
-    private final Pattern p1 = Pattern.compile("url\\((.*?)\\)", 40);
+    private final Pattern p1 = Pattern.compile("url\\((.*?)\\)", Pattern.MULTILINE | Pattern.DOTALL);
     private final Pattern p2 = Pattern.compile(":eq|:lt|:gt|:first|:last|^body$|^#");
-    private final Pattern p3 = Pattern.compile("(url|src|href|-original|-src|-play|-url)$", 10);
+    private final Pattern p3 = Pattern.compile("(url|src|href|-original|-src|-play|-url)$", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
 
     private final Cache cache;
 
@@ -45,7 +45,7 @@ public class Parser {
     private String parseHikerToJq(String parse, boolean first) {
         if (!parse.contains("&&")) {
             String[] split = parse.split(" ");
-            return (p2.matcher(split[split.length + (-1)]).find() || !first) ? parse : parse + ":eq(0)";
+            return (p2.matcher(split[split.length - 1]).find() || !first) ? parse : parse + ":eq(0)";
         }
         String[] parses = parse.split("&&");
         List<String> items = new ArrayList<>();

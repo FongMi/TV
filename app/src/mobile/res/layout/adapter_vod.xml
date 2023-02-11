@@ -6,26 +6,24 @@
     android:layout_height="200dp"
     android:foreground="@drawable/shape_vod">
 
-    <com.makeramen.roundedimageview.RoundedImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/black_20"
         android:scaleType="center"
-        app:riv_corner_radius="8dp"
-        app:riv_mutate_background="true"
+        app:shapeAppearanceOverlay="@style/VodStyle"
         tools:src="@drawable/ic_img_loading" />
 
-    <com.makeramen.roundedimageview.RoundedImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/delete"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/black_50"
         android:scaleType="center"
-        android:src="@drawable/ic_delete"
+        android:src="@drawable/ic_delete_vod"
         android:visibility="gone"
-        app:riv_corner_radius="8dp"
-        app:riv_mutate_background="true"
+        app:shapeAppearanceOverlay="@style/VodStyle"
         tools:visibility="visible" />
 
     <TextView
@@ -34,6 +32,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:background="#CC2196F3"
+        android:ellipsize="end"
         android:padding="4dp"
         android:singleLine="true"
         android:textColor="@color/white"
@@ -48,6 +47,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:background="#CCF44336"
+        android:ellipsize="end"
         android:padding="4dp"
         android:singleLine="true"
         android:textColor="@color/white"
@@ -62,6 +62,7 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/name"
         android:background="#CC177535"
+        android:ellipsize="end"
         android:padding="4dp"
         android:singleLine="true"
         android:textColor="@color/white"
@@ -74,6 +75,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:background="@drawable/shape_vod_name"
+        android:ellipsize="marquee"
         android:gravity="center"
         android:padding="6dp"
         android:singleLine="true"

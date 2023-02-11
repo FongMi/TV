@@ -38,9 +38,9 @@ import com.fongmi.android.tv.player.source.TVBus;
 import com.fongmi.android.tv.player.source.ZLive;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownLive;
 import com.fongmi.android.tv.ui.custom.CustomLiveListView;
-import com.fongmi.android.tv.ui.custom.TrackSelectionDialog;
 import com.fongmi.android.tv.ui.custom.dialog.LiveDialog;
 import com.fongmi.android.tv.ui.custom.dialog.PassDialog;
+import com.fongmi.android.tv.ui.custom.dialog.TrackDialog;
 import com.fongmi.android.tv.ui.presenter.ChannelPresenter;
 import com.fongmi.android.tv.ui.presenter.GroupPresenter;
 import com.fongmi.android.tv.utils.Clock;
@@ -322,7 +322,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void onTrack(View view) {
         int type = Integer.parseInt(view.getTag().toString());
-        TrackSelectionDialog.create(this).player(mPlayers).type(type).show();
+        TrackDialog.create(this).player(mPlayers).type(type).show();
         hideControl();
     }
 
@@ -490,6 +490,10 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         if (show) showInfo();
         else setInfo();
         getUrl();
+    }
+
+    private void notifyItemChanged(RecyclerView view, ArrayObjectAdapter adapter) {
+        if (!view.isComputingLayout()) adapter.notifyArrayItemRangeChanged(0, adapter.size());
     }
 
     @Override
@@ -690,7 +694,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void checkNext() {
-        if (mChannel.isOnly()) {
+        if (mChannel.isLast()) {
             if (isGone(mBinding.recycler)) onKeyDown();
         } else {
             nextLine(true);

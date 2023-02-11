@@ -40,8 +40,8 @@ public class ImgUtil {
 
     public static void loadLive(String url, ImageView view) {
         view.setVisibility(TextUtils.isEmpty(url) ? View.GONE : View.VISIBLE);
-        if (TextUtils.isEmpty(url)) view.setImageResource(R.drawable.ic_live);
-        else Glide.with(App.get()).asBitmap().load(url).skipMemoryCache(true).dontAnimate().signature(new ObjectKey(url)).error(R.drawable.ic_live).into(view);
+        if (TextUtils.isEmpty(url)) view.setImageResource(R.drawable.ic_img_empty);
+        else Glide.with(App.get()).asBitmap().load(url).skipMemoryCache(true).dontAnimate().signature(new ObjectKey(url)).error(R.drawable.ic_img_empty).into(view);
     }
 
     public static GlideUrl getUrl(String url) {
