@@ -59,6 +59,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     private HistoryPresenter mHistoryPresenter;
     private SiteViewModel mViewModel;
     private boolean confirm;
+    private Result result;
 
     @Override
     protected ViewBinding getBinding() {
@@ -67,15 +68,13 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     protected void initView() {
-        WallConfig.get().init();
-        LiveConfig.get().init();
-        ApiConfig.get().init().load(getCallback());
         mBinding.progressLayout.showProgress();
-        Updater.get().start(this);
+        Updater.get().start();
         Server.get().start();
         setRecyclerView();
         setViewModel();
         setAdapter();
+        initConfig();
     }
 
     @Override
@@ -105,8 +104,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mViewModel.result.observe(this, result -> {
             mAdapter.remove("progress");
-            addVideo(result);
-            result.clear();
+            addVideo(this.result = result);
         });
     }
 
@@ -115,6 +113,12 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         mAdapter.add(R.string.home_history);
         mAdapter.add(R.string.home_recommend);
         mHistoryAdapter = new ArrayObjectAdapter(mHistoryPresenter = new HistoryPresenter(this));
+    }
+
+    private void initConfig() {
+        WallConfig.get().init();
+        LiveConfig.get().init();
+        ApiConfig.get().init().load(getCallback());
     }
 
     private Callback getCallback() {
@@ -142,8 +146,8 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     }
 
     private void getVideo() {
+        this.result = Result.empty();
         int index = getRecommendIndex();
-        mViewModel.getResult().setValue(Result.empty());
         String home = ApiConfig.get().getHome().getName();
         mBinding.title.setText(home.isEmpty() ? ResUtil.getString(R.string.app_name) : home);
         if (mAdapter.size() > index) mAdapter.removeItems(index, mAdapter.size() - index);
@@ -205,7 +209,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     public void onItemClick(Func item) {
         switch (item.getResId()) {
             case R.string.home_vod:
-                VodActivity.start(this, mViewModel.getResult().getValue());
+                VodActivity.start(this, result.clear());
                 break;
             case R.string.home_live:
                 LiveActivity.start(this);

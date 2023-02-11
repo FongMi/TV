@@ -2,192 +2,359 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:keepScreenOn="true"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="16dp">
 
-    <LinearLayout
-        android:id="@+id/site"
-        android:layout_width="match_parent"
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/shape_item"
-        android:foreground="?android:attr/selectableItemBackground"
-        android:orientation="horizontal">
+        android:text="@string/nav_setting"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        android:textStyle="bold" />
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/setting_site"
-            android:textColor="@color/white"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/home"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:textSize="16sp" />
-
-    </LinearLayout>
-
-    <LinearLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:layout_marginTop="16dp">
 
         <LinearLayout
-            android:id="@+id/config"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_weight="1"
-            android:background="@drawable/shape_item"
-            android:foreground="?android:attr/selectableItemBackground"
-            android:orientation="horizontal">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
-                android:text="@string/setting_url"
-                android:textColor="@color/white"
-                android:textSize="16sp" />
-
-            <TextView
-                android:id="@+id/url"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="end"
-                android:singleLine="true"
-                android:textColor="@color/white"
-                android:textSize="16sp"
-                tools:text="https://" />
+                android:orientation="horizontal">
 
+                <LinearLayout
+                    android:id="@+id/vod"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="12dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/shape_item"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:text="@string/setting_vod"
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/vodUrl"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="middle"
+                        android:gravity="end"
+                        android:singleLine="true"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        tools:text="https://" />
+
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/vodHome"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="12dp"
+                    android:background="@drawable/shape_item"
+                    android:padding="7dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_setting_home" />
+
+                <ImageView
+                    android:id="@+id/vodHistory"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/shape_item"
+                    android:padding="7dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_setting_history" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/live"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="12dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/shape_item"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:text="@string/setting_live"
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/liveUrl"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="middle"
+                        android:gravity="end"
+                        android:singleLine="true"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        tools:text="https://" />
+
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/liveHome"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="12dp"
+                    android:background="@drawable/shape_item"
+                    android:padding="7dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_setting_home" />
+
+                <ImageView
+                    android:id="@+id/liveHistory"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/shape_item"
+                    android:padding="7dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_setting_history" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/wall"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="12dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/shape_item"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:text="@string/setting_wall"
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/wallUrl"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="middle"
+                        android:gravity="end"
+                        android:singleLine="true"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        tools:text="https://" />
+
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/wallDefault"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="12dp"
+                    android:background="@drawable/shape_item"
+                    android:padding="7dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_setting_home" />
+
+                <ImageView
+                    android:id="@+id/wallRefresh"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/shape_item"
+                    android:padding="7dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_setting_refresh" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/player"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/shape_item"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="@string/setting_player"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/playerText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    tools:text="EXO" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/decode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/shape_item"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="@string/setting_decode"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/decodeText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    tools:text="硬解" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/render"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/shape_item"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="@string/setting_render"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/renderText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    tools:text="Surface" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/scale"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/shape_item"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="@string/setting_scale"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/scaleText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    tools:text="Fill" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/quality"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/shape_item"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="@string/setting_quality"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/qualityText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    tools:text="High" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/version"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/shape_item"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="@string/setting_version"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/versionText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    tools:text="1.2.1" />
+
+            </LinearLayout>
         </LinearLayout>
-
-        <ImageView
-            android:id="@+id/history"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/shape_item"
-            android:foreground="?android:attr/selectableItemBackground"
-            android:padding="8dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_history" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/render"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/shape_item"
-        android:foreground="?android:attr/selectableItemBackground"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:text="@string/setting_render"
-            android:textColor="@color/white"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/renderText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="end"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            tools:text="Surface" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/scale"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/shape_item"
-        android:foreground="?android:attr/selectableItemBackground"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:text="@string/setting_scale"
-            android:textColor="@color/white"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/scaleText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="end"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            tools:text="Fill" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/quality"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/shape_item"
-        android:foreground="?android:attr/selectableItemBackground"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:text="@string/setting_quality"
-            android:textColor="@color/white"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/qualityText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="end"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            tools:text="High" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/version"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/shape_item"
-        android:foreground="?android:attr/selectableItemBackground"
-        android:orientation="horizontal">
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/setting_version"
-            android:textColor="@color/white"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/versionText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            tools:text="1.2.1" />
-
-    </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 </LinearLayout>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <title>解析</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1"/>
+</head>
+
+<body>
+<script>
+    let html = "";
+    const jxs = "%s";
+    const url = "%s";
+    const list = jxs.split(";");
+    for (let i = 0; i < list.length; i++) {
+        html = html + "<iframe sandbox='allow-scripts allow-same-origin allow-forms' src=" + list[i] + url + "></iframe>";
+    }
+    document.write(html);
+</script>
+</body>
+
+</html>

@@ -42,8 +42,8 @@ import com.fongmi.android.tv.net.OkHttp;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
-import com.fongmi.android.tv.ui.custom.TrackSelectionDialog;
 import com.fongmi.android.tv.ui.custom.dialog.DescDialog;
+import com.fongmi.android.tv.ui.custom.dialog.TrackDialog;
 import com.fongmi.android.tv.ui.presenter.ArrayPresenter;
 import com.fongmi.android.tv.ui.presenter.EpisodePresenter;
 import com.fongmi.android.tv.ui.presenter.FlagPresenter;
@@ -76,7 +76,7 @@ import okhttp3.Call;
 import okhttp3.Response;
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Listener, TrackSelectionDialog.Listener, ArrayPresenter.OnClickListener, Clock.Callback {
+public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Listener, TrackDialog.Listener, ArrayPresenter.OnClickListener, Clock.Callback {
 
     private ActivityDetailBinding mBinding;
     private ViewGroup.LayoutParams mFrameParams;
@@ -138,7 +138,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         return ApiConfig.get().getSite(getKey());
     }
 
-    private Vod.Flag getVodFlag() {
+    private Vod.Flag getFlag() {
         return (Vod.Flag) mFlagAdapter.get(mBinding.flag.getSelectedPosition());
     }
 
@@ -174,6 +174,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private boolean isReplay() {
         return Prefers.getReset() == 1;
+    }
+
+    private boolean isFromCollect() {
+        return getCallingActivity().getShortClassName().contains(CollectActivity.class.getSimpleName());
     }
 
     @Override
@@ -284,7 +288,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mViewModel.player.observe(this, result -> {
             boolean useParse = (result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx() == 1;
             mBinding.control.parseLayout.setVisibility(mParseAdapter.size() > 0 && useParse ? View.VISIBLE : View.GONE);
-            mPlayers.start(result, useParse, getSite().isSwitchable() ? Constant.TIMEOUT_PLAY : -1);
+            int timeout = getSite().isSwitchable() ? Constant.TIMEOUT_PLAY : -1;
+            mPlayers.start(result, useParse, timeout);
             resetFocus();
         });
         mViewModel.result.observe(this, result -> {
@@ -320,18 +325,19 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void getPlayer(boolean replay) {
         Vod.Flag.Episode item = (Vod.Flag.Episode) mEpisodeAdapter.get(getEpisodePosition());
         mBinding.widget.title.setText(getString(R.string.detail_title, mBinding.name.getText(), item.getName()));
-        mViewModel.playerContent(getKey(), getVodFlag().getFlag(), item.getUrl());
+        mViewModel.playerContent(getKey(), getFlag().getFlag(), item.getUrl());
         Clock.get().setCallback(null);
         updateHistory(item, replay);
         showProgress();
     }
 
     private void setEmpty() {
-        if (getName().isEmpty()) {
+        if (isFromCollect()) {
+            finish();
+        } else if (getName().isEmpty()) {
             mBinding.progressLayout.showEmpty();
         } else {
-            CollectActivity.start(this, getName(), true);
-            finish();
+            checkSearch();
         }
     }
 
@@ -350,8 +356,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mFlagAdapter.setItems(item.getVodFlags(), null);
         mBinding.content.setMaxLines(getMaxLines());
         mBinding.video.requestFocus();
-        if (hasFlag()) checkHistory();
         getPart(item.getVodName());
+        checkFlag(item);
         checkKeep();
     }
 
@@ -404,7 +410,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void reverseEpisode() {
         for (int i = 0; i < mFlagAdapter.size(); i++) Collections.reverse(((Vod.Flag) mFlagAdapter.get(i)).getEpisodes());
-        setEpisodeAdapter(getVodFlag().getEpisodes());
+        setEpisodeAdapter(getFlag().getEpisodes());
         mBinding.episode.setSelectedPosition(getEpisodePosition());
     }
 
@@ -585,7 +591,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void onTrack(View view) {
         int type = Integer.parseInt(view.getTag().toString());
-        TrackSelectionDialog.create(this).player(mPlayers).type(type).listener(this).show();
+        TrackDialog.create(this).player(mPlayers).type(type).listener(this).show();
         hideControl();
     }
 
@@ -668,18 +674,15 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         });
     }
 
-    private boolean hasFlag() {
-        mBinding.flag.setVisibility(mFlagAdapter.size() > 0 ? View.VISIBLE : View.GONE);
-        if (mFlagAdapter.size() > 0) return true;
-        Notify.show(R.string.error_episode);
-        initSearch(getName(), true);
-        hideProgress();
-        return false;
+    private void checkFlag(Vod item) {
+        mBinding.flag.setVisibility(item.getVodFlags().isEmpty() ? View.GONE : View.VISIBLE);
+        if (isVisible(mBinding.flag)) checkHistory(item);
+        else ErrorEvent.episode();
     }
 
-    private void checkHistory() {
+    private void checkHistory(Vod item) {
         mHistory = History.find(getHistoryKey());
-        mHistory = mHistory == null ? createHistory() : mHistory;
+        mHistory = mHistory == null ? createHistory(item) : mHistory;
         setFlagActivated(mHistory.getFlag());
         if (mHistory.isRevSort()) reverseEpisode();
         setScale(mHistory.getScale() == -1 ? Prefers.getScale() : mHistory.getScale());
@@ -691,13 +694,13 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         setDecodeView();
     }
 
-    private History createHistory() {
+    private History createHistory(Vod item) {
         History history = new History();
         history.setKey(getHistoryKey());
         history.setCid(ApiConfig.getCid());
-        history.setVodPic(mBinding.video.getTag().toString());
-        history.setVodName(mBinding.name.getText().toString());
-        history.findEpisode(mFlagAdapter);
+        history.setVodPic(item.getVodPic());
+        history.setVodName(item.getVodName());
+        history.findEpisode(item.getVodFlags());
         return history;
     }
 
@@ -707,7 +710,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mHistory.setPosition(position);
         mHistory.setEpisodeUrl(item.getUrl());
         mHistory.setVodRemarks(item.getName());
-        mHistory.setVodFlag(getVodFlag().getFlag());
+        mHistory.setVodFlag(getFlag().getFlag());
         mHistory.setCreateTime(System.currentTimeMillis());
     }
 
@@ -799,10 +802,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         showError(event.getMsg());
         mPlayers.stop();
         hideProgress();
-        statFlow();
+        startFlow();
     }
 
-    private void statFlow() {
+    private void startFlow() {
+        if (!getSite().isSwitchable()) return;
         if (isVisible(mBinding.control.parseLayout)) checkParse();
         else checkFlag();
     }
@@ -810,25 +814,25 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void checkParse() {
         int position = getParsePosition();
         if (position == mParseAdapter.size() - 1) initParse();
-        if (position == mParseAdapter.size() - 1) checkFlag();
+        if (position == 0 || position == mParseAdapter.size() - 1) checkFlag();
         else nextParse(position);
-    }
-
-    private void checkFlag() {
-        int position = mBinding.flag.getSelectedPosition();
-        if (position == mFlagAdapter.size() - 1 || !getSite().isSwitchable()) checkSearch();
-        else nextFlag(position);
-    }
-
-    private void checkSearch() {
-        if (isAutoMode() && mSearchAdapter.size() > 0) nextSite();
-        else initSearch(getName(), getSite().isSwitchable());
     }
 
     private void initParse() {
         if (mParseAdapter.size() == 0) return;
         ApiConfig.get().setParse((Parse) mParseAdapter.get(0));
         notifyItemChanged(mBinding.control.parse, mParseAdapter);
+    }
+
+    private void checkFlag() {
+        int position = mBinding.flag.getSelectedPosition();
+        if (position == mFlagAdapter.size() - 1) checkSearch();
+        else nextFlag(position);
+    }
+
+    private void checkSearch() {
+        if (isAutoMode() && mSearchAdapter.size() > 0) nextSite();
+        else initSearch(getName(), true);
     }
 
     private void initSearch(String keyword, boolean auto) {
@@ -842,7 +846,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void startSearch(String keyword) {
         mSearchAdapter.clear();
         mExecutor = Executors.newFixedThreadPool(Constant.THREAD_POOL);
-        for (Site site : ApiConfig.get().getSites()) if (site.isSearchable() && !site.getKey().equals(getKey())) mExecutor.execute(() -> search(site, keyword));
+        for (Site site : ApiConfig.get().getSites()) {
+            if (site.getKey().equals(getKey())) continue;
+            if (isAutoMode() && !site.isSwitchable()) continue;
+            if (site.isSearchable()) mExecutor.execute(() -> search(site, keyword));
+        }
     }
 
     private void stopSearch() {
@@ -920,11 +928,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         this.mInitTrack = initTrack;
     }
 
-    public boolean isInitAuto() {
+    private boolean isInitAuto() {
         return mInitAuto;
     }
 
-    public void setInitAuto(boolean initAuto) {
+    private void setInitAuto(boolean initAuto) {
         this.mInitAuto = initAuto;
     }
 
@@ -934,6 +942,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void setAutoMode(boolean autoMode) {
         this.mAutoMode = autoMode;
+    }
+
+    private void notifyItemChanged(RecyclerView view, ArrayObjectAdapter adapter) {
+        if (!view.isComputingLayout()) adapter.notifyArrayItemRangeChanged(0, adapter.size());
     }
 
     @Override

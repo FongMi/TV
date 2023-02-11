@@ -38,7 +38,7 @@ import java.util.List;
 
 public class VodFragment extends BaseFragment implements CustomScroller.Callback, VodPresenter.OnClickListener {
 
-    private HashMap<String, String> mExtend;
+    private HashMap<String, String> mExtends;
     private FragmentVodBinding mBinding;
     private CustomScroller mScroller;
     private ArrayObjectAdapter mAdapter;
@@ -83,7 +83,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     @Override
     protected void initView() {
         mTypeIds = new ArrayList<>();
-        mExtend = new HashMap<>();
+        mExtends = new HashMap<>();
         mFilters = Filter.arrayFrom(getFilter());
         mBinding.progressLayout.showProgress();
         setRecyclerView();
@@ -115,7 +115,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     private void setClick(ArrayObjectAdapter adapter, String key, Filter.Value item) {
         for (int i = 0; i < adapter.size(); i++) ((Filter.Value) adapter.get(i)).setActivated(item);
         adapter.notifyArrayItemRangeChanged(0, adapter.size());
-        mExtend.put(key, item.getV());
+        mExtends.put(key, item.getV());
         if (isFolder()) refresh(1);
         else getVideo();
     }
@@ -137,7 +137,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         int filterSize = mOpen ? mFilters.size() : 0;
         boolean clear = page.equals("1") && mAdapter.size() > filterSize;
         if (clear) mAdapter.removeItems(filterSize, mAdapter.size() - filterSize);
-        mViewModel.categoryContent(getKey(), typeId, page, true, mExtend);
+        mViewModel.categoryContent(getKey(), typeId, page, true, mExtends);
     }
 
     private boolean checkLastSize(List<Vod> items) {
@@ -161,29 +161,35 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         mAdapter.addAll(mAdapter.size(), rows);
     }
 
-    private void addFilter() {
+    private ListRow getRow(Filter filter) {
+        FilterPresenter presenter = new FilterPresenter(filter.getKey());
+        ArrayObjectAdapter adapter = new ArrayObjectAdapter(presenter);
+        presenter.setOnClickListener((key, item) -> setClick(adapter, key, item));
+        adapter.setItems(filter.getValue(), null);
+        return new ListRow(adapter);
+    }
+
+    private void showFilter() {
         List<ListRow> rows = new ArrayList<>();
-        for (Filter filter : mFilters) {
-            FilterPresenter presenter = new FilterPresenter(filter.getKey());
-            ArrayObjectAdapter adapter = new ArrayObjectAdapter(presenter);
-            presenter.setOnClickListener((key, item) -> setClick(adapter, key, item));
-            adapter.setItems(filter.getValue(), null);
-            rows.add(new ListRow(adapter));
-        }
+        for (Filter filter : mFilters) rows.add(getRow(filter));
         mAdapter.addAll(0, rows);
         mBinding.recycler.postDelayed(() -> mBinding.recycler.smoothScrollToPosition(0), 50);
+    }
+
+    private void hideFilter() {
+        mAdapter.removeItems(0, mFilters.size());
+    }
+
+    public void toggleFilter(boolean open) {
+        if (open) showFilter();
+        else hideFilter();
+        mOpen = open;
     }
 
     private void refresh(int num) {
         String typeId = mTypeIds.get(mTypeIds.size() - num);
         mTypeIds = mTypeIds.subList(0, mTypeIds.size() - num);
         getVideo(typeId, "1");
-    }
-
-    public void toggleFilter(boolean open) {
-        if (open) addFilter();
-        else mAdapter.removeItems(0, mFilters.size());
-        mOpen = open;
     }
 
     public boolean canGoBack() {

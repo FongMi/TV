@@ -4,9 +4,6 @@
     <string name="app_name">影视</string>
     <string name="app_exit">再按一次返回键退出</string>
 
-    <!-- Splash -->
-    <string name="splash_info">正在加载配置</string>
-
     <!-- Vod -->
     <string name="vod_last">上次看到<xliff:g name="name">%s</xliff:g></string>
 
@@ -88,7 +85,7 @@
     <string name="error_play_url">播放数据加载失败</string>
     <string name="error_play_format">不支援的影片格式</string>
     <string name="error_play_timeout">连接超时</string>
-    <string name="error_episode">暂无播放数据</string>
+    <string name="error_play_episode">暂无播放数据</string>
     <string name="error_empty">找不到数据</string>
 
     <!-- Update -->

@@ -13,15 +13,6 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/app_name"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:text="@string/home_history"
             android:textColor="@color/white"
             android:textSize="18sp" />
@@ -45,7 +36,8 @@
             android:id="@+id/progressLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="16dp">
+            android:layout_marginTop="16dp"
+            android:descendantFocusability="blocksDescendants">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recommend"

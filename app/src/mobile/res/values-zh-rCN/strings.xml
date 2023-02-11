@@ -2,7 +2,7 @@
 
     <!-- Nav -->
     <string name="nav_home">首页</string>
-    <string name="nav_vod">片库</string>
+    <string name="nav_vod">点播</string>
     <string name="nav_setting">设定</string>
 
     <!-- Home -->

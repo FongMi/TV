@@ -34,6 +34,8 @@ import com.google.android.exoplayer2.upstream.cache.CacheDataSource;
 import com.google.android.exoplayer2.upstream.cache.NoOpCacheEvictor;
 import com.google.android.exoplayer2.upstream.cache.SimpleCache;
 import com.google.android.exoplayer2.util.MimeTypes;
+import com.google.android.exoplayer2.util.Util;
+import com.google.common.net.HttpHeaders;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -81,7 +83,7 @@ public class ExoUtil {
     }
 
     private static MediaItem getMediaItem(String url, List<Sub> subs, int errorCode) {
-        MediaItem.Builder builder = new MediaItem.Builder().setUri(Uri.parse(url.trim()));
+        MediaItem.Builder builder = new MediaItem.Builder().setUri(Uri.parse(url.trim().replace("\\", "")));
         if (errorCode == PlaybackException.ERROR_CODE_PARSING_MANIFEST_MALFORMED) builder.setMimeType(MimeTypes.APPLICATION_OCTET);
         else if (errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED) builder.setMimeType(MimeTypes.APPLICATION_M3U8);
         if (subs.size() > 0) builder.setSubtitleConfigurations(getSubtitles(subs));
@@ -101,11 +103,12 @@ public class ExoUtil {
     }
 
     private static synchronized HttpDataSource.Factory getHttpDataSourceFactory() {
-        if (httpDataSourceFactory == null) httpDataSourceFactory = new DefaultHttpDataSource.Factory().setConnectTimeoutMs(5000).setReadTimeoutMs(5000).setBlackList(ApiConfig.get().getAds()).setAllowCrossProtocolRedirects(true);
+        if (httpDataSourceFactory == null) httpDataSourceFactory = new DefaultHttpDataSource.Factory().setBlackList(ApiConfig.get().getAds()).setAllowCrossProtocolRedirects(true);
         return httpDataSourceFactory;
     }
 
     private static synchronized DataSource.Factory getDataSourceFactory(Map<String, String> headers) {
+        if (!headers.containsKey(HttpHeaders.USER_AGENT)) headers.put(HttpHeaders.USER_AGENT, Util.getUserAgent(App.get(), App.get().getPackageName()));
         if (dataSourceFactory == null) dataSourceFactory = buildReadOnlyCacheDataSource(new DefaultDataSource.Factory(App.get(), getHttpDataSourceFactory()), getCache());
         httpDataSourceFactory.setDefaultRequestProperties(headers);
         return dataSourceFactory;

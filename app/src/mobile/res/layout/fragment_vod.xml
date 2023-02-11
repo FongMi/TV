@@ -12,6 +12,18 @@
         android:elevation="0dp"
         app:elevation="0dp">
 
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/app_name"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_scrollFlags="scroll|enterAlways" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler"
             android:layout_width="match_parent"
@@ -23,7 +35,6 @@
             android:paddingTop="8dp"
             android:paddingEnd="8dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_scrollFlags="scroll|enterAlways"
             tools:listitem="@layout/adapter_type" />
 
     </com.google.android.material.appbar.AppBarLayout>

@@ -8,7 +8,7 @@
     <TextView
         android:id="@+id/text"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_weight="1"
         android:background="@drawable/selector_text"
         android:ellipsize="middle"
@@ -23,7 +23,7 @@
     <ImageView
         android:id="@+id/delete"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginStart="12dp"
         android:background="@drawable/selector_text"
         android:focusable="true"
