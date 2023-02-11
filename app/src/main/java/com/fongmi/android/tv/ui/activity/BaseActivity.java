@@ -1,10 +1,12 @@
 package com.fongmi.android.tv.ui.activity;
 
 import android.app.Activity;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewbinding.ViewBinding;
 
