@@ -9,12 +9,8 @@ import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderNull;
 
-import org.json.JSONObject;
-
 import java.io.File;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -100,22 +96,6 @@ public class JarLoader {
             e.printStackTrace();
             return new SpiderNull();
         }
-    }
-
-    public JSONObject jsonExt(String key, LinkedHashMap<String, String> jxs, String url) throws Exception {
-        String clsKey = "Json" + key;
-        String hotClass = "com.github.catvod.parser." + clsKey;
-        Class<?> jsonParserCls = loaders.get("").loadClass(hotClass);
-        Method mth = jsonParserCls.getMethod("parse", LinkedHashMap.class, String.class);
-        return (JSONObject) mth.invoke(null, jxs, url);
-    }
-
-    public JSONObject jsonExtMix(String flag, String key, String name, LinkedHashMap<String, HashMap<String, String>> jxs, String url) throws Exception {
-        String clsKey = "Mix" + key;
-        String hotClass = "com.github.catvod.parser." + clsKey;
-        Class<?> jsonParserCls = loaders.get("").loadClass(hotClass);
-        Method mth = jsonParserCls.getMethod("parse", LinkedHashMap.class, String.class, String.class, String.class);
-        return (JSONObject) mth.invoke(null, jxs, name, flag, url);
     }
 
     public Object[] proxyInvoke(Map<?, ?> params) {

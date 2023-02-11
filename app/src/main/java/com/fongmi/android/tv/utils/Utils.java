@@ -15,7 +15,6 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.server.Server;
-import com.google.android.exoplayer2.util.Util;
 import com.permissionx.guolindev.PermissionX;
 
 import java.math.BigInteger;
@@ -79,7 +78,7 @@ public class Utils {
     }
 
     public static String checkProxy(String url) {
-        if (url.startsWith("proxy://")) return url.replace("proxy://", Server.get().getAddress(true) + "/proxy?");
+        if (url.startsWith("proxy://")) return url.replace("proxy://", Server.getProxy());
         return url;
     }
 
@@ -116,10 +115,6 @@ public class Utils {
         } catch (NoSuchAlgorithmException e) {
             return "";
         }
-    }
-
-    public static String getUserAgent() {
-        return Util.getUserAgent(App.get(), App.get().getPackageName().concat(".").concat(getUUID()));
     }
 
     public static String getUUID() {

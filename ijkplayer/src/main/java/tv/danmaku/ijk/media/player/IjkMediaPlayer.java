@@ -21,6 +21,7 @@ package tv.danmaku.ijk.media.player;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
+import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
@@ -186,8 +187,8 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
             if (!mIsLibLoaded) {
                 if (libLoader == null) libLoader = sLocalLibLoader;
                 libLoader.loadLibrary("ijkffmpeg");
+                libLoader.loadLibrary("ijkplayer");
                 libLoader.loadLibrary("ijksdl");
-                libLoader.loadLibrary("player");
                 mIsLibLoaded = true;
             }
         }
@@ -410,8 +411,6 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
                 if (!TextUtils.isEmpty(value)) sb.append(entry.getValue());
                 sb.append("\r\n");
                 setOption(OPT_CATEGORY_FORMAT, "headers", sb.toString());
-                setOption(OPT_CATEGORY_FORMAT, "allowed_extensions", "ALL");
-                setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "protocol_whitelist", "async,cache,crypto,file,http,https,ijkhttphook,ijkinject,ijklivehook,ijklongurl,ijksegment,ijktcphook,pipe,rtp,tcp,tls,udp,ijkurlhook,data");
             }
         }
         setDataSource(path);
@@ -608,6 +607,9 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
 
     @Override
     public native void seekTo(long msec) throws IllegalStateException;
+
+    @Override
+    public native boolean getCurrentFrame(Bitmap bitmap);
 
     @Override
     public native long getCurrentPosition();

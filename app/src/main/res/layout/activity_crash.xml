@@ -19,7 +19,7 @@
         android:lineSpacingExtra="4dp"
         android:text="@string/crash_info"
         android:textColor="@color/grey_200"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:textStyle="bold" />
 
     <Button

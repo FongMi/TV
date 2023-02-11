@@ -6,10 +6,9 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.leanback.widget.ArrayObjectAdapter;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
+import com.fongmi.android.tv.Config;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.WallConfig;
 import com.fongmi.android.tv.event.RefreshEvent;
@@ -24,6 +23,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.io.File;
 
 import me.jessyan.autosize.AutoSizeCompat;
+import me.jessyan.autosize.AutoSizeConfig;
 
 public abstract class BaseActivity extends AppCompatActivity {
 
@@ -49,10 +49,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected void initEvent() {
     }
 
-    protected void notifyItemChanged(RecyclerView view, ArrayObjectAdapter adapter) {
-        if (!view.isComputingLayout()) adapter.notifyArrayItemRangeChanged(0, adapter.size());
-    }
-
     private void setWall() {
         try {
             File file = FileUtil.getWall(Prefers.getWall());
@@ -70,6 +66,16 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     }
 
+    private void setAutoSizeConfig(Configuration newConfig) {
+        if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            AutoSizeConfig.getInstance().setDesignWidthInDp(Config.getAutoSizeWidth());
+            AutoSizeConfig.getInstance().setDesignHeightInDp(Config.getAutoSizeHeight());
+        } else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            AutoSizeConfig.getInstance().setDesignWidthInDp(Config.getAutoSizeHeight());
+            AutoSizeConfig.getInstance().setDesignHeightInDp(Config.getAutoSizeWidth());
+        }
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefreshEvent(RefreshEvent event) {
         if (event.getType() != RefreshEvent.Type.WALL) return;
@@ -84,6 +90,11 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        setAutoSizeConfig(newConfig);
+        super.onConfigurationChanged(newConfig);
+    }
+
     protected void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);

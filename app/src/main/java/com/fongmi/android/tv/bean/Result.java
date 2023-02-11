@@ -179,12 +179,13 @@ public class Result {
         return subs == null ? Collections.emptyList() : subs;
     }
 
-    public void clear() {
-        getList().clear();
-    }
-
     public Map<String, String> getHeaders() {
         return Json.toMap(getHeader());
+    }
+
+    public Result clear() {
+        getList().clear();
+        return this;
     }
 
     @NonNull
