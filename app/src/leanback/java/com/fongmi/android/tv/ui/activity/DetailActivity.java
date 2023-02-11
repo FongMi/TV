@@ -277,7 +277,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.scale.setText(ResUtil.getStringArray(R.array.select_scale)[scale]);
     }
 
-    boolean test = false;
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mViewModel.search.observe(this, result -> setSearch(result.getList()));

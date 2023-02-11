@@ -16,12 +16,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -126,8 +122,10 @@ public class ApiConfig {
 
     private void parseConfig(JsonObject object, Callback callback) {
         try {
-            parseJson(object);
-            parseLive(object);
+            initSite(object);
+            initLive(object);
+            initParse(object);
+            initOther(object);
             jarLoader.parseJar("", Json.safeString(object, "spider"));
             config.json(object.toString()).update();
             App.post(callback::success);
@@ -137,7 +135,7 @@ public class ApiConfig {
         }
     }
 
-    private void parseJson(JsonObject object) {
+    private void initSite(JsonObject object) {
         for (JsonElement element : Json.safeListElement(object, "sites")) {
             Site site = Site.objectFrom(element).sync();
             site.setApi(parseApi(site.getApi()));
@@ -145,23 +143,30 @@ public class ApiConfig {
             if (site.getKey().equals(config.getHome())) setHome(site);
             if (!sites.contains(site)) sites.add(site);
         }
-        for (JsonElement element : Json.safeListElement(object, "parses")) {
-            Parse parse = Parse.objectFrom(element);
-            if (!parses.contains(parse)) parses.add(parse);
-        }
-        if (home == null) setHome(sites.isEmpty() ? new Site() : sites.get(0));
-        if (parse == null) setParse(parses.isEmpty() ? new Parse() : parses.get(0));
-        flags.addAll(Json.safeListString(object, "flags"));
-        setWall(Json.safeString(object, "wallpaper"));
-        setAds(Json.safeListString(object, "ads"));
     }
 
-    private void parseLive(JsonObject object) {
+    private void initLive(JsonObject object) {
         boolean hasLive = object.has("lives");
         if (hasLive) Config.create(config.getUrl(), 1);
         boolean loadApi = hasLive && LiveConfig.get().isSame(config.getUrl());
         if (loadApi) LiveConfig.get().clear().config(Config.find(config.getUrl(), 1).update()).parse(object);
         else LiveConfig.get().load();
+    }
+
+    private void initParse(JsonObject object) {
+        for (JsonElement element : Json.safeListElement(object, "parses")) {
+            Parse item = Parse.objectFrom(element);
+            if (!parses.contains(item)) parses.add(item);
+        }
+    }
+
+    private void initOther(JsonObject object) {
+        if (parses.size() > 0) parses.add(0, Parse.mix());
+        if (home == null) setHome(sites.isEmpty() ? new Site() : sites.get(0));
+        if (parse == null) setParse(parses.isEmpty() ? new Parse() : parses.get(0));
+        setFlags(Json.safeListString(object, "flags"));
+        setWall(Json.safeString(object, "wallpaper"));
+        setAds(Json.safeListString(object, "ads"));
     }
 
     private String parseApi(String api) {
@@ -200,14 +205,6 @@ public class ApiConfig {
         return jarLoader.proxyInvoke(param);
     }
 
-    public JSONObject jsonExt(String key, LinkedHashMap<String, String> jxs, String url) throws Exception {
-        return jarLoader.jsonExt(key, jxs, url);
-    }
-
-    public JSONObject jsonExtMix(String flag, String key, String name, LinkedHashMap<String, HashMap<String, String>> jxs, String url) throws Exception {
-        return jarLoader.jsonExtMix(flag, key, name, jxs, url);
-    }
-
     public Site getSite(String key) {
         int index = getSites().indexOf(Site.get(key));
         return index == -1 ? new Site() : getSites().get(index);
@@ -226,8 +223,18 @@ public class ApiConfig {
         return parses == null ? Collections.emptyList() : parses;
     }
 
+    public List<Parse> getParses(int type) {
+        List<Parse> items = new ArrayList<>();
+        for (Parse item : getParses()) if (item.getType() == type) items.add(item);
+        return items;
+    }
+
     public List<String> getFlags() {
         return flags == null ? Collections.emptyList() : flags;
+    }
+
+    private void setFlags(List<String> flags) {
+        this.flags.addAll(flags);
     }
 
     public String getAds() {
@@ -270,6 +277,6 @@ public class ApiConfig {
         this.parse = parse;
         this.parse.setActivated(true);
         config.parse(parse.getName()).update();
-        for (Parse item : parses) item.setActivated(parse);
+        for (Parse item : getParses()) item.setActivated(parse);
     }
 }
