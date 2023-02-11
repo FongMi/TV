@@ -127,7 +127,7 @@ public class Live {
     }
 
     public Live check() {
-        boolean proxy = getGroup().equals("redirect") && getChannels().size() > 0 && getChannels().get(0).getUrls().size() > 0 && getChannels().get(0).getUrls().get(0).startsWith("proxy");
+        boolean proxy = getChannels().size() > 0 && getChannels().get(0).getUrls().size() > 0 && getChannels().get(0).getUrls().get(0).startsWith("proxy");
         if (proxy) setProxy();
         return this;
     }

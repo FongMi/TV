@@ -6,6 +6,7 @@ import android.text.format.Formatter;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.event.ServerEvent;
+import com.fongmi.android.tv.utils.Utils;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -24,6 +25,14 @@ public class Server implements Nano.Listener {
 
     public static Server get() {
         return Loader.INSTANCE;
+    }
+
+    public static String getParse(String jxs, String url) {
+        return get().getAddress(true) + "/parse?jxs=" + Utils.substring(jxs) + "&url=" + url;
+    }
+
+    public static String getProxy() {
+        return get().getAddress(true) + "/proxy?";
     }
 
     public Server() {
