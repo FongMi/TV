@@ -49,15 +49,23 @@ public class Updater implements Download.Callback {
         return Github.get().getKitkatPath("/release/" + BuildConfig.FLAVOR + ".apk");
     }
 
-    public Updater reset() {
+    public Updater force() {
+        Notify.show(R.string.update_check);
         Prefers.putUpdate(true);
         return this;
     }
 
-    public void start(Activity activity) {
-        this.binding = DialogUpdateBinding.inflate(LayoutInflater.from(activity));
-        this.dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).setCancelable(false).create();
+    private Updater check() {
+        dismiss();
+        return this;
+    }
+
+    public void start() {
         App.execute(this::doInBackground);
+    }
+
+    private boolean need(int code) {
+        return code > BuildConfig.VERSION_CODE && Prefers.getUpdate();
     }
 
     private void doInBackground() {
@@ -66,23 +74,23 @@ public class Updater implements Download.Callback {
             String name = object.optString("name");
             String desc = object.optString("desc");
             int code = object.optInt("code");
-            boolean need = code > BuildConfig.VERSION_CODE && Prefers.getUpdate();
-            if (need) App.post(() -> show(name, desc));
+            if (need(code)) App.post(() -> show(App.activity(), name, desc));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void show(String version, String desc) {
+    private void show(Activity activity, String version, String desc) {
+        binding = DialogUpdateBinding.inflate(LayoutInflater.from(activity));
         binding.version.setText(ResUtil.getString(R.string.update_version, version));
         binding.confirm.setOnClickListener(this::confirm);
         binding.cancel.setOnClickListener(this::cancel);
         binding.desc.setText(desc);
-        dialog.show();
+        check().create(activity).show();
     }
 
-    private void dismiss() {
-        if (dialog != null) dialog.dismiss();
+    private AlertDialog create(Activity activity) {
+        return dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).setCancelable(false).create();
     }
 
     private void cancel(View view) {
@@ -93,6 +101,13 @@ public class Updater implements Download.Callback {
     private void confirm(View view) {
         binding.confirm.setEnabled(false);
         Download.create(getApk(), getFile(), this).start();
+    }
+
+    private void dismiss() {
+        try {
+            if (dialog != null) dialog.dismiss();
+        } catch (Exception ignored) {
+        }
     }
 
     @Override
