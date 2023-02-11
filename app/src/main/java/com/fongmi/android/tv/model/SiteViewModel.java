@@ -143,7 +143,9 @@ public class SiteViewModel extends ViewModel {
                 params.put("flag", flag);
                 String body = OkHttp.newCall(site.getApi(), params).execute().body().string();
                 SpiderDebug.log(body);
-                return Result.fromJson(body);
+                Result result = Result.fromJson(body);
+                if (result.getFlag().isEmpty()) result.setFlag(flag);
+                return result;
             } else {
                 String url = id;
                 String type = Uri.parse(url).getQueryParameter("type");

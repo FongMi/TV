@@ -223,9 +223,10 @@ public class ApiConfig {
         return parses == null ? Collections.emptyList() : parses;
     }
 
-    public List<Parse> getParses(int type) {
+    public List<Parse> getParses(int type, String flag) {
         List<Parse> items = new ArrayList<>();
-        for (Parse item : getParses()) if (item.getType() == type) items.add(item);
+        for (Parse item : getParses()) if (item.getType() == type && item.getExt().getFlag().contains(flag)) items.add(item);
+        if (items.isEmpty()) for (Parse item : getParses()) if (item.getType() == type) items.add(item);
         return items;
     }
 
