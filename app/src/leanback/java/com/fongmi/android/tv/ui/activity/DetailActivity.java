@@ -147,6 +147,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         return 0;
     }
 
+    private int getParsePosition() {
+        for (int i = 0; i < mParseAdapter.size(); i++) if (((Parse) mParseAdapter.get(i)).isActivated()) return i;
+        return 0;
+    }
+
     private int getPlayerType() {
         return mHistory != null && mHistory.getPlayer() != -1 ? mHistory.getPlayer() : getSite().getPlayerType() != -1 ? getSite().getPlayerType() : Prefers.getPlayer();
     }
@@ -797,11 +802,29 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         showError(event.getMsg());
         mPlayers.stop();
         hideProgress();
-        statFlow();
+        startFlow();
     }
 
-    private void statFlow() {
+    private void startFlow() {
         if (!getSite().isSwitchable()) return;
+        if (isVisible(mBinding.control.parseLayout)) checkParse();
+        else checkFlag();
+    }
+
+    private void checkParse() {
+        int position = getParsePosition();
+        if (position == mParseAdapter.size() - 1) initParse();
+        if (position == 0 || position == mParseAdapter.size() - 1) checkFlag();
+        else nextParse(position);
+    }
+
+    private void initParse() {
+        if (mParseAdapter.size() == 0) return;
+        ApiConfig.get().setParse((Parse) mParseAdapter.get(0));
+        notifyItemChanged(mBinding.control.parse, mParseAdapter);
+    }
+
+    private void checkFlag() {
         int position = mBinding.flag.getSelectedPosition();
         if (position == mFlagAdapter.size() - 1) checkSearch();
         else nextFlag(position);
@@ -853,6 +876,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         String keyword = mBinding.part.getTag().toString();
         if (isAutoMode()) return !item.getVodName().equals(keyword);
         else return !item.getVodName().contains(keyword);
+    }
+
+    private void nextParse(int position) {
+        Parse parse = (Parse) mParseAdapter.get(position + 1);
+        Notify.show(getString(R.string.play_switch_parse, parse.getName()));
+        setParseActivated(parse);
     }
 
     private void nextFlag(int position) {
