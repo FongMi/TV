@@ -8,7 +8,7 @@
       "api": "csp_Csp",
       "searchable": 1,
       "filterable": 1,
-      "switchable": 1,
+      "changeable": 1,
       "ext": "https://github.com/one.json"
     },
     {
@@ -18,7 +18,7 @@
       "api": "csp_Csp",
       "searchable": 1,
       "filterable": 1,
-      "switchable": 1,
+      "changeable": 1,
       "ext": "https://github.com/two.json"
     },
     {
@@ -28,7 +28,7 @@
       "api": "csp_Csp",
       "searchable": 1,
       "filterable": 1,
-      "switchable": 1,
+      "changeable": 1,
       "ext": "https://github.com/extend.json",
       "jar": "https://github.com/extend.jar"
     }
