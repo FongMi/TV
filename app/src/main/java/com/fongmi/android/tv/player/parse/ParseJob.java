@@ -140,7 +140,7 @@ public class ParseJob {
     }
 
     private void startWeb(String key, Parse item, String webUrl, Callback callback) {
-        webViews.add(CustomWebView.create(App.get()).start(key, item.getUrl() + webUrl, item.getHeaders(), callback));
+        webViews.add(CustomWebView.create(App.get()).start(key, item.getName(), item.getUrl() + webUrl, item.getHeaders(), callback));
     }
 
     private HashMap<String, String> getHeader(JsonObject object) {
