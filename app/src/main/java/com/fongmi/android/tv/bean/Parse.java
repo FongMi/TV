@@ -54,14 +54,14 @@ public class Parse {
 
     public static Parse mixJson() {
         Parse parse = new Parse();
-        parse.setName("Json聚合");
+        parse.setName("Json");
         parse.setType(2);
         return parse;
     }
 
     public static Parse mixWeb() {
         Parse parse = new Parse();
-        parse.setName("Web聚合");
+        parse.setName("Web");
         parse.setType(3);
         return parse;
     }
