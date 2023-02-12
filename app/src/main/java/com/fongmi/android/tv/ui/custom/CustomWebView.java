@@ -35,6 +35,7 @@ public class CustomWebView extends WebView {
     private WebResourceResponse empty;
     private List<String> keys;
     private Runnable timer;
+    private String from;
     private String key;
 
     public static CustomWebView create(@NonNull Context context) {
@@ -70,11 +71,12 @@ public class CustomWebView extends WebView {
         }
     }
 
-    public CustomWebView start(String key, String url, Map<String, String> headers, ParseJob.Callback callback) {
+    public CustomWebView start(String key, String from, String url, Map<String, String> headers, ParseJob.Callback callback) {
         App.post(timer, Constant.TIMEOUT_PARSE_WEB);
         this.callback = callback;
         setUserAgent(headers);
         loadUrl(url, headers);
+        this.from = from;
         this.key = key;
         return this;
     }
@@ -133,7 +135,7 @@ public class CustomWebView extends WebView {
     }
 
     private void onSuccess(Map<String, String> news, String url) {
-        if (callback != null) callback.onParseSuccess(news, url, "");
+        if (callback != null) callback.onParseSuccess(news, url, from);
         callback = null;
         stop(false);
     }
