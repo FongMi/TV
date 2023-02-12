@@ -179,6 +179,10 @@ public class Channel {
         return getUrls().size() == 1;
     }
 
+    public boolean isLast() {
+        return getLine() == getUrls().size() - 1;
+    }
+
     public String getLineText() {
         if (getUrls().size() <= 1) return "";
         if (getCurrent().contains("$")) return getCurrent().split("\\$")[1];

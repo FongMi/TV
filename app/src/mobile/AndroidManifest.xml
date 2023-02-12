@@ -24,5 +24,10 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".ui.activity.DetailActivity"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
+            android:screenOrientation="fullSensor" />
+
     </application>
 </manifest>

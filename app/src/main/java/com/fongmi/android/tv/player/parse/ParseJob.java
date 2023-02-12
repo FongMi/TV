@@ -1,4 +1,4 @@
-package com.fongmi.android.tv.player;
+package com.fongmi.android.tv.player.parse;
 
 import android.text.TextUtils;
 
@@ -8,14 +8,14 @@ import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.net.OkHttp;
+import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.ui.custom.CustomWebView;
 import com.fongmi.android.tv.utils.Json;
-import com.fongmi.android.tv.utils.Utils;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -24,23 +24,25 @@ import java.util.concurrent.TimeUnit;
 import okhttp3.Headers;
 import okhttp3.Response;
 
-public class ParseTask {
+public class ParseJob {
 
     private ExecutorService executor;
+    private ExecutorService infinite;
     private CustomWebView webView;
     private Callback callback;
     private Parse parse;
 
-    public static ParseTask create(Callback callback) {
-        return new ParseTask(callback);
+    public static ParseJob create(Callback callback) {
+        return new ParseJob(callback);
     }
 
-    public ParseTask(Callback callback) {
+    public ParseJob(Callback callback) {
         this.executor = Executors.newFixedThreadPool(2);
+        this.infinite = Executors.newCachedThreadPool();
         this.callback = callback;
     }
 
-    public ParseTask run(Result result, boolean useParse) {
+    public ParseJob start(Result result, boolean useParse) {
         setParse(result, useParse);
         execute(result);
         return this;
@@ -56,7 +58,7 @@ public class ParseTask {
     private void execute(Result result) {
         executor.execute(() -> {
             try {
-                executor.submit(getTask(result)).get(getTimeout(), TimeUnit.MILLISECONDS);
+                executor.submit(getTask(result)).get(Constant.TIMEOUT_PARSE_DEF, TimeUnit.MILLISECONDS);
             } catch (Throwable e) {
                 onParseError();
             }
@@ -73,55 +75,46 @@ public class ParseTask {
         };
     }
 
-    private int getTimeout() {
-        switch (parse.getType()) {
-            case 1: //Json
-                return Constant.TIMEOUT_PARSE_JSON;
-            case 2: //Json 擴展
-                return Constant.TIMEOUT_PARSE_JSON_EXT;
-            case 3: //聚合
-                return Constant.TIMEOUT_PARSE_JSON_MIX;
-            default:
-                return Constant.TIMEOUT_PARSE_DEF;
-        }
-    }
-
     private void doInBackground(String key, String webUrl, String flag) throws Exception {
         switch (parse.getType()) {
             case 0: //嗅探
                 App.post(() -> startWeb(key, parse.getUrl() + webUrl, parse.getHeaders(), callback));
                 break;
             case 1: //Json
-                jsonParse(webUrl);
-                break;
-            case 2: //Json 擴展
-                jsonExtend(webUrl);
+                jsonParse(parse, webUrl, false);
                 break;
             case 3: //聚合
-                jsonMix(webUrl, flag);
+                mixJson(webUrl, flag);
+                mixWeb(webUrl, flag);
                 break;
         }
     }
 
-    private void jsonParse(String webUrl) throws Exception {
-        Response response = OkHttp.newCall(parse.getUrl() + webUrl, Headers.of(parse.getHeaders())).execute();
+    private void jsonParse(Parse item, String webUrl, boolean strict) throws Exception {
+        Response response = OkHttp.newCall(item.getUrl() + webUrl, Headers.of(item.getHeaders())).execute();
         JsonObject object = JsonParser.parseString(response.body().string()).getAsJsonObject();
-        HashMap<String, String> headers = new HashMap<>();
-        for (String key : object.keySet()) if (key.equalsIgnoreCase("user-agent") || key.equalsIgnoreCase("referer")) headers.put(key, object.get(key).getAsString());
         object = object.has("data") ? object.getAsJsonObject("data") : object;
-        checkResult(headers, Json.safeString(object, "url"));
+        if (strict) checkResult(item, getHeader(object), Json.safeString(object, "url"));
+        else checkResult(getHeader(object), Json.safeString(object, "url"));
     }
 
-    private void jsonExtend(String webUrl) throws Exception {
-        LinkedHashMap<String, String> jxs = new LinkedHashMap<>();
-        for (Parse item : ApiConfig.get().getParses()) if (item.getType() == 1) jxs.put(item.getName(), item.extUrl());
-        checkResult(Result.fromObject(ApiConfig.get().jsonExt(parse.getUrl(), jxs, webUrl)));
+    private void mixJson(String webUrl, String flag) {
+        List<Parse> items = ApiConfig.get().getParses(1, flag);
+        for (Parse item : items) infinite.execute(() -> jsonParse(item, webUrl));
     }
 
-    private void jsonMix(String webUrl, String flag) throws Exception {
-        LinkedHashMap<String, HashMap<String, String>> jxs = new LinkedHashMap<>();
-        for (Parse item : ApiConfig.get().getParses()) jxs.put(item.getName(), item.mixMap());
-        checkResult(Result.fromObject(ApiConfig.get().jsonExtMix(flag + "@", parse.getUrl(), parse.getName(), jxs, webUrl)));
+    private void mixWeb(String webUrl, String flag) {
+        StringBuilder sb = new StringBuilder();
+        List<Parse> items = ApiConfig.get().getParses(0, flag);
+        for (Parse item : items) sb.append(item.getUrl()).append(";");
+        if (sb.length() > 0) App.post(() -> startWeb(Server.getParse(sb.toString(), webUrl), callback));
+    }
+
+    private void jsonParse(Parse item, String webUrl) {
+        try {
+            jsonParse(item, webUrl, true);
+        } catch (Exception ignored) {
+        }
     }
 
     private void checkResult(HashMap<String, String> headers, String url) {
@@ -129,14 +122,13 @@ public class ParseTask {
         else onParseSuccess(headers, url, "");
     }
 
-    private void checkResult(Result result) {
-        if (result.getUrl().isEmpty()) {
-            onParseError();
-        } else if (result.getParse(0) == 1) {
-            App.post(() -> startWeb(Utils.checkProxy(result.getUrl()), result.getHeaders(), callback));
-        } else {
-            onParseSuccess(result.getHeaders(), result.getUrl(), result.getJxFrom());
-        }
+    private void checkResult(Parse item, HashMap<String, String> headers, String url) throws Exception {
+        int code = OkHttp.newCall(url, Headers.of(headers)).execute().code();
+        if (code == 200) onParseSuccess(headers, url, item.getName());
+    }
+
+    private void startWeb(String url, Callback callback) {
+        startWeb(url, new HashMap<>(), callback);
     }
 
     private void startWeb(String url, Map<String, String> headers, Callback callback) {
@@ -145,6 +137,12 @@ public class ParseTask {
 
     private void startWeb(String key, String url, Map<String, String> headers, Callback callback) {
         webView = CustomWebView.create(App.get()).start(key, url, headers, callback);
+    }
+
+    private HashMap<String, String> getHeader(JsonObject object) {
+        HashMap<String, String> headers = new HashMap<>();
+        for (String key : object.keySet()) if (key.equalsIgnoreCase("user-agent") || key.equalsIgnoreCase("referer")) headers.put(key, object.get(key).getAsString());
+        return headers;
     }
 
     private void onParseSuccess(Map<String, String> headers, String url, String from) {
@@ -163,7 +161,9 @@ public class ParseTask {
 
     public void stop() {
         if (executor != null) executor.shutdownNow();
+        if (infinite != null) infinite.shutdownNow();
         if (webView != null) webView.stop(false);
+        infinite = null;
         executor = null;
         callback = null;
         webView = null;

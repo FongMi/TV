@@ -36,7 +36,6 @@
                     android:layout_marginEnd="12dp"
                     android:layout_weight="1"
                     android:background="@drawable/shape_item"
-                    android:foreground="?android:attr/selectableItemBackground"
                     android:orientation="horizontal">
 
                     <TextView
@@ -66,7 +65,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="12dp"
                     android:background="@drawable/shape_item"
-                    android:foreground="?android:attr/selectableItemBackground"
                     android:padding="7dp"
                     android:scaleType="fitCenter"
                     android:src="@drawable/ic_setting_home" />
@@ -76,7 +74,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/shape_item"
-                    android:foreground="?android:attr/selectableItemBackground"
                     android:padding="7dp"
                     android:scaleType="fitCenter"
                     android:src="@drawable/ic_setting_history" />
@@ -96,7 +93,6 @@
                     android:layout_marginEnd="12dp"
                     android:layout_weight="1"
                     android:background="@drawable/shape_item"
-                    android:foreground="?android:attr/selectableItemBackground"
                     android:orientation="horizontal">
 
                     <TextView
@@ -126,7 +122,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="12dp"
                     android:background="@drawable/shape_item"
-                    android:foreground="?android:attr/selectableItemBackground"
                     android:padding="7dp"
                     android:scaleType="fitCenter"
                     android:src="@drawable/ic_setting_home" />
@@ -136,7 +131,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/shape_item"
-                    android:foreground="?android:attr/selectableItemBackground"
                     android:padding="7dp"
                     android:scaleType="fitCenter"
                     android:src="@drawable/ic_setting_history" />
@@ -156,7 +150,6 @@
                     android:layout_marginEnd="12dp"
                     android:layout_weight="1"
                     android:background="@drawable/shape_item"
-                    android:foreground="?android:attr/selectableItemBackground"
                     android:orientation="horizontal">
 
                     <TextView
@@ -186,7 +179,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="12dp"
                     android:background="@drawable/shape_item"
-                    android:foreground="?android:attr/selectableItemBackground"
                     android:padding="7dp"
                     android:scaleType="fitCenter"
                     android:src="@drawable/ic_setting_home" />
@@ -196,7 +188,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/shape_item"
-                    android:foreground="?android:attr/selectableItemBackground"
                     android:padding="7dp"
                     android:scaleType="fitCenter"
                     android:src="@drawable/ic_setting_refresh" />
@@ -209,7 +200,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:background="@drawable/shape_item"
-                android:foreground="?android:attr/selectableItemBackground"
                 android:orientation="horizontal">
 
                 <TextView
@@ -237,7 +227,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:background="@drawable/shape_item"
-                android:foreground="?android:attr/selectableItemBackground"
                 android:orientation="horizontal">
 
                 <TextView
@@ -265,7 +254,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:background="@drawable/shape_item"
-                android:foreground="?android:attr/selectableItemBackground"
                 android:orientation="horizontal">
 
                 <TextView
@@ -293,7 +281,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:background="@drawable/shape_item"
-                android:foreground="?android:attr/selectableItemBackground"
                 android:orientation="horizontal">
 
                 <TextView
@@ -321,7 +308,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:background="@drawable/shape_item"
-                android:foreground="?android:attr/selectableItemBackground"
                 android:orientation="horizontal">
 
                 <TextView
@@ -344,40 +330,11 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/size"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:background="@drawable/shape_item"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:text="@string/setting_size"
-                    android:textColor="@color/white"
-                    android:textSize="16sp" />
-
-                <TextView
-                    android:id="@+id/sizeText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="end"
-                    android:textColor="@color/white"
-                    android:textSize="16sp"
-                    tools:text="Medium" />
-
-            </LinearLayout>
-
-            <LinearLayout
                 android:id="@+id/version"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:background="@drawable/shape_item"
-                android:foreground="?android:attr/selectableItemBackground"
                 android:orientation="horizontal">
 
                 <TextView

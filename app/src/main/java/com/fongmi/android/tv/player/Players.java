@@ -10,6 +10,7 @@ import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Track;
 import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.event.PlayerEvent;
+import com.fongmi.android.tv.player.parse.ParseJob;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
@@ -32,13 +33,13 @@ import java.util.Map;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IMediaPlayer.OnErrorListener, IMediaPlayer.OnPreparedListener, IMediaPlayer.OnCompletionListener, AnalyticsListener, ParseTask.Callback {
+public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IMediaPlayer.OnErrorListener, IMediaPlayer.OnPreparedListener, IMediaPlayer.OnCompletionListener, AnalyticsListener, ParseJob.Callback {
 
     private IjkVideoView ijkPlayer;
     private StringBuilder builder;
     private Formatter formatter;
-    private ParseTask parseTask;
     private ExoPlayer exoPlayer;
+    private ParseJob parseJob;
     private Runnable runnable;
     private int errorCode;
     private int timeout;
@@ -276,7 +277,7 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
             ErrorEvent.url();
         } else if (result.getParse(1) == 1 || result.getJx() == 1) {
             stopParse();
-            parseTask = ParseTask.create(this).run(result, useParse);
+            parseJob = ParseJob.create(this).start(result, useParse);
         } else {
             this.timeout = timeout;
             setMediaSource(result);
@@ -322,7 +323,7 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     }
 
     private void stopParse() {
-        if (parseTask != null) parseTask.stop();
+        if (parseJob != null) parseJob.stop();
     }
 
     private void setMediaSource(Result result) {

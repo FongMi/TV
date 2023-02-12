@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="150dp"
-    android:layout_height="200dp">
+    android:layout_height="200dp"
+    android:foreground="@drawable/shape_vod">
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/image"
@@ -35,7 +36,7 @@
         android:padding="4dp"
         android:singleLine="true"
         android:textColor="@color/white"
-        android:textSize="14sp"
+        android:textSize="12sp"
         android:visibility="gone"
         tools:text="2022"
         tools:visibility="visible" />
@@ -50,7 +51,7 @@
         android:padding="4dp"
         android:singleLine="true"
         android:textColor="@color/white"
-        android:textSize="14sp"
+        android:textSize="12sp"
         android:visibility="gone"
         tools:text="泥巴"
         tools:visibility="visible" />
@@ -65,7 +66,7 @@
         android:padding="4dp"
         android:singleLine="true"
         android:textColor="@color/white"
-        android:textSize="14sp"
+        android:textSize="12sp"
         tools:text="1080p" />
 
     <TextView
@@ -79,7 +80,7 @@
         android:padding="6dp"
         android:singleLine="true"
         android:textColor="@color/white"
-        android:textSize="16sp"
+        android:textSize="14sp"
         tools:text="蜘蛛人" />
 
 </RelativeLayout>
