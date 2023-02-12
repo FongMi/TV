@@ -23,6 +23,7 @@ public class SiteDialog implements SitePresenter.OnClickListener {
     private final SitePresenter presenter;
     private final SiteCallback callback;
     private final AlertDialog dialog;
+    private float width;
 
     public static SiteDialog create(Activity activity) {
         return new SiteDialog(activity);
@@ -37,17 +38,21 @@ public class SiteDialog implements SitePresenter.OnClickListener {
 
     public SiteDialog search(boolean search) {
         this.presenter.search(search);
+        this.width = 0.4f;
         return this;
     }
 
     public SiteDialog filter(boolean filter) {
         this.presenter.filter(filter);
+        this.width = 0.4f;
         return this;
     }
 
     public SiteDialog all() {
         this.presenter.search(true);
         this.presenter.filter(true);
+        this.presenter.change(true);
+        this.width = 0.5f;
         return this;
     }
 
@@ -66,7 +71,7 @@ public class SiteDialog implements SitePresenter.OnClickListener {
     private void setDialog() {
         if (adapter.size() == 0) return;
         WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
-        params.width = (int) (ResUtil.getScreenWidthPx() * 0.4f);
+        params.width = (int) (ResUtil.getScreenWidthPx() * width);
         params.height = (int) (ResUtil.getScreenHeightPx() * 0.745f);
         dialog.getWindow().setAttributes(params);
         dialog.getWindow().setDimAmount(0);
@@ -93,6 +98,12 @@ public class SiteDialog implements SitePresenter.OnClickListener {
     }
 
     @Override
+    public void onChangeClick(Site item) {
+        item.setChangeable(!item.isChangeable()).save();
+        adapter.notifyArrayItemRangeChanged(0, adapter.size());
+    }
+
+    @Override
     public boolean onSearchLongClick(Site item) {
         boolean result = !item.isSearchable();
         for (Site site : ApiConfig.get().getSites()) site.setSearchable(result).save();
@@ -104,6 +115,14 @@ public class SiteDialog implements SitePresenter.OnClickListener {
     public boolean onFilterLongClick(Site item) {
         boolean result = !item.isFilterable();
         for (Site site : ApiConfig.get().getSites()) site.setFilterable(result).save();
+        adapter.notifyArrayItemRangeChanged(0, adapter.size());
+        return true;
+    }
+
+    @Override
+    public boolean onChangeLongClick(Site item) {
+        boolean result = !item.isChangeable();
+        for (Site site : ApiConfig.get().getSites()) site.setChangeable(result).save();
         adapter.notifyArrayItemRangeChanged(0, adapter.size());
         return true;
     }
