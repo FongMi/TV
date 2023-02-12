@@ -52,9 +52,16 @@ public class Parse {
         return parse;
     }
 
-    public static Parse mix() {
+    public static Parse mixJson() {
         Parse parse = new Parse();
-        parse.setName("超級解析");
+        parse.setName("Json聚合");
+        parse.setType(2);
+        return parse;
+    }
+
+    public static Parse mixWeb() {
+        Parse parse = new Parse();
+        parse.setName("Web聚合");
         parse.setType(3);
         return parse;
     }
