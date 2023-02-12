@@ -24,7 +24,7 @@ import com.fongmi.android.tv.db.dao.TrackDao;
 @Database(entities = {Keep.class, Site.class, Track.class, Config.class, History.class}, version = AppDatabase.VERSION)
 public abstract class AppDatabase extends RoomDatabase {
 
-    public static final int VERSION = 18;
+    public static final int VERSION = 19;
     public static final String SYMBOL = "@@@";
 
     private static volatile AppDatabase instance;
@@ -43,6 +43,7 @@ public abstract class AppDatabase extends RoomDatabase {
                 .addMigrations(MIGRATION_15_16)
                 .addMigrations(MIGRATION_16_17)
                 .addMigrations(MIGRATION_17_18)
+                .addMigrations(MIGRATION_18_19)
                 .allowMainThreadQueries()
                 .fallbackToDestructiveMigration()
                 .build();
@@ -108,6 +109,13 @@ public abstract class AppDatabase extends RoomDatabase {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             database.execSQL("ALTER TABLE Config ADD COLUMN parse TEXT DEFAULT NULL");
+        }
+    };
+
+    static final Migration MIGRATION_18_19 = new Migration(18, 19) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE Site ADD COLUMN changeable INTEGER DEFAULT 1");
         }
     };
 }
