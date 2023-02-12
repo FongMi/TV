@@ -8,12 +8,12 @@ import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.net.OkHttp;
-import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.ui.custom.CustomWebView;
 import com.fongmi.android.tv.utils.Json;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,9 +27,9 @@ import okhttp3.Response;
 
 public class ParseJob {
 
+    private final List<CustomWebView> webViews;
     private ExecutorService executor;
     private ExecutorService infinite;
-    private CustomWebView webView;
     private Callback callback;
     private Parse parse;
 
@@ -40,6 +40,7 @@ public class ParseJob {
     public ParseJob(Callback callback) {
         this.executor = Executors.newFixedThreadPool(2);
         this.infinite = Executors.newCachedThreadPool();
+        this.webViews = new ArrayList<>();
         this.callback = callback;
     }
 
@@ -79,14 +80,16 @@ public class ParseJob {
     private void doInBackground(String key, String webUrl, String flag) throws Exception {
         switch (parse.getType()) {
             case 0: //嗅探
-                App.post(() -> startWeb(key, parse.getUrl() + webUrl, parse.getHeaders(), callback));
+                App.post(() -> startWeb(key, parse, webUrl, callback));
                 break;
             case 1: //Json
                 jsonParse(parse, webUrl, false);
                 break;
-            case 3: //聚合
-                mixWeb(webUrl, flag);
+            case 2: //Json聚合
                 mixJson(webUrl, flag);
+                break;
+            case 3: //Web聚合
+                mixWeb(webUrl, flag);
                 break;
         }
     }
@@ -108,10 +111,9 @@ public class ParseJob {
     }
 
     private void mixWeb(String webUrl, String flag) {
-        StringBuilder sb = new StringBuilder();
         List<Parse> items = ApiConfig.get().getParses(0, flag);
-        for (Parse item : items) sb.append(item.getUrl()).append(";");
-        if (sb.length() > 0) App.post(() -> startWeb(Server.getParse(sb.toString(), webUrl), callback));
+        for (Parse item : items) App.post(() -> startWeb(item, webUrl, callback));
+        if (items.isEmpty()) onParseError();
     }
 
     private void jsonParse(CountDownLatch latch, Parse item, String webUrl) {
@@ -133,16 +135,12 @@ public class ParseJob {
         if (code == 200) onParseSuccess(headers, url, item.getName());
     }
 
-    private void startWeb(String url, Callback callback) {
-        startWeb(url, new HashMap<>(), callback);
+    private void startWeb(Parse item, String webUrl, Callback callback) {
+        startWeb("", item, webUrl, callback);
     }
 
-    private void startWeb(String url, Map<String, String> headers, Callback callback) {
-        startWeb("", url, headers, callback);
-    }
-
-    private void startWeb(String key, String url, Map<String, String> headers, Callback callback) {
-        webView = CustomWebView.create(App.get()).start(key, url, headers, callback);
+    private void startWeb(String key, Parse item, String webUrl, Callback callback) {
+        webViews.add(CustomWebView.create(App.get()).start(key, item.getUrl() + webUrl, item.getHeaders(), callback));
     }
 
     private HashMap<String, String> getHeader(JsonObject object) {
@@ -165,14 +163,17 @@ public class ParseJob {
         });
     }
 
+    private void stopWeb() {
+        for (CustomWebView webView : webViews) webView.stop(false);
+    }
+
     public void stop() {
         if (executor != null) executor.shutdownNow();
         if (infinite != null) infinite.shutdownNow();
-        if (webView != null) webView.stop(false);
         infinite = null;
         executor = null;
         callback = null;
-        webView = null;
+        stopWeb();
     }
 
     public interface Callback {

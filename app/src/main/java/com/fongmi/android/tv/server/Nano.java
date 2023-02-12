@@ -70,7 +70,6 @@ public class Nano extends NanoHTTPD {
         switch (session.getMethod()) {
             case GET:
                 if (url.startsWith("/file")) return doFile(url);
-                else if (url.startsWith("/parse")) return doParse(session.getParms());
                 else if (url.startsWith("/proxy")) return doProxy(session.getParms());
                 break;
             case POST:
@@ -103,17 +102,6 @@ public class Nano extends NanoHTTPD {
             else return newFixedLengthResponse(Response.Status.OK, MIME_PLAINTEXT, listFiles(file));
         } catch (Exception e) {
             return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, e.getMessage());
-        }
-    }
-
-    private Response doParse(Map<String, String> params) {
-        try {
-            String jxs = params.get("jxs");
-            String url = params.get("url");
-            String html = String.format(FileUtil.getAsset("parse.html"), jxs, url);
-            return newFixedLengthResponse(Response.Status.OK, MIME_HTML, html);
-        } catch (Exception e) {
-            return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, "500");
         }
     }
 
