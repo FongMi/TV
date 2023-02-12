@@ -15,7 +15,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.Collections;
 import java.util.List;
 
-@Entity(ignoredColumns = {"type", "api", "playUrl", "switchable", "ext", "jar", "categories"})
+@Entity(ignoredColumns = {"type", "api", "playUrl", "ext", "jar", "categories"})
 public class Site {
 
     @NonNull
@@ -34,8 +34,8 @@ public class Site {
     private Integer searchable;
     @SerializedName("filterable")
     private Integer filterable;
-    @SerializedName("switchable")
-    private Integer switchable;
+    @SerializedName("changeable")
+    private Integer changeable;
     @SerializedName("ext")
     private String ext;
     @SerializedName("jar")
@@ -118,8 +118,12 @@ public class Site {
         this.filterable = filterable;
     }
 
-    public Integer getSwitchable() {
-        return switchable == null ? 1 : switchable;
+    public Integer getChangeable() {
+        return changeable == null ? 1 : changeable;
+    }
+
+    public void setChangeable(Integer changeable) {
+        this.changeable = changeable;
     }
 
     public String getExt() {
@@ -150,10 +154,6 @@ public class Site {
         this.activated = item.equals(this);
     }
 
-    public boolean isSwitchable() {
-        return getSwitchable() == 1;
-    }
-
     public boolean isSearchable() {
         return getSearchable() == 1;
     }
@@ -172,12 +172,25 @@ public class Site {
         return this;
     }
 
+    public boolean isChangeable() {
+        return getChangeable() == 1;
+    }
+
+    public Site setChangeable(boolean changeable) {
+        setChangeable(changeable ? 1 : 0);
+        return this;
+    }
+
     public int getSearchIcon() {
         return isSearchable() ? R.drawable.ic_search_on : R.drawable.ic_search_off;
     }
 
     public int getFilterIcon() {
         return isFilterable() ? R.drawable.ic_filter_on : R.drawable.ic_filter_off;
+    }
+
+    public int getChangeIcon() {
+        return isChangeable() ? R.drawable.ic_change_on : R.drawable.ic_change_off;
     }
 
     public static Site find(String key) {
@@ -192,6 +205,7 @@ public class Site {
         Site item = find(getKey());
         if (item == null) return this;
         setFilterable(item.getFilterable());
+        setChangeable(item.getChangeable());
         if (getSearchable() != 0) setSearchable(item.getSearchable());
         return this;
     }

@@ -15,6 +15,7 @@ public class SitePresenter extends Presenter {
     private final OnClickListener mListener;
     private boolean search;
     private boolean filter;
+    private boolean change;
 
     public SitePresenter(OnClickListener listener) {
         this.mListener = listener;
@@ -30,6 +31,11 @@ public class SitePresenter extends Presenter {
         return this;
     }
 
+    public SitePresenter change(boolean change) {
+        this.change = change;
+        return this;
+    }
+
     public interface OnClickListener {
 
         void onTextClick(Site item);
@@ -38,9 +44,13 @@ public class SitePresenter extends Presenter {
 
         void onFilterClick(Site item);
 
+        void onChangeClick(Site item);
+
         boolean onSearchLongClick(Site item);
 
         boolean onFilterLongClick(Site item);
+
+        boolean onChangeLongClick(Site item);
     }
 
     @Override
@@ -55,17 +65,19 @@ public class SitePresenter extends Presenter {
         holder.binding.text.setText(item.getName());
         holder.binding.text.setFocusable(!search || filter);
         holder.binding.text.setActivated(item.isActivated());
-        holder.binding.filter.setActivated(item.isActivated());
-        holder.binding.search.setActivated(item.isActivated());
         holder.binding.filter.setImageResource(item.getFilterIcon());
         holder.binding.search.setImageResource(item.getSearchIcon());
+        holder.binding.change.setImageResource(item.getChangeIcon());
         holder.binding.search.setVisibility(search ? View.VISIBLE : View.GONE);
         holder.binding.filter.setVisibility(filter ? View.VISIBLE : View.GONE);
+        holder.binding.change.setVisibility(change ? View.VISIBLE : View.GONE);
         holder.binding.text.setOnClickListener(v -> mListener.onTextClick(item));
         holder.binding.search.setOnClickListener(v -> mListener.onSearchClick(item));
         holder.binding.filter.setOnClickListener(v -> mListener.onFilterClick(item));
+        holder.binding.change.setOnClickListener(v -> mListener.onChangeClick(item));
         holder.binding.search.setOnLongClickListener(v -> mListener.onSearchLongClick(item));
         holder.binding.filter.setOnLongClickListener(v -> mListener.onFilterLongClick(item));
+        holder.binding.change.setOnLongClickListener(v -> mListener.onChangeLongClick(item));
     }
 
     @Override
