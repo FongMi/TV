@@ -17,6 +17,7 @@ import com.google.gson.JsonParser;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -84,8 +85,8 @@ public class ParseJob {
                 jsonParse(parse, webUrl, false);
                 break;
             case 3: //聚合
-                mixJson(webUrl, flag);
                 mixWeb(webUrl, flag);
+                mixJson(webUrl, flag);
                 break;
         }
     }
@@ -98,9 +99,12 @@ public class ParseJob {
         else checkResult(getHeader(object), Json.safeString(object, "url"));
     }
 
-    private void mixJson(String webUrl, String flag) {
+    private void mixJson(String webUrl, String flag) throws Exception {
         List<Parse> items = ApiConfig.get().getParses(1, flag);
-        for (Parse item : items) infinite.execute(() -> jsonParse(item, webUrl));
+        CountDownLatch latch = new CountDownLatch(items.size());
+        for (Parse item : items) infinite.execute(() -> jsonParse(latch, item, webUrl));
+        latch.await();
+        onParseError();
     }
 
     private void mixWeb(String webUrl, String flag) {
@@ -110,10 +114,12 @@ public class ParseJob {
         if (sb.length() > 0) App.post(() -> startWeb(Server.getParse(sb.toString(), webUrl), callback));
     }
 
-    private void jsonParse(Parse item, String webUrl) {
+    private void jsonParse(CountDownLatch latch, Parse item, String webUrl) {
         try {
             jsonParse(item, webUrl, true);
         } catch (Exception ignored) {
+        } finally {
+            latch.countDown();
         }
     }
 

@@ -13,7 +13,7 @@ https://github.com/CatVodTVOfficial/CatVodTVJarLoader
 
 <pre><code>searchable：搜索    (0：關閉、1：啟用)  
 filterable：篩選    (0：關閉、1：啟用)  
-switchable：換源    (0：關閉、1：啟用)
+changeable：換源    (0：關閉、1：啟用)
 playerType：播放器  (1：IJK、2：EXO)</code></pre>
 
 ### 直播欄位
