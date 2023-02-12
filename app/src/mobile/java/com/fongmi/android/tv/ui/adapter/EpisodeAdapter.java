@@ -48,6 +48,11 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
         return null;
     }
 
+    public int getPosition() {
+        for (int i = 0; i < mItems.size(); i++) if (mItems.get(i).isActivated()) return i;
+        return 0;
+    }
+
     @Override
     public int getItemCount() {
         return mItems.size();
