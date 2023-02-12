@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.App;
@@ -143,6 +144,10 @@ public class DetailActivity extends BaseActivity implements FlagAdapter.OnClickL
         return Prefers.getReset() == 1;
     }
 
+    private boolean isFromSearch() {
+        return getCallingActivity().getShortClassName().contains(SearchActivity.class.getSimpleName());
+    }
+
     @Override
     protected ViewBinding getBinding() {
         return mBinding = ActivityDetailBinding.inflate(getLayoutInflater());
@@ -243,7 +248,8 @@ public class DetailActivity extends BaseActivity implements FlagAdapter.OnClickL
         mViewModel.player.observe(this, result -> {
             boolean useParse = (result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx() == 1;
             mBinding.control.parseLayout.setVisibility(mParseAdapter.getItemCount() > 0 && useParse ? View.VISIBLE : View.GONE);
-            mPlayers.start(result, useParse, getSite().isSwitchable() ? Constant.TIMEOUT_PLAY : -1);
+            int timeout = getSite().isChangeable() ? Constant.TIMEOUT_PLAY : -1;
+            mPlayers.start(result, useParse, timeout);
         });
         mViewModel.result.observe(this, result -> {
             if (result.getList().isEmpty()) setEmpty();
@@ -266,8 +272,7 @@ public class DetailActivity extends BaseActivity implements FlagAdapter.OnClickL
         getDetail();
     }
 
-    private void getPlayer(boolean replay) {
-        Vod.Flag.Episode item = getEpisode();
+    private void getPlayer(Vod.Flag.Episode item, boolean replay) {
         mBinding.widget.title.setText(getString(R.string.detail_title, mBinding.name.getText(), item.getName()));
         mViewModel.playerContent(getKey(), mFlagAdapter.getActivated().getFlag(), item.getUrl());
         Clock.get().setCallback(null);
@@ -276,10 +281,12 @@ public class DetailActivity extends BaseActivity implements FlagAdapter.OnClickL
     }
 
     private void setEmpty() {
-        if (getName().isEmpty()) {
+        if (isFromSearch()) {
+            finish();
+        } else if (getName().isEmpty()) {
             mBinding.progressLayout.showEmpty();
         } else {
-            finish();
+            //checkSearch();
         }
     }
 
@@ -306,11 +313,29 @@ public class DetailActivity extends BaseActivity implements FlagAdapter.OnClickL
         view.setTag(text);
     }
 
-    private void setFlagActivated(Vod.Flag item) {
-        if (mFlagAdapter.getItemCount() == 0 || item.isActivated()) return;
+    @Override
+    public void onItemClick(Vod.Flag item) {
+        if (item.isActivated()) return;
         mFlagAdapter.setActivated(item);
+        mBinding.flag.scrollToPosition(mFlagAdapter.getPosition());
         setEpisodeAdapter(item.getEpisodes());
         seamless(item);
+    }
+
+    @Override
+    public void onItemClick(Vod.Flag.Episode item) {
+        if (item.isActivated()) return;
+        mFlagAdapter.toggle(item);
+        notifyItemChanged(mEpisodeAdapter);
+        mBinding.episode.scrollToPosition(mEpisodeAdapter.getPosition());
+        onRefresh();
+    }
+
+    @Override
+    public void onItemClick(Parse item) {
+        ApiConfig.get().setParse(item);
+        notifyItemChanged(mParseAdapter);
+        onRefresh();
     }
 
     private void setEpisodeAdapter(List<Vod.Flag.Episode> items) {
@@ -322,14 +347,7 @@ public class DetailActivity extends BaseActivity implements FlagAdapter.OnClickL
         Vod.Flag.Episode episode = flag.find(mHistory.getVodRemarks());
         if (episode == null || episode.isActivated()) return;
         mHistory.setVodRemarks(episode.getName());
-        setEpisodeActivated(episode);
-    }
-
-    private void setEpisodeActivated(Vod.Flag.Episode item) {
-        mFlagAdapter.toggle(item);
-        mEpisodeAdapter.notifyDataSetChanged();
-        if (mEpisodeAdapter.getItemCount() == 0) return;
-        onRefresh();
+        onItemClick(episode);
     }
 
     private void reverseEpisode() {
@@ -337,18 +355,14 @@ public class DetailActivity extends BaseActivity implements FlagAdapter.OnClickL
         setEpisodeAdapter(getFlag().getEpisodes());
     }
 
-    private void setParseActivated(Parse item) {
-        ApiConfig.get().setParse(item);
-        mParseAdapter.notifyDataSetChanged();
-        onRefresh();
-    }
-
     private void onRefresh() {
-        getPlayer(false);
+        Vod.Flag.Episode episode = getEpisode();
+        if (episode != null) getPlayer(episode, false);
     }
 
     private void onReset() {
-        getPlayer(isReplay());
+        Vod.Flag.Episode episode = getEpisode();
+        if (episode != null) getPlayer(episode, isReplay());
     }
 
     private void showProgress() {
@@ -413,7 +427,7 @@ public class DetailActivity extends BaseActivity implements FlagAdapter.OnClickL
     private void checkHistory(Vod item) {
         mHistory = History.find(getHistoryKey());
         mHistory = mHistory == null ? createHistory(item) : mHistory;
-        setFlagActivated(mHistory.getFlag());
+        onItemClick(mHistory.getFlag());
         if (mHistory.isRevSort()) reverseEpisode();
         setScale(mHistory.getScale() == -1 ? Prefers.getScale() : mHistory.getScale());
         mBinding.control.opening.setText(mPlayers.stringToTime(mHistory.getOpening()));
@@ -457,19 +471,6 @@ public class DetailActivity extends BaseActivity implements FlagAdapter.OnClickL
         keep.setVodName(mBinding.name.getText().toString());
         keep.setCreateTime(System.currentTimeMillis());
         keep.save();
-    }
-
-    @Override
-    public void onItemClick(Vod.Flag item) {
-    }
-
-    @Override
-    public void onItemClick(Vod.Flag.Episode item) {
-    }
-
-    @Override
-    public void onItemClick(Parse item) {
-
     }
 
     @Override
@@ -585,6 +586,10 @@ public class DetailActivity extends BaseActivity implements FlagAdapter.OnClickL
 
     private void setAutoMode(boolean autoMode) {
         this.mAutoMode = autoMode;
+    }
+
+    private void notifyItemChanged(RecyclerView.Adapter<?> adapter) {
+        adapter.notifyItemRangeChanged(0, adapter.getItemCount());
     }
 
     @Override

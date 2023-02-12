@@ -49,9 +49,14 @@ public class FlagAdapter extends RecyclerView.Adapter<FlagAdapter.ViewHolder> {
         return null;
     }
 
+    public int getPosition() {
+        for (int i = 0; i < mItems.size(); i++) if (mItems.get(i).isActivated()) return i;
+        return 0;
+    }
+
     public void setActivated(Vod.Flag flag) {
         for (Vod.Flag item : mItems) item.setActivated(flag);
-        notifyDataSetChanged();
+        notifyItemRangeChanged(0, getItemCount());
     }
 
     public void toggle(Vod.Flag.Episode episode) {
