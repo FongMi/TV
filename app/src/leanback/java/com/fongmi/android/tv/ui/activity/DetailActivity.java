@@ -288,7 +288,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mViewModel.player.observe(this, result -> {
             boolean useParse = (result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx() == 1;
             mBinding.control.parseLayout.setVisibility(mParseAdapter.size() > 0 && useParse ? View.VISIBLE : View.GONE);
-            int timeout = getSite().isSwitchable() ? Constant.TIMEOUT_PLAY : -1;
+            int timeout = getSite().isChangeable() ? Constant.TIMEOUT_PLAY : -1;
             mPlayers.start(result, useParse, timeout);
             resetFocus();
         });
@@ -806,7 +806,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void startFlow() {
-        if (!getSite().isSwitchable()) return;
+        if (!getSite().isChangeable()) return;
         if (isVisible(mBinding.control.parseLayout)) checkParse();
         else checkFlag();
     }
@@ -848,7 +848,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mExecutor = Executors.newFixedThreadPool(Constant.THREAD_POOL);
         for (Site site : ApiConfig.get().getSites()) {
             if (site.getKey().equals(getKey())) continue;
-            if (isAutoMode() && !site.isSwitchable()) continue;
+            if (isAutoMode() && !site.isChangeable()) continue;
             if (site.isSearchable()) mExecutor.execute(() -> search(site, keyword));
         }
     }
