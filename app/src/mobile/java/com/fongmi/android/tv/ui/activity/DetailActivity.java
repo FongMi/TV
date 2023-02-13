@@ -3,11 +3,15 @@ package com.fongmi.android.tv.ui.activity;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.text.Html;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -365,6 +369,21 @@ public class DetailActivity extends BaseActivity implements FlagAdapter.OnClickL
         if (episode != null) getPlayer(episode, isReplay());
     }
 
+    private void enterFullscreen() {
+        mBinding.video.setForeground(null);
+        getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+        mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
+        App.post(() -> setFullscreen(true), 250);
+        onPlay();
+    }
+
+    private void exitFullscreen() {
+        getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        mBinding.video.setLayoutParams(mFrameParams);
+        setFullscreen(false);
+        hideInfo();
+    }
+
     private void showProgress() {
         mBinding.widget.progress.setVisibility(View.VISIBLE);
         App.post(mR2, 0);
@@ -590,6 +609,16 @@ public class DetailActivity extends BaseActivity implements FlagAdapter.OnClickL
 
     private void notifyItemChanged(RecyclerView.Adapter<?> adapter) {
         adapter.notifyItemRangeChanged(0, adapter.getItemCount());
+    }
+
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            exitFullscreen();
+        } else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            enterFullscreen();
+        }
     }
 
     @Override
