@@ -52,17 +52,10 @@ public class Parse {
         return parse;
     }
 
-    public static Parse mixJson() {
+    public static Parse god() {
         Parse parse = new Parse();
-        parse.setName("Json");
-        parse.setType(2);
-        return parse;
-    }
-
-    public static Parse mixWeb() {
-        Parse parse = new Parse();
-        parse.setName("Web");
-        parse.setType(3);
+        parse.setName("超級解析");
+        parse.setType(4);
         return parse;
     }
 
