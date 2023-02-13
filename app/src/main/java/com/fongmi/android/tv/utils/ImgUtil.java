@@ -31,11 +31,13 @@ public class ImgUtil {
     }
 
     public static void loadKeep(String url, ImageView view) {
-        Glide.with(App.get()).load(Utils.checkProxy(url)).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).into(view);
+        view.setScaleType(ImageView.ScaleType.CENTER);
+        Glide.with(App.get()).asBitmap().load(Utils.checkProxy(url)).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).listener(getListener(view)).into(view);
     }
 
     public static void loadHistory(String url, ImageView view) {
-        Glide.with(App.get()).load(Utils.checkProxy(url)).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).into(view);
+        view.setScaleType(ImageView.ScaleType.CENTER);
+        Glide.with(App.get()).asBitmap().load(Utils.checkProxy(url)).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).listener(getListener(view)).into(view);
     }
 
     public static void loadLive(String url, ImageView view) {
