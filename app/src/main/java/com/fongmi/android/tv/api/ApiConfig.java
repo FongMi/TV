@@ -158,13 +158,10 @@ public class ApiConfig {
             Parse item = Parse.objectFrom(element);
             if (!parses.contains(item)) parses.add(item);
         }
-        if (parses.size() > 0) {
-            parses.add(0, Parse.mixWeb());
-            parses.add(0, Parse.mixJson());
-        }
     }
 
     private void initOther(JsonObject object) {
+        if (parses.size() > 0) parses.add(0, Parse.god());
         if (home == null) setHome(sites.isEmpty() ? new Site() : sites.get(0));
         if (parse == null) setParse(parses.isEmpty() ? new Parse() : parses.get(0));
         setFlags(Json.safeListString(object, "flags"));
