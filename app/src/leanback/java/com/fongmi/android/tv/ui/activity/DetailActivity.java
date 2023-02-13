@@ -329,7 +329,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void getPlayer(Vod.Flag flag, Vod.Flag.Episode episode, boolean replay) {
         mBinding.widget.title.setText(getString(R.string.detail_title, mBinding.name.getText(), episode.getName()));
         mViewModel.playerContent(getKey(), flag.getFlag(), episode.getUrl());
-        Clock.get().setCallback(null);
         updateHistory(episode, replay);
         showProgress();
     }
@@ -536,12 +535,14 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onRefresh() {
+        Clock.get().setCallback(null);
         if (mFlagAdapter.size() == 0) return;
         if (mEpisodeAdapter.size() == 0) return;
         getPlayer(getFlag(), getEpisode(), false);
     }
 
     private void onReset() {
+        Clock.get().setCallback(null);
         if (mFlagAdapter.size() == 0) return;
         if (mEpisodeAdapter.size() == 0) return;
         getPlayer(getFlag(), getEpisode(), isReplay());
