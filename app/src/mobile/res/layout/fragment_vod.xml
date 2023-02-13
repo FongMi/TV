@@ -25,7 +25,7 @@
             app:layout_scrollFlags="scroll|enterAlways" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler"
+            android:id="@+id/type"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clipChildren="false"
