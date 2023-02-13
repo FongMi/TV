@@ -94,7 +94,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         //mBinding.filter.setAdapter(mFilterAdapter = new FilterAdapter(this));
         mBinding.recycler.setHasFixedSize(true);
         mBinding.recycler.setAdapter(mVodAdapter = new VodAdapter(this));
-        mBinding.recycler.setLayoutManager(mGridLayoutManager = new GridLayoutManager(getContext(), 3));
+        mBinding.recycler.setLayoutManager(mGridLayoutManager = new GridLayoutManager(getContext(), getSpanCount()));
     }
 
     private void setViewModel() {
@@ -181,9 +181,9 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            mGridLayoutManager.setSpanCount(3);
+            mGridLayoutManager.setSpanCount(getSpanCount());
         } else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            mGridLayoutManager.setSpanCount(6);
+            mGridLayoutManager.setSpanCount(getSpanCount());
         }
     }
 }

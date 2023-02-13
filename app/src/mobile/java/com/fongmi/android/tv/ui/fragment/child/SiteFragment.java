@@ -47,10 +47,10 @@ public class SiteFragment extends BaseFragment implements VodAdapter.OnClickList
     private void setRecyclerView() {
         mBinding.history.setHasFixedSize(true);
         mBinding.history.getItemAnimator().setChangeDuration(0);
-        mBinding.history.setLayoutManager(mHistoryManager = new GridLayoutManager(getContext(), 3));
+        mBinding.history.setLayoutManager(mHistoryManager = new GridLayoutManager(getContext(), getSpanCount()));
         mBinding.history.setAdapter(mHistoryAdapter = new HistoryAdapter(this));
         mBinding.recommend.setHasFixedSize(true);
-        mBinding.recommend.setLayoutManager(mRecommendManager = new GridLayoutManager(getContext(), 3));
+        mBinding.recommend.setLayoutManager(mRecommendManager = new GridLayoutManager(getContext(), getSpanCount()));
         mBinding.recommend.setAdapter(mVodAdapter = new VodAdapter(this));
     }
 
@@ -118,11 +118,11 @@ public class SiteFragment extends BaseFragment implements VodAdapter.OnClickList
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            mHistoryManager.setSpanCount(3);
-            mRecommendManager.setSpanCount(3);
+            mHistoryManager.setSpanCount(getSpanCount());
+            mRecommendManager.setSpanCount(getSpanCount());
         } else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            mHistoryManager.setSpanCount(6);
-            mRecommendManager.setSpanCount(6);
+            mHistoryManager.setSpanCount(getSpanCount());
+            mRecommendManager.setSpanCount(getSpanCount());
         }
     }
 }
