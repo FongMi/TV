@@ -172,8 +172,8 @@ public class DetailActivity extends BaseActivity implements FlagAdapter.OnClickL
     @SuppressLint("ClickableViewAccessibility")
     protected void initEvent() {
         mBinding.control.seek.setListener(mPlayers);
-        /*mBinding.desc.setOnClickListener(view -> onDesc());
-        mBinding.keep.setOnClickListener(view -> onKeep());
+        mBinding.more.setOnClickListener(view -> onMore());
+        /*mBinding.keep.setOnClickListener(view -> onKeep());
         mBinding.video.setOnClickListener(view -> onVideo());
         mBinding.control.text.setOnClickListener(this::onTrack);
         mBinding.control.audio.setOnClickListener(this::onTrack);
@@ -382,6 +382,12 @@ public class DetailActivity extends BaseActivity implements FlagAdapter.OnClickL
         mBinding.video.setLayoutParams(mFrameParams);
         setFullscreen(false);
         hideInfo();
+    }
+
+    private void onMore() {
+        boolean more = getString(R.string.vod_content_expand).equals(mBinding.more.getText().toString());
+        mBinding.more.setText(more ? R.string.vod_content_collapse : R.string.vod_content_expand);
+        mBinding.content.setMaxLines(more ? Integer.MAX_VALUE : 4);
     }
 
     private void showProgress() {
