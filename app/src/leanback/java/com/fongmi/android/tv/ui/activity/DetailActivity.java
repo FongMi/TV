@@ -533,10 +533,14 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onRefresh() {
+        if (mFlagAdapter.size() == 0) return;
+        if (mEpisodeAdapter.size() == 0) return;
         getPlayer(false);
     }
 
     private void onReset() {
+        if (mFlagAdapter.size() == 0) return;
+        if (mEpisodeAdapter.size() == 0) return;
         getPlayer(isReplay());
     }
 
