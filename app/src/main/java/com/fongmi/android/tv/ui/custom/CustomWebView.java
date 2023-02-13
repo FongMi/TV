@@ -2,13 +2,12 @@ package com.fongmi.android.tv.ui.custom;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.net.Uri;
 import android.net.http.SslError;
 import android.text.TextUtils;
 import android.webkit.CookieManager;
 import android.webkit.SslErrorHandler;
-import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -24,16 +23,13 @@ import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.crawler.Spider;
 
 import java.io.ByteArrayInputStream;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class CustomWebView extends WebView {
 
     private WebResourceResponse empty;
     private ParseCallback callback;
-    private List<String> keys;
     private Runnable timer;
     private String from;
     private String key;
@@ -50,7 +46,6 @@ public class CustomWebView extends WebView {
     @SuppressLint("SetJavaScriptEnabled")
     public void initSettings() {
         this.timer = () -> stop(true);
-        this.keys = Arrays.asList("user-agent", "referer", "origin");
         this.empty = new WebResourceResponse("text/plain", "utf-8", new ByteArrayInputStream("".getBytes()));
         getSettings().setUseWideViewPort(true);
         getSettings().setDatabaseEnabled(true);
@@ -58,7 +53,6 @@ public class CustomWebView extends WebView {
         getSettings().setJavaScriptEnabled(true);
         getSettings().setLoadWithOverviewMode(true);
         getSettings().setJavaScriptCanOpenWindowsAutomatically(false);
-        getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         setWebViewClient(webViewClient());
     }
 
@@ -85,13 +79,10 @@ public class CustomWebView extends WebView {
         return new WebViewClient() {
             @Nullable
             @Override
-            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-                String url = request.getUrl().toString();
-                String host = request.getUrl().getHost();
-                if (ApiConfig.get().getAds().contains(host)) return empty;
-                Map<String, String> headers = request.getRequestHeaders();
-                if (isVideoFormat(url, headers)) post(headers, url);
-                return super.shouldInterceptRequest(view, request);
+            public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
+                if (isAds(url)) return empty;
+                if (isVideoFormat(url)) post(url);
+                return super.shouldInterceptRequest(view, url);
             }
 
             @Override
@@ -107,22 +98,29 @@ public class CustomWebView extends WebView {
         };
     }
 
-    private boolean isVideoFormat(String url, Map<String, String> headers) {
+    private boolean isAds(String url) {
+        try {
+            return ApiConfig.get().getAds().contains(Uri.parse(url).getHost());
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private boolean isVideoFormat(String url) {
         try {
             Site site = ApiConfig.get().getSite(key);
             Spider spider = ApiConfig.get().getCSP(site);
             if (spider.manualVideoCheck()) return spider.isVideoFormat(url);
-            return Utils.isVideoFormat(url, headers);
+            return Utils.isVideoFormat(url);
         } catch (Exception ignored) {
-            return Utils.isVideoFormat(url, headers);
+            return Utils.isVideoFormat(url);
         }
     }
 
-    private void post(Map<String, String> headers, String url) {
+    private void post(String url) {
         Map<String, String> news = new HashMap<>();
         String cookie = CookieManager.getInstance().getCookie(url);
         if (!TextUtils.isEmpty(cookie)) news.put("cookie", cookie);
-        for (String key : headers.keySet()) if (keys.contains(key.toLowerCase())) news.put(key, headers.get(key));
         onParseSuccess(news, url);
     }
 
