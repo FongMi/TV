@@ -103,19 +103,19 @@ public class ParseJob implements ParseCallback {
     private void godParse(String webUrl, String flag) throws Exception {
         List<Parse> json = ApiConfig.get().getParses(1, flag);
         List<Parse> webs = ApiConfig.get().getParses(0, flag);
-        CountDownLatch cd = new CountDownLatch(json.size());
-        for (Parse item : json) infinite.execute(() -> jsonParse(cd, item, webUrl));
-        cd.await();
+        CountDownLatch latch = new CountDownLatch(json.size());
+        for (Parse item : json) infinite.execute(() -> jsonParse(latch, item, webUrl));
+        latch.await();
         if (webs.isEmpty()) onParseError();
         for (Parse item : webs) App.post(() -> startWeb(item, webUrl));
     }
 
-    private void jsonParse(CountDownLatch cd, Parse item, String webUrl) {
+    private void jsonParse(CountDownLatch latch, Parse item, String webUrl) {
         try {
             jsonParse(item, webUrl, true);
         } catch (Exception ignored) {
         } finally {
-            cd.countDown();
+            latch.countDown();
         }
     }
 
@@ -161,6 +161,7 @@ public class ParseJob implements ParseCallback {
 
     private void stopWeb() {
         for (CustomWebView webView : webViews) webView.stop(false);
+        webViews.clear();
     }
 
     public void stop() {
