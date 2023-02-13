@@ -78,16 +78,16 @@ public class VodFragment extends BaseFragment implements SiteCallback, TypeAdapt
         mBinding.pager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
-                mBinding.recycler.smoothScrollToPosition(position);
+                mBinding.type.smoothScrollToPosition(position);
                 mTypeAdapter.setActivated(position);
             }
         });
     }
 
     private void setRecyclerView() {
-        mBinding.recycler.setHasFixedSize(true);
-        mBinding.recycler.setItemAnimator(null);
-        mBinding.recycler.setAdapter(mTypeAdapter = new TypeAdapter(this));
+        mBinding.type.setHasFixedSize(true);
+        mBinding.type.setItemAnimator(null);
+        mBinding.type.setAdapter(mTypeAdapter = new TypeAdapter(this));
         mBinding.pager.setAdapter(mPageAdapter = new PageAdapter(getChildFragmentManager()));
     }
 
