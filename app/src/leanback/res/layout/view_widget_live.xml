@@ -4,10 +4,27 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include
+    <LinearLayout
         android:id="@+id/progress"
-        layout="@layout/view_progress"
-        android:visibility="gone" />
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <include layout="@layout/view_progress" />
+
+        <TextView
+            android:id="@+id/traffic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:visibility="gone"
+            tools:text="120KB/s" />
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/digital"
@@ -44,7 +61,6 @@
             android:id="@+id/action"
             android:layout_width="56dp"
             android:layout_height="56dp"
-            android:background="?attr/selectableItemBackground"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_play" />
 
@@ -84,12 +100,13 @@
     <LinearLayout
         android:id="@+id/info"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="64dp"
         android:layout_gravity="bottom"
         android:background="@drawable/shape_info_live"
         android:gravity="center"
         android:orientation="horizontal"
-        android:padding="16dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
         android:visibility="gone"
         tools:visibility="visible">
 
@@ -108,7 +125,8 @@
             android:layout_width="48dp"
             android:layout_height="36dp"
             android:layout_marginEnd="12dp"
-            android:scaleType="fitCenter" />
+            android:scaleType="fitCenter"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/name"

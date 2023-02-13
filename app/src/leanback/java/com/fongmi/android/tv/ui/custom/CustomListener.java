@@ -36,6 +36,7 @@ public abstract class CustomListener implements TextWatcher, RecognitionListener
 
     @Override
     public void onResults(Bundle results) {
+        if (results == null) return;
         StringBuilder sb = new StringBuilder();
         List<String> texts = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
         for (String text : texts) sb.append(text).append("\n");

@@ -8,9 +8,7 @@ import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.net.Callback;
-import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Json;
-import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderNull;
@@ -18,26 +16,23 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 public class ApiConfig {
 
-    private List<String> ads;
-    private List<String> flags;
-    private List<Parse> parses;
     private List<Site> sites;
-    private JarLoader jLoader;
-    private PyLoader pLoader;
+    private List<Parse> parses;
+    private List<String> flags;
+    private JarLoader jarLoader;
+    private PyLoader pyLoader;
+    private JsLoader jsLoader;
     private Config config;
-    private String wall;
     private Parse parse;
+    private String wall;
+    private String ads;
     private Site home;
 
     private static class Loader {
@@ -65,15 +60,17 @@ public class ApiConfig {
     }
 
     public ApiConfig init() {
-        this.home = null;
+        this.ads = null;
         this.wall = null;
+        this.home = null;
+        this.parse = null;
         this.config = Config.vod();
-        this.ads = new ArrayList<>();
         this.sites = new ArrayList<>();
         this.flags = new ArrayList<>();
         this.parses = new ArrayList<>();
-        this.jLoader = new JarLoader();
-        this.pLoader = new PyLoader();
+        this.jarLoader = new JarLoader();
+        this.pyLoader = new PyLoader();
+        this.jsLoader = new JsLoader();
         return this;
     }
 
@@ -83,14 +80,16 @@ public class ApiConfig {
     }
 
     public ApiConfig clear() {
-        this.home = null;
+        this.ads = null;
         this.wall = null;
-        this.ads.clear();
+        this.home = null;
+        this.parse = null;
         this.sites.clear();
         this.flags.clear();
         this.parses.clear();
-        this.jLoader.clear();
-        this.pLoader.clear();
+        this.jarLoader.clear();
+        this.pyLoader.clear();
+        this.jsLoader.clear();
         return this;
     }
 
@@ -123,9 +122,11 @@ public class ApiConfig {
 
     private void parseConfig(JsonObject object, Callback callback) {
         try {
-            parseJson(object);
-            parseLive(object);
-            jLoader.parseJar("", Json.safeString(object, "spider"));
+            initSite(object);
+            initLive(object);
+            initParse(object);
+            initOther(object);
+            jarLoader.parseJar("", Json.safeString(object, "spider"));
             config.json(object.toString()).update();
             App.post(callback::success);
         } catch (Exception e) {
@@ -134,26 +135,17 @@ public class ApiConfig {
         }
     }
 
-    private void parseJson(JsonObject object) {
+    private void initSite(JsonObject object) {
         for (JsonElement element : Json.safeListElement(object, "sites")) {
             Site site = Site.objectFrom(element).sync();
+            site.setApi(parseApi(site.getApi()));
             site.setExt(parseExt(site.getExt()));
             if (site.getKey().equals(config.getHome())) setHome(site);
             if (!sites.contains(site)) sites.add(site);
         }
-        for (JsonElement element : Json.safeListElement(object, "parses")) {
-            Parse parse = Parse.objectFrom(element);
-            if (parse.getName().equals(Prefers.getParse())) setParse(parse);
-            if (!parses.contains(parse)) parses.add(parse);
-        }
-        if (home == null) setHome(sites.isEmpty() ? new Site() : sites.get(0));
-        if (parse == null) setParse(parses.isEmpty() ? new Parse() : parses.get(0));
-        flags.addAll(Json.safeListString(object, "flags"));
-        ads.addAll(Json.safeListString(object, "ads"));
-        setWall(Json.safeString(object, "wallpaper"));
     }
 
-    private void parseLive(JsonObject object) {
+    private void initLive(JsonObject object) {
         boolean hasLive = object.has("lives");
         if (hasLive) Config.create(config.getUrl(), 1);
         boolean loadApi = hasLive && LiveConfig.get().isSame(config.getUrl());
@@ -161,33 +153,56 @@ public class ApiConfig {
         else LiveConfig.get().load();
     }
 
+    private void initParse(JsonObject object) {
+        for (JsonElement element : Json.safeListElement(object, "parses")) {
+            Parse item = Parse.objectFrom(element);
+            if (!parses.contains(item)) parses.add(item);
+        }
+    }
+
+    private void initOther(JsonObject object) {
+        if (parses.size() > 0) parses.add(0, Parse.mix());
+        if (home == null) setHome(sites.isEmpty() ? new Site() : sites.get(0));
+        if (parse == null) setParse(parses.isEmpty() ? new Parse() : parses.get(0));
+        setFlags(Json.safeListString(object, "flags"));
+        setWall(Json.safeString(object, "wallpaper"));
+        setAds(Json.safeListString(object, "ads"));
+    }
+
+    private String parseApi(String api) {
+        if (TextUtils.isEmpty(api)) return api;
+        if (api.startsWith("http")) return api;
+        if (api.startsWith("file")) return Utils.convert(api);
+        if (api.endsWith(".js")) return parseApi(Utils.convert(config.getUrl(), api));
+        return api;
+    }
+
     private String parseExt(String ext) {
+        if (TextUtils.isEmpty(ext)) return ext;
         if (ext.startsWith("http")) return ext;
-        else if (ext.startsWith("file")) return FileUtil.read(ext);
-        else if (ext.startsWith("img+")) return Decoder.getExt(ext);
-        else if (ext.contains("http") || ext.contains("file")) return ext;
-        else if (ext.endsWith(".txt") || ext.endsWith(".json") || ext.endsWith(".py")) return parseExt(Utils.convert(config.getUrl(), ext));
+        if (ext.startsWith("file")) return Utils.convert(ext);
+        if (ext.startsWith("img+")) return Decoder.getExt(ext);
+        if (ext.contains("http") || ext.contains("file")) return ext;
+        if (ext.endsWith(".txt") || ext.endsWith(".json") || ext.endsWith(".py") || ext.endsWith(".js")) return parseExt(Utils.convert(config.getUrl(), ext));
         return ext;
     }
 
     public Spider getCSP(Site site) {
+        boolean js = site.getApi().contains(".js");
         boolean py = site.getApi().startsWith("py_");
         boolean csp = site.getApi().startsWith("csp_");
-        if (py) return pLoader.getSpider(site.getKey(), site.getApi(), site.getExt());
-        else if (csp) return jLoader.getSpider(site.getKey(), site.getApi(), site.getExt(), site.getJar());
+        if (js) return jsLoader.getSpider(site.getKey(), site.getApi(), site.getExt());
+        if (py) return pyLoader.getSpider(site.getKey(), site.getApi(), site.getExt());
+        if (csp) return jarLoader.getSpider(site.getKey(), site.getApi(), site.getExt(), site.getJar());
         else return new SpiderNull();
     }
 
+    public void setJar(String key) {
+        jarLoader.setJar(key);
+    }
+
     public Object[] proxyLocal(Map<?, ?> param) {
-        return jLoader.proxyInvoke(param);
-    }
-
-    public JSONObject jsonExt(String key, LinkedHashMap<String, String> jxs, String url) {
-        return jLoader.jsonExt(key, jxs, url);
-    }
-
-    public JSONObject jsonExtMix(String flag, String key, String name, LinkedHashMap<String, HashMap<String, String>> jxs, String url) {
-        return jLoader.jsonExtMix(flag, key, name, jxs, url);
+        return jarLoader.proxyInvoke(param);
     }
 
     public Site getSite(String key) {
@@ -208,27 +223,31 @@ public class ApiConfig {
         return parses == null ? Collections.emptyList() : parses;
     }
 
+    public List<Parse> getParses(int type, String flag) {
+        List<Parse> items = new ArrayList<>();
+        for (Parse item : getParses()) if (item.getType() == type && item.getExt().getFlag().contains(flag)) items.add(item);
+        if (items.isEmpty()) for (Parse item : getParses()) if (item.getType() == type) items.add(item);
+        return items;
+    }
+
     public List<String> getFlags() {
         return flags == null ? Collections.emptyList() : flags;
     }
 
+    private void setFlags(List<String> flags) {
+        this.flags.addAll(flags);
+    }
+
     public String getAds() {
-        return ads == null ? "" : ads.toString();
+        return ads;
+    }
+
+    private void setAds(List<String> ads) {
+        this.ads = TextUtils.join(",", ads);
     }
 
     public Config getConfig() {
         return config == null ? Config.vod() : config;
-    }
-
-    public Parse getParse() {
-        return parse == null ? new Parse() : parse;
-    }
-
-    public void setParse(Parse parse) {
-        this.parse = parse;
-        this.parse.setActivated(true);
-        Prefers.putParse(parse.getName());
-        for (Parse item : parses) item.setActivated(parse);
     }
 
     public String getWall() {
@@ -249,5 +268,16 @@ public class ApiConfig {
         this.home.setActivated(true);
         config.home(home.getKey()).update();
         for (Site item : getSites()) item.setActivated(home);
+    }
+
+    public Parse getParse() {
+        return parse == null ? new Parse() : parse;
+    }
+
+    public void setParse(Parse parse) {
+        this.parse = parse;
+        this.parse.setActivated(true);
+        config.parse(parse.getName()).update();
+        for (Parse item : getParses()) item.setActivated(parse);
     }
 }

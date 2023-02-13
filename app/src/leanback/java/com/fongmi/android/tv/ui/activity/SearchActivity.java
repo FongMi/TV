@@ -4,12 +4,10 @@ import android.app.Activity;
 import android.content.Intent;
 import android.text.Editable;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.viewbinding.ViewBinding;
 
@@ -19,12 +17,13 @@ import com.fongmi.android.tv.bean.Hot;
 import com.fongmi.android.tv.bean.Suggest;
 import com.fongmi.android.tv.databinding.ActivitySearchBinding;
 import com.fongmi.android.tv.net.Callback;
-import com.fongmi.android.tv.net.OKHttp;
+import com.fongmi.android.tv.net.OkHttp;
 import com.fongmi.android.tv.ui.adapter.HistoryAdapter;
 import com.fongmi.android.tv.ui.adapter.WordAdapter;
 import com.fongmi.android.tv.ui.custom.CustomKeyboard;
 import com.fongmi.android.tv.ui.custom.CustomListener;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
+import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
 import com.fongmi.android.tv.utils.Utils;
 
 import java.io.IOException;
@@ -42,13 +41,6 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
     public static void start(Activity activity) {
         activity.startActivity(new Intent(activity, SearchActivity.class));
     }
-
-    private final ActivityResultLauncher<String> launcher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), new ActivityResultCallback<>() {
-        @Override
-        public void onActivityResult(Boolean isGranted) {
-            if (isGranted) mBinding.mic.start();
-        }
-    });
 
     @Override
     protected ViewBinding getBinding() {
@@ -75,7 +67,7 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
                 else getSuggest(s.toString());
             }
         });
-        mBinding.mic.setListener(launcher, new CustomListener() {
+        mBinding.mic.setListener(this, new CustomListener() {
             @Override
             public void onEndOfSpeech() {
                 mBinding.mic.stop();
@@ -100,7 +92,7 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
 
     private void getHot() {
         mBinding.hint.setText(R.string.search_hot);
-        OKHttp.newCall("https://api.web.360kan.com/v1/rank?cat=1").enqueue(new Callback() {
+        OkHttp.newCall("https://api.web.360kan.com/v1/rank?cat=1").enqueue(new Callback() {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 List<String> items = Hot.get(response.body().string());
@@ -111,7 +103,7 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
 
     private void getSuggest(String text) {
         mBinding.hint.setText(R.string.search_suggest);
-        OKHttp.newCall("https://suggest.video.iqiyi.com/?if=mobile&key=" + text).enqueue(new Callback() {
+        OkHttp.newCall("https://suggest.video.iqiyi.com/?if=mobile&key=" + text).enqueue(new Callback() {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 List<String> items = Suggest.get(response.body().string());
@@ -139,6 +131,17 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
         if (TextUtils.isEmpty(keyword)) return;
         CollectActivity.start(this, keyword);
         App.post(() -> mHistoryAdapter.add(keyword), 250);
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (Utils.isMenuKey(event)) showDialog();
+        return super.dispatchKeyEvent(event);
+    }
+
+    @Override
+    public void showDialog() {
+        SiteDialog.create(this).search(true).show();
     }
 
     @Override

@@ -42,8 +42,8 @@ public class CustomKeyboard implements KeyboardAdapter.OnClickListener {
         StringBuilder sb = new StringBuilder(binding.keyword.getText().toString());
         int cursor = binding.keyword.getSelectionStart();
         switch (resId) {
-            case R.drawable.ic_keyboard_space:
-                onTextClick(" ");
+            case R.drawable.ic_search_on:
+                callback.showDialog();
                 break;
             case R.drawable.ic_keyboard_left:
                 binding.keyword.setSelection(--cursor < 0 ? 0 : cursor);
@@ -74,6 +74,8 @@ public class CustomKeyboard implements KeyboardAdapter.OnClickListener {
     }
 
     public interface Callback {
+
+        void showDialog();
 
         void onRemote();
 

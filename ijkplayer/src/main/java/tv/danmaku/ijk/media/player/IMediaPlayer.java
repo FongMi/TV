@@ -19,6 +19,7 @@ package tv.danmaku.ijk.media.player;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.view.Surface;
@@ -29,7 +30,6 @@ import java.io.IOException;
 import java.util.Map;
 
 import tv.danmaku.ijk.media.player.misc.IMediaDataSource;
-import tv.danmaku.ijk.media.player.misc.ITrackInfo;
 
 public interface IMediaPlayer {
     /*
@@ -102,6 +102,8 @@ public interface IMediaPlayer {
     boolean isPlaying();
 
     void seekTo(long msec) throws IllegalStateException;
+
+    boolean getCurrentFrame(Bitmap bitmap);
 
     long getCurrentPosition();
 
@@ -200,11 +202,6 @@ public interface IMediaPlayer {
     void setLooping(boolean looping);
 
     boolean isLooping();
-
-    /*--------------------
-     * AndroidMediaPlayer: JELLY_BEAN
-     */
-    ITrackInfo[] getTrackInfo();
 
     /*--------------------
      * AndroidMediaPlayer: ICE_CREAM_SANDWICH:

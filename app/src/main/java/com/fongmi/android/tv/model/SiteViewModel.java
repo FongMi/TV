@@ -7,11 +7,12 @@ import android.util.ArrayMap;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Vod;
-import com.fongmi.android.tv.net.OKHttp;
+import com.fongmi.android.tv.net.OkHttp;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderDebug;
@@ -39,14 +40,6 @@ public class SiteViewModel extends ViewModel {
         this.search = new MutableLiveData<>();
     }
 
-    public MutableLiveData<Result> getResult() {
-        return result;
-    }
-
-    public MutableLiveData<Result> getPlayer() {
-        return player;
-    }
-
     public void homeContent() {
         Site site = ApiConfig.get().getHome();
         execute(result, () -> {
@@ -54,6 +47,7 @@ public class SiteViewModel extends ViewModel {
                 Spider spider = ApiConfig.get().getCSP(site);
                 String homeContent = spider.homeContent(true);
                 SpiderDebug.log(homeContent);
+                ApiConfig.get().setJar(site.getJar());
                 Result result = Result.fromJson(homeContent);
                 if (result.getList().size() > 0) return result;
                 String homeVideoContent = spider.homeVideoContent();
@@ -63,11 +57,11 @@ public class SiteViewModel extends ViewModel {
             } else if (site.getType() == 4) {
                 ArrayMap<String, String> params = new ArrayMap<>();
                 params.put("filter", "true");
-                String body = OKHttp.newCall(site.getApi(), params).execute().body().string();
+                String body = OkHttp.newCall(site.getApi(), params).execute().body().string();
                 SpiderDebug.log(body);
                 return Result.fromJson(body);
             } else {
-                String body = OKHttp.newCall(site.getApi()).execute().body().string();
+                String body = OkHttp.newCall(site.getApi()).execute().body().string();
                 SpiderDebug.log(body);
                 Result result = site.getType() == 0 ? Result.fromXml(body) : Result.fromJson(body);
                 if (result.getList().isEmpty() || result.getList().get(0).getVodPic().length() > 0) return result;
@@ -76,7 +70,7 @@ public class SiteViewModel extends ViewModel {
                 ArrayMap<String, String> params = new ArrayMap<>();
                 params.put("ac", site.getType() == 0 ? "videolist" : "detail");
                 params.put("ids", TextUtils.join(",", ids));
-                body = OKHttp.newCall(site.getApi(), params).execute().body().string();
+                body = OkHttp.newCall(site.getApi(), params).execute().body().string();
                 List<Vod> items = site.getType() == 0 ? Result.fromXml(body).getList() : Result.fromJson(body).getList();
                 result.setList(items);
                 return result;
@@ -91,6 +85,7 @@ public class SiteViewModel extends ViewModel {
                 Spider spider = ApiConfig.get().getCSP(site);
                 String categoryContent = spider.categoryContent(tid, page, filter, extend);
                 SpiderDebug.log(categoryContent);
+                ApiConfig.get().setJar(site.getJar());
                 return Result.fromJson(categoryContent);
             } else {
                 ArrayMap<String, String> params = new ArrayMap<>();
@@ -99,7 +94,7 @@ public class SiteViewModel extends ViewModel {
                 params.put("ac", site.getType() == 0 ? "videolist" : "detail");
                 params.put("t", tid);
                 params.put("pg", page);
-                String body = OKHttp.newCall(site.getApi(), params).execute().body().string();
+                String body = OkHttp.newCall(site.getApi(), params).execute().body().string();
                 SpiderDebug.log(body);
                 return site.getType() == 0 ? Result.fromXml(body) : Result.fromJson(body);
             }
@@ -113,6 +108,7 @@ public class SiteViewModel extends ViewModel {
                 Spider spider = ApiConfig.get().getCSP(site);
                 String detailContent = spider.detailContent(Arrays.asList(id));
                 SpiderDebug.log(detailContent);
+                ApiConfig.get().setJar(site.getJar());
                 Result result = Result.fromJson(detailContent);
                 if (!result.getList().isEmpty()) result.getList().get(0).setVodFlags();
                 return result;
@@ -120,7 +116,7 @@ public class SiteViewModel extends ViewModel {
                 ArrayMap<String, String> params = new ArrayMap<>();
                 params.put("ac", site.getType() == 0 ? "videolist" : "detail");
                 params.put("ids", id);
-                String body = OKHttp.newCall(site.getApi(), params).execute().body().string();
+                String body = OkHttp.newCall(site.getApi(), params).execute().body().string();
                 SpiderDebug.log(body);
                 Result result = site.getType() == 0 ? Result.fromXml(body) : Result.fromJson(body);
                 if (!result.getList().isEmpty()) result.getList().get(0).setVodFlags();
@@ -136,20 +132,24 @@ public class SiteViewModel extends ViewModel {
                 Spider spider = ApiConfig.get().getCSP(site);
                 String playerContent = spider.playerContent(flag, id, ApiConfig.get().getFlags());
                 SpiderDebug.log(playerContent);
+                ApiConfig.get().setJar(site.getJar());
                 Result result = Result.objectFrom(playerContent);
                 if (result.getFlag().isEmpty()) result.setFlag(flag);
+                result.setKey(key);
                 return result;
             } else if (site.getType() == 4) {
                 ArrayMap<String, String> params = new ArrayMap<>();
                 params.put("play", id);
                 params.put("flag", flag);
-                String body = OKHttp.newCall(site.getApi(), params).execute().body().string();
+                String body = OkHttp.newCall(site.getApi(), params).execute().body().string();
                 SpiderDebug.log(body);
-                return Result.fromJson(body);
+                Result result = Result.fromJson(body);
+                if (result.getFlag().isEmpty()) result.setFlag(flag);
+                return result;
             } else {
                 String url = id;
                 String type = Uri.parse(url).getQueryParameter("type");
-                if (type != null && type.equals("json")) url = Result.fromJson(OKHttp.newCall(id).execute().body().string()).getUrl();
+                if (type != null && type.equals("json")) url = Result.fromJson(OkHttp.newCall(id).execute().body().string()).getUrl();
                 Result result = new Result();
                 result.setUrl(url);
                 result.setFlag(flag);
@@ -171,7 +171,7 @@ public class SiteViewModel extends ViewModel {
             ArrayMap<String, String> params = new ArrayMap<>();
             params.put("wd", keyword);
             if (site.getType() != 0) params.put("ac", "detail");
-            String body = OKHttp.newCall(site.getApi(), params).execute().body().string();
+            String body = OkHttp.newCall(site.getApi(), params).execute().body().string();
             SpiderDebug.log(site.getName() + "," + body);
             if (site.getType() == 0) post(site, Result.fromXml(body));
             else post(site, Result.fromJson(body));
@@ -189,7 +189,7 @@ public class SiteViewModel extends ViewModel {
         executor = Executors.newFixedThreadPool(2);
         executor.execute(() -> {
             try {
-                if (!Thread.interrupted()) result.postValue(executor.submit(callable).get(30, TimeUnit.SECONDS));
+                if (!Thread.interrupted()) result.postValue(executor.submit(callable).get(Constant.TIMEOUT_VOD, TimeUnit.MILLISECONDS));
             } catch (Throwable e) {
                 e.printStackTrace();
                 if (e instanceof InterruptedException) return;

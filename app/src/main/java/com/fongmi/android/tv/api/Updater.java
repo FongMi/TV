@@ -1,7 +1,6 @@
 package com.fongmi.android.tv.api;
 
 import android.app.Activity;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -9,10 +8,11 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.BuildConfig;
-import com.fongmi.android.tv.Constant;
+import com.fongmi.android.tv.Github;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.DialogUpdateBinding;
-import com.fongmi.android.tv.net.OKHttp;
+import com.fongmi.android.tv.net.Download;
+import com.fongmi.android.tv.net.OkHttp;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
@@ -22,15 +22,13 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.lang.ref.WeakReference;
+import java.util.Locale;
 
-public class Updater implements View.OnClickListener {
+public class Updater implements Download.Callback {
 
-    private WeakReference<Activity> activity;
+    private DialogUpdateBinding binding;
     private AlertDialog dialog;
     private String branch;
-    private boolean force;
-    private String md5;
 
     private static class Loader {
         static volatile Updater INSTANCE = new Updater();
@@ -45,25 +43,20 @@ public class Updater implements View.OnClickListener {
     }
 
     private String getJson() {
-        return Constant.getBranchPath(branch, "/release/" + BuildConfig.FLAVOR_mode + "-" + branch + ".json");
+        return Github.get().getBranchPath(branch, "/release/" + BuildConfig.FLAVOR_mode + "-" + branch + ".json");
     }
 
     private String getApk() {
-        return Constant.getBranchPath(branch, "/release/" + BuildConfig.FLAVOR_mode + "-" + BuildConfig.FLAVOR_api + ".apk");
+        return Github.get().getBranchPath(branch, "/release/" + BuildConfig.FLAVOR_mode + "-" + BuildConfig.FLAVOR_api + ".apk");
     }
 
     private Updater() {
-        this.branch = Constant.RELEASE;
-    }
-
-    public Updater reset() {
-        Prefers.putUpdate(true);
-        return this;
+        this.branch = Github.RELEASE;
     }
 
     public Updater force() {
         Notify.show(R.string.update_check);
-        this.force = true;
+        Prefers.putUpdate(true);
         return this;
     }
 
@@ -72,63 +65,75 @@ public class Updater implements View.OnClickListener {
         return this;
     }
 
-    public void start(Activity activity) {
-        this.activity = new WeakReference<>(activity);
+    private Updater check() {
+        dismiss();
+        return this;
+    }
+
+    public void start() {
         App.execute(this::doInBackground);
     }
 
-    private void doInBackground() {
-        FileUtil.clearDir(getFile());
-        connect(getJson());
+    private boolean need(int code, String name) {
+        return (branch.equals(Github.DEV) ? !name.equals(BuildConfig.VERSION_NAME) : code > BuildConfig.VERSION_CODE) && Prefers.getUpdate();
     }
 
-    private void connect(String target) {
+    private void doInBackground() {
         try {
-            JSONObject object = new JSONObject(OKHttp.newCall(target).execute().body().string());
+            JSONObject object = new JSONObject(OkHttp.newCall(getJson()).execute().body().string());
             String name = object.optString("name");
             String desc = object.optString("desc");
             int code = object.optInt("code");
-            boolean need = code > BuildConfig.VERSION_CODE;
-            if (need || force) FileUtil.write(getFile(), OKHttp.newCall(getApk()).execute().body().bytes());
-            boolean show = need && Prefers.getUpdate() || force && !Prefers.getApkMd5().equals(md5 = FileUtil.getMd5(getFile()));
-            if (getFile().exists() && show) App.post(() -> checkActivity(name, desc));
+            if (need(code, name)) App.post(() -> show(App.activity(), name, desc));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void checkActivity(String version, String desc) {
-        if (dialog != null) dialog.dismiss();
-        if (activity.get().isFinishing()) install();
-        else showDialog(version, desc);
-    }
-
-    private void showDialog(String version, String desc) {
-        DialogUpdateBinding binding = DialogUpdateBinding.inflate(LayoutInflater.from(activity.get()));
-        dialog = new MaterialAlertDialogBuilder(activity.get()).setView(binding.getRoot()).create();
+    private void show(Activity activity, String version, String desc) {
+        binding = DialogUpdateBinding.inflate(LayoutInflater.from(activity));
         binding.version.setText(ResUtil.getString(R.string.update_version, version));
-        binding.confirm.setOnClickListener(this);
-        binding.cancel.setOnClickListener(this);
+        binding.confirm.setOnClickListener(this::confirm);
+        binding.cancel.setOnClickListener(this::cancel);
         binding.desc.setText(desc);
-        dialog.show();
+        check().create(activity).show();
     }
 
-    private void install() {
-        FileUtil.openFile(getFile());
-        if (!TextUtils.isEmpty(md5)) Prefers.putApkMD5(md5);
+    private AlertDialog create(Activity activity) {
+        return dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).setCancelable(false).create();
+    }
+
+    private void cancel(View view) {
+        Prefers.putUpdate(false);
+        dismiss();
+    }
+
+    private void confirm(View view) {
+        binding.confirm.setEnabled(false);
+        Download.create(getApk(), getFile(), this).start();
     }
 
     private void dismiss() {
-        if (dialog != null) dialog.dismiss();
-        this.branch = Constant.RELEASE;
-        this.force = false;
-        this.md5 = null;
+        try {
+            if (dialog != null) dialog.dismiss();
+        } catch (Exception ignored) {
+        }
     }
 
     @Override
-    public void onClick(View view) {
-        if (view.getId() == R.id.cancel) Prefers.putUpdate(false);
-        if (view.getId() == R.id.confirm) install();
+    public void progress(int progress) {
+        binding.confirm.setText(String.format(Locale.getDefault(), "%1$d%%", progress));
+    }
+
+    @Override
+    public void error(String message) {
+        Notify.show(message);
+        dismiss();
+    }
+
+    @Override
+    public void success(File file) {
+        FileUtil.openFile(getFile());
         dismiss();
     }
 }

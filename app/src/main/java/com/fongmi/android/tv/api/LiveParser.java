@@ -6,7 +6,7 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Group;
 import com.fongmi.android.tv.bean.Live;
-import com.fongmi.android.tv.net.OKHttp;
+import com.fongmi.android.tv.net.OkHttp;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Utils;
 
@@ -27,10 +27,12 @@ public class LiveParser {
 
     public static void start(Live live) {
         if (live.getGroups().size() > 0) return;
-        start(live, getText(live.getUrl()));
+        if (live.getType() == 0) text(live, getText(live.getUrl()));
+        if (live.getType() == 1) json(live, getText(live.getUrl()));
+        if (live.getType() == 2) proxy(live, getText(live.getUrl()));
     }
 
-    public static void start(Live live, String text) {
+    public static void text(Live live, String text) {
         int number = 0;
         if (live.getGroups().size() > 0) return;
         if (text.trim().startsWith("#EXTM3U")) m3u(live, text);
@@ -38,6 +40,16 @@ public class LiveParser {
         for (Group group : live.getGroups()) {
             for (Channel channel : group.getChannel()) {
                 channel.setNumber(++number);
+                channel.live(live);
+            }
+        }
+    }
+
+    private static void json(Live live, String text) {
+        live.getGroups().addAll(Group.arrayFrom(text));
+        for (Group group : live.getGroups()) {
+            for (Channel channel : group.getChannel()) {
+                channel.live(live);
             }
         }
     }
@@ -45,10 +57,11 @@ public class LiveParser {
     private static void m3u(Live live, String text) {
         Channel channel = Channel.create("");
         for (String line : text.split("\n")) {
+            if (Thread.interrupted()) break;
             if (line.startsWith("#EXTINF:")) {
                 Group group = live.find(Group.create(extract(line, GROUP)));
                 channel = group.find(Channel.create(extract(line, NAME)));
-                channel.epg(live).setLogo(extract(line, LOGO));
+                channel.setLogo(extract(line, LOGO));
             } else if (line.contains("://")) {
                 channel.getUrls().add(line);
             }
@@ -59,11 +72,24 @@ public class LiveParser {
         for (String line : text.split("\n")) {
             String[] split = line.split(",");
             if (split.length < 2) continue;
+            if (Thread.interrupted()) break;
             if (line.contains("#genre#")) live.getGroups().add(Group.create(split[0]));
             if (live.getGroups().isEmpty()) live.getGroups().add(Group.create(R.string.live_group));
             if (split[1].contains("://")) {
                 Group group = live.getGroups().get(live.getGroups().size() - 1);
-                group.find(Channel.create(split[0]).epg(live)).addUrls(split[1].split("#"));
+                group.find(Channel.create(split[0])).addUrls(split[1].split("#"));
+            }
+        }
+    }
+
+    private static void proxy(Live live, String text) {
+        int number = 0;
+        for (Live item : Live.arrayFrom(text)) {
+            Group group = live.find(Group.create(item.getGroup()));
+            for (Channel channel : item.getChannels()) {
+                channel.setNumber(++number);
+                channel.live(live);
+                group.add(channel);
             }
         }
     }
@@ -71,10 +97,10 @@ public class LiveParser {
     private static String getText(String url) {
         try {
             if (url.startsWith("file")) return FileUtil.read(url);
-            else if (url.startsWith("http")) return OKHttp.newCall(url).execute().body().string();
-            else if (url.endsWith(".txt") || url.endsWith(".m3u")) return getText(Utils.convert(LiveConfig.getUrl(), url));
-            else if (url.length() > 0 && url.length() % 4 == 0) return getText(new String(Base64.decode(url, Base64.DEFAULT)));
-            else return "";
+            if (url.startsWith("http")) return OkHttp.newCall(url).execute().body().string();
+            if (url.endsWith(".txt") || url.endsWith(".m3u")) return getText(Utils.convert(LiveConfig.getUrl(), url));
+            if (url.length() > 0 && url.length() % 4 == 0) return getText(new String(Base64.decode(url, Base64.DEFAULT)));
+            return "";
         } catch (Exception e) {
             e.printStackTrace();
             return "";

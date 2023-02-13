@@ -36,6 +36,8 @@ public class Site {
     private Integer searchable;
     @SerializedName("filterable")
     private Integer filterable;
+    @SerializedName("changeable")
+    private Integer changeable;
     @SerializedName("ext")
     private String ext;
     @SerializedName("jar")
@@ -102,8 +104,12 @@ public class Site {
         return playUrl;
     }
 
+    public int getPlayerType() {
+        return playerType == null ? -1 : playerType == 1 ? 1 : 0;
+    }
+
     public Integer getSearchable() {
-        return searchable;
+        return searchable == null ? 1 : searchable;
     }
 
     public void setSearchable(Integer searchable) {
@@ -111,11 +117,19 @@ public class Site {
     }
 
     public Integer getFilterable() {
-        return filterable;
+        return filterable == null ? 1 : filterable;
     }
 
     public void setFilterable(Integer filterable) {
         this.filterable = filterable;
+    }
+
+    public Integer getChangeable() {
+        return changeable == null ? 1 : changeable;
+    }
+
+    public void setChangeable(Integer changeable) {
+        this.changeable = changeable;
     }
 
     public String getExt() {
@@ -146,25 +160,30 @@ public class Site {
         this.activated = item.equals(this);
     }
 
-    public String getActivatedName() {
-        return (isActivated() ? "√ " : "").concat(getName());
-    }
-
     public boolean isSearchable() {
-        return getSearchable() == null || getSearchable() == 1;
+        return getSearchable() == 1;
     }
 
     public Site setSearchable(boolean searchable) {
-        setSearchable(searchable ? 1 : 0);
+        if (getSearchable() != 0) setSearchable(searchable ? 1 : 2);
         return this;
     }
 
     public boolean isFilterable() {
-        return getFilterable() == null || getFilterable() == 1;
+        return getFilterable() == 1;
     }
 
     public Site setFilterable(boolean filterable) {
         setFilterable(filterable ? 1 : 0);
+        return this;
+    }
+
+    public boolean isChangeable() {
+        return getChangeable() == 1;
+    }
+
+    public Site setChangeable(boolean changeable) {
+        setChangeable(changeable ? 1 : 0);
         return this;
     }
 
@@ -176,10 +195,8 @@ public class Site {
         return isFilterable() ? R.drawable.ic_filter_on : R.drawable.ic_filter_off;
     }
 
-    public int getPlayerType() {
-        if (playerType == null) return -1;
-        if (playerType == 1) return 1;
-        return 0;
+    public int getChangeIcon() {
+        return isChangeable() ? R.drawable.ic_change_on : R.drawable.ic_change_off;
     }
 
     public static Site find(String key) {
@@ -193,8 +210,9 @@ public class Site {
     public Site sync() {
         Site item = find(getKey());
         if (item == null) return this;
-        setSearchable(item.getSearchable());
         setFilterable(item.getFilterable());
+        setChangeable(item.getChangeable());
+        if (getSearchable() != 0) setSearchable(item.getSearchable());
         return this;
     }
 
