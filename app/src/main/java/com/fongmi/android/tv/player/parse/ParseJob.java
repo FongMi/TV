@@ -7,13 +7,14 @@ import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Result;
+import com.fongmi.android.tv.impl.ParseCallback;
 import com.fongmi.android.tv.net.OkHttp;
-import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.ui.custom.CustomWebView;
 import com.fongmi.android.tv.utils.Json;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,21 +26,22 @@ import java.util.concurrent.TimeUnit;
 import okhttp3.Headers;
 import okhttp3.Response;
 
-public class ParseJob {
+public class ParseJob implements ParseCallback {
 
+    private final List<CustomWebView> webViews;
     private ExecutorService executor;
     private ExecutorService infinite;
-    private CustomWebView webView;
-    private Callback callback;
+    private ParseCallback callback;
     private Parse parse;
 
-    public static ParseJob create(Callback callback) {
+    public static ParseJob create(ParseCallback callback) {
         return new ParseJob(callback);
     }
 
-    public ParseJob(Callback callback) {
+    public ParseJob(ParseCallback callback) {
         this.executor = Executors.newFixedThreadPool(2);
         this.infinite = Executors.newCachedThreadPool();
+        this.webViews = new ArrayList<>();
         this.callback = callback;
     }
 
@@ -79,14 +81,13 @@ public class ParseJob {
     private void doInBackground(String key, String webUrl, String flag) throws Exception {
         switch (parse.getType()) {
             case 0: //嗅探
-                App.post(() -> startWeb(key, parse.getUrl() + webUrl, parse.getHeaders(), callback));
+                App.post(() -> startWeb(key, parse, webUrl));
                 break;
             case 1: //Json
                 jsonParse(parse, webUrl, false);
                 break;
-            case 3: //聚合
-                mixWeb(webUrl, flag);
-                mixJson(webUrl, flag);
+            case 4: //God
+                godParse(webUrl, flag);
                 break;
         }
     }
@@ -99,19 +100,14 @@ public class ParseJob {
         else checkResult(getHeader(object), Json.safeString(object, "url"));
     }
 
-    private void mixJson(String webUrl, String flag) throws Exception {
-        List<Parse> items = ApiConfig.get().getParses(1, flag);
-        CountDownLatch latch = new CountDownLatch(items.size());
-        for (Parse item : items) infinite.execute(() -> jsonParse(latch, item, webUrl));
+    private void godParse(String webUrl, String flag) throws Exception {
+        List<Parse> json = ApiConfig.get().getParses(1, flag);
+        List<Parse> webs = ApiConfig.get().getParses(0, flag);
+        CountDownLatch latch = new CountDownLatch(json.size());
+        for (Parse item : json) infinite.execute(() -> jsonParse(latch, item, webUrl));
         latch.await();
-        onParseError();
-    }
-
-    private void mixWeb(String webUrl, String flag) {
-        StringBuilder sb = new StringBuilder();
-        List<Parse> items = ApiConfig.get().getParses(0, flag);
-        for (Parse item : items) sb.append(item.getUrl()).append(";");
-        if (sb.length() > 0) App.post(() -> startWeb(Server.getParse(sb.toString(), webUrl), callback));
+        if (webs.isEmpty()) onParseError();
+        for (Parse item : webs) App.post(() -> startWeb(item, webUrl));
     }
 
     private void jsonParse(CountDownLatch latch, Parse item, String webUrl) {
@@ -133,16 +129,12 @@ public class ParseJob {
         if (code == 200) onParseSuccess(headers, url, item.getName());
     }
 
-    private void startWeb(String url, Callback callback) {
-        startWeb(url, new HashMap<>(), callback);
+    private void startWeb(Parse item, String webUrl) {
+        startWeb("", item, webUrl);
     }
 
-    private void startWeb(String url, Map<String, String> headers, Callback callback) {
-        startWeb("", url, headers, callback);
-    }
-
-    private void startWeb(String key, String url, Map<String, String> headers, Callback callback) {
-        webView = CustomWebView.create(App.get()).start(key, url, headers, callback);
+    private void startWeb(String key, Parse item, String webUrl) {
+        webViews.add(CustomWebView.create(App.get()).start(key, item.getName(), item.getUrl() + webUrl, item.getHeaders(), this));
     }
 
     private HashMap<String, String> getHeader(JsonObject object) {
@@ -151,34 +143,33 @@ public class ParseJob {
         return headers;
     }
 
-    private void onParseSuccess(Map<String, String> headers, String url, String from) {
+    @Override
+    public void onParseSuccess(Map<String, String> headers, String url, String from) {
         App.post(() -> {
             if (callback != null) callback.onParseSuccess(headers, url, from);
             stop();
         });
     }
 
-    private void onParseError() {
+    @Override
+    public void onParseError() {
         App.post(() -> {
             if (callback != null) callback.onParseError();
             stop();
         });
     }
 
+    private void stopWeb() {
+        for (CustomWebView webView : webViews) webView.stop(false);
+        webViews.clear();
+    }
+
     public void stop() {
         if (executor != null) executor.shutdownNow();
         if (infinite != null) infinite.shutdownNow();
-        if (webView != null) webView.stop(false);
         infinite = null;
         executor = null;
         callback = null;
-        webView = null;
-    }
-
-    public interface Callback {
-
-        void onParseSuccess(Map<String, String> headers, String url, String from);
-
-        void onParseError();
+        stopWeb();
     }
 }

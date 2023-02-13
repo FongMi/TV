@@ -1,5 +1,6 @@
 package com.fongmi.android.tv.ui.fragment.child;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -22,7 +23,6 @@ import com.fongmi.android.tv.ui.adapter.FilterAdapter;
 import com.fongmi.android.tv.ui.adapter.ValueAdapter;
 import com.fongmi.android.tv.ui.adapter.VodAdapter;
 import com.fongmi.android.tv.ui.custom.CustomScroller;
-import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -33,6 +33,7 @@ import java.util.List;
 
 public class TypeFragment extends BaseFragment implements CustomScroller.Callback, ValueAdapter.OnClickListener, VodAdapter.OnClickListener {
 
+    private GridLayoutManager mGridLayoutManager;
     private HashMap<String, String> mExtends;
     private FragmentTypeBinding mBinding;
     private FilterAdapter mFilterAdapter;
@@ -84,16 +85,16 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     @Override
     protected void initEvent() {
-        mBinding.scroller.setOnScrollChangeListener(mScroller);
+        mBinding.recycler.addOnScrollListener(mScroller = new CustomScroller(this));
+        //mBinding.scroller.setOnScrollChangeListener(mScroller);
     }
 
     private void setRecyclerView() {
-        mBinding.filter.setHasFixedSize(true);
-        mBinding.filter.setAdapter(mFilterAdapter = new FilterAdapter(this));
+        //mBinding.filter.setHasFixedSize(true);
+        //mBinding.filter.setAdapter(mFilterAdapter = new FilterAdapter(this));
         mBinding.recycler.setHasFixedSize(true);
         mBinding.recycler.setAdapter(mVodAdapter = new VodAdapter(this));
-        mBinding.recycler.setLayoutManager(new GridLayoutManager(getContext(), 3));
-        mBinding.recycler.addItemDecoration(new SpaceItemDecoration(3, 16));
+        mBinding.recycler.setLayoutManager(mGridLayoutManager = new GridLayoutManager(getContext(), getSpanCount()));
     }
 
     private void setViewModel() {
@@ -124,12 +125,12 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     }
 
     private void showFilter() {
-        mBinding.scroller.smoothScrollTo(0, 0);
-        mFilterAdapter.addAll(mFilters);
+        //mBinding.scroller.smoothScrollTo(0, 0);
+        //mFilterAdapter.addAll(mFilters);
     }
 
     private void hideFilter() {
-        mFilterAdapter.clear();
+        //mFilterAdapter.clear();
     }
 
     public void toggleFilter(boolean open) {
@@ -174,5 +175,15 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefreshEvent(RefreshEvent event) {
         if (event.getType() == RefreshEvent.Type.IMAGE) mVodAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            mGridLayoutManager.setSpanCount(getSpanCount());
+        } else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mGridLayoutManager.setSpanCount(getSpanCount());
+        }
     }
 }
