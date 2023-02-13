@@ -2,12 +2,13 @@ package com.fongmi.android.tv.ui.custom;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.net.Uri;
 import android.net.http.SslError;
 import android.text.TextUtils;
 import android.webkit.CookieManager;
 import android.webkit.SslErrorHandler;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -18,19 +19,23 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Site;
-import com.fongmi.android.tv.player.parse.ParseJob;
+import com.fongmi.android.tv.impl.ParseCallback;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.crawler.Spider;
 
 import java.io.ByteArrayInputStream;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class CustomWebView extends WebView {
 
-    private ParseJob.Callback callback;
     private WebResourceResponse empty;
+    private ParseCallback callback;
+    private List<String> keys;
     private Runnable timer;
+    private String from;
     private String key;
 
     public static CustomWebView create(@NonNull Context context) {
@@ -45,6 +50,7 @@ public class CustomWebView extends WebView {
     @SuppressLint("SetJavaScriptEnabled")
     public void initSettings() {
         this.timer = () -> stop(true);
+        this.keys = Arrays.asList("user-agent", "referer", "origin");
         this.empty = new WebResourceResponse("text/plain", "utf-8", new ByteArrayInputStream("".getBytes()));
         getSettings().setUseWideViewPort(true);
         getSettings().setDatabaseEnabled(true);
@@ -52,6 +58,7 @@ public class CustomWebView extends WebView {
         getSettings().setJavaScriptEnabled(true);
         getSettings().setLoadWithOverviewMode(true);
         getSettings().setJavaScriptCanOpenWindowsAutomatically(false);
+        getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         setWebViewClient(webViewClient());
     }
 
@@ -64,11 +71,12 @@ public class CustomWebView extends WebView {
         }
     }
 
-    public CustomWebView start(String key, String url, Map<String, String> headers, ParseJob.Callback callback) {
+    public CustomWebView start(String key, String from, String url, Map<String, String> headers, ParseCallback callback) {
         App.post(timer, Constant.TIMEOUT_PARSE_WEB);
         this.callback = callback;
         setUserAgent(headers);
         loadUrl(url, headers);
+        this.from = from;
         this.key = key;
         return this;
     }
@@ -77,10 +85,13 @@ public class CustomWebView extends WebView {
         return new WebViewClient() {
             @Nullable
             @Override
-            public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
-                if (isAds(url)) return empty;
-                if (isVideoFormat(url)) post(url);
-                return super.shouldInterceptRequest(view, url);
+            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                String url = request.getUrl().toString();
+                String host = request.getUrl().getHost();
+                if (ApiConfig.get().getAds().contains(host)) return empty;
+                Map<String, String> headers = request.getRequestHeaders();
+                if (isVideoFormat(url, headers)) post(headers, url);
+                return super.shouldInterceptRequest(view, request);
             }
 
             @Override
@@ -96,47 +107,40 @@ public class CustomWebView extends WebView {
         };
     }
 
-    private boolean isAds(String url) {
-        try {
-            return ApiConfig.get().getAds().contains(Uri.parse(url).getHost());
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    private boolean isVideoFormat(String url) {
+    private boolean isVideoFormat(String url, Map<String, String> headers) {
         try {
             Site site = ApiConfig.get().getSite(key);
             Spider spider = ApiConfig.get().getCSP(site);
             if (spider.manualVideoCheck()) return spider.isVideoFormat(url);
-            return Utils.isVideoFormat(url);
+            return Utils.isVideoFormat(url, headers);
         } catch (Exception ignored) {
-            return Utils.isVideoFormat(url);
+            return Utils.isVideoFormat(url, headers);
         }
     }
 
-    private void post(String url) {
+    private void post(Map<String, String> headers, String url) {
         Map<String, String> news = new HashMap<>();
         String cookie = CookieManager.getInstance().getCookie(url);
         if (!TextUtils.isEmpty(cookie)) news.put("cookie", cookie);
-        App.post(() -> onSuccess(news, url));
+        for (String key : headers.keySet()) if (keys.contains(key.toLowerCase())) news.put(key, headers.get(key));
+        onParseSuccess(news, url);
     }
 
     public void stop(boolean error) {
         stopLoading();
         loadUrl("about:blank");
         App.removeCallbacks(timer);
-        if (error) App.post(this::onError);
+        if (error) onParseError();
         else callback = null;
     }
 
-    private void onSuccess(Map<String, String> news, String url) {
-        if (callback != null) callback.onParseSuccess(news, url, "");
+    private void onParseSuccess(Map<String, String> news, String url) {
+        if (callback != null) callback.onParseSuccess(news, url, from);
+        App.post(() -> stop(false));
         callback = null;
-        stop(false);
     }
 
-    private void onError() {
+    private void onParseError() {
         if (callback != null) callback.onParseError();
         callback = null;
     }

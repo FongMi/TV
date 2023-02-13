@@ -52,10 +52,10 @@ public class Parse {
         return parse;
     }
 
-    public static Parse mix() {
+    public static Parse god() {
         Parse parse = new Parse();
         parse.setName("超級解析");
-        parse.setType(3);
+        parse.setType(4);
         return parse;
     }
 

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/selector_text"
-    android:ellipsize="middle"
+    android:ellipsize="marquee"
     android:focusable="true"
     android:focusableInTouchMode="true"
     android:singleLine="true"

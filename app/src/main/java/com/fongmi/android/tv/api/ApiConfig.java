@@ -161,7 +161,7 @@ public class ApiConfig {
     }
 
     private void initOther(JsonObject object) {
-        if (parses.size() > 0) parses.add(0, Parse.mix());
+        if (parses.size() > 0) parses.add(0, Parse.god());
         if (home == null) setHome(sites.isEmpty() ? new Site() : sites.get(0));
         if (parse == null) setParse(parses.isEmpty() ? new Parse() : parses.get(0));
         setFlags(Json.safeListString(object, "flags"));
@@ -223,10 +223,16 @@ public class ApiConfig {
         return parses == null ? Collections.emptyList() : parses;
     }
 
+    public List<Parse> getParses(int type) {
+        List<Parse> items = new ArrayList<>();
+        for (Parse item : getParses()) if (item.getType() == type) items.add(item);
+        return items;
+    }
+
     public List<Parse> getParses(int type, String flag) {
         List<Parse> items = new ArrayList<>();
-        for (Parse item : getParses()) if (item.getType() == type && item.getExt().getFlag().contains(flag)) items.add(item);
-        if (items.isEmpty()) for (Parse item : getParses()) if (item.getType() == type) items.add(item);
+        for (Parse item : getParses(type)) if (item.getExt().getFlag().contains(flag)) items.add(item);
+        if (items.isEmpty()) items.addAll(getParses(type));
         return items;
     }
 
