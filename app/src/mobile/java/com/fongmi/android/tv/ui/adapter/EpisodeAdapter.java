@@ -44,8 +44,12 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
     }
 
     public Vod.Flag.Episode getActivated() {
-        for (Vod.Flag.Episode item : mItems) if (item.isActivated()) return item;
-        return null;
+        return mItems.get(getPosition());
+    }
+
+    public int getPosition() {
+        for (int i = 0; i < mItems.size(); i++) if (mItems.get(i).isActivated()) return i;
+        return 0;
     }
 
     @Override

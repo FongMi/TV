@@ -1,12 +1,12 @@
 package com.fongmi.android.tv.ui.fragment.child;
 
+import android.content.res.Configuration;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.bean.History;
@@ -18,15 +18,16 @@ import com.fongmi.android.tv.ui.activity.BaseFragment;
 import com.fongmi.android.tv.ui.activity.DetailActivity;
 import com.fongmi.android.tv.ui.adapter.HistoryAdapter;
 import com.fongmi.android.tv.ui.adapter.VodAdapter;
-import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 public class SiteFragment extends BaseFragment implements VodAdapter.OnClickListener, HistoryAdapter.OnClickListener {
 
-    private FragmentSiteBinding mBinding;
+    private GridLayoutManager mRecommendManager;
+    private GridLayoutManager mHistoryManager;
     private HistoryAdapter mHistoryAdapter;
+    private FragmentSiteBinding mBinding;
     private VodAdapter mVodAdapter;
 
     public static SiteFragment newInstance() {
@@ -46,12 +47,10 @@ public class SiteFragment extends BaseFragment implements VodAdapter.OnClickList
     private void setRecyclerView() {
         mBinding.history.setHasFixedSize(true);
         mBinding.history.getItemAnimator().setChangeDuration(0);
-        mBinding.history.addItemDecoration(new SpaceItemDecoration(16));
-        mBinding.history.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        mBinding.history.setLayoutManager(mHistoryManager = new GridLayoutManager(getContext(), getSpanCount()));
         mBinding.history.setAdapter(mHistoryAdapter = new HistoryAdapter(this));
         mBinding.recommend.setHasFixedSize(true);
-        mBinding.recommend.addItemDecoration(new SpaceItemDecoration(3, 16));
-        mBinding.recommend.setLayoutManager(new GridLayoutManager(getContext(), 3));
+        mBinding.recommend.setLayoutManager(mRecommendManager = new GridLayoutManager(getContext(), getSpanCount()));
         mBinding.recommend.setAdapter(mVodAdapter = new VodAdapter(this));
     }
 
@@ -112,6 +111,18 @@ public class SiteFragment extends BaseFragment implements VodAdapter.OnClickList
             case HISTORY:
                 getHistory();
                 break;
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            mHistoryManager.setSpanCount(getSpanCount());
+            mRecommendManager.setSpanCount(getSpanCount());
+        } else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mHistoryManager.setSpanCount(getSpanCount());
+            mRecommendManager.setSpanCount(getSpanCount());
         }
     }
 }
