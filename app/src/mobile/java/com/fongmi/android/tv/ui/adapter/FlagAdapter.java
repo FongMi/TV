@@ -45,8 +45,7 @@ public class FlagAdapter extends RecyclerView.Adapter<FlagAdapter.ViewHolder> {
     }
 
     public Vod.Flag getActivated() {
-        for (Vod.Flag item : mItems) if (item.isActivated()) return item;
-        return null;
+        return mItems.get(getPosition());
     }
 
     public int getPosition() {
