@@ -130,7 +130,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     }
 
     private void hideFilter() {
-        mFilterAdapter.clear();
+        //mFilterAdapter.clear();
     }
 
     public void toggleFilter(boolean open) {
