@@ -19,7 +19,7 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Site;
-import com.fongmi.android.tv.player.parse.ParseJob;
+import com.fongmi.android.tv.impl.ParseCallback;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.crawler.Spider;
 
@@ -31,8 +31,8 @@ import java.util.Map;
 
 public class CustomWebView extends WebView {
 
-    private ParseJob.Callback callback;
     private WebResourceResponse empty;
+    private ParseCallback callback;
     private List<String> keys;
     private Runnable timer;
     private String from;
@@ -71,7 +71,7 @@ public class CustomWebView extends WebView {
         }
     }
 
-    public CustomWebView start(String key, String from, String url, Map<String, String> headers, ParseJob.Callback callback) {
+    public CustomWebView start(String key, String from, String url, Map<String, String> headers, ParseCallback callback) {
         App.post(timer, Constant.TIMEOUT_PARSE_WEB);
         this.callback = callback;
         setUserAgent(headers);

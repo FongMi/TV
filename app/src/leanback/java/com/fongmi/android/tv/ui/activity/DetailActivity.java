@@ -814,7 +814,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void checkParse() {
         int position = getParsePosition();
         boolean last = position == mParseAdapter.size() - 1;
-        boolean pass = position == 1 || last;
+        boolean pass = position == 0 || last;
         if (last) initParse();
         if (pass) checkFlag();
         else nextParse(position);
