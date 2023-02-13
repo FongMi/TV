@@ -126,7 +126,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     private void showFilter() {
         //mBinding.scroller.smoothScrollTo(0, 0);
-        mFilterAdapter.addAll(mFilters);
+        //mFilterAdapter.addAll(mFilters);
     }
 
     private void hideFilter() {
