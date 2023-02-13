@@ -276,11 +276,10 @@ public class DetailActivity extends BaseActivity implements FlagAdapter.OnClickL
         getDetail();
     }
 
-    private void getPlayer(Vod.Flag.Episode item, boolean replay) {
-        mBinding.widget.title.setText(getString(R.string.detail_title, mBinding.name.getText(), item.getName()));
-        mViewModel.playerContent(getKey(), mFlagAdapter.getActivated().getFlag(), item.getUrl());
-        Clock.get().setCallback(null);
-        updateHistory(item, replay);
+    private void getPlayer(Vod.Flag flag, Vod.Flag.Episode episode, boolean replay) {
+        mBinding.widget.title.setText(getString(R.string.detail_title, mBinding.name.getText(), episode.getName()));
+        mViewModel.playerContent(getKey(), flag.getFlag(), episode.getUrl());
+        updateHistory(episode, replay);
         showProgress();
     }
 
@@ -360,13 +359,17 @@ public class DetailActivity extends BaseActivity implements FlagAdapter.OnClickL
     }
 
     private void onRefresh() {
-        Vod.Flag.Episode episode = getEpisode();
-        if (episode != null) getPlayer(episode, false);
+        Clock.get().setCallback(null);
+        if (mFlagAdapter.getItemCount() == 0) return;
+        if (mEpisodeAdapter.getItemCount() == 0) return;
+        getPlayer(getFlag(), getEpisode(), false);
     }
 
     private void onReset() {
-        Vod.Flag.Episode episode = getEpisode();
-        if (episode != null) getPlayer(episode, isReplay());
+        Clock.get().setCallback(null);
+        if (mFlagAdapter.getItemCount() == 0) return;
+        if (mEpisodeAdapter.getItemCount() == 0) return;
+        getPlayer(getFlag(), getEpisode(), isReplay());
     }
 
     private void enterFullscreen() {
@@ -479,7 +482,7 @@ public class DetailActivity extends BaseActivity implements FlagAdapter.OnClickL
         mHistory.setPosition(position);
         mHistory.setEpisodeUrl(item.getUrl());
         mHistory.setVodRemarks(item.getName());
-        mHistory.setVodFlag(mFlagAdapter.getActivated().getFlag());
+        mHistory.setVodFlag(getFlag().getFlag());
         mHistory.setCreateTime(System.currentTimeMillis());
     }
 
