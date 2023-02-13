@@ -9,4 +9,8 @@
     <string name="home_history">最近觀看</string>
     <string name="home_recommend">更新推薦</string>
 
+    <!-- VOD -->
+    <string name="vod_content_expand">展開</string>
+    <string name="vod_content_collapse">收起</string>
+
 </resources>
