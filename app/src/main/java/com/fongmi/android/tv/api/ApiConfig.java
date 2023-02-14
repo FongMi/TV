@@ -16,8 +16,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -155,8 +159,9 @@ public class ApiConfig {
 
     private void initParse(JsonObject object) {
         for (JsonElement element : Json.safeListElement(object, "parses")) {
-            Parse item = Parse.objectFrom(element);
-            if (!parses.contains(item)) parses.add(item);
+            Parse parse = Parse.objectFrom(element);
+            if (parse.getName().equals(config.getParse()) && parse.getType() > 1) setParse(parse);
+            if (!parses.contains(parse)) parses.add(parse);
         }
     }
 
@@ -203,6 +208,14 @@ public class ApiConfig {
 
     public Object[] proxyLocal(Map<?, ?> param) {
         return jarLoader.proxyInvoke(param);
+    }
+
+    public JSONObject jsonExt(String key, LinkedHashMap<String, String> jxs, String url) throws Exception {
+        return jarLoader.jsonExt(key, jxs, url);
+    }
+
+    public JSONObject jsonExtMix(String flag, String key, String name, LinkedHashMap<String, HashMap<String, String>> jxs, String url) throws Exception {
+        return jarLoader.jsonExtMix(flag, key, name, jxs, url);
     }
 
     public Site getSite(String key) {
