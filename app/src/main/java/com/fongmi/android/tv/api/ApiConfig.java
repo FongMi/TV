@@ -159,8 +159,9 @@ public class ApiConfig {
 
     private void initParse(JsonObject object) {
         for (JsonElement element : Json.safeListElement(object, "parses")) {
-            Parse item = Parse.objectFrom(element);
-            if (!parses.contains(item)) parses.add(item);
+            Parse parse = Parse.objectFrom(element);
+            if (parse.getName().equals(config.getParse()) && parse.getType() > 1) setParse(parse);
+            if (!parses.contains(parse)) parses.add(parse);
         }
     }
 
