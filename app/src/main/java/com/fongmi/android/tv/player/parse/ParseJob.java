@@ -113,20 +113,21 @@ public class ParseJob implements ParseCallback {
     private void jsonParse(CountDownLatch latch, Parse item, String webUrl) {
         try {
             jsonParse(item, webUrl, true);
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             latch.countDown();
         }
     }
 
-    private void checkResult(HashMap<String, String> headers, String url) {
+    private void checkResult(Map<String, String> headers, String url) {
         if (TextUtils.isEmpty(url)) onParseError();
         else onParseSuccess(headers, url, "");
     }
 
-    private void checkResult(Parse item, HashMap<String, String> headers, String url) throws Exception {
-        int code = OkHttp.newCall(url, Headers.of(headers)).execute().code();
-        if (code == 200) onParseSuccess(headers, url, item.getName());
+    private void checkResult(Parse item, Map<String, String> headers, String url) throws Exception {
+        Response response = OkHttp.newCall(url, Headers.of(headers)).execute();
+        if (response.code() == 200) onParseSuccess(headers, url, item.getName());
     }
 
     private void startWeb(Parse item, String webUrl) {
@@ -137,8 +138,8 @@ public class ParseJob implements ParseCallback {
         webViews.add(CustomWebView.create(App.get()).start(key, item.getName(), item.getUrl() + webUrl, item.getHeaders(), this));
     }
 
-    private HashMap<String, String> getHeader(JsonObject object) {
-        HashMap<String, String> headers = new HashMap<>();
+    private Map<String, String> getHeader(JsonObject object) {
+        Map<String, String> headers = new HashMap<>();
         for (String key : object.keySet()) if (key.equalsIgnoreCase("user-agent") || key.equalsIgnoreCase("referer")) headers.put(key, object.get(key).getAsString());
         return headers;
     }
