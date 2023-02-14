@@ -156,7 +156,7 @@ public class ParseJob implements ParseCallback {
             Response response = OkHttp.newCall(url, Headers.of(headers)).execute();
             Map<String, List<String>> respHeader = response.headers().toMultimap();
             if (response.code() != 200 || url.length() < 40) return false;
-            if (respHeader.containsKey("content-length") && Integer.parseInt(respHeader.get("content-length").get(0)) < 10 * 1024 * 1024) return false;
+            if (respHeader.containsKey("content-length") && Integer.parseInt(respHeader.get("content-length").get(0)) < 10 * 1024) return false;
             return true;
         } catch (Exception e) {
             return false;
