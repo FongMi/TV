@@ -24,7 +24,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Headers;
-import okhttp3.Response;
 
 public class ParseJob implements ParseCallback {
 
@@ -99,10 +98,12 @@ public class ParseJob implements ParseCallback {
     }
 
     private void jsonParse(Parse item, String webUrl, boolean error) throws Exception {
-        Response response = OkHttp.newCall(item.getUrl() + webUrl, Headers.of(item.getHeaders())).execute();
-        JsonObject object = JsonParser.parseString(response.body().string()).getAsJsonObject();
+        String body = OkHttp.newCall(item.getUrl() + webUrl, Headers.of(item.getHeaders())).execute().body().string();
+        JsonObject object = JsonParser.parseString(body).getAsJsonObject();
         object = object.has("data") ? object.getAsJsonObject("data") : object;
-        checkResult(getHeader(object), Json.safeString(object, "url"), item.getName(), error);
+        boolean illegal = body.contains("不存在") || body.contains("已过期");
+        String url = illegal ? "" : Json.safeString(object, "url");
+        checkResult(getHeader(object), url, item.getName(), error);
     }
 
     private void jsonExtend(String webUrl) throws Exception {
@@ -153,11 +154,8 @@ public class ParseJob implements ParseCallback {
 
     private boolean isPass(Map<String, String> headers, String url) {
         try {
-            Response response = OkHttp.newCall(url, Headers.of(headers)).execute();
-            Map<String, List<String>> respHeader = response.headers().toMultimap();
-            if (response.code() != 200 || url.length() < 40) return false;
-            if (respHeader.containsKey("content-length") && Integer.parseInt(respHeader.get("content-length").get(0)) < 10 * 1024) return false;
-            return true;
+            int code = OkHttp.newCall(url, Headers.of(headers)).execute().code();
+            return code == 200 && url.length() >= 40;
         } catch (Exception e) {
             return false;
         }
