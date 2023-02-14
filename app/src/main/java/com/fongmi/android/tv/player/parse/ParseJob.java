@@ -1,7 +1,5 @@
 package com.fongmi.android.tv.player.parse;
 
-import android.text.TextUtils;
-
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.api.ApiConfig;
@@ -140,14 +138,29 @@ public class ParseJob implements ParseCallback {
     }
 
     private void checkResult(Map<String, String> headers, String url, String from, boolean error) {
-        if (!TextUtils.isEmpty(url)) onParseSuccess(headers, url, from);
-        else if (error) onParseError();
+        if (isPass(headers, url)) {
+            onParseSuccess(headers, url, from);
+        } else if (error) {
+            onParseError();
+        }
     }
 
     private void checkResult(Result result) {
         if (result.getUrl().isEmpty()) onParseError();
         else if (result.getParse() == 1) startWeb(Utils.checkProxy(result.getUrl()), result.getHeaders());
         else onParseSuccess(result.getHeaders(), result.getUrl(), result.getJxFrom());
+    }
+
+    private boolean isPass(Map<String, String> headers, String url) {
+        try {
+            Response response = OkHttp.newCall(url, Headers.of(headers)).execute();
+            Map<String, List<String>> respHeader = response.headers().toMultimap();
+            if (response.code() != 200 || url.length() < 40) return false;
+            if (respHeader.containsKey("content-length") && Integer.parseInt(respHeader.get("content-length").get(0)) < 10 * 1024 * 1024) return false;
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private void startWeb(Parse item, String webUrl) {
