@@ -10,7 +10,6 @@ import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Track;
 import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.event.PlayerEvent;
-import com.fongmi.android.tv.impl.ParseCallback;
 import com.fongmi.android.tv.player.parse.ParseJob;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
@@ -34,7 +33,7 @@ import java.util.Map;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IMediaPlayer.OnErrorListener, IMediaPlayer.OnPreparedListener, IMediaPlayer.OnCompletionListener, AnalyticsListener, ParseCallback {
+public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IMediaPlayer.OnErrorListener, IMediaPlayer.OnPreparedListener, IMediaPlayer.OnCompletionListener, AnalyticsListener, ParseJob.Callback {
 
     private IjkVideoView ijkPlayer;
     private StringBuilder builder;

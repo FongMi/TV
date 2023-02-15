@@ -9,12 +9,8 @@ import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderNull;
 
-import org.json.JSONObject;
-
 import java.io.File;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -102,22 +98,10 @@ public class JarLoader {
         }
     }
 
-    public JSONObject jsonExt(String key, LinkedHashMap<String, String> jxs, String url) throws Exception {
-        Class<?> clz = loaders.get("").loadClass("com.github.catvod.parser.Json" + key);
-        Method method = clz.getMethod("parse", LinkedHashMap.class, String.class);
-        return (JSONObject) method.invoke(null, jxs, url);
-    }
-
-    public JSONObject jsonExtMix(String flag, String key, String name, LinkedHashMap<String, HashMap<String, String>> jxs, String url) throws Exception {
-        Class<?> clz = loaders.get("").loadClass("com.github.catvod.parser.Mix" + key);
-        Method method = clz.getMethod("parse", LinkedHashMap.class, String.class, String.class, String.class);
-        return (JSONObject) method.invoke(null, jxs, name, flag, url);
-    }
-
     public Object[] proxyInvoke(Map<?, ?> params) {
         try {
-            Method method = methods.get(Utils.getMd5(jar));
-            if (method != null) return (Object[]) method.invoke(null, params);
+            Method proxyFun = methods.get(Utils.getMd5(jar));
+            if (proxyFun != null) return (Object[]) proxyFun.invoke(null, params);
             else return null;
         } catch (Exception e) {
             e.printStackTrace();

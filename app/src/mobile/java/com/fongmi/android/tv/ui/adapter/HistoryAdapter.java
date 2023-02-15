@@ -21,11 +21,13 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
     private final OnClickListener mListener;
     private final List<History> mItems;
+    private int width, height;
     private boolean delete;
 
     public HistoryAdapter(OnClickListener listener) {
         this.mListener = listener;
         this.mItems = new ArrayList<>();
+        setLayoutSize(3);
     }
 
     public interface OnClickListener {
@@ -52,6 +54,13 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         notifyItemRemoved(position);
     }
 
+    private void setLayoutSize(int spanCount) {
+        int space = ResUtil.dp2px(32) + ResUtil.dp2px(16 * (spanCount - 1));
+        int base = ResUtil.getScreenWidthPx() - space;
+        width = base / spanCount;
+        height = (int) (width / 0.75f);
+    }
+
     static class ViewHolder extends RecyclerView.ViewHolder {
 
         private final AdapterVodBinding binding;
@@ -76,7 +85,10 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(AdapterVodBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        ViewHolder holder = new ViewHolder(AdapterVodBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        holder.binding.getRoot().getLayoutParams().width = width;
+        holder.binding.getRoot().getLayoutParams().height = height;
+        return holder;
     }
 
     @Override

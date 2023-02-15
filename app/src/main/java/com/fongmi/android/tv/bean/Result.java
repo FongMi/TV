@@ -135,10 +135,6 @@ public class Result {
         return TextUtils.isEmpty(jxFrom) ? "" : jxFrom;
     }
 
-    public Integer getParse() {
-        return getParse(0);
-    }
-
     public Integer getParse(Integer def) {
         return parse == null ? def : parse;
     }

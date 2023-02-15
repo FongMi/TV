@@ -7,51 +7,43 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="16dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
             android:text="@string/home_history"
             android:textColor="@color/white"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textSize="18sp" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/history"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clipChildren="false"
-            android:clipToPadding="false"
-            android:nestedScrollingEnabled="false"
-            android:padding="8dp" />
+            android:layout_marginTop="16dp"
+            android:nestedScrollingEnabled="false" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginTop="16dp"
             android:text="@string/home_recommend"
             android:textColor="@color/white"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textSize="18sp" />
 
         <com.fongmi.android.tv.ui.custom.ProgressLayout
             android:id="@+id/progressLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginTop="16dp"
             android:descendantFocusability="blocksDescendants">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recommend"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:clipChildren="false"
-                android:clipToPadding="false"
-                android:nestedScrollingEnabled="false"
-                android:padding="8dp" />
+                android:nestedScrollingEnabled="false" />
 
         </com.fongmi.android.tv.ui.custom.ProgressLayout>
     </LinearLayout>

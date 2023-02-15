@@ -1,6 +1,5 @@
 package com.fongmi.android.tv.ui.activity;
 
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,10 +19,6 @@ import org.greenrobot.eventbus.ThreadMode;
 public abstract class BaseFragment extends Fragment {
 
     protected abstract ViewBinding getBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container);
-
-    protected int getSpanCount() {
-        return getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT ? 3 : 6;
-    }
 
     @Nullable
     @Override

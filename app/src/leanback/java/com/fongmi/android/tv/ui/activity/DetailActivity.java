@@ -142,10 +142,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         return (Vod.Flag) mFlagAdapter.get(mBinding.flag.getSelectedPosition());
     }
 
-    private Vod.Flag.Episode getEpisode() {
-        return (Vod.Flag.Episode) mEpisodeAdapter.get(getEpisodePosition());
-    }
-
     private int getEpisodePosition() {
         for (int i = 0; i < mEpisodeAdapter.size(); i++) if (((Vod.Flag.Episode) mEpisodeAdapter.get(i)).isActivated()) return i;
         return 0;
@@ -326,10 +322,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         getDetail();
     }
 
-    private void getPlayer(Vod.Flag flag, Vod.Flag.Episode episode, boolean replay) {
-        mBinding.widget.title.setText(getString(R.string.detail_title, mBinding.name.getText(), episode.getName()));
-        mViewModel.playerContent(getKey(), flag.getFlag(), episode.getUrl());
-        updateHistory(episode, replay);
+    private void getPlayer(boolean replay) {
+        Vod.Flag.Episode item = (Vod.Flag.Episode) mEpisodeAdapter.get(getEpisodePosition());
+        mBinding.widget.title.setText(getString(R.string.detail_title, mBinding.name.getText(), item.getName()));
+        mViewModel.playerContent(getKey(), getFlag().getFlag(), item.getUrl());
+        Clock.get().setCallback(null);
+        updateHistory(item, replay);
         showProgress();
     }
 
@@ -535,17 +533,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onRefresh() {
-        Clock.get().setCallback(null);
-        if (mFlagAdapter.size() == 0) return;
-        if (mEpisodeAdapter.size() == 0) return;
-        getPlayer(getFlag(), getEpisode(), false);
+        getPlayer(false);
     }
 
     private void onReset() {
-        Clock.get().setCallback(null);
-        if (mFlagAdapter.size() == 0) return;
-        if (mEpisodeAdapter.size() == 0) return;
-        getPlayer(getFlag(), getEpisode(), isReplay());
+        getPlayer(isReplay());
     }
 
     private boolean onResetToggle() {
@@ -821,10 +813,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void checkParse() {
         int position = getParsePosition();
-        boolean last = position == mParseAdapter.size() - 1;
-        boolean pass = position == 0 || last;
-        if (last) initParse();
-        if (pass) checkFlag();
+        if (position == mParseAdapter.size() - 1) initParse();
+        if (position == 0 || position == mParseAdapter.size() - 1) checkFlag();
         else nextParse(position);
     }
 

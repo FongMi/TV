@@ -84,7 +84,7 @@ public class Utils {
     }
 
     public static String checkProxy(String url) {
-        if (url.startsWith("proxy://")) return url.replace("proxy://", Server.get().getAddress("proxy?"));
+        if (url.startsWith("proxy://")) return url.replace("proxy://", Server.getProxy());
         return url;
     }
 
@@ -95,7 +95,7 @@ public class Utils {
     }
 
     public static String convert(String text) {
-        return text.startsWith("file") ? Server.get().getAddress(text) : text;
+        return text.startsWith("file") ? Server.get().getAddress(true) + "/" + text : text;
     }
 
     public static String convert(String baseUrl, String text) {

@@ -31,13 +31,11 @@ public class ImgUtil {
     }
 
     public static void loadKeep(String url, ImageView view) {
-        view.setScaleType(ImageView.ScaleType.CENTER);
-        Glide.with(App.get()).asBitmap().load(Utils.checkProxy(url)).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).listener(getListener(view)).into(view);
+        Glide.with(App.get()).load(Utils.checkProxy(url)).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).into(view);
     }
 
     public static void loadHistory(String url, ImageView view) {
-        view.setScaleType(ImageView.ScaleType.CENTER);
-        Glide.with(App.get()).asBitmap().load(Utils.checkProxy(url)).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).listener(getListener(view)).into(view);
+        Glide.with(App.get()).load(Utils.checkProxy(url)).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).into(view);
     }
 
     public static void loadLive(String url, ImageView view) {
@@ -47,12 +45,11 @@ public class ImgUtil {
     }
 
     public static GlideUrl getUrl(String url) {
-        String param = null;
         LazyHeaders.Builder builder = new LazyHeaders.Builder();
-        if (url.contains("@Cookie=")) builder.addHeader("Cookie", param = url.split("@Cookie=")[1].split("@")[0]);
-        if (url.contains("@Referer=")) builder.addHeader("Referer", param = url.split("@Referer=")[1].split("@")[0]);
-        if (url.contains("@User-Agent=")) builder.addHeader("User-Agent", param = url.split("@User-Agent=")[1].split("@")[0]);
-        return new GlideUrl(param == null ? url : url.split("@")[0], builder.build());
+        if (url.contains("@Cookie=")) builder.addHeader("Cookie", url.split("@Cookie=")[1].split("@")[0]);
+        if (url.contains("@Referer=")) builder.addHeader("Referer", url.split("@Referer=")[1].split("@")[0]);
+        if (url.contains("@User-Agent=")) builder.addHeader("User-Agent", url.split("@User-Agent=")[1].split("@")[0]);
+        return new GlideUrl(url.split("@")[0], builder.build());
     }
 
     private static RequestListener<Bitmap> getListener(ImageView view) {
