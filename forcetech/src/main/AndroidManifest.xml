@@ -22,7 +22,7 @@
         <service
             android:name="com.forcetech.service.P5PService"
             android:exported="false"
-            android:process=":p9p" />
+            android:process=":p5p" />
 
         <service
             android:name="com.forcetech.service.P6PService"

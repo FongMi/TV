@@ -95,8 +95,8 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
-        //setAutoSizeConfig(newConfig);
         super.onConfigurationChanged(newConfig);
+        setAutoSizeConfig(newConfig);
         Utils.hideSystemUI(this);
     }
 

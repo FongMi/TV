@@ -16,8 +16,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -155,13 +159,14 @@ public class ApiConfig {
 
     private void initParse(JsonObject object) {
         for (JsonElement element : Json.safeListElement(object, "parses")) {
-            Parse item = Parse.objectFrom(element);
-            if (!parses.contains(item)) parses.add(item);
+            Parse parse = Parse.objectFrom(element);
+            if (parse.getName().equals(config.getParse()) && parse.getType() > 1) setParse(parse);
+            if (!parses.contains(parse)) parses.add(parse);
         }
     }
 
     private void initOther(JsonObject object) {
-        if (parses.size() > 0) parses.add(0, Parse.mix());
+        if (parses.size() > 0) parses.add(0, Parse.god());
         if (home == null) setHome(sites.isEmpty() ? new Site() : sites.get(0));
         if (parse == null) setParse(parses.isEmpty() ? new Parse() : parses.get(0));
         setFlags(Json.safeListString(object, "flags"));
@@ -205,6 +210,14 @@ public class ApiConfig {
         return jarLoader.proxyInvoke(param);
     }
 
+    public JSONObject jsonExt(String key, LinkedHashMap<String, String> jxs, String url) throws Exception {
+        return jarLoader.jsonExt(key, jxs, url);
+    }
+
+    public JSONObject jsonExtMix(String flag, String key, String name, LinkedHashMap<String, HashMap<String, String>> jxs, String url) throws Exception {
+        return jarLoader.jsonExtMix(flag, key, name, jxs, url);
+    }
+
     public Site getSite(String key) {
         int index = getSites().indexOf(Site.get(key));
         return index == -1 ? new Site() : getSites().get(index);
@@ -223,10 +236,16 @@ public class ApiConfig {
         return parses == null ? Collections.emptyList() : parses;
     }
 
+    public List<Parse> getParses(int type) {
+        List<Parse> items = new ArrayList<>();
+        for (Parse item : getParses()) if (item.getType() == type) items.add(item);
+        return items;
+    }
+
     public List<Parse> getParses(int type, String flag) {
         List<Parse> items = new ArrayList<>();
-        for (Parse item : getParses()) if (item.getType() == type && item.getExt().getFlag().contains(flag)) items.add(item);
-        if (items.isEmpty()) for (Parse item : getParses()) if (item.getType() == type) items.add(item);
+        for (Parse item : getParses(type)) if (item.getExt().getFlag().contains(flag)) items.add(item);
+        if (items.isEmpty()) items.addAll(getParses(type));
         return items;
     }
 

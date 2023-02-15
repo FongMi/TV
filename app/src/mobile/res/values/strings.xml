@@ -9,4 +9,8 @@
     <string name="home_history">History</string>
     <string name="home_recommend">Recommend</string>
 
+    <!-- VOD -->
+    <string name="vod_content_expand">Expand</string>
+    <string name="vod_content_collapse">Collapse</string>
+
 </resources>
