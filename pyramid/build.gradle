@@ -7,8 +7,8 @@ android {
     compileSdk 33
 
     defaultConfig {
-        minSdk 17
-        targetSdk 33
+        minSdk 16
+        targetSdk 29
         ndk { abiFilters "armeabi-v7a" }
         python {
             buildPython "C:/Users/FongMi.DIREK/Anaconda3/envs/py38/python.exe"
