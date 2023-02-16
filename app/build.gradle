@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId "com.fongmi.android.tv"
-        minSdk 17
+        minSdk 16
         targetSdk 29
         versionCode 65
         versionName "1.6.5"
