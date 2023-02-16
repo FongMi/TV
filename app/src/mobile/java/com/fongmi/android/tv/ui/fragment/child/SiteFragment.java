@@ -117,12 +117,7 @@ public class SiteFragment extends BaseFragment implements VodAdapter.OnClickList
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            mHistoryManager.setSpanCount(getSpanCount());
-            mRecommendManager.setSpanCount(getSpanCount());
-        } else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            mHistoryManager.setSpanCount(getSpanCount());
-            mRecommendManager.setSpanCount(getSpanCount());
-        }
+        mHistoryManager.setSpanCount(getSpanCount());
+        mRecommendManager.setSpanCount(getSpanCount());
     }
 }

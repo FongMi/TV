@@ -47,6 +47,20 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
         return mItems.get(getPosition());
     }
 
+    public Vod.Flag.Episode getNext() {
+        int current = getPosition();
+        int max = getItemCount() - 1;
+        current = ++current > max ? max : current;
+        return mItems.get(current);
+    }
+
+    public Vod.Flag.Episode getPrev() {
+        int current = getPosition();
+        int max = getItemCount() - 1;
+        current = ++current > max ? max : current;
+        return mItems.get(current);
+    }
+
     public int getPosition() {
         for (int i = 0; i < mItems.size(); i++) if (mItems.get(i).isActivated()) return i;
         return 0;
