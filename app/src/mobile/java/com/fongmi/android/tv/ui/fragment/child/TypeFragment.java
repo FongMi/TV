@@ -180,10 +180,6 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            mGridLayoutManager.setSpanCount(getSpanCount());
-        } else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            mGridLayoutManager.setSpanCount(getSpanCount());
-        }
+        mGridLayoutManager.setSpanCount(getSpanCount());
     }
 }
