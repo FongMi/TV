@@ -17,8 +17,8 @@ public class SiteDialog implements SiteAdapter.OnClickListener {
 
     private final DialogSiteBinding binding;
     private final SiteCallback callback;
+    private final SiteAdapter adapter;
     private final AlertDialog dialog;
-    private SiteAdapter adapter;
 
     public static SiteDialog create(Fragment fragment) {
         return new SiteDialog(fragment);
