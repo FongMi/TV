@@ -22,7 +22,7 @@ public abstract class BaseFragment extends Fragment {
     protected abstract ViewBinding getBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container);
 
     protected int getSpanCount() {
-        return ResUtil.isPort() ? 3 : 5;
+        return ResUtil.isPort() ? 3 : 6;
     }
 
     @Nullable
