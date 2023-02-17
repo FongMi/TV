@@ -27,18 +27,21 @@ import com.fongmi.android.tv.databinding.ActivityCollectBinding;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.ui.fragment.CollectFragment;
 import com.fongmi.android.tv.ui.presenter.CollectPresenter;
+import com.fongmi.android.tv.utils.PausableThreadPoolExecutor;
 import com.fongmi.android.tv.utils.ResUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 public class CollectActivity extends BaseActivity {
 
     private ActivityCollectBinding mBinding;
     private ArrayObjectAdapter mAdapter;
-    private ExecutorService mExecutor;
+    private PausableThreadPoolExecutor mExecutor;
     private SiteViewModel mViewModel;
     private PageAdapter mPageAdapter;
     private List<Site> mSites;
@@ -121,7 +124,8 @@ public class CollectActivity extends BaseActivity {
     private void search() {
         mAdapter.add(Collect.all());
         mPageAdapter.notifyDataSetChanged();
-        mExecutor = Executors.newFixedThreadPool(Constant.THREAD_POOL);
+        int core = Runtime.getRuntime().availableProcessors();
+        mExecutor = new PausableThreadPoolExecutor(core, core * 2, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(100));
         mBinding.result.setText(getString(R.string.collect_result, getKeyword()));
         for (Site site : mSites) mExecutor.execute(() -> search(site));
     }
@@ -157,7 +161,20 @@ public class CollectActivity extends BaseActivity {
         super.onBackPressed();
         if (mExecutor == null) return;
         mExecutor.shutdownNow();
-        mExecutor = null;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mExecutor == null) return;
+        mExecutor.pause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mExecutor == null) return;
+        mExecutor.resume();
     }
 
     class PageAdapter extends FragmentStatePagerAdapter {
