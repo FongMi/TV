@@ -51,11 +51,11 @@
 
     </FrameLayout>
 
-    <View
+    <include
+        layout="@layout/view_shadow"
         android:layout_width="match_parent"
         android:layout_height="4dp"
-        android:layout_below="@+id/video"
-        android:background="@drawable/shadow_video" />
+        android:layout_below="@+id/video" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -248,7 +248,8 @@
                 android:text="@string/vod_content_expand"
                 android:textColor="@color/white"
                 android:textSize="12sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:visibility="gone" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
