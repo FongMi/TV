@@ -498,6 +498,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.video.setLayoutParams(mFrameParams);
         App.post(mR3, 3000);
         setFullscreen(false);
+        hideControl();
         hideInfo();
     }
 
