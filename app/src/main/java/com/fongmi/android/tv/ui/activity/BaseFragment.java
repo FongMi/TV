@@ -1,6 +1,5 @@
 package com.fongmi.android.tv.ui.activity;
 
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.event.RefreshEvent;
+import com.fongmi.android.tv.utils.ResUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -22,7 +22,7 @@ public abstract class BaseFragment extends Fragment {
     protected abstract ViewBinding getBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container);
 
     protected int getSpanCount() {
-        return getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT ? 3 : 6;
+        return ResUtil.isPort() ? 3 : 6;
     }
 
     @Nullable
