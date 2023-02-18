@@ -9,7 +9,6 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 
 import androidx.fragment.app.FragmentActivity;
