@@ -843,8 +843,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void checkSearch() {
-        if (isAutoMode() && mSearchAdapter.size() > 0) nextSite();
-        else initSearch(getName(), true);
+        if (mSearchAdapter.size() == 0) initSearch(getName(), true);
+        else if (isAutoMode()) nextSite();
     }
 
     private void initSearch(String keyword, boolean auto) {
