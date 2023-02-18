@@ -9,6 +9,7 @@ import android.text.Html;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -77,6 +78,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private int mCurrent;
     private Runnable mR1;
     private Runnable mR2;
+    private Runnable mR3;
 
     public static void start(Activity activity, String id, String name) {
         start(activity, ApiConfig.get().getHome().getKey(), id, name);
@@ -168,6 +170,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mPlayers = new Players().init();
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
+        mR3 = this::setSensor;
         checkOrientation();
         setRecyclerView();
         setVideoView();
@@ -305,6 +308,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         setText(mBinding.director, R.string.detail_director, Html.fromHtml(item.getVodDirector()).toString());
         mFlagAdapter.addAll(item.getVodFlags());
         checkFlag(item);
+        checkLine();
         checkKeep();
     }
 
@@ -312,6 +316,18 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         view.setVisibility(text.isEmpty() ? View.GONE : View.VISIBLE);
         view.setText(resId > 0 ? getString(resId, text) : text);
         view.setTag(text);
+    }
+
+    private void checkLine() {
+        mBinding.content.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                mBinding.content.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                int lines = mBinding.content.getLayout().getLineCount() - 1;
+                boolean ellipse = mBinding.content.getLayout().getEllipsisCount(lines) > 0;
+                mBinding.more.setVisibility(ellipse ? View.VISIBLE : View.GONE);
+            }
+        });
     }
 
     @Override
@@ -471,17 +487,18 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void enterFullscreen() {
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
         App.post(() -> setFullscreen(true), 250);
     }
 
     private void exitFullscreen() {
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
         getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         mBinding.video.setLayoutParams(mFrameParams);
+        App.post(mR3, 3000);
         setFullscreen(false);
+        hideControl();
         hideInfo();
     }
 
@@ -542,6 +559,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void setTraffic() {
         Traffic.setSpeed(mBinding.widget.traffic);
         App.post(mR2, Constant.INTERVAL_TRAFFIC);
+    }
+
+    private void setSensor() {
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
     }
 
     private void setR1Callback() {
