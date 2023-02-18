@@ -3,11 +3,13 @@ package com.fongmi.android.tv.ui.activity;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.text.Html;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -38,6 +40,7 @@ import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.adapter.EpisodeAdapter;
 import com.fongmi.android.tv.ui.adapter.FlagAdapter;
 import com.fongmi.android.tv.ui.adapter.ParseAdapter;
+import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.Notify;
@@ -56,13 +59,14 @@ import java.util.concurrent.ExecutorService;
 
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class DetailActivity extends BaseActivity implements FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, ParseAdapter.OnClickListener, Clock.Callback {
+public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Listener, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, ParseAdapter.OnClickListener, Clock.Callback {
 
     private ActivityDetailBinding mBinding;
     private ViewGroup.LayoutParams mFrameParams;
     private EpisodeAdapter mEpisodeAdapter;
     private ParseAdapter mParseAdapter;
     private FlagAdapter mFlagAdapter;
+    private CustomKeyDownVod mKeyDown;
     private ExecutorService mExecutor;
     private SiteViewModel mViewModel;
     private boolean mFullscreen;
@@ -74,6 +78,7 @@ public class DetailActivity extends BaseActivity implements FlagAdapter.OnClickL
     private int mCurrent;
     private Runnable mR1;
     private Runnable mR2;
+    private Runnable mR3;
 
     public static void start(Activity activity, String id, String name) {
         start(activity, ApiConfig.get().getHome().getKey(), id, name);
@@ -159,9 +164,14 @@ public class DetailActivity extends BaseActivity implements FlagAdapter.OnClickL
 
     @Override
     protected void initView() {
+        mKeyDown = CustomKeyDownVod.create(this);
         mFrameParams = mBinding.video.getLayoutParams();
         mBinding.progressLayout.showProgress();
         mPlayers = new Players().init();
+        mR1 = this::hideControl;
+        mR2 = this::setTraffic;
+        mR3 = this::setSensor;
+        checkOrientation();
         setRecyclerView();
         setVideoView();
         setViewModel();
@@ -173,7 +183,6 @@ public class DetailActivity extends BaseActivity implements FlagAdapter.OnClickL
     protected void initEvent() {
         mBinding.control.seek.setListener(mPlayers);
         mBinding.more.setOnClickListener(view -> onMore());
-        /*mBinding.keep.setOnClickListener(view -> onKeep());
         mBinding.video.setOnClickListener(view -> onVideo());
         mBinding.control.text.setOnClickListener(this::onTrack);
         mBinding.control.audio.setOnClickListener(this::onTrack);
@@ -192,18 +201,10 @@ public class DetailActivity extends BaseActivity implements FlagAdapter.OnClickL
         mBinding.control.ending.setOnLongClickListener(view -> onEndingReset());
         mBinding.control.opening.setOnLongClickListener(view -> onOpeningReset());
         mBinding.video.setOnTouchListener((view, event) -> mKeyDown.onTouchEvent(event));
-        mBinding.flag.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
-            @Override
-            public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
-                if (mFlagAdapter.size() > 0) setFlagActivated((Vod.Flag) mFlagAdapter.get(position));
-            }
-        });
-        mBinding.array.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
-            @Override
-            public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
-                if (mEpisodeAdapter.size() > 20 && position > 1) mBinding.episode.setSelectedPosition((position - 2) * 20);
-            }
-        });*/
+    }
+
+    private void checkOrientation() {
+        if (ResUtil.isLand()) enterFullscreen();
     }
 
     private void setRecyclerView() {
@@ -307,6 +308,7 @@ public class DetailActivity extends BaseActivity implements FlagAdapter.OnClickL
         setText(mBinding.director, R.string.detail_director, Html.fromHtml(item.getVodDirector()).toString());
         mFlagAdapter.addAll(item.getVodFlags());
         checkFlag(item);
+        checkLine();
         checkKeep();
     }
 
@@ -314,6 +316,18 @@ public class DetailActivity extends BaseActivity implements FlagAdapter.OnClickL
         view.setVisibility(text.isEmpty() ? View.GONE : View.VISIBLE);
         view.setText(resId > 0 ? getString(resId, text) : text);
         view.setTag(text);
+    }
+
+    private void checkLine() {
+        mBinding.content.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                mBinding.content.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                int lines = mBinding.content.getLayout().getLineCount() - 1;
+                boolean ellipse = mBinding.content.getLayout().getEllipsisCount(lines) > 0;
+                mBinding.more.setVisibility(ellipse ? View.VISIBLE : View.GONE);
+            }
+        });
     }
 
     @Override
@@ -358,6 +372,51 @@ public class DetailActivity extends BaseActivity implements FlagAdapter.OnClickL
         setEpisodeAdapter(getFlag().getEpisodes());
     }
 
+    private void onVideo() {
+        if (!isFullscreen()) enterFullscreen();
+    }
+
+    private void checkNext() {
+        if (mHistory.isRevPlay()) onPrev();
+        else onNext();
+    }
+
+    private void checkPrev() {
+        if (mHistory.isRevPlay()) onNext();
+        else onPrev();
+    }
+
+    private void onNext() {
+        Vod.Flag.Episode item = mEpisodeAdapter.getNext();
+        if (item.isActivated()) Notify.show(mHistory.isRevPlay() ? R.string.error_play_prev : R.string.error_play_next);
+        else onItemClick(item);
+    }
+
+    private void onPrev() {
+        Vod.Flag.Episode item = mEpisodeAdapter.getPrev();
+        if (item.isActivated()) Notify.show(mHistory.isRevPlay() ? R.string.error_play_next : R.string.error_play_prev);
+        else onItemClick(item);
+    }
+
+    private void onScale() {
+        int index = mHistory.getScale();
+        if (index == -1) index = Prefers.getScale();
+        String[] array = ResUtil.getStringArray(R.array.select_scale);
+        mHistory.setScale(index = index == array.length - 1 ? 0 : ++index);
+        setScale(index);
+    }
+
+    private void onSpeed() {
+        mBinding.control.speed.setText(mPlayers.addSpeed());
+        mHistory.setSpeed(mPlayers.getSpeed());
+    }
+
+    private boolean onSpeedLong() {
+        mBinding.control.speed.setText(mPlayers.toggleSpeed());
+        mHistory.setSpeed(mPlayers.getSpeed());
+        return true;
+    }
+
     private void onRefresh() {
         Clock.get().setCallback(null);
         if (mFlagAdapter.getItemCount() == 0) return;
@@ -372,18 +431,74 @@ public class DetailActivity extends BaseActivity implements FlagAdapter.OnClickL
         getPlayer(getFlag(), getEpisode(), isReplay());
     }
 
+    private boolean onResetToggle() {
+        Prefers.putReset(Math.abs(Prefers.getReset() - 1));
+        mBinding.control.reset.setText(ResUtil.getStringArray(R.array.select_reset)[Prefers.getReset()]);
+        return true;
+    }
+
+    private void onOpening() {
+        long current = mPlayers.getPosition();
+        long duration = mPlayers.getDuration();
+        if (current < 0 || current > duration / 2) return;
+        mHistory.setOpening(current);
+        mBinding.control.opening.setText(mPlayers.stringToTime(mHistory.getOpening()));
+    }
+
+    private boolean onOpeningReset() {
+        mHistory.setOpening(0);
+        mBinding.control.opening.setText(mPlayers.stringToTime(mHistory.getOpening()));
+        return true;
+    }
+
+    private void onEnding() {
+        long current = mPlayers.getPosition();
+        long duration = mPlayers.getDuration();
+        if (current < 0 || current < duration / 2) return;
+        mHistory.setEnding(duration - current);
+        mBinding.control.ending.setText(mPlayers.stringToTime(mHistory.getEnding()));
+    }
+
+    private boolean onEndingReset() {
+        mHistory.setEnding(0);
+        mBinding.control.ending.setText(mPlayers.stringToTime(mHistory.getEnding()));
+        return true;
+    }
+
+    private void onPlayer() {
+        mPlayers.togglePlayer();
+        Prefers.putPlayer(mPlayers.getPlayer());
+        mHistory.setPlayer(mPlayers.getPlayer());
+        setPlayerView();
+        onRefresh();
+    }
+
+    private void onDecode() {
+        mPlayers.toggleDecode();
+        mPlayers.set(getExo(), getIjk());
+        setDecodeView();
+        onRefresh();
+    }
+
+    private void onTrack(View view) {
+        int type = Integer.parseInt(view.getTag().toString());
+        //TrackDialog.create(this).player(mPlayers).type(type).listener(this).show();
+        hideControl();
+    }
+
     private void enterFullscreen() {
-        mBinding.video.setForeground(null);
         getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
         App.post(() -> setFullscreen(true), 250);
-        onPlay();
     }
 
     private void exitFullscreen() {
         getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         mBinding.video.setLayoutParams(mFrameParams);
+        App.post(mR3, 3000);
         setFullscreen(false);
+        hideControl();
         hideInfo();
     }
 
@@ -428,7 +543,7 @@ public class DetailActivity extends BaseActivity implements FlagAdapter.OnClickL
     private void showControl(View view) {
         mBinding.control.getRoot().setVisibility(View.VISIBLE);
         view.requestFocus();
-        //setR1Callback();
+        setR1Callback();
     }
 
     private void hideControl() {
@@ -444,6 +559,14 @@ public class DetailActivity extends BaseActivity implements FlagAdapter.OnClickL
     private void setTraffic() {
         Traffic.setSpeed(mBinding.widget.traffic);
         App.post(mR2, Constant.INTERVAL_TRAFFIC);
+    }
+
+    private void setSensor() {
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+    }
+
+    private void setR1Callback() {
+        App.post(mR1, Constant.INTERVAL_HIDE);
     }
 
     private void checkFlag(Vod item) {
@@ -508,7 +631,7 @@ public class DetailActivity extends BaseActivity implements FlagAdapter.OnClickL
         if (current >= 0 && duration > 0) App.execute(() -> mHistory.update(current, duration));
         if (mHistory.getEnding() > 0 && duration > 0 && mHistory.getEnding() + current >= duration) {
             Clock.get().setCallback(null);
-            //checkNext();
+            checkNext();
         }
     }
 
@@ -533,7 +656,7 @@ public class DetailActivity extends BaseActivity implements FlagAdapter.OnClickL
                 mBinding.widget.size.setText(mPlayers.getSizeText());
                 break;
             case Player.STATE_ENDED:
-                //checkNext();
+                checkNext();
                 break;
         }
     }
@@ -621,11 +744,28 @@ public class DetailActivity extends BaseActivity implements FlagAdapter.OnClickL
     }
 
     @Override
+    public void onSingleTap() {
+        if (isFullscreen()) {
+            if (isVisible(mBinding.control.getRoot())) hideControl();
+            else showControl(mBinding.control.next);
+        }
+    }
+
+    @Override
+    public void onDoubleTap() {
+        if (isFullscreen()) {
+            if (mPlayers.isPlaying()) onPause(true);
+            else onPlay();
+            hideControl();
+        }
+    }
+
+    @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+        if (ResUtil.isPort()) {
             exitFullscreen();
-        } else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        } else if (ResUtil.isLand()) {
             enterFullscreen();
         }
     }
@@ -649,6 +789,8 @@ public class DetailActivity extends BaseActivity implements FlagAdapter.OnClickL
     public void onBackPressed() {
         if (isVisible(mBinding.control.getRoot())) {
             hideControl();
+        } else if (isFullscreen()) {
+            exitFullscreen();
         } else {
             super.onBackPressed();
         }
