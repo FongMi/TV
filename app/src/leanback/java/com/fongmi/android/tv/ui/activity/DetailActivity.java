@@ -258,7 +258,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.part.setAdapter(new ItemBridgeAdapter(mPartAdapter = new ArrayObjectAdapter(mPartPresenter = new PartPresenter(item -> initSearch(item, false)))));
         mBinding.search.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.search.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-        mBinding.search.setAdapter(new ItemBridgeAdapter(mSearchAdapter = new ArrayObjectAdapter(new SearchPresenter(this::getDetail))));
+        mBinding.search.setAdapter(new ItemBridgeAdapter(mSearchAdapter = new ArrayObjectAdapter(new SearchPresenter(this::setSearch))));
         mBinding.control.parse.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.control.parse.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         mBinding.control.parse.setAdapter(new ItemBridgeAdapter(mParseAdapter = new ArrayObjectAdapter(new ParsePresenter(this::setParseActivated))));
@@ -882,6 +882,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mSearchAdapter.addAll(mSearchAdapter.size(), items);
         mBinding.search.setVisibility(View.VISIBLE);
         if (isInitAuto()) nextSite();
+    }
+
+    private void setSearch(Vod item) {
+        setAutoMode(false);
+        getDetail(item);
     }
 
     private boolean mismatch(Vod item) {
