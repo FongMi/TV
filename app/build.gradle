@@ -10,8 +10,8 @@ android {
         applicationId "com.fongmi.android.tv"
         minSdk 16
         targetSdk 29
-        versionCode 65
-        versionName "1.6.5"
+        versionCode 66
+        versionName "1.6.6"
         multiDexEnabled true
         ndk { abiFilters "armeabi-v7a" }
     }
@@ -77,7 +77,6 @@ dependencies {
     implementation 'com.google.zxing:core:3.3.0'
     implementation 'com.guolindev.permissionx:permissionx:1.7.1'
     implementation 'com.squareup.okhttp3:okhttp:3.12.13'
-    implementation 'me.jessyan:autosize:1.2.1'
     implementation 'net.java.dev.jna:jna:5.12.1'
     implementation 'org.apache.commons:commons-compress:1.20'
     implementation 'org.chromium.net:cronet-embedded:101.4951.41'
@@ -85,6 +84,7 @@ dependencies {
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
     implementation('org.simpleframework:simple-xml:2.7.1') { exclude group: 'stax', module: 'stax-api' exclude group: 'xpp3', module: 'xpp3' }
     leanbackImplementation 'androidx.leanback:leanback:1.2.0-alpha02'
+    leanbackImplementation 'me.jessyan:autosize:1.2.1'
     annotationProcessor 'androidx.room:room-compiler:2.5.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.14.2'
 }

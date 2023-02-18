@@ -11,21 +11,19 @@
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowTranslucentNavigation">true</item>
+        <item name="bottomSheetDialogTheme">@style/BottomSheetDialog</item>
     </style>
 
-    <style name="VodStyle">
-        <item name="cornerSize">8dp</item>
-        <item name="cornerFamily">rounded</item>
+    <style name="BottomSheetModal" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/shape_bottom_sheet</item>
     </style>
 
-    <style name="ExoStyle">
-        <item name="auto_show">false</item>
-        <item name="resize_mode">fit</item>
-        <item name="use_artwork">true</item>
-        <item name="use_controller">false</item>
-        <item name="animation_enabled">false</item>
-        <item name="default_artwork">@drawable/radio</item>
-        <item name="keep_content_on_player_reset">true</item>
+    <style name="BottomSheetDialog.Base" parent="Theme.MaterialComponents.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/BottomSheetModal</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowIsFloating">false</item>
     </style>
+
+    <style name="BottomSheetDialog" parent="BottomSheetDialog.Base" />
 
 </resources>

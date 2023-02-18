@@ -1,10 +1,9 @@
 package com.fongmi.android.tv.ui.custom;
 
 import androidx.annotation.NonNull;
-import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class CustomScroller extends RecyclerView.OnScrollListener implements NestedScrollView.OnScrollChangeListener {
+public class CustomScroller extends RecyclerView.OnScrollListener {
 
     private final Callback callback;
     private boolean loading;
@@ -20,12 +19,6 @@ public class CustomScroller extends RecyclerView.OnScrollListener implements Nes
     public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
         if (isLoading() || recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE || callback == null) return;
         if (!recyclerView.canScrollVertically(1) && dy > 0) callback.onLoadMore(String.valueOf(++page));
-    }
-
-    @Override
-    public void onScrollChange(@NonNull NestedScrollView nestedScrollView, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-        if (isLoading() || callback == null) return;
-        if (!nestedScrollView.canScrollVertically(1) && scrollY - oldScrollY > 0) callback.onLoadMore(String.valueOf(++page));
     }
 
     public void reset() {

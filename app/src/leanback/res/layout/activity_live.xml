@@ -16,7 +16,7 @@
 
         <com.google.android.exoplayer2.ui.StyledPlayerView
             android:id="@+id/surface"
-            style="@style/ExoStyle"
+            style="@style/Player.Live"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="gone"
@@ -24,7 +24,7 @@
 
         <com.google.android.exoplayer2.ui.StyledPlayerView
             android:id="@+id/texture"
-            style="@style/ExoStyle"
+            style="@style/Player.Live"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="gone"
