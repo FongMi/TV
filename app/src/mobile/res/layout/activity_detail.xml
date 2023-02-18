@@ -15,7 +15,7 @@
 
         <com.google.android.exoplayer2.ui.StyledPlayerView
             android:id="@+id/surface"
-            style="@style/ExoStyle"
+            style="@style/Player.Vod"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="gone"
@@ -23,7 +23,7 @@
 
         <com.google.android.exoplayer2.ui.StyledPlayerView
             android:id="@+id/texture"
-            style="@style/ExoStyle"
+            style="@style/Player.Vod"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="gone"
@@ -51,11 +51,11 @@
 
     </FrameLayout>
 
-    <View
+    <include
+        layout="@layout/view_shadow"
         android:layout_width="match_parent"
         android:layout_height="4dp"
-        android:layout_below="@+id/video"
-        android:background="@drawable/shadow_video" />
+        android:layout_below="@+id/video" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -248,7 +248,8 @@
                 android:text="@string/vod_content_expand"
                 android:textColor="@color/white"
                 android:textSize="12sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:visibility="gone" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
