@@ -12,6 +12,7 @@
         android:layout_width="400dp"
         android:layout_height="225dp"
         android:layout_marginStart="24dp"
+        android:layout_marginLeft="24dp"
         android:layout_marginTop="24dp"
         android:background="@color/black"
         android:focusable="true"
@@ -62,8 +63,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
+        android:layout_marginLeft="24dp"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="24dp"
+        android:layout_marginRight="24dp"
         android:layout_toEndOf="@+id/video"
         android:singleLine="true"
         android:textColor="@color/white"
@@ -79,6 +82,7 @@
         android:layout_alignStart="@+id/name"
         android:layout_marginTop="6dp"
         android:layout_marginEnd="24dp"
+        android:layout_marginRight="24dp"
         android:singleLine="true"
         android:textColor="@color/white"
         android:textSize="16sp"
@@ -92,6 +96,7 @@
         android:layout_alignStart="@+id/remark"
         android:layout_marginTop="6dp"
         android:layout_marginEnd="24dp"
+        android:layout_marginRight="24dp"
         android:orientation="horizontal">
 
         <TextView
@@ -99,6 +104,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="12dp"
+            android:layout_marginRight="12dp"
             android:singleLine="true"
             android:textColor="@color/white"
             android:textSize="16sp"
@@ -109,6 +115,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="12dp"
+            android:layout_marginRight="12dp"
             android:singleLine="true"
             android:textColor="@color/white"
             android:textSize="16sp"
@@ -119,6 +126,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="12dp"
+            android:layout_marginRight="12dp"
             android:singleLine="true"
             android:textColor="@color/white"
             android:textSize="16sp"
@@ -143,6 +151,7 @@
         android:layout_alignStart="@+id/name"
         android:layout_marginTop="6dp"
         android:layout_marginEnd="24dp"
+        android:layout_marginRight="24dp"
         android:singleLine="true"
         android:textColor="@color/white"
         android:textSize="16sp"
@@ -156,6 +165,7 @@
         android:layout_alignStart="@+id/name"
         android:layout_marginTop="6dp"
         android:layout_marginEnd="24dp"
+        android:layout_marginRight="24dp"
         android:singleLine="true"
         android:textColor="@color/white"
         android:textSize="16sp"
@@ -169,6 +179,7 @@
         android:layout_alignStart="@+id/name"
         android:layout_marginTop="6dp"
         android:layout_marginEnd="24dp"
+        android:layout_marginRight="24dp"
         android:ellipsize="end"
         android:lineSpacingExtra="4dp"
         android:maxLines="1"
@@ -189,6 +200,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
             android:background="@drawable/selector_item"
             android:drawablePadding="6dp"
             android:focusable="true"
@@ -235,8 +247,10 @@
                 android:clipChildren="false"
                 android:clipToPadding="false"
                 android:paddingStart="24dp"
+                android:paddingLeft="24dp"
                 android:paddingTop="12dp"
                 android:paddingEnd="24dp"
+                android:paddingRight="24dp"
                 android:paddingBottom="8dp"
                 android:visibility="gone" />
 
@@ -247,8 +261,10 @@
                 android:clipChildren="false"
                 android:clipToPadding="false"
                 android:paddingStart="24dp"
+                android:paddingLeft="24dp"
                 android:paddingTop="8dp"
                 android:paddingEnd="24dp"
+                android:paddingRight="24dp"
                 android:paddingBottom="8dp"
                 android:visibility="gone" />
 
@@ -259,8 +275,10 @@
                 android:clipChildren="false"
                 android:clipToPadding="false"
                 android:paddingStart="24dp"
+                android:paddingLeft="24dp"
                 android:paddingTop="8dp"
                 android:paddingEnd="24dp"
+                android:paddingRight="24dp"
                 android:paddingBottom="8dp"
                 android:visibility="gone" />
 
@@ -271,8 +289,10 @@
                 android:clipChildren="false"
                 android:clipToPadding="false"
                 android:paddingStart="24dp"
+                android:paddingLeft="24dp"
                 android:paddingTop="8dp"
                 android:paddingEnd="24dp"
+                android:paddingRight="24dp"
                 android:paddingBottom="8dp" />
 
             <androidx.leanback.widget.HorizontalGridView
@@ -283,8 +303,10 @@
                 android:clipChildren="false"
                 android:clipToPadding="false"
                 android:paddingStart="24dp"
+                android:paddingLeft="24dp"
                 android:paddingTop="8dp"
                 android:paddingEnd="24dp"
+                android:paddingRight="24dp"
                 android:paddingBottom="8dp"
                 android:visibility="gone" />
 

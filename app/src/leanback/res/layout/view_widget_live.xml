@@ -81,7 +81,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
+                android:layout_marginLeft="4dp"
                 android:layout_marginEnd="4dp"
+                android:layout_marginRight="4dp"
                 android:text="/"
                 android:textColor="@color/white"
                 android:textSize="16sp" />
@@ -106,7 +108,9 @@
         android:gravity="center"
         android:orientation="horizontal"
         android:paddingStart="16dp"
+        android:paddingLeft="16dp"
         android:paddingEnd="16dp"
+        android:paddingRight="16dp"
         android:visibility="gone"
         tools:visibility="visible">
 
@@ -115,6 +119,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="12dp"
+            android:layout_marginRight="12dp"
             android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -125,6 +130,7 @@
             android:layout_width="48dp"
             android:layout_height="36dp"
             android:layout_marginEnd="12dp"
+            android:layout_marginRight="12dp"
             android:scaleType="fitCenter"
             android:visibility="gone" />
 
@@ -133,6 +139,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="12dp"
+            android:layout_marginRight="12dp"
             android:maxEms="34"
             android:singleLine="true"
             android:textColor="@color/white"
@@ -145,6 +152,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="12dp"
+            android:layout_marginRight="12dp"
             android:layout_weight="1"
             android:singleLine="true"
             android:textColor="@color/white"
@@ -157,6 +165,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="12dp"
+            android:layout_marginRight="12dp"
             android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold"

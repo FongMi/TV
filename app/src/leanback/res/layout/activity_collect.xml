@@ -12,6 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
+        android:layout_marginLeft="24dp"
         android:layout_marginTop="24dp"
         android:layout_marginBottom="16dp"
         android:singleLine="true"
@@ -26,7 +27,9 @@
         android:clipChildren="false"
         android:clipToPadding="false"
         android:paddingStart="24dp"
+        android:paddingLeft="24dp"
         android:paddingEnd="24dp"
+        android:paddingRight="24dp"
         app:focusOutEnd="true"
         app:focusOutFront="true" />
 
