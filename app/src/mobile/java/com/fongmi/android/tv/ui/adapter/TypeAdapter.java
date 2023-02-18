@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.fongmi.android.tv.bean.Class;
 import com.fongmi.android.tv.databinding.AdapterTypeBinding;
-import com.fongmi.android.tv.utils.ResUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,8 +86,6 @@ public class TypeAdapter extends RecyclerView.Adapter<TypeAdapter.ViewHolder> {
         Class item = mItems.get(position);
         holder.binding.text.setText(item.getTypeName());
         holder.binding.text.setActivated(item.isActivated());
-        holder.binding.text.setCompoundDrawablePadding(ResUtil.dp2px(4));
-        holder.binding.text.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, item.getIcon(), 0);
         holder.binding.getRoot().setOnClickListener(v -> mListener.onItemClick(position, item));
     }
 }

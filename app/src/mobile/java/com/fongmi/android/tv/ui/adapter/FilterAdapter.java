@@ -9,18 +9,18 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.fongmi.android.tv.bean.Filter;
 import com.fongmi.android.tv.databinding.AdapterFilterBinding;
+import com.fongmi.android.tv.impl.FilterCallback;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class FilterAdapter extends RecyclerView.Adapter<FilterAdapter.ViewHolder> {
 
-    private final ValueAdapter.OnClickListener mListener;
+    private final FilterCallback mListener;
     private final List<Filter> mItems;
 
-    public FilterAdapter(ValueAdapter.OnClickListener listener) {
+    public FilterAdapter(FilterCallback listener, List<Filter> items) {
         this.mListener = listener;
-        this.mItems = new ArrayList<>();
+        this.mItems = items;
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -31,16 +31,6 @@ public class FilterAdapter extends RecyclerView.Adapter<FilterAdapter.ViewHolder
             super(binding.getRoot());
             this.binding = binding;
         }
-    }
-
-    public void addAll(List<Filter> items) {
-        mItems.addAll(items);
-        notifyDataSetChanged();
-    }
-
-    public void clear() {
-        mItems.clear();
-        notifyDataSetChanged();
     }
 
     @Override
