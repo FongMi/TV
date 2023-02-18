@@ -33,14 +33,19 @@ public class Notify {
     }
 
     public static void progress(Context context) {
-        ViewProgressBinding binding = ViewProgressBinding.inflate(LayoutInflater.from(context));
-        get().mDialog = new MaterialAlertDialogBuilder(context).setView(binding.getRoot()).create();
-        get().mDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        dismiss();
+        get().create(context);
         get().mDialog.show();
     }
 
     public static void dismiss() {
         if (get().mDialog != null && get().mDialog.isShowing()) get().mDialog.dismiss();
+    }
+
+    private void create(Context context) {
+        ViewProgressBinding binding = ViewProgressBinding.inflate(LayoutInflater.from(context));
+        mDialog = new MaterialAlertDialogBuilder(context).setView(binding.getRoot()).create();
+        mDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
     }
 
     private void makeText(String message) {
