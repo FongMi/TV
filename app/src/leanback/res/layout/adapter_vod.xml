@@ -13,7 +13,7 @@
         android:layout_height="match_parent"
         android:background="@color/black_20"
         android:scaleType="center"
-        app:shapeAppearanceOverlay="@style/VodStyle"
+        app:shapeAppearanceOverlay="@style/Vod"
         tools:src="@drawable/ic_img_loading" />
 
     <com.google.android.material.imageview.ShapeableImageView
@@ -24,7 +24,7 @@
         android:scaleType="center"
         android:src="@drawable/ic_delete_vod"
         android:visibility="gone"
-        app:shapeAppearanceOverlay="@style/VodStyle"
+        app:shapeAppearanceOverlay="@style/Vod"
         tools:visibility="visible" />
 
     <TextView
