@@ -2,6 +2,7 @@ package com.fongmi.android.tv.ui.activity;
 
 import android.app.Activity;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
@@ -9,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewbinding.ViewBinding;
 
+import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.WallConfig;
 import com.fongmi.android.tv.event.RefreshEvent;
@@ -63,6 +65,11 @@ public abstract class BaseActivity extends AppCompatActivity {
         if (event.getType() != RefreshEvent.Type.WALL) return;
         WallConfig.get().setDrawable(null);
         setWall();
+    }
+
+    @Override
+    public Resources getResources() {
+        return Product.hackResources(super.getResources());
     }
 
     @Override

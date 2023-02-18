@@ -14,21 +14,6 @@
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialog</item>
     </style>
 
-    <style name="VodStyle">
-        <item name="cornerSize">8dp</item>
-        <item name="cornerFamily">rounded</item>
-    </style>
-
-    <style name="ExoStyle">
-        <item name="auto_show">false</item>
-        <item name="resize_mode">fit</item>
-        <item name="use_artwork">true</item>
-        <item name="use_controller">false</item>
-        <item name="animation_enabled">false</item>
-        <item name="default_artwork">@drawable/radio</item>
-        <item name="keep_content_on_player_reset">true</item>
-    </style>
-
     <style name="BottomSheetModal" parent="Widget.Design.BottomSheet.Modal">
         <item name="android:background">@drawable/shape_bottom_sheet</item>
     </style>

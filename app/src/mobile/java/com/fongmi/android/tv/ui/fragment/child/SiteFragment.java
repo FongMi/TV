@@ -41,6 +41,7 @@ public class SiteFragment extends BaseFragment implements VodAdapter.OnClickList
 
     @Override
     protected void initView() {
+        mBinding.progressLayout.showProgress();
         setRecyclerView();
     }
 
