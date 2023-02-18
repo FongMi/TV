@@ -8,14 +8,17 @@
     android:keepScreenOn="true"
     android:orientation="horizontal"
     android:paddingStart="24dp"
+    android:paddingLeft="24dp"
     android:paddingTop="24dp"
-    android:paddingEnd="24dp">
+    android:paddingEnd="24dp"
+    android:paddingRight="24dp">
 
     <LinearLayout
         android:id="@+id/historyLayout"
         android:layout_width="128dp"
         android:layout_height="match_parent"
         android:layout_marginEnd="36dp"
+        android:layout_marginRight="36dp"
         android:orientation="vertical">
 
         <TextView
@@ -43,6 +46,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_marginEnd="36dp"
+        android:layout_marginRight="36dp"
         android:orientation="vertical">
 
         <com.fongmi.android.tv.ui.custom.CustomMic
@@ -50,6 +54,7 @@
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:layout_marginEnd="12dp"
+            android:layout_marginRight="12dp"
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:nextFocusLeft="@id/history"
@@ -92,6 +97,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginEnd="24dp"
+        android:layout_marginRight="24dp"
         android:orientation="vertical">
 
         <TextView

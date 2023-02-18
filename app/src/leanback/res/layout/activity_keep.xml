@@ -10,8 +10,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingStart="24dp"
+        android:paddingLeft="24dp"
         android:paddingTop="24dp"
-        android:paddingEnd="24dp">
+        android:paddingEnd="24dp"
+        android:paddingRight="24dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -30,8 +32,10 @@
         android:clipChildren="false"
         android:clipToPadding="false"
         android:paddingStart="24dp"
+        android:paddingLeft="24dp"
         android:paddingTop="16dp"
         android:paddingEnd="24dp"
+        android:paddingRight="24dp"
         android:paddingBottom="24dp" />
 
 </LinearLayout>
