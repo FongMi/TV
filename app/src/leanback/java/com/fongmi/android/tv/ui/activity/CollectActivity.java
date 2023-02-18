@@ -125,7 +125,7 @@ public class CollectActivity extends BaseActivity {
         mAdapter.add(Collect.all());
         mPageAdapter.notifyDataSetChanged();
         int core = Runtime.getRuntime().availableProcessors();
-        mExecutor = new PausableThreadPoolExecutor(core, core * 2, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(100));
+        mExecutor = new PausableThreadPoolExecutor(Math.max(Constant.THREAD_POOL, core), core * 2, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
         mBinding.result.setText(getString(R.string.collect_result, getKeyword()));
         for (Site site : mSites) mExecutor.execute(() -> search(site));
     }
