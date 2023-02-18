@@ -97,6 +97,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private boolean mAutoMode;
     private History mHistory;
     private Players mPlayers;
+    private String mSiteKey;
     private int mCurrent;
     private Runnable mR1;
     private Runnable mR2;
@@ -197,6 +198,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mPlayers = new Players().init();
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
+        mSiteKey = getKey();
         setRecyclerView();
         setVideoView();
         setViewModel();
@@ -835,7 +837,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void checkFlag() {
-        int position = mBinding.flag.getSelectedPosition();
+        int position = isGone(mBinding.flag) ? -1 : mBinding.flag.getSelectedPosition();
         if (position == mFlagAdapter.size() - 1) checkSearch();
         else nextFlag(position);
     }
@@ -903,6 +905,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void nextSite() {
         if (mSearchAdapter.size() == 0) return;
         Vod vod = (Vod) mSearchAdapter.get(0);
+        if (vod.getSiteKey().equals(mSiteKey)) return;
         Notify.show(getString(R.string.play_switch_site, vod.getSiteName()));
         mSearchAdapter.removeItems(0, 1);
         setInitAuto(false);
