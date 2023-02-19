@@ -10,8 +10,6 @@ android {
         applicationId "com.fongmi.android.tv"
         minSdk 16
         targetSdk 29
-        versionCode 66
-        versionName "1.6.6"
         multiDexEnabled true
         ndk { abiFilters "armeabi-v7a" }
     }
@@ -19,9 +17,13 @@ android {
     productFlavors {
         leanback {
             dimension "mode"
+            versionCode 66
+            versionName "1.6.6"
         }
         mobile {
             dimension "mode"
+            versionCode 1
+            versionName "1.0.1"
         }
     }
 

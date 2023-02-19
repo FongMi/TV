@@ -21,9 +21,7 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class Utils {
@@ -69,12 +67,6 @@ public class Utils {
         if (headers.containsKey("Accept") && headers.get("Accept").startsWith("image")) return false;
         if (url.contains("url=http") || url.contains(".js") || url.contains(".css") || url.contains(".html")) return false;
         return Sniffer.RULE.matcher(url).find();
-    }
-
-    public static boolean isVip(String url) {
-        List<String> hosts = Arrays.asList("iqiyi.com", "v.qq.com", "youku.com", "le.com", "tudou.com", "mgtv.com", "sohu.com", "acfun.cn", "bilibili.com", "baofeng.com", "pptv.com");
-        for (String host : hosts) if (url.contains(host)) return true;
-        return false;
     }
 
     public static String checkProxy(String url) {
