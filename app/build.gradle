@@ -20,11 +20,6 @@ android {
             versionCode 66
             versionName "1.6.6"
         }
-        mobile {
-            dimension "mode"
-            versionCode 1
-            versionName "1.0.1"
-        }
     }
 
     buildFeatures {
