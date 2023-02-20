@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewpager.widget.ViewPager;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Class;
@@ -154,7 +155,14 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefreshEvent(RefreshEvent event) {
-        if (event.getType() == RefreshEvent.Type.VIDEO) homeContent();
+        switch (event.getType()) {
+            case VIDEO:
+                homeContent();
+                break;
+            case EMPTY:
+                App.post(() -> EventBus.getDefault().post(Result.empty()), 250);
+                break;
+        }
     }
 
     private void homeContent() {
