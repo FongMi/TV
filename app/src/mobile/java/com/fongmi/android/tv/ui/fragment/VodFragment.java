@@ -150,7 +150,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
 
     @Override
     public void setFilter(String key, String value) {
-        getFragment().setFilter(key, value);
+        getTypeFragment().setFilter(key, value);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -174,8 +174,17 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         if (!getSite().getKey().isEmpty()) mViewModel.homeContent();
     }
 
-    private TypeFragment getFragment() {
+    private SiteFragment getSiteFragment() {
+        return (SiteFragment) mPageAdapter.instantiateItem(mBinding.pager, 0);
+    }
+
+    private TypeFragment getTypeFragment() {
         return (TypeFragment) mPageAdapter.instantiateItem(mBinding.pager, mBinding.pager.getCurrentItem());
+    }
+
+    public boolean canBack() {
+        if (mBinding.pager.getCurrentItem() > 0) return true;
+        return getSiteFragment().canBack();
     }
 
     class PageAdapter extends FragmentStatePagerAdapter {

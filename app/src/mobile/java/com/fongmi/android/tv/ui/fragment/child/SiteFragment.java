@@ -93,6 +93,12 @@ public class SiteFragment extends BaseFragment implements VodAdapter.OnClickList
         mHistoryAdapter.notifyItemRangeChanged(0, mHistoryAdapter.getItemCount());
     }
 
+    public boolean canBack() {
+        if (!mHistoryAdapter.isDelete()) return true;
+        setHistoryDelete(false);
+        return false;
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onResult(Result result) {
         mBinding.progressLayout.showContent();

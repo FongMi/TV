@@ -51,7 +51,7 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
         mFragments = new ArrayList<>();
         mFragments.add(VodFragment.newInstance());
         mFragments.add(SettingFragment.newInstance());
-        for (Fragment fragment : mFragments) getSupportFragmentManager().beginTransaction().add(R.id.container, fragment).hide(fragment).commit();
+        for (int i = 0; i < mFragments.size(); i++) getSupportFragmentManager().beginTransaction().add(R.id.container, mFragments.get(i), String.valueOf(i)).hide(mFragments.get(i)).commit();
     }
 
     private void initConfig() {
@@ -76,6 +76,10 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
         };
     }
 
+    private VodFragment getVodFragment() {
+        return (VodFragment) getSupportFragmentManager().findFragmentByTag("0");
+    }
+
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
@@ -92,8 +96,11 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        finish();
+        if (getVodFragment().isVisible()) {
+            if (getVodFragment().canBack()) super.onBackPressed();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override
