@@ -495,7 +495,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void enterFullscreen() {
         getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
-        App.post(() -> setFullscreen(true), 250);
+        setFullscreen(true);
     }
 
     private void exitFullscreen() {
@@ -769,18 +769,44 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        if (ResUtil.isPort()) {
-            exitFullscreen();
-        } else if (ResUtil.isLand()) {
-            enterFullscreen();
+        if (ResUtil.isLand()) enterFullscreen();
+        if (ResUtil.isPort()) exitFullscreen();
+    }
+
+    @Override
+    protected void onUserLeaveHint() {
+        super.onUserLeaveHint();
+        Utils.enterPIP(this);
+    }
+
+    @Override
+    public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode) {
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode);
+        mBinding.progressLayout.setVisibility(isInPictureInPictureMode ? View.GONE : View.VISIBLE);
+        if (isInPictureInPictureMode) {
+            hideControl();
+            hideInfo();
+        } else if (!mPlayers.isPlaying()) {
+            finish();
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        onPlay();
+    }
+
+    @Override
+    protected void onStop() {
+        onPause(false);
+        super.onStop();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         Clock.start(mBinding.widget.time);
-        onPlay();
     }
 
     @Override
@@ -788,7 +814,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         super.onPause();
         RefreshEvent.history();
         Clock.get().release();
-        onPause(false);
     }
 
     @Override
