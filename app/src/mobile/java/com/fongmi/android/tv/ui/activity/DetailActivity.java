@@ -48,6 +48,7 @@ import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Traffic;
+import com.fongmi.android.tv.utils.Utils;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.ui.StyledPlayerView;
@@ -176,6 +177,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         setRecyclerView();
         setVideoView();
         setViewModel();
+        showProgress();
         getDetail();
     }
 
@@ -716,7 +718,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void setFullscreen(boolean fullscreen) {
-        this.mFullscreen = fullscreen;
+        Utils.toggleFullscreen(this, mFullscreen = fullscreen);
     }
 
     private boolean isInitTrack() {
