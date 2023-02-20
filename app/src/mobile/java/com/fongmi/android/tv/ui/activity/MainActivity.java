@@ -70,6 +70,7 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
 
             @Override
             public void error(int resId) {
+                RefreshEvent.empty();
                 Notify.show(resId);
             }
         };
