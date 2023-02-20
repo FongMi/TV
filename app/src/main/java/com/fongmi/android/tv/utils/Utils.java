@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.PictureInPictureParams;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
@@ -82,11 +83,14 @@ public class Utils {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && App.get().getPackageManager().hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE);
     }
 
-    public static void enterPIP(Activity activity) {
+    public static void enterPIP(Activity activity, Rect sourceRectHint, Rational rational) {
         try {
             if (!hasPIP() || activity.isInPictureInPictureMode()) return;
             PictureInPictureParams.Builder builder = new PictureInPictureParams.Builder();
-            builder.setAspectRatio(new Rational(16, 9)).build();
+            builder.setAspectRatio(rational).build();
+            builder.setSourceRectHint(sourceRectHint);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) builder.setAutoEnterEnabled(true);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) builder.setSeamlessResizeEnabled(true);
             activity.enterPictureInPictureMode(builder.build());
         } catch (Exception e) {
             e.printStackTrace();
