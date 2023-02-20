@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.text.Html;
+import android.text.Layout;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -323,9 +324,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
             @Override
             public void onGlobalLayout() {
                 mBinding.content.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                int lines = mBinding.content.getLayout().getLineCount() - 1;
-                boolean ellipse = mBinding.content.getLayout().getEllipsisCount(lines) > 0;
-                mBinding.more.setVisibility(ellipse ? View.VISIBLE : View.GONE);
+                Layout layout = mBinding.content.getLayout();
+                if (layout != null) {
+                    int lines = layout.getLineCount() - 1;
+                    boolean ellipse = layout.getEllipsisCount(lines) > 0;
+                    mBinding.more.setVisibility(ellipse ? View.VISIBLE : View.GONE);
+                }
             }
         });
     }
