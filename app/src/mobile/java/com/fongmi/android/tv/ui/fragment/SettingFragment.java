@@ -134,7 +134,6 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
             case 0:
                 Notify.dismiss();
                 RefreshEvent.video();
-                RefreshEvent.history();
                 mBinding.liveUrl.setText(LiveConfig.getUrl());
                 mBinding.wallUrl.setText(WallConfig.getUrl());
                 break;

@@ -170,8 +170,12 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     }
 
     public boolean canBack() {
-        if (mBinding.pager.getCurrentItem() > 0) return true;
-        return getSiteFragment().canBack();
+        try {
+            if (mBinding.pager.getCurrentItem() > 0) return true;
+            return getSiteFragment().canBack();
+        } catch (Exception e) {
+            return true;
+        }
     }
 
     class PageAdapter extends FragmentStatePagerAdapter {

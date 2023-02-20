@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.viewbinding.ViewBinding;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.api.LiveConfig;
@@ -27,6 +28,7 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
 
     private ActivityMainBinding mBinding;
     private List<Fragment> mFragments;
+    private boolean confirm;
 
     @Override
     protected ViewBinding getBinding() {
@@ -64,7 +66,6 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
         return new Callback() {
             @Override
             public void success() {
-                RefreshEvent.history();
                 RefreshEvent.video();
             }
 
@@ -78,6 +79,16 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
 
     private VodFragment getVodFragment() {
         return (VodFragment) getSupportFragmentManager().findFragmentByTag("0");
+    }
+
+    private SettingFragment getSettingFragment() {
+        return (SettingFragment) getSupportFragmentManager().findFragmentByTag("1");
+    }
+
+    private void setConfirm() {
+        confirm = true;
+        Notify.show(R.string.app_exit);
+        App.post(() -> confirm = false, 2000);
     }
 
     @Override
@@ -96,10 +107,11 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
 
     @Override
     public void onBackPressed() {
-        if (getVodFragment().isVisible()) {
-            if (getVodFragment().canBack()) super.onBackPressed();
-        } else {
-            super.onBackPressed();
+        if (getSettingFragment().isVisible()) {
+            mBinding.navigation.setSelectedItemId(R.id.vod);
+        } else if (getVodFragment().canBack()) {
+            if (!confirm) setConfirm();
+            else super.onBackPressed();
         }
     }
 

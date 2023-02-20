@@ -86,7 +86,7 @@ public class SiteFragment extends BaseFragment implements VodAdapter.OnClickList
 
     @Override
     public boolean onLongClick() {
-        setHistoryDelete(true);
+        setHistoryDelete(!mHistoryAdapter.isDelete());
         return true;
     }
 
@@ -105,6 +105,7 @@ public class SiteFragment extends BaseFragment implements VodAdapter.OnClickList
     public void onResult(Result result) {
         mBinding.progressLayout.showContent();
         mVodAdapter.addAll(result.getList());
+        getHistory();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
