@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="24dp">
+    android:padding="16dp">
 
     <TextView
         android:id="@+id/version"
@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:letterSpacing="0.02"
         android:textColor="@color/grey_900"
-        android:textSize="18sp"
+        android:textSize="16sp"
         tools:text="@string/update_version" />
 
     <View
@@ -35,7 +35,7 @@
             android:letterSpacing="0.02"
             android:lineSpacingExtra="8dp"
             android:textColor="@color/grey_900"
-            android:textSize="16sp"
+            android:textSize="14sp"
             tools:text="1. 新增 ffmpeg 音頻軟解\n2. 詳情頁新增分詞快搜\n3. 修復搜尋閃退問題\n4. 設定支援渲染切換" />
 
     </androidx.core.widget.NestedScrollView>
@@ -52,11 +52,10 @@
             android:layout_marginEnd="16dp"
             android:layout_weight="1"
             android:background="@drawable/shape_text"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
             android:gravity="center"
             android:text="@string/update_confirm"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/cancel"
@@ -64,11 +63,10 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@drawable/shape_text"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
             android:gravity="center"
             android:text="@string/dialog_negative"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:textSize="14sp" />
 
     </LinearLayout>
 </LinearLayout>
