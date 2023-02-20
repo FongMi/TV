@@ -29,91 +29,91 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="8dp"
                 android:text="@string/play"
                 android:textColor="@color/grey_700"
-                android:textSize="16sp" />
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/next"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="8dp"
                 android:background="@drawable/shape_text"
                 android:text="@string/play_next"
                 android:textColor="@color/white"
-                android:textSize="14sp" />
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/prev"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="8dp"
                 android:background="@drawable/shape_text"
                 android:text="@string/play_prev"
                 android:textColor="@color/white"
-                android:textSize="14sp" />
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/reset"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="8dp"
                 android:background="@drawable/shape_text"
                 android:textColor="@color/white"
-                android:textSize="14sp"
+                android:textSize="12sp"
                 tools:text="刷新" />
 
             <TextView
                 android:id="@+id/player"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="8dp"
                 android:background="@drawable/shape_text"
                 android:textColor="@color/white"
-                android:textSize="14sp"
+                android:textSize="12sp"
                 tools:text="EXO" />
 
             <TextView
                 android:id="@+id/decode"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="8dp"
                 android:background="@drawable/shape_text"
                 android:textColor="@color/white"
-                android:textSize="14sp"
+                android:textSize="12sp"
                 tools:text="硬解" />
 
             <TextView
                 android:id="@+id/speed"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="8dp"
                 android:background="@drawable/shape_text"
                 android:textColor="@color/white"
-                android:textSize="14sp"
+                android:textSize="12sp"
                 tools:text="1.00" />
 
             <TextView
                 android:id="@+id/scale"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="8dp"
                 android:background="@drawable/shape_text"
                 android:textColor="@color/white"
-                android:textSize="14sp"
+                android:textSize="12sp"
                 tools:text="預設" />
 
             <TextView
                 android:id="@+id/text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="8dp"
                 android:background="@drawable/shape_text"
                 android:tag="3"
                 android:text="@string/play_track_text"
                 android:textColor="@color/white"
-                android:textSize="14sp"
+                android:textSize="12sp"
                 android:visibility="gone"
                 tools:visibility="visible" />
 
@@ -121,12 +121,12 @@
                 android:id="@+id/audio"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="8dp"
                 android:background="@drawable/shape_text"
                 android:tag="1"
                 android:text="@string/play_track_audio"
                 android:textColor="@color/white"
-                android:textSize="14sp"
+                android:textSize="12sp"
                 android:visibility="gone"
                 tools:visibility="visible" />
 
@@ -134,31 +134,31 @@
                 android:id="@+id/video"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="8dp"
                 android:background="@drawable/shape_text"
                 android:tag="2"
                 android:text="@string/play_track_video"
                 android:textColor="@color/white"
-                android:textSize="14sp"
+                android:textSize="12sp"
                 android:visibility="gone"
                 tools:visibility="visible" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="8dp"
                 android:text="@string/play_oped"
                 android:textColor="@color/grey_700"
-                android:textSize="16sp" />
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/opening"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="8dp"
                 android:background="@drawable/shape_text"
                 android:textColor="@color/white"
-                android:textSize="14sp"
+                android:textSize="12sp"
                 tools:text="00:00" />
 
             <TextView
@@ -167,7 +167,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/shape_text"
                 android:textColor="@color/white"
-                android:textSize="14sp"
+                android:textSize="12sp"
                 tools:text="00:00" />
 
         </LinearLayout>
@@ -187,10 +187,10 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="12dp"
+            android:layout_marginEnd="8dp"
             android:text="@string/parse"
             android:textColor="@color/grey_700"
-            android:textSize="16sp" />
+            android:textSize="14sp" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/parse"

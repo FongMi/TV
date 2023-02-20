@@ -94,8 +94,8 @@
         tools:visibility="visible">
 
         <ImageView
-            android:layout_width="56dp"
-            android:layout_height="56dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_vod_error" />
 
@@ -124,8 +124,8 @@
 
         <ImageView
             android:id="@+id/action"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_play" />
 
