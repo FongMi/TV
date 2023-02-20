@@ -134,6 +134,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
             @Override
             public void error(int resId) {
                 mBinding.progressLayout.showContent();
+                result = Result.empty();
                 Notify.show(resId);
                 setFocus();
             }
