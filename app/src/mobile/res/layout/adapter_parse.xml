@@ -7,5 +7,5 @@
     android:background="@drawable/shape_item"
     android:gravity="center"
     android:textColor="@color/text"
-    android:textSize="14sp"
+    android:textSize="12sp"
     tools:text="泥巴" />
