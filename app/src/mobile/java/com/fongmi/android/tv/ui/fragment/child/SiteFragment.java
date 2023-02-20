@@ -80,6 +80,8 @@ public class SiteFragment extends BaseFragment implements VodAdapter.OnClickList
     public void onItemDelete(History item) {
         mHistoryAdapter.remove(item.delete());
         mBinding.history.requestLayout();
+        if (mHistoryAdapter.getItemCount() > 0) return;
+        mHistoryAdapter.setDelete(false);
     }
 
     @Override
