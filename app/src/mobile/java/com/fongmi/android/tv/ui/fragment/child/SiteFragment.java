@@ -46,10 +46,10 @@ public class SiteFragment extends BaseFragment implements VodAdapter.OnClickList
     private void setRecyclerView() {
         mBinding.history.setHasFixedSize(true);
         mBinding.history.getItemAnimator().setChangeDuration(0);
-        mBinding.history.setLayoutManager(mHistoryManager = new GridLayoutManager(getContext(), Product.getColumn()));
+        mBinding.history.setLayoutManager(mHistoryManager = new GridLayoutManager(getContext(), Product.getColumn(getActivity())));
         mBinding.history.setAdapter(mHistoryAdapter = new HistoryAdapter(this));
         mBinding.recommend.setHasFixedSize(true);
-        mBinding.recommend.setLayoutManager(mRecommendManager = new GridLayoutManager(getContext(), Product.getColumn()));
+        mBinding.recommend.setLayoutManager(mRecommendManager = new GridLayoutManager(getContext(), Product.getColumn(getActivity())));
         mBinding.recommend.setAdapter(mVodAdapter = new VodAdapter(this));
     }
 
@@ -107,7 +107,7 @@ public class SiteFragment extends BaseFragment implements VodAdapter.OnClickList
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        mHistoryManager.setSpanCount(Product.getColumn());
-        mRecommendManager.setSpanCount(Product.getColumn());
+        mHistoryManager.setSpanCount(Product.getColumn(getActivity()));
+        mRecommendManager.setSpanCount(Product.getColumn(getActivity()));
     }
 }
