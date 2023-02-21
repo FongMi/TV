@@ -229,6 +229,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.episode.setAdapter(mEpisodeAdapter = new EpisodeAdapter(this));
         mBinding.control.parse.setHasFixedSize(true);
         mBinding.control.parse.setItemAnimator(null);
+        mBinding.control.parse.addItemDecoration(new SpaceItemDecoration(8));
         mBinding.control.parse.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         mBinding.control.parse.setAdapter(mParseAdapter = new ParseAdapter(this));
     }

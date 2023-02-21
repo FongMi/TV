@@ -42,7 +42,7 @@
                 android:background="@drawable/shape_text"
                 android:text="@string/play_next"
                 android:textColor="@color/white"
-                android:textSize="12sp" />
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/prev"
@@ -52,7 +52,7 @@
                 android:background="@drawable/shape_text"
                 android:text="@string/play_prev"
                 android:textColor="@color/white"
-                android:textSize="12sp" />
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/reset"
@@ -61,7 +61,7 @@
                 android:layout_marginEnd="8dp"
                 android:background="@drawable/shape_text"
                 android:textColor="@color/white"
-                android:textSize="12sp"
+                android:textSize="14sp"
                 tools:text="刷新" />
 
             <TextView
@@ -71,7 +71,7 @@
                 android:layout_marginEnd="8dp"
                 android:background="@drawable/shape_text"
                 android:textColor="@color/white"
-                android:textSize="12sp"
+                android:textSize="14sp"
                 tools:text="EXO" />
 
             <TextView
@@ -81,7 +81,7 @@
                 android:layout_marginEnd="8dp"
                 android:background="@drawable/shape_text"
                 android:textColor="@color/white"
-                android:textSize="12sp"
+                android:textSize="14sp"
                 tools:text="硬解" />
 
             <TextView
@@ -91,7 +91,7 @@
                 android:layout_marginEnd="8dp"
                 android:background="@drawable/shape_text"
                 android:textColor="@color/white"
-                android:textSize="12sp"
+                android:textSize="14sp"
                 tools:text="1.00" />
 
             <TextView
@@ -101,7 +101,7 @@
                 android:layout_marginEnd="8dp"
                 android:background="@drawable/shape_text"
                 android:textColor="@color/white"
-                android:textSize="12sp"
+                android:textSize="14sp"
                 tools:text="預設" />
 
             <TextView
@@ -113,7 +113,7 @@
                 android:tag="3"
                 android:text="@string/play_track_text"
                 android:textColor="@color/white"
-                android:textSize="12sp"
+                android:textSize="14sp"
                 android:visibility="gone"
                 tools:visibility="visible" />
 
@@ -126,7 +126,7 @@
                 android:tag="1"
                 android:text="@string/play_track_audio"
                 android:textColor="@color/white"
-                android:textSize="12sp"
+                android:textSize="14sp"
                 android:visibility="gone"
                 tools:visibility="visible" />
 
@@ -139,7 +139,7 @@
                 android:tag="2"
                 android:text="@string/play_track_video"
                 android:textColor="@color/white"
-                android:textSize="12sp"
+                android:textSize="14sp"
                 android:visibility="gone"
                 tools:visibility="visible" />
 
@@ -158,7 +158,7 @@
                 android:layout_marginEnd="8dp"
                 android:background="@drawable/shape_text"
                 android:textColor="@color/white"
-                android:textSize="12sp"
+                android:textSize="14sp"
                 tools:text="00:00" />
 
             <TextView
@@ -167,7 +167,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/shape_text"
                 android:textColor="@color/white"
-                android:textSize="12sp"
+                android:textSize="14sp"
                 tools:text="00:00" />
 
         </LinearLayout>
@@ -196,7 +196,8 @@
             android:id="@+id/parse"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tools:layout_height="36dp" />
+            tools:layout_height="36dp"
+            tools:listitem="@layout/adapter_parse" />
 
     </LinearLayout>
 

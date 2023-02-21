@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Parse;
-import com.fongmi.android.tv.databinding.AdapterFlagBinding;
+import com.fongmi.android.tv.databinding.AdapterParseBinding;
 
 import java.util.List;
 
@@ -29,9 +29,9 @@ public class ParseAdapter extends RecyclerView.Adapter<ParseAdapter.ViewHolder> 
 
     static class ViewHolder extends RecyclerView.ViewHolder {
 
-        private final AdapterFlagBinding binding;
+        private final AdapterParseBinding binding;
 
-        ViewHolder(@NonNull AdapterFlagBinding binding) {
+        ViewHolder(@NonNull AdapterParseBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
         }
@@ -50,7 +50,7 @@ public class ParseAdapter extends RecyclerView.Adapter<ParseAdapter.ViewHolder> 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(AdapterFlagBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        return new ViewHolder(AdapterParseBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
     }
 
     @Override
