@@ -76,7 +76,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     private void setRecyclerView() {
         mBinding.recycler.setHasFixedSize(true);
         mBinding.recycler.setAdapter(mVodAdapter = new VodAdapter(this));
-        mBinding.recycler.setLayoutManager(mGridLayoutManager = new GridLayoutManager(getContext(), Product.getColumn()));
+        mBinding.recycler.setLayoutManager(mGridLayoutManager = new GridLayoutManager(getContext(), Product.getColumn(getActivity())));
     }
 
     private void setViewModel() {
@@ -148,6 +148,6 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        mGridLayoutManager.setSpanCount(Product.getColumn());
+        mGridLayoutManager.setSpanCount(Product.getColumn(getActivity()));
     }
 }
