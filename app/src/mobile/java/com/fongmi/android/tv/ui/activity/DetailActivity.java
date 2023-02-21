@@ -162,7 +162,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private boolean isFromSearch() {
-        return getCallingActivity().getShortClassName().contains(SearchActivity.class.getSimpleName());
+        return getCallingActivity() != null && getCallingActivity().getShortClassName().contains(SearchActivity.class.getSimpleName());
     }
 
     @Override
