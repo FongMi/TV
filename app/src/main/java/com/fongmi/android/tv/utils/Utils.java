@@ -3,6 +3,8 @@ package com.fongmi.android.tv.utils;
 import android.Manifest;
 import android.app.Activity;
 import android.app.PictureInPictureParams;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Rect;
@@ -162,6 +164,16 @@ public class Utils {
     public static String substring(String text, int num) {
         if (text != null && text.length() > num) return text.substring(0, text.length() - num);
         return text;
+    }
+
+    public static CharSequence getClip() {
+        ClipboardManager cm = (ClipboardManager) App.get().getSystemService(Context.CLIPBOARD_SERVICE);
+        return cm.getText();
+    }
+
+    public static void clearClip() {
+        ClipboardManager cm = (ClipboardManager) App.get().getSystemService(Context.CLIPBOARD_SERVICE);
+        cm.setPrimaryClip(ClipData.newPlainText("", ""));
     }
 
     public static long format(SimpleDateFormat format, String src) {
