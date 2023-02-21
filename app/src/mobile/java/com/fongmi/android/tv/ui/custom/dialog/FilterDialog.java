@@ -16,7 +16,6 @@ import com.fongmi.android.tv.bean.Filter;
 import com.fongmi.android.tv.databinding.DialogFilterBinding;
 import com.fongmi.android.tv.impl.FilterCallback;
 import com.fongmi.android.tv.ui.adapter.FilterAdapter;
-import com.fongmi.android.tv.utils.Utils;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -70,12 +69,6 @@ public class FilterDialog extends BottomSheetDialogFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        Utils.hideSystemUI(getDialog().getWindow());
     }
 
     @Override

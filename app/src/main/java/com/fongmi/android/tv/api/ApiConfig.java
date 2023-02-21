@@ -258,7 +258,7 @@ public class ApiConfig {
     }
 
     public String getAds() {
-        return ads;
+        return TextUtils.isEmpty(ads) ? "" : ads;
     }
 
     private void setAds(List<String> ads) {

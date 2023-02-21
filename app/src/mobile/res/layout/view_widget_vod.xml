@@ -24,12 +24,12 @@
             android:shadowRadius="1"
             android:singleLine="true"
             android:textColor="@color/white"
-            android:textSize="20sp"
+            android:textSize="16sp"
             tools:text="慶餘年第一季：第一集" />
 
         <TextView
             android:id="@+id/size"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/title"
             android:layout_alignStart="@+id/title"
@@ -39,7 +39,7 @@
             android:shadowDy="2"
             android:shadowRadius="1"
             android:textColor="@color/white"
-            android:textSize="16sp"
+            android:textSize="14sp"
             tools:text="1920 x 1080" />
 
         <TextView
@@ -54,7 +54,7 @@
             android:shadowDy="2"
             android:shadowRadius="1"
             android:textColor="@color/white"
-            android:textSize="20sp"
+            android:textSize="16sp"
             tools:text="09:20:00" />
 
     </RelativeLayout>
@@ -65,7 +65,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:orientation="vertical"
-        android:visibility="visible">
+        android:visibility="gone"
+        tools:visibility="visible">
 
         <include layout="@layout/view_progress" />
 
@@ -75,9 +76,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:textColor="@color/white"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:visibility="gone"
-            tools:text="120KB/s" />
+            tools:text="120KB/s"
+            tools:visibility="visible" />
 
     </LinearLayout>
 
@@ -86,16 +88,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:background="@color/black_40"
+        android:background="@drawable/shape_widget"
         android:gravity="center"
         android:orientation="vertical"
         android:padding="16dp"
         android:visibility="gone"
-        tools:visibility="visible">
+        tools:visibility="gone">
 
         <ImageView
-            android:layout_width="56dp"
-            android:layout_height="56dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_vod_error" />
 
@@ -105,7 +107,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:textColor="@color/white"
-            android:textSize="16sp"
+            android:textSize="14sp"
             tools:text="@string/error_play_format" />
 
     </LinearLayout>
@@ -115,17 +117,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:background="@color/black_40"
+        android:background="@drawable/shape_widget"
         android:gravity="center"
         android:orientation="vertical"
         android:padding="16dp"
         android:visibility="gone"
-        tools:visibility="visible">
+        tools:visibility="gone">
 
         <ImageView
             android:id="@+id/action"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_play" />
 
@@ -139,7 +141,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/white"
-                android:textSize="16sp"
+                android:textSize="14sp"
                 tools:text="00:00:00" />
 
             <TextView
@@ -149,14 +151,14 @@
                 android:layout_marginEnd="4dp"
                 android:text="/"
                 android:textColor="@color/white"
-                android:textSize="16sp" />
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/exo_duration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/white"
-                android:textSize="16sp"
+                android:textSize="14sp"
                 tools:text="00:00:00" />
 
         </LinearLayout>

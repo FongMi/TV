@@ -192,12 +192,10 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         getVideo(typeId, "1");
     }
 
-    public boolean canGoBack() {
-        return mTypeIds.size() > 1;
-    }
-
-    public void goBack() {
+    public boolean canBack() {
+        if (mTypeIds.size() == 0) return true;
         refresh(2);
+        return false;
     }
 
     @Override
