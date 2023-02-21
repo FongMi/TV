@@ -174,8 +174,4 @@ public class Prefers {
     public static float getThumbnail() {
         return 0.3f * getQuality() + 0.4f;
     }
-
-    public static int getColumn() {
-        return Math.abs(getSize() - 7);
-    }
 }

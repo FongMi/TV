@@ -37,6 +37,7 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
 
     @Override
     protected void initView() {
+        Notify.progress(this);
         Updater.get().start();
         Server.get().start();
         initFragment();
@@ -67,12 +68,13 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
             @Override
             public void success() {
                 RefreshEvent.video();
+                Notify.dismiss();
             }
 
             @Override
             public void error(int resId) {
-                RefreshEvent.empty();
                 Notify.show(resId);
+                Notify.dismiss();
             }
         };
     }
