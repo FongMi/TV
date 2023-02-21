@@ -166,9 +166,9 @@ public class Utils {
         return text;
     }
 
-    public static CharSequence getClip() {
+    public static String getClip() {
         ClipboardManager cm = (ClipboardManager) App.get().getSystemService(Context.CLIPBOARD_SERVICE);
-        return cm.getText();
+        return cm.getText() == null ? "" : cm.getText().toString();
     }
 
     public static void clearClip() {
