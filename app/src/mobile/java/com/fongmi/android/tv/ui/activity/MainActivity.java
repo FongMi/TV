@@ -37,18 +37,18 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
     }
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        checkAction(intent);
+    }
+
+    @Override
     protected void initView() {
         Notify.progress(this);
         Updater.get().start();
         Server.get().start();
         initFragment();
         initConfig();
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        checkAction(intent);
     }
 
     private void checkAction(Intent intent) {
