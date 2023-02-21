@@ -1,7 +1,7 @@
 package com.fongmi.android.tv.ui.activity;
 
 import android.content.Intent;
-import android.text.TextUtils;
+import android.util.Patterns;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
@@ -100,9 +100,10 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
 
     private void checkAction(Intent intent) {
         if (ApiConfig.get().getSite("push_agent") == null) return;
+        boolean hasClip = Patterns.WEB_URL.matcher(Utils.getClip()).matches();
         boolean hasAction = intent.getAction() != null && intent.getAction().equals(Intent.ACTION_SEND) && intent.getType().equals("text/plain");
         if (hasAction) DetailActivity.start(this, "push_agent", intent.getStringExtra(Intent.EXTRA_TEXT), "");
-        else if (!TextUtils.isEmpty(Utils.getClip())) showDialog(Utils.getClip().toString());
+        else if (hasClip) showDialog(Utils.getClip());
     }
 
     private void showDialog(String text) {
