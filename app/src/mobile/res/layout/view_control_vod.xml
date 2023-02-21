@@ -7,18 +7,20 @@
     android:background="@drawable/shape_controller"
     android:orientation="vertical"
     android:paddingStart="16dp"
-    android:paddingTop="16dp"
+    android:paddingTop="4dp"
     android:paddingEnd="16dp"
-    android:paddingBottom="8dp">
+    android:paddingBottom="4dp">
 
     <HorizontalScrollView
+        android:id="@+id/actionLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="8dp"
         android:fillViewport="true"
         android:scrollbars="none">
 
         <LinearLayout
-            android:id="@+id/actionLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
@@ -27,16 +29,16 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="8dp"
                 android:text="@string/play"
                 android:textColor="@color/grey_700"
-                android:textSize="16sp" />
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/next"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="8dp"
                 android:background="@drawable/shape_text"
                 android:text="@string/play_next"
                 android:textColor="@color/white"
@@ -46,7 +48,7 @@
                 android:id="@+id/prev"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="8dp"
                 android:background="@drawable/shape_text"
                 android:text="@string/play_prev"
                 android:textColor="@color/white"
@@ -56,7 +58,7 @@
                 android:id="@+id/reset"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="8dp"
                 android:background="@drawable/shape_text"
                 android:textColor="@color/white"
                 android:textSize="14sp"
@@ -66,7 +68,7 @@
                 android:id="@+id/player"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="8dp"
                 android:background="@drawable/shape_text"
                 android:textColor="@color/white"
                 android:textSize="14sp"
@@ -76,7 +78,7 @@
                 android:id="@+id/decode"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="8dp"
                 android:background="@drawable/shape_text"
                 android:textColor="@color/white"
                 android:textSize="14sp"
@@ -86,7 +88,7 @@
                 android:id="@+id/speed"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="8dp"
                 android:background="@drawable/shape_text"
                 android:textColor="@color/white"
                 android:textSize="14sp"
@@ -96,7 +98,7 @@
                 android:id="@+id/scale"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="8dp"
                 android:background="@drawable/shape_text"
                 android:textColor="@color/white"
                 android:textSize="14sp"
@@ -106,7 +108,7 @@
                 android:id="@+id/text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="8dp"
                 android:background="@drawable/shape_text"
                 android:tag="3"
                 android:text="@string/play_track_text"
@@ -119,7 +121,7 @@
                 android:id="@+id/audio"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="8dp"
                 android:background="@drawable/shape_text"
                 android:tag="1"
                 android:text="@string/play_track_audio"
@@ -132,7 +134,7 @@
                 android:id="@+id/video"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="8dp"
                 android:background="@drawable/shape_text"
                 android:tag="2"
                 android:text="@string/play_track_video"
@@ -144,16 +146,16 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="8dp"
                 android:text="@string/play_oped"
                 android:textColor="@color/grey_700"
-                android:textSize="16sp" />
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/opening"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="8dp"
                 android:background="@drawable/shape_text"
                 android:textColor="@color/white"
                 android:textSize="14sp"
@@ -163,7 +165,6 @@
                 android:id="@+id/ending"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
                 android:background="@drawable/shape_text"
                 android:textColor="@color/white"
                 android:textSize="14sp"
@@ -176,7 +177,8 @@
         android:id="@+id/parseLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:visibility="gone"
@@ -185,25 +187,48 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="12dp"
+            android:layout_marginEnd="8dp"
             android:text="@string/parse"
             android:textColor="@color/grey_700"
-            android:textSize="16sp" />
+            android:textSize="14sp" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/parse"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clipChildren="false"
-            android:clipToPadding="false"
-            tools:layout_height="36dp" />
+            tools:layout_height="36dp"
+            tools:listitem="@layout/adapter_parse" />
 
     </LinearLayout>
 
-    <com.fongmi.android.tv.ui.custom.CustomSeekView
-        android:id="@+id/seek"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
+        <com.fongmi.android.tv.ui.custom.CustomSeekView
+            android:id="@+id/seek"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1" />
+
+        <ImageView
+            android:id="@+id/lock"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="4dp"
+            android:src="@drawable/ic_lock_off" />
+
+        <ImageView
+            android:id="@+id/full"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="4dp"
+            android:src="@drawable/ic_full_off" />
+
+    </LinearLayout>
 </LinearLayout>

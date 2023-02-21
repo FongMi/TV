@@ -19,7 +19,7 @@ public class TypeAdapter extends RecyclerView.Adapter<TypeAdapter.ViewHolder> {
 
     public TypeAdapter(OnClickListener listener) {
         this.mListener = listener;
-        this.mItems = new ArrayList<>(List.of(home()));
+        this.mItems = new ArrayList<>();
     }
 
     public interface OnClickListener {
