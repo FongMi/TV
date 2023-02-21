@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.api.LiveConfig;
@@ -41,7 +42,6 @@ import com.fongmi.android.tv.ui.presenter.ProgressPresenter;
 import com.fongmi.android.tv.ui.presenter.VodPresenter;
 import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.Notify;
-import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Utils;
 import com.google.common.collect.Lists;
@@ -158,7 +158,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     }
 
     private void addVideo(Result result) {
-        for (List<Vod> items : Lists.partition(result.getList(), Prefers.getColumn())) {
+        for (List<Vod> items : Lists.partition(result.getList(), Product.getColumn())) {
             ArrayObjectAdapter adapter = new ArrayObjectAdapter(new VodPresenter(this));
             adapter.setItems(items, null);
             mAdapter.add(new ListRow(adapter));
