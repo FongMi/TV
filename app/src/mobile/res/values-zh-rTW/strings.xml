@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
 
     <!-- Nav -->
     <string name="nav_vod">點播</string>
@@ -8,6 +8,7 @@
     <string name="home">首頁</string>
     <string name="home_history">最近觀看</string>
     <string name="home_recommend">更新推薦</string>
+    <string name="home_open_url">是否開啟「<xliff:g name="name">%s</xliff:g>」？</string>
 
     <!-- Detail -->
     <string name="detail_flag">線路</string>

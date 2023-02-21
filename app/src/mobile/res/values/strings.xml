@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" xmlns:xliff="http://schemas.android.com/apk/res-auto" tools:ignore="MissingTranslation">
 
     <!-- Nav -->
     <string name="nav_vod">Vod</string>
@@ -8,6 +8,7 @@
     <string name="home">Home</string>
     <string name="home_history">History</string>
     <string name="home_recommend">Recommend</string>
+    <string name="home_open_url">Open <xliff:g name="name">%s</xliff:g> ?</string>
 
     <!-- Detail -->
     <string name="detail_flag">Flag</string>
