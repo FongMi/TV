@@ -99,16 +99,10 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
     }
 
     private void checkAction(Intent intent) {
-        boolean hasPush = ApiConfig.get().getSite("push_agent") != null;
+        if (ApiConfig.get().getSite("push_agent") == null) return;
         boolean hasAction = intent.getAction() != null && intent.getAction().equals(Intent.ACTION_SEND) && intent.getType().equals("text/plain");
-        if (hasPush && hasAction) DetailActivity.start(this, "push_agent", intent.getStringExtra(Intent.EXTRA_TEXT), "");
-        else checkClip();
-    }
-
-    private void checkClip() {
-        CharSequence text = Utils.getClip();
-        if (TextUtils.isEmpty(text)) return;
-        showDialog(text.toString());
+        if (hasAction) DetailActivity.start(this, "push_agent", intent.getStringExtra(Intent.EXTRA_TEXT), "");
+        else if (!TextUtils.isEmpty(Utils.getClip())) showDialog(Utils.getClip().toString());
     }
 
     private void showDialog(String text) {
