@@ -111,7 +111,6 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
 
     private void setFilter() {
         int position = mBinding.pager.getCurrentItem();
-        if (position == 0) mBinding.filter.setVisibility(View.GONE);
         Class type = mTypeAdapter.get(position);
         setFabVisible(type.getFilter() != null);
     }
