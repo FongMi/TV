@@ -20,4 +20,8 @@ public class Product {
     public static int getColumn() {
         return Math.abs(Prefers.getSize() - 7);
     }
+
+    public static void bootLive() {
+        LiveActivity.start(App.activity());
+    }
 }
