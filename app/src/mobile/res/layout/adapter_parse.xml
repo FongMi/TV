@@ -4,8 +4,8 @@
     android:id="@+id/text"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@drawable/shape_item"
+    android:background="@drawable/shape_text"
     android:gravity="center"
     android:textColor="@color/text"
     android:textSize="14sp"
-    tools:text="泥巴" />
+    tools:text="超級解析" />

@@ -26,10 +26,11 @@ import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.ui.activity.BaseFragment;
 import com.fongmi.android.tv.ui.adapter.TypeAdapter;
 import com.fongmi.android.tv.ui.custom.dialog.FilterDialog;
+import com.fongmi.android.tv.ui.custom.dialog.LinkDialog;
 import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
 import com.fongmi.android.tv.ui.fragment.child.SiteFragment;
 import com.fongmi.android.tv.ui.fragment.child.TypeFragment;
-import com.fongmi.android.tv.utils.ResUtil;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -44,7 +45,6 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     private SiteViewModel mViewModel;
     private TypeAdapter mTypeAdapter;
     private PageAdapter mPageAdapter;
-    private boolean destroy;
 
     public static VodFragment newInstance() {
         return new VodFragment();
@@ -54,14 +54,6 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         return ApiConfig.get().getHome();
     }
 
-    public boolean isDestroy() {
-        return destroy;
-    }
-
-    public void setDestroy(boolean destroy) {
-        this.destroy = destroy;
-    }
-
     @Override
     protected ViewBinding getBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
         return mBinding = FragmentVodBinding.inflate(inflater, container, false);
@@ -69,12 +61,14 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
 
     @Override
     protected void initView() {
+        EventBus.getDefault().register(this);
         setRecyclerView();
         setViewModel();
     }
 
     @Override
     protected void initEvent() {
+        mBinding.link.setOnClickListener(this::onLink);
         mBinding.title.setOnClickListener(this::onTitle);
         mBinding.filter.setOnClickListener(this::onFilter);
         mBinding.pager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
@@ -91,16 +85,12 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         mBinding.type.setHasFixedSize(true);
         mBinding.type.setItemAnimator(null);
         mBinding.type.setAdapter(mTypeAdapter = new TypeAdapter(this));
-        mBinding.pager.setAdapter(mPageAdapter = new PageAdapter(getChildFragmentManager()));
+        mBinding.pager.setOffscreenPageLimit(-1);
     }
 
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
-        mViewModel.result.observe(getViewLifecycleOwner(), result -> {
-            EventBus.getDefault().post(result);
-            setAdapter(result);
-            setDestroy(false);
-        });
+        mViewModel.result.observe(getViewLifecycleOwner(), this::setAdapter);
     }
 
     private List<Class> getTypes(Result result) {
@@ -115,16 +105,25 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         Boolean filter = getSite().isFilterable() ? false : null;
         for (Class item : mTypeAdapter.getTypes()) if (result.getFilters().containsKey(item.getTypeId())) item.setFilter(filter);
         for (Class item : mTypeAdapter.getTypes()) if (result.getFilters().containsKey(item.getTypeId())) item.setFilters(result.getFilters().get(item.getTypeId()));
+        getSiteFragment().showContent(result);
         mPageAdapter.notifyDataSetChanged();
-        mBinding.pager.setCurrentItem(0);
     }
 
     private void setFilter() {
         int position = mBinding.pager.getCurrentItem();
         if (position == 0) mBinding.filter.setVisibility(View.GONE);
         Class type = mTypeAdapter.get(position);
-        if (type.getFilter() != null) mBinding.filter.show();
-        else mBinding.filter.hide();
+        setFabVisible(type.getFilter() != null);
+    }
+
+    private void setFabVisible(boolean filter) {
+        if (filter) {
+            mBinding.link.hide();
+            mBinding.filter.show();
+        } else {
+            mBinding.filter.hide();
+            mBinding.link.show();
+        }
     }
 
     private void onTitle(View view) {
@@ -132,13 +131,19 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     }
 
     private void onFilter(View view) {
+        for (Fragment fragment : getChildFragmentManager().getFragments()) if (fragment instanceof BottomSheetDialogFragment) return;
         FilterDialog.create(this).filter(mTypeAdapter.get(mBinding.pager.getCurrentItem()).getFilters()).show(getChildFragmentManager(), null);
+    }
+
+    private void onLink(View view) {
+        if (ApiConfig.hasPush()) LinkDialog.create(this).show();
+        else mBinding.link.hide();
     }
 
     @Override
     public void setSite(Site item) {
         ApiConfig.get().setHome(item);
-        RefreshEvent.video();
+        homeContent();
     }
 
     @Override
@@ -149,25 +154,50 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
 
     @Override
     public void setFilter(String key, String value) {
-        getFragment().setFilter(key, value);
+        getTypeFragment().setFilter(key, value);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefreshEvent(RefreshEvent event) {
-        if (event.getType() == RefreshEvent.Type.VIDEO) homeContent();
+        switch (event.getType()) {
+            case HISTORY:
+                getSiteFragment().getHistory();
+                break;
+            case VIDEO:
+                homeContent();
+                break;
+        }
     }
 
     private void homeContent() {
-        setDestroy(true);
         mTypeAdapter.clear();
-        mPageAdapter.notifyDataSetChanged();
         String home = getSite().getName();
-        mBinding.title.setText(home.isEmpty() ? ResUtil.getString(R.string.app_name) : home);
+        mBinding.title.setText(home.isEmpty() ? getString(R.string.app_name) : home);
+        mBinding.pager.setAdapter(mPageAdapter = new PageAdapter(getChildFragmentManager()));
         if (!getSite().getKey().isEmpty()) mViewModel.homeContent();
     }
 
-    private TypeFragment getFragment() {
+    private SiteFragment getSiteFragment() {
+        return (SiteFragment) mPageAdapter.instantiateItem(mBinding.pager, 0);
+    }
+
+    private TypeFragment getTypeFragment() {
         return (TypeFragment) mPageAdapter.instantiateItem(mBinding.pager, mBinding.pager.getCurrentItem());
+    }
+
+    public boolean canBack() {
+        try {
+            if (mBinding.pager.getCurrentItem() == 0) return getSiteFragment().canBack();
+            else return getTypeFragment().canBack();
+        } catch (Exception e) {
+            return true;
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        EventBus.getDefault().unregister(this);
     }
 
     class PageAdapter extends FragmentStatePagerAdapter {
@@ -190,13 +220,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         }
 
         @Override
-        public int getItemPosition(@NonNull Object object) {
-            return POSITION_NONE;
-        }
-
-        @Override
         public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
-            if (position != 0 && isDestroy()) super.destroyItem(container, position, object);
         }
     }
 }

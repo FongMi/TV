@@ -182,7 +182,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private boolean isFromCollect() {
-        return getCallingActivity().getShortClassName().contains(CollectActivity.class.getSimpleName());
+        return getCallingActivity() != null && getCallingActivity().getShortClassName().contains(CollectActivity.class.getSimpleName());
     }
 
     @Override
@@ -292,7 +292,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mViewModel.search.observe(this, result -> setSearch(result.getList()));
         mViewModel.player.observe(this, result -> {
-            boolean useParse = (result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx() == 1;
+            boolean useParse = result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag()) || result.getJx() == 1;
             mBinding.control.parseLayout.setVisibility(mParseAdapter.size() > 0 && useParse ? View.VISIBLE : View.GONE);
             int timeout = getSite().isChangeable() ? Constant.TIMEOUT_PLAY : -1;
             mPlayers.start(result, useParse, timeout);

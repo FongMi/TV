@@ -63,6 +63,10 @@ public class ApiConfig {
         return get().getSite(key).getName();
     }
 
+    public static boolean hasPush() {
+        return get().getSite("push_agent") != null;
+    }
+
     public ApiConfig init() {
         this.ads = null;
         this.wall = null;
@@ -258,7 +262,7 @@ public class ApiConfig {
     }
 
     public String getAds() {
-        return ads;
+        return TextUtils.isEmpty(ads) ? "" : ads;
     }
 
     private void setAds(List<String> ads) {
