@@ -88,6 +88,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private Runnable mR2;
     private Runnable mR3;
 
+    public static void push(Activity activity, String url) {
+        start(activity, "push_agent", url, url);
+    }
+
     public static void start(Activity activity, String id, String name) {
         start(activity, ApiConfig.get().getHome().getKey(), id, name);
     }
@@ -544,7 +548,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
         getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
-        App.post(mR3, 3000);
         setFullscreen(true);
         hideAll();
     }
@@ -554,7 +557,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
         getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         mBinding.video.setLayoutParams(mFrameParams);
-        App.post(mR3, 3000);
+        App.post(mR3, 2000);
         setFullscreen(false);
         hideAll();
     }
