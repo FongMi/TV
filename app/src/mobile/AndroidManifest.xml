@@ -8,18 +8,27 @@
             android:name=".ui.activity.MainActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
             android:exported="true"
-            android:screenOrientation="fullSensor"
+            android:launchMode="singleTask"
+            android:screenOrientation="fullUser"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
 
         <activity
             android:name=".ui.activity.DetailActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
-            android:screenOrientation="fullSensor" />
+            android:resizeableActivity="true"
+            android:screenOrientation="fullSensor"
+            android:supportsPictureInPicture="true"
+            android:theme="@style/AppTheme.Detail" />
 
     </application>
 </manifest>

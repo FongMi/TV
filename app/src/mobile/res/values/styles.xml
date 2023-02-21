@@ -1,6 +1,13 @@
 <resources>
 
-    <style name="AppTheme" parent="BaseTheme" />
+    <style name="AppTheme" parent="BaseTheme">
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
+    <style name="AppTheme.Detail" parent="AppTheme">
+        <item name="android:statusBarColor">@color/black</item>
+        <item name="android:windowTranslucentStatus">false</item>
+    </style>
 
     <style name="BaseTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">@color/blue_500</item>
@@ -8,9 +15,6 @@
         <item name="colorAccent">@color/blue_500</item>
         <item name="android:windowAnimationStyle">@null</item>
         <item name="android:windowBackground">@null</item>
-        <item name="android:windowFullscreen">true</item>
-        <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:windowTranslucentNavigation">true</item>
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialog</item>
     </style>
 

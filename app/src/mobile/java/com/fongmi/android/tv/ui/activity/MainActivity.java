@@ -1,11 +1,13 @@
 package com.fongmi.android.tv.ui.activity;
 
+import android.content.Intent;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.viewbinding.ViewBinding;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.api.LiveConfig;
@@ -27,6 +29,7 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
 
     private ActivityMainBinding mBinding;
     private List<Fragment> mFragments;
+    private boolean confirm;
 
     @Override
     protected ViewBinding getBinding() {
@@ -35,10 +38,23 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
 
     @Override
     protected void initView() {
+        Notify.progress(this);
         Updater.get().start();
         Server.get().start();
         initFragment();
         initConfig();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        checkAction(intent);
+    }
+
+    private void checkAction(Intent intent) {
+        boolean hasPush = ApiConfig.get().getSite("push_agent") != null;
+        boolean hasAction = intent.getAction() != null && intent.getAction().equals(Intent.ACTION_SEND) && intent.getType().equals("text/plain");
+        if (hasPush && hasAction) DetailActivity.start(this, "push_agent", intent.getStringExtra(Intent.EXTRA_TEXT), "");
     }
 
     @Override
@@ -51,7 +67,7 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
         mFragments = new ArrayList<>();
         mFragments.add(VodFragment.newInstance());
         mFragments.add(SettingFragment.newInstance());
-        for (Fragment fragment : mFragments) getSupportFragmentManager().beginTransaction().add(R.id.container, fragment).hide(fragment).commit();
+        for (int i = 0; i < mFragments.size(); i++) getSupportFragmentManager().beginTransaction().add(R.id.container, mFragments.get(i), String.valueOf(i)).hide(mFragments.get(i)).commitNowAllowingStateLoss();
     }
 
     private void initConfig() {
@@ -64,25 +80,41 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
         return new Callback() {
             @Override
             public void success() {
-                RefreshEvent.history();
+                checkAction(getIntent());
                 RefreshEvent.video();
+                Notify.dismiss();
             }
 
             @Override
             public void error(int resId) {
                 Notify.show(resId);
+                Notify.dismiss();
             }
         };
+    }
+
+    private VodFragment getVodFragment() {
+        return (VodFragment) getSupportFragmentManager().findFragmentByTag("0");
+    }
+
+    private SettingFragment getSettingFragment() {
+        return (SettingFragment) getSupportFragmentManager().findFragmentByTag("1");
+    }
+
+    private void setConfirm() {
+        confirm = true;
+        Notify.show(R.string.app_exit);
+        App.post(() -> confirm = false, 2000);
     }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.vod:
-                getSupportFragmentManager().beginTransaction().hide(mFragments.get(1)).show(mFragments.get(0)).commit();
+                getSupportFragmentManager().beginTransaction().hide(mFragments.get(1)).show(mFragments.get(0)).commitNowAllowingStateLoss();
                 return true;
             case R.id.setting:
-                getSupportFragmentManager().beginTransaction().hide(mFragments.get(0)).show(mFragments.get(1)).commit();
+                getSupportFragmentManager().beginTransaction().hide(mFragments.get(0)).show(mFragments.get(1)).commitNowAllowingStateLoss();
                 return true;
             default:
                 return false;
@@ -91,8 +123,12 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        finish();
+        if (getSettingFragment().isVisible()) {
+            mBinding.navigation.setSelectedItemId(R.id.vod);
+        } else if (getVodFragment().canBack()) {
+            if (!confirm) setConfirm();
+            else finish();
+        }
     }
 
     @Override
