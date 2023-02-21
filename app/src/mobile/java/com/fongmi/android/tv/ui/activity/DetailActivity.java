@@ -92,16 +92,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     public static void start(Activity activity, String key, String id, String name) {
-        start(activity, key, id, name, false);
-    }
-
-    public static void start(Activity activity, String key, String id, String name, boolean clear) {
         Intent intent = new Intent(activity, DetailActivity.class);
-        if (clear) intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra("name", name);
         intent.putExtra("key", key);
         intent.putExtra("id", id);
-        activity.startActivityForResult(intent, 1000);
+        activity.startActivity(intent);
     }
 
     private String getName() {
