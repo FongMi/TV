@@ -2,6 +2,8 @@ package com.fongmi.android.tv;
 
 import android.content.res.Resources;
 
+import com.fongmi.android.tv.utils.Prefers;
+
 import me.jessyan.autosize.AutoSizeCompat;
 
 public class Product {
@@ -16,6 +18,6 @@ public class Product {
     }
 
     public static int getColumn() {
-        return Math.abs(getSize() - 7);
+        return Math.abs(Prefers.getSize() - 7);
     }
 }
