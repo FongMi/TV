@@ -26,6 +26,7 @@ import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.ui.activity.BaseFragment;
 import com.fongmi.android.tv.ui.adapter.TypeAdapter;
 import com.fongmi.android.tv.ui.custom.dialog.FilterDialog;
+import com.fongmi.android.tv.ui.custom.dialog.LinkDialog;
 import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
 import com.fongmi.android.tv.ui.fragment.child.SiteFragment;
 import com.fongmi.android.tv.ui.fragment.child.TypeFragment;
@@ -67,6 +68,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
 
     @Override
     protected void initEvent() {
+        mBinding.link.setOnClickListener(this::onLink);
         mBinding.title.setOnClickListener(this::onTitle);
         mBinding.filter.setOnClickListener(this::onFilter);
         mBinding.pager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
@@ -111,8 +113,17 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         int position = mBinding.pager.getCurrentItem();
         if (position == 0) mBinding.filter.setVisibility(View.GONE);
         Class type = mTypeAdapter.get(position);
-        if (type.getFilter() != null) mBinding.filter.show();
-        else mBinding.filter.hide();
+        setFabVisible(type.getFilter() != null);
+    }
+
+    private void setFabVisible(boolean filter) {
+        if (filter) {
+            mBinding.link.hide();
+            mBinding.filter.show();
+        } else {
+            mBinding.filter.hide();
+            mBinding.link.show();
+        }
     }
 
     private void onTitle(View view) {
@@ -122,6 +133,11 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     private void onFilter(View view) {
         for (Fragment fragment : getChildFragmentManager().getFragments()) if (fragment instanceof BottomSheetDialogFragment) return;
         FilterDialog.create(this).filter(mTypeAdapter.get(mBinding.pager.getCurrentItem()).getFilters()).show(getChildFragmentManager(), null);
+    }
+
+    private void onLink(View view) {
+        if (ApiConfig.hasPush()) LinkDialog.create(this).show();
+        else mBinding.link.hide();
     }
 
     @Override
