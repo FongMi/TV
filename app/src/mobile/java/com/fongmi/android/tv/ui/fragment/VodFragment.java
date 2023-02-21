@@ -13,7 +13,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewpager.widget.ViewPager;
 
-import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Class;
@@ -30,7 +29,6 @@ import com.fongmi.android.tv.ui.custom.dialog.FilterDialog;
 import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
 import com.fongmi.android.tv.ui.fragment.child.SiteFragment;
 import com.fongmi.android.tv.ui.fragment.child.TypeFragment;
-import com.fongmi.android.tv.utils.ResUtil;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -61,6 +59,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
 
     @Override
     protected void initView() {
+        EventBus.getDefault().register(this);
         setRecyclerView();
         setViewModel();
     }
@@ -82,8 +81,8 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     private void setRecyclerView() {
         mBinding.type.setHasFixedSize(true);
         mBinding.type.setItemAnimator(null);
-        mBinding.pager.setOffscreenPageLimit(-1);
         mBinding.type.setAdapter(mTypeAdapter = new TypeAdapter(this));
+        mBinding.pager.setOffscreenPageLimit(-1);
     }
 
     private void setViewModel() {
@@ -103,9 +102,8 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         Boolean filter = getSite().isFilterable() ? false : null;
         for (Class item : mTypeAdapter.getTypes()) if (result.getFilters().containsKey(item.getTypeId())) item.setFilter(filter);
         for (Class item : mTypeAdapter.getTypes()) if (result.getFilters().containsKey(item.getTypeId())) item.setFilters(result.getFilters().get(item.getTypeId()));
-        mBinding.pager.setAdapter(mPageAdapter = new PageAdapter(getChildFragmentManager()));
-        EventBus.getDefault().post(result);
-        mBinding.pager.setCurrentItem(0);
+        getSiteFragment().showContent(result);
+        mPageAdapter.notifyDataSetChanged();
     }
 
     private void setFilter() {
@@ -127,7 +125,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     @Override
     public void setSite(Site item) {
         ApiConfig.get().setHome(item);
-        RefreshEvent.video();
+        homeContent();
     }
 
     @Override
@@ -144,11 +142,11 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefreshEvent(RefreshEvent event) {
         switch (event.getType()) {
+            case HISTORY:
+                getSiteFragment().getHistory();
+                break;
             case VIDEO:
                 homeContent();
-                break;
-            case EMPTY:
-                App.post(() -> EventBus.getDefault().post(Result.empty()), 250);
                 break;
         }
     }
@@ -156,8 +154,8 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     private void homeContent() {
         mTypeAdapter.clear();
         String home = getSite().getName();
-        if (mPageAdapter != null) mPageAdapter.notifyDataSetChanged();
-        mBinding.title.setText(home.isEmpty() ? ResUtil.getString(R.string.app_name) : home);
+        mBinding.title.setText(home.isEmpty() ? getString(R.string.app_name) : home);
+        mBinding.pager.setAdapter(mPageAdapter = new PageAdapter(getChildFragmentManager()));
         if (!getSite().getKey().isEmpty()) mViewModel.homeContent();
     }
 
@@ -171,11 +169,17 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
 
     public boolean canBack() {
         try {
-            if (mBinding.pager.getCurrentItem() > 0) return true;
-            return getSiteFragment().canBack();
+            if (mBinding.pager.getCurrentItem() == 0) return getSiteFragment().canBack();
+            else return getTypeFragment().canBack();
         } catch (Exception e) {
             return true;
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        EventBus.getDefault().unregister(this);
     }
 
     class PageAdapter extends FragmentStatePagerAdapter {

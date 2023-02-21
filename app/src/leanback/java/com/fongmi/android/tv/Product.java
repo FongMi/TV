@@ -14,4 +14,8 @@ public class Product {
             return resources;
         }
     }
+
+    public static int getColumn() {
+        return Math.abs(getSize() - 7);
+    }
 }
