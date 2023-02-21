@@ -65,7 +65,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:orientation="vertical"
-        android:visibility="visible">
+        android:visibility="gone"
+        tools:visibility="visible">
 
         <include layout="@layout/view_progress" />
 
@@ -77,7 +78,8 @@
             android:textColor="@color/white"
             android:textSize="14sp"
             android:visibility="gone"
-            tools:text="120KB/s" />
+            tools:text="120KB/s"
+            tools:visibility="visible" />
 
     </LinearLayout>
 
@@ -91,7 +93,7 @@
         android:orientation="vertical"
         android:padding="16dp"
         android:visibility="gone"
-        tools:visibility="visible">
+        tools:visibility="gone">
 
         <ImageView
             android:layout_width="48dp"
@@ -120,7 +122,7 @@
         android:orientation="vertical"
         android:padding="16dp"
         android:visibility="gone"
-        tools:visibility="visible">
+        tools:visibility="gone">
 
         <ImageView
             android:id="@+id/action"

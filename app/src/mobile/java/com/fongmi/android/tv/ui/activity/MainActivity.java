@@ -53,7 +53,7 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
         mFragments = new ArrayList<>();
         mFragments.add(VodFragment.newInstance());
         mFragments.add(SettingFragment.newInstance());
-        for (int i = 0; i < mFragments.size(); i++) getSupportFragmentManager().beginTransaction().add(R.id.container, mFragments.get(i), String.valueOf(i)).hide(mFragments.get(i)).commit();
+        for (int i = 0; i < mFragments.size(); i++) getSupportFragmentManager().beginTransaction().add(R.id.container, mFragments.get(i), String.valueOf(i)).hide(mFragments.get(i)).commitNowAllowingStateLoss();
     }
 
     private void initConfig() {
@@ -95,10 +95,10 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.vod:
-                getSupportFragmentManager().beginTransaction().hide(mFragments.get(1)).show(mFragments.get(0)).commit();
+                getSupportFragmentManager().beginTransaction().hide(mFragments.get(1)).show(mFragments.get(0)).commitNowAllowingStateLoss();
                 return true;
             case R.id.setting:
-                getSupportFragmentManager().beginTransaction().hide(mFragments.get(0)).show(mFragments.get(1)).commit();
+                getSupportFragmentManager().beginTransaction().hide(mFragments.get(0)).show(mFragments.get(1)).commitNowAllowingStateLoss();
                 return true;
             default:
                 return false;
