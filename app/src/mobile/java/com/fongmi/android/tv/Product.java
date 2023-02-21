@@ -14,4 +14,7 @@ public class Product {
     public static int getColumn(Activity activity) {
         return ResUtil.isPort(activity) ? 3 : 6;
     }
+
+    public static void bootLive() {
+    }
 }
