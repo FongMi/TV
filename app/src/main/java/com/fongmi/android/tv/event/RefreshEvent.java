@@ -30,10 +30,6 @@ public class RefreshEvent {
         EventBus.getDefault().post(new RefreshEvent(Type.WALL));
     }
 
-    public static void empty() {
-        EventBus.getDefault().post(new RefreshEvent(Type.EMPTY));
-    }
-
     private RefreshEvent(Type type) {
         this.type = type;
     }
@@ -43,6 +39,6 @@ public class RefreshEvent {
     }
 
     public enum Type {
-        IMAGE, VIDEO, HISTORY, KEEP, SIZE, WALL, EMPTY
+        IMAGE, VIDEO, HISTORY, KEEP, SIZE, WALL
     }
 }

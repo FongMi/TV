@@ -11,18 +11,15 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.viewbinding.ViewBinding;
 
+import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.FragmentTypeBinding;
-import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.ui.activity.BaseFragment;
 import com.fongmi.android.tv.ui.activity.DetailActivity;
 import com.fongmi.android.tv.ui.adapter.VodAdapter;
 import com.fongmi.android.tv.ui.custom.CustomScroller;
-
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -79,7 +76,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     private void setRecyclerView() {
         mBinding.recycler.setHasFixedSize(true);
         mBinding.recycler.setAdapter(mVodAdapter = new VodAdapter(this));
-        mBinding.recycler.setLayoutManager(mGridLayoutManager = new GridLayoutManager(getContext(), getSpanCount()));
+        mBinding.recycler.setLayoutManager(mGridLayoutManager = new GridLayoutManager(getContext(), Product.getColumn()));
     }
 
     private void setViewModel() {
@@ -116,6 +113,12 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         getVideo(typeId, "1");
     }
 
+    public boolean canBack() {
+        if (mTypeIds.size() == 0) return true;
+        refresh(2);
+        return false;
+    }
+
     @Override
     public void onLoadMore(String page) {
         if (isFolder()) return;
@@ -142,14 +145,9 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         return true;
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onRefreshEvent(RefreshEvent event) {
-        if (event.getType() == RefreshEvent.Type.IMAGE) mVodAdapter.notifyDataSetChanged();
-    }
-
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        mGridLayoutManager.setSpanCount(getSpanCount());
+        mGridLayoutManager.setSpanCount(Product.getColumn());
     }
 }
