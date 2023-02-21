@@ -1,6 +1,5 @@
 package com.fongmi.android.tv.ui.custom.dialog;
 
-import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -13,16 +12,11 @@ import com.fongmi.android.tv.api.LiveConfig;
 import com.fongmi.android.tv.api.WallConfig;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.databinding.DialogConfigBinding;
-import com.fongmi.android.tv.event.ServerEvent;
 import com.fongmi.android.tv.impl.ConfigCallback;
 import com.fongmi.android.tv.utils.Utils;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
-
-public class ConfigDialog implements DialogInterface.OnDismissListener {
+public class ConfigDialog {
 
     private final DialogConfigBinding binding;
     private final ConfigCallback callback;
@@ -53,7 +47,6 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
 
     private void initDialog() {
         dialog.getWindow().setDimAmount(0);
-        dialog.setOnDismissListener(this);
         dialog.show();
     }
 
@@ -63,7 +56,6 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
     }
 
     private void initEvent() {
-        EventBus.getDefault().register(this);
         binding.positive.setOnClickListener(this::onPositive);
         binding.negative.setOnClickListener(this::onNegative);
         binding.text.setOnEditorActionListener((textView, actionId, event) -> {
@@ -94,17 +86,5 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
 
     private void onNegative(View view) {
         dialog.dismiss();
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onServerEvent(ServerEvent event) {
-        if (event.getType() != ServerEvent.Type.API) return;
-        binding.text.setText(event.getText());
-        binding.text.setSelection(binding.text.getText().length());
-    }
-
-    @Override
-    public void onDismiss(DialogInterface dialogInterface) {
-        EventBus.getDefault().unregister(this);
     }
 }
