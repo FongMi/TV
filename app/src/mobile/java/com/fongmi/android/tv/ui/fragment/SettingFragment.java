@@ -78,6 +78,10 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.decode.setOnClickListener(view -> setDecode());
         mBinding.render.setOnClickListener(view -> setRender());
         mBinding.scale.setOnClickListener(view -> setScale());
+        mBinding.version.setOnLongClickListener(v -> {
+            Updater.get().force().branch("dev").start();
+            return true;
+        });
     }
 
     @Override
