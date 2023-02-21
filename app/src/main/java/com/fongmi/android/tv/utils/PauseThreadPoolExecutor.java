@@ -6,20 +6,23 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class PausableThreadPoolExecutor extends ThreadPoolExecutor {
-    private boolean isPaused;
-    private ReentrantLock pauseLock = new ReentrantLock();
-    private Condition unpaused = pauseLock.newCondition();
+public class PauseThreadPoolExecutor extends ThreadPoolExecutor {
 
-    public PausableThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue) {
+    private final ReentrantLock pauseLock;
+    private final Condition condition;
+    private boolean isPaused;
+
+    public PauseThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue) {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue);
+        pauseLock = new ReentrantLock();
+        condition = pauseLock.newCondition();
     }
 
     protected void beforeExecute(Thread t, Runnable r) {
         super.beforeExecute(t, r);
         pauseLock.lock();
         try {
-            while (isPaused) unpaused.await();
+            while (isPaused) condition.await();
         } catch (InterruptedException ie) {
             t.interrupt();
         } finally {
@@ -40,7 +43,7 @@ public class PausableThreadPoolExecutor extends ThreadPoolExecutor {
         pauseLock.lock();
         try {
             isPaused = false;
-            unpaused.signalAll();
+            condition.signalAll();
         } finally {
             pauseLock.unlock();
         }
