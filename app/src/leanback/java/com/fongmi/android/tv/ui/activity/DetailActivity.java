@@ -182,7 +182,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private boolean isFromCollect() {
-        return getCallingActivity().getShortClassName().contains(CollectActivity.class.getSimpleName());
+        return getCallingActivity() != null && getCallingActivity().getShortClassName().contains(CollectActivity.class.getSimpleName());
     }
 
     @Override
