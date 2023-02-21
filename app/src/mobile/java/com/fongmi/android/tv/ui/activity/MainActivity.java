@@ -66,6 +66,7 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
     }
 
     private void initFragment() {
+        if (mFragments != null) return;
         mFragments = new ArrayList<>();
         mFragments.add(VodFragment.newInstance());
         mFragments.add(SettingFragment.newInstance());
