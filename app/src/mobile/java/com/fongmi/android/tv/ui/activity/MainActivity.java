@@ -1,5 +1,6 @@
 package com.fongmi.android.tv.ui.activity;
 
+import android.content.Intent;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
@@ -45,6 +46,18 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
     }
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        checkAction(intent);
+    }
+
+    private void checkAction(Intent intent) {
+        boolean hasPush = ApiConfig.get().getSite("push_agent") != null;
+        boolean hasAction = intent.getAction() != null && intent.getAction().equals(Intent.ACTION_SEND) && intent.getType().equals("text/plain");
+        if (hasPush && hasAction) DetailActivity.start(this, "push_agent", intent.getStringExtra(Intent.EXTRA_TEXT), "");
+    }
+
+    @Override
     protected void initEvent() {
         mBinding.navigation.setOnItemSelectedListener(this);
         mBinding.navigation.setSelectedItemId(R.id.vod);
@@ -67,6 +80,7 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
         return new Callback() {
             @Override
             public void success() {
+                checkAction(getIntent());
                 RefreshEvent.video();
                 Notify.dismiss();
             }
