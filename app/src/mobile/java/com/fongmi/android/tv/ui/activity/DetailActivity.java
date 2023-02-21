@@ -394,8 +394,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onMore() {
-        boolean more = getString(R.string.vod_content_expand).equals(mBinding.more.getText().toString());
-        mBinding.more.setText(more ? R.string.vod_content_collapse : R.string.vod_content_expand);
+        boolean more = getString(R.string.detail_content_expand).equals(mBinding.more.getText().toString());
+        mBinding.more.setText(more ? R.string.detail_content_collapse : R.string.detail_content_expand);
         mBinding.content.setMaxLines(more ? Integer.MAX_VALUE : 4);
     }
 
