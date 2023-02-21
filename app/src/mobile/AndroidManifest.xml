@@ -8,7 +8,7 @@
             android:name=".ui.activity.MainActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
             android:exported="true"
-            android:launchMode="singleTask"
+            android:launchMode="singleTop"
             android:screenOrientation="fullUser"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
@@ -25,6 +25,7 @@
         <activity
             android:name=".ui.activity.DetailActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
+            android:launchMode="singleTop"
             android:resizeableActivity="true"
             android:screenOrientation="fullSensor"
             android:supportsPictureInPicture="true"

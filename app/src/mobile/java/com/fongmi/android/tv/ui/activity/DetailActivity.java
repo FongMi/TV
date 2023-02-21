@@ -82,6 +82,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private boolean mAutoMode;
     private boolean mUseParse;
     private boolean mLock;
+    private boolean mStop;
     private int mCurrent;
     private Runnable mR1;
     private Runnable mR2;
@@ -170,10 +171,16 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        getIntent().putExtras(intent);
+        getDetail();
+    }
+
+    @Override
     protected void initView() {
         mKeyDown = CustomKeyDownVod.create(this);
         mFrameParams = mBinding.video.getLayoutParams();
-        mBinding.progressLayout.showProgress();
         mPlayers = new Players().init();
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
@@ -213,7 +220,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void checkOrientation() {
-        if (ResUtil.isLand()) enterFullscreen();
+        if (ResUtil.isLand(this)) enterFullscreen();
     }
 
     private void setRecyclerView() {
@@ -274,6 +281,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void getDetail() {
+        mBinding.progressLayout.showProgress();
         mViewModel.detailContent(getKey(), getId());
     }
 
@@ -386,8 +394,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onMore() {
-        boolean more = getString(R.string.vod_content_expand).equals(mBinding.more.getText().toString());
-        mBinding.more.setText(more ? R.string.vod_content_collapse : R.string.vod_content_expand);
+        boolean more = getString(R.string.detail_content_expand).equals(mBinding.more.getText().toString());
+        mBinding.more.setText(more ? R.string.detail_content_collapse : R.string.detail_content_expand);
         mBinding.content.setMaxLines(more ? Integer.MAX_VALUE : 4);
     }
 
@@ -402,7 +410,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         setR1Callback();
         setLock(!isLock());
         mBinding.control.lock.setImageResource(isLock() ? R.drawable.ic_lock_on : R.drawable.ic_lock_off);
-        setRequestedOrientation(isLock() ? (ResUtil.isLand() ? ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT) : ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+        setRequestedOrientation(isLock() ? (ResUtil.isLand(this) ? ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT) : ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
     }
 
     private void onFull() {
@@ -538,8 +546,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
         App.post(mR3, 3000);
         setFullscreen(true);
-        hideControl();
-        hideInfo();
+        hideAll();
     }
 
     private void exitFullscreen() {
@@ -549,8 +556,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.video.setLayoutParams(mFrameParams);
         App.post(mR3, 3000);
         setFullscreen(false);
-        hideControl();
-        hideInfo();
+        hideAll();
     }
 
     private void showProgress() {
@@ -599,6 +605,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void hideCenter() {
         mBinding.widget.action.setImageResource(R.drawable.ic_play);
+        hideInfo();
+    }
+
+    private void hideAll() {
+        hideControl();
         hideInfo();
     }
 
@@ -807,6 +818,14 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         this.mLock = lock;
     }
 
+    public boolean isStop() {
+        return mStop;
+    }
+
+    public void setStop(boolean stop) {
+        this.mStop = stop;
+    }
+
     private void notifyItemChanged(RecyclerView.Adapter<?> adapter) {
         adapter.notifyItemRangeChanged(0, adapter.getItemCount());
     }
@@ -825,14 +844,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     @Override
-    public void onConfigurationChanged(@NonNull Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        if (isLock()) return;
-        if (ResUtil.isLand()) enterFullscreen();
-        if (ResUtil.isPort()) exitFullscreen();
-    }
-
-    @Override
     protected void onUserLeaveHint() {
         super.onUserLeaveHint();
         Rect sourceRectHint = new Rect();
@@ -844,24 +855,31 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode);
         mBinding.progressLayout.setVisibility(isInPictureInPictureMode ? View.GONE : View.VISIBLE);
-        if (isInPictureInPictureMode) {
-            hideControl();
-            hideInfo();
-        } else if (!mPlayers.isPlaying()) {
-            finish();
-        }
+        if (isInPictureInPictureMode) hideAll();
+        else if (isStop()) finish();
+    }
+
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (Utils.hasPIP() && isInPictureInPictureMode() || isLock()) return;
+        else if (ResUtil.isPort(this)) exitFullscreen();
+        else if (ResUtil.isLand(this)) enterFullscreen();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        setStop(false);
         onPlay();
     }
 
     @Override
     protected void onStop() {
-        onPause(false);
         super.onStop();
+        RefreshEvent.history();
+        onPause(false);
+        setStop(true);
     }
 
     @Override
@@ -873,7 +891,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     @Override
     protected void onPause() {
         super.onPause();
-        RefreshEvent.history();
         Clock.get().release();
     }
 

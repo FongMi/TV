@@ -183,7 +183,7 @@
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="16dp"
-                    android:text="線路"
+                    android:text="@string/detail_flag"
                     android:textColor="@color/white"
                     android:textSize="16sp"
                     android:textStyle="bold" />
@@ -204,7 +204,7 @@
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="16dp"
-                    android:text="選集"
+                    android:text="@string/detail_episode"
                     android:textColor="@color/white"
                     android:textSize="16sp"
                     android:textStyle="bold" />
@@ -225,7 +225,7 @@
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="16dp"
-                    android:text="簡介"
+                    android:text="@string/detail_content"
                     android:textColor="@color/white"
                     android:textSize="16sp"
                     android:textStyle="bold" />
@@ -251,7 +251,7 @@
                     android:layout_gravity="end"
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="16dp"
-                    android:text="@string/vod_content_expand"
+                    android:text="@string/detail_content_expand"
                     android:textColor="@color/white"
                     android:textSize="12sp"
                     android:textStyle="bold"
