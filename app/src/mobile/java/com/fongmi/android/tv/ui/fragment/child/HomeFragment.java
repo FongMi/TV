@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.viewbinding.ViewBinding;
 
@@ -19,6 +20,7 @@ import com.fongmi.android.tv.ui.activity.BaseFragment;
 import com.fongmi.android.tv.ui.activity.DetailActivity;
 import com.fongmi.android.tv.ui.adapter.HistoryAdapter;
 import com.fongmi.android.tv.ui.adapter.VodAdapter;
+import com.fongmi.android.tv.ui.fragment.VodFragment;
 
 public class HomeFragment extends BaseFragment implements VodAdapter.OnClickListener, HistoryAdapter.OnClickListener {
 
@@ -32,6 +34,10 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
         return new HomeFragment();
     }
 
+    private VodFragment getParent() {
+        return (VodFragment) getParentFragment();
+    }
+
     @Override
     protected ViewBinding getBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
         return mBinding = FragmentHomeBinding.inflate(inflater, container, false);
@@ -42,6 +48,11 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
         mBinding.progressLayout.showProgress();
         setRecyclerView();
         getHistory();
+    }
+
+    @Override
+    protected void initEvent() {
+        mBinding.getRoot().setOnScrollChangeListener((NestedScrollView.OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> getParent().toggleLink(scrollY - oldScrollY));
     }
 
     private void setRecyclerView() {
