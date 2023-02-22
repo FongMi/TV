@@ -81,8 +81,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private boolean mUseParse;
     private boolean mLock;
     private boolean mStop;
+    private boolean mLand;
     private int mCurrent;
-    private int mRotate;
     private Runnable mR1;
     private Runnable mR2;
 
@@ -536,7 +536,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void enterFullscreen() {
-        mRotate = getRequestedOrientation();
+        setLand(ResUtil.isLand(this));
         mBinding.control.full.setImageResource(R.drawable.ic_full_off);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE);
         getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
@@ -546,9 +546,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void exitFullscreen() {
-        setRequestedOrientation(mRotate);
         mBinding.control.full.setImageResource(R.drawable.ic_full_on);
+        setRequestedOrientation(isLand() ? ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
         getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_USER);
         mBinding.episode.scrollToPosition(mEpisodeAdapter.getPosition());
         mBinding.video.setLayoutParams(mFrameParams);
         setFullscreen(false);
@@ -816,6 +817,14 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     public void setStop(boolean stop) {
         this.mStop = stop;
+    }
+
+    public boolean isLand() {
+        return mLand;
+    }
+
+    public void setLand(boolean land) {
+        this.mLand = land;
     }
 
     private void notifyItemChanged(RecyclerView.Adapter<?> adapter) {
