@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.text.Html;
 import android.text.Layout;
@@ -16,7 +15,6 @@ import android.view.ViewTreeObserver;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -86,7 +84,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private int mCurrent;
     private Runnable mR1;
     private Runnable mR2;
-    private Runnable mR3;
 
     public static void push(Activity activity, String url) {
         start(activity, "push_agent", url, url);
@@ -188,8 +185,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mPlayers = new Players().init();
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
-        mR3 = this::setRotate;
-        checkOrientation();
         setRecyclerView();
         setVideoView();
         setViewModel();
@@ -221,10 +216,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.ending.setOnLongClickListener(view -> onEndingReset());
         mBinding.control.opening.setOnLongClickListener(view -> onOpeningReset());
         mBinding.video.setOnTouchListener((view, event) -> mKeyDown.onTouchEvent(event));
-    }
-
-    private void checkOrientation() {
-        if (ResUtil.isLand(this)) enterFullscreen();
     }
 
     private void setRecyclerView() {
@@ -544,6 +535,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void enterFullscreen() {
+        mBinding.progressLayout.setVisibility(View.GONE);
         mBinding.control.full.setImageResource(R.drawable.ic_full_off);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE);
         getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
@@ -556,8 +548,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.full.setImageResource(R.drawable.ic_full_on);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
         getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        mBinding.episode.scrollToPosition(mEpisodeAdapter.getPosition());
+        mBinding.progressLayout.setVisibility(View.VISIBLE);
         mBinding.video.setLayoutParams(mFrameParams);
-        App.post(mR3, 2000);
         setFullscreen(false);
         hideAll();
     }
@@ -619,10 +612,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void setTraffic() {
         Traffic.setSpeed(mBinding.widget.traffic);
         App.post(mR2, Constant.INTERVAL_TRAFFIC);
-    }
-
-    private void setRotate() {
-        if (!isLock()) setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_USER);
     }
 
     private void setR1Callback() {
@@ -863,14 +852,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     @Override
-    public void onConfigurationChanged(@NonNull Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        if (Utils.hasPIP() && isInPictureInPictureMode() || isLock()) return;
-        else if (ResUtil.isPort(this)) exitFullscreen();
-        else if (ResUtil.isLand(this)) enterFullscreen();
-    }
-
-    @Override
     protected void onStart() {
         super.onStart();
         setStop(false);
@@ -912,6 +893,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     protected void onDestroy() {
         super.onDestroy();
         mPlayers.release();
-        App.removeCallbacks(mR1, mR2, mR3);
+        App.removeCallbacks(mR1, mR2);
     }
 }
