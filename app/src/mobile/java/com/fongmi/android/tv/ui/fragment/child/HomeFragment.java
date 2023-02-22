@@ -7,15 +7,19 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.widget.NestedScrollView;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Product;
+import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Result;
+import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.FragmentHomeBinding;
+import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.ui.activity.BaseFragment;
 import com.fongmi.android.tv.ui.activity.DetailActivity;
 import com.fongmi.android.tv.ui.adapter.HistoryAdapter;
@@ -28,6 +32,7 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
     private GridLayoutManager mHistoryManager;
     private HistoryAdapter mHistoryAdapter;
     private FragmentHomeBinding mBinding;
+    private SiteViewModel mViewModel;
     private VodAdapter mVodAdapter;
 
     public static HomeFragment newInstance() {
@@ -36,6 +41,10 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
 
     private VodFragment getParent() {
         return (VodFragment) getParentFragment();
+    }
+
+    private Site getSite() {
+        return ApiConfig.get().getHome();
     }
 
     @Override
@@ -47,7 +56,9 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
     protected void initView() {
         mBinding.progressLayout.showProgress();
         setRecyclerView();
+        setViewModel();
         getHistory();
+        getVideo();
     }
 
     @Override
@@ -65,13 +76,34 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
         mBinding.recommend.setAdapter(mVodAdapter = new VodAdapter(this));
     }
 
+    private void setViewModel() {
+        mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
+        mViewModel.result.observe(getViewLifecycleOwner(), this::setAdapter);
+    }
+
     public void getHistory() {
         mHistoryAdapter.addAll(History.get());
     }
 
-    public void showContent(Result result) {
+    private void getVideo() {
+        if (!getSite().getKey().isEmpty()) mViewModel.homeContent();
+    }
+
+    private void setAdapter(Result result) {
         mBinding.progressLayout.showContent();
         mVodAdapter.addAll(result.getList());
+        getParent().setAdapter(result);
+    }
+
+    private void setHistoryDelete(boolean delete) {
+        mHistoryAdapter.setDelete(delete);
+        mHistoryAdapter.notifyItemRangeChanged(0, mHistoryAdapter.getItemCount());
+    }
+
+    public boolean canBack() {
+        if (!mHistoryAdapter.isDelete()) return true;
+        setHistoryDelete(false);
+        return false;
     }
 
     @Override
@@ -102,17 +134,6 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
     public boolean onLongClick() {
         setHistoryDelete(!mHistoryAdapter.isDelete());
         return true;
-    }
-
-    private void setHistoryDelete(boolean delete) {
-        mHistoryAdapter.setDelete(delete);
-        mHistoryAdapter.notifyItemRangeChanged(0, mHistoryAdapter.getItemCount());
-    }
-
-    public boolean canBack() {
-        if (!mHistoryAdapter.isDelete()) return true;
-        setHistoryDelete(false);
-        return false;
     }
 
     @Override
