@@ -51,6 +51,7 @@ import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Traffic;
 import com.fongmi.android.tv.utils.Utils;
+import com.github.bassaer.library.MDColor;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.ui.StyledPlayerView;
@@ -191,6 +192,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         setVideoView();
         setViewModel();
         showProgress();
+        getRotate();
         getDetail();
     }
 
@@ -208,6 +210,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.scale.setOnClickListener(view -> onScale());
         mBinding.control.speed.setOnClickListener(view -> onSpeed());
         mBinding.control.reset.setOnClickListener(view -> onReset());
+        mBinding.control.rotate.setOnClickListener(view -> onRotate());
         mBinding.control.player.setOnClickListener(view -> onPlayer());
         mBinding.control.decode.setOnClickListener(view -> onDecode());
         mBinding.control.ending.setOnClickListener(view -> onEnding());
@@ -274,6 +277,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
             else setDetail(result.getList().get(0));
             Notify.dismiss();
         });
+    }
+
+    private void getRotate() {
+        mBinding.control.rotate.getDrawable().setTint(Prefers.isRotate() ? MDColor.YELLOW_500 : MDColor.WHITE);
+        setRotate();
     }
 
     private void getDetail() {
@@ -474,6 +482,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         return true;
     }
 
+    private void onRotate() {
+        Prefers.putRotate(!Prefers.isRotate());
+        getRotate();
+    }
+
     private void onPlayer() {
         mPlayers.togglePlayer();
         Prefers.putPlayer(mPlayers.getPlayer());
@@ -610,7 +623,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void setRotate() {
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_USER);
+        setRequestedOrientation(Prefers.isRotate() ? ActivityInfo.SCREEN_ORIENTATION_FULL_USER : ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
     }
 
     private void setR1Callback() {
