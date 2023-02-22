@@ -57,7 +57,6 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
         mBinding.progressLayout.showProgress();
         setRecyclerView();
         setViewModel();
-        getHistory();
         getVideo();
     }
 
@@ -81,7 +80,7 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
         mViewModel.result.observe(getViewLifecycleOwner(), this::setAdapter);
     }
 
-    public void getHistory() {
+    private void getHistory() {
         mHistoryAdapter.addAll(History.get());
     }
 
@@ -141,5 +140,11 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
         super.onConfigurationChanged(newConfig);
         mHistoryManager.setSpanCount(Product.getColumn(getActivity()));
         mRecommendManager.setSpanCount(Product.getColumn(getActivity()));
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getHistory();
     }
 }

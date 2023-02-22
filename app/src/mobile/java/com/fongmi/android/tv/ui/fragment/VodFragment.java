@@ -12,6 +12,7 @@ import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewpager.widget.ViewPager;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Class;
@@ -119,14 +120,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefreshEvent(RefreshEvent event) {
-        switch (event.getType()) {
-            case HISTORY:
-                getHomeFragment().getHistory();
-                break;
-            case VIDEO:
-                homeContent();
-                break;
-        }
+        if (event.getType() == RefreshEvent.Type.VIDEO) homeContent();
     }
 
     private void homeContent() {
@@ -139,13 +133,6 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         List<Class> types = new ArrayList<>();
         for (String cate : getSite().getCategories()) for (Class type : result.getTypes()) if (cate.equals(type.getTypeName())) types.add(type);
         return types;
-    }
-
-    public void setAdapter(Result result) {
-        result.setTypes(getTypes(result));
-        mTypeAdapter.addAll(result.getTypes());
-        for (Class item : mTypeAdapter.getTypes()) if (result.getFilters().containsKey(item.getTypeId())) item.setFilters(result.getFilters().get(item.getTypeId()));
-        mPageAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -173,6 +160,13 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         Utils.toggleFab(dy, mBinding.filter);
     }
 
+    public void setAdapter(Result result) {
+        result.setTypes(getTypes(result));
+        mTypeAdapter.addAll(result.getTypes());
+        for (Class item : mTypeAdapter.getTypes()) if (result.getFilters().containsKey(item.getTypeId())) item.setFilters(result.getFilters().get(item.getTypeId()));
+        App.post(() -> mPageAdapter.notifyDataSetChanged());
+    }
+
     public boolean canBack() {
         try {
             if (mBinding.pager.getCurrentItem() == 0) return getHomeFragment().canBack();
@@ -191,7 +185,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     class PageAdapter extends FragmentStatePagerAdapter {
 
         public PageAdapter(@NonNull FragmentManager fm) {
-            super(fm);
+            super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         }
 
         @NonNull
