@@ -82,10 +82,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private boolean mAutoMode;
     private boolean mUseParse;
     private boolean mStop;
-    private boolean mLand;
     private int mCurrent;
     private Runnable mR1;
     private Runnable mR2;
+    private Runnable mR3;
 
     public static void push(Activity activity, String url) {
         start(activity, "push_agent", url, url);
@@ -187,6 +187,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mPlayers = new Players().init();
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
+        mR3 = this::setRotate;
         setRecyclerView();
         setVideoView();
         setViewModel();
@@ -529,22 +530,23 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void enterFullscreen() {
-        setLand(ResUtil.isLand(this));
-        mBinding.control.full.setImageResource(R.drawable.ic_full_off);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
-        getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
+        mBinding.control.getRoot().setBackgroundResource(R.drawable.shape_controller);
+        getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+        mBinding.control.full.setImageResource(R.drawable.ic_full_off);
         setFullscreen(true);
         hideAll();
     }
 
     private void exitFullscreen() {
-        mBinding.control.full.setImageResource(R.drawable.ic_full_on);
-        setRequestedOrientation(isLand() ? ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
         getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_USER);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
         mBinding.episode.scrollToPosition(mEpisodeAdapter.getPosition());
+        mBinding.control.full.setImageResource(R.drawable.ic_full_on);
+        mBinding.control.getRoot().setBackgroundResource(0);
         mBinding.video.setLayoutParams(mFrameParams);
+        App.post(mR3, 2000);
         setFullscreen(false);
         hideAll();
     }
@@ -606,6 +608,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void setTraffic() {
         Traffic.setSpeed(mBinding.widget.traffic);
         App.post(mR2, Constant.INTERVAL_TRAFFIC);
+    }
+
+    private void setRotate() {
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_USER);
     }
 
     private void setR1Callback() {
@@ -802,14 +808,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         this.mStop = stop;
     }
 
-    public boolean isLand() {
-        return mLand;
-    }
-
-    public void setLand(boolean land) {
-        this.mLand = land;
-    }
-
     private void notifyItemChanged(RecyclerView.Adapter<?> adapter) {
         adapter.notifyItemRangeChanged(0, adapter.getItemCount());
     }
@@ -898,6 +896,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     protected void onDestroy() {
         super.onDestroy();
         mPlayers.release();
-        App.removeCallbacks(mR1, mR2);
+        App.removeCallbacks(mR1, mR2, mR3);
     }
 }
