@@ -183,7 +183,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_full_off" />
+            android:src="@drawable/ic_full_on" />
 
     </LinearLayout>
 </LinearLayout>

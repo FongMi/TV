@@ -83,9 +83,9 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         mBinding.pager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
+                setFabVisible(mTypeAdapter.get(mBinding.pager.getCurrentItem()).getFilters().size() > 0);
                 mBinding.type.smoothScrollToPosition(position);
                 mTypeAdapter.setActivated(position);
-                setFilter();
             }
         });
     }
@@ -111,17 +111,9 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     private void setAdapter(Result result) {
         result.setTypes(getTypes(result));
         mTypeAdapter.addAll(result.getTypes());
-        Boolean filter = getSite().isFilterable() ? false : null;
-        for (Class item : mTypeAdapter.getTypes()) if (result.getFilters().containsKey(item.getTypeId())) item.setFilter(filter);
         for (Class item : mTypeAdapter.getTypes()) if (result.getFilters().containsKey(item.getTypeId())) item.setFilters(result.getFilters().get(item.getTypeId()));
         getHomeFragment().showContent(result);
         mPageAdapter.notifyDataSetChanged();
-    }
-
-    private void setFilter() {
-        int position = mBinding.pager.getCurrentItem();
-        Class type = mTypeAdapter.get(position);
-        setFabVisible(type.getFilter() != null);
     }
 
     private void setFabVisible(boolean filter) {
@@ -135,7 +127,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     }
 
     private void onTitle(View view) {
-        SiteDialog.create(this).filter(true).show();
+        SiteDialog.create(this).show();
     }
 
     private void onLink(View view) {
