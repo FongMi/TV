@@ -82,6 +82,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private boolean mLock;
     private boolean mStop;
     private int mCurrent;
+    private int mRotate;
     private Runnable mR1;
     private Runnable mR2;
 
@@ -535,7 +536,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void enterFullscreen() {
-        mBinding.progressLayout.setVisibility(View.GONE);
+        mRotate = getRequestedOrientation();
         mBinding.control.full.setImageResource(R.drawable.ic_full_off);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE);
         getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
@@ -545,11 +546,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void exitFullscreen() {
+        setRequestedOrientation(mRotate);
         mBinding.control.full.setImageResource(R.drawable.ic_full_on);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
         getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         mBinding.episode.scrollToPosition(mEpisodeAdapter.getPosition());
-        mBinding.progressLayout.setVisibility(View.VISIBLE);
         mBinding.video.setLayoutParams(mFrameParams);
         setFullscreen(false);
         hideAll();
