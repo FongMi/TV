@@ -12,7 +12,6 @@ import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewpager.widget.ViewPager;
 
-import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Class;
@@ -42,19 +41,18 @@ import java.util.List;
 public class VodFragment extends BaseFragment implements SiteCallback, FilterCallback, TypeAdapter.OnClickListener {
 
     private FragmentVodBinding mBinding;
-    private TypeAdapter mTypeAdapter;
-    private PageAdapter mPageAdapter;
+    private TypeAdapter mAdapter;
 
     public static VodFragment newInstance() {
         return new VodFragment();
     }
 
     private HomeFragment getHomeFragment() {
-        return (HomeFragment) mPageAdapter.instantiateItem(mBinding.pager, 0);
+        return (HomeFragment) mBinding.pager.getAdapter().instantiateItem(mBinding.pager, 0);
     }
 
     private TypeFragment getTypeFragment() {
-        return (TypeFragment) mPageAdapter.instantiateItem(mBinding.pager, mBinding.pager.getCurrentItem());
+        return (TypeFragment) mBinding.pager.getAdapter().instantiateItem(mBinding.pager, mBinding.pager.getCurrentItem());
     }
 
     private Site getSite() {
@@ -81,9 +79,9 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         mBinding.pager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
-                setFabVisible(mTypeAdapter.get(mBinding.pager.getCurrentItem()).getFilters().size() > 0);
+                setFabVisible(mAdapter.get(mBinding.pager.getCurrentItem()).getFilters().size() > 0);
                 mBinding.type.smoothScrollToPosition(position);
-                mTypeAdapter.setActivated(position);
+                mAdapter.setActivated(position);
             }
         });
     }
@@ -91,7 +89,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     private void setRecyclerView() {
         mBinding.type.setHasFixedSize(true);
         mBinding.type.setItemAnimator(null);
-        mBinding.type.setAdapter(mTypeAdapter = new TypeAdapter(this));
+        mBinding.type.setAdapter(mAdapter = new TypeAdapter(this));
     }
 
     private void setFabVisible(boolean filter) {
@@ -115,7 +113,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
 
     private void onFilter(View view) {
         for (Fragment fragment : getChildFragmentManager().getFragments()) if (fragment instanceof BottomSheetDialogFragment) return;
-        FilterDialog.create(this).filter(mTypeAdapter.get(mBinding.pager.getCurrentItem()).getFilters()).show(getChildFragmentManager(), null);
+        FilterDialog.create(this).filter(mAdapter.get(mBinding.pager.getCurrentItem()).getFilters()).show(getChildFragmentManager(), null);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -124,8 +122,8 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     }
 
     private void homeContent() {
-        mTypeAdapter.clear();
-        mBinding.pager.setAdapter(mPageAdapter = new PageAdapter(getChildFragmentManager()));
+        mAdapter.clear();
+        mBinding.pager.setAdapter(new PageAdapter(getChildFragmentManager()));
         mBinding.title.setText(getSite().getName().isEmpty() ? getString(R.string.app_name) : getSite().getName());
     }
 
@@ -143,8 +141,8 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
 
     @Override
     public void onItemClick(int position, Class item) {
-        mTypeAdapter.setActivated(position);
         mBinding.pager.setCurrentItem(position);
+        mAdapter.setActivated(position);
     }
 
     @Override
@@ -161,10 +159,14 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     }
 
     public void setAdapter(Result result) {
-        result.setTypes(getTypes(result));
-        mTypeAdapter.addAll(result.getTypes());
-        for (Class item : mTypeAdapter.getTypes()) if (result.getFilters().containsKey(item.getTypeId())) item.setFilters(result.getFilters().get(item.getTypeId()));
-        App.post(() -> mPageAdapter.notifyDataSetChanged());
+        try {
+            result.setTypes(getTypes(result));
+            mAdapter.addAll(result.getTypes());
+            for (Class item : mAdapter.getTypes()) if (result.getFilters().containsKey(item.getTypeId())) item.setFilters(result.getFilters().get(item.getTypeId()));
+            mBinding.pager.getAdapter().notifyDataSetChanged();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean canBack() {
@@ -191,14 +193,14 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         @NonNull
         @Override
         public Fragment getItem(int position) {
-            Class type = mTypeAdapter.get(position);
+            Class type = mAdapter.get(position);
             if (position == 0) return HomeFragment.newInstance();
             return TypeFragment.newInstance(type.getTypeId(), type.getTypeFlag().equals("1"));
         }
 
         @Override
         public int getCount() {
-            return mTypeAdapter.getItemCount();
+            return mAdapter.getItemCount();
         }
 
         @Override
