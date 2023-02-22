@@ -28,7 +28,7 @@ import com.fongmi.android.tv.ui.adapter.TypeAdapter;
 import com.fongmi.android.tv.ui.custom.dialog.FilterDialog;
 import com.fongmi.android.tv.ui.custom.dialog.LinkDialog;
 import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
-import com.fongmi.android.tv.ui.fragment.child.SiteFragment;
+import com.fongmi.android.tv.ui.fragment.child.HomeFragment;
 import com.fongmi.android.tv.ui.fragment.child.TypeFragment;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
@@ -176,8 +176,8 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         if (!getSite().getKey().isEmpty()) mViewModel.homeContent();
     }
 
-    private SiteFragment getSiteFragment() {
-        return (SiteFragment) mPageAdapter.instantiateItem(mBinding.pager, 0);
+    private HomeFragment getSiteFragment() {
+        return (HomeFragment) mPageAdapter.instantiateItem(mBinding.pager, 0);
     }
 
     private TypeFragment getTypeFragment() {
@@ -209,7 +209,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         @Override
         public Fragment getItem(int position) {
             Class type = mTypeAdapter.get(position);
-            if (position == 0) return SiteFragment.newInstance();
+            if (position == 0) return HomeFragment.newInstance();
             return TypeFragment.newInstance(type.getTypeId(), type.getTypeFlag().equals("1"));
         }
 
