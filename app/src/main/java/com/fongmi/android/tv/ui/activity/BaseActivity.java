@@ -1,12 +1,10 @@
 package com.fongmi.android.tv.ui.activity;
 
 import android.app.Activity;
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewbinding.ViewBinding;
 
@@ -24,18 +22,12 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
 
-import me.jessyan.autosize.AutoSizeCompat;
-import me.jessyan.autosize.internal.CustomAdapt;
-
-public abstract class BaseActivity extends AppCompatActivity implements CustomAdapt {
+public abstract class BaseActivity extends AppCompatActivity {
 
     protected abstract ViewBinding getBinding();
 
-    private boolean land;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        land = ResUtil.isLand(this);
         super.onCreate(savedInstanceState);
         setContentView(getBinding().getRoot());
         EventBus.getDefault().register(this);
@@ -64,13 +56,9 @@ public abstract class BaseActivity extends AppCompatActivity implements CustomAd
         }
     }
 
-    private Resources hackResources(Resources resources) {
-        try {
-            AutoSizeCompat.autoConvertDensityOfCustomAdapt(resources, this);
-            return resources;
-        } catch (Exception ignored) {
-            return resources;
-        }
+    @Override
+    public Resources getResources() {
+        return Product.hackResources(super.getResources());
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -81,29 +69,8 @@ public abstract class BaseActivity extends AppCompatActivity implements CustomAd
     }
 
     @Override
-    public Resources getResources() {
-        return hackResources(super.getResources());
-    }
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
-    }
-
-    @Override
-    public void onConfigurationChanged(@NonNull Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        land = ResUtil.isLand(this);
-    }
-
-    @Override
-    public boolean isBaseOnWidth() {
-        return true;
-    }
-
-    @Override
-    public float getSizeInDp() {
-        return Product.getSizeInDp(land);
     }
 }
