@@ -6,8 +6,10 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Class;
 import com.fongmi.android.tv.databinding.AdapterTypeBinding;
+import com.fongmi.android.tv.utils.ResUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +21,7 @@ public class TypeAdapter extends RecyclerView.Adapter<TypeAdapter.ViewHolder> {
 
     public TypeAdapter(OnClickListener listener) {
         this.mListener = listener;
-        this.mItems = new ArrayList<>(List.of(home()));
+        this.mItems = new ArrayList<>();
     }
 
     public interface OnClickListener {
@@ -39,7 +41,7 @@ public class TypeAdapter extends RecyclerView.Adapter<TypeAdapter.ViewHolder> {
 
     private Class home() {
         Class type = new Class();
-        type.setTypeName("首頁");
+        type.setTypeName(ResUtil.getString(R.string.home));
         type.setTypeId("home");
         type.setActivated(true);
         return type;

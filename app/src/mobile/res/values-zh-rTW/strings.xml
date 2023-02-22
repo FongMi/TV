@@ -1,16 +1,20 @@
-<resources>
+<resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
 
     <!-- Nav -->
-    <string name="nav_home">首頁</string>
     <string name="nav_vod">點播</string>
     <string name="nav_setting">設定</string>
 
     <!-- Home -->
+    <string name="home">首頁</string>
     <string name="home_history">最近觀看</string>
     <string name="home_recommend">更新推薦</string>
+    <string name="home_open_url">是否開啟「<xliff:g name="name">%s</xliff:g>」？</string>
 
-    <!-- VOD -->
-    <string name="vod_content_expand">展開</string>
-    <string name="vod_content_collapse">收起</string>
+    <!-- Detail -->
+    <string name="detail_flag">線路</string>
+    <string name="detail_episode">選集</string>
+    <string name="detail_content">簡介</string>
+    <string name="detail_content_expand">展開</string>
+    <string name="detail_content_collapse">收起</string>
 
 </resources>
