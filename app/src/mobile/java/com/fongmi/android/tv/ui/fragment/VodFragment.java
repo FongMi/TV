@@ -30,6 +30,7 @@ import com.fongmi.android.tv.ui.custom.dialog.LinkDialog;
 import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
 import com.fongmi.android.tv.ui.fragment.child.HomeFragment;
 import com.fongmi.android.tv.ui.fragment.child.TypeFragment;
+import com.fongmi.android.tv.utils.Utils;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import org.greenrobot.eventbus.EventBus;
@@ -48,6 +49,14 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
 
     public static VodFragment newInstance() {
         return new VodFragment();
+    }
+
+    private HomeFragment getHomeFragment() {
+        return (HomeFragment) mPageAdapter.instantiateItem(mBinding.pager, 0);
+    }
+
+    private TypeFragment getTypeFragment() {
+        return (TypeFragment) mPageAdapter.instantiateItem(mBinding.pager, mBinding.pager.getCurrentItem());
     }
 
     private Site getSite() {
@@ -105,7 +114,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         Boolean filter = getSite().isFilterable() ? false : null;
         for (Class item : mTypeAdapter.getTypes()) if (result.getFilters().containsKey(item.getTypeId())) item.setFilter(filter);
         for (Class item : mTypeAdapter.getTypes()) if (result.getFilters().containsKey(item.getTypeId())) item.setFilters(result.getFilters().get(item.getTypeId()));
-        getSiteFragment().showContent(result);
+        getHomeFragment().showContent(result);
         mPageAdapter.notifyDataSetChanged();
     }
 
@@ -117,8 +126,8 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
 
     private void setFabVisible(boolean filter) {
         if (filter) {
-            mBinding.link.hide();
             mBinding.filter.show();
+            mBinding.link.hide();
         } else {
             mBinding.filter.hide();
             mBinding.link.show();
@@ -129,14 +138,14 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         SiteDialog.create(this).filter(true).show();
     }
 
-    private void onFilter(View view) {
-        for (Fragment fragment : getChildFragmentManager().getFragments()) if (fragment instanceof BottomSheetDialogFragment) return;
-        FilterDialog.create(this).filter(mTypeAdapter.get(mBinding.pager.getCurrentItem()).getFilters()).show(getChildFragmentManager(), null);
-    }
-
     private void onLink(View view) {
         if (ApiConfig.hasPush()) LinkDialog.create(this).show();
         else mBinding.link.hide();
+    }
+
+    private void onFilter(View view) {
+        for (Fragment fragment : getChildFragmentManager().getFragments()) if (fragment instanceof BottomSheetDialogFragment) return;
+        FilterDialog.create(this).filter(mTypeAdapter.get(mBinding.pager.getCurrentItem()).getFilters()).show(getChildFragmentManager(), null);
     }
 
     @Override
@@ -160,7 +169,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     public void onRefreshEvent(RefreshEvent event) {
         switch (event.getType()) {
             case HISTORY:
-                getSiteFragment().getHistory();
+                getHomeFragment().getHistory();
                 break;
             case VIDEO:
                 homeContent();
@@ -176,17 +185,17 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         if (!getSite().getKey().isEmpty()) mViewModel.homeContent();
     }
 
-    private HomeFragment getSiteFragment() {
-        return (HomeFragment) mPageAdapter.instantiateItem(mBinding.pager, 0);
+    public void toggleLink(int dy) {
+        Utils.toggleFab(dy, mBinding.link);
     }
 
-    private TypeFragment getTypeFragment() {
-        return (TypeFragment) mPageAdapter.instantiateItem(mBinding.pager, mBinding.pager.getCurrentItem());
+    public void toggleFilter(int dy) {
+        Utils.toggleFab(dy, mBinding.filter);
     }
 
     public boolean canBack() {
         try {
-            if (mBinding.pager.getCurrentItem() == 0) return getSiteFragment().canBack();
+            if (mBinding.pager.getCurrentItem() == 0) return getHomeFragment().canBack();
             else return getTypeFragment().canBack();
         } catch (Exception e) {
             return true;
