@@ -531,7 +531,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void enterFullscreen() {
         setLand(ResUtil.isLand(this));
         mBinding.control.full.setImageResource(R.drawable.ic_full_off);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
         getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
         setFullscreen(true);
@@ -847,6 +847,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         if (isFullscreen()) Utils.hideSystemUI(this);
+        if (ResUtil.isLand(this)) enterFullscreen();
     }
 
     @Override
