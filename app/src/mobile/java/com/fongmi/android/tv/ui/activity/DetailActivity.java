@@ -188,7 +188,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mPlayers = new Players().init();
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
-        mR3 = this::setSensor;
+        mR3 = this::setRotate;
         checkOrientation();
         setRecyclerView();
         setVideoView();
@@ -414,7 +414,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         setR1Callback();
         setLock(!isLock());
         mBinding.control.lock.setImageResource(isLock() ? R.drawable.ic_lock_on : R.drawable.ic_lock_off);
-        setRequestedOrientation(isLock() ? (ResUtil.isLand(this) ? ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT) : ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+        setRequestedOrientation(isLock() ? (ResUtil.isLand(this) ? ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT) : ActivityInfo.SCREEN_ORIENTATION_FULL_USER);
     }
 
     private void onFull() {
@@ -545,7 +545,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void enterFullscreen() {
         mBinding.control.full.setImageResource(R.drawable.ic_full_off);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE);
         getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
         setFullscreen(true);
@@ -554,7 +554,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void exitFullscreen() {
         mBinding.control.full.setImageResource(R.drawable.ic_full_on);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
         getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         mBinding.video.setLayoutParams(mFrameParams);
         App.post(mR3, 2000);
@@ -621,8 +621,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         App.post(mR2, Constant.INTERVAL_TRAFFIC);
     }
 
-    private void setSensor() {
-        if (!isLock()) setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+    private void setRotate() {
+        if (!isLock()) setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_USER);
     }
 
     private void setR1Callback() {
