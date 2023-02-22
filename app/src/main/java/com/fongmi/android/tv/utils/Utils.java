@@ -81,6 +81,7 @@ public class Utils {
     }
 
     public static void toggleFab(int dy, FloatingActionButton fab) {
+        if (Math.abs(dy) < 50) return;
         if (dy > 0) Utils.hideFab(fab);
         else Utils.showFab(fab);
     }
