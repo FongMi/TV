@@ -9,7 +9,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewpager.widget.ViewPager;
 
@@ -22,7 +21,6 @@ import com.fongmi.android.tv.databinding.FragmentVodBinding;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.impl.FilterCallback;
 import com.fongmi.android.tv.impl.SiteCallback;
-import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.ui.activity.BaseFragment;
 import com.fongmi.android.tv.ui.adapter.TypeAdapter;
 import com.fongmi.android.tv.ui.custom.dialog.FilterDialog;
@@ -43,7 +41,6 @@ import java.util.List;
 public class VodFragment extends BaseFragment implements SiteCallback, FilterCallback, TypeAdapter.OnClickListener {
 
     private FragmentVodBinding mBinding;
-    private SiteViewModel mViewModel;
     private TypeAdapter mTypeAdapter;
     private PageAdapter mPageAdapter;
 
@@ -71,8 +68,8 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     @Override
     protected void initView() {
         EventBus.getDefault().register(this);
+        mBinding.pager.setOffscreenPageLimit(-1);
         setRecyclerView();
-        setViewModel();
     }
 
     @Override
@@ -94,26 +91,6 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         mBinding.type.setHasFixedSize(true);
         mBinding.type.setItemAnimator(null);
         mBinding.type.setAdapter(mTypeAdapter = new TypeAdapter(this));
-        mBinding.pager.setOffscreenPageLimit(-1);
-    }
-
-    private void setViewModel() {
-        mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
-        mViewModel.result.observe(getViewLifecycleOwner(), this::setAdapter);
-    }
-
-    private List<Class> getTypes(Result result) {
-        List<Class> types = new ArrayList<>();
-        for (String cate : getSite().getCategories()) for (Class type : result.getTypes()) if (cate.equals(type.getTypeName())) types.add(type);
-        return types;
-    }
-
-    private void setAdapter(Result result) {
-        result.setTypes(getTypes(result));
-        mTypeAdapter.addAll(result.getTypes());
-        for (Class item : mTypeAdapter.getTypes()) if (result.getFilters().containsKey(item.getTypeId())) item.setFilters(result.getFilters().get(item.getTypeId()));
-        getHomeFragment().showContent(result);
-        mPageAdapter.notifyDataSetChanged();
     }
 
     private void setFabVisible(boolean filter) {
@@ -140,6 +117,37 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         FilterDialog.create(this).filter(mTypeAdapter.get(mBinding.pager.getCurrentItem()).getFilters()).show(getChildFragmentManager(), null);
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onRefreshEvent(RefreshEvent event) {
+        switch (event.getType()) {
+            case HISTORY:
+                getHomeFragment().getHistory();
+                break;
+            case VIDEO:
+                homeContent();
+                break;
+        }
+    }
+
+    private void homeContent() {
+        mTypeAdapter.clear();
+        mBinding.pager.setAdapter(mPageAdapter = new PageAdapter(getChildFragmentManager()));
+        mBinding.title.setText(getSite().getName().isEmpty() ? getString(R.string.app_name) : getSite().getName());
+    }
+
+    private List<Class> getTypes(Result result) {
+        List<Class> types = new ArrayList<>();
+        for (String cate : getSite().getCategories()) for (Class type : result.getTypes()) if (cate.equals(type.getTypeName())) types.add(type);
+        return types;
+    }
+
+    public void setAdapter(Result result) {
+        result.setTypes(getTypes(result));
+        mTypeAdapter.addAll(result.getTypes());
+        for (Class item : mTypeAdapter.getTypes()) if (result.getFilters().containsKey(item.getTypeId())) item.setFilters(result.getFilters().get(item.getTypeId()));
+        mPageAdapter.notifyDataSetChanged();
+    }
+
     @Override
     public void setSite(Site item) {
         ApiConfig.get().setHome(item);
@@ -155,26 +163,6 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     @Override
     public void setFilter(String key, String value) {
         getTypeFragment().setFilter(key, value);
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onRefreshEvent(RefreshEvent event) {
-        switch (event.getType()) {
-            case HISTORY:
-                getHomeFragment().getHistory();
-                break;
-            case VIDEO:
-                homeContent();
-                break;
-        }
-    }
-
-    private void homeContent() {
-        mTypeAdapter.clear();
-        String home = getSite().getName();
-        mBinding.title.setText(home.isEmpty() ? getString(R.string.app_name) : home);
-        mBinding.pager.setAdapter(mPageAdapter = new PageAdapter(getChildFragmentManager()));
-        if (!getSite().getKey().isEmpty()) mViewModel.homeContent();
     }
 
     public void toggleLink(int dy) {
