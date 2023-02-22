@@ -182,6 +182,14 @@
             android:layout_weight="1" />
 
         <ImageView
+            android:id="@+id/rotate"
+            android:layout_width="24dp"
+            android:layout_marginEnd="6dp"
+            android:layout_height="24dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_lock_rotate" />
+
+        <ImageView
             android:id="@+id/full"
             android:layout_width="24dp"
             android:layout_height="24dp"
