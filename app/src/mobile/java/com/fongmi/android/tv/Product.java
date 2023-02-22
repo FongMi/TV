@@ -8,7 +8,12 @@ import com.fongmi.android.tv.utils.ResUtil;
 public class Product {
 
     public static Resources hackResources(Resources resources) {
-        return resources;
+        try {
+            //AutoSizeCompat.autoConvertDensityOfGlobal(resources);
+            return resources;
+        } catch (Exception ignored) {
+            return resources;
+        }
     }
 
     public static int getColumn(Activity activity) {
