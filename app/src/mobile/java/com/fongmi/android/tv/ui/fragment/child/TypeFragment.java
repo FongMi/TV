@@ -125,12 +125,6 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         getVideo(typeId, "1");
     }
 
-    public boolean canBack() {
-        if (mTypeIds.size() == 0) return true;
-        refresh(2);
-        return false;
-    }
-
     @Override
     public void onLoadMore(String page) {
         if (isFolder()) return;
@@ -161,5 +155,12 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mGridLayoutManager.setSpanCount(Product.getColumn(getActivity()));
+    }
+
+    @Override
+    public boolean canBack() {
+        if (mTypeIds.size() == 0) return true;
+        refresh(2);
+        return false;
     }
 }
