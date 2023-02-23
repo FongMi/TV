@@ -129,6 +129,14 @@ public class Utils {
         return Sniffer.RULE.matcher(url).find();
     }
 
+    public static boolean isAutoRotate() {
+        return Settings.System.getInt(App.get().getContentResolver(), Settings.System.ACCELEROMETER_ROTATION, 0) == 1;
+    }
+
+    public static boolean hasPermission(FragmentActivity activity) {
+        return PermissionX.isGranted(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+    }
+
     public static String checkProxy(String url) {
         if (url.startsWith("proxy://")) return url.replace("proxy://", Server.get().getAddress("proxy?"));
         return url;
@@ -214,9 +222,5 @@ public class Utils {
         if (imm != null && windowToken != null) {
             imm.hideSoftInputFromWindow(windowToken, 0);
         }
-    }
-
-    public static boolean hasPermission(FragmentActivity activity) {
-        return PermissionX.isGranted(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
     }
 }
