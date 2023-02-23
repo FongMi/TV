@@ -114,7 +114,12 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefreshEvent(RefreshEvent event) {
-        if (event.getType() == RefreshEvent.Type.VIDEO) homeContent();
+        switch (event.getType()) {
+            case VIDEO:
+            case SIZE:
+                homeContent();
+                break;
+        }
     }
 
     private void homeContent() {
