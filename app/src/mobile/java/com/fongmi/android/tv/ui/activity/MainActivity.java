@@ -1,6 +1,7 @@
 package com.fongmi.android.tv.ui.activity;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
@@ -17,26 +18,24 @@ import com.fongmi.android.tv.databinding.ActivityMainBinding;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.server.Server;
+import com.fongmi.android.tv.ui.custom.FragmentStateManager;
 import com.fongmi.android.tv.ui.fragment.SettingFragment;
 import com.fongmi.android.tv.ui.fragment.VodFragment;
 import com.fongmi.android.tv.utils.Notify;
 import com.google.android.material.navigation.NavigationBarView;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class MainActivity extends BaseActivity implements NavigationBarView.OnItemSelectedListener {
 
+    private FragmentStateManager mManager;
     private ActivityMainBinding mBinding;
-    private List<Fragment> mFragments;
     private boolean confirm;
 
     private VodFragment getVodFragment() {
-        return (VodFragment) getSupportFragmentManager().findFragmentByTag("0");
+        return (VodFragment) mManager.getFragment(0);
     }
 
     private SettingFragment getSettingFragment() {
-        return (SettingFragment) getSupportFragmentManager().findFragmentByTag("1");
+        return (SettingFragment) mManager.getFragment(1);
     }
 
     @Override
@@ -51,26 +50,31 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
     }
 
     @Override
-    protected void initView() {
+    protected void initView(Bundle savedInstanceState) {
+        initFragment(savedInstanceState);
         Notify.progress(this);
         Updater.get().start();
         Server.get().start();
-        initFragment();
         initConfig();
     }
 
     @Override
     protected void initEvent() {
         mBinding.navigation.setOnItemSelectedListener(this);
-        mBinding.navigation.setSelectedItemId(R.id.vod);
     }
 
-    private void initFragment() {
-        if (mFragments != null) return;
-        mFragments = new ArrayList<>();
-        mFragments.add(VodFragment.newInstance());
-        mFragments.add(SettingFragment.newInstance());
-        for (int i = 0; i < mFragments.size(); i++) getSupportFragmentManager().beginTransaction().add(R.id.container, mFragments.get(i), String.valueOf(i)).hide(mFragments.get(i)).commitNowAllowingStateLoss();
+    private void initFragment(Bundle savedInstanceState) {
+        mManager = new FragmentStateManager(mBinding.container, getSupportFragmentManager()) {
+            @Override
+            public Fragment getItem(int position) {
+                if (position == 0) {
+                    return VodFragment.newInstance();
+                } else {
+                    return SettingFragment.newInstance();
+                }
+            }
+        };
+        if (savedInstanceState == null) mManager.change(0);
     }
 
     private void initConfig() {
@@ -111,10 +115,10 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.vod:
-                getSupportFragmentManager().beginTransaction().hide(mFragments.get(1)).show(mFragments.get(0)).commitNowAllowingStateLoss();
+                mManager.change(0);
                 return true;
             case R.id.setting:
-                getSupportFragmentManager().beginTransaction().hide(mFragments.get(0)).show(mFragments.get(1)).commitNowAllowingStateLoss();
+                mManager.change(1);
                 return true;
             default:
                 return false;
