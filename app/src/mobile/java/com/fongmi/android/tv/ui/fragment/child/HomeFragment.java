@@ -99,12 +99,6 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
         mHistoryAdapter.notifyItemRangeChanged(0, mHistoryAdapter.getItemCount());
     }
 
-    public boolean canBack() {
-        if (!mHistoryAdapter.isDelete()) return true;
-        setHistoryDelete(false);
-        return false;
-    }
-
     @Override
     public void onItemClick(Vod item) {
         if (item.shouldSearch()) onLongClick(item);
@@ -146,5 +140,12 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
     public void onResume() {
         super.onResume();
         getHistory();
+    }
+
+    @Override
+    public boolean canBack() {
+        if (!mHistoryAdapter.isDelete()) return true;
+        setHistoryDelete(false);
+        return false;
     }
 }
