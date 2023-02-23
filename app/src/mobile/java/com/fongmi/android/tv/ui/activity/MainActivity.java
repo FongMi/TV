@@ -63,6 +63,11 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
         mBinding.navigation.setOnItemSelectedListener(this);
     }
 
+    private void checkAction(Intent intent) {
+        boolean push = ApiConfig.hasPush() && intent.getAction() != null && intent.getAction().equals(Intent.ACTION_SEND) && intent.getType().equals("text/plain");
+        if (push) DetailActivity.push(this, intent.getStringExtra(Intent.EXTRA_TEXT));
+    }
+
     private void initFragment(Bundle savedInstanceState) {
         mManager = new FragmentStateManager(mBinding.container, getSupportFragmentManager()) {
             @Override
@@ -98,11 +103,6 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
                 Notify.dismiss();
             }
         };
-    }
-
-    private void checkAction(Intent intent) {
-        boolean push = ApiConfig.hasPush() && intent.getAction() != null && intent.getAction().equals(Intent.ACTION_SEND) && intent.getType().equals("text/plain");
-        if (push) DetailActivity.push(this, intent.getStringExtra(Intent.EXTRA_TEXT));
     }
 
     private void setConfirm() {

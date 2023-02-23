@@ -3,12 +3,12 @@
 
     <item
         android:id="@+id/vod"
-        android:icon="@drawable/ic_vod"
+        android:icon="@drawable/ic_nav_vod"
         android:title="@string/nav_vod" />
 
     <item
         android:id="@+id/setting"
-        android:icon="@drawable/ic_setting"
+        android:icon="@drawable/ic_nav_setting"
         android:title="@string/nav_setting" />
 
 </menu>
