@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 import androidx.core.widget.NestedScrollView;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.App;
@@ -28,8 +29,7 @@ import com.fongmi.android.tv.ui.fragment.VodFragment;
 
 public class HomeFragment extends BaseFragment implements VodAdapter.OnClickListener, HistoryAdapter.OnClickListener {
 
-    private GridLayoutManager mRecommendManager;
-    private GridLayoutManager mHistoryManager;
+    private GridLayoutManager mGridLayoutManager;
     private HistoryAdapter mHistoryAdapter;
     private FragmentHomeBinding mBinding;
     private SiteViewModel mViewModel;
@@ -68,10 +68,10 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
     private void setRecyclerView() {
         mBinding.history.setHasFixedSize(true);
         mBinding.history.getItemAnimator().setChangeDuration(0);
-        mBinding.history.setLayoutManager(mHistoryManager = new GridLayoutManager(getContext(), Product.getColumn(getActivity())));
+        mBinding.history.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         mBinding.history.setAdapter(mHistoryAdapter = new HistoryAdapter(this));
         mBinding.recommend.setHasFixedSize(true);
-        mBinding.recommend.setLayoutManager(mRecommendManager = new GridLayoutManager(getContext(), Product.getColumn(getActivity())));
+        mBinding.recommend.setLayoutManager(mGridLayoutManager = new GridLayoutManager(getContext(), Product.getColumn()));
         mBinding.recommend.setAdapter(mVodAdapter = new VodAdapter(this));
     }
 
@@ -132,8 +132,7 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        mHistoryManager.setSpanCount(Product.getColumn(getActivity()));
-        mRecommendManager.setSpanCount(Product.getColumn(getActivity()));
+        mGridLayoutManager.setSpanCount(Product.getColumn());
     }
 
     @Override
