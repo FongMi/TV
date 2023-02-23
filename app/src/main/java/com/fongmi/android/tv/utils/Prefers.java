@@ -163,6 +163,14 @@ public class Prefers {
         put("across", across);
     }
 
+    public static boolean isRotate() {
+        return getBoolean("rotate", true);
+    }
+
+    public static void putRotate(boolean rotate) {
+        put("rotate", rotate);
+    }
+
     public static boolean getUpdate() {
         return getBoolean("update", true);
     }
@@ -173,9 +181,5 @@ public class Prefers {
 
     public static float getThumbnail() {
         return 0.3f * getQuality() + 0.4f;
-    }
-
-    public static int getColumn() {
-        return Math.abs(getSize() - 7);
     }
 }

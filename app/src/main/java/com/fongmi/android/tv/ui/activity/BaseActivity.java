@@ -56,6 +56,11 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public Resources getResources() {
+        return Product.hackResources(super.getResources());
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefreshEvent(RefreshEvent event) {
         if (event.getType() != RefreshEvent.Type.WALL) return;
@@ -64,10 +69,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     @Override
-    public Resources getResources() {
-        return Product.hackResources(super.getResources());
-    }
-
     protected void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
