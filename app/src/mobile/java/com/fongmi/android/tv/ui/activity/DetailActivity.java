@@ -79,6 +79,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private boolean initAuto;
     private boolean autoMode;
     private boolean useParse;
+    private boolean rotate;
     private boolean stop;
     private boolean lock;
     private Runnable mR1;
@@ -158,19 +159,19 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         return view.getVisibility() == View.GONE;
     }
 
-    private boolean isReplay() {
-        return Prefers.getReset() == 1;
-    }
-
     private boolean isFromSearch() {
         return getCallingActivity() != null && getCallingActivity().getShortClassName().contains(SearchActivity.class.getSimpleName());
     }
 
-    private int getOrientation() {
+    private int getLockOrient() {
         if (isLock()) {
             return ResUtil.isLand(this) ? ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
-        } else {
+        } else if (isRotate()) {
+            return ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT;
+        } else if (Utils.isAutoRotate()) {
             return ActivityInfo.SCREEN_ORIENTATION_FULL_USER;
+        } else {
+            return ResUtil.isLand(this) ? ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT;
         }
     }
 
@@ -211,12 +212,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         //mBinding.control.video.setOnClickListener(this::onTrack);
         mBinding.control.full.setOnClickListener(view -> onFull());
         mBinding.control.lock.setOnClickListener(view -> onLock());
-        mBinding.control.play.setOnClickListener(view -> onPlay());
+        mBinding.control.play.setOnClickListener(view -> checkPlay());
         mBinding.control.next.setOnClickListener(view -> checkNext());
         mBinding.control.prev.setOnClickListener(view -> checkPrev());
         mBinding.control.scale.setOnClickListener(view -> onScale());
         mBinding.control.speed.setOnClickListener(view -> onSpeed());
-        //mBinding.control.reset.setOnClickListener(view -> onReset());
         mBinding.control.rotate.setOnClickListener(view -> onRotate());
         mBinding.control.player.setOnClickListener(view -> onPlayer());
         mBinding.control.decode.setOnClickListener(view -> onDecode());
@@ -224,7 +224,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.opening.setOnClickListener(view -> onOpening());
         mBinding.control.setting.setOnClickListener(view -> onSetting());
         mBinding.control.speed.setOnLongClickListener(view -> onSpeedLong());
-        //mBinding.control.reset.setOnLongClickListener(view -> onResetToggle());
         mBinding.control.ending.setOnLongClickListener(view -> onEndingReset());
         mBinding.control.opening.setOnLongClickListener(view -> onOpeningReset());
         mBinding.video.setOnTouchListener((view, event) -> mKeyDown.onTouchEvent(event));
@@ -252,7 +251,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.player.setText(mPlayers.getPlayerText());
         getExo().setVisibility(mPlayers.isExo() ? View.VISIBLE : View.GONE);
         getIjk().setVisibility(mPlayers.isIjk() ? View.VISIBLE : View.GONE);
-        //mBinding.control.reset.setText(ResUtil.getStringArray(R.array.select_reset)[Prefers.getReset()]);
     }
 
     private void setDecodeView() {
@@ -421,9 +419,17 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void onLock() {
         setLock(!isLock());
-        setRequestedOrientation(getOrientation());
+        setRequestedOrientation(getLockOrient());
         mBinding.control.lock.setImageResource(isLock() ? R.drawable.ic_lock_on : R.drawable.ic_lock_off);
         showControl();
+    }
+
+    private void checkPlay() {
+        setR1Callback();
+        boolean playing = mPlayers.isPlaying();
+        mBinding.control.play.setImageResource(playing ? R.drawable.ic_control_play : R.drawable.ic_control_pause);
+        if (playing) onPause(false);
+        else onPlay();
     }
 
     private void checkNext() {
@@ -478,28 +484,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         getPlayer(getFlag(), getEpisode(), false);
     }
 
-    private void onReset() {
-        setR1Callback();
-        Clock.get().setCallback(null);
-        if (mFlagAdapter.getItemCount() == 0) return;
-        if (mEpisodeAdapter.getItemCount() == 0) return;
-        getPlayer(getFlag(), getEpisode(), isReplay());
-    }
-
-    private boolean onResetToggle() {
-        Prefers.putReset(Math.abs(Prefers.getReset() - 1));
-        //mBinding.control.reset.setText(ResUtil.getStringArray(R.array.select_reset)[Prefers.getReset()]);
-        setR1Callback();
-        return true;
-    }
-
     private void onRotate() {
-        if (ResUtil.isLand(this)) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
-        } else {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
-        }
         setR1Callback();
+        setRotate(!isRotate());
+        setRequestedOrientation(ResUtil.isLand(this) ? ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
     }
 
     private void onPlayer() {
@@ -567,6 +555,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.full.setImageResource(R.drawable.ic_full_off);
         App.post(mR3, 2000);
         setFullscreen(true);
+        setRotate(false);
         hideControl();
     }
 
@@ -578,6 +567,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.video.setLayoutParams(mFrameParams);
         App.post(mR3, 2000);
         setFullscreen(false);
+        setRotate(false);
         hideControl();
     }
 
@@ -604,12 +594,13 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void showControl() {
-        mBinding.control.top.setVisibility(isLock() ? View.GONE : View.VISIBLE);
-        mBinding.control.right.setVisibility(isLock() ? View.GONE : View.VISIBLE);
-        mBinding.control.bottom.setVisibility(isLock() ? View.GONE : View.VISIBLE);
+        mBinding.control.play.setImageResource(mPlayers.isPlaying() ? R.drawable.ic_control_pause : R.drawable.ic_control_play);
         mBinding.control.parse.setVisibility(isFullscreen() && isUseParse() ? View.VISIBLE : View.GONE);
         mBinding.control.action.setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
         mBinding.control.rotate.setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
+        mBinding.control.bottom.setVisibility(isLock() ? View.GONE : View.VISIBLE);
+        mBinding.control.right.setVisibility(isLock() ? View.GONE : View.VISIBLE);
+        mBinding.control.top.setVisibility(isLock() ? View.GONE : View.VISIBLE);
         mBinding.control.getRoot().setVisibility(View.VISIBLE);
         setR1Callback();
     }
@@ -625,7 +616,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void setOrient() {
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_USER);
+        if (Utils.isAutoRotate()) setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_USER);
     }
 
     private void setR1Callback() {
@@ -811,6 +802,14 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         this.useParse = useParse;
     }
 
+    public boolean isRotate() {
+        return rotate;
+    }
+
+    public void setRotate(boolean rotate) {
+        this.rotate = rotate;
+    }
+
     public boolean isStop() {
         return stop;
     }
@@ -866,7 +865,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         if (Utils.hasPIP() && isInPictureInPictureMode()) return;
         if (isFullscreen()) Utils.hideSystemUI(this);
         if (ResUtil.isLand(this)) enterFullscreen();
-        if (ResUtil.isPort(this)) exitFullscreen();
+        if (ResUtil.isPort(this) && !isRotate()) exitFullscreen();
     }
 
     @Override
