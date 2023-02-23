@@ -11,7 +11,6 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
         android:text="@string/app_name"
         android:textColor="@color/white"
         android:textSize="20sp"
@@ -49,9 +48,19 @@
         android:layout_margin="16dp"
         android:visibility="gone"
         app:backgroundTint="@color/blue_500"
-        app:layout_behavior=".ui.custom.CustomFabBehavior"
-        app:srcCompat="@drawable/ic_type_filter"
+        app:srcCompat="@drawable/ic_filter"
         app:tint="@color/white"
         tools:visibility="visible" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/link"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="16dp"
+        app:backgroundTint="@color/blue_500"
+        app:srcCompat="@drawable/ic_link"
+        app:tint="@color/white" />
 
 </RelativeLayout>

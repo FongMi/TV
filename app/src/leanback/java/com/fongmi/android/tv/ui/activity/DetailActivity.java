@@ -157,8 +157,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         return 0;
     }
 
-    private int getPlayerType() {
+    private int getPlayer() {
         return mHistory != null && mHistory.getPlayer() != -1 ? mHistory.getPlayer() : getSite().getPlayerType() != -1 ? getSite().getPlayerType() : Prefers.getPlayer();
+    }
+
+    private int getScale() {
+        return mHistory != null && mHistory.getScale() != -1 ? mHistory.getScale() : Prefers.getScale();
     }
 
     private StyledPlayerView getExo() {
@@ -182,7 +186,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private boolean isFromCollect() {
-        return getCallingActivity().getShortClassName().contains(CollectActivity.class.getSimpleName());
+        return getCallingActivity() != null && getCallingActivity().getShortClassName().contains(CollectActivity.class.getSimpleName());
     }
 
     @Override
@@ -292,8 +296,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mViewModel.search.observe(this, result -> setSearch(result.getList()));
         mViewModel.player.observe(this, result -> {
-            boolean useParse = result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag()) || result.getJx() == 1;
-            mBinding.control.parseLayout.setVisibility(mParseAdapter.size() > 0 && useParse ? View.VISIBLE : View.GONE);
+            boolean useParse = ApiConfig.hasParse() && ((result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx() == 1);
+            mBinding.control.parseLayout.setVisibility(useParse ? View.VISIBLE : View.GONE);
             int timeout = getSite().isChangeable() ? Constant.TIMEOUT_PLAY : -1;
             mPlayers.start(result, useParse, timeout);
             resetFocus();
@@ -518,8 +522,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onScale() {
-        int index = mHistory.getScale();
-        if (index == -1) index = Prefers.getScale();
+        int index = getScale();
         String[] array = ResUtil.getStringArray(R.array.select_scale);
         mHistory.setScale(index = index == array.length - 1 ? 0 : ++index);
         setScale(index);
@@ -566,7 +569,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private boolean onOpeningReset() {
         mHistory.setOpening(0);
-        mBinding.control.opening.setText(mPlayers.stringToTime(mHistory.getOpening()));
+        mBinding.control.opening.setText(R.string.play_op);
         return true;
     }
 
@@ -580,7 +583,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private boolean onEndingReset() {
         mHistory.setEnding(0);
-        mBinding.control.ending.setText(mPlayers.stringToTime(mHistory.getEnding()));
+        mBinding.control.ending.setText(R.string.play_ed);
         return true;
     }
 
@@ -695,11 +698,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mHistory = mHistory == null ? createHistory(item) : mHistory;
         setFlagActivated(mHistory.getFlag());
         if (mHistory.isRevSort()) reverseEpisode();
-        setScale(mHistory.getScale() == -1 ? Prefers.getScale() : mHistory.getScale());
-        mBinding.control.opening.setText(mPlayers.stringToTime(mHistory.getOpening()));
-        mBinding.control.ending.setText(mPlayers.stringToTime(mHistory.getEnding()));
+        mBinding.control.opening.setText(mHistory.getOpening() == 0 ? getString(R.string.play_op) : mPlayers.stringToTime(mHistory.getOpening()));
+        mBinding.control.ending.setText(mHistory.getEnding() == 0 ? getString(R.string.play_ed) : mPlayers.stringToTime(mHistory.getEnding()));
         mBinding.control.speed.setText(mPlayers.setSpeed(mHistory.getSpeed()));
-        mPlayers.setPlayer(getPlayerType());
+        mPlayers.setPlayer(getPlayer());
+        setScale(getScale());
         setPlayerView();
         setDecodeView();
     }

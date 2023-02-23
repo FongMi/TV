@@ -36,14 +36,8 @@ public class SiteDialog implements SiteAdapter.OnClickListener {
         return this;
     }
 
-    public SiteDialog filter(boolean filter) {
-        this.adapter.filter(filter);
-        return this;
-    }
-
     public SiteDialog all() {
         this.adapter.search(true);
-        this.adapter.filter(true);
         return this;
     }
 
@@ -80,23 +74,9 @@ public class SiteDialog implements SiteAdapter.OnClickListener {
     }
 
     @Override
-    public void onFilterClick(Site item) {
-        item.setFilterable(!item.isFilterable()).save();
-        adapter.notifyItemRangeChanged(0, adapter.getItemCount());
-    }
-
-    @Override
     public boolean onSearchLongClick(Site item) {
         boolean result = !item.isSearchable();
         for (Site site : ApiConfig.get().getSites()) site.setSearchable(result).save();
-        adapter.notifyItemRangeChanged(0, adapter.getItemCount());
-        return true;
-    }
-
-    @Override
-    public boolean onFilterLongClick(Site item) {
-        boolean result = !item.isFilterable();
-        for (Site site : ApiConfig.get().getSites()) site.setFilterable(result).save();
         adapter.notifyItemRangeChanged(0, adapter.getItemCount());
         return true;
     }

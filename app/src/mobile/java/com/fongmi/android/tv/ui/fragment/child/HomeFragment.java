@@ -6,41 +6,63 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.widget.NestedScrollView;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.viewbinding.ViewBinding;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Product;
+import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Result;
+import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Vod;
-import com.fongmi.android.tv.databinding.FragmentSiteBinding;
+import com.fongmi.android.tv.databinding.FragmentHomeBinding;
+import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.ui.activity.BaseFragment;
 import com.fongmi.android.tv.ui.activity.DetailActivity;
 import com.fongmi.android.tv.ui.adapter.HistoryAdapter;
 import com.fongmi.android.tv.ui.adapter.VodAdapter;
+import com.fongmi.android.tv.ui.fragment.VodFragment;
 
-public class SiteFragment extends BaseFragment implements VodAdapter.OnClickListener, HistoryAdapter.OnClickListener {
+public class HomeFragment extends BaseFragment implements VodAdapter.OnClickListener, HistoryAdapter.OnClickListener {
 
     private GridLayoutManager mRecommendManager;
     private GridLayoutManager mHistoryManager;
     private HistoryAdapter mHistoryAdapter;
-    private FragmentSiteBinding mBinding;
+    private FragmentHomeBinding mBinding;
+    private SiteViewModel mViewModel;
     private VodAdapter mVodAdapter;
 
-    public static SiteFragment newInstance() {
-        return new SiteFragment();
+    public static HomeFragment newInstance() {
+        return new HomeFragment();
+    }
+
+    private VodFragment getParent() {
+        return (VodFragment) getParentFragment();
+    }
+
+    private Site getSite() {
+        return ApiConfig.get().getHome();
     }
 
     @Override
     protected ViewBinding getBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
-        return mBinding = FragmentSiteBinding.inflate(inflater, container, false);
+        return mBinding = FragmentHomeBinding.inflate(inflater, container, false);
     }
 
     @Override
     protected void initView() {
         mBinding.progressLayout.showProgress();
         setRecyclerView();
-        getHistory();
+        setViewModel();
+        getVideo();
+    }
+
+    @Override
+    protected void initEvent() {
+        mBinding.getRoot().setOnScrollChangeListener((NestedScrollView.OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> getParent().toggleLink(scrollY - oldScrollY));
     }
 
     private void setRecyclerView() {
@@ -53,13 +75,34 @@ public class SiteFragment extends BaseFragment implements VodAdapter.OnClickList
         mBinding.recommend.setAdapter(mVodAdapter = new VodAdapter(this));
     }
 
-    public void getHistory() {
+    private void setViewModel() {
+        mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
+        mViewModel.result.observe(getViewLifecycleOwner(), this::setAdapter);
+    }
+
+    private void getHistory() {
         mHistoryAdapter.addAll(History.get());
     }
 
-    public void showContent(Result result) {
+    private void getVideo() {
+        if (!getSite().getKey().isEmpty()) mViewModel.homeContent();
+    }
+
+    private void setAdapter(Result result) {
         mBinding.progressLayout.showContent();
         mVodAdapter.addAll(result.getList());
+        getParent().setAdapter(result);
+    }
+
+    private void setHistoryDelete(boolean delete) {
+        mHistoryAdapter.setDelete(delete);
+        mHistoryAdapter.notifyItemRangeChanged(0, mHistoryAdapter.getItemCount());
+    }
+
+    public boolean canBack() {
+        if (!mHistoryAdapter.isDelete()) return true;
+        setHistoryDelete(false);
+        return false;
     }
 
     @Override
@@ -82,9 +125,8 @@ public class SiteFragment extends BaseFragment implements VodAdapter.OnClickList
     @Override
     public void onItemDelete(History item) {
         mHistoryAdapter.remove(item.delete());
-        mBinding.history.requestLayout();
-        if (mHistoryAdapter.getItemCount() > 0) return;
-        mHistoryAdapter.setDelete(false);
+        App.post(() -> mBinding.history.requestLayout(), 250);
+        if (mHistoryAdapter.getItemCount() == 0) setHistoryDelete(false);
     }
 
     @Override
@@ -93,21 +135,16 @@ public class SiteFragment extends BaseFragment implements VodAdapter.OnClickList
         return true;
     }
 
-    private void setHistoryDelete(boolean delete) {
-        mHistoryAdapter.setDelete(delete);
-        mHistoryAdapter.notifyItemRangeChanged(0, mHistoryAdapter.getItemCount());
-    }
-
-    public boolean canBack() {
-        if (!mHistoryAdapter.isDelete()) return true;
-        setHistoryDelete(false);
-        return false;
-    }
-
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mHistoryManager.setSpanCount(Product.getColumn(getActivity()));
         mRecommendManager.setSpanCount(Product.getColumn(getActivity()));
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getHistory();
     }
 }

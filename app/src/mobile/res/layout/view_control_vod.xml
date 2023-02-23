@@ -4,19 +4,19 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="bottom"
-    android:background="@drawable/shape_controller"
+    android:clipChildren="false"
+    android:clipToPadding="false"
     android:orientation="vertical"
-    android:paddingStart="16dp"
-    android:paddingTop="4dp"
-    android:paddingEnd="16dp"
-    android:paddingBottom="4dp">
+    android:paddingStart="12dp"
+    android:paddingTop="12dp"
+    android:paddingEnd="12dp"
+    android:paddingBottom="6dp">
 
     <HorizontalScrollView
-        android:id="@+id/actionLayout"
+        android:id="@+id/action"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="6dp"
         android:fillViewport="true"
         android:scrollbars="none">
 
@@ -27,19 +27,11 @@
             android:orientation="horizontal">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:text="@string/play"
-                android:textColor="@color/grey_700"
-                android:textSize="14sp" />
-
-            <TextView
                 android:id="@+id/next"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:background="@drawable/shape_text"
+                android:background="@drawable/shape_action"
                 android:text="@string/play_next"
                 android:textColor="@color/white"
                 android:textSize="14sp" />
@@ -49,7 +41,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:background="@drawable/shape_text"
+                android:background="@drawable/shape_action"
                 android:text="@string/play_prev"
                 android:textColor="@color/white"
                 android:textSize="14sp" />
@@ -59,7 +51,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:background="@drawable/shape_text"
+                android:background="@drawable/shape_action"
                 android:textColor="@color/white"
                 android:textSize="14sp"
                 tools:text="刷新" />
@@ -69,7 +61,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:background="@drawable/shape_text"
+                android:background="@drawable/shape_action"
                 android:textColor="@color/white"
                 android:textSize="14sp"
                 tools:text="EXO" />
@@ -79,7 +71,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:background="@drawable/shape_text"
+                android:background="@drawable/shape_action"
                 android:textColor="@color/white"
                 android:textSize="14sp"
                 tools:text="硬解" />
@@ -89,7 +81,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:background="@drawable/shape_text"
+                android:background="@drawable/shape_action"
                 android:textColor="@color/white"
                 android:textSize="14sp"
                 tools:text="1.00" />
@@ -99,7 +91,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:background="@drawable/shape_text"
+                android:background="@drawable/shape_action"
                 android:textColor="@color/white"
                 android:textSize="14sp"
                 tools:text="預設" />
@@ -109,7 +101,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:background="@drawable/shape_text"
+                android:background="@drawable/shape_action"
                 android:tag="3"
                 android:text="@string/play_track_text"
                 android:textColor="@color/white"
@@ -122,7 +114,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:background="@drawable/shape_text"
+                android:background="@drawable/shape_action"
                 android:tag="1"
                 android:text="@string/play_track_audio"
                 android:textColor="@color/white"
@@ -135,7 +127,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:background="@drawable/shape_text"
+                android:background="@drawable/shape_action"
                 android:tag="2"
                 android:text="@string/play_track_video"
                 android:textColor="@color/white"
@@ -144,19 +136,11 @@
                 tools:visibility="visible" />
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:text="@string/play_oped"
-                android:textColor="@color/grey_700"
-                android:textSize="14sp" />
-
-            <TextView
                 android:id="@+id/opening"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:background="@drawable/shape_text"
+                android:background="@drawable/shape_action"
                 android:textColor="@color/white"
                 android:textSize="14sp"
                 tools:text="00:00" />
@@ -165,7 +149,7 @@
                 android:id="@+id/ending"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/shape_text"
+                android:background="@drawable/shape_action"
                 android:textColor="@color/white"
                 android:textSize="14sp"
                 tools:text="00:00" />
@@ -173,33 +157,16 @@
         </LinearLayout>
     </HorizontalScrollView>
 
-    <LinearLayout
-        android:id="@+id/parseLayout"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/parse"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="6dp"
         android:visibility="gone"
-        tools:visibility="visible">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:text="@string/parse"
-            android:textColor="@color/grey_700"
-            android:textSize="14sp" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/parse"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:layout_height="36dp"
-            tools:listitem="@layout/adapter_parse" />
-
-    </LinearLayout>
+        tools:itemCount="1"
+        tools:listitem="@layout/adapter_parse"
+        tools:visibility="visible" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -211,24 +178,23 @@
             android:id="@+id/seek"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="6dp"
             android:layout_weight="1" />
 
         <ImageView
-            android:id="@+id/lock"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
+            android:id="@+id/rotate"
+            android:layout_width="24dp"
+            android:layout_marginEnd="6dp"
+            android:layout_height="24dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:padding="4dp"
-            android:src="@drawable/ic_lock_off" />
+            android:src="@drawable/ic_lock_rotate" />
 
         <ImageView
             android:id="@+id/full"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:padding="4dp"
-            android:src="@drawable/ic_full_off" />
+            android:src="@drawable/ic_full_on" />
 
     </LinearLayout>
 </LinearLayout>
