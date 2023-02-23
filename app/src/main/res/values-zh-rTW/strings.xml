@@ -35,15 +35,16 @@
 
     <!-- Play -->
     <string name="play">播放</string>
-    <string name="play_next">下一集</string>
-    <string name="play_prev">上一集</string>
+    <string name="play_next">下集</string>
+    <string name="play_prev">上集</string>
     <string name="play_ready">準備播放：<xliff:g name="name">%s</xliff:g></string>
     <string name="play_track_text">字幕</string>
     <string name="play_track_audio">音軌</string>
     <string name="play_track_video">視軌</string>
     <string name="play_invert">反轉</string>
     <string name="play_across">跨類</string>
-    <string name="play_oped">片頭片尾</string>
+    <string name="play_op">片頭</string>
+    <string name="play_ed">片尾</string>
     <string name="play_reverse">倒序</string>
     <string name="play_forward">→</string>
     <string name="play_backward">←</string>
@@ -74,6 +75,7 @@
     <string name="dialog_positive">確定</string>
     <string name="dialog_negative">取消</string>
     <string name="dialog_config_hint">請輸入接口…</string>
+    <string name="dialog_config_url">請輸入網址…</string>
 
     <!-- Error -->
     <string name="error_so_load">FFmpeg 載入失敗</string>

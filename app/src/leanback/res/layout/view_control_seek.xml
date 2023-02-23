@@ -27,8 +27,8 @@
         android:nextFocusLeft="@+id/timeBar"
         android:nextFocusRight="@+id/timeBar"
         android:nextFocusDown="@+id/timeBar"
-        app:buffered_color="@color/grey_700"
-        app:played_color="@color/blue_700"
+        app:buffered_color="@color/blue_200"
+        app:played_color="@color/blue_500"
         app:scrubber_color="@color/blue_500"
         app:unplayed_color="@color/grey_500" />
 

@@ -36,7 +36,6 @@ import com.fongmi.android.tv.databinding.ActivityDetailBinding;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.event.PlayerEvent;
-import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
@@ -52,6 +51,7 @@ import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Traffic;
 import com.fongmi.android.tv.utils.Utils;
+import com.github.bassaer.library.MDColor;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.ui.StyledPlayerView;
@@ -81,12 +81,15 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private boolean mInitAuto;
     private boolean mAutoMode;
     private boolean mUseParse;
-    private boolean mLock;
     private boolean mStop;
     private int mCurrent;
     private Runnable mR1;
     private Runnable mR2;
     private Runnable mR3;
+
+    public static void push(Activity activity, String url) {
+        start(activity, "push_agent", url, url);
+    }
 
     public static void start(Activity activity, String id, String name) {
         start(activity, ApiConfig.get().getHome().getKey(), id, name);
@@ -184,12 +187,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mPlayers = new Players().init();
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
-        mR3 = this::setSensor;
-        checkOrientation();
+        mR3 = this::setRotate;
         setRecyclerView();
         setVideoView();
         setViewModel();
         showProgress();
+        getRotate();
         getDetail();
     }
 
@@ -201,13 +204,13 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.text.setOnClickListener(this::onTrack);
         mBinding.control.audio.setOnClickListener(this::onTrack);
         mBinding.control.video.setOnClickListener(this::onTrack);
-        mBinding.control.lock.setOnClickListener(view -> onLock());
         mBinding.control.full.setOnClickListener(view -> onFull());
         mBinding.control.next.setOnClickListener(view -> checkNext());
         mBinding.control.prev.setOnClickListener(view -> checkPrev());
         mBinding.control.scale.setOnClickListener(view -> onScale());
         mBinding.control.speed.setOnClickListener(view -> onSpeed());
         mBinding.control.reset.setOnClickListener(view -> onReset());
+        mBinding.control.rotate.setOnClickListener(view -> onRotate());
         mBinding.control.player.setOnClickListener(view -> onPlayer());
         mBinding.control.decode.setOnClickListener(view -> onDecode());
         mBinding.control.ending.setOnClickListener(view -> onEnding());
@@ -217,10 +220,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.ending.setOnLongClickListener(view -> onEndingReset());
         mBinding.control.opening.setOnLongClickListener(view -> onOpeningReset());
         mBinding.video.setOnTouchListener((view, event) -> mKeyDown.onTouchEvent(event));
-    }
-
-    private void checkOrientation() {
-        if (ResUtil.isLand(this)) enterFullscreen();
     }
 
     private void setRecyclerView() {
@@ -268,8 +267,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         //mViewModel.search.observe(this, result -> setSearch(result.getList()));
         mViewModel.player.observe(this, result -> {
-            setUseParse(result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag()) || result.getJx() == 1);
-            mBinding.control.parseLayout.setVisibility(mParseAdapter.getItemCount() > 0 && isUseParse() ? View.VISIBLE : View.GONE);
+            setUseParse(ApiConfig.hasParse() && ((result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx() == 1));
+            mBinding.control.parse.setVisibility(isFullscreen() && isUseParse() ? View.VISIBLE : View.GONE);
             int timeout = getSite().isChangeable() ? Constant.TIMEOUT_PLAY : -1;
             mPlayers.start(result, isUseParse(), timeout);
         });
@@ -278,6 +277,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
             else setDetail(result.getList().get(0));
             Notify.dismiss();
         });
+    }
+
+    private void getRotate() {
+        mBinding.control.rotate.getDrawable().setTint(Prefers.isRotate() ? MDColor.YELLOW_500 : MDColor.WHITE);
+        setRotate();
     }
 
     private void getDetail() {
@@ -406,13 +410,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         hideControl();
     }
 
-    private void onLock() {
-        setR1Callback();
-        setLock(!isLock());
-        mBinding.control.lock.setImageResource(isLock() ? R.drawable.ic_lock_on : R.drawable.ic_lock_off);
-        setRequestedOrientation(isLock() ? (ResUtil.isLand(this) ? ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT) : ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
-    }
-
     private void onFull() {
         setR1Callback();
         toggleFullscreen();
@@ -485,6 +482,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         return true;
     }
 
+    private void onRotate() {
+        Prefers.putRotate(!Prefers.isRotate());
+        getRotate();
+    }
+
     private void onPlayer() {
         mPlayers.togglePlayer();
         Prefers.putPlayer(mPlayers.getPlayer());
@@ -513,7 +515,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private boolean onEndingReset() {
         mHistory.setEnding(0);
-        mBinding.control.ending.setText(mPlayers.stringToTime(mHistory.getEnding()));
+        mBinding.control.ending.setText(R.string.play_ed);
         setR1Callback();
         return true;
     }
@@ -529,7 +531,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private boolean onOpeningReset() {
         mHistory.setOpening(0);
-        mBinding.control.opening.setText(mPlayers.stringToTime(mHistory.getOpening()));
+        mBinding.control.opening.setText(R.string.play_op);
         setR1Callback();
         return true;
     }
@@ -540,21 +542,23 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void enterFullscreen() {
-        mBinding.control.full.setImageResource(R.drawable.ic_full_off);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
-        getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
-        App.post(mR3, 3000);
+        mBinding.control.getRoot().setBackgroundResource(R.drawable.shape_controller);
+        getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+        mBinding.control.full.setImageResource(R.drawable.ic_full_off);
         setFullscreen(true);
         hideAll();
     }
 
     private void exitFullscreen() {
-        mBinding.control.full.setImageResource(R.drawable.ic_full_on);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
         getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
+        mBinding.episode.scrollToPosition(mEpisodeAdapter.getPosition());
+        mBinding.control.full.setImageResource(R.drawable.ic_full_on);
+        mBinding.control.getRoot().setBackgroundResource(0);
         mBinding.video.setLayoutParams(mFrameParams);
-        App.post(mR3, 3000);
+        App.post(mR3, 2000);
         setFullscreen(false);
         hideAll();
     }
@@ -592,8 +596,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void showControl() {
-        mBinding.control.parseLayout.setVisibility(isFullscreen() && isUseParse() ? View.VISIBLE : View.GONE);
-        mBinding.control.actionLayout.setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
+        mBinding.control.parse.setVisibility(isFullscreen() && isUseParse() ? View.VISIBLE : View.GONE);
+        mBinding.control.action.setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
         mBinding.control.getRoot().setVisibility(View.VISIBLE);
         setR1Callback();
     }
@@ -618,8 +622,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         App.post(mR2, Constant.INTERVAL_TRAFFIC);
     }
 
-    private void setSensor() {
-        if (!isLock()) setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
+    private void setRotate() {
+        setRequestedOrientation(Prefers.isRotate() ? ActivityInfo.SCREEN_ORIENTATION_FULL_USER : ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);
     }
 
     private void setR1Callback() {
@@ -637,8 +641,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mHistory = mHistory == null ? createHistory(item) : mHistory;
         onItemClick(mHistory.getFlag());
         if (mHistory.isRevSort()) reverseEpisode();
-        mBinding.control.opening.setText(mPlayers.stringToTime(mHistory.getOpening()));
-        mBinding.control.ending.setText(mPlayers.stringToTime(mHistory.getEnding()));
+        mBinding.control.opening.setText(mHistory.getOpening() == 0 ? getString(R.string.play_op) : mPlayers.stringToTime(mHistory.getOpening()));
+        mBinding.control.ending.setText(mHistory.getEnding() == 0 ? getString(R.string.play_ed) : mPlayers.stringToTime(mHistory.getEnding()));
         mBinding.control.speed.setText(mPlayers.setSpeed(mHistory.getSpeed()));
         mPlayers.setPlayer(getPlayer());
         setScale(getScale());
@@ -758,8 +762,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onPause(boolean visible) {
-        mBinding.widget.exoDuration.setText(mPlayers.getDurationTime());
-        mBinding.widget.exoPosition.setText(mPlayers.getPositionTime(0));
         if (visible) showInfo();
         else hideInfo();
         mPlayers.pause();
@@ -810,14 +812,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         this.mUseParse = useParse;
     }
 
-    public boolean isLock() {
-        return mLock;
-    }
-
-    public void setLock(boolean lock) {
-        this.mLock = lock;
-    }
-
     public boolean isStop() {
         return mStop;
     }
@@ -862,9 +856,15 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        if (Utils.hasPIP() && isInPictureInPictureMode() || isLock()) return;
-        else if (ResUtil.isPort(this)) exitFullscreen();
-        else if (ResUtil.isLand(this)) enterFullscreen();
+        if (Utils.hasPIP() && isInPictureInPictureMode()) return;
+        if (isFullscreen()) Utils.hideSystemUI(this);
+        if (ResUtil.isLand(this)) enterFullscreen();
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (isFullscreen() && hasFocus) Utils.hideSystemUI(this);
     }
 
     @Override
@@ -877,7 +877,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     @Override
     protected void onStop() {
         super.onStop();
-        RefreshEvent.history();
         onPause(false);
         setStop(true);
     }
