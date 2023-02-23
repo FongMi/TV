@@ -1,6 +1,7 @@
 package com.fongmi.android.tv.api;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Config;
@@ -9,7 +10,6 @@ import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.net.Callback;
-import com.fongmi.android.tv.ui.activity.LiveActivity;
 import com.fongmi.android.tv.utils.Json;
 import com.fongmi.android.tv.utils.Prefers;
 import com.google.gson.JsonElement;
@@ -104,7 +104,7 @@ public class LiveConfig {
         if (!object.has("lives")) return;
         for (JsonElement element : Json.safeListElement(object, "lives")) parse(Live.objectFrom(element).check());
         if (home == null) setHome(lives.isEmpty() ? new Live() : lives.get(0));
-        if (home.isBoot()) App.post(() -> LiveActivity.start(App.activity()));
+        if (home.isBoot()) App.post(Product::bootLive);
     }
 
     private void parse(Live live) {

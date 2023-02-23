@@ -18,7 +18,6 @@ public class SiteAdapter extends RecyclerView.Adapter<SiteAdapter.ViewHolder> {
     private final OnClickListener mListener;
     private final List<Site> mItems;
     private boolean search;
-    private boolean filter;
 
     public SiteAdapter(OnClickListener listener) {
         this.mListener = listener;
@@ -30,22 +29,13 @@ public class SiteAdapter extends RecyclerView.Adapter<SiteAdapter.ViewHolder> {
         return this;
     }
 
-    public SiteAdapter filter(boolean filter) {
-        this.filter = filter;
-        return this;
-    }
-
     public interface OnClickListener {
 
         void onTextClick(Site item);
 
         void onSearchClick(Site item);
 
-        void onFilterClick(Site item);
-
         boolean onSearchLongClick(Site item);
-
-        boolean onFilterLongClick(Site item);
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -73,18 +63,13 @@ public class SiteAdapter extends RecyclerView.Adapter<SiteAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Site item = mItems.get(position);
         holder.binding.text.setText(item.getName());
-        holder.binding.text.setFocusable(!search || filter);
+        holder.binding.text.setFocusable(!search);
         holder.binding.text.setActivated(item.isActivated());
-        holder.binding.filter.setActivated(item.isActivated());
         holder.binding.search.setActivated(item.isActivated());
-        holder.binding.filter.setImageResource(item.getFilterIcon());
         holder.binding.search.setImageResource(item.getSearchIcon());
         holder.binding.search.setVisibility(search ? View.VISIBLE : View.GONE);
-        holder.binding.filter.setVisibility(filter ? View.VISIBLE : View.GONE);
         holder.binding.text.setOnClickListener(v -> mListener.onTextClick(item));
         holder.binding.search.setOnClickListener(v -> mListener.onSearchClick(item));
-        holder.binding.filter.setOnClickListener(v -> mListener.onFilterClick(item));
         holder.binding.search.setOnLongClickListener(v -> mListener.onSearchLongClick(item));
-        holder.binding.filter.setOnLongClickListener(v -> mListener.onFilterLongClick(item));
     }
 }

@@ -1,7 +1,6 @@
 package com.fongmi.android.tv.ui.activity;
 
 import android.content.Intent;
-import android.util.Patterns;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
@@ -21,8 +20,6 @@ import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.ui.fragment.SettingFragment;
 import com.fongmi.android.tv.ui.fragment.VodFragment;
 import com.fongmi.android.tv.utils.Notify;
-import com.fongmi.android.tv.utils.Utils;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.navigation.NavigationBarView;
 
 import java.util.ArrayList;
@@ -69,6 +66,7 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
     }
 
     private void initFragment() {
+        if (mFragments != null) return;
         mFragments = new ArrayList<>();
         mFragments.add(VodFragment.newInstance());
         mFragments.add(SettingFragment.newInstance());
@@ -99,20 +97,8 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
     }
 
     private void checkAction(Intent intent) {
-        if (ApiConfig.get().getSite("push_agent") == null) return;
-        boolean hasClip = Patterns.WEB_URL.matcher(Utils.getClip()).matches();
-        boolean hasAction = intent.getAction() != null && intent.getAction().equals(Intent.ACTION_SEND) && intent.getType().equals("text/plain");
-        if (hasAction) DetailActivity.start(this, "push_agent", intent.getStringExtra(Intent.EXTRA_TEXT), "");
-        else if (hasClip) showDialog(Utils.getClip());
-    }
-
-    private void showDialog(String text) {
-        new MaterialAlertDialogBuilder(this).setMessage(getString(R.string.home_open_url, text))
-                .setNegativeButton(R.string.dialog_negative, (dialog, which) -> Utils.clearClip())
-                .setPositiveButton(R.string.dialog_positive, (dialog, which) -> {
-                    DetailActivity.start(MainActivity.this, "push_agent", text, "");
-                    Utils.clearClip();
-                }).show();
+        boolean push = ApiConfig.hasPush() && intent.getAction() != null && intent.getAction().equals(Intent.ACTION_SEND) && intent.getType().equals("text/plain");
+        if (push) DetailActivity.push(this, intent.getStringExtra(Intent.EXTRA_TEXT));
     }
 
     private void setConfirm() {

@@ -56,8 +56,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
 
     public Vod.Flag.Episode getPrev() {
         int current = getPosition();
-        int max = getItemCount() - 1;
-        current = ++current > max ? max : current;
+        current = --current < 0 ? 0 : current;
         return mItems.get(current);
     }
 
