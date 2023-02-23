@@ -202,21 +202,21 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.seek.setListener(mPlayers);
         mBinding.more.setOnClickListener(view -> onMore());
         mBinding.control.text.setOnClickListener(this::onTrack);
-        mBinding.control.audio.setOnClickListener(this::onTrack);
-        mBinding.control.video.setOnClickListener(this::onTrack);
+        //mBinding.control.audio.setOnClickListener(this::onTrack);
+        //mBinding.control.video.setOnClickListener(this::onTrack);
         mBinding.control.full.setOnClickListener(view -> onFull());
         mBinding.control.next.setOnClickListener(view -> checkNext());
         mBinding.control.prev.setOnClickListener(view -> checkPrev());
         mBinding.control.scale.setOnClickListener(view -> onScale());
         mBinding.control.speed.setOnClickListener(view -> onSpeed());
-        mBinding.control.reset.setOnClickListener(view -> onReset());
+        //mBinding.control.reset.setOnClickListener(view -> onReset());
         mBinding.control.rotate.setOnClickListener(view -> onRotate());
         mBinding.control.player.setOnClickListener(view -> onPlayer());
         mBinding.control.decode.setOnClickListener(view -> onDecode());
         mBinding.control.ending.setOnClickListener(view -> onEnding());
         mBinding.control.opening.setOnClickListener(view -> onOpening());
         mBinding.control.speed.setOnLongClickListener(view -> onSpeedLong());
-        mBinding.control.reset.setOnLongClickListener(view -> onResetToggle());
+        //mBinding.control.reset.setOnLongClickListener(view -> onResetToggle());
         mBinding.control.ending.setOnLongClickListener(view -> onEndingReset());
         mBinding.control.opening.setOnLongClickListener(view -> onOpeningReset());
         mBinding.video.setOnTouchListener((view, event) -> mKeyDown.onTouchEvent(event));
@@ -244,7 +244,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.player.setText(mPlayers.getPlayerText());
         getExo().setVisibility(mPlayers.isExo() ? View.VISIBLE : View.GONE);
         getIjk().setVisibility(mPlayers.isIjk() ? View.VISIBLE : View.GONE);
-        mBinding.control.reset.setText(ResUtil.getStringArray(R.array.select_reset)[Prefers.getReset()]);
+        //mBinding.control.reset.setText(ResUtil.getStringArray(R.array.select_reset)[Prefers.getReset()]);
     }
 
     private void setDecodeView() {
@@ -300,7 +300,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void getPlayer(Vod.Flag flag, Vod.Flag.Episode episode, boolean replay) {
-        mBinding.widget.title.setText(getString(R.string.detail_title, mBinding.name.getText(), episode.getName()));
+        mBinding.control.title.setText(getString(R.string.detail_title, mBinding.name.getText(), episode.getName()));
         mViewModel.playerContent(getKey(), flag.getFlag(), episode.getUrl());
         updateHistory(episode, replay);
         showProgress();
@@ -477,7 +477,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private boolean onResetToggle() {
         Prefers.putReset(Math.abs(Prefers.getReset() - 1));
-        mBinding.control.reset.setText(ResUtil.getStringArray(R.array.select_reset)[Prefers.getReset()]);
+        //mBinding.control.reset.setText(ResUtil.getStringArray(R.array.select_reset)[Prefers.getReset()]);
         setR1Callback();
         return true;
     }
@@ -543,7 +543,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void enterFullscreen() {
         mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
-        mBinding.control.getRoot().setBackgroundResource(R.drawable.shape_controller);
         getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
         mBinding.control.full.setImageResource(R.drawable.ic_full_off);
@@ -556,7 +555,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
         mBinding.episode.scrollToPosition(mEpisodeAdapter.getPosition());
         mBinding.control.full.setImageResource(R.drawable.ic_full_on);
-        mBinding.control.getRoot().setBackgroundResource(0);
         mBinding.video.setLayoutParams(mFrameParams);
         App.post(mR3, 2000);
         setFullscreen(false);
@@ -564,35 +562,35 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void showProgress() {
-        mBinding.widget.progress.setVisibility(View.VISIBLE);
+        mBinding.control.progress.setVisibility(View.VISIBLE);
         App.post(mR2, 0);
         hideError();
     }
 
     private void hideProgress() {
-        mBinding.widget.progress.setVisibility(View.GONE);
+        mBinding.control.progress.setVisibility(View.GONE);
         App.removeCallbacks(mR2);
         Traffic.reset();
     }
 
     private void showError(String text) {
-        mBinding.widget.text.setText(text);
-        mBinding.widget.error.setVisibility(View.VISIBLE);
+        mBinding.control.text.setText(text);
+        mBinding.control.error.setVisibility(View.VISIBLE);
     }
 
     private void hideError() {
-        mBinding.widget.text.setText("");
-        mBinding.widget.error.setVisibility(View.GONE);
+        mBinding.control.text.setText("");
+        mBinding.control.error.setVisibility(View.GONE);
     }
 
     private void showInfo() {
-        mBinding.widget.center.setVisibility(View.VISIBLE);
-        mBinding.widget.info.setVisibility(View.VISIBLE);
+        mBinding.control.center.setVisibility(View.VISIBLE);
+        mBinding.control.info.setVisibility(View.VISIBLE);
     }
 
     private void hideInfo() {
-        mBinding.widget.center.setVisibility(View.GONE);
-        mBinding.widget.info.setVisibility(View.GONE);
+        mBinding.control.center.setVisibility(View.GONE);
+        mBinding.control.info.setVisibility(View.GONE);
     }
 
     private void showControl() {
@@ -608,7 +606,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void hideCenter() {
-        mBinding.widget.action.setImageResource(R.drawable.ic_play);
+        mBinding.widget.action.setImageResource(R.drawable.ic_control_play);
         hideInfo();
     }
 
