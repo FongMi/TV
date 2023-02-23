@@ -47,12 +47,8 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         return new VodFragment();
     }
 
-    private HomeFragment getHomeFragment() {
-        return (HomeFragment) mBinding.pager.getAdapter().instantiateItem(mBinding.pager, 0);
-    }
-
-    private TypeFragment getTypeFragment() {
-        return (TypeFragment) mBinding.pager.getAdapter().instantiateItem(mBinding.pager, mBinding.pager.getCurrentItem());
+    private BaseFragment getFragment() {
+        return (BaseFragment) mBinding.pager.getAdapter().instantiateItem(mBinding.pager, mBinding.pager.getCurrentItem());
     }
 
     private Site getSite() {
@@ -147,7 +143,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
 
     @Override
     public void setFilter(String key, String value) {
-        getTypeFragment().setFilter(key, value);
+        ((TypeFragment) getFragment()).setFilter(key, value);
     }
 
     public void toggleLink(int dy) {
@@ -169,13 +165,9 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         }
     }
 
+    @Override
     public boolean canBack() {
-        try {
-            if (mBinding.pager.getCurrentItem() == 0) return getHomeFragment().canBack();
-            else return getTypeFragment().canBack();
-        } catch (Exception e) {
-            return true;
-        }
+        return getFragment().canBack();
     }
 
     @Override

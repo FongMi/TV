@@ -30,14 +30,6 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
     private ActivityMainBinding mBinding;
     private boolean confirm;
 
-    private VodFragment getVodFragment() {
-        return (VodFragment) mManager.getFragment(0);
-    }
-
-    private SettingFragment getSettingFragment() {
-        return (SettingFragment) mManager.getFragment(1);
-    }
-
     @Override
     protected ViewBinding getBinding() {
         return mBinding = ActivityMainBinding.inflate(getLayoutInflater());
@@ -127,9 +119,9 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
 
     @Override
     public void onBackPressed() {
-        if (getSettingFragment().isVisible()) {
+        if (mManager.isVisible(1)) {
             mBinding.navigation.setSelectedItemId(R.id.vod);
-        } else if (getVodFragment().canBack()) {
+        } else if (mManager.canBack(0)) {
             if (!confirm) setConfirm();
             else finish();
         }

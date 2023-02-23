@@ -6,6 +6,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.fongmi.android.tv.ui.activity.BaseFragment;
+
 public abstract class FragmentStateManager {
 
     private final FragmentManager fm;
@@ -30,11 +32,21 @@ public abstract class FragmentStateManager {
         ft.commitNowAllowingStateLoss();
     }
 
-    public String getTag(long id) {
-        return "android:switcher:" + id;
+    private String getTag(int position) {
+        return "android:switcher:" + position;
     }
 
-    public Fragment getFragment(long id) {
-        return fm.findFragmentByTag(getTag(id));
+    public BaseFragment getFragment(int position) {
+        return (BaseFragment) fm.findFragmentByTag(getTag(position));
+    }
+
+    public boolean isVisible(int position) {
+        Fragment fragment = getFragment(position);
+        return fragment != null && fragment.isVisible();
+    }
+
+    public boolean canBack(int position) {
+        BaseFragment fragment = getFragment(position);
+        return fragment != null && fragment.canBack();
     }
 }
