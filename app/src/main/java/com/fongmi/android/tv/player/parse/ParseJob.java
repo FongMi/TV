@@ -52,8 +52,8 @@ public class ParseJob implements ParseCallback {
 
     private void setParse(Result result, boolean useParse) {
         if (useParse) parse = ApiConfig.get().getParse();
-        else if (result.getPlayUrl().startsWith("json:")) parse = Parse.get(1, result.getPlayUrl().substring(5));
-        else if (result.getPlayUrl().startsWith("parse:")) parse = ApiConfig.get().getParse(result.getPlayUrl().substring(6));
+        if (result.getPlayUrl().startsWith("json:")) parse = Parse.get(1, result.getPlayUrl().substring(5));
+        if (result.getPlayUrl().startsWith("parse:")) parse = ApiConfig.get().getParse(result.getPlayUrl().substring(6));
         if (parse == null) parse = Parse.get(0, result.getPlayUrl(), result.getHeader());
     }
 
