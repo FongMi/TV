@@ -30,6 +30,14 @@ public class Clock {
         this.date = new Date();
     }
 
+    public static void stop() {
+        get().release();
+    }
+
+    public static void start() {
+        start(null);
+    }
+
     public static void start(TextView view) {
         start(view, "HH:mm:ss");
     }
@@ -56,8 +64,8 @@ public class Clock {
     private void doJob(TextView view) {
         try {
             date.setTime(System.currentTimeMillis());
-            view.setText(formatter.format(date));
             if (callback != null) callback.onTimeChanged();
+            if (view != null) view.setText(formatter.format(date));
         } catch (Exception ignored) {
         }
     }

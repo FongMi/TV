@@ -22,6 +22,7 @@ import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.impl.FilterCallback;
 import com.fongmi.android.tv.impl.SiteCallback;
 import com.fongmi.android.tv.ui.activity.BaseFragment;
+import com.fongmi.android.tv.ui.activity.CollectActivity;
 import com.fongmi.android.tv.ui.adapter.TypeAdapter;
 import com.fongmi.android.tv.ui.custom.dialog.FilterDialog;
 import com.fongmi.android.tv.ui.custom.dialog.LinkDialog;
@@ -47,12 +48,8 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         return new VodFragment();
     }
 
-    private HomeFragment getHomeFragment() {
-        return (HomeFragment) mBinding.pager.getAdapter().instantiateItem(mBinding.pager, 0);
-    }
-
-    private TypeFragment getTypeFragment() {
-        return (TypeFragment) mBinding.pager.getAdapter().instantiateItem(mBinding.pager, mBinding.pager.getCurrentItem());
+    private BaseFragment getFragment() {
+        return (BaseFragment) mBinding.pager.getAdapter().instantiateItem(mBinding.pager, mBinding.pager.getCurrentItem());
     }
 
     private Site getSite() {
@@ -76,6 +73,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         mBinding.link.setOnClickListener(this::onLink);
         mBinding.title.setOnClickListener(this::onTitle);
         mBinding.filter.setOnClickListener(this::onFilter);
+        mBinding.search.setOnClickListener(this::onSearch);
         mBinding.pager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
@@ -116,9 +114,18 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         FilterDialog.create(this).filter(mAdapter.get(mBinding.pager.getCurrentItem()).getFilters()).show(getChildFragmentManager(), null);
     }
 
+    private void onSearch(View view) {
+        CollectActivity.start(getActivity());
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefreshEvent(RefreshEvent event) {
-        if (event.getType() == RefreshEvent.Type.VIDEO) homeContent();
+        switch (event.getType()) {
+            case VIDEO:
+            case SIZE:
+                homeContent();
+                break;
+        }
     }
 
     private void homeContent() {
@@ -147,7 +154,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
 
     @Override
     public void setFilter(String key, String value) {
-        getTypeFragment().setFilter(key, value);
+        ((TypeFragment) getFragment()).setFilter(key, value);
     }
 
     public void toggleLink(int dy) {
@@ -169,13 +176,9 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         }
     }
 
+    @Override
     public boolean canBack() {
-        try {
-            if (mBinding.pager.getCurrentItem() == 0) return getHomeFragment().canBack();
-            else return getTypeFragment().canBack();
-        } catch (Exception e) {
-            return true;
-        }
+        return getFragment().canBack();
     }
 
     @Override
