@@ -398,9 +398,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         onItemClick(episode);
     }
 
-    private void reverseEpisode() {
+    private void reverseEpisode(boolean scroll) {
         mFlagAdapter.reverse();
         setEpisodeAdapter(getFlag().getEpisodes());
+        if (scroll) mBinding.episode.scrollToPosition(mEpisodeAdapter.getPosition());
     }
 
     private void onMore() {
@@ -411,7 +412,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void onReverse() {
         mHistory.setRevSort(!mHistory.isRevSort());
-        reverseEpisode();
+        reverseEpisode(false);
     }
 
     private void onFull() {
@@ -659,7 +660,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mHistory = History.find(getHistoryKey());
         mHistory = mHistory == null ? createHistory(item) : mHistory;
         onItemClick(mHistory.getFlag());
-        if (mHistory.isRevSort()) reverseEpisode();
+        if (mHistory.isRevSort()) reverseEpisode(true);
         mBinding.control.opening.setText(mHistory.getOpening() == 0 ? getString(R.string.play_op) : mPlayers.stringToTime(mHistory.getOpening()));
         mBinding.control.ending.setText(mHistory.getEnding() == 0 ? getString(R.string.play_ed) : mPlayers.stringToTime(mHistory.getEnding()));
         mBinding.control.speed.setText(mPlayers.setSpeed(mHistory.getSpeed()));
