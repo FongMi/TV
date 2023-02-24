@@ -65,10 +65,6 @@ dependencies {
     implementation project(':forcetech')
     implementation project(':ijkplayer')
     pythonImplementation project(':pyramid')
-    implementation project(':exoplayer-library')
-    implementation project(':exoplayer-extension-av1')
-    implementation project(':exoplayer-extension-rtmp')
-    implementation project(':exoplayer-extension-ffmpeg')
     implementation 'androidx.appcompat:appcompat:1.6.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.5.1'
@@ -77,6 +73,7 @@ dependencies {
     implementation 'cat.ereza:customactivityoncrash:2.4.0'
     implementation 'com.github.bassaer:materialdesigncolors:1.0.0'
     implementation 'com.github.bumptech.glide:glide:4.14.2'
+    implementation 'com.google.android.exoplayer:exoplayer:2.18.2'
     implementation 'com.google.android.material:material:1.8.0'
     implementation 'com.google.code.gson:gson:2.10.1'
     implementation 'com.google.net.cronet:cronet-okhttp:0.1.0'
