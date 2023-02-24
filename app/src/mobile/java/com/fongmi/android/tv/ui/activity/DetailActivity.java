@@ -787,10 +787,14 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onPause(boolean visible) {
+        mBinding.widget.state.setVisibility(visible ? View.VISIBLE : View.GONE);
+        mBinding.widget.duration.setText(mPlayers.getDurationTime());
+        mBinding.widget.position.setText(mPlayers.getPositionTime(0));
         mPlayers.pause();
     }
 
     private void onPlay() {
+        mBinding.widget.state.setVisibility(View.GONE);
         mPlayers.play();
     }
 
