@@ -105,16 +105,10 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.vod:
-                mManager.change(0);
-                return true;
-            case R.id.setting:
-                mManager.change(1);
-                return true;
-            default:
-                return false;
-        }
+        if (mBinding.navigation.getSelectedItemId() == item.getItemId()) return false;
+        if (item.getItemId() == R.id.vod) return mManager.change(0);
+        if (item.getItemId() == R.id.setting) return mManager.change(1);
+        return false;
     }
 
     @Override
