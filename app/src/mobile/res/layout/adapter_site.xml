@@ -26,7 +26,7 @@
         android:background="@drawable/shape_text"
         android:padding="8dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_search_on"
+        android:src="@drawable/ic_site_search_on"
         app:tint="@color/text" />
 
 </LinearLayout>
