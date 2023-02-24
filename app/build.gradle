@@ -21,8 +21,8 @@ android {
         }
         mobile {
             dimension "mode"
-            versionCode 3
-            versionName "20230223#1"
+            versionCode 5
+            versionName "1.0.5"
         }
         java {
             dimension = "api"
@@ -65,7 +65,7 @@ dependencies {
     implementation project(':forcetech')
     implementation project(':ijkplayer')
     pythonImplementation project(':pyramid')
-    implementation 'androidx.appcompat:appcompat:1.6.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.5.1'
     implementation 'androidx.preference:preference:1.2.0'

@@ -17,7 +17,7 @@
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
             android:exported="true"
             android:launchMode="singleTask"
-            android:screenOrientation="fullUser"
+            android:screenOrientation="userPortrait"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -38,6 +38,11 @@
             android:screenOrientation="fullUser"
             android:supportsPictureInPicture="true"
             android:theme="@style/AppTheme.Detail" />
+
+        <activity
+            android:name=".ui.activity.CollectActivity"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
+            android:screenOrientation="userPortrait" />
 
     </application>
 </manifest>

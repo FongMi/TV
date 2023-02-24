@@ -5,23 +5,41 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:text="@string/app_name"
-        android:textColor="@color/white"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_scrollFlags="scroll|enterAlways" />
+        android:layout_marginEnd="16dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:layout_weight="1"
+            android:text="@string/app_name"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_scrollFlags="scroll|enterAlways" />
+
+        <ImageView
+            android:id="@+id/search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_vod_search" />
+
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/type"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/title"
+        android:layout_below="@+id/toolbar"
         android:clipChildren="false"
         android:clipToPadding="false"
         android:orientation="horizontal"
@@ -48,7 +66,7 @@
         android:layout_margin="16dp"
         android:visibility="gone"
         app:backgroundTint="@color/blue_500"
-        app:srcCompat="@drawable/ic_filter"
+        app:srcCompat="@drawable/ic_fab_filter"
         app:tint="@color/white"
         tools:visibility="visible" />
 
@@ -60,7 +78,7 @@
         android:layout_alignParentBottom="true"
         android:layout_margin="16dp"
         app:backgroundTint="@color/blue_500"
-        app:srcCompat="@drawable/ic_link"
+        app:srcCompat="@drawable/ic_fab_link"
         app:tint="@color/white" />
 
 </RelativeLayout>

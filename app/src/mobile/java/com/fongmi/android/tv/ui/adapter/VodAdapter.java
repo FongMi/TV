@@ -6,9 +6,11 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.AdapterVodBinding;
 import com.fongmi.android.tv.utils.ImgUtil;
+import com.fongmi.android.tv.utils.ResUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,10 +19,12 @@ public class VodAdapter extends RecyclerView.Adapter<VodAdapter.ViewHolder> {
 
     private final OnClickListener mListener;
     private final List<Vod> mItems;
+    private int width, height;
 
     public VodAdapter(OnClickListener listener) {
         this.mListener = listener;
         this.mItems = new ArrayList<>();
+        setLayoutSize();
     }
 
     public interface OnClickListener {
@@ -28,6 +32,21 @@ public class VodAdapter extends RecyclerView.Adapter<VodAdapter.ViewHolder> {
         void onItemClick(Vod item);
 
         boolean onLongClick(Vod item);
+    }
+
+    private void setLayoutSize() {
+        int space = ResUtil.dp2px(32) + ResUtil.dp2px(16 * (Product.getColumn() - 1));
+        int base = ResUtil.getScreenWidthPx() - space;
+        width = base / Product.getColumn();
+        height = (int) (width / 0.75f);
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -58,7 +77,10 @@ public class VodAdapter extends RecyclerView.Adapter<VodAdapter.ViewHolder> {
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(AdapterVodBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        ViewHolder holder = new ViewHolder(AdapterVodBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        holder.binding.getRoot().getLayoutParams().width = width;
+        holder.binding.getRoot().getLayoutParams().height = height;
+        return holder;
     }
 
     @Override
