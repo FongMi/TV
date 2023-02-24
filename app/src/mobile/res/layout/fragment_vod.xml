@@ -48,7 +48,7 @@
         android:layout_margin="16dp"
         android:visibility="gone"
         app:backgroundTint="@color/blue_500"
-        app:srcCompat="@drawable/ic_filter"
+        app:srcCompat="@drawable/ic_fab_filter"
         app:tint="@color/white"
         tools:visibility="visible" />
 
@@ -60,7 +60,7 @@
         android:layout_alignParentBottom="true"
         android:layout_margin="16dp"
         app:backgroundTint="@color/blue_500"
-        app:srcCompat="@drawable/ic_link"
+        app:srcCompat="@drawable/ic_fab_link"
         app:tint="@color/white" />
 
 </RelativeLayout>
