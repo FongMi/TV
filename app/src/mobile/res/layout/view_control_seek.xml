@@ -30,7 +30,7 @@
         app:buffered_color="@color/blue_200"
         app:played_color="@color/blue_500"
         app:scrubber_color="@color/blue_500"
-        app:unplayed_color="@color/grey_500" />
+        app:unplayed_color="@color/grey_200" />
 
     <TextView
         android:id="@+id/duration"
