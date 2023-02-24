@@ -1,6 +1,5 @@
 package com.fongmi.android.tv.ui.fragment.child;
 
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -18,6 +17,7 @@ import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.FragmentTypeBinding;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.ui.activity.BaseFragment;
+import com.fongmi.android.tv.ui.activity.CollectActivity;
 import com.fongmi.android.tv.ui.activity.DetailActivity;
 import com.fongmi.android.tv.ui.adapter.VodAdapter;
 import com.fongmi.android.tv.ui.custom.CustomScroller;
@@ -29,7 +29,6 @@ import java.util.List;
 
 public class TypeFragment extends BaseFragment implements CustomScroller.Callback, VodAdapter.OnClickListener {
 
-    private GridLayoutManager mGridLayoutManager;
     private HashMap<String, String> mExtends;
     private FragmentTypeBinding mBinding;
     private CustomScroller mScroller;
@@ -88,7 +87,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     private void setRecyclerView() {
         mBinding.recycler.setHasFixedSize(true);
         mBinding.recycler.setAdapter(mVodAdapter = new VodAdapter(this));
-        mBinding.recycler.setLayoutManager(mGridLayoutManager = new GridLayoutManager(getContext(), Product.getColumn()));
+        mBinding.recycler.setLayoutManager(new GridLayoutManager(getContext(), Product.getColumn()));
     }
 
     private void setViewModel() {
@@ -147,14 +146,8 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     @Override
     public boolean onLongClick(Vod item) {
-        //CollectActivity.start(getActivity(), item.getVodName());
+        CollectActivity.start(getActivity(), item.getVodName());
         return true;
-    }
-
-    @Override
-    public void onConfigurationChanged(@NonNull Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        mGridLayoutManager.setSpanCount(Product.getColumn());
     }
 
     @Override

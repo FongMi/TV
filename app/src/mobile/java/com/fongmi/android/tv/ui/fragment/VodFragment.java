@@ -22,6 +22,7 @@ import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.impl.FilterCallback;
 import com.fongmi.android.tv.impl.SiteCallback;
 import com.fongmi.android.tv.ui.activity.BaseFragment;
+import com.fongmi.android.tv.ui.activity.CollectActivity;
 import com.fongmi.android.tv.ui.adapter.TypeAdapter;
 import com.fongmi.android.tv.ui.custom.dialog.FilterDialog;
 import com.fongmi.android.tv.ui.custom.dialog.LinkDialog;
@@ -72,6 +73,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         mBinding.link.setOnClickListener(this::onLink);
         mBinding.title.setOnClickListener(this::onTitle);
         mBinding.filter.setOnClickListener(this::onFilter);
+        mBinding.search.setOnClickListener(this::onSearch);
         mBinding.pager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
@@ -110,6 +112,10 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     private void onFilter(View view) {
         for (Fragment fragment : getChildFragmentManager().getFragments()) if (fragment instanceof BottomSheetDialogFragment) return;
         FilterDialog.create(this).filter(mAdapter.get(mBinding.pager.getCurrentItem()).getFilters()).show(getChildFragmentManager(), null);
+    }
+
+    private void onSearch(View view) {
+        CollectActivity.start(getActivity());
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
