@@ -106,7 +106,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     }
 
     private void checkPage() {
-        if (mScroller.getPage() != 1 || mVodAdapter.getItemCount() >= 4 || isFolder()) return;
+        if (mScroller.getPage() != 1 || mVodAdapter.getItemCount() >= 40 || isFolder()) return;
         if (mScroller.addPage()) getVideo(getTypeId(), "2");
     }
 
