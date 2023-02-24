@@ -11,19 +11,13 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:orientation="vertical"
-        android:visibility="gone"
-        tools:visibility="visible">
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:letterSpacing="0.02"
-            android:shadowColor="@color/grey_900"
-            android:shadowDx="2"
-            android:shadowDy="2"
-            android:shadowRadius="1"
             android:singleLine="true"
             android:textColor="@color/white"
             android:textSize="14sp"
@@ -33,10 +27,6 @@
             android:id="@+id/size"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:shadowColor="@color/grey_900"
-            android:shadowDx="2"
-            android:shadowDy="2"
-            android:shadowRadius="1"
             android:textColor="@color/white"
             android:textSize="14sp"
             tools:text="1920 x 1080" />
@@ -51,14 +41,13 @@
         android:layout_centerVertical="true"
         android:layout_marginStart="16dp"
         android:gravity="center"
-        android:orientation="vertical"
-        android:visibility="gone"
-        tools:visibility="visible">
+        android:orientation="vertical">
 
         <ImageView
             android:id="@+id/lock"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_lock_off" />
 
     </LinearLayout>
@@ -71,55 +60,55 @@
         android:layout_centerVertical="true"
         android:layout_marginEnd="16dp"
         android:gravity="center"
-        android:orientation="vertical"
-        android:visibility="gone"
-        tools:visibility="visible">
+        android:orientation="vertical">
 
         <ImageView
             android:id="@+id/setting"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_control_setting" />
 
         <ImageView
             android:id="@+id/rotate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_control_rotate" />
 
     </LinearLayout>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/parse"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/bottom"
-        android:layout_marginBottom="8dp"
-        android:clipChildren="false"
-        android:clipToPadding="false"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:visibility="gone"
-        tools:itemCount="1"
-        tools:listitem="@layout/adapter_parse"
-        tools:visibility="visible" />
 
     <LinearLayout
         android:id="@+id/bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="8dp"
         android:orientation="vertical"
-        android:visibility="gone"
-        tools:visibility="visible">
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/parse"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:paddingStart="16dp"
+            android:paddingTop="4dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="4dp"
+            android:visibility="gone"
+            tools:itemCount="1"
+            tools:listitem="@layout/adapter_parse"
+            tools:visibility="visible" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="4dp"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
@@ -139,92 +128,138 @@
 
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/control"
-            android:layout_width="wrap_content"
+        <HorizontalScrollView
+            android:id="@+id/action"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:gravity="center"
-            android:orientation="horizontal"
+            android:fillViewport="true"
+            android:scrollbars="none"
             android:visibility="gone"
             tools:visibility="visible">
 
-            <TextView
-                android:id="@+id/player"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/white"
-                android:textSize="14sp"
-                tools:text="EXO" />
+                android:layout_gravity="center"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp">
 
-            <TextView
-                android:id="@+id/decode"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:textColor="@color/white"
-                android:textSize="14sp"
-                tools:text="硬解" />
+                <TextView
+                    android:id="@+id/player"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:paddingStart="8dp"
+                    android:paddingTop="4dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="4dp"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    tools:text="EXO" />
 
-            <TextView
-                android:id="@+id/opening"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:textColor="@color/white"
-                android:textSize="14sp"
-                tools:text="片頭" />
+                <TextView
+                    android:id="@+id/decode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:paddingStart="8dp"
+                    android:paddingTop="4dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="4dp"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    tools:text="硬解" />
 
-            <ImageView
-                android:id="@+id/prev"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:src="@drawable/ic_control_prev" />
+                <TextView
+                    android:id="@+id/opening"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:paddingStart="8dp"
+                    android:paddingTop="4dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="4dp"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    tools:text="片頭" />
 
-            <ImageView
-                android:id="@+id/play"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:src="@drawable/ic_control_play" />
+                <ImageView
+                    android:id="@+id/prev"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:paddingStart="8dp"
+                    android:paddingTop="4dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="4dp"
+                    android:src="@drawable/ic_control_prev" />
 
-            <ImageView
-                android:id="@+id/next"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
-                android:src="@drawable/ic_control_next" />
+                <ImageView
+                    android:id="@+id/play"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:paddingStart="8dp"
+                    android:paddingTop="4dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="4dp"
+                    android:src="@drawable/ic_control_pause" />
 
-            <TextView
-                android:id="@+id/ending"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
-                android:textColor="@color/white"
-                android:textSize="14sp"
-                tools:text="片尾" />
+                <ImageView
+                    android:id="@+id/next"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:paddingStart="8dp"
+                    android:paddingTop="4dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="4dp"
+                    android:src="@drawable/ic_control_next" />
 
-            <TextView
-                android:id="@+id/speed"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
-                android:textColor="@color/white"
-                android:textSize="14sp"
-                tools:text="速度" />
+                <TextView
+                    android:id="@+id/ending"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:paddingStart="8dp"
+                    android:paddingTop="4dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="4dp"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    tools:text="片尾" />
 
-            <TextView
-                android:id="@+id/scale"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/white"
-                android:textSize="14sp"
-                tools:text="縮放" />
+                <TextView
+                    android:id="@+id/speed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:paddingStart="8dp"
+                    android:paddingTop="4dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="4dp"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    tools:text="速度" />
 
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/scale"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:paddingStart="8dp"
+                    android:paddingTop="4dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="4dp"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    tools:text="縮放" />
+
+            </LinearLayout>
+        </HorizontalScrollView>
     </LinearLayout>
 </RelativeLayout>

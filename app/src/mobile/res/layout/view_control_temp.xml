@@ -3,15 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <TextView
-        android:id="@+id/reset"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:background="@drawable/shape_control_action"
-        android:textColor="@color/white"
-        android:textSize="14sp"
-        tools:text="刷新" />
+
     <TextView
         android:id="@+id/text"
         android:layout_width="wrap_content"
@@ -50,4 +42,5 @@
         android:textSize="14sp"
         android:visibility="gone"
         tools:visibility="visible" />
+
 </RelativeLayout>
