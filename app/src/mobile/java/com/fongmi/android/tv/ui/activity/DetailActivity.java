@@ -17,6 +17,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.core.app.ShareCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -53,6 +54,7 @@ import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Traffic;
 import com.fongmi.android.tv.utils.Utils;
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.ui.StyledPlayerView;
 
@@ -209,9 +211,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     protected void initEvent() {
         mBinding.control.seek.setListener(mPlayers);
         mBinding.more.setOnClickListener(view -> onMore());
-        //mBinding.control.text.setOnClickListener(this::onTrack);
-        //mBinding.control.audio.setOnClickListener(this::onTrack);
-        //mBinding.control.video.setOnClickListener(this::onTrack);
         mBinding.reverse.setOnClickListener(view -> onReverse());
         mBinding.control.full.setOnClickListener(view -> onFull());
         mBinding.control.keep.setOnClickListener(view -> onKeep());
@@ -415,13 +414,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         reverseEpisode();
     }
 
-    private void onTrack(View view) {
-        int type = Integer.parseInt(view.getTag().toString());
-        TrackDialog.create(this).player(mPlayers).type(type).listener(this).show();
-        setR1Callback();
-        hideControl();
-    }
-
     private void onFull() {
         setR1Callback();
         toggleFullscreen();
@@ -562,7 +554,17 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onSetting() {
-        setR1Callback();
+        PopupMenu popup = new PopupMenu(this, mBinding.control.setting);
+        if (mPlayers.haveTrack(C.TRACK_TYPE_TEXT)) popup.getMenu().add(0, C.TRACK_TYPE_TEXT, 0, R.string.play_track_text);
+        if (mPlayers.haveTrack(C.TRACK_TYPE_AUDIO)) popup.getMenu().add(0, C.TRACK_TYPE_AUDIO, 1, R.string.play_track_audio);
+        if (mPlayers.haveTrack(C.TRACK_TYPE_VIDEO)) popup.getMenu().add(0, C.TRACK_TYPE_VIDEO, 2, R.string.play_track_video);
+        popup.setOnMenuItemClickListener(item -> {
+            TrackDialog.create(this).player(mPlayers).type(item.getItemId()).show(getSupportFragmentManager(), null);
+            return true;
+        });
+        if (popup.getMenu().size() > 0) {
+            popup.show();
+        }
     }
 
     private void toggleFullscreen() {
@@ -732,7 +734,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         switch (event.getState()) {
             case 0:
                 checkPosition();
-                setTrackVisible(false);
                 break;
             case Player.STATE_IDLE:
                 break;
@@ -744,7 +745,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
                 hideProgress();
                 mPlayers.reset();
                 setDefaultTrack();
-                setTrackVisible(true);
                 mBinding.control.size.setText(mPlayers.getSizeText());
                 break;
             case Player.STATE_ENDED:
@@ -757,12 +757,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mPlayers.seekTo(Math.max(mHistory.getOpening(), mHistory.getPosition()), false);
         Clock.get().setCallback(this);
         setInitTrack(true);
-    }
-
-    private void setTrackVisible(boolean visible) {
-        //mBinding.control.text.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_TEXT) ? View.VISIBLE : View.GONE);
-        //mBinding.control.audio.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_AUDIO) ? View.VISIBLE : View.GONE);
-        //mBinding.control.video.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_VIDEO) ? View.VISIBLE : View.GONE);
     }
 
     private void setDefaultTrack() {
