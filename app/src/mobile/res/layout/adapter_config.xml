@@ -26,6 +26,6 @@
         android:background="@drawable/shape_text"
         android:padding="8dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_delete_config" />
+        android:src="@drawable/ic_setting_delete" />
 
 </LinearLayout>
