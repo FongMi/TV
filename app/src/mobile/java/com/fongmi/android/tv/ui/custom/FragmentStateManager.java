@@ -20,7 +20,7 @@ public abstract class FragmentStateManager {
 
     public abstract Fragment getItem(int position);
 
-    public void change(int position) {
+    public boolean change(int position) {
         FragmentTransaction ft = fm.beginTransaction();
         Fragment fragment = fm.findFragmentByTag(getTag(position));
         if (fragment == null) ft.add(container.getId(), fragment = getItem(position), getTag(position));
@@ -30,6 +30,7 @@ public abstract class FragmentStateManager {
         ft.setPrimaryNavigationFragment(fragment);
         ft.setReorderingAllowed(true);
         ft.commitNowAllowingStateLoss();
+        return true;
     }
 
     private String getTag(int position) {

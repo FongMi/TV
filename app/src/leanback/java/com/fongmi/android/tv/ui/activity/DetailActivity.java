@@ -416,7 +416,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         onRefresh();
     }
 
-    private void reverseEpisode() {
+    private void reverseEpisode(boolean scroll) {
         for (int i = 0; i < mFlagAdapter.size(); i++) Collections.reverse(((Vod.Flag) mFlagAdapter.get(i)).getEpisodes());
         setEpisodeAdapter(getFlag().getEpisodes());
         mBinding.episode.setSelectedPosition(getEpisodePosition());
