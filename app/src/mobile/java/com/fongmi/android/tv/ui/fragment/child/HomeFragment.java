@@ -1,6 +1,5 @@
 package com.fongmi.android.tv.ui.fragment.child;
 
-import android.content.res.Configuration;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -22,6 +21,7 @@ import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.FragmentHomeBinding;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.ui.activity.BaseFragment;
+import com.fongmi.android.tv.ui.activity.CollectActivity;
 import com.fongmi.android.tv.ui.activity.DetailActivity;
 import com.fongmi.android.tv.ui.adapter.HistoryAdapter;
 import com.fongmi.android.tv.ui.adapter.VodAdapter;
@@ -29,7 +29,6 @@ import com.fongmi.android.tv.ui.fragment.VodFragment;
 
 public class HomeFragment extends BaseFragment implements VodAdapter.OnClickListener, HistoryAdapter.OnClickListener {
 
-    private GridLayoutManager mGridLayoutManager;
     private HistoryAdapter mHistoryAdapter;
     private FragmentHomeBinding mBinding;
     private SiteViewModel mViewModel;
@@ -71,7 +70,7 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
         mBinding.history.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         mBinding.history.setAdapter(mHistoryAdapter = new HistoryAdapter(this));
         mBinding.recommend.setHasFixedSize(true);
-        mBinding.recommend.setLayoutManager(mGridLayoutManager = new GridLayoutManager(getContext(), Product.getColumn()));
+        mBinding.recommend.setLayoutManager(new GridLayoutManager(getContext(), Product.getColumn()));
         mBinding.recommend.setAdapter(mVodAdapter = new VodAdapter(this));
     }
 
@@ -107,7 +106,7 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
 
     @Override
     public boolean onLongClick(Vod item) {
-        //CollectActivity.start(this, item.getVodName());
+        CollectActivity.start(getActivity(), item.getVodName());
         return true;
     }
 
@@ -127,12 +126,6 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
     public boolean onLongClick() {
         setHistoryDelete(!mHistoryAdapter.isDelete());
         return true;
-    }
-
-    @Override
-    public void onConfigurationChanged(@NonNull Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        mGridLayoutManager.setSpanCount(Product.getColumn());
     }
 
     @Override

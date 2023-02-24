@@ -41,6 +41,14 @@ public class VodAdapter extends RecyclerView.Adapter<VodAdapter.ViewHolder> {
         height = (int) (width / 0.75f);
     }
 
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
     static class ViewHolder extends RecyclerView.ViewHolder {
 
         private final AdapterVodBinding binding;
