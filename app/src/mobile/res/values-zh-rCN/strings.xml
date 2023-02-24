@@ -17,4 +17,9 @@
     <string name="detail_content_expand">展开</string>
     <string name="detail_content_collapse">收起</string>
 
+    <!-- Search -->
+    <string name="search_keyword">关键字…</string>
+    <string name="search_history">历史</string>
+    <string name="search_hot">热搜</string>
+
 </resources>

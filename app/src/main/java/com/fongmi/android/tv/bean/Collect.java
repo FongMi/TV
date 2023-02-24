@@ -10,9 +10,12 @@ public class Collect {
 
     private final Site site;
     private final List<Vod> list;
+    private boolean activated;
 
     public static Collect all() {
-        return new Collect(Site.get("all", ResUtil.getString(R.string.all)), new ArrayList<>());
+        Collect all = new Collect(Site.get("all", ResUtil.getString(R.string.all)), new ArrayList<>());
+        all.setActivated(true);
+        return all;
     }
 
     public static Collect create(List<Vod> list) {
@@ -30,5 +33,13 @@ public class Collect {
 
     public List<Vod> getList() {
         return list;
+    }
+
+    public boolean isActivated() {
+        return activated;
+    }
+
+    public void setActivated(boolean activated) {
+        this.activated = activated;
     }
 }

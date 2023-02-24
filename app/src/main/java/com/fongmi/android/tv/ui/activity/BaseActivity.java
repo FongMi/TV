@@ -33,6 +33,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         EventBus.getDefault().register(this);
         setWall();
         initView();
+        initView(savedInstanceState);
         initEvent();
     }
 
@@ -41,6 +42,9 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     protected void initView() {
+    }
+
+    protected void initView(Bundle savedInstanceState) {
     }
 
     protected void initEvent() {

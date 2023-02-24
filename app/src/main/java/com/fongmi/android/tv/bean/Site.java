@@ -188,15 +188,15 @@ public class Site {
     }
 
     public int getSearchIcon() {
-        return isSearchable() ? R.drawable.ic_search_on : R.drawable.ic_search_off;
+        return isSearchable() ? R.drawable.ic_site_search_on : R.drawable.ic_site_search_off;
     }
 
     public int getFilterIcon() {
-        return isFilterable() ? R.drawable.ic_filter_on : R.drawable.ic_filter_off;
+        return isFilterable() ? R.drawable.ic_site_filter_on : R.drawable.ic_site_filter_off;
     }
 
     public int getChangeIcon() {
-        return isChangeable() ? R.drawable.ic_change_on : R.drawable.ic_change_off;
+        return isChangeable() ? R.drawable.ic_site_change_on : R.drawable.ic_site_change_off;
     }
 
     public static Site find(String key) {
