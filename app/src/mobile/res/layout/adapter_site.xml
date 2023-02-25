@@ -26,18 +26,7 @@
         android:background="@drawable/shape_text"
         android:padding="8dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_search_on"
-        app:tint="@color/text" />
-
-    <ImageView
-        android:id="@+id/filter"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_marginStart="12dp"
-        android:background="@drawable/shape_text"
-        android:padding="8dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/ic_filter_on"
+        android:src="@drawable/ic_site_search_on"
         app:tint="@color/text" />
 
 </LinearLayout>

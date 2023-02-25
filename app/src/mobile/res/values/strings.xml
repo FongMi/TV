@@ -17,4 +17,9 @@
     <string name="detail_content_expand">Expand</string>
     <string name="detail_content_collapse">Collapse</string>
 
+    <!-- Search -->
+    <string name="search_keyword">Keywords…</string>
+    <string name="search_history">History</string>
+    <string name="search_hot">Hot</string>
+
 </resources>

@@ -54,11 +54,11 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.liveUrl.setText(LiveConfig.getUrl());
         mBinding.wallUrl.setText(WallConfig.getUrl());
         mBinding.versionText.setText(BuildConfig.VERSION_NAME);
+        mBinding.sizeText.setText(ResUtil.getStringArray(R.array.select_size)[Prefers.getSize()]);
         mBinding.scaleText.setText(ResUtil.getStringArray(R.array.select_scale)[Prefers.getScale()]);
         mBinding.playerText.setText(ResUtil.getStringArray(R.array.select_player)[Prefers.getPlayer()]);
         mBinding.decodeText.setText(ResUtil.getStringArray(R.array.select_decode)[Prefers.getDecode()]);
         mBinding.renderText.setText(ResUtil.getStringArray(R.array.select_render)[Prefers.getRender()]);
-        mBinding.qualityText.setText(ResUtil.getStringArray(R.array.select_quality)[Prefers.getQuality()]);
     }
 
     @Override
@@ -73,11 +73,15 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.version.setOnClickListener(view -> Updater.get().force().start());
         mBinding.wallDefault.setOnClickListener(view -> setWallDefault());
         mBinding.wallRefresh.setOnClickListener(view -> setWallRefresh());
-        mBinding.quality.setOnClickListener(view -> setQuality());
         mBinding.player.setOnClickListener(view -> setPlayer());
         mBinding.decode.setOnClickListener(view -> setDecode());
         mBinding.render.setOnClickListener(view -> setRender());
         mBinding.scale.setOnClickListener(view -> setScale());
+        mBinding.size.setOnClickListener(view -> setSize());
+        mBinding.version.setOnLongClickListener(v -> {
+            Updater.get().force().branch("dev").start();
+            return true;
+        });
     }
 
     @Override
@@ -157,14 +161,6 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         LiveConfig.get().setHome(item);
     }
 
-    private void setQuality() {
-        int index = Prefers.getQuality();
-        String[] array = ResUtil.getStringArray(R.array.select_quality);
-        Prefers.putQuality(index = index == array.length - 1 ? 0 : ++index);
-        mBinding.qualityText.setText(array[index]);
-        RefreshEvent.image();
-    }
-
     private void setPlayer() {
         int index = Prefers.getPlayer();
         String[] array = ResUtil.getStringArray(R.array.select_player);
@@ -191,6 +187,14 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         String[] array = ResUtil.getStringArray(R.array.select_scale);
         Prefers.putScale(index = index == array.length - 1 ? 0 : ++index);
         mBinding.scaleText.setText(array[index]);
+    }
+
+    private void setSize() {
+        int index = Prefers.getSize();
+        String[] array = ResUtil.getStringArray(R.array.select_size);
+        Prefers.putSize(index = index == array.length - 1 ? 0 : ++index);
+        mBinding.sizeText.setText(array[index]);
+        RefreshEvent.size();
     }
 
     private void setWallDefault() {

@@ -2,6 +2,7 @@ package com.fongmi.android.tv;
 
 import android.content.res.Resources;
 
+import com.fongmi.android.tv.ui.activity.LiveActivity;
 import com.fongmi.android.tv.utils.Prefers;
 
 import me.jessyan.autosize.AutoSizeCompat;

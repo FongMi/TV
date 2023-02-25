@@ -4,12 +4,20 @@
 
     <application>
 
+        <meta-data
+            android:name="design_width_in_dp"
+            android:value="411" />
+
+        <meta-data
+            android:name="design_height_in_dp"
+            android:value="891" />
+
         <activity
             android:name=".ui.activity.MainActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
             android:exported="true"
-            android:launchMode="singleTop"
-            android:screenOrientation="fullUser"
+            android:launchMode="singleTask"
+            android:screenOrientation="userPortrait"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,11 +33,16 @@
         <activity
             android:name=".ui.activity.DetailActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
-            android:launchMode="singleTop"
+            android:launchMode="singleTask"
             android:resizeableActivity="true"
-            android:screenOrientation="fullSensor"
+            android:screenOrientation="fullUser"
             android:supportsPictureInPicture="true"
             android:theme="@style/AppTheme.Detail" />
+
+        <activity
+            android:name=".ui.activity.CollectActivity"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
+            android:screenOrientation="userPortrait" />
 
     </application>
 </manifest>

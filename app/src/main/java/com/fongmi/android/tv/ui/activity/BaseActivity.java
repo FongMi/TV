@@ -33,6 +33,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         EventBus.getDefault().register(this);
         setWall();
         initView();
+        initView(savedInstanceState);
         initEvent();
     }
 
@@ -41,6 +42,9 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     protected void initView() {
+    }
+
+    protected void initView(Bundle savedInstanceState) {
     }
 
     protected void initEvent() {
@@ -56,16 +60,16 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public Resources getResources() {
+        return Product.hackResources(super.getResources());
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefreshEvent(RefreshEvent event) {
         if (event.getType() != RefreshEvent.Type.WALL) return;
         WallConfig.get().setDrawable(null);
         setWall();
-    }
-
-    @Override
-    public Resources getResources() {
-        return Product.hackResources(super.getResources());
     }
 
     @Override

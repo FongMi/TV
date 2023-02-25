@@ -67,6 +67,10 @@ public class ApiConfig {
         return get().getSite("push_agent") != null;
     }
 
+    public static boolean hasParse() {
+        return get().getParses().size() > 0;
+    }
+
     public ApiConfig init() {
         this.ads = null;
         this.wall = null;

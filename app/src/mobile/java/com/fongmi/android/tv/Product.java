@@ -1,9 +1,8 @@
 package com.fongmi.android.tv;
 
-import android.app.Activity;
 import android.content.res.Resources;
 
-import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.Prefers;
 
 public class Product {
 
@@ -11,8 +10,8 @@ public class Product {
         return resources;
     }
 
-    public static int getColumn(Activity activity) {
-        return ResUtil.isPort(activity) ? 3 : 6;
+    public static int getColumn() {
+        return Math.abs(Prefers.getSize() - 5);
     }
 
     public static void bootLive() {

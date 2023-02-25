@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.History;
@@ -21,11 +22,13 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
     private final OnClickListener mListener;
     private final List<History> mItems;
+    private int width, height;
     private boolean delete;
 
     public HistoryAdapter(OnClickListener listener) {
         this.mListener = listener;
         this.mItems = new ArrayList<>();
+        setLayoutSize();
     }
 
     public interface OnClickListener {
@@ -35,6 +38,13 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         void onItemDelete(History item);
 
         boolean onLongClick();
+    }
+
+    private void setLayoutSize() {
+        int space = ResUtil.dp2px(32) + ResUtil.dp2px(16 * (Product.getColumn() - 1));
+        int base = ResUtil.getScreenWidthPx() - space;
+        width = base / Product.getColumn();
+        height = (int) (width / 0.75f);
     }
 
     public boolean isDelete() {
@@ -76,7 +86,10 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(AdapterVodBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        ViewHolder holder = new ViewHolder(AdapterVodBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        holder.binding.getRoot().getLayoutParams().width = width;
+        holder.binding.getRoot().getLayoutParams().height = height;
+        return holder;
     }
 
     @Override
