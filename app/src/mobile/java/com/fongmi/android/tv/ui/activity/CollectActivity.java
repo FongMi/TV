@@ -125,6 +125,7 @@ public class CollectActivity extends BaseActivity implements CollectAdapter.OnCl
         mVodAdapter.clear();
         mCollectAdapter.clear();
         Utils.hideKeyboard(mBinding.keyword);
+        if (mExecutor != null) mExecutor.shutdownNow();
         int core = Runtime.getRuntime().availableProcessors();
         int corePoolSize = Math.max(Constant.THREAD_POOL, core);
         mExecutor = new PauseThreadPoolExecutor(corePoolSize, corePoolSize, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
