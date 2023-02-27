@@ -152,7 +152,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     @Override
     public boolean canBack() {
-        if (mTypeIds.size() == 0) return true;
+        if (mTypeIds.size() < 2) return true;
         refresh(2);
         return false;
     }
