@@ -72,6 +72,8 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
         mBinding.recommend.setHasFixedSize(true);
         mBinding.recommend.setLayoutManager(new GridLayoutManager(getContext(), Product.getColumn()));
         mBinding.recommend.setAdapter(mVodAdapter = new VodAdapter(this));
+        mHistoryAdapter.setSize(Product.getSpec(getActivity()));
+        mVodAdapter.setSize(Product.getSpec(getActivity()));
     }
 
     private void setViewModel() {
