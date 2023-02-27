@@ -22,19 +22,18 @@ import tv.danmaku.ijk.media.player.misc.IjkTrackInfo;
 
 public final class TrackDialog extends BaseDialog implements TrackAdapter.OnClickListener {
 
-    private DialogTrackBinding binding;
     private final TrackNameProvider provider;
     private final TrackAdapter adapter;
-    private final Listener listener;
+    private DialogTrackBinding binding;
+    private Listener listener;
     private Players player;
     private int type;
 
-    public static TrackDialog create(Listener listener) {
-        return new TrackDialog(listener);
+    public static TrackDialog create() {
+        return new TrackDialog();
     }
 
-    public TrackDialog(Listener listener) {
-        this.listener = listener;
+    public TrackDialog() {
         this.adapter = new TrackAdapter(this);
         this.provider = new TrackNameProvider();
     }
@@ -46,6 +45,11 @@ public final class TrackDialog extends BaseDialog implements TrackAdapter.OnClic
 
     public TrackDialog player(Players player) {
         this.player = player;
+        return this;
+    }
+
+    public TrackDialog listener(Listener listener) {
+        this.listener = listener;
         return this;
     }
 

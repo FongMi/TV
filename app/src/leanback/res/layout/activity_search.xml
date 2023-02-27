@@ -54,7 +54,7 @@
             android:focusableInTouchMode="true"
             android:nextFocusLeft="@id/history"
             android:scaleType="fitCenter"
-            android:src="@drawable/ic_mic" />
+            android:src="@drawable/ic_search_mic" />
 
         <com.fongmi.android.tv.ui.custom.CustomEditText
             android:id="@+id/keyword"

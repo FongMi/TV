@@ -322,7 +322,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void onTrack(View view) {
         int type = Integer.parseInt(view.getTag().toString());
-        TrackDialog.create(this).player(mPlayers).type(type).show();
+        TrackDialog.create().player(mPlayers).type(type).show(getSupportFragmentManager(), null);
         hideControl();
     }
 
@@ -379,7 +379,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void hideCenter() {
-        mBinding.widget.action.setImageResource(R.drawable.ic_play);
+        mBinding.widget.action.setImageResource(R.drawable.ic_widget_play);
         mBinding.widget.center.setVisibility(View.GONE);
     }
 
@@ -549,7 +549,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         if (!mPlayers.isVod() || !mChannel.isOnly()) return;
         mBinding.widget.exoDuration.setText(mPlayers.getDurationTime());
         mBinding.widget.exoPosition.setText(mPlayers.getPositionTime(time));
-        mBinding.widget.action.setImageResource(time > 0 ? R.drawable.ic_forward : R.drawable.ic_rewind);
+        mBinding.widget.action.setImageResource(time > 0 ? R.drawable.ic_widget_forward : R.drawable.ic_widget_rewind);
         mBinding.widget.center.setVisibility(View.VISIBLE);
         hideProgress();
     }
