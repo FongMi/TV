@@ -27,9 +27,6 @@ public class InputRequestProcess implements RequestProcess {
             case "search":
                 nano.getListener().onSearch(params.get("word").trim());
                 break;
-            case "update":
-                nano.getListener().onUpdate(params.get("branch").trim());
-                break;
             case "push":
                 nano.getListener().onPush(params.get("url").trim());
                 break;
