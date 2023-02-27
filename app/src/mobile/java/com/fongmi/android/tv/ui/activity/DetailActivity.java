@@ -100,7 +100,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     public static void start(Activity activity, String key, String id, String name) {
         Intent intent = new Intent(activity, DetailActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra("name", name);
         intent.putExtra("key", key);
         intent.putExtra("id", id);
@@ -266,6 +265,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         getIjk().setRender(Prefers.getRender());
         if (ResUtil.isLand(this)) enterFullscreen();
         getExo().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
+        getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
     }
 
     private void setScale(int scale) {
@@ -560,7 +560,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         if (mPlayers.haveTrack(C.TRACK_TYPE_AUDIO)) popup.getMenu().add(0, C.TRACK_TYPE_AUDIO, 1, R.string.play_track_audio);
         if (mPlayers.haveTrack(C.TRACK_TYPE_VIDEO)) popup.getMenu().add(0, C.TRACK_TYPE_VIDEO, 2, R.string.play_track_video);
         popup.setOnMenuItemClickListener(item -> {
-            TrackDialog.create(this).player(mPlayers).type(item.getItemId()).show(getSupportFragmentManager(), null);
+            TrackDialog.create().player(mPlayers).type(item.getItemId()).listener(this).show(getSupportFragmentManager(), null);
             return true;
         });
         if (popup.getMenu().size() > 0) {
@@ -651,6 +651,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void checkFlag(Vod item) {
+        mBinding.reverse.setVisibility(item.getVodFlags().isEmpty() ? View.GONE : View.VISIBLE);
         mBinding.flag.setVisibility(item.getVodFlags().isEmpty() ? View.GONE : View.VISIBLE);
         if (isVisible(mBinding.flag)) checkHistory(item);
         else ErrorEvent.episode();
@@ -895,8 +896,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         super.onConfigurationChanged(newConfig);
         if (Utils.hasPIP() && isInPictureInPictureMode()) return;
         if (isFullscreen()) Utils.hideSystemUI(this);
-        if (ResUtil.isLand(this)) enterFullscreen();
-        if (ResUtil.isPort(this) && !isRotate()) exitFullscreen();
+        if (ResUtil.isLand(this) && !isFullscreen()) enterFullscreen();
+        if (ResUtil.isPort(this) && isFullscreen() && !isRotate()) exitFullscreen();
     }
 
     @Override
