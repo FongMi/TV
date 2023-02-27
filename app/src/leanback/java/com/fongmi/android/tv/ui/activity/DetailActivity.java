@@ -284,6 +284,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mPlayers.set(getExo(), getIjk());
         getIjk().setRender(Prefers.getRender());
         getExo().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
+        getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
     }
 
     private void setScale(int scale) {
@@ -419,7 +420,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void reverseEpisode(boolean scroll) {
         for (int i = 0; i < mFlagAdapter.size(); i++) Collections.reverse(((Vod.Flag) mFlagAdapter.get(i)).getEpisodes());
         setEpisodeAdapter(getFlag().getEpisodes());
-        mBinding.episode.setSelectedPosition(getEpisodePosition());
+        if (scroll) mBinding.episode.setSelectedPosition(getEpisodePosition());
     }
 
     private void setParseActivated(Parse item) {
@@ -443,7 +444,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     @Override
     public void onRevSort() {
         mHistory.setRevSort(!mHistory.isRevSort());
-        reverseEpisode();
+        reverseEpisode(false);
     }
 
     @Override
@@ -604,7 +605,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void onTrack(View view) {
         int type = Integer.parseInt(view.getTag().toString());
-        TrackDialog.create(this).player(mPlayers).type(type).listener(this).show();
+        TrackDialog.create().player(mPlayers).type(type).listener(this).show(getSupportFragmentManager(), null);
         hideControl();
     }
 
@@ -657,7 +658,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void hideCenter() {
-        mBinding.widget.action.setImageResource(R.drawable.ic_play);
+        mBinding.widget.action.setImageResource(R.drawable.ic_widget_play);
         hideInfo();
     }
 
@@ -697,7 +698,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mHistory = History.find(getHistoryKey());
         mHistory = mHistory == null ? createHistory(item) : mHistory;
         setFlagActivated(mHistory.getFlag());
-        if (mHistory.isRevSort()) reverseEpisode();
+        if (mHistory.isRevSort()) reverseEpisode(true);
         mBinding.control.opening.setText(mHistory.getOpening() == 0 ? getString(R.string.play_op) : mPlayers.stringToTime(mHistory.getOpening()));
         mBinding.control.ending.setText(mHistory.getEnding() == 0 ? getString(R.string.play_ed) : mPlayers.stringToTime(mHistory.getEnding()));
         mBinding.control.speed.setText(mPlayers.setSpeed(mHistory.getSpeed()));
@@ -728,7 +729,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void checkKeep() {
-        mBinding.keep.setCompoundDrawablesRelativeWithIntrinsicBounds(Keep.find(getHistoryKey()) == null ? R.drawable.ic_keep_not_yet : R.drawable.ic_keep_added, 0, 0, 0);
+        mBinding.keep.setCompoundDrawablesRelativeWithIntrinsicBounds(Keep.find(getHistoryKey()) == null ? R.drawable.ic_detail_keep_off : R.drawable.ic_detail_keep_on, 0, 0, 0);
     }
 
     private void createKeep() {
@@ -981,7 +982,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     public void onSeeking(int time) {
         mBinding.widget.exoDuration.setText(mPlayers.getDurationTime());
         mBinding.widget.exoPosition.setText(mPlayers.getPositionTime(time));
-        mBinding.widget.action.setImageResource(time > 0 ? R.drawable.ic_forward : R.drawable.ic_rewind);
+        mBinding.widget.action.setImageResource(time > 0 ? R.drawable.ic_widget_forward : R.drawable.ic_widget_rewind);
         mBinding.widget.center.setVisibility(View.VISIBLE);
         hideProgress();
     }
