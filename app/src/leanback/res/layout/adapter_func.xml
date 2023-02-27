@@ -13,7 +13,7 @@
         android:id="@+id/icon"
         android:layout_width="36dp"
         android:layout_height="36dp"
-        tools:src="@drawable/ic_vod" />
+        tools:src="@drawable/ic_home_vod" />
 
     <TextView
         android:id="@+id/text"
