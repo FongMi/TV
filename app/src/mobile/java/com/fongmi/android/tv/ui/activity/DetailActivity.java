@@ -89,6 +89,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private Runnable mR1;
     private Runnable mR2;
     private Runnable mR3;
+    private Runnable mR4;
 
     public static void push(Activity activity, String url) {
         start(activity, "push_agent", url, url);
@@ -198,6 +199,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
         mR3 = this::setOrient;
+        mR4 = this::onPlay;
         setRecyclerView();
         setVideoView();
         setViewModel();
@@ -618,6 +620,16 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.widget.error.setVisibility(View.GONE);
     }
 
+    private void showState(int resId) {
+        mBinding.widget.action.setImageResource(resId);
+        mBinding.widget.state.setVisibility(View.VISIBLE);
+        mBinding.widget.position.setText(mPlayers.getPositionTime(0));
+    }
+
+    private void hideState() {
+        mBinding.widget.state.setVisibility(View.GONE);
+    }
+
     private void showControl() {
         mBinding.control.parse.setVisibility(isFullscreen() && isUseParse() ? View.VISIBLE : View.GONE);
         mBinding.control.action.setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
@@ -783,15 +795,13 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onPause(boolean visible) {
-        mBinding.widget.state.setVisibility(visible ? View.VISIBLE : View.GONE);
-        mBinding.widget.duration.setText(mPlayers.getDurationTime());
-        mBinding.widget.position.setText(mPlayers.getPositionTime(0));
+        if (visible) showState(R.drawable.ic_control_play);
         mPlayers.pause();
     }
 
     private void onPlay() {
-        mBinding.widget.state.setVisibility(View.GONE);
         mPlayers.play();
+        hideState();
     }
 
     private boolean isFullscreen() {
@@ -871,15 +881,15 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     @Override
     public void onDoubleTapLeft() {
         mPlayers.seekTo(-15 * 1000);
-        showProgress();
-        onPlay();
+        showState(R.drawable.ic_widget_rewind);
+        App.post(mR4, 500);
     }
 
     @Override
     public void onDoubleTapRight() {
         mPlayers.seekTo(15 * 1000);
-        showProgress();
-        onPlay();
+        showState(R.drawable.ic_widget_forward);
+        App.post(mR4, 500);
     }
 
     @Override
@@ -961,6 +971,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     protected void onDestroy() {
         super.onDestroy();
         mPlayers.release();
-        App.removeCallbacks(mR1, mR2, mR3);
+        App.removeCallbacks(mR1, mR2, mR3, mR4);
     }
 }
