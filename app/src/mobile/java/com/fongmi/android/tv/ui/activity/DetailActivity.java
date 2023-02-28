@@ -559,13 +559,13 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         if (mPlayers.haveTrack(C.TRACK_TYPE_TEXT)) popup.getMenu().add(0, C.TRACK_TYPE_TEXT, 0, R.string.play_track_text);
         if (mPlayers.haveTrack(C.TRACK_TYPE_AUDIO)) popup.getMenu().add(0, C.TRACK_TYPE_AUDIO, 1, R.string.play_track_audio);
         if (mPlayers.haveTrack(C.TRACK_TYPE_VIDEO)) popup.getMenu().add(0, C.TRACK_TYPE_VIDEO, 2, R.string.play_track_video);
-        popup.setOnMenuItemClickListener(item -> {
-            TrackDialog.create().player(mPlayers).type(item.getItemId()).listener(this).show(getSupportFragmentManager(), null);
-            return true;
-        });
-        if (popup.getMenu().size() > 0) {
-            popup.show();
-        }
+        popup.setOnMenuItemClickListener(item -> onTrack(item.getItemId()));
+        popup.show();
+    }
+
+    private boolean onTrack(int type) {
+        TrackDialog.create().player(mPlayers).type(type).listener(this).show(getSupportFragmentManager(), null);
+        return true;
     }
 
     private void toggleFullscreen() {
@@ -869,7 +869,21 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     @Override
-    public void onDoubleTap() {
+    public void onDoubleTapLeft() {
+        mPlayers.seekTo(-15 * 1000);
+        showProgress();
+        onPlay();
+    }
+
+    @Override
+    public void onDoubleTapRight() {
+        mPlayers.seekTo(15 * 1000);
+        showProgress();
+        onPlay();
+    }
+
+    @Override
+    public void onDoubleTapCenter() {
         if (mPlayers.isPlaying()) onPause(true);
         else onPlay();
         hideControl();
