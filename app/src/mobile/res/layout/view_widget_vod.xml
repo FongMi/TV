@@ -59,49 +59,27 @@
         android:id="@+id/state"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:layout_gravity="end|top"
+        android:layout_margin="16dp"
         android:gravity="center"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:visibility="gone"
         tools:visibility="visible">
 
         <ImageView
             android:id="@+id/action"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_control_play" />
-
-        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_marginEnd="4dp"
+            android:src="@drawable/ic_widget_rewind" />
 
-            <TextView
-                android:id="@+id/position"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/white"
-                android:textSize="12sp"
-                tools:text="00:00:00" />
+        <TextView
+            android:id="@+id/position"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            tools:text="00:00:00" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="2dp"
-                android:layout_marginEnd="2dp"
-                android:text="/"
-                android:textColor="@color/white"
-                android:textSize="12sp" />
-
-            <TextView
-                android:id="@+id/duration"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/white"
-                android:textSize="12sp"
-                tools:text="00:00:00" />
-
-        </LinearLayout>
     </LinearLayout>
 </FrameLayout>
