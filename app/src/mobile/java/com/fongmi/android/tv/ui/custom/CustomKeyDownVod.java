@@ -6,13 +6,12 @@ import android.view.MotionEvent;
 
 import androidx.annotation.NonNull;
 
-import com.fongmi.android.tv.Constant;
+import com.fongmi.android.tv.utils.ResUtil;
 
 public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
 
     private final GestureDetector detector;
     private final Listener listener;
-    private int holdTime;
 
     public static CustomKeyDownVod create(Context context) {
         return new CustomKeyDownVod(context);
@@ -29,7 +28,13 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
 
     @Override
     public boolean onDoubleTap(@NonNull MotionEvent e) {
-        listener.onDoubleTap();
+        int base = ResUtil.getScreenWidthPx() / 3;
+        boolean left = e.getX() > 0 && e.getX() < base;
+        boolean center = e.getX() > base && e.getX() < base * 2;
+        boolean right = e.getX() > base * 2 && e.getX() < base * 3;
+        if (left) listener.onDoubleTapLeft();
+        if (right) listener.onDoubleTapRight();
+        if (center) listener.onDoubleTapCenter();
         return true;
     }
 
@@ -39,22 +44,14 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
         return true;
     }
 
-    private int addTime() {
-        return holdTime = holdTime + Constant.INTERVAL_SEEK;
-    }
-
-    private int subTime() {
-        return holdTime = holdTime - Constant.INTERVAL_SEEK;
-    }
-
-    public void resetTime() {
-        holdTime = 0;
-    }
-
     public interface Listener {
 
         void onSingleTap();
 
-        void onDoubleTap();
+        void onDoubleTapLeft();
+
+        void onDoubleTapRight();
+
+        void onDoubleTapCenter();
     }
 }
