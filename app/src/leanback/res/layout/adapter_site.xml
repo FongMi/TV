@@ -32,7 +32,7 @@
         android:focusableInTouchMode="true"
         android:padding="8dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_search_on"
+        android:src="@drawable/ic_site_search_on"
         app:tint="@color/text" />
 
     <ImageView
@@ -46,7 +46,7 @@
         android:focusableInTouchMode="true"
         android:padding="8dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_filter_on"
+        android:src="@drawable/ic_site_filter_on"
         app:tint="@color/text" />
 
     <ImageView
@@ -60,7 +60,7 @@
         android:focusableInTouchMode="true"
         android:padding="8dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_change_on"
+        android:src="@drawable/ic_site_change_on"
         app:tint="@color/text" />
 
 </LinearLayout>

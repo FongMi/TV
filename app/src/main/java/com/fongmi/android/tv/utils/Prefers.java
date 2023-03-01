@@ -163,14 +163,6 @@ public class Prefers {
         put("across", across);
     }
 
-    public static boolean isRotate() {
-        return getBoolean("rotate", true);
-    }
-
-    public static void putRotate(boolean rotate) {
-        put("rotate", rotate);
-    }
-
     public static boolean getUpdate() {
         return getBoolean("update", true);
     }

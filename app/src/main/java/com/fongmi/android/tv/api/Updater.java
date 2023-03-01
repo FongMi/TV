@@ -28,6 +28,7 @@ public class Updater implements Download.Callback {
 
     private DialogUpdateBinding binding;
     private AlertDialog dialog;
+    private String branch;
 
     private static class Loader {
         static volatile Updater INSTANCE = new Updater();
@@ -38,20 +39,29 @@ public class Updater implements Download.Callback {
     }
 
     private File getFile() {
-        return FileUtil.getCacheFile(BuildConfig.FLAVOR + ".apk");
+        return FileUtil.getCacheFile(branch + ".apk");
     }
 
     private String getJson() {
-        return Github.get().getKitkatPath("/release/" + BuildConfig.FLAVOR + ".json");
+        return Github.get().getBranchPath(branch, "/release/" + BuildConfig.FLAVOR_mode + "-" + branch + ".json");
     }
 
     private String getApk() {
-        return Github.get().getKitkatPath("/release/" + BuildConfig.FLAVOR + ".apk");
+        return Github.get().getBranchPath(branch, "/release/" + BuildConfig.FLAVOR_mode + "-" + BuildConfig.FLAVOR_api + ".apk");
+    }
+
+    private Updater() {
+        this.branch = Github.RELEASE;
     }
 
     public Updater force() {
         Notify.show(R.string.update_check);
         Prefers.putUpdate(true);
+        return this;
+    }
+
+    public Updater dev() {
+        this.branch = Github.DEV;
         return this;
     }
 
@@ -64,8 +74,8 @@ public class Updater implements Download.Callback {
         App.execute(this::doInBackground);
     }
 
-    private boolean need(int code) {
-        return code > BuildConfig.VERSION_CODE && Prefers.getUpdate();
+    private boolean need(int code, String name) {
+        return (branch.equals(Github.DEV) ? !name.equals(BuildConfig.VERSION_NAME) : code > BuildConfig.VERSION_CODE) && Prefers.getUpdate();
     }
 
     private void doInBackground() {
@@ -74,7 +84,7 @@ public class Updater implements Download.Callback {
             String name = object.optString("name");
             String desc = object.optString("desc");
             int code = object.optInt("code");
-            if (need(code)) App.post(() -> show(App.activity(), name, desc));
+            if (need(code, name)) App.post(() -> show(App.activity(), name, desc));
         } catch (Exception e) {
             e.printStackTrace();
         }

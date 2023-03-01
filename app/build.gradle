@@ -17,8 +17,8 @@ android {
     productFlavors {
         leanback {
             dimension "mode"
-            versionCode 67
-            versionName "1.6.7"
+            versionCode 68
+            versionName "1.6.8"
         }
     }
 
@@ -60,7 +60,7 @@ dependencies {
     implementation project(':exoplayer-extension-rtmp')
     implementation project(':exoplayer-extension-ffmpeg')
     implementation 'androidx.multidex:multidex:2.0.1'
-    implementation 'androidx.appcompat:appcompat:1.6.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.5.1'
     implementation 'androidx.preference:preference:1.2.0'
@@ -82,6 +82,7 @@ dependencies {
     implementation('org.simpleframework:simple-xml:2.7.1') { exclude group: 'stax', module: 'stax-api' exclude group: 'xpp3', module: 'xpp3' }
     leanbackImplementation 'androidx.leanback:leanback:1.2.0-alpha02'
     leanbackImplementation 'me.jessyan:autosize:1.2.1'
+    mobileImplementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     annotationProcessor 'androidx.room:room-compiler:2.5.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.14.2'
 }
