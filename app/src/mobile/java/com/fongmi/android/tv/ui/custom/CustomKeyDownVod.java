@@ -34,7 +34,7 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
     public boolean onDown(@NonNull MotionEvent e) {
         int width = ResUtil.getScreenWidthPx();
         int edgeX = (int) Math.abs(e.getX() - width);
-        touch = e.getX() > 300 && edgeX > 300;
+        touch = e.getX() > 200 && edgeX > 200;
         seek = false;
         return true;
     }
