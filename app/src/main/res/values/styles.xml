@@ -1,8 +1,16 @@
 <resources>
 
     <style name="Vod">
-        <item name="cornerSize">8dp</item>
         <item name="cornerFamily">rounded</item>
+    </style>
+
+    <style name="Vod.Grid">
+        <item name="cornerSize">8dp</item>
+    </style>
+
+    <style name="Vod.List">
+        <item name="cornerSizeTopLeft">8dp</item>
+        <item name="cornerSizeBottomLeft">8dp</item>
     </style>
 
     <style name="Player">

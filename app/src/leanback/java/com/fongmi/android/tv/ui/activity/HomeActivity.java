@@ -44,7 +44,6 @@ import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Utils;
-import com.google.android.exoplayer2.util.Log;
 import com.google.common.collect.Lists;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -271,6 +270,10 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     public void setSite(Site item) {
         ApiConfig.get().setHome(item);
         getVideo();
+    }
+
+    @Override
+    public void onChanged() {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
