@@ -11,10 +11,6 @@ public class ServerEvent {
         EventBus.getDefault().post(new ServerEvent(Type.SEARCH, text));
     }
 
-    public static void update(String text) {
-        EventBus.getDefault().post(new ServerEvent(Type.UPDATE, text));
-    }
-
     public static void push(String text) {
         EventBus.getDefault().post(new ServerEvent(Type.PUSH, text));
     }
@@ -37,6 +33,6 @@ public class ServerEvent {
     }
 
     public enum Type {
-        SEARCH, UPDATE, PUSH, API
+        SEARCH, PUSH, API
     }
 }

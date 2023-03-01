@@ -8,11 +8,6 @@ function search() {
     doAction('search', { word: $('#keyword').val() });
 }
 
-function update() {
-    doAction('update', { branch: "dev" });
-    $('#update').attr("disabled", true);
-}
-
 function push() {
     doAction('push', { url: $('#push_url').val() });
 }

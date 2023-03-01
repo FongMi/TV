@@ -1,6 +1,7 @@
 package com.fongmi.android.tv.utils;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
@@ -20,6 +21,10 @@ public class ResUtil {
 
     public static DisplayMetrics getDisplayMetrics() {
         return App.get().getResources().getDisplayMetrics();
+    }
+
+    public static int getScreenWidthPx(Context context) {
+        return context.getResources().getDisplayMetrics().widthPixels;
     }
 
     public static int getScreenWidthPx() {

@@ -9,6 +9,7 @@ import androidx.core.widget.NestedScrollView;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.App;
@@ -27,7 +28,7 @@ import com.fongmi.android.tv.ui.adapter.HistoryAdapter;
 import com.fongmi.android.tv.ui.adapter.VodAdapter;
 import com.fongmi.android.tv.ui.fragment.VodFragment;
 
-public class HomeFragment extends BaseFragment implements VodAdapter.OnClickListener, HistoryAdapter.OnClickListener {
+public class HomeFragment extends BaseFragment implements VodAdapter.OnClickListener, HistoryAdapter.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     private HistoryAdapter mHistoryAdapter;
     private FragmentHomeBinding mBinding;
@@ -61,7 +62,8 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
 
     @Override
     protected void initEvent() {
-        mBinding.getRoot().setOnScrollChangeListener((NestedScrollView.OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> getParent().toggleLink(scrollY - oldScrollY));
+        mBinding.swipeLayout.setOnRefreshListener(this);
+        mBinding.scrollView.setOnScrollChangeListener((NestedScrollView.OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> getParent().toggleLink(scrollY - oldScrollY));
     }
 
     private void setRecyclerView() {
@@ -72,6 +74,8 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
         mBinding.recommend.setHasFixedSize(true);
         mBinding.recommend.setLayoutManager(new GridLayoutManager(getContext(), Product.getColumn()));
         mBinding.recommend.setAdapter(mVodAdapter = new VodAdapter(this));
+        mHistoryAdapter.setSize(Product.getSpec(getActivity()));
+        mVodAdapter.setSize(Product.getSpec(getActivity()));
     }
 
     private void setViewModel() {
@@ -88,6 +92,7 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
     }
 
     private void setAdapter(Result result) {
+        mBinding.swipeLayout.setRefreshing(false);
         mBinding.progressLayout.showContent();
         mVodAdapter.addAll(result.getList());
         getParent().setAdapter(result);
@@ -96,6 +101,12 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
     private void setHistoryDelete(boolean delete) {
         mHistoryAdapter.setDelete(delete);
         mHistoryAdapter.notifyItemRangeChanged(0, mHistoryAdapter.getItemCount());
+    }
+
+    @Override
+    public void onRefresh() {
+        mVodAdapter.clear();
+        getVideo();
     }
 
     @Override

@@ -58,7 +58,7 @@
             android:focusableInTouchMode="true"
             android:padding="8dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/ic_home" />
+            android:src="@drawable/ic_setting_home" />
 
         <ImageView
             android:id="@+id/vodHistory"
@@ -124,7 +124,7 @@
             android:focusableInTouchMode="true"
             android:padding="8dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/ic_home" />
+            android:src="@drawable/ic_setting_home" />
 
         <ImageView
             android:id="@+id/liveHistory"
@@ -191,7 +191,7 @@
             android:focusableInTouchMode="true"
             android:padding="8dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/ic_home" />
+            android:src="@drawable/ic_setting_home" />
 
         <ImageView
             android:id="@+id/wallRefresh"

@@ -16,7 +16,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="@color/white_90"
+        android:background="@color/white_70"
+        app:elevation="0dp"
         app:menu="@menu/menu_nav" />
 
 </RelativeLayout>

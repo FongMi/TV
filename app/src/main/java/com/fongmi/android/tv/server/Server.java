@@ -91,11 +91,6 @@ public class Server implements Nano.Listener {
     }
 
     @Override
-    public void onUpdate(String text) {
-        if (text.length() > 0) ServerEvent.update(text);
-    }
-
-    @Override
     public void onPush(String text) {
         if (text.length() > 0) ServerEvent.push(text);
     }
