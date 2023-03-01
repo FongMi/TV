@@ -28,6 +28,7 @@ public class Clock {
     public void init(String format) {
         this.formatter = new SimpleDateFormat(format, Locale.getDefault());
         this.date = new Date();
+        this.callback = null;
     }
 
     public static void stop() {
