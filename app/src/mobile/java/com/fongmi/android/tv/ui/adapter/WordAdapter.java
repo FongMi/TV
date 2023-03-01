@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.fongmi.android.tv.databinding.AdapterSearchWordBinding;
+import com.fongmi.android.tv.databinding.AdapterCollectWordBinding;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,7 @@ public class WordAdapter extends RecyclerView.Adapter<WordAdapter.ViewHolder> {
 
     public void addAll(List<String> items) {
         mItems.clear();
-        mItems.addAll(items);
+        mItems.addAll(items.subList(0, Math.min(items.size(), 10)));
         notifyDataSetChanged();
     }
 
@@ -41,19 +41,19 @@ public class WordAdapter extends RecyclerView.Adapter<WordAdapter.ViewHolder> {
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(AdapterSearchWordBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        return new ViewHolder(AdapterCollectWordBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.binding.word.setText(mItems.get(position));
+        holder.binding.text.setText(mItems.get(position));
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        private final AdapterSearchWordBinding binding;
+        private final AdapterCollectWordBinding binding;
 
-        public ViewHolder(@NonNull AdapterSearchWordBinding binding) {
+        public ViewHolder(@NonNull AdapterCollectWordBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
             itemView.setOnClickListener(this);

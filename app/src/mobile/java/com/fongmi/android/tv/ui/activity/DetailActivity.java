@@ -155,14 +155,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         return mBinding.ijk;
     }
 
-    private boolean isVisible(View view) {
-        return view.getVisibility() == View.VISIBLE;
-    }
-
-    private boolean isGone(View view) {
-        return view.getVisibility() == View.GONE;
-    }
-
     private boolean isFromSearch() {
         return getCallingActivity() != null && getCallingActivity().getShortClassName().contains(CollectActivity.class.getSimpleName());
     }

@@ -11,7 +11,7 @@
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/image"
         android:layout_width="90dp"
-        android:layout_height="120dp"
+        android:layout_height="match_parent"
         android:scaleType="center"
         app:shapeAppearanceOverlay="@style/Vod.List"
         tools:src="@drawable/ic_img_loading" />
@@ -62,7 +62,7 @@
             android:maxLines="4"
             android:textColor="@color/white"
             android:textSize="14sp"
-            tools:text="蜘蛛人蜘蛛人蜘蛛人蜘蛛人蜘蛛人蜘蛛人蜘蛛人蜘蛛人蜘蛛人蜘蛛人蜘蛛人蜘蛛人蜘蛛人蜘蛛人蜘蛛人蜘蛛人蜘蛛人蜘蛛人蜘蛛人蜘蛛人蜘蛛人蜘蛛人蜘蛛人蜘蛛人蜘蛛人蜘蛛人蜘蛛人蜘蛛人蜘蛛人蜘蛛人蜘蛛人蜘蛛人蜘蛛人蜘蛛人蜘蛛人蜘蛛人蜘蛛人" />
+            tools:text="蜘蛛人" />
 
         <TextView
             android:id="@+id/remark"
