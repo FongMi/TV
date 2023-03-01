@@ -73,6 +73,7 @@ public class Clock {
 
     public void release() {
         if (timer != null) timer.cancel();
+        if (callback != null) callback = null;
     }
 
     public interface Callback {
