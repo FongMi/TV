@@ -4,22 +4,15 @@ plugins {
 
 android {
     compileSdk 33
-    flavorDimensions "mode"
 
     defaultConfig {
         applicationId "com.fongmi.android.tv"
         minSdk 16
         targetSdk 29
+        versionCode 68
+        versionName "1.6.8"
         multiDexEnabled true
         ndk { abiFilters "armeabi-v7a" }
-    }
-
-    productFlavors {
-        leanback {
-            dimension "mode"
-            versionCode 68
-            versionName "1.6.8"
-        }
     }
 
     buildFeatures {
@@ -42,7 +35,7 @@ android {
 
     android.applicationVariants.all { variant ->
         variant.outputs.all { output ->
-            outputFileName = "${variant.productFlavors[0].name}.apk"
+            outputFileName = "leanback-4.1.apk"
         }
     }
 }
@@ -61,6 +54,7 @@ dependencies {
     implementation project(':exoplayer-extension-ffmpeg')
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.leanback:leanback:1.2.0-alpha02'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.5.1'
     implementation 'androidx.preference:preference:1.2.0'
@@ -74,15 +68,13 @@ dependencies {
     implementation 'com.google.zxing:core:3.3.0'
     implementation 'com.guolindev.permissionx:permissionx:1.7.1'
     implementation 'com.squareup.okhttp3:okhttp:3.12.13'
+    implementation 'me.jessyan:autosize:1.2.1'
     implementation 'net.java.dev.jna:jna:5.12.1'
     implementation 'org.apache.commons:commons-compress:1.20'
     implementation 'org.chromium.net:cronet-embedded:101.4951.41'
     implementation 'org.greenrobot:eventbus:3.3.1'
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
     implementation('org.simpleframework:simple-xml:2.7.1') { exclude group: 'stax', module: 'stax-api' exclude group: 'xpp3', module: 'xpp3' }
-    leanbackImplementation 'androidx.leanback:leanback:1.2.0-alpha02'
-    leanbackImplementation 'me.jessyan:autosize:1.2.1'
-    mobileImplementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     annotationProcessor 'androidx.room:room-compiler:2.5.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.14.2'
 }
