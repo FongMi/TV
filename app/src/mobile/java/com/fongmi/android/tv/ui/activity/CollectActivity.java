@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.Constant;
+import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Collect;
 import com.fongmi.android.tv.bean.Site;
@@ -78,16 +79,6 @@ public class CollectActivity extends BaseActivity implements CollectAdapter.OnCl
         });
     }
 
-    private void setLayoutSize() {
-        int width = (ResUtil.getScreenWidthPx() - ResUtil.dp2px(64)) / 3;
-        int height = (int) (width / 0.75f);
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mBinding.collect.getLayoutParams();
-        params.width = width + ResUtil.dp2px(24);
-        mBinding.collect.setLayoutParams(params);
-        mVodAdapter.setWidth(width);
-        mVodAdapter.setHeight(height);
-    }
-
     private void setRecyclerView() {
         mBinding.collect.setHasFixedSize(true);
         mBinding.collect.setItemAnimator(null);
@@ -95,6 +86,13 @@ public class CollectActivity extends BaseActivity implements CollectAdapter.OnCl
         mBinding.recycler.setHasFixedSize(true);
         mBinding.recycler.setAdapter(mVodAdapter = new VodAdapter(this));
         mBinding.recycler.setLayoutManager(new GridLayoutManager(this, 2));
+        mVodAdapter.setSize(Product.getSpec(getActivity(), ResUtil.dp2px(64), 3));
+    }
+
+    private void setLayoutSize() {
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mBinding.collect.getLayoutParams();
+        params.width = mVodAdapter.getWidth() + ResUtil.dp2px(24);
+        mBinding.collect.setLayoutParams(params);
     }
 
     private void setViewModel() {
@@ -125,6 +123,7 @@ public class CollectActivity extends BaseActivity implements CollectAdapter.OnCl
         mVodAdapter.clear();
         mCollectAdapter.clear();
         Utils.hideKeyboard(mBinding.keyword);
+        if (mExecutor != null) mExecutor.shutdownNow();
         int core = Runtime.getRuntime().availableProcessors();
         int corePoolSize = Math.max(Constant.THREAD_POOL, core);
         mExecutor = new PauseThreadPoolExecutor(corePoolSize, corePoolSize, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());

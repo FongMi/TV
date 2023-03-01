@@ -177,8 +177,6 @@ public class Nano extends NanoHTTPD {
 
         void onSearch(String text);
 
-        void onUpdate(String text);
-
         void onPush(String text);
 
         void onApi(String text);

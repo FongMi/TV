@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    android:background="@drawable/shape_text"
+    android:background="@drawable/shape_item"
     android:gravity="center"
     android:singleLine="true"
     android:textColor="@color/text"
