@@ -75,6 +75,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     @Override
     protected void initEvent() {
+        mBinding.swipeLayout.setOnRefreshListener(this::getVideo);
         mBinding.recycler.addOnScrollListener(mScroller = new CustomScroller(this));
         mBinding.recycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -96,6 +97,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         mViewModel.result.observe(getViewLifecycleOwner(), result -> {
             mBinding.progressLayout.showContent(isFolder(), result.getList().size());
             mScroller.endLoading(result.getList().isEmpty());
+            mBinding.swipeLayout.setRefreshing(false);
             mVodAdapter.addAll(result.getList());
             checkPage();
         });
@@ -115,7 +117,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         if (isFolder()) mTypeIds.add(typeId);
         if (isFolder()) mBinding.recycler.scrollToPosition(0);
         if (page.equals("1")) mVodAdapter.clear();
-        if (page.equals("1")) mBinding.progressLayout.showProgress();
+        if (page.equals("1") && !mBinding.swipeLayout.isRefreshing()) mBinding.progressLayout.showProgress();
         mViewModel.categoryContent(ApiConfig.get().getHome().getKey(), typeId, page, true, mExtends);
     }
 
