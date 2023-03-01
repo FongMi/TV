@@ -963,7 +963,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         } else if (isFullscreen()) {
             exitFullscreen();
         } else {
-            super.onBackPressed();
+            finish();
         }
     }
 
