@@ -241,6 +241,7 @@ public class CollectActivity extends BaseActivity implements SiteCallback, WordA
     public void onDataChanged(int size) {
         mBinding.record.setVisibility(size == 0 ? View.GONE : View.VISIBLE);
         mBinding.recordRecycler.setVisibility(size == 0 ? View.GONE : View.VISIBLE);
+        App.post(() -> mBinding.recordRecycler.requestLayout(), 250);
     }
 
     @Override
