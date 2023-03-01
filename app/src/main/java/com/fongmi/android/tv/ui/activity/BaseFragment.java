@@ -31,4 +31,8 @@ public abstract class BaseFragment extends Fragment {
 
     protected void initEvent() {
     }
+
+    public boolean canBack() {
+        return true;
+    }
 }

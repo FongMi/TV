@@ -1,10 +1,11 @@
 package com.fongmi.android.tv.ui.custom.dialog;
 
-import android.app.Activity;
 import android.view.LayoutInflater;
-import android.view.WindowManager;
+import android.view.ViewGroup;
 
-import androidx.appcompat.app.AlertDialog;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.bean.Track;
 import com.fongmi.android.tv.databinding.DialogTrackBinding;
@@ -12,32 +13,27 @@ import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.adapter.TrackAdapter;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.ui.custom.TrackNameProvider;
-import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.exoplayer2.Tracks;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import tv.danmaku.ijk.media.player.misc.IjkTrackInfo;
 
-public final class TrackDialog implements TrackAdapter.OnClickListener {
+public final class TrackDialog extends BaseDialog implements TrackAdapter.OnClickListener {
 
-    private final DialogTrackBinding binding;
     private final TrackNameProvider provider;
     private final TrackAdapter adapter;
-    private final AlertDialog dialog;
+    private DialogTrackBinding binding;
     private Listener listener;
     private Players player;
     private int type;
 
-    public static TrackDialog create(Activity activity) {
-        return new TrackDialog(activity);
+    public static TrackDialog create() {
+        return new TrackDialog();
     }
 
-    public TrackDialog(Activity activity) {
-        this.binding = DialogTrackBinding.inflate(LayoutInflater.from(activity));
-        this.dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).create();
+    public TrackDialog() {
         this.adapter = new TrackAdapter(this);
         this.provider = new TrackNameProvider();
     }
@@ -57,24 +53,17 @@ public final class TrackDialog implements TrackAdapter.OnClickListener {
         return this;
     }
 
-    public void show() {
-        setRecyclerView();
-        setDialog();
+    @Override
+    protected ViewBinding getBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
+        return binding = DialogTrackBinding.inflate(inflater, container, false);
     }
 
-    private void setRecyclerView() {
+    @Override
+    protected void initView() {
         binding.recycler.setHasFixedSize(true);
         binding.recycler.addItemDecoration(new SpaceItemDecoration(1, 16));
         binding.recycler.setAdapter(adapter.addAll(getTrack()));
         binding.recycler.scrollToPosition(adapter.getSelected());
-    }
-
-    private void setDialog() {
-        WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
-        params.width = (int) (ResUtil.getScreenWidthPx() * 0.4f);
-        dialog.getWindow().setAttributes(params);
-        dialog.getWindow().setDimAmount(0);
-        dialog.show();
     }
 
     private List<Track> getTrack() {
@@ -118,7 +107,7 @@ public final class TrackDialog implements TrackAdapter.OnClickListener {
     public void onItemClick(Track item) {
         if (listener != null) listener.onTrackClick(item);
         player.setTrack(List.of(item));
-        dialog.dismiss();
+        dismiss();
     }
 
     public interface Listener {
