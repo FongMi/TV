@@ -2,38 +2,60 @@ package com.fongmi.android.tv.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.RelativeLayout;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.viewbinding.ViewBinding;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.Product;
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Collect;
+import com.fongmi.android.tv.bean.Hot;
 import com.fongmi.android.tv.bean.Site;
+import com.fongmi.android.tv.bean.Suggest;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.ActivityCollectBinding;
+import com.fongmi.android.tv.impl.SiteCallback;
 import com.fongmi.android.tv.model.SiteViewModel;
+import com.fongmi.android.tv.net.Callback;
+import com.fongmi.android.tv.net.OkHttp;
 import com.fongmi.android.tv.ui.adapter.CollectAdapter;
+import com.fongmi.android.tv.ui.adapter.RecordAdapter;
 import com.fongmi.android.tv.ui.adapter.VodAdapter;
+import com.fongmi.android.tv.ui.adapter.WordAdapter;
+import com.fongmi.android.tv.ui.custom.CustomListener;
+import com.fongmi.android.tv.ui.custom.ViewType;
+import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
 import com.fongmi.android.tv.utils.PauseThreadPoolExecutor;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Utils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-public class CollectActivity extends BaseActivity implements CollectAdapter.OnClickListener, VodAdapter.OnClickListener {
+import okhttp3.Call;
+import okhttp3.Response;
 
+public class CollectActivity extends BaseActivity implements SiteCallback, WordAdapter.OnClickListener, RecordAdapter.OnClickListener, CollectAdapter.OnClickListener, VodAdapter.OnClickListener {
+
+    private GridLayoutManager mGridLayoutManager;
     private PauseThreadPoolExecutor mExecutor;
     private ActivityCollectBinding mBinding;
     private CollectAdapter mCollectAdapter;
+    private RecordAdapter mRecordAdapter;
+    private WordAdapter mWordAdapter;
     private SiteViewModel mViewModel;
     private VodAdapter mVodAdapter;
     private List<Site> mSites;
@@ -63,29 +85,46 @@ public class CollectActivity extends BaseActivity implements CollectAdapter.OnCl
 
     @Override
     protected void initView() {
+        mSites = new ArrayList<>();
         setRecyclerView();
         setLayoutSize();
         setViewModel();
         setKeyword();
         setSite();
+        getHot();
         search();
     }
 
     @Override
     protected void initEvent() {
+        mBinding.view.setOnClickListener(this::switchView);
+        mBinding.site.setOnClickListener(v -> SiteDialog.create(this).search(true).show());
         mBinding.keyword.setOnEditorActionListener((textView, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) search();
             return true;
         });
+        mBinding.keyword.addTextChangedListener(new CustomListener() {
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.toString().isEmpty()) getHot();
+                else getSuggest(s.toString());
+            }
+        });
     }
 
     private void setRecyclerView() {
+        mBinding.wordRecycler.setHasFixedSize(true);
+        mBinding.wordRecycler.setLayoutManager(new GridLayoutManager(this, 2));
+        mBinding.wordRecycler.setAdapter(mWordAdapter = new WordAdapter(this));
+        mBinding.recordRecycler.setHasFixedSize(true);
+        mBinding.recordRecycler.setLayoutManager(new GridLayoutManager(this, 2));
+        mBinding.recordRecycler.setAdapter(mRecordAdapter = new RecordAdapter(this));
         mBinding.collect.setHasFixedSize(true);
         mBinding.collect.setItemAnimator(null);
         mBinding.collect.setAdapter(mCollectAdapter = new CollectAdapter(this));
         mBinding.recycler.setHasFixedSize(true);
         mBinding.recycler.setAdapter(mVodAdapter = new VodAdapter(this));
-        mBinding.recycler.setLayoutManager(new GridLayoutManager(this, 2));
+        mBinding.recycler.setLayoutManager(mGridLayoutManager = new GridLayoutManager(this, 2));
         mVodAdapter.setSize(Product.getSpec(getActivity(), ResUtil.dp2px(64), 3));
     }
 
@@ -110,7 +149,6 @@ public class CollectActivity extends BaseActivity implements CollectAdapter.OnCl
     }
 
     private void setSite() {
-        mSites = new ArrayList<>();
         for (Site site : ApiConfig.get().getSites()) if (site.isSearchable()) mSites.add(site);
         Site home = ApiConfig.get().getHome();
         if (!mSites.contains(home)) return;
@@ -123,26 +161,93 @@ public class CollectActivity extends BaseActivity implements CollectAdapter.OnCl
         mVodAdapter.clear();
         mCollectAdapter.clear();
         Utils.hideKeyboard(mBinding.keyword);
+        mBinding.site.setVisibility(View.GONE);
+        mBinding.agent.setVisibility(View.GONE);
+        mBinding.view.setVisibility(View.VISIBLE);
+        mBinding.result.setVisibility(View.VISIBLE);
         if (mExecutor != null) mExecutor.shutdownNow();
         int core = Runtime.getRuntime().availableProcessors();
         int corePoolSize = Math.max(Constant.THREAD_POOL, core);
         mExecutor = new PauseThreadPoolExecutor(corePoolSize, corePoolSize, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
-        for (Site site : mSites) mExecutor.execute(() -> search(site));
+        String keyword = mBinding.keyword.getText().toString().trim();
+        for (Site site : mSites) mExecutor.execute(() -> search(site, keyword));
+        App.post(() -> mRecordAdapter.add(keyword), 250);
     }
 
-    private void search(Site site) {
+    private void search(Site site, String keyword) {
         try {
-            mViewModel.searchContent(site, mBinding.keyword.getText().toString());
+            mViewModel.searchContent(site, keyword);
         } catch (Throwable ignored) {
         }
+    }
+
+    private void getHot() {
+        mBinding.word.setText(R.string.search_hot);
+        OkHttp.newCall("https://api.web.360kan.com/v1/rank?cat=1").enqueue(new Callback() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                List<String> items = Hot.get(response.body().string());
+                App.post(() -> mWordAdapter.addAll(items));
+            }
+        });
+    }
+
+    private void getSuggest(String text) {
+        mBinding.word.setText(R.string.search_suggest);
+        OkHttp.newCall("https://suggest.video.iqiyi.com/?if=mobile&key=" + text).enqueue(new Callback() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                List<String> items = Suggest.get(response.body().string());
+                App.post(() -> mWordAdapter.addAll(items));
+            }
+        });
+    }
+
+    private void switchView(View view) {
+        boolean grid = mVodAdapter.getViewType() == ViewType.GRID;
+        mBinding.view.setImageResource(grid ? R.drawable.ic_view_grid : R.drawable.ic_view_list);
+        mVodAdapter.setViewType(grid ? ViewType.LIST : ViewType.GRID);
+        mGridLayoutManager.setSpanCount(grid ? 1 : 2);
+    }
+
+    private void showAgent() {
+        mVodAdapter.clear();
+        mCollectAdapter.clear();
+        mBinding.view.setVisibility(View.GONE);
+        mBinding.result.setVisibility(View.GONE);
+        mBinding.site.setVisibility(View.VISIBLE);
+        mBinding.agent.setVisibility(View.VISIBLE);
+        if (mExecutor != null) mExecutor.shutdownNow();
+    }
+
+    @Override
+    public void setSite(Site item) {
+    }
+
+    @Override
+    public void onChanged() {
+        mSites.clear();
+        setSite();
+    }
+
+    @Override
+    public void onItemClick(String text) {
+        mBinding.keyword.setText(text);
+        mBinding.keyword.setSelection(text.length());
+        search();
+    }
+
+    @Override
+    public void onDataChanged(int size) {
+        mBinding.record.setVisibility(size == 0 ? View.GONE : View.VISIBLE);
+        mBinding.recordRecycler.setVisibility(size == 0 ? View.GONE : View.VISIBLE);
     }
 
     @Override
     public void onItemClick(int position, Collect item) {
         mBinding.recycler.scrollToPosition(0);
         mCollectAdapter.setActivated(position);
-        mVodAdapter.clear();
-        mVodAdapter.addAll(item.getList());
+        mVodAdapter.clear().addAll(item.getList());
     }
 
     @Override
@@ -169,7 +274,10 @@ public class CollectActivity extends BaseActivity implements CollectAdapter.OnCl
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        if (mExecutor != null) mExecutor.shutdownNow();
+        if (isVisible(mBinding.result)) {
+            showAgent();
+        } else {
+            super.onBackPressed();
+        }
     }
 }
