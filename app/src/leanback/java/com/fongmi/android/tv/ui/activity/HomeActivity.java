@@ -44,6 +44,7 @@ import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Utils;
+import com.google.android.exoplayer2.util.Log;
 import com.google.common.collect.Lists;
 
 import org.greenrobot.eventbus.Subscribe;
