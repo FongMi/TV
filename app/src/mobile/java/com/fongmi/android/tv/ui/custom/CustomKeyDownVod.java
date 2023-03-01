@@ -12,6 +12,9 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
 
     private final GestureDetector detector;
     private final Listener listener;
+    private boolean touch;
+    private boolean seek;
+    private int time;
 
     public static CustomKeyDownVod create(Context context) {
         return new CustomKeyDownVod(context);
@@ -23,7 +26,28 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
     }
 
     public boolean onTouchEvent(MotionEvent e) {
+        if (seek && e.getAction() == MotionEvent.ACTION_UP) listener.onSeekTo(time);
         return detector.onTouchEvent(e);
+    }
+
+    @Override
+    public boolean onDown(@NonNull MotionEvent e) {
+        touch = true;
+        seek = false;
+        return true;
+    }
+
+    @Override
+    public boolean onScroll(@NonNull MotionEvent e1, @NonNull MotionEvent e2, float distanceX, float distanceY) {
+        int deltaX = (int) (e2.getX() - e1.getX());
+        if (touch) {
+            seek = Math.abs(distanceX) >= Math.abs(distanceY);
+            touch = false;
+        }
+        if (seek) {
+            listener.onSeeking(time = deltaX * 50);
+        }
+        return true;
     }
 
     @Override
@@ -45,6 +69,10 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
     }
 
     public interface Listener {
+
+        void onSeeking(int time);
+
+        void onSeekTo(int time);
 
         void onSingleTap();
 
