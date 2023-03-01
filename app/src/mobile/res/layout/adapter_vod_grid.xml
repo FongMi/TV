@@ -2,10 +2,10 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="150dp"
-    android:layout_height="200dp"
-    android:focusable="true"
-    android:focusableInTouchMode="true">
+    android:layout_width="match_parent"
+    android:layout_height="150dp"
+    android:layout_margin="8dp"
+    android:foreground="@drawable/shape_vod">
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/image"
@@ -15,17 +15,6 @@
         android:scaleType="center"
         app:shapeAppearanceOverlay="@style/Vod.Grid"
         tools:src="@drawable/ic_img_loading" />
-
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/delete"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/black_50"
-        android:scaleType="center"
-        android:src="@drawable/ic_vod_delete"
-        android:visibility="gone"
-        app:shapeAppearanceOverlay="@style/Vod.Grid"
-        tools:visibility="visible" />
 
     <TextView
         android:id="@+id/year"
@@ -37,7 +26,7 @@
         android:padding="4dp"
         android:singleLine="true"
         android:textColor="@color/white"
-        android:textSize="14sp"
+        android:textSize="12sp"
         android:visibility="gone"
         tools:text="2022"
         tools:visibility="visible" />
@@ -52,7 +41,7 @@
         android:padding="4dp"
         android:singleLine="true"
         android:textColor="@color/white"
-        android:textSize="14sp"
+        android:textSize="12sp"
         android:visibility="gone"
         tools:text="泥巴"
         tools:visibility="visible" />
@@ -67,7 +56,7 @@
         android:padding="4dp"
         android:singleLine="true"
         android:textColor="@color/white"
-        android:textSize="14sp"
+        android:textSize="12sp"
         tools:text="1080p" />
 
     <TextView
@@ -81,13 +70,7 @@
         android:padding="6dp"
         android:singleLine="true"
         android:textColor="@color/white"
-        android:textSize="16sp"
+        android:textSize="14sp"
         tools:text="蜘蛛人" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/selector_vod"
-        android:duplicateParentState="true" />
 
 </RelativeLayout>
