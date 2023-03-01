@@ -71,6 +71,12 @@
     <string name="setting_version">版本</string>
     <string name="setting_storage">權限</string>
 
+    <!-- Search -->
+    <string name="search_keyword">關鍵字…</string>
+    <string name="search_record">歷史</string>
+    <string name="search_suggest">建議</string>
+    <string name="search_hot">熱搜</string>
+
     <!-- Dialog -->
     <string name="dialog_positive">確定</string>
     <string name="dialog_negative">取消</string>

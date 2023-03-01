@@ -146,6 +146,10 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     }
 
     @Override
+    public void onChanged() {
+    }
+
+    @Override
     public void onItemClick(int position, Class item) {
         mBinding.pager.setCurrentItem(position);
         mAdapter.setActivated(position);

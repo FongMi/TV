@@ -13,7 +13,7 @@
         android:layout_height="match_parent"
         android:background="@color/black_20"
         android:scaleType="center"
-        app:shapeAppearanceOverlay="@style/Vod"
+        app:shapeAppearanceOverlay="@style/Vod.Grid"
         tools:src="@drawable/ic_img_loading" />
 
     <com.google.android.material.imageview.ShapeableImageView
@@ -24,22 +24,7 @@
         android:scaleType="center"
         android:src="@drawable/ic_vod_delete"
         android:visibility="gone"
-        app:shapeAppearanceOverlay="@style/Vod"
-        tools:visibility="visible" />
-
-    <TextView
-        android:id="@+id/year"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:background="#CC2196F3"
-        android:ellipsize="end"
-        android:padding="4dp"
-        android:singleLine="true"
-        android:textColor="@color/white"
-        android:textSize="12sp"
-        android:visibility="gone"
-        tools:text="2022"
+        app:shapeAppearanceOverlay="@style/Vod.Grid"
         tools:visibility="visible" />
 
     <TextView
