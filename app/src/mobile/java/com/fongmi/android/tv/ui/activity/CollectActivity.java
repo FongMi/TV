@@ -113,18 +113,18 @@ public class CollectActivity extends BaseActivity implements SiteCallback, WordA
     }
 
     private void setRecyclerView() {
-        mBinding.wordRecycler.setHasFixedSize(true);
-        mBinding.wordRecycler.setLayoutManager(new GridLayoutManager(this, 2));
-        mBinding.wordRecycler.setAdapter(mWordAdapter = new WordAdapter(this));
-        mBinding.recordRecycler.setHasFixedSize(true);
-        mBinding.recordRecycler.setLayoutManager(new GridLayoutManager(this, 2));
-        mBinding.recordRecycler.setAdapter(mRecordAdapter = new RecordAdapter(this));
         mBinding.collect.setHasFixedSize(true);
         mBinding.collect.setItemAnimator(null);
         mBinding.collect.setAdapter(mCollectAdapter = new CollectAdapter(this));
         mBinding.recycler.setHasFixedSize(true);
         mBinding.recycler.setAdapter(mVodAdapter = new VodAdapter(this));
         mBinding.recycler.setLayoutManager(mGridLayoutManager = new GridLayoutManager(this, 2));
+        mBinding.wordRecycler.setHasFixedSize(true);
+        mBinding.wordRecycler.setLayoutManager(new GridLayoutManager(this, 2));
+        mBinding.wordRecycler.setAdapter(mWordAdapter = new WordAdapter(this));
+        mBinding.recordRecycler.setHasFixedSize(true);
+        mBinding.recordRecycler.setLayoutManager(new GridLayoutManager(this, 2));
+        mBinding.recordRecycler.setAdapter(mRecordAdapter = new RecordAdapter(this));
         mVodAdapter.setSize(Product.getSpec(getActivity(), ResUtil.dp2px(64), 3));
     }
 
