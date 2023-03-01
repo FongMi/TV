@@ -64,7 +64,6 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     @Override
     protected void initView() {
         EventBus.getDefault().register(this);
-        mBinding.pager.setOffscreenPageLimit(-1);
         setRecyclerView();
     }
 
