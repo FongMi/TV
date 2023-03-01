@@ -70,9 +70,8 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.liveHistory.setOnClickListener(view -> HistoryDialog.create(this).type(1).show());
         mBinding.wallDefault.setOnClickListener(view -> setWallDefault());
         mBinding.wallRefresh.setOnClickListener(view -> setWallRefresh());
-        mBinding.version.setOnLongClickListener(view -> onVersion(true));
-        mBinding.version.setOnClickListener(view -> onVersion(false));
         mBinding.quality.setOnClickListener(view -> setQuality());
+        mBinding.version.setOnClickListener(view -> onVersion());
         mBinding.player.setOnClickListener(view -> setPlayer());
         mBinding.decode.setOnClickListener(view -> setDecode());
         mBinding.render.setOnClickListener(view -> setRender());
@@ -158,9 +157,8 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         LiveConfig.get().setHome(item);
     }
 
-    private boolean onVersion(boolean dev) {
-        if (dev) Updater.get().force().dev().start();
-        else Updater.get().force().start();
+    private boolean onVersion() {
+        Updater.get().force().start();
         return true;
     }
 
