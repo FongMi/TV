@@ -42,7 +42,7 @@ public class CustomKeyboard implements KeyboardAdapter.OnClickListener {
         StringBuilder sb = new StringBuilder(binding.keyword.getText().toString());
         int cursor = binding.keyword.getSelectionStart();
         switch (resId) {
-            case R.drawable.ic_search_on:
+            case R.drawable.ic_site_search_on:
                 callback.showDialog();
                 break;
             case R.drawable.ic_keyboard_left:

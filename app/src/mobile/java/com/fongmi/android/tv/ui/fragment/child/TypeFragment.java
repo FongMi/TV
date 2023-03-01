@@ -75,6 +75,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     @Override
     protected void initEvent() {
+        mBinding.swipeLayout.setOnRefreshListener(this::getVideo);
         mBinding.recycler.addOnScrollListener(mScroller = new CustomScroller(this));
         mBinding.recycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -88,6 +89,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         mBinding.recycler.setHasFixedSize(true);
         mBinding.recycler.setAdapter(mVodAdapter = new VodAdapter(this));
         mBinding.recycler.setLayoutManager(new GridLayoutManager(getContext(), Product.getColumn()));
+        mVodAdapter.setSize(Product.getSpec(getActivity()));
     }
 
     private void setViewModel() {
@@ -95,18 +97,20 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         mViewModel.result.observe(getViewLifecycleOwner(), result -> {
             mBinding.progressLayout.showContent(isFolder(), result.getList().size());
             mScroller.endLoading(result.getList().isEmpty());
+            mBinding.swipeLayout.setRefreshing(false);
             mVodAdapter.addAll(result.getList());
             checkPage();
         });
     }
 
     private void getVideo() {
+        mTypeIds.clear();
         mScroller.reset();
         getVideo(getTypeId(), "1");
     }
 
     private void checkPage() {
-        if (mScroller.getPage() != 1 || mVodAdapter.getItemCount() >= 4 || isFolder()) return;
+        if (mScroller.getPage() != 1 || mVodAdapter.getItemCount() >= 40 || isFolder()) return;
         if (mScroller.addPage()) getVideo(getTypeId(), "2");
     }
 
@@ -114,7 +118,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         if (isFolder()) mTypeIds.add(typeId);
         if (isFolder()) mBinding.recycler.scrollToPosition(0);
         if (page.equals("1")) mVodAdapter.clear();
-        if (page.equals("1")) mBinding.progressLayout.showProgress();
+        if (page.equals("1") && !mBinding.swipeLayout.isRefreshing()) mBinding.progressLayout.showProgress();
         mViewModel.categoryContent(ApiConfig.get().getHome().getKey(), typeId, page, true, mExtends);
     }
 
@@ -152,7 +156,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     @Override
     public boolean canBack() {
-        if (mTypeIds.size() == 0) return true;
+        if (mTypeIds.size() < 2) return true;
         refresh(2);
         return false;
     }
