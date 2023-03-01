@@ -112,14 +112,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         return getHome().getPlayerType() != -1 ? getHome().getPlayerType() : Prefers.getLivePlayer();
     }
 
-    private boolean isVisible(View view) {
-        return view.getVisibility() == View.VISIBLE;
-    }
-
-    private boolean isGone(View view) {
-        return view.getVisibility() == View.GONE;
-    }
-
     @Override
     protected ViewBinding getBinding() {
         return mBinding = ActivityLiveBinding.inflate(getLayoutInflater());
