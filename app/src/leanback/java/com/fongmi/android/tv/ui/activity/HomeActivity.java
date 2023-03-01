@@ -316,7 +316,6 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     @Override
     protected void onResume() {
         super.onResume();
-        Log.e("DDD", "DDD");
         Clock.start(mBinding.time, "MM/dd HH:mm:ss");
     }
 
