@@ -621,9 +621,13 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void showState(int resId) {
+        showState(resId, 0);
+    }
+
+    private void showState(int resId, long time) {
         mBinding.widget.action.setImageResource(resId);
         mBinding.widget.state.setVisibility(View.VISIBLE);
-        mBinding.widget.position.setText(mPlayers.getPositionTime(0));
+        mBinding.widget.position.setText(mPlayers.getPositionTime(time));
     }
 
     private void hideState() {
@@ -870,6 +874,19 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void notifyItemChanged(RecyclerView.Adapter<?> adapter) {
         adapter.notifyItemRangeChanged(0, adapter.getItemCount());
+    }
+
+    @Override
+    public void onSeeking(int time) {
+        if (!isLock()) showState(time > 0 ? R.drawable.ic_widget_forward : R.drawable.ic_widget_rewind, time);
+    }
+
+    @Override
+    public void onSeekTo(int time) {
+        if (isLock()) return;
+        mPlayers.seekTo(time);
+        showProgress();
+        onPlay();
     }
 
     @Override
