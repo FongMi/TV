@@ -58,6 +58,27 @@
         android:orientation="vertical">
 
         <TextView
+            android:id="@+id/record"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:text="@string/search_record"
+            android:textColor="@color/white"
+            android:textSize="18sp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recordRecycler"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:padding="8dp"
+            tools:itemCount="5"
+            tools:listitem="@layout/adapter_collect_record" />
+
+        <TextView
             android:id="@+id/word"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -77,28 +98,6 @@
             android:padding="8dp"
             tools:itemCount="5"
             tools:listitem="@layout/adapter_collect_word" />
-
-        <TextView
-            android:id="@+id/record"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
-            android:text="@string/search_record"
-            android:textColor="@color/white"
-            android:textSize="18sp" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recordRecycler"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:clipChildren="false"
-            android:clipToPadding="false"
-            android:padding="8dp"
-            tools:itemCount="5"
-            tools:listitem="@layout/adapter_collect_record" />
 
     </LinearLayout>
 
