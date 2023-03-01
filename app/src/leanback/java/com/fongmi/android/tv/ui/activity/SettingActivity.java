@@ -154,6 +154,10 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
     }
 
     @Override
+    public void onChanged() {
+    }
+
+    @Override
     public void setLive(Live item) {
         LiveConfig.get().setHome(item);
     }
