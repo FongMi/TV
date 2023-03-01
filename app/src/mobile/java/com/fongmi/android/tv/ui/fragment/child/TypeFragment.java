@@ -104,6 +104,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     }
 
     private void getVideo() {
+        mTypeIds.clear();
         mScroller.reset();
         getVideo(getTypeId(), "1");
     }
