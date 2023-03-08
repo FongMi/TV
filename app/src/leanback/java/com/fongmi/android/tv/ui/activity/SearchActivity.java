@@ -20,6 +20,7 @@ import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.net.OkHttp;
 import com.fongmi.android.tv.ui.adapter.RecordAdapter;
 import com.fongmi.android.tv.ui.adapter.WordAdapter;
+import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.CustomKeyboard;
 import com.fongmi.android.tv.ui.custom.CustomListener;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;

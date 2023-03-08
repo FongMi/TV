@@ -31,6 +31,7 @@ import com.fongmi.android.tv.event.ServerEvent;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.server.Server;
+import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.CustomRowPresenter;
 import com.fongmi.android.tv.ui.custom.CustomSelector;
 import com.fongmi.android.tv.ui.custom.CustomTitleView;
