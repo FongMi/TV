@@ -24,6 +24,7 @@ import com.fongmi.android.tv.bean.Class;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.databinding.ActivityVodBinding;
+import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.fragment.VodFragment;
 import com.fongmi.android.tv.ui.presenter.TypePresenter;
 import com.fongmi.android.tv.utils.ResUtil;
@@ -159,7 +160,7 @@ public class VodActivity extends BaseActivity {
     class PageAdapter extends FragmentStatePagerAdapter {
 
         public PageAdapter(@NonNull FragmentManager fm) {
-            super(fm);
+            super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         }
 
         @NonNull
