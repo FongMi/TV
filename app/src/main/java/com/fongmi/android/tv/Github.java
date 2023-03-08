@@ -11,9 +11,8 @@ import okhttp3.Request;
 public class Github {
 
     public static final String A = "https://raw.githubusercontent.com/";
-    public static final String B = "https://gh-proxy.com/";
-    public static final String C = "https://ghproxy.com/";
-    public static final String D = "https://raw.iqiq.io/";
+    public static final String B = "https://ghproxy.com/";
+    public static final String C = "https://raw.iqiq.io/";
     public static final String REPO = "FongMi/TV/";
     public static final String RELEASE = "release";
     public static final String DEV = "dev";
@@ -32,7 +31,6 @@ public class Github {
         check(A);
         check(B);
         check(C);
-        check(D);
     }
 
     private void check(String url) {
@@ -45,7 +43,7 @@ public class Github {
     }
 
     private void setProxy(String url) {
-        this.proxy = url.equals(B) || url.equals(C) ? url + A + REPO : url + REPO;
+        this.proxy = url.equals(B) ? url + A + REPO : url + REPO;
     }
 
     private String getProxy() {
