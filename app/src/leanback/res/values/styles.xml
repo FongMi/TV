@@ -8,6 +8,7 @@
         <item name="colorAccent">@color/blue_500</item>
         <item name="android:windowAnimationStyle">@null</item>
         <item name="android:windowBackground">@null</item>
+        <item name="bottomSheetDialogTheme">@style/BottomSheetDialog</item>
     </style>
 
 </resources>
