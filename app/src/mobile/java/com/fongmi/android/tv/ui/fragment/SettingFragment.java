@@ -23,7 +23,7 @@ import com.fongmi.android.tv.impl.ConfigCallback;
 import com.fongmi.android.tv.impl.LiveCallback;
 import com.fongmi.android.tv.impl.SiteCallback;
 import com.fongmi.android.tv.net.Callback;
-import com.fongmi.android.tv.ui.activity.BaseFragment;
+import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.custom.dialog.ConfigDialog;
 import com.fongmi.android.tv.ui.custom.dialog.HistoryDialog;
 import com.fongmi.android.tv.ui.custom.dialog.LiveDialog;
