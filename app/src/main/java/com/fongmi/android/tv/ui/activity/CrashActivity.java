@@ -5,6 +5,7 @@ import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.ActivityCrashBinding;
+import com.fongmi.android.tv.ui.base.BaseActivity;
 
 import java.util.Objects;
 
