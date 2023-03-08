@@ -1,7 +1,6 @@
-package com.fongmi.android.tv.ui.activity;
+package com.fongmi.android.tv.ui.base;
 
 import android.app.Activity;
-import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
@@ -9,7 +8,6 @@ import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewbinding.ViewBinding;
 
-import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.WallConfig;
 import com.fongmi.android.tv.event.RefreshEvent;
@@ -33,16 +31,12 @@ public abstract class BaseActivity extends AppCompatActivity {
         setContentView(getBinding().getRoot());
         EventBus.getDefault().register(this);
         setWall();
-        initView();
         initView(savedInstanceState);
         initEvent();
     }
 
     protected Activity getActivity() {
         return this;
-    }
-
-    protected void initView() {
     }
 
     protected void initView(Bundle savedInstanceState) {
@@ -67,11 +61,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         } catch (Exception e) {
             getWindow().setBackgroundDrawableResource(R.drawable.wallpaper_1);
         }
-    }
-
-    @Override
-    public Resources getResources() {
-        return Product.hackResources(super.getResources());
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

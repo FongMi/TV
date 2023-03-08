@@ -25,6 +25,7 @@ import com.fongmi.android.tv.bean.Collect;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.databinding.ActivityCollectBinding;
 import com.fongmi.android.tv.model.SiteViewModel;
+import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.fragment.CollectFragment;
 import com.fongmi.android.tv.ui.presenter.CollectPresenter;
 import com.fongmi.android.tv.utils.PauseThreadPoolExecutor;
@@ -176,18 +177,18 @@ public class CollectActivity extends BaseActivity {
     class PageAdapter extends FragmentStatePagerAdapter {
 
         public PageAdapter(@NonNull FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public int getCount() {
-            return mAdapter.size();
+            super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         }
 
         @NonNull
         @Override
         public Fragment getItem(int position) {
             return CollectFragment.newInstance(((Collect) mAdapter.get(position)).getList());
+        }
+
+        @Override
+        public int getCount() {
+            return mAdapter.size();
         }
 
         @Override
