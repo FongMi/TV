@@ -195,7 +195,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     class PageAdapter extends FragmentStatePagerAdapter {
 
         public PageAdapter(@NonNull FragmentManager fm) {
-            super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
+            super(fm);
         }
 
         @NonNull
