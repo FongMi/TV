@@ -175,10 +175,6 @@ public class Vod {
         return getVodTag().equals("folder");
     }
 
-    public boolean shouldSearch() {
-        return getVodId().isEmpty() || getVodId().startsWith("msearch:");
-    }
-
     public void setVodFlags() {
         String[] playFlags = getVodPlayFrom().split("\\$\\$\\$");
         String[] playUrls = getVodPlayUrl().split("\\$\\$\\$");
