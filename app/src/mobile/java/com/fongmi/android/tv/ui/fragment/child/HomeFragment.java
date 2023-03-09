@@ -54,16 +54,20 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
 
     @Override
     protected void initView() {
-        mBinding.progressLayout.showProgress();
         setRecyclerView();
         setViewModel();
-        getVideo();
     }
 
     @Override
     protected void initEvent() {
         mBinding.swipeLayout.setOnRefreshListener(this);
         mBinding.scrollView.setOnScrollChangeListener((NestedScrollView.OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> getParent().toggleLink(scrollY - oldScrollY));
+    }
+
+    @Override
+    protected void initData() {
+        mBinding.progressLayout.showProgress();
+        getVideo();
     }
 
     private void setRecyclerView() {
