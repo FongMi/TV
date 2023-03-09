@@ -12,8 +12,8 @@ public class PauseThreadPoolExecutor extends ThreadPoolExecutor {
     private final Condition condition;
     private boolean isPaused;
 
-    public PauseThreadPoolExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue) {
-        super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue);
+    public PauseThreadPoolExecutor(int corePoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue) {
+        super(corePoolSize, corePoolSize, keepAliveTime, unit, workQueue);
         pauseLock = new ReentrantLock();
         condition = pauseLock.newCondition();
     }
