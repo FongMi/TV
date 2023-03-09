@@ -88,6 +88,10 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         mBinding.progressLayout.showProgress();
         setRecyclerView();
         setViewModel();
+    }
+
+    @Override
+    protected void initData() {
         getVideo();
     }
 

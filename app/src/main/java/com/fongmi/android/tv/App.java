@@ -111,15 +111,4 @@ public class App extends MultiDexApplication {
             }
         });
     }
-
-    @Override
-    public String getPackageName() {
-        for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
-            if (element.getClassName().equals("org.chromium.base.BuildInfo")) {
-                if (element.getMethodName().equals("getAll")) return "com.android.chrome";
-                break;
-            }
-        }
-        return super.getPackageName();
-    }
 }
