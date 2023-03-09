@@ -129,6 +129,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
 
     private void homeContent() {
         mAdapter.clear();
+        setFabVisible(false);
         mBinding.pager.setAdapter(new PageAdapter(getChildFragmentManager()));
         mBinding.title.setText(getSite().getName().isEmpty() ? getString(R.string.app_name) : getSite().getName());
     }
