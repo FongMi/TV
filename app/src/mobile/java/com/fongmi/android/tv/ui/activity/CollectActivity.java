@@ -168,9 +168,7 @@ public class CollectActivity extends BaseActivity implements SiteCallback, WordA
         mBinding.view.setVisibility(View.VISIBLE);
         mBinding.result.setVisibility(View.VISIBLE);
         if (mExecutor != null) mExecutor.shutdownNow();
-        int core = Runtime.getRuntime().availableProcessors();
-        int corePoolSize = Math.max(Constant.THREAD_POOL, core);
-        mExecutor = new PauseThreadPoolExecutor(corePoolSize, corePoolSize, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
+        mExecutor = new PauseThreadPoolExecutor(Constant.THREAD_POOL, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
         String keyword = mBinding.keyword.getText().toString().trim();
         for (Site site : mSites) mExecutor.execute(() -> search(site, keyword));
         App.post(() -> mRecordAdapter.add(keyword), 250);
