@@ -77,8 +77,10 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_margin="16dp"
+        android:visibility="gone"
         app:backgroundTint="@color/blue_500"
         app:srcCompat="@drawable/ic_fab_link"
-        app:tint="@color/white" />
+        app:tint="@color/white"
+        tools:visibility="visible" />
 
 </RelativeLayout>
