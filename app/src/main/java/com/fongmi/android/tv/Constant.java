@@ -22,5 +22,5 @@ public class Constant {
     //代理超時時間
     public static final int TIMEOUT_GITHUB = 5 * 1000;
     //搜尋線程數量
-    public static final int THREAD_POOL = 5;
+    public static final int THREAD_POOL = 7;
 }
