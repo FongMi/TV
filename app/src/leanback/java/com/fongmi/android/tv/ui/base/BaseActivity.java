@@ -1,13 +1,12 @@
-package com.fongmi.android.tv.ui.activity;
+package com.fongmi.android.tv.ui.base;
 
 import android.app.Activity;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.leanback.widget.ArrayObjectAdapter;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.R;
@@ -49,8 +48,12 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected void initEvent() {
     }
 
-    protected void notifyItemChanged(RecyclerView view, ArrayObjectAdapter adapter) {
-        if (!view.isComputingLayout()) adapter.notifyArrayItemRangeChanged(0, adapter.size());
+    protected boolean isVisible(View view) {
+        return view.getVisibility() == View.VISIBLE;
+    }
+
+    protected boolean isGone(View view) {
+        return view.getVisibility() == View.GONE;
     }
 
     private void setWall() {
@@ -63,10 +66,12 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     }
 
-    private void hackResources() {
+    private Resources hackResources(Resources resources) {
         try {
-            AutoSizeCompat.autoConvertDensityOfGlobal(super.getResources());
+            AutoSizeCompat.autoConvertDensityOfGlobal(resources);
+            return resources;
         } catch (Exception ignored) {
+            return resources;
         }
     }
 
@@ -79,8 +84,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     @Override
     public Resources getResources() {
-        hackResources();
-        return super.getResources();
+        return hackResources(super.getResources());
     }
 
     @Override
