@@ -60,8 +60,8 @@ public class Updater implements Download.Callback {
         return this;
     }
 
-    public Updater branch(String branch) {
-        this.branch = branch;
+    public Updater dev() {
+        this.branch = Github.DEV;
         return this;
     }
 

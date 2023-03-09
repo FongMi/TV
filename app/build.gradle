@@ -16,13 +16,13 @@ android {
     productFlavors {
         leanback {
             dimension "mode"
-            versionCode 67
-            versionName "1.6.7"
+            versionCode 69
+            versionName "20230309#6"
         }
         mobile {
             dimension "mode"
-            versionCode 5
-            versionName "20230225#2"
+            versionCode 6
+            versionName "20230302"
         }
         java {
             dimension = "api"
@@ -91,6 +91,7 @@ dependencies {
     implementation('org.simpleframework:simple-xml:2.7.1') { exclude group: 'stax', module: 'stax-api' exclude group: 'xpp3', module: 'xpp3' }
     leanbackImplementation 'androidx.leanback:leanback:1.2.0-alpha02'
     leanbackImplementation 'me.jessyan:autosize:1.2.1'
+    mobileImplementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     annotationProcessor 'androidx.room:room-compiler:2.5.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.14.2'
 }

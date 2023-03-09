@@ -197,7 +197,7 @@
             android:text="@string/detail_desc"
             android:textColor="@color/white"
             android:textSize="16sp"
-            app:drawableStartCompat="@drawable/ic_desc" />
+            app:drawableStartCompat="@drawable/ic_detail_desc" />
 
         <TextView
             android:id="@+id/keep"
@@ -211,7 +211,7 @@
             android:text="@string/keep"
             android:textColor="@color/white"
             android:textSize="16sp"
-            app:drawableStartCompat="@drawable/ic_keep_added" />
+            app:drawableStartCompat="@drawable/ic_detail_keep_off" />
 
     </LinearLayout>
 

@@ -6,25 +6,27 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.bean.Vod;
-import com.fongmi.android.tv.databinding.AdapterVodBinding;
-import com.fongmi.android.tv.utils.ImgUtil;
-import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.databinding.AdapterVodGridBinding;
+import com.fongmi.android.tv.databinding.AdapterVodListBinding;
+import com.fongmi.android.tv.ui.custom.ViewType;
+import com.fongmi.android.tv.ui.holder.VodGridHolder;
+import com.fongmi.android.tv.ui.holder.VodListHolder;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class VodAdapter extends RecyclerView.Adapter<VodAdapter.ViewHolder> {
+public class VodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private final OnClickListener mListener;
     private final List<Vod> mItems;
     private int width, height;
+    private int viewType;
 
     public VodAdapter(OnClickListener listener) {
         this.mListener = listener;
         this.mItems = new ArrayList<>();
-        setLayoutSize();
+        this.viewType = ViewType.GRID;
     }
 
     public interface OnClickListener {
@@ -34,29 +36,21 @@ public class VodAdapter extends RecyclerView.Adapter<VodAdapter.ViewHolder> {
         boolean onLongClick(Vod item);
     }
 
-    private void setLayoutSize() {
-        int space = ResUtil.dp2px(32) + ResUtil.dp2px(16 * (Product.getColumn() - 1));
-        int base = ResUtil.getScreenWidthPx() - space;
-        width = base / Product.getColumn();
-        height = (int) (width / 0.75f);
+    public void setSize(int[] size) {
+        this.width = size[0];
+        this.height = size[1];
     }
 
-    public void setWidth(int width) {
-        this.width = width;
+    public int getWidth() {
+        return width;
     }
 
-    public void setHeight(int height) {
-        this.height = height;
+    public int getViewType() {
+        return viewType;
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
-
-        private final AdapterVodBinding binding;
-
-        ViewHolder(@NonNull AdapterVodBinding binding) {
-            super(binding.getRoot());
-            this.binding = binding;
-        }
+    public void setViewType(int viewType) {
+        this.viewType = viewType;
     }
 
     public void addAll(List<Vod> items) {
@@ -64,9 +58,10 @@ public class VodAdapter extends RecyclerView.Adapter<VodAdapter.ViewHolder> {
         notifyItemRangeInserted(mItems.size(), items.size());
     }
 
-    public void clear() {
+    public VodAdapter clear() {
         mItems.clear();
         notifyDataSetChanged();
+        return this;
     }
 
     @Override
@@ -74,27 +69,32 @@ public class VodAdapter extends RecyclerView.Adapter<VodAdapter.ViewHolder> {
         return mItems.size();
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        return viewType;
+    }
+
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        ViewHolder holder = new ViewHolder(AdapterVodBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
-        holder.binding.getRoot().getLayoutParams().width = width;
-        holder.binding.getRoot().getLayoutParams().height = height;
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        if (viewType == ViewType.LIST) return new VodListHolder(AdapterVodListBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), mListener);
+        VodGridHolder holder = new VodGridHolder(AdapterVodGridBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), mListener);
+        holder.itemView.getLayoutParams().width = width;
+        holder.itemView.getLayoutParams().height = height;
         return holder;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Vod item = mItems.get(position);
-        holder.binding.name.setText(item.getVodName());
-        holder.binding.year.setText(item.getVodYear());
-        holder.binding.site.setText(item.getSiteName());
-        holder.binding.remark.setText(item.getVodRemarks());
-        holder.binding.site.setVisibility(item.getSiteVisible());
-        holder.binding.year.setVisibility(item.getYearVisible());
-        holder.binding.remark.setVisibility(item.getRemarkVisible());
-        holder.binding.getRoot().setOnClickListener(v -> mListener.onItemClick(item));
-        holder.binding.getRoot().setOnLongClickListener(v -> mListener.onLongClick(item));
-        ImgUtil.load(item.getVodPic(), holder.binding.image);
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        switch (viewType) {
+            case ViewType.GRID:
+                VodGridHolder gridHolder = (VodGridHolder) holder;
+                gridHolder.initView(mItems.get(position));
+                break;
+            case ViewType.LIST:
+                VodListHolder listHolder = (VodListHolder) holder;
+                listHolder.initView(mItems.get(position));
+                break;
+        }
     }
 }

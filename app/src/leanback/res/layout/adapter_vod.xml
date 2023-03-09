@@ -13,7 +13,7 @@
         android:layout_height="match_parent"
         android:background="@color/black_20"
         android:scaleType="center"
-        app:shapeAppearanceOverlay="@style/Vod"
+        app:shapeAppearanceOverlay="@style/Vod.Grid"
         tools:src="@drawable/ic_img_loading" />
 
     <com.google.android.material.imageview.ShapeableImageView
@@ -22,9 +22,9 @@
         android:layout_height="match_parent"
         android:background="@color/black_50"
         android:scaleType="center"
-        android:src="@drawable/ic_delete_vod"
+        android:src="@drawable/ic_vod_delete"
         android:visibility="gone"
-        app:shapeAppearanceOverlay="@style/Vod"
+        app:shapeAppearanceOverlay="@style/Vod.Grid"
         tools:visibility="visible" />
 
     <TextView

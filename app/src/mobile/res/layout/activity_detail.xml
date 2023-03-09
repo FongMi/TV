@@ -219,7 +219,8 @@
                         android:layout_height="20dp"
                         android:layout_marginStart="8dp"
                         android:background="?attr/selectableItemBackgroundBorderless"
-                        android:src="@drawable/ic_detail_reverse" />
+                        android:src="@drawable/ic_detail_reverse"
+                        android:visibility="gone" />
 
                 </LinearLayout>
 

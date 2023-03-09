@@ -36,6 +36,7 @@ import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.player.source.Force;
 import com.fongmi.android.tv.player.source.TVBus;
 import com.fongmi.android.tv.player.source.ZLive;
+import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownLive;
 import com.fongmi.android.tv.ui.custom.CustomLiveListView;
 import com.fongmi.android.tv.ui.custom.dialog.LiveDialog;
@@ -110,14 +111,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private int getPlayerType() {
         return getHome().getPlayerType() != -1 ? getHome().getPlayerType() : Prefers.getLivePlayer();
-    }
-
-    private boolean isVisible(View view) {
-        return view.getVisibility() == View.VISIBLE;
-    }
-
-    private boolean isGone(View view) {
-        return view.getVisibility() == View.GONE;
     }
 
     @Override
@@ -322,7 +315,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void onTrack(View view) {
         int type = Integer.parseInt(view.getTag().toString());
-        TrackDialog.create(this).player(mPlayers).type(type).show();
+        TrackDialog.create().player(mPlayers).type(type).show(getSupportFragmentManager(), null);
         hideControl();
     }
 
@@ -379,7 +372,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void hideCenter() {
-        mBinding.widget.action.setImageResource(R.drawable.ic_play);
+        mBinding.widget.action.setImageResource(R.drawable.ic_widget_play);
         mBinding.widget.center.setVisibility(View.GONE);
     }
 
@@ -549,7 +542,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         if (!mPlayers.isVod() || !mChannel.isOnly()) return;
         mBinding.widget.exoDuration.setText(mPlayers.getDurationTime());
         mBinding.widget.exoPosition.setText(mPlayers.getPositionTime(time));
-        mBinding.widget.action.setImageResource(time > 0 ? R.drawable.ic_forward : R.drawable.ic_rewind);
+        mBinding.widget.action.setImageResource(time > 0 ? R.drawable.ic_widget_forward : R.drawable.ic_widget_rewind);
         mBinding.widget.center.setVisibility(View.VISIBLE);
         hideProgress();
     }

@@ -97,7 +97,7 @@
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/ic_vod_error" />
+            android:src="@drawable/ic_widget_error" />
 
         <TextView
             android:id="@+id/text"
@@ -127,7 +127,7 @@
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/ic_play" />
+            android:src="@drawable/ic_widget_play" />
 
         <LinearLayout
             android:layout_width="wrap_content"

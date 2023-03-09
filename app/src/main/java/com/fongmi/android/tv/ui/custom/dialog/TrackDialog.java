@@ -13,6 +13,7 @@ import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.adapter.TrackAdapter;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.ui.custom.TrackNameProvider;
+import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.exoplayer2.Tracks;
 
 import java.util.ArrayList;
@@ -22,19 +23,18 @@ import tv.danmaku.ijk.media.player.misc.IjkTrackInfo;
 
 public final class TrackDialog extends BaseDialog implements TrackAdapter.OnClickListener {
 
-    private DialogTrackBinding binding;
     private final TrackNameProvider provider;
     private final TrackAdapter adapter;
-    private final Listener listener;
+    private DialogTrackBinding binding;
+    private Listener listener;
     private Players player;
     private int type;
 
-    public static TrackDialog create(Listener listener) {
-        return new TrackDialog(listener);
+    public static TrackDialog create() {
+        return new TrackDialog();
     }
 
-    public TrackDialog(Listener listener) {
-        this.listener = listener;
+    public TrackDialog() {
         this.adapter = new TrackAdapter(this);
         this.provider = new TrackNameProvider();
     }
@@ -46,6 +46,11 @@ public final class TrackDialog extends BaseDialog implements TrackAdapter.OnClic
 
     public TrackDialog player(Players player) {
         this.player = player;
+        return this;
+    }
+
+    public TrackDialog listener(Listener listener) {
+        this.listener = listener;
         return this;
     }
 
@@ -104,6 +109,12 @@ public final class TrackDialog extends BaseDialog implements TrackAdapter.OnClic
         if (listener != null) listener.onTrackClick(item);
         player.setTrack(List.of(item));
         dismiss();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getDialog().getWindow().setLayout((int) (ResUtil.getScreenWidthPx() * 0.8f), -1);
     }
 
     public interface Listener {

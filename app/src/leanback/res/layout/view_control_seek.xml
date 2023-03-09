@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/grey_700"
-        android:textSize="14sp"
+        android:textSize="16sp"
         tools:text="00:00:00" />
 
     <com.google.android.exoplayer2.ui.DefaultTimeBar
@@ -37,7 +37,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/grey_700"
-        android:textSize="14sp"
+        android:textSize="16sp"
         tools:text="00:00:00" />
 
 </LinearLayout>

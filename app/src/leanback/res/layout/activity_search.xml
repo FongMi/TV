@@ -12,7 +12,7 @@
     android:paddingEnd="24dp">
 
     <LinearLayout
-        android:id="@+id/historyLayout"
+        android:id="@+id/recordLayout"
         android:layout_width="128dp"
         android:layout_height="match_parent"
         android:layout_marginEnd="36dp"
@@ -22,12 +22,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:text="@string/search_history"
+            android:text="@string/search_record"
             android:textColor="@color/white"
             android:textSize="24sp" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/historyRecycler"
+            android:id="@+id/recordRecycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipChildren="false"
@@ -35,7 +35,7 @@
             android:paddingBottom="24dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:itemCount="10"
-            tools:listitem="@layout/adapter_search_history" />
+            tools:listitem="@layout/adapter_search_record" />
 
     </LinearLayout>
 
@@ -52,9 +52,9 @@
             android:layout_marginEnd="12dp"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            android:nextFocusLeft="@id/history"
+            android:nextFocusLeft="@id/record"
             android:scaleType="fitCenter"
-            android:src="@drawable/ic_mic" />
+            android:src="@drawable/ic_search_mic" />
 
         <com.fongmi.android.tv.ui.custom.CustomEditText
             android:id="@+id/keyword"
