@@ -4,7 +4,6 @@ import android.graphics.Color;
 import android.net.Uri;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Sub;
 import com.fongmi.android.tv.utils.FileUtil;
@@ -84,10 +83,8 @@ public class ExoUtil {
 
     private static MediaItem getMediaItem(String url, List<Sub> subs, int errorCode) {
         MediaItem.Builder builder = new MediaItem.Builder().setUri(Uri.parse(url.trim().replace("\\", "")));
-        if (errorCode == PlaybackException.ERROR_CODE_PARSING_MANIFEST_MALFORMED) builder.setMimeType(MimeTypes.APPLICATION_OCTET);
-        else if (errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED) builder.setMimeType(MimeTypes.APPLICATION_M3U8);
+        if (errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED) builder.setMimeType(MimeTypes.APPLICATION_M3U8);
         if (subs.size() > 0) builder.setSubtitleConfigurations(getSubtitles(subs));
-        builder.setAllowChunklessPreparation(Prefers.getDecode() == 1);
         return builder.build();
     }
 
@@ -103,7 +100,7 @@ public class ExoUtil {
     }
 
     private static synchronized HttpDataSource.Factory getHttpDataSourceFactory() {
-        if (httpDataSourceFactory == null) httpDataSourceFactory = new DefaultHttpDataSource.Factory().setBlackList(ApiConfig.get().getAds()).setAllowCrossProtocolRedirects(true);
+        if (httpDataSourceFactory == null) httpDataSourceFactory = new DefaultHttpDataSource.Factory().setAllowCrossProtocolRedirects(true);
         return httpDataSourceFactory;
     }
 
