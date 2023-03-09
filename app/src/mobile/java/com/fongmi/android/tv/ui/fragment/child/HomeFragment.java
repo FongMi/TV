@@ -21,11 +21,11 @@ import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.FragmentHomeBinding;
 import com.fongmi.android.tv.model.SiteViewModel;
-import com.fongmi.android.tv.ui.activity.BaseFragment;
 import com.fongmi.android.tv.ui.activity.CollectActivity;
 import com.fongmi.android.tv.ui.activity.DetailActivity;
 import com.fongmi.android.tv.ui.adapter.HistoryAdapter;
 import com.fongmi.android.tv.ui.adapter.VodAdapter;
+import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.fragment.VodFragment;
 
 public class HomeFragment extends BaseFragment implements VodAdapter.OnClickListener, HistoryAdapter.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
@@ -111,8 +111,7 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
 
     @Override
     public void onItemClick(Vod item) {
-        if (item.shouldSearch()) onLongClick(item);
-        else DetailActivity.start(getActivity(), item.getVodId(), item.getVodName());
+        DetailActivity.start(getActivity(), item.getVodId(), item.getVodName());
     }
 
     @Override

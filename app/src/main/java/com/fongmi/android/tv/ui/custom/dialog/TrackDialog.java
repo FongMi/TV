@@ -13,6 +13,7 @@ import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.adapter.TrackAdapter;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.ui.custom.TrackNameProvider;
+import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.exoplayer2.Tracks;
 
 import java.util.ArrayList;
@@ -108,6 +109,12 @@ public final class TrackDialog extends BaseDialog implements TrackAdapter.OnClic
         if (listener != null) listener.onTrackClick(item);
         player.setTrack(List.of(item));
         dismiss();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getDialog().getWindow().setLayout((int) (ResUtil.getScreenWidthPx() * 0.8f), -1);
     }
 
     public interface Listener {

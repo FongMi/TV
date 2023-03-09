@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewpager.widget.ViewPager;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
@@ -25,6 +26,7 @@ import com.fongmi.android.tv.bean.Collect;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.databinding.ActivityCollectBinding;
 import com.fongmi.android.tv.model.SiteViewModel;
+import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.fragment.CollectFragment;
 import com.fongmi.android.tv.ui.presenter.CollectPresenter;
 import com.fongmi.android.tv.utils.PauseThreadPoolExecutor;
@@ -85,7 +87,6 @@ public class CollectActivity extends BaseActivity {
         mBinding.recycler.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
-                mBinding.pager.setCurrentItem(position);
                 onChildSelected(child);
             }
         });
@@ -122,9 +123,7 @@ public class CollectActivity extends BaseActivity {
     private void search() {
         mAdapter.add(Collect.all());
         mPageAdapter.notifyDataSetChanged();
-        int core = Runtime.getRuntime().availableProcessors();
-        int corePoolSize = Math.max(Constant.THREAD_POOL, core);
-        mExecutor = new PauseThreadPoolExecutor(corePoolSize, corePoolSize, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
+        mExecutor = new PauseThreadPoolExecutor(Constant.THREAD_POOL, 0, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
         mBinding.result.setText(getString(R.string.collect_result, getKeyword()));
         for (Site site : mSites) mExecutor.execute(() -> search(site));
     }
@@ -141,7 +140,15 @@ public class CollectActivity extends BaseActivity {
         if (child == null) return;
         mOldView = child.itemView;
         mOldView.setActivated(true);
+        App.post(mRunnable, 200);
     }
+
+    private final Runnable mRunnable = new Runnable() {
+        @Override
+        public void run() {
+            mBinding.pager.setCurrentItem(mBinding.recycler.getSelectedPosition());
+        }
+    };
 
     private CollectFragment getFragment() {
         return (CollectFragment) mPageAdapter.instantiateItem(mBinding.pager, 0);
@@ -179,15 +186,15 @@ public class CollectActivity extends BaseActivity {
             super(fm);
         }
 
-        @Override
-        public int getCount() {
-            return mAdapter.size();
-        }
-
         @NonNull
         @Override
         public Fragment getItem(int position) {
             return CollectFragment.newInstance(((Collect) mAdapter.get(position)).getList());
+        }
+
+        @Override
+        public int getCount() {
+            return mAdapter.size();
         }
 
         @Override

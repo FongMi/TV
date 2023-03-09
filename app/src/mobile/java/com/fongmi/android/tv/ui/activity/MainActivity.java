@@ -18,6 +18,7 @@ import com.fongmi.android.tv.databinding.ActivityMainBinding;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.server.Server;
+import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.FragmentStateManager;
 import com.fongmi.android.tv.ui.fragment.SettingFragment;
 import com.fongmi.android.tv.ui.fragment.VodFragment;
@@ -64,11 +65,7 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
         mManager = new FragmentStateManager(mBinding.container, getSupportFragmentManager()) {
             @Override
             public Fragment getItem(int position) {
-                if (position == 0) {
-                    return VodFragment.newInstance();
-                } else {
-                    return SettingFragment.newInstance();
-                }
+                return position == 0 ? VodFragment.newInstance() : SettingFragment.newInstance();
             }
         };
         if (savedInstanceState == null) mManager.change(0);
