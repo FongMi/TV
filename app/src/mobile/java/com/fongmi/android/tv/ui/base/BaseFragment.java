@@ -22,32 +22,40 @@ public abstract class BaseFragment extends Fragment {
         return getBinding(inflater, container).getRoot();
     }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        initView();
+        initEvent();
+    }
+
     protected void initView() {
     }
 
     protected void initEvent() {
     }
 
-    public boolean canBack() {
-        return true;
+    protected void initData() {
     }
 
-    private void resume() {
+    private void onVisible() {
         if (init) return;
-        initView();
-        initEvent();
+        initData();
         init = true;
+    }
+
+    public boolean canBack() {
+        return true;
     }
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
-        if (isVisibleToUser) if (isResumed()) resume();
+        if (isVisibleToUser) if (isResumed()) onVisible();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if (getUserVisibleHint()) resume();
+        if (getUserVisibleHint()) onVisible();
     }
 }

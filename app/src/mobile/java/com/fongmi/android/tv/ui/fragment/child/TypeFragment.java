@@ -67,10 +67,8 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         mTypeIds = new ArrayList<>();
         mExtends = new HashMap<>();
         mScroller = new CustomScroller(this);
-        mBinding.progressLayout.showProgress();
         setRecyclerView();
         setViewModel();
-        getVideo();
     }
 
     @Override
@@ -83,6 +81,12 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
                 getParent().toggleFilter(dy);
             }
         });
+    }
+
+    @Override
+    protected void initData() {
+        mBinding.progressLayout.showProgress();
+        getVideo();
     }
 
     private void setRecyclerView() {
