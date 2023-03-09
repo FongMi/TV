@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewpager.widget.ViewPager;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
@@ -86,7 +87,6 @@ public class CollectActivity extends BaseActivity {
         mBinding.recycler.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
-                mBinding.pager.setCurrentItem(position);
                 onChildSelected(child);
             }
         });
@@ -140,7 +140,15 @@ public class CollectActivity extends BaseActivity {
         if (child == null) return;
         mOldView = child.itemView;
         mOldView.setActivated(true);
+        App.post(mRunnable, 200);
     }
+
+    private final Runnable mRunnable = new Runnable() {
+        @Override
+        public void run() {
+            mBinding.pager.setCurrentItem(mBinding.recycler.getSelectedPosition());
+        }
+    };
 
     private CollectFragment getFragment() {
         return (CollectFragment) mPageAdapter.instantiateItem(mBinding.pager, 0);
