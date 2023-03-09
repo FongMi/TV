@@ -111,8 +111,7 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
 
     @Override
     public void onItemClick(Vod item) {
-        if (item.shouldSearch()) onLongClick(item);
-        else DetailActivity.start(getActivity(), item.getVodId(), item.getVodName());
+        DetailActivity.start(getActivity(), item.getVodId(), item.getVodName());
     }
 
     @Override
