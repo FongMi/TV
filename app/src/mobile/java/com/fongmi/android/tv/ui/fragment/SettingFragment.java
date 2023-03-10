@@ -205,7 +205,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
     }
 
     private void setWallDefault() {
-        WallConfig.refresh(Prefers.getWall() == 2 ? 1 : Prefers.getWall() + 1);
+        WallConfig.refresh(Prefers.getWall() == 4 ? 1 : Prefers.getWall() + 1);
     }
 
     private void setWallRefresh() {
