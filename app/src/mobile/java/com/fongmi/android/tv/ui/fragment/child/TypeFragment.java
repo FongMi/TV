@@ -103,7 +103,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
             mScroller.endLoading(result.getList().isEmpty());
             mBinding.swipeLayout.setRefreshing(false);
             mVodAdapter.addAll(result.getList());
-            checkPage();
+            checkPage(result.getList().size());
         });
     }
 
@@ -113,9 +113,9 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         getVideo(getTypeId(), "1");
     }
 
-    private void checkPage() {
-        if (mScroller.getPage() != 1 || mVodAdapter.getItemCount() >= 40 || isFolder()) return;
-        if (mScroller.addPage()) getVideo(getTypeId(), "2");
+    private void checkPage(int count) {
+        if (count == 0 || mVodAdapter.getItemCount() >= 40 || isFolder()) return;
+        getVideo(getTypeId(), String.valueOf(mScroller.addPage()));
     }
 
     private void getVideo(String typeId, String page) {
