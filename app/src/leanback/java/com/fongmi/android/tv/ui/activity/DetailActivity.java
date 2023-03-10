@@ -92,13 +92,14 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private CustomKeyDownVod mKeyDown;
     private ExecutorService mExecutor;
     private SiteViewModel mViewModel;
-    private boolean mFullscreen;
-    private boolean mInitTrack;
-    private boolean mInitAuto;
-    private boolean mAutoMode;
     private History mHistory;
     private Players mPlayers;
     private String mSiteKey;
+    private boolean fullscreen;
+    private boolean initTrack;
+    private boolean initAuto;
+    private boolean autoMode;
+    private boolean useParse;
     private int mCurrent;
     private Runnable mR1;
     private Runnable mR2;
@@ -290,10 +291,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mViewModel.search.observe(this, result -> setSearch(result.getList()));
         mViewModel.player.observe(this, result -> {
-            boolean useParse = ApiConfig.hasParse() && ((result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx() == 1);
-            mBinding.control.parseLayout.setVisibility(useParse ? View.VISIBLE : View.GONE);
+            setUseParse(ApiConfig.hasParse() && ((result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx() == 1));
+            mBinding.control.parseLayout.setVisibility(isUseParse() ? View.VISIBLE : View.GONE);
             int timeout = getSite().isChangeable() ? Constant.TIMEOUT_PLAY : -1;
-            mPlayers.start(result, useParse, timeout);
+            mPlayers.start(result, isUseParse(), timeout);
             resetFocus();
         });
         mViewModel.result.observe(this, result -> {
@@ -304,10 +305,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void resetFocus() {
-        boolean useParse = isVisible(mBinding.control.parseLayout);
-        findViewById(R.id.timeBar).setNextFocusUpId(useParse ? R.id.parse : R.id.next);
+        findViewById(R.id.timeBar).setNextFocusUpId(isUseParse() ? R.id.parse : R.id.next);
         for (int i = 0; i < mBinding.control.actionLayout.getChildCount(); i++) {
-            mBinding.control.actionLayout.getChildAt(i).setNextFocusDownId(useParse ? R.id.parse : R.id.timeBar);
+            mBinding.control.actionLayout.getChildAt(i).setNextFocusDownId(isUseParse() ? R.id.parse : R.id.timeBar);
         }
     }
 
@@ -814,7 +814,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void startFlow() {
         if (!getSite().isChangeable()) return;
-        if (isVisible(mBinding.control.parseLayout)) checkParse();
+        if (isUseParse()) checkParse();
         else checkFlag();
     }
 
@@ -928,35 +928,43 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private boolean isFullscreen() {
-        return mFullscreen;
+        return fullscreen;
     }
 
     private void setFullscreen(boolean fullscreen) {
-        this.mFullscreen = fullscreen;
+        this.fullscreen = fullscreen;
     }
 
     private boolean isInitTrack() {
-        return mInitTrack;
+        return initTrack;
     }
 
     private void setInitTrack(boolean initTrack) {
-        this.mInitTrack = initTrack;
+        this.initTrack = initTrack;
     }
 
     private boolean isInitAuto() {
-        return mInitAuto;
+        return initAuto;
     }
 
     private void setInitAuto(boolean initAuto) {
-        this.mInitAuto = initAuto;
+        this.initAuto = initAuto;
     }
 
     private boolean isAutoMode() {
-        return mAutoMode;
+        return autoMode;
     }
 
     private void setAutoMode(boolean autoMode) {
-        this.mAutoMode = autoMode;
+        this.autoMode = autoMode;
+    }
+
+    public boolean isUseParse() {
+        return useParse;
+    }
+
+    public void setUseParse(boolean useParse) {
+        this.useParse = useParse;
     }
 
     private void notifyItemChanged(RecyclerView view, ArrayObjectAdapter adapter) {

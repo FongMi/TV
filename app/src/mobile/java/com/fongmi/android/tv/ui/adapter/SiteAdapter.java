@@ -38,16 +38,6 @@ public class SiteAdapter extends RecyclerView.Adapter<SiteAdapter.ViewHolder> {
         boolean onSearchLongClick(Site item);
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
-
-        private final AdapterSiteBinding binding;
-
-        ViewHolder(@NonNull AdapterSiteBinding binding) {
-            super(binding.getRoot());
-            this.binding = binding;
-        }
-    }
-
     @Override
     public int getItemCount() {
         return mItems.size();
@@ -72,5 +62,15 @@ public class SiteAdapter extends RecyclerView.Adapter<SiteAdapter.ViewHolder> {
         holder.binding.text.setOnClickListener(v -> mListener.onTextClick(item));
         holder.binding.search.setOnClickListener(v -> mListener.onSearchClick(item));
         holder.binding.search.setOnLongClickListener(v -> mListener.onSearchLongClick(item));
+    }
+
+    static class ViewHolder extends RecyclerView.ViewHolder {
+
+        private final AdapterSiteBinding binding;
+
+        ViewHolder(@NonNull AdapterSiteBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
     }
 }

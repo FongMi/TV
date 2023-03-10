@@ -28,16 +28,6 @@ public class CollectAdapter extends RecyclerView.Adapter<CollectAdapter.ViewHold
         void onItemClick(int position, Collect item);
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
-
-        private final AdapterCollectBinding binding;
-
-        ViewHolder(@NonNull AdapterCollectBinding binding) {
-            super(binding.getRoot());
-            this.binding = binding;
-        }
-    }
-
     public void clear() {
         mItems.clear();
         mItems.add(Collect.all());
@@ -80,5 +70,15 @@ public class CollectAdapter extends RecyclerView.Adapter<CollectAdapter.ViewHold
         holder.binding.text.setActivated(item.isActivated());
         holder.binding.text.setText(item.getSite().getName());
         holder.binding.text.setOnClickListener(v -> mListener.onItemClick(position, item));
+    }
+
+    static class ViewHolder extends RecyclerView.ViewHolder {
+
+        private final AdapterCollectBinding binding;
+
+        ViewHolder(@NonNull AdapterCollectBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
     }
 }
