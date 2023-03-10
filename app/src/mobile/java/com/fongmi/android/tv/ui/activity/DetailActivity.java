@@ -881,7 +881,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     @Override
     public void onSeeking(int time) {
-        if (!isLock()) showState(time > 0 ? R.drawable.ic_widget_forward : R.drawable.ic_widget_rewind, time);
+        if (isLock()) return;
+        showState(time > 0 ? R.drawable.ic_widget_forward : R.drawable.ic_widget_rewind, time);
+        hideProgress();
     }
 
     @Override
@@ -899,24 +901,24 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     @Override
+    public void onDoubleTap() {
+        if (mPlayers.isPlaying()) onPause(true);
+        else onPlay();
+        hideControl();
+    }
+
     public void onDoubleTapLeft() {
         mPlayers.seekTo(-15 * 1000);
         showState(R.drawable.ic_widget_rewind);
         App.post(mR4, 500);
+        hideProgress();
     }
 
-    @Override
     public void onDoubleTapRight() {
         mPlayers.seekTo(15 * 1000);
         showState(R.drawable.ic_widget_forward);
         App.post(mR4, 500);
-    }
-
-    @Override
-    public void onDoubleTapCenter() {
-        if (mPlayers.isPlaying()) onPause(true);
-        else onPlay();
-        hideControl();
+        hideProgress();
     }
 
     @Override
