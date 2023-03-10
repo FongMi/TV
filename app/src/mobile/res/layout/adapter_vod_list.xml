@@ -38,6 +38,7 @@
         android:layout_marginTop="8dp"
         android:background="#CCF44336"
         android:ellipsize="end"
+        android:maxWidth="90dp"
         android:padding="4dp"
         android:singleLine="true"
         android:textColor="@color/white"
