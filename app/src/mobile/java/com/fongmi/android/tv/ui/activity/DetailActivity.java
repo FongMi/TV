@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Rect;
+import android.os.Bundle;
 import android.text.Html;
 import android.text.Layout;
 import android.util.Rational;
@@ -45,6 +46,7 @@ import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.adapter.EpisodeAdapter;
 import com.fongmi.android.tv.ui.adapter.FlagAdapter;
 import com.fongmi.android.tv.ui.adapter.ParseAdapter;
+import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.ui.custom.dialog.TrackDialog;
@@ -155,14 +157,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         return mBinding.ijk;
     }
 
-    private boolean isVisible(View view) {
-        return view.getVisibility() == View.VISIBLE;
-    }
-
-    private boolean isGone(View view) {
-        return view.getVisibility() == View.GONE;
-    }
-
     private boolean isFromSearch() {
         return getCallingActivity() != null && getCallingActivity().getShortClassName().contains(CollectActivity.class.getSimpleName());
     }
@@ -192,7 +186,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     @Override
-    protected void initView() {
+    protected void initView(Bundle savedInstanceState) {
         mKeyDown = CustomKeyDownVod.create(this);
         mFrameParams = mBinding.video.getLayoutParams();
         mPlayers = new Players().init();
@@ -577,6 +571,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void enterFullscreen() {
         mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
+        mBinding.control.getRoot().setPadding(ResUtil.dp2px(24), ResUtil.dp2px(16), ResUtil.dp2px(24), 0);
         getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
         mBinding.control.full.setImageResource(R.drawable.ic_control_full_off);
@@ -587,10 +582,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void exitFullscreen() {
+        mBinding.control.getRoot().setPadding(ResUtil.dp2px(16), ResUtil.dp2px(16), ResUtil.dp2px(16), 0);
         getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        mBinding.control.full.setImageResource(R.drawable.ic_control_full_on);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
         mBinding.episode.scrollToPosition(mEpisodeAdapter.getPosition());
-        mBinding.control.full.setImageResource(R.drawable.ic_control_full_on);
         mBinding.video.setLayoutParams(mFrameParams);
         App.post(mR3, 2000);
         setFullscreen(false);

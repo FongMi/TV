@@ -71,6 +71,13 @@
     <string name="setting_version">Version</string>
     <string name="setting_storage">Permission</string>
 
+    <!-- Search -->
+    <string name="search_keyword">Keywords…</string>
+    <string name="search_record">History</string>
+    <string name="search_suggest">Suggest</string>
+    <string name="search_hot">Hot</string>
+
+
     <!-- Dialog -->
     <string name="dialog_positive">OK</string>
     <string name="dialog_negative">Cancel</string>

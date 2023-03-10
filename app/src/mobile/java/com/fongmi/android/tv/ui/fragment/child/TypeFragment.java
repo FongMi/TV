@@ -16,10 +16,10 @@ import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.FragmentTypeBinding;
 import com.fongmi.android.tv.model.SiteViewModel;
-import com.fongmi.android.tv.ui.activity.BaseFragment;
 import com.fongmi.android.tv.ui.activity.CollectActivity;
 import com.fongmi.android.tv.ui.activity.DetailActivity;
 import com.fongmi.android.tv.ui.adapter.VodAdapter;
+import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.custom.CustomScroller;
 import com.fongmi.android.tv.ui.fragment.VodFragment;
 
@@ -67,10 +67,8 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         mTypeIds = new ArrayList<>();
         mExtends = new HashMap<>();
         mScroller = new CustomScroller(this);
-        mBinding.progressLayout.showProgress();
         setRecyclerView();
         setViewModel();
-        getVideo();
     }
 
     @Override
@@ -83,6 +81,12 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
                 getParent().toggleFilter(dy);
             }
         });
+    }
+
+    @Override
+    protected void initData() {
+        mBinding.progressLayout.showProgress();
+        getVideo();
     }
 
     private void setRecyclerView() {
@@ -143,8 +147,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     @Override
     public void onItemClick(Vod item) {
-        if (item.shouldSearch()) onLongClick(item);
-        else if (item.isFolder()) getVideo(item.getVodId(), "1");
+        if (item.isFolder()) getVideo(item.getVodId(), "1");
         else DetailActivity.start(getActivity(), item.getVodId(), item.getVodName());
     }
 

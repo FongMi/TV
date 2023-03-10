@@ -1,5 +1,6 @@
 package com.fongmi.android.tv.ui.custom.dialog;
 
+import android.app.Activity;
 import android.view.LayoutInflater;
 
 import androidx.appcompat.app.AlertDialog;
@@ -20,8 +21,19 @@ public class SiteDialog implements SiteAdapter.OnClickListener {
     private final SiteAdapter adapter;
     private final AlertDialog dialog;
 
+    public static SiteDialog create(Activity activity) {
+        return new SiteDialog(activity);
+    }
+
     public static SiteDialog create(Fragment fragment) {
         return new SiteDialog(fragment);
+    }
+
+    public SiteDialog(Activity activity) {
+        this.callback = (activity instanceof SiteCallback) ? (SiteCallback) activity : null;
+        this.binding = DialogSiteBinding.inflate(LayoutInflater.from(activity));
+        this.dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).create();
+        this.adapter = new SiteAdapter(this);
     }
 
     public SiteDialog(Fragment fragment) {
@@ -71,6 +83,7 @@ public class SiteDialog implements SiteAdapter.OnClickListener {
     public void onSearchClick(Site item) {
         item.setSearchable(!item.isSearchable()).save();
         adapter.notifyItemRangeChanged(0, adapter.getItemCount());
+        callback.onChanged();
     }
 
     @Override
@@ -78,6 +91,7 @@ public class SiteDialog implements SiteAdapter.OnClickListener {
         boolean result = !item.isSearchable();
         for (Site site : ApiConfig.get().getSites()) site.setSearchable(result).save();
         adapter.notifyItemRangeChanged(0, adapter.getItemCount());
+        callback.onChanged();
         return true;
     }
 }

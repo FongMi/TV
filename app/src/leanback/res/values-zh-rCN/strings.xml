@@ -10,12 +10,6 @@
     <string name="home_history">最近观看</string>
     <string name="home_recommend">更新推荐</string>
 
-    <!-- Search -->
-    <string name="search_keyword">关键字…</string>
-    <string name="search_history">历史</string>
-    <string name="search_suggest">建议</string>
-    <string name="search_hot">热搜</string>
-
     <!-- Collect -->
     <string name="collect_result">“<xliff:g name="name">%s</xliff:g>”的搜索结果</string>
 
