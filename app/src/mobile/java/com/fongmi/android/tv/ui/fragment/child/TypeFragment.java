@@ -99,11 +99,12 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mViewModel.result.observe(getViewLifecycleOwner(), result -> {
-            mBinding.progressLayout.showContent(isFolder(), result.getList().size());
-            mScroller.endLoading(result.getList().isEmpty());
+            int size = result.getList().size();
+            mBinding.progressLayout.showContent(isFolder(), size);
             mBinding.swipeLayout.setRefreshing(false);
+            mScroller.endLoading(size == 0);
             mVodAdapter.addAll(result.getList());
-            checkPage(result.getList().size());
+            checkPage(size);
         });
     }
 
