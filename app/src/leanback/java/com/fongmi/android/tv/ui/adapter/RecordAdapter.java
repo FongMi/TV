@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.fongmi.android.tv.databinding.AdapterSearchHistoryBinding;
+import com.fongmi.android.tv.databinding.AdapterSearchRecordBinding;
 import com.fongmi.android.tv.utils.Prefers;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -15,13 +15,13 @@ import com.google.gson.reflect.TypeToken;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHolder> {
+public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.ViewHolder> {
 
     private final OnClickListener mListener;
     private final List<String> mItems;
     private final Gson mGson;
 
-    public HistoryAdapter(OnClickListener listener) {
+    public RecordAdapter(OnClickListener listener) {
         this.mListener = listener;
         this.mGson = new Gson();
         this.mItems = getItems();
@@ -30,7 +30,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
     public interface OnClickListener {
 
-        void onItemClick(String item);
+        void onItemClick(String text);
 
         void onDataChanged(int size);
     }
@@ -70,19 +70,19 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(AdapterSearchHistoryBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        return new ViewHolder(AdapterSearchRecordBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.binding.history.setText(mItems.get(position));
+        holder.binding.record.setText(mItems.get(position));
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
-        private final AdapterSearchHistoryBinding binding;
+        private final AdapterSearchRecordBinding binding;
 
-        public ViewHolder(@NonNull AdapterSearchHistoryBinding binding) {
+        public ViewHolder(@NonNull AdapterSearchRecordBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
             itemView.setOnClickListener(this);

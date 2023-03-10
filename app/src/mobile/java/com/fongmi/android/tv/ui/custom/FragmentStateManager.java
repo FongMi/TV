@@ -6,7 +6,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.fongmi.android.tv.ui.activity.BaseFragment;
+import com.fongmi.android.tv.ui.base.BaseFragment;
 
 public abstract class FragmentStateManager {
 
