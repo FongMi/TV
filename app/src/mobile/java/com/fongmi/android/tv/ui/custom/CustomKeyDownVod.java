@@ -89,8 +89,8 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
 
     private int getDelay() {
         int count = Math.abs(time) / Constant.INTERVAL_SEEK;
-        if (count < 10) return 250;
-        else if (count < 20) return 100;
+        if (count < 5) return 250;
+        else if (count < 15) return 100;
         else return 50;
     }
 
