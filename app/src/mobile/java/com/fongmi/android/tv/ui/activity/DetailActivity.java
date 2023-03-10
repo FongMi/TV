@@ -188,7 +188,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     @Override
     protected void initView(Bundle savedInstanceState) {
-        mKeyDown = CustomKeyDownVod.create(this);
+        mKeyDown = CustomKeyDownVod.create(this, mBinding.video);
         mFrameParams = mBinding.video.getLayoutParams();
         mPlayers = new Players().init();
         mR1 = this::hideControl;
@@ -437,6 +437,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void onLock() {
         setLock(!isLock());
         setRequestedOrientation(getLockOrient());
+        mKeyDown.setLock(isLock());
         checkLockImg();
         showControl();
     }
@@ -989,7 +990,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     @Override
     public void onSpeedUp() {
-        if (isLock()) return;
         mPlayers.setSpeed(3.0f);
         showState(R.drawable.ic_widget_forward);
         showTime();
@@ -997,7 +997,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     @Override
     public void onSpeedReset() {
-        if (isLock()) return;
         mPlayers.setSpeed(1.0f);
         App.removeCallbacks(mR4);
         hideState();
@@ -1005,14 +1004,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     @Override
     public void onSeeking(int time) {
-        if (isLock()) return;
         showState(time > 0 ? R.drawable.ic_widget_forward : R.drawable.ic_widget_rewind, time);
         hideProgress();
     }
 
     @Override
     public void onSeekTo(int time) {
-        if (isLock()) return;
         mPlayers.seekTo(time);
         showProgress();
         onPlay();

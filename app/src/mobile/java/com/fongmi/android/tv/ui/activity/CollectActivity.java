@@ -127,7 +127,7 @@ public class CollectActivity extends BaseActivity implements SiteCallback, WordA
         mBinding.recordRecycler.setHasFixedSize(true);
         mBinding.recordRecycler.setLayoutManager(new GridLayoutManager(this, 2));
         mBinding.recordRecycler.setAdapter(mRecordAdapter = new RecordAdapter(this));
-        mVodAdapter.setSize(Product.getSpec(getActivity(), ResUtil.dp2px(64), 3));
+        mVodAdapter.setSize(Product.getSpec(ResUtil.dp2px(64), 3));
     }
 
     private void setLayoutSize() {
