@@ -1,16 +1,11 @@
 package com.fongmi.android.tv;
 
 import android.content.Context;
-import android.content.res.Resources;
 
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 
 public class Product {
-
-    public static Resources hackResources(Resources resources) {
-        return resources;
-    }
 
     public static int getColumn() {
         return Math.abs(Prefers.getSize() - 5);

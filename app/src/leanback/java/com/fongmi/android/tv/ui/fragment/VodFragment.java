@@ -21,9 +21,9 @@ import com.fongmi.android.tv.bean.Filter;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.FragmentVodBinding;
 import com.fongmi.android.tv.model.SiteViewModel;
-import com.fongmi.android.tv.ui.activity.BaseFragment;
 import com.fongmi.android.tv.ui.activity.CollectActivity;
 import com.fongmi.android.tv.ui.activity.DetailActivity;
+import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.custom.CustomRowPresenter;
 import com.fongmi.android.tv.ui.custom.CustomScroller;
 import com.fongmi.android.tv.ui.custom.CustomSelector;
@@ -88,6 +88,10 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         mBinding.progressLayout.showProgress();
         setRecyclerView();
         setViewModel();
+    }
+
+    @Override
+    protected void initData() {
         getVideo();
     }
 
@@ -202,8 +206,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
 
     @Override
     public void onItemClick(Vod item) {
-        if (item.shouldSearch()) onLongClick(item);
-        else if (item.isFolder()) getVideo(item.getVodId(), "1");
+        if (item.isFolder()) getVideo(item.getVodId(), "1");
         else DetailActivity.start(getActivity(), getKey(), item.getVodId(), item.getVodName());
     }
 

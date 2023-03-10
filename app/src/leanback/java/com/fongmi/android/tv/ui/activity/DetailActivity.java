@@ -41,6 +41,7 @@ import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.net.OkHttp;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
+import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
 import com.fongmi.android.tv.ui.custom.dialog.DescDialog;
 import com.fongmi.android.tv.ui.custom.dialog.TrackDialog;
@@ -171,14 +172,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private IjkVideoView getIjk() {
         return mBinding.ijk;
-    }
-
-    private boolean isVisible(View view) {
-        return view.getVisibility() == View.VISIBLE;
-    }
-
-    private boolean isGone(View view) {
-        return view.getVisibility() == View.GONE;
     }
 
     private boolean isReplay() {
@@ -861,7 +854,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void startSearch(String keyword) {
         mSearchAdapter.clear();
-        mExecutor = Executors.newFixedThreadPool(Constant.THREAD_POOL * 2);
+        mExecutor = Executors.newFixedThreadPool(Constant.THREAD_POOL);
         for (Site site : ApiConfig.get().getSites()) {
             if (site.getKey().equals(getKey())) continue;
             if (isAutoMode() && !site.isChangeable()) continue;
