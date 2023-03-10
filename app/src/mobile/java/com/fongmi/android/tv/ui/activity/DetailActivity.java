@@ -323,14 +323,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.video.setTag(item.getVodPic());
         mBinding.name.setText(item.getVodName());
         setText(mBinding.remark, 0, item.getVodRemarks());
-        setText(mBinding.year, R.string.detail_year, item.getVodYear());
-        setText(mBinding.area, R.string.detail_area, item.getVodArea());
-        setText(mBinding.type, R.string.detail_type, item.getTypeName());
         setText(mBinding.site, R.string.detail_site, getSite().getName());
         setText(mBinding.actor, R.string.detail_actor, Html.fromHtml(item.getVodActor()).toString());
         setText(mBinding.content, 0, Html.fromHtml(item.getVodContent()).toString());
         setText(mBinding.director, R.string.detail_director, Html.fromHtml(item.getVodDirector()).toString());
         mFlagAdapter.addAll(item.getVodFlags());
+        setOther(mBinding.other, item);
         checkFlag(item);
         checkKeepImg();
         checkLine();
@@ -340,6 +338,15 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         view.setVisibility(text.isEmpty() ? View.GONE : View.VISIBLE);
         view.setText(resId > 0 ? getString(resId, text) : text);
         view.setTag(text);
+    }
+
+    private void setOther(TextView view, Vod item) {
+        StringBuilder sb = new StringBuilder();
+        if (!item.getVodYear().isEmpty()) sb.append(getString(R.string.detail_year, item.getVodYear())).append("  ");
+        if (!item.getVodArea().isEmpty()) sb.append(getString(R.string.detail_area, item.getVodArea())).append("  ");
+        if (!item.getTypeName().isEmpty()) sb.append(getString(R.string.detail_type, item.getTypeName())).append("  ");
+        view.setVisibility(sb.length() == 0 ? View.GONE : View.VISIBLE);
+        view.setText(Utils.substring(sb.toString(), 2));
     }
 
     private void checkLine() {
