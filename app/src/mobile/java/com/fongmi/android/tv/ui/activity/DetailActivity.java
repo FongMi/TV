@@ -96,6 +96,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private Runnable mR1;
     private Runnable mR2;
     private Runnable mR3;
+    private Runnable mR4;
 
     public static void push(Activity activity, String url) {
         start(activity, "push_agent", url, url);
@@ -193,6 +194,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
         mR3 = this::setOrient;
+        mR4 = this::showTime;
         mSiteKey = getKey();
         setRecyclerView();
         setVideoView();
@@ -623,6 +625,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.widget.error.setVisibility(View.GONE);
     }
 
+    private void showTime() {
+        mBinding.widget.position.setText(mPlayers.getPositionTime(0));
+        App.post(mR4, 200);
+    }
+
     private void showState(int resId) {
         showState(resId, 0);
     }
@@ -981,6 +988,22 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     @Override
+    public void onSpeedUp() {
+        if (isLock()) return;
+        mPlayers.setSpeed(3.0f);
+        showState(R.drawable.ic_widget_forward);
+        showTime();
+    }
+
+    @Override
+    public void onSpeedReset() {
+        if (isLock()) return;
+        mPlayers.setSpeed(1.0f);
+        App.removeCallbacks(mR4);
+        hideState();
+    }
+
+    @Override
     public void onSeeking(int time) {
         if (isLock()) return;
         showState(time > 0 ? R.drawable.ic_widget_forward : R.drawable.ic_widget_rewind, time);
@@ -1081,6 +1104,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     protected void onDestroy() {
         super.onDestroy();
         mPlayers.release();
-        App.removeCallbacks(mR1, mR2, mR3);
+        App.removeCallbacks(mR1, mR2, mR3, mR4);
     }
 }
