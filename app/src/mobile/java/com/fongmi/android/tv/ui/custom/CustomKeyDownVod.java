@@ -16,6 +16,7 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
     private final Listener listener;
     private Runnable runnable;
     private boolean touch;
+    private boolean speed;
     private boolean seek;
     private int time;
 
@@ -29,7 +30,8 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
     }
 
     public boolean onTouchEvent(MotionEvent e) {
-        if (seek && e.getAction() == MotionEvent.ACTION_UP) seekDone();
+        if (seek && e.getAction() == MotionEvent.ACTION_UP) seekTo();
+        if (speed && e.getAction() == MotionEvent.ACTION_UP) listener.onSpeedReset();
         return detector.onTouchEvent(e);
     }
 
@@ -39,6 +41,7 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
         float downX = e.getX() > width ? width : e.getX();
         float edgeX = Math.abs(downX - width);
         touch = e.getX() > 100 && edgeX > 0;
+        speed = false;
         seek = false;
         return true;
     }
@@ -46,11 +49,10 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
     @Override
     public void onLongPress(@NonNull MotionEvent e) {
         int base = ResUtil.getScreenWidthPx() / 3;
-        boolean left = e.getX() > 0 && e.getX() < base;
-        boolean right = e.getX() > base * 2 && e.getX() < base * 3;
-        if (left) App.post(runnable = this::subTime, 0);
-        if (right) App.post(runnable = this::addTime, 0);
-        seek = left || right;
+        seek = e.getX() > 0 && e.getX() < base;
+        speed = e.getX() > base * 2 && e.getX() < base * 3;
+        if (seek) App.post(runnable = this::subTime, 0);
+        if (speed) listener.onSpeedUp();
     }
 
     @Override
@@ -78,11 +80,6 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
         return true;
     }
 
-    private void addTime() {
-        listener.onSeeking(time = time + Constant.INTERVAL_SEEK);
-        App.post(runnable, getDelay());
-    }
-
     private void subTime() {
         listener.onSeeking(time = time - Constant.INTERVAL_SEEK);
         App.post(runnable, getDelay());
@@ -95,7 +92,7 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
         else return 50;
     }
 
-    private void seekDone() {
+    private void seekTo() {
         App.removeCallbacks(runnable);
         listener.onSeekTo(time);
         seek = false;
@@ -103,6 +100,10 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
     }
 
     public interface Listener {
+
+        void onSpeedUp();
+
+        void onSpeedReset();
 
         void onSeeking(int time);
 
