@@ -61,11 +61,11 @@ public class ConfigAdapter extends RecyclerView.Adapter<ConfigAdapter.ViewHolder
         holder.binding.delete.setOnClickListener(v -> mListener.onDeleteClick(item));
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder {
 
         private final AdapterConfigBinding binding;
 
-        public ViewHolder(@NonNull AdapterConfigBinding binding) {
+        ViewHolder(@NonNull AdapterConfigBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
         }

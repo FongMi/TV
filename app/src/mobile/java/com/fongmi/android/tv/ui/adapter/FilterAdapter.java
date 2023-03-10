@@ -23,16 +23,6 @@ public class FilterAdapter extends RecyclerView.Adapter<FilterAdapter.ViewHolder
         this.mItems = items;
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
-
-        private final AdapterFilterBinding binding;
-
-        ViewHolder(@NonNull AdapterFilterBinding binding) {
-            super(binding.getRoot());
-            this.binding = binding;
-        }
-    }
-
     @Override
     public int getItemCount() {
         return mItems.size();
@@ -51,5 +41,15 @@ public class FilterAdapter extends RecyclerView.Adapter<FilterAdapter.ViewHolder
         holder.binding.recycler.setItemAnimator(null);
         holder.binding.recycler.setLayoutManager(new LinearLayoutManager(holder.itemView.getContext(), LinearLayoutManager.HORIZONTAL, false));
         holder.binding.recycler.setAdapter(new ValueAdapter(mListener, item));
+    }
+
+    static class ViewHolder extends RecyclerView.ViewHolder {
+
+        private final AdapterFilterBinding binding;
+
+        ViewHolder(@NonNull AdapterFilterBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
     }
 }
