@@ -58,16 +58,6 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         notifyItemRemoved(position);
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
-
-        private final AdapterVodBinding binding;
-
-        ViewHolder(@NonNull AdapterVodBinding binding) {
-            super(binding.getRoot());
-            this.binding = binding;
-        }
-    }
-
     public void addAll(List<History> items) {
         mItems.clear();
         mItems.addAll(items);
@@ -107,5 +97,15 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
             if (isDelete()) mListener.onItemDelete(item);
             else mListener.onItemClick(item);
         });
+    }
+
+    static class ViewHolder extends RecyclerView.ViewHolder {
+
+        private final AdapterVodBinding binding;
+
+        ViewHolder(@NonNull AdapterVodBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
     }
 }

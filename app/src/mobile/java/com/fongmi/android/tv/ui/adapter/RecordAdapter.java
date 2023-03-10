@@ -1,7 +1,6 @@
 package com.fongmi.android.tv.ui.adapter;
 
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -37,7 +36,8 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.ViewHolder
 
     private List<String> getItems() {
         if (Prefers.getKeyword().isEmpty()) return new ArrayList<>();
-        return mGson.fromJson(Prefers.getKeyword(), new TypeToken<List<String>>() {}.getType());
+        return mGson.fromJson(Prefers.getKeyword(), new TypeToken<List<String>>() {
+        }.getType());
     }
 
     private void checkToAdd(String item) {
@@ -75,32 +75,27 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.binding.text.setText(mItems.get(position));
+        String text = mItems.get(position);
+        holder.binding.text.setText(text);
+        holder.binding.text.setOnClickListener(v -> mListener.onItemClick(text));
+        holder.binding.text.setOnLongClickListener(v -> onLongClick(position));
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+    private boolean onLongClick(int position) {
+        mItems.remove(position);
+        notifyItemRemoved(position);
+        mListener.onDataChanged(getItemCount());
+        Prefers.putKeyword(mGson.toJson(mItems));
+        return true;
+    }
+
+    static class ViewHolder extends RecyclerView.ViewHolder {
 
         private final AdapterCollectRecordBinding binding;
 
-        public ViewHolder(@NonNull AdapterCollectRecordBinding binding) {
+        ViewHolder(@NonNull AdapterCollectRecordBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
-            itemView.setOnClickListener(this);
-            itemView.setOnLongClickListener(this);
-        }
-
-        @Override
-        public void onClick(View view) {
-            mListener.onItemClick(mItems.get(getLayoutPosition()));
-        }
-
-        @Override
-        public boolean onLongClick(View v) {
-            mItems.remove(getLayoutPosition());
-            notifyItemRemoved(getLayoutPosition());
-            mListener.onDataChanged(getItemCount());
-            Prefers.putKeyword(mGson.toJson(mItems));
-            return true;
         }
     }
 }

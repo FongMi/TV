@@ -1,7 +1,6 @@
 package com.fongmi.android.tv.ui.adapter;
 
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -46,22 +45,18 @@ public class WordAdapter extends RecyclerView.Adapter<WordAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.binding.text.setText(mItems.get(position));
+        String item = mItems.get(position);
+        holder.binding.text.setText(item);
+        holder.binding.text.setOnClickListener(v -> mListener.onItemClick(item));
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    static class ViewHolder extends RecyclerView.ViewHolder {
 
         private final AdapterCollectWordBinding binding;
 
-        public ViewHolder(@NonNull AdapterCollectWordBinding binding) {
+        ViewHolder(@NonNull AdapterCollectWordBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
-            itemView.setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View view) {
-            mListener.onItemClick(mItems.get(getLayoutPosition()));
         }
     }
 }

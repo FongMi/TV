@@ -245,6 +245,17 @@
                     android:textStyle="bold"
                     android:visibility="gone" />
 
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/search"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:visibility="gone" />
+
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
     </com.fongmi.android.tv.ui.custom.ProgressLayout>
