@@ -6,12 +6,15 @@ import android.view.MotionEvent;
 
 import androidx.annotation.NonNull;
 
+import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.utils.ResUtil;
 
 public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
 
     private final GestureDetector detector;
     private final Listener listener;
+    private Runnable runnable;
     private boolean touch;
     private boolean seek;
     private int time;
@@ -26,7 +29,7 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
     }
 
     public boolean onTouchEvent(MotionEvent e) {
-        if (seek && e.getAction() == MotionEvent.ACTION_UP) listener.onSeekTo(time);
+        if (seek && e.getAction() == MotionEvent.ACTION_UP) seekDone();
         return detector.onTouchEvent(e);
     }
 
@@ -37,6 +40,16 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
         touch = e.getX() > 200 && edgeX > 200;
         seek = false;
         return true;
+    }
+
+    @Override
+    public void onLongPress(@NonNull MotionEvent e) {
+        int base = ResUtil.getScreenWidthPx() / 3;
+        boolean left = e.getX() > 0 && e.getX() < base;
+        boolean right = e.getX() > base * 2 && e.getX() < base * 3;
+        if (left) App.post(runnable = this::subTime, 0);
+        if (right) App.post(runnable = this::addTime, 0);
+        seek = left || right;
     }
 
     @Override
@@ -54,13 +67,7 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
 
     @Override
     public boolean onDoubleTap(@NonNull MotionEvent e) {
-        int base = ResUtil.getScreenWidthPx() / 3;
-        boolean left = e.getX() > 0 && e.getX() < base;
-        boolean center = e.getX() > base && e.getX() < base * 2;
-        boolean right = e.getX() > base * 2 && e.getX() < base * 3;
-        if (left) listener.onDoubleTapLeft();
-        if (right) listener.onDoubleTapRight();
-        if (center) listener.onDoubleTapCenter();
+        listener.onDoubleTap();
         return true;
     }
 
@@ -68,6 +75,31 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
     public boolean onSingleTapConfirmed(@NonNull MotionEvent e) {
         listener.onSingleTap();
         return true;
+    }
+
+    private void addTime() {
+        listener.onSeeking(time = time + Constant.INTERVAL_SEEK);
+        App.post(runnable, getDelay());
+    }
+
+    private void subTime() {
+        listener.onSeeking(time = time - Constant.INTERVAL_SEEK);
+        App.post(runnable, getDelay());
+    }
+
+    private int getDelay() {
+        int count = Math.abs(time) / Constant.INTERVAL_SEEK;
+        if (count < 5) return 500;
+        else if (count < 10) return 250;
+        else if (count < 15) return 100;
+        else return 50;
+    }
+
+    private void seekDone() {
+        App.removeCallbacks(runnable);
+        listener.onSeekTo(time);
+        seek = false;
+        time = 0;
     }
 
     public interface Listener {
@@ -78,10 +110,6 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
 
         void onSingleTap();
 
-        void onDoubleTapLeft();
-
-        void onDoubleTapRight();
-
-        void onDoubleTapCenter();
+        void onDoubleTap();
     }
 }
