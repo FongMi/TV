@@ -114,7 +114,7 @@ public final class TrackDialog extends BaseDialog implements TrackAdapter.OnClic
     @Override
     public void onResume() {
         super.onResume();
-        getDialog().getWindow().setLayout((int) (ResUtil.getScreenWidthPx() * 0.8f), -1);
+        getDialog().getWindow().setLayout((int) (ResUtil.getScreenWidth() * 0.8f), -1);
     }
 
     public interface Listener {
