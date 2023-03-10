@@ -1,8 +1,16 @@
 <resources>
 
     <style name="Vod">
-        <item name="cornerSize">8dp</item>
         <item name="cornerFamily">rounded</item>
+    </style>
+
+    <style name="Vod.Grid">
+        <item name="cornerSize">8dp</item>
+    </style>
+
+    <style name="Vod.List">
+        <item name="cornerSizeTopLeft">8dp</item>
+        <item name="cornerSizeBottomLeft">8dp</item>
     </style>
 
     <style name="Player">
@@ -21,5 +29,17 @@
     <style name="Player.Live">
         <item name="keep_content_on_player_reset">true</item>
     </style>
+
+    <style name="BottomSheetModal" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/shape_bottom_sheet</item>
+    </style>
+
+    <style name="BottomSheetDialog.Base" parent="Theme.MaterialComponents.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/BottomSheetModal</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowIsFloating">false</item>
+    </style>
+
+    <style name="BottomSheetDialog" parent="BottomSheetDialog.Base" />
 
 </resources>

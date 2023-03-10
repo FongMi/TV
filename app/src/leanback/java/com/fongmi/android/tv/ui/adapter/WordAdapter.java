@@ -24,7 +24,7 @@ public class WordAdapter extends RecyclerView.Adapter<WordAdapter.ViewHolder> {
 
     public interface OnClickListener {
 
-        void onItemClick(String item);
+        void onItemClick(String text);
     }
 
     public void addAll(List<String> items) {

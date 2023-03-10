@@ -78,9 +78,8 @@ public class ImgUtil {
         Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
         if (bitmap.getWidth() < width && bitmap.getHeight() < height) return bytes;
         Matrix matrix = new Matrix();
-        boolean land = bitmap.getWidth() > bitmap.getHeight();
         matrix.postScale((float) width / bitmap.getWidth(), (float) height / bitmap.getHeight());
-        bitmap = Bitmap.createBitmap(bitmap, land ? bitmap.getWidth() / 2 - bitmap.getHeight() / 2 : 0, 0, bitmap.getHeight(), bitmap.getHeight(), matrix, false);
+        bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, false);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         return baos.toByteArray();

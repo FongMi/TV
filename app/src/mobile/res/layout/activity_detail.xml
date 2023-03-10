@@ -101,56 +101,50 @@
                     android:textSize="14sp"
                     tools:text="更新到第二季" />
 
-                <HorizontalScrollView
-                    android:layout_width="match_parent"
+                <LinearLayout
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
-                    android:scrollbars="none">
+                    android:layout_marginEnd="16dp"
+                    android:orientation="horizontal">
 
-                    <LinearLayout
+                    <TextView
+                        android:id="@+id/site"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:paddingStart="16dp"
-                        android:paddingEnd="16dp">
+                        android:layout_marginEnd="8dp"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        tools:text="站源：泥巴" />
 
-                        <TextView
-                            android:id="@+id/site"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="8dp"
-                            android:textColor="@color/white"
-                            android:textSize="14sp"
-                            tools:text="站源：泥巴" />
+                    <TextView
+                        android:id="@+id/year"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        tools:text="年份：2022" />
 
-                        <TextView
-                            android:id="@+id/year"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="8dp"
-                            android:textColor="@color/white"
-                            android:textSize="14sp"
-                            tools:text="年份：2022" />
+                    <TextView
+                        android:id="@+id/area"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        tools:text="地區：台灣" />
 
-                        <TextView
-                            android:id="@+id/area"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginEnd="8dp"
-                            android:textColor="@color/white"
-                            android:textSize="14sp"
-                            tools:text="地區：台灣" />
+                    <TextView
+                        android:id="@+id/type"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        tools:text="類型：科幻" />
 
-                        <TextView
-                            android:id="@+id/type"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textColor="@color/white"
-                            android:textSize="14sp"
-                            tools:text="類型：科幻" />
-
-                    </LinearLayout>
-                </HorizontalScrollView>
+                </LinearLayout>
 
                 <TextView
                     android:id="@+id/director"
