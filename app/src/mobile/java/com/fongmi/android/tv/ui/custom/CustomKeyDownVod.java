@@ -43,8 +43,10 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
     }
 
     public boolean onTouchEvent(MotionEvent e) {
-        if (changeTime && e.getAction() == MotionEvent.ACTION_UP) seekTo();
-        if (changeSpeed && e.getAction() == MotionEvent.ACTION_UP) listener.onSpeedReset();
+        if (changeTime && e.getAction() == MotionEvent.ACTION_UP) onSeekEnd();
+        if (changeSpeed && e.getAction() == MotionEvent.ACTION_UP) listener.onSpeedEnd();
+        if (changeBright && e.getAction() == MotionEvent.ACTION_UP) listener.onBrightEnd();
+        if (changeVolume && e.getAction() == MotionEvent.ACTION_UP) listener.onVolumeEnd();
         return detector.onTouchEvent(e);
     }
 
@@ -85,7 +87,7 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
         float deltaX = e2.getX() - e1.getX();
         float deltaY = e1.getY() - e2.getY();
         if (touch) checkFunc(distanceX, distanceY, e2);
-        if (changeTime) listener.onSeeking(time = (int) deltaX * 50);
+        if (changeTime) listener.onSeek(time = (int) deltaX * 50);
         if (changeBright) setBright(deltaY);
         if (changeVolume) setVolume(deltaY);
         return true;
@@ -104,7 +106,7 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
     }
 
     private void subTime() {
-        listener.onSeeking(time = time - Constant.INTERVAL_SEEK);
+        listener.onSeek(time = time - Constant.INTERVAL_SEEK);
         App.post(runnable, getDelay());
     }
 
@@ -115,9 +117,9 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
         else return 50;
     }
 
-    private void seekTo() {
+    private void onSeekEnd() {
         App.removeCallbacks(runnable);
-        listener.onSeekTo(time);
+        listener.onSeekEnd(time);
         changeTime = false;
         time = 0;
     }
@@ -146,7 +148,7 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
         WindowManager.LayoutParams attributes = App.activity().getWindow().getAttributes();
         attributes.screenBrightness = brightness;
         App.activity().getWindow().setAttributes(attributes);
-        int percent = (int) (brightness * 100);
+        listener.onBright((int) (brightness * 100));
     }
 
     private void setVolume(float deltaY) {
@@ -157,18 +159,26 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
         if (index > maxVolume) index = maxVolume;
         if (index < 0) index = 0;
         manager.setStreamVolume(AudioManager.STREAM_MUSIC, (int) index, 0);
-        int percent = (int) (index / maxVolume * 100);
+        listener.onVolume((int) (index / maxVolume * 100));
     }
 
     public interface Listener {
 
         void onSpeedUp();
 
-        void onSpeedReset();
+        void onSpeedEnd();
 
-        void onSeeking(int time);
+        void onBright(int progress);
 
-        void onSeekTo(int time);
+        void onBrightEnd();
+
+        void onVolume(int progress);
+
+        void onVolumeEnd();
+
+        void onSeek(int time);
+
+        void onSeekEnd(int time);
 
         void onSingleTap();
 
