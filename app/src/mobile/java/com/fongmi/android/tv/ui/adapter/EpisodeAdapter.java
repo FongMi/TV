@@ -70,7 +70,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Vod.Flag.Episode item = mItems.get(position);
         holder.binding.text.setText(item.getName());
-        //holder.binding.text.setMaxEms(ResUtil.getEms());
+        holder.binding.text.setSelected(item.isActivated());
         holder.binding.text.setActivated(item.isActivated());
         holder.binding.text.setOnClickListener(v -> mListener.onItemClick(item));
     }

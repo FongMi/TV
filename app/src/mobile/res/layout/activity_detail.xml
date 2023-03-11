@@ -64,6 +64,7 @@
         android:layout_below="@+id/video">
 
         <androidx.core.widget.NestedScrollView
+            android:id="@+id/scroll"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fillViewport="true">

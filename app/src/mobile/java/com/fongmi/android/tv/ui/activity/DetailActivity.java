@@ -206,6 +206,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     @SuppressLint("ClickableViewAccessibility")
     protected void initEvent() {
         mBinding.control.seek.setListener(mPlayers);
+        mBinding.name.setOnClickListener(view -> onName());
         mBinding.more.setOnClickListener(view -> onMore());
         mBinding.reverse.setOnClickListener(view -> onReverse());
         mBinding.control.full.setOnClickListener(view -> onFull());
@@ -300,6 +301,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void getDetail(Vod item) {
         getIntent().putExtra("key", item.getSiteKey());
         getIntent().putExtra("id", item.getVodId());
+        mBinding.scroll.scrollTo(0, 0);
         Clock.get().setCallback(null);
         mPlayers.stop();
         hideProgress();
@@ -410,6 +412,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mFlagAdapter.reverse();
         setEpisodeAdapter(getFlag().getEpisodes());
         if (scroll) mBinding.episode.scrollToPosition(mEpisodeAdapter.getPosition());
+    }
+
+    private void onName() {
+        String name = mBinding.name.getText().toString();
+        Notify.show(getString(R.string.detail_search, name));
+        initSearch(name, false);
     }
 
     private void onMore() {
