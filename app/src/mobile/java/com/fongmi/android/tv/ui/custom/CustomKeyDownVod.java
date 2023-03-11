@@ -1,5 +1,6 @@
 package com.fongmi.android.tv.ui.custom;
 
+import android.app.Activity;
 import android.content.Context;
 import android.media.AudioManager;
 import android.view.GestureDetector;
@@ -19,6 +20,7 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
     private final AudioManager manager;
     private final Listener listener;
     private final Runnable runnable;
+    private final Activity activity;
     private final View videoView;
     private boolean changeBright;
     private boolean changeVolume;
@@ -30,16 +32,17 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
     private float volume;
     private int time;
 
-    public static CustomKeyDownVod create(Context context, View videoView) {
-        return new CustomKeyDownVod(context, videoView);
+    public static CustomKeyDownVod create(Activity activity, View videoView) {
+        return new CustomKeyDownVod(activity, videoView);
     }
 
-    private CustomKeyDownVod(Context context, View videoView) {
+    private CustomKeyDownVod(Activity activity, View videoView) {
         this.manager = (AudioManager) App.get().getSystemService(Context.AUDIO_SERVICE);
-        this.detector = new GestureDetector(context, this);
-        this.listener = (Listener) context;
+        this.detector = new GestureDetector(activity, this);
+        this.listener = (Listener) activity;
         this.runnable = this::subTime;
         this.videoView = videoView;
+        this.activity = activity;
     }
 
     public boolean onTouchEvent(MotionEvent e) {
@@ -62,7 +65,7 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
     public boolean onDown(@NonNull MotionEvent e) {
         if (isEdge(e) || lock) return true;
         volume = manager.getStreamVolume(AudioManager.STREAM_MUSIC);
-        bright = App.activity().getWindow().getAttributes().screenBrightness;
+        bright = activity.getWindow().getAttributes().screenBrightness;
         changeBright = false;
         changeVolume = false;
         changeSpeed = false;
@@ -145,9 +148,9 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
         float brightness = deltaY * 2 / height + bright;
         if (brightness < 0) brightness = 0f;
         if (brightness > 1.0f) brightness = 1.0f;
-        WindowManager.LayoutParams attributes = App.activity().getWindow().getAttributes();
+        WindowManager.LayoutParams attributes = activity.getWindow().getAttributes();
         attributes.screenBrightness = brightness;
-        App.activity().getWindow().setAttributes(attributes);
+        activity.getWindow().setAttributes(attributes);
         listener.onBright((int) (brightness * 100));
     }
 
