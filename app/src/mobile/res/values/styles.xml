@@ -18,4 +18,15 @@
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialog</item>
     </style>
 
+    <style name="Control" />
+
+    <style name="Control.Action">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">?attr/selectableItemBackgroundBorderless</item>
+        <item name="android:layout_marginEnd">16dp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
 </resources>
