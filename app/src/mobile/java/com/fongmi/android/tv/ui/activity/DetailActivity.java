@@ -18,7 +18,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.widget.PopupMenu;
 import androidx.core.app.ShareCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -209,6 +208,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.seek.setListener(mPlayers);
         mBinding.more.setOnClickListener(view -> onMore());
         mBinding.reverse.setOnClickListener(view -> onReverse());
+        mBinding.control.text.setOnClickListener(this::onTrack);
+        mBinding.control.audio.setOnClickListener(this::onTrack);
+        mBinding.control.video.setOnClickListener(this::onTrack);
         mBinding.control.full.setOnClickListener(view -> onFull());
         mBinding.control.keep.setOnClickListener(view -> onKeep());
         mBinding.control.lock.setOnClickListener(view -> onLock());
@@ -223,7 +225,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.decode.setOnClickListener(view -> onDecode());
         mBinding.control.ending.setOnClickListener(view -> onEnding());
         mBinding.control.opening.setOnClickListener(view -> onOpening());
-        mBinding.control.setting.setOnClickListener(view -> onSetting());
         mBinding.control.speed.setOnLongClickListener(view -> onSpeedLong());
         mBinding.control.ending.setOnLongClickListener(view -> onEndingReset());
         mBinding.control.opening.setOnLongClickListener(view -> onOpeningReset());
@@ -420,6 +421,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         reverseEpisode(false);
     }
 
+    private void onTrack(View view) {
+        int type = Integer.parseInt(view.getTag().toString());
+        TrackDialog.create().player(mPlayers).type(type).listener(this).show(getSupportFragmentManager(), null);
+        hideControl();
+    }
+
     private void onFull() {
         setR1Callback();
         toggleFullscreen();
@@ -560,20 +567,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         return true;
     }
 
-    private void onSetting() {
-        PopupMenu popup = new PopupMenu(this, mBinding.control.setting);
-        if (mPlayers.haveTrack(C.TRACK_TYPE_TEXT)) popup.getMenu().add(0, C.TRACK_TYPE_TEXT, 0, R.string.play_track_text);
-        if (mPlayers.haveTrack(C.TRACK_TYPE_AUDIO)) popup.getMenu().add(0, C.TRACK_TYPE_AUDIO, 1, R.string.play_track_audio);
-        if (mPlayers.haveTrack(C.TRACK_TYPE_VIDEO)) popup.getMenu().add(0, C.TRACK_TYPE_VIDEO, 2, R.string.play_track_video);
-        popup.setOnMenuItemClickListener(item -> onTrack(item.getItemId()));
-        popup.show();
-    }
-
-    private boolean onTrack(int type) {
-        TrackDialog.create().player(mPlayers).type(type).listener(this).show(getSupportFragmentManager(), null);
-        return true;
-    }
-
     private void toggleFullscreen() {
         if (isFullscreen()) exitFullscreen();
         else enterFullscreen();
@@ -647,12 +640,14 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void showControl() {
         mBinding.control.parse.setVisibility(isFullscreen() && isUseParse() ? View.VISIBLE : View.GONE);
+        mBinding.control.rotate.setVisibility(isFullscreen() && !isLock() ? View.VISIBLE : View.GONE);
+        mBinding.control.setting.setVisibility(isFullscreen() ? View.GONE : View.VISIBLE);
         mBinding.control.action.setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
-        mBinding.control.rotate.setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
         mBinding.control.share.setVisibility(isFullscreen() ? View.GONE : View.VISIBLE);
         mBinding.control.keep.setVisibility(isFullscreen() ? View.GONE : View.VISIBLE);
+        mBinding.control.lock.setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
+        mBinding.control.center.setVisibility(isLock() ? View.GONE : View.VISIBLE);
         mBinding.control.bottom.setVisibility(isLock() ? View.GONE : View.VISIBLE);
-        mBinding.control.right.setVisibility(isLock() ? View.GONE : View.VISIBLE);
         mBinding.control.top.setVisibility(isLock() ? View.GONE : View.VISIBLE);
         mBinding.control.getRoot().setVisibility(View.VISIBLE);
         checkPlayImg(mPlayers.isPlaying());
@@ -763,6 +758,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         switch (event.getState()) {
             case 0:
                 checkPosition();
+                setTrackVisible(false);
                 break;
             case Player.STATE_IDLE:
                 break;
@@ -774,6 +770,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
                 hideProgress();
                 mPlayers.reset();
                 setDefaultTrack();
+                setTrackVisible(true);
                 mBinding.control.size.setText(mPlayers.getSizeText());
                 break;
             case Player.STATE_ENDED:
@@ -786,6 +783,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mPlayers.seekTo(Math.max(mHistory.getOpening(), mHistory.getPosition()), false);
         Clock.get().setCallback(this);
         setInitTrack(true);
+    }
+
+    private void setTrackVisible(boolean visible) {
+        mBinding.control.text.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_TEXT) ? View.VISIBLE : View.GONE);
+        mBinding.control.audio.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_AUDIO) ? View.VISIBLE : View.GONE);
+        mBinding.control.video.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_VIDEO) ? View.VISIBLE : View.GONE);
     }
 
     private void setDefaultTrack() {
