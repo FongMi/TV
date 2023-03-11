@@ -110,7 +110,7 @@
             android:id="@+id/brightIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
+            android:layout_marginEnd="12dp"
             tools:src="@drawable/ic_widget_bright_high" />
 
         <com.google.android.material.progressindicator.LinearProgressIndicator
@@ -118,7 +118,7 @@
             android:layout_width="120dp"
             android:layout_height="wrap_content"
             app:indicatorColor="@color/white"
-            app:trackColor="@color/grey_700" />
+            app:trackColor="@color/grey_500" />
 
     </LinearLayout>
 
@@ -138,7 +138,7 @@
             android:id="@+id/volumeIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
+            android:layout_marginEnd="12dp"
             tools:src="@drawable/ic_widget_volume_high" />
 
         <com.google.android.material.progressindicator.LinearProgressIndicator
@@ -146,7 +146,7 @@
             android:layout_width="120dp"
             android:layout_height="wrap_content"
             app:indicatorColor="@color/white"
-            app:trackColor="@color/grey_700" />
+            app:trackColor="@color/grey_500" />
 
     </LinearLayout>
 </FrameLayout>
