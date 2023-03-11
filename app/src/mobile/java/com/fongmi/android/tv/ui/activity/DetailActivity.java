@@ -1045,7 +1045,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     @Override
     public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode);
-        mBinding.progressLayout.setVisibility(isInPictureInPictureMode ? View.GONE : View.VISIBLE);
         if (isInPictureInPictureMode) hideControl();
         else if (isStop()) finish();
     }
@@ -1053,10 +1052,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        if (Utils.hasPIP() && isInPictureInPictureMode()) return;
         if (isFullscreen()) Utils.hideSystemUI(this);
-        if (ResUtil.isLand(this) && !isFullscreen()) enterFullscreen();
-        if (ResUtil.isPort(this) && isFullscreen() && !isRotate()) exitFullscreen();
+        if (Utils.hasPIP() && isInPictureInPictureMode()) enterFullscreen();
+        else if (ResUtil.isLand(this) && !isFullscreen()) enterFullscreen();
+        else if (ResUtil.isPort(this) && isFullscreen() && !isRotate()) exitFullscreen();
     }
 
     @Override
