@@ -100,7 +100,7 @@ public class CollectActivity extends BaseActivity implements SiteCallback, WordA
     @Override
     protected void initEvent() {
         mBinding.view.setOnClickListener(this::switchView);
-        mBinding.site.setOnClickListener(v -> SiteDialog.create(this).search(true).show());
+        mBinding.site.setOnClickListener(v -> SiteDialog.create(this).search().show());
         mBinding.keyword.setOnEditorActionListener((textView, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) search();
             return true;

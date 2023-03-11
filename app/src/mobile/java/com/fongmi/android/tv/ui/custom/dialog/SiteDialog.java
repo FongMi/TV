@@ -43,8 +43,13 @@ public class SiteDialog implements SiteAdapter.OnClickListener {
         this.adapter = new SiteAdapter(this);
     }
 
-    public SiteDialog search(boolean search) {
-        this.adapter.search(search);
+    public SiteDialog search() {
+        this.adapter.search(true);
+        return this;
+    }
+
+    public SiteDialog change() {
+        this.adapter.change(true);
         return this;
     }
 
