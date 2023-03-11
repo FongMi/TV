@@ -95,7 +95,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private Runnable mR1;
     private Runnable mR2;
     private Runnable mR3;
-    private Runnable mR4;
 
     public static void push(Activity activity, String url) {
         start(activity, "push_agent", url, url);
@@ -193,7 +192,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
         mR3 = this::setOrient;
-        mR4 = this::showTime;
         mSiteKey = getKey();
         setRecyclerView();
         setVideoView();
@@ -619,23 +617,18 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.widget.error.setVisibility(View.GONE);
     }
 
-    private void showTime() {
-        mBinding.widget.position.setText(mPlayers.getPositionTime(0));
-        App.post(mR4, 200);
+    private void showPosition(int resId) {
+        showPosition(resId, 0);
     }
 
-    private void showState(int resId) {
-        showState(resId, 0);
-    }
-
-    private void showState(int resId, long time) {
+    private void showPosition(int resId, long time) {
         mBinding.widget.action.setImageResource(resId);
-        mBinding.widget.state.setVisibility(View.VISIBLE);
-        mBinding.widget.position.setText(mPlayers.getPositionTime(time));
+        mBinding.widget.position.setVisibility(View.VISIBLE);
+        mBinding.widget.time.setText(mPlayers.getPositionTime(time));
     }
 
-    private void hideState() {
-        mBinding.widget.state.setVisibility(View.GONE);
+    private void hidePosition() {
+        mBinding.widget.position.setVisibility(View.GONE);
     }
 
     private void showControl() {
@@ -914,13 +907,13 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onPause(boolean visible) {
-        if (visible) showState(R.drawable.ic_control_play);
+        if (visible) showPosition(R.drawable.ic_control_play);
         mPlayers.pause();
     }
 
     private void onPlay() {
         mPlayers.play();
-        hideState();
+        hidePosition();
     }
 
     private boolean isFullscreen() {
@@ -993,26 +986,54 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     @Override
     public void onSpeedUp() {
+        mBinding.widget.speed.startAnimation(ResUtil.getAnim(R.anim.forward));
+        mBinding.widget.speed.setVisibility(View.VISIBLE);
         mPlayers.setSpeed(3.0f);
-        showState(R.drawable.ic_widget_forward);
-        showTime();
     }
 
     @Override
-    public void onSpeedReset() {
+    public void onSpeedEnd() {
+        mBinding.widget.speed.setVisibility(View.GONE);
+        mBinding.widget.speed.clearAnimation();
         mPlayers.setSpeed(1.0f);
-        App.removeCallbacks(mR4);
-        hideState();
     }
 
     @Override
-    public void onSeeking(int time) {
-        showState(time > 0 ? R.drawable.ic_widget_forward : R.drawable.ic_widget_rewind, time);
+    public void onBright(int progress) {
+        mBinding.widget.bright.setVisibility(View.VISIBLE);
+        mBinding.widget.brightProgress.setProgress(progress);
+        if (progress < 35) mBinding.widget.brightIcon.setImageResource(R.drawable.ic_widget_bright_low);
+        else if (progress < 70) mBinding.widget.brightIcon.setImageResource(R.drawable.ic_widget_bright_medium);
+        else mBinding.widget.brightIcon.setImageResource(R.drawable.ic_widget_bright_high);
+    }
+
+    @Override
+    public void onBrightEnd() {
+        mBinding.widget.bright.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onVolume(int progress) {
+        mBinding.widget.volume.setVisibility(View.VISIBLE);
+        mBinding.widget.volumeProgress.setProgress(progress);
+        if (progress < 35) mBinding.widget.volumeIcon.setImageResource(R.drawable.ic_widget_volume_low);
+        else if (progress < 70) mBinding.widget.volumeIcon.setImageResource(R.drawable.ic_widget_volume_medium);
+        else mBinding.widget.volumeIcon.setImageResource(R.drawable.ic_widget_volume_high);
+    }
+
+    @Override
+    public void onVolumeEnd() {
+        mBinding.widget.volume.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onSeek(int time) {
+        showPosition(time > 0 ? R.drawable.ic_widget_forward : R.drawable.ic_widget_rewind, time);
         hideProgress();
     }
 
     @Override
-    public void onSeekTo(int time) {
+    public void onSeekEnd(int time) {
         mPlayers.seekTo(time);
         showProgress();
         onPlay();
@@ -1104,6 +1125,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     protected void onDestroy() {
         super.onDestroy();
         mPlayers.release();
-        App.removeCallbacks(mR1, mR2, mR3, mR4);
+        App.removeCallbacks(mR1, mR2, mR3);
     }
 }
