@@ -36,14 +36,14 @@ public class SiteDialog implements SitePresenter.OnClickListener {
         this.adapter = new ArrayObjectAdapter(presenter = new SitePresenter(this));
     }
 
-    public SiteDialog search(boolean search) {
-        this.presenter.search(search);
+    public SiteDialog search() {
+        this.presenter.search(true);
         this.width = 0.4f;
         return this;
     }
 
-    public SiteDialog filter(boolean filter) {
-        this.presenter.filter(filter);
+    public SiteDialog filter() {
+        this.presenter.filter(true);
         this.width = 0.4f;
         return this;
     }
