@@ -38,7 +38,7 @@
 
         </LinearLayout>
 
-        <ImageButton
+        <ImageView
             android:id="@+id/keep"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -46,7 +46,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_control_keep_off" />
 
-        <ImageButton
+        <ImageView
             android:id="@+id/share"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -54,7 +54,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_control_share" />
 
-        <ImageButton
+        <ImageView
             android:id="@+id/setting"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -71,26 +71,49 @@
         android:gravity="center"
         android:orientation="horizontal">
 
-        <ImageButton
-            android:id="@+id/prev"
-            style="@style/ExoStyledControls.Button.Center.Previous"
-            android:layout_width="36dp"
-            android:layout_height="36dp" />
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/shape_control">
 
-        <ImageButton
-            android:id="@+id/play"
-            style="@style/ExoStyledControls.Button.Center.PlayPause"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp" />
+            <ImageView
+                android:id="@+id/prev"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/exo_icon_previous" />
 
-        <ImageButton
-            android:id="@+id/next"
-            style="@style/ExoStyledControls.Button.Center.Next"
-            android:layout_width="36dp"
-            android:layout_height="36dp" />
+        </FrameLayout>
 
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:background="@drawable/shape_control">
+
+            <ImageView
+                android:id="@+id/play"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/exo_icon_play" />
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/shape_control">
+
+            <ImageView
+                android:id="@+id/next"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/exo_icon_next" />
+
+        </FrameLayout>
     </LinearLayout>
 
     <LinearLayout
@@ -103,14 +126,14 @@
         android:gravity="center"
         android:orientation="vertical">
 
-        <ImageButton
+        <ImageView
             android:id="@+id/lock"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_control_lock_off" />
 
-        <ImageButton
+        <ImageView
             android:id="@+id/rotate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
