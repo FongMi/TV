@@ -22,7 +22,7 @@ android {
         mobile {
             dimension "mode"
             versionCode 6
-            versionName "20230311#2"
+            versionName "20230311#3"
         }
         java {
             dimension = "api"
