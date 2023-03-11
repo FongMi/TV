@@ -82,6 +82,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private ExecutorService mExecutor;
     private SiteViewModel mViewModel;
     private FlagAdapter mFlagAdapter;
+    private TrackDialog mTrackDialog;
     private History mHistory;
     private Players mPlayers;
     private String mSiteKey;
@@ -491,8 +492,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onTrack(View view) {
-        int type = Integer.parseInt(view.getTag().toString());
-        TrackDialog.create().player(mPlayers).type(type).listener(this).show(getSupportFragmentManager(), null);
+        mTrackDialog = TrackDialog.create().player(mPlayers).type(Integer.parseInt(view.getTag().toString())).listener(this);
+        mTrackDialog.show(getSupportFragmentManager(), null);
         hideControl();
     }
 
@@ -649,6 +650,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         App.removeCallbacks(mR1);
     }
 
+    private void hideTrack() {
+        if (mTrackDialog != null) mTrackDialog.dismissAllowingStateLoss();
+        mTrackDialog = null;
+    }
+
     private void setTraffic() {
         Traffic.setSpeed(mBinding.widget.traffic);
         App.post(mR2, Constant.INTERVAL_TRAFFIC);
@@ -708,7 +714,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void checkPlayImg(boolean playing) {
-        mBinding.control.play.setImageResource(playing ? com.google.android.exoplayer2.ui.R.drawable.exo_ic_pause_circle_filled : com.google.android.exoplayer2.ui.R.drawable.exo_ic_play_circle_filled);
+        mBinding.control.play.setImageResource(playing ? com.google.android.exoplayer2.ui.R.drawable.exo_icon_pause : com.google.android.exoplayer2.ui.R.drawable.exo_icon_play);
     }
 
     private void checkLockImg() {
@@ -975,15 +981,15 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     @Override
     public void onSpeedUp() {
         mBinding.widget.speed.startAnimation(ResUtil.getAnim(R.anim.forward));
+        mBinding.control.action.speed.setText(mPlayers.setSpeed(3.0f));
         mBinding.widget.speed.setVisibility(View.VISIBLE);
-        mPlayers.setSpeed(3.0f);
     }
 
     @Override
     public void onSpeedEnd() {
+        mBinding.control.action.speed.setText(mPlayers.setSpeed(mHistory.getSpeed()));
         mBinding.widget.speed.setVisibility(View.GONE);
         mBinding.widget.speed.clearAnimation();
-        mPlayers.setSpeed(1.0f);
     }
 
     @Override
@@ -1060,6 +1066,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         super.onPictureInPictureModeChanged(isInPictureInPictureMode);
         if (isInPictureInPictureMode) hideControl();
         else if (isStop()) finish();
+        hideTrack();
     }
 
     @Override
