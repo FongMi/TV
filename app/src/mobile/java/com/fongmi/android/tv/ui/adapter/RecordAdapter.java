@@ -1,6 +1,7 @@
 package com.fongmi.android.tv.ui.adapter;
 
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -78,24 +79,25 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.ViewHolder
         String text = mItems.get(position);
         holder.binding.text.setText(text);
         holder.binding.text.setOnClickListener(v -> mListener.onItemClick(text));
-        holder.binding.text.setOnLongClickListener(v -> onLongClick(position));
     }
 
-    private boolean onLongClick(int position) {
-        mItems.remove(position);
-        notifyItemRemoved(position);
-        mListener.onDataChanged(getItemCount());
-        Prefers.putKeyword(mGson.toJson(mItems));
-        return true;
-    }
-
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener {
 
         private final AdapterCollectRecordBinding binding;
 
         ViewHolder(@NonNull AdapterCollectRecordBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
+            itemView.setOnLongClickListener(this);
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            mItems.remove(getLayoutPosition());
+            notifyItemRemoved(getLayoutPosition());
+            mListener.onDataChanged(getItemCount());
+            Prefers.putKeyword(mGson.toJson(mItems));
+            return true;
         }
     }
 }
