@@ -450,8 +450,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void checkPlay() {
         setR1Callback();
         checkPlayImg(!mPlayers.isPlaying());
-        if (mPlayers.isPlaying()) onPause(false);
-        else onPlay();
+        if (mPlayers.isPlaying()) mPlayers.pause();
+        else mPlayers.play();
     }
 
     private void checkNext() {
@@ -572,7 +572,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void enterFullscreen() {
         mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
-        mBinding.control.getRoot().setPadding(ResUtil.dp2px(24), ResUtil.dp2px(16), ResUtil.dp2px(24), 0);
         getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
         mBinding.control.full.setImageResource(R.drawable.ic_control_full_off);
@@ -583,7 +582,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void exitFullscreen() {
-        mBinding.control.getRoot().setPadding(ResUtil.dp2px(16), ResUtil.dp2px(16), ResUtil.dp2px(16), 0);
         getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         mBinding.control.full.setImageResource(R.drawable.ic_control_full_on);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
@@ -615,20 +613,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void hideError() {
         mBinding.widget.text.setText("");
         mBinding.widget.error.setVisibility(View.GONE);
-    }
-
-    private void showPosition(int resId) {
-        showPosition(resId, 0);
-    }
-
-    private void showPosition(int resId, long time) {
-        mBinding.widget.action.setImageResource(resId);
-        mBinding.widget.position.setVisibility(View.VISIBLE);
-        mBinding.widget.time.setText(mPlayers.getPositionTime(time));
-    }
-
-    private void hidePosition() {
-        mBinding.widget.position.setVisibility(View.GONE);
     }
 
     private void showControl() {
@@ -711,7 +695,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void checkPlayImg(boolean playing) {
-        mBinding.control.play.setImageResource(playing ? R.drawable.ic_control_pause : R.drawable.ic_control_play);
+        mBinding.control.play.setImageResource(playing ? com.google.android.exoplayer2.ui.R.drawable.exo_ic_pause_circle_filled : com.google.android.exoplayer2.ui.R.drawable.exo_ic_play_circle_filled);
     }
 
     private void checkLockImg() {
@@ -764,6 +748,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
                 mPlayers.reset();
                 setDefaultTrack();
                 setTrackVisible(true);
+                checkPlayImg(mPlayers.isPlaying());
                 mBinding.control.size.setText(mPlayers.getSizeText());
                 break;
             case Player.STATE_ENDED:
@@ -906,16 +891,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         getDetail(vod);
     }
 
-    private void onPause(boolean visible) {
-        if (visible) showPosition(R.drawable.ic_control_play);
-        mPlayers.pause();
-    }
-
-    private void onPlay() {
-        mPlayers.play();
-        hidePosition();
-    }
-
     private boolean isFullscreen() {
         return fullscreen;
     }
@@ -1028,15 +1003,18 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     @Override
     public void onSeek(int time) {
-        showPosition(time > 0 ? R.drawable.ic_widget_forward : R.drawable.ic_widget_rewind, time);
+        mBinding.widget.action.setImageResource(time > 0 ? R.drawable.ic_widget_forward : R.drawable.ic_widget_rewind);
+        mBinding.widget.seek.setVisibility(View.VISIBLE);
+        mBinding.widget.time.setText(mPlayers.getPositionTime(time));
         hideProgress();
     }
 
     @Override
     public void onSeekEnd(int time) {
+        mBinding.widget.seek.setVisibility(View.GONE);
         mPlayers.seekTo(time);
+        mPlayers.play();
         showProgress();
-        onPlay();
     }
 
     @Override
@@ -1047,9 +1025,13 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     @Override
     public void onDoubleTap() {
-        if (mPlayers.isPlaying()) onPause(true);
-        else onPlay();
-        hideControl();
+        if (mPlayers.isPlaying()) {
+            mPlayers.pause();
+            showControl();
+        } else {
+            mPlayers.play();
+            hideControl();
+        }
     }
 
     @Override
@@ -1086,14 +1068,14 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     @Override
     protected void onStart() {
         super.onStart();
+        mPlayers.play();
         setStop(false);
-        onPlay();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        onPause(false);
+        mPlayers.pause();
         setStop(true);
     }
 

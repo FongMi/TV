@@ -3,15 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black_20"
-    android:paddingStart="16dp"
-    android:paddingTop="16dp"
-    android:paddingEnd="16dp">
+    android:background="@color/black_20">
 
     <LinearLayout
         android:id="@+id/top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="16dp"
         android:orientation="horizontal">
 
         <LinearLayout
@@ -40,7 +38,7 @@
 
         </LinearLayout>
 
-        <ImageView
+        <ImageButton
             android:id="@+id/keep"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -48,7 +46,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_control_keep_off" />
 
-        <ImageView
+        <ImageButton
             android:id="@+id/share"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -56,7 +54,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_control_share" />
 
-        <ImageView
+        <ImageButton
             android:id="@+id/setting"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -73,28 +71,25 @@
         android:gravity="center"
         android:orientation="horizontal">
 
-        <ImageView
+        <ImageButton
             android:id="@+id/prev"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_control_prev" />
-
-        <ImageView
-            android:id="@+id/play"
+            style="@style/ExoStyledControls.Button.Center.Previous"
             android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_control_pause" />
+            android:layout_height="36dp" />
 
-        <ImageView
+        <ImageButton
+            android:id="@+id/play"
+            style="@style/ExoStyledControls.Button.Center.PlayPause"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp" />
+
+        <ImageButton
             android:id="@+id/next"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_control_next" />
+            style="@style/ExoStyledControls.Button.Center.Next"
+            android:layout_width="36dp"
+            android:layout_height="36dp" />
 
     </LinearLayout>
 
@@ -104,17 +99,18 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
+        android:layout_marginEnd="24dp"
         android:gravity="center"
         android:orientation="vertical">
 
-        <ImageView
+        <ImageButton
             android:id="@+id/lock"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_control_lock_off" />
 
-        <ImageView
+        <ImageButton
             android:id="@+id/rotate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -129,22 +125,28 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:orientation="vertical"
-        android:paddingBottom="8dp">
+        android:orientation="vertical">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/parse"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
+            android:layout_marginBottom="8dp"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
             tools:itemCount="1"
             tools:listitem="@layout/adapter_parse" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
 
             <com.fongmi.android.tv.ui.custom.CustomSeekView
                 android:id="@+id/seek"
@@ -166,9 +168,14 @@
             android:id="@+id/action"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginBottom="16dp"
+            android:clipChildren="false"
+            android:clipToPadding="false"
             android:fillViewport="true"
-            android:scrollbars="none">
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:scrollbars="none"
+            android:visibility="visible">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -179,67 +186,32 @@
 
                 <TextView
                     android:id="@+id/player"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:padding="4dp"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
+                    style="@style/Control.Action"
                     tools:text="EXO" />
 
                 <TextView
                     android:id="@+id/decode"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:padding="4dp"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
+                    style="@style/Control.Action"
                     tools:text="硬解" />
 
                 <TextView
                     android:id="@+id/speed"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:padding="4dp"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
+                    style="@style/Control.Action"
                     tools:text="速度" />
 
                 <TextView
                     android:id="@+id/scale"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:padding="4dp"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
+                    style="@style/Control.Action"
                     tools:text="縮放" />
 
                 <TextView
                     android:id="@+id/opening"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:padding="4dp"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
+                    style="@style/Control.Action"
                     tools:text="片頭" />
 
                 <TextView
                     android:id="@+id/ending"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:padding="4dp"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
+                    style="@style/Control.Action"
                     tools:text="片尾" />
 
                 <View
@@ -249,41 +221,26 @@
 
                 <TextView
                     android:id="@+id/text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:padding="4dp"
+                    style="@style/Control.Action"
                     android:tag="3"
                     android:text="@string/play_track_text"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
                     android:visibility="gone"
                     tools:visibility="visible" />
 
                 <TextView
                     android:id="@+id/audio"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
+                    style="@style/Control.Action"
                     android:tag="1"
                     android:text="@string/play_track_audio"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
                     android:visibility="gone"
                     tools:visibility="visible" />
 
                 <TextView
                     android:id="@+id/video"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
+                    style="@style/Control.Action"
+                    android:layout_marginEnd="0dp"
                     android:tag="2"
                     android:text="@string/play_track_video"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
                     android:visibility="gone"
                     tools:visibility="visible" />
 

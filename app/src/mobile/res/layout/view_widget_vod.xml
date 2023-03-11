@@ -57,7 +57,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/position"
+        android:id="@+id/seek"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top|center"
