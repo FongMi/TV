@@ -86,10 +86,6 @@ public class ResUtil {
         return activity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
     }
 
-    public static int getEms() {
-        return Math.min(getScreenWidth() / sp2px(24), 35);
-    }
-
     public static int sp2px(int sp) {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, getDisplayMetrics());
     }

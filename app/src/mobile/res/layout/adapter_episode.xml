@@ -7,6 +7,8 @@
     android:background="@drawable/shape_item"
     android:ellipsize="marquee"
     android:gravity="center"
+    android:maxEms="10"
+    android:singleLine="true"
     android:textColor="@color/text"
     android:textSize="14sp"
     tools:text="20" />
