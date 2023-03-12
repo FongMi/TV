@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
         android:singleLine="true"
-        android:textColor="@color/green_a_400"
+        android:textColor="@color/yellow_500"
         android:textSize="12sp"
         tools:text="泥巴"
         tools:visibility="visible" />
@@ -33,7 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
         android:singleLine="true"
-        android:textColor="@color/yellow_500"
+        android:textColor="@color/yellow_300"
         android:textSize="12sp"
         tools:text="1080p" />
 
