@@ -183,7 +183,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
         getIntent().putExtras(intent);
+        setOrient();
         getDetail();
     }
 
@@ -398,6 +400,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void setEpisodeAdapter(List<Vod.Flag.Episode> items) {
+        mBinding.control.nextRoot.setVisibility(items.size() < 2 ? View.GONE : View.VISIBLE);
+        mBinding.control.prevRoot.setVisibility(items.size() < 2 ? View.GONE : View.VISIBLE);
         mBinding.episode.setVisibility(items.isEmpty() ? View.GONE : View.VISIBLE);
         mEpisodeAdapter.addAll(items);
     }
@@ -594,6 +598,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void enterFullscreen() {
+        if (isFullscreen()) return;
         mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
         getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
@@ -605,6 +610,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void exitFullscreen() {
+        if (!isFullscreen()) return;
         getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         mBinding.control.full.setImageResource(R.drawable.ic_control_full_on);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
@@ -1073,18 +1079,22 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     @Override
     public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode);
-        if (isInPictureInPictureMode) hideControl();
-        else if (isStop()) finish();
-        hideTrack();
+        if (isInPictureInPictureMode) {
+            enterFullscreen();
+            hideControl();
+            hideTrack();
+        } else {
+            exitFullscreen();
+            if (isStop()) finish();
+        }
     }
 
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        if (isFullscreen()) Utils.hideSystemUI(this);
-        if (Utils.hasPIP() && isInPictureInPictureMode()) enterFullscreen();
-        else if (ResUtil.isLand(this) && !isFullscreen()) enterFullscreen();
-        else if (ResUtil.isPort(this) && isFullscreen() && !isRotate()) exitFullscreen();
+        if (ResUtil.isLand(this)) enterFullscreen();
+        else if (ResUtil.isPort(this) && !isRotate()) exitFullscreen();
+        else if (isFullscreen()) Utils.hideSystemUI(this);
     }
 
     @Override
