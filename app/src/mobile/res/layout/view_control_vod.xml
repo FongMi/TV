@@ -72,9 +72,11 @@
         android:orientation="horizontal">
 
         <FrameLayout
+            android:id="@+id/prevRoot"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/shape_control">
+            android:background="@drawable/shape_control"
+            android:visibility="gone">
 
             <ImageView
                 android:id="@+id/prev"
@@ -102,9 +104,11 @@
         </FrameLayout>
 
         <FrameLayout
+            android:id="@+id/nextRoot"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/shape_control">
+            android:background="@drawable/shape_control"
+            android:visibility="gone">
 
             <ImageView
                 android:id="@+id/next"
