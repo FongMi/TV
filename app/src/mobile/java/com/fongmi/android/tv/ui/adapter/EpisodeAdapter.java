@@ -27,20 +27,15 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
         void onItemClick(Vod.Flag.Episode item);
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
-
-        private final AdapterEpisodeBinding binding;
-
-        ViewHolder(@NonNull AdapterEpisodeBinding binding) {
-            super(binding.getRoot());
-            this.binding = binding;
-        }
-    }
-
     public void addAll(List<Vod.Flag.Episode> items) {
         mItems.clear();
         mItems.addAll(items);
         notifyDataSetChanged();
+    }
+
+    public int getPosition() {
+        for (int i = 0; i < mItems.size(); i++) if (mItems.get(i).isActivated()) return i;
+        return 0;
     }
 
     public Vod.Flag.Episode getActivated() {
@@ -60,11 +55,6 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
         return mItems.get(current);
     }
 
-    public int getPosition() {
-        for (int i = 0; i < mItems.size(); i++) if (mItems.get(i).isActivated()) return i;
-        return 0;
-    }
-
     @Override
     public int getItemCount() {
         return mItems.size();
@@ -80,8 +70,18 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Vod.Flag.Episode item = mItems.get(position);
         holder.binding.text.setText(item.getName());
-        //holder.binding.text.setMaxEms(ResUtil.getEms());
+        holder.binding.text.setSelected(item.isActivated());
         holder.binding.text.setActivated(item.isActivated());
         holder.binding.text.setOnClickListener(v -> mListener.onItemClick(item));
+    }
+
+    static class ViewHolder extends RecyclerView.ViewHolder {
+
+        private final AdapterEpisodeBinding binding;
+
+        ViewHolder(@NonNull AdapterEpisodeBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
     }
 }

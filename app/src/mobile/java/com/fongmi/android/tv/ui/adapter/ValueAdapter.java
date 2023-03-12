@@ -24,16 +24,6 @@ public class ValueAdapter extends RecyclerView.Adapter<ValueAdapter.ViewHolder> 
         this.mKey = filter.getKey();
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
-
-        private final AdapterValueBinding binding;
-
-        ViewHolder(@NonNull AdapterValueBinding binding) {
-            super(binding.getRoot());
-            this.binding = binding;
-        }
-    }
-
     @Override
     public int getItemCount() {
         return mItems.size();
@@ -50,12 +40,22 @@ public class ValueAdapter extends RecyclerView.Adapter<ValueAdapter.ViewHolder> 
         Filter.Value item = mItems.get(position);
         holder.binding.text.setText(item.getN());
         holder.binding.text.setActivated(item.isActivated());
-        holder.binding.getRoot().setOnClickListener(v -> onItemClick(item));
+        holder.binding.text.setOnClickListener(v -> onItemClick(item));
     }
 
     private void onItemClick(Filter.Value value) {
         for (Filter.Value item : mItems) item.setActivated(value);
         notifyItemRangeChanged(0, getItemCount());
         mListener.setFilter(mKey, value.getV());
+    }
+
+    static class ViewHolder extends RecyclerView.ViewHolder {
+
+        private final AdapterValueBinding binding;
+
+        ViewHolder(@NonNull AdapterValueBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
     }
 }

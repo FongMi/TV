@@ -100,7 +100,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     }
 
     private void onTitle(View view) {
-        SiteDialog.create(this).show();
+        SiteDialog.create(this).change().show();
     }
 
     private void onLink(View view) {

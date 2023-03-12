@@ -100,7 +100,7 @@ public class CollectActivity extends BaseActivity implements SiteCallback, WordA
     @Override
     protected void initEvent() {
         mBinding.view.setOnClickListener(this::switchView);
-        mBinding.site.setOnClickListener(v -> SiteDialog.create(this).search(true).show());
+        mBinding.site.setOnClickListener(v -> SiteDialog.create(this).search().show());
         mBinding.keyword.setOnEditorActionListener((textView, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) search();
             return true;
@@ -127,7 +127,7 @@ public class CollectActivity extends BaseActivity implements SiteCallback, WordA
         mBinding.recordRecycler.setHasFixedSize(true);
         mBinding.recordRecycler.setLayoutManager(new GridLayoutManager(this, 2));
         mBinding.recordRecycler.setAdapter(mRecordAdapter = new RecordAdapter(this));
-        mVodAdapter.setSize(Product.getSpec(getActivity(), ResUtil.dp2px(64), 3));
+        mVodAdapter.setSize(Product.getSpec(this, ResUtil.dp2px(64), 3));
     }
 
     private void setLayoutSize() {

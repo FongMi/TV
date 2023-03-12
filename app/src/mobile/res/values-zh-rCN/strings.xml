@@ -8,13 +8,11 @@
     <string name="home">首页</string>
     <string name="home_history">最近观看</string>
     <string name="home_recommend">更新推荐</string>
-    <string name="home_open_url">是否开启「<xliff:g name="name">%s</xliff:g>」？</string>
 
     <!-- Detail -->
     <string name="detail_flag">线路</string>
     <string name="detail_episode">选集</string>
     <string name="detail_content">简介</string>
-    <string name="detail_content_expand">展开</string>
-    <string name="detail_content_collapse">收起</string>
+    <string name="detail_search">快搜“<xliff:g name="name">%s</xliff:g>”</string>
 
 </resources>
