@@ -6,8 +6,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.leanback.widget.Presenter;
 
+import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.databinding.AdapterPartBinding;
-import com.fongmi.android.tv.utils.ResUtil;
 
 public class PartPresenter extends Presenter {
 
