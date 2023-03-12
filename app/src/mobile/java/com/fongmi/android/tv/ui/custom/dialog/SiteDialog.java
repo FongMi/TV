@@ -43,13 +43,19 @@ public class SiteDialog implements SiteAdapter.OnClickListener {
         this.adapter = new SiteAdapter(this);
     }
 
-    public SiteDialog search(boolean search) {
-        this.adapter.search(search);
+    public SiteDialog search() {
+        this.adapter.search(true);
+        return this;
+    }
+
+    public SiteDialog change() {
+        this.adapter.change(true);
         return this;
     }
 
     public SiteDialog all() {
         this.adapter.search(true);
+        this.adapter.change(true);
         return this;
     }
 
@@ -80,10 +86,16 @@ public class SiteDialog implements SiteAdapter.OnClickListener {
     }
 
     @Override
-    public void onSearchClick(Site item) {
+    public void onSearchClick(int position, Site item) {
         item.setSearchable(!item.isSearchable()).save();
-        adapter.notifyItemRangeChanged(0, adapter.getItemCount());
+        adapter.notifyItemChanged(position);
         callback.onChanged();
+    }
+
+    @Override
+    public void onChangeClick(int position, Site item) {
+        item.setChangeable(!item.isChangeable()).save();
+        adapter.notifyItemChanged(position);
     }
 
     @Override
@@ -92,6 +104,14 @@ public class SiteDialog implements SiteAdapter.OnClickListener {
         for (Site site : ApiConfig.get().getSites()) site.setSearchable(result).save();
         adapter.notifyItemRangeChanged(0, adapter.getItemCount());
         callback.onChanged();
+        return true;
+    }
+
+    @Override
+    public boolean onChangeLongClick(Site item) {
+        boolean result = !item.isChangeable();
+        for (Site site : ApiConfig.get().getSites()) site.setChangeable(result).save();
+        adapter.notifyItemRangeChanged(0, adapter.getItemCount());
         return true;
     }
 }

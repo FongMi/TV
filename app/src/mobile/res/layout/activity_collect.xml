@@ -14,6 +14,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
+        android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <EditText
@@ -109,10 +110,10 @@
             android:id="@+id/collect"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_marginTop="8dp"
             android:clipChildren="false"
             android:clipToPadding="false"
             android:paddingStart="8dp"
-            android:paddingTop="8dp"
             android:paddingEnd="0dp"
             android:paddingBottom="8dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
@@ -122,11 +123,11 @@
             android:id="@+id/recycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginTop="8dp"
             android:layout_toEndOf="@+id/collect"
             android:clipChildren="false"
             android:clipToPadding="false"
             android:paddingStart="0dp"
-            android:paddingTop="8dp"
             android:paddingEnd="8dp"
             android:paddingBottom="8dp"
             tools:listitem="@layout/adapter_vod" />

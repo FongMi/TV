@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -56,11 +57,12 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/state"
+        android:id="@+id/seek"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="end|top"
-        android:layout_margin="16dp"
+        android:layout_gravity="top|center"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/shape_widget"
         android:gravity="center"
         android:orientation="horizontal"
         android:visibility="gone"
@@ -70,16 +72,81 @@
             android:id="@+id/action"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"
+            android:layout_marginEnd="8dp"
             android:src="@drawable/ic_widget_rewind" />
 
         <TextView
-            android:id="@+id/position"
+            android:id="@+id/time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/white"
             android:textSize="14sp"
             tools:text="00:00:00" />
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/speed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center"
+        android:layout_marginTop="24dp"
+        android:src="@drawable/ic_widget_forward"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/bright"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/shape_widget"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <ImageView
+            android:id="@+id/brightIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            tools:src="@drawable/ic_widget_bright_high" />
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/brightProgress"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            app:indicatorColor="@color/white"
+            app:trackColor="@color/grey_500" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/volume"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/shape_widget"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <ImageView
+            android:id="@+id/volumeIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            tools:src="@drawable/ic_widget_volume_high" />
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/volumeProgress"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            app:indicatorColor="@color/white"
+            app:trackColor="@color/grey_500" />
 
     </LinearLayout>
 </FrameLayout>

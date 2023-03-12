@@ -37,7 +37,8 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.ViewHolder
 
     private List<String> getItems() {
         if (Prefers.getKeyword().isEmpty()) return new ArrayList<>();
-        return mGson.fromJson(Prefers.getKeyword(), new TypeToken<List<String>>() {}.getType());
+        return mGson.fromJson(Prefers.getKeyword(), new TypeToken<List<String>>() {
+        }.getType());
     }
 
     private void checkToAdd(String item) {
@@ -75,23 +76,19 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.binding.text.setText(mItems.get(position));
+        String text = mItems.get(position);
+        holder.binding.text.setText(text);
+        holder.binding.text.setOnClickListener(v -> mListener.onItemClick(text));
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener {
 
         private final AdapterCollectRecordBinding binding;
 
-        public ViewHolder(@NonNull AdapterCollectRecordBinding binding) {
+        ViewHolder(@NonNull AdapterCollectRecordBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
-            itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
-        }
-
-        @Override
-        public void onClick(View view) {
-            mListener.onItemClick(mItems.get(getLayoutPosition()));
         }
 
         @Override

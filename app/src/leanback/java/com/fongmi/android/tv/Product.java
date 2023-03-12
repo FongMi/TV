@@ -12,4 +12,8 @@ public class Product {
     public static void bootLive() {
         LiveActivity.start(App.activity());
     }
+
+    public static int getEms() {
+        return Math.min(getScreenWidth() / sp2px(24), 35);
+    }
 }
