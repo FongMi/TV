@@ -13,8 +13,6 @@
     <string name="detail_flag">線路</string>
     <string name="detail_episode">選集</string>
     <string name="detail_content">簡介</string>
-    <string name="detail_content_expand">展開</string>
-    <string name="detail_content_collapse">收起</string>
     <string name="detail_search">快搜「<xliff:g name="name">%s</xliff:g>」</string>
 
 </resources>
