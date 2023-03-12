@@ -28,29 +28,23 @@ public class FlagAdapter extends RecyclerView.Adapter<FlagAdapter.ViewHolder> {
         void onItemClick(Vod.Flag item);
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
-
-        private final AdapterFlagBinding binding;
-
-        ViewHolder(@NonNull AdapterFlagBinding binding) {
-            super(binding.getRoot());
-            this.binding = binding;
-        }
-    }
-
     public void addAll(List<Vod.Flag> items) {
         mItems.clear();
         mItems.addAll(items);
         notifyDataSetChanged();
     }
 
-    public Vod.Flag getActivated() {
-        return mItems.get(getPosition());
-    }
-
     public int getPosition() {
         for (int i = 0; i < mItems.size(); i++) if (mItems.get(i).isActivated()) return i;
         return 0;
+    }
+
+    public Vod.Flag get(int position) {
+        return mItems.get(position);
+    }
+
+    public Vod.Flag getActivated() {
+        return mItems.get(getPosition());
     }
 
     public void setActivated(Vod.Flag flag) {
@@ -83,5 +77,15 @@ public class FlagAdapter extends RecyclerView.Adapter<FlagAdapter.ViewHolder> {
         holder.binding.text.setText(item.getFlag());
         holder.binding.text.setActivated(item.isActivated());
         holder.binding.text.setOnClickListener(v -> mListener.onItemClick(item));
+    }
+
+    static class ViewHolder extends RecyclerView.ViewHolder {
+
+        private final AdapterFlagBinding binding;
+
+        ViewHolder(@NonNull AdapterFlagBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
     }
 }

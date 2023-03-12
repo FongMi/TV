@@ -62,7 +62,7 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
 
     private void initDialog() {
         WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
-        params.width = (int) (ResUtil.getScreenWidthPx() * 0.55f);
+        params.width = (int) (ResUtil.getScreenWidth() * 0.55f);
         dialog.getWindow().setAttributes(params);
         dialog.getWindow().setDimAmount(0);
         dialog.setOnDismissListener(this);
