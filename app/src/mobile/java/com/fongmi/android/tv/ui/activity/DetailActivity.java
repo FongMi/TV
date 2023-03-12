@@ -1114,9 +1114,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     public void onBackPressed() {
         if (isVisible(mBinding.control.getRoot())) {
             hideControl();
-        } else if (isFullscreen()) {
+        } else if (isFullscreen() && !isLock()) {
             exitFullscreen();
-        } else {
+        } else if (!isLock()) {
             stopSearch();
             finish();
         }
