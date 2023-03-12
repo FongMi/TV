@@ -98,7 +98,7 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
 
     @Override
     public boolean onDoubleTap(@NonNull MotionEvent e) {
-        listener.onDoubleTap();
+        if (!lock) listener.onDoubleTap();
         return true;
     }
 
