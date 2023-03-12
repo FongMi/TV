@@ -62,12 +62,20 @@ public class ResUtil {
         return getDisplayMetrics().widthPixels;
     }
 
+    public static int getScreenWidth(Context context) {
+        return context.getResources().getDisplayMetrics().widthPixels;
+    }
+
     public static int getScreenWidthNav() {
         return getDisplayMetrics().widthPixels + getNavigationBarHeight(App.get());
     }
 
     public static int getScreenHeight() {
         return getDisplayMetrics().heightPixels;
+    }
+
+    public static int getScreenHeight(Context context) {
+        return context.getResources().getDisplayMetrics().heightPixels;
     }
 
     public static int getScreenHeightNav() {
