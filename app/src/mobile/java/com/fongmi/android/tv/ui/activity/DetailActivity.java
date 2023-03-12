@@ -8,13 +8,11 @@ import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.text.Html;
-import android.text.Layout;
 import android.util.Rational;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -210,7 +208,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     protected void initEvent() {
         mBinding.control.seek.setListener(mPlayers);
         mBinding.name.setOnClickListener(view -> onName());
-        mBinding.more.setOnClickListener(view -> onMore());
+        mBinding.content.setOnClickListener(view -> onContent());
         mBinding.reverse.setOnClickListener(view -> onReverse());
         mBinding.control.full.setOnClickListener(view -> onFull());
         mBinding.control.keep.setOnClickListener(view -> onKeep());
@@ -341,7 +339,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         setOther(mBinding.other, item);
         checkFlag(item);
         checkKeepImg();
-        checkLine();
     }
 
     private void setText(TextView view, int resId, String text) {
@@ -357,21 +354,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         if (!item.getTypeName().isEmpty()) sb.append(getString(R.string.detail_type, item.getTypeName())).append("  ");
         view.setVisibility(sb.length() == 0 ? View.GONE : View.VISIBLE);
         view.setText(Utils.substring(sb.toString(), 2));
-    }
-
-    private void checkLine() {
-        mBinding.content.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                mBinding.content.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                Layout layout = mBinding.content.getLayout();
-                if (layout != null) {
-                    int lines = layout.getLineCount() - 1;
-                    boolean ellipse = layout.getEllipsisCount(lines) > 0;
-                    mBinding.more.setVisibility(ellipse ? View.VISIBLE : View.GONE);
-                }
-            }
-        });
     }
 
     @Override
@@ -425,9 +407,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         initSearch(name, false);
     }
 
-    private void onMore() {
-        boolean more = getString(R.string.detail_content_expand).equals(mBinding.more.getText().toString());
-        mBinding.more.setText(more ? R.string.detail_content_collapse : R.string.detail_content_expand);
+    private void onContent() {
+        boolean more = mBinding.content.getMaxLines() == 2;
         mBinding.content.setMaxLines(more ? Integer.MAX_VALUE : 2);
     }
 
@@ -1092,8 +1073,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        if (ResUtil.isLand(this)) enterFullscreen();
-        else if (ResUtil.isPort(this) && !isRotate()) exitFullscreen();
+        if (ResUtil.isPort(this) && !isRotate()) exitFullscreen();
+        else if (ResUtil.isLand(this)) enterFullscreen();
         else if (isFullscreen()) Utils.hideSystemUI(this);
     }
 

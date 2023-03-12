@@ -13,8 +13,6 @@
     <string name="detail_flag">Flag</string>
     <string name="detail_episode">Episode</string>
     <string name="detail_content">Summary</string>
-    <string name="detail_content_expand">Expand</string>
-    <string name="detail_content_collapse">Collapse</string>
     <string name="detail_search">Searching <xliff:g name="name">%s</xliff:g></string>
 
 </resources>
