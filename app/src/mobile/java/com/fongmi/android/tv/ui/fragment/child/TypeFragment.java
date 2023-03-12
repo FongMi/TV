@@ -99,11 +99,12 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mViewModel.result.observe(getViewLifecycleOwner(), result -> {
-            mBinding.progressLayout.showContent(isFolder(), result.getList().size());
-            mScroller.endLoading(result.getList().isEmpty());
+            int size = result.getList().size();
+            mBinding.progressLayout.showContent(isFolder(), size);
             mBinding.swipeLayout.setRefreshing(false);
+            mScroller.endLoading(size == 0);
             mVodAdapter.addAll(result.getList());
-            checkPage();
+            checkPage(size);
         });
     }
 
@@ -113,9 +114,9 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         getVideo(getTypeId(), "1");
     }
 
-    private void checkPage() {
-        if (mScroller.getPage() != 1 || mVodAdapter.getItemCount() >= 40 || isFolder()) return;
-        if (mScroller.addPage()) getVideo(getTypeId(), "2");
+    private void checkPage(int count) {
+        if (count == 0 || mVodAdapter.getItemCount() >= 40 || isFolder()) return;
+        getVideo(getTypeId(), String.valueOf(mScroller.addPage()));
     }
 
     private void getVideo(String typeId, String page) {

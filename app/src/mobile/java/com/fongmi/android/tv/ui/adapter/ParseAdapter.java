@@ -27,19 +27,17 @@ public class ParseAdapter extends RecyclerView.Adapter<ParseAdapter.ViewHolder> 
         void onItemClick(Parse item);
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
-
-        private final AdapterParseBinding binding;
-
-        ViewHolder(@NonNull AdapterParseBinding binding) {
-            super(binding.getRoot());
-            this.binding = binding;
-        }
+    public int getPosition() {
+        for (int i = 0; i < mItems.size(); i++) if (mItems.get(i).isActivated()) return i;
+        return 0;
     }
 
-    public Parse getActivated() {
-        for (Parse item : mItems) if (item.isActivated()) return item;
-        return null;
+    public Parse get(int position) {
+        return mItems.get(position);
+    }
+
+    public Parse first() {
+        return mItems.get(0);
     }
 
     @Override
@@ -59,5 +57,15 @@ public class ParseAdapter extends RecyclerView.Adapter<ParseAdapter.ViewHolder> 
         holder.binding.text.setText(item.getName());
         holder.binding.text.setActivated(item.isActivated());
         holder.binding.text.setOnClickListener(v -> mListener.onItemClick(item));
+    }
+
+    static class ViewHolder extends RecyclerView.ViewHolder {
+
+        private final AdapterParseBinding binding;
+
+        ViewHolder(@NonNull AdapterParseBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
     }
 }

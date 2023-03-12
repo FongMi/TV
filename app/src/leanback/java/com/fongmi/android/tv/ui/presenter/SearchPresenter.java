@@ -22,7 +22,7 @@ public class SearchPresenter extends Presenter {
 
     private void setLayoutSize() {
         int space = ResUtil.dp2px(24) + ResUtil.dp2px(8 * 5);
-        int base = ResUtil.getScreenWidthPx() - space;
+        int base = ResUtil.getScreenWidth() - space;
         width = base / 5;
     }
 

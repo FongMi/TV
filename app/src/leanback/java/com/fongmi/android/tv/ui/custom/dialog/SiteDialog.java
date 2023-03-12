@@ -36,14 +36,14 @@ public class SiteDialog implements SitePresenter.OnClickListener {
         this.adapter = new ArrayObjectAdapter(presenter = new SitePresenter(this));
     }
 
-    public SiteDialog search(boolean search) {
-        this.presenter.search(search);
+    public SiteDialog search() {
+        this.presenter.search(true);
         this.width = 0.4f;
         return this;
     }
 
-    public SiteDialog filter(boolean filter) {
-        this.presenter.filter(filter);
+    public SiteDialog filter() {
+        this.presenter.filter(true);
         this.width = 0.4f;
         return this;
     }
@@ -71,8 +71,8 @@ public class SiteDialog implements SitePresenter.OnClickListener {
     private void setDialog() {
         if (adapter.size() == 0) return;
         WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
-        params.width = (int) (ResUtil.getScreenWidthPx() * width);
-        params.height = (int) (ResUtil.getScreenHeightPx() * 0.745f);
+        params.width = (int) (ResUtil.getScreenWidth() * width);
+        params.height = (int) (ResUtil.getScreenHeight() * 0.745f);
         dialog.getWindow().setAttributes(params);
         dialog.getWindow().setDimAmount(0);
         dialog.show();

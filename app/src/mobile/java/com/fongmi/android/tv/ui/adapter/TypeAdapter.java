@@ -29,16 +29,6 @@ public class TypeAdapter extends RecyclerView.Adapter<TypeAdapter.ViewHolder> {
         void onItemClick(int position, Class item);
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
-
-        private final AdapterTypeBinding binding;
-
-        ViewHolder(@NonNull AdapterTypeBinding binding) {
-            super(binding.getRoot());
-            this.binding = binding;
-        }
-    }
-
     private Class home() {
         Class type = new Class();
         type.setTypeName(ResUtil.getString(R.string.home));
@@ -92,6 +82,16 @@ public class TypeAdapter extends RecyclerView.Adapter<TypeAdapter.ViewHolder> {
         Class item = mItems.get(position);
         holder.binding.text.setText(item.getTypeName());
         holder.binding.text.setActivated(item.isActivated());
-        holder.binding.getRoot().setOnClickListener(v -> mListener.onItemClick(position, item));
+        holder.binding.text.setOnClickListener(v -> mListener.onItemClick(position, item));
+    }
+
+    static class ViewHolder extends RecyclerView.ViewHolder {
+
+        private final AdapterTypeBinding binding;
+
+        ViewHolder(@NonNull AdapterTypeBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
     }
 }
