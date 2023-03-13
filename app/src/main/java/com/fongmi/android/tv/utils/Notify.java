@@ -51,7 +51,7 @@ public class Notify {
         ViewProgressBinding binding = ViewProgressBinding.inflate(LayoutInflater.from(context));
         mDialog = new MaterialAlertDialogBuilder(context).setView(binding.getRoot()).create();
         mDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-        mDialog.getWindow().setDimAmount(dim ? 1 : 0);
+        mDialog.getWindow().setDimAmount(dim ? 0.5f : 0);
         mDialog.show();
     }
 
