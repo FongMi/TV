@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Rational;
@@ -19,8 +18,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.app.ShareCompat;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
@@ -182,6 +179,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
+        mBinding.swipeLayout.setRefreshing(true);
         getIntent().putExtras(intent);
         setOrient();
         getDetail();
@@ -191,6 +189,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     protected void initView(Bundle savedInstanceState) {
         mKeyDown = CustomKeyDownVod.create(this, mBinding.video);
         mFrameParams = mBinding.video.getLayoutParams();
+        mBinding.progressLayout.showProgress();
         mPlayers = new Players().init();
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
@@ -206,7 +205,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     @Override
     @SuppressLint("ClickableViewAccessibility")
     protected void initEvent() {
-        mBinding.control.seek.setListener(mPlayers);
         mBinding.name.setOnClickListener(view -> onName());
         mBinding.content.setOnClickListener(view -> onContent());
         mBinding.reverse.setOnClickListener(view -> onReverse());
@@ -233,25 +231,23 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.action.opening.setOnLongClickListener(view -> onOpeningReset());
         mBinding.video.setOnTouchListener((view, event) -> mKeyDown.onTouchEvent(event));
         mBinding.control.action.getRoot().setOnTouchListener(this::onActionTouch);
+        mBinding.swipeLayout.setOnRefreshListener(this::getDetail);
+        mBinding.control.seek.setListener(mPlayers);
     }
 
     private void setRecyclerView() {
         mBinding.flag.setHasFixedSize(true);
         mBinding.flag.setItemAnimator(null);
         mBinding.flag.addItemDecoration(new SpaceItemDecoration(8));
-        mBinding.flag.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         mBinding.flag.setAdapter(mFlagAdapter = new FlagAdapter(this));
         mBinding.episode.setHasFixedSize(true);
         mBinding.episode.setItemAnimator(null);
         mBinding.episode.addItemDecoration(new SpaceItemDecoration(8));
-        mBinding.episode.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         mBinding.episode.setAdapter(mEpisodeAdapter = new EpisodeAdapter(this));
-        mBinding.search.setLayoutManager(new GridLayoutManager(this, 2, GridLayoutManager.HORIZONTAL, false));
         mBinding.search.setAdapter(mSearchAdapter = new SearchAdapter(this::setSearch));
         mBinding.control.parse.setHasFixedSize(true);
         mBinding.control.parse.setItemAnimator(null);
         mBinding.control.parse.addItemDecoration(new SpaceItemDecoration(8));
-        mBinding.control.parse.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         mBinding.control.parse.setAdapter(mParseAdapter = new ParseAdapter(this));
     }
 
@@ -289,19 +285,20 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
             mPlayers.start(result, isUseParse(), timeout);
         });
         mViewModel.result.observe(this, result -> {
+            mBinding.swipeLayout.setRefreshing(false);
             if (result.getList().isEmpty()) setEmpty();
             else setDetail(result.getList().get(0));
         });
     }
 
     private void getDetail() {
-        mBinding.progressLayout.showProgress();
         mViewModel.detailContent(getKey(), getId());
     }
 
     private void getDetail(Vod item) {
         getIntent().putExtra("key", item.getSiteKey());
         getIntent().putExtra("id", item.getVodId());
+        mBinding.swipeLayout.setRefreshing(true);
         mBinding.scroll.scrollTo(0, 0);
         Clock.get().setCallback(null);
         mPlayers.stop();
@@ -1052,9 +1049,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     @Override
     protected void onUserLeaveHint() {
         super.onUserLeaveHint();
-        Rect sourceRectHint = new Rect();
-        mBinding.video.getGlobalVisibleRect(sourceRectHint);
-        Utils.enterPIP(this, sourceRectHint, getScale() == 2 ? new Rational(4, 3) : new Rational(16, 9));
+        Utils.enterPIP(this, getScale() == 2 ? new Rational(4, 3) : new Rational(16, 9));
+        if (isLock()) onLock();
     }
 
     @Override
