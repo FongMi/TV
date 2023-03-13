@@ -120,12 +120,9 @@ public class CollectActivity extends BaseActivity implements SiteCallback, WordA
         mBinding.collect.setAdapter(mCollectAdapter = new CollectAdapter(this));
         mBinding.recycler.setHasFixedSize(true);
         mBinding.recycler.setAdapter(mVodAdapter = new VodAdapter(this));
-        mBinding.recycler.setLayoutManager(mGridLayoutManager = new GridLayoutManager(this, 2));
         mBinding.wordRecycler.setHasFixedSize(true);
-        mBinding.wordRecycler.setLayoutManager(new GridLayoutManager(this, 2));
         mBinding.wordRecycler.setAdapter(mWordAdapter = new WordAdapter(this));
         mBinding.recordRecycler.setHasFixedSize(true);
-        mBinding.recordRecycler.setLayoutManager(new GridLayoutManager(this, 2));
         mBinding.recordRecycler.setAdapter(mRecordAdapter = new RecordAdapter(this));
         mVodAdapter.setSize(Product.getSpec(this, ResUtil.dp2px(64), 3));
     }
@@ -205,9 +202,10 @@ public class CollectActivity extends BaseActivity implements SiteCallback, WordA
 
     private void switchView(View view) {
         boolean grid = mVodAdapter.getViewType() == ViewType.GRID;
+        GridLayoutManager manager = (GridLayoutManager) mBinding.recycler.getLayoutManager();
         mBinding.view.setImageResource(grid ? R.drawable.ic_view_grid : R.drawable.ic_view_list);
         mVodAdapter.setViewType(grid ? ViewType.LIST : ViewType.GRID);
-        mGridLayoutManager.setSpanCount(grid ? 1 : 2);
+        manager.setSpanCount(grid ? 1 : 2);
     }
 
     private void showAgent() {

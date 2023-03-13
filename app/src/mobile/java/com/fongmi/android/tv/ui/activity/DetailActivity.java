@@ -19,8 +19,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.app.ShareCompat;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
@@ -239,19 +237,15 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.flag.setHasFixedSize(true);
         mBinding.flag.setItemAnimator(null);
         mBinding.flag.addItemDecoration(new SpaceItemDecoration(8));
-        mBinding.flag.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         mBinding.flag.setAdapter(mFlagAdapter = new FlagAdapter(this));
         mBinding.episode.setHasFixedSize(true);
         mBinding.episode.setItemAnimator(null);
         mBinding.episode.addItemDecoration(new SpaceItemDecoration(8));
-        mBinding.episode.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         mBinding.episode.setAdapter(mEpisodeAdapter = new EpisodeAdapter(this));
-        mBinding.search.setLayoutManager(new GridLayoutManager(this, 2, GridLayoutManager.HORIZONTAL, false));
         mBinding.search.setAdapter(mSearchAdapter = new SearchAdapter(this::setSearch));
         mBinding.control.parse.setHasFixedSize(true);
         mBinding.control.parse.setItemAnimator(null);
         mBinding.control.parse.addItemDecoration(new SpaceItemDecoration(8));
-        mBinding.control.parse.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         mBinding.control.parse.setAdapter(mParseAdapter = new ParseAdapter(this));
     }
 

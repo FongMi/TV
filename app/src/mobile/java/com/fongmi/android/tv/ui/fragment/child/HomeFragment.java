@@ -5,7 +5,6 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.widget.NestedScrollView;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -61,7 +60,6 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
     @Override
     protected void initEvent() {
         mBinding.swipeLayout.setOnRefreshListener(this);
-        mBinding.scrollView.setOnScrollChangeListener((NestedScrollView.OnScrollChangeListener) (v, scrollX, scrollY, oldScrollX, oldScrollY) -> getParent().toggleLink(scrollY - oldScrollY));
     }
 
     @Override
