@@ -75,9 +75,9 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         mBinding.pager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
-                setFabVisible(mAdapter.get(mBinding.pager.getCurrentItem()).getFilters().size() > 0);
                 mBinding.type.smoothScrollToPosition(position);
                 mAdapter.setActivated(position);
+                setFabVisible(position);
             }
         });
     }
@@ -88,13 +88,16 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         mBinding.type.setAdapter(mAdapter = new TypeAdapter(this));
     }
 
-    private void setFabVisible(boolean filter) {
-        if (filter) {
+    private void setFabVisible(int position) {
+        if (position == 0) {
+            mBinding.filter.hide();
+            mBinding.link.show();
+        } else if (mAdapter.get(position).getFilters().size() > 0) {
             mBinding.filter.show();
             mBinding.link.hide();
         } else {
             mBinding.filter.hide();
-            mBinding.link.show();
+            mBinding.link.hide();
         }
     }
 
@@ -127,8 +130,8 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     }
 
     private void homeContent() {
+        setFabVisible(0);
         mAdapter.clear();
-        setFabVisible(false);
         mBinding.pager.setAdapter(new PageAdapter(getChildFragmentManager()));
         mBinding.title.setText(getSite().getName().isEmpty() ? getString(R.string.app_name) : getSite().getName());
     }
