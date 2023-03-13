@@ -75,6 +75,8 @@
             android:clipChildren="false"
             android:clipToPadding="false"
             android:padding="8dp"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:spanCount="2"
             tools:itemCount="5"
             tools:listitem="@layout/adapter_collect_record" />
 
@@ -95,6 +97,8 @@
             android:clipChildren="false"
             android:clipToPadding="false"
             android:padding="8dp"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:spanCount="2"
             tools:itemCount="5"
             tools:listitem="@layout/adapter_collect_word" />
 
@@ -130,6 +134,8 @@
             android:paddingStart="0dp"
             android:paddingEnd="8dp"
             android:paddingBottom="8dp"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:spanCount="2"
             tools:listitem="@layout/adapter_vod" />
 
     </RelativeLayout>
