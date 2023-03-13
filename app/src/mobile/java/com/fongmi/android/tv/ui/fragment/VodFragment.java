@@ -29,7 +29,6 @@ import com.fongmi.android.tv.ui.custom.dialog.LinkDialog;
 import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
 import com.fongmi.android.tv.ui.fragment.child.HomeFragment;
 import com.fongmi.android.tv.ui.fragment.child.TypeFragment;
-import com.fongmi.android.tv.utils.Utils;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import org.greenrobot.eventbus.EventBus;
@@ -159,14 +158,6 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     @Override
     public void setFilter(String key, String value) {
         ((TypeFragment) getFragment()).setFilter(key, value);
-    }
-
-    public void toggleLink(int dy) {
-        Utils.toggleFab(dy, mBinding.link);
-    }
-
-    public void toggleFilter(int dy) {
-        Utils.toggleFab(dy, mBinding.filter);
     }
 
     public void setAdapter(Result result) {

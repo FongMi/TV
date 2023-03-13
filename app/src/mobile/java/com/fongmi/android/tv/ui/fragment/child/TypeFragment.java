@@ -8,7 +8,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.Product;
@@ -21,7 +20,6 @@ import com.fongmi.android.tv.ui.activity.DetailActivity;
 import com.fongmi.android.tv.ui.adapter.VodAdapter;
 import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.custom.CustomScroller;
-import com.fongmi.android.tv.ui.fragment.VodFragment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,10 +41,6 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         TypeFragment fragment = new TypeFragment();
         fragment.setArguments(args);
         return fragment;
-    }
-
-    private VodFragment getParent() {
-        return (VodFragment) getParentFragment();
     }
 
     private String getTypeId() {
@@ -75,12 +69,6 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     protected void initEvent() {
         mBinding.swipeLayout.setOnRefreshListener(this::getVideo);
         mBinding.recycler.addOnScrollListener(mScroller = new CustomScroller(this));
-        mBinding.recycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                getParent().toggleFilter(dy);
-            }
-        });
     }
 
     @Override

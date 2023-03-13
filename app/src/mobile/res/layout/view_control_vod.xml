@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -161,8 +162,10 @@
             android:layout_marginBottom="8dp"
             android:clipChildren="false"
             android:clipToPadding="false"
+            android:orientation="horizontal"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:itemCount="1"
             tools:listitem="@layout/adapter_parse" />
 
