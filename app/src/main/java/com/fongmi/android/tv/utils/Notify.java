@@ -33,7 +33,11 @@ public class Notify {
     }
 
     public static void progress(Context context) {
-        dismiss(); get().create(context);
+        progress(context, false);
+    }
+
+    public static void progress(Context context, boolean dim) {
+        dismiss(); get().create(context, dim);
     }
 
     public static void dismiss() {
@@ -43,10 +47,11 @@ public class Notify {
         }
     }
 
-    private void create(Context context) {
+    private void create(Context context, boolean dim) {
         ViewProgressBinding binding = ViewProgressBinding.inflate(LayoutInflater.from(context));
         mDialog = new MaterialAlertDialogBuilder(context).setView(binding.getRoot()).create();
         mDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        mDialog.getWindow().setDimAmount(dim ? 0.5f : 0);
         mDialog.show();
     }
 
