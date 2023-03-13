@@ -6,8 +6,13 @@ https://github.com/CatVodTVOfficial/CatVodTVJarLoader
 
 ### 下載
 
+電視版
 [Jar+Js](https://github.com/FongMi/TV/blob/main/release/leanback-java.apk?raw=true "TV")  
 [Jar+Js+Py](https://github.com/FongMi/TV/blob/main/release/leanback-python.apk?raw=true "TV")
+
+手機版
+[Jar+Js](https://github.com/FongMi/TV/blob/main/release/mobile-java.apk?raw=true "TV")  
+[Jar+Js+Py](https://github.com/FongMi/TV/blob/main/release/mobile-python.apk?raw=true "TV")
 
 ### 點播欄位
 
