@@ -27,7 +27,7 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
 
     private FragmentVodChildBinding mBinding;
     private SiteViewModel mViewModel;
-    private VodAdapter mVodAdapter;
+    private VodAdapter mAdapter;
 
     public static HomeFragment newInstance() {
         return new HomeFragment();
@@ -66,8 +66,8 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
     private void setRecyclerView() {
         mBinding.recycler.setHasFixedSize(true);
         mBinding.recycler.setLayoutManager(new GridLayoutManager(getContext(), Product.getColumn()));
-        mBinding.recycler.setAdapter(mVodAdapter = new VodAdapter(this));
-        mVodAdapter.setSize(Product.getSpec(getActivity()));
+        mBinding.recycler.setAdapter(mAdapter = new VodAdapter(this));
+        mAdapter.setSize(Product.getSpec(getActivity()));
     }
 
     private void setViewModel() {
@@ -82,13 +82,13 @@ public class HomeFragment extends BaseFragment implements VodAdapter.OnClickList
     private void setAdapter(Result result) {
         mBinding.swipeLayout.setRefreshing(false);
         mBinding.progressLayout.showContent();
-        mVodAdapter.addAll(result.getList());
+        mAdapter.addAll(result.getList());
         getParent().setAdapter(result);
     }
 
     @Override
     public void onRefresh() {
-        mVodAdapter.clear();
+        mAdapter.clear();
         getVideo();
     }
 
