@@ -32,8 +32,8 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     private FragmentVodChildBinding mBinding;
     private CustomScroller mScroller;
     private SiteViewModel mViewModel;
-    private VodAdapter mVodAdapter;
     private List<String> mTypeIds;
+    private VodAdapter mAdapter;
 
     public static TypeFragment newInstance(String typeId, boolean folder) {
         Bundle args = new Bundle();
@@ -80,9 +80,9 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     private void setRecyclerView() {
         mBinding.recycler.setHasFixedSize(true);
-        mBinding.recycler.setAdapter(mVodAdapter = new VodAdapter(this));
+        mBinding.recycler.setAdapter(mAdapter = new VodAdapter(this));
         mBinding.recycler.setLayoutManager(new GridLayoutManager(getContext(), Product.getColumn()));
-        mVodAdapter.setSize(Product.getSpec(getActivity()));
+        mAdapter.setSize(Product.getSpec(getActivity()));
     }
 
     private void setViewModel() {
@@ -101,19 +101,19 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         mBinding.progressLayout.showContent(isFolder(), size);
         mBinding.swipeLayout.setRefreshing(false);
         mScroller.endLoading(size == 0);
-        mVodAdapter.addAll(result.getList());
+        mAdapter.addAll(result.getList());
         checkPage(size);
     }
 
     private void checkPage(int count) {
-        if (count == 0 || mVodAdapter.getItemCount() >= 40 || isFolder()) return;
+        if (count == 0 || mAdapter.getItemCount() >= 40 || isFolder()) return;
         getVideo(getTypeId(), String.valueOf(mScroller.addPage()));
     }
 
     private void getVideo(String typeId, String page) {
         if (isFolder()) mTypeIds.add(typeId);
         if (isFolder()) mBinding.recycler.scrollToPosition(0);
-        if (page.equals("1")) mVodAdapter.clear();
+        if (page.equals("1")) mAdapter.clear();
         if (page.equals("1") && !mBinding.swipeLayout.isRefreshing()) mBinding.progressLayout.showProgress();
         mViewModel.categoryContent(ApiConfig.get().getHome().getKey(), typeId, page, true, mExtends);
     }
