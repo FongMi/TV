@@ -1103,6 +1103,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     @Override
     protected void onPause() {
         super.onPause();
+        RefreshEvent.history();
         Clock.stop();
     }
 

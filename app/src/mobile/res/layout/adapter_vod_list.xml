@@ -12,6 +12,7 @@
         android:id="@+id/image"
         android:layout_width="90dp"
         android:layout_height="match_parent"
+        android:background="@color/black_10"
         android:scaleType="center"
         app:shapeAppearanceOverlay="@style/Vod.List"
         tools:src="@drawable/ic_img_loading" />

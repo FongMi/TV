@@ -65,7 +65,12 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
         mManager = new FragmentStateManager(mBinding.container, getSupportFragmentManager()) {
             @Override
             public Fragment getItem(int position) {
-                return position == 0 ? VodFragment.newInstance() : SettingFragment.newInstance();
+                switch (position) {
+                    case 0:
+                        return VodFragment.newInstance();
+                    default:
+                        return SettingFragment.newInstance();
+                }
             }
         };
         if (savedInstanceState == null) mManager.change(0);
@@ -112,7 +117,7 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
     public void onBackPressed() {
         if (mManager.isVisible(1)) {
             mBinding.navigation.setSelectedItemId(R.id.vod);
-        } else if (mManager.canBack(0)) {
+        } else {
             if (!confirm) setConfirm();
             else finish();
         }
