@@ -12,7 +12,6 @@ import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewpager.widget.ViewPager;
 
-import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Class;
 import com.fongmi.android.tv.bean.Result;
@@ -22,6 +21,8 @@ import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.impl.FilterCallback;
 import com.fongmi.android.tv.impl.SiteCallback;
 import com.fongmi.android.tv.ui.activity.CollectActivity;
+import com.fongmi.android.tv.ui.activity.HistoryActivity;
+import com.fongmi.android.tv.ui.activity.KeepActivity;
 import com.fongmi.android.tv.ui.adapter.TypeAdapter;
 import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.custom.dialog.FilterDialog;
@@ -69,9 +70,11 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     @Override
     protected void initEvent() {
         mBinding.link.setOnClickListener(this::onLink);
-        mBinding.title.setOnClickListener(this::onTitle);
+        mBinding.logo.setOnClickListener(this::onLogo);
+        mBinding.keep.setOnClickListener(this::onKeep);
         mBinding.filter.setOnClickListener(this::onFilter);
         mBinding.search.setOnClickListener(this::onSearch);
+        mBinding.history.setOnClickListener(this::onHistory);
         mBinding.pager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
@@ -101,13 +104,17 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         }
     }
 
-    private void onTitle(View view) {
-        SiteDialog.create(this).change().show();
-    }
-
     private void onLink(View view) {
         if (ApiConfig.hasPush()) LinkDialog.create(this).show();
         else mBinding.link.hide();
+    }
+
+    private void onLogo(View view) {
+        SiteDialog.create(this).change().show();
+    }
+
+    private void onKeep(View view) {
+        KeepActivity.start(getActivity());
     }
 
     private void onFilter(View view) {
@@ -117,6 +124,10 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
 
     private void onSearch(View view) {
         CollectActivity.start(getActivity());
+    }
+
+    private void onHistory(View view) {
+        HistoryActivity.start(getActivity());
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -133,7 +144,6 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         setFabVisible(0);
         mAdapter.clear();
         mBinding.pager.setAdapter(new PageAdapter(getChildFragmentManager()));
-        mBinding.title.setText(getSite().getName().isEmpty() ? getString(R.string.app_name) : getSite().getName());
     }
 
     private List<Class> getTypes(Result result) {

@@ -249,7 +249,6 @@
                         android:layout_height="wrap_content"
                         android:clipChildren="false"
                         android:clipToPadding="false"
-                        android:nestedScrollingEnabled="false"
                         android:paddingStart="8dp"
                         android:paddingEnd="8dp"
                         android:visibility="gone"
