@@ -135,8 +135,7 @@
             android:paddingEnd="8dp"
             android:paddingBottom="8dp"
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-            app:spanCount="2"
-            tools:listitem="@layout/adapter_vod" />
+            app:spanCount="2" />
 
     </RelativeLayout>
 </LinearLayout>

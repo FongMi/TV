@@ -77,7 +77,6 @@
     <string name="search_suggest">Suggest</string>
     <string name="search_hot">Hot</string>
 
-
     <!-- Dialog -->
     <string name="dialog_positive">OK</string>
     <string name="dialog_negative">Cancel</string>

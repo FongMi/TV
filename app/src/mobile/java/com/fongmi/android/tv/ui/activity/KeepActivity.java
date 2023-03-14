@@ -1,0 +1,82 @@
+package com.fongmi.android.tv.ui.activity;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.viewbinding.ViewBinding;
+
+import com.fongmi.android.tv.Product;
+import com.fongmi.android.tv.bean.Keep;
+import com.fongmi.android.tv.databinding.ActivityKeepBinding;
+import com.fongmi.android.tv.event.RefreshEvent;
+import com.fongmi.android.tv.ui.adapter.KeepAdapter;
+import com.fongmi.android.tv.ui.base.BaseActivity;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
+public class KeepActivity extends BaseActivity implements KeepAdapter.OnClickListener {
+
+    private ActivityKeepBinding mBinding;
+    private KeepAdapter mAdapter;
+
+    public static void start(Activity activity) {
+        activity.startActivity(new Intent(activity, KeepActivity.class));
+    }
+
+    @Override
+    protected ViewBinding getBinding() {
+        return mBinding = ActivityKeepBinding.inflate(getLayoutInflater());
+    }
+
+    @Override
+    protected void initView(Bundle savedInstanceState) {
+        setRecyclerView();
+        getKeep();
+    }
+
+    @Override
+    protected void initEvent() {
+
+    }
+
+    private void setRecyclerView() {
+        mBinding.recycler.setHasFixedSize(true);
+        mBinding.recycler.getItemAnimator().setChangeDuration(0);
+        mBinding.recycler.setLayoutManager(new GridLayoutManager(this, Product.getColumn()));
+        mBinding.recycler.setAdapter(mAdapter = new KeepAdapter(this));
+        mAdapter.setSize(Product.getSpec(getActivity()));
+    }
+
+    private void getKeep() {
+        mAdapter.addAll(Keep.getVod());
+    }
+
+    private void setDelete(boolean delete) {
+        mAdapter.setDelete(delete);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onRefreshEvent(RefreshEvent event) {
+        if (event.getType().equals(RefreshEvent.Type.KEEP)) getKeep();
+    }
+
+    @Override
+    public void onItemClick(Keep item) {
+        DetailActivity.start(this, item.getSiteKey(), item.getVodId(), item.getVodName());
+    }
+
+    @Override
+    public void onItemDelete(Keep item) {
+        mAdapter.remove(item.delete());
+        if (mAdapter.getItemCount() == 0) setDelete(false);
+    }
+
+    @Override
+    public boolean onLongClick() {
+        setDelete(!mAdapter.isDelete());
+        return true;
+    }
+}

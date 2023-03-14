@@ -52,7 +52,6 @@ import okhttp3.Response;
 
 public class CollectActivity extends BaseActivity implements SiteCallback, WordAdapter.OnClickListener, RecordAdapter.OnClickListener, CollectAdapter.OnClickListener, VodAdapter.OnClickListener {
 
-    private GridLayoutManager mGridLayoutManager;
     private PauseThreadPoolExecutor mExecutor;
     private ActivityCollectBinding mBinding;
     private CollectAdapter mCollectAdapter;
