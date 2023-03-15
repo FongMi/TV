@@ -370,6 +370,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.nextRoot.setVisibility(items.size() < 2 ? View.GONE : View.VISIBLE);
         mBinding.control.prevRoot.setVisibility(items.size() < 2 ? View.GONE : View.VISIBLE);
         mBinding.episode.setVisibility(items.isEmpty() ? View.GONE : View.VISIBLE);
+        mBinding.reverse.setVisibility(items.size() < 5 ? View.GONE : View.VISIBLE);
+        mBinding.more.setVisibility(items.size() < 5 ? View.GONE : View.VISIBLE);
         mEpisodeAdapter.addAll(items);
     }
 
@@ -662,7 +664,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void checkFlag(Vod item) {
-        mBinding.reverse.setVisibility(item.getVodFlags().isEmpty() ? View.GONE : View.VISIBLE);
         mBinding.flag.setVisibility(item.getVodFlags().isEmpty() ? View.GONE : View.VISIBLE);
         if (isVisible(mBinding.flag)) checkHistory(item);
         else ErrorEvent.episode();
