@@ -12,14 +12,18 @@ import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewpager.widget.ViewPager;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Class;
+import com.fongmi.android.tv.bean.Hot;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.databinding.FragmentVodBinding;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.impl.FilterCallback;
 import com.fongmi.android.tv.impl.SiteCallback;
+import com.fongmi.android.tv.net.Callback;
+import com.fongmi.android.tv.net.OkHttp;
 import com.fongmi.android.tv.ui.activity.CollectActivity;
 import com.fongmi.android.tv.ui.activity.HistoryActivity;
 import com.fongmi.android.tv.ui.activity.KeepActivity;
@@ -30,19 +34,27 @@ import com.fongmi.android.tv.ui.custom.dialog.LinkDialog;
 import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
 import com.fongmi.android.tv.ui.fragment.child.HomeFragment;
 import com.fongmi.android.tv.ui.fragment.child.TypeFragment;
+import com.fongmi.android.tv.utils.Prefers;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+
+import okhttp3.Call;
+import okhttp3.Response;
 
 public class VodFragment extends BaseFragment implements SiteCallback, FilterCallback, TypeAdapter.OnClickListener {
 
     private FragmentVodBinding mBinding;
     private TypeAdapter mAdapter;
+    private Runnable mRunnable;
+    private List<String> mHots;
 
     public static VodFragment newInstance() {
         return new VodFragment();
@@ -65,6 +77,8 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     protected void initView() {
         EventBus.getDefault().register(this);
         setRecyclerView();
+        initHot();
+        getHot();
     }
 
     @Override
@@ -90,6 +104,26 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         mBinding.type.setHasFixedSize(true);
         mBinding.type.setItemAnimator(null);
         mBinding.type.setAdapter(mAdapter = new TypeAdapter(this));
+    }
+
+    private void initHot() {
+        mHots = Hot.get(Prefers.getHot());
+        App.post(mRunnable = this::updateHot, 0);
+    }
+
+    private void getHot() {
+        OkHttp.newCall("https://api.web.360kan.com/v1/rank?cat=1").enqueue(new Callback() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                mHots = Hot.get(response.body().string());
+            }
+        });
+    }
+
+    private void updateHot() {
+        App.post(mRunnable, 10 * 1000);
+        if (mHots.isEmpty() || mHots.size() < 10) return;
+        mBinding.hot.setText(mHots.get(new Random().nextInt(11)));
     }
 
     private void setFabVisible(int position) {
@@ -128,7 +162,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     }
 
     private void onSearch(View view) {
-        CollectActivity.start(getActivity());
+        CollectActivity.start(getActivity(), mBinding.hot.getText().toString());
     }
 
     private void onHistory(View view) {
@@ -199,6 +233,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        App.removeCallbacks(mRunnable);
         EventBus.getDefault().unregister(this);
     }
 
