@@ -578,12 +578,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void enterFullscreen() {
         if (isFullscreen()) return;
         mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
+        setRequestedOrientation(mPlayers.isPortrait() ? ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
         getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
         mBinding.control.full.setImageResource(R.drawable.ic_control_full_off);
+        setRotate(mPlayers.isPortrait());
         App.post(mR3, 2000);
         setFullscreen(true);
-        setRotate(false);
         hideControl();
     }
 
