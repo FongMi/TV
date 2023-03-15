@@ -3,16 +3,19 @@ package com.fongmi.android.tv.ui.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.Product;
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.databinding.ActivityHistoryBinding;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.ui.adapter.HistoryAdapter;
 import com.fongmi.android.tv.ui.base.BaseActivity;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -39,7 +42,7 @@ public class HistoryActivity extends BaseActivity implements HistoryAdapter.OnCl
 
     @Override
     protected void initEvent() {
-
+        mBinding.delete.setOnClickListener(this::onDelete);
     }
 
     private void setRecyclerView() {
@@ -54,8 +57,14 @@ public class HistoryActivity extends BaseActivity implements HistoryAdapter.OnCl
         mAdapter.addAll(History.get());
     }
 
-    private void setDelete(boolean delete) {
-        mAdapter.setDelete(delete);
+    private void onDelete(View view) {
+        if (mAdapter.isDelete()) {
+            new MaterialAlertDialogBuilder(this).setMessage(R.string.ask_history_delete).setNegativeButton(R.string.dialog_negative, null).setPositiveButton(R.string.dialog_positive, (dialog, which) -> mAdapter.clear()).show();
+        } else if (mAdapter.getItemCount() > 0) {
+            mAdapter.setDelete(true);
+        } else {
+            mBinding.delete.setVisibility(View.GONE);
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -71,12 +80,18 @@ public class HistoryActivity extends BaseActivity implements HistoryAdapter.OnCl
     @Override
     public void onItemDelete(History item) {
         mAdapter.remove(item.delete());
-        if (mAdapter.getItemCount() == 0) setDelete(false);
+        if (mAdapter.getItemCount() == 0) mAdapter.setDelete(false);
     }
 
     @Override
     public boolean onLongClick() {
-        setDelete(!mAdapter.isDelete());
+        mAdapter.setDelete(!mAdapter.isDelete());
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mAdapter.isDelete()) mAdapter.setDelete(false);
+        else super.onBackPressed();
     }
 }
