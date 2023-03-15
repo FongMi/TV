@@ -83,6 +83,10 @@
     <string name="dialog_config_hint">Please enter the config…</string>
     <string name="dialog_config_url">Please enter the url…</string>
 
+    <!-- Ask -->
+    <string name="ask_keep_delete">Do you want to clear all keep records?</string>
+    <string name="ask_history_delete">Do you want to clear all history records?</string>
+
     <!-- Error -->
     <string name="error_so_load">Failed to load FFmpeg</string>
     <string name="error_config_get">Configuration get failed</string>

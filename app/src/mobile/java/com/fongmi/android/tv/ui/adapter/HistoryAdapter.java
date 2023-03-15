@@ -58,6 +58,13 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         notifyDataSetChanged();
     }
 
+    public void clear() {
+        mItems.clear();
+        setDelete(false);
+        notifyDataSetChanged();
+        History.delete(ApiConfig.getCid());
+    }
+
     public void remove(History item) {
         int position = mItems.indexOf(item);
         if (position == -1) return;

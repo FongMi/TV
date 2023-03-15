@@ -55,6 +55,13 @@ public class KeepAdapter extends RecyclerView.Adapter<KeepAdapter.ViewHolder> {
         notifyDataSetChanged();
     }
 
+    public void clear() {
+        mItems.clear();
+        setDelete(false);
+        notifyDataSetChanged();
+        Keep.deleteAll();
+    }
+
     public void remove(Keep item) {
         int index = mItems.indexOf(item);
         if (index == -1) return;

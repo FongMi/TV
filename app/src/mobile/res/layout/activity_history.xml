@@ -14,15 +14,23 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp">
+            android:layout_marginEnd="16dp"
+            android:gravity="center_vertical">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="@string/history"
                 android:textColor="@color/white"
                 android:textSize="20sp"
                 android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/delete"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_vod_delete" />
 
         </LinearLayout>
 
