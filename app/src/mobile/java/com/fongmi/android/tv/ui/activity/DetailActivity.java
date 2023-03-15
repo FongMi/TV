@@ -756,6 +756,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
                 break;
             case Player.STATE_READY:
                 stopSearch();
+                checkRotate();
                 hideProgress();
                 mPlayers.reset();
                 setDefaultTrack();
@@ -773,6 +774,13 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mPlayers.seekTo(Math.max(mHistory.getOpening(), mHistory.getPosition()), false);
         Clock.get().setCallback(this);
         setInitTrack(true);
+    }
+
+    private void checkRotate() {
+        if (isFullscreen() && !isRotate() && mPlayers.isPortrait()) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
+            setRotate(true);
+        }
     }
 
     private void setTrackVisible(boolean visible) {
