@@ -69,6 +69,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
 
     @Override
     protected void initEvent() {
+        mBinding.hot.setOnClickListener(this::onHot);
         mBinding.link.setOnClickListener(this::onLink);
         mBinding.logo.setOnClickListener(this::onLogo);
         mBinding.keep.setOnClickListener(this::onKeep);
@@ -120,6 +121,10 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     private void onFilter(View view) {
         for (Fragment fragment : getChildFragmentManager().getFragments()) if (fragment instanceof BottomSheetDialogFragment) return;
         FilterDialog.create(this).filter(mAdapter.get(mBinding.pager.getCurrentItem()).getFilters()).show(getChildFragmentManager(), null);
+    }
+
+    private void onHot(View view) {
+        CollectActivity.start(getActivity());
     }
 
     private void onSearch(View view) {
