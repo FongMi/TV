@@ -12,8 +12,9 @@ import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Vod;
-import com.fongmi.android.tv.databinding.FragmentTypeBinding;
+import com.fongmi.android.tv.databinding.FragmentVodChildBinding;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.ui.activity.CollectActivity;
 import com.fongmi.android.tv.ui.activity.DetailActivity;
@@ -28,11 +29,11 @@ import java.util.List;
 public class TypeFragment extends BaseFragment implements CustomScroller.Callback, VodAdapter.OnClickListener {
 
     private HashMap<String, String> mExtends;
-    private FragmentTypeBinding mBinding;
+    private FragmentVodChildBinding mBinding;
     private CustomScroller mScroller;
     private SiteViewModel mViewModel;
-    private VodAdapter mVodAdapter;
     private List<String> mTypeIds;
+    private VodAdapter mAdapter;
 
     public static TypeFragment newInstance(String typeId, boolean folder) {
         Bundle args = new Bundle();
@@ -53,7 +54,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     @Override
     protected ViewBinding getBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
-        return mBinding = FragmentTypeBinding.inflate(inflater, container, false);
+        return mBinding = FragmentVodChildBinding.inflate(inflater, container, false);
     }
 
     @Override
@@ -79,21 +80,14 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     private void setRecyclerView() {
         mBinding.recycler.setHasFixedSize(true);
-        mBinding.recycler.setAdapter(mVodAdapter = new VodAdapter(this));
+        mBinding.recycler.setAdapter(mAdapter = new VodAdapter(this));
         mBinding.recycler.setLayoutManager(new GridLayoutManager(getContext(), Product.getColumn()));
-        mVodAdapter.setSize(Product.getSpec(getActivity()));
+        mAdapter.setSize(Product.getSpec(getActivity()));
     }
 
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
-        mViewModel.result.observe(getViewLifecycleOwner(), result -> {
-            int size = result.getList().size();
-            mBinding.progressLayout.showContent(isFolder(), size);
-            mBinding.swipeLayout.setRefreshing(false);
-            mScroller.endLoading(size == 0);
-            mVodAdapter.addAll(result.getList());
-            checkPage(size);
-        });
+        mViewModel.result.observe(getViewLifecycleOwner(), this::setAdapter);
     }
 
     private void getVideo() {
@@ -102,15 +96,24 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         getVideo(getTypeId(), "1");
     }
 
+    private void setAdapter(Result result) {
+        int size = result.getList().size();
+        mBinding.progressLayout.showContent(isFolder(), size);
+        mBinding.swipeLayout.setRefreshing(false);
+        mScroller.endLoading(size == 0);
+        mAdapter.addAll(result.getList());
+        checkPage(size);
+    }
+
     private void checkPage(int count) {
-        if (count == 0 || mVodAdapter.getItemCount() >= 40 || isFolder()) return;
+        if (count == 0 || mAdapter.getItemCount() >= 40 || isFolder()) return;
         getVideo(getTypeId(), String.valueOf(mScroller.addPage()));
     }
 
     private void getVideo(String typeId, String page) {
         if (isFolder()) mTypeIds.add(typeId);
         if (isFolder()) mBinding.recycler.scrollToPosition(0);
-        if (page.equals("1")) mVodAdapter.clear();
+        if (page.equals("1")) mAdapter.clear();
         if (page.equals("1") && !mBinding.swipeLayout.isRefreshing()) mBinding.progressLayout.showProgress();
         mViewModel.categoryContent(ApiConfig.get().getHome().getKey(), typeId, page, true, mExtends);
     }

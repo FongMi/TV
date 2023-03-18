@@ -7,33 +7,30 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.api.ApiConfig;
-import com.fongmi.android.tv.bean.History;
+import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.databinding.AdapterVodBinding;
 import com.fongmi.android.tv.utils.ImgUtil;
-import com.fongmi.android.tv.utils.ResUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHolder> {
+public class KeepAdapter extends RecyclerView.Adapter<KeepAdapter.ViewHolder> {
 
     private final OnClickListener mListener;
-    private final List<History> mItems;
+    private final List<Keep> mItems;
     private int width, height;
     private boolean delete;
 
-    public HistoryAdapter(OnClickListener listener) {
-        this.mListener = listener;
+    public KeepAdapter(OnClickListener listener) {
         this.mItems = new ArrayList<>();
+        this.mListener = listener;
     }
 
     public interface OnClickListener {
 
-        void onItemClick(History item);
+        void onItemClick(Keep item);
 
-        void onItemDelete(History item);
+        void onItemDelete(Keep item);
 
         boolean onLongClick();
     }
@@ -52,7 +49,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         notifyItemRangeChanged(0, mItems.size());
     }
 
-    public void addAll(List<History> items) {
+    public void addAll(List<Keep> items) {
         mItems.clear();
         mItems.addAll(items);
         notifyDataSetChanged();
@@ -62,14 +59,14 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         mItems.clear();
         setDelete(false);
         notifyDataSetChanged();
-        History.delete(ApiConfig.getCid());
+        Keep.deleteAll();
     }
 
-    public void remove(History item) {
-        int position = mItems.indexOf(item);
-        if (position == -1) return;
-        mItems.remove(position);
-        notifyItemRemoved(position);
+    public void remove(Keep item) {
+        int index = mItems.indexOf(item);
+        if (index == -1) return;
+        mItems.remove(index);
+        notifyItemRemoved(index);
     }
 
     @Override
@@ -88,18 +85,17 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        History item = mItems.get(position);
+        Keep item = mItems.get(position);
         holder.binding.name.setText(item.getVodName());
+        holder.binding.remark.setVisibility(View.GONE);
         holder.binding.site.setVisibility(View.VISIBLE);
-        holder.binding.site.setText(ApiConfig.getSiteName(item.getSiteKey()));
-        holder.binding.remark.setText(ResUtil.getString(R.string.vod_last, item.getVodRemarks()));
-        holder.binding.remark.setVisibility(delete ? View.GONE : View.VISIBLE);
+        holder.binding.site.setText(item.getSiteName());
         holder.binding.delete.setVisibility(!delete ? View.GONE : View.VISIBLE);
-        ImgUtil.loadHistory(item.getVodPic(), holder.binding.image);
+        ImgUtil.loadKeep(item.getVodPic(), holder.binding.image);
         setClickListener(holder.binding.getRoot(), item);
     }
 
-    private void setClickListener(View root, History item) {
+    private void setClickListener(View root, Keep item) {
         root.setOnLongClickListener(view -> mListener.onLongClick());
         root.setOnClickListener(view -> {
             if (isDelete()) mListener.onItemDelete(item);
