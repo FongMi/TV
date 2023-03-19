@@ -70,9 +70,9 @@ public class EpisodeFragment extends BaseFragment implements EpisodeAdapter.OnCl
         int total = 0;
         for (Vod.Flag.Episode item : items) total += item.getName().length();
         int offset = total / items.size();
-        if (offset > 20) return 1;
-        if (offset > 15) return 2;
-        if (offset > 10) return 3;
+        if (offset >= 20) return 1;
+        if (offset >= 15) return 2;
+        if (offset >= 10) return 3;
         if (offset >= 4) return 4;
         return 5;
     }
