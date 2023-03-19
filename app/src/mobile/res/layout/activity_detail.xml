@@ -183,7 +183,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:layout_marginTop="16dp"
-                        android:layout_marginEnd="16dp"
+                        android:layout_marginEnd="12dp"
                         android:gravity="center_vertical">
 
                         <TextView
@@ -218,7 +218,9 @@
                             android:text="@string/detail_more"
                             android:textColor="@color/white"
                             android:textSize="14sp"
-                            app:drawableEndCompat="@drawable/ic_detail_more" />
+                            android:visibility="gone"
+                            app:drawableEndCompat="@drawable/ic_detail_more"
+                            tools:visibility="visible" />
 
                     </LinearLayout>
 

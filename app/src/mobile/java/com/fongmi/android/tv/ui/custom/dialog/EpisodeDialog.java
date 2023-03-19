@@ -54,11 +54,21 @@ public class EpisodeDialog extends BaseDialog {
     protected void initView() {
         binding.pager.setAdapter(new PageAdapter(getActivity()));
         new TabLayoutMediator(binding.tabs, binding.pager, (tab, position) -> tab.setText(titles.get(position))).attach();
+        setCurrentPage();
     }
 
     private void setTitles() {
-        if (reverse) for (int i = episodes.size() + 1; i > 0; i -= 50) titles.add((i - 1) + " - " + Math.max(i - 50, 1));
+        if (reverse) for (int i = episodes.size(); i > 0; i -= 50) titles.add(i + " - " + Math.max(i - 49, 1));
         else for (int i = 0; i < episodes.size(); i += 50) titles.add((i + 1) + " - " + Math.min(i + 50, episodes.size()));
+    }
+
+    private void setCurrentPage() {
+        for (int i = 0; i < episodes.size(); i++) {
+            if (episodes.get(i).isActivated()) {
+                binding.pager.setCurrentItem(i / 50);
+                break;
+            }
+        }
     }
 
     @Override
