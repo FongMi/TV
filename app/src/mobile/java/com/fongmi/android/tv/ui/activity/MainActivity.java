@@ -117,7 +117,7 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
     public void onBackPressed() {
         if (mManager.isVisible(1)) {
             mBinding.navigation.setSelectedItemId(R.id.vod);
-        } else {
+        } else if (mManager.canBack(0)) {
             if (!confirm) setConfirm();
             else finish();
         }
