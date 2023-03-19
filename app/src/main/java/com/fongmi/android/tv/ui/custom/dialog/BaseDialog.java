@@ -48,7 +48,7 @@ public abstract class BaseDialog extends BottomSheetDialogFragment {
         return dialog;
     }
 
-    private void setBehavior(BottomSheetDialog dialog) {
+    protected void setBehavior(BottomSheetDialog dialog) {
         FrameLayout bottomSheet = dialog.findViewById(com.google.android.material.R.id.design_bottom_sheet);
         BottomSheetBehavior<FrameLayout> behavior = BottomSheetBehavior.from(bottomSheet);
         behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
