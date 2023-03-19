@@ -77,6 +77,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private ActivityDetailBinding mBinding;
     private EpisodeAdapter mEpisodeAdapter;
     private SearchAdapter mSearchAdapter;
+    private EpisodeDialog mEpisodeDialog;
     private ParseAdapter mParseAdapter;
     private CustomKeyDownVod mKeyDown;
     private ExecutorService mExecutor;
@@ -282,6 +283,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
             if (result.getList().isEmpty()) setEmpty();
             else setDetail(result.getList().get(0));
         });
+        mViewModel.episode.observe(this, episode -> {
+            onItemClick(episode);
+            hideEpisode();
+        });
     }
 
     private void getDetail() {
@@ -399,6 +404,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         initSearch(name, false);
     }
 
+    private void onMore() {
+        for (Fragment fragment : getSupportFragmentManager().getFragments()) if (fragment instanceof BottomSheetDialogFragment) return;
+        mEpisodeDialog = EpisodeDialog.create().reverse(mHistory.isRevSort()).episodes(mEpisodeAdapter.getItems());
+        mEpisodeDialog.show(getSupportFragmentManager(), null);
+    }
+
     private void onContent() {
         boolean more = mBinding.content.getMaxLines() == 2;
         mBinding.content.setMaxLines(more ? Integer.MAX_VALUE : 2);
@@ -478,6 +489,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onTrack(View view) {
+        for (Fragment fragment : getSupportFragmentManager().getFragments()) if (fragment instanceof BottomSheetDialogFragment) return;
         mTrackDialog = TrackDialog.create().player(mPlayers).type(Integer.parseInt(view.getTag().toString())).listener(this);
         mTrackDialog.show(getSupportFragmentManager(), null);
         hideControl();
@@ -653,6 +665,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void hideTrack() {
         if (mTrackDialog != null) mTrackDialog.dismissAllowingStateLoss();
         mTrackDialog = null;
+    }
+
+    private void hideEpisode() {
+        if (mEpisodeDialog != null) mEpisodeDialog.dismissAllowingStateLoss();
+        mEpisodeDialog = null;
     }
 
     private void setTraffic() {
@@ -1073,6 +1090,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         if (isInPictureInPictureMode) {
             enterFullscreen();
             hideControl();
+            hideEpisode();
             hideTrack();
         } else {
             exitFullscreen();
