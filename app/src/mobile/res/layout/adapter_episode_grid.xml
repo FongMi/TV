@@ -9,6 +9,7 @@
     android:ellipsize="marquee"
     android:focusable="true"
     android:gravity="center"
+    android:padding="8dp"
     android:singleLine="true"
     android:textColor="@color/text"
     android:textSize="14sp"
