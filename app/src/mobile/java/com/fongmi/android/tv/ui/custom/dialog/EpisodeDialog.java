@@ -57,8 +57,8 @@ public class EpisodeDialog extends BaseDialog {
     }
 
     private void setTitles() {
-        if (reverse) for (int i = episodes.size() + 1; i > 0; i -= 50) titles.add((i - 1) + "-" + Math.max(i - 50, 1));
-        else for (int i = 0; i < episodes.size(); i += 50) titles.add((i + 1) + "-" + Math.min(i + 50, episodes.size()));
+        if (reverse) for (int i = episodes.size() + 1; i > 0; i -= 50) titles.add((i - 1) + " - " + Math.max(i - 50, 1));
+        else for (int i = 0; i < episodes.size(); i += 50) titles.add((i + 1) + " - " + Math.min(i + 50, episodes.size()));
     }
 
     @Override
