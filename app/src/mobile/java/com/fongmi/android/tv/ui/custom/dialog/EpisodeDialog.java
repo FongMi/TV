@@ -13,7 +13,6 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.DialogEpisodeBinding;
 import com.fongmi.android.tv.ui.fragment.EpisodeFragment;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 import java.util.ArrayList;
@@ -69,10 +68,6 @@ public class EpisodeDialog extends BaseDialog {
                 break;
             }
         }
-    }
-
-    @Override
-    protected void setBehavior(BottomSheetDialog dialog) {
     }
 
     class PageAdapter extends FragmentStateAdapter {
