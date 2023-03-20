@@ -58,7 +58,7 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
     }
 
     private boolean isEdge(MotionEvent e) {
-        return ResUtil.isEdge(e, ResUtil.dp2px(24));
+        return ResUtil.isEdge(e, ResUtil.dp2px(16));
     }
 
     @Override
