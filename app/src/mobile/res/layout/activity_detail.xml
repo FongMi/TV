@@ -213,7 +213,6 @@
                             android:id="@+id/more"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:background="?android:attr/selectableItemBackground"
                             android:gravity="center"
                             android:text="@string/detail_more"
                             android:textColor="@color/white"

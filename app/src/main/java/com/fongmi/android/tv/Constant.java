@@ -4,7 +4,7 @@ public class Constant {
     //快進時間單位
     public static final int INTERVAL_SEEK = 10 * 1000;
     //控件隱藏時間
-    public static final int INTERVAL_HIDE = 3 * 1000;
+    public static final int INTERVAL_HIDE = 5 * 1000;
     //網路偵測間隔
     public static final int INTERVAL_TRAFFIC = 500;
     //點播爬蟲時間
