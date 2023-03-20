@@ -1050,7 +1050,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     @Override
     public void onBackPressed() {
-        if (isVisible(mBinding.control.getRoot())) {
+        if (isVisible(mBinding.widget.center)) {
+            hideCenter();
+        } else if (isVisible(mBinding.control.getRoot())) {
             hideControl();
         } else if (isFullscreen()) {
             exitFullscreen();
