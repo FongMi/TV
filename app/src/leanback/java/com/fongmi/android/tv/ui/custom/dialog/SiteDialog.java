@@ -42,15 +42,14 @@ public class SiteDialog implements SitePresenter.OnClickListener {
         return this;
     }
 
-    public SiteDialog filter() {
-        this.presenter.filter(true);
+    public SiteDialog change() {
+        this.presenter.change(true);
         this.width = 0.4f;
         return this;
     }
 
     public SiteDialog all() {
         this.presenter.search(true);
-        this.presenter.filter(true);
         this.presenter.change(true);
         this.width = 0.5f;
         return this;
@@ -92,12 +91,6 @@ public class SiteDialog implements SitePresenter.OnClickListener {
     }
 
     @Override
-    public void onFilterClick(Site item) {
-        item.setFilterable(!item.isFilterable()).save();
-        adapter.notifyArrayItemRangeChanged(0, adapter.size());
-    }
-
-    @Override
     public void onChangeClick(Site item) {
         item.setChangeable(!item.isChangeable()).save();
         adapter.notifyArrayItemRangeChanged(0, adapter.size());
@@ -107,14 +100,6 @@ public class SiteDialog implements SitePresenter.OnClickListener {
     public boolean onSearchLongClick(Site item) {
         boolean result = !item.isSearchable();
         for (Site site : ApiConfig.get().getSites()) site.setSearchable(result).save();
-        adapter.notifyArrayItemRangeChanged(0, adapter.size());
-        return true;
-    }
-
-    @Override
-    public boolean onFilterLongClick(Site item) {
-        boolean result = !item.isFilterable();
-        for (Site site : ApiConfig.get().getSites()) site.setFilterable(result).save();
         adapter.notifyArrayItemRangeChanged(0, adapter.size());
         return true;
     }
