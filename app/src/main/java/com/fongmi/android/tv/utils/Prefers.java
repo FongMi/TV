@@ -131,6 +131,14 @@ public class Prefers {
         put("keyword", keyword);
     }
 
+    public static String getHot() {
+        return getString("hot");
+    }
+
+    public static void putHot(String hot) {
+        put("hot", hot);
+    }
+
     public static int getScale() {
         return getInt("scale");
     }

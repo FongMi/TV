@@ -10,9 +10,9 @@
     </style>
 
     <style name="BaseTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <item name="colorPrimary">@color/blue_500</item>
-        <item name="colorPrimaryDark">@color/blue_700</item>
-        <item name="colorAccent">@color/blue_500</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primaryDark</item>
+        <item name="colorAccent">@color/accent</item>
         <item name="android:windowAnimationStyle">@null</item>
         <item name="android:windowBackground">@null</item>
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialog</item>
