@@ -101,7 +101,7 @@ public class Site {
     }
 
     public String getPlayUrl() {
-        return playUrl;
+        return TextUtils.isEmpty(playUrl) ? "" : playUrl;
     }
 
     public int getPlayerType() {

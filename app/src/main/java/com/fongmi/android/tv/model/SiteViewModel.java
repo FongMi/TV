@@ -160,7 +160,7 @@ public class SiteViewModel extends ViewModel {
                 result.setUrl(url);
                 result.setFlag(flag);
                 result.setPlayUrl(site.getPlayUrl());
-                result.setParse(Utils.isVideoFormat(url) ? 0 : 1);
+                result.setParse(Utils.isVideoFormat(url) && result.getPlayUrl().isEmpty() ? 0 : 1);
                 return result;
             }
         });
