@@ -183,7 +183,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:layout_marginTop="16dp"
-                        android:layout_marginEnd="16dp"
+                        android:layout_marginEnd="12dp"
                         android:gravity="center_vertical">
 
                         <TextView
@@ -201,7 +201,25 @@
                             android:layout_marginStart="8dp"
                             android:background="?attr/selectableItemBackgroundBorderless"
                             android:src="@drawable/ic_detail_reverse"
-                            android:visibility="gone" />
+                            android:visibility="gone"
+                            tools:visibility="visible" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:layout_weight="1" />
+
+                        <TextView
+                            android:id="@+id/more"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="@string/detail_more"
+                            android:textColor="@color/white"
+                            android:textSize="14sp"
+                            android:visibility="gone"
+                            app:drawableEndCompat="@drawable/ic_detail_more"
+                            tools:visibility="visible" />
 
                     </LinearLayout>
 
@@ -249,7 +267,6 @@
                         android:layout_height="wrap_content"
                         android:clipChildren="false"
                         android:clipToPadding="false"
-                        android:nestedScrollingEnabled="false"
                         android:paddingStart="8dp"
                         android:paddingEnd="8dp"
                         android:visibility="gone"

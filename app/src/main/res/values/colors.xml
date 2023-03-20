@@ -1,7 +1,5 @@
 <resources>
 
-    <color name="primary">@color/black</color>
-    <color name="primaryDark">@color/black</color>
     <color name="transparent">#00000000</color>
     <color name="black">#000000</color>
     <color name="black_05">#0D000000</color>

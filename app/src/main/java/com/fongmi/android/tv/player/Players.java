@@ -150,6 +150,10 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         return isExo() ? exoPlayer != null && exoPlayer.isPlaying() : ijkPlayer != null && ijkPlayer.isPlaying();
     }
 
+    public boolean isPortrait() {
+        return getVideoHeight() > getVideoWidth();
+    }
+
     public String getSizeText() {
         return getVideoWidth() + " x " + getVideoHeight();
     }

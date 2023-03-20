@@ -48,6 +48,6 @@ public abstract class FragmentStateManager {
 
     public boolean canBack(int position) {
         BaseFragment fragment = getFragment(position);
-        return fragment != null && fragment.canBack();
+        return fragment != null && (fragment.canBack() || fragment.isHidden());
     }
 }

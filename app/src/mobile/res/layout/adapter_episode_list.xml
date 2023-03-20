@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/text"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/shape_item"
+    android:ellipsize="marquee"
+    android:gravity="center"
+    android:maxEms="10"
+    android:singleLine="true"
+    android:textColor="@color/text"
+    android:textSize="14sp"
+    tools:text="20" />
