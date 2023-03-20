@@ -61,9 +61,9 @@ public class EpisodeFragment extends BaseFragment implements EpisodeAdapter.OnCl
     }
 
     private void setEpisode() {
-        List<Vod.Flag.Episode> items = Vod.Flag.Episode.arrayFrom(getJson());
-        mBinding.recycler.setLayoutManager(new GridLayoutManager(getContext(), getSpan(items)));
-        mAdapter.addAll(items);
+        mAdapter.addAll(Vod.Flag.Episode.arrayFrom(getJson()));
+        mBinding.recycler.setLayoutManager(new GridLayoutManager(getContext(), getSpan(mAdapter.getItems())));
+        mBinding.recycler.scrollToPosition(mAdapter.getPosition());
     }
 
     private int getSpan(List<Vod.Flag.Episode> items) {
