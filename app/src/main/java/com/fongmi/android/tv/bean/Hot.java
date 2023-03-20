@@ -1,10 +1,10 @@
 package com.fongmi.android.tv.bean;
 
+import com.fongmi.android.tv.utils.Prefers;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class Hot {
@@ -20,9 +20,10 @@ public class Hot {
         try {
             List<String> items = new ArrayList<>();
             for (Data item : objectFrom(str).getData()) items.add(item.getTitle());
+            Prefers.putHot(str);
             return items;
         } catch (Exception e) {
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
     }
 

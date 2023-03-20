@@ -429,7 +429,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mEpisodePresenter.setNextFocusDown(size > 1 ? R.id.array : R.id.part);
         mPartPresenter.setNextFocusUp(size > 1 ? R.id.array : R.id.episode);
         mBinding.array.setVisibility(size > 1 ? View.VISIBLE : View.GONE);
-        if (mHistory.isRevSort()) for (int i = size + 1; i > 0; i -= 20) items.add((i - 1) + "-" + Math.max(i - 20, 1));
+        if (mHistory.isRevSort()) for (int i = size; i > 0; i -= 20) items.add(i + "-" + Math.max(i - 19, 1));
         else for (int i = 0; i < size; i += 20) items.add((i + 1) + "-" + Math.min(i + 20, size));
         mArrayAdapter.setItems(items, null);
     }

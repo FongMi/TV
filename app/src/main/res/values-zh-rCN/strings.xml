@@ -83,6 +83,10 @@
     <string name="dialog_config_hint">请输入接口…</string>
     <string name="dialog_config_url">请输入地址…</string>
 
+    <!-- Ask -->
+    <string name="ask_keep_delete">是否清空所有收藏纪录？</string>
+    <string name="ask_history_delete">是否清空所有观看纪录？</string>
+
     <!-- Error -->
     <string name="error_so_load">FFmpeg 加载失败</string>
     <string name="error_config_get">配置取得失败</string>

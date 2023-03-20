@@ -13,7 +13,7 @@
             android:id="@+id/recycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="-16dp"
+            android:layout_marginTop="-12dp"
             android:clipChildren="false"
             android:clipToPadding="false"
             android:padding="8dp" />

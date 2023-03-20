@@ -5,12 +5,14 @@
     <string name="nav_setting">設定</string>
 
     <!-- Home -->
-    <string name="home">首頁</string>
-    <string name="home_history">最近觀看</string>
-    <string name="home_recommend">更新推薦</string>
+    <string name="home">推薦</string>
+
+    <!-- History -->
+    <string name="history">最近觀看</string>
 
     <!-- Detail -->
     <string name="detail_flag">線路</string>
+    <string name="detail_more">更多</string>
     <string name="detail_episode">選集</string>
     <string name="detail_content">簡介</string>
     <string name="detail_search">快搜「<xliff:g name="name">%s</xliff:g>」</string>

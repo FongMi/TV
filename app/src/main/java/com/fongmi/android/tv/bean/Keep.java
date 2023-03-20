@@ -95,6 +95,10 @@ public class Keep {
         return AppDatabase.get().getKeepDao().find(key) != null;
     }
 
+    public static void deleteAll() {
+        AppDatabase.get().getKeepDao().delete();
+    }
+
     public static void delete(int cid) {
         AppDatabase.get().getKeepDao().delete(cid);
     }
