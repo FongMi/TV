@@ -226,6 +226,10 @@ public class Channel {
         return Uri.parse(getCurrent()).getHost().equals("www.youtube.com");
     }
 
+    public boolean isBiliBili() {
+        return Uri.parse(getCurrent()).getHost().equals("live.bilibili.com");
+    }
+
     public Map<String, String> getHeaders() {
         HashMap<String, String> map = new HashMap<>();
         if (getUa().isEmpty()) return map;

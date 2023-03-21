@@ -1,6 +1,7 @@
 package com.fongmi.android.tv.player.source;
 
 import com.fongmi.android.tv.net.OkHttp;
+import com.fongmi.android.tv.utils.Sniffer;
 import com.google.common.net.HttpHeaders;
 
 import java.util.Arrays;
@@ -12,8 +13,6 @@ import okhttp3.Headers;
 
 public class Youtube {
 
-    private static final String CHROME = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36";
-
     private static class Loader {
         static volatile Youtube INSTANCE = new Youtube();
     }
@@ -24,12 +23,12 @@ public class Youtube {
 
     public String fetch(String url) {
         try {
-            String result = OkHttp.newCall(url, Headers.of(HttpHeaders.USER_AGENT, CHROME)).execute().body().string();
+            String result = OkHttp.newCall(url, Headers.of(HttpHeaders.USER_AGENT, Sniffer.CHROME)).execute().body().string();
             Pattern pattern = Pattern.compile("hlsManifestUrl\\S*?(https\\S*?\\.m3u8)");
             Matcher matcher = pattern.matcher(result);
             if (!matcher.find()) return "";
             String stable = matcher.group(1);
-            result = OkHttp.newCall(stable, Headers.of(HttpHeaders.USER_AGENT, CHROME)).execute().body().string();
+            result = OkHttp.newCall(stable, Headers.of(HttpHeaders.USER_AGENT, Sniffer.CHROME)).execute().body().string();
             String quality = find(result);
             return quality.isEmpty() ? url : quality;
         } catch (Exception e) {
