@@ -61,11 +61,11 @@ public class EpisodeDialog extends BaseDialog {
     private void setSpanCount() {
         int total = 0;
         for (Vod.Flag.Episode item : episodes) total += item.getName().length();
-        int offset = total / episodes.size();
-        if (offset >= 20) spanCount = 1;
-        else if (offset >= 10) spanCount = 2;
-        else if (offset >= 6) spanCount = 3;
-        else if (offset >= 3) spanCount = 4;
+        int offset = (int) Math.ceil((double) total / episodes.size());
+        if (offset >= 12) spanCount = 1;
+        else if (offset >= 8) spanCount = 2;
+        else if (offset >= 4) spanCount = 3;
+        else if (offset >= 2) spanCount = 4;
         itemCount = spanCount * 10;
     }
 
