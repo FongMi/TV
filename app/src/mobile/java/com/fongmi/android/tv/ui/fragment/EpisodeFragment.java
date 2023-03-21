@@ -26,12 +26,17 @@ public class EpisodeFragment extends BaseFragment implements EpisodeAdapter.OnCl
     private SiteViewModel mViewModel;
     private EpisodeAdapter mAdapter;
 
+    private int getSpanCount() {
+        return getArguments().getInt("spanCount");
+    }
+
     private String getJson() {
         return getArguments().getString("json");
     }
 
-    public static EpisodeFragment newInstance(List<Vod.Flag.Episode> items) {
+    public static EpisodeFragment newInstance(int spanCount, List<Vod.Flag.Episode> items) {
         Bundle args = new Bundle();
+        args.putInt("spanCount", spanCount);
         args.putString("json", new Gson().toJson(items));
         EpisodeFragment fragment = new EpisodeFragment();
         fragment.setArguments(args);
@@ -62,19 +67,8 @@ public class EpisodeFragment extends BaseFragment implements EpisodeAdapter.OnCl
 
     private void setEpisode() {
         mAdapter.addAll(Vod.Flag.Episode.arrayFrom(getJson()));
-        mBinding.recycler.setLayoutManager(new GridLayoutManager(getContext(), getSpan(mAdapter.getItems())));
+        mBinding.recycler.setLayoutManager(new GridLayoutManager(getContext(), getSpanCount()));
         mBinding.recycler.scrollToPosition(mAdapter.getPosition());
-    }
-
-    private int getSpan(List<Vod.Flag.Episode> items) {
-        int total = 0;
-        for (Vod.Flag.Episode item : items) total += item.getName().length();
-        int offset = total / items.size();
-        if (offset >= 20) return 1;
-        if (offset >= 10) return 2;
-        if (offset >= 6) return 3;
-        if (offset >= 3) return 4;
-        return 5;
     }
 
     @Override
