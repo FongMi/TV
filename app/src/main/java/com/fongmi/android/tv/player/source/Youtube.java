@@ -41,7 +41,7 @@ public class Youtube {
     private String find(String result) {
         String url = "";
         List<String> items = Arrays.asList("301", "300", "96", "95", "94");
-        for (String item : items) if (!(url = find(result, "https:\\/.*\\/" + item + "\\/.*index.m3u8")).isEmpty()) break;
+        for (String item : items) if (!(url = find(result, "https:/.*/" + item + "/.*index.m3u8")).isEmpty()) break;
         return url;
     }
 
