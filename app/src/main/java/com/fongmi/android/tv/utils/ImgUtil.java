@@ -73,8 +73,8 @@ public class ImgUtil {
     }
 
     public static byte[] resize(byte[] bytes) {
-        int width = ResUtil.getScreenWidthPx();
-        int height = ResUtil.getScreenHeightPx();
+        int width = ResUtil.getScreenWidth();
+        int height = ResUtil.getScreenHeight();
         Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
         if (bitmap.getWidth() < width && bitmap.getHeight() < height) return bytes;
         Matrix matrix = new Matrix();

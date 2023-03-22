@@ -45,7 +45,7 @@ public class HistoryPresenter extends Presenter {
 
     private void setLayoutSize() {
         int space = ResUtil.dp2px(48) + ResUtil.dp2px(16 * (Product.getColumn() - 1));
-        int base = ResUtil.getScreenWidthPx() - space;
+        int base = ResUtil.getScreenWidth() - space;
         width = base / Product.getColumn();
         height = (int) (width / 0.75f);
     }
