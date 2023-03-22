@@ -16,8 +16,8 @@ android {
     productFlavors {
         leanback {
             dimension "mode"
-            versionCode 70
-            versionName "20230321#1"
+            versionCode 71
+            versionName "1.7.1"
         }
         mobile {
             dimension "mode"
