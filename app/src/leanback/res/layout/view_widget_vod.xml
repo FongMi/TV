@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -160,5 +161,61 @@
                 tools:text="00:00:00" />
 
         </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/bright"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/shape_widget"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <ImageView
+            android:id="@+id/brightIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            tools:src="@drawable/ic_widget_bright_high" />
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/brightProgress"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            app:indicatorColor="@color/white"
+            app:trackColor="@color/grey_500" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/volume"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/shape_widget"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <ImageView
+            android:id="@+id/volumeIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            tools:src="@drawable/ic_widget_volume_high" />
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/volumeProgress"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            app:indicatorColor="@color/white"
+            app:trackColor="@color/grey_500" />
+
     </LinearLayout>
 </FrameLayout>

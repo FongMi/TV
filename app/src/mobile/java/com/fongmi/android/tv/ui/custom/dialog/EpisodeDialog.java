@@ -13,7 +13,6 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.DialogEpisodeBinding;
 import com.fongmi.android.tv.ui.fragment.EpisodeFragment;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 import java.util.ArrayList;
@@ -25,6 +24,8 @@ public class EpisodeDialog extends BaseDialog {
     private DialogEpisodeBinding binding;
     private final List<String> titles;
     private boolean reverse;
+    private int spanCount;
+    private int itemCount;
 
     public static EpisodeDialog create() {
         return new EpisodeDialog();
@@ -32,6 +33,7 @@ public class EpisodeDialog extends BaseDialog {
 
     public EpisodeDialog() {
         this.titles = new ArrayList<>();
+        this.spanCount = 5;
     }
 
     public EpisodeDialog reverse(boolean reverse) {
@@ -41,7 +43,6 @@ public class EpisodeDialog extends BaseDialog {
 
     public EpisodeDialog episodes(List<Vod.Flag.Episode> episodes) {
         this.episodes = episodes;
-        setTitles();
         return this;
     }
 
@@ -52,27 +53,40 @@ public class EpisodeDialog extends BaseDialog {
 
     @Override
     protected void initView() {
+        setSpanCount();
+        setTitles();
+        setPager();
+    }
+
+    private void setSpanCount() {
+        int total = 0;
+        for (Vod.Flag.Episode item : episodes) total += item.getName().length();
+        int offset = (int) Math.ceil((double) total / episodes.size());
+        if (offset >= 12) spanCount = 1;
+        else if (offset >= 8) spanCount = 2;
+        else if (offset >= 4) spanCount = 3;
+        else if (offset >= 2) spanCount = 4;
+        itemCount = spanCount * 10;
+    }
+
+    private void setTitles() {
+        if (reverse) for (int i = episodes.size(); i > 0; i -= itemCount) titles.add(i + " - " + Math.max(i - itemCount - 1, 1));
+        else for (int i = 0; i < episodes.size(); i += itemCount) titles.add((i + 1) + " - " + Math.min(i + itemCount, episodes.size()));
+    }
+
+    private void setPager() {
         binding.pager.setAdapter(new PageAdapter(getActivity()));
         new TabLayoutMediator(binding.tabs, binding.pager, (tab, position) -> tab.setText(titles.get(position))).attach();
         setCurrentPage();
     }
 
-    private void setTitles() {
-        if (reverse) for (int i = episodes.size(); i > 0; i -= 50) titles.add(i + " - " + Math.max(i - 49, 1));
-        else for (int i = 0; i < episodes.size(); i += 50) titles.add((i + 1) + " - " + Math.min(i + 50, episodes.size()));
-    }
-
     private void setCurrentPage() {
         for (int i = 0; i < episodes.size(); i++) {
             if (episodes.get(i).isActivated()) {
-                binding.pager.setCurrentItem(i / 50);
+                binding.pager.setCurrentItem(i / itemCount);
                 break;
             }
         }
-    }
-
-    @Override
-    protected void setBehavior(BottomSheetDialog dialog) {
     }
 
     class PageAdapter extends FragmentStateAdapter {
@@ -84,7 +98,7 @@ public class EpisodeDialog extends BaseDialog {
         @NonNull
         @Override
         public Fragment createFragment(int position) {
-            return EpisodeFragment.newInstance(episodes.subList(position * 50, Math.min(position * 50 + 50, episodes.size())));
+            return EpisodeFragment.newInstance(spanCount, episodes.subList(position * itemCount, Math.min(position * itemCount + itemCount, episodes.size())));
         }
 
         @Override
