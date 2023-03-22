@@ -58,7 +58,7 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
     }
 
     private boolean isEdge(MotionEvent e) {
-        return ResUtil.isEdge(e, ResUtil.dp2px(40));
+        return ResUtil.isEdge(e, ResUtil.dp2px(16));
     }
 
     @Override
@@ -77,11 +77,8 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
     @Override
     public void onLongPress(@NonNull MotionEvent e) {
         if (isEdge(e) || lock) return;
-        int base = ResUtil.getScreenWidthNav() / 3;
-        changeTime = e.getX() > 0 && e.getX() < base;
-        changeSpeed = e.getX() > base * 2 && e.getX() < base * 3;
-        if (changeTime) App.post(runnable, 0);
-        if (changeSpeed) listener.onSpeedUp();
+        changeSpeed = true;
+        listener.onSpeedUp();
     }
 
     @Override

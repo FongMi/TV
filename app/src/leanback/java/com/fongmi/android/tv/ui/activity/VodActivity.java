@@ -39,7 +39,6 @@ public class VodActivity extends BaseActivity {
     private ActivityVodBinding mBinding;
     private ArrayObjectAdapter mAdapter;
     private PageAdapter mPageAdapter;
-    private Result mResult;
     private View mOldView;
 
     public static void start(Activity activity, Result result) {
@@ -73,7 +72,6 @@ public class VodActivity extends BaseActivity {
 
     @Override
     protected void initView() {
-        mResult = Result.fromJson(getResult());
         setRecyclerView();
         setTypes();
         setPager();
@@ -101,17 +99,18 @@ public class VodActivity extends BaseActivity {
         mBinding.recycler.setAdapter(new ItemBridgeAdapter(mAdapter = new ArrayObjectAdapter(new TypePresenter(this::updateFilter))));
     }
 
-    private List<Class> getTypes() {
+    private List<Class> getTypes(Result result) {
         List<Class> types = new ArrayList<>();
-        for (String cate : getSite().getCategories()) for (Class type : mResult.getTypes()) if (cate.equals(type.getTypeName())) types.add(type);
+        for (String cate : getSite().getCategories()) for (Class type : result.getTypes()) if (cate.equals(type.getTypeName())) types.add(type);
         return types;
     }
 
     private void setTypes() {
-        mResult.setTypes(getTypes());
-        Boolean filter = getSite().isFilterable() ? false : null;
-        for (Class item : mResult.getTypes()) if (mResult.getFilters().containsKey(item.getTypeId())) item.setFilter(filter);
-        mAdapter.setItems(mResult.getTypes(), null);
+        Result result = Result.fromJson(getResult());
+        result.setTypes(getTypes(result));
+        for (Class item : result.getTypes()) if (result.getFilters().containsKey(item.getTypeId())) item.setFilter(false);
+        for (Class item : result.getTypes()) if (result.getFilters().containsKey(item.getTypeId())) item.setFilters(result.getFilters().get(item.getTypeId()));
+        mAdapter.setItems(result.getTypes(), null);
     }
 
     private void setPager() {
@@ -141,13 +140,13 @@ public class VodActivity extends BaseActivity {
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (Utils.isMenuKey(event)) updateFilter(mResult.getTypes().get(mBinding.pager.getCurrentItem()));
+        if (Utils.isMenuKey(event)) updateFilter((Class) mAdapter.get(mBinding.pager.getCurrentItem()));
         return super.dispatchKeyEvent(event);
     }
 
     @Override
     public void onBackPressed() {
-        Class item = mResult.getTypes().get(mBinding.pager.getCurrentItem());
+        Class item = (Class) mAdapter.get(mBinding.pager.getCurrentItem());
         if (item.getFilter() != null && item.getFilter()) updateFilter(item);
         else if (getFragment().canGoBack()) getFragment().goBack();
         else super.onBackPressed();
@@ -166,14 +165,14 @@ public class VodActivity extends BaseActivity {
         @NonNull
         @Override
         public Fragment getItem(int position) {
-            Class type = mResult.getTypes().get(position);
-            String filter = new Gson().toJson(mResult.getFilters().get(type.getTypeId()));
+            Class type = (Class) mAdapter.get(position);
+            String filter = new Gson().toJson(type.getFilters());
             return VodFragment.newInstance(getKey(), type.getTypeId(), filter, type.getTypeFlag().equals("1"));
         }
 
         @Override
         public int getCount() {
-            return mResult.getTypes().size();
+            return mAdapter.size();
         }
 
         @Override
