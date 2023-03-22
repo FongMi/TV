@@ -1,0 +1,7 @@
+<resources>
+
+    <color name="primary">@color/black</color>
+    <color name="primaryDark">@color/black</color>
+    <color name="accent">@color/blue_500</color>
+
+</resources>

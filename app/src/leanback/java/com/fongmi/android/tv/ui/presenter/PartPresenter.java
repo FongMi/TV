@@ -6,8 +6,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.leanback.widget.Presenter;
 
+import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.databinding.AdapterPartBinding;
-import com.fongmi.android.tv.utils.ResUtil;
 
 public class PartPresenter extends Presenter {
 
@@ -36,7 +36,7 @@ public class PartPresenter extends Presenter {
         String text = object.toString();
         ViewHolder holder = (ViewHolder) viewHolder;
         holder.binding.text.setText(text);
-        holder.binding.text.setMaxEms(ResUtil.getEms());
+        holder.binding.text.setMaxEms(Product.getEms());
         holder.binding.text.setNextFocusUpId(nextFocus);
         setOnClickListener(holder, view -> mListener.onItemClick(text));
     }

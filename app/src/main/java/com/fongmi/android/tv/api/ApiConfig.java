@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Config;
+import com.fongmi.android.tv.bean.Depot;
 import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.net.Callback;
@@ -118,7 +119,7 @@ public class ApiConfig {
 
     private void loadConfig(Callback callback) {
         try {
-            parseConfig(JsonParser.parseString(Decoder.getJson(config.getUrl())).getAsJsonObject(), callback);
+            checkJson(JsonParser.parseString(Decoder.getJson(config.getUrl())).getAsJsonObject(), callback);
         } catch (Exception e) {
             if (config.getUrl().isEmpty()) App.post(() -> callback.error(0));
             else loadCache(callback);
@@ -128,8 +129,25 @@ public class ApiConfig {
     }
 
     private void loadCache(Callback callback) {
-        if (!TextUtils.isEmpty(config.getJson())) parseConfig(JsonParser.parseString(config.getJson()).getAsJsonObject(), callback);
+        if (!TextUtils.isEmpty(config.getJson())) checkJson(JsonParser.parseString(config.getJson()).getAsJsonObject(), callback);
         else App.post(() -> callback.error(R.string.error_config_get));
+    }
+
+    private void checkJson(JsonObject object, Callback callback) {
+        if (object.has("urls")) {
+            parseDepot(object, callback);
+        } else {
+            parseConfig(object, callback);
+        }
+    }
+
+    private void parseDepot(JsonObject object, Callback callback) {
+        List<Depot> items = Depot.arrayFrom(object.getAsJsonArray("urls").toString());
+        List<Config> configs = new ArrayList<>();
+        for (Depot item : items) configs.add(Config.find(item, 0));
+        Config.delete(config.getUrl());
+        config = configs.get(0);
+        loadConfig(callback);
     }
 
     private void parseConfig(JsonObject object, Callback callback) {

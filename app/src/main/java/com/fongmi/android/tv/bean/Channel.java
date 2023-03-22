@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.google.common.net.HttpHeaders;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
@@ -221,10 +222,18 @@ public class Channel {
         return getScheme().startsWith("tvbus");
     }
 
+    public boolean isYoutube() {
+        return Uri.parse(getCurrent()).getHost().equals("www.youtube.com");
+    }
+
+    public boolean isBiliBili() {
+        return Uri.parse(getCurrent()).getHost().equals("live.bilibili.com");
+    }
+
     public Map<String, String> getHeaders() {
         HashMap<String, String> map = new HashMap<>();
         if (getUa().isEmpty()) return map;
-        map.put("User-Agent", getUa());
+        map.put(HttpHeaders.USER_AGENT, getUa());
         return map;
     }
 
