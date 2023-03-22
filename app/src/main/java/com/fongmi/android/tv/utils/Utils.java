@@ -6,7 +6,6 @@ import android.app.PictureInPictureParams;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
@@ -23,7 +22,6 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.server.Server;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.permissionx.guolindev.PermissionX;
 
 import java.math.BigInteger;
@@ -85,38 +83,15 @@ public class Utils {
         window.getDecorView().setSystemUiVisibility(flags);
     }
 
-    public static void toggleFab(int dy, FloatingActionButton fab) {
-        if (Math.abs(dy) < 50) return;
-        if (dy > 0) Utils.hideFab(fab);
-        else Utils.showFab(fab);
-    }
-
-    public static void showFab(FloatingActionButton fab) {
-        if (fab.getVisibility() == View.INVISIBLE) fab.show();
-    }
-
-    public static void hideFab(FloatingActionButton fab) {
-        if (fab.getVisibility() != View.VISIBLE) return;
-        fab.hide(new FloatingActionButton.OnVisibilityChangedListener() {
-            @Override
-            public void onHidden(FloatingActionButton fab) {
-                fab.setVisibility(View.INVISIBLE);
-            }
-        });
-    }
-
     public static boolean hasPIP() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && App.get().getPackageManager().hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE);
     }
 
-    public static void enterPIP(Activity activity, Rect sourceRectHint, Rational rational) {
+    public static void enterPIP(Activity activity, Rational rational) {
         try {
             if (!hasPIP() || activity.isInPictureInPictureMode()) return;
             PictureInPictureParams.Builder builder = new PictureInPictureParams.Builder();
             builder.setAspectRatio(rational).build();
-            builder.setSourceRectHint(sourceRectHint);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) builder.setAutoEnterEnabled(true);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) builder.setSeamlessResizeEnabled(true);
             activity.enterPictureInPictureMode(builder.build());
         } catch (Exception e) {
             e.printStackTrace();

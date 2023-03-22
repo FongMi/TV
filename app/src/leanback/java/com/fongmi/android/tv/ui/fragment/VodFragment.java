@@ -109,10 +109,11 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mViewModel.result.observe(getViewLifecycleOwner(), result -> {
-            mBinding.progressLayout.showContent(isFolder(), result.getList().size());
-            mScroller.endLoading(result.getList().isEmpty());
+            int size = result.getList().size();
+            mBinding.progressLayout.showContent(isFolder(), size);
+            mScroller.endLoading(size == 0);
             addVideo(result.getList());
-            checkPage();
+            checkPage(size);
         });
     }
 
@@ -129,9 +130,9 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         getVideo(getTypeId(), "1");
     }
 
-    private void checkPage() {
-        if (mScroller.getPage() != 1 || mAdapter.size() >= 4 || isFolder()) return;
-        if (mScroller.addPage()) getVideo(getTypeId(), "2");
+    private void checkPage(int count) {
+        if (count == 0 || mAdapter.size() >= 4 || isFolder()) return;
+        getVideo(getTypeId(), String.valueOf(mScroller.addPage()));
     }
 
     private void getVideo(String typeId, String page) {

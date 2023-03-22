@@ -284,6 +284,16 @@ public class Vod {
 
             private boolean activated;
 
+            public static Episode objectFrom(String str) {
+                return new Gson().fromJson(str, Episode.class);
+            }
+
+            public static List<Episode> arrayFrom(String str) {
+                Type listType = new TypeToken<List<Episode>>() {}.getType();
+                List<Episode> items = new Gson().fromJson(str, listType);
+                return items == null ? Collections.emptyList() : items;
+            }
+
             public Episode(String name, String url) {
                 this.name = name;
                 this.url = url;
