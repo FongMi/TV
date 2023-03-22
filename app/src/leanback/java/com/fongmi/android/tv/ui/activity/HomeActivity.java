@@ -263,7 +263,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     public void showDialog() {
-        SiteDialog.create(this).filter().show();
+        SiteDialog.create(this).change().show();
     }
 
     @Override
