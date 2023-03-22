@@ -10,8 +10,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingStart="24dp"
+        android:paddingLeft="24dp"
         android:paddingTop="24dp"
         android:paddingEnd="24dp"
+        android:paddingRight="24dp"
         android:paddingBottom="16dp">
 
         <TextView
@@ -31,7 +33,9 @@
         android:clipChildren="false"
         android:clipToPadding="false"
         android:paddingStart="24dp"
+        android:paddingLeft="24dp"
         android:paddingEnd="24dp"
+        android:paddingRight="24dp"
         android:paddingBottom="24dp" />
 
 </LinearLayout>
