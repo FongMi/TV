@@ -16,7 +16,6 @@ android {
 
     productFlavors {
         leanback {
-
             dimension "default"
             versionCode 71
             versionName "1.7.1"
