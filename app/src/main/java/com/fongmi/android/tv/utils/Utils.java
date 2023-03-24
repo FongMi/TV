@@ -2,7 +2,6 @@ package com.fongmi.android.tv.utils;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.PictureInPictureParams;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -12,7 +11,6 @@ import android.os.IBinder;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Base64;
-import android.util.Rational;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -85,17 +83,6 @@ public class Utils {
 
     public static boolean hasPIP() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && App.get().getPackageManager().hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE);
-    }
-
-    public static void enterPIP(Activity activity, Rational rational) {
-        try {
-            if (!hasPIP() || activity.isInPictureInPictureMode()) return;
-            PictureInPictureParams.Builder builder = new PictureInPictureParams.Builder();
-            builder.setAspectRatio(rational).build();
-            activity.enterPictureInPictureMode(builder.build());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public static boolean isVideoFormat(String url) {
