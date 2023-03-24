@@ -25,9 +25,13 @@ import java.io.ByteArrayOutputStream;
 public class ImgUtil {
 
     public static void load(String url, ImageView view) {
-        view.setScaleType(ImageView.ScaleType.CENTER);
+        load(url, view, ImageView.ScaleType.CENTER);
+    }
+
+    public static void load(String url, ImageView view, ImageView.ScaleType scaleType) {
+        view.setScaleType(scaleType);
         if (TextUtils.isEmpty(url)) view.setImageResource(R.drawable.ic_img_error);
-        else Glide.with(App.get()).asBitmap().load(getUrl(Utils.checkProxy(url))).skipMemoryCache(true).dontAnimate().sizeMultiplier(Prefers.getThumbnail()).signature(new ObjectKey(url + "_" + Prefers.getQuality())).placeholder(R.drawable.ic_img_loading).listener(getListener(view)).into(view);
+        else Glide.with(App.get()).asBitmap().load(getUrl(Utils.checkProxy(url))).skipMemoryCache(true).dontAnimate().sizeMultiplier(Prefers.getThumbnail()).signature(new ObjectKey(url + "_" + Prefers.getQuality())).placeholder(R.drawable.ic_img_loading).listener(getListener(view, scaleType)).into(view);
     }
 
     public static void loadKeep(String url, ImageView view) {
@@ -56,10 +60,14 @@ public class ImgUtil {
     }
 
     private static RequestListener<Bitmap> getListener(ImageView view) {
+        return getListener(view, ImageView.ScaleType.CENTER);
+    }
+
+    private static RequestListener<Bitmap> getListener(ImageView view, ImageView.ScaleType scaleType) {
         return new RequestListener<>() {
             @Override
             public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
-                view.setScaleType(ImageView.ScaleType.CENTER);
+                view.setScaleType(scaleType);
                 view.setImageResource(R.drawable.ic_img_error);
                 return true;
             }
