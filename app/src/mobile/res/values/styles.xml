@@ -9,13 +9,14 @@
         <item name="android:windowTranslucentStatus">false</item>
     </style>
 
-    <style name="BaseTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="BaseTheme" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primaryDark</item>
         <item name="colorAccent">@color/accent</item>
-        <item name="android:windowAnimationStyle">@null</item>
         <item name="android:windowBackground">@null</item>
-        <item name="bottomSheetDialogTheme">@style/BottomSheetDialog</item>
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:navigationBarColor">@color/transparent</item>
+        <item name="bottomSheetDialogTheme">@style/ThemeOverlay.App.BottomSheetDialog</item>
     </style>
 
     <style name="Control" />
