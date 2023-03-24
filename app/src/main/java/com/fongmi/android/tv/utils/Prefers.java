@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import androidx.preference.PreferenceManager;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.ui.custom.ViewType;
 
 public class Prefers {
 
@@ -137,6 +138,14 @@ public class Prefers {
 
     public static void putHot(String hot) {
         put("hot", hot);
+    }
+
+    public static int getViewType() {
+        return getInt("viewType", ViewType.GRID);
+    }
+
+    public static void putViewType(int viewType) {
+        put("viewType", viewType);
     }
 
     public static int getScale() {
