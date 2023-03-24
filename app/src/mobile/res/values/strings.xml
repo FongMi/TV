@@ -4,8 +4,8 @@
     <string name="nav_vod">Vod</string>
     <string name="nav_setting">Setting</string>
 
-    <!-- Home -->
-    <string name="home">Home</string>
+    <!-- Vod -->
+    <string name="vod_home">Home</string>
 
     <!-- History -->
     <string name="history">History</string>

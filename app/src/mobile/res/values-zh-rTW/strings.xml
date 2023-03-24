@@ -4,8 +4,8 @@
     <string name="nav_vod">點播</string>
     <string name="nav_setting">設定</string>
 
-    <!-- Home -->
-    <string name="home">推薦</string>
+    <!-- Vod -->
+    <string name="vod_home">推薦</string>
 
     <!-- History -->
     <string name="history">最近觀看</string>
