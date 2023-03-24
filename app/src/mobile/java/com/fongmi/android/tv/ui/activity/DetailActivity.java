@@ -7,7 +7,6 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.text.Html;
-import android.util.Rational;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
@@ -40,12 +39,14 @@ import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
+import com.fongmi.android.tv.receiver.PipReceiver;
 import com.fongmi.android.tv.ui.adapter.EpisodeAdapter;
 import com.fongmi.android.tv.ui.adapter.FlagAdapter;
 import com.fongmi.android.tv.ui.adapter.ParseAdapter;
 import com.fongmi.android.tv.ui.adapter.SearchAdapter;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
+import com.fongmi.android.tv.ui.custom.Pip;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.ui.custom.ViewType;
 import com.fongmi.android.tv.ui.custom.dialog.EpisodeDialog;
@@ -84,9 +85,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private SiteViewModel mViewModel;
     private FlagAdapter mFlagAdapter;
     private TrackDialog mTrackDialog;
+    private PipReceiver mReceiver;
     private History mHistory;
     private Players mPlayers;
-    private String mSiteKey;
     private boolean fullscreen;
     private boolean initTrack;
     private boolean initAuto;
@@ -98,6 +99,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private Runnable mR1;
     private Runnable mR2;
     private Runnable mR3;
+    private String mKey;
+    private Pip mPip;
 
     public static void push(Activity activity, String url) {
         start(activity, "push_agent", url, url);
@@ -183,11 +186,13 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mKeyDown = CustomKeyDownVod.create(this, mBinding.video);
         mFrameParams = mBinding.video.getLayoutParams();
         mBinding.progressLayout.showProgress();
+        mReceiver = new PipReceiver(mBinding);
         mPlayers = new Players().init();
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
         mR3 = this::setOrient;
-        mSiteKey = getKey();
+        mPip = new Pip();
+        mKey = getKey();
         setRecyclerView();
         setVideoView();
         setViewModel();
@@ -733,6 +738,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void checkPlayImg(boolean playing) {
         mBinding.control.play.setImageResource(playing ? com.google.android.exoplayer2.ui.R.drawable.exo_icon_pause : com.google.android.exoplayer2.ui.R.drawable.exo_icon_play);
+        mPip.update(this, playing);
     }
 
     private void checkLockImg() {
@@ -929,7 +935,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void nextSite() {
         if (mSearchAdapter.getItemCount() == 0) return;
         Vod vod = mSearchAdapter.get(0);
-        if (vod.getSiteKey().equals(mSiteKey)) return;
+        if (vod.getSiteKey().equals(mKey)) return;
         Notify.show(getString(R.string.play_switch_site, vod.getSiteName()));
         mSearchAdapter.remove(0);
         setInitAuto(false);
@@ -1084,20 +1090,22 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     @Override
     protected void onUserLeaveHint() {
         super.onUserLeaveHint();
-        Utils.enterPIP(this, getScale() == 2 ? new Rational(4, 3) : new Rational(16, 9));
-        if (isLock()) onLock();
+        mPip.enter(this, getScale() == 2);
+        if (isLock()) App.post(this::onLock, 500);
     }
 
     @Override
     public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode);
         if (isInPictureInPictureMode) {
+            mReceiver.register(this);
             enterFullscreen();
             hideControl();
             hideEpisode();
             hideTrack();
         } else {
             exitFullscreen();
+            mReceiver.unregister(this);
             if (isStop()) finish();
         }
     }
