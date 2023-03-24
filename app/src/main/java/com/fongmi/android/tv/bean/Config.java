@@ -6,7 +6,6 @@ import androidx.room.Entity;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.db.AppDatabase;
 
 import java.util.List;
@@ -23,6 +22,10 @@ public class Config {
     private String name;
     private String home;
     private String parse;
+
+    public static Config create(int type) {
+        return create("", type);
+    }
 
     public static Config create(String url, int type) {
         return new Config(url, "", type);
@@ -149,17 +152,17 @@ public class Config {
 
     public static Config vod() {
         Config item = AppDatabase.get().getConfigDao().findOne(0);
-        return item == null ? create("", 0) : item;
+        return item == null ? create(0) : item;
     }
 
     public static Config live() {
         Config item = AppDatabase.get().getConfigDao().findOne(1);
-        return item == null ? create(ApiConfig.getUrl(), 1) : item;
+        return item == null ? create(1) : item;
     }
 
     public static Config wall() {
         Config item = AppDatabase.get().getConfigDao().findOne(2);
-        return item == null ? create("", 2) : item;
+        return item == null ? create(2) : item;
     }
 
     public static Config find(int id) {
