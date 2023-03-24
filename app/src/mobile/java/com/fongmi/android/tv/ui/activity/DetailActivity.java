@@ -202,6 +202,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.more.setOnClickListener(view -> onMore());
         mBinding.content.setOnClickListener(view -> onContent());
         mBinding.reverse.setOnClickListener(view -> onReverse());
+        mBinding.control.back.setOnClickListener(view -> onFull());
         mBinding.control.full.setOnClickListener(view -> onFull());
         mBinding.control.keep.setOnClickListener(view -> onKeep());
         mBinding.control.lock.setOnClickListener(view -> onLock());
@@ -587,7 +588,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
         setRequestedOrientation(mPlayers.isPortrait() ? ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
         getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-        mBinding.control.full.setImageResource(R.drawable.ic_control_full_off);
+        mBinding.control.full.setVisibility(View.GONE);
         setRotate(mPlayers.isPortrait());
         App.post(mR3, 2000);
         setFullscreen(true);
@@ -597,9 +598,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void exitFullscreen() {
         if (!isFullscreen()) return;
         getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-        mBinding.control.full.setImageResource(R.drawable.ic_control_full_on);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
         mBinding.episode.scrollToPosition(mEpisodeAdapter.getPosition());
+        mBinding.control.full.setVisibility(View.VISIBLE);
         mBinding.video.setLayoutParams(mFrameParams);
         App.post(mR3, 2000);
         setFullscreen(false);
@@ -644,6 +645,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void showControl() {
         mBinding.control.parse.setVisibility(isFullscreen() && isUseParse() ? View.VISIBLE : View.GONE);
         mBinding.control.rotate.setVisibility(isFullscreen() && !isLock() ? View.VISIBLE : View.GONE);
+        mBinding.control.back.setVisibility(isFullscreen() && !isLock() ? View.VISIBLE : View.GONE);
         mBinding.control.action.getRoot().setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
         mBinding.control.setting.setVisibility(isFullscreen() ? View.GONE : View.VISIBLE);
         mBinding.control.share.setVisibility(isFullscreen() ? View.GONE : View.VISIBLE);
