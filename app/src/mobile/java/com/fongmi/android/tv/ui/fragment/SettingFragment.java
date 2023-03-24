@@ -32,6 +32,7 @@ import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Utils;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.permissionx.guolindev.PermissionX;
 
 public class SettingFragment extends BaseFragment implements ConfigCallback, SiteCallback, LiveCallback {
@@ -192,18 +193,22 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
     }
 
     private void setScale() {
-        int index = Prefers.getScale();
         String[] array = ResUtil.getStringArray(R.array.select_scale);
-        Prefers.putScale(index = index == array.length - 1 ? 0 : ++index);
-        mBinding.scaleText.setText(array[index]);
+        new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.setting_scale).setNegativeButton(R.string.dialog_negative, null).setSingleChoiceItems(array, Prefers.getScale(), (dialog, which) -> {
+            mBinding.scaleText.setText(array[which]);
+            Prefers.putScale(which);
+            dialog.dismiss();
+        }).show();
     }
 
     private void setSize() {
-        int index = Prefers.getSize();
         String[] array = ResUtil.getStringArray(R.array.select_size);
-        Prefers.putSize(index = index == array.length - 1 ? 0 : ++index);
-        mBinding.sizeText.setText(array[index]);
-        RefreshEvent.size();
+        new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.setting_size).setNegativeButton(R.string.dialog_negative, null).setSingleChoiceItems(array, Prefers.getSize(), (dialog, which) -> {
+            mBinding.sizeText.setText(array[which]);
+            Prefers.putSize(which);
+            RefreshEvent.size();
+            dialog.dismiss();
+        }).show();
     }
 
     private void setWallDefault() {

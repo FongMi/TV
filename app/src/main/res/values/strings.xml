@@ -137,6 +137,7 @@
         <item>Small</item>
         <item>Medium</item>
         <item>Large</item>
+        <item>Extra</item>
     </string-array>
 
     <string-array name="select_scale">
