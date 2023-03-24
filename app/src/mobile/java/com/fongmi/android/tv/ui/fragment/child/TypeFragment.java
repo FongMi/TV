@@ -84,7 +84,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     private void setRecyclerView() {
         mBinding.recycler.setHasFixedSize(true);
         mBinding.recycler.setAdapter(mAdapter = new VodAdapter(this));
-        mBinding.recycler.setPadding(ResUtil.dp2px(isFolder() ? 0 : 8), ResUtil.dp2px(isFolder() ? 4 : 8), ResUtil.dp2px(isFolder() ? 0 : 8), ResUtil.dp2px(isFolder() ? 0 : 8));
+        mBinding.recycler.setPadding(ResUtil.dp2px(isFolder() ? 0 : 8), ResUtil.dp2px(isFolder() ? 12 : 8), ResUtil.dp2px(isFolder() ? 0 : 8), ResUtil.dp2px(isFolder() ? 0 : 8));
         mBinding.recycler.setLayoutManager(isFolder() ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getContext(), Product.getColumn()));
         mAdapter.setViewType(isFolder() ? ViewType.FOLDER : ViewType.GRID);
         mAdapter.setSize(Product.getSpec(getActivity()));
