@@ -4,11 +4,11 @@
 
     <solid android:color="@color/black_50" />
 
-    <corners android:radius="40dp" />
+    <corners android:radius="28dp" />
 
     <padding
         android:bottom="6dp"
-        android:left="12dp"
+        android:left="16dp"
         android:right="16dp"
         android:top="6dp" />
 
