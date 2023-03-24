@@ -31,7 +31,7 @@ public class TypeAdapter extends RecyclerView.Adapter<TypeAdapter.ViewHolder> {
 
     private Class home() {
         Class type = new Class();
-        type.setTypeName(ResUtil.getString(R.string.home));
+        type.setTypeName(ResUtil.getString(R.string.vod_home));
         type.setTypeId("home");
         type.setActivated(true);
         return type;
