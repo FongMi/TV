@@ -1006,8 +1006,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     @Override
     public void onSpeedUp() {
+        mBinding.control.action.speed.setText(mPlayers.setSpeed(mPlayers.getSpeed() < 3 ? 3 : 5));
         mBinding.widget.speed.startAnimation(ResUtil.getAnim(R.anim.forward));
-        mBinding.control.action.speed.setText(mPlayers.setSpeed(3.0f));
         mBinding.widget.speed.setVisibility(View.VISIBLE);
     }
 
@@ -1070,7 +1070,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     @Override
     public void onDoubleTap() {
-        if (mPlayers.isPlaying()) {
+        if (!isFullscreen()) {
+            enterFullscreen();
+        } else if (mPlayers.isPlaying()) {
             mPlayers.pause();
             showControl();
         } else {
