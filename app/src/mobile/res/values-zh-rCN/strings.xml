@@ -10,11 +10,19 @@
     <!-- History -->
     <string name="history">最近观看</string>
 
+    <!-- Keep -->
+    <string name="keep">我的收藏</string>
+
     <!-- Detail -->
     <string name="detail_flag">线路</string>
     <string name="detail_more">更多</string>
     <string name="detail_episode">选集</string>
     <string name="detail_content">简介</string>
     <string name="detail_search">快搜“<xliff:g name="name">%s</xliff:g>”</string>
+
+    <!-- Dialog -->
+    <string name="dialog_delete_record">删除全部纪录？</string>
+    <string name="dialog_delete_keep">收藏纪录将会全部删除。</string>
+    <string name="dialog_delete_history">观看纪录将会全部删除。</string>
 
 </resources>
