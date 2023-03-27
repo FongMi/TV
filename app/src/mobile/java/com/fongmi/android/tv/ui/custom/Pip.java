@@ -24,6 +24,7 @@ public class Pip {
     public static final int CONTROL_TYPE_PREV = 1;
     public static final int CONTROL_TYPE_NEXT = 2;
     public static final int CONTROL_TYPE_PLAY = 3;
+    public static final int CONTROL_TYPE_PAUSE = 4;
 
     private PictureInPictureParams.Builder builder;
 
@@ -43,9 +44,10 @@ public class Pip {
     public void update(Activity activity, boolean play) {
         if (!Utils.hasPIP()) return;
         List<RemoteAction> actions = new ArrayList<>();
-        actions.add(new RemoteAction(Icon.createWithResource(activity, com.google.android.exoplayer2.ui.R.drawable.exo_icon_previous), "", "", PendingIntent.getBroadcast(activity, CONTROL_TYPE_PREV, new Intent(ACTION_MEDIA_CONTROL).putExtra(EXTRA_CONTROL_TYPE, CONTROL_TYPE_PREV), 0)));
-        actions.add(new RemoteAction(Icon.createWithResource(activity, play ? com.google.android.exoplayer2.ui.R.drawable.exo_icon_pause : com.google.android.exoplayer2.ui.R.drawable.exo_icon_play), "", "", PendingIntent.getBroadcast(activity, CONTROL_TYPE_PLAY, new Intent(ACTION_MEDIA_CONTROL).putExtra(EXTRA_CONTROL_TYPE, CONTROL_TYPE_PLAY), 0)));
-        actions.add(new RemoteAction(Icon.createWithResource(activity, com.google.android.exoplayer2.ui.R.drawable.exo_icon_next), "", "", PendingIntent.getBroadcast(activity, CONTROL_TYPE_NEXT, new Intent(ACTION_MEDIA_CONTROL).putExtra(EXTRA_CONTROL_TYPE, CONTROL_TYPE_NEXT), 0)));
+        int icon = play ? com.google.android.exoplayer2.ui.R.drawable.exo_icon_pause : com.google.android.exoplayer2.ui.R.drawable.exo_icon_play;
+        actions.add(new RemoteAction(Icon.createWithResource(activity, com.google.android.exoplayer2.ui.R.drawable.exo_icon_previous), "", "", PendingIntent.getBroadcast(activity, CONTROL_TYPE_PREV, new Intent(ACTION_MEDIA_CONTROL).putExtra(EXTRA_CONTROL_TYPE, CONTROL_TYPE_PREV), PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE)));
+        actions.add(new RemoteAction(Icon.createWithResource(activity, icon), "", "", PendingIntent.getBroadcast(activity, play ? CONTROL_TYPE_PAUSE : CONTROL_TYPE_PLAY, new Intent(ACTION_MEDIA_CONTROL).putExtra(EXTRA_CONTROL_TYPE, play ? CONTROL_TYPE_PAUSE : CONTROL_TYPE_PLAY), PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE)));
+        actions.add(new RemoteAction(Icon.createWithResource(activity, com.google.android.exoplayer2.ui.R.drawable.exo_icon_next), "", "", PendingIntent.getBroadcast(activity, CONTROL_TYPE_NEXT, new Intent(ACTION_MEDIA_CONTROL).putExtra(EXTRA_CONTROL_TYPE, CONTROL_TYPE_NEXT), PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE)));
         activity.setPictureInPictureParams(builder.setActions(actions).build());
     }
 
