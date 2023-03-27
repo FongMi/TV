@@ -22,7 +22,7 @@ import com.fongmi.android.tv.ui.adapter.RecordAdapter;
 import com.fongmi.android.tv.ui.adapter.WordAdapter;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.CustomKeyboard;
-import com.fongmi.android.tv.ui.custom.CustomListener;
+import com.fongmi.android.tv.ui.custom.CustomTextListener;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
 import com.fongmi.android.tv.utils.Utils;
@@ -61,14 +61,14 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
             if (actionId == EditorInfo.IME_ACTION_DONE) onSearch();
             return true;
         });
-        mBinding.keyword.addTextChangedListener(new CustomListener() {
+        mBinding.keyword.addTextChangedListener(new CustomTextListener() {
             @Override
             public void afterTextChanged(Editable s) {
                 if (s.toString().isEmpty()) getHot();
                 else getSuggest(s.toString());
             }
         });
-        mBinding.mic.setListener(this, new CustomListener() {
+        mBinding.mic.setListener(this, new CustomTextListener() {
             @Override
             public void onEndOfSpeech() {
                 mBinding.mic.stop();

@@ -8,7 +8,7 @@ import android.text.TextWatcher;
 
 import java.util.List;
 
-public abstract class CustomListener implements TextWatcher, RecognitionListener {
+public abstract class CustomTextListener implements TextWatcher, RecognitionListener {
 
     @Override
     public void onReadyForSpeech(Bundle params) {

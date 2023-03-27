@@ -81,7 +81,7 @@ public class Utils {
         window.getDecorView().setSystemUiVisibility(flags);
     }
 
-    public static boolean hasPIP() {
+    public static boolean hasPiP() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && App.get().getPackageManager().hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE);
     }
 
