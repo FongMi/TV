@@ -93,10 +93,6 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
 
     @Override
     public void setConfig(Config config) {
-        checkPermission(config);
-    }
-
-    private void checkPermission(Config config) {
         if (config.getUrl().startsWith("file") && !Utils.hasPermission(getActivity())) {
             PermissionX.init(this).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> load(config));
         } else {
