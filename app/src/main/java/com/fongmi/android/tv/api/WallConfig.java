@@ -3,13 +3,13 @@ package com.fongmi.android.tv.api;
 import android.graphics.drawable.Drawable;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.net.OkHttp;
 import com.fongmi.android.tv.utils.FileUtil;
-import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.Prefers;
 
 import java.io.File;
@@ -84,7 +84,7 @@ public class WallConfig {
 
     private File write(File file) throws IOException {
         if (url.startsWith("file")) FileUtil.copy(FileUtil.getLocal(url), file);
-        else if (url.startsWith("http")) FileUtil.write(file, ImgUtil.resize(OkHttp.newCall(url).execute().body().bytes()));
+        else if (url.startsWith("http")) FileUtil.write(file, Product.resize(OkHttp.newCall(url).execute().body().bytes()));
         else file.delete();
         return file;
     }
