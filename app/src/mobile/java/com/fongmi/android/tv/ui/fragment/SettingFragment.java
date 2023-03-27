@@ -42,6 +42,11 @@ import com.permissionx.guolindev.PermissionX;
 public class SettingFragment extends BaseFragment implements ConfigCallback, SiteCallback, LiveCallback {
 
     private FragmentSettingBinding mBinding;
+    private String[] render;
+    private String[] decode;
+    private String[] player;
+    private String[] scale;
+    private String[] size;
     private int type;
 
     public static SettingFragment newInstance() {
@@ -59,11 +64,11 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.liveUrl.setText(LiveConfig.getUrl());
         mBinding.wallUrl.setText(WallConfig.getUrl());
         mBinding.versionText.setText(BuildConfig.VERSION_NAME);
-        mBinding.sizeText.setText(ResUtil.getStringArray(R.array.select_size)[Prefers.getSize()]);
-        mBinding.scaleText.setText(ResUtil.getStringArray(R.array.select_scale)[Prefers.getScale()]);
-        mBinding.playerText.setText(ResUtil.getStringArray(R.array.select_player)[Prefers.getPlayer()]);
-        mBinding.decodeText.setText(ResUtil.getStringArray(R.array.select_decode)[Prefers.getDecode()]);
-        mBinding.renderText.setText(ResUtil.getStringArray(R.array.select_render)[Prefers.getRender()]);
+        mBinding.sizeText.setText((size = ResUtil.getStringArray(R.array.select_size))[Prefers.getSize()]);
+        mBinding.scaleText.setText((scale = ResUtil.getStringArray(R.array.select_scale))[Prefers.getScale()]);
+        mBinding.playerText.setText((player = ResUtil.getStringArray(R.array.select_player))[Prefers.getPlayer()]);
+        mBinding.decodeText.setText((decode = ResUtil.getStringArray(R.array.select_decode))[Prefers.getDecode()]);
+        mBinding.renderText.setText((render = ResUtil.getStringArray(R.array.select_render))[Prefers.getRender()]);
     }
 
     @Override
@@ -176,38 +181,33 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
 
     private void setPlayer() {
         int index = Prefers.getPlayer();
-        String[] array = ResUtil.getStringArray(R.array.select_player);
-        Prefers.putPlayer(index = index == array.length - 1 ? 0 : ++index);
-        mBinding.playerText.setText(array[index]);
+        Prefers.putPlayer(index = index == player.length - 1 ? 0 : ++index);
+        mBinding.playerText.setText(player[index]);
     }
 
     private void setDecode() {
         int index = Prefers.getDecode();
-        String[] array = ResUtil.getStringArray(R.array.select_decode);
-        Prefers.putDecode(index = index == array.length - 1 ? 0 : ++index);
-        mBinding.decodeText.setText(array[index]);
+        Prefers.putDecode(index = index == decode.length - 1 ? 0 : ++index);
+        mBinding.decodeText.setText(decode[index]);
     }
 
     private void setRender() {
         int index = Prefers.getRender();
-        String[] array = ResUtil.getStringArray(R.array.select_render);
-        Prefers.putRender(index = index == array.length - 1 ? 0 : ++index);
-        mBinding.renderText.setText(array[index]);
+        Prefers.putRender(index = index == render.length - 1 ? 0 : ++index);
+        mBinding.renderText.setText(render[index]);
     }
 
     private void setScale() {
-        String[] array = ResUtil.getStringArray(R.array.select_scale);
-        new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.setting_scale).setNegativeButton(R.string.dialog_negative, null).setSingleChoiceItems(array, Prefers.getScale(), (dialog, which) -> {
-            mBinding.scaleText.setText(array[which]);
+        new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.setting_scale).setNegativeButton(R.string.dialog_negative, null).setSingleChoiceItems(scale, Prefers.getScale(), (dialog, which) -> {
+            mBinding.scaleText.setText(scale[which]);
             Prefers.putScale(which);
             dialog.dismiss();
         }).show();
     }
 
     private void setSize() {
-        String[] array = ResUtil.getStringArray(R.array.select_size);
-        new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.setting_size).setNegativeButton(R.string.dialog_negative, null).setSingleChoiceItems(array, Prefers.getSize(), (dialog, which) -> {
-            mBinding.sizeText.setText(array[which]);
+        new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.setting_size).setNegativeButton(R.string.dialog_negative, null).setSingleChoiceItems(size, Prefers.getSize(), (dialog, which) -> {
+            mBinding.sizeText.setText(size[which]);
             Prefers.putSize(which);
             RefreshEvent.size();
             dialog.dismiss();
@@ -220,6 +220,18 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
 
     private void setWallRefresh() {
         WallConfig.get().load();
+    }
+
+    private void updateText() {
+        if (player == null || decode == null) return;
+        mBinding.playerText.setText(player[Prefers.getPlayer()]);
+        mBinding.decodeText.setText(decode[Prefers.getDecode()]);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateText();
     }
 
     @Override
