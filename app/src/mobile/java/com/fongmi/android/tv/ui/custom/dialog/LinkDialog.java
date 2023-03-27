@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.text.TextUtils;
 import android.util.Patterns;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
 
 import androidx.appcompat.app.AlertDialog;
@@ -13,12 +14,14 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.DialogLinkBinding;
 import com.fongmi.android.tv.ui.activity.DetailActivity;
+import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.Utils;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class LinkDialog {
 
     private final DialogLinkBinding binding;
+    private final Fragment fragment;
     private AlertDialog dialog;
 
     public static LinkDialog create(Fragment fragment) {
@@ -26,6 +29,7 @@ public class LinkDialog {
     }
 
     public LinkDialog(Fragment fragment) {
+        this.fragment = fragment;
         this.binding = DialogLinkBinding.inflate(LayoutInflater.from(fragment.getContext()));
     }
 
@@ -43,6 +47,7 @@ public class LinkDialog {
 
     private void initView() {
         CharSequence text = Utils.getClipText();
+        binding.input.setEndIconOnClickListener(this::onChoose);
         if (!TextUtils.isEmpty(text) && Patterns.WEB_URL.matcher(text).matches()) binding.text.setText(text);
     }
 
@@ -51,6 +56,11 @@ public class LinkDialog {
             if (actionId == EditorInfo.IME_ACTION_DONE) dialog.getButton(DialogInterface.BUTTON_POSITIVE).performClick();
             return true;
         });
+    }
+
+    private void onChoose(View view) {
+        FileChooser.from(fragment).show();
+        dialog.dismiss();
     }
 
     private void onPositive(DialogInterface dialog, int which) {
