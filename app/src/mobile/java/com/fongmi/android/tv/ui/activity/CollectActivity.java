@@ -34,7 +34,7 @@ import com.fongmi.android.tv.ui.adapter.RecordAdapter;
 import com.fongmi.android.tv.ui.adapter.VodAdapter;
 import com.fongmi.android.tv.ui.adapter.WordAdapter;
 import com.fongmi.android.tv.ui.base.BaseActivity;
-import com.fongmi.android.tv.ui.custom.CustomListener;
+import com.fongmi.android.tv.ui.custom.CustomTextListener;
 import com.fongmi.android.tv.ui.custom.ViewType;
 import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
 import com.fongmi.android.tv.utils.PauseThreadPoolExecutor;
@@ -106,7 +106,7 @@ public class CollectActivity extends BaseActivity implements SiteCallback, WordA
             if (actionId == EditorInfo.IME_ACTION_DONE) search();
             return true;
         });
-        mBinding.keyword.addTextChangedListener(new CustomListener() {
+        mBinding.keyword.addTextChangedListener(new CustomTextListener() {
             @Override
             public void afterTextChanged(Editable s) {
                 if (s.toString().isEmpty()) getHot();
