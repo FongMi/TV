@@ -39,14 +39,14 @@ import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
-import com.fongmi.android.tv.receiver.PipReceiver;
+import com.fongmi.android.tv.receiver.PiPReceiver;
 import com.fongmi.android.tv.ui.adapter.EpisodeAdapter;
 import com.fongmi.android.tv.ui.adapter.FlagAdapter;
 import com.fongmi.android.tv.ui.adapter.ParseAdapter;
 import com.fongmi.android.tv.ui.adapter.SearchAdapter;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
-import com.fongmi.android.tv.ui.custom.Pip;
+import com.fongmi.android.tv.utils.PiP;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.ui.custom.ViewType;
 import com.fongmi.android.tv.ui.custom.dialog.ControlDialog;
@@ -85,7 +85,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private ExecutorService mExecutor;
     private SiteViewModel mViewModel;
     private FlagAdapter mFlagAdapter;
-    private PipReceiver mReceiver;
+    private PiPReceiver mReceiver;
     private History mHistory;
     private Players mPlayers;
     private boolean fullscreen;
@@ -100,7 +100,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private Runnable mR2;
     private Runnable mR3;
     private String mKey;
-    private Pip mPip;
+    private PiP mPiP;
 
     public static void push(Activity activity, String url) {
         start(activity, "push_agent", url, url);
@@ -186,12 +186,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mKeyDown = CustomKeyDownVod.create(this, mBinding.video);
         mFrameParams = mBinding.video.getLayoutParams();
         mBinding.progressLayout.showProgress();
-        mReceiver = new PipReceiver(mBinding);
+        mReceiver = new PiPReceiver(mBinding);
         mPlayers = new Players().init();
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
         mR3 = this::setOrient;
-        mPip = new Pip();
+        mPiP = new PiP();
         mKey = getKey();
         setRecyclerView();
         setVideoView();
@@ -255,7 +255,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.action.player.setText(mPlayers.getPlayerText());
         getExo().setVisibility(mPlayers.isExo() ? View.VISIBLE : View.GONE);
         getIjk().setVisibility(mPlayers.isIjk() ? View.VISIBLE : View.GONE);
-        mBinding.video.addOnLayoutChangeListener((view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> mPip.update(getActivity(), view));
+        mBinding.video.addOnLayoutChangeListener((view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> mPiP.update(getActivity(), view));
     }
 
     private void setDecodeView() {
@@ -732,7 +732,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void checkPlayImg(boolean playing) {
         mBinding.control.play.setImageResource(playing ? com.google.android.exoplayer2.ui.R.drawable.exo_icon_pause : com.google.android.exoplayer2.ui.R.drawable.exo_icon_play);
-        mPip.update(this, playing);
+        mPiP.update(this, playing);
     }
 
     private void checkLockImg() {
@@ -1091,7 +1091,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     @Override
     protected void onUserLeaveHint() {
         super.onUserLeaveHint();
-        mPip.enter(this, getScale() == 2);
+        mPiP.enter(this, getScale() == 2);
         if (isLock()) App.post(this::onLock, 500);
     }
 

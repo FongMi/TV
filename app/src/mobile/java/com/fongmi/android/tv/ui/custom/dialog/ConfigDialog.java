@@ -2,6 +2,7 @@ package com.fongmi.android.tv.ui.custom.dialog;
 
 import android.content.DialogInterface;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
 
 import androidx.appcompat.app.AlertDialog;
@@ -14,6 +15,7 @@ import com.fongmi.android.tv.api.WallConfig;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.databinding.DialogConfigBinding;
 import com.fongmi.android.tv.impl.ConfigCallback;
+import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.Utils;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -21,6 +23,7 @@ public class ConfigDialog {
 
     private final DialogConfigBinding binding;
     private final ConfigCallback callback;
+    private final Fragment fragment;
     private AlertDialog dialog;
     private String url;
     private int type;
@@ -35,6 +38,7 @@ public class ConfigDialog {
     }
 
     public ConfigDialog(Fragment fragment) {
+        this.fragment = fragment;
         this.callback = (ConfigCallback) fragment;
         this.binding = DialogConfigBinding.inflate(LayoutInflater.from(fragment.getContext()));
     }
@@ -54,6 +58,7 @@ public class ConfigDialog {
     private void initView() {
         binding.text.setText(url = getUrl());
         binding.text.setSelection(url.length());
+        binding.input.setEndIconOnClickListener(this::onChoose);
     }
 
     private void initEvent() {
@@ -74,6 +79,11 @@ public class ConfigDialog {
             default:
                 return "";
         }
+    }
+
+    private void onChoose(View view) {
+        FileChooser.from(fragment).show();
+        dialog.dismiss();
     }
 
     private void onPositive(DialogInterface dialog, int which) {
