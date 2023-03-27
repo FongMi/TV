@@ -65,12 +65,7 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
         mManager = new FragmentStateManager(mBinding.container, getSupportFragmentManager()) {
             @Override
             public Fragment getItem(int position) {
-                switch (position) {
-                    case 0:
-                        return VodFragment.newInstance();
-                    default:
-                        return SettingFragment.newInstance();
-                }
+                return position == 0 ? VodFragment.newInstance() : SettingFragment.newInstance();
             }
         };
         if (savedInstanceState == null) mManager.change(0);
