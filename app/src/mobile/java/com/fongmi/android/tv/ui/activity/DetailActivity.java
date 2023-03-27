@@ -49,6 +49,7 @@ import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
 import com.fongmi.android.tv.ui.custom.Pip;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.ui.custom.ViewType;
+import com.fongmi.android.tv.ui.custom.dialog.ControlDialog;
 import com.fongmi.android.tv.ui.custom.dialog.EpisodeDialog;
 import com.fongmi.android.tv.ui.custom.dialog.TrackDialog;
 import com.fongmi.android.tv.utils.Clock;
@@ -72,19 +73,18 @@ import java.util.concurrent.Executors;
 
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Listener, TrackDialog.Listener, Clock.Callback, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, ParseAdapter.OnClickListener {
+public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Listener, TrackDialog.Listener, ControlDialog.Listener, Clock.Callback, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, ParseAdapter.OnClickListener {
 
     private ViewGroup.LayoutParams mFrameParams;
     private ActivityDetailBinding mBinding;
     private EpisodeAdapter mEpisodeAdapter;
     private SearchAdapter mSearchAdapter;
-    private EpisodeDialog mEpisodeDialog;
+    private ControlDialog mControlDialog;
     private ParseAdapter mParseAdapter;
     private CustomKeyDownVod mKeyDown;
     private ExecutorService mExecutor;
     private SiteViewModel mViewModel;
     private FlagAdapter mFlagAdapter;
-    private TrackDialog mTrackDialog;
     private PipReceiver mReceiver;
     private History mHistory;
     private Players mPlayers;
@@ -255,6 +255,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.action.player.setText(mPlayers.getPlayerText());
         getExo().setVisibility(mPlayers.isExo() ? View.VISIBLE : View.GONE);
         getIjk().setVisibility(mPlayers.isIjk() ? View.VISIBLE : View.GONE);
+        mBinding.video.addOnLayoutChangeListener((view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> mPip.update(getActivity(), view));
     }
 
     private void setDecodeView() {
@@ -291,7 +292,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         });
         mViewModel.episode.observe(this, episode -> {
             onItemClick(episode);
-            hideEpisode();
+            hideSheet();
         });
     }
 
@@ -412,8 +413,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void onMore() {
         for (Fragment fragment : getSupportFragmentManager().getFragments()) if (fragment instanceof BottomSheetDialogFragment) return;
-        mEpisodeDialog = EpisodeDialog.create().reverse(mHistory.isRevSort()).episodes(mEpisodeAdapter.getItems());
-        mEpisodeDialog.show(getSupportFragmentManager(), null);
+        EpisodeDialog.create().reverse(mHistory.isRevSort()).episodes(mEpisodeAdapter.getItems()).show(getSupportFragmentManager(), null);
     }
 
     private void onContent() {
@@ -490,14 +490,14 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onSetting() {
-        mBinding.control.action.getRoot().setVisibility(View.VISIBLE);
-        setR1Callback();
+        for (Fragment fragment : getSupportFragmentManager().getFragments()) if (fragment instanceof BottomSheetDialogFragment) return;
+        mControlDialog = ControlDialog.create(this).detail(mBinding).players(mPlayers);
+        mControlDialog.show(getSupportFragmentManager(), null);
     }
 
     private void onTrack(View view) {
         for (Fragment fragment : getSupportFragmentManager().getFragments()) if (fragment instanceof BottomSheetDialogFragment) return;
-        mTrackDialog = TrackDialog.create().player(mPlayers).type(Integer.parseInt(view.getTag().toString())).listener(this);
-        mTrackDialog.show(getSupportFragmentManager(), null);
+        TrackDialog.create().player(mPlayers).type(Integer.parseInt(view.getTag().toString())).listener(this).show(getSupportFragmentManager(), null);
         hideControl();
     }
 
@@ -669,14 +669,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         App.removeCallbacks(mR1);
     }
 
-    private void hideTrack() {
-        if (mTrackDialog != null) mTrackDialog.dismissAllowingStateLoss();
-        mTrackDialog = null;
-    }
-
-    private void hideEpisode() {
-        if (mEpisodeDialog != null) mEpisodeDialog.dismissAllowingStateLoss();
-        mEpisodeDialog = null;
+    private void hideSheet() {
+        for (Fragment fragment : getSupportFragmentManager().getFragments()) if (fragment instanceof BottomSheetDialogFragment) ((BottomSheetDialogFragment) fragment).dismiss();
     }
 
     private void setTraffic() {
@@ -818,6 +812,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.action.text.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_TEXT) ? View.VISIBLE : View.GONE);
         mBinding.control.action.audio.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_AUDIO) ? View.VISIBLE : View.GONE);
         mBinding.control.action.video.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_VIDEO) ? View.VISIBLE : View.GONE);
+        if (mControlDialog != null && mControlDialog.isVisible()) mControlDialog.setTrackVisible();
     }
 
     private void setDefaultTrack() {
@@ -1011,6 +1006,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     @Override
+    public void onScale(int tag) {
+        mHistory.setScale(tag);
+        setScale(tag);
+    }
+
+    @Override
     public void onSpeedUp() {
         mBinding.control.action.speed.setText(mPlayers.setSpeed(mPlayers.getSpeed() < 3 ? 3 : 5));
         mBinding.widget.speed.startAnimation(ResUtil.getAnim(R.anim.forward));
@@ -1101,8 +1102,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
             mReceiver.register(this);
             enterFullscreen();
             hideControl();
-            hideEpisode();
-            hideTrack();
+            hideSheet();
         } else {
             exitFullscreen();
             mReceiver.unregister(this);
