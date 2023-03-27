@@ -1,6 +1,8 @@
 package com.fongmi.android.tv.ui.fragment;
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -28,6 +30,8 @@ import com.fongmi.android.tv.ui.custom.dialog.ConfigDialog;
 import com.fongmi.android.tv.ui.custom.dialog.HistoryDialog;
 import com.fongmi.android.tv.ui.custom.dialog.LiveDialog;
 import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
+import com.fongmi.android.tv.utils.FileChooser;
+import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
@@ -38,7 +42,7 @@ import com.permissionx.guolindev.PermissionX;
 public class SettingFragment extends BaseFragment implements ConfigCallback, SiteCallback, LiveCallback {
 
     private FragmentSettingBinding mBinding;
-    private Config config;
+    private int type;
 
     public static SettingFragment newInstance() {
         return new SettingFragment();
@@ -66,11 +70,11 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
     protected void initEvent() {
         mBinding.vodHome.setOnClickListener(view -> SiteDialog.create(this).all().show());
         mBinding.liveHome.setOnClickListener(view -> LiveDialog.create(this).show());
-        mBinding.vod.setOnClickListener(view -> ConfigDialog.create(this).type(0).show());
-        mBinding.live.setOnClickListener(view -> ConfigDialog.create(this).type(1).show());
-        mBinding.wall.setOnClickListener(view -> ConfigDialog.create(this).type(2).show());
-        mBinding.vodHistory.setOnClickListener(view -> HistoryDialog.create(this).type(0).show());
-        mBinding.liveHistory.setOnClickListener(view -> HistoryDialog.create(this).type(1).show());
+        mBinding.vod.setOnClickListener(view -> ConfigDialog.create(this).type(type = 0).show());
+        mBinding.live.setOnClickListener(view -> ConfigDialog.create(this).type(type = 1).show());
+        mBinding.wall.setOnClickListener(view -> ConfigDialog.create(this).type(type = 2).show());
+        mBinding.vodHistory.setOnClickListener(view -> HistoryDialog.create(this).type(type = 0).show());
+        mBinding.liveHistory.setOnClickListener(view -> HistoryDialog.create(this).type(type = 1).show());
         mBinding.wallDefault.setOnClickListener(view -> setWallDefault());
         mBinding.wallRefresh.setOnClickListener(view -> setWallRefresh());
         mBinding.version.setOnLongClickListener(view -> onVersion(true));
@@ -84,38 +88,37 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
 
     @Override
     public void setConfig(Config config) {
-        this.config = config;
-        checkPermission();
+        checkPermission(config);
     }
 
-    private void checkPermission() {
+    private void checkPermission(Config config) {
         if (config.getUrl().startsWith("file") && !Utils.hasPermission(getActivity())) {
-            PermissionX.init(this).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> loadConfig());
+            PermissionX.init(this).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> load(config));
         } else {
-            loadConfig();
+            load(config);
         }
     }
 
-    private void loadConfig() {
+    private void load(Config config) {
         switch (config.getType()) {
             case 0:
                 Notify.progress(getActivity(), true);
                 mBinding.vodUrl.setText(config.getUrl());
-                ApiConfig.get().clear().config(config).load(getCallback());
+                ApiConfig.get().clear().config(config).load(getCallback(config));
                 break;
             case 1:
                 Notify.progress(getActivity(), true);
                 mBinding.liveUrl.setText(config.getUrl());
-                LiveConfig.get().clear().config(config).load(getCallback());
+                LiveConfig.get().clear().config(config).load(getCallback(config));
                 break;
             case 2:
                 mBinding.wallUrl.setText(config.getUrl());
-                WallConfig.get().clear().config(config).load(getCallback());
+                WallConfig.get().clear().config(config).load(getCallback(config));
                 break;
         }
     }
 
-    private Callback getCallback() {
+    private Callback getCallback(Config config) {
         return new Callback() {
             @Override
             public void success() {
@@ -132,7 +135,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
     }
 
     private void setConfig() {
-        switch (config.getType()) {
+        switch (type) {
             case 0:
                 Notify.dismiss();
                 RefreshEvent.video();
@@ -217,5 +220,12 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
 
     private void setWallRefresh() {
         WallConfig.get().load();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode != Activity.RESULT_OK || requestCode != FileChooser.REQUEST_PICK_FILE) return;
+        setConfig(Config.find("file:/" + FileChooser.getPathFromUri(getContext(), data.getData()).replace(FileUtil.getRootPath(), ""), type));
     }
 }
