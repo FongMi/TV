@@ -10,7 +10,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="倍速"
+        android:text="@string/control_speed"
         android:textColor="@color/black"
         android:textSize="16sp" />
 
@@ -32,7 +32,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:text="縮放"
+        android:text="@string/control_scale"
         android:textColor="@color/black"
         android:textSize="16sp" />
 
@@ -112,7 +112,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="8dp"
-        android:text="播放"
+        android:text="@string/play"
         android:textColor="@color/black"
         android:textSize="16sp" />
 
@@ -177,7 +177,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="8dp"
-        android:text="軌道"
+        android:text="@string/control_track"
         android:textColor="@color/black"
         android:textSize="16sp"
         android:visibility="gone"

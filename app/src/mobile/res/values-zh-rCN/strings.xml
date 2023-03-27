@@ -20,6 +20,11 @@
     <string name="detail_content">简介</string>
     <string name="detail_search">快搜“<xliff:g name="name">%s</xliff:g>”</string>
 
+    <!-- Control -->
+    <string name="control_speed">倍速</string>
+    <string name="control_scale">缩放</string>
+    <string name="control_track">轨道</string>
+
     <!-- Dialog -->
     <string name="dialog_delete_record">删除全部纪录？</string>
     <string name="dialog_delete_keep">收藏纪录将会全部删除。</string>
