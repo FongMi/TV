@@ -166,6 +166,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:layout_marginBottom="8dp"
         android:orientation="vertical">
 
         <androidx.recyclerview.widget.RecyclerView
@@ -185,7 +186,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingStart="16dp"
@@ -211,8 +211,7 @@
             android:id="@+id/action"
             layout="@layout/view_control_vod_action"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp" />
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 </RelativeLayout>

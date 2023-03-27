@@ -25,8 +25,7 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:background">?attr/selectableItemBackgroundBorderless</item>
-        <item name="android:padding">4dp</item>
-        <item name="android:layout_marginEnd">16dp</item>
+        <item name="android:padding">8dp</item>
         <item name="android:shadowColor">@color/grey_200</item>
         <item name="android:shadowDx">1</item>
         <item name="android:shadowDy">1</item>
