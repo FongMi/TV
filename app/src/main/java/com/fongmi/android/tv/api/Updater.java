@@ -1,6 +1,7 @@
 package com.fongmi.android.tv.api;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -92,25 +93,24 @@ public class Updater implements Download.Callback {
 
     private void show(Activity activity, String version, String desc) {
         binding = DialogUpdateBinding.inflate(LayoutInflater.from(activity));
-        binding.version.setText(ResUtil.getString(R.string.update_version, version));
-        binding.confirm.setOnClickListener(this::confirm);
-        binding.cancel.setOnClickListener(this::cancel);
+        check().create(activity, ResUtil.getString(R.string.update_version, version)).show();
+        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(this::confirm);
+        dialog.getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(this::cancel);
         binding.desc.setText(desc);
-        check().create(activity).show();
     }
 
-    private AlertDialog create(Activity activity) {
-        return dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).setCancelable(false).create();
+    private AlertDialog create(Activity activity, String title) {
+        return dialog = new MaterialAlertDialogBuilder(activity).setTitle(title).setView(binding.getRoot()).setPositiveButton(R.string.update_confirm, null).setNegativeButton(R.string.dialog_negative, null).setCancelable(false).create();
     }
 
     private void cancel(View view) {
         Prefers.putUpdate(false);
-        dismiss();
+        dialog.dismiss();
     }
 
     private void confirm(View view) {
-        binding.confirm.setEnabled(false);
         Download.create(getApk(), getFile(), this).start();
+        view.setEnabled(false);
     }
 
     private void dismiss() {
@@ -122,7 +122,7 @@ public class Updater implements Download.Callback {
 
     @Override
     public void progress(int progress) {
-        binding.confirm.setText(String.format(Locale.getDefault(), "%1$d%%", progress));
+        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setText(String.format(Locale.getDefault(), "%1$d%%", progress));
     }
 
     @Override

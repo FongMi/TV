@@ -14,10 +14,13 @@
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/navigation"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="56dp"
         android:layout_alignParentBottom="true"
-        android:background="@color/white_80"
+        android:background="@color/white_15"
         app:elevation="0dp"
+        app:itemIconTint="@color/nav"
+        app:itemTextColor="@color/white"
+        app:labelVisibilityMode="unlabeled"
         app:menu="@menu/menu_nav" />
 
 </RelativeLayout>

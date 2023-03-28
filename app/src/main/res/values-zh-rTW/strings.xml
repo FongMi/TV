@@ -14,9 +14,6 @@
     <string name="live_epg_now">正在播放：<xliff:g name="name">%s</xliff:g></string>
     <string name="live_line">來源 <xliff:g name="name">%s</xliff:g></string>
 
-    <!-- Push -->
-    <string name="push_clip">推送剪貼簿內容</string>
-
     <!-- Detail -->
     <string name="detail_title"><xliff:g name="name">%s</xliff:g>：<xliff:g name="name">%s</xliff:g></string>
     <string name="detail_site">站源：<xliff:g name="name">%s</xliff:g></string>
@@ -56,6 +53,7 @@
 
     <!-- Parse -->
     <string name="parse">解析</string>
+    <string name="parse_god">超級解析</string>
     <string name="parse_from">解析來自：<xliff:g name="name">%s</xliff:g></string>
 
     <!-- Setting -->
@@ -83,12 +81,7 @@
     <string name="dialog_config_hint">請輸入接口…</string>
     <string name="dialog_config_url">請輸入網址…</string>
 
-    <!-- Ask -->
-    <string name="ask_keep_delete">是否清空所有收藏紀錄？</string>
-    <string name="ask_history_delete">是否清空所有觀看紀錄？</string>
-
     <!-- Error -->
-    <string name="error_so_load">FFmpeg 載入失敗</string>
     <string name="error_config_get">配置取得失敗</string>
     <string name="error_config_parse">配置解析失敗</string>
     <string name="error_play_next">已經是最後一集了！</string>
@@ -135,6 +128,7 @@
         <item>小</item>
         <item>中</item>
         <item>大</item>
+        <item>特大</item>
     </string-array>
 
     <string-array name="select_scale">

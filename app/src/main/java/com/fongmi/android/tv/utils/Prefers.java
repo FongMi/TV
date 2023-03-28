@@ -139,6 +139,14 @@ public class Prefers {
         put("hot", hot);
     }
 
+    public static int getViewType() {
+        return getInt("viewType");
+    }
+
+    public static void putViewType(int viewType) {
+        put("viewType", viewType);
+    }
+
     public static int getScale() {
         return getInt("scale");
     }
