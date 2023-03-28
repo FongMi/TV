@@ -4,8 +4,9 @@
     android:id="@+id/text"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@drawable/shape_text"
+    android:background="@drawable/selector_accent"
+    android:foreground="?android:attr/selectableItemBackground"
     android:gravity="center"
-    android:textColor="@color/text"
+    android:textColor="@color/white"
     android:textSize="14sp"
     tools:text="超級解析" />
