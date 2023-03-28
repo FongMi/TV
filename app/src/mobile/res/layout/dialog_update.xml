@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"
             android:letterSpacing="0.02"
             android:lineSpacingExtra="8dp"
-            android:textColor="@color/grey_900"
+            android:textColor="?android:attr/textColorPrimary"
             android:textSize="14sp"
             tools:text="1. 新增 ffmpeg 音頻軟解\n2. 詳情頁新增分詞快搜\n3. 修復搜尋閃退問題\n4. 設定支援渲染切換" />
 
