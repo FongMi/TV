@@ -53,6 +53,7 @@
 
     <!-- Parse -->
     <string name="parse">解析</string>
+    <string name="parse_god">超级解析</string>
     <string name="parse_from">解析来自：<xliff:g name="name">%s</xliff:g></string>
 
     <!-- Setting -->
