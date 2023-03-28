@@ -34,4 +34,8 @@
         <item name="android:textSize">14sp</item>
     </style>
 
+    <style name="Indicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@color/indicator</item>
+    </style>
+
 </resources>
