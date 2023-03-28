@@ -56,6 +56,10 @@ public class ApiConfig {
         return get().getConfig().getUrl();
     }
 
+    public static String getDesc() {
+        return get().getConfig().getDesc();
+    }
+
     public static int getHomeIndex() {
         return get().getSites().indexOf(get().getHome());
     }
