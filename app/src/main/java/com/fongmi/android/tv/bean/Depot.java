@@ -2,6 +2,7 @@ package com.fongmi.android.tv.bean;
 
 import android.text.TextUtils;
 
+import com.fongmi.android.tv.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
@@ -24,7 +25,7 @@ public class Depot {
     }
 
     public String getUrl() {
-        return TextUtils.isEmpty(url) ? "" : url;
+        return TextUtils.isEmpty(url) ? "" : Utils.checkClan(url);
     }
 
     public String getName() {
