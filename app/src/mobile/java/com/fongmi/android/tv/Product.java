@@ -38,12 +38,14 @@ public class Product {
     }
 
     private static Bitmap crop(Bitmap bitmap) {
+        int width = ResUtil.getScreenWidth();
+        int height = ResUtil.getScreenHeight();
         if (bitmap.getWidth() >= bitmap.getHeight()) {
             return Bitmap.createBitmap(bitmap, bitmap.getWidth() / 2 - bitmap.getHeight() / 2, 0, bitmap.getHeight(), bitmap.getHeight());
+        } else if (bitmap.getWidth() < width && bitmap.getHeight() < height) {
+            return bitmap;
         } else {
             Matrix matrix = new Matrix();
-            int width = ResUtil.getScreenWidth();
-            int height = ResUtil.getScreenHeight();
             matrix.postScale((float) width / bitmap.getWidth(), (float) height / bitmap.getHeight());
             return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, false);
         }
