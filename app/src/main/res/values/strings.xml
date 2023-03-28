@@ -53,6 +53,7 @@
 
     <!-- Parse -->
     <string name="parse">Parse</string>
+    <string name="parse_god">Super</string>
     <string name="parse_from">Parse from: <xliff:g name="name">%s</xliff:g></string>
 
     <!-- Setting -->
