@@ -113,6 +113,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
                 LiveConfig.get().clear().config(config).load(getCallback(config));
                 break;
             case 2:
+                Notify.progress(getActivity(), true);
                 mBinding.wallUrl.setText(config.getUrl());
                 WallConfig.get().clear().config(config).load(getCallback(config));
                 break;
@@ -149,6 +150,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
                 mBinding.liveUrl.setText(LiveConfig.getUrl());
                 break;
             case 2:
+                Notify.dismiss();
                 mBinding.wallUrl.setText(WallConfig.getUrl());
                 break;
         }
