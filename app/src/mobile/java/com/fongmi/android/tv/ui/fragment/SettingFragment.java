@@ -60,9 +60,9 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
 
     @Override
     protected void initView() {
-        mBinding.vodUrl.setText(ApiConfig.getUrl());
-        mBinding.liveUrl.setText(LiveConfig.getUrl());
+        mBinding.vodUrl.setText(ApiConfig.getDesc());
         mBinding.wallUrl.setText(WallConfig.getUrl());
+        mBinding.liveUrl.setText(LiveConfig.getDesc());
         mBinding.versionText.setText(BuildConfig.VERSION_NAME);
         mBinding.sizeText.setText((size = ResUtil.getStringArray(R.array.select_size))[Prefers.getSize()]);
         mBinding.scaleText.setText((scale = ResUtil.getStringArray(R.array.select_scale))[Prefers.getScale()]);
@@ -104,12 +104,12 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         switch (config.getType()) {
             case 0:
                 Notify.progress(getActivity(), true);
-                mBinding.vodUrl.setText(config.getUrl());
+                mBinding.vodUrl.setText(config.getDesc());
                 ApiConfig.get().clear().config(config).load(getCallback(config));
                 break;
             case 1:
                 Notify.progress(getActivity(), true);
-                mBinding.liveUrl.setText(config.getUrl());
+                mBinding.liveUrl.setText(config.getDesc());
                 LiveConfig.get().clear().config(config).load(getCallback(config));
                 break;
             case 2:
@@ -141,13 +141,13 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
             case 0:
                 Notify.dismiss();
                 RefreshEvent.video();
-                mBinding.vodUrl.setText(ApiConfig.getUrl());
-                mBinding.liveUrl.setText(LiveConfig.getUrl());
+                mBinding.vodUrl.setText(ApiConfig.getDesc());
+                mBinding.liveUrl.setText(LiveConfig.getDesc());
                 mBinding.wallUrl.setText(WallConfig.getUrl());
                 break;
             case 1:
                 Notify.dismiss();
-                mBinding.liveUrl.setText(LiveConfig.getUrl());
+                mBinding.liveUrl.setText(LiveConfig.getDesc());
                 break;
             case 2:
                 Notify.dismiss();

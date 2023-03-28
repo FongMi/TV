@@ -18,8 +18,8 @@
         android:layout_alignParentBottom="true"
         android:background="@color/white_15"
         app:elevation="0dp"
+        app:itemActiveIndicatorStyle="@style/Indicator"
         app:itemIconTint="@color/nav"
-        app:itemTextColor="@color/white"
         app:labelVisibilityMode="unlabeled"
         app:menu="@menu/menu_nav" />
 
