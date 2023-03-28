@@ -3,6 +3,7 @@ package com.fongmi.android.tv;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
@@ -40,7 +41,11 @@ public class Product {
         if (bitmap.getWidth() >= bitmap.getHeight()) {
             return Bitmap.createBitmap(bitmap, bitmap.getWidth() / 2 - bitmap.getHeight() / 2, 0, bitmap.getHeight(), bitmap.getHeight());
         } else {
-            return Bitmap.createBitmap(bitmap, 0, bitmap.getHeight() / 2 - bitmap.getWidth() / 2, bitmap.getWidth(), bitmap.getWidth());
+            Matrix matrix = new Matrix();
+            int width = ResUtil.getScreenWidth();
+            int height = ResUtil.getScreenHeight();
+            matrix.postScale((float) width / bitmap.getWidth(), (float) height / bitmap.getHeight());
+            return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, false);
         }
     }
 }
