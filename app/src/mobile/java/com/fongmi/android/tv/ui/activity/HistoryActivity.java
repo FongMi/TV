@@ -55,11 +55,12 @@ public class HistoryActivity extends BaseActivity implements HistoryAdapter.OnCl
 
     private void getHistory() {
         mAdapter.addAll(History.get());
+        mBinding.delete.setVisibility(mAdapter.getItemCount() > 0 ? View.VISIBLE : View.GONE);
     }
 
     private void onDelete(View view) {
         if (mAdapter.isDelete()) {
-            new MaterialAlertDialogBuilder(this).setMessage(R.string.ask_history_delete).setNegativeButton(R.string.dialog_negative, null).setPositiveButton(R.string.dialog_positive, (dialog, which) -> mAdapter.clear()).show();
+            new MaterialAlertDialogBuilder(this).setTitle(R.string.dialog_delete_record).setMessage(R.string.dialog_delete_history).setNegativeButton(R.string.dialog_negative, null).setPositiveButton(R.string.dialog_positive, (dialog, which) -> mAdapter.clear()).show();
         } else if (mAdapter.getItemCount() > 0) {
             mAdapter.setDelete(true);
         } else {
@@ -80,7 +81,9 @@ public class HistoryActivity extends BaseActivity implements HistoryAdapter.OnCl
     @Override
     public void onItemDelete(History item) {
         mAdapter.remove(item.delete());
-        if (mAdapter.getItemCount() == 0) mAdapter.setDelete(false);
+        if (mAdapter.getItemCount() > 0) return;
+        mBinding.delete.setVisibility(View.GONE);
+        mAdapter.setDelete(false);
     }
 
     @Override

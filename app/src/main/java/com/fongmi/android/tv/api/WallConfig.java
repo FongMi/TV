@@ -3,13 +3,13 @@ package com.fongmi.android.tv.api;
 import android.graphics.drawable.Drawable;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.net.OkHttp;
 import com.fongmi.android.tv.utils.FileUtil;
-import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.Prefers;
 
 import java.io.File;
@@ -18,7 +18,7 @@ import java.io.IOException;
 public class WallConfig {
 
     private Drawable drawable;
-    private String url;
+    private Config config;
 
     private static class Loader {
         static volatile WallConfig INSTANCE = new WallConfig();
@@ -29,7 +29,7 @@ public class WallConfig {
     }
 
     public static String getUrl() {
-        return get().url;
+        return get().getConfig().getUrl();
     }
 
     public static Drawable drawable(Drawable drawable) {
@@ -39,22 +39,26 @@ public class WallConfig {
     }
 
     public WallConfig init() {
-        this.url = Config.wall().getUrl();
+        this.config = Config.wall();
         return this;
     }
 
     public WallConfig config(Config config) {
-        setUrl(config.getUrl());
+        this.config = config;
         return this;
     }
 
     public WallConfig clear() {
-        this.url = null;
+        this.config = null;
         return this;
     }
 
     public void setUrl(String url) {
-        this.url = url;
+        this.config = Config.find(url, 2);
+    }
+
+    public Config getConfig() {
+        return config == null ? Config.wall() : config;
     }
 
     public void setDrawable(Drawable drawable) {
@@ -75,6 +79,7 @@ public class WallConfig {
             if (file.exists() && file.length() > 0) refresh(0);
             else setUrl(ApiConfig.get().getWall());
             App.post(callback::success);
+            config.update();
         } catch (Exception e) {
             App.post(() -> callback.error(R.string.error_config_parse));
             setUrl(ApiConfig.get().getWall());
@@ -83,8 +88,8 @@ public class WallConfig {
     }
 
     private File write(File file) throws IOException {
-        if (url.startsWith("file")) FileUtil.copy(FileUtil.getLocal(url), file);
-        else if (url.startsWith("http")) FileUtil.write(file, ImgUtil.resize(OkHttp.newCall(url).execute().body().bytes()));
+        if (getUrl().startsWith("file")) FileUtil.copy(FileUtil.getLocal(getUrl()), file);
+        else if (getUrl().startsWith("http")) FileUtil.write(file, Product.resize(OkHttp.newCall(getUrl()).execute().body().bytes()));
         else file.delete();
         return file;
     }

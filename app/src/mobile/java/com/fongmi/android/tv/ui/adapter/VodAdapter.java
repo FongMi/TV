@@ -7,9 +7,11 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.fongmi.android.tv.bean.Vod;
+import com.fongmi.android.tv.databinding.AdapterVodFolderBinding;
 import com.fongmi.android.tv.databinding.AdapterVodGridBinding;
 import com.fongmi.android.tv.databinding.AdapterVodListBinding;
 import com.fongmi.android.tv.ui.custom.ViewType;
+import com.fongmi.android.tv.ui.holder.VodFolderHolder;
 import com.fongmi.android.tv.ui.holder.VodGridHolder;
 import com.fongmi.android.tv.ui.holder.VodListHolder;
 
@@ -78,6 +80,7 @@ public class VodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        if (viewType == ViewType.FOLDER) return new VodFolderHolder(AdapterVodFolderBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), mListener);
         if (viewType == ViewType.LIST) return new VodListHolder(AdapterVodListBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), mListener);
         VodGridHolder holder = new VodGridHolder(AdapterVodGridBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), mListener);
         holder.itemView.getLayoutParams().width = width;
@@ -89,12 +92,13 @@ public class VodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         switch (viewType) {
             case ViewType.GRID:
-                VodGridHolder gridHolder = (VodGridHolder) holder;
-                gridHolder.initView(mItems.get(position));
+                ((VodGridHolder) holder).initView(mItems.get(position));
                 break;
             case ViewType.LIST:
-                VodListHolder listHolder = (VodListHolder) holder;
-                listHolder.initView(mItems.get(position));
+                ((VodListHolder) holder).initView(mItems.get(position));
+                break;
+            case ViewType.FOLDER:
+                ((VodFolderHolder) holder).initView(mItems.get(position));
                 break;
         }
     }
