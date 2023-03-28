@@ -1,8 +1,14 @@
 package com.fongmi.android.tv;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+
 import com.fongmi.android.tv.ui.activity.LiveActivity;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
+
+import java.io.ByteArrayOutputStream;
 
 public class Product {
 
