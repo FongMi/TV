@@ -61,7 +61,7 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:ellipsize="end"
-            android:maxLines="4"
+            android:maxLines="3"
             android:textColor="@color/white"
             android:textSize="14sp"
             tools:text="蜘蛛人" />

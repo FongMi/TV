@@ -24,7 +24,6 @@ import com.fongmi.android.tv.ui.adapter.VodAdapter;
 import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.custom.CustomScroller;
 import com.fongmi.android.tv.ui.custom.ViewType;
-import com.fongmi.android.tv.utils.ResUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -85,7 +84,6 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     private void setRecyclerView() {
         mBinding.recycler.setHasFixedSize(true);
         mBinding.recycler.setAdapter(mAdapter = new VodAdapter(this));
-        mBinding.recycler.setPadding(ResUtil.dp2px(isFolder() ? 0 : 8), ResUtil.dp2px(isFolder() ? 12 : 8), ResUtil.dp2px(isFolder() ? 0 : 8), ResUtil.dp2px(isFolder() ? 0 : 8));
         mBinding.recycler.setLayoutManager(isFolder() ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getContext(), Product.getColumn()));
         mAdapter.setViewType(isFolder() ? ViewType.FOLDER : ViewType.GRID);
         mAdapter.setSize(Product.getSpec(getActivity()));
