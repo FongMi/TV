@@ -4,7 +4,9 @@ import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.utils.Json;
+import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -55,7 +57,7 @@ public class Parse {
 
     public static Parse god() {
         Parse parse = new Parse();
-        parse.setName("超級解析");
+        parse.setName(ResUtil.getString(R.string.parse_god));
         parse.setType(4);
         return parse;
     }

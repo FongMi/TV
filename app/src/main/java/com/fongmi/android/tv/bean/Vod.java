@@ -104,7 +104,7 @@ public class Vod {
     }
 
     public String getVodRemarks() {
-        return TextUtils.isEmpty(vodRemarks) ? "" : vodRemarks;
+        return TextUtils.isEmpty(vodRemarks) ? "" : vodRemarks.trim();
     }
 
     public String getVodYear() {

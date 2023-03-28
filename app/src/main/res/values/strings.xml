@@ -14,9 +14,6 @@
     <string name="live_epg_now">Playing: <xliff:g name="name">%s</xliff:g></string>
     <string name="live_line">Line <xliff:g name="name">%s</xliff:g></string>
 
-    <!-- Push -->
-    <string name="push_clip">Push clipboard content</string>
-
     <!-- Detail -->
     <string name="detail_title"><xliff:g name="name">%s</xliff:g> : <xliff:g name="name">%s</xliff:g></string>
     <string name="detail_site">Site: <xliff:g name="name">%s</xliff:g></string>
@@ -56,6 +53,7 @@
 
     <!-- Parse -->
     <string name="parse">Parse</string>
+    <string name="parse_god">Super</string>
     <string name="parse_from">Parse from: <xliff:g name="name">%s</xliff:g></string>
 
     <!-- Setting -->
@@ -83,12 +81,7 @@
     <string name="dialog_config_hint">Please enter the config…</string>
     <string name="dialog_config_url">Please enter the url…</string>
 
-    <!-- Ask -->
-    <string name="ask_keep_delete">Do you want to clear all keep records?</string>
-    <string name="ask_history_delete">Do you want to clear all history records?</string>
-
     <!-- Error -->
-    <string name="error_so_load">Failed to load FFmpeg</string>
     <string name="error_config_get">Configuration get failed</string>
     <string name="error_config_parse">Configuration parse failed</string>
     <string name="error_play_next">It\'s the last episode!</string>
@@ -140,6 +133,7 @@
         <item>Small</item>
         <item>Medium</item>
         <item>Large</item>
+        <item>Extra</item>
     </string-array>
 
     <string-array name="select_scale">

@@ -34,7 +34,7 @@ import com.fongmi.android.tv.ui.adapter.RecordAdapter;
 import com.fongmi.android.tv.ui.adapter.VodAdapter;
 import com.fongmi.android.tv.ui.adapter.WordAdapter;
 import com.fongmi.android.tv.ui.base.BaseActivity;
-import com.fongmi.android.tv.ui.custom.CustomListener;
+import com.fongmi.android.tv.ui.custom.CustomTextListener;
 import com.fongmi.android.tv.ui.custom.ViewType;
 import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
 import com.fongmi.android.tv.utils.PauseThreadPoolExecutor;
@@ -91,6 +91,7 @@ public class CollectActivity extends BaseActivity implements SiteCallback, WordA
         setRecyclerView();
         setLayoutSize();
         setViewModel();
+        setViewType();
         setKeyword();
         setSite();
         getHot();
@@ -99,13 +100,13 @@ public class CollectActivity extends BaseActivity implements SiteCallback, WordA
 
     @Override
     protected void initEvent() {
-        mBinding.view.setOnClickListener(this::switchView);
+        mBinding.view.setOnClickListener(this::toggleView);
         mBinding.site.setOnClickListener(v -> SiteDialog.create(this).search().show());
         mBinding.keyword.setOnEditorActionListener((textView, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) search();
             return true;
         });
-        mBinding.keyword.addTextChangedListener(new CustomListener() {
+        mBinding.keyword.addTextChangedListener(new CustomTextListener() {
             @Override
             public void afterTextChanged(Editable s) {
                 if (s.toString().isEmpty()) getHot();
@@ -125,6 +126,14 @@ public class CollectActivity extends BaseActivity implements SiteCallback, WordA
         mBinding.recordRecycler.setHasFixedSize(true);
         mBinding.recordRecycler.setAdapter(mRecordAdapter = new RecordAdapter(this));
         mVodAdapter.setSize(Product.getSpec(this, ResUtil.dp2px(64), 3));
+    }
+
+    private void setViewType() {
+        mVodAdapter.setViewType(Prefers.getViewType());
+        boolean grid = mVodAdapter.getViewType() == ViewType.GRID;
+        GridLayoutManager manager = (GridLayoutManager) mBinding.recycler.getLayoutManager();
+        mBinding.view.setImageResource(grid ? R.drawable.ic_view_list : R.drawable.ic_view_grid);
+        manager.setSpanCount(grid ? 2 : 1);
     }
 
     private void setLayoutSize() {
@@ -194,12 +203,10 @@ public class CollectActivity extends BaseActivity implements SiteCallback, WordA
         });
     }
 
-    private void switchView(View view) {
-        boolean grid = mVodAdapter.getViewType() == ViewType.GRID;
-        GridLayoutManager manager = (GridLayoutManager) mBinding.recycler.getLayoutManager();
-        mBinding.view.setImageResource(grid ? R.drawable.ic_view_grid : R.drawable.ic_view_list);
-        mVodAdapter.setViewType(grid ? ViewType.LIST : ViewType.GRID);
-        manager.setSpanCount(grid ? 1 : 2);
+    private void toggleView(View view) {
+        mVodAdapter.setViewType(mVodAdapter.getViewType() == ViewType.GRID ? ViewType.LIST : ViewType.GRID);
+        Prefers.putViewType(mVodAdapter.getViewType());
+        setViewType();
     }
 
     private void showAgent() {
