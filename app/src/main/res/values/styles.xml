@@ -34,7 +34,7 @@
         <item name="android:background">@drawable/shape_bottom_sheet</item>
     </style>
 
-    <style name="ThemeOverlay.App.BottomSheetDialog" parent="Theme.MaterialComponents.Light.BottomSheetDialog">
+    <style name="ThemeOverlay.App.BottomSheetDialog" parent="Theme.MaterialComponents.DayNight.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/ModalBottomSheetDialog</item>
         <item name="android:backgroundDimEnabled">false</item>
         <item name="android:windowIsFloating">false</item>
