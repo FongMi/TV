@@ -20,6 +20,9 @@ import androidx.core.app.ShareCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.media3.common.C;
+import androidx.media3.common.Player;
+import androidx.media3.ui.PlayerView;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
@@ -60,9 +63,6 @@ import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Traffic;
 import com.fongmi.android.tv.utils.Utils;
-import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.ui.StyledPlayerView;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.permissionx.guolindev.PermissionX;
 
@@ -164,7 +164,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         return mHistory != null && mHistory.getScale() != -1 ? mHistory.getScale() : Prefers.getScale();
     }
 
-    private StyledPlayerView getExo() {
+    private PlayerView getExo() {
         return Prefers.getRender() == 0 ? mBinding.surface : mBinding.texture;
     }
 
@@ -742,7 +742,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void checkPlayImg(boolean playing) {
-        mBinding.control.play.setImageResource(playing ? com.google.android.exoplayer2.ui.R.drawable.exo_icon_pause : com.google.android.exoplayer2.ui.R.drawable.exo_icon_play);
+        mBinding.control.play.setImageResource(playing ? androidx.media3.ui.R.drawable.exo_icon_pause : androidx.media3.ui.R.drawable.exo_icon_play);
         mPiP.update(this, playing);
     }
 

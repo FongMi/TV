@@ -1,6 +1,14 @@
 package com.fongmi.android.tv.player;
 
 import androidx.annotation.NonNull;
+import androidx.media3.common.PlaybackException;
+import androidx.media3.common.Player;
+import androidx.media3.common.TrackSelectionOverride;
+import androidx.media3.common.util.Util;
+import androidx.media3.exoplayer.DefaultLoadControl;
+import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.exoplayer.analytics.AnalyticsListener;
+import androidx.media3.ui.PlayerView;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
@@ -16,14 +24,6 @@ import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.github.catvod.crawler.SpiderDebug;
-import com.google.android.exoplayer2.DefaultLoadControl;
-import com.google.android.exoplayer2.ExoPlayer;
-import com.google.android.exoplayer2.PlaybackException;
-import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.analytics.AnalyticsListener;
-import com.google.android.exoplayer2.trackselection.TrackSelectionOverride;
-import com.google.android.exoplayer2.ui.StyledPlayerView;
-import com.google.android.exoplayer2.util.Util;
 import com.google.common.collect.ImmutableList;
 
 import java.util.Formatter;
@@ -66,14 +66,14 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         return this;
     }
 
-    public void set(StyledPlayerView exo, IjkVideoView ijk) {
+    public void set(PlayerView exo, IjkVideoView ijk) {
         releaseExo();
         releaseIjk();
         setupExo(exo);
         setupIjk(ijk);
     }
 
-    private void setupExo(StyledPlayerView view) {
+    private void setupExo(PlayerView view) {
         exoPlayer = new ExoPlayer.Builder(App.get()).setLoadControl(new DefaultLoadControl()).setRenderersFactory(ExoUtil.buildRenderersFactory()).setTrackSelector(ExoUtil.buildTrackSelector()).build();
         exoPlayer.addAnalyticsListener(this);
         exoPlayer.setPlayWhenReady(true);
