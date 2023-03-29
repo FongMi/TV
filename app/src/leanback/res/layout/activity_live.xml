@@ -14,7 +14,7 @@
         android:clickable="true"
         android:focusable="true">
 
-        <com.google.android.exoplayer2.ui.StyledPlayerView
+        <androidx.media3.ui.PlayerView
             android:id="@+id/surface"
             style="@style/Player.Live"
             android:layout_width="match_parent"
@@ -22,7 +22,7 @@
             android:visibility="gone"
             app:surface_type="surface_view" />
 
-        <com.google.android.exoplayer2.ui.StyledPlayerView
+        <androidx.media3.ui.PlayerView
             android:id="@+id/texture"
             style="@style/Player.Live"
             android:layout_width="match_parent"
