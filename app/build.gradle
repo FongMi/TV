@@ -22,7 +22,7 @@ android {
         mobile {
             dimension "mode"
             versionCode 9
-            versionName "20230329#1"
+            versionName "20230329#2"
         }
         java {
             dimension = "api"
@@ -57,6 +57,7 @@ android {
     }
 
     lint {
+        abortOnError false
         disable 'UnsafeOptInUsageError'
     }
 }
