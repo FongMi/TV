@@ -30,7 +30,7 @@ import com.fongmi.android.tv.ui.custom.dialog.ConfigDialog;
 import com.fongmi.android.tv.ui.custom.dialog.HistoryDialog;
 import com.fongmi.android.tv.ui.custom.dialog.LiveDialog;
 import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
-import com.fongmi.android.tv.utils.FileChooser;
+import com.fongmi.android.tv.ui.custom.FileChooser;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
@@ -61,8 +61,8 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
     @Override
     protected void initView() {
         mBinding.vodUrl.setText(ApiConfig.getDesc());
-        mBinding.wallUrl.setText(WallConfig.getUrl());
         mBinding.liveUrl.setText(LiveConfig.getDesc());
+        mBinding.wallUrl.setText(WallConfig.getDesc());
         mBinding.versionText.setText(BuildConfig.VERSION_NAME);
         mBinding.sizeText.setText((size = ResUtil.getStringArray(R.array.select_size))[Prefers.getSize()]);
         mBinding.scaleText.setText((scale = ResUtil.getStringArray(R.array.select_scale))[Prefers.getScale()]);
@@ -114,7 +114,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
                 break;
             case 2:
                 Notify.progress(getActivity(), true);
-                mBinding.wallUrl.setText(config.getUrl());
+                mBinding.wallUrl.setText(config.getDesc());
                 WallConfig.get().clear().config(config).load(getCallback(config));
                 break;
         }
@@ -143,7 +143,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
                 RefreshEvent.video();
                 mBinding.vodUrl.setText(ApiConfig.getDesc());
                 mBinding.liveUrl.setText(LiveConfig.getDesc());
-                mBinding.wallUrl.setText(WallConfig.getUrl());
+                mBinding.wallUrl.setText(WallConfig.getDesc());
                 break;
             case 1:
                 Notify.dismiss();
@@ -151,7 +151,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
                 break;
             case 2:
                 Notify.dismiss();
-                mBinding.wallUrl.setText(WallConfig.getUrl());
+                mBinding.wallUrl.setText(WallConfig.getDesc());
                 break;
         }
     }

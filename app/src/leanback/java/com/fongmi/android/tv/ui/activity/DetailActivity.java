@@ -17,6 +17,9 @@ import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.ItemBridgeAdapter;
 import androidx.leanback.widget.OnChildViewHolderSelectedListener;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.media3.common.C;
+import androidx.media3.common.Player;
+import androidx.media3.ui.PlayerView;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
@@ -57,9 +60,6 @@ import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Traffic;
 import com.fongmi.android.tv.utils.Utils;
-import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.ui.StyledPlayerView;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -167,7 +167,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         return mHistory != null && mHistory.getScale() != -1 ? mHistory.getScale() : Prefers.getScale();
     }
 
-    private StyledPlayerView getExo() {
+    private PlayerView getExo() {
         return Prefers.getRender() == 0 ? mBinding.surface : mBinding.texture;
     }
 

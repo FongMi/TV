@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 
 import com.fongmi.android.tv.databinding.ActivityDetailBinding;
-import com.fongmi.android.tv.utils.PiP;
+import com.fongmi.android.tv.ui.custom.PiP;
 
 public class PiPReceiver extends BroadcastReceiver {
 

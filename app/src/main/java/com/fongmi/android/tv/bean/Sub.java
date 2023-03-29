@@ -3,7 +3,8 @@ package com.fongmi.android.tv.bean;
 import android.net.Uri;
 import android.text.TextUtils;
 
-import com.google.android.exoplayer2.MediaItem;
+import androidx.media3.common.MediaItem;
+
 import com.google.gson.annotations.SerializedName;
 
 public class Sub {
