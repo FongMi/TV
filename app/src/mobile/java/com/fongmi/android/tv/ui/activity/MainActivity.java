@@ -22,6 +22,7 @@ import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.FragmentStateManager;
 import com.fongmi.android.tv.ui.fragment.SettingFragment;
 import com.fongmi.android.tv.ui.fragment.VodFragment;
+import com.fongmi.android.tv.ui.custom.FileChooser;
 import com.fongmi.android.tv.utils.Notify;
 import com.google.android.material.navigation.NavigationBarView;
 
@@ -57,8 +58,12 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
     }
 
     private void checkAction(Intent intent) {
-        boolean push = ApiConfig.hasPush() && intent.getAction() != null && intent.getAction().equals(Intent.ACTION_SEND) && intent.getType().equals("text/plain");
-        if (push) DetailActivity.push(this, intent.getStringExtra(Intent.EXTRA_TEXT));
+        boolean push = ApiConfig.hasPush() && intent.getAction() != null;
+        if (push && intent.getAction().equals(Intent.ACTION_SEND) && intent.getType().equals("text/plain")) {
+            DetailActivity.push(this, intent.getStringExtra(Intent.EXTRA_TEXT));
+        } else if (push && intent.getAction().equals(Intent.ACTION_VIEW)) {
+            DetailActivity.file(this, FileChooser.getPathFromUri(this, intent.getData()));
+        }
     }
 
     private void initFragment(Bundle savedInstanceState) {
