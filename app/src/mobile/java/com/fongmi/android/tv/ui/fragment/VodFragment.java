@@ -37,7 +37,7 @@ import com.fongmi.android.tv.ui.custom.dialog.LinkDialog;
 import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
 import com.fongmi.android.tv.ui.fragment.child.HomeFragment;
 import com.fongmi.android.tv.ui.fragment.child.TypeFragment;
-import com.fongmi.android.tv.utils.FileChooser;
+import com.fongmi.android.tv.ui.custom.FileChooser;
 import com.fongmi.android.tv.utils.Prefers;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 

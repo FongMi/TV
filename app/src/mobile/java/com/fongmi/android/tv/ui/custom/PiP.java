@@ -1,4 +1,4 @@
-package com.fongmi.android.tv.utils;
+package com.fongmi.android.tv.ui.custom;
 
 import android.app.Activity;
 import android.app.PendingIntent;
@@ -12,6 +12,8 @@ import android.util.Rational;
 import android.view.View;
 
 import androidx.media3.ui.R;
+
+import com.fongmi.android.tv.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
