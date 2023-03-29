@@ -146,8 +146,7 @@ public class Config {
     }
 
     public static void delete(String url, int type) {
-        if (type == 2) AppDatabase.get().getConfigDao().delete(type);
-        else AppDatabase.get().getConfigDao().delete(url, type);
+        AppDatabase.get().getConfigDao().delete(url, type);
     }
 
     public static Config vod() {
@@ -172,6 +171,16 @@ public class Config {
     public static Config find(String url, int type) {
         Config item = AppDatabase.get().getConfigDao().find(url, type);
         return item == null ? create(url, type) : item.type(type);
+    }
+
+    public static Config find(String url, String name, int type) {
+        Config item = AppDatabase.get().getConfigDao().find(url, type);
+        return item == null ? create(url, name, type) : item.type(type).name(name);
+    }
+
+    public static Config find(Config config, int type) {
+        Config item = AppDatabase.get().getConfigDao().find(config.getUrl(), type);
+        return item == null ? create(config.getUrl(), config.getName(), type) : item.type(type).name(config.getName());
     }
 
     public static Config find(Depot depot, int type) {

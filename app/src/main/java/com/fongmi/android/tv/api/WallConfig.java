@@ -19,6 +19,7 @@ public class WallConfig {
 
     private Drawable drawable;
     private Config config;
+    private boolean same;
 
     private static class Loader {
         static volatile WallConfig INSTANCE = new WallConfig();
@@ -30,6 +31,10 @@ public class WallConfig {
 
     public static String getUrl() {
         return get().getConfig().getUrl();
+    }
+
+    public static String getDesc() {
+        return get().getConfig().getDesc();
     }
 
     public static Drawable drawable(Drawable drawable) {
@@ -45,16 +50,13 @@ public class WallConfig {
 
     public WallConfig config(Config config) {
         this.config = config;
+        this.same = config.getUrl().equals(ApiConfig.get().getWall());
         return this;
     }
 
     public WallConfig clear() {
         this.config = null;
         return this;
-    }
-
-    public void setUrl(String url) {
-        this.config = Config.find(url, 2);
     }
 
     public Config getConfig() {
@@ -77,12 +79,12 @@ public class WallConfig {
         try {
             File file = write(FileUtil.getWall(0));
             if (file.exists() && file.length() > 0) refresh(0);
-            else setUrl(ApiConfig.get().getWall());
+            else config(Config.find(ApiConfig.get().getWall(), 2));
             App.post(callback::success);
             config.update();
         } catch (Exception e) {
             App.post(() -> callback.error(R.string.error_config_parse));
-            setUrl(ApiConfig.get().getWall());
+            config(Config.find(ApiConfig.get().getWall(), 2));
             e.printStackTrace();
         }
     }
@@ -92,6 +94,10 @@ public class WallConfig {
         else if (getUrl().startsWith("http")) FileUtil.write(file, Product.resize(OkHttp.newCall(getUrl()).execute().body().bytes()));
         else file.delete();
         return file;
+    }
+
+    public boolean isSame(String url) {
+        return same || config.getUrl().isEmpty() || url.equals(config.getUrl());
     }
 
     public static void refresh(int index) {

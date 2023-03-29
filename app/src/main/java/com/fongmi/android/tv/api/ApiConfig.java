@@ -180,10 +180,8 @@ public class ApiConfig {
     }
 
     private void initLive(JsonObject object) {
-        boolean hasLive = object.has("lives");
-        if (hasLive) Config.create(config.getUrl(), 1);
-        boolean loadApi = hasLive && LiveConfig.get().isSame(config.getUrl());
-        if (loadApi) LiveConfig.get().clear().config(Config.find(config.getUrl(), 1).update()).parse(object);
+        boolean load = object.has("lives") && LiveConfig.get().isSame(config.getUrl());
+        if (load) LiveConfig.get().clear().config(Config.find(config, 1).update()).parse(object);
         else LiveConfig.get().load();
     }
 
@@ -304,8 +302,9 @@ public class ApiConfig {
     }
 
     private void setWall(String wall) {
-        if (Config.wall().getUrl().isEmpty()) WallConfig.get().setUrl(wall);
         this.wall = wall;
+        boolean load = !TextUtils.isEmpty(wall) && WallConfig.get().isSame(wall);
+        if (load) WallConfig.get().config(Config.find(wall, config.getName(), 2).update());
     }
 
     public Site getHome() {
