@@ -1,4 +1,4 @@
-package com.fongmi.android.tv.utils;
+package com.fongmi.android.tv.ui.custom;
 
 import android.content.Context;
 import android.content.Intent;
