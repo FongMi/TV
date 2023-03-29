@@ -1,6 +1,6 @@
 package com.fongmi.android.tv.event;
 
-import com.google.android.exoplayer2.Player;
+import androidx.media3.common.Player;
 
 import org.greenrobot.eventbus.EventBus;
 
