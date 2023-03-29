@@ -5,6 +5,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.media3.common.Tracks;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.bean.Track;
@@ -13,7 +14,6 @@ import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.adapter.TrackAdapter;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.ui.custom.TrackNameProvider;
-import com.google.android.exoplayer2.Tracks;
 
 import java.util.ArrayList;
 import java.util.List;
