@@ -5,13 +5,13 @@ import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.media3.common.C;
+import androidx.media3.common.Format;
+import androidx.media3.common.MimeTypes;
+import androidx.media3.common.util.Util;
+import androidx.media3.ui.R;
 
 import com.fongmi.android.tv.App;
-import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.Format;
-import com.google.android.exoplayer2.ui.R;
-import com.google.android.exoplayer2.util.MimeTypes;
-import com.google.android.exoplayer2.util.Util;
 
 import java.util.Locale;
 
@@ -31,9 +31,9 @@ public class TrackNameProvider {
         if (trackType == C.TRACK_TYPE_VIDEO) {
             trackName = joinWithSeparator(buildRoleString(format), buildResolutionString(format), buildBitrateString(format));
         } else if (trackType == C.TRACK_TYPE_AUDIO) {
-            trackName = joinWithSeparator(buildLanguageOrLabelString(format), buildAudioChannelString(format), buildBitrateString(format));
+            trackName = joinWithSeparator(buildLanguageOrLabelString(format), buildAudioChannelString(format), buildMimeString(format), buildBitrateString(format));
         } else {
-            trackName = joinWithSeparator(buildLanguageString(format), buildLabelString(format));
+            trackName = joinWithSeparator(buildLanguageString(format), buildLabelString(format), buildMimeString(format));
         }
         return TextUtils.isEmpty(trackName) ? resources.getString(R.string.exo_track_unknown) : trackName;
     }
@@ -138,7 +138,7 @@ public class TrackNameProvider {
         return itemList;
     }
 
-    private static int inferPrimaryTrackType(Format format) {
+    private int inferPrimaryTrackType(Format format) {
         int trackType = MimeTypes.getTrackType(format.sampleMimeType);
         if (trackType != C.TRACK_TYPE_UNKNOWN) return trackType;
         if (MimeTypes.getVideoMediaMimeType(format.codecs) != null) return C.TRACK_TYPE_VIDEO;
@@ -146,5 +146,65 @@ public class TrackNameProvider {
         if (format.width != Format.NO_VALUE || format.height != Format.NO_VALUE) return C.TRACK_TYPE_VIDEO;
         if (format.channelCount != Format.NO_VALUE || format.sampleRate != Format.NO_VALUE) return C.TRACK_TYPE_AUDIO;
         return C.TRACK_TYPE_UNKNOWN;
+    }
+
+    private String buildMimeString(Format format) {
+        if (format.sampleMimeType == null) return "";
+        switch (format.sampleMimeType) {
+            case MimeTypes.AUDIO_DTS:
+                return "DTS";
+            case MimeTypes.AUDIO_DTS_HD:
+                return "DTS-HD";
+            case MimeTypes.AUDIO_DTS_EXPRESS:
+                return "DTS Express";
+            case MimeTypes.AUDIO_TRUEHD:
+                return "TrueHD";
+            case MimeTypes.AUDIO_AC3:
+                return "AC-3";
+            case MimeTypes.AUDIO_E_AC3:
+                return "E-AC-3";
+            case MimeTypes.AUDIO_E_AC3_JOC:
+                return "E-AC-3-JOC";
+            case MimeTypes.AUDIO_AC4:
+                return "AC-4";
+            case MimeTypes.AUDIO_AAC:
+                return "AAC";
+            case MimeTypes.AUDIO_MPEG:
+                return "MP3";
+            case MimeTypes.AUDIO_MPEG_L2:
+                return "MP2";
+            case MimeTypes.AUDIO_VORBIS:
+                return "Vorbis";
+            case MimeTypes.AUDIO_OPUS:
+                return "Opus";
+            case MimeTypes.AUDIO_FLAC:
+                return "FLAC";
+            case MimeTypes.AUDIO_ALAC:
+                return "ALAC";
+            case MimeTypes.AUDIO_WAV:
+                return "WAV";
+            case MimeTypes.AUDIO_AMR:
+                return "AMR";
+            case MimeTypes.AUDIO_AMR_NB:
+                return "AMR-NB";
+            case MimeTypes.AUDIO_AMR_WB:
+                return "AMR-WB";
+            case MimeTypes.APPLICATION_PGS:
+                return "PGS";
+            case MimeTypes.APPLICATION_SUBRIP:
+                return "SRT";
+            case MimeTypes.TEXT_SSA:
+                return "SSA";
+            case MimeTypes.TEXT_VTT:
+                return "VTT";
+            case MimeTypes.APPLICATION_TTML:
+                return "TTML";
+            case MimeTypes.APPLICATION_TX3G:
+                return "TX3G";
+            case MimeTypes.APPLICATION_DVBSUBS:
+                return "DVB";
+            default:
+                return "";
+        }
     }
 }

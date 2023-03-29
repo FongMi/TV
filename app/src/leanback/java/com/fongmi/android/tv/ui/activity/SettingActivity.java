@@ -35,7 +35,13 @@ import com.permissionx.guolindev.PermissionX;
 public class SettingActivity extends BaseActivity implements ConfigCallback, SiteCallback, LiveCallback {
 
     private ActivitySettingBinding mBinding;
-    private Config config;
+    private String[] quality;
+    private String[] render;
+    private String[] decode;
+    private String[] player;
+    private String[] scale;
+    private String[] size;
+    private int type;
 
     public static void start(Activity activity) {
         activity.startActivity(new Intent(activity, SettingActivity.class));
@@ -48,27 +54,27 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
 
     @Override
     protected void initView() {
-        mBinding.vodUrl.setText(ApiConfig.getUrl());
-        mBinding.liveUrl.setText(LiveConfig.getUrl());
-        mBinding.wallUrl.setText(WallConfig.getUrl());
+        mBinding.vodUrl.setText(ApiConfig.getDesc());
+        mBinding.liveUrl.setText(LiveConfig.getDesc());
+        mBinding.wallUrl.setText(WallConfig.getDesc());
         mBinding.versionText.setText(BuildConfig.VERSION_NAME);
-        mBinding.sizeText.setText(ResUtil.getStringArray(R.array.select_size)[Prefers.getSize()]);
-        mBinding.scaleText.setText(ResUtil.getStringArray(R.array.select_scale)[Prefers.getScale()]);
-        mBinding.playerText.setText(ResUtil.getStringArray(R.array.select_player)[Prefers.getPlayer()]);
-        mBinding.decodeText.setText(ResUtil.getStringArray(R.array.select_decode)[Prefers.getDecode()]);
-        mBinding.renderText.setText(ResUtil.getStringArray(R.array.select_render)[Prefers.getRender()]);
-        mBinding.qualityText.setText(ResUtil.getStringArray(R.array.select_quality)[Prefers.getQuality()]);
+        mBinding.sizeText.setText((size = ResUtil.getStringArray(R.array.select_size))[Prefers.getSize()]);
+        mBinding.scaleText.setText((scale = ResUtil.getStringArray(R.array.select_scale))[Prefers.getScale()]);
+        mBinding.playerText.setText((player = ResUtil.getStringArray(R.array.select_player))[Prefers.getPlayer()]);
+        mBinding.decodeText.setText((decode = ResUtil.getStringArray(R.array.select_decode))[Prefers.getDecode()]);
+        mBinding.renderText.setText((render = ResUtil.getStringArray(R.array.select_render))[Prefers.getRender()]);
+        mBinding.qualityText.setText((quality = ResUtil.getStringArray(R.array.select_quality))[Prefers.getQuality()]);
     }
 
     @Override
     protected void initEvent() {
         mBinding.vodHome.setOnClickListener(view -> SiteDialog.create(this).all().show());
         mBinding.liveHome.setOnClickListener(view -> LiveDialog.create(this).show());
-        mBinding.vod.setOnClickListener(view -> ConfigDialog.create(this).type(0).show());
-        mBinding.live.setOnClickListener(view -> ConfigDialog.create(this).type(1).show());
-        mBinding.wall.setOnClickListener(view -> ConfigDialog.create(this).type(2).show());
-        mBinding.vodHistory.setOnClickListener(view -> HistoryDialog.create(this).type(0).show());
-        mBinding.liveHistory.setOnClickListener(view -> HistoryDialog.create(this).type(1).show());
+        mBinding.vod.setOnClickListener(view -> ConfigDialog.create(this).type(type = 0).show());
+        mBinding.live.setOnClickListener(view -> ConfigDialog.create(this).type(type = 1).show());
+        mBinding.wall.setOnClickListener(view -> ConfigDialog.create(this).type(type = 2).show());
+        mBinding.vodHistory.setOnClickListener(view -> HistoryDialog.create(this).type(type = 0).show());
+        mBinding.liveHistory.setOnClickListener(view -> HistoryDialog.create(this).type(type = 1).show());
         mBinding.wallDefault.setOnClickListener(view -> setWallDefault());
         mBinding.wallRefresh.setOnClickListener(view -> setWallRefresh());
         mBinding.version.setOnLongClickListener(view -> onVersion(true));
@@ -83,38 +89,33 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
 
     @Override
     public void setConfig(Config config) {
-        this.config = config;
-        checkPermission();
-    }
-
-    private void checkPermission() {
         if (config.getUrl().startsWith("file") && !Utils.hasPermission(this)) {
-            PermissionX.init(this).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> loadConfig());
+            PermissionX.init(this).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> load(config));
         } else {
-            loadConfig();
+            load(config);
         }
     }
 
-    private void loadConfig() {
+    private void load(Config config) {
         switch (config.getType()) {
             case 0:
                 Notify.progress(this);
-                mBinding.vodUrl.setText(config.getUrl());
-                ApiConfig.get().clear().config(config).load(getCallback());
+                mBinding.vodUrl.setText(config.getDesc());
+                ApiConfig.get().clear().config(config).load(getCallback(config));
                 break;
             case 1:
                 Notify.progress(this);
-                mBinding.liveUrl.setText(config.getUrl());
-                LiveConfig.get().clear().config(config).load(getCallback());
+                mBinding.liveUrl.setText(config.getDesc());
+                LiveConfig.get().clear().config(config).load(getCallback(config));
                 break;
             case 2:
-                mBinding.wallUrl.setText(config.getUrl());
-                WallConfig.get().clear().config(config).load(getCallback());
+                mBinding.wallUrl.setText(config.getDesc());
+                WallConfig.get().clear().config(config).load(getCallback(config));
                 break;
         }
     }
 
-    private Callback getCallback() {
+    private Callback getCallback(Config config) {
         return new Callback() {
             @Override
             public void success() {
@@ -131,14 +132,14 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
     }
 
     private void setConfig() {
-        switch (config.getType()) {
+        switch (type) {
             case 0:
                 Notify.dismiss();
                 RefreshEvent.video();
                 RefreshEvent.history();
-                mBinding.vodUrl.setText(ApiConfig.getUrl());
-                mBinding.liveUrl.setText(LiveConfig.getUrl());
-                mBinding.wallUrl.setText(WallConfig.getUrl());
+                mBinding.vodUrl.setText(ApiConfig.getDesc());
+                mBinding.liveUrl.setText(LiveConfig.getDesc());
+                mBinding.wallUrl.setText(WallConfig.getDesc());
                 break;
             case 1:
                 Notify.dismiss();
@@ -173,45 +174,39 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
 
     private void setQuality() {
         int index = Prefers.getQuality();
-        String[] array = ResUtil.getStringArray(R.array.select_quality);
-        Prefers.putQuality(index = index == array.length - 1 ? 0 : ++index);
-        mBinding.qualityText.setText(array[index]);
+        Prefers.putQuality(index = index == quality.length - 1 ? 0 : ++index);
+        mBinding.qualityText.setText(quality[index]);
         RefreshEvent.image();
     }
 
     private void setPlayer() {
         int index = Prefers.getPlayer();
-        String[] array = ResUtil.getStringArray(R.array.select_player);
-        Prefers.putPlayer(index = index == array.length - 1 ? 0 : ++index);
-        mBinding.playerText.setText(array[index]);
+        Prefers.putPlayer(index = index == player.length - 1 ? 0 : ++index);
+        mBinding.playerText.setText(player[index]);
     }
 
     private void setDecode() {
         int index = Prefers.getDecode();
-        String[] array = ResUtil.getStringArray(R.array.select_decode);
-        Prefers.putDecode(index = index == array.length - 1 ? 0 : ++index);
-        mBinding.decodeText.setText(array[index]);
+        Prefers.putDecode(index = index == decode.length - 1 ? 0 : ++index);
+        mBinding.decodeText.setText(decode[index]);
     }
 
     private void setRender() {
         int index = Prefers.getRender();
-        String[] array = ResUtil.getStringArray(R.array.select_render);
-        Prefers.putRender(index = index == array.length - 1 ? 0 : ++index);
-        mBinding.renderText.setText(array[index]);
+        Prefers.putRender(index = index == render.length - 1 ? 0 : ++index);
+        mBinding.renderText.setText(render[index]);
     }
 
     private void setScale() {
         int index = Prefers.getScale();
-        String[] array = ResUtil.getStringArray(R.array.select_scale);
-        Prefers.putScale(index = index == array.length - 1 ? 0 : ++index);
-        mBinding.scaleText.setText(array[index]);
+        Prefers.putScale(index = index == scale.length - 1 ? 0 : ++index);
+        mBinding.scaleText.setText(scale[index]);
     }
 
     private void setSize() {
         int index = Prefers.getSize();
-        String[] array = ResUtil.getStringArray(R.array.select_size);
-        Prefers.putSize(index = index == array.length - 1 ? 0 : ++index);
-        mBinding.sizeText.setText(array[index]);
+        Prefers.putSize(index = index == size.length - 2 ? 0 : ++index);
+        mBinding.sizeText.setText(size[index]);
         RefreshEvent.size();
     }
 

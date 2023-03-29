@@ -1,4 +1,4 @@
-package com.fongmi.android.tv.utils;
+package com.fongmi.android.tv.ui.custom;
 
 import android.app.Activity;
 import android.app.PendingIntent;
@@ -10,6 +10,10 @@ import android.graphics.drawable.Icon;
 import android.os.Build;
 import android.util.Rational;
 import android.view.View;
+
+import androidx.media3.ui.R;
+
+import com.fongmi.android.tv.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,10 +46,10 @@ public class PiP {
     public void update(Activity activity, boolean play) {
         if (!Utils.hasPiP()) return;
         List<RemoteAction> actions = new ArrayList<>();
-        int icon = play ? com.google.android.exoplayer2.ui.R.drawable.exo_icon_pause : com.google.android.exoplayer2.ui.R.drawable.exo_icon_play;
-        actions.add(new RemoteAction(Icon.createWithResource(activity, com.google.android.exoplayer2.ui.R.drawable.exo_icon_previous), "", "", PendingIntent.getBroadcast(activity, CONTROL_TYPE_PREV, new Intent(ACTION_MEDIA_CONTROL).putExtra(EXTRA_CONTROL_TYPE, CONTROL_TYPE_PREV), PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE)));
+        int icon = play ? R.drawable.exo_icon_pause : R.drawable.exo_icon_play;
+        actions.add(new RemoteAction(Icon.createWithResource(activity, R.drawable.exo_icon_previous), "", "", PendingIntent.getBroadcast(activity, CONTROL_TYPE_PREV, new Intent(ACTION_MEDIA_CONTROL).putExtra(EXTRA_CONTROL_TYPE, CONTROL_TYPE_PREV), PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE)));
         actions.add(new RemoteAction(Icon.createWithResource(activity, icon), "", "", PendingIntent.getBroadcast(activity, play ? CONTROL_TYPE_PAUSE : CONTROL_TYPE_PLAY, new Intent(ACTION_MEDIA_CONTROL).putExtra(EXTRA_CONTROL_TYPE, play ? CONTROL_TYPE_PAUSE : CONTROL_TYPE_PLAY), PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE)));
-        actions.add(new RemoteAction(Icon.createWithResource(activity, com.google.android.exoplayer2.ui.R.drawable.exo_icon_next), "", "", PendingIntent.getBroadcast(activity, CONTROL_TYPE_NEXT, new Intent(ACTION_MEDIA_CONTROL).putExtra(EXTRA_CONTROL_TYPE, CONTROL_TYPE_NEXT), PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE)));
+        actions.add(new RemoteAction(Icon.createWithResource(activity, R.drawable.exo_icon_next), "", "", PendingIntent.getBroadcast(activity, CONTROL_TYPE_NEXT, new Intent(ACTION_MEDIA_CONTROL).putExtra(EXTRA_CONTROL_TYPE, CONTROL_TYPE_NEXT), PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE)));
         activity.setPictureInPictureParams(builder.setActions(actions).build());
     }
 
