@@ -473,7 +473,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onDesc() {
-        String desc = mBinding.content.getTag().toString().trim();
+        String desc = mBinding.content.getTag().toString();
         if (desc.length() > 0) DescDialog.show(this, desc);
     }
 
