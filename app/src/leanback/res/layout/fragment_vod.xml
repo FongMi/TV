@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.fongmi.android.tv.ui.custom.ProgressLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/progressLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -18,4 +17,9 @@
         app:focusOutEnd="true"
         app:focusOutFront="true" />
 
-</com.fongmi.android.tv.ui.custom.ProgressLayout>
+    <include
+        android:id="@+id/progress"
+        layout="@layout/view_progress"
+        android:visibility="gone" />
+
+</FrameLayout>
