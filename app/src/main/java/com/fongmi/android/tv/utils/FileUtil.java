@@ -163,7 +163,7 @@ public class FileUtil {
     public static void clearDir(File dir) {
         if (dir == null) return;
         if (dir.isDirectory()) for (File file : dir.listFiles()) clearDir(file);
-        if (dir.delete()) Log.d(TAG, "Deleted:" + dir.getPath());
+        if (dir.delete()) Log.d(TAG, "Deleted:" + dir.getAbsolutePath());
     }
 
     public static void openFile(File file) {
