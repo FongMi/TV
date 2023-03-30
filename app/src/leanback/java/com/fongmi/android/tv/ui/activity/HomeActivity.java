@@ -30,7 +30,7 @@ import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.event.ServerEvent;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.net.Callback;
-import com.fongmi.android.tv.server.Server;
+import com.fongmi.android.tv.service.NanoService;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.CustomRowPresenter;
 import com.fongmi.android.tv.ui.custom.CustomSelector;
@@ -71,7 +71,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     protected void initView() {
         mBinding.progressLayout.showProgress();
         Updater.get().start();
-        Server.get().start();
+        NanoService.start();
         setRecyclerView();
         setViewModel();
         setAdapter();
@@ -350,6 +350,5 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         WallConfig.get().clear();
         LiveConfig.get().clear();
         ApiConfig.get().clear();
-        Server.get().stop();
     }
 }
