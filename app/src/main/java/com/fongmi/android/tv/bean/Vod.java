@@ -124,7 +124,7 @@ public class Vod {
     }
 
     public String getVodContent() {
-        return TextUtils.isEmpty(vodContent) ? "" : vodContent.trim();
+        return TextUtils.isEmpty(vodContent) ? "" : vodContent.trim().replace("\n", "<br>");
     }
 
     public String getVodPlayFrom() {
