@@ -69,6 +69,7 @@ dependencies {
     implementation project(':catvod')
     implementation project(':forcetech')
     implementation project(':ijkplayer')
+    pythonImplementation project(':pyramid')
     implementation project(':media-lib-database')
     implementation project(':media-lib-datasource')
     implementation project(':media-lib-datasource-rtmp')
@@ -82,7 +83,6 @@ dependencies {
     implementation project(':media-lib-extractor')
     implementation project(':media-lib-session')
     implementation project(':media-lib-ui')
-    pythonImplementation project(':pyramid')
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.5.1'
     implementation 'androidx.preference:preference:1.2.0'
