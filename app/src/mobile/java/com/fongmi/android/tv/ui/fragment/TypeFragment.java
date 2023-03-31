@@ -1,4 +1,4 @@
-package com.fongmi.android.tv.ui.fragment.child;
+package com.fongmi.android.tv.ui.fragment;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -16,7 +16,7 @@ import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Vod;
-import com.fongmi.android.tv.databinding.FragmentVodChildBinding;
+import com.fongmi.android.tv.databinding.FragmentTypeBinding;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.ui.activity.CollectActivity;
 import com.fongmi.android.tv.ui.activity.DetailActivity;
@@ -32,11 +32,20 @@ import java.util.List;
 public class TypeFragment extends BaseFragment implements CustomScroller.Callback, VodAdapter.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     private HashMap<String, String> mExtends;
-    private FragmentVodChildBinding mBinding;
+    private FragmentTypeBinding mBinding;
     private CustomScroller mScroller;
     private SiteViewModel mViewModel;
     private List<String> mTypeIds;
     private VodAdapter mAdapter;
+
+    public static TypeFragment newInstance(Result result) {
+        Bundle args = new Bundle();
+        args.putString("typeId", "home");
+        args.putString("result", result.toString());
+        TypeFragment fragment = new TypeFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     public static TypeFragment newInstance(String typeId, boolean folder) {
         Bundle args = new Bundle();
@@ -55,9 +64,17 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         return getArguments().getBoolean("folder");
     }
 
+    private boolean isHome() {
+        return getTypeId().equals("home");
+    }
+
+    private String getResult() {
+        return getArguments().getString("result");
+    }
+
     @Override
     protected ViewBinding getBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
-        return mBinding = FragmentVodChildBinding.inflate(inflater, container, false);
+        return mBinding = FragmentTypeBinding.inflate(inflater, container, false);
     }
 
     @Override
@@ -119,7 +136,8 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         if (isFolder()) mBinding.recycler.scrollToPosition(0);
         if (page.equals("1")) mAdapter.clear();
         if (page.equals("1") && !mBinding.swipeLayout.isRefreshing()) mBinding.progressLayout.showProgress();
-        mViewModel.categoryContent(ApiConfig.get().getHome().getKey(), typeId, page, true, mExtends);
+        if (isHome()) setAdapter(Result.fromJson(getResult()));
+        else mViewModel.categoryContent(ApiConfig.get().getHome().getKey(), typeId, page, true, mExtends);
     }
 
     private void refresh(int num) {
@@ -136,7 +154,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     @Override
     public void onLoadMore(String page) {
-        if (isFolder()) return;
+        if (isFolder() || isHome()) return;
         mScroller.setLoading(true);
         getVideo(getTypeId(), page);
     }
