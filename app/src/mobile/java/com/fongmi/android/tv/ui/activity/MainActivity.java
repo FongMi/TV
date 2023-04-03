@@ -88,7 +88,6 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
             public void success() {
                 checkAction(getIntent());
                 RefreshEvent.video();
-                Notify.dismiss();
             }
 
             @Override
