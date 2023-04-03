@@ -82,6 +82,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         mTypeIds = new ArrayList<>();
         mExtends = new HashMap<>();
         mScroller = new CustomScroller(this);
+        mBinding.swipeLayout.setEnabled(!isHome());
         setRecyclerView();
         setViewModel();
     }
