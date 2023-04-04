@@ -88,43 +88,43 @@ public class Vod {
     }
 
     public String getVodId() {
-        return TextUtils.isEmpty(vodId) ? "" : vodId;
+        return TextUtils.isEmpty(vodId) ? "" : vodId.trim();
     }
 
     public String getVodName() {
-        return TextUtils.isEmpty(vodName) ? "" : vodName;
+        return TextUtils.isEmpty(vodName) ? "" : vodName.trim();
     }
 
     public String getTypeName() {
-        return TextUtils.isEmpty(typeName) ? "" : typeName;
+        return TextUtils.isEmpty(typeName) ? "" : typeName.trim();
     }
 
     public String getVodPic() {
-        return TextUtils.isEmpty(vodPic) ? "" : vodPic;
+        return TextUtils.isEmpty(vodPic) ? "" : vodPic.trim();
     }
 
     public String getVodRemarks() {
-        return TextUtils.isEmpty(vodRemarks) ? "" : vodRemarks;
+        return TextUtils.isEmpty(vodRemarks) ? "" : vodRemarks.trim();
     }
 
     public String getVodYear() {
-        return TextUtils.isEmpty(vodYear) ? "" : vodYear;
+        return TextUtils.isEmpty(vodYear) ? "" : vodYear.trim();
     }
 
     public String getVodArea() {
-        return TextUtils.isEmpty(vodArea) ? "" : vodArea;
+        return TextUtils.isEmpty(vodArea) ? "" : vodArea.trim();
     }
 
     public String getVodDirector() {
-        return TextUtils.isEmpty(vodDirector) ? "" : vodDirector;
+        return TextUtils.isEmpty(vodDirector) ? "" : vodDirector.trim();
     }
 
     public String getVodActor() {
-        return TextUtils.isEmpty(vodActor) ? "" : vodActor;
+        return TextUtils.isEmpty(vodActor) ? "" : vodActor.trim();
     }
 
     public String getVodContent() {
-        return TextUtils.isEmpty(vodContent) ? "" : vodContent.replace("\n", "<br>");
+        return TextUtils.isEmpty(vodContent) ? "" : vodContent.trim().replace("\n", "<br>");
     }
 
     public String getVodPlayFrom() {
