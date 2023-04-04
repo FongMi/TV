@@ -268,7 +268,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         @Override
         public Fragment getItem(int position) {
             Class type = mAdapter.get(position);
-            return type.isHome() ? TypeFragment.newInstance(result.getList()) : TypeFragment.newInstance(type.getTypeId(), type.getTypeFlag().equals("1"));
+            return type.isHome() ? TypeFragment.newInstance(Result.list(result.getList())) : TypeFragment.newInstance(type.getTypeId(), type.getTypeFlag().equals("1"));
         }
 
         @Override
