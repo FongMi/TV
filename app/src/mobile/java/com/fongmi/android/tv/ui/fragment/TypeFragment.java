@@ -56,6 +56,10 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         return fragment;
     }
 
+    private String getItems() {
+        return getArguments().getString("items");
+    }
+
     private String getTypeId() {
         return getArguments().getString("typeId");
     }
@@ -66,10 +70,6 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     private boolean isHome() {
         return getTypeId().equals("home");
-    }
-
-    private String getItems() {
-        return getArguments().getString("items");
     }
 
     @Override
