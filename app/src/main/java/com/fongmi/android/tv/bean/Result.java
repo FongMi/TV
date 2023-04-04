@@ -99,12 +99,6 @@ public class Result {
         return result;
     }
 
-    public static Result list(List<Vod> items) {
-        Result result = new Result();
-        result.setList(items);
-        return result;
-    }
-
     public List<Class> getTypes() {
         return types == null ? Collections.emptyList() : types;
     }

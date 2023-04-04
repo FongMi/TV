@@ -212,13 +212,13 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         setFabVisible(0);
         mAdapter.clear();
         mViewModel.homeContent();
-        Notify.progress(getActivity());
         mBinding.pager.setAdapter(new PageAdapter(getChildFragmentManager()));
     }
 
     @Override
     public void setSite(Site item) {
         ApiConfig.get().setHome(item);
+        Notify.progress(getActivity());
         homeContent();
     }
 
@@ -268,7 +268,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         @Override
         public Fragment getItem(int position) {
             Class type = mAdapter.get(position);
-            return type.getTypeId().equals("home") ? TypeFragment.newInstance(Result.list(result.getList())) : TypeFragment.newInstance(type.getTypeId(), type.getTypeFlag().equals("1"));
+            return type.isHome() ? TypeFragment.newInstance(result.getList()) : TypeFragment.newInstance(type.getTypeId(), type.getTypeFlag().equals("1"));
         }
 
         @Override
