@@ -32,7 +32,7 @@ public class Class {
     private boolean activated;
 
     public String getTypeId() {
-        return typeId;
+        return TextUtils.isEmpty(typeId) ? "" : typeId;
     }
 
     public void setTypeId(String typeId) {
@@ -40,7 +40,7 @@ public class Class {
     }
 
     public String getTypeName() {
-        return typeName;
+        return TextUtils.isEmpty(typeName) ? "" : typeName;
     }
 
     public void setTypeName(String typeName) {
@@ -82,6 +82,10 @@ public class Class {
     public boolean toggleFilter() {
         setFilter(!getFilter());
         return getFilter();
+    }
+
+    public boolean isHome() {
+        return getTypeId().equals("home");
     }
 
     @Override
