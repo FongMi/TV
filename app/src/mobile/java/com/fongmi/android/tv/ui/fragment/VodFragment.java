@@ -247,6 +247,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     @Override
     public boolean canBack() {
         if (mBinding.pager.getAdapter() == null) return true;
+        if (mBinding.pager.getAdapter().getCount() == 0) return true;
         return getFragment().canBack();
     }
 
