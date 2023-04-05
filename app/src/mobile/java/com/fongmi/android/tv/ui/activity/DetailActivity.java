@@ -215,6 +215,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     protected void initEvent() {
         mBinding.name.setOnClickListener(view -> onName());
         mBinding.more.setOnClickListener(view -> onMore());
+        mBinding.actor.setOnClickListener(view -> onActor());
         mBinding.content.setOnClickListener(view -> onContent());
         mBinding.reverse.setOnClickListener(view -> onReverse());
         mBinding.control.back.setOnClickListener(view -> onFull());
@@ -427,9 +428,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         EpisodeDialog.create().reverse(mHistory.isRevSort()).episodes(mEpisodeAdapter.getItems()).show(getSupportFragmentManager(), null);
     }
 
+    private void onActor() {
+        mBinding.actor.setMaxLines(mBinding.actor.getMaxLines() == 1 ? Integer.MAX_VALUE : 1);
+    }
+
     private void onContent() {
-        boolean more = mBinding.content.getMaxLines() == 2;
-        mBinding.content.setMaxLines(more ? Integer.MAX_VALUE : 2);
+        mBinding.content.setMaxLines(mBinding.content.getMaxLines() == 2 ? Integer.MAX_VALUE : 2);
     }
 
     private void onReverse() {

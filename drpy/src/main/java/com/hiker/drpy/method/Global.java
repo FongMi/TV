@@ -27,6 +27,7 @@ public class Global {
 
     private final QuickJSContext ctx;
     private final Parser parser;
+    private final Gson gson;
 
     public static Global create(QuickJSContext jsContext) {
         return new Global(jsContext);
@@ -34,6 +35,7 @@ public class Global {
 
     private Global(QuickJSContext ctx) {
         this.parser = new Parser();
+        this.gson = new Gson();
         this.ctx = ctx;
     }
 
@@ -84,9 +86,9 @@ public class Global {
 
     @Keep
     @JSMethod
-    public JSObject pdfa(String html, String rule) {
+    public Object pdfa(String html, String rule) {
         try {
-            return ctx.parseJSON(new Gson().toJson(parser.pdfa(html, rule)));
+            return ctx.parse(gson.toJson(parser.pdfa(html, rule)));
         } catch (Exception e) {
             return ctx.createNewJSObject();
         }
@@ -104,9 +106,9 @@ public class Global {
 
     @Keep
     @JSMethod
-    public JSObject pdfl(String html, String rule, String texts, String urls, String urlKey) {
+    public Object pdfl(String html, String rule, String texts, String urls, String urlKey) {
         try {
-            return ctx.parseJSON(new Gson().toJson(parser.pdfl(html, rule, texts, urls, urlKey)));
+            return ctx.parse(gson.toJson(parser.pdfl(html, rule, texts, urls, urlKey)));
         } catch (Exception e) {
             return ctx.createNewJSObject();
         }
