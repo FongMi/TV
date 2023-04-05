@@ -331,6 +331,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mViewModel.playerContent(getKey(), flag.getFlag(), episode.getUrl());
         updateHistory(episode, replay);
         showProgress();
+        hideCenter();
     }
 
     private void setEmpty() {
@@ -473,7 +474,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onDesc() {
-        String desc = mBinding.content.getTag().toString().trim();
+        String desc = mBinding.content.getTag().toString();
         if (desc.length() > 0) DescDialog.show(this, desc);
     }
 
