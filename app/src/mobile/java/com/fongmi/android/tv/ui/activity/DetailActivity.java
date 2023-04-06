@@ -450,6 +450,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onCast() {
+        mBinding.control.cast.setEnabled(false);
         Cast.create(this).url(ApiConfig.getUrl()).history(mHistory).start();
     }
 
@@ -1033,12 +1034,14 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     @Override
     public void onCastTo(Device device) {
         Notify.show(getString(R.string.cast_device, device.getName()));
+        mBinding.control.cast.setEnabled(true);
         checkPlayImg(false);
         mPlayers.pause();
     }
 
     @Override
     public void onCastError(int resId) {
+        mBinding.control.cast.setEnabled(true);
         Notify.show(resId);
     }
 
