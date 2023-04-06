@@ -17,7 +17,11 @@
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:padding="16dp">
+            android:paddingStart="16dp"
+            android:paddingTop="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="4dp"
+            app:layout_scrollFlags="scroll|enterAlways">
 
             <ImageView
                 android:id="@+id/logo"
@@ -45,6 +49,7 @@
                     android:singleLine="true"
                     android:textColor="@color/white"
                     android:textSize="14sp"
+                    tools:ignore="NestedWeights"
                     tools:text="狂飆" />
 
                 <ImageView
@@ -80,6 +85,7 @@
             android:clipToPadding="false"
             android:orientation="horizontal"
             android:paddingStart="8dp"
+            android:paddingTop="12dp"
             android:paddingEnd="8dp"
             android:paddingBottom="12dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
