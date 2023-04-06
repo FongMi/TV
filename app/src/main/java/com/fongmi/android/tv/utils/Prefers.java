@@ -28,6 +28,14 @@ public class Prefers {
         return getInt(key, 0);
     }
 
+    public static long getLong(String key, long defaultValue) {
+        return getPrefers().getLong(key, defaultValue);
+    }
+
+    public static long getLong(String key) {
+        return getLong(key, 0);
+    }
+
     public static boolean getBoolean(String key, boolean defaultValue) {
         return getPrefers().getBoolean(key, defaultValue);
     }

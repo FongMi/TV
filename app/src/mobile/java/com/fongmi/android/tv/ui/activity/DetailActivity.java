@@ -36,6 +36,7 @@ import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Track;
 import com.fongmi.android.tv.bean.Vod;
+import com.fongmi.android.tv.cast.Cast;
 import com.fongmi.android.tv.databinding.ActivityDetailBinding;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.event.ErrorEvent;
@@ -44,7 +45,7 @@ import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
-import com.fongmi.android.tv.receiver.PiPReceiver;
+import com.fongmi.android.tv.pip.Receiver;
 import com.fongmi.android.tv.ui.adapter.EpisodeAdapter;
 import com.fongmi.android.tv.ui.adapter.FlagAdapter;
 import com.fongmi.android.tv.ui.adapter.ParseAdapter;
@@ -58,7 +59,7 @@ import com.fongmi.android.tv.ui.custom.dialog.EpisodeDialog;
 import com.fongmi.android.tv.ui.custom.dialog.TrackDialog;
 import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.Notify;
-import com.fongmi.android.tv.ui.custom.PiP;
+import com.fongmi.android.tv.pip.PiP;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Traffic;
@@ -89,7 +90,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private ExecutorService mExecutor;
     private SiteViewModel mViewModel;
     private FlagAdapter mFlagAdapter;
-    private PiPReceiver mReceiver;
+    private Receiver mReceiver;
     private History mHistory;
     private Players mPlayers;
     private boolean fullscreen;
@@ -196,7 +197,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mKeyDown = CustomKeyDownVod.create(this, mBinding.video);
         mFrameParams = mBinding.video.getLayoutParams();
         mBinding.progressLayout.showProgress();
-        mReceiver = new PiPReceiver(mBinding);
+        mReceiver = new Receiver(mBinding);
         mPlayers = new Players().init();
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
@@ -219,6 +220,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.content.setOnClickListener(view -> onContent());
         mBinding.reverse.setOnClickListener(view -> onReverse());
         mBinding.control.back.setOnClickListener(view -> onFull());
+        mBinding.control.cast.setOnClickListener(view -> onCast());
         mBinding.control.full.setOnClickListener(view -> onFull());
         mBinding.control.keep.setOnClickListener(view -> onKeep());
         mBinding.control.lock.setOnClickListener(view -> onLock());
@@ -446,6 +448,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         toggleFullscreen();
     }
 
+    private void onCast() {
+        Cast.create().url(ApiConfig.getUrl()).history(mHistory).start();
+        mBinding.control.play.performClick();
+    }
+
     private void onKeep() {
         Keep keep = Keep.find(getHistoryKey());
         Notify.show(keep != null ? R.string.keep_del : R.string.keep_add);
@@ -663,6 +670,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void showControl() {
+        mBinding.control.cast.setVisibility(mHistory == null || isFullscreen() ? View.GONE : View.VISIBLE);
         mBinding.control.parse.setVisibility(isFullscreen() && isUseParse() ? View.VISIBLE : View.GONE);
         mBinding.control.rotate.setVisibility(isFullscreen() && !isLock() ? View.VISIBLE : View.GONE);
         mBinding.control.back.setVisibility(isFullscreen() && !isLock() ? View.VISIBLE : View.GONE);
@@ -1098,7 +1106,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     @Override
     public void onDoubleTap() {
         if (!isFullscreen()) {
-            enterFullscreen();
+            App.post(this::enterFullscreen, 250);
         } else if (mPlayers.isPlaying()) {
             mPlayers.pause();
             showControl();

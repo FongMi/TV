@@ -281,4 +281,10 @@ public class History {
             }
         }
     }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return new Gson().toJson(this);
+    }
 }

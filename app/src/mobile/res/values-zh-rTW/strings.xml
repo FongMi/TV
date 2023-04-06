@@ -20,6 +20,10 @@
     <string name="detail_content">簡介</string>
     <string name="detail_search">快搜「<xliff:g name="name">%s</xliff:g>」</string>
 
+    <!-- Cast -->
+    <string name="cast_device_empty">找不到裝置</string>
+    <string name="cast_device">已投放至「<xliff:g name="name">%s</xliff:g>」</string>
+
     <!-- Control -->
     <string name="control_speed">倍速</string>
     <string name="control_scale">縮放</string>
