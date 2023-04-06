@@ -70,7 +70,7 @@ public class Updater implements Download.Callback {
             String name = object.optString("name");
             String desc = object.optString("desc");
             int code = object.optInt("code");
-            App.post(() -> show(App.activity(), name, desc));
+            if (need(code)) App.post(() -> show(App.activity(), name, desc));
         } catch (Exception e) {
             e.printStackTrace();
         }
