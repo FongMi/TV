@@ -144,8 +144,14 @@ public class Utils {
         }
     }
 
-    public static String getUUID() {
+    public static String getDeviceId() {
         return Settings.Secure.getString(App.get().getContentResolver(), Settings.Secure.ANDROID_ID);
+    }
+
+    public static String getDeviceName() {
+        String model = Build.MODEL;
+        String manufacturer = Build.MANUFACTURER;
+        return model.startsWith(manufacturer) ? model : manufacturer + " " + model;
     }
 
     public static String getBase64(String ext) {
