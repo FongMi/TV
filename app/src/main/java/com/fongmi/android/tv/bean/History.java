@@ -7,6 +7,8 @@ import androidx.room.PrimaryKey;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.db.AppDatabase;
+import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
@@ -15,23 +17,44 @@ public class History {
 
     @NonNull
     @PrimaryKey
+    @SerializedName("key")
     private String key;
+    @SerializedName("vodPic")
     private String vodPic;
+    @SerializedName("vodName")
     private String vodName;
+    @SerializedName("vodFlag")
     private String vodFlag;
+    @SerializedName("vodRemarks")
     private String vodRemarks;
+    @SerializedName("episodeUrl")
     private String episodeUrl;
+    @SerializedName("revSort")
     private boolean revSort;
+    @SerializedName("revPlay")
     private boolean revPlay;
+    @SerializedName("createTime")
     private long createTime;
+    @SerializedName("opening")
     private long opening;
+    @SerializedName("ending")
     private long ending;
+    @SerializedName("position")
     private long position;
+    @SerializedName("duration")
     private long duration;
+    @SerializedName("speed")
     private float speed;
+    @SerializedName("player")
     private int player;
+    @SerializedName("scale")
     private int scale;
+    @SerializedName("cid")
     private int cid;
+
+    public static History objectFrom(String str) {
+        return new Gson().fromJson(str, History.class);
+    }
 
     public History() {
         this.speed = 1;
@@ -228,8 +251,13 @@ public class History {
     public void update(long position, long duration) {
         setPosition(position);
         setDuration(duration);
+        update();
+    }
+
+    public History update() {
         checkMerge(AppDatabase.get().getHistoryDao().findByName(ApiConfig.getCid(), getVodName()));
         AppDatabase.get().getHistoryDao().insertOrUpdate(this);
+        return this;
     }
 
     public History delete() {
