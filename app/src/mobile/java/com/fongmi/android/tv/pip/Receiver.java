@@ -1,4 +1,4 @@
-package com.fongmi.android.tv.receiver;
+package com.fongmi.android.tv.pip;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -7,13 +7,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 
 import com.fongmi.android.tv.databinding.ActivityDetailBinding;
-import com.fongmi.android.tv.ui.custom.PiP;
 
-public class PiPReceiver extends BroadcastReceiver {
+public class Receiver extends BroadcastReceiver {
 
     private final ActivityDetailBinding binding;
 
-    public PiPReceiver(ActivityDetailBinding binding) {
+    public Receiver(ActivityDetailBinding binding) {
         this.binding = binding;
     }
 
