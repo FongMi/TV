@@ -11,6 +11,11 @@ android {
         minSdk 21
         targetSdk 29
         ndk { abiFilters "armeabi-v7a" }
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
     }
 
     productFlavors {
