@@ -24,7 +24,6 @@ public class Updater implements Download.Callback {
 
     private DialogUpdateBinding binding;
     private AlertDialog dialog;
-    private String branch;
 
     private static class Loader {
         static volatile Updater INSTANCE = new Updater();
@@ -44,10 +43,6 @@ public class Updater implements Download.Callback {
 
     private String getApk() {
         return Github.get().getKitkatPath("/release/" + BuildConfig.FLAVOR + ".apk");
-    }
-
-    private Updater() {
-        this.branch = Github.RELEASE;
     }
 
     public Updater force() {
@@ -75,7 +70,7 @@ public class Updater implements Download.Callback {
             String name = object.optString("name");
             String desc = object.optString("desc");
             int code = object.optInt("code");
-            if (need(code)) App.post(() -> show(App.activity(), name, desc));
+            App.post(() -> show(App.activity(), name, desc));
         } catch (Exception e) {
             e.printStackTrace();
         }
