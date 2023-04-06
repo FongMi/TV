@@ -39,6 +39,10 @@ public class LiveConfig {
         return get().getConfig().getUrl();
     }
 
+    public static String getDesc() {
+        return get().getConfig().getDesc();
+    }
+
     public static int getHomeIndex() {
         return get().getLives().indexOf(get().getHome());
     }
