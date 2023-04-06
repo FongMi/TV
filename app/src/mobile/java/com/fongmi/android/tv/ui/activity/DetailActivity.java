@@ -30,6 +30,7 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.bean.Device;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.bean.Parse;
@@ -78,7 +79,7 @@ import java.util.concurrent.Executors;
 
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Listener, TrackDialog.Listener, ControlDialog.Listener, Clock.Callback, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, ParseAdapter.OnClickListener {
+public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Listener, Cast.Listener, TrackDialog.Listener, ControlDialog.Listener, Clock.Callback, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, ParseAdapter.OnClickListener {
 
     private ViewGroup.LayoutParams mFrameParams;
     private ActivityDetailBinding mBinding;
@@ -449,8 +450,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onCast() {
-        Cast.create().url(ApiConfig.getUrl()).history(mHistory).start();
-        mBinding.control.play.performClick();
+        Cast.create(this).url(ApiConfig.getUrl()).history(mHistory).start();
     }
 
     private void onKeep() {
@@ -676,9 +676,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.back.setVisibility(isFullscreen() && !isLock() ? View.VISIBLE : View.GONE);
         mBinding.control.action.getRoot().setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
         mBinding.control.setting.setVisibility(isFullscreen() ? View.GONE : View.VISIBLE);
+        mBinding.control.title.setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
         mBinding.control.share.setVisibility(isFullscreen() ? View.GONE : View.VISIBLE);
         mBinding.control.keep.setVisibility(isFullscreen() ? View.GONE : View.VISIBLE);
         mBinding.control.lock.setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
+        mBinding.control.size.setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
         mBinding.control.center.setVisibility(isLock() ? View.GONE : View.VISIBLE);
         mBinding.control.bottom.setVisibility(isLock() ? View.GONE : View.VISIBLE);
         mBinding.control.top.setVisibility(isLock() ? View.GONE : View.VISIBLE);
@@ -1026,6 +1028,18 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void notifyItemChanged(RecyclerView.Adapter<?> adapter) {
         adapter.notifyItemRangeChanged(0, adapter.getItemCount());
+    }
+
+    @Override
+    public void onCastTo(Device device) {
+        Notify.show(getString(R.string.cast_device, device.getName()));
+        checkPlayImg(false);
+        mPlayers.pause();
+    }
+
+    @Override
+    public void onCastError(int resId) {
+        Notify.show(resId);
     }
 
     @Override

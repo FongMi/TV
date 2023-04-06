@@ -40,6 +40,14 @@
         </LinearLayout>
 
         <ImageView
+            android:id="@+id/cast"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_control_cast" />
+
+        <ImageView
             android:id="@+id/keep"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -158,14 +166,6 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="4dp"
             android:src="@drawable/ic_control_rotate" />
-
-        <ImageView
-            android:id="@+id/cast"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:padding="4dp"
-            android:src="@drawable/ic_control_cast" />
 
     </LinearLayout>
 
