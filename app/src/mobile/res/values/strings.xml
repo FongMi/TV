@@ -20,6 +20,10 @@
     <string name="detail_content">Summary</string>
     <string name="detail_search">Searching <xliff:g name="name">%s</xliff:g></string>
 
+    <!-- Cast -->
+    <string name="cast_device_empty">Could\'t find a device to cast</string>
+    <string name="cast_device">Cast to <xliff:g name="name">%s</xliff:g></string>
+
     <!-- Control -->
     <string name="control_speed">Speed</string>
     <string name="control_scale">Scale</string>

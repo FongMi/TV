@@ -1,4 +1,4 @@
-package com.fongmi.android.tv.ui.custom;
+package com.fongmi.android.tv.pip;
 
 import android.app.Activity;
 import android.app.PendingIntent;

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 21,
-    "identityHash": "0dd6fc8bd9e6415bed916c27d8febede",
+    "identityHash": "f36d8a4b7379ebede24a22f085c33856",
     "entities": [
       {
         "tableName": "Keep",
@@ -259,13 +259,13 @@
       },
       {
         "tableName": "Device",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `uuid` TEXT, `name` TEXT, `ip` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `uuid` TEXT, `name` TEXT, `ip` TEXT)",
         "fields": [
           {
             "fieldPath": "id",
             "columnName": "id",
             "affinity": "INTEGER",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "uuid",
@@ -426,7 +426,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0dd6fc8bd9e6415bed916c27d8febede')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f36d8a4b7379ebede24a22f085c33856')"
     ]
   }
 }
