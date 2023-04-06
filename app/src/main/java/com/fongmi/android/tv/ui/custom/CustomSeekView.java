@@ -8,12 +8,12 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.media3.common.util.Util;
+import androidx.media3.ui.DefaultTimeBar;
+import androidx.media3.ui.TimeBar;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.player.Players;
-import com.google.android.exoplayer2.ui.DefaultTimeBar;
-import com.google.android.exoplayer2.ui.TimeBar;
-import com.google.android.exoplayer2.util.Util;
 
 public class CustomSeekView extends FrameLayout implements TimeBar.OnScrubListener {
 

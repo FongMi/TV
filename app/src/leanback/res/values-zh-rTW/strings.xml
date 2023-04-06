@@ -14,6 +14,7 @@
     <string name="collect_result">「<xliff:g name="name">%s</xliff:g>」的搜尋結果</string>
 
     <!-- Push -->
+    <string name="push_clip">推送剪貼簿內容</string>
     <string name="push_info">使用手機掃描 QR Code，或於瀏覽器輸入網址\n<xliff:g name="name">%s</xliff:g></string>
 
 </resources>

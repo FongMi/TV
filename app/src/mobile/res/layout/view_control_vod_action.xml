@@ -4,8 +4,8 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:fillViewport="true"
-    android:paddingStart="16dp"
-    android:paddingEnd="16dp"
+    android:paddingStart="8dp"
+    android:paddingEnd="8dp"
     android:scrollbars="none"
     android:visibility="visible">
 
@@ -71,7 +71,6 @@
         <TextView
             android:id="@+id/ending"
             style="@style/Control.Action"
-            android:layout_marginEnd="0dp"
             tools:text="片尾" />
 
     </LinearLayout>

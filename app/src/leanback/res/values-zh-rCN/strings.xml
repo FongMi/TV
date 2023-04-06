@@ -14,6 +14,7 @@
     <string name="collect_result">“<xliff:g name="name">%s</xliff:g>”的搜索结果</string>
 
     <!-- Push -->
+    <string name="push_clip">推送剪贴板内容</string>
     <string name="push_info">使用手机扫描二维码，或于浏览器访问地址\n<xliff:g name="name">%s</xliff:g></string>
 
 </resources>
