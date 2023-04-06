@@ -265,6 +265,11 @@ public class History {
         return this;
     }
 
+    public History cid(int cid) {
+        setCid(cid);
+        return update();
+    }
+
     public void findEpisode(List<Vod.Flag> flags) {
         setVodFlag(flags.get(0).getFlag());
         setVodRemarks(flags.get(0).getEpisodes().get(0).getName());
