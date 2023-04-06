@@ -3,6 +3,7 @@ package com.fongmi.android.tv.ui.fragment;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -85,7 +86,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         mTypeIds = new ArrayList<>();
         mExtends = new HashMap<>();
         mFilters = Filter.arrayFrom(getFilter());
-        mBinding.progressLayout.showProgress();
+        mBinding.progress.getRoot().setVisibility(View.VISIBLE);
         setRecyclerView();
         setViewModel();
     }
@@ -110,7 +111,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mViewModel.result.observe(getViewLifecycleOwner(), result -> {
             int size = result.getList().size();
-            mBinding.progressLayout.showContent(isFolder(), size);
+            mBinding.progress.getRoot().setVisibility(View.GONE);
             mScroller.endLoading(size == 0);
             addVideo(result.getList());
             checkPage(size);

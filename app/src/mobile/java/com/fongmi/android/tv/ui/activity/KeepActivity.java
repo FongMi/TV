@@ -58,11 +58,12 @@ public class KeepActivity extends BaseActivity implements KeepAdapter.OnClickLis
 
     private void getKeep() {
         mAdapter.addAll(Keep.getVod());
+        mBinding.delete.setVisibility(mAdapter.getItemCount() > 0 ? View.VISIBLE : View.GONE);
     }
 
     private void onDelete(View view) {
         if (mAdapter.isDelete()) {
-            new MaterialAlertDialogBuilder(this).setMessage(R.string.ask_keep_delete).setNegativeButton(R.string.dialog_negative, null).setPositiveButton(R.string.dialog_positive, (dialog, which) -> mAdapter.clear()).show();
+            new MaterialAlertDialogBuilder(this).setTitle(R.string.dialog_delete_record).setMessage(R.string.dialog_delete_keep).setNegativeButton(R.string.dialog_negative, null).setPositiveButton(R.string.dialog_positive, (dialog, which) -> mAdapter.clear()).show();
         } else if (mAdapter.getItemCount() > 0) {
             mAdapter.setDelete(true);
         } else {
@@ -100,7 +101,9 @@ public class KeepActivity extends BaseActivity implements KeepAdapter.OnClickLis
     @Override
     public void onItemDelete(Keep item) {
         mAdapter.remove(item.delete());
-        if (mAdapter.getItemCount() == 0) mAdapter.setDelete(false);
+        if (mAdapter.getItemCount() > 0) return;
+        mBinding.delete.setVisibility(View.GONE);
+        mAdapter.setDelete(false);
     }
 
     @Override

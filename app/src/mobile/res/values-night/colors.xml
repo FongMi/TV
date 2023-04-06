@@ -1,0 +1,8 @@
+<resources>
+
+    <color name="primary">@color/light_blue_500</color>
+    <color name="primaryDark">@color/light_blue_700</color>
+    <color name="accent">@color/light_blue_500</color>
+    <color name="indicator">@color/black_50</color>
+
+</resources>

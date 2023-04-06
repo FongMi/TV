@@ -1,6 +1,7 @@
 package com.fongmi.android.tv.api;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -39,15 +40,15 @@ public class Updater implements Download.Callback {
     }
 
     private File getFile() {
-        return FileUtil.getCacheFile(BuildConfig.FLAVOR + ".apk");
+        return FileUtil.getCacheFile(branch + ".apk");
     }
 
     private String getJson() {
-        return Github.get().getKitkatPath("/release/" + BuildConfig.FLAVOR + ".json");
+        return Github.get().getBranchPath(branch, "/release/" + BuildConfig.FLAVOR_mode + "-" + branch + ".json");
     }
 
     private String getApk() {
-        return Github.get().getKitkatPath("/release/" + BuildConfig.FLAVOR + ".apk");
+        return Github.get().getBranchPath(branch, "/release/" + BuildConfig.FLAVOR_mode + "-" + BuildConfig.FLAVOR_api + ".apk");
     }
 
     private Updater() {
@@ -60,6 +61,11 @@ public class Updater implements Download.Callback {
         return this;
     }
 
+    public Updater dev() {
+        this.branch = Github.DEV;
+        return this;
+    }
+
     private Updater check() {
         dismiss();
         return this;
@@ -69,8 +75,8 @@ public class Updater implements Download.Callback {
         App.execute(this::doInBackground);
     }
 
-    private boolean need(int code) {
-        return code > BuildConfig.VERSION_CODE && Prefers.getUpdate();
+    private boolean need(int code, String name) {
+        return (branch.equals(Github.DEV) ? !name.equals(BuildConfig.VERSION_NAME) : code > BuildConfig.VERSION_CODE) && Prefers.getUpdate();
     }
 
     private void doInBackground() {
@@ -79,7 +85,7 @@ public class Updater implements Download.Callback {
             String name = object.optString("name");
             String desc = object.optString("desc");
             int code = object.optInt("code");
-            if (need(code)) App.post(() -> show(App.activity(), name, desc));
+            if (need(code, name)) App.post(() -> show(App.activity(), name, desc));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -87,25 +93,24 @@ public class Updater implements Download.Callback {
 
     private void show(Activity activity, String version, String desc) {
         binding = DialogUpdateBinding.inflate(LayoutInflater.from(activity));
-        binding.version.setText(ResUtil.getString(R.string.update_version, version));
-        binding.confirm.setOnClickListener(this::confirm);
-        binding.cancel.setOnClickListener(this::cancel);
+        check().create(activity, ResUtil.getString(R.string.update_version, version)).show();
+        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setOnClickListener(this::confirm);
+        dialog.getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(this::cancel);
         binding.desc.setText(desc);
-        check().create(activity).show();
     }
 
-    private AlertDialog create(Activity activity) {
-        return dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).setCancelable(false).create();
+    private AlertDialog create(Activity activity, String title) {
+        return dialog = new MaterialAlertDialogBuilder(activity).setTitle(title).setView(binding.getRoot()).setPositiveButton(R.string.update_confirm, null).setNegativeButton(R.string.dialog_negative, null).setCancelable(false).create();
     }
 
     private void cancel(View view) {
         Prefers.putUpdate(false);
-        dismiss();
+        dialog.dismiss();
     }
 
     private void confirm(View view) {
-        binding.confirm.setEnabled(false);
         Download.create(getApk(), getFile(), this).start();
+        view.setEnabled(false);
     }
 
     private void dismiss() {
@@ -117,7 +122,7 @@ public class Updater implements Download.Callback {
 
     @Override
     public void progress(int progress) {
-        binding.confirm.setText(String.format(Locale.getDefault(), "%1$d%%", progress));
+        dialog.getButton(DialogInterface.BUTTON_POSITIVE).setText(String.format(Locale.getDefault(), "%1$d%%", progress));
     }
 
     @Override
