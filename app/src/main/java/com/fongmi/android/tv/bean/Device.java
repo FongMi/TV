@@ -11,6 +11,7 @@ import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.utils.Utils;
 import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
@@ -18,9 +19,13 @@ import java.util.List;
 public class Device {
 
     @PrimaryKey(autoGenerate = true)
+    @SerializedName("id")
     private Integer id;
+    @SerializedName("uuid")
     private String uuid;
+    @SerializedName("name")
     private String name;
+    @SerializedName("ip")
     private String ip;
 
     public static Device get() {
