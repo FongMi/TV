@@ -86,7 +86,6 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         mTypeIds = new ArrayList<>();
         mExtends = new HashMap<>();
         mFilters = Filter.arrayFrom(getFilter());
-        mBinding.progress.getRoot().setVisibility(View.VISIBLE);
         setRecyclerView();
         setViewModel();
     }
@@ -111,10 +110,10 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mViewModel.result.observe(getViewLifecycleOwner(), result -> {
             int size = result.getList().size();
-            mBinding.progress.getRoot().setVisibility(View.GONE);
             mScroller.endLoading(size == 0);
             addVideo(result.getList());
             checkPage(size);
+            hideProgress();
         });
     }
 
@@ -138,6 +137,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
 
     private void getVideo(String typeId, String page) {
         if (page.equals("1")) mLast = null;
+        if (page.equals("1")) showProgress();
         if (isFolder()) mTypeIds.add(typeId);
         if (isFolder() && !mOpen) mBinding.recycler.moveToTop();
         int filterSize = mOpen ? mFilters.size() : 0;
@@ -173,6 +173,14 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         presenter.setOnClickListener((key, item) -> setClick(adapter, key, item));
         adapter.setItems(filter.getValue(), null);
         return new ListRow(adapter);
+    }
+
+    private void showProgress() {
+        mBinding.progress.getRoot().setVisibility(View.VISIBLE);
+    }
+
+    private void hideProgress() {
+        mBinding.progress.getRoot().setVisibility(View.GONE);
     }
 
     private void showFilter() {
