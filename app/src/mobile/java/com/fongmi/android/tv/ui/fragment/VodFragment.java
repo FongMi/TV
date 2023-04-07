@@ -34,11 +34,10 @@ import com.fongmi.android.tv.ui.activity.HistoryActivity;
 import com.fongmi.android.tv.ui.activity.KeepActivity;
 import com.fongmi.android.tv.ui.adapter.TypeAdapter;
 import com.fongmi.android.tv.ui.base.BaseFragment;
-import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.ui.custom.dialog.FilterDialog;
 import com.fongmi.android.tv.ui.custom.dialog.LinkDialog;
 import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
-import com.fongmi.android.tv.utils.Notify;
+import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.Prefers;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
@@ -85,6 +84,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         EventBus.getDefault().register(this);
         setRecyclerView();
         setViewModel();
+        showProgress();
         initHot();
         getHot();
     }
@@ -152,7 +152,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         mAdapter.addAll(handle());
         for (Class item : mAdapter.getTypes()) if (result.getFilters().containsKey(item.getTypeId())) item.setFilters(result.getFilters().get(item.getTypeId()));
         mBinding.pager.getAdapter().notifyDataSetChanged();
-        Notify.dismiss();
+        hideProgress();
     }
 
     private void setFabVisible(int position) {
@@ -198,6 +198,14 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         HistoryActivity.start(getActivity());
     }
 
+    private void showProgress() {
+        mBinding.progress.getRoot().setVisibility(View.VISIBLE);
+    }
+
+    private void hideProgress() {
+        mBinding.progress.getRoot().setVisibility(View.GONE);
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefreshEvent(RefreshEvent event) {
         switch (event.getType()) {
@@ -209,6 +217,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     }
 
     private void homeContent() {
+        showProgress();
         setFabVisible(0);
         mAdapter.clear();
         mViewModel.homeContent();
@@ -218,7 +227,6 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     @Override
     public void setSite(Site item) {
         ApiConfig.get().setHome(item);
-        Notify.progress(getActivity());
         homeContent();
     }
 
