@@ -46,7 +46,6 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
     @Override
     protected void initView(Bundle savedInstanceState) {
         initFragment(savedInstanceState);
-        Notify.progress(this);
         Updater.get().start();
         Server.get().start();
         initConfig();
@@ -93,7 +92,6 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
             @Override
             public void error(int resId) {
                 Notify.show(resId);
-                Notify.dismiss();
             }
         };
     }
