@@ -183,6 +183,6 @@ public class Nano extends NanoHTTPD {
 
         void onApi(String url);
 
-        void onCast(String url, String history);
+        void onCast(String url, String device, String history);
     }
 }

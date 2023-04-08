@@ -34,7 +34,7 @@ public class InputRequestProcess implements RequestProcess {
                 nano.getListener().onApi(params.get("url").trim());
                 break;
             case "cast":
-                nano.getListener().onCast(params.get("url").trim(), params.get("history").trim());
+                nano.getListener().onCast(params.get("url").trim(), params.get("device").trim(), params.get("history").trim());
                 break;
         }
         return Nano.createPlainTextResponse(NanoHTTPD.Response.Status.OK, "ok");
