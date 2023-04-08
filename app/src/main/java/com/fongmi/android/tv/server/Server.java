@@ -31,12 +31,16 @@ public class Server implements Nano.Listener {
         this.port = 9978;
     }
 
-    public String getAddress(boolean local) {
-        return "http://" + (local ? "127.0.0.1" : getIP()) + ":" + port;
+    public String getAddress() {
+        return getAddress(false);
     }
 
     public String getAddress(String path) {
         return getAddress(true) + "/" + path;
+    }
+
+    public String getAddress(boolean local) {
+        return "http://" + (local ? "127.0.0.1" : getIP()) + ":" + port;
     }
 
     public void start() {
