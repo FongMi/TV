@@ -29,7 +29,7 @@ public class PushActivity extends BaseActivity {
 
     @Override
     protected void initView() {
-        String address = Server.get().getAddress(false);
+        String address = Server.get().getAddress();
         mBinding.code.setImageBitmap(QRCode.getBitmap(address, 250, 1));
         mBinding.info.setText(ResUtil.getString(R.string.push_info, address));
         mBinding.clip.setOnClickListener(this::onClip);

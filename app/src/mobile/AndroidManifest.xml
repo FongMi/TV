@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.fongmi.android.tv">
 
+    <uses-permission android:name="android.permission.CAMERA" />
+
     <application>
 
         <meta-data
@@ -59,6 +61,11 @@
 
         <activity
             android:name=".ui.activity.KeepActivity"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
+            android:screenOrientation="userPortrait" />
+
+        <activity
+            android:name=".ui.activity.ScanActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
             android:screenOrientation="userPortrait" />
 

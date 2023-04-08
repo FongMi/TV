@@ -37,16 +37,16 @@ import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Track;
 import com.fongmi.android.tv.bean.Vod;
-import com.fongmi.android.tv.cast.Cast;
 import com.fongmi.android.tv.databinding.ActivityDetailBinding;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.model.SiteViewModel;
+import com.fongmi.android.tv.pip.PiP;
+import com.fongmi.android.tv.pip.Receiver;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
-import com.fongmi.android.tv.pip.Receiver;
 import com.fongmi.android.tv.ui.adapter.EpisodeAdapter;
 import com.fongmi.android.tv.ui.adapter.FlagAdapter;
 import com.fongmi.android.tv.ui.adapter.ParseAdapter;
@@ -55,12 +55,12 @@ import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.ui.custom.ViewType;
+import com.fongmi.android.tv.ui.custom.dialog.CastDialog;
 import com.fongmi.android.tv.ui.custom.dialog.ControlDialog;
 import com.fongmi.android.tv.ui.custom.dialog.EpisodeDialog;
 import com.fongmi.android.tv.ui.custom.dialog.TrackDialog;
 import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.Notify;
-import com.fongmi.android.tv.pip.PiP;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Traffic;
@@ -79,7 +79,7 @@ import java.util.concurrent.Executors;
 
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Listener, Cast.Listener, TrackDialog.Listener, ControlDialog.Listener, Clock.Callback, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, ParseAdapter.OnClickListener {
+public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Listener, CastDialog.Listener, TrackDialog.Listener, ControlDialog.Listener, Clock.Callback, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, ParseAdapter.OnClickListener {
 
     private ViewGroup.LayoutParams mFrameParams;
     private ActivityDetailBinding mBinding;
@@ -450,8 +450,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onCast() {
-        mBinding.control.cast.setEnabled(false);
-        Cast.create(this).url(ApiConfig.getUrl()).history(mHistory).start();
+        for (Fragment fragment : getSupportFragmentManager().getFragments()) if (fragment instanceof BottomSheetDialogFragment) return;
+        CastDialog.create(this).url(ApiConfig.getUrl()).history(mHistory).show(getSupportFragmentManager(), null);
     }
 
     private void onKeep() {
@@ -672,6 +672,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void showControl() {
         mBinding.control.cast.setVisibility(mHistory == null || isFullscreen() ? View.GONE : View.VISIBLE);
+        mBinding.control.keep.setVisibility(mHistory == null || isFullscreen() ? View.GONE : View.VISIBLE);
         mBinding.control.parse.setVisibility(isFullscreen() && isUseParse() ? View.VISIBLE : View.GONE);
         mBinding.control.rotate.setVisibility(isFullscreen() && !isLock() ? View.VISIBLE : View.GONE);
         mBinding.control.back.setVisibility(isFullscreen() && !isLock() ? View.VISIBLE : View.GONE);
@@ -679,7 +680,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.setting.setVisibility(isFullscreen() ? View.GONE : View.VISIBLE);
         mBinding.control.title.setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
         mBinding.control.share.setVisibility(isFullscreen() ? View.GONE : View.VISIBLE);
-        mBinding.control.keep.setVisibility(isFullscreen() ? View.GONE : View.VISIBLE);
         mBinding.control.lock.setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
         mBinding.control.size.setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
         mBinding.control.center.setVisibility(isLock() ? View.GONE : View.VISIBLE);
@@ -1033,16 +1033,13 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     @Override
     public void onCastTo(Device device) {
-        Notify.show(getString(R.string.cast_device, device.getName()));
-        mBinding.control.cast.setEnabled(true);
+        Notify.show(getString(R.string.cast_to, device.getName()));
         checkPlayImg(false);
         mPlayers.pause();
     }
 
     @Override
-    public void onCastError(int resId) {
-        mBinding.control.cast.setEnabled(true);
-        Notify.show(resId);
+    public void onCastError() {
     }
 
     @Override
