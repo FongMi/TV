@@ -25,6 +25,10 @@ import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.custom.CustomScroller;
 import com.fongmi.android.tv.ui.custom.ViewType;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,15 +42,6 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     private List<String> mTypeIds;
     private VodAdapter mAdapter;
 
-    public static TypeFragment newInstance(Result result) {
-        Bundle args = new Bundle();
-        args.putString("typeId", "home");
-        args.putString("result", result.toString());
-        TypeFragment fragment = new TypeFragment();
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     public static TypeFragment newInstance(String typeId, boolean folder) {
         Bundle args = new Bundle();
         args.putString("typeId", typeId);
@@ -54,10 +49,6 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         TypeFragment fragment = new TypeFragment();
         fragment.setArguments(args);
         return fragment;
-    }
-
-    private String getResult() {
-        return getArguments().getString("result");
     }
 
     private String getTypeId() {
@@ -79,16 +70,17 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     @Override
     protected void initView() {
+        EventBus.getDefault().register(this);
+        mScroller = new CustomScroller(this);
         mTypeIds = new ArrayList<>();
         mExtends = new HashMap<>();
-        mScroller = new CustomScroller(this);
-        mBinding.swipeLayout.setEnabled(!isHome());
         setRecyclerView();
         setViewModel();
     }
 
     @Override
     protected void initEvent() {
+        mBinding.swipeLayout.setEnabled(!isHome());
         mBinding.swipeLayout.setOnRefreshListener(this);
         mBinding.recycler.addOnScrollListener(mScroller = new CustomScroller(this));
     }
@@ -137,14 +129,23 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         if (isFolder()) mBinding.recycler.scrollToPosition(0);
         if (page.equals("1")) mAdapter.clear();
         if (page.equals("1") && !mBinding.swipeLayout.isRefreshing()) mBinding.progressLayout.showProgress();
-        if (!isHome()) mViewModel.categoryContent(ApiConfig.get().getHome().getKey(), typeId, page, true, mExtends);
-        else setAdapter(Result.fromJson(getResult()));
+        mViewModel.categoryContent(ApiConfig.get().getHome().getKey(), typeId, page, true, mExtends);
     }
 
     private void refresh(int num) {
         String typeId = mTypeIds.get(mTypeIds.size() - num);
         mTypeIds = mTypeIds.subList(0, mTypeIds.size() - num);
         getVideo(typeId, "1");
+    }
+
+    public void setFilter(String key, String value) {
+        mExtends.put(key, value);
+        onRefresh();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onResult(Result result) {
+        if (isHome()) setAdapter(result);
     }
 
     @Override
@@ -158,12 +159,6 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         if (isFolder() || isHome()) return;
         mScroller.setLoading(true);
         getVideo(getTypeId(), page);
-    }
-
-    public void setFilter(String key, String value) {
-        mExtends.put(key, value);
-        if (isFolder()) refresh(1);
-        else getVideo();
     }
 
     @Override
@@ -183,5 +178,11 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         if (mTypeIds.size() < 2) return true;
         refresh(2);
         return false;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        EventBus.getDefault().unregister(this);
     }
 }
