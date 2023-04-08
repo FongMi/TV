@@ -60,7 +60,6 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     private TypeAdapter mAdapter;
     private Runnable mRunnable;
     private List<String> mHots;
-    private Result result;
 
     public static VodFragment newInstance() {
         return new VodFragment();
@@ -140,7 +139,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         mBinding.hot.setText(mHots.get(new Random().nextInt(11)));
     }
 
-    private Result handle() {
+    private Result handle(Result result) {
         List<Class> types = new ArrayList<>();
         for (String cate : getSite().getCategories()) for (Class type : result.getTypes()) if (cate.equals(type.getTypeName())) types.add(type);
         result.setTypes(types);
@@ -148,10 +147,10 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     }
 
     private void setAdapter(Result result) {
-        this.result = result;
-        mAdapter.addAll(handle());
-        for (Class item : mAdapter.getTypes()) if (result.getFilters().containsKey(item.getTypeId())) item.setFilters(result.getFilters().get(item.getTypeId()));
+        mAdapter.addAll(handle(result));
         mBinding.pager.getAdapter().notifyDataSetChanged();
+        for (Class item : mAdapter.getTypes()) if (result.getFilters().containsKey(item.getTypeId())) item.setFilters(result.getFilters().get(item.getTypeId()));
+        EventBus.getDefault().post(result);
         hideProgress();
     }
 
@@ -276,7 +275,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         @Override
         public Fragment getItem(int position) {
             Class type = mAdapter.get(position);
-            return type.isHome() ? TypeFragment.newInstance(Result.list(result.getList())) : TypeFragment.newInstance(type.getTypeId(), type.getTypeFlag().equals("1"));
+            return TypeFragment.newInstance(type.getTypeId(), type.getTypeFlag().equals("1"));
         }
 
         @Override
