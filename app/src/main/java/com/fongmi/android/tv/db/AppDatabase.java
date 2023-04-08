@@ -11,20 +11,22 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.bean.Config;
+import com.fongmi.android.tv.bean.Device;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Track;
 import com.fongmi.android.tv.db.dao.ConfigDao;
+import com.fongmi.android.tv.db.dao.DeviceDao;
 import com.fongmi.android.tv.db.dao.HistoryDao;
 import com.fongmi.android.tv.db.dao.KeepDao;
 import com.fongmi.android.tv.db.dao.SiteDao;
 import com.fongmi.android.tv.db.dao.TrackDao;
 
-@Database(entities = {Keep.class, Site.class, Track.class, Config.class, History.class}, version = AppDatabase.VERSION)
+@Database(entities = {Keep.class, Site.class, Track.class, Config.class, Device.class, History.class}, version = AppDatabase.VERSION)
 public abstract class AppDatabase extends RoomDatabase {
 
-    public static final int VERSION = 20;
+    public static final int VERSION = 21;
     public static final String SYMBOL = "@@@";
 
     private static volatile AppDatabase instance;
@@ -45,6 +47,7 @@ public abstract class AppDatabase extends RoomDatabase {
                 .addMigrations(MIGRATION_17_18)
                 .addMigrations(MIGRATION_18_19)
                 .addMigrations(MIGRATION_19_20)
+                .addMigrations(MIGRATION_20_21)
                 .allowMainThreadQueries()
                 .fallbackToDestructiveMigration()
                 .build();
@@ -57,6 +60,8 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract TrackDao getTrackDao();
 
     public abstract ConfigDao getConfigDao();
+
+    public abstract DeviceDao getDeviceDao();
 
     public abstract HistoryDao getHistoryDao();
 
@@ -124,6 +129,14 @@ public abstract class AppDatabase extends RoomDatabase {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             database.execSQL("ALTER TABLE Config ADD COLUMN name TEXT DEFAULT NULL");
+        }
+    };
+
+    static final Migration MIGRATION_20_21 = new Migration(20, 21) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `Device` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `uuid` TEXT, `name` TEXT, `ip` TEXT)");
+            database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_Device_uuid_name` ON `Device` (`uuid`, `name`)");
         }
     };
 }

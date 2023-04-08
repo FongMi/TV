@@ -70,7 +70,7 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
     }
 
     private void initView() {
-        String address = Server.get().getAddress(false);
+        String address = Server.get().getAddress();
         binding.text.setText(url = getUrl());
         binding.text.setSelection(url.length());
         binding.code.setImageBitmap(QRCode.getBitmap(address, 200, 0));

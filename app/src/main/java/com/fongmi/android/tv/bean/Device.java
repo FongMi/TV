@@ -1,5 +1,6 @@
 package com.fongmi.android.tv.bean;
 
+import android.net.Uri;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
@@ -32,7 +33,7 @@ public class Device {
         Device device = new Device();
         device.setUuid(Utils.getDeviceId());
         device.setName(Utils.getDeviceName());
-        device.setIp(Server.get().getAddress(false));
+        device.setIp(Server.get().getAddress());
         return device;
     }
 
@@ -70,6 +71,10 @@ public class Device {
 
     public void setIp(String ip) {
         this.ip = ip;
+    }
+
+    public String getHost() {
+        return Uri.parse(getIp()).getHost();
     }
 
     public Device save() {
