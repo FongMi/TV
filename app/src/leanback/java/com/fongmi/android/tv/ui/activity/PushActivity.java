@@ -8,6 +8,7 @@ import android.view.View;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.databinding.ActivityPushBinding;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.ui.base.BaseActivity;
@@ -37,6 +38,6 @@ public class PushActivity extends BaseActivity {
 
     private void onClip(View view) {
         CharSequence text = ((ClipboardManager) getSystemService(CLIPBOARD_SERVICE)).getText();
-        if (text != null) DetailActivity.start(this, "push_agent", text.toString(), "");
+        if (text != null && ApiConfig.hasPush()) DetailActivity.push(this, text.toString(), false);
     }
 }

@@ -37,13 +37,6 @@ public class Device {
         return device;
     }
 
-    public static Device get(org.fourthline.cling.model.meta.Device<?, ?, ?> item) {
-        Device device = new Device();
-        device.setName(item.getDetails().getFriendlyName());
-        device.setUuid(item.getIdentity().getUdn().getIdentifierString());
-        return device;
-    }
-
     public static Device objectFrom(String str) {
         return new Gson().fromJson(str, Device.class);
     }
