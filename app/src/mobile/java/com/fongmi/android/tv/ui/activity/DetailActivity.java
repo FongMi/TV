@@ -680,7 +680,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.back.setVisibility(isFullscreen() && !isLock() ? View.VISIBLE : View.GONE);
         mBinding.control.action.getRoot().setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
         mBinding.control.setting.setVisibility(isFullscreen() ? View.GONE : View.VISIBLE);
-        mBinding.control.title.setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
         mBinding.control.share.setVisibility(isFullscreen() ? View.GONE : View.VISIBLE);
         mBinding.control.lock.setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
         mBinding.control.center.setVisibility(isLock() ? View.GONE : View.VISIBLE);
