@@ -66,10 +66,10 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
     }
 
     public void remove(History item) {
-        int position = mItems.indexOf(item);
-        if (position == -1) return;
-        mItems.remove(position);
-        notifyItemRemoved(position);
+        int index = mItems.indexOf(item);
+        if (index == -1) return;
+        mItems.remove(index);
+        notifyItemRemoved(index);
     }
 
     @Override

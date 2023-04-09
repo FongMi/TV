@@ -189,6 +189,10 @@ public class Result {
         return subs == null ? Collections.emptyList() : subs;
     }
 
+    public String getRealUrl() {
+        return getPlayUrl() + getUrl();
+    }
+
     public Map<String, String> getHeaders() {
         return Json.toMap(getHeader());
     }

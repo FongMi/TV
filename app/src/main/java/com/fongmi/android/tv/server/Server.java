@@ -106,7 +106,7 @@ public class Server implements Nano.Listener {
     }
 
     @Override
-    public void onCast(String url, String device, String history) {
-        CastEvent.post(url, device, history);
+    public void onCast(String device, String config, String history) {
+        CastEvent.post(device, config, history);
     }
 }

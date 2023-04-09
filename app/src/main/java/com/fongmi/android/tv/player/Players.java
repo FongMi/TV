@@ -332,11 +332,11 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     }
 
     private void setMediaSource(Result result) {
-        SpiderDebug.log(errorCode + "," + result.getUrl() + "," + result.getHeaders());
-        if (isIjk()) ijkPlayer.setMediaSource(result.getPlayUrl() + result.getUrl(), result.getHeaders());
+        SpiderDebug.log(errorCode + "," + result.getRealUrl() + "," + result.getHeaders());
+        if (isIjk()) ijkPlayer.setMediaSource(result.getRealUrl(), result.getHeaders());
         if (isExo()) exoPlayer.setMediaSource(ExoUtil.getSource(result, errorCode));
         if (isExo()) exoPlayer.prepare();
-        setTimeoutCheck();
+        setTimeoutCheck(result.getRealUrl());
     }
 
     private void setMediaSource(Map<String, String> headers, String url) {
@@ -344,12 +344,12 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
         if (isIjk()) ijkPlayer.setMediaSource(url, headers);
         if (isExo()) exoPlayer.setMediaSource(ExoUtil.getSource(headers, url, errorCode));
         if (isExo()) exoPlayer.prepare();
-        setTimeoutCheck();
+        setTimeoutCheck(url);
     }
 
-    private void setTimeoutCheck() {
+    private void setTimeoutCheck(String url) {
         App.post(runnable, timeout);
-        PlayerEvent.state(0);
+        PlayerEvent.url(url);
     }
 
     private void removeTimeoutCheck() {
