@@ -103,17 +103,17 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
     private void load(Config config) {
         switch (config.getType()) {
             case 0:
-                Notify.progress(getActivity(), true);
+                Notify.progress(getActivity());
                 mBinding.vodUrl.setText(config.getDesc());
                 ApiConfig.get().clear().config(config).load(getCallback(config));
                 break;
             case 1:
-                Notify.progress(getActivity(), true);
+                Notify.progress(getActivity());
                 mBinding.liveUrl.setText(config.getDesc());
                 LiveConfig.get().clear().config(config).load(getCallback(config));
                 break;
             case 2:
-                Notify.progress(getActivity(), true);
+                Notify.progress(getActivity());
                 mBinding.wallUrl.setText(config.getDesc());
                 WallConfig.get().clear().config(config).load(getCallback(config));
                 break;
