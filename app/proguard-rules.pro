@@ -34,6 +34,9 @@
 -keep class com.github.catvod.crawler.** { *; }
 -keep class * extends com.github.catvod.crawler.Spider
 
+# Cling
+-keep class org.fourthline.cling.** { *; }
+
 # IJK
 -keep class tv.danmaku.ijk.media.player.** { *; }
 -keep class tv.danmaku.ijk.media.player.IjkMediaPlayer { *; }
