@@ -71,6 +71,7 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
         mBinding.mic.setListener(this, new CustomTextListener() {
             @Override
             public void onEndOfSpeech() {
+                mBinding.keyword.requestFocus();
                 mBinding.mic.stop();
             }
 
@@ -126,7 +127,6 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
 
     @Override
     public void onSearch() {
-        mBinding.mic.setFocusable(false);
         String keyword = mBinding.keyword.getText().toString().trim();
         mBinding.keyword.setSelection(mBinding.keyword.length());
         Utils.hideKeyboard(mBinding.keyword);
@@ -155,6 +155,5 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
     protected void onResume() {
         super.onResume();
         mBinding.keyword.requestFocus();
-        mBinding.mic.setFocusable(true);
     }
 }
