@@ -104,6 +104,14 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private Runnable mR1;
     private Runnable mR2;
 
+    public static void cast(Activity activity, History history) {
+        start(activity, history.getSiteKey(), history.getVodId(), history.getVodName(), true, true);
+    }
+
+    public static void push(Activity activity, String url, boolean clear) {
+        start(activity, "push_agent", url, url, clear);
+    }
+
     public static void start(Activity activity, String id, String name) {
         start(activity, ApiConfig.get().getHome().getKey(), id, name);
     }
@@ -113,12 +121,21 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     public static void start(Activity activity, String key, String id, String name, boolean clear) {
+        start(activity, key, id, name, clear, false);
+    }
+
+    public static void start(Activity activity, String key, String id, String name, boolean clear, boolean cast) {
         Intent intent = new Intent(activity, DetailActivity.class);
         if (clear) intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra("cast", cast);
         intent.putExtra("name", name);
         intent.putExtra("key", key);
         intent.putExtra("id", id);
         activity.startActivityForResult(intent, 1000);
+    }
+
+    private boolean isCast() {
+        return getIntent().getBooleanExtra("cast", false);
     }
 
     private String getName() {
@@ -201,6 +218,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         setVideoView();
         setViewModel();
         getDetail();
+        checkCast();
     }
 
     @Override
@@ -309,6 +327,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         for (int i = 0; i < mBinding.control.actionLayout.getChildCount(); i++) {
             mBinding.control.actionLayout.getChildAt(i).setNextFocusDownId(isUseParse() ? R.id.parse : R.id.timeBar);
         }
+    }
+
+    private void checkCast() {
+        if (isCast()) onVideo();
     }
 
     private void getDetail() {
