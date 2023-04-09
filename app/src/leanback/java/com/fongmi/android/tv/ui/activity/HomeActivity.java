@@ -306,19 +306,17 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
                 CollectActivity.start(this, event.getText(), true);
                 break;
             case PUSH:
-                if (ApiConfig.get().getSite("push_agent") == null) return;
-                DetailActivity.start(this, "push_agent", event.getText(), "", true);
+                if (ApiConfig.hasPush()) DetailActivity.push(this, event.getText(), true);
                 break;
         }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onCastEvent(CastEvent event) {
-        if (ApiConfig.getUrl().equals(event.getUrl())) {
-            History history = event.getHistory().cid(ApiConfig.getCid());
-            DetailActivity.start(this, history.getSiteKey(), history.getVodId(), history.getVodName(), true);
+        if (ApiConfig.getUrl().equals(event.getConfig())) {
+            DetailActivity.cast(this, event.getHistory().cid(ApiConfig.getCid()));
         } else {
-            ApiConfig.get().clear().config(Config.find(event.getUrl(), 0)).load(getCallback(event));
+            ApiConfig.get().clear().config(Config.find(event.getConfig(), 0)).load(getCallback(event));
         }
     }
 
