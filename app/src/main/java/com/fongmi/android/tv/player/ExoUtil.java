@@ -72,7 +72,7 @@ public class ExoUtil {
     }
 
     public static MediaSource getSource(Result result, int errorCode) {
-        return getSource(result.getHeaders(), result.getPlayUrl() + result.getUrl(), result.getSubs(), errorCode);
+        return getSource(result.getHeaders(), result.getRealUrl(), result.getSubs(), errorCode);
     }
 
     public static MediaSource getSource(Map<String, String> headers, String url, int errorCode) {
