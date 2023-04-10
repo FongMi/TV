@@ -115,6 +115,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         else PermissionX.init(activity).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> start(activity, "push_agent", "file://" + url, name));
     }
 
+    public static void cast(Activity activity, History history) {
+        start(activity, history.getSiteKey(), history.getVodId(), history.getVodName());
+    }
+
     public static void push(Activity activity, String url) {
         start(activity, "push_agent", url, url);
     }
@@ -1041,7 +1045,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     @Override
-    public void onCastSuccess() {
+    public void onCastTo(boolean mobile) {
+        if (mobile) return;
         checkPlayImg(false);
         mPlayers.pause();
     }

@@ -8,6 +8,7 @@ import androidx.room.Entity;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
+import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.utils.Utils;
@@ -28,12 +29,15 @@ public class Device {
     private String name;
     @SerializedName("ip")
     private String ip;
+    @SerializedName("type")
+    private int type;
 
     public static Device get() {
         Device device = new Device();
         device.setUuid(Utils.getDeviceId());
         device.setName(Utils.getDeviceName());
         device.setIp(Server.get().getAddress());
+        device.setType(Product.getDeviceType());
         return device;
     }
 
@@ -76,8 +80,24 @@ public class Device {
         this.ip = ip;
     }
 
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    public boolean isLeanback() {
+        return getType() == 0;
+    }
+
+    public boolean isMobile() {
+        return getType() == 1;
+    }
+
     public boolean isCast() {
-        return getIp().isEmpty();
+        return getType() == 2;
     }
 
     public String getHost() {
@@ -86,6 +106,11 @@ public class Device {
 
     public Device save() {
         AppDatabase.get().getDeviceDao().insertOrUpdate(this);
+        return this;
+    }
+
+    public Device delete() {
+        if (getId() != null) AppDatabase.get().getDeviceDao().delete(getId());
         return this;
     }
 

@@ -22,6 +22,7 @@ import com.fongmi.android.tv.bean.Hot;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.databinding.FragmentVodBinding;
+import com.fongmi.android.tv.event.CastEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.impl.FilterCallback;
 import com.fongmi.android.tv.impl.SiteCallback;
@@ -36,6 +37,7 @@ import com.fongmi.android.tv.ui.adapter.TypeAdapter;
 import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.custom.dialog.FilterDialog;
 import com.fongmi.android.tv.ui.custom.dialog.LinkDialog;
+import com.fongmi.android.tv.ui.custom.dialog.ReceiveDialog;
 import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
 import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.Prefers;
@@ -206,6 +208,14 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         mBinding.progress.getRoot().setVisibility(View.GONE);
     }
 
+    private void homeContent() {
+        showProgress();
+        setFabVisible(0);
+        mAdapter.clear();
+        mViewModel.homeContent();
+        mBinding.pager.setAdapter(new PageAdapter(getChildFragmentManager()));
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefreshEvent(RefreshEvent event) {
         switch (event.getType()) {
@@ -219,12 +229,10 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         }
     }
 
-    private void homeContent() {
-        showProgress();
-        setFabVisible(0);
-        mAdapter.clear();
-        mViewModel.homeContent();
-        mBinding.pager.setAdapter(new PageAdapter(getChildFragmentManager()));
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onCastEvent(CastEvent event) {
+        for (Fragment fragment : getChildFragmentManager().getFragments()) if (fragment instanceof BottomSheetDialogFragment) return;
+        ReceiveDialog.create().event(event).show(getChildFragmentManager(), null);
     }
 
     @Override
