@@ -21,16 +21,21 @@
             app:shapeAppearanceOverlay="@style/Vod.Grid"
             tools:src="@drawable/ic_img_loading" />
 
+        <include
+            android:id="@+id/progress"
+            layout="@layout/view_progress"
+            android:visibility="gone" />
+
         <FrameLayout
+            android:id="@+id/play"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:background="@drawable/shape_control">
 
             <ImageView
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:src="@drawable/exo_icon_play" />
 
         </FrameLayout>

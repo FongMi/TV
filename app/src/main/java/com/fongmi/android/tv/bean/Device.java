@@ -9,6 +9,7 @@ import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import com.fongmi.android.tv.Product;
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.utils.Utils;
@@ -88,16 +89,16 @@ public class Device {
         this.type = type;
     }
 
-    public boolean isLeanback() {
-        return getType() == 0;
-    }
-
     public boolean isMobile() {
         return getType() == 1;
     }
 
     public boolean isCast() {
         return getType() == 2;
+    }
+
+    public int getIcon() {
+        return isMobile() ? R.drawable.ic_cast_mobile : R.drawable.ic_cast_tv;
     }
 
     public String getHost() {
@@ -109,13 +110,12 @@ public class Device {
         return this;
     }
 
-    public Device delete() {
-        if (getId() != null) AppDatabase.get().getDeviceDao().delete(getId());
-        return this;
-    }
-
     public static List<Device> getAll() {
         return AppDatabase.get().getDeviceDao().findAll();
+    }
+
+    public static void delete() {
+        AppDatabase.get().getDeviceDao().delete();
     }
 
     @Override
