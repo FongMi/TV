@@ -25,7 +25,6 @@
     <string name="cast_device_empty">Could\'t find a device to cast</string>
     <string name="cast_device_offline">Device is offline</string>
     <string name="cast_scan">Please scan QR Code to bind</string>
-    <string name="cast_to">Cast to <xliff:g name="name">%s</xliff:g></string>
 
     <!-- Control -->
     <string name="control_speed">Speed</string>

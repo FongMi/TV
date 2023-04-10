@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 21,
-    "identityHash": "f36d8a4b7379ebede24a22f085c33856",
+    "version": 22,
+    "identityHash": "0d186de42a589253f12a86254e20636e",
     "entities": [
       {
         "tableName": "Keep",
@@ -259,7 +259,7 @@
       },
       {
         "tableName": "Device",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `uuid` TEXT, `name` TEXT, `ip` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `uuid` TEXT, `name` TEXT, `ip` TEXT, `type` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -284,6 +284,12 @@
             "columnName": "ip",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -426,7 +432,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f36d8a4b7379ebede24a22f085c33856')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0d186de42a589253f12a86254e20636e')"
     ]
   }
 }
