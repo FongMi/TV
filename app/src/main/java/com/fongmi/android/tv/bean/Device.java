@@ -9,7 +9,6 @@ import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import com.fongmi.android.tv.Product;
-import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.utils.Utils;
@@ -95,10 +94,6 @@ public class Device {
 
     public boolean isCast() {
         return getType() == 2;
-    }
-
-    public int getIcon() {
-        return isMobile() ? R.drawable.ic_cast_mobile : R.drawable.ic_cast_tv;
     }
 
     public String getHost() {
