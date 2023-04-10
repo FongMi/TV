@@ -26,7 +26,7 @@ import com.fongmi.android.tv.db.dao.TrackDao;
 @Database(entities = {Keep.class, Site.class, Track.class, Config.class, Device.class, History.class}, version = AppDatabase.VERSION)
 public abstract class AppDatabase extends RoomDatabase {
 
-    public static final int VERSION = 21;
+    public static final int VERSION = 22;
     public static final String SYMBOL = "@@@";
 
     private static volatile AppDatabase instance;
@@ -48,6 +48,7 @@ public abstract class AppDatabase extends RoomDatabase {
                 .addMigrations(MIGRATION_18_19)
                 .addMigrations(MIGRATION_19_20)
                 .addMigrations(MIGRATION_20_21)
+                .addMigrations(MIGRATION_21_22)
                 .allowMainThreadQueries()
                 .fallbackToDestructiveMigration()
                 .build();
@@ -137,6 +138,13 @@ public abstract class AppDatabase extends RoomDatabase {
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             database.execSQL("CREATE TABLE IF NOT EXISTS `Device` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `uuid` TEXT, `name` TEXT, `ip` TEXT)");
             database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_Device_uuid_name` ON `Device` (`uuid`, `name`)");
+        }
+    };
+
+    static final Migration MIGRATION_21_22 = new Migration(21, 22) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE Device ADD COLUMN type INTEGER DEFAULT 0 NOT NULL");
         }
     };
 }

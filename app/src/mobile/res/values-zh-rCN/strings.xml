@@ -25,7 +25,6 @@
     <string name="cast_device_empty">找不到装置</string>
     <string name="cast_device_offline">装置已离线</string>
     <string name="cast_scan">请扫描影视 QRCode 进行绑定</string>
-    <string name="cast_to">已投放至“<xliff:g name="name">%s</xliff:g>”</string>
 
     <!-- Control -->
     <string name="control_speed">倍速</string>
