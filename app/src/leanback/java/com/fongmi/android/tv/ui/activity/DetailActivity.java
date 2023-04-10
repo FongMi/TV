@@ -209,7 +209,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     protected void initView() {
         mKeyDown = CustomKeyDownVod.create(this, mBinding.video);
         mFrameParams = mBinding.video.getLayoutParams();
-        mBinding.progressLayout.showProgress();
         mPlayers = new Players().init();
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
@@ -331,6 +330,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void checkCast() {
         if (isCast()) onVideo();
+        else mBinding.progressLayout.showProgress();
     }
 
     private void getDetail() {
