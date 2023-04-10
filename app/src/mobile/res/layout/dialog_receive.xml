@@ -50,7 +50,7 @@
         android:ellipsize="end"
         android:maxLines="3"
         android:textColor="?android:attr/textColorPrimary"
-        android:textSize="14sp"
+        android:textSize="16sp"
         tools:text="狂飆" />
 
     <TextView
@@ -59,9 +59,9 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/name"
         android:layout_alignStart="@+id/name"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="2dp"
         android:singleLine="true"
-        android:textColor="?android:attr/textColorPrimary"
+        android:textColor="?android:attr/textColorSecondary"
         android:textSize="14sp"
         tools:text="Xiaomi 13" />
 

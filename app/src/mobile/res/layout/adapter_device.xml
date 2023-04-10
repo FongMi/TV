@@ -36,7 +36,7 @@
             android:layout_marginTop="2dp"
             android:singleLine="true"
             android:textColor="@color/white"
-            android:textSize="14sp"
+            android:textSize="12sp"
             tools:text="127.0.0.1" />
 
     </LinearLayout>
