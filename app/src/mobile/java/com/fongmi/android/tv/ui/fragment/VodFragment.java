@@ -151,18 +151,19 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         mBinding.pager.getAdapter().notifyDataSetChanged();
         for (Class item : mAdapter.getTypes()) if (result.getFilters().containsKey(item.getTypeId())) item.setFilters(result.getFilters().get(item.getTypeId()));
         EventBus.getDefault().post(result);
+        setFabVisible(0);
         hideProgress();
     }
 
     private void setFabVisible(int position) {
-        if (position == 0) {
-            mBinding.link.show();
+        if (mAdapter.getItemCount() == 0) {
+            mBinding.link.setVisibility(View.GONE);
             mBinding.filter.setVisibility(View.GONE);
         } else if (mAdapter.get(position).getFilters().size() > 0) {
             mBinding.link.setVisibility(View.GONE);
             mBinding.filter.show();
-        } else {
-            mBinding.link.setVisibility(View.GONE);
+        } else if (position == 0) {
+            mBinding.link.show();
             mBinding.filter.setVisibility(View.GONE);
         }
     }
