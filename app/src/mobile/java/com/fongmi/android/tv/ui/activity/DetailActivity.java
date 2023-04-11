@@ -457,7 +457,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void onCast() {
         for (Fragment fragment : getSupportFragmentManager().getFragments()) if (fragment instanceof BottomSheetDialogFragment) return;
-        CastDialog.create(this).config(ApiConfig.getUrl()).video(CastVideo.get(getName(), getUrl())).history(mHistory).show(getSupportFragmentManager(), null);
+        CastDialog.create(this).config(ApiConfig.getUrl()).history(mHistory).video(CastVideo.get(getName(), getUrl())).show(getSupportFragmentManager(), null);
     }
 
     private void onKeep() {
