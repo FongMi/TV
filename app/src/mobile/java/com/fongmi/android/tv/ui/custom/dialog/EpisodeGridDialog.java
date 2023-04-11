@@ -11,44 +11,44 @@ import androidx.viewbinding.ViewBinding;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import com.fongmi.android.tv.bean.Vod;
-import com.fongmi.android.tv.databinding.DialogEpisodeBinding;
+import com.fongmi.android.tv.databinding.DialogEpisodeGridBinding;
 import com.fongmi.android.tv.ui.fragment.EpisodeFragment;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class EpisodeDialog extends BaseDialog {
+public class EpisodeGridDialog extends BaseDialog {
 
-    private List<Vod.Flag.Episode> episodes;
-    private DialogEpisodeBinding binding;
     private final List<String> titles;
+    private DialogEpisodeGridBinding binding;
+    private List<Vod.Flag.Episode> episodes;
     private boolean reverse;
     private int spanCount;
     private int itemCount;
 
-    public static EpisodeDialog create() {
-        return new EpisodeDialog();
+    public static EpisodeGridDialog create() {
+        return new EpisodeGridDialog();
     }
 
-    public EpisodeDialog() {
+    public EpisodeGridDialog() {
         this.titles = new ArrayList<>();
         this.spanCount = 5;
     }
 
-    public EpisodeDialog reverse(boolean reverse) {
+    public EpisodeGridDialog reverse(boolean reverse) {
         this.reverse = reverse;
         return this;
     }
 
-    public EpisodeDialog episodes(List<Vod.Flag.Episode> episodes) {
+    public EpisodeGridDialog episodes(List<Vod.Flag.Episode> episodes) {
         this.episodes = episodes;
         return this;
     }
 
     @Override
     protected ViewBinding getBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
-        return binding = DialogEpisodeBinding.inflate(inflater, container, false);
+        return binding = DialogEpisodeGridBinding.inflate(inflater, container, false);
     }
 
     @Override
