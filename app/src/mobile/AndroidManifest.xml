@@ -10,7 +10,7 @@
             android:name=".ui.activity.MainActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
             android:exported="true"
-            android:screenOrientation="userPortrait"
+            android:screenOrientation="fullUser"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -43,23 +43,23 @@
 
         <activity
             android:name=".ui.activity.CollectActivity"
-            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
-            android:screenOrientation="userPortrait" />
+            android:configChanges="screenSize|smallestScreenSize|screenLayout"
+            android:screenOrientation="fullUser" />
 
         <activity
             android:name=".ui.activity.HistoryActivity"
-            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
-            android:screenOrientation="userPortrait" />
+            android:configChanges="screenSize|smallestScreenSize|screenLayout"
+            android:screenOrientation="fullUser" />
 
         <activity
             android:name=".ui.activity.KeepActivity"
-            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
-            android:screenOrientation="userPortrait" />
+            android:configChanges="screenSize|smallestScreenSize|screenLayout"
+            android:screenOrientation="fullUser" />
 
         <activity
             android:name=".ui.activity.ScanActivity"
-            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
-            android:screenOrientation="userPortrait" />
+            android:configChanges="screenSize|smallestScreenSize|screenLayout"
+            android:screenOrientation="fullUser" />
 
         <service
             android:name="com.android.cast.dlna.dmc.DLNACastService"

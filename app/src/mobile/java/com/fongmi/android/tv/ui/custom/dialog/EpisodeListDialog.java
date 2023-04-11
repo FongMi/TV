@@ -37,9 +37,10 @@ public class EpisodeListDialog implements EpisodeAdapter.OnClickListener {
         return this;
     }
 
-    public void show() {
+    public SideSheetDialog show() {
         initDialog();
         initView();
+        return dialog;
     }
 
     private void initDialog() {
@@ -74,6 +75,5 @@ public class EpisodeListDialog implements EpisodeAdapter.OnClickListener {
     @Override
     public void onItemClick(Vod.Flag.Episode item) {
         viewModel.setEpisode(item);
-        dialog.dismiss();
     }
 }
