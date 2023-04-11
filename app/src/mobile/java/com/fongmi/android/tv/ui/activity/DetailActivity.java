@@ -57,7 +57,8 @@ import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.ui.custom.ViewType;
 import com.fongmi.android.tv.ui.custom.dialog.CastDialog;
 import com.fongmi.android.tv.ui.custom.dialog.ControlDialog;
-import com.fongmi.android.tv.ui.custom.dialog.EpisodeDialog;
+import com.fongmi.android.tv.ui.custom.dialog.EpisodeGridDialog;
+import com.fongmi.android.tv.ui.custom.dialog.EpisodeListDialog;
 import com.fongmi.android.tv.ui.custom.dialog.TrackDialog;
 import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.Notify;
@@ -245,6 +246,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.action.decode.setOnClickListener(view -> onDecode());
         mBinding.control.action.ending.setOnClickListener(view -> onEnding());
         mBinding.control.action.opening.setOnClickListener(view -> onOpening());
+        mBinding.control.action.episodes.setOnClickListener(view -> onEpisodes());
         mBinding.control.action.speed.setOnLongClickListener(view -> onSpeedLong());
         mBinding.control.action.ending.setOnLongClickListener(view -> onEndingReset());
         mBinding.control.action.opening.setOnLongClickListener(view -> onOpeningReset());
@@ -434,7 +436,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void onMore() {
         for (Fragment fragment : getSupportFragmentManager().getFragments()) if (fragment instanceof BottomSheetDialogFragment) return;
-        EpisodeDialog.create().reverse(mHistory.isRevSort()).episodes(mEpisodeAdapter.getItems()).show(getSupportFragmentManager(), null);
+        EpisodeGridDialog.create().reverse(mHistory.isRevSort()).episodes(mEpisodeAdapter.getItems()).show(getSupportFragmentManager(), null);
     }
 
     private void onActor() {
@@ -605,6 +607,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.action.opening.setText(R.string.play_op);
         setR1Callback();
         return true;
+    }
+
+    private void onEpisodes() {
+        EpisodeListDialog.create(this).episodes(mEpisodeAdapter.getItems()).show();
     }
 
     private boolean onActionTouch(View v, MotionEvent e) {
