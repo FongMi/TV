@@ -3,6 +3,7 @@ package com.fongmi.android.tv.ui.activity;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -73,6 +74,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -92,6 +94,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private ExecutorService mExecutor;
     private SiteViewModel mViewModel;
     private FlagAdapter mFlagAdapter;
+    private List<Dialog> mDialogs;
     private Receiver mReceiver;
     private History mHistory;
     private Players mPlayers;
@@ -206,6 +209,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.progressLayout.showProgress();
         mReceiver = new Receiver(mBinding);
         mPlayers = new Players().init();
+        mDialogs = new ArrayList<>();
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
         mR3 = this::setOrient;
@@ -610,7 +614,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onEpisodes() {
-        EpisodeListDialog.create(this).episodes(mEpisodeAdapter.getItems()).show();
+        mDialogs.add(EpisodeListDialog.create(this).episodes(mEpisodeAdapter.getItems()).show());
     }
 
     private boolean onActionTouch(View v, MotionEvent e) {
@@ -706,7 +710,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void hideSheet() {
+        for (Dialog dialog : mDialogs) dialog.dismiss();
         for (Fragment fragment : getSupportFragmentManager().getFragments()) if (fragment instanceof BottomSheetDialogFragment) ((BottomSheetDialogFragment) fragment).dismiss();
+        mDialogs.clear();
     }
 
     private void setTraffic() {

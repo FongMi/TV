@@ -1,6 +1,7 @@
 package com.fongmi.android.tv.ui.activity;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -101,6 +102,12 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
         confirm = true;
         Notify.show(R.string.app_exit);
         App.post(() -> confirm = false, 2000);
+    }
+
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        RefreshEvent.video();
     }
 
     @Override
