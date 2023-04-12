@@ -1,5 +1,7 @@
 package com.fongmi.android.tv.api;
 
+import android.text.TextUtils;
+
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.R;
@@ -87,7 +89,7 @@ public class LiveConfig {
             parseConfig(Decoder.getJson(config.getUrl()), callback);
         } catch (Exception e) {
             e.printStackTrace();
-            App.post(() -> callback.error(config.getUrl().isEmpty() ? 0 : R.string.error_config_get));
+            App.post(() -> callback.error(TextUtils.isEmpty(config.getUrl()) ? 0 : R.string.error_config_get));
         }
     }
 
@@ -186,7 +188,7 @@ public class LiveConfig {
     }
 
     public boolean isSame(String url) {
-        return same || config.getUrl().isEmpty() || url.equals(config.getUrl());
+        return same || TextUtils.isEmpty(config.getUrl()) || url.equals(config.getUrl());
     }
 
     public List<Live> getLives() {
