@@ -2,6 +2,7 @@ package com.fongmi.android.tv.ui.custom.dialog;
 
 import android.Manifest;
 import android.content.DialogInterface;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -72,7 +73,7 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
     private void initView() {
         String address = Server.get().getAddress();
         binding.text.setText(url = getUrl());
-        binding.text.setSelection(url.length());
+        binding.text.setSelection(TextUtils.isEmpty(url) ? 0 : url.length());
         binding.code.setImageBitmap(QRCode.getBitmap(address, 200, 0));
         binding.storage.setVisibility(Utils.hasPermission(activity) ? View.GONE : View.VISIBLE);
         binding.info.setText(ResUtil.getString(R.string.push_info, address).replace("，", "\n"));
