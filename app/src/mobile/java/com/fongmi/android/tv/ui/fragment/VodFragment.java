@@ -96,6 +96,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         mBinding.link.setOnClickListener(this::onLink);
         mBinding.logo.setOnClickListener(this::onLogo);
         mBinding.keep.setOnClickListener(this::onKeep);
+        mBinding.retry.setOnClickListener(this::onRetry);
         mBinding.filter.setOnClickListener(this::onFilter);
         mBinding.search.setOnClickListener(this::onSearch);
         mBinding.history.setOnClickListener(this::onHistory);
@@ -155,6 +156,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         EventBus.getDefault().post(result);
         setFabVisible(0);
         hideProgress();
+        checkRetry();
     }
 
     private void setFabVisible(int position) {
@@ -170,6 +172,10 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         }
     }
 
+    private void checkRetry() {
+        mBinding.retry.setVisibility(mAdapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
+    }
+
     private void onLink(View view) {
         if (ApiConfig.hasPush()) LinkDialog.create(this).show();
         else mBinding.link.hide();
@@ -181,6 +187,10 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
 
     private void onKeep(View view) {
         KeepActivity.start(getActivity());
+    }
+
+    private void onRetry(View view) {
+        homeContent();
     }
 
     private void onFilter(View view) {
@@ -201,6 +211,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     }
 
     private void showProgress() {
+        mBinding.retry.setVisibility(View.GONE);
         mBinding.progress.getRoot().setVisibility(View.VISIBLE);
     }
 

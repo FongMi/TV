@@ -99,6 +99,15 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
+    <ImageView
+        android:id="@+id/retry"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_gravity="center"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_vod_retry"
+        android:visibility="gone" />
+
     <include
         android:id="@+id/progress"
         layout="@layout/view_progress"

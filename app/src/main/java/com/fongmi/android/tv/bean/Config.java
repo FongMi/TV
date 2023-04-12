@@ -3,6 +3,7 @@ package com.fongmi.android.tv.bean;
 import android.text.TextUtils;
 
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
@@ -24,7 +25,7 @@ public class Config {
     private String parse;
 
     public static Config create(int type) {
-        return create("", type);
+        return new Config(type);
     }
 
     public static Config create(String url, int type) {
@@ -33,6 +34,12 @@ public class Config {
 
     public static Config create(String url, String name, int type) {
         return new Config(url, name, type);
+    }
+
+    @Ignore
+    public Config(int type) {
+        this.type = type;
+        this.id = -1;
     }
 
     public Config(String url, String name, int type) {
