@@ -1,6 +1,7 @@
 package com.fongmi.android.tv.ui.custom.dialog;
 
 import android.content.DialogInterface;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -57,8 +58,8 @@ public class ConfigDialog {
 
     private void initView() {
         binding.text.setText(url = getUrl());
-        binding.text.setSelection(url.length());
         binding.input.setEndIconOnClickListener(this::onChoose);
+        binding.text.setSelection(TextUtils.isEmpty(url) ? 0 : url.length());
     }
 
     private void initEvent() {
