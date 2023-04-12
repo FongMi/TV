@@ -637,6 +637,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     @Override
     public void setLive(Live item) {
         LiveConfig.get().setHome(item);
+        mPlayers.stop();
         mHides.clear();
         hideControl();
         getLive();
