@@ -222,6 +222,9 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
 
     private void updateText() {
         if (player == null || decode == null) return;
+        mBinding.vodUrl.setText(ApiConfig.getDesc());
+        mBinding.liveUrl.setText(LiveConfig.getDesc());
+        mBinding.wallUrl.setText(WallConfig.getDesc());
         mBinding.playerText.setText(player[Prefers.getPlayer()]);
         mBinding.decodeText.setText(decode[Prefers.getDecode()]);
     }
