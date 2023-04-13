@@ -1,5 +1,8 @@
 package com.fongmi.android.tv.bean;
 
+import android.text.TextUtils;
+import android.view.View;
+
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -199,12 +202,16 @@ public class History {
         this.cid = cid;
     }
 
+    public String getSiteName() {
+        return ApiConfig.getSiteName(getSiteKey());
+    }
+
     public String getSiteKey() {
-        return getKey().substring(0, getKey().lastIndexOf(AppDatabase.SYMBOL));
+        return getKey().split(AppDatabase.SYMBOL)[0];
     }
 
     public String getVodId() {
-        return getKey().substring(getKey().lastIndexOf(AppDatabase.SYMBOL) + AppDatabase.SYMBOL.length());
+        return getKey().split(AppDatabase.SYMBOL)[1];
     }
 
     public Vod.Flag getFlag() {
@@ -213,6 +220,10 @@ public class History {
 
     public Vod.Flag.Episode getEpisode() {
         return new Vod.Flag.Episode(getVodRemarks(), getEpisodeUrl());
+    }
+
+    public int getSiteVisible() {
+        return TextUtils.isEmpty(getSiteName()) ? View.GONE : View.VISIBLE;
     }
 
     public int getRevPlayText() {
@@ -254,6 +265,12 @@ public class History {
         update();
     }
 
+    public History update(int cid) {
+        setCid(cid);
+        update();
+        return this;
+    }
+
     public History update() {
         checkMerge(AppDatabase.get().getHistoryDao().findByName(ApiConfig.getCid(), getVodName()));
         AppDatabase.get().getHistoryDao().insertOrUpdate(this);
@@ -263,11 +280,6 @@ public class History {
     public History delete() {
         AppDatabase.get().getHistoryDao().delete(ApiConfig.getCid(), getKey());
         return this;
-    }
-
-    public History cid(int cid) {
-        setCid(cid);
-        return update();
     }
 
     public void findEpisode(List<Vod.Flag> flags) {
