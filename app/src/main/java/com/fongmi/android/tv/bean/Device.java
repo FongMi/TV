@@ -92,12 +92,12 @@ public class Device {
         return getType() == 1;
     }
 
-    public boolean isCast() {
+    public boolean isDLNA() {
         return getType() == 2;
     }
 
     public String getHost() {
-        return isCast() ? getUuid() : Uri.parse(getIp()).getHost();
+        return isDLNA() ? getUuid() : Uri.parse(getIp()).getHost();
     }
 
     public Device save() {
