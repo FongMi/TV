@@ -64,11 +64,11 @@ public class HistoryPresenter extends Presenter {
         ViewHolder holder = (ViewHolder) viewHolder;
         setClickListener(holder.view, item);
         holder.binding.name.setText(item.getVodName());
-        holder.binding.site.setVisibility(View.VISIBLE);
-        holder.binding.site.setText(ApiConfig.getSiteName(item.getSiteKey()));
-        holder.binding.remark.setText(ResUtil.getString(R.string.vod_last, item.getVodRemarks()));
+        holder.binding.site.setText(item.getSiteName());
+        holder.binding.site.setVisibility(item.getSiteVisible());
         holder.binding.remark.setVisibility(delete ? View.GONE : View.VISIBLE);
         holder.binding.delete.setVisibility(!delete ? View.GONE : View.VISIBLE);
+        holder.binding.remark.setText(ResUtil.getString(R.string.vod_last, item.getVodRemarks()));
         ImgUtil.loadHistory(item.getVodPic(), holder.binding.image);
     }
 

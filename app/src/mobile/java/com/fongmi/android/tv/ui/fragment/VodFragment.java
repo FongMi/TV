@@ -62,6 +62,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     private TypeAdapter mAdapter;
     private Runnable mRunnable;
     private List<String> mHots;
+    private Result mResult;
 
     public static VodFragment newInstance() {
         return new VodFragment();
@@ -119,7 +120,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
 
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
-        mViewModel.result.observe(getViewLifecycleOwner(), this::setAdapter);
+        mViewModel.result.observe(getViewLifecycleOwner(), result -> setAdapter(mResult = result));
     }
 
     private void initHot() {
@@ -153,7 +154,6 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         mAdapter.addAll(handle(result));
         mBinding.pager.getAdapter().notifyDataSetChanged();
         for (Class item : mAdapter.getTypes()) if (result.getFilters().containsKey(item.getTypeId())) item.setFilters(result.getFilters().get(item.getTypeId()));
-        EventBus.getDefault().post(result);
         setFabVisible(0);
         hideProgress();
         checkRetry();
@@ -225,6 +225,10 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         mAdapter.clear();
         mViewModel.homeContent();
         mBinding.pager.setAdapter(new PageAdapter(getChildFragmentManager()));
+    }
+
+    public Result getResult() {
+        return mResult;
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

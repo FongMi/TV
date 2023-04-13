@@ -25,10 +25,6 @@ import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.custom.CustomScroller;
 import com.fongmi.android.tv.ui.custom.ViewType;
 
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -63,6 +59,10 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         return getTypeId().equals("home");
     }
 
+    private VodFragment getParent() {
+        return (VodFragment) getParentFragment();
+    }
+
     @Override
     protected ViewBinding getBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
         return mBinding = FragmentTypeBinding.inflate(inflater, container, false);
@@ -70,7 +70,6 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     @Override
     protected void initView() {
-        EventBus.getDefault().register(this);
         mScroller = new CustomScroller(this);
         mTypeIds = new ArrayList<>();
         mExtends = new HashMap<>();
@@ -110,6 +109,15 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         getVideo(getTypeId(), "1");
     }
 
+    private void getVideo(String typeId, String page) {
+        if (isFolder()) mTypeIds.add(typeId);
+        if (isFolder()) mBinding.recycler.scrollToPosition(0);
+        if (page.equals("1")) mAdapter.clear();
+        if (page.equals("1") && !mBinding.swipeLayout.isRefreshing()) mBinding.progressLayout.showProgress();
+        if (isHome() && page.equals("1")) setAdapter(getParent().getResult());
+        else mViewModel.categoryContent(ApiConfig.get().getHome().getKey(), typeId, page, true, mExtends);
+    }
+
     private void setAdapter(Result result) {
         int size = result.getList().size();
         mBinding.progressLayout.showContent(isFolder(), size);
@@ -124,14 +132,6 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         getVideo(getTypeId(), String.valueOf(mScroller.addPage()));
     }
 
-    private void getVideo(String typeId, String page) {
-        if (isFolder()) mTypeIds.add(typeId);
-        if (isFolder()) mBinding.recycler.scrollToPosition(0);
-        if (page.equals("1")) mAdapter.clear();
-        if (page.equals("1") && !mBinding.swipeLayout.isRefreshing()) mBinding.progressLayout.showProgress();
-        mViewModel.categoryContent(ApiConfig.get().getHome().getKey(), typeId, page, true, mExtends);
-    }
-
     private void refresh(int num) {
         String typeId = mTypeIds.get(mTypeIds.size() - num);
         mTypeIds = mTypeIds.subList(0, mTypeIds.size() - num);
@@ -141,11 +141,6 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     public void setFilter(String key, String value) {
         mExtends.put(key, value);
         onRefresh();
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onResult(Result result) {
-        if (isHome()) setAdapter(result);
     }
 
     @Override
@@ -178,11 +173,5 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         if (mTypeIds.size() < 2) return true;
         refresh(2);
         return false;
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        EventBus.getDefault().unregister(this);
     }
 }
