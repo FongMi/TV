@@ -416,6 +416,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void seamless(Vod.Flag flag) {
+        if (!getSite().isChangeable()) return;
         Vod.Flag.Episode episode = flag.find(mHistory.getVodRemarks());
         if (episode == null || episode.isActivated()) return;
         mHistory.setVodRemarks(episode.getName());
@@ -716,6 +717,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mHistory = History.find(getHistoryKey());
         mHistory = mHistory == null ? createHistory(item) : mHistory;
         setFlagActivated(mHistory.getFlag());
+        setEpisodeActivated(mHistory.getEpisode());
         if (mHistory.isRevSort()) reverseEpisode(true);
         mBinding.control.opening.setText(mHistory.getOpening() == 0 ? getString(R.string.play_op) : mPlayers.stringToTime(mHistory.getOpening()));
         mBinding.control.ending.setText(mHistory.getEnding() == 0 ? getString(R.string.play_ed) : mPlayers.stringToTime(mHistory.getEnding()));
