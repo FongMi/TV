@@ -31,6 +31,10 @@ public class Trans {
         for (int i = 0, n = UTF8T.length; i < n; ++i) map.put(UTF8S[i], UTF8T[i]);
     }
 
+    public static boolean pass() {
+        return !get().trans;
+    }
+
     public static String get(String text) {
         if (!get().trans || TextUtils.isEmpty(text)) return text;
         char[] chars = text.toCharArray();

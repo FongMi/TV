@@ -5,6 +5,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 
+import com.fongmi.android.tv.utils.Trans;
 import com.fongmi.android.tv.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
@@ -175,6 +176,17 @@ public class Vod {
         return getVodTag().equals("folder");
     }
 
+    public void trans() {
+        if (Trans.pass()) return;
+        this.vodName = Trans.get(vodName);
+        this.vodArea = Trans.get(vodArea);
+        this.typeName = Trans.get(typeName);
+        this.vodActor = Trans.get(vodActor);
+        this.vodRemarks = Trans.get(vodRemarks);
+        this.vodContent = Trans.get(vodContent);
+        this.vodDirector = Trans.get(vodDirector);
+    }
+
     public void setVodFlags() {
         String[] playFlags = getVodPlayFrom().split("\\$\\$\\$");
         String[] playUrls = getVodPlayUrl().split("\\$\\$\\$");
@@ -296,7 +308,7 @@ public class Vod {
 
             public Episode(String name, String url) {
                 this.number = Utils.getDigit(name);
-                this.name = name;
+                this.name = Trans.get(name);
                 this.url = url;
             }
 
