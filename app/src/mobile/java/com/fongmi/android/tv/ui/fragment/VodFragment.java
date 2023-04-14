@@ -41,6 +41,7 @@ import com.fongmi.android.tv.ui.custom.dialog.ReceiveDialog;
 import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
 import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.Prefers;
+import com.fongmi.android.tv.utils.Trans;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import org.greenrobot.eventbus.EventBus;
