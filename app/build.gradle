@@ -101,9 +101,8 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.14.2'
     implementation 'com.google.android.material:material:1.9.0-beta01'
     implementation 'com.google.code.gson:gson:2.10.1'
-    implementation 'com.google.net.cronet:cronet-okhttp:0.1.0'
-    implementation 'com.google.zxing:core:3.3.0'
     implementation 'com.guolindev.permissionx:permissionx:1.7.1'
+    implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
     implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.10'
     implementation 'net.java.dev.jna:jna:5.12.1'
     implementation 'org.apache.commons:commons-compress:1.20'
@@ -115,7 +114,6 @@ dependencies {
     leanbackImplementation 'me.jessyan:autosize:1.2.1'
     mobileImplementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     mobileImplementation 'com.github.devin1014.DLNA-Cast:dlna-dmc:V1.0.0'
-    mobileImplementation('com.journeyapps:zxing-android-embedded:4.3.0') { transitive = false }
     annotationProcessor 'androidx.room:room-compiler:2.5.1'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.14.2'
 }

@@ -28,7 +28,6 @@
 
 # Cronet
 -keep class org.chromium.net.**{*;}
--keep class com.google.net.cronet.**{*;}
 
 # CatVod
 -keep class com.github.catvod.crawler.** { *; }
@@ -48,9 +47,3 @@
 # ZLive
 -keep class com.sun.jna.** { *; }
 -keep class com.east.android.zlive.** { *; }
-
-# Zxing
--keepclassmembers enum * {
-    public static **[] values();
-    public static ** valueOf(java.lang.String);
-}
