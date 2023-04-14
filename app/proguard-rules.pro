@@ -2,7 +2,7 @@
 -keepattributes Signature
 -keepattributes *Annotation*
 -dontwarn sun.misc.**
--keep class com.google.gson.**{*;}
+-keep class com.google.gson.** { *; }
 -keep class * extends com.google.gson.TypeAdapter
 -keep class * implements com.google.gson.TypeAdapterFactory
 -keep class * implements com.google.gson.JsonSerializer
@@ -12,7 +12,6 @@
 -keep,allowobfuscation,allowshrinking class * extends com.google.gson.reflect.TypeToken
 
 # SimpleXML
--keep class org.simpleframework.xml.** { *; }
 -keep interface org.simpleframework.xml.core.Label { public *; }
 -keep class * implements org.simpleframework.xml.core.Label { public *; }
 -keep interface org.simpleframework.xml.core.Parameter { public *; }
@@ -29,6 +28,7 @@
 
 # Cronet
 -keep class org.chromium.net.** { *; }
+-keep class com.google.net.cronet.** { *; }
 
 # CatVod
 -keep class com.github.catvod.crawler.** { *; }
@@ -41,6 +41,9 @@
 -keep class tv.danmaku.ijk.media.player.** { *; }
 -keep class tv.danmaku.ijk.media.player.IjkMediaPlayer { *; }
 -keep class tv.danmaku.ijk.media.player.ffmpeg.FFmpegApi { *; }
+
+# Sardine
+-keep class com.thegrizzlylabs.sardineandroid.** { *; }
 
 # TVBus
 -keep class com.tvbus.engine.** { *; }
