@@ -91,7 +91,7 @@ public class Class {
 
     public void trans() {
         if (Trans.pass()) return;
-        this.typeName = Trans.get(typeName);
+        this.typeName = Trans.s2t(typeName);
     }
 
     @Override

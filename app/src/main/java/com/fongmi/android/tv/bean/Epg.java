@@ -87,7 +87,7 @@ public class Epg {
         for (Epg item : getList()) {
             item.setStartTime(Utils.format(format, getDate().concat(item.getStart())));
             item.setEndTime(Utils.format(format, getDate().concat(item.getEnd())));
-            item.setTitle(Trans.get(item.getTitle()));
+            item.setTitle(Trans.s2t(item.getTitle()));
         }
     }
 

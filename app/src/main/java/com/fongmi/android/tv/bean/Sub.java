@@ -37,7 +37,7 @@ public class Sub {
 
     public void trans() {
         if (Trans.pass()) return;
-        this.name = Trans.get(name);
+        this.name = Trans.s2t(name);
     }
 
     public MediaItem.SubtitleConfiguration getExo() {
