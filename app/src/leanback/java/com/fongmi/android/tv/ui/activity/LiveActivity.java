@@ -446,6 +446,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.widget.number.setText(mChannel.getNumber());
         mBinding.control.line.setVisibility(mChannel.getLineVisible());
         mBinding.widget.line.setVisibility(mChannel.getLineVisible());
+        showEpg();
         checkEpg();
     }
 
@@ -453,8 +454,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         if (mChannel.getEpg().isEmpty()) return;
         String date = mFormatDate.format(new Date());
         String epg = mChannel.getEpg().replace("{date}", date);
-        if (mChannel.getData().equal(date)) showEpg();
-        else getEpg(epg, mChannel);
+        if (!mChannel.getData().equal(date)) getEpg(epg, mChannel);
     }
 
     private void getEpg(String epg, Channel channel) {
