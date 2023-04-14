@@ -23,11 +23,11 @@
 -keepclassmembers,allowobfuscation class * { @org.simpleframework.xml.ElementList <fields>; }
 
 # OkHttp
--dontwarn okhttp3.**
+-keep class okio.** { *; }
 -keep class okhttp3.** { *; }
 
 # Cronet
--keep class org.chromium.net.**{*;}
+-keep class org.chromium.net.** { *; }
 
 # CatVod
 -keep class com.github.catvod.crawler.** { *; }
