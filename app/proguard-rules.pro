@@ -47,3 +47,9 @@
 # ZLive
 -keep class com.sun.jna.** { *; }
 -keep class com.east.android.zlive.** { *; }
+
+# Zxing
+-keepclassmembers enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
