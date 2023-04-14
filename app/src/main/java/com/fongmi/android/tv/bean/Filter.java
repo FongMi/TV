@@ -75,7 +75,7 @@ public class Filter {
         }
 
         public void trans() {
-            this.n = Trans.get(n);
+            this.n = Trans.s2t(n);
         }
 
         @Override
