@@ -101,7 +101,7 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.14.2'
     implementation 'com.google.android.material:material:1.9.0-beta01'
     implementation 'com.google.code.gson:gson:2.10.1'
-    implementation 'com.google.zxing:core:3.3.0'
+    implementation 'com.google.zxing:core:3.4.1'
     implementation 'com.guolindev.permissionx:permissionx:1.7.1'
     implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.10'
     implementation 'net.java.dev.jna:jna:5.12.1'
