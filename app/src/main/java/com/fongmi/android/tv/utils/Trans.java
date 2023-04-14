@@ -37,6 +37,7 @@ public class Trans {
     }
 
     private String get(String text, Map<Character, Character> map) {
+        if (TextUtils.isEmpty(text)) return text;
         char[] chars = text.toCharArray();
         for (int i = 0; i < chars.length; ++i) {
             Character found = map.get(chars[i]);
@@ -50,12 +51,10 @@ public class Trans {
     }
 
     public static String s2t(String text) {
-        if (pass() || TextUtils.isEmpty(text)) return text;
-        return get().get(text, get().s2t);
+        return pass() ? text : get().get(text, get().s2t);
     }
 
     public static String t2s(String text) {
-        if (pass() || TextUtils.isEmpty(text)) return text;
-        return get().get(text, get().t2s);
+        return pass() ? text : get().get(text, get().t2s);
     }
 }
