@@ -247,7 +247,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.flag.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
-                if (mFlagAdapter.size() > 0) setFlagActivated((Vod.Flag) mFlagAdapter.get(position));
+                if (mFlagAdapter.size() > 0) setFlagActivated((Vod.Flag) mFlagAdapter.get(position), false);
             }
         });
         mBinding.array.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
@@ -261,7 +261,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void setRecyclerView() {
         mBinding.flag.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.flag.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-        mBinding.flag.setAdapter(new ItemBridgeAdapter(mFlagAdapter = new ArrayObjectAdapter(new FlagPresenter(this::setFlagActivated))));
+        mBinding.flag.setAdapter(new ItemBridgeAdapter(mFlagAdapter = new ArrayObjectAdapter(new FlagPresenter(item -> setFlagActivated(item, false)))));
         mBinding.episode.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.episode.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         mBinding.episode.setAdapter(new ItemBridgeAdapter(mEpisodeAdapter = new ArrayObjectAdapter(mEpisodePresenter = new EpisodePresenter(this::setEpisodeActivated))));
@@ -400,13 +400,13 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         view.setTag(text);
     }
 
-    private void setFlagActivated(Vod.Flag item) {
+    private void setFlagActivated(Vod.Flag item, boolean force) {
         if (mFlagAdapter.size() == 0 || item.isActivated()) return;
         for (int i = 0; i < mFlagAdapter.size(); i++) ((Vod.Flag) mFlagAdapter.get(i)).setActivated(item);
         mBinding.flag.setSelectedPosition(mFlagAdapter.indexOf(item));
         notifyItemChanged(mBinding.flag, mFlagAdapter);
         setEpisodeAdapter(item.getEpisodes());
-        seamless(item);
+        seamless(item, force);
     }
 
     private void setEpisodeAdapter(List<Vod.Flag.Episode> items) {
@@ -415,8 +415,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         setArray(items.size());
     }
 
-    private void seamless(Vod.Flag flag) {
-        if (!getSite().isChangeable()) return;
+    private void seamless(Vod.Flag flag, boolean force) {
+        if (!force && !getSite().isChangeable()) return;
         Vod.Flag.Episode episode = flag.find(mHistory.getVodRemarks());
         if (episode == null || episode.isActivated()) return;
         mHistory.setVodRemarks(episode.getName());
@@ -716,8 +716,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void checkHistory(Vod item) {
         mHistory = History.find(getHistoryKey());
         mHistory = mHistory == null ? createHistory(item) : mHistory;
-        setFlagActivated(mHistory.getFlag());
-        setEpisodeActivated(mHistory.getEpisode());
+        setFlagActivated(mHistory.getFlag(), true);
         if (mHistory.isRevSort()) reverseEpisode(true);
         mBinding.control.opening.setText(mHistory.getOpening() == 0 ? getString(R.string.play_op) : mPlayers.stringToTime(mHistory.getOpening()));
         mBinding.control.ending.setText(mHistory.getEnding() == 0 ? getString(R.string.play_ed) : mPlayers.stringToTime(mHistory.getEnding()));
@@ -928,7 +927,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void nextFlag(int position) {
         Vod.Flag flag = (Vod.Flag) mFlagAdapter.get(position + 1);
         Notify.show(getString(R.string.play_switch_flag, flag.getFlag()));
-        setFlagActivated(flag);
+        setFlagActivated(flag, true);
     }
 
     private void nextSite() {
