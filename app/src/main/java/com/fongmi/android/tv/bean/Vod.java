@@ -178,13 +178,13 @@ public class Vod {
 
     public void trans() {
         if (Trans.pass()) return;
-        this.vodName = Trans.get(vodName);
-        this.vodArea = Trans.get(vodArea);
-        this.typeName = Trans.get(typeName);
-        this.vodActor = Trans.get(vodActor);
-        this.vodRemarks = Trans.get(vodRemarks);
-        this.vodContent = Trans.get(vodContent);
-        this.vodDirector = Trans.get(vodDirector);
+        this.vodName = Trans.s2t(vodName);
+        this.vodArea = Trans.s2t(vodArea);
+        this.typeName = Trans.s2t(typeName);
+        this.vodActor = Trans.s2t(vodActor);
+        this.vodRemarks = Trans.s2t(vodRemarks);
+        this.vodContent = Trans.s2t(vodContent);
+        this.vodDirector = Trans.s2t(vodDirector);
     }
 
     public void setVodFlags() {
@@ -308,7 +308,7 @@ public class Vod {
 
             public Episode(String name, String url) {
                 this.number = Utils.getDigit(name);
-                this.name = Trans.get(name);
+                this.name = Trans.s2t(name);
                 this.url = url;
             }
 
