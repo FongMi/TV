@@ -23,10 +23,6 @@ public class Config {
     private String home;
     private String parse;
 
-    public Config() {
-        this.id = -1;
-    }
-
     public static Config create(int type) {
         return new Config().type(type);
     }
@@ -191,7 +187,7 @@ public class Config {
     }
 
     public Config insert() {
-        setId(TextUtils.isEmpty(url) ? -1 : Math.toIntExact(AppDatabase.get().getConfigDao().insert(this)));
+        setId(Math.toIntExact(AppDatabase.get().getConfigDao().insert(this)));
         return this;
     }
 
