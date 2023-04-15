@@ -23,6 +23,7 @@
 -keepclassmembers,allowobfuscation class * { @org.simpleframework.xml.ElementList <fields>; }
 
 # OkHttp
+-dontwarn okhttp3.**
 -keep class okio.** { *; }
 -keep class okhttp3.** { *; }
 
