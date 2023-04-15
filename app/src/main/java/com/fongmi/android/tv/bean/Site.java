@@ -101,7 +101,7 @@ public class Site {
     }
 
     public String getPlayUrl() {
-        return playUrl;
+        return TextUtils.isEmpty(playUrl) ? "" : playUrl;
     }
 
     public int getPlayerType() {
@@ -169,15 +169,6 @@ public class Site {
         return this;
     }
 
-    public boolean isFilterable() {
-        return getFilterable() == 1;
-    }
-
-    public Site setFilterable(boolean filterable) {
-        setFilterable(filterable ? 1 : 0);
-        return this;
-    }
-
     public boolean isChangeable() {
         return getChangeable() == 1;
     }
@@ -189,10 +180,6 @@ public class Site {
 
     public int getSearchIcon() {
         return isSearchable() ? R.drawable.ic_site_search_on : R.drawable.ic_site_search_off;
-    }
-
-    public int getFilterIcon() {
-        return isFilterable() ? R.drawable.ic_site_filter_on : R.drawable.ic_site_filter_off;
     }
 
     public int getChangeIcon() {
@@ -210,7 +197,6 @@ public class Site {
     public Site sync() {
         Site item = find(getKey());
         if (item == null) return this;
-        setFilterable(item.getFilterable());
         setChangeable(item.getChangeable());
         if (getSearchable() != 0) setSearchable(item.getSearchable());
         return this;

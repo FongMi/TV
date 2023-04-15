@@ -4,9 +4,11 @@
     android:id="@+id/recycler"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:clipChildren="false"
+    android:clipToPadding="false"
     android:paddingStart="12dp"
-    android:paddingTop="8dp"
+    android:paddingTop="16dp"
     android:paddingEnd="12dp"
-    android:paddingBottom="8dp"
+    android:paddingBottom="16dp"
     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
     app:maxHeight="212dp" />

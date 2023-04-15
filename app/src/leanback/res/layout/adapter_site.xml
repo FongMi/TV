@@ -35,19 +35,6 @@
         app:tint="@color/text" />
 
     <ImageView
-        android:id="@+id/filter"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_marginStart="12dp"
-        android:background="@drawable/selector_text"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:padding="8dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/ic_site_filter_on"
-        app:tint="@color/text" />
-
-    <ImageView
         android:id="@+id/change"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"

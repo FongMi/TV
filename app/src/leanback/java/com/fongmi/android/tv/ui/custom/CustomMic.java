@@ -51,7 +51,7 @@ public class CustomMic extends AppCompatImageView {
         this.listen = listen;
     }
 
-    public void setListener(FragmentActivity activity, CustomListener listener) {
+    public void setListener(FragmentActivity activity, CustomTextListener listener) {
         this.recognizer.setRecognitionListener(listener);
         this.activity = activity;
     }

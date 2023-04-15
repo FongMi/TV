@@ -5,6 +5,7 @@ import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Config;
+import com.fongmi.android.tv.bean.Depot;
 import com.fongmi.android.tv.bean.Group;
 import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.bean.Live;
@@ -36,6 +37,10 @@ public class LiveConfig {
 
     public static String getUrl() {
         return get().getConfig().getUrl();
+    }
+
+    public static String getDesc() {
+        return get().getConfig().getDesc();
     }
 
     public static int getHomeIndex() {
@@ -79,32 +84,57 @@ public class LiveConfig {
 
     private void loadConfig(Callback callback) {
         try {
-            parseConfig(Decoder.getJson(config.getUrl()));
-            App.post(callback::success);
+            parseConfig(Decoder.getJson(config.getUrl()), callback);
         } catch (Exception e) {
             e.printStackTrace();
             App.post(() -> callback.error(config.getUrl().isEmpty() ? 0 : R.string.error_config_get));
         }
     }
 
-    private void parseConfig(String json) {
-        if (Json.invalid(json)) parse(json);
-        else parse(JsonParser.parseString(json).getAsJsonObject());
+    private void parseConfig(String text, Callback callback) {
+        if (Json.invalid(text)) {
+            parseText(text, callback);
+        } else {
+            checkJson(JsonParser.parseString(text).getAsJsonObject(), callback);
+        }
     }
 
-    private void parse(String text) {
+    private void parseText(String text, Callback callback) {
         Live live = new Live(config.getUrl());
         LiveParser.text(live, text);
+        App.post(callback::success);
         lives.remove(live);
         lives.add(live);
         setHome(live);
     }
 
-    public void parse(JsonObject object) {
+    private void checkJson(JsonObject object, Callback callback) {
+        if (object.has("urls")) {
+            parseDepot(object, callback);
+        } else {
+            parseConfig(object, callback);
+        }
+    }
+
+    public void parseDepot(JsonObject object, Callback callback) {
+        List<Depot> items = Depot.arrayFrom(object.getAsJsonArray("urls").toString());
+        List<Config> configs = new ArrayList<>();
+        for (Depot item : items) configs.add(Config.find(item, 1));
+        Config.delete(config.getUrl());
+        config = configs.get(0);
+        loadConfig(callback);
+    }
+
+    public void parseConfig(JsonObject object, Callback callback) {
         if (!object.has("lives")) return;
         for (JsonElement element : Json.safeListElement(object, "lives")) parse(Live.objectFrom(element).check());
         if (home == null) setHome(lives.isEmpty() ? new Live() : lives.get(0));
         if (home.isBoot()) App.post(Product::bootLive);
+        if (callback != null) App.post(callback::success);
+    }
+
+    public void parse(JsonObject object) {
+        parseConfig(object, null);
     }
 
     private void parse(Live live) {

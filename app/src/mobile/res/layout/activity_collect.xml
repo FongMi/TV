@@ -11,9 +11,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
+        android:layout_margin="16dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -55,8 +53,8 @@
         android:id="@+id/agent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="16dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        tools:visibility="gone">
 
         <TextView
             android:id="@+id/record"
@@ -75,6 +73,8 @@
             android:clipChildren="false"
             android:clipToPadding="false"
             android:padding="8dp"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:spanCount="2"
             tools:itemCount="5"
             tools:listitem="@layout/adapter_collect_record" />
 
@@ -95,6 +95,8 @@
             android:clipChildren="false"
             android:clipToPadding="false"
             android:padding="8dp"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:spanCount="2"
             tools:itemCount="5"
             tools:listitem="@layout/adapter_collect_word" />
 
@@ -104,13 +106,14 @@
         android:id="@+id/result"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone">
+        android:visibility="gone"
+        tools:visibility="visible">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/collect"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="-8dp"
             android:clipChildren="false"
             android:clipToPadding="false"
             android:paddingStart="8dp"
@@ -123,14 +126,15 @@
             android:id="@+id/recycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="-8dp"
             android:layout_toEndOf="@+id/collect"
             android:clipChildren="false"
             android:clipToPadding="false"
             android:paddingStart="0dp"
             android:paddingEnd="8dp"
             android:paddingBottom="8dp"
-            tools:listitem="@layout/adapter_vod" />
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:spanCount="2" />
 
     </RelativeLayout>
 </LinearLayout>

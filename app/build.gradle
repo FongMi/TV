@@ -16,19 +16,19 @@ android {
     productFlavors {
         leanback {
             dimension "mode"
-            versionCode 70
-            versionName "1.7.0"
+            versionCode 72
+            versionName "1.7.2"
         }
         mobile {
             dimension "mode"
-            versionCode 7
-            versionName "1.0.7"
+            versionCode 10
+            versionName "1.1.0"
         }
         java {
-            dimension = "api"
+            dimension "api"
         }
         python {
-            dimension = "api"
+            dimension "api"
         }
     }
 
@@ -55,6 +55,11 @@ android {
             outputFileName = "${variant.productFlavors[0].name}-${variant.productFlavors[1].name}.apk"
         }
     }
+
+    lint {
+        abortOnError false
+        disable 'UnsafeOptInUsageError'
+    }
 }
 
 dependencies {
@@ -65,16 +70,26 @@ dependencies {
     implementation project(':forcetech')
     implementation project(':ijkplayer')
     pythonImplementation project(':pyramid')
+    implementation 'androidx.media3:media3-database:1.0.0'
+    implementation 'androidx.media3:media3-datasource:1.0.0'
+    implementation 'androidx.media3:media3-datasource-rtmp:1.0.0'
+    implementation 'androidx.media3:media3-exoplayer:1.0.0'
+    implementation 'androidx.media3:media3-exoplayer-dash:1.0.0'
+    implementation 'androidx.media3:media3-exoplayer-hls:1.0.0'
+    implementation 'androidx.media3:media3-exoplayer-rtsp:1.0.0'
+    implementation 'androidx.media3:media3-exoplayer-smoothstreaming:1.0.0'
+    implementation 'androidx.media3:media3-extractor:1.0.0'
+    implementation 'androidx.media3:media3-session:1.0.0'
+    implementation 'androidx.media3:media3-ui:1.0.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.5.1'
     implementation 'androidx.preference:preference:1.2.0'
-    implementation 'androidx.room:room-runtime:2.5.0'
+    implementation 'androidx.room:room-runtime:2.5.1'
     implementation 'cat.ereza:customactivityoncrash:2.4.0'
     implementation 'com.github.bassaer:materialdesigncolors:1.0.0'
     implementation 'com.github.bumptech.glide:glide:4.14.2'
-    implementation 'com.google.android.exoplayer:exoplayer:2.18.4'
-    implementation 'com.google.android.material:material:1.8.0'
+    implementation 'com.google.android.exoplayer:exoplayer:2.18.5'
+    implementation 'com.google.android.material:material:1.9.0-beta01'
     implementation 'com.google.code.gson:gson:2.10.1'
     implementation 'com.google.net.cronet:cronet-okhttp:0.1.0'
     implementation 'com.google.zxing:core:3.3.0'
@@ -89,6 +104,6 @@ dependencies {
     leanbackImplementation 'androidx.leanback:leanback:1.2.0-alpha02'
     leanbackImplementation 'me.jessyan:autosize:1.2.1'
     mobileImplementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
-    annotationProcessor 'androidx.room:room-compiler:2.5.0'
+    annotationProcessor 'androidx.room:room-compiler:2.5.1'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.14.2'
 }

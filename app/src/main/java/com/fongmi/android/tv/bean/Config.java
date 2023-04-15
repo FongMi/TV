@@ -1,10 +1,11 @@
 package com.fongmi.android.tv.bean;
 
+import android.text.TextUtils;
+
 import androidx.room.Entity;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.db.AppDatabase;
 
 import java.util.List;
@@ -18,15 +19,25 @@ public class Config {
     private long time;
     private String url;
     private String json;
+    private String name;
     private String home;
     private String parse;
 
-    public static Config create(String url, int type) {
-        return new Config(url, type);
+    public static Config create(int type) {
+        return create("", type);
     }
 
-    public Config(String url, int type) {
+    public static Config create(String url, int type) {
+        return new Config(url, "", type);
+    }
+
+    public static Config create(String url, String name, int type) {
+        return new Config(url, name, type);
+    }
+
+    public Config(String url, String name, int type) {
         this.url = url;
+        this.name = name;
         this.type = type;
         this.id = (int) insert();
     }
@@ -53,6 +64,14 @@ public class Config {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getJson() {
@@ -92,6 +111,11 @@ public class Config {
         return this;
     }
 
+    public Config name(String name) {
+        setName(name);
+        return this;
+    }
+
     public Config json(String json) {
         setJson(json);
         return this;
@@ -107,28 +131,37 @@ public class Config {
         return this;
     }
 
+    public String getDesc() {
+        if (!TextUtils.isEmpty(getName())) return getName();
+        if (!TextUtils.isEmpty(getUrl())) return getUrl();
+        return "";
+    }
+
     public static List<Config> getAll(int type) {
         return AppDatabase.get().getConfigDao().findByType(type);
     }
 
+    public static void delete(String url) {
+        AppDatabase.get().getConfigDao().delete(url);
+    }
+
     public static void delete(String url, int type) {
-        if (type == 2) AppDatabase.get().getConfigDao().delete(type);
-        else AppDatabase.get().getConfigDao().delete(url, type);
+        AppDatabase.get().getConfigDao().delete(url, type);
     }
 
     public static Config vod() {
         Config item = AppDatabase.get().getConfigDao().findOne(0);
-        return item == null ? create("", 0) : item;
+        return item == null ? create(0) : item;
     }
 
     public static Config live() {
         Config item = AppDatabase.get().getConfigDao().findOne(1);
-        return item == null ? create(ApiConfig.getUrl(), 1) : item;
+        return item == null ? create(1) : item;
     }
 
     public static Config wall() {
         Config item = AppDatabase.get().getConfigDao().findOne(2);
-        return item == null ? create("", 2) : item;
+        return item == null ? create(2) : item;
     }
 
     public static Config find(int id) {
@@ -138,6 +171,21 @@ public class Config {
     public static Config find(String url, int type) {
         Config item = AppDatabase.get().getConfigDao().find(url, type);
         return item == null ? create(url, type) : item.type(type);
+    }
+
+    public static Config find(String url, String name, int type) {
+        Config item = AppDatabase.get().getConfigDao().find(url, type);
+        return item == null ? create(url, name, type) : item.type(type).name(name);
+    }
+
+    public static Config find(Config config, int type) {
+        Config item = AppDatabase.get().getConfigDao().find(config.getUrl(), type);
+        return item == null ? create(config.getUrl(), config.getName(), type) : item.type(type).name(config.getName());
+    }
+
+    public static Config find(Depot depot, int type) {
+        Config item = AppDatabase.get().getConfigDao().find(depot.getUrl(), type);
+        return item == null ? create(depot.getUrl(), depot.getName(), type) : item.type(type).name(depot.getName());
     }
 
     public long insert() {

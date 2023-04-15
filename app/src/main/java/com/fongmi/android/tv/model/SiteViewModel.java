@@ -29,15 +29,21 @@ import java.util.concurrent.TimeUnit;
 
 public class SiteViewModel extends ViewModel {
 
+    public MutableLiveData<Vod.Flag.Episode> episode;
     public MutableLiveData<Result> result;
     public MutableLiveData<Result> player;
     public MutableLiveData<Result> search;
     public ExecutorService executor;
 
     public SiteViewModel() {
+        this.episode = new MutableLiveData<>();
         this.result = new MutableLiveData<>();
         this.player = new MutableLiveData<>();
         this.search = new MutableLiveData<>();
+    }
+
+    public void setEpisode(Vod.Flag.Episode value) {
+        episode.setValue(value);
     }
 
     public void homeContent() {
@@ -154,7 +160,7 @@ public class SiteViewModel extends ViewModel {
                 result.setUrl(url);
                 result.setFlag(flag);
                 result.setPlayUrl(site.getPlayUrl());
-                result.setParse(Utils.isVideoFormat(url) ? 0 : 1);
+                result.setParse(Utils.isVideoFormat(url) && result.getPlayUrl().isEmpty() ? 0 : 1);
                 return result;
             }
         });

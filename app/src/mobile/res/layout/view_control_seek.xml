@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center"
+    android:gravity="center_vertical"
     android:orientation="horizontal">
 
     <TextView
@@ -15,13 +15,14 @@
         android:textSize="14sp"
         tools:text="00:00:00" />
 
-    <com.google.android.exoplayer2.ui.DefaultTimeBar
+    <androidx.media3.ui.DefaultTimeBar
         android:id="@+id/timeBar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:layout_weight="1"
+        app:bar_height="2dp"
         app:buffered_color="@color/blue_200"
         app:played_color="@color/blue_500"
         app:scrubber_color="@color/blue_500"

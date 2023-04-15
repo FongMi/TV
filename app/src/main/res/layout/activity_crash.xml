@@ -28,7 +28,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:backgroundTint="@color/blue_500"
+        android:backgroundTint="@color/accent"
         android:text="@string/crash_restart" />
 
     <Button

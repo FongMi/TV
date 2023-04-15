@@ -25,6 +25,6 @@ public abstract class ConfigDao extends BaseDao<Config> {
     @Query("DELETE FROM Config WHERE url = :url AND type = :type")
     public abstract void delete(String url, int type);
 
-    @Query("DELETE FROM Config WHERE type = :type")
-    public abstract void delete(int type);
+    @Query("DELETE FROM Config WHERE url = :url")
+    public abstract void delete(String url);
 }

@@ -12,6 +12,7 @@
         android:id="@+id/image"
         android:layout_width="90dp"
         android:layout_height="match_parent"
+        android:background="@color/black_10"
         android:scaleType="center"
         app:shapeAppearanceOverlay="@style/Vod.List"
         tools:src="@drawable/ic_img_loading" />
@@ -60,7 +61,7 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:ellipsize="end"
-            android:maxLines="4"
+            android:maxLines="3"
             android:textColor="@color/white"
             android:textSize="14sp"
             tools:text="蜘蛛人" />
@@ -70,7 +71,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:ellipsize="end"
             android:singleLine="true"
             android:textColor="@color/white"
             android:textSize="12sp"

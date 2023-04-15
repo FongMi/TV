@@ -3,4 +3,5 @@
 *build
 *.jks
 /local.properties
-/exo
+/media
+*ser*
