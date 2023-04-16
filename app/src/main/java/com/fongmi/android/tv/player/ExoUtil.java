@@ -31,7 +31,6 @@ import androidx.media3.extractor.ts.TsExtractor;
 import androidx.media3.ui.CaptionStyleCompat;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Sub;
 import com.fongmi.android.tv.utils.FileUtil;
@@ -104,7 +103,7 @@ public class ExoUtil {
     }
 
     private static synchronized HttpDataSource.Factory getHttpDataSourceFactory() {
-        if (httpDataSourceFactory == null) httpDataSourceFactory = new DefaultHttpDataSource.Factory().setBlackList(ApiConfig.get().getAds()).setAllowCrossProtocolRedirects(true);
+        if (httpDataSourceFactory == null) httpDataSourceFactory = new DefaultHttpDataSource.Factory().setAllowCrossProtocolRedirects(true);
         return httpDataSourceFactory;
     }
 
