@@ -32,11 +32,13 @@ public class ImgUtil {
 
     public static void loadKeep(String url, ImageView view) {
         view.setScaleType(ImageView.ScaleType.CENTER);
+        if (TextUtils.isEmpty(url)) view.setImageResource(R.drawable.ic_img_error);
         Glide.with(App.get()).asBitmap().load(getUrl(url)).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).listener(getListener(view)).into(view);
     }
 
     public static void loadHistory(String url, ImageView view) {
         view.setScaleType(ImageView.ScaleType.CENTER);
+        if (TextUtils.isEmpty(url)) view.setImageResource(R.drawable.ic_img_error);
         Glide.with(App.get()).asBitmap().load(getUrl(url)).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).listener(getListener(view)).into(view);
     }
 
