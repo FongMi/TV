@@ -27,17 +27,17 @@ public class ImgUtil {
     public static void load(String url, ImageView view, ImageView.ScaleType scaleType) {
         view.setScaleType(scaleType);
         if (TextUtils.isEmpty(url)) view.setImageResource(R.drawable.ic_img_error);
-        else Glide.with(App.get()).asBitmap().load(getUrl(Utils.checkProxy(url))).skipMemoryCache(true).dontAnimate().sizeMultiplier(Prefers.getThumbnail()).signature(new ObjectKey(url + "_" + Prefers.getQuality())).placeholder(R.drawable.ic_img_loading).listener(getListener(view, scaleType)).into(view);
+        else Glide.with(App.get()).asBitmap().load(url.startsWith("data:") ? url : getUrl(Utils.checkProxy(url))).skipMemoryCache(true).dontAnimate().sizeMultiplier(Prefers.getThumbnail()).signature(new ObjectKey(url + "_" + Prefers.getQuality())).placeholder(R.drawable.ic_img_loading).listener(getListener(view, scaleType)).into(view);
     }
 
     public static void loadKeep(String url, ImageView view) {
         view.setScaleType(ImageView.ScaleType.CENTER);
-        Glide.with(App.get()).asBitmap().load(Utils.checkProxy(url)).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).listener(getListener(view)).into(view);
+        Glide.with(App.get()).asBitmap().load(url.startsWith("data:") ? url : getUrl(Utils.checkProxy(url))).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).listener(getListener(view)).into(view);
     }
 
     public static void loadHistory(String url, ImageView view) {
         view.setScaleType(ImageView.ScaleType.CENTER);
-        Glide.with(App.get()).asBitmap().load(Utils.checkProxy(url)).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).listener(getListener(view)).into(view);
+        Glide.with(App.get()).asBitmap().load(url.startsWith("data:") ? url : getUrl(Utils.checkProxy(url))).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).listener(getListener(view)).into(view);
     }
 
     public static void loadLive(String url, ImageView view) {
