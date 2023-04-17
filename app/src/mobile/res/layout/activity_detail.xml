@@ -237,31 +237,39 @@
                         android:paddingEnd="16dp"
                         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginEnd="16dp"
-                        android:text="@string/detail_content"
-                        android:textColor="@color/white"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/content"
+                    <LinearLayout
+                        android:id="@+id/content_layout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginEnd="16dp"
-                        android:layout_marginBottom="8dp"
-                        android:ellipsize="end"
-                        android:lineSpacingExtra="4dp"
-                        android:maxLines="2"
-                        android:textColor="@color/white"
-                        android:textSize="14sp"
-                        tools:text="一個身世神秘的少年范閒（張若昀飾），因對自身身世的好奇而離開故鄉澹州，前赴南慶京都。范閒在京中各大勢力之間遊走，以探查自己屢遭刺殺的原因。其間結識靖王世子、二皇子，與太子、長公主等人對抗，並遊歷四方、闖蕩江湖，卻意外發現這世界隱藏著的秘密。本劇第一季上半部主要描述范閒在南慶京都追查刺殺的幕後黑手，京中各式人等對范閒繼承內庫的態度和應對，以及監察院院長陳萍萍希望范閒接掌監察院所做的一切舉動。下半部劇情發生在北齊上京。南慶駐北齊上京諜報首領言冰雲被北齊官方抓獲，慶帝與陳萍萍同意用已被關在監察院大牢多年的前北魏諜報首領肖恩交換言冰雲，並派范閒親率南慶使團負責此事。" />
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginTop="16dp"
+                            android:layout_marginEnd="16dp"
+                            android:text="@string/detail_content"
+                            android:textColor="@color/white"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/content"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginEnd="16dp"
+                            android:layout_marginBottom="8dp"
+                            android:ellipsize="end"
+                            android:lineSpacingExtra="4dp"
+                            android:maxLines="2"
+                            android:textColor="@color/white"
+                            android:textSize="14sp"
+                            tools:text="一個身世神秘的少年范閒（張若昀飾），因對自身身世的好奇而離開故鄉澹州，前赴南慶京都。范閒在京中各大勢力之間遊走，以探查自己屢遭刺殺的原因。其間結識靖王世子、二皇子，與太子、長公主等人對抗，並遊歷四方、闖蕩江湖，卻意外發現這世界隱藏著的秘密。本劇第一季上半部主要描述范閒在南慶京都追查刺殺的幕後黑手，京中各式人等對范閒繼承內庫的態度和應對，以及監察院院長陳萍萍希望范閒接掌監察院所做的一切舉動。下半部劇情發生在北齊上京。南慶駐北齊上京諜報首領言冰雲被北齊官方抓獲，慶帝與陳萍萍同意用已被關在監察院大牢多年的前北魏諜報首領肖恩交換言冰雲，並派范閒親率南慶使團負責此事。" />
+
+                    </LinearLayout>
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/search"
