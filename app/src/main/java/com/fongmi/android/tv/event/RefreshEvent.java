@@ -10,6 +10,10 @@ public class RefreshEvent {
         EventBus.getDefault().post(new RefreshEvent(Type.EMPTY));
     }
 
+    public static void config() {
+        EventBus.getDefault().post(new RefreshEvent(Type.CONFIG));
+    }
+
     public static void image() {
         EventBus.getDefault().post(new RefreshEvent(Type.IMAGE));
     }
@@ -43,6 +47,6 @@ public class RefreshEvent {
     }
 
     public enum Type {
-        EMPTY, IMAGE, VIDEO, HISTORY, KEEP, SIZE, WALL
+        EMPTY, CONFIG, IMAGE, VIDEO, HISTORY, KEEP, SIZE, WALL
     }
 }
