@@ -229,7 +229,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     }
 
     public Result getResult() {
-        return mResult;
+        return mResult == null ? new Result() : mResult;
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
