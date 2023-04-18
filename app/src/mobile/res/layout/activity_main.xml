@@ -16,7 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:layout_alignParentBottom="true"
-        android:background="@color/white_10"
+        android:background="@color/transparent"
         app:elevation="0dp"
         app:itemActiveIndicatorStyle="@style/Indicator"
         app:itemIconTint="@color/nav"
