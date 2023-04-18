@@ -28,6 +28,7 @@ public class Group {
     @SerializedName("pass")
     private String pass;
 
+    private boolean selected;
     private int position;
 
     public static List<Group> arrayFrom(String str) {
@@ -81,6 +82,14 @@ public class Group {
 
     public void setPass(String pass) {
         this.pass = pass;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 
     public int getPosition() {
