@@ -125,11 +125,11 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mR2 = this::hideControl;
         mR3 = this::setChannelActivated;
         mR4 = this::setTraffic;
+        mHides = new ArrayList<>();
         mPlayers = new Players().init();
         mKeyDown = CustomKeyDownLive.create(this);
         mFormatDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         mFormatTime = new SimpleDateFormat("yyyy-MM-ddHH:mm", Locale.getDefault());
-        mHides = new ArrayList<>();
         setRecyclerView();
         setVideoView();
         setViewModel();
@@ -223,6 +223,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private void setPosition(int[] position) {
         if (position[0] == -1) return;
         if (mGroupAdapter.size() == 1) return;
+        if (position[0] >= mGroupAdapter.size()) return;
         mGroup = (Group) mGroupAdapter.get(position[0]);
         mBinding.group.setSelectedPosition(position[0]);
         if (mGroup.getChannel().isEmpty()) return;
@@ -233,12 +234,12 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void setPosition() {
         if (mChannel == null) return;
-        Group group = mChannel.getGroup();
-        int position = mGroupAdapter.indexOf(group);
+        mGroup = mChannel.getGroup();
+        int position = mGroupAdapter.indexOf(mGroup);
         boolean change = mBinding.group.getSelectedPosition() != position;
         if (change) mBinding.group.setSelectedPosition(position);
-        if (change) mChannelAdapter.setItems(group.getChannel(), null);
-        mBinding.channel.setSelectedPosition(group.getPosition());
+        if (change) mChannelAdapter.setItems(mGroup.getChannel(), null);
+        mBinding.channel.setSelectedPosition(mGroup.getPosition());
     }
 
     private void onChildSelected(@Nullable RecyclerView.ViewHolder child, Group group) {
@@ -390,8 +391,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public void onItemClick(Group item) {
-        mChannelAdapter.setItems(mGroup.getChannel(), null);
-        mBinding.channel.setSelectedPosition(mGroup.getPosition());
+        mChannelAdapter.setItems(item.getChannel(), null);
+        mBinding.channel.setSelectedPosition(item.getPosition());
         if (!item.isKeep() || ++count < 5 || mHides.isEmpty()) return;
         App.removeCallbacks(mR0);
         PassDialog.show(this);
