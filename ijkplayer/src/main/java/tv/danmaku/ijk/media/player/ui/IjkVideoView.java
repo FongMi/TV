@@ -176,7 +176,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     private void fixUserAgent() {
-        if (!mHeaders.containsKey(Utils.USER_AGENT)) mHeaders.put(Utils.USER_AGENT, Utils.getUserAgent(mAppContext));
+        if (!mHeaders.containsKey(Utils.USER_AGENT)) mHeaders.put(Utils.USER_AGENT, Utils.CHROME);
         mIjkPlayer.setOption(format, "user_agent", mHeaders.get(Utils.USER_AGENT));
         mHeaders.remove(Utils.USER_AGENT);
     }
