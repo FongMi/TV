@@ -199,7 +199,10 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(LiveViewModel.class);
         mViewModel.channel.observe(this, result -> mPlayers.start(result));
-        mViewModel.live.observe(this, this::setGroup);
+        mViewModel.live.observe(this, live -> {
+            hideProgress();
+            setGroup(live);
+        });
     }
 
     private void getLive() {
@@ -217,7 +220,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mGroupAdapter.setItems(items, null);
         setPosition(LiveConfig.get().find(items));
         mBinding.control.home.setText(home.getName());
-        hideProgress();
     }
 
     private void setPosition(int[] position) {

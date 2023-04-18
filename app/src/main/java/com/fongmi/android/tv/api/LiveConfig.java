@@ -57,6 +57,10 @@ public class LiveConfig {
         return get().getHome() == null;
     }
 
+    public static boolean hasUrl() {
+        return getUrl().length() > 0;
+    }
+
     public LiveConfig init() {
         this.home = null;
         this.config = Config.live();

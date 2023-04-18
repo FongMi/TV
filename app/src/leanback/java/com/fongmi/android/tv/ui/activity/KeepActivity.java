@@ -63,7 +63,7 @@ public class KeepActivity extends BaseActivity implements KeepAdapter.OnClickLis
 
             @Override
             public void error(int resId) {
-                CollectActivity.start(getActivity(), item.getVodName());
+                Notify.show(resId);
             }
         });
     }
