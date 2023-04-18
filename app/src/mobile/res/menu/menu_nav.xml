@@ -7,6 +7,11 @@
         android:title="@string/nav_vod" />
 
     <item
+        android:id="@+id/live"
+        android:icon="@drawable/ic_nav_live"
+        android:title="@string/nav_live" />
+
+    <item
         android:id="@+id/setting"
         android:icon="@drawable/ic_nav_setting"
         android:title="@string/nav_setting" />
