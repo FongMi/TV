@@ -1,5 +1,6 @@
 package com.fongmi.android.tv.ui.custom.dialog;
 
+import android.app.Activity;
 import android.view.LayoutInflater;
 
 import androidx.appcompat.app.AlertDialog;
@@ -15,10 +16,14 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class LiveDialog implements LiveAdapter.OnClickListener {
 
-    private final DialogLiveBinding binding;
     private final LiveCallback callback;
-    private final AlertDialog dialog;
-    private final LiveAdapter adapter;
+    private DialogLiveBinding binding;
+    private LiveAdapter adapter;
+    private AlertDialog dialog;
+
+    public static LiveDialog create(Activity activity) {
+        return new LiveDialog(activity);
+    }
 
     public static LiveDialog create(Fragment fragment) {
         return new LiveDialog(fragment);
@@ -26,8 +31,17 @@ public class LiveDialog implements LiveAdapter.OnClickListener {
 
     public LiveDialog(Fragment fragment) {
         this.callback = (LiveCallback) fragment;
-        this.binding = DialogLiveBinding.inflate(LayoutInflater.from(fragment.getContext()));
-        this.dialog = new MaterialAlertDialogBuilder(fragment.getActivity()).setView(binding.getRoot()).create();
+        init(fragment.getActivity());
+    }
+
+    public LiveDialog(Activity activity) {
+        this.callback = (LiveCallback) activity;
+        init(activity);
+    }
+
+    private void init(Activity activity) {
+        this.binding = DialogLiveBinding.inflate(LayoutInflater.from(activity));
+        this.dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).create();
         this.adapter = new LiveAdapter(this);
     }
 

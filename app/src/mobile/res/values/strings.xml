@@ -2,6 +2,7 @@
 
     <!-- Nav -->
     <string name="nav_vod">Vod</string>
+    <string name="nav_live">Live</string>
     <string name="nav_setting">Setting</string>
 
     <!-- Vod -->

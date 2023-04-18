@@ -3,6 +3,7 @@
     package="com.fongmi.android.tv">
 
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application>
 
@@ -55,6 +56,11 @@
             android:name=".ui.activity.KeepActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout"
             android:screenOrientation="fullUser" />
+
+        <activity
+            android:name=".ui.activity.LiveActivity"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout"
+            android:screenOrientation="sensorLandscape" />
 
         <activity
             android:name=".ui.activity.ScanActivity"
