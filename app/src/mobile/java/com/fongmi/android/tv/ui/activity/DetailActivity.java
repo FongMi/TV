@@ -680,13 +680,14 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void showError(String text) {
-        mBinding.widget.text.setText(text);
         mBinding.widget.error.setVisibility(View.VISIBLE);
+        mBinding.widget.text.setText(text);
+        hideProgress();
     }
 
     private void hideError() {
-        mBinding.widget.text.setText("");
         mBinding.widget.error.setVisibility(View.GONE);
+        mBinding.widget.text.setText("");
     }
 
     private void showControl() {
@@ -878,7 +879,6 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         Clock.get().setCallback(null);
         showError(event.getMsg());
         mPlayers.stop();
-        hideProgress();
         startFlow();
     }
 

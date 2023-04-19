@@ -351,7 +351,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     @Override
     protected void onPause() {
         super.onPause();
-        Clock.get().release();
+        Clock.stop();
     }
 
     @Override

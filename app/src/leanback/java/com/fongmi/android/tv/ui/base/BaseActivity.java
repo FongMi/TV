@@ -9,6 +9,8 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.leanback.widget.ArrayObjectAdapter;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.R;
@@ -58,6 +60,10 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     protected boolean isGone(View view) {
         return view.getVisibility() == View.GONE;
+    }
+
+    protected void notifyItemChanged(RecyclerView view, ArrayObjectAdapter adapter) {
+        if (!view.isComputingLayout()) adapter.notifyArrayItemRangeChanged(0, adapter.size());
     }
 
     private void setWall() {
