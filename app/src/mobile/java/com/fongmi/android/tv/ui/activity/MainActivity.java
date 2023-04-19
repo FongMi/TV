@@ -27,9 +27,6 @@ import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.Notify;
 import com.google.android.material.navigation.NavigationBarView;
 
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
-
 public class MainActivity extends BaseActivity implements NavigationBarView.OnItemSelectedListener {
 
     private FragmentStateManager mManager;
@@ -114,8 +111,9 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
         App.post(() -> confirm = false, 2000);
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+    @Override
     public void onRefreshEvent(RefreshEvent event) {
+        super.onRefreshEvent(event);
         if (!event.getType().equals(RefreshEvent.Type.CONFIG)) return;
         mBinding.navigation.getMenu().findItem(R.id.vod).setVisible(true);
         mBinding.navigation.getMenu().findItem(R.id.setting).setVisible(true);
