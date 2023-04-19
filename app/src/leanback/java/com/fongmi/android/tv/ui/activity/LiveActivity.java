@@ -184,11 +184,11 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mPlayers.set(getExo(), getIjk());
         setScale(Prefers.getLiveScale());
         getIjk().setRender(Prefers.getRender());
+        findViewById(R.id.timeBar).setNextFocusUpId(R.id.home);
         mBinding.control.speed.setText(mPlayers.getSpeedText());
-        mBinding.control.home.setVisibility(LiveConfig.isOnly() ? View.GONE : View.VISIBLE);
         mBinding.control.invert.setActivated(Prefers.isInvert());
         mBinding.control.across.setActivated(Prefers.isAcross());
-        findViewById(R.id.timeBar).setNextFocusUpId(R.id.home);
+        mBinding.control.home.setVisibility(LiveConfig.isOnly() ? View.GONE : View.VISIBLE);
     }
 
     private void setScale(int scale) {
@@ -267,7 +267,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void onToggle() {
         if (isVisible(mBinding.control.getRoot())) hideControl();
-        else if (isVisible(mBinding.recycler)) hideUI();
+        if (isVisible(mBinding.recycler)) hideUI();
         else showUI();
         hideInfo();
     }
@@ -364,6 +364,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.control.getRoot().setVisibility(View.VISIBLE);
         view.requestFocus();
         setR2Callback();
+        hideInfo();
+        hideUI();
     }
 
     private void hideControl() {
@@ -700,8 +702,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         if (isVisible(mBinding.control.home)) showControl(mBinding.control.home);
         else if (isVisible(mBinding.control.line)) showControl(mBinding.control.line);
         else showControl(mBinding.control.player);
-        hideInfo();
-        hideUI();
     }
 
     @Override
