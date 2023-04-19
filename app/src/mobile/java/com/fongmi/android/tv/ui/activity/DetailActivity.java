@@ -82,7 +82,7 @@ import java.util.concurrent.Executors;
 
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Listener, CastDialog.Listener, TrackDialog.Listener, ControlDialog.Listener, Clock.Callback, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, ParseAdapter.OnClickListener {
+public class DetailActivity extends BaseActivity implements Clock.Callback, CustomKeyDownVod.Listener, CastDialog.Listener, Receiver.Listener, TrackDialog.Listener, ControlDialog.Listener, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, ParseAdapter.OnClickListener {
 
     private ViewGroup.LayoutParams mFrameParams;
     private ActivityDetailBinding mBinding;
@@ -207,8 +207,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mKeyDown = CustomKeyDownVod.create(this, mBinding.video);
         mFrameParams = mBinding.video.getLayoutParams();
         mBinding.progressLayout.showProgress();
-        mReceiver = new Receiver(mBinding);
         mPlayers = new Players().init();
+        mReceiver = new Receiver(this);
         mDialogs = new ArrayList<>();
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
@@ -1152,6 +1152,21 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
             mPlayers.play();
             hideControl();
         }
+    }
+
+    @Override
+    public void onControlPlay() {
+        mBinding.control.play.performClick();
+    }
+
+    @Override
+    public void onControlNext() {
+        mBinding.control.next.performClick();
+    }
+
+    @Override
+    public void onControlPrev() {
+        mBinding.control.prev.performClick();
     }
 
     @Override
