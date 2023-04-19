@@ -452,8 +452,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void setChannel(Channel item) {
-        LiveConfig.get().setKeep(mGroup, mChannel = item);
         App.post(mR3, 100);
+        mChannel = item;
         showInfo();
     }
 
@@ -487,6 +487,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void getUrl() {
+        LiveConfig.get().setKeep(mChannel);
         mViewModel.getUrl(mChannel);
         showProgress();
     }
