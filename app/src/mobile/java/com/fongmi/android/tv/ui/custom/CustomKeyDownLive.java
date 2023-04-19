@@ -87,7 +87,10 @@ public class CustomKeyDownLive extends GestureDetector.SimpleOnGestureListener {
 
     @Override
     public boolean onSingleTapConfirmed(@NonNull MotionEvent e) {
-        if (!lock) listener.onSingleTap();
+        if (lock) return true;
+        int half = ResUtil.getScreenWidthNav() / 2;
+        if (e.getX() > half) listener.onDoubleTap();
+        else listener.onSingleTap();
         return true;
     }
 
