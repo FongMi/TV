@@ -548,9 +548,9 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void onSpeed() {
-        setR1Callback();
         mBinding.control.action.speed.setText(mPlayers.addSpeed());
         mHistory.setSpeed(mPlayers.getSpeed());
+        setR1Callback();
     }
 
     private boolean onSpeedLong() {
