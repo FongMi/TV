@@ -195,11 +195,12 @@ public class SiteViewModel extends ViewModel {
         executor = Executors.newFixedThreadPool(2);
         executor.execute(() -> {
             try {
-                if (!Thread.interrupted()) result.postValue(executor.submit(callable).get(Constant.TIMEOUT_VOD, TimeUnit.MILLISECONDS));
+                if (Thread.interrupted()) return;
+                result.postValue(executor.submit(callable).get(Constant.TIMEOUT_VOD, TimeUnit.MILLISECONDS));
             } catch (Throwable e) {
+                if (e instanceof InterruptedException || Thread.interrupted()) return;
+                result.postValue(Result.empty());
                 e.printStackTrace();
-                if (e instanceof InterruptedException) return;
-                if (!Thread.interrupted()) result.postValue(Result.empty());
             }
         });
     }
