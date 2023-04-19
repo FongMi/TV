@@ -39,6 +39,10 @@ public abstract class BaseActivity extends AppCompatActivity {
         return this;
     }
 
+    protected boolean customWall() {
+        return true;
+    }
+
     protected void initView(Bundle savedInstanceState) {
     }
 
@@ -55,6 +59,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     private void setWall() {
         try {
+            if (!customWall()) return;
             File file = FileUtil.getWall(Prefers.getWall());
             if (file.exists() && file.length() > 0) getWindow().setBackgroundDrawable(WallConfig.drawable(Drawable.createFromPath(file.getAbsolutePath())));
             else getWindow().setBackgroundDrawableResource(ResUtil.getDrawable(file.getName()));
