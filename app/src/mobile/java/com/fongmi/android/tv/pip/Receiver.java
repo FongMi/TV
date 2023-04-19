@@ -6,14 +6,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 
-import com.fongmi.android.tv.databinding.ActivityDetailBinding;
-
 public class Receiver extends BroadcastReceiver {
 
-    private final ActivityDetailBinding binding;
+    private final Listener listener;
 
-    public Receiver(ActivityDetailBinding binding) {
-        this.binding = binding;
+    public Receiver(Listener listener) {
+        this.listener = listener;
     }
 
     public void register(Activity activity) {
@@ -34,14 +32,23 @@ public class Receiver extends BroadcastReceiver {
         switch (controlType) {
             case PiP.CONTROL_TYPE_PLAY:
             case PiP.CONTROL_TYPE_PAUSE:
-                binding.control.play.performClick();
+                listener.onControlPlay();
                 break;
             case PiP.CONTROL_TYPE_NEXT:
-                binding.control.next.performClick();
+                listener.onControlNext();
                 break;
             case PiP.CONTROL_TYPE_PREV:
-                binding.control.prev.performClick();
+                listener.onControlPrev();
                 break;
         }
+    }
+
+    public interface Listener {
+
+        void onControlPlay();
+
+        void onControlNext();
+
+        void onControlPrev();
     }
 }
