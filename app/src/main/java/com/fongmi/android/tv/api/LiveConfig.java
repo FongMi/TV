@@ -168,14 +168,16 @@ public class LiveConfig {
             Group group = items.get(i);
             if (group.getName().equals(splits[1])) {
                 int j = group.find(splits[2]);
+                if (j != -1 && splits.length == 4) group.getChannel().get(j).setLine(splits[3]);
                 if (j != -1) return new int[]{i, j};
             }
         }
         return new int[]{1, 0};
     }
 
-    public void setKeep(Group group, Channel channel) {
-        if (!group.isHidden() && home != null) Prefers.putKeep(home.getName() + AppDatabase.SYMBOL + group.getName() + AppDatabase.SYMBOL + channel.getName());
+    public void setKeep(Channel channel) {
+        if (channel.getGroup().isHidden() || home == null) return;
+        Prefers.putKeep(home.getName() + AppDatabase.SYMBOL + channel.getGroup().getName() + AppDatabase.SYMBOL + channel.getName() + AppDatabase.SYMBOL + channel.getCurrent());
     }
 
     public int[] find(List<Group> items) {
