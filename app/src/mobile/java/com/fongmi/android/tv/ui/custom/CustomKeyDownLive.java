@@ -102,8 +102,8 @@ public class CustomKeyDownLive extends GestureDetector.SimpleOnGestureListener {
     }
 
     private void checkFunc(float distanceX, float distanceY, MotionEvent e2) {
-        int third = ResUtil.getScreenWidthNav() / 3;
-        if (e2.getX() > third && e2.getX() < third * 2) center = true;
+        int four = ResUtil.getScreenWidthNav() / 4;
+        if (e2.getX() > four && e2.getX() < four * 3) center = true;
         else if (Math.abs(distanceX) < Math.abs(distanceY)) checkSide(e2);
         touch = false;
     }
@@ -122,11 +122,8 @@ public class CustomKeyDownLive extends GestureDetector.SimpleOnGestureListener {
 
     private void checkSide(MotionEvent e2) {
         int half = ResUtil.getScreenWidthNav() / 2;
-        if (e2.getX() > half) {
-            changeVolume = true;
-        } else {
-            changeBright = true;
-        }
+        if (e2.getX() > half) changeVolume = true;
+        else changeBright = true;
     }
 
     private void setBright(float deltaY) {
