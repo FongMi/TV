@@ -131,11 +131,8 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
 
     private void checkSide(MotionEvent e2) {
         int half = ResUtil.getScreenWidthNav() / 2;
-        if (e2.getX() > half) {
-            changeVolume = true;
-        } else {
-            changeBright = true;
-        }
+        if (e2.getX() > half) changeVolume = true;
+        else changeBright = true;
     }
 
     private void setBright(float deltaY) {
