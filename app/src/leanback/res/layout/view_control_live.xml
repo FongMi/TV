@@ -7,7 +7,7 @@
     android:background="@drawable/shape_controller"
     android:orientation="vertical"
     android:paddingStart="16dp"
-    android:paddingTop="20dp"
+    android:paddingTop="18dp"
     android:paddingEnd="16dp"
     android:paddingBottom="8dp">
 
