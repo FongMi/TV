@@ -646,13 +646,14 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void showError(String text) {
-        mBinding.widget.text.setText(text);
         mBinding.widget.error.setVisibility(View.VISIBLE);
+        mBinding.widget.text.setText(text);
+        hideProgress();
     }
 
     private void hideError() {
-        mBinding.widget.text.setText("");
         mBinding.widget.error.setVisibility(View.GONE);
+        mBinding.widget.text.setText("");
     }
 
     private void showInfo() {
@@ -834,7 +835,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         Clock.get().setCallback(null);
         showError(event.getMsg());
         mPlayers.stop();
-        hideProgress();
         startFlow();
     }
 
@@ -993,10 +993,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         this.useParse = useParse;
     }
 
-    private void notifyItemChanged(RecyclerView view, ArrayObjectAdapter adapter) {
-        if (!view.isComputingLayout()) adapter.notifyArrayItemRangeChanged(0, adapter.size());
-    }
-
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (isFullscreen() && Utils.isMenuKey(event)) onToggle();
@@ -1098,8 +1094,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     protected void onPause() {
         super.onPause();
         RefreshEvent.history();
-        Clock.get().release();
         onPause(false);
+        Clock.stop();
     }
 
     @Override

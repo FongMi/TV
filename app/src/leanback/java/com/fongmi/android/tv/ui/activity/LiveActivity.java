@@ -188,6 +188,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.control.home.setVisibility(LiveConfig.isOnly() ? View.GONE : View.VISIBLE);
         mBinding.control.invert.setActivated(Prefers.isInvert());
         mBinding.control.across.setActivated(Prefers.isAcross());
+        findViewById(R.id.timeBar).setNextFocusUpId(R.id.home);
     }
 
     private void setScale(int scale) {
@@ -339,12 +340,24 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private void showProgress() {
         mBinding.widget.progress.setVisibility(View.VISIBLE);
         App.post(mR4, 0);
+        hideError();
     }
 
     private void hideProgress() {
         mBinding.widget.progress.setVisibility(View.GONE);
         App.removeCallbacks(mR4);
         Traffic.reset();
+    }
+
+    private void showError(String text) {
+        mBinding.widget.error.setVisibility(View.VISIBLE);
+        mBinding.widget.text.setText(text);
+        hideProgress();
+    }
+
+    private void hideError() {
+        mBinding.widget.error.setVisibility(View.GONE);
+        mBinding.widget.text.setText("");
     }
 
     private void showControl(View view) {
@@ -370,7 +383,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void showEpg() {
-        mBinding.control.play.setText(mChannel.getData().getEpg());
         mBinding.widget.play.setText(mChannel.getData().getEpg());
     }
 
@@ -441,14 +453,12 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void setInfo() {
         mChannel.loadLogo(mBinding.widget.logo);
-        mBinding.control.name.setText(mChannel.getName());
-        mBinding.control.line.setText(mChannel.getLineText());
-        mBinding.control.number.setText(mChannel.getNumber());
         mBinding.widget.name.setText(mChannel.getName());
         mBinding.widget.line.setText(mChannel.getLineText());
         mBinding.widget.number.setText(mChannel.getNumber());
-        mBinding.control.line.setVisibility(mChannel.getLineVisible());
+        mBinding.control.line.setText(mChannel.getLineText());
         mBinding.widget.line.setVisibility(mChannel.getLineVisible());
+        mBinding.control.line.setVisibility(mChannel.getLineVisible());
         showEpg();
         checkEpg();
     }
@@ -475,6 +485,102 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         showProgress();
     }
 
+    @Override
+    public void setLive(Live item) {
+        LiveConfig.get().setHome(item);
+        mPlayers.stop();
+        mHides.clear();
+        hideControl();
+        getLive();
+    }
+
+    @Override
+    public void setPass(String pass) {
+        boolean first = true;
+        int position = mGroupAdapter.size();
+        Iterator<Group> iterator = mHides.iterator();
+        while (iterator.hasNext()) {
+            Group item = iterator.next();
+            if (!item.getPass().equals(pass)) continue;
+            mGroupAdapter.add(mGroupAdapter.size(), item);
+            if (first) mBinding.group.setSelectedPosition(position);
+            if (first) onItemClick(mGroup = item);
+            iterator.remove();
+            first = false;
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onPlayerEvent(PlayerEvent event) {
+        switch (event.getState()) {
+            case 0:
+                setTrackVisible(false);
+                break;
+            case Player.STATE_IDLE:
+                break;
+            case Player.STATE_BUFFERING:
+                showProgress();
+                break;
+            case Player.STATE_READY:
+                hideProgress();
+                mPlayers.reset();
+                setSpeedVisible();
+                setTrackVisible(true);
+                break;
+            case Player.STATE_ENDED:
+                nextChannel();
+                break;
+        }
+    }
+
+    private void setSpeedVisible() {
+        mBinding.control.speed.setVisibility(mPlayers.isVod() ? View.VISIBLE : View.GONE);
+    }
+
+    private void setTrackVisible(boolean visible) {
+        mBinding.control.text.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_TEXT) ? View.VISIBLE : View.GONE);
+        mBinding.control.audio.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_AUDIO) ? View.VISIBLE : View.GONE);
+        mBinding.control.video.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_VIDEO) ? View.VISIBLE : View.GONE);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onErrorEvent(ErrorEvent event) {
+        if (!event.isRetry() || mPlayers.addRetry() > 3) onError(event);
+        else getUrl();
+    }
+
+    private void onError(ErrorEvent event) {
+        mPlayers.stop();
+        startFlow(event);
+    }
+
+    private void startFlow(ErrorEvent event) {
+        if (!mChannel.isLast()) {
+            nextLine(true);
+        } else if (isGone(mBinding.recycler)) {
+            mChannel.setLine(0);
+            nextChannel();
+        } else {
+            showError(event.getMsg());
+        }
+    }
+
+    private void prevChannel() {
+        int position = mGroup.getPosition() - 1;
+        boolean limit = position < 0;
+        if (Prefers.isAcross() & limit) prevGroup(true);
+        else mGroup.setPosition(limit ? mChannelAdapter.size() - 1 : position);
+        setChannel(mGroup.current());
+    }
+
+    private void nextChannel() {
+        int position = mGroup.getPosition() + 1;
+        boolean limit = position > mChannelAdapter.size() - 1;
+        if (Prefers.isAcross() && limit) nextGroup(true);
+        else mGroup.setPosition(limit ? 0 : position);
+        setChannel(mGroup.current());
+    }
+
     private void prevLine() {
         mChannel.prevLine();
         showInfo();
@@ -488,8 +594,22 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         getUrl();
     }
 
-    private void notifyItemChanged(RecyclerView view, ArrayObjectAdapter adapter) {
-        if (!view.isComputingLayout()) adapter.notifyArrayItemRangeChanged(0, adapter.size());
+    private void seekTo(int time) {
+        mPlayers.seekTo(time);
+        showProgress();
+        hideCenter();
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (isVisible(mBinding.control.getRoot())) setR2Callback();
+        if (mKeyDown.hasEvent(event)) mKeyDown.onKeyDown(event);
+        return super.dispatchKeyEvent(event);
+    }
+
+    @Override
+    public void setUITimer() {
+        App.post(mR0, Constant.INTERVAL_HIDE);
     }
 
     @Override
@@ -517,15 +637,10 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        if (isVisible(mBinding.control.getRoot())) setR2Callback();
-        if (mKeyDown.hasEvent(event)) mKeyDown.onKeyDown(event);
-        return super.dispatchKeyEvent(event);
-    }
-
-    @Override
-    public void setUITimer() {
-        App.post(mR0, Constant.INTERVAL_HIDE);
+    public boolean dispatch(boolean check) {
+        boolean condition1 = mGroup != null && mChannel != null;
+        boolean condition2 = isGone(mBinding.recycler) && isGone(mBinding.control.getRoot());
+        return check ? condition1 && condition2 : condition1;
     }
 
     @Override
@@ -551,28 +666,13 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     @Override
-    public boolean dispatch(boolean check) {
-        boolean condition1 = mGroup != null && mChannel != null;
-        boolean condition2 = isGone(mBinding.recycler) && isGone(mBinding.control.getRoot());
-        return check ? condition1 && condition2 : condition1;
-    }
-
-    @Override
     public void onKeyUp() {
-        int position = mGroup.getPosition() - 1;
-        boolean limit = position < 0;
-        if (Prefers.isAcross() & limit) prevGroup(true);
-        else mGroup.setPosition(limit ? mChannelAdapter.size() - 1 : position);
-        setChannel(mGroup.current());
+        prevChannel();
     }
 
     @Override
     public void onKeyDown() {
-        int position = mGroup.getPosition() + 1;
-        boolean limit = position > mChannelAdapter.size() - 1;
-        if (Prefers.isAcross() && limit) nextGroup(true);
-        else mGroup.setPosition(limit ? 0 : position);
-        setChannel(mGroup.current());
+        nextChannel();
     }
 
     @Override
@@ -587,12 +687,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         if (mChannel.isOnly() && mPlayers.isVod()) App.post(() -> seekTo(time), 250);
         else if (!mChannel.isOnly()) nextLine(true);
         mKeyDown.resetTime();
-    }
-
-    private void seekTo(int time) {
-        mPlayers.seekTo(time);
-        showProgress();
-        hideCenter();
     }
 
     @Override
@@ -622,84 +716,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     @Override
-    public void setPass(String pass) {
-        boolean first = true;
-        int position = mGroupAdapter.size();
-        Iterator<Group> iterator = mHides.iterator();
-        while (iterator.hasNext()) {
-            Group item = iterator.next();
-            if (!item.getPass().equals(pass)) continue;
-            mGroupAdapter.add(mGroupAdapter.size(), item);
-            if (first) mBinding.group.setSelectedPosition(position);
-            if (first) onItemClick(mGroup = item);
-            iterator.remove();
-            first = false;
-        }
-    }
-
-    @Override
-    public void setLive(Live item) {
-        LiveConfig.get().setHome(item);
-        mPlayers.stop();
-        mHides.clear();
-        hideControl();
-        getLive();
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onPlayerEvent(PlayerEvent event) {
-        switch (event.getState()) {
-            case 0:
-                setTrackVisible(false);
-                break;
-            case Player.STATE_IDLE:
-                break;
-            case Player.STATE_BUFFERING:
-                showProgress();
-                break;
-            case Player.STATE_READY:
-                hideProgress();
-                mPlayers.reset();
-                setSpeedVisible();
-                setTrackVisible(true);
-                break;
-            case Player.STATE_ENDED:
-                onKeyDown();
-                break;
-        }
-    }
-
-    private void setSpeedVisible() {
-        mBinding.control.speed.setVisibility(mPlayers.isVod() ? View.VISIBLE : View.GONE);
-    }
-
-    private void setTrackVisible(boolean visible) {
-        mBinding.control.text.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_TEXT) ? View.VISIBLE : View.GONE);
-        mBinding.control.audio.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_AUDIO) ? View.VISIBLE : View.GONE);
-        mBinding.control.video.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_VIDEO) ? View.VISIBLE : View.GONE);
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onErrorEvent(ErrorEvent event) {
-        if (!event.isRetry() || mPlayers.addRetry() > 3) onError();
-        else getUrl();
-    }
-
-    private void onError() {
-        mPlayers.stop();
-        checkNext();
-    }
-
-    private void checkNext() {
-        if (mChannel.isLast()) {
-            if (isGone(mBinding.recycler)) onKeyDown();
-        } else {
-            nextLine(true);
-            getUrl();
-        }
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
         Clock.start(mBinding.widget.time);
@@ -709,8 +725,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     @Override
     protected void onPause() {
         super.onPause();
-        Clock.get().release();
         mPlayers.pause();
+        Clock.stop();
     }
 
     @Override
