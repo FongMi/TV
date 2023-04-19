@@ -27,6 +27,7 @@ public class CustomKeyDownLive extends GestureDetector.SimpleOnGestureListener {
     private boolean changeVolume;
     private boolean center;
     private boolean touch;
+    private boolean lock;
     private float bright;
     private float volume;
 
@@ -48,13 +49,17 @@ public class CustomKeyDownLive extends GestureDetector.SimpleOnGestureListener {
         return detector.onTouchEvent(e);
     }
 
+    public void setLock(boolean lock) {
+        this.lock = lock;
+    }
+
     private boolean isEdge(MotionEvent e) {
         return ResUtil.isEdge(e, ResUtil.dp2px(16));
     }
 
     @Override
     public boolean onDown(@NonNull MotionEvent e) {
-        if (isEdge(e)) return true;
+        if (isEdge(e) || lock) return true;
         volume = manager.getStreamVolume(AudioManager.STREAM_MUSIC);
         bright = activity.getWindow().getAttributes().screenBrightness;
         changeBright = false;
@@ -66,7 +71,7 @@ public class CustomKeyDownLive extends GestureDetector.SimpleOnGestureListener {
 
     @Override
     public boolean onScroll(@NonNull MotionEvent e1, @NonNull MotionEvent e2, float distanceX, float distanceY) {
-        if (isEdge(e1)) return true;
+        if (isEdge(e1) || lock) return true;
         float deltaY = e1.getY() - e2.getY();
         if (touch) checkFunc(distanceX, distanceY, e2);
         if (changeBright) setBright(deltaY);
@@ -82,7 +87,7 @@ public class CustomKeyDownLive extends GestureDetector.SimpleOnGestureListener {
 
     @Override
     public boolean onSingleTapConfirmed(@NonNull MotionEvent e) {
-        listener.onSingleTap();
+        if (!lock) listener.onSingleTap();
         return true;
     }
 
