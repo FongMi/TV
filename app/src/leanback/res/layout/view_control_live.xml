@@ -100,30 +100,6 @@
                 tools:text="預設" />
 
             <TextView
-                android:id="@+id/invert"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
-                android:background="@drawable/selector_text"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:text="@string/play_invert"
-                android:textColor="@color/text"
-                android:textSize="14sp" />
-
-            <TextView
-                android:id="@+id/across"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
-                android:background="@drawable/selector_text"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:text="@string/play_across"
-                android:textColor="@color/text"
-                android:textSize="14sp" />
-
-            <TextView
                 android:id="@+id/text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -157,6 +133,7 @@
                 android:id="@+id/video"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="12dp"
                 android:background="@drawable/selector_text"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
@@ -166,6 +143,29 @@
                 android:textSize="14sp"
                 android:visibility="gone"
                 tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/invert"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="12dp"
+                android:background="@drawable/selector_text"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:text="@string/play_invert"
+                android:textColor="@color/text"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/across"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/selector_text"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:text="@string/play_across"
+                android:textColor="@color/text"
+                android:textSize="14sp" />
 
         </LinearLayout>
     </HorizontalScrollView>
