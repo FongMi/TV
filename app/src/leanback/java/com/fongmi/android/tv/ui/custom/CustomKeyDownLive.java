@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.utils.Prefers;
+import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Utils;
 
 public class CustomKeyDownLive extends GestureDetector.SimpleOnGestureListener {
@@ -91,7 +92,10 @@ public class CustomKeyDownLive extends GestureDetector.SimpleOnGestureListener {
 
     @Override
     public boolean onSingleTapConfirmed(@NonNull MotionEvent e) {
-        if (listener.dispatch(false)) listener.onSingleTap();
+        if (!listener.dispatch(false)) return true;
+        int half = ResUtil.getScreenWidthNav() / 2;
+        if (e.getX() > half) listener.onDoubleTap();
+        else listener.onSingleTap();
         return true;
     }
 

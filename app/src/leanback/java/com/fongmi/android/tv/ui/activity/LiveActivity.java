@@ -362,7 +362,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         view.requestFocus();
         setR2Callback();
         hideInfo();
-        hideUI();
     }
 
     private void hideControl() {
@@ -721,7 +720,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public void onDoubleTap() {
-        if (isVisible(mBinding.control.getRoot())) hideControl();
+        if (isVisible(mBinding.recycler)) hideUI();
+        else if (isVisible(mBinding.control.getRoot())) hideControl();
         else onMenu();
     }
 
