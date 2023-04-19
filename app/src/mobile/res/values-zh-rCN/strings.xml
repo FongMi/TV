@@ -1,5 +1,9 @@
 <resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
 
+    <!-- App -->
+    <string name="app_keep">我的收藏</string>
+    <string name="app_history">最近观看</string>
+
     <!-- Nav -->
     <string name="nav_vod">点播</string>
     <string name="nav_live">直播</string>
@@ -7,12 +11,6 @@
 
     <!-- Vod -->
     <string name="vod_home">推荐</string>
-
-    <!-- History -->
-    <string name="history">最近观看</string>
-
-    <!-- Keep -->
-    <string name="keep">我的收藏</string>
 
     <!-- Detail -->
     <string name="detail_flag">线路</string>
