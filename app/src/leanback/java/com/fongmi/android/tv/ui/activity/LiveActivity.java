@@ -146,13 +146,13 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.control.audio.setOnClickListener(this::onTrack);
         mBinding.control.video.setOnClickListener(this::onTrack);
         mBinding.control.home.setOnClickListener(view -> onHome());
+        mBinding.control.line.setOnClickListener(view -> onLine());
         mBinding.control.scale.setOnClickListener(view -> onScale());
         mBinding.control.speed.setOnClickListener(view -> onSpeed());
         mBinding.control.invert.setOnClickListener(view -> onInvert());
         mBinding.control.across.setOnClickListener(view -> onAcross());
         mBinding.control.player.setOnClickListener(view -> onPlayer());
         mBinding.control.decode.setOnClickListener(view -> onDecode());
-        mBinding.control.line.setOnClickListener(view -> nextLine(false));
         mBinding.control.speed.setOnLongClickListener(view -> onSpeedLong());
         mBinding.video.setOnTouchListener((view, event) -> mKeyDown.onTouchEvent(event));
         mBinding.group.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
@@ -260,21 +260,19 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         getUrl();
     }
 
-    private void setTraffic() {
-        Traffic.setSpeed(mBinding.widget.traffic);
-        App.post(mR4, Constant.INTERVAL_TRAFFIC);
-    }
-
-    private void onToggle() {
-        if (isVisible(mBinding.control.getRoot())) hideControl();
-        if (isVisible(mBinding.recycler)) hideUI();
-        else showUI();
-        hideInfo();
+    private void onTrack(View view) {
+        int type = Integer.parseInt(view.getTag().toString());
+        TrackDialog.create().player(mPlayers).type(type).show(getSupportFragmentManager(), null);
+        hideControl();
     }
 
     private void onHome() {
         LiveDialog.create(this).show();
         hideControl();
+    }
+
+    private void onLine() {
+        nextLine(false);
     }
 
     private void onScale() {
@@ -315,12 +313,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mPlayers.set(getExo(), getIjk());
         setDecodeView();
         getUrl();
-    }
-
-    private void onTrack(View view) {
-        int type = Integer.parseInt(view.getTag().toString());
-        TrackDialog.create().player(mPlayers).type(type).show(getSupportFragmentManager(), null);
-        hideControl();
     }
 
     private void hideUI() {
@@ -373,6 +365,11 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         App.removeCallbacks(mR2);
     }
 
+    private void hideCenter() {
+        mBinding.widget.action.setImageResource(R.drawable.ic_widget_play);
+        mBinding.widget.center.setVisibility(View.GONE);
+    }
+
     private void showInfo() {
         mBinding.widget.info.setVisibility(View.VISIBLE);
         setR1Callback();
@@ -388,9 +385,9 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.widget.play.setText(mChannel.getData().getEpg());
     }
 
-    private void hideCenter() {
-        mBinding.widget.action.setImageResource(R.drawable.ic_widget_play);
-        mBinding.widget.center.setVisibility(View.GONE);
+    private void setTraffic() {
+        Traffic.setSpeed(mBinding.widget.traffic);
+        App.post(mR4, Constant.INTERVAL_TRAFFIC);
     }
 
     private void setR1Callback() {
@@ -399,6 +396,13 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void setR2Callback() {
         App.post(mR2, Constant.INTERVAL_HIDE);
+    }
+
+    private void onToggle() {
+        if (isVisible(mBinding.control.getRoot())) hideControl();
+        if (isVisible(mBinding.recycler)) hideUI();
+        else showUI();
+        hideInfo();
     }
 
     private void resetPass() {
