@@ -100,8 +100,8 @@ public class CollectActivity extends BaseActivity implements SiteCallback, WordA
 
     @Override
     protected void initEvent() {
+        mBinding.site.setOnClickListener(this::onSite);
         mBinding.view.setOnClickListener(this::toggleView);
-        mBinding.site.setOnClickListener(v -> SiteDialog.create(this).search().show());
         mBinding.keyword.setOnEditorActionListener((textView, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) search();
             return true;
@@ -201,6 +201,11 @@ public class CollectActivity extends BaseActivity implements SiteCallback, WordA
                 App.post(() -> mWordAdapter.addAll(items));
             }
         });
+    }
+
+    private void onSite(View view) {
+        Utils.hideKeyboard(mBinding.keyword);
+        App.post(() -> SiteDialog.create().search().show(this), 50);
     }
 
     private void toggleView(View view) {
