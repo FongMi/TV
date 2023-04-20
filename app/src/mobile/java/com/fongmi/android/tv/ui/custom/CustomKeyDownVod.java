@@ -11,7 +11,6 @@ import android.view.WindowManager;
 import androidx.annotation.NonNull;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.utils.ResUtil;
 
 public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
@@ -19,7 +18,6 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
     private final GestureDetector detector;
     private final AudioManager manager;
     private final Listener listener;
-    private final Runnable runnable;
     private final Activity activity;
     private final View videoView;
     private boolean changeBright;
@@ -40,7 +38,6 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
         this.manager = (AudioManager) App.get().getSystemService(Context.AUDIO_SERVICE);
         this.detector = new GestureDetector(activity, this);
         this.listener = (Listener) activity;
-        this.runnable = this::subTime;
         this.videoView = videoView;
         this.activity = activity;
     }
@@ -105,20 +102,7 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
         return true;
     }
 
-    private void subTime() {
-        listener.onSeek(time = time - Constant.INTERVAL_SEEK);
-        App.post(runnable, getDelay());
-    }
-
-    private int getDelay() {
-        int count = Math.abs(time) / Constant.INTERVAL_SEEK;
-        if (count < 5) return 250;
-        else if (count < 15) return 100;
-        else return 50;
-    }
-
     private void onSeekEnd() {
-        App.removeCallbacks(runnable);
         listener.onSeekEnd(time);
         changeTime = false;
         time = 0;
@@ -132,11 +116,8 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
 
     private void checkSide(MotionEvent e2) {
         int half = ResUtil.getScreenWidthNav() / 2;
-        if (e2.getX() > half) {
-            changeVolume = true;
-        } else {
-            changeBright = true;
-        }
+        if (e2.getX() > half) changeVolume = true;
+        else changeBright = true;
     }
 
     private void setBright(float deltaY) {

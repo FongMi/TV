@@ -92,7 +92,7 @@ public class Utils {
     public static boolean isVideoFormat(String url, Map<String, String> headers) {
         if (Sniffer.CUSTOM.matcher(url).find()) return true;
         if (headers.containsKey("Accept") && headers.get("Accept").startsWith("image")) return false;
-        if (url.contains("url=http") || url.contains("v=http") || url.contains(".js") || url.contains(".css") || url.contains(".html")) return false;
+        if (url.contains("url=http") || url.contains("v=http") || url.contains(".css") || url.contains(".html")) return false;
         return Sniffer.RULE.matcher(url).find();
     }
 
@@ -144,8 +144,14 @@ public class Utils {
         }
     }
 
-    public static String getUUID() {
+    public static String getDeviceId() {
         return Settings.Secure.getString(App.get().getContentResolver(), Settings.Secure.ANDROID_ID);
+    }
+
+    public static String getDeviceName() {
+        String model = Build.MODEL;
+        String manufacturer = Build.MANUFACTURER;
+        return model.startsWith(manufacturer) ? model : manufacturer + " " + model;
     }
 
     public static String getBase64(String ext) {

@@ -2,6 +2,7 @@ package com.fongmi.android.tv.bean;
 
 import android.text.TextUtils;
 
+import com.fongmi.android.tv.utils.Trans;
 import com.google.gson.annotations.SerializedName;
 
 import org.simpleframework.xml.Attribute;
@@ -86,6 +87,11 @@ public class Class {
 
     public boolean isHome() {
         return getTypeId().equals("home");
+    }
+
+    public void trans() {
+        if (Trans.pass()) return;
+        this.typeName = Trans.s2t(typeName);
     }
 
     @Override

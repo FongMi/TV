@@ -38,15 +38,6 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     private List<String> mTypeIds;
     private VodAdapter mAdapter;
 
-    public static TypeFragment newInstance(Result result) {
-        Bundle args = new Bundle();
-        args.putString("typeId", "home");
-        args.putString("result", result.toString());
-        TypeFragment fragment = new TypeFragment();
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     public static TypeFragment newInstance(String typeId, boolean folder) {
         Bundle args = new Bundle();
         args.putString("typeId", typeId);
@@ -54,10 +45,6 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         TypeFragment fragment = new TypeFragment();
         fragment.setArguments(args);
         return fragment;
-    }
-
-    private String getResult() {
-        return getArguments().getString("result");
     }
 
     private String getTypeId() {
@@ -72,6 +59,10 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         return getTypeId().equals("home");
     }
 
+    private VodFragment getParent() {
+        return (VodFragment) getParentFragment();
+    }
+
     @Override
     protected ViewBinding getBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
         return mBinding = FragmentTypeBinding.inflate(inflater, container, false);
@@ -79,16 +70,16 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     @Override
     protected void initView() {
+        mScroller = new CustomScroller(this);
         mTypeIds = new ArrayList<>();
         mExtends = new HashMap<>();
-        mScroller = new CustomScroller(this);
-        mBinding.swipeLayout.setEnabled(!isHome());
         setRecyclerView();
         setViewModel();
     }
 
     @Override
     protected void initEvent() {
+        mBinding.swipeLayout.setEnabled(!isHome());
         mBinding.swipeLayout.setOnRefreshListener(this);
         mBinding.recycler.addOnScrollListener(mScroller = new CustomScroller(this));
     }
@@ -118,6 +109,15 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         getVideo(getTypeId(), "1");
     }
 
+    private void getVideo(String typeId, String page) {
+        if (isFolder()) mTypeIds.add(typeId);
+        if (isFolder()) mBinding.recycler.scrollToPosition(0);
+        if (page.equals("1")) mAdapter.clear();
+        if (page.equals("1") && !mBinding.swipeLayout.isRefreshing()) mBinding.progressLayout.showProgress();
+        if (isHome() && page.equals("1")) setAdapter(getParent().getResult());
+        else mViewModel.categoryContent(ApiConfig.get().getHome().getKey(), typeId, page, true, mExtends);
+    }
+
     private void setAdapter(Result result) {
         int size = result.getList().size();
         mBinding.progressLayout.showContent(isFolder(), size);
@@ -132,19 +132,15 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         getVideo(getTypeId(), String.valueOf(mScroller.addPage()));
     }
 
-    private void getVideo(String typeId, String page) {
-        if (isFolder()) mTypeIds.add(typeId);
-        if (isFolder()) mBinding.recycler.scrollToPosition(0);
-        if (page.equals("1")) mAdapter.clear();
-        if (page.equals("1") && !mBinding.swipeLayout.isRefreshing()) mBinding.progressLayout.showProgress();
-        if (!isHome()) mViewModel.categoryContent(ApiConfig.get().getHome().getKey(), typeId, page, true, mExtends);
-        else setAdapter(Result.fromJson(getResult()));
-    }
-
     private void refresh(int num) {
         String typeId = mTypeIds.get(mTypeIds.size() - num);
         mTypeIds = mTypeIds.subList(0, mTypeIds.size() - num);
         getVideo(typeId, "1");
+    }
+
+    public void setFilter(String key, String value) {
+        mExtends.put(key, value);
+        onRefresh();
     }
 
     @Override
@@ -158,12 +154,6 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         if (isFolder() || isHome()) return;
         mScroller.setLoading(true);
         getVideo(getTypeId(), page);
-    }
-
-    public void setFilter(String key, String value) {
-        mExtends.put(key, value);
-        if (isFolder()) refresh(1);
-        else getVideo();
     }
 
     @Override

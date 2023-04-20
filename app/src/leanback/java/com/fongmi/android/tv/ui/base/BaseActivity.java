@@ -9,6 +9,8 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.leanback.widget.ArrayObjectAdapter;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.R;
@@ -46,6 +48,10 @@ public abstract class BaseActivity extends AppCompatActivity {
         return this;
     }
 
+    protected boolean customWall() {
+        return true;
+    }
+
     protected void initView() {
     }
 
@@ -60,8 +66,13 @@ public abstract class BaseActivity extends AppCompatActivity {
         return view.getVisibility() == View.GONE;
     }
 
+    protected void notifyItemChanged(RecyclerView view, ArrayObjectAdapter adapter) {
+        if (!view.isComputingLayout()) adapter.notifyArrayItemRangeChanged(0, adapter.size());
+    }
+
     private void setWall() {
         try {
+            if (!customWall()) return;
             File file = FileUtil.getWall(Prefers.getWall());
             if (file.exists() && file.length() > 0) getWindow().setBackgroundDrawable(WallConfig.drawable(Drawable.createFromPath(file.getAbsolutePath())));
             else getWindow().setBackgroundDrawableResource(ResUtil.getDrawable(file.getName()));

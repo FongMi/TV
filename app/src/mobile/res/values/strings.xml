@@ -1,17 +1,16 @@
 <resources xmlns:tools="http://schemas.android.com/tools" xmlns:xliff="http://schemas.android.com/apk/res-auto" tools:ignore="MissingTranslation">
 
+    <!-- App -->
+    <string name="app_keep">Keep</string>
+    <string name="app_history">History</string>
+
     <!-- Nav -->
     <string name="nav_vod">Vod</string>
+    <string name="nav_live">Live</string>
     <string name="nav_setting">Setting</string>
 
     <!-- Vod -->
     <string name="vod_home">Home</string>
-
-    <!-- History -->
-    <string name="history">History</string>
-
-    <!-- Keep -->
-    <string name="keep">Keep</string>
 
     <!-- Detail -->
     <string name="detail_flag">Flag</string>
@@ -19,6 +18,12 @@
     <string name="detail_episode">Episode</string>
     <string name="detail_content">Summary</string>
     <string name="detail_search">Searching <xliff:g name="name">%s</xliff:g></string>
+
+    <!-- Cast -->
+    <string name="cast_select">Select devices</string>
+    <string name="cast_device_empty">Could\'t find a device to cast</string>
+    <string name="cast_device_offline">Device is offline</string>
+    <string name="cast_scan">Please scan QR Code to bind</string>
 
     <!-- Control -->
     <string name="control_speed">Speed</string>

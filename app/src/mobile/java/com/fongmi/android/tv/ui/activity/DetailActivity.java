@@ -3,6 +3,7 @@ package com.fongmi.android.tv.ui.activity;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -36,15 +37,17 @@ import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Track;
 import com.fongmi.android.tv.bean.Vod;
+import com.fongmi.android.tv.cast.CastVideo;
 import com.fongmi.android.tv.databinding.ActivityDetailBinding;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.model.SiteViewModel;
+import com.fongmi.android.tv.pip.PiP;
+import com.fongmi.android.tv.pip.Receiver;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
-import com.fongmi.android.tv.receiver.PiPReceiver;
 import com.fongmi.android.tv.ui.adapter.EpisodeAdapter;
 import com.fongmi.android.tv.ui.adapter.FlagAdapter;
 import com.fongmi.android.tv.ui.adapter.ParseAdapter;
@@ -53,12 +56,13 @@ import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.ui.custom.ViewType;
+import com.fongmi.android.tv.ui.custom.dialog.CastDialog;
 import com.fongmi.android.tv.ui.custom.dialog.ControlDialog;
-import com.fongmi.android.tv.ui.custom.dialog.EpisodeDialog;
+import com.fongmi.android.tv.ui.custom.dialog.EpisodeGridDialog;
+import com.fongmi.android.tv.ui.custom.dialog.EpisodeListDialog;
 import com.fongmi.android.tv.ui.custom.dialog.TrackDialog;
 import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.Notify;
-import com.fongmi.android.tv.ui.custom.PiP;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Traffic;
@@ -70,6 +74,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -77,7 +82,7 @@ import java.util.concurrent.Executors;
 
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Listener, TrackDialog.Listener, ControlDialog.Listener, Clock.Callback, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, ParseAdapter.OnClickListener {
+public class DetailActivity extends BaseActivity implements Clock.Callback, CustomKeyDownVod.Listener, CastDialog.Listener, Receiver.Listener, TrackDialog.Listener, ControlDialog.Listener, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, ParseAdapter.OnClickListener {
 
     private ViewGroup.LayoutParams mFrameParams;
     private ActivityDetailBinding mBinding;
@@ -89,7 +94,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private ExecutorService mExecutor;
     private SiteViewModel mViewModel;
     private FlagAdapter mFlagAdapter;
-    private PiPReceiver mReceiver;
+    private List<Dialog> mDialogs;
+    private Receiver mReceiver;
     private History mHistory;
     private Players mPlayers;
     private boolean fullscreen;
@@ -104,12 +110,17 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private Runnable mR2;
     private Runnable mR3;
     private String mKey;
+    private String url;
     private PiP mPiP;
 
     public static void file(FragmentActivity activity, String url) {
         String name = new File(url).getName();
         if (Utils.hasPermission(activity)) start(activity, "push_agent", "file://" + url, name);
         else PermissionX.init(activity).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> start(activity, "push_agent", "file://" + url, name));
+    }
+
+    public static void cast(Activity activity, History history) {
+        start(activity, history.getSiteKey(), history.getVodId(), history.getVodName());
     }
 
     public static void push(Activity activity, String url) {
@@ -141,7 +152,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private String getHistoryKey() {
-        return getKey().concat(AppDatabase.SYMBOL).concat(getId());
+        return getKey().concat(AppDatabase.SYMBOL).concat(getId()).concat(AppDatabase.SYMBOL) + ApiConfig.getCid();
     }
 
     private Site getSite() {
@@ -196,8 +207,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mKeyDown = CustomKeyDownVod.create(this, mBinding.video);
         mFrameParams = mBinding.video.getLayoutParams();
         mBinding.progressLayout.showProgress();
-        mReceiver = new PiPReceiver(mBinding);
         mPlayers = new Players().init();
+        mReceiver = new Receiver(this);
+        mDialogs = new ArrayList<>();
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
         mR3 = this::setOrient;
@@ -219,6 +231,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.content.setOnClickListener(view -> onContent());
         mBinding.reverse.setOnClickListener(view -> onReverse());
         mBinding.control.back.setOnClickListener(view -> onFull());
+        mBinding.control.cast.setOnClickListener(view -> onCast());
         mBinding.control.full.setOnClickListener(view -> onFull());
         mBinding.control.keep.setOnClickListener(view -> onKeep());
         mBinding.control.lock.setOnClickListener(view -> onLock());
@@ -237,6 +250,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.action.decode.setOnClickListener(view -> onDecode());
         mBinding.control.action.ending.setOnClickListener(view -> onEnding());
         mBinding.control.action.opening.setOnClickListener(view -> onOpening());
+        mBinding.control.action.episodes.setOnClickListener(view -> onEpisodes());
         mBinding.control.action.speed.setOnLongClickListener(view -> onSpeedLong());
         mBinding.control.action.ending.setOnLongClickListener(view -> onEndingReset());
         mBinding.control.action.opening.setOnLongClickListener(view -> onOpeningReset());
@@ -328,6 +342,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mViewModel.playerContent(getKey(), flag.getFlag(), episode.getUrl());
         updateHistory(episode, replay);
         showProgress();
+        setUrl(null);
     }
 
     private void setEmpty() {
@@ -349,6 +364,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         setText(mBinding.actor, R.string.detail_actor, Html.fromHtml(item.getVodActor()).toString());
         setText(mBinding.content, 0, Html.fromHtml(item.getVodContent()).toString());
         setText(mBinding.director, R.string.detail_director, Html.fromHtml(item.getVodDirector()).toString());
+        mBinding.contentLayout.setVisibility(mBinding.content.getVisibility());
         mFlagAdapter.addAll(item.getVodFlags());
         setOther(mBinding.other, item);
         checkFlag(item);
@@ -371,12 +387,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     @Override
-    public void onItemClick(Vod.Flag item) {
+    public void onItemClick(Vod.Flag item, boolean force) {
         if (item.isActivated()) return;
         mFlagAdapter.setActivated(item);
         mBinding.flag.scrollToPosition(mFlagAdapter.getPosition());
         setEpisodeAdapter(item.getEpisodes());
-        seamless(item);
+        seamless(item, force);
     }
 
     @Override
@@ -396,6 +412,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void setEpisodeAdapter(List<Vod.Flag.Episode> items) {
+        mBinding.control.action.episodes.setVisibility(items.size() < 2 ? View.GONE : View.VISIBLE);
         mBinding.control.nextRoot.setVisibility(items.size() < 2 ? View.GONE : View.VISIBLE);
         mBinding.control.prevRoot.setVisibility(items.size() < 2 ? View.GONE : View.VISIBLE);
         mBinding.episode.setVisibility(items.isEmpty() ? View.GONE : View.VISIBLE);
@@ -404,7 +421,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mEpisodeAdapter.addAll(items);
     }
 
-    private void seamless(Vod.Flag flag) {
+    private void seamless(Vod.Flag flag, boolean force) {
+        if (!force && !getSite().isChangeable()) return;
         Vod.Flag.Episode episode = flag.find(mHistory.getVodRemarks());
         if (episode == null || episode.isActivated()) return;
         mHistory.setVodRemarks(episode.getName());
@@ -425,7 +443,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void onMore() {
         for (Fragment fragment : getSupportFragmentManager().getFragments()) if (fragment instanceof BottomSheetDialogFragment) return;
-        EpisodeDialog.create().reverse(mHistory.isRevSort()).episodes(mEpisodeAdapter.getItems()).show(getSupportFragmentManager(), null);
+        EpisodeGridDialog.create().reverse(mHistory.isRevSort()).episodes(mEpisodeAdapter.getItems()).show(getSupportFragmentManager(), null);
     }
 
     private void onActor() {
@@ -446,6 +464,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         toggleFullscreen();
     }
 
+    private void onCast() {
+        for (Fragment fragment : getSupportFragmentManager().getFragments()) if (fragment instanceof BottomSheetDialogFragment) return;
+        CastDialog.create(this).config(ApiConfig.getUrl()).history(mHistory).video(CastVideo.get(getName(), getUrl())).show(getSupportFragmentManager(), null);
+    }
+
     private void onKeep() {
         Keep keep = Keep.find(getHistoryKey());
         Notify.show(keep != null ? R.string.keep_del : R.string.keep_add);
@@ -464,7 +487,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onShare() {
-        new ShareCompat.IntentBuilder(this).setType("text/plain").setText(getId()).startChooser();
+        new ShareCompat.IntentBuilder(this).setType("text/plain").setText(getUrl()).startChooser();
     }
 
     private void checkPlay() {
@@ -525,9 +548,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onSpeed() {
-        setR1Callback();
         mBinding.control.action.speed.setText(mPlayers.addSpeed());
         mHistory.setSpeed(mPlayers.getSpeed());
+        setR1Callback();
     }
 
     private boolean onSpeedLong() {
@@ -593,6 +616,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         return true;
     }
 
+    private void onEpisodes() {
+        mDialogs.add(EpisodeListDialog.create(this).episodes(mEpisodeAdapter.getItems()).show());
+    }
+
     private boolean onActionTouch(View v, MotionEvent e) {
         setR1Callback();
         return false;
@@ -653,23 +680,25 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void showError(String text) {
-        mBinding.widget.text.setText(text);
         mBinding.widget.error.setVisibility(View.VISIBLE);
+        mBinding.widget.text.setText(text);
+        hideProgress();
     }
 
     private void hideError() {
-        mBinding.widget.text.setText("");
         mBinding.widget.error.setVisibility(View.GONE);
+        mBinding.widget.text.setText("");
     }
 
     private void showControl() {
+        mBinding.control.share.setVisibility(getUrl() == null || isFullscreen() ? View.GONE : View.VISIBLE);
+        mBinding.control.cast.setVisibility(getUrl() == null || isFullscreen() ? View.GONE : View.VISIBLE);
+        mBinding.control.keep.setVisibility(mHistory == null || isFullscreen() ? View.GONE : View.VISIBLE);
         mBinding.control.parse.setVisibility(isFullscreen() && isUseParse() ? View.VISIBLE : View.GONE);
         mBinding.control.rotate.setVisibility(isFullscreen() && !isLock() ? View.VISIBLE : View.GONE);
         mBinding.control.back.setVisibility(isFullscreen() && !isLock() ? View.VISIBLE : View.GONE);
         mBinding.control.action.getRoot().setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
         mBinding.control.setting.setVisibility(isFullscreen() ? View.GONE : View.VISIBLE);
-        mBinding.control.share.setVisibility(isFullscreen() ? View.GONE : View.VISIBLE);
-        mBinding.control.keep.setVisibility(isFullscreen() ? View.GONE : View.VISIBLE);
         mBinding.control.lock.setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
         mBinding.control.center.setVisibility(isLock() ? View.GONE : View.VISIBLE);
         mBinding.control.bottom.setVisibility(isLock() ? View.GONE : View.VISIBLE);
@@ -685,7 +714,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void hideSheet() {
+        for (Dialog dialog : mDialogs) dialog.dismiss();
         for (Fragment fragment : getSupportFragmentManager().getFragments()) if (fragment instanceof BottomSheetDialogFragment) ((BottomSheetDialogFragment) fragment).dismiss();
+        mDialogs.clear();
     }
 
     private void setTraffic() {
@@ -710,7 +741,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void checkHistory(Vod item) {
         mHistory = History.find(getHistoryKey());
         mHistory = mHistory == null ? createHistory(item) : mHistory;
-        onItemClick(mHistory.getFlag());
+        onItemClick(mHistory.getFlag(), true);
         if (mHistory.isRevSort()) reverseEpisode(true);
         mBinding.control.action.opening.setText(mHistory.getOpening() == 0 ? getString(R.string.play_op) : mPlayers.stringToTime(mHistory.getOpening()));
         mBinding.control.action.ending.setText(mHistory.getEnding() == 0 ? getString(R.string.play_ed) : mPlayers.stringToTime(mHistory.getEnding()));
@@ -787,6 +818,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         switch (event.getState()) {
             case 0:
                 checkPosition();
+                setUrl(event.getUrl());
                 setTrackVisible(false);
                 break;
             case Player.STATE_IDLE:
@@ -847,7 +879,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         Clock.get().setCallback(null);
         showError(event.getMsg());
         mPlayers.stop();
-        hideProgress();
         startFlow();
     }
 
@@ -939,7 +970,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void nextFlag(int position) {
         Vod.Flag flag = mFlagAdapter.get(position + 1);
         Notify.show(getString(R.string.play_switch_flag, flag.getFlag()));
-        onItemClick(flag);
+        onItemClick(flag, true);
     }
 
     private void nextSite() {
@@ -1016,8 +1047,23 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         this.lock = lock;
     }
 
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
     private void notifyItemChanged(RecyclerView.Adapter<?> adapter) {
         adapter.notifyItemRangeChanged(0, adapter.getItemCount());
+    }
+
+    @Override
+    public void onCastTo(boolean mobile) {
+        if (mobile) return;
+        checkPlayImg(false);
+        mPlayers.pause();
     }
 
     @Override
@@ -1098,7 +1144,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     @Override
     public void onDoubleTap() {
         if (!isFullscreen()) {
-            enterFullscreen();
+            App.post(this::enterFullscreen, 250);
         } else if (mPlayers.isPlaying()) {
             mPlayers.pause();
             showControl();
@@ -1106,6 +1152,21 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
             mPlayers.play();
             hideControl();
         }
+    }
+
+    @Override
+    public void onControlPlay() {
+        mBinding.control.play.performClick();
+    }
+
+    @Override
+    public void onControlNext() {
+        mBinding.control.next.performClick();
+    }
+
+    @Override
+    public void onControlPrev() {
+        mBinding.control.prev.performClick();
     }
 
     @Override

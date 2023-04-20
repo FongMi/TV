@@ -12,9 +12,9 @@ import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.BuildConfig;
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.Updater;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.api.LiveConfig;
-import com.fongmi.android.tv.api.Updater;
 import com.fongmi.android.tv.api.WallConfig;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Live;
@@ -26,11 +26,11 @@ import com.fongmi.android.tv.impl.LiveCallback;
 import com.fongmi.android.tv.impl.SiteCallback;
 import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.ui.base.BaseFragment;
+import com.fongmi.android.tv.ui.custom.FileChooser;
 import com.fongmi.android.tv.ui.custom.dialog.ConfigDialog;
 import com.fongmi.android.tv.ui.custom.dialog.HistoryDialog;
 import com.fongmi.android.tv.ui.custom.dialog.LiveDialog;
 import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
-import com.fongmi.android.tv.ui.custom.FileChooser;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
@@ -103,17 +103,17 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
     private void load(Config config) {
         switch (config.getType()) {
             case 0:
-                Notify.progress(getActivity(), true);
+                Notify.progress(getActivity());
                 mBinding.vodUrl.setText(config.getDesc());
                 ApiConfig.get().clear().config(config).load(getCallback(config));
                 break;
             case 1:
-                Notify.progress(getActivity(), true);
+                Notify.progress(getActivity());
                 mBinding.liveUrl.setText(config.getDesc());
                 LiveConfig.get().clear().config(config).load(getCallback(config));
                 break;
             case 2:
-                Notify.progress(getActivity(), true);
+                Notify.progress(getActivity());
                 mBinding.wallUrl.setText(config.getDesc());
                 WallConfig.get().clear().config(config).load(getCallback(config));
                 break;
@@ -141,12 +141,14 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
             case 0:
                 Notify.dismiss();
                 RefreshEvent.video();
+                RefreshEvent.config();
                 mBinding.vodUrl.setText(ApiConfig.getDesc());
                 mBinding.liveUrl.setText(LiveConfig.getDesc());
                 mBinding.wallUrl.setText(WallConfig.getDesc());
                 break;
             case 1:
                 Notify.dismiss();
+                RefreshEvent.config();
                 mBinding.liveUrl.setText(LiveConfig.getDesc());
                 break;
             case 2:
@@ -222,6 +224,9 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
 
     private void updateText() {
         if (player == null || decode == null) return;
+        mBinding.vodUrl.setText(ApiConfig.getDesc());
+        mBinding.liveUrl.setText(LiveConfig.getDesc());
+        mBinding.wallUrl.setText(WallConfig.getDesc());
         mBinding.playerText.setText(player[Prefers.getPlayer()]);
         mBinding.decodeText.setText(decode[Prefers.getDecode()]);
     }

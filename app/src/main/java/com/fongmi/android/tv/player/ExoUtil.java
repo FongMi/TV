@@ -7,7 +7,6 @@ import androidx.media3.common.MediaItem;
 import androidx.media3.common.MimeTypes;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Tracks;
-import androidx.media3.common.util.Util;
 import androidx.media3.database.DatabaseProvider;
 import androidx.media3.database.StandaloneDatabaseProvider;
 import androidx.media3.datasource.DataSource;
@@ -35,6 +34,7 @@ import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Sub;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Prefers;
+import com.fongmi.android.tv.utils.Sniffer;
 import com.google.common.net.HttpHeaders;
 
 import java.util.ArrayList;
@@ -71,7 +71,7 @@ public class ExoUtil {
     }
 
     public static MediaSource getSource(Result result, int errorCode) {
-        return getSource(result.getHeaders(), result.getPlayUrl() + result.getUrl(), result.getSubs(), errorCode);
+        return getSource(result.getHeaders(), result.getRealUrl(), result.getSubs(), errorCode);
     }
 
     public static MediaSource getSource(Map<String, String> headers, String url, int errorCode) {
@@ -106,7 +106,7 @@ public class ExoUtil {
     }
 
     private static synchronized DataSource.Factory getDataSourceFactory(Map<String, String> headers) {
-        if (!headers.containsKey(HttpHeaders.USER_AGENT)) headers.put(HttpHeaders.USER_AGENT, Util.getUserAgent(App.get(), App.get().getPackageName()));
+        if (!headers.containsKey(HttpHeaders.USER_AGENT)) headers.put(HttpHeaders.USER_AGENT, Sniffer.CHROME);
         if (dataSourceFactory == null) dataSourceFactory = buildReadOnlyCacheDataSource(new DefaultDataSource.Factory(App.get(), getHttpDataSourceFactory()), getCache());
         httpDataSourceFactory.setDefaultRequestProperties(headers);
         return dataSourceFactory;
