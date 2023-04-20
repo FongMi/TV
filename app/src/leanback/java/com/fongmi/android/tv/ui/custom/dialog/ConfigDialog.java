@@ -73,8 +73,8 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
     private void initView() {
         String address = Server.get().getAddress();
         binding.text.setText(url = getUrl());
-        binding.text.setSelection(TextUtils.isEmpty(url) ? 0 : url.length());
         binding.code.setImageBitmap(QRCode.getBitmap(address, 200, 0));
+        binding.text.setSelection(TextUtils.isEmpty(url) ? 0 : url.length());
         binding.storage.setVisibility(Utils.hasPermission(activity) ? View.GONE : View.VISIBLE);
         binding.info.setText(ResUtil.getString(R.string.push_info, address).replace("，", "\n"));
     }

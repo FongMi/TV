@@ -623,8 +623,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onTrack(View view) {
-        int type = Integer.parseInt(view.getTag().toString());
-        TrackDialog.create().player(mPlayers).type(type).listener(this).show(getSupportFragmentManager(), null);
+        TrackDialog.create().player(mPlayers).type(Integer.parseInt(view.getTag().toString())).show(this);
         hideControl();
     }
 
