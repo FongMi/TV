@@ -130,7 +130,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="12dp"
-                android:text="@string/live_setting"
+                android:text="@string/live_other"
                 android:textColor="@color/grey_700"
                 android:textSize="18sp" />
 
