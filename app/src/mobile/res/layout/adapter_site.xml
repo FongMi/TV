@@ -28,8 +28,7 @@
         android:background="@drawable/shape_text_round"
         android:padding="8dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_site_search_on"
-        app:tint="@color/text" />
+        android:src="@drawable/ic_site_search_on" />
 
     <ImageView
         android:id="@+id/change"
@@ -39,7 +38,6 @@
         android:background="@drawable/shape_text_round"
         android:padding="8dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_site_change_on"
-        app:tint="@color/text" />
+        android:src="@drawable/ic_site_change_on" />
 
 </LinearLayout>
