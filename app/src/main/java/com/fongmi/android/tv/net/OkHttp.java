@@ -1,9 +1,8 @@
 package com.fongmi.android.tv.net;
 
-import android.util.ArrayMap;
-
 import com.fongmi.android.tv.Constant;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -48,11 +47,11 @@ public class OkHttp {
         return client().newCall(new Request.Builder().url(url).headers(headers).build());
     }
 
-    public static Call newCall(String url, ArrayMap<String, String> params) {
+    public static Call newCall(String url, LinkedHashMap<String, String> params) {
         return client().newCall(new Request.Builder().url(buildUrl(url, params)).build());
     }
 
-    public static Call newCall(OkHttpClient client, String url, ArrayMap<String, String> params) {
+    public static Call newCall(OkHttpClient client, String url, LinkedHashMap<String, String> params) {
         return client.newCall(new Request.Builder().url(buildUrl(url, params)).build());
     }
 
@@ -60,7 +59,7 @@ public class OkHttp {
         return client.newCall(new Request.Builder().url(url).post(body).build());
     }
 
-    private static HttpUrl buildUrl(String url, ArrayMap<String, String> params) {
+    private static HttpUrl buildUrl(String url, LinkedHashMap<String, String> params) {
         HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(url)).newBuilder();
         for (Map.Entry<String, String> entry : params.entrySet()) builder.addQueryParameter(entry.getKey(), entry.getValue());
         return builder.build();
