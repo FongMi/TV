@@ -108,12 +108,8 @@ public class Group {
         return getName().equals(ResUtil.getString(R.string.keep));
     }
 
-    public boolean isSetting() {
-        return getName().equals(ResUtil.getString(R.string.live_setting));
-    }
-
     public boolean skip() {
-        return isKeep() || isSetting();
+        return isKeep();
     }
 
     public void loadLogo(ImageView view) {

@@ -708,9 +708,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public void onMenu() {
-        if (isVisible(mBinding.control.home)) showControl(mBinding.control.home);
-        else if (isVisible(mBinding.control.line)) showControl(mBinding.control.line);
-        else showControl(mBinding.control.player);
+        showControl(mBinding.control.player);
     }
 
     @Override
