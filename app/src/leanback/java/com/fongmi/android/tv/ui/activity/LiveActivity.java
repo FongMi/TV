@@ -68,7 +68,7 @@ import okhttp3.Call;
 import okhttp3.Response;
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class LiveActivity extends BaseActivity implements GroupPresenter.OnClickListener, ChannelPresenter.OnClickListener, CustomKeyDownLive.Listener, CustomLiveListView.Callback, PassCallback, LiveCallback {
+public class LiveActivity extends BaseActivity implements GroupPresenter.OnClickListener, ChannelPresenter.OnClickListener, CustomKeyDownLive.Listener, CustomLiveListView.Callback, TrackDialog.Listener, PassCallback, LiveCallback {
 
     private ActivityLiveBinding mBinding;
     private ArrayObjectAdapter mChannelAdapter;
@@ -266,8 +266,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void onTrack(View view) {
-        int type = Integer.parseInt(view.getTag().toString());
-        TrackDialog.create().player(mPlayers).type(type).show(getSupportFragmentManager(), null);
+        TrackDialog.create().player(mPlayers).type(Integer.parseInt(view.getTag().toString())).show(this);
         hideControl();
     }
 
@@ -418,8 +417,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mChannelAdapter.setItems(item.getChannel(), null);
         mBinding.channel.setSelectedPosition(item.getPosition());
         if (!item.isKeep() || ++count < 5 || mHides.isEmpty()) return;
+        PassDialog.create().show(this);
         App.removeCallbacks(mR0);
-        PassDialog.show(this);
         resetPass();
     }
 
@@ -494,6 +493,10 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         LiveConfig.get().setKeep(mChannel);
         mViewModel.getUrl(mChannel);
         showProgress();
+    }
+
+    @Override
+    public void onTrackClick(Track item) {
     }
 
     @Override
