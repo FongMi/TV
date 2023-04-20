@@ -11,18 +11,23 @@ android {
         minSdk 21
         targetSdk 29
         ndk { abiFilters "armeabi-v7a" }
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
     }
 
     productFlavors {
         leanback {
             dimension "mode"
-            versionCode 72
-            versionName "1.7.2"
+            versionCode 73
+            versionName "1.7.3"
         }
         mobile {
             dimension "mode"
-            versionCode 10
-            versionName "1.1.0"
+            versionCode 11
+            versionName "1.1.1"
         }
         java {
             dimension "api"
@@ -43,6 +48,10 @@ android {
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+    }
+
+    packagingOptions {
+        exclude 'META-INF/beans.xml'
     }
 
     compileOptions {
@@ -88,11 +97,11 @@ dependencies {
     implementation 'cat.ereza:customactivityoncrash:2.4.0'
     implementation 'com.github.bassaer:materialdesigncolors:1.0.0'
     implementation 'com.github.bumptech.glide:glide:4.14.2'
-    implementation 'com.google.android.exoplayer:exoplayer:2.18.5'
+    implementation('com.github.thegrizzlylabs:sardine-android:0.8') { exclude group: 'com.squareup.okhttp3', module: 'okhttp' }
     implementation 'com.google.android.material:material:1.9.0-beta01'
     implementation 'com.google.code.gson:gson:2.10.1'
     implementation 'com.google.net.cronet:cronet-okhttp:0.1.0'
-    implementation 'com.google.zxing:core:3.3.0'
+    implementation 'com.google.zxing:core:3.4.1'
     implementation 'com.guolindev.permissionx:permissionx:1.7.1'
     implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.10'
     implementation 'net.java.dev.jna:jna:5.12.1'
@@ -104,6 +113,8 @@ dependencies {
     leanbackImplementation 'androidx.leanback:leanback:1.2.0-alpha02'
     leanbackImplementation 'me.jessyan:autosize:1.2.1'
     mobileImplementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+    mobileImplementation 'com.github.devin1014.DLNA-Cast:dlna-dmc:V1.0.0'
+    mobileImplementation('com.journeyapps:zxing-android-embedded:4.3.0') { transitive = false }
     annotationProcessor 'androidx.room:room-compiler:2.5.1'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.14.2'
 }

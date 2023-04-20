@@ -13,6 +13,7 @@ import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.net.OkHttp;
+import com.fongmi.android.tv.utils.Trans;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderDebug;
@@ -169,12 +170,12 @@ public class SiteViewModel extends ViewModel {
     public void searchContent(Site site, String keyword) throws Throwable {
         if (site.getType() == 3) {
             Spider spider = ApiConfig.get().getCSP(site);
-            String searchContent = spider.searchContent(keyword, false);
+            String searchContent = spider.searchContent(Trans.t2s(keyword), false);
             SpiderDebug.log(searchContent);
             post(site, Result.fromJson(searchContent));
         } else {
             ArrayMap<String, String> params = new ArrayMap<>();
-            params.put("wd", keyword);
+            params.put("wd", Trans.t2s(keyword));
             if (site.getType() != 0) params.put("ac", "detail");
             String body = OkHttp.newCall(site.getApi(), params).execute().body().string();
             SpiderDebug.log(site.getName() + "," + body);
@@ -194,11 +195,12 @@ public class SiteViewModel extends ViewModel {
         executor = Executors.newFixedThreadPool(2);
         executor.execute(() -> {
             try {
-                if (!Thread.interrupted()) result.postValue(executor.submit(callable).get(Constant.TIMEOUT_VOD, TimeUnit.MILLISECONDS));
+                if (Thread.interrupted()) return;
+                result.postValue(executor.submit(callable).get(Constant.TIMEOUT_VOD, TimeUnit.MILLISECONDS));
             } catch (Throwable e) {
+                if (e instanceof InterruptedException || Thread.interrupted()) return;
+                result.postValue(Result.empty());
                 e.printStackTrace();
-                if (e instanceof InterruptedException) return;
-                if (!Thread.interrupted()) result.postValue(Result.empty());
             }
         });
     }

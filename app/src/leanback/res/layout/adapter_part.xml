@@ -10,6 +10,7 @@
     android:focusableInTouchMode="true"
     android:gravity="center"
     android:nextFocusUp="@id/array"
+    android:singleLine="true"
     android:textColor="@color/white"
     android:textSize="16sp"
     tools:text="分詞" />

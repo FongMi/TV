@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 
 import com.fongmi.android.tv.gson.FilterAdapter;
 import com.fongmi.android.tv.utils.Json;
+import com.fongmi.android.tv.utils.Trans;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
@@ -59,7 +60,7 @@ public class Result {
     public static Result fromJson(String str) {
         try {
             Result result = FilterAdapter.gson().fromJson(str, Result.class);
-            return result == null ? empty() : result;
+            return result == null ? empty() : result.trans();
         } catch (Exception e) {
             return empty();
         }
@@ -67,7 +68,7 @@ public class Result {
 
     public static Result fromXml(String str) {
         try {
-            return new Persister().read(Result.class, str);
+            return new Persister().read(Result.class, str).trans();
         } catch (Exception e) {
             return empty();
         }
@@ -189,12 +190,24 @@ public class Result {
         return subs == null ? Collections.emptyList() : subs;
     }
 
+    public String getRealUrl() {
+        return getPlayUrl() + getUrl();
+    }
+
     public Map<String, String> getHeaders() {
         return Json.toMap(getHeader());
     }
 
     public Result clear() {
         getList().clear();
+        return this;
+    }
+
+    public Result trans() {
+        if (Trans.pass()) return this;
+        for (Class type : getTypes()) type.trans();
+        for (Vod vod : getList()) vod.trans();
+        for (Sub sub : getSubs()) sub.trans();
         return this;
     }
 

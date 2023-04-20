@@ -20,12 +20,14 @@ import com.fongmi.android.tv.Updater;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.api.LiveConfig;
 import com.fongmi.android.tv.api.WallConfig;
+import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Func;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.ActivityHomeBinding;
+import com.fongmi.android.tv.event.CastEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.event.ServerEvent;
 import com.fongmi.android.tv.model.SiteViewModel;
@@ -304,10 +306,34 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
                 CollectActivity.start(this, event.getText(), true);
                 break;
             case PUSH:
-                if (ApiConfig.get().getSite("push_agent") == null) return;
-                DetailActivity.start(this, "push_agent", event.getText(), "", true);
+                if (ApiConfig.hasPush()) DetailActivity.push(this, event.getText(), true);
                 break;
         }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onCastEvent(CastEvent event) {
+        if (ApiConfig.getUrl().equals(event.getConfig())) {
+            DetailActivity.cast(this, event.getHistory().update(ApiConfig.getCid()));
+        } else {
+            ApiConfig.get().clear().config(Config.find(event.getConfig(), 0)).load(getCallback(event));
+        }
+    }
+
+    private Callback getCallback(CastEvent event) {
+        return new Callback() {
+            @Override
+            public void success() {
+                RefreshEvent.history();
+                RefreshEvent.video();
+                onCastEvent(event);
+            }
+
+            @Override
+            public void error(int resId) {
+                Notify.show(resId);
+            }
+        };
     }
 
     @Override
@@ -325,7 +351,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     @Override
     protected void onPause() {
         super.onPause();
-        Clock.get().release();
+        Clock.stop();
     }
 
     @Override
@@ -339,7 +365,6 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
             Notify.show(R.string.app_exit);
             App.post(() -> confirm = false, 2000);
         } else {
-            super.onBackPressed();
             finish();
         }
     }

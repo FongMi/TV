@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.utils.Prefers;
+import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Utils;
 
 public class CustomKeyDownLive extends GestureDetector.SimpleOnGestureListener {
@@ -58,9 +59,11 @@ public class CustomKeyDownLive extends GestureDetector.SimpleOnGestureListener {
         } else if (event.getAction() == KeyEvent.ACTION_DOWN && Utils.isRightKey(event)) {
             listener.onSeeking(addTime());
         } else if (event.getAction() == KeyEvent.ACTION_DOWN && Utils.isUpKey(event)) {
-            if (Prefers.isInvert()) listener.onKeyDown(); else listener.onKeyUp();
+            if (Prefers.isInvert()) listener.onKeyDown();
+            else listener.onKeyUp();
         } else if (event.getAction() == KeyEvent.ACTION_DOWN && Utils.isDownKey(event)) {
-            if (Prefers.isInvert()) listener.onKeyUp(); else listener.onKeyDown();
+            if (Prefers.isInvert()) listener.onKeyUp();
+            else listener.onKeyDown();
         } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isLeftKey(event)) {
             listener.onKeyLeft(holdTime);
         } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isRightKey(event)) {
@@ -89,21 +92,24 @@ public class CustomKeyDownLive extends GestureDetector.SimpleOnGestureListener {
 
     @Override
     public boolean onSingleTapConfirmed(@NonNull MotionEvent e) {
-        if (listener.dispatch(false)) listener.onSingleTap();
+        if (!listener.dispatch(false)) return true;
+        int half = ResUtil.getScreenWidthNav() / 2;
+        if (e.getX() > half) listener.onDoubleTap();
+        else listener.onSingleTap();
         return true;
     }
 
     @Override
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-        if (listener.dispatch(true)) check(e1, e2, velocityX, velocityY);
+        if (listener.dispatch(true)) checkFunc(e1, e2, velocityX, velocityY);
         return true;
     }
 
-    private void check(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+    private void checkFunc(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
         if (e1.getX() - e2.getX() > DISTANCE && Math.abs(velocityX) > VELOCITY) {
-            listener.onKeyLeft(30 * 1000);
+            listener.onKeyLeft(Constant.INTERVAL_SEEK * 3);
         } else if (e2.getX() - e1.getX() > DISTANCE && Math.abs(velocityX) > VELOCITY) {
-            listener.onKeyRight(30 * 1000);
+            listener.onKeyRight(Constant.INTERVAL_SEEK * 3);
         } else if (e1.getY() - e2.getY() > DISTANCE && Math.abs(velocityY) > VELOCITY) {
             listener.onKeyUp();
         } else if (e2.getY() - e1.getY() > DISTANCE && Math.abs(velocityY) > VELOCITY) {

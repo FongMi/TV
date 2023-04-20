@@ -66,10 +66,10 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
     }
 
     public void remove(History item) {
-        int position = mItems.indexOf(item);
-        if (position == -1) return;
-        mItems.remove(position);
-        notifyItemRemoved(position);
+        int index = mItems.indexOf(item);
+        if (index == -1) return;
+        mItems.remove(index);
+        notifyItemRemoved(index);
     }
 
     @Override
@@ -90,11 +90,11 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         History item = mItems.get(position);
         holder.binding.name.setText(item.getVodName());
-        holder.binding.site.setVisibility(View.VISIBLE);
-        holder.binding.site.setText(ApiConfig.getSiteName(item.getSiteKey()));
-        holder.binding.remark.setText(ResUtil.getString(R.string.vod_last, item.getVodRemarks()));
+        holder.binding.site.setText(item.getSiteName());
+        holder.binding.site.setVisibility(item.getSiteVisible());
         holder.binding.remark.setVisibility(delete ? View.GONE : View.VISIBLE);
         holder.binding.delete.setVisibility(!delete ? View.GONE : View.VISIBLE);
+        holder.binding.remark.setText(ResUtil.getString(R.string.vod_last, item.getVodRemarks()));
         ImgUtil.loadHistory(item.getVodPic(), holder.binding.image);
         setClickListener(holder.binding.getRoot(), item);
     }

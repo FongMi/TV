@@ -12,6 +12,10 @@ import java.io.ByteArrayOutputStream;
 
 public class Product {
 
+    public static int getDeviceType() {
+        return 1;
+    }
+
     public static int getColumn() {
         return Math.abs(Prefers.getSize() - 5);
     }

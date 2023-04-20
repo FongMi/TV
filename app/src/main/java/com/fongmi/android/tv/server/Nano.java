@@ -2,6 +2,7 @@ package com.fongmi.android.tv.server;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.bean.Device;
 import com.fongmi.android.tv.server.process.InputRequestProcess;
 import com.fongmi.android.tv.server.process.RawRequestProcess;
 import com.fongmi.android.tv.server.process.RequestProcess;
@@ -71,6 +72,7 @@ public class Nano extends NanoHTTPD {
             case GET:
                 if (url.startsWith("/file")) return doFile(url);
                 else if (url.startsWith("/proxy")) return doProxy(session.getParms());
+                else if (url.startsWith("/device")) return createPlainTextResponse(NanoHTTPD.Response.Status.OK, Device.get().toString());
                 break;
             case POST:
                 if (url.startsWith("/upload")) return doUpload(session.getParms(), files);
@@ -99,9 +101,9 @@ public class Nano extends NanoHTTPD {
             String path = url.substring(6);
             File file = FileUtil.getRootFile(path);
             if (file.isFile()) return newChunkedResponse(Response.Status.OK, "application/octet-stream", new FileInputStream(file));
-            else return newFixedLengthResponse(Response.Status.OK, MIME_PLAINTEXT, listFiles(file));
+            else return createPlainTextResponse(Response.Status.OK, listFiles(file));
         } catch (Exception e) {
-            return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, e.getMessage());
+            return createPlainTextResponse(Response.Status.INTERNAL_ERROR, e.getMessage());
         }
     }
 
@@ -110,7 +112,7 @@ public class Nano extends NanoHTTPD {
             Object[] rs = ApiConfig.get().proxyLocal(params);
             return newChunkedResponse(Response.Status.lookup((Integer) rs[0]), (String) rs[1], (InputStream) rs[2]);
         } catch (Exception e) {
-            return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, "500");
+            return createPlainTextResponse(Response.Status.INTERNAL_ERROR, "500");
         }
     }
 
@@ -122,20 +124,20 @@ public class Nano extends NanoHTTPD {
             if (fn.toLowerCase().endsWith(".zip")) FileUtil.unzip(temp, FileUtil.getRootPath() + File.separator + path);
             else FileUtil.copy(temp, FileUtil.getRootFile(path + File.separator + fn));
         }
-        return newFixedLengthResponse(Response.Status.OK, MIME_PLAINTEXT, "OK");
+        return createPlainTextResponse(Response.Status.OK, "OK");
     }
 
     private Response doNewFolder(Map<String, String> params) {
         String path = params.get("path");
         String name = params.get("name");
         FileUtil.getRootFile(path + File.separator + name).mkdirs();
-        return newFixedLengthResponse(Response.Status.OK, MIME_PLAINTEXT, "OK");
+        return createPlainTextResponse(Response.Status.OK, "OK");
     }
 
     private Response doDelFolder(Map<String, String> params) {
         String path = params.get("path");
         FileUtil.clearDir(FileUtil.getRootFile(path));
-        return newFixedLengthResponse(Response.Status.OK, MIME_PLAINTEXT, "OK");
+        return createPlainTextResponse(Response.Status.OK, "OK");
     }
 
     private String getParent(File root) {
@@ -175,10 +177,12 @@ public class Nano extends NanoHTTPD {
 
     public interface Listener {
 
-        void onSearch(String text);
+        void onSearch(String word);
 
-        void onPush(String text);
+        void onPush(String url);
 
-        void onApi(String text);
+        void onApi(String url);
+
+        void onCast(String device, String config, String history);
     }
 }

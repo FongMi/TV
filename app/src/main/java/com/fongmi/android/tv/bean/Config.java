@@ -24,22 +24,15 @@ public class Config {
     private String parse;
 
     public static Config create(int type) {
-        return create("", type);
+        return new Config().type(type);
     }
 
-    public static Config create(String url, int type) {
-        return new Config(url, "", type);
+    public static Config create(int type, String url) {
+        return new Config().type(type).url(url).insert();
     }
 
-    public static Config create(String url, String name, int type) {
-        return new Config(url, name, type);
-    }
-
-    public Config(String url, String name, int type) {
-        this.url = url;
-        this.name = name;
-        this.type = type;
-        this.id = (int) insert();
+    public static Config create(int type, String url, String name) {
+        return new Config().type(type).url(url).name(name).insert();
     }
 
     public int getId() {
@@ -111,6 +104,11 @@ public class Config {
         return this;
     }
 
+    public Config url(String url) {
+        setUrl(url);
+        return this;
+    }
+
     public Config name(String name) {
         setName(name);
         return this;
@@ -170,26 +168,27 @@ public class Config {
 
     public static Config find(String url, int type) {
         Config item = AppDatabase.get().getConfigDao().find(url, type);
-        return item == null ? create(url, type) : item.type(type);
+        return item == null ? create(type, url) : item.type(type);
     }
 
     public static Config find(String url, String name, int type) {
         Config item = AppDatabase.get().getConfigDao().find(url, type);
-        return item == null ? create(url, name, type) : item.type(type).name(name);
+        return item == null ? create(type, url, name) : item.type(type).name(name);
     }
 
     public static Config find(Config config, int type) {
         Config item = AppDatabase.get().getConfigDao().find(config.getUrl(), type);
-        return item == null ? create(config.getUrl(), config.getName(), type) : item.type(type).name(config.getName());
+        return item == null ? create(type, config.getUrl(), config.getName()) : item.type(type).name(config.getName());
     }
 
     public static Config find(Depot depot, int type) {
         Config item = AppDatabase.get().getConfigDao().find(depot.getUrl(), type);
-        return item == null ? create(depot.getUrl(), depot.getName(), type) : item.type(type).name(depot.getName());
+        return item == null ? create(type, depot.getUrl(), depot.getName()) : item.type(type).name(depot.getName());
     }
 
-    public long insert() {
-        return getUrl().isEmpty() ? -1 : AppDatabase.get().getConfigDao().insert(this);
+    public Config insert() {
+        setId(Math.toIntExact(AppDatabase.get().getConfigDao().insert(this)));
+        return this;
     }
 
     public Config update() {

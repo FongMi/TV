@@ -2,6 +2,7 @@
 
     <!-- App -->
     <string name="app_name">TV</string>
+    <string name="app_id">C0868879</string>
     <string name="app_exit">Press back again to exit</string>
 
     <!-- Vod -->
@@ -10,7 +11,6 @@
     <!-- Live -->
     <string name="live_pass">Pass</string>
     <string name="live_group">Group</string>
-    <string name="live_setting">Setting</string>
     <string name="live_epg_now">Playing: <xliff:g name="name">%s</xliff:g></string>
     <string name="live_line">Line <xliff:g name="name">%s</xliff:g></string>
 

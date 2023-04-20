@@ -17,7 +17,11 @@
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:padding="16dp">
+            android:paddingStart="16dp"
+            android:paddingTop="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="4dp"
+            app:layout_scrollFlags="scroll|enterAlways">
 
             <ImageView
                 android:id="@+id/logo"
@@ -45,6 +49,7 @@
                     android:singleLine="true"
                     android:textColor="@color/white"
                     android:textSize="14sp"
+                    tools:ignore="NestedWeights"
                     tools:text="狂飆" />
 
                 <ImageView
@@ -80,6 +85,7 @@
             android:clipToPadding="false"
             android:orientation="horizontal"
             android:paddingStart="8dp"
+            android:paddingTop="12dp"
             android:paddingEnd="8dp"
             android:paddingBottom="12dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
@@ -93,6 +99,20 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
+    <ImageView
+        android:id="@+id/retry"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_gravity="center"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_vod_retry"
+        android:visibility="gone" />
+
+    <include
+        android:id="@+id/progress"
+        layout="@layout/view_progress"
+        android:visibility="gone" />
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/filter"
         android:layout_width="wrap_content"
@@ -102,7 +122,7 @@
         app:backgroundTint="@color/blue_500"
         app:layout_anchor="@id/pager"
         app:layout_anchorGravity="end|bottom"
-        app:layout_behavior=".ui.custom.CustomFabBehavior"
+        app:layout_behavior="com.fongmi.android.tv.ui.custom.CustomFabBehavior"
         app:srcCompat="@drawable/ic_fab_filter"
         app:tint="@color/white"
         tools:visibility="visible" />
@@ -116,7 +136,7 @@
         app:backgroundTint="@color/blue_500"
         app:layout_anchor="@id/pager"
         app:layout_anchorGravity="end|bottom"
-        app:layout_behavior=".ui.custom.CustomFabBehavior"
+        app:layout_behavior="com.fongmi.android.tv.ui.custom.CustomFabBehavior"
         app:srcCompat="@drawable/ic_fab_link"
         app:tint="@color/white"
         tools:visibility="visible" />
