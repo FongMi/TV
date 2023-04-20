@@ -57,7 +57,6 @@ public class ConfigDialog {
 
     private void initView() {
         binding.text.setText(url = getUrl());
-        binding.text.setSelection(url.length());
         binding.input.setEndIconOnClickListener(this::onChoose);
     }
 

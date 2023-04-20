@@ -1,5 +1,8 @@
 package com.fongmi.android.tv.bean;
 
+import android.text.TextUtils;
+
+import com.fongmi.android.tv.utils.Trans;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
@@ -33,11 +36,17 @@ public class Filter {
     }
 
     public String getName() {
-        return name;
+        return TextUtils.isEmpty(name) ? "" : name;
     }
 
     public List<Value> getValue() {
-        return value;
+        return value == null ? Collections.emptyList() : value;
+    }
+
+    public Filter trans() {
+        if (Trans.pass()) return this;
+        for (Value value : getValue()) value.trans();
+        return this;
     }
 
     public static class Value {
@@ -50,11 +59,11 @@ public class Filter {
         private boolean activated;
 
         public String getN() {
-            return n;
+            return TextUtils.isEmpty(n) ? "" : n;
         }
 
         public String getV() {
-            return v;
+            return TextUtils.isEmpty(v) ? "" : v;
         }
 
         public boolean isActivated() {
@@ -63,6 +72,10 @@ public class Filter {
 
         public void setActivated(Value item) {
             this.activated = item.equals(this);
+        }
+
+        public void trans() {
+            this.n = Trans.s2t(n);
         }
 
         @Override

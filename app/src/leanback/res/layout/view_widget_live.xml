@@ -26,6 +26,35 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/shape_widget"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <ImageView
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_widget_error" />
+
+        <TextView
+            android:id="@+id/text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            tools:text="@string/error_play_format" />
+
+    </LinearLayout>
+
     <TextView
         android:id="@+id/digital"
         android:layout_width="wrap_content"
@@ -102,7 +131,7 @@
         android:layout_width="match_parent"
         android:layout_height="64dp"
         android:layout_gravity="bottom"
-        android:background="@drawable/shape_info_live"
+        android:background="@drawable/shape_live_info"
         android:gravity="center"
         android:orientation="horizontal"
         android:paddingStart="16dp"

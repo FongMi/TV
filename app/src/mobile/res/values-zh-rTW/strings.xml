@@ -1,17 +1,16 @@
 <resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
 
+    <!-- App -->
+    <string name="app_keep">我的收藏</string>
+    <string name="app_history">最近觀看</string>
+
     <!-- Nav -->
     <string name="nav_vod">點播</string>
+    <string name="nav_live">直播</string>
     <string name="nav_setting">設定</string>
 
     <!-- Vod -->
     <string name="vod_home">推薦</string>
-
-    <!-- History -->
-    <string name="history">最近觀看</string>
-
-    <!-- Keep -->
-    <string name="keep">我的收藏</string>
 
     <!-- Detail -->
     <string name="detail_flag">線路</string>
@@ -19,6 +18,12 @@
     <string name="detail_episode">選集</string>
     <string name="detail_content">簡介</string>
     <string name="detail_search">快搜「<xliff:g name="name">%s</xliff:g>」</string>
+
+    <!-- Cast -->
+    <string name="cast_select">選擇裝置</string>
+    <string name="cast_device_empty">找不到裝置</string>
+    <string name="cast_device_offline">裝置已離線</string>
+    <string name="cast_scan">請掃描影視 QRCode 進行綁定</string>
 
     <!-- Control -->
     <string name="control_speed">倍速</string>

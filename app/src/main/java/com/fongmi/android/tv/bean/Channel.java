@@ -141,11 +141,15 @@ public class Channel {
     }
 
     public void setLine(int line) {
-        this.line = line;
+        this.line = Math.max(line, 0);
     }
 
     public boolean isSelected() {
         return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 
     public void setSelected(Channel item) {
@@ -204,6 +208,10 @@ public class Channel {
         if (live.getUa().length() > 0 && getUa().isEmpty()) setUa(live.getUa());
         if (!getEpg().startsWith("http")) setEpg(live.getEpg().replace("{name}", getName()).replace("{epg}", getEpg()));
         if (!getLogo().startsWith("http")) setLogo(live.getLogo().replace("{name}", getName()).replace("{logo}", getLogo()));
+    }
+
+    public void setLine(String line) {
+        setLine(getUrls().indexOf(line));
     }
 
     public String getScheme() {

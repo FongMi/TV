@@ -28,6 +28,7 @@ public class Group {
     @SerializedName("pass")
     private String pass;
 
+    private boolean selected;
     private int position;
 
     public static List<Group> arrayFrom(String str) {
@@ -83,6 +84,14 @@ public class Group {
         this.pass = pass;
     }
 
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
     public int getPosition() {
         return position;
     }
@@ -99,12 +108,8 @@ public class Group {
         return getName().equals(ResUtil.getString(R.string.keep));
     }
 
-    public boolean isSetting() {
-        return getName().equals(ResUtil.getString(R.string.live_setting));
-    }
-
     public boolean skip() {
-        return isKeep() || isSetting();
+        return isKeep();
     }
 
     public void loadLogo(ImageView view) {

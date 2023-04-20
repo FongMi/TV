@@ -58,13 +58,14 @@ public class LiveViewModel extends ViewModel {
         executor = Executors.newFixedThreadPool(2);
         executor.execute(() -> {
             try {
-                if (!Thread.interrupted() && type == LIVE) live.postValue((Live) executor.submit(callable).get(Constant.TIMEOUT_HTTP, TimeUnit.MILLISECONDS));
-                if (!Thread.interrupted() && type == CHANNEL) channel.postValue((Channel) executor.submit(callable).get(Constant.TIMEOUT_LIVE, TimeUnit.MILLISECONDS));
+                if (Thread.interrupted()) return;
+                if (type == LIVE) live.postValue((Live) executor.submit(callable).get(Constant.TIMEOUT_HTTP, TimeUnit.MILLISECONDS));
+                if (type == CHANNEL) channel.postValue((Channel) executor.submit(callable).get(Constant.TIMEOUT_LIVE, TimeUnit.MILLISECONDS));
             } catch (Throwable e) {
+                if (e instanceof InterruptedException || Thread.interrupted()) return;
+                if (type == LIVE) live.postValue(new Live());
+                if (type == CHANNEL) channel.postValue(new Channel());
                 e.printStackTrace();
-                if (e instanceof InterruptedException) return;
-                if (!Thread.interrupted() && type == LIVE) live.postValue(new Live());
-                if (!Thread.interrupted() && type == CHANNEL) channel.postValue(new Channel());
             }
         });
     }
