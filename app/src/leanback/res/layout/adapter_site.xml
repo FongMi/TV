@@ -9,7 +9,7 @@
     <TextView
         android:id="@+id/text"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_height="40dp"
         android:layout_weight="1"
         android:background="@drawable/selector_text"
         android:ellipsize="marquee"
@@ -23,8 +23,8 @@
 
     <ImageView
         android:id="@+id/search"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginStart="12dp"
         android:background="@drawable/selector_text"
         android:focusable="true"
@@ -36,8 +36,8 @@
 
     <ImageView
         android:id="@+id/change"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginStart="12dp"
         android:background="@drawable/selector_text"
         android:focusable="true"

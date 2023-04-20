@@ -20,8 +20,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 public class PassDialog extends BaseDialog {
 
-    private final PassCallback callback;
     private DialogPassBinding binding;
+    private PassCallback callback;
 
     public static PassDialog create() {
         return new PassDialog();
