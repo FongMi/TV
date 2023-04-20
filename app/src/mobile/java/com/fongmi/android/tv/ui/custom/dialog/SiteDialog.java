@@ -23,7 +23,7 @@ public class SiteDialog extends BaseDialog implements SiteAdapter.OnClickListene
     private final SiteAdapter adapter;
     private DialogSiteBinding binding;
     private SiteCallback callback;
-    private int spanCount;
+    private int count;
 
     public static SiteDialog create() {
         return new SiteDialog();
@@ -35,20 +35,20 @@ public class SiteDialog extends BaseDialog implements SiteAdapter.OnClickListene
 
     public SiteDialog search() {
         this.adapter.search(true);
-        this.spanCount = 2;
+        this.count = 2;
         return this;
     }
 
     public SiteDialog change() {
         this.adapter.change(true);
-        this.spanCount = 2;
+        this.count = 2;
         return this;
     }
 
     public SiteDialog all() {
         this.adapter.search(true);
         this.adapter.change(true);
-        this.spanCount = 1;
+        this.count = 1;
         return this;
     }
 
@@ -64,6 +64,10 @@ public class SiteDialog extends BaseDialog implements SiteAdapter.OnClickListene
         this.callback = (SiteCallback) fragment;
     }
 
+    private int getCount() {
+        return adapter.getItemCount() < 2 ? 1 : count;
+    }
+
     @Override
     protected ViewBinding getBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
         return binding = DialogSiteBinding.inflate(inflater, container, false);
@@ -74,8 +78,8 @@ public class SiteDialog extends BaseDialog implements SiteAdapter.OnClickListene
         binding.recycler.setAdapter(adapter);
         binding.recycler.setItemAnimator(null);
         binding.recycler.setHasFixedSize(true);
-        binding.recycler.addItemDecoration(new SpaceItemDecoration(spanCount, 16));
-        binding.recycler.setLayoutManager(new GridLayoutManager(getContext(), spanCount));
+        binding.recycler.addItemDecoration(new SpaceItemDecoration(getCount(), 16));
+        binding.recycler.setLayoutManager(new GridLayoutManager(getContext(), getCount()));
         binding.recycler.scrollToPosition(ApiConfig.getHomeIndex());
     }
 
