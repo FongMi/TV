@@ -2,7 +2,7 @@
 -keepattributes Signature
 -keepattributes *Annotation*
 -dontwarn sun.misc.**
--keep class com.google.gson.**{*;}
+-keep class com.google.gson.** { *; }
 -keep class * extends com.google.gson.TypeAdapter
 -keep class * implements com.google.gson.TypeAdapterFactory
 -keep class * implements com.google.gson.JsonSerializer
@@ -24,20 +24,27 @@
 
 # OkHttp
 -dontwarn okhttp3.**
+-keep class okio.** { *; }
 -keep class okhttp3.** { *; }
 
 # Cronet
--keep class org.chromium.net.**{*;}
--keep class com.google.net.cronet.**{*;}
+-keep class org.chromium.net.** { *; }
+-keep class com.google.net.cronet.** { *; }
 
 # CatVod
 -keep class com.github.catvod.crawler.** { *; }
 -keep class * extends com.github.catvod.crawler.Spider
 
+# Cling
+-keep class org.fourthline.cling.** { *; }
+
 # IJK
 -keep class tv.danmaku.ijk.media.player.** { *; }
 -keep class tv.danmaku.ijk.media.player.IjkMediaPlayer { *; }
 -keep class tv.danmaku.ijk.media.player.ffmpeg.FFmpegApi { *; }
+
+# Sardine
+-keep class com.thegrizzlylabs.sardineandroid.** { *; }
 
 # TVBus
 -keep class com.tvbus.engine.** { *; }

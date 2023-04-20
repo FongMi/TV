@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.Trans;
 import com.fongmi.android.tv.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
@@ -50,6 +51,10 @@ public class Epg {
         return TextUtils.isEmpty(title) ? "" : title;
     }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
     public String getStart() {
         return TextUtils.isEmpty(start) ? "" : start;
     }
@@ -82,6 +87,7 @@ public class Epg {
         for (Epg item : getList()) {
             item.setStartTime(Utils.format(format, getDate().concat(item.getStart())));
             item.setEndTime(Utils.format(format, getDate().concat(item.getEnd())));
+            item.setTitle(Trans.s2t(item.getTitle()));
         }
     }
 

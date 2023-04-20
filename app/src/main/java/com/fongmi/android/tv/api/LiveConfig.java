@@ -1,5 +1,7 @@
 package com.fongmi.android.tv.api;
 
+import android.text.TextUtils;
+
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.R;
@@ -55,6 +57,10 @@ public class LiveConfig {
         return get().getHome() == null;
     }
 
+    public static boolean hasUrl() {
+        return getUrl().length() > 0;
+    }
+
     public LiveConfig init() {
         this.home = null;
         this.config = Config.live();
@@ -87,7 +93,7 @@ public class LiveConfig {
             parseConfig(Decoder.getJson(config.getUrl()), callback);
         } catch (Exception e) {
             e.printStackTrace();
-            App.post(() -> callback.error(config.getUrl().isEmpty() ? 0 : R.string.error_config_get));
+            App.post(() -> callback.error(TextUtils.isEmpty(config.getUrl()) ? 0 : R.string.error_config_get));
         }
     }
 
@@ -162,14 +168,16 @@ public class LiveConfig {
             Group group = items.get(i);
             if (group.getName().equals(splits[1])) {
                 int j = group.find(splits[2]);
+                if (j != -1 && splits.length == 4) group.getChannel().get(j).setLine(splits[3]);
                 if (j != -1) return new int[]{i, j};
             }
         }
         return new int[]{1, 0};
     }
 
-    public void setKeep(Group group, Channel channel) {
-        if (!group.isHidden() && home != null) Prefers.putKeep(home.getName() + AppDatabase.SYMBOL + group.getName() + AppDatabase.SYMBOL + channel.getName());
+    public void setKeep(Channel channel) {
+        if (channel.getGroup().isHidden() || home == null) return;
+        Prefers.putKeep(home.getName() + AppDatabase.SYMBOL + channel.getGroup().getName() + AppDatabase.SYMBOL + channel.getName() + AppDatabase.SYMBOL + channel.getCurrent());
     }
 
     public int[] find(List<Group> items) {
@@ -186,7 +194,7 @@ public class LiveConfig {
     }
 
     public boolean isSame(String url) {
-        return same || config.getUrl().isEmpty() || url.equals(config.getUrl());
+        return same || TextUtils.isEmpty(config.getUrl()) || url.equals(config.getUrl());
     }
 
     public List<Live> getLives() {
