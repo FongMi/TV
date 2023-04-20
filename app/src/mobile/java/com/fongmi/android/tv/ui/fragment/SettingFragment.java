@@ -74,7 +74,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
     @Override
     protected void initEvent() {
         mBinding.vodHome.setOnClickListener(view -> SiteDialog.create(this).show());
-        mBinding.liveHome.setOnClickListener(view -> LiveDialog.create().show(this));
+        mBinding.liveHome.setOnClickListener(view -> LiveDialog.create(this).show());
         mBinding.vod.setOnClickListener(view -> ConfigDialog.create(this).type(type = 0).show());
         mBinding.live.setOnClickListener(view -> ConfigDialog.create(this).type(type = 1).show());
         mBinding.wall.setOnClickListener(view -> ConfigDialog.create(this).type(type = 2).show());
