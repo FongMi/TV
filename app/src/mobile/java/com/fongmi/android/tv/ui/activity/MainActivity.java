@@ -100,11 +100,6 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
         };
     }
 
-    private boolean openLive() {
-        LiveActivity.start(this);
-        return false;
-    }
-
     private void setConfirm() {
         confirm = true;
         Notify.show(R.string.app_exit);
@@ -117,7 +112,6 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
         if (!event.getType().equals(RefreshEvent.Type.CONFIG)) return;
         mBinding.navigation.getMenu().findItem(R.id.vod).setVisible(true);
         mBinding.navigation.getMenu().findItem(R.id.setting).setVisible(true);
-        mBinding.navigation.getMenu().findItem(R.id.live).setVisible(LiveConfig.hasUrl());
     }
 
     @Override
@@ -125,7 +119,6 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
         if (mBinding.navigation.getSelectedItemId() == item.getItemId()) return false;
         if (item.getItemId() == R.id.vod) return mManager.change(0);
         if (item.getItemId() == R.id.setting) return mManager.change(1);
-        if (item.getItemId() == R.id.live) return openLive();
         return false;
     }
 
