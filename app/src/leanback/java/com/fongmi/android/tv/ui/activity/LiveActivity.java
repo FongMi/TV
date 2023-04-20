@@ -27,6 +27,7 @@ import com.fongmi.android.tv.bean.Epg;
 import com.fongmi.android.tv.bean.Group;
 import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.bean.Live;
+import com.fongmi.android.tv.bean.Track;
 import com.fongmi.android.tv.databinding.ActivityLiveBinding;
 import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.event.PlayerEvent;
