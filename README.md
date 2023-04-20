@@ -9,7 +9,7 @@ https://github.com/CatVodTVOfficial/CatVodTVJarLoader
 電視版  
 [Jar+Js](https://github.com/FongMi/TV/raw/release/release/leanback-java.apk "TV")  
 [Jar+Js+Py](https://github.com/FongMi/TV/raw/release/release/leanback-python.apk "TV")  
-[Android 4.4](https://github.com/FongMi/TV/raw/kitkat/release/leanback.apk "TV")
+[Android 4.1](https://github.com/FongMi/TV/raw/kitkat/release/leanback.apk "TV")
 
 手機版  
 [Jar+Js](https://github.com/FongMi/TV/raw/release/release/mobile-java.apk "TV")  
