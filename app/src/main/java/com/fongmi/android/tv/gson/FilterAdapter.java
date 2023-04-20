@@ -30,8 +30,8 @@ public class FilterAdapter implements JsonDeserializer<LinkedHashMap<String, Lis
         for (String key : filters.keySet()) {
             List<Filter> items = new ArrayList<>();
             JsonElement element = filters.get(key);
-            if (element.isJsonObject()) items.add(Filter.objectFrom(element));
-            else for (JsonElement item : element.getAsJsonArray()) items.add(Filter.objectFrom(item));
+            if (element.isJsonObject()) items.add(Filter.objectFrom(element).trans());
+            else for (JsonElement item : element.getAsJsonArray()) items.add(Filter.objectFrom(item).trans());
             filterMap.put(key, items);
         }
         return filterMap;

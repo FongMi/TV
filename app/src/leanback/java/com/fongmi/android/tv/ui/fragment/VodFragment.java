@@ -16,6 +16,7 @@ import androidx.leanback.widget.ListRow;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewbinding.ViewBinding;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Filter;
@@ -86,7 +87,6 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         mTypeIds = new ArrayList<>();
         mExtends = new HashMap<>();
         mFilters = Filter.arrayFrom(getFilter());
-        mBinding.progress.getRoot().setVisibility(View.VISIBLE);
         setRecyclerView();
         setViewModel();
     }
@@ -111,10 +111,10 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mViewModel.result.observe(getViewLifecycleOwner(), result -> {
             int size = result.getList().size();
-            mBinding.progress.getRoot().setVisibility(View.GONE);
             mScroller.endLoading(size == 0);
             addVideo(result.getList());
             checkPage(size);
+            hideProgress();
         });
     }
 
@@ -137,11 +137,13 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     }
 
     private void getVideo(String typeId, String page) {
-        if (page.equals("1")) mLast = null;
+        boolean first = page.equals("1");
+        if (first) mLast = null;
+        if (first) showProgress();
         if (isFolder()) mTypeIds.add(typeId);
         if (isFolder() && !mOpen) mBinding.recycler.moveToTop();
         int filterSize = mOpen ? mFilters.size() : 0;
-        boolean clear = page.equals("1") && mAdapter.size() > filterSize;
+        boolean clear = first && mAdapter.size() > filterSize;
         if (clear) mAdapter.removeItems(filterSize, mAdapter.size() - filterSize);
         mViewModel.categoryContent(getKey(), typeId, page, true, mExtends);
     }
@@ -175,11 +177,20 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         return new ListRow(adapter);
     }
 
+    private void showProgress() {
+        if (!mOpen) mBinding.progress.getRoot().setVisibility(View.VISIBLE);
+    }
+
+    private void hideProgress() {
+        mBinding.progress.getRoot().setVisibility(View.GONE);
+    }
+
     private void showFilter() {
         List<ListRow> rows = new ArrayList<>();
         for (Filter filter : mFilters) rows.add(getRow(filter));
+        App.post(() -> mBinding.recycler.smoothScrollToPosition(0), 48);
         mAdapter.addAll(0, rows);
-        mBinding.recycler.postDelayed(() -> mBinding.recycler.smoothScrollToPosition(0), 50);
+        hideProgress();
     }
 
     private void hideFilter() {

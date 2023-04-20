@@ -6,7 +6,7 @@ import com.fongmi.android.tv.net.OkHttp;
 
 import java.io.IOException;
 
-import okhttp3.Request;
+import okhttp3.OkHttpClient;
 
 public class Github {
 
@@ -17,6 +17,7 @@ public class Github {
     public static final String RELEASE = "release";
     public static final String KITKAT = "kitkat";
 
+    private OkHttpClient client;
     private String proxy;
 
     private static class Loader {
@@ -28,6 +29,7 @@ public class Github {
     }
 
     public Github() {
+        client = OkHttp.client(Constant.TIMEOUT_GITHUB);
         check(A);
         check(B);
         check(C);
@@ -36,7 +38,7 @@ public class Github {
     private void check(String url) {
         try {
             if (getProxy().length() > 0) return;
-            int code = OkHttp.client(Constant.TIMEOUT_GITHUB).newCall(new Request.Builder().url(url).build()).execute().code();
+            int code = OkHttp.newCall(client, url).execute().code();
             if (code == 200) setProxy(url);
         } catch (IOException ignored) {
         }

@@ -1,4 +1,4 @@
-package com.fongmi.android.tv.api;
+package com.fongmi.android.tv;
 
 import android.app.Activity;
 import android.content.DialogInterface;
@@ -7,10 +7,6 @@ import android.view.View;
 
 import androidx.appcompat.app.AlertDialog;
 
-import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.BuildConfig;
-import com.fongmi.android.tv.Github;
-import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.DialogUpdateBinding;
 import com.fongmi.android.tv.net.Download;
 import com.fongmi.android.tv.net.OkHttp;

@@ -5,6 +5,7 @@ import android.text.TextUtils;
 
 import androidx.media3.common.MediaItem;
 
+import com.fongmi.android.tv.utils.Trans;
 import com.google.gson.annotations.SerializedName;
 
 public class Sub {
@@ -32,6 +33,11 @@ public class Sub {
 
     public String getFormat() {
         return TextUtils.isEmpty(format) ? "" : format;
+    }
+
+    public void trans() {
+        if (Trans.pass()) return;
+        this.name = Trans.s2t(name);
     }
 
     public MediaItem.SubtitleConfiguration getExo() {
