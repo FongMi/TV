@@ -7,6 +7,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.App;
@@ -18,6 +20,7 @@ import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.adapter.ParseAdapter;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import java.util.Arrays;
 import java.util.List;
@@ -26,19 +29,18 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
 
     private DialogControlBinding binding;
     private ActivityDetailBinding detail;
-    private final Listener listener;
     private List<TextView> scales;
     private final String[] scale;
+    private Listener listener;
     private Players players;
     private boolean parse;
 
-    public static ControlDialog create(Listener listener) {
-        return new ControlDialog(listener);
+    public static ControlDialog create() {
+        return new ControlDialog();
     }
 
-    public ControlDialog(Listener listener) {
+    public ControlDialog() {
         this.scale = ResUtil.getStringArray(R.array.select_scale);
-        this.listener = listener;
     }
 
     public ControlDialog detail(ActivityDetailBinding detail) {
@@ -53,6 +55,13 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
 
     public ControlDialog parse(boolean parse) {
         this.parse = parse;
+        return this;
+    }
+
+    public ControlDialog show(FragmentActivity activity) {
+        for (Fragment f : activity.getSupportFragmentManager().getFragments()) if (f instanceof BottomSheetDialogFragment) return this;
+        show(activity.getSupportFragmentManager(), null);
+        this.listener = (Listener) activity;
         return this;
     }
 

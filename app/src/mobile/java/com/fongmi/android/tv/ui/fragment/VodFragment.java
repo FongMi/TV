@@ -42,7 +42,6 @@ import com.fongmi.android.tv.ui.custom.dialog.ReceiveDialog;
 import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.Trans;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -183,7 +182,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     }
 
     private void onLogo(View view) {
-        SiteDialog.create(this).change().show();
+        SiteDialog.create().change().show(this);
     }
 
     private void onKeep(View view) {
@@ -195,8 +194,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     }
 
     private void onFilter(View view) {
-        for (Fragment fragment : getChildFragmentManager().getFragments()) if (fragment instanceof BottomSheetDialogFragment) return;
-        FilterDialog.create(this).filter(mAdapter.get(mBinding.pager.getCurrentItem()).getFilters()).show(getChildFragmentManager(), null);
+        FilterDialog.create().filter(mAdapter.get(mBinding.pager.getCurrentItem()).getFilters()).show(this);
     }
 
     private void onHot(View view) {
@@ -247,8 +245,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onCastEvent(CastEvent event) {
-        for (Fragment fragment : getChildFragmentManager().getFragments()) if (fragment instanceof BottomSheetDialogFragment) return;
-        ReceiveDialog.create().event(event).show(getChildFragmentManager(), null);
+        ReceiveDialog.create().event(event).show(this);
     }
 
     @Override
