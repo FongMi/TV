@@ -4,10 +4,8 @@
     android:id="@+id/text"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/shape_text_round"
-    android:ellipsize="middle"
-    android:gravity="center"
+    android:background="@drawable/shape_text"
     android:singleLine="true"
     android:textColor="@color/text"
-    android:textSize="16sp"
+    android:textSize="14sp"
     tools:text="https://fongmi.github.io/live.json" />

@@ -442,8 +442,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void onMore() {
-        for (Fragment fragment : getSupportFragmentManager().getFragments()) if (fragment instanceof BottomSheetDialogFragment) return;
-        EpisodeGridDialog.create().reverse(mHistory.isRevSort()).episodes(mEpisodeAdapter.getItems()).show(getSupportFragmentManager(), null);
+        EpisodeGridDialog.create().reverse(mHistory.isRevSort()).episodes(mEpisodeAdapter.getItems()).show(this);
     }
 
     private void onActor() {
@@ -465,8 +464,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void onCast() {
-        for (Fragment fragment : getSupportFragmentManager().getFragments()) if (fragment instanceof BottomSheetDialogFragment) return;
-        CastDialog.create(this).config(ApiConfig.getUrl()).history(mHistory).video(CastVideo.get(getName(), getUrl())).show(getSupportFragmentManager(), null);
+        CastDialog.create().config(ApiConfig.getUrl()).history(mHistory).video(CastVideo.get(getName(), getUrl())).show(this);
     }
 
     private void onKeep() {
@@ -528,14 +526,11 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void onSetting() {
-        for (Fragment fragment : getSupportFragmentManager().getFragments()) if (fragment instanceof BottomSheetDialogFragment) return;
-        mControlDialog = ControlDialog.create(this).detail(mBinding).players(mPlayers).parse(isUseParse());
-        mControlDialog.show(getSupportFragmentManager(), null);
+        mControlDialog = ControlDialog.create().detail(mBinding).players(mPlayers).parse(isUseParse()).show(this);
     }
 
     private void onTrack(View view) {
-        for (Fragment fragment : getSupportFragmentManager().getFragments()) if (fragment instanceof BottomSheetDialogFragment) return;
-        TrackDialog.create().player(mPlayers).type(Integer.parseInt(view.getTag().toString())).listener(this).show(getSupportFragmentManager(), null);
+        TrackDialog.create().player(mPlayers).type(Integer.parseInt(view.getTag().toString())).show(this);
         hideControl();
     }
 
