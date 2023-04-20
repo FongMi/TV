@@ -11,7 +11,7 @@
     <string name="home_recommend">Recommend</string>
 
     <!-- Live -->
-    <string name="live_setting">Setting</string>
+    <string name="live_other">Other</string>
 
     <!-- Collect -->
     <string name="collect_result">Search results for <xliff:g name="name">%s</xliff:g></string>

@@ -28,7 +28,8 @@
             android:id="@+id/speed"
             style="@style/Control.Action"
             android:visibility="gone"
-            tools:text="速度" />
+            tools:text="速度"
+            tools:visibility="visible" />
 
         <TextView
             android:id="@+id/scale"
