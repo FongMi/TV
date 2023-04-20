@@ -8,6 +8,7 @@ import android.view.View;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.databinding.ActivityPushBinding;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.ui.base.BaseActivity;
@@ -29,7 +30,7 @@ public class PushActivity extends BaseActivity {
 
     @Override
     protected void initView() {
-        String address = Server.get().getAddress(false);
+        String address = Server.get().getAddress();
         mBinding.code.setImageBitmap(QRCode.getBitmap(address, 250, 1));
         mBinding.info.setText(ResUtil.getString(R.string.push_info, address));
         mBinding.clip.setOnClickListener(this::onClip);
@@ -37,6 +38,6 @@ public class PushActivity extends BaseActivity {
 
     private void onClip(View view) {
         CharSequence text = ((ClipboardManager) getSystemService(CLIPBOARD_SERVICE)).getText();
-        if (text != null) DetailActivity.start(this, "push_agent", text.toString(), "");
+        if (text != null && ApiConfig.hasPush()) DetailActivity.push(this, text.toString(), false);
     }
 }

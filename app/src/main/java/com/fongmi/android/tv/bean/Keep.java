@@ -80,11 +80,11 @@ public class Keep {
     }
 
     public String getSiteKey() {
-        return getKey().substring(0, getKey().lastIndexOf(AppDatabase.SYMBOL));
+        return getKey().split(AppDatabase.SYMBOL)[0];
     }
 
     public String getVodId() {
-        return getKey().substring(getKey().lastIndexOf(AppDatabase.SYMBOL) + AppDatabase.SYMBOL.length());
+        return getKey().split(AppDatabase.SYMBOL)[1];
     }
 
     public static Keep find(String key) {

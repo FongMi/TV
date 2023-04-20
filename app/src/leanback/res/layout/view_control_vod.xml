@@ -7,7 +7,7 @@
     android:background="@drawable/shape_controller"
     android:orientation="vertical"
     android:paddingStart="16dp"
-    android:paddingTop="16dp"
+    android:paddingTop="18dp"
     android:paddingEnd="16dp"
     android:paddingBottom="8dp">
 
@@ -43,7 +43,6 @@
                 android:focusable="true"
                 android:focusableInTouchMode="true"
                 android:nextFocusLeft="@id/next"
-                android:nextFocusDown="@id/parse"
                 android:text="@string/play_next"
                 android:textColor="@color/white"
                 android:textSize="14sp" />
@@ -57,7 +56,6 @@
                 android:background="@drawable/selector_text"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
-                android:nextFocusDown="@id/parse"
                 android:text="@string/play_prev"
                 android:textColor="@color/white"
                 android:textSize="14sp" />
@@ -71,7 +69,6 @@
                 android:background="@drawable/selector_text"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
-                android:nextFocusDown="@id/parse"
                 android:textColor="@color/white"
                 android:textSize="14sp"
                 tools:text="刷新" />
@@ -85,7 +82,6 @@
                 android:background="@drawable/selector_text"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
-                android:nextFocusDown="@id/parse"
                 android:textColor="@color/white"
                 android:textSize="14sp"
                 tools:text="EXO" />
@@ -99,7 +95,6 @@
                 android:background="@drawable/selector_text"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
-                android:nextFocusDown="@id/parse"
                 android:textColor="@color/white"
                 android:textSize="14sp"
                 tools:text="硬解" />
@@ -113,7 +108,6 @@
                 android:background="@drawable/selector_text"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
-                android:nextFocusDown="@id/parse"
                 android:textColor="@color/white"
                 android:textSize="14sp"
                 tools:text="1.00" />
@@ -127,7 +121,6 @@
                 android:background="@drawable/selector_text"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
-                android:nextFocusDown="@id/parse"
                 android:textColor="@color/white"
                 android:textSize="14sp"
                 tools:text="預設" />
@@ -141,7 +134,6 @@
                 android:background="@drawable/selector_text"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
-                android:nextFocusDown="@id/parse"
                 android:tag="3"
                 android:text="@string/play_track_text"
                 android:textColor="@color/white"
@@ -158,7 +150,6 @@
                 android:background="@drawable/selector_text"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
-                android:nextFocusDown="@id/parse"
                 android:tag="1"
                 android:text="@string/play_track_audio"
                 android:textColor="@color/white"
@@ -175,7 +166,6 @@
                 android:background="@drawable/selector_text"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
-                android:nextFocusDown="@id/parse"
                 android:tag="2"
                 android:text="@string/play_track_video"
                 android:textColor="@color/white"
@@ -192,7 +182,6 @@
                 android:background="@drawable/selector_text"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
-                android:nextFocusDown="@id/parse"
                 android:textColor="@color/white"
                 android:textSize="14sp"
                 tools:text="00:00" />
@@ -201,13 +190,10 @@
                 android:id="@+id/ending"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="12dp"
-                android:layout_marginRight="12dp"
                 android:background="@drawable/selector_text"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
                 android:nextFocusRight="@id/ending"
-                android:nextFocusDown="@id/parse"
                 android:textColor="@color/white"
                 android:textSize="14sp"
                 tools:text="00:00" />

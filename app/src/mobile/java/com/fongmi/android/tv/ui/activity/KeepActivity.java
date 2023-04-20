@@ -18,6 +18,7 @@ import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.ui.adapter.KeepAdapter;
 import com.fongmi.android.tv.ui.base.BaseActivity;
+import com.fongmi.android.tv.utils.Notify;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -76,12 +77,13 @@ public class KeepActivity extends BaseActivity implements KeepAdapter.OnClickLis
             @Override
             public void success() {
                 DetailActivity.start(getActivity(), item.getSiteKey(), item.getVodId(), item.getVodName());
+                RefreshEvent.config();
                 RefreshEvent.video();
             }
 
             @Override
             public void error(int resId) {
-                CollectActivity.start(getActivity(), item.getVodName());
+                Notify.show(resId);
             }
         });
     }

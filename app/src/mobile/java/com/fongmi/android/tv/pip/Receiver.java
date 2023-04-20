@@ -1,4 +1,4 @@
-package com.fongmi.android.tv.receiver;
+package com.fongmi.android.tv.pip;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -6,15 +6,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 
-import com.fongmi.android.tv.databinding.ActivityDetailBinding;
-import com.fongmi.android.tv.ui.custom.PiP;
+public class Receiver extends BroadcastReceiver {
 
-public class PiPReceiver extends BroadcastReceiver {
+    private final Listener listener;
 
-    private final ActivityDetailBinding binding;
-
-    public PiPReceiver(ActivityDetailBinding binding) {
-        this.binding = binding;
+    public Receiver(Listener listener) {
+        this.listener = listener;
     }
 
     public void register(Activity activity) {
@@ -35,14 +32,23 @@ public class PiPReceiver extends BroadcastReceiver {
         switch (controlType) {
             case PiP.CONTROL_TYPE_PLAY:
             case PiP.CONTROL_TYPE_PAUSE:
-                binding.control.play.performClick();
+                listener.onControlPlay();
                 break;
             case PiP.CONTROL_TYPE_NEXT:
-                binding.control.next.performClick();
+                listener.onControlNext();
                 break;
             case PiP.CONTROL_TYPE_PREV:
-                binding.control.prev.performClick();
+                listener.onControlPrev();
                 break;
         }
+    }
+
+    public interface Listener {
+
+        void onControlPlay();
+
+        void onControlNext();
+
+        void onControlPrev();
     }
 }
