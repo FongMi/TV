@@ -66,9 +66,9 @@ dependencies {
     implementation project(':tvbus')
     implementation project(':zlive')
     implementation project(':catvod')
+    implementation project(':pyramid')
     implementation project(':forcetech')
     implementation project(':ijkplayer')
-    implementation project(':pyramid')
     implementation project(':media-lib-database')
     implementation project(':media-lib-datasource')
     implementation project(':media-lib-datasource-rtmp')
@@ -94,14 +94,12 @@ dependencies {
     implementation 'com.github.thegrizzlylabs:sardine-android:0.8'
     implementation 'com.google.android.material:material:1.9.0-beta01'
     implementation 'com.google.code.gson:gson:2.8.6'
-    implementation 'com.google.net.cronet:cronet-okhttp:0.1.0'
     implementation 'com.google.zxing:core:3.4.1'
     implementation 'com.guolindev.permissionx:permissionx:1.7.1'
     implementation 'com.squareup.okhttp3:okhttp:3.12.13'
     implementation 'me.jessyan:autosize:1.2.1'
     implementation 'net.java.dev.jna:jna:5.12.1'
     implementation 'org.apache.commons:commons-compress:1.20'
-    implementation 'org.chromium.net:cronet-embedded:101.4951.41'
     implementation 'org.greenrobot:eventbus:3.3.1'
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
     implementation('org.simpleframework:simple-xml:2.7.1') { exclude group: 'stax', module: 'stax-api' exclude group: 'xpp3', module: 'xpp3' }
