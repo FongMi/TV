@@ -1,14 +1,10 @@
 package com.fongmi.android.tv.ui.custom.dialog;
 
+import android.app.Activity;
 import android.view.LayoutInflater;
-import android.view.ViewGroup;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Site;
@@ -16,78 +12,71 @@ import com.fongmi.android.tv.databinding.DialogSiteBinding;
 import com.fongmi.android.tv.impl.SiteCallback;
 import com.fongmi.android.tv.ui.adapter.SiteAdapter;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-public class SiteDialog extends BaseDialog implements SiteAdapter.OnClickListener {
+public class SiteDialog implements SiteAdapter.OnClickListener {
 
+    private final DialogSiteBinding binding;
+    private final SiteCallback callback;
     private final SiteAdapter adapter;
-    private DialogSiteBinding binding;
-    private SiteCallback callback;
-    private int count;
+    private final AlertDialog dialog;
 
-    public static SiteDialog create() {
-        return new SiteDialog();
+    public static SiteDialog create(Activity activity) {
+        return new SiteDialog(activity);
     }
 
-    public SiteDialog() {
+    public static SiteDialog create(Fragment fragment) {
+        return new SiteDialog(fragment);
+    }
+
+    public SiteDialog(Activity activity) {
+        this.callback = (activity instanceof SiteCallback) ? (SiteCallback) activity : null;
+        this.binding = DialogSiteBinding.inflate(LayoutInflater.from(activity));
+        this.dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).create();
+        this.adapter = new SiteAdapter(this);
+    }
+
+    public SiteDialog(Fragment fragment) {
+        this.callback = (fragment instanceof SiteCallback) ? (SiteCallback) fragment : null;
+        this.binding = DialogSiteBinding.inflate(LayoutInflater.from(fragment.getContext()));
+        this.dialog = new MaterialAlertDialogBuilder(fragment.getActivity()).setView(binding.getRoot()).create();
         this.adapter = new SiteAdapter(this);
     }
 
     public SiteDialog search() {
         this.adapter.search(true);
-        this.count = 2;
         return this;
     }
 
     public SiteDialog change() {
         this.adapter.change(true);
-        this.count = 2;
         return this;
     }
 
-    public SiteDialog all() {
-        this.adapter.search(true);
-        this.adapter.change(true);
-        this.count = 1;
-        return this;
+    public void show() {
+        setRecyclerView();
+        setDialog();
     }
 
-    public void show(FragmentActivity activity) {
-        for (Fragment f : activity.getSupportFragmentManager().getFragments()) if (f instanceof BottomSheetDialogFragment) return;
-        show(activity.getSupportFragmentManager(), null);
-        this.callback = (SiteCallback) activity;
-    }
-
-    public void show(Fragment fragment) {
-        for (Fragment f : fragment.getChildFragmentManager().getFragments()) if (f instanceof BottomSheetDialogFragment) return;
-        show(fragment.getChildFragmentManager(), null);
-        this.callback = (SiteCallback) fragment;
-    }
-
-    private int getCount() {
-        return adapter.getItemCount() < 2 ? 1 : count;
-    }
-
-    @Override
-    protected ViewBinding getBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
-        return binding = DialogSiteBinding.inflate(inflater, container, false);
-    }
-
-    @Override
-    protected void initView() {
+    private void setRecyclerView() {
         binding.recycler.setAdapter(adapter);
         binding.recycler.setItemAnimator(null);
         binding.recycler.setHasFixedSize(true);
-        binding.recycler.addItemDecoration(new SpaceItemDecoration(getCount(), 16));
-        binding.recycler.setLayoutManager(new GridLayoutManager(getContext(), getCount()));
+        binding.recycler.addItemDecoration(new SpaceItemDecoration(1, 16));
         binding.recycler.scrollToPosition(ApiConfig.getHomeIndex());
+    }
+
+    private void setDialog() {
+        if (adapter.getItemCount() == 0) return;
+        dialog.getWindow().setDimAmount(0);
+        dialog.show();
     }
 
     @Override
     public void onTextClick(Site item) {
         if (callback == null) return;
         callback.setSite(item);
-        dismiss();
+        dialog.dismiss();
     }
 
     @Override
