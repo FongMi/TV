@@ -7,8 +7,10 @@
     android:background="@drawable/shape_controller"
     android:orientation="vertical"
     android:paddingStart="16dp"
+    android:paddingLeft="16dp"
     android:paddingTop="18dp"
     android:paddingEnd="16dp"
+    android:paddingRight="16dp"
     android:paddingBottom="8dp">
 
     <com.fongmi.android.tv.ui.custom.CustomHorizontalGridView
