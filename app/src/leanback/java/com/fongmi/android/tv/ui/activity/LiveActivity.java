@@ -404,7 +404,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void onToggle() {
         if (isVisible(mBinding.control.getRoot())) hideControl();
-        if (isVisible(mBinding.recycler)) hideUI();
+        else if (isVisible(mBinding.recycler)) hideUI();
         else showUI();
         hideInfo();
     }
