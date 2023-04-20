@@ -205,7 +205,7 @@ public class CollectActivity extends BaseActivity implements SiteCallback, WordA
 
     private void onSite(View view) {
         Utils.hideKeyboard(mBinding.keyword);
-        App.post(() -> SiteDialog.create().search().show(this), 50);
+        App.post(() -> SiteDialog.create(this).search().show(), 50);
     }
 
     private void toggleView(View view) {
