@@ -51,7 +51,7 @@ public class SiteDialog implements SitePresenter.OnClickListener {
     public SiteDialog all() {
         this.presenter.search(true);
         this.presenter.change(true);
-        this.width = 0.5f;
+        this.width = 0.45f;
         return this;
     }
 
@@ -71,7 +71,7 @@ public class SiteDialog implements SitePresenter.OnClickListener {
         if (adapter.size() == 0) return;
         WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
         params.width = (int) (ResUtil.getScreenWidth() * width);
-        params.height = (int) (ResUtil.getScreenHeight() * 0.745f);
+        params.height = (int) (ResUtil.getScreenHeight() * 0.736f);
         dialog.getWindow().setAttributes(params);
         dialog.getWindow().setDimAmount(0);
         dialog.show();
