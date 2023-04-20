@@ -12,11 +12,11 @@ public class Constant {
     //直播解析時間
     public static final int TIMEOUT_LIVE = 10 * 1000;
     //播放超時時間
-    public static final int TIMEOUT_PLAY = 15 * 1000;
+    public static final int TIMEOUT_PLAY = 30 * 1000;
     //解析預設時間
-    public static final int TIMEOUT_PARSE_DEF = 15 * 1000;
+    public static final int TIMEOUT_PARSE_DEF = 30 * 1000;
     //嗅探超時時間
-    public static final int TIMEOUT_PARSE_WEB = 15 * 1000;
+    public static final int TIMEOUT_PARSE_WEB = 30 * 1000;
     //網路超時時間
     public static final int TIMEOUT_HTTP = 30 * 1000;
     //代理超時時間

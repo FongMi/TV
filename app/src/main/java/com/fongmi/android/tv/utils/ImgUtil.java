@@ -64,7 +64,7 @@ public class ImgUtil {
     }
 
     private static RequestListener<Bitmap> getListener(ImageView view, ImageView.ScaleType scaleType) {
-        return new RequestListener<>() {
+        return new RequestListener<Bitmap>() {
             @Override
             public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
                 view.setScaleType(scaleType);
