@@ -20,11 +20,16 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 public class LiveDialog extends BaseDialog implements LiveAdapter.OnClickListener {
 
+    private final LiveAdapter adapter;
     private DialogLiveBinding binding;
     private LiveCallback callback;
 
     public static LiveDialog create() {
         return new LiveDialog();
+    }
+
+    public LiveDialog() {
+        this.adapter = new LiveAdapter(this);
     }
 
     public void show(FragmentActivity activity) {
@@ -39,6 +44,10 @@ public class LiveDialog extends BaseDialog implements LiveAdapter.OnClickListene
         this.callback = (LiveCallback) fragment;
     }
 
+    private int getCount() {
+        return adapter.getItemCount() < 2 ? 1 : 2;
+    }
+
     @Override
     protected ViewBinding getBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
         return binding = DialogLiveBinding.inflate(inflater, container, false);
@@ -46,10 +55,10 @@ public class LiveDialog extends BaseDialog implements LiveAdapter.OnClickListene
 
     @Override
     protected void initView() {
+        binding.recycler.setAdapter(adapter);
         binding.recycler.setHasFixedSize(true);
-        binding.recycler.setAdapter(new LiveAdapter(this));
-        binding.recycler.addItemDecoration(new SpaceItemDecoration(2, 16));
-        binding.recycler.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        binding.recycler.addItemDecoration(new SpaceItemDecoration(getCount(), 16));
+        binding.recycler.setLayoutManager(new GridLayoutManager(getContext(), getCount()));
         binding.recycler.scrollToPosition(LiveConfig.getHomeIndex());
     }
 
