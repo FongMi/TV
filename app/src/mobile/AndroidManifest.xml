@@ -3,7 +3,6 @@
     package="com.fongmi.android.tv">
 
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application>
 
