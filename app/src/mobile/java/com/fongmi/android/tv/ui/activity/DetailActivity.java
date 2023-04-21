@@ -55,7 +55,7 @@ import com.fongmi.android.tv.ui.adapter.SearchAdapter;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
-import com.fongmi.android.tv.ui.custom.ViewType;
+import com.fongmi.android.tv.ui.base.ViewType;
 import com.fongmi.android.tv.ui.custom.dialog.CastDialog;
 import com.fongmi.android.tv.ui.custom.dialog.ControlDialog;
 import com.fongmi.android.tv.ui.custom.dialog.EpisodeGridDialog;
