@@ -44,8 +44,8 @@ import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.model.SiteViewModel;
-import com.fongmi.android.tv.pip.PiP;
-import com.fongmi.android.tv.pip.Receiver;
+import com.fongmi.android.tv.utils.PiP;
+import com.fongmi.android.tv.receiver.PiPReceiver;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.adapter.EpisodeAdapter;
@@ -82,7 +82,7 @@ import java.util.concurrent.Executors;
 
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class DetailActivity extends BaseActivity implements Clock.Callback, CustomKeyDownVod.Listener, CastDialog.Listener, Receiver.Listener, TrackDialog.Listener, ControlDialog.Listener, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, ParseAdapter.OnClickListener {
+public class DetailActivity extends BaseActivity implements Clock.Callback, CustomKeyDownVod.Listener, CastDialog.Listener, PiPReceiver.Listener, TrackDialog.Listener, ControlDialog.Listener, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, ParseAdapter.OnClickListener {
 
     private ViewGroup.LayoutParams mFrameParams;
     private ActivityDetailBinding mBinding;
@@ -95,7 +95,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     private SiteViewModel mViewModel;
     private FlagAdapter mFlagAdapter;
     private List<Dialog> mDialogs;
-    private Receiver mReceiver;
+    private PiPReceiver mReceiver;
     private History mHistory;
     private Players mPlayers;
     private boolean fullscreen;
@@ -207,8 +207,8 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mKeyDown = CustomKeyDownVod.create(this, mBinding.video);
         mFrameParams = mBinding.video.getLayoutParams();
         mBinding.progressLayout.showProgress();
+        mReceiver = new PiPReceiver(this);
         mPlayers = new Players().init();
-        mReceiver = new Receiver(this);
         mDialogs = new ArrayList<>();
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
