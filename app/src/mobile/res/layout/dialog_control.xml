@@ -170,6 +170,18 @@
             tools:text="硬解" />
 
         <TextView
+            android:id="@+id/loop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/selector_accent"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:gravity="center"
+            android:text="@string/play_loop"
+            android:textColor="@color/white"
+            android:textSize="14sp" />
+
+        <TextView
             android:id="@+id/opening"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -79,6 +79,7 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
         binding.decode.setText(detail.control.action.decode.getText());
         binding.ending.setText(detail.control.action.ending.getText());
         binding.opening.setText(detail.control.action.opening.getText());
+        binding.loop.setActivated(detail.control.action.loop.isActivated());
         setTrackVisible();
         setScaleText();
         setParse();
@@ -90,6 +91,7 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
         binding.text.setOnClickListener(v -> dismiss(detail.control.action.text));
         binding.audio.setOnClickListener(v -> dismiss(detail.control.action.audio));
         binding.video.setOnClickListener(v -> dismiss(detail.control.action.video));
+        binding.loop.setOnClickListener(v -> active(binding.loop, detail.control.action.loop));
         binding.player.setOnClickListener(v -> click(binding.player, detail.control.action.player));
         binding.decode.setOnClickListener(v -> click(binding.decode, detail.control.action.decode));
         binding.ending.setOnClickListener(v -> click(binding.ending, detail.control.action.ending));
@@ -118,6 +120,11 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
         for (TextView textView : scales) textView.setActivated(false);
         listener.onScale(Integer.parseInt(view.getTag().toString()));
         view.setActivated(true);
+    }
+
+    private void active(View view, TextView target) {
+        target.performClick();
+        view.setActivated(target.isActivated());
     }
 
     private void click(TextView view, TextView target) {
