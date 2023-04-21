@@ -244,6 +244,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mBinding.control.action.text.setOnClickListener(this::onTrack);
         mBinding.control.action.audio.setOnClickListener(this::onTrack);
         mBinding.control.action.video.setOnClickListener(this::onTrack);
+        mBinding.control.action.loop.setOnClickListener(view -> onLoop());
         mBinding.control.action.scale.setOnClickListener(view -> onScale());
         mBinding.control.action.speed.setOnClickListener(view -> onSpeed());
         mBinding.control.action.player.setOnClickListener(view -> onPlayer());
@@ -534,6 +535,10 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         hideControl();
     }
 
+    private void onLoop() {
+        mBinding.control.action.loop.setActivated(!mBinding.control.action.loop.isActivated());
+    }
+
     private void onScale() {
         int index = getScale();
         String[] array = ResUtil.getStringArray(R.array.select_scale);
@@ -560,6 +565,13 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         if (mFlagAdapter.getItemCount() == 0) return;
         if (mEpisodeAdapter.getItemCount() == 0) return;
         getPlayer(getFlag(), getEpisode(), false);
+    }
+
+    private void onReset() {
+        Clock.get().setCallback(null);
+        if (mFlagAdapter.getItemCount() == 0) return;
+        if (mEpisodeAdapter.getItemCount() == 0) return;
+        getPlayer(getFlag(), getEpisode(), true);
     }
 
     private void onPlayer() {
@@ -832,7 +844,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
                 mBinding.control.size.setText(mPlayers.getSizeText());
                 break;
             case Player.STATE_ENDED:
-                checkNext();
+                checkEnded();
                 break;
         }
     }
@@ -847,6 +859,14 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         if (isFullscreen() && !isRotate() && mPlayers.isPortrait()) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
             setRotate(true);
+        }
+    }
+
+    private void checkEnded() {
+        if (mBinding.control.action.loop.isActivated()) {
+            onReset();
+        } else {
+            checkNext();
         }
     }
 

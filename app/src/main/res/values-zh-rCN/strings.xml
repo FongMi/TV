@@ -31,21 +31,22 @@
 
     <!-- Play -->
     <string name="play">播放</string>
+    <string name="play_op">片头</string>
+    <string name="play_ed">片尾</string>
     <string name="play_next">下集</string>
     <string name="play_prev">上集</string>
-    <string name="play_ready">准备播放：<xliff:g name="name">%s</xliff:g></string>
+    <string name="play_loop">循环</string>
+    <string name="play_forward">→</string>
+    <string name="play_backward">←</string>
+    <string name="play_invert">反转</string>
+    <string name="play_across">跨类</string>
+    <string name="play_reverse">倒序</string>
     <string name="play_track_text">字幕</string>
     <string name="play_track_audio">音轨</string>
     <string name="play_track_video">视轨</string>
-    <string name="play_invert">反转</string>
-    <string name="play_across">跨类</string>
-    <string name="play_op">片头</string>
-    <string name="play_ed">片尾</string>
-    <string name="play_reverse">倒序</string>
-    <string name="play_forward">→</string>
-    <string name="play_backward">←</string>
     <string name="play_forward_hint">已切换正序播放</string>
     <string name="play_backward_hint">已切换倒序播放</string>
+    <string name="play_ready">准备播放：<xliff:g name="name">%s</xliff:g></string>
     <string name="play_switch_parse">正在切换解析至「<xliff:g name="name">%s</xliff:g>」</string>
     <string name="play_switch_flag">正在切换线路至「<xliff:g name="name">%s</xliff:g>」</string>
     <string name="play_switch_site">正在切换站源至「<xliff:g name="name">%s</xliff:g>」</string>
