@@ -10,7 +10,7 @@ import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.DialogEpisodeListBinding;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.ui.adapter.EpisodeAdapter;
-import com.fongmi.android.tv.ui.custom.ViewType;
+import com.fongmi.android.tv.ui.base.ViewType;
 import com.google.android.material.sidesheet.SideSheetDialog;
 
 import java.util.List;

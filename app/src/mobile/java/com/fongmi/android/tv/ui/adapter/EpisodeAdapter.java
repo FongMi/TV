@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.AdapterEpisodeGridBinding;
 import com.fongmi.android.tv.databinding.AdapterEpisodeListBinding;
-import com.fongmi.android.tv.ui.custom.ViewType;
+import com.fongmi.android.tv.ui.base.ViewType;
 
 import java.util.ArrayList;
 import java.util.List;
