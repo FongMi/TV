@@ -56,7 +56,7 @@
                     android:id="@+id/search"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_vod_search" />
+                    android:src="@drawable/ic_action_search" />
 
             </LinearLayout>
 
@@ -66,14 +66,14 @@
                 android:layout_height="24dp"
                 android:layout_marginEnd="12dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_vod_keep" />
+                android:src="@drawable/ic_action_keep" />
 
             <ImageView
                 android:id="@+id/history"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_vod_history" />
+                android:src="@drawable/ic_action_history" />
 
         </LinearLayout>
 
@@ -105,7 +105,7 @@
         android:layout_height="56dp"
         android:layout_gravity="center"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/ic_vod_retry"
+        android:src="@drawable/ic_action_retry"
         android:visibility="gone" />
 
     <include
