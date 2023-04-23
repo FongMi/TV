@@ -15,21 +15,6 @@
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/cast_select"
-            android:textColor="?android:attr/textColorPrimary"
-            android:textSize="16sp" />
-
-        <androidx.mediarouter.app.MediaRouteButton
-            android:id="@+id/cast"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginEnd="20dp"
-            android:mediaRouteTypes="user" />
-
         <ImageView
             android:id="@+id/scan"
             android:layout_width="wrap_content"
