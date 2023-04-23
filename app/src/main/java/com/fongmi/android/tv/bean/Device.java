@@ -100,16 +100,12 @@ public class Device {
         return getType() == 2;
     }
 
-    public boolean isCast() {
-        return getType() == 3;
-    }
-
     public boolean isApp() {
         return isLeanback() || isMobile();
     }
 
     public String getHost() {
-        return isDLNA() || isCast() ? getUuid() : Uri.parse(getIp()).getHost();
+        return isDLNA() ? getUuid() : Uri.parse(getIp()).getHost();
     }
 
     public Device save() {

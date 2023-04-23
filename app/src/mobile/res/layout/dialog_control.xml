@@ -19,14 +19,13 @@
         android:id="@+id/speed"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/accent"
         android:stepSize="0.25"
         android:valueFrom="1"
         android:valueTo="5"
-        app:haloColor="@color/blue_500"
-        app:thumbColor="@color/blue_500"
-        app:tickColor="@color/transparent"
-        app:trackColorActive="@color/blue_500"
+        app:haloColor="@color/accent"
+        app:labelStyle="@style/Tooltip"
+        app:thumbColor="@color/accent"
+        app:trackColorActive="@color/accent"
         app:trackColorInactive="@color/blue_50" />
 
     <TextView
