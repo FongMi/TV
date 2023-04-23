@@ -35,6 +35,9 @@
 -keep class com.github.catvod.crawler.** { *; }
 -keep class * extends com.github.catvod.crawler.Spider
 
+# Cast
+-keep class * implements com.google.android.gms.cast.framework.OptionsProvider
+
 # Cling
 -keep class org.fourthline.cling.** { *; }
 
