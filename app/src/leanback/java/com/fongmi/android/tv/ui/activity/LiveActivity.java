@@ -493,6 +493,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void getUrl() {
+        if (mChannel == null) return;
         LiveConfig.get().setKeep(mChannel);
         mViewModel.getUrl(mChannel);
         showProgress();
