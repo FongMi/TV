@@ -114,8 +114,10 @@ dependencies {
     implementation('org.simpleframework:simple-xml:2.7.1') { exclude group: 'stax', module: 'stax-api' exclude group: 'xpp3', module: 'xpp3' }
     leanbackImplementation 'androidx.leanback:leanback:1.2.0-alpha02'
     leanbackImplementation 'me.jessyan:autosize:1.2.1'
+    mobileImplementation 'androidx.mediarouter:mediarouter:1.3.0'
     mobileImplementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     mobileImplementation 'com.github.devin1014.DLNA-Cast:dlna-dmc:V1.0.0'
+    mobileImplementation 'com.google.android.gms:play-services-cast-framework:21.3.0'
     mobileImplementation('com.journeyapps:zxing-android-embedded:4.3.0') { transitive = false }
     annotationProcessor 'androidx.room:room-compiler:2.5.1'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.14.2'
