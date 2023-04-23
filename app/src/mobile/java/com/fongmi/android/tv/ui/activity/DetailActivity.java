@@ -67,7 +67,6 @@ import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Traffic;
 import com.fongmi.android.tv.utils.Utils;
-import com.google.android.gms.cast.framework.CastContext;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.permissionx.guolindev.PermissionX;
 
@@ -95,7 +94,6 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     private ExecutorService mExecutor;
     private SiteViewModel mViewModel;
     private FlagAdapter mFlagAdapter;
-    private CastContext mCastContext;
     private List<Dialog> mDialogs;
     private PiPReceiver mReceiver;
     private History mHistory;
