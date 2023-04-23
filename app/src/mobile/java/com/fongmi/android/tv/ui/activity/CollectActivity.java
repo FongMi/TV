@@ -132,7 +132,7 @@ public class CollectActivity extends BaseActivity implements SiteCallback, WordA
         mVodAdapter.setViewType(Prefers.getViewType());
         boolean grid = mVodAdapter.getViewType() == ViewType.GRID;
         GridLayoutManager manager = (GridLayoutManager) mBinding.recycler.getLayoutManager();
-        mBinding.view.setImageResource(grid ? R.drawable.ic_view_list : R.drawable.ic_view_grid);
+        mBinding.view.setImageResource(grid ? R.drawable.ic_action_list : R.drawable.ic_action_grid);
         manager.setSpanCount(grid ? 2 : 1);
     }
 
