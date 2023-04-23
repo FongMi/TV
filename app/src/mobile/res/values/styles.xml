@@ -16,7 +16,6 @@
         <item name="android:windowBackground">@null</item>
         <item name="android:windowAnimationStyle">@null</item>
         <item name="android:navigationBarColor">@color/transparent</item>
-        <item name="bottomSheetDialogTheme">@style/ThemeOverlay.App.BottomSheetDialog</item>
     </style>
 
     <style name="Control" />
@@ -36,6 +35,10 @@
 
     <style name="Indicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
         <item name="android:color">@color/indicator</item>
+    </style>
+
+    <style name="Tooltip" parent="Widget.Material3.Tooltip">
+        <item name="backgroundTint">@color/accent</item>
     </style>
 
 </resources>
