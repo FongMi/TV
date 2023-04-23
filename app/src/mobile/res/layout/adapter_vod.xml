@@ -22,7 +22,7 @@
         android:layout_height="match_parent"
         android:background="@color/black_50"
         android:scaleType="center"
-        android:src="@drawable/ic_vod_delete"
+        android:src="@drawable/ic_action_delete"
         android:visibility="gone"
         app:shapeAppearanceOverlay="@style/Vod.Grid"
         tools:visibility="visible" />
