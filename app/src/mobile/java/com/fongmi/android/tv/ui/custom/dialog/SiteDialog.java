@@ -55,6 +55,12 @@ public class SiteDialog implements SiteAdapter.OnClickListener {
         return this;
     }
 
+    public SiteDialog all() {
+        this.adapter.search(true);
+        this.adapter.change(true);
+        return this;
+    }
+
     public void show() {
         setRecyclerView();
         setDialog();
