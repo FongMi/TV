@@ -22,10 +22,6 @@
         android:stepSize="0.25"
         android:valueFrom="1"
         android:valueTo="5"
-        app:haloColor="@color/accent"
-        app:labelStyle="@style/Tooltip"
-        app:thumbColor="@color/accent"
-        app:trackColorActive="@color/accent"
         app:trackColorInactive="@color/blue_50" />
 
     <TextView
@@ -69,10 +65,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:background="@drawable/selector_accent"
+            android:background="@drawable/shape_accent"
             android:gravity="center"
             android:tag="0"
-            android:textColor="@color/text_accent"
+            android:textColor="@color/control"
             android:textSize="14sp"
             tools:text="預設" />
 
@@ -81,10 +77,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:background="@drawable/selector_accent"
+            android:background="@drawable/shape_accent"
             android:gravity="center"
             android:tag="1"
-            android:textColor="@color/text_accent"
+            android:textColor="@color/control"
             android:textSize="14sp"
             tools:text="16:9" />
 
@@ -93,10 +89,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:background="@drawable/selector_accent"
+            android:background="@drawable/shape_accent"
             android:gravity="center"
             android:tag="2"
-            android:textColor="@color/text_accent"
+            android:textColor="@color/control"
             android:textSize="14sp"
             tools:text="4:3" />
 
@@ -105,10 +101,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:background="@drawable/selector_accent"
+            android:background="@drawable/shape_accent"
             android:gravity="center"
             android:tag="3"
-            android:textColor="@color/text_accent"
+            android:textColor="@color/control"
             android:textSize="14sp"
             tools:text="填充" />
 
@@ -116,10 +112,10 @@
             android:id="@+id/scale_4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/selector_accent"
+            android:background="@drawable/shape_accent"
             android:gravity="center"
             android:tag="4"
-            android:textColor="@color/text_accent"
+            android:textColor="@color/control"
             android:textSize="14sp"
             tools:text="裁剪" />
 
@@ -144,9 +140,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:background="@drawable/selector_accent"
+            android:background="@drawable/shape_accent"
             android:gravity="center"
-            android:textColor="@color/text_accent"
+            android:textColor="@color/control"
             android:textSize="14sp"
             tools:text="EXO" />
 
@@ -155,9 +151,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:background="@drawable/selector_accent"
+            android:background="@drawable/shape_accent"
             android:gravity="center"
-            android:textColor="@color/text_accent"
+            android:textColor="@color/control"
             android:textSize="14sp"
             tools:text="硬解" />
 
@@ -166,10 +162,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:background="@drawable/selector_accent"
+            android:background="@drawable/shape_accent"
             android:gravity="center"
             android:text="@string/play_loop"
-            android:textColor="@color/text_accent"
+            android:textColor="@color/control"
             android:textSize="14sp" />
 
         <TextView
@@ -177,9 +173,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:background="@drawable/selector_accent"
+            android:background="@drawable/shape_accent"
             android:gravity="center"
-            android:textColor="@color/text_accent"
+            android:textColor="@color/control"
             android:textSize="14sp"
             tools:text="片頭" />
 
@@ -188,9 +184,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="0dp"
-            android:background="@drawable/selector_accent"
+            android:background="@drawable/shape_accent"
             android:gravity="center"
-            android:textColor="@color/text_accent"
+            android:textColor="@color/control"
             android:textSize="14sp"
             tools:text="片尾" />
 
@@ -218,11 +214,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:background="@drawable/selector_accent"
+            android:background="@drawable/shape_accent"
             android:gravity="center"
             android:tag="3"
             android:text="@string/play_track_text"
-            android:textColor="@color/text_accent"
+            android:textColor="@color/control"
             android:textSize="14sp"
             android:visibility="gone"
             tools:visibility="visible" />
@@ -232,11 +228,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:background="@drawable/selector_accent"
+            android:background="@drawable/shape_accent"
             android:gravity="center"
             android:tag="1"
             android:text="@string/play_track_audio"
-            android:textColor="@color/text_accent"
+            android:textColor="@color/control"
             android:textSize="14sp"
             android:visibility="gone"
             tools:visibility="visible" />
@@ -245,11 +241,11 @@
             android:id="@+id/video"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/selector_accent"
+            android:background="@drawable/shape_accent"
             android:gravity="center"
             android:tag="2"
             android:text="@string/play_track_video"
-            android:textColor="@color/text_accent"
+            android:textColor="@color/control"
             android:textSize="14sp"
             android:visibility="gone"
             tools:visibility="visible" />
