@@ -4,10 +4,9 @@
     android:id="@+id/text"
     style="@style/Widget.Material3.Button.OutlinedButton"
     android:layout_width="match_parent"
-    android:layout_height="40dp"
+    android:layout_height="wrap_content"
     android:ellipsize="marquee"
     android:gravity="center"
     android:singleLine="true"
     android:textColor="@color/dialog"
-    android:textSize="14sp"
     tools:text="https://fongmi.github.io/live.json" />
