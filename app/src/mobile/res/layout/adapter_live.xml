@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Button xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.button.MaterialButton xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/text"
-    style="@style/Widget.Material3.Button.OutlinedButton"
+    style="?attr/materialButtonOutlinedStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:ellipsize="marquee"
