@@ -28,8 +28,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:backgroundTint="@color/accent"
-        android:text="@string/crash_restart" />
+        android:backgroundTint="?android:attr/colorControlActivated"
+        android:text="@string/crash_restart"
+        android:textColor="@color/white" />
 
     <Button
         android:id="@+id/details"
