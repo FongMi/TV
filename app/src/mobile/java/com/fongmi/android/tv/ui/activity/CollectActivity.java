@@ -91,8 +91,8 @@ public class CollectActivity extends BaseActivity implements SiteCallback, WordA
         setRecyclerView();
         setLayoutSize();
         setViewModel();
+        checkKeyword();
         setViewType();
-        setKeyword();
         setSite();
         getHot();
         search();
@@ -151,9 +151,14 @@ public class CollectActivity extends BaseActivity implements SiteCallback, WordA
         });
     }
 
-    private void setKeyword() {
+    private void checkKeyword() {
         if (TextUtils.isEmpty(getKeyword())) mBinding.keyword.requestFocus();
-        else mBinding.keyword.setText(getKeyword());
+        else setKeyword(getKeyword());
+    }
+
+    private void setKeyword(String text) {
+        mBinding.keyword.setText(text);
+        mBinding.keyword.setSelection(text.length());
     }
 
     private void setSite() {
@@ -236,8 +241,7 @@ public class CollectActivity extends BaseActivity implements SiteCallback, WordA
 
     @Override
     public void onItemClick(String text) {
-        mBinding.keyword.setText(text);
-        mBinding.keyword.setSelection(text.length());
+        setKeyword(text);
         search();
     }
 
