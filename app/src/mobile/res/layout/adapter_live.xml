@@ -8,5 +8,5 @@
     android:ellipsize="marquee"
     android:gravity="center"
     android:singleLine="true"
-    android:textColor="@color/dialog"
+    android:textColor="@color/text_outline"
     tools:text="https://fongmi.github.io/live.json" />
