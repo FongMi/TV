@@ -163,7 +163,7 @@ public class ApiConfig {
             jarLoader.parseJar("", Json.safeString(object, "spider"));
             config.json(object.toString()).update();
             App.post(callback::success);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
             App.post(() -> callback.error(R.string.error_config_parse));
         }
