@@ -16,6 +16,7 @@
         android:gravity="center"
         android:singleLine="true"
         android:textColor="?android:attr/textColorPrimary"
+        android:textSize="14sp"
         tools:text="https://fongmi.github.io/cat.json" />
 
     <ImageView
