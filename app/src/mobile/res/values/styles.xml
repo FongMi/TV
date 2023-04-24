@@ -35,6 +35,9 @@
     </style>
 
     <style name="BottomSheetDialog" parent="Theme.Material3.DayNight.BottomSheetDialog">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primaryDark</item>
+        <item name="colorAccent">@color/accent</item>
         <item name="android:backgroundDimEnabled">false</item>
         <item name="android:windowIsFloating">false</item>
         <item name="bottomSheetStyle">@style/ModalBottomSheetDialog</item>
@@ -50,10 +53,6 @@
 
     <style name="Indicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
         <item name="android:color">@color/indicator</item>
-    </style>
-
-    <style name="Tooltip" parent="Widget.Material3.Tooltip">
-        <item name="backgroundTint">@color/accent</item>
     </style>
 
 </resources>

@@ -14,7 +14,7 @@
         android:layout_weight="1"
         android:ellipsize="marquee"
         android:gravity="center"
-        android:textColor="@color/text_outline"
+        android:textColor="@color/control"
         tools:text="泥巴" />
 
     <ImageView
