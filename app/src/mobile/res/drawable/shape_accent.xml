@@ -15,8 +15,8 @@
                 android:color="?attr/colorOutline" />
             <padding
                 android:bottom="8dp"
-                android:left="16dp"
-                android:right="16dp"
+                android:left="12dp"
+                android:right="12dp"
                 android:top="8dp" />
         </shape>
     </item>
