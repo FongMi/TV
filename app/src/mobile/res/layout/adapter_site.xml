@@ -6,9 +6,9 @@
     android:gravity="center_vertical"
     android:orientation="horizontal">
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/text"
-        style="@style/Widget.Material3.Button.OutlinedButton"
+        style="?attr/materialButtonOutlinedStyle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
