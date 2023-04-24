@@ -3,16 +3,16 @@
     android:color="?attr/colorControlActivated">
     <item android:id="@android:id/mask">
         <shape android:shape="rectangle">
+            <corners android:radius="8dp" />
             <solid android:color="#f5f5f5" />
-            <corners android:radius="4dp" />
         </shape>
     </item>
     <item>
         <shape android:shape="rectangle">
+            <corners android:radius="8dp" />
             <stroke
-                android:width="0.5dp"
-                android:color="?android:attr/textColorPrimary" />
-            <corners android:radius="4dp" />
+                android:width="1dp"
+                android:color="?attr/colorOutline" />
             <padding
                 android:bottom="8dp"
                 android:left="12dp"
