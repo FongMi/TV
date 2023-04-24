@@ -18,6 +18,7 @@ import com.fongmi.android.tv.databinding.ActivityDetailBinding;
 import com.fongmi.android.tv.databinding.DialogControlBinding;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.adapter.ParseAdapter;
+import com.fongmi.android.tv.ui.base.ViewType;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -113,7 +114,7 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
         binding.parse.setHasFixedSize(true);
         binding.parse.setItemAnimator(null);
         binding.parse.addItemDecoration(new SpaceItemDecoration(8));
-        binding.parse.setAdapter(new ParseAdapter(this));
+        binding.parse.setAdapter(new ParseAdapter(this, ViewType.LIGHT));
     }
 
     private void setScale(View view) {

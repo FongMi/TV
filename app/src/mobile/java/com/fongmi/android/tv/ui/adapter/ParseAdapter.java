@@ -2,13 +2,16 @@ package com.fongmi.android.tv.ui.adapter;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Parse;
-import com.fongmi.android.tv.databinding.AdapterParseBinding;
+import com.fongmi.android.tv.databinding.AdapterParseDarkBinding;
+import com.fongmi.android.tv.databinding.AdapterParseLightBinding;
+import com.fongmi.android.tv.ui.base.ViewType;
 
 import java.util.List;
 
@@ -16,10 +19,12 @@ public class ParseAdapter extends RecyclerView.Adapter<ParseAdapter.ViewHolder> 
 
     private final OnClickListener mListener;
     private final List<Parse> mItems;
+    private final int viewType;
 
-    public ParseAdapter(OnClickListener listener) {
-        this.mListener = listener;
+    public ParseAdapter(OnClickListener listener, int viewType) {
         this.mItems = ApiConfig.get().getParses();
+        this.mListener = listener;
+        this.viewType = viewType;
     }
 
     public interface OnClickListener {
@@ -45,27 +50,44 @@ public class ParseAdapter extends RecyclerView.Adapter<ParseAdapter.ViewHolder> 
         return mItems.size();
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        return viewType;
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(AdapterParseBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        if (viewType == ViewType.DARK) return new ViewHolder(AdapterParseDarkBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        return new ViewHolder(AdapterParseLightBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Parse item = mItems.get(position);
-        holder.binding.text.setText(item.getName());
-        holder.binding.text.setActivated(item.isActivated());
-        holder.binding.text.setOnClickListener(v -> mListener.onItemClick(item));
+        if (holder.darkBinding != null) holder.initView(holder.darkBinding.text, item);
+        if (holder.lightBinding != null) holder.initView(holder.lightBinding.text, item);
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder {
 
-        private final AdapterParseBinding binding;
+        private AdapterParseDarkBinding darkBinding;
+        private AdapterParseLightBinding lightBinding;
 
-        ViewHolder(@NonNull AdapterParseBinding binding) {
+        ViewHolder(@NonNull AdapterParseDarkBinding binding) {
             super(binding.getRoot());
-            this.binding = binding;
+            this.darkBinding = binding;
+        }
+
+        ViewHolder(@NonNull AdapterParseLightBinding binding) {
+            super(binding.getRoot());
+            this.lightBinding = binding;
+        }
+
+        void initView(TextView view, Parse item) {
+            view.setText(item.getName());
+            view.setActivated(item.isActivated());
+            view.setOnClickListener(v -> mListener.onItemClick(item));
         }
     }
 }
