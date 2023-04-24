@@ -274,7 +274,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mBinding.control.parse.setHasFixedSize(true);
         mBinding.control.parse.setItemAnimator(null);
         mBinding.control.parse.addItemDecoration(new SpaceItemDecoration(8));
-        mBinding.control.parse.setAdapter(mParseAdapter = new ParseAdapter(this));
+        mBinding.control.parse.setAdapter(mParseAdapter = new ParseAdapter(this, ViewType.DARK));
     }
 
     private void setPlayerView() {
