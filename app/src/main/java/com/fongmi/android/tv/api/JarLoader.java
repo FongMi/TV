@@ -43,7 +43,7 @@ public class JarLoader {
         this.jar = jar;
     }
 
-    private void load(String key, File file) throws Exception {
+    private void load(String key, File file) throws Throwable {
         DexClassLoader loader = new DexClassLoader(file.getAbsolutePath(), FileUtil.getCachePath(), null, App.get().getClassLoader());
         Class<?> classInit = loader.loadClass("com.github.catvod.spider.Init");
         Method method = classInit.getMethod("init", Context.class);
@@ -69,7 +69,7 @@ public class JarLoader {
         }
     }
 
-    public void parseJar(String key, String jar) throws Exception {
+    public void parseJar(String key, String jar) throws Throwable {
         String[] texts = jar.split(";md5;");
         String md5 = !jar.startsWith("file") && texts.length > 1 ? texts[1].trim() : "";
         jar = texts[0];
