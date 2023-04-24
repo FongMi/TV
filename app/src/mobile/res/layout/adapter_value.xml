@@ -7,6 +7,6 @@
     android:layout_marginStart="4dp"
     android:layout_marginEnd="4dp"
     android:background="@drawable/selector_accent"
-    android:textColor="@color/white"
+    android:textColor="@color/text_accent"
     android:textSize="14sp"
     tools:text="全部" />

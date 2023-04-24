@@ -73,7 +73,7 @@
             android:foreground="?android:attr/selectableItemBackground"
             android:gravity="center"
             android:tag="0"
-            android:textColor="@color/white"
+            android:textColor="@color/text_accent"
             android:textSize="14sp"
             tools:text="預設" />
 
@@ -86,7 +86,7 @@
             android:foreground="?android:attr/selectableItemBackground"
             android:gravity="center"
             android:tag="1"
-            android:textColor="@color/white"
+            android:textColor="@color/text_accent"
             android:textSize="14sp"
             tools:text="16:9" />
 
@@ -99,7 +99,7 @@
             android:foreground="?android:attr/selectableItemBackground"
             android:gravity="center"
             android:tag="2"
-            android:textColor="@color/white"
+            android:textColor="@color/text_accent"
             android:textSize="14sp"
             tools:text="4:3" />
 
@@ -112,7 +112,7 @@
             android:foreground="?android:attr/selectableItemBackground"
             android:gravity="center"
             android:tag="3"
-            android:textColor="@color/white"
+            android:textColor="@color/text_accent"
             android:textSize="14sp"
             tools:text="填充" />
 
@@ -124,7 +124,7 @@
             android:foreground="?android:attr/selectableItemBackground"
             android:gravity="center"
             android:tag="4"
-            android:textColor="@color/white"
+            android:textColor="@color/text_accent"
             android:textSize="14sp"
             tools:text="裁剪" />
 
@@ -152,7 +152,7 @@
             android:background="@drawable/selector_accent"
             android:foreground="?android:attr/selectableItemBackground"
             android:gravity="center"
-            android:textColor="@color/white"
+            android:textColor="@color/text_accent"
             android:textSize="14sp"
             tools:text="EXO" />
 
@@ -164,7 +164,7 @@
             android:background="@drawable/selector_accent"
             android:foreground="?android:attr/selectableItemBackground"
             android:gravity="center"
-            android:textColor="@color/white"
+            android:textColor="@color/text_accent"
             android:textSize="14sp"
             tools:text="硬解" />
 
@@ -177,7 +177,7 @@
             android:foreground="?android:attr/selectableItemBackground"
             android:gravity="center"
             android:text="@string/play_loop"
-            android:textColor="@color/white"
+            android:textColor="@color/text_accent"
             android:textSize="14sp" />
 
         <TextView
@@ -188,7 +188,7 @@
             android:background="@drawable/selector_accent"
             android:foreground="?android:attr/selectableItemBackground"
             android:gravity="center"
-            android:textColor="@color/white"
+            android:textColor="@color/text_accent"
             android:textSize="14sp"
             tools:text="片頭" />
 
@@ -200,7 +200,7 @@
             android:background="@drawable/selector_accent"
             android:foreground="?android:attr/selectableItemBackground"
             android:gravity="center"
-            android:textColor="@color/white"
+            android:textColor="@color/text_accent"
             android:textSize="14sp"
             tools:text="片尾" />
 
@@ -233,7 +233,7 @@
             android:gravity="center"
             android:tag="3"
             android:text="@string/play_track_text"
-            android:textColor="@color/white"
+            android:textColor="@color/text_accent"
             android:textSize="14sp"
             android:visibility="gone"
             tools:visibility="visible" />
@@ -248,7 +248,7 @@
             android:gravity="center"
             android:tag="1"
             android:text="@string/play_track_audio"
-            android:textColor="@color/white"
+            android:textColor="@color/text_accent"
             android:textSize="14sp"
             android:visibility="gone"
             tools:visibility="visible" />
@@ -262,7 +262,7 @@
             android:gravity="center"
             android:tag="2"
             android:text="@string/play_track_video"
-            android:textColor="@color/white"
+            android:textColor="@color/text_accent"
             android:textSize="14sp"
             android:visibility="gone"
             tools:visibility="visible" />

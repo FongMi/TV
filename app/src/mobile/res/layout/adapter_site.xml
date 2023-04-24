@@ -14,7 +14,7 @@
         android:layout_weight="1"
         android:ellipsize="marquee"
         android:gravity="center"
-        android:textColor="@color/dialog"
+        android:textColor="@color/text_outline"
         tools:text="泥巴" />
 
     <ImageView
