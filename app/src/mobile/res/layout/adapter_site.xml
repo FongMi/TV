@@ -3,37 +3,35 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:gravity="center_vertical"
     android:orientation="horizontal">
 
     <Button
         android:id="@+id/text"
         style="@style/Widget.Material3.Button.OutlinedButton"
         android:layout_width="0dp"
-        android:layout_height="40dp"
+        android:layout_height="wrap_content"
         android:layout_weight="1"
         android:ellipsize="marquee"
         android:gravity="center"
         android:textColor="@color/dialog"
-        android:textSize="14sp"
         tools:text="泥巴" />
 
     <ImageView
         android:id="@+id/search"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:padding="8dp"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_site_search_on" />
 
     <ImageView
         android:id="@+id/change"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:padding="8dp"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_site_change_on" />
 
