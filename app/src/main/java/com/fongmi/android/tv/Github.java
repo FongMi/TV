@@ -17,7 +17,7 @@ public class Github {
     public static final String RELEASE = "release";
     public static final String KITKAT = "kitkat";
 
-    private OkHttpClient client;
+    private final OkHttpClient client;
     private String proxy;
 
     private static class Loader {

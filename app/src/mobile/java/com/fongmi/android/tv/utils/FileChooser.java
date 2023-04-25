@@ -1,4 +1,4 @@
-package com.fongmi.android.tv.ui.custom;
+package com.fongmi.android.tv.utils;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -12,8 +12,6 @@ import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 
 import androidx.fragment.app.Fragment;
-
-import com.fongmi.android.tv.utils.FileUtil;
 
 import java.io.File;
 import java.io.FileOutputStream;

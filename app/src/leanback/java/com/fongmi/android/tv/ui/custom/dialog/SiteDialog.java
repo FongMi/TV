@@ -30,10 +30,10 @@ public class SiteDialog implements SitePresenter.OnClickListener {
     }
 
     public SiteDialog(Activity activity) {
-        this.callback = (activity instanceof SiteCallback) ? (SiteCallback) activity : null;
         this.binding = DialogSiteBinding.inflate(LayoutInflater.from(activity));
-        this.dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).create();
         this.adapter = new ArrayObjectAdapter(presenter = new SitePresenter(this));
+        this.dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).create();
+        this.callback = (SiteCallback) activity;
     }
 
     public SiteDialog search() {
@@ -51,7 +51,7 @@ public class SiteDialog implements SitePresenter.OnClickListener {
     public SiteDialog all() {
         this.presenter.search(true);
         this.presenter.change(true);
-        this.width = 0.5f;
+        this.width = 0.45f;
         return this;
     }
 
@@ -71,7 +71,7 @@ public class SiteDialog implements SitePresenter.OnClickListener {
         if (adapter.size() == 0) return;
         WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
         params.width = (int) (ResUtil.getScreenWidth() * width);
-        params.height = (int) (ResUtil.getScreenHeight() * 0.745f);
+        params.height = (int) (ResUtil.getScreenHeight() * 0.738f);
         dialog.getWindow().setAttributes(params);
         dialog.getWindow().setDimAmount(0);
         dialog.show();
@@ -79,7 +79,6 @@ public class SiteDialog implements SitePresenter.OnClickListener {
 
     @Override
     public void onTextClick(Site item) {
-        if (callback == null) return;
         callback.setSite(item);
         dialog.dismiss();
     }

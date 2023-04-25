@@ -10,9 +10,6 @@
     <string name="home_history">最近观看</string>
     <string name="home_recommend">更新推荐</string>
 
-    <!-- Live -->
-    <string name="live_setting">设置</string>
-
     <!-- Collect -->
     <string name="collect_result">“<xliff:g name="name">%s</xliff:g>”的搜索结果</string>
 

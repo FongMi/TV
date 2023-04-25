@@ -128,6 +128,18 @@
                 tools:text="預設" />
 
             <TextView
+                android:id="@+id/loop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="12dp"
+                android:background="@drawable/selector_text"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:text="@string/play_loop"
+                android:textColor="@color/text"
+                android:textSize="14sp" />
+
+            <TextView
                 android:id="@+id/text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
