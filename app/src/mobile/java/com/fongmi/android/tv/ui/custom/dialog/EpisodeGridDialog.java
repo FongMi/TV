@@ -13,6 +13,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.DialogEpisodeGridBinding;
 import com.fongmi.android.tv.ui.fragment.EpisodeFragment;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 import java.util.ArrayList;
@@ -20,9 +21,9 @@ import java.util.List;
 
 public class EpisodeGridDialog extends BaseDialog {
 
-    private final List<String> titles;
     private DialogEpisodeGridBinding binding;
     private List<Vod.Flag.Episode> episodes;
+    private final List<String> titles;
     private boolean reverse;
     private int spanCount;
     private int itemCount;
@@ -44,6 +45,11 @@ public class EpisodeGridDialog extends BaseDialog {
     public EpisodeGridDialog episodes(List<Vod.Flag.Episode> episodes) {
         this.episodes = episodes;
         return this;
+    }
+
+    public void show(FragmentActivity activity) {
+        for (Fragment f : activity.getSupportFragmentManager().getFragments()) if (f instanceof BottomSheetDialogFragment) return;
+        show(activity.getSupportFragmentManager(), null);
     }
 
     @Override

@@ -79,15 +79,15 @@ import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
 public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Listener, TrackDialog.Listener, ArrayPresenter.OnClickListener, Clock.Callback {
 
-    private ActivityDetailBinding mBinding;
     private ViewGroup.LayoutParams mFrameParams;
-    private ArrayObjectAdapter mFlagAdapter;
-    private ArrayObjectAdapter mArrayAdapter;
-    private ArrayObjectAdapter mEpisodeAdapter;
-    private ArrayObjectAdapter mParseAdapter;
-    private ArrayObjectAdapter mPartAdapter;
-    private ArrayObjectAdapter mSearchAdapter;
     private EpisodePresenter mEpisodePresenter;
+    private ArrayObjectAdapter mEpisodeAdapter;
+    private ArrayObjectAdapter mSearchAdapter;
+    private ArrayObjectAdapter mArrayAdapter;
+    private ArrayObjectAdapter mParseAdapter;
+    private ArrayObjectAdapter mFlagAdapter;
+    private ArrayObjectAdapter mPartAdapter;
+    private ActivityDetailBinding mBinding;
     private PartPresenter mPartPresenter;
     private CustomKeyDownVod mKeyDown;
     private ExecutorService mExecutor;
@@ -230,6 +230,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.text.setOnClickListener(this::onTrack);
         mBinding.control.audio.setOnClickListener(this::onTrack);
         mBinding.control.video.setOnClickListener(this::onTrack);
+        mBinding.control.loop.setOnClickListener(view -> onLoop());
         mBinding.control.next.setOnClickListener(view -> checkNext());
         mBinding.control.prev.setOnClickListener(view -> checkPrev());
         mBinding.control.scale.setOnClickListener(view -> onScale());
@@ -514,6 +515,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         if (!isFullscreen()) enterFullscreen();
     }
 
+    private void onLoop() {
+        mBinding.control.loop.setActivated(!mBinding.control.loop.isActivated());
+    }
+
     private void checkNext() {
         if (mHistory.isRevPlay()) onPrev();
         else onNext();
@@ -567,10 +572,14 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onReset() {
+        onReset(isReplay());
+    }
+
+    private void onReset(boolean replay) {
         Clock.get().setCallback(null);
         if (mFlagAdapter.size() == 0) return;
         if (mEpisodeAdapter.size() == 0) return;
-        getPlayer(getFlag(), getEpisode(), isReplay());
+        getPlayer(getFlag(), getEpisode(), replay);
     }
 
     private boolean onResetToggle() {
@@ -623,8 +632,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onTrack(View view) {
-        int type = Integer.parseInt(view.getTag().toString());
-        TrackDialog.create().player(mPlayers).type(type).listener(this).show(getSupportFragmentManager(), null);
+        TrackDialog.create().player(mPlayers).type(Integer.parseInt(view.getTag().toString())).show(this);
         hideControl();
     }
 
@@ -801,7 +809,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
                 mBinding.widget.size.setText(mPlayers.getSizeText());
                 break;
             case Player.STATE_ENDED:
-                checkNext();
+                checkEnded();
                 break;
         }
     }
@@ -810,6 +818,14 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mPlayers.seekTo(Math.max(mHistory.getOpening(), mHistory.getPosition()), false);
         Clock.get().setCallback(this);
         setInitTrack(true);
+    }
+
+    private void checkEnded() {
+        if (mBinding.control.loop.isActivated()) {
+            onReset(true);
+        } else {
+            checkNext();
+        }
     }
 
     private void setTrackVisible(boolean visible) {

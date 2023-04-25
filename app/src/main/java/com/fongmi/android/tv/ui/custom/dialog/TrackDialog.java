@@ -5,15 +5,18 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.media3.common.Tracks;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.bean.Track;
 import com.fongmi.android.tv.databinding.DialogTrackBinding;
 import com.fongmi.android.tv.player.Players;
+import com.fongmi.android.tv.player.TrackNameProvider;
 import com.fongmi.android.tv.ui.adapter.TrackAdapter;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
-import com.fongmi.android.tv.player.TrackNameProvider;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,9 +51,10 @@ public final class TrackDialog extends BaseDialog implements TrackAdapter.OnClic
         return this;
     }
 
-    public TrackDialog listener(Listener listener) {
-        this.listener = listener;
-        return this;
+    public void show(FragmentActivity activity) {
+        for (Fragment f : activity.getSupportFragmentManager().getFragments()) if (f instanceof BottomSheetDialogFragment) return;
+        show(activity.getSupportFragmentManager(), null);
+        this.listener = (Listener) activity;
     }
 
     @Override

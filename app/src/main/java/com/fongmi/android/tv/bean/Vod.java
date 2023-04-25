@@ -207,6 +207,7 @@ public class Vod {
         @Attribute(name = "flag", required = false)
         @SerializedName("flag")
         private String flag;
+        private String show;
 
         @Text
         private String urls;
@@ -222,11 +223,16 @@ public class Vod {
 
         public Flag(String flag) {
             this.episodes = new ArrayList<>();
+            this.show = Trans.s2t(flag);
             this.flag = flag;
         }
 
+        public String getShow() {
+            return TextUtils.isEmpty(show) ? "" : show;
+        }
+
         public String getFlag() {
-            return flag;
+            return TextUtils.isEmpty(flag) ? "" : flag;
         }
 
         public String getUrls() {
