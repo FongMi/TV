@@ -47,7 +47,8 @@ public class CustomRecyclerView extends RecyclerView {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        if (maxHeight > 0) heightMeasureSpec = MeasureSpec.makeMeasureSpec(maxHeight, MeasureSpec.AT_MOST);
+        int newHeight = MeasureSpec.makeMeasureSpec(maxHeight, MeasureSpec.AT_MOST);
+        if (heightMeasureSpec > newHeight) heightMeasureSpec = newHeight;
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 }
