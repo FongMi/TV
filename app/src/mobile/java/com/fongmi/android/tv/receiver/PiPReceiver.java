@@ -1,4 +1,4 @@
-package com.fongmi.android.tv.pip;
+package com.fongmi.android.tv.receiver;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -6,11 +6,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 
-public class Receiver extends BroadcastReceiver {
+import com.fongmi.android.tv.utils.PiP;
+
+public class PiPReceiver extends BroadcastReceiver {
 
     private final Listener listener;
 
-    public Receiver(Listener listener) {
+    public PiPReceiver(Listener listener) {
         this.listener = listener;
     }
 

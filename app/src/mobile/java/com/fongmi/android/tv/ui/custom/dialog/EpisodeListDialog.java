@@ -1,6 +1,7 @@
 package com.fongmi.android.tv.ui.custom.dialog;
 
 import android.view.LayoutInflater;
+import android.view.WindowManager;
 
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
@@ -9,8 +10,7 @@ import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.DialogEpisodeListBinding;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.ui.adapter.EpisodeAdapter;
-import com.fongmi.android.tv.ui.custom.ViewType;
-import com.fongmi.android.tv.utils.Utils;
+import com.fongmi.android.tv.ui.base.ViewType;
 import com.google.android.material.sidesheet.SideSheetDialog;
 
 import java.util.List;
@@ -47,11 +47,11 @@ public class EpisodeListDialog implements EpisodeAdapter.OnClickListener {
         binding = DialogEpisodeListBinding.inflate(LayoutInflater.from(activity));
         dialog = new SideSheetDialog(activity);
         dialog.setContentView(binding.getRoot());
+        dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         dialog.show();
     }
 
     private void initView() {
-        Utils.hideSystemUI(dialog.getWindow());
         setRecyclerView();
         setViewModel();
         setEpisode();

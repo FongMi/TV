@@ -7,6 +7,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.App;
@@ -16,8 +18,10 @@ import com.fongmi.android.tv.databinding.ActivityDetailBinding;
 import com.fongmi.android.tv.databinding.DialogControlBinding;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.adapter.ParseAdapter;
+import com.fongmi.android.tv.ui.base.ViewType;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import java.util.Arrays;
 import java.util.List;
@@ -26,19 +30,18 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
 
     private DialogControlBinding binding;
     private ActivityDetailBinding detail;
-    private final Listener listener;
     private List<TextView> scales;
     private final String[] scale;
+    private Listener listener;
     private Players players;
     private boolean parse;
 
-    public static ControlDialog create(Listener listener) {
-        return new ControlDialog(listener);
+    public static ControlDialog create() {
+        return new ControlDialog();
     }
 
-    public ControlDialog(Listener listener) {
+    public ControlDialog() {
         this.scale = ResUtil.getStringArray(R.array.select_scale);
-        this.listener = listener;
     }
 
     public ControlDialog detail(ActivityDetailBinding detail) {
@@ -56,6 +59,13 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
         return this;
     }
 
+    public ControlDialog show(FragmentActivity activity) {
+        for (Fragment f : activity.getSupportFragmentManager().getFragments()) if (f instanceof BottomSheetDialogFragment) return this;
+        show(activity.getSupportFragmentManager(), null);
+        this.listener = (Listener) activity;
+        return this;
+    }
+
     @Override
     protected ViewBinding getBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
         binding = DialogControlBinding.inflate(inflater, container, false);
@@ -70,6 +80,7 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
         binding.decode.setText(detail.control.action.decode.getText());
         binding.ending.setText(detail.control.action.ending.getText());
         binding.opening.setText(detail.control.action.opening.getText());
+        binding.loop.setActivated(detail.control.action.loop.isActivated());
         setTrackVisible();
         setScaleText();
         setParse();
@@ -81,6 +92,7 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
         binding.text.setOnClickListener(v -> dismiss(detail.control.action.text));
         binding.audio.setOnClickListener(v -> dismiss(detail.control.action.audio));
         binding.video.setOnClickListener(v -> dismiss(detail.control.action.video));
+        binding.loop.setOnClickListener(v -> active(binding.loop, detail.control.action.loop));
         binding.player.setOnClickListener(v -> click(binding.player, detail.control.action.player));
         binding.decode.setOnClickListener(v -> click(binding.decode, detail.control.action.decode));
         binding.ending.setOnClickListener(v -> click(binding.ending, detail.control.action.ending));
@@ -102,13 +114,18 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
         binding.parse.setHasFixedSize(true);
         binding.parse.setItemAnimator(null);
         binding.parse.addItemDecoration(new SpaceItemDecoration(8));
-        binding.parse.setAdapter(new ParseAdapter(this));
+        binding.parse.setAdapter(new ParseAdapter(this, ViewType.LIGHT));
     }
 
     private void setScale(View view) {
         for (TextView textView : scales) textView.setActivated(false);
         listener.onScale(Integer.parseInt(view.getTag().toString()));
         view.setActivated(true);
+    }
+
+    private void active(View view, TextView target) {
+        target.performClick();
+        view.setActivated(target.isActivated());
     }
 
     private void click(TextView view, TextView target) {
