@@ -16,7 +16,7 @@
         <item name="android:windowBackground">@null</item>
         <item name="android:windowAnimationStyle">@null</item>
         <item name="android:navigationBarColor">@color/transparent</item>
-        <item name="bottomSheetDialogTheme">@style/ThemeOverlay.App.BottomSheetDialog</item>
+        <item name="bottomSheetDialogTheme">@style/BottomSheetDialog</item>
     </style>
 
     <style name="Control" />
@@ -32,6 +32,23 @@
         <item name="android:shadowRadius">0.5</item>
         <item name="android:textColor">@color/white</item>
         <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="BottomSheetDialog" parent="Theme.Material3.DayNight.BottomSheetDialog">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primaryDark</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="bottomSheetStyle">@style/ModalBottomSheetDialog</item>
+    </style>
+
+    <style name="ModalBottomSheetDialog" parent="Widget.Material3.BottomSheet.Modal">
+        <item name="shapeAppearance">@style/ShapeAppearance.App.LargeComponent</item>
+    </style>
+
+    <style name="ShapeAppearance.App.LargeComponent" parent="ShapeAppearance.Material3.LargeComponent">
+        <item name="cornerSize">16dp</item>
     </style>
 
     <style name="Indicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">

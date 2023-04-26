@@ -1,43 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:gravity="center_vertical"
     android:orientation="horizontal">
 
-    <TextView
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/text"
+        style="?attr/materialButtonOutlinedStyle"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:background="@drawable/shape_text_round"
+        android:ellipsize="marquee"
         android:gravity="center"
         android:singleLine="true"
-        android:textColor="@color/text"
-        android:textSize="16sp"
+        android:textColor="@color/control"
+        android:textSize="14sp"
         tools:text="泥巴" />
 
     <ImageView
         android:id="@+id/search"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_marginStart="12dp"
-        android:background="@drawable/shape_text_round"
-        android:padding="8dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_site_search_on"
-        app:tint="@color/text" />
+        android:src="@drawable/ic_site_search_on" />
 
     <ImageView
         android:id="@+id/change"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_marginStart="12dp"
-        android:background="@drawable/shape_text_round"
-        android:padding="8dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_site_change_on"
-        app:tint="@color/text" />
+        android:src="@drawable/ic_site_change_on" />
 
 </LinearLayout>

@@ -29,14 +29,14 @@ public class LiveDialog implements LiveAdapter.OnClickListener {
         return new LiveDialog(fragment);
     }
 
-    public LiveDialog(Fragment fragment) {
-        this.callback = (LiveCallback) fragment;
-        init(fragment.getActivity());
-    }
-
     public LiveDialog(Activity activity) {
         this.callback = (LiveCallback) activity;
         init(activity);
+    }
+
+    public LiveDialog(Fragment fragment) {
+        this.callback = (LiveCallback) fragment;
+        init(fragment.getActivity());
     }
 
     private void init(Activity activity) {
@@ -53,7 +53,7 @@ public class LiveDialog implements LiveAdapter.OnClickListener {
     private void setRecyclerView() {
         binding.recycler.setAdapter(adapter);
         binding.recycler.setHasFixedSize(true);
-        binding.recycler.addItemDecoration(new SpaceItemDecoration(1, 16));
+        binding.recycler.addItemDecoration(new SpaceItemDecoration(1, 8));
         binding.recycler.scrollToPosition(LiveConfig.getHomeIndex());
     }
 

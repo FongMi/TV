@@ -10,7 +10,7 @@ import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.AdapterVodFolderBinding;
 import com.fongmi.android.tv.databinding.AdapterVodGridBinding;
 import com.fongmi.android.tv.databinding.AdapterVodListBinding;
-import com.fongmi.android.tv.ui.custom.ViewType;
+import com.fongmi.android.tv.ui.base.ViewType;
 import com.fongmi.android.tv.ui.holder.VodFolderHolder;
 import com.fongmi.android.tv.ui.holder.VodGridHolder;
 import com.fongmi.android.tv.ui.holder.VodListHolder;

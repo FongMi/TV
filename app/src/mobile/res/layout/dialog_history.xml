@@ -4,6 +4,7 @@
     android:id="@+id/recycler"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="16dp"
+    android:overScrollMode="never"
+    android:padding="24dp"
     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-    app:maxHeight="352dp" />
+    app:maxHeight="376dp" />

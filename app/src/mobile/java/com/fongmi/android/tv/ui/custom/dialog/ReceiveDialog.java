@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.api.ApiConfig;
@@ -18,6 +19,7 @@ import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.ui.activity.DetailActivity;
 import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.Notify;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 public class ReceiveDialog extends BaseDialog {
 
@@ -31,6 +33,11 @@ public class ReceiveDialog extends BaseDialog {
     public ReceiveDialog event(CastEvent event) {
         this.event = event;
         return this;
+    }
+
+    public void show(Fragment fragment) {
+        for (Fragment f : fragment.getChildFragmentManager().getFragments()) if (f instanceof BottomSheetDialogFragment) return;
+        show(fragment.getChildFragmentManager(), null);
     }
 
     @Override

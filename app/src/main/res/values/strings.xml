@@ -2,7 +2,6 @@
 
     <!-- App -->
     <string name="app_name">TV</string>
-    <string name="app_id">C0868879</string>
     <string name="app_exit">Press back again to exit</string>
 
     <!-- Vod -->
@@ -32,21 +31,22 @@
 
     <!-- Play -->
     <string name="play">Play</string>
+    <string name="play_op">OP</string>
+    <string name="play_ed">ED</string>
     <string name="play_next">Next</string>
     <string name="play_prev">Prev</string>
-    <string name="play_ready">Ready to play: <xliff:g name="name">%s</xliff:g></string>
+    <string name="play_loop">Loop</string>
+    <string name="play_forward">→</string>
+    <string name="play_backward">←</string>
+    <string name="play_invert">Invert</string>
+    <string name="play_across">Across</string>
+    <string name="play_reverse">Reverse</string>
     <string name="play_track_text">Text</string>
     <string name="play_track_audio">Audio</string>
     <string name="play_track_video">Video</string>
-    <string name="play_invert">Invert</string>
-    <string name="play_across">Across</string>
-    <string name="play_op">OP</string>
-    <string name="play_ed">ED</string>
-    <string name="play_reverse">Reverse</string>
-    <string name="play_forward">→</string>
-    <string name="play_backward">←</string>
     <string name="play_forward_hint">Normal play switched</string>
     <string name="play_backward_hint">Reverse play switched</string>
+    <string name="play_ready">Ready to play: <xliff:g name="name">%s</xliff:g></string>
     <string name="play_switch_parse">Switching parse to <xliff:g name="name">%s</xliff:g></string>
     <string name="play_switch_flag">Switching flag to <xliff:g name="name">%s</xliff:g></string>
     <string name="play_switch_site">Switching site to <xliff:g name="name">%s</xliff:g></string>

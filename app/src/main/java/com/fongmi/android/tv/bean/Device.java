@@ -88,12 +88,20 @@ public class Device {
         this.type = type;
     }
 
+    public boolean isLeanback() {
+        return getType() == 0;
+    }
+
     public boolean isMobile() {
         return getType() == 1;
     }
 
     public boolean isDLNA() {
         return getType() == 2;
+    }
+
+    public boolean isApp() {
+        return isLeanback() || isMobile();
     }
 
     public String getHost() {

@@ -16,10 +16,10 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class SiteDialog implements SiteAdapter.OnClickListener {
 
-    private final DialogSiteBinding binding;
     private final SiteCallback callback;
-    private final SiteAdapter adapter;
-    private final AlertDialog dialog;
+    private DialogSiteBinding binding;
+    private SiteAdapter adapter;
+    private AlertDialog dialog;
 
     public static SiteDialog create(Activity activity) {
         return new SiteDialog(activity);
@@ -30,16 +30,18 @@ public class SiteDialog implements SiteAdapter.OnClickListener {
     }
 
     public SiteDialog(Activity activity) {
-        this.callback = (activity instanceof SiteCallback) ? (SiteCallback) activity : null;
-        this.binding = DialogSiteBinding.inflate(LayoutInflater.from(activity));
-        this.dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).create();
-        this.adapter = new SiteAdapter(this);
+        this.callback = (SiteCallback) activity;
+        init(activity);
     }
 
     public SiteDialog(Fragment fragment) {
-        this.callback = (fragment instanceof SiteCallback) ? (SiteCallback) fragment : null;
-        this.binding = DialogSiteBinding.inflate(LayoutInflater.from(fragment.getContext()));
-        this.dialog = new MaterialAlertDialogBuilder(fragment.getActivity()).setView(binding.getRoot()).create();
+        this.callback = (SiteCallback) fragment;
+        init(fragment.getActivity());
+    }
+
+    private void init(Activity activity) {
+        this.binding = DialogSiteBinding.inflate(LayoutInflater.from(activity));
+        this.dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).create();
         this.adapter = new SiteAdapter(this);
     }
 
@@ -68,7 +70,7 @@ public class SiteDialog implements SiteAdapter.OnClickListener {
         binding.recycler.setAdapter(adapter);
         binding.recycler.setItemAnimator(null);
         binding.recycler.setHasFixedSize(true);
-        binding.recycler.addItemDecoration(new SpaceItemDecoration(1, 16));
+        binding.recycler.addItemDecoration(new SpaceItemDecoration(1, 8));
         binding.recycler.scrollToPosition(ApiConfig.getHomeIndex());
     }
 
