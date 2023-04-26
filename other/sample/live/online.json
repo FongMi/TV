@@ -1,36 +1,53 @@
 {
   "lives": [
     {
-      "name": "TXT",
-      "type": 0,
-      "url": "https://github.com/live.txt",
-      "epg": "http://epg.51zmt.top:8000/api/diyp/?ch={name}&date={date}",
-      "logo": "https://epg.112114.xyz/logo/{name}.png",
-      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36",
-      "boot": false
+      "name": "M3U",
+      "url": "https://github.com/live.m3u"
     },
     {
-      "name": "M3U",
-      "type": 0,
-      "url": "https://github.com/live.m3u",
+      "name": "TXT",
+      "url": "https://github.com/live.txt",
       "epg": "https://epg.112114.xyz/?ch={name}&date={date}",
-      "logo": "https://epg.112114.xyz/logo/{name}.png",
-      "ua": "okhttp/3.15",
-      "boot": false
+      "logo": "https://epg.112114.xyz/logo/{name}.png"
     },
     {
       "name": "IJK",
-      "type": 0,
       "url": "https://github.com/live.txt",
+      "epg": "https://epg.112114.xyz/?ch={name}&date={date}",
+      "logo": "https://epg.112114.xyz/logo/{name}.png",
       "playerType": 1
+    },
+    {
+      "name": "EXO",
+      "url": "https://github.com/live.txt",
+      "epg": "https://epg.112114.xyz/?ch={name}&date={date}",
+      "logo": "https://epg.112114.xyz/logo/{name}.png",
+      "playerType": 2
+    },
+    {
+      "name": "PRO",
+      "boot": false,
+      "url": "https://github.com/live.txt",
+      "epg": "https://epg.112114.xyz/?ch={name}&date={date}",
+      "logo": "https://epg.112114.xyz/logo/{name}.png",
+      "ua": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36",
+      "referer": "https://github.com/"
+    },
+    {
+      "name": "Custom",
+      "boot": false,
+      "url": "https://github.com/live.txt",
+      "epg": "https://epg.112114.xyz/?ch={name}&date={date}",
+      "logo": "https://epg.112114.xyz/logo/{name}.png",
+      "header": {
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36",
+        "referer": "https://github.com/"
+      }
     },
     {
       "name": "JSON",
       "type": 1,
-      "url": "https://github.com/live.json",
-      "epg": "http://epg.51zmt.top:8000/api/diyp/?ch={epg}&date={date}",
-      "logo": "http://epg.51zmt.top:8000/{logo}",
-      "boot": false
+      "url": "https://github.com/live.json"
     }
   ]
 }
