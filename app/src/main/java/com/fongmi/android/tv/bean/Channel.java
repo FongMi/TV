@@ -7,6 +7,7 @@ import android.widget.ImageView;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.utils.ImgUtil;
+import com.fongmi.android.tv.utils.Json;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.common.net.HttpHeaders;
 import com.google.gson.Gson;
@@ -15,7 +16,6 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -34,6 +34,10 @@ public class Channel {
     private String name;
     @SerializedName("ua")
     private String ua;
+    @SerializedName("referer")
+    private String referer;
+    @SerializedName("header")
+    private JsonElement header;
 
     private boolean selected;
     private Group group;
@@ -110,6 +114,22 @@ public class Channel {
 
     public void setUa(String ua) {
         this.ua = ua;
+    }
+
+    public String getReferer() {
+        return TextUtils.isEmpty(referer) ? "" : referer;
+    }
+
+    public void setReferer(String referer) {
+        this.referer = referer;
+    }
+
+    public JsonElement getHeader() {
+        return header;
+    }
+
+    public void setHeader(JsonElement header) {
+        this.header = header;
     }
 
     public Group getGroup() {
@@ -206,6 +226,8 @@ public class Channel {
 
     public void live(Live live) {
         if (live.getUa().length() > 0 && getUa().isEmpty()) setUa(live.getUa());
+        if (live.getHeader() != null && getHeader() == null) setHeader(live.getHeader());
+        if (live.getReferer().length() > 0 && getReferer().isEmpty()) setReferer(live.getReferer());
         if (!getEpg().startsWith("http")) setEpg(live.getEpg().replace("{name}", getName()).replace("{epg}", getEpg()));
         if (!getLogo().startsWith("http")) setLogo(live.getLogo().replace("{name}", getName()).replace("{logo}", getLogo()));
     }
@@ -239,10 +261,10 @@ public class Channel {
     }
 
     public Map<String, String> getHeaders() {
-        HashMap<String, String> map = new HashMap<>();
-        if (getUa().isEmpty()) return map;
-        map.put(HttpHeaders.USER_AGENT, getUa());
-        return map;
+        Map<String, String> headers = Json.toMap(getHeader());
+        if (!getUa().isEmpty()) headers.put(HttpHeaders.USER_AGENT, getUa());
+        if (!getReferer().isEmpty()) headers.put(HttpHeaders.REFERER, getReferer());
+        return headers;
     }
 
     public Channel copy(Channel item) {

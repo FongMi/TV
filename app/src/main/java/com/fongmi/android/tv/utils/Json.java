@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Json {
 
@@ -58,8 +59,8 @@ public class Json {
         }
     }
 
-    public static HashMap<String, String> toMap(JsonElement element) {
-        HashMap<String, String> map = new HashMap<>();
+    public static Map<String, String> toMap(JsonElement element) {
+        Map<String, String> map = new HashMap<>();
         JsonObject object = safeObject(element);
         for (String key : object.keySet()) map.put(key, safeString(object, key));
         return map;
