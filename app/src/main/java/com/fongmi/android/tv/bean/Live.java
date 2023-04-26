@@ -32,6 +32,10 @@ public class Live {
     private String epg;
     @SerializedName("ua")
     private String ua;
+    @SerializedName("referer")
+    private String referer;
+    @SerializedName("header")
+    private JsonElement header;
     @SerializedName("playerType")
     private Integer playerType;
     @SerializedName("channels")
@@ -96,6 +100,14 @@ public class Live {
 
     public String getUa() {
         return TextUtils.isEmpty(ua) ? "" : ua;
+    }
+
+    public String getReferer() {
+        return TextUtils.isEmpty(referer) ? "" : referer;
+    }
+
+    public JsonElement getHeader() {
+        return header;
     }
 
     public int getPlayerType() {
