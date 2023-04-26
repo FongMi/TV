@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.button.MaterialButton xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/text"
+    style="?attr/materialButtonOutlinedStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/shape_text_round"
-    android:ellipsize="middle"
+    android:ellipsize="marquee"
     android:gravity="center"
     android:singleLine="true"
-    android:textColor="@color/text"
-    android:textSize="16sp"
+    android:textColor="@color/control"
+    android:textSize="14sp"
     tools:text="https://fongmi.github.io/live.json" />

@@ -22,11 +22,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:layout_weight="1"
-        app:bar_height="2dp"
-        app:buffered_color="@color/blue_200"
-        app:played_color="@color/blue_500"
-        app:scrubber_color="@color/blue_500"
-        app:unplayed_color="@color/grey_200" />
+        app:bar_height="2dp" />
 
     <TextView
         android:id="@+id/duration"

@@ -180,15 +180,13 @@
             android:id="@+id/parse"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
             android:clipChildren="false"
             android:clipToPadding="false"
             android:orientation="horizontal"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
+            android:padding="8dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:itemCount="1"
-            tools:listitem="@layout/adapter_parse" />
+            tools:itemCount="5"
+            tools:listitem="@layout/adapter_parse_dark" />
 
         <LinearLayout
             android:layout_width="match_parent"

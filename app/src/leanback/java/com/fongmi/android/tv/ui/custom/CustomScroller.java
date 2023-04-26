@@ -1,5 +1,7 @@
 package com.fongmi.android.tv.ui.custom;
 
+import android.view.View;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -15,9 +17,15 @@ public class CustomScroller extends RecyclerView.OnScrollListener {
     }
 
     @Override
-    public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-        if (isLoading() || recyclerView.getScrollState() == RecyclerView.SCROLL_STATE_IDLE || callback == null) return;
-        if (!recyclerView.canScrollVertically(1) && dy > 0) callback.onLoadMore(String.valueOf(++page));
+    public void onScrollStateChanged(@NonNull RecyclerView view, int newState) {
+        if (isLoading() || newState != RecyclerView.SCROLL_STATE_IDLE) return;
+        if (isBottom(view)) callback.onLoadMore(String.valueOf(++page));
+    }
+
+    private boolean isBottom(RecyclerView view) {
+        View lastChild = view.getLayoutManager().getChildAt(view.getLayoutManager().getChildCount() - 1);
+        int lastPosition = view.getLayoutManager().getPosition(lastChild);
+        return lastPosition == view.getLayoutManager().getItemCount() - 1;
     }
 
     public void reset() {

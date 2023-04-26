@@ -22,8 +22,8 @@ import com.fongmi.android.tv.ui.activity.CollectActivity;
 import com.fongmi.android.tv.ui.activity.DetailActivity;
 import com.fongmi.android.tv.ui.adapter.VodAdapter;
 import com.fongmi.android.tv.ui.base.BaseFragment;
+import com.fongmi.android.tv.ui.base.ViewType;
 import com.fongmi.android.tv.ui.custom.CustomScroller;
-import com.fongmi.android.tv.ui.custom.ViewType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
