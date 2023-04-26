@@ -37,30 +37,32 @@ import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Track;
 import com.fongmi.android.tv.bean.Vod;
+import com.fongmi.android.tv.cast.CastVideo;
 import com.fongmi.android.tv.databinding.ActivityDetailBinding;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.model.SiteViewModel;
-import com.fongmi.android.tv.pip.PiP;
-import com.fongmi.android.tv.pip.Receiver;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
+import com.fongmi.android.tv.receiver.PiPReceiver;
 import com.fongmi.android.tv.ui.adapter.EpisodeAdapter;
 import com.fongmi.android.tv.ui.adapter.FlagAdapter;
 import com.fongmi.android.tv.ui.adapter.ParseAdapter;
 import com.fongmi.android.tv.ui.adapter.SearchAdapter;
 import com.fongmi.android.tv.ui.base.BaseActivity;
+import com.fongmi.android.tv.ui.base.ViewType;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
-import com.fongmi.android.tv.ui.custom.ViewType;
+import com.fongmi.android.tv.ui.custom.dialog.CastDialog;
 import com.fongmi.android.tv.ui.custom.dialog.ControlDialog;
 import com.fongmi.android.tv.ui.custom.dialog.EpisodeGridDialog;
 import com.fongmi.android.tv.ui.custom.dialog.EpisodeListDialog;
 import com.fongmi.android.tv.ui.custom.dialog.TrackDialog;
 import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.Notify;
+import com.fongmi.android.tv.utils.PiP;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Traffic;
@@ -80,7 +82,7 @@ import java.util.concurrent.Executors;
 
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class DetailActivity extends BaseActivity implements Clock.Callback, CustomKeyDownVod.Listener, Receiver.Listener, TrackDialog.Listener, ControlDialog.Listener, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, ParseAdapter.OnClickListener {
+public class DetailActivity extends BaseActivity implements Clock.Callback, CustomKeyDownVod.Listener, CastDialog.Listener, PiPReceiver.Listener, TrackDialog.Listener, ControlDialog.Listener, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, ParseAdapter.OnClickListener {
 
     private ViewGroup.LayoutParams mFrameParams;
     private ActivityDetailBinding mBinding;
@@ -93,7 +95,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     private SiteViewModel mViewModel;
     private FlagAdapter mFlagAdapter;
     private List<Dialog> mDialogs;
-    private Receiver mReceiver;
+    private PiPReceiver mReceiver;
     private History mHistory;
     private Players mPlayers;
     private boolean fullscreen;
@@ -205,8 +207,8 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mKeyDown = CustomKeyDownVod.create(this, mBinding.video);
         mFrameParams = mBinding.video.getLayoutParams();
         mBinding.progressLayout.showProgress();
+        mReceiver = new PiPReceiver(this);
         mPlayers = new Players().init();
-        mReceiver = new Receiver(this);
         mDialogs = new ArrayList<>();
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
@@ -229,6 +231,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mBinding.content.setOnClickListener(view -> onContent());
         mBinding.reverse.setOnClickListener(view -> onReverse());
         mBinding.control.back.setOnClickListener(view -> onFull());
+        mBinding.control.cast.setOnClickListener(view -> onCast());
         mBinding.control.full.setOnClickListener(view -> onFull());
         mBinding.control.keep.setOnClickListener(view -> onKeep());
         mBinding.control.lock.setOnClickListener(view -> onLock());
@@ -241,6 +244,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mBinding.control.action.text.setOnClickListener(this::onTrack);
         mBinding.control.action.audio.setOnClickListener(this::onTrack);
         mBinding.control.action.video.setOnClickListener(this::onTrack);
+        mBinding.control.action.loop.setOnClickListener(view -> onLoop());
         mBinding.control.action.scale.setOnClickListener(view -> onScale());
         mBinding.control.action.speed.setOnClickListener(view -> onSpeed());
         mBinding.control.action.player.setOnClickListener(view -> onPlayer());
@@ -270,7 +274,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mBinding.control.parse.setHasFixedSize(true);
         mBinding.control.parse.setItemAnimator(null);
         mBinding.control.parse.addItemDecoration(new SpaceItemDecoration(8));
-        mBinding.control.parse.setAdapter(mParseAdapter = new ParseAdapter(this));
+        mBinding.control.parse.setAdapter(mParseAdapter = new ParseAdapter(this, ViewType.DARK));
     }
 
     private void setPlayerView() {
@@ -439,8 +443,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void onMore() {
-        for (Fragment fragment : getSupportFragmentManager().getFragments()) if (fragment instanceof BottomSheetDialogFragment) return;
-        EpisodeGridDialog.create().reverse(mHistory.isRevSort()).episodes(mEpisodeAdapter.getItems()).show(getSupportFragmentManager(), null);
+        EpisodeGridDialog.create().reverse(mHistory.isRevSort()).episodes(mEpisodeAdapter.getItems()).show(this);
     }
 
     private void onActor() {
@@ -459,6 +462,10 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     private void onFull() {
         setR1Callback();
         toggleFullscreen();
+    }
+
+    private void onCast() {
+        CastDialog.create().config(ApiConfig.getUrl()).history(mHistory).video(CastVideo.get(getName(), getUrl())).show(this);
     }
 
     private void onKeep() {
@@ -520,15 +527,16 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void onSetting() {
-        for (Fragment fragment : getSupportFragmentManager().getFragments()) if (fragment instanceof BottomSheetDialogFragment) return;
-        mControlDialog = ControlDialog.create(this).detail(mBinding).players(mPlayers).parse(isUseParse());
-        mControlDialog.show(getSupportFragmentManager(), null);
+        mControlDialog = ControlDialog.create().detail(mBinding).players(mPlayers).parse(isUseParse()).show(this);
     }
 
     private void onTrack(View view) {
-        for (Fragment fragment : getSupportFragmentManager().getFragments()) if (fragment instanceof BottomSheetDialogFragment) return;
-        TrackDialog.create().player(mPlayers).type(Integer.parseInt(view.getTag().toString())).listener(this).show(getSupportFragmentManager(), null);
+        TrackDialog.create().player(mPlayers).type(Integer.parseInt(view.getTag().toString())).show(this);
         hideControl();
+    }
+
+    private void onLoop() {
+        mBinding.control.action.loop.setActivated(!mBinding.control.action.loop.isActivated());
     }
 
     private void onScale() {
@@ -557,6 +565,13 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         if (mFlagAdapter.getItemCount() == 0) return;
         if (mEpisodeAdapter.getItemCount() == 0) return;
         getPlayer(getFlag(), getEpisode(), false);
+    }
+
+    private void onReset() {
+        Clock.get().setCallback(null);
+        if (mFlagAdapter.getItemCount() == 0) return;
+        if (mEpisodeAdapter.getItemCount() == 0) return;
+        getPlayer(getFlag(), getEpisode(), true);
     }
 
     private void onPlayer() {
@@ -684,6 +699,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     private void showControl() {
         mBinding.control.share.setVisibility(getUrl() == null || isFullscreen() ? View.GONE : View.VISIBLE);
+        mBinding.control.cast.setVisibility(getUrl() == null || isFullscreen() ? View.GONE : View.VISIBLE);
         mBinding.control.keep.setVisibility(mHistory == null || isFullscreen() ? View.GONE : View.VISIBLE);
         mBinding.control.parse.setVisibility(isFullscreen() && isUseParse() ? View.VISIBLE : View.GONE);
         mBinding.control.rotate.setVisibility(isFullscreen() && !isLock() ? View.VISIBLE : View.GONE);
@@ -828,7 +844,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
                 mBinding.control.size.setText(mPlayers.getSizeText());
                 break;
             case Player.STATE_ENDED:
-                checkNext();
+                checkEnded();
                 break;
         }
     }
@@ -843,6 +859,14 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         if (isFullscreen() && !isRotate() && mPlayers.isPortrait()) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
             setRotate(true);
+        }
+    }
+
+    private void checkEnded() {
+        if (mBinding.control.action.loop.isActivated()) {
+            onReset();
+        } else {
+            checkNext();
         }
     }
 
@@ -1048,6 +1072,13 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     private void notifyItemChanged(RecyclerView.Adapter<?> adapter) {
         adapter.notifyItemRangeChanged(0, adapter.getItemCount());
+    }
+
+    @Override
+    public void onCastTo(boolean mobile) {
+        if (mobile) return;
+        checkPlayImg(false);
+        mPlayers.pause();
     }
 
     @Override

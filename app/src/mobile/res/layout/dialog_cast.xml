@@ -29,14 +29,14 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_cast_scan" />
+            android:src="@drawable/ic_action_scan" />
 
         <ImageView
             android:id="@+id/refresh"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_cast_refresh" />
+            android:src="@drawable/ic_action_refresh" />
 
     </LinearLayout>
 

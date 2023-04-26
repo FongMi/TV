@@ -3,28 +3,28 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:gravity="center_vertical"
     android:orientation="horizontal">
 
-    <TextView
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/text"
+        style="?attr/materialButtonOutlinedStyle"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:background="@drawable/shape_text_round"
         android:ellipsize="middle"
         android:gravity="center"
         android:singleLine="true"
-        android:textColor="@color/white"
-        android:textSize="16sp"
+        android:textColor="?android:attr/textColorPrimary"
+        android:textSize="14sp"
         tools:text="https://fongmi.github.io/cat.json" />
 
     <ImageView
         android:id="@+id/delete"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_marginStart="12dp"
-        android:background="@drawable/shape_text_round"
-        android:padding="8dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_setting_delete" />
 

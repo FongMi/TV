@@ -20,15 +20,16 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 public class PassDialog extends BaseDialog {
 
-    private final PassCallback callback;
     private DialogPassBinding binding;
+    private PassCallback callback;
 
-    public static void show(FragmentActivity activity) {
-        for (Fragment fragment : activity.getSupportFragmentManager().getFragments()) if (fragment instanceof BottomSheetDialogFragment) return;
-        new PassDialog(activity).show(activity.getSupportFragmentManager(), null);
+    public static PassDialog create() {
+        return new PassDialog();
     }
 
-    private PassDialog(FragmentActivity activity) {
+    public void show(FragmentActivity activity) {
+        for (Fragment f : activity.getSupportFragmentManager().getFragments()) if (f instanceof BottomSheetDialogFragment) return;
+        show(activity.getSupportFragmentManager(), null);
         this.callback = (PassCallback) activity;
     }
 

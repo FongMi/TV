@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -9,7 +8,7 @@
     <TextView
         android:id="@+id/text"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_height="40dp"
         android:layout_weight="1"
         android:background="@drawable/selector_text"
         android:ellipsize="marquee"
@@ -23,28 +22,26 @@
 
     <ImageView
         android:id="@+id/search"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginStart="12dp"
         android:background="@drawable/selector_text"
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:padding="8dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_site_search_on"
-        app:tint="@color/text" />
+        android:src="@drawable/ic_site_search_on" />
 
     <ImageView
         android:id="@+id/change"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginStart="12dp"
         android:background="@drawable/selector_text"
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:padding="8dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_site_change_on"
-        app:tint="@color/text" />
+        android:src="@drawable/ic_site_change_on" />
 
 </LinearLayout>

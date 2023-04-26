@@ -49,7 +49,7 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder
 
     public List<String> getIps() {
         List<String> ips = new ArrayList<>();
-        for (Device item : mItems) if (!item.isDLNA()) ips.add(item.getIp());
+        for (Device item : mItems) if (item.isApp()) ips.add(item.getIp());
         return ips;
     }
 
@@ -69,8 +69,12 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder
         Device item = mItems.get(position);
         holder.binding.name.setText(item.getName());
         holder.binding.host.setText(item.getHost());
+        holder.binding.type.setImageResource(getIcon(item));
         holder.binding.getRoot().setOnClickListener(v -> mListener.onItemClick(item));
-        holder.binding.type.setImageResource(item.isMobile() ? R.drawable.ic_cast_mobile : R.drawable.ic_cast_tv);
+    }
+
+    private int getIcon(Device item) {
+        return item.isMobile() ? R.drawable.ic_cast_mobile : R.drawable.ic_cast_tv;
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {

@@ -14,7 +14,7 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.DialogLinkBinding;
 import com.fongmi.android.tv.ui.activity.DetailActivity;
-import com.fongmi.android.tv.ui.custom.FileChooser;
+import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.Utils;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 

@@ -35,13 +35,13 @@ public class CastDevice {
 
     public List<com.fongmi.android.tv.bean.Device> getAll() {
         List<com.fongmi.android.tv.bean.Device> items = new ArrayList<>();
-        for (Device<?, ?, ?> device : devices) items.add(create(device));
+        for (Device<?, ?, ?> item : devices) items.add(create(item));
         return items;
     }
 
-    public List<com.fongmi.android.tv.bean.Device> add(Device<?, ?, ?> device) {
-        devices.remove(device);
-        devices.add(device);
+    public List<com.fongmi.android.tv.bean.Device> add(Device<?, ?, ?> item) {
+        devices.remove(item);
+        devices.add(item);
         return getAll();
     }
 

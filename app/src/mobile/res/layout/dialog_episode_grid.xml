@@ -22,11 +22,11 @@
         android:layout_marginTop="8dp"
         android:background="@color/transparent"
         app:tabIndicatorAnimationMode="elastic"
-        app:tabIndicatorColor="@color/accent"
+        app:tabIndicatorColor="?attr/colorControlActivated"
         app:tabIndicatorFullWidth="false"
         app:tabIndicatorHeight="2dp"
         app:tabMode="scrollable"
-        app:tabSelectedTextColor="@color/accent"
+        app:tabSelectedTextColor="?attr/colorControlActivated"
         app:tabTextColor="@color/grey_500" />
 
     <androidx.viewpager2.widget.ViewPager2

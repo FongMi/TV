@@ -53,7 +53,9 @@ public class SitePresenter extends Presenter {
         Site item = (Site) object;
         ViewHolder holder = (ViewHolder) viewHolder;
         holder.binding.text.setText(item.getName());
+        holder.binding.text.setEnabled(!search || change);
         holder.binding.text.setFocusable(!search || change);
+        holder.binding.text.setSelected(item.isActivated());
         holder.binding.text.setActivated(item.isActivated());
         holder.binding.search.setImageResource(item.getSearchIcon());
         holder.binding.change.setImageResource(item.getChangeIcon());
