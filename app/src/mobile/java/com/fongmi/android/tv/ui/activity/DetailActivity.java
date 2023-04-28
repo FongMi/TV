@@ -249,6 +249,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mBinding.control.action.player.setOnClickListener(view -> onPlayer());
         mBinding.control.action.decode.setOnClickListener(view -> onDecode());
         mBinding.control.action.ending.setOnClickListener(view -> onEnding());
+        mBinding.control.action.reseting.setOnClickListener(view -> onReseting());
         mBinding.control.action.opening.setOnClickListener(view -> onOpening());
         mBinding.control.action.episodes.setOnClickListener(view -> onEpisodes());
         mBinding.control.action.speed.setOnLongClickListener(view -> onSpeedLong());
@@ -594,10 +595,21 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mBinding.control.action.ending.setText(mPlayers.stringToTime(mHistory.getEnding()));
         setR1Callback();
     }
+    
 
     private boolean onEndingReset() {
         mHistory.setEnding(0);
         mBinding.control.action.ending.setText(R.string.play_ed);
+        setR1Callback();
+        return true;
+    }
+    
+    private boolean onReseting() {
+        mHistory.setEnding(0);
+        mBinding.control.action.ending.setText(R.string.play_ed);
+        setR1Callback();
+        mHistory.setOpening(0);
+        mBinding.control.action.opening.setText(R.string.play_op);
         setR1Callback();
         return true;
     }
