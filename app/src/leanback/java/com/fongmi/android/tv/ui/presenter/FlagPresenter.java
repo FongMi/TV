@@ -30,7 +30,7 @@ public class FlagPresenter extends Presenter {
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object object) {
         Vod.Flag item = (Vod.Flag) object;
         ViewHolder holder = (ViewHolder) viewHolder;
-        holder.binding.text.setText(item.getFlag());
+        holder.binding.text.setText(item.getShow());
         holder.binding.text.setActivated(item.isActivated());
         setOnClickListener(holder, view -> mListener.onItemClick(item));
     }
