@@ -77,6 +77,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
@@ -691,11 +693,14 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void showControl() {
+        updateTime();
         mBinding.control.share.setVisibility(getUrl() == null || isFullscreen() ? View.GONE : View.VISIBLE);
         mBinding.control.keep.setVisibility(mHistory == null || isFullscreen() ? View.GONE : View.VISIBLE);
         mBinding.control.parse.setVisibility(isFullscreen() && isUseParse() ? View.VISIBLE : View.GONE);
         mBinding.control.rotate.setVisibility(isFullscreen() && !isLock() ? View.VISIBLE : View.GONE);
         mBinding.control.back.setVisibility(isFullscreen() && !isLock() ? View.VISIBLE : View.GONE);
+        mBinding.control.backnew.setVisibility(isFullscreen() && !isLock() ? View.VISIBLE : View.GONE);
+        mBinding.control.time.setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
         mBinding.control.action.getRoot().setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
         mBinding.control.setting.setVisibility(isFullscreen() ? View.GONE : View.VISIBLE);
         mBinding.control.lock.setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
@@ -706,7 +711,13 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         checkPlayImg(mPlayers.isPlaying());
         setR1Callback();
     }
-
+    
+    private void updateTime() {
+        TextView timeTextView = mBinding.control.time;
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+        String currentTime = sdf.format(new Date());
+        timeTextView.setText(currentTime);
+        
     private void hideControl() {
         mBinding.control.getRoot().setVisibility(View.GONE);
         App.removeCallbacks(mR1);
@@ -1234,6 +1245,17 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     @Override
     public void onBackPressed() {
+        if (isVisible(mBinding.control.getRoot())) {
+            hideControl();
+        } else if (isFullscreen() && !isLock()) {
+            exitFullscreen();
+        } else if (!isLock()) {
+            stopSearch();
+            finish();
+        }
+    }
+    
+    public void onBacknewPressed() {
         if (isVisible(mBinding.control.getRoot())) {
             hideControl();
         } else if (isFullscreen() && !isLock()) {
