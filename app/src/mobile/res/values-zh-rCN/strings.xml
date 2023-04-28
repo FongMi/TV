@@ -29,6 +29,7 @@
     <string name="control_speed">倍速</string>
     <string name="control_scale">缩放</string>
     <string name="control_track">轨道</string>
+    <string name="control_reset">重置</string>
 
     <!-- Dialog -->
     <string name="dialog_delete_record">删除全部纪录？</string>
