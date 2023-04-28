@@ -29,6 +29,7 @@
     <string name="control_speed">Speed</string>
     <string name="control_scale">Scale</string>
     <string name="control_track">Track</string>
+    <string name="control_reset">Reset</string>
 
     <!-- Dialog -->
     <string name="dialog_delete_record">Delete all records?</string>
