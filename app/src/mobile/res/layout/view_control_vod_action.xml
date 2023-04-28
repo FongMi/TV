@@ -83,6 +83,14 @@
             android:id="@+id/ending"
             style="@style/Control.Action"
             tools:text="片尾" />
+            
+        <TextView
+            android:id="@+id/reseting"
+            android:layout_marginEnd="30dp"
+            style="@style/Control.Action"
+            android:tag="3"
+            android:text="@string/control_reset"
+            android:visibility="visible" />
 
     </LinearLayout>
 </HorizontalScrollView>
