@@ -228,7 +228,7 @@ public class Vod {
         }
 
         public String getShow() {
-            return TextUtils.isEmpty(show) ? "" : show;
+            return TextUtils.isEmpty(show) ? getFlag() : show;
         }
 
         public String getFlag() {
