@@ -20,7 +20,10 @@ public class TypePresenter extends Presenter {
     }
 
     public interface OnClickListener {
+
         void onItemClick(Class item);
+
+        boolean onLongClick(Class item);
     }
 
     @Override
@@ -35,6 +38,7 @@ public class TypePresenter extends Presenter {
         holder.binding.text.setText(item.getTypeName());
         holder.binding.text.setCompoundDrawablePadding(ResUtil.dp2px(4));
         holder.binding.text.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, getIcon(item), 0);
+        holder.view.setOnLongClickListener(view -> mListener.onLongClick(item));
         setOnClickListener(holder, view -> mListener.onItemClick(item));
     }
 

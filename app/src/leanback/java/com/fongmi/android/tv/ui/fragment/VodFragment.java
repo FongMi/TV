@@ -122,8 +122,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         for (int i = 0; i < adapter.size(); i++) ((Filter.Value) adapter.get(i)).setActivated(item);
         adapter.notifyArrayItemRangeChanged(0, adapter.size());
         mExtends.put(key, item.getV());
-        if (isFolder()) refresh(1);
-        else getVideo();
+        onRefresh();
     }
 
     private void getVideo() {
@@ -177,6 +176,12 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         return new ListRow(adapter);
     }
 
+    private void refresh(int num) {
+        String typeId = mTypeIds.get(mTypeIds.size() - num);
+        mTypeIds = mTypeIds.subList(0, mTypeIds.size() - num);
+        getVideo(typeId, "1");
+    }
+
     private void showProgress() {
         if (!mOpen) mBinding.progress.getRoot().setVisibility(View.VISIBLE);
     }
@@ -203,10 +208,9 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         mOpen = open;
     }
 
-    private void refresh(int num) {
-        String typeId = mTypeIds.get(mTypeIds.size() - num);
-        mTypeIds = mTypeIds.subList(0, mTypeIds.size() - num);
-        getVideo(typeId, "1");
+    public void onRefresh() {
+        if (isFolder()) refresh(1);
+        else getVideo();
     }
 
     public boolean canGoBack() {
