@@ -17,8 +17,8 @@
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/image"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
             android:layout_margin="16dp"
             android:scaleType="fitCenter"
             app:shapeAppearanceOverlay="@style/Vod.Grid"
@@ -44,7 +44,7 @@
                 android:id="@+id/remark"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
+                android:layout_marginTop="4dp"
                 android:singleLine="true"
                 android:textColor="@color/white"
                 android:textSize="14sp"
