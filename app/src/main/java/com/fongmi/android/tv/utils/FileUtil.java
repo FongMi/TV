@@ -208,10 +208,11 @@ public class FileUtil {
         return TextUtils.isEmpty(mimeType) ? "*/*" : mimeType;
     }
 
-    private static long getFolderSize(File f) {
+    private static long getFolderSize(File file) {
         long size = 0;
-        if (f.isDirectory()) for (File file : f.listFiles()) size += getFolderSize(file);
-        else size = f.length();
+        if (file == null) return 0;
+        if (file.isDirectory()) for (File f : file.listFiles()) size += getFolderSize(f);
+        else size = file.length();
         return size;
     }
 
