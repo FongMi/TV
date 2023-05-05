@@ -6,10 +6,12 @@ import android.os.Build;
 import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
+import android.webkit.WebView;
 
 import androidx.core.content.FileProvider;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.net.Callback;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
@@ -25,6 +27,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URLConnection;
 import java.security.MessageDigest;
+import java.text.DecimalFormat;
 
 public class FileUtil {
 
@@ -36,6 +39,10 @@ public class FileUtil {
 
     public static File getRootFile(String path) {
         return new File(getRootPath() + File.separator + path);
+    }
+
+    public static File getExternalCacheDir() {
+        return App.get().getExternalCacheDir();
     }
 
     public static File getCacheDir() {
@@ -65,15 +72,6 @@ public class FileUtil {
     public static File getLocal(String path) {
         if (path.contains(getRootPath())) return new File(path);
         return new File(path.replace("file:/", getRootPath()));
-    }
-
-    private static Uri getShareUri(File file) {
-        return Build.VERSION.SDK_INT < Build.VERSION_CODES.N ? Uri.fromFile(file) : FileProvider.getUriForFile(App.get(), App.get().getPackageName() + ".provider", file);
-    }
-
-    private static String getMimeType(String fileName) {
-        String mimeType = URLConnection.guessContentTypeFromName(fileName);
-        return TextUtils.isEmpty(mimeType) ? "*/*" : mimeType;
     }
 
     public static File write(File file, byte[] data) throws IOException {
@@ -140,6 +138,10 @@ public class FileUtil {
         }
     }
 
+    public static boolean equals(String jar, String md5) {
+        return getMd5(getJar(jar)).equalsIgnoreCase(md5);
+    }
+
     public static String getMd5(File file) {
         try {
             MessageDigest digest = MessageDigest.getInstance("MD5");
@@ -154,10 +156,6 @@ public class FileUtil {
         } catch (Exception e) {
             return "";
         }
-    }
-
-    public static boolean equals(String jar, String md5) {
-        return getMd5(getJar(jar)).equalsIgnoreCase(md5);
     }
 
     public static void clearDir(File dir) {
@@ -183,5 +181,44 @@ public class FileUtil {
             e.printStackTrace();
             return file;
         }
+    }
+
+    public static void clearCache(Callback callback) {
+        new WebView(App.get()).clearCache(true);
+        App.execute(() -> {
+            clearDir(getCacheDir());
+            clearDir(getExternalCacheDir());
+            App.post(callback::success);
+        });
+    }
+
+    public static void getCacheSize(Callback callback) {
+        App.execute(() -> {
+            String result = byteCountToDisplaySize(getFolderSize(getCacheDir()) + getFolderSize(getExternalCacheDir()));
+            App.post(() -> callback.success(result));
+        });
+    }
+
+    private static Uri getShareUri(File file) {
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.N ? Uri.fromFile(file) : FileProvider.getUriForFile(App.get(), App.get().getPackageName() + ".provider", file);
+    }
+
+    private static String getMimeType(String fileName) {
+        String mimeType = URLConnection.guessContentTypeFromName(fileName);
+        return TextUtils.isEmpty(mimeType) ? "*/*" : mimeType;
+    }
+
+    private static long getFolderSize(File f) {
+        long size = 0;
+        if (f.isDirectory()) for (File file : f.listFiles()) size += getFolderSize(file);
+        else size = f.length();
+        return size;
+    }
+
+    private static String byteCountToDisplaySize(long size) {
+        if (size <= 0) return "0 KB";
+        String[] units = new String[]{"bytes", "KB", "MB", "GB", "TB"};
+        int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
+        return new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
     }
 }
