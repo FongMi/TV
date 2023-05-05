@@ -57,6 +57,11 @@ public class Updater implements Download.Callback {
         return this;
     }
 
+    public Updater release() {
+        this.branch = Github.RELEASE;
+        return this;
+    }
+
     public Updater dev() {
         this.branch = Github.DEV;
         return this;

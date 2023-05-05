@@ -433,7 +433,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/white"
                 android:textSize="18sp"
-                tools:text="1.0MB" />
+                tools:text="1.0 MB" />
 
         </LinearLayout>
 
