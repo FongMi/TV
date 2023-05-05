@@ -27,11 +27,11 @@ import com.fongmi.android.tv.impl.LiveCallback;
 import com.fongmi.android.tv.impl.SiteCallback;
 import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.ui.base.BaseFragment;
-import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.ui.custom.dialog.ConfigDialog;
 import com.fongmi.android.tv.ui.custom.dialog.HistoryDialog;
 import com.fongmi.android.tv.ui.custom.dialog.LiveDialog;
 import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
+import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
@@ -284,20 +284,15 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         });
     }
 
-    private void updateText() {
-        if (player == null || decode == null) return;
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        if (hidden || player == null || decode == null) return;
         mBinding.vodUrl.setText(ApiConfig.getDesc());
         mBinding.liveUrl.setText(LiveConfig.getDesc());
         mBinding.wallUrl.setText(WallConfig.getDesc());
         mBinding.playerText.setText(player[Prefers.getPlayer()]);
         mBinding.decodeText.setText(decode[Prefers.getDecode()]);
         setCacheText();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        updateText();
     }
 
     @Override
