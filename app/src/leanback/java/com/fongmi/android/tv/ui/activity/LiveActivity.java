@@ -88,6 +88,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private Runnable mR2;
     private Runnable mR3;
     private Runnable mR4;
+    private boolean confirm;
     private int count;
 
     public static void start(Activity activity) {
@@ -752,6 +753,10 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
             hideInfo();
         } else if (isVisible(mBinding.recycler)) {
             hideUI();
+        } else if (!confirm) {
+            confirm = true;
+            Notify.show(R.string.app_exit);
+            App.post(() -> confirm = false, 2000);
         } else {
             super.onBackPressed();
         }
