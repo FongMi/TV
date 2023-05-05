@@ -66,6 +66,7 @@
     <string name="setting_scale">缩放比例</string>
     <string name="setting_quality">图片品质</string>
     <string name="setting_size">图片尺寸</string>
+    <string name="setting_cache">缓存</string>
     <string name="setting_version">版本</string>
     <string name="setting_storage">权限</string>
 
