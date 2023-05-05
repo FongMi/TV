@@ -47,7 +47,7 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
     @Override
     protected void initView(Bundle savedInstanceState) {
         initFragment(savedInstanceState);
-        Updater.get().start();
+        Updater.get().release().start();
         Server.get().start();
         initConfig();
     }
