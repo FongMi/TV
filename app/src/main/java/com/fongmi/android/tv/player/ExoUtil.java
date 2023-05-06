@@ -54,7 +54,7 @@ public class ExoUtil {
     private static Cache cache;
 
     public static LoadControl buildLoadControl() {
-        return new DefaultLoadControl.Builder().setBufferDurationsMs(DefaultLoadControl.DEFAULT_MIN_BUFFER_MS, DefaultLoadControl.DEFAULT_MAX_BUFFER_MS * 6, DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_MS, DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS).build();
+        return new DefaultLoadControl();
     }
 
     public static TrackSelector buildTrackSelector() {
