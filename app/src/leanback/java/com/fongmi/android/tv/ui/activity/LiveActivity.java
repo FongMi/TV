@@ -417,7 +417,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     @Override
     public void onItemClick(Group item) {
         mChannelAdapter.setItems(item.getChannel(), null);
-        mBinding.channel.setSelectedPosition(item.getPosition());
+        mBinding.channel.setSelectedPosition(Math.max(item.getPosition(), 0));
         if (!item.isKeep() || ++count < 5 || mHides.isEmpty()) return;
         PassDialog.create().show(this);
         App.removeCallbacks(mR0);
