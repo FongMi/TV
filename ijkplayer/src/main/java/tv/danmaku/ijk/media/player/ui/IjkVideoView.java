@@ -57,6 +57,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     private long mCurrentBufferPosition;
     private float mCurrentSpeed;
 
+    private IRenderView.ISurfaceHolder mSurfaceHolder;
     private IMediaPlayer.Listener mListener;
     private IRenderView mRenderView;
 
@@ -108,6 +109,10 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     private void setRenderView(int render) {
+        if (mRenderView != null) {
+            bindSurfaceHolder(mPlayer, mSurfaceHolder);
+            return;
+        }
         switch (render) {
             case RENDER_TEXTURE_VIEW:
                 setRenderView(new TextureRenderView(getContext()));
@@ -119,7 +124,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     private void setRenderView(IRenderView renderView) {
-        removeRenderView();
         mRenderView = renderView;
         setResizeMode(mCurrentAspectRatio);
         mContentFrame.addView(mRenderView.getView(), 0, new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER));
@@ -190,13 +194,13 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     public void release() {
         if (mPlayer == null) return;
+        removeRenderView();
         mPlayer.release();
         mPlayer = null;
         reset();
     }
 
     private void reset() {
-        removeRenderView();
         mSubtitleView.setText("");
         mTargetState = STATE_IDLE;
         mCurrentState = STATE_IDLE;
@@ -401,7 +405,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     @Override
     public void onSurfaceCreated(@NonNull IRenderView.ISurfaceHolder holder, int width, int height) {
-        if (mPlayer != null) bindSurfaceHolder(mPlayer, holder);
+        if (mPlayer != null) bindSurfaceHolder(mPlayer, mSurfaceHolder = holder);
     }
 
     @Override
