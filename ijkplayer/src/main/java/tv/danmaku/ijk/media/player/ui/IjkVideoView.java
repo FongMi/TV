@@ -200,13 +200,13 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     public void release() {
         if (mPlayer == null) return;
-        removeRenderView();
         mPlayer.release();
         mPlayer = null;
         reset();
     }
 
     private void reset() {
+        removeRenderView();
         mSubtitleView.setText("");
         mTargetState = STATE_IDLE;
         mCurrentState = STATE_IDLE;
