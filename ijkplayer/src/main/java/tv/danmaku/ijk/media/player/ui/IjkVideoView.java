@@ -97,7 +97,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     public void setRender(int render) {
         mCurrentRender = render;
-        if (mPlayer == null) return;
         switch (render) {
             case RENDER_TEXTURE_VIEW:
                 setRenderView(new TextureRenderView(getContext()));
@@ -146,8 +145,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
             fixUserAgent(headers);
             setSpeed(mCurrentSpeed);
             setRender(mCurrentRender);
-            mCurrentBufferPosition = 0;
-            mCurrentBufferPercentage = 0;
             mAudioManager.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
             mPlayer.setDataSource(getContext(), uri, headers);
             mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -198,20 +195,23 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         if (mPlayer == null) return;
         mPlayer.stop();
         mPlayer.reset();
-        mTargetState = STATE_IDLE;
-        mCurrentState = STATE_IDLE;
-        mAudioManager.abandonAudioFocus(null);
+        reset();
     }
 
     public void release() {
         if (mPlayer == null) return;
-        mSubtitleView.setText("");
         removeRenderView();
-        mPlayer.reset();
         mPlayer.release();
         mPlayer = null;
+        reset();
+    }
+
+    private void reset() {
+        mSubtitleView.setText("");
         mTargetState = STATE_IDLE;
         mCurrentState = STATE_IDLE;
+        mCurrentBufferPosition = 0;
+        mCurrentBufferPercentage = 0;
         mAudioManager.abandonAudioFocus(null);
     }
 
