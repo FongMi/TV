@@ -57,11 +57,11 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     private long mCurrentBufferPosition;
     private float mCurrentSpeed;
 
-    private IRenderView.ISurfaceHolder mSurfaceHolder;
     private IMediaPlayer.Listener mListener;
     private IRenderView mRenderView;
 
     private final SubtitleView mSubtitleView;
+    private final AudioManager mAudioManager;
     private final FrameLayout mContentFrame;
     private IjkMediaPlayer mPlayer;
 
@@ -76,11 +76,19 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     public IjkVideoView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         LayoutInflater.from(context).inflate(R.layout.ijk_player_view, this);
+        mAudioManager = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
         mContentFrame = findViewById(R.id.ijk_content_frame);
         mSubtitleView = findViewById(R.id.ijk_subtitle);
         mCurrentState = STATE_IDLE;
         mTargetState = STATE_IDLE;
         mCurrentSpeed = 1;
+    }
+
+    public IjkVideoView setPlayer(int decode) {
+        mPlayer = new IjkMediaPlayer();
+        mPlayer.setListener(this);
+        mCurrentDecode = decode;
+        return this;
     }
 
     public void addListener(IMediaPlayer.Listener listener) {
@@ -132,18 +140,16 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     private void openVideo(Uri uri, Map<String, String> headers) {
-        release(false);
-        AudioManager am = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
-        am.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
         try {
-            createPlayer(uri);
+            stop();
+            setOption(uri);
             fixUserAgent(headers);
             setSpeed(mCurrentSpeed);
             setRender(mCurrentRender);
             mCurrentBufferPosition = 0;
             mCurrentBufferPercentage = 0;
+            mAudioManager.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
             mPlayer.setDataSource(getContext(), uri, headers);
-            bindSurfaceHolder(mPlayer, mSurfaceHolder);
             mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mPlayer.setScreenOnWhilePlaying(true);
             mPlayer.prepareAsync();
@@ -180,31 +186,33 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         @Override
         public void onSurfaceCreated(@NonNull IRenderView.ISurfaceHolder holder, int width, int height) {
             if (mPlayer != null) bindSurfaceHolder(mPlayer, holder);
-            mSurfaceHolder = holder;
         }
 
         @Override
         public void onSurfaceDestroyed(@NonNull IRenderView.ISurfaceHolder holder) {
             if (mPlayer != null) mPlayer.setDisplay(null);
-            mSurfaceHolder = null;
         }
     };
 
-    public void release() {
-        release(true);
+    public void stop() {
+        if (mPlayer == null) return;
+        mPlayer.stop();
+        mPlayer.reset();
+        mTargetState = STATE_IDLE;
+        mCurrentState = STATE_IDLE;
+        mAudioManager.abandonAudioFocus(null);
     }
 
-    public void release(boolean clearState) {
+    public void release() {
         if (mPlayer == null) return;
         mSubtitleView.setText("");
         removeRenderView();
         mPlayer.reset();
         mPlayer.release();
         mPlayer = null;
+        mTargetState = STATE_IDLE;
         mCurrentState = STATE_IDLE;
-        if (clearState) mTargetState = STATE_IDLE;
-        AudioManager am = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
-        am.abandonAudioFocus(null);
+        mAudioManager.abandonAudioFocus(null);
     }
 
     @Override
@@ -218,11 +226,9 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     @Override
     public void pause() {
-        if (isInPlaybackState()) {
-            if (mPlayer.isPlaying()) {
-                mPlayer.pause();
-                mCurrentState = STATE_PAUSED;
-            }
+        if (isInPlaybackState() && mPlayer.isPlaying()) {
+            mPlayer.pause();
+            mCurrentState = STATE_PAUSED;
         }
         mTargetState = STATE_PAUSED;
     }
@@ -260,10 +266,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     public float getSpeed() {
         if (mPlayer != null) return mPlayer.getSpeed();
         return mCurrentSpeed;
-    }
-
-    public void setDecode(int decode) {
-        this.mCurrentDecode = decode;
     }
 
     public int getVideoWidth() {
@@ -376,10 +378,8 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         }
     }
 
-    private void createPlayer(Uri uri) {
+    private void setOption(Uri uri) {
         String url = uri.toString();
-        mPlayer = new IjkMediaPlayer();
-        mPlayer.setListener(this);
         mPlayer.setOption(codec, "skip_loop_filter", 48);
         mPlayer.setOption(format, "dns_cache_clear", 1);
         mPlayer.setOption(format, "dns_cache_timeout", -1);
