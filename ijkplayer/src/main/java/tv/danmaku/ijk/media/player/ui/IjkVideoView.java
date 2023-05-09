@@ -43,8 +43,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     private static final int RENDER_TEXTURE_VIEW = 1;
 
     private int mVideoRotationDegree;
-    private int mSurfaceWidth;
-    private int mSurfaceHeight;
     private int mVideoWidth;
     private int mVideoHeight;
 
@@ -172,8 +170,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     IRenderView.IRenderCallback mSHCallback = new IRenderView.IRenderCallback() {
         @Override
         public void onSurfaceChanged(@NonNull IRenderView.ISurfaceHolder holder, int format, int w, int h) {
-            mSurfaceWidth = w;
-            mSurfaceHeight = h;
             boolean isValidState = mTargetState == STATE_PLAYING;
             boolean hasValidSize = !mRenderView.shouldWaitForResize() || (mVideoWidth == w && mVideoHeight == h);
             if (mPlayer != null && isValidState && hasValidSize) {
