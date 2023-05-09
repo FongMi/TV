@@ -23,7 +23,7 @@ import tv.danmaku.ijk.media.player.R;
 import tv.danmaku.ijk.media.player.misc.ITrackInfo;
 import tv.danmaku.ijk.media.player.misc.IjkTrackInfo;
 
-public class IjkVideoView extends FrameLayout implements MediaController.MediaPlayerControl, IMediaPlayer.Listener {
+public class IjkVideoView extends FrameLayout implements MediaController.MediaPlayerControl, IMediaPlayer.Listener, IRenderView.IRenderCallback {
 
     private final String TAG = IjkVideoView.class.getSimpleName();
 
@@ -97,6 +97,9 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     public void setRender(int render) {
         mCurrentRender = render;
+    }
+
+    private void setRenderView(int render) {
         switch (render) {
             case RENDER_TEXTURE_VIEW:
                 setRenderView(new TextureRenderView(getContext()));
@@ -112,14 +115,14 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         mRenderView = renderView;
         setResizeMode(mCurrentAspectRatio);
         mContentFrame.addView(mRenderView.getView(), 0, new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER));
-        mRenderView.addRenderCallback(mSHCallback);
+        mRenderView.addRenderCallback(this);
         mRenderView.setVideoRotation(mVideoRotationDegree);
     }
 
     private void removeRenderView() {
         if (mRenderView == null) return;
         mContentFrame.removeView(mRenderView.getView());
-        mRenderView.removeRenderCallback(mSHCallback);
+        mRenderView.removeRenderCallback(this);
         mRenderView = null;
     }
 
@@ -132,7 +135,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         setVideoURI(Uri.parse(path.trim().replace("\\", "")), headers);
     }
 
-    public void setVideoURI(Uri uri, Map<String, String> headers) {
+    private void setVideoURI(Uri uri, Map<String, String> headers) {
         openVideo(uri, headers);
         requestLayout();
         invalidate();
@@ -144,7 +147,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
             setOption(uri);
             fixUserAgent(headers);
             setSpeed(mCurrentSpeed);
-            setRender(mCurrentRender);
+            setRenderView(mCurrentRender);
             mAudioManager.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
             mPlayer.setDataSource(getContext(), uri, headers);
             mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -169,27 +172,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         if (mp == null || holder == null) return;
         holder.bindToMediaPlayer(mp);
     }
-
-    IRenderView.IRenderCallback mSHCallback = new IRenderView.IRenderCallback() {
-        @Override
-        public void onSurfaceChanged(@NonNull IRenderView.ISurfaceHolder holder, int format, int w, int h) {
-            boolean isValidState = mTargetState == STATE_PLAYING;
-            boolean hasValidSize = !mRenderView.shouldWaitForResize() || (mVideoWidth == w && mVideoHeight == h);
-            if (mPlayer != null && isValidState && hasValidSize) {
-                start();
-            }
-        }
-
-        @Override
-        public void onSurfaceCreated(@NonNull IRenderView.ISurfaceHolder holder, int width, int height) {
-            if (mPlayer != null) bindSurfaceHolder(mPlayer, holder);
-        }
-
-        @Override
-        public void onSurfaceDestroyed(@NonNull IRenderView.ISurfaceHolder holder) {
-            if (mPlayer != null) mPlayer.setDisplay(null);
-        }
-    };
 
     public void stop() {
         if (mPlayer == null) return;
@@ -407,6 +389,23 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
             mPlayer.setOption(format, "probesize", 512 * 1000);
             mPlayer.setOption(format, "analyzeduration", 2 * 1000 * 1000);
         }
+    }
+
+    @Override
+    public void onSurfaceCreated(@NonNull IRenderView.ISurfaceHolder holder, int width, int height) {
+        if (mPlayer != null) bindSurfaceHolder(mPlayer, holder);
+    }
+
+    @Override
+    public void onSurfaceChanged(@NonNull IRenderView.ISurfaceHolder holder, int format, int width, int height) {
+        boolean isValidState = mTargetState == STATE_PLAYING;
+        boolean hasValidSize = !mRenderView.shouldWaitForResize() || (mVideoWidth == width && mVideoHeight == height);
+        if (mPlayer != null && isValidState && hasValidSize) start();
+    }
+
+    @Override
+    public void onSurfaceDestroyed(@NonNull IRenderView.ISurfaceHolder holder) {
+        if (mPlayer != null) mPlayer.setDisplay(null);
     }
 
     @Override
