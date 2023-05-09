@@ -47,8 +47,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     private int mSurfaceHeight;
     private int mVideoWidth;
     private int mVideoHeight;
-    private int mVideoSarNum;
-    private int mVideoSarDen;
 
     private int mTargetState;
     private int mCurrentState;
@@ -176,7 +174,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         public void onSurfaceChanged(@NonNull IRenderView.ISurfaceHolder holder, int format, int w, int h) {
             mSurfaceWidth = w;
             mSurfaceHeight = h;
-            boolean isValidState = (mTargetState == STATE_PLAYING);
+            boolean isValidState = mTargetState == STATE_PLAYING;
             boolean hasValidSize = !mRenderView.shouldWaitForResize() || (mVideoWidth == w && mVideoHeight == h);
             if (mPlayer != null && isValidState && hasValidSize) {
                 start();
@@ -423,17 +421,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         mListener.onPrepared(mPlayer);
         mVideoWidth = mp.getVideoWidth();
         mVideoHeight = mp.getVideoHeight();
-        if (mVideoWidth != 0 && mVideoHeight != 0) {
-            if (mRenderView != null) {
-                mRenderView.setVideoSize(mVideoWidth, mVideoHeight);
-                mRenderView.setVideoSampleAspectRatio(mVideoSarNum, mVideoSarDen);
-                if (!mRenderView.shouldWaitForResize() || mSurfaceWidth == mVideoWidth && mSurfaceHeight == mVideoHeight) {
-                    if (mTargetState == STATE_PLAYING) start();
-                }
-            }
-        } else if (mTargetState == STATE_PLAYING) {
-            start();
-        }
+        if (mTargetState == STATE_PLAYING) start();
     }
 
     @Override
@@ -476,13 +464,11 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     @Override
     public void onVideoSizeChanged(IMediaPlayer mp, int width, int height, int sar_num, int sar_den) {
-        mVideoWidth = mp.getVideoWidth();
-        mVideoHeight = mp.getVideoHeight();
-        mVideoSarNum = mp.getVideoSarNum();
-        mVideoSarDen = mp.getVideoSarDen();
+        mVideoWidth = width;
+        mVideoHeight = height;
         if (mVideoWidth != 0 && mVideoHeight != 0 && mRenderView != null) {
             mRenderView.setVideoSize(mVideoWidth, mVideoHeight);
-            mRenderView.setVideoSampleAspectRatio(mVideoSarNum, mVideoSarDen);
+            mRenderView.setVideoSampleAspectRatio(sar_num, sar_den);
             requestLayout();
         }
     }
