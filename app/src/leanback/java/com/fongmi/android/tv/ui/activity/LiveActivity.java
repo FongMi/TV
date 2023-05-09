@@ -190,7 +190,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private void setVideoView() {
         mPlayers.set(getExo(), getIjk());
         setScale(Prefers.getLiveScale());
-        getIjk().setRender(Prefers.getRender());
         findViewById(R.id.timeBar).setNextFocusUpId(R.id.home);
         mBinding.control.speed.setText(mPlayers.getSpeedText());
         mBinding.control.invert.setActivated(Prefers.isInvert());
