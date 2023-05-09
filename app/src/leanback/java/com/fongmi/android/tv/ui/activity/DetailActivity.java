@@ -294,7 +294,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void setVideoView() {
         mPlayers.set(getExo(), getIjk());
-        getIjk().setRender(Prefers.getRender());
         getExo().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
         getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
     }

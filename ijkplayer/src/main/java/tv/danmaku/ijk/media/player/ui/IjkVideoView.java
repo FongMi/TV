@@ -84,11 +84,19 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         mCurrentSpeed = 1;
     }
 
-    public IjkVideoView setPlayer(int decode) {
-        mPlayer = new IjkMediaPlayer();
-        mPlayer.setListener(this);
+    public IjkVideoView decode(int decode) {
         mCurrentDecode = decode;
         return this;
+    }
+
+    public IjkVideoView render(int render) {
+        setRender(render);
+        return this;
+    }
+
+    public void build() {
+        mPlayer = new IjkMediaPlayer();
+        mPlayer.setListener(this);
     }
 
     public void addListener(IMediaPlayer.Listener listener) {
