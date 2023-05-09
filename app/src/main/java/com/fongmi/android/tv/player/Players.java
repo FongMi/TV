@@ -33,7 +33,7 @@ import java.util.Map;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IMediaPlayer.OnErrorListener, IMediaPlayer.OnPreparedListener, IMediaPlayer.OnCompletionListener, AnalyticsListener, ParseCallback {
+public class Players implements Player.Listener, IMediaPlayer.Listener, AnalyticsListener, ParseCallback {
 
     private IjkVideoView ijkPlayer;
     private StringBuilder builder;
@@ -83,10 +83,7 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     private void setupIjk(IjkVideoView view) {
         ijkPlayer = view;
         ijkPlayer.setDecode(decode);
-        ijkPlayer.setOnInfoListener(this);
-        ijkPlayer.setOnErrorListener(this);
-        ijkPlayer.setOnPreparedListener(this);
-        ijkPlayer.setOnCompletionListener(this);
+        ijkPlayer.addListener(this);
     }
 
     public ExoPlayer exo() {
@@ -408,18 +405,16 @@ public class Players implements Player.Listener, IMediaPlayer.OnInfoListener, IM
     }
 
     @Override
-    public boolean onInfo(IMediaPlayer mp, int what, int extra) {
+    public void onInfo(IMediaPlayer mp, int what, int extra) {
         switch (what) {
             case IMediaPlayer.MEDIA_INFO_BUFFERING_START:
                 PlayerEvent.state(Player.STATE_BUFFERING);
-                return true;
+                break;
             case IMediaPlayer.MEDIA_INFO_BUFFERING_END:
             case IMediaPlayer.MEDIA_INFO_VIDEO_SEEK_RENDERING_START:
             case IMediaPlayer.MEDIA_INFO_AUDIO_SEEK_RENDERING_START:
                 PlayerEvent.ready();
-                return true;
-            default:
-                return true;
+                break;
         }
     }
 
