@@ -32,6 +32,11 @@
         </activity>
 
         <activity
+            android:name=".ui.activity.CollectActivity"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout"
+            android:screenOrientation="fullUser" />
+
+        <activity
             android:name=".ui.activity.DetailActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
             android:excludeFromRecents="true"
@@ -40,11 +45,6 @@
             android:screenOrientation="fullUser"
             android:supportsPictureInPicture="true"
             android:theme="@style/AppTheme.Detail" />
-
-        <activity
-            android:name=".ui.activity.CollectActivity"
-            android:configChanges="screenSize|smallestScreenSize|screenLayout"
-            android:screenOrientation="fullUser" />
 
         <activity
             android:name=".ui.activity.HistoryActivity"
@@ -64,6 +64,11 @@
             android:resizeableActivity="true"
             android:screenOrientation="sensorLandscape"
             android:supportsPictureInPicture="true" />
+
+        <activity
+            android:name=".ui.activity.VodActivity"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout"
+            android:screenOrientation="fullUser" />
 
         <activity
             android:name=".ui.activity.ScanActivity"
