@@ -13,7 +13,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.Product;
-import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.FragmentTypeBinding;
@@ -38,13 +37,18 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     private List<String> mTypeIds;
     private VodAdapter mAdapter;
 
-    public static TypeFragment newInstance(String typeId, boolean folder) {
+    public static TypeFragment newInstance(String key, String typeId, boolean folder) {
         Bundle args = new Bundle();
+        args.putString("key", key);
         args.putString("typeId", typeId);
         args.putBoolean("folder", folder);
         TypeFragment fragment = new TypeFragment();
         fragment.setArguments(args);
         return fragment;
+    }
+
+    private String getKey() {
+        return getArguments().getString("key");
     }
 
     private String getTypeId() {
@@ -115,7 +119,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         if (page.equals("1")) mAdapter.clear();
         if (page.equals("1") && !mBinding.swipeLayout.isRefreshing()) mBinding.progressLayout.showProgress();
         if (isHome() && page.equals("1")) setAdapter(getParent().getResult());
-        else mViewModel.categoryContent(ApiConfig.get().getHome().getKey(), typeId, page, true, mExtends);
+        else mViewModel.categoryContent(getKey(), typeId, page, true, mExtends);
     }
 
     private void setAdapter(Result result) {
