@@ -37,6 +37,7 @@
 
         <tv.danmaku.ijk.media.player.ui.IjkVideoView
             android:id="@+id/ijk"
+            style="@style/Player.Vod"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="gone" />

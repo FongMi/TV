@@ -1,6 +1,7 @@
 package tv.danmaku.ijk.media.player.ui;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -42,7 +43,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     private static final int RENDER_SURFACE_VIEW = 0;
     private static final int RENDER_TEXTURE_VIEW = 1;
 
-    private int mVideoRotationDegree;
     private int mVideoWidth;
     private int mVideoHeight;
 
@@ -56,6 +56,8 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     private int mCurrentBufferPercentage;
     private long mCurrentBufferPosition;
     private float mCurrentSpeed;
+
+    private boolean mKeepContentOnPlayerReset;
 
     private IRenderView.ISurfaceHolder mSurfaceHolder;
     private IMediaPlayer.Listener mListener;
@@ -78,11 +80,21 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         super(context, attrs, defStyleAttr);
         LayoutInflater.from(context).inflate(R.layout.ijk_player_view, this);
         mAudioManager = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
+        if (attrs != null) initAttr(context, attrs, defStyleAttr);
         mContentFrame = findViewById(R.id.ijk_content_frame);
         mSubtitleView = findViewById(R.id.ijk_subtitle);
         mCurrentState = STATE_IDLE;
         mTargetState = STATE_IDLE;
         mCurrentSpeed = 1;
+    }
+
+    private void initAttr(Context context, AttributeSet attrs, int defStyleAttr) {
+        TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.IjkVideoView, defStyleAttr, 0);
+        try {
+            mKeepContentOnPlayerReset = a.getBoolean(R.styleable.IjkVideoView_keep_content_on_player_reset, mKeepContentOnPlayerReset);
+        } finally {
+            a.recycle();
+        }
     }
 
     public IjkVideoView decode(int decode) {
@@ -147,6 +159,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     private void setVideoURI(Uri uri, Map<String, String> headers) {
+        if (!mKeepContentOnPlayerReset) removeRenderView();
         openVideo(uri, headers);
         requestLayout();
         invalidate();
@@ -440,7 +453,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     public void onInfo(IMediaPlayer mp, int what, int extra) {
         mListener.onInfo(mp, what, extra);
         if (what == IMediaPlayer.MEDIA_INFO_VIDEO_ROTATION_CHANGED) {
-            mVideoRotationDegree = extra;
             if (mRenderView != null) mRenderView.setVideoRotation(extra);
         }
     }
