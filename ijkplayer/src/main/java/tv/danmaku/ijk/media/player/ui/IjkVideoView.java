@@ -128,7 +128,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         setResizeMode(mCurrentAspectRatio);
         mContentFrame.addView(mRenderView.getView(), 0, new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER));
         mRenderView.addRenderCallback(this);
-        mRenderView.setVideoRotation(mVideoRotationDegree);
     }
 
     private void removeRenderView() {
@@ -155,8 +154,8 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     private void openVideo(Uri uri, Map<String, String> headers) {
         try {
-            stop();
-            setOption(uri);
+            mPlayer.reset();
+            setOptions(uri);
             fixUserAgent(headers);
             setSpeed(mCurrentSpeed);
             setRenderView(mCurrentRender);
@@ -188,19 +187,18 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     public void stop() {
         if (mPlayer == null) return;
         mPlayer.stop();
-        mPlayer.reset();
         reset();
     }
 
     public void release() {
         if (mPlayer == null) return;
-        removeRenderView();
         mPlayer.release();
         mPlayer = null;
         reset();
     }
 
     private void reset() {
+        removeRenderView();
         mSubtitleView.setText("");
         mTargetState = STATE_IDLE;
         mCurrentState = STATE_IDLE;
@@ -372,7 +370,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         }
     }
 
-    private void setOption(Uri uri) {
+    private void setOptions(Uri uri) {
         String url = uri.toString();
         mPlayer.setOption(codec, "skip_loop_filter", 48);
         mPlayer.setOption(format, "dns_cache_clear", 1);
