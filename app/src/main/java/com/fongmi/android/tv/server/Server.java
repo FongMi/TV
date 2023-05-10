@@ -67,12 +67,12 @@ public class Server implements Nano.Listener {
     }
 
     private String getIP() {
-        WifiManager manager = (WifiManager) App.get().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        int address = manager.getConnectionInfo().getIpAddress();
-        if (address != 0) return Formatter.formatIpAddress(address);
         try {
+            WifiManager manager = (WifiManager) App.get().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+            int address = manager.getConnectionInfo().getIpAddress();
+            if (address != 0) return Formatter.formatIpAddress(address);
             return getHostAddress();
-        } catch (SocketException e) {
+        } catch (Exception e) {
             return "";
         }
     }

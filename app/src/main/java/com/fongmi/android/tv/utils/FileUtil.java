@@ -28,6 +28,9 @@ import java.io.InputStreamReader;
 import java.net.URLConnection;
 import java.security.MessageDigest;
 import java.text.DecimalFormat;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class FileUtil {
 
@@ -160,7 +163,7 @@ public class FileUtil {
 
     public static void clearDir(File dir) {
         if (dir == null) return;
-        if (dir.isDirectory()) for (File file : dir.listFiles()) clearDir(file);
+        if (dir.isDirectory()) for (File file : listFiles(dir)) clearDir(file);
         if (dir.delete()) Log.d(TAG, "Deleted:" + dir.getAbsolutePath());
     }
 
@@ -208,10 +211,15 @@ public class FileUtil {
         return TextUtils.isEmpty(mimeType) ? "*/*" : mimeType;
     }
 
+    private static List<File> listFiles(File dir) {
+        File[] files = dir.listFiles();
+        return files == null ? Collections.emptyList() : Arrays.asList(files);
+    }
+
     private static long getFolderSize(File file) {
         long size = 0;
         if (file == null) return 0;
-        if (file.isDirectory()) for (File f : file.listFiles()) size += getFolderSize(f);
+        if (file.isDirectory()) for (File f : listFiles(file)) size += getFolderSize(f);
         else size = file.length();
         return size;
     }
