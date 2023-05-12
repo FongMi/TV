@@ -3,6 +3,7 @@ package com.fongmi.android.tv.ui.activity;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.view.View;
 
 import androidx.viewbinding.ViewBinding;
 
@@ -26,6 +27,7 @@ import com.fongmi.android.tv.ui.custom.dialog.ConfigDialog;
 import com.fongmi.android.tv.ui.custom.dialog.HistoryDialog;
 import com.fongmi.android.tv.ui.custom.dialog.LiveDialog;
 import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
+import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
@@ -64,26 +66,29 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.decodeText.setText((decode = ResUtil.getStringArray(R.array.select_decode))[Prefers.getDecode()]);
         mBinding.renderText.setText((render = ResUtil.getStringArray(R.array.select_render))[Prefers.getRender()]);
         mBinding.qualityText.setText((quality = ResUtil.getStringArray(R.array.select_quality))[Prefers.getQuality()]);
+        setCacheText();
     }
 
     @Override
     protected void initEvent() {
-        mBinding.vodHome.setOnClickListener(view -> SiteDialog.create(this).all().show());
-        mBinding.liveHome.setOnClickListener(view -> LiveDialog.create(this).show());
-        mBinding.vod.setOnClickListener(view -> ConfigDialog.create(this).type(type = 0).show());
-        mBinding.live.setOnClickListener(view -> ConfigDialog.create(this).type(type = 1).show());
-        mBinding.wall.setOnClickListener(view -> ConfigDialog.create(this).type(type = 2).show());
-        mBinding.vodHistory.setOnClickListener(view -> HistoryDialog.create(this).type(type = 0).show());
-        mBinding.liveHistory.setOnClickListener(view -> HistoryDialog.create(this).type(type = 1).show());
-        mBinding.wallDefault.setOnClickListener(view -> setWallDefault());
-        mBinding.wallRefresh.setOnClickListener(view -> setWallRefresh());
-        mBinding.quality.setOnClickListener(view -> setQuality());
-        mBinding.version.setOnClickListener(view -> onVersion());
-        mBinding.player.setOnClickListener(view -> setPlayer());
-        mBinding.decode.setOnClickListener(view -> setDecode());
-        mBinding.render.setOnClickListener(view -> setRender());
-        mBinding.scale.setOnClickListener(view -> setScale());
-        mBinding.size.setOnClickListener(view -> setSize());
+        mBinding.vod.setOnClickListener(this::onVod);
+        mBinding.live.setOnClickListener(this::onLive);
+        mBinding.wall.setOnClickListener(this::onWall);
+        mBinding.cache.setOnClickListener(this::onCache);
+        mBinding.version.setOnClickListener(this::onVersion);
+        mBinding.vodHome.setOnClickListener(this::onVodHome);
+        mBinding.liveHome.setOnClickListener(this::onLiveHome);
+        mBinding.vodHistory.setOnClickListener(this::onVodHistory);
+        mBinding.version.setOnLongClickListener(this::onVersionDev);
+        mBinding.liveHistory.setOnClickListener(this::onLiveHistory);
+        mBinding.wallDefault.setOnClickListener(this::setWallDefault);
+        mBinding.wallRefresh.setOnClickListener(this::setWallRefresh);
+        mBinding.quality.setOnClickListener(this::setQuality);
+        mBinding.player.setOnClickListener(this::setPlayer);
+        mBinding.decode.setOnClickListener(this::setDecode);
+        mBinding.render.setOnClickListener(this::setRender);
+        mBinding.scale.setOnClickListener(this::setScale);
+        mBinding.size.setOnClickListener(this::setSize);
     }
 
     @Override
@@ -133,6 +138,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
     private void setConfig() {
         switch (type) {
             case 0:
+                setCacheText();
                 Notify.dismiss();
                 RefreshEvent.video();
                 RefreshEvent.history();
@@ -141,10 +147,12 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
                 mBinding.wallUrl.setText(WallConfig.getDesc());
                 break;
             case 1:
+                setCacheText();
                 Notify.dismiss();
                 mBinding.liveUrl.setText(LiveConfig.getUrl());
                 break;
             case 2:
+                setCacheText();
                 mBinding.wallUrl.setText(WallConfig.getUrl());
                 break;
         }
@@ -165,54 +173,111 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         LiveConfig.get().setHome(item);
     }
 
-    private boolean onVersion() {
-        Updater.get().force().start();
+    private void onVod(View view) {
+        ConfigDialog.create(this).type(type = 0).show();
+    }
+
+    private void onLive(View view) {
+        ConfigDialog.create(this).type(type = 1).show();
+    }
+
+    private void onWall(View view) {
+        ConfigDialog.create(this).type(type = 2).show();
+    }
+
+    private void onVodHome(View view) {
+        SiteDialog.create(this).all().show();
+    }
+
+    private void onLiveHome(View view) {
+        LiveDialog.create(this).show();
+    }
+
+    private void onVodHistory(View view) {
+        HistoryDialog.create(this).type(type = 0).show();
+    }
+
+    private void onLiveHistory(View view) {
+        HistoryDialog.create(this).type(type = 1).show();
+    }
+
+    private void onVersion(View view) {
+        Updater.get().force().release().start();
+    }
+
+    private boolean onVersionDev(View view) {
+        Updater.get().force().dev().start();
         return true;
     }
 
-    private void setQuality() {
+    private void setWallDefault(View view) {
+        WallConfig.refresh(Prefers.getWall() == 4 ? 1 : Prefers.getWall() + 1);
+    }
+
+    private void setWallRefresh(View view) {
+        Notify.progress(this);
+        WallConfig.get().load(new Callback() {
+            @Override
+            public void success() {
+                Notify.dismiss();
+                setCacheText();
+            }
+        });
+    }
+
+    private void setQuality(View view) {
         int index = Prefers.getQuality();
         Prefers.putQuality(index = index == quality.length - 1 ? 0 : ++index);
         mBinding.qualityText.setText(quality[index]);
         RefreshEvent.image();
     }
 
-    private void setPlayer() {
+    private void setPlayer(View view) {
         int index = Prefers.getPlayer();
         Prefers.putPlayer(index = index == player.length - 1 ? 0 : ++index);
         mBinding.playerText.setText(player[index]);
     }
 
-    private void setDecode() {
+    private void setDecode(View view) {
         int index = Prefers.getDecode();
         Prefers.putDecode(index = index == decode.length - 1 ? 0 : ++index);
         mBinding.decodeText.setText(decode[index]);
     }
 
-    private void setRender() {
+    private void setRender(View view) {
         int index = Prefers.getRender();
         Prefers.putRender(index = index == render.length - 1 ? 0 : ++index);
         mBinding.renderText.setText(render[index]);
     }
 
-    private void setScale() {
+    private void setScale(View view) {
         int index = Prefers.getScale();
         Prefers.putScale(index = index == scale.length - 1 ? 0 : ++index);
         mBinding.scaleText.setText(scale[index]);
     }
 
-    private void setSize() {
+    private void setSize(View view) {
         int index = Prefers.getSize();
         Prefers.putSize(index = index == size.length - 2 ? 0 : ++index);
         mBinding.sizeText.setText(size[index]);
         RefreshEvent.size();
     }
 
-    private void setWallDefault() {
-        WallConfig.refresh(Prefers.getWall() == 4 ? 1 : Prefers.getWall() + 1);
+    private void onCache(View view) {
+        FileUtil.clearCache(new Callback() {
+            @Override
+            public void success() {
+                setCacheText();
+            }
+        });
     }
 
-    private void setWallRefresh() {
-        WallConfig.get().load();
+    private void setCacheText() {
+        FileUtil.getCacheSize(new Callback() {
+            @Override
+            public void success(String result) {
+                mBinding.cacheText.setText(result);
+            }
+        });
     }
 }
