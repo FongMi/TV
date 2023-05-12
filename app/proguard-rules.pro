@@ -38,6 +38,9 @@
 # Cling
 -keep class org.fourthline.cling.** { *; }
 
+# EXO
+-keep class org.xmlpull.v1.** { *; }
+
 # IJK
 -keep class tv.danmaku.ijk.media.player.** { *; }
 -keep class tv.danmaku.ijk.media.player.IjkMediaPlayer { *; }
