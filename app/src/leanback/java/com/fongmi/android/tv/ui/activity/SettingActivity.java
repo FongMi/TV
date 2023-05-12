@@ -79,7 +79,6 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.vodHome.setOnClickListener(this::onVodHome);
         mBinding.liveHome.setOnClickListener(this::onLiveHome);
         mBinding.vodHistory.setOnClickListener(this::onVodHistory);
-        mBinding.version.setOnLongClickListener(this::onVersionDev);
         mBinding.liveHistory.setOnClickListener(this::onLiveHistory);
         mBinding.wallDefault.setOnClickListener(this::setWallDefault);
         mBinding.wallRefresh.setOnClickListener(this::setWallRefresh);
@@ -202,12 +201,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
     }
 
     private void onVersion(View view) {
-        Updater.get().force().release().start();
-    }
-
-    private boolean onVersionDev(View view) {
-        Updater.get().force().dev().start();
-        return true;
+        Updater.get().force().start();
     }
 
     private void setWallDefault(View view) {
