@@ -72,7 +72,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     @Override
     protected void initView() {
         mBinding.progressLayout.showProgress();
-        Updater.get().release().start();
+        Updater.get().start();
         Server.get().start();
         setRecyclerView();
         setViewModel();
