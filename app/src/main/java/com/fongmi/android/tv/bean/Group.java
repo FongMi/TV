@@ -47,6 +47,7 @@ public class Group {
 
     public Group(String name) {
         this.name = name;
+        this.position = -1;
         if (!name.contains("_")) return;
         setName(name.split("_")[0]);
         setPass(name.split("_")[1]);

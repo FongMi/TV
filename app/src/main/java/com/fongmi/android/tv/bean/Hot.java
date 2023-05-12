@@ -20,7 +20,7 @@ public class Hot {
         try {
             List<String> items = new ArrayList<>();
             for (Data item : objectFrom(str).getData()) items.add(item.getTitle());
-            Prefers.putHot(str);
+            if (items.size() > 0) Prefers.putHot(str);
             return items;
         } catch (Exception e) {
             return new ArrayList<>();

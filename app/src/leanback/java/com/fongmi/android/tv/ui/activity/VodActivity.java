@@ -35,7 +35,7 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VodActivity extends BaseActivity {
+public class VodActivity extends BaseActivity implements TypePresenter.OnClickListener {
 
     private ActivityVodBinding mBinding;
     private ArrayObjectAdapter mAdapter;
@@ -97,7 +97,7 @@ public class VodActivity extends BaseActivity {
     private void setRecyclerView() {
         mBinding.recycler.setHorizontalSpacing(ResUtil.dp2px(16));
         mBinding.recycler.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-        mBinding.recycler.setAdapter(new ItemBridgeAdapter(mAdapter = new ArrayObjectAdapter(new TypePresenter(this::updateFilter))));
+        mBinding.recycler.setAdapter(new ItemBridgeAdapter(mAdapter = new ArrayObjectAdapter(new TypePresenter(this))));
     }
 
     private List<Class> getTypes(Result result) {
@@ -137,6 +137,17 @@ public class VodActivity extends BaseActivity {
         if (item.getFilter() == null) return;
         getFragment().toggleFilter(item.toggleFilter());
         mAdapter.notifyArrayItemRangeChanged(0, mAdapter.size());
+    }
+
+    @Override
+    public void onItemClick(Class item) {
+        updateFilter(item);
+    }
+
+    @Override
+    public boolean onLongClick(Class item) {
+        getFragment().onRefresh();
+        return true;
     }
 
     @Override

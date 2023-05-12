@@ -26,6 +26,7 @@ import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.ui.activity.CollectActivity;
 import com.fongmi.android.tv.ui.activity.DetailActivity;
 import com.fongmi.android.tv.ui.base.BaseFragment;
+import com.fongmi.android.tv.ui.base.ViewType;
 import com.fongmi.android.tv.ui.custom.CustomRowPresenter;
 import com.fongmi.android.tv.ui.custom.CustomScroller;
 import com.fongmi.android.tv.ui.custom.CustomSelector;
@@ -42,9 +43,9 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
 
     private HashMap<String, String> mExtends;
     private FragmentVodBinding mBinding;
-    private CustomScroller mScroller;
     private ArrayObjectAdapter mAdapter;
     private ArrayObjectAdapter mLast;
+    private CustomScroller mScroller;
     private SiteViewModel mViewModel;
     private List<Filter> mFilters;
     private List<String> mTypeIds;
@@ -99,6 +100,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     @SuppressLint("RestrictedApi")
     private void setRecyclerView() {
         CustomSelector selector = new CustomSelector();
+        selector.addPresenter(Vod.class, new VodPresenter(this, ViewType.FOLDER));
         selector.addPresenter(ListRow.class, new CustomRowPresenter(16), VodPresenter.class);
         selector.addPresenter(ListRow.class, new CustomRowPresenter(8, FocusHighlight.ZOOM_FACTOR_NONE, HorizontalGridView.FOCUS_SCROLL_ALIGNED), FilterPresenter.class);
         mBinding.recycler.addOnScrollListener(mScroller = new CustomScroller(this));
@@ -122,8 +124,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         for (int i = 0; i < adapter.size(); i++) ((Filter.Value) adapter.get(i)).setActivated(item);
         adapter.notifyArrayItemRangeChanged(0, adapter.size());
         mExtends.put(key, item.getV());
-        if (isFolder()) refresh(1);
-        else getVideo();
+        onRefresh();
     }
 
     private void getVideo() {
@@ -148,17 +149,25 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         mViewModel.categoryContent(getKey(), typeId, page, true, mExtends);
     }
 
+    private void addVideo(List<Vod> items) {
+        if (isFolder()) {
+            mAdapter.addAll(mAdapter.size(), items);
+        } else {
+            addGrid(items);
+        }
+    }
+
     private boolean checkLastSize(List<Vod> items) {
         if (mLast == null || items.size() == 0) return false;
         int size = Product.getColumn() - mLast.size();
         if (size == 0) return false;
         size = Math.min(size, items.size());
         mLast.addAll(mLast.size(), new ArrayList<>(items.subList(0, size)));
-        addVideo(new ArrayList<>(items.subList(size, items.size())));
+        addGrid(new ArrayList<>(items.subList(size, items.size())));
         return true;
     }
 
-    private void addVideo(List<Vod> items) {
+    private void addGrid(List<Vod> items) {
         if (checkLastSize(items)) return;
         List<ListRow> rows = new ArrayList<>();
         for (List<Vod> part : Lists.partition(items, Product.getColumn())) {
@@ -175,6 +184,12 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         presenter.setOnClickListener((key, item) -> setClick(adapter, key, item));
         adapter.setItems(filter.getValue(), null);
         return new ListRow(adapter);
+    }
+
+    private void refresh(int num) {
+        String typeId = mTypeIds.get(mTypeIds.size() - num);
+        mTypeIds = mTypeIds.subList(0, mTypeIds.size() - num);
+        getVideo(typeId, "1");
     }
 
     private void showProgress() {
@@ -203,10 +218,9 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         mOpen = open;
     }
 
-    private void refresh(int num) {
-        String typeId = mTypeIds.get(mTypeIds.size() - num);
-        mTypeIds = mTypeIds.subList(0, mTypeIds.size() - num);
-        getVideo(typeId, "1");
+    public void onRefresh() {
+        if (isFolder()) refresh(1);
+        else getVideo();
     }
 
     public boolean canGoBack() {
