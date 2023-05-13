@@ -32,11 +32,7 @@ public class TextureRenderView extends TextureView implements IRenderView {
     }
 
     public TextureRenderView(Context context, AttributeSet attrs, int defStyleAttr) {
-        this(context, attrs, defStyleAttr, 0);
-    }
-
-    public TextureRenderView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
+        super(context, attrs, defStyleAttr);
         mMeasureHelper = new MeasureHelper(this);
         mSurfaceCallback = new SurfaceCallback(this);
         setSurfaceTextureListener(mSurfaceCallback);
