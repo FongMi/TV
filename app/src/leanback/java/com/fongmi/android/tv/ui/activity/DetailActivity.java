@@ -294,7 +294,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void setVideoView() {
         mPlayers.set(getExo(), getIjk());
-        getIjk().setRender(Prefers.getRender());
         getExo().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
         getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
     }
@@ -1116,10 +1115,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     @Override
     public void onBackPressed() {
-        if (isVisible(mBinding.widget.center)) {
-            hideCenter();
-        } else if (isVisible(mBinding.control.getRoot())) {
+        if (isVisible(mBinding.control.getRoot())) {
             hideControl();
+        } else if (isVisible(mBinding.widget.center)) {
+            hideCenter();
         } else if (isFullscreen()) {
             exitFullscreen();
         } else {

@@ -21,33 +21,21 @@ import tv.danmaku.ijk.media.player.IMediaPlayer;
 
 public class SurfaceRenderView extends SurfaceView implements IRenderView {
 
-    private MeasureHelper mMeasureHelper;
+    private final MeasureHelper mMeasureHelper;
 
     public SurfaceRenderView(Context context) {
-        super(context);
-        initView(context);
+        this(context, null);
     }
 
     public SurfaceRenderView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        initView(context);
+        this(context, attrs, 0);
     }
 
     public SurfaceRenderView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        initView(context);
-    }
-
-    public SurfaceRenderView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
-        initView(context);
-    }
-
-    private void initView(Context context) {
         mMeasureHelper = new MeasureHelper(this);
         mSurfaceCallback = new SurfaceCallback(this);
         getHolder().addCallback(mSurfaceCallback);
-        getHolder().setType(SurfaceHolder.SURFACE_TYPE_NORMAL);
     }
 
     @Override
@@ -143,7 +131,7 @@ public class SurfaceRenderView extends SurfaceView implements IRenderView {
         mSurfaceCallback.removeRenderCallback(callback);
     }
 
-    private SurfaceCallback mSurfaceCallback;
+    private final SurfaceCallback mSurfaceCallback;
 
     private static final class SurfaceCallback implements SurfaceHolder.Callback {
 

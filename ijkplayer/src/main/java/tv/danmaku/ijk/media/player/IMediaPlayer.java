@@ -126,62 +126,21 @@ public interface IMediaPlayer {
     @Deprecated
     boolean isPlayable();
 
-    void setOnPreparedListener(OnPreparedListener listener);
-
-    void setOnCompletionListener(OnCompletionListener listener);
-
-    void setOnBufferingUpdateListener(
-            OnBufferingUpdateListener listener);
-
-    void setOnSeekCompleteListener(
-            OnSeekCompleteListener listener);
-
-    void setOnVideoSizeChangedListener(
-            OnVideoSizeChangedListener listener);
-
-    void setOnErrorListener(OnErrorListener listener);
-
-    void setOnInfoListener(OnInfoListener listener);
-
-    void setOnTimedTextListener(OnTimedTextListener listener);
+    void setListener(Listener listener);
 
     /*--------------------
      * Listeners
      */
-    interface OnPreparedListener {
+    interface Listener {
         void onPrepared(IMediaPlayer mp);
-    }
-
-    interface OnCompletionListener {
         void onCompletion(IMediaPlayer mp);
-    }
-
-    interface OnBufferingUpdateListener {
-
-        void onBufferingUpdate(IMediaPlayer mp, long position);
-
-        void onBufferingUpdate(IMediaPlayer mp, int percent);
-    }
-
-    interface OnSeekCompleteListener {
-        void onSeekComplete(IMediaPlayer mp);
-    }
-
-    interface OnVideoSizeChangedListener {
-        void onVideoSizeChanged(IMediaPlayer mp, int width, int height,
-                                int sar_num, int sar_den);
-    }
-
-    interface OnErrorListener {
+        void onInfo(IMediaPlayer mp, int what, int extra);
         boolean onError(IMediaPlayer mp, int what, int extra);
-    }
-
-    interface OnInfoListener {
-        boolean onInfo(IMediaPlayer mp, int what, int extra);
-    }
-
-    interface OnTimedTextListener {
-        void onTimedText(IMediaPlayer mp, IjkTimedText text);
+        default void onSeekComplete(IMediaPlayer mp) {}
+        default void onTimedText(IMediaPlayer mp, IjkTimedText text) {}
+        default void onBufferingUpdate(IMediaPlayer mp, int percent) {}
+        default void onBufferingUpdate(IMediaPlayer mp, long position) {}
+        default void onVideoSizeChanged(IMediaPlayer mp, int width, int height, int sar_num, int sar_den) {}
     }
 
     /*--------------------

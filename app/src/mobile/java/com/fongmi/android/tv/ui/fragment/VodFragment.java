@@ -42,6 +42,7 @@ import com.fongmi.android.tv.ui.custom.dialog.ReceiveDialog;
 import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.Trans;
+import com.google.common.net.HttpHeaders;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -53,6 +54,7 @@ import java.util.List;
 import java.util.Random;
 
 import okhttp3.Call;
+import okhttp3.Headers;
 import okhttp3.Response;
 
 public class VodFragment extends BaseFragment implements SiteCallback, FilterCallback, TypeAdapter.OnClickListener {
@@ -129,7 +131,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     }
 
     private void getHot() {
-        OkHttp.newCall("https://api.web.360kan.com/v1/rank?cat=1").enqueue(new Callback() {
+        OkHttp.newCall("https://api.web.360kan.com/v1/rank?cat=1", Headers.of(HttpHeaders.REFERER, "https://www.360kan.com/rank/general")).enqueue(new Callback() {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 mHots = Hot.get(response.body().string());
@@ -300,7 +302,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         @Override
         public Fragment getItem(int position) {
             Class type = mAdapter.get(position);
-            return TypeFragment.newInstance(type.getTypeId(), type.getTypeFlag().equals("1"));
+            return TypeFragment.newInstance(getSite().getKey(), type.getTypeId(), type.getTypeFlag().equals("1"));
         }
 
         @Override

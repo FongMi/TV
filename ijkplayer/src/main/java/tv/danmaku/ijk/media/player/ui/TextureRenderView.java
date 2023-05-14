@@ -21,29 +21,18 @@ import tv.danmaku.ijk.media.player.IMediaPlayer;
 
 public class TextureRenderView extends TextureView implements IRenderView {
 
-    private MeasureHelper mMeasureHelper;
+    private final MeasureHelper mMeasureHelper;
 
     public TextureRenderView(Context context) {
-        super(context);
-        initView(context);
+        this(context, null);
     }
 
     public TextureRenderView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        initView(context);
+        this(context, attrs, 0);
     }
 
     public TextureRenderView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        initView(context);
-    }
-
-    public TextureRenderView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
-        initView(context);
-    }
-
-    private void initView(Context context) {
         mMeasureHelper = new MeasureHelper(this);
         mSurfaceCallback = new SurfaceCallback(this);
         setSurfaceTextureListener(mSurfaceCallback);
@@ -57,13 +46,6 @@ public class TextureRenderView extends TextureView implements IRenderView {
     @Override
     public boolean shouldWaitForResize() {
         return false;
-    }
-
-    @Override
-    protected void onDetachedFromWindow() {
-        mSurfaceCallback.willDetachFromWindow();
-        super.onDetachedFromWindow();
-        mSurfaceCallback.didDetachFromWindow();
     }
 
     @Override
@@ -98,10 +80,6 @@ public class TextureRenderView extends TextureView implements IRenderView {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         mMeasureHelper.doMeasure(widthMeasureSpec, heightMeasureSpec);
         setMeasuredDimension(mMeasureHelper.getMeasuredWidth(), mMeasureHelper.getMeasuredHeight());
-    }
-
-    public IRenderView.ISurfaceHolder getSurfaceHolder() {
-        return new InternalSurfaceHolder(this, mSurfaceCallback.mSurfaceTexture);
     }
 
     private static final class InternalSurfaceHolder implements IRenderView.ISurfaceHolder {
@@ -154,7 +132,7 @@ public class TextureRenderView extends TextureView implements IRenderView {
         mSurfaceCallback.removeRenderCallback(callback);
     }
 
-    private SurfaceCallback mSurfaceCallback;
+    private final SurfaceCallback mSurfaceCallback;
 
     private static final class SurfaceCallback implements SurfaceTextureListener {
 
@@ -163,19 +141,11 @@ public class TextureRenderView extends TextureView implements IRenderView {
         private int mWidth;
         private int mHeight;
 
-        private boolean mOwnSurfaceTexture = true;
-        private boolean mWillDetachFromWindow = false;
-        private boolean mDidDetachFromWindow = false;
-
         private final WeakReference<TextureRenderView> mWeakRenderView;
         private final Map<IRenderCallback, Object> mRenderCallbackMap = new ConcurrentHashMap<>();
 
         private SurfaceCallback(@NonNull TextureRenderView renderView) {
             mWeakRenderView = new WeakReference<>(renderView);
-        }
-
-        private void setOwnSurfaceTexture(boolean ownSurfaceTexture) {
-            mOwnSurfaceTexture = ownSurfaceTexture;
         }
 
         private void addRenderCallback(@NonNull IRenderCallback callback) {
@@ -223,19 +193,11 @@ public class TextureRenderView extends TextureView implements IRenderView {
             mHeight = 0;
             ISurfaceHolder surfaceHolder = new InternalSurfaceHolder(mWeakRenderView.get(), surface);
             for (IRenderCallback renderCallback : mRenderCallbackMap.keySet()) renderCallback.onSurfaceDestroyed(surfaceHolder);
-            return mOwnSurfaceTexture;
+            return true;
         }
 
         @Override
         public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-        }
-
-        private void willDetachFromWindow() {
-            mWillDetachFromWindow = true;
-        }
-
-        private void didDetachFromWindow() {
-            mDidDetachFromWindow = true;
         }
     }
 
