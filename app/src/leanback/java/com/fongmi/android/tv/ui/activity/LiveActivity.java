@@ -88,6 +88,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private Runnable mR2;
     private Runnable mR3;
     private Runnable mR4;
+    private boolean confirm;
     private int count;
 
     public static void start(Activity activity) {
@@ -189,7 +190,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private void setVideoView() {
         mPlayers.set(getExo(), getIjk());
         setScale(Prefers.getLiveScale());
-        getIjk().setRender(Prefers.getRender());
         findViewById(R.id.timeBar).setNextFocusUpId(R.id.home);
         mBinding.control.speed.setText(mPlayers.getSpeedText());
         mBinding.control.invert.setActivated(Prefers.isInvert());
@@ -416,7 +416,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     @Override
     public void onItemClick(Group item) {
         mChannelAdapter.setItems(item.getChannel(), null);
-        mBinding.channel.setSelectedPosition(item.getPosition());
+        mBinding.channel.setSelectedPosition(Math.max(item.getPosition(), 0));
         if (!item.isKeep() || ++count < 5 || mHides.isEmpty()) return;
         PassDialog.create().show(this);
         App.removeCallbacks(mR0);
@@ -752,6 +752,10 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
             hideInfo();
         } else if (isVisible(mBinding.recycler)) {
             hideUI();
+        } else if (!confirm) {
+            confirm = true;
+            Notify.show(R.string.app_exit);
+            App.post(() -> confirm = false, 2000);
         } else {
             super.onBackPressed();
         }

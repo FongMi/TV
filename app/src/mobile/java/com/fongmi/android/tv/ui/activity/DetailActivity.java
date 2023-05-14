@@ -287,7 +287,6 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     private void setVideoView() {
         mPlayers.set(getExo(), getIjk());
-        getIjk().setRender(Prefers.getRender());
         if (ResUtil.isLand(this)) enterFullscreen();
         getExo().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
         getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);

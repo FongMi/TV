@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <attr name="keep_content_on_player_reset" format="boolean" />
+
+    <declare-styleable name="IjkVideoView">
+        <attr name="keep_content_on_player_reset" />
+    </declare-styleable>
+
+</resources>

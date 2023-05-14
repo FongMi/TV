@@ -21,6 +21,7 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Collect;
 import com.fongmi.android.tv.bean.Hot;
+import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Suggest;
 import com.fongmi.android.tv.bean.Vod;
@@ -34,8 +35,8 @@ import com.fongmi.android.tv.ui.adapter.RecordAdapter;
 import com.fongmi.android.tv.ui.adapter.VodAdapter;
 import com.fongmi.android.tv.ui.adapter.WordAdapter;
 import com.fongmi.android.tv.ui.base.BaseActivity;
-import com.fongmi.android.tv.ui.custom.CustomTextListener;
 import com.fongmi.android.tv.ui.base.ViewType;
+import com.fongmi.android.tv.ui.custom.CustomTextListener;
 import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
 import com.fongmi.android.tv.utils.PauseThreadPoolExecutor;
 import com.fongmi.android.tv.utils.Prefers;
@@ -261,7 +262,8 @@ public class CollectActivity extends BaseActivity implements SiteCallback, WordA
 
     @Override
     public void onItemClick(Vod item) {
-        DetailActivity.start(this, item.getSiteKey(), item.getVodId(), item.getVodName());
+        if (item.isFolder()) VodActivity.start(this, item.getSiteKey(), Result.folder(item));
+        else DetailActivity.start(this, item.getSiteKey(), item.getVodId(), item.getVodName());
     }
 
     @Override
