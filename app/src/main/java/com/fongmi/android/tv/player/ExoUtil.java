@@ -91,8 +91,8 @@ public class ExoUtil {
         return new DefaultMediaSourceFactory(getDataSourceFactory(headers), getExtractorsFactory()).createMediaSource(getMediaItem(uri, subs, errorCode));
     }
 
-    private static MediaItem getMediaItem(String url, List<Sub> subs, int errorCode) {
-        MediaItem.Builder builder = new MediaItem.Builder().setUri(Uri.parse(url.trim().replace("\\", "")));
+    private static MediaItem getMediaItem(Uri uri, List<Sub> subs, int errorCode) {
+        MediaItem.Builder builder = new MediaItem.Builder().setUri(uri);
         if (errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED) builder.setMimeType(MimeTypes.APPLICATION_M3U8);
         if (subs.size() > 0) builder.setSubtitleConfigurations(getSubtitles(subs));
         return builder.build();
