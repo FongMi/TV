@@ -19,14 +19,13 @@
             android:id="@+id/keyword"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
             android:layout_weight="1"
             android:background="@null"
             android:hint="@string/search_keyword"
             android:imeOptions="actionDone"
             android:inputType="textCapCharacters|textAutoCorrect|textAutoComplete"
             android:letterSpacing="0.02"
-            android:maxLength="20"
+            android:maxLength="255"
             android:singleLine="true"
             android:textColor="@color/white"
             android:textColorHint="@color/white"
@@ -37,6 +36,7 @@
             android:id="@+id/site"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
             android:src="@drawable/ic_action_site" />
 
         <ImageView
@@ -45,7 +45,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:src="@drawable/ic_action_list"
-            android:visibility="gone" />
+            android:visibility="gone"
+            tools:visibility="visible" />
 
     </LinearLayout>
 
