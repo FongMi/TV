@@ -478,7 +478,10 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void onShare() {
-        new ShareCompat.IntentBuilder(this).setType("text/plain").setText(getUrl()).startChooser();
+        ShareCompat.IntentBuilder builder = new ShareCompat.IntentBuilder(this).setType("text/plain").setText(getUrl());
+        builder.getIntent().putExtra("title", mBinding.control.title.getText());
+        builder.getIntent().putExtra("name", mBinding.control.title.getText());
+        builder.startChooser();
     }
 
     private void checkPlay() {

@@ -7,7 +7,6 @@
       "type": 3,
       "api": "csp_Csp",
       "searchable": 1,
-      "filterable": 1,
       "changeable": 1,
       "ext": "file://Download/one.json"
     },
@@ -17,7 +16,6 @@
       "type": 3,
       "api": "csp_Csp",
       "searchable": 1,
-      "filterable": 1,
       "changeable": 1,
       "ext": "file://Download/two.json"
     },
@@ -27,7 +25,6 @@
       "type": 3,
       "api": "csp_Csp",
       "searchable": 1,
-      "filterable": 1,
       "changeable": 1,
       "ext": "file://Download/extend.json",
       "jar": "file://Download/extend.jar"
