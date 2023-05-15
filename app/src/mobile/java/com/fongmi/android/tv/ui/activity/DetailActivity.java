@@ -464,7 +464,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void onCast() {
-        CastDialog.create().config(ApiConfig.getUrl()).history(mHistory).video(CastVideo.get(getName(), getUrl())).show(this);
+        CastDialog.create().history(mHistory).video(CastVideo.get(getName(), getUrl())).show(this);
     }
 
     private void onKeep() {
