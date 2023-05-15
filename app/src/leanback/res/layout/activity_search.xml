@@ -68,7 +68,7 @@
             android:imeOptions="actionDone"
             android:inputType="textCapCharacters|textAutoCorrect|textAutoComplete"
             android:letterSpacing="0.02"
-            android:maxLength="20"
+            android:maxLength="255"
             android:nextFocusRight="@id/word"
             android:singleLine="true"
             android:textColor="@color/white"
