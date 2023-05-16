@@ -7,9 +7,11 @@ import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.db.AppDatabase;
+import com.fongmi.android.tv.net.Callback;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
@@ -312,8 +314,27 @@ public class History {
         }
     }
 
-    public static void sync(List<History> items) {
+    private static void sync(List<History> targets) {
+        for (History target : targets) {
+            List<History> items = AppDatabase.get().getHistoryDao().findByName(ApiConfig.getCid(), target.getVodName());
+            if (items.isEmpty()) {
+                target.update(ApiConfig.getCid());
+                continue;
+            }
+            for (History item : items) {
+                if (target.getCreateTime() > item.getCreateTime()) {
+                    target.update(ApiConfig.getCid());
+                    break;
+                }
+            }
+        }
+    }
 
+    public static void sync(List<History> targets, Callback callback) {
+        App.execute(() -> {
+            sync(targets);
+            App.post(callback::success);
+        });
     }
 
     @NonNull

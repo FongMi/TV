@@ -52,8 +52,8 @@ public class OkHttp {
         return client().newCall(new Request.Builder().url(buildUrl(url, params)).build());
     }
 
-    public static Call newCall(String url, RequestBody body) {
-        return client().newCall(new Request.Builder().url(url).post(body).build());
+    public static Call newCall(OkHttpClient client, String url, RequestBody body) {
+        return client.newCall(new Request.Builder().url(url).post(body).build());
     }
 
     private static HttpUrl buildUrl(String url, ArrayMap<String, String> params) {
