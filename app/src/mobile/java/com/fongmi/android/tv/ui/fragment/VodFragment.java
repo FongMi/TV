@@ -235,31 +235,6 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         return mResult == null ? new Result() : mResult;
     }
 
-    private Callback getCallback() {
-        return new Callback() {
-            @Override
-            public void success() {
-                RefreshEvent.history();
-            }
-        };
-    }
-
-    private Callback getCallback(SyncEvent event) {
-        return new Callback() {
-            @Override
-            public void success() {
-                RefreshEvent.config();
-                RefreshEvent.video();
-                onSyncEvent(event);
-            }
-
-            @Override
-            public void error(int resId) {
-                Notify.show(resId);
-            }
-        };
-    }
-
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefreshEvent(RefreshEvent event) {
         switch (event.getType()) {
@@ -281,10 +256,26 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onSyncEvent(SyncEvent event) {
         if (ApiConfig.get().getConfig().equals(event.getConfig())) {
-            History.sync(event.getHistory(), getCallback());
+            History.sync(event.getHistory());
         } else {
             ApiConfig.get().clear().config(event.getConfig()).load(getCallback(event));
         }
+    }
+
+    private Callback getCallback(SyncEvent event) {
+        return new Callback() {
+            @Override
+            public void success() {
+                RefreshEvent.config();
+                RefreshEvent.video();
+                onSyncEvent(event);
+            }
+
+            @Override
+            public void error(int resId) {
+                Notify.show(resId);
+            }
+        };
     }
 
     @Override
