@@ -20,7 +20,6 @@ import com.fongmi.android.tv.Updater;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.api.LiveConfig;
 import com.fongmi.android.tv.api.WallConfig;
-import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Func;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Result;
@@ -30,6 +29,7 @@ import com.fongmi.android.tv.databinding.ActivityHomeBinding;
 import com.fongmi.android.tv.event.CastEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.event.ServerEvent;
+import com.fongmi.android.tv.event.SyncEvent;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.server.Server;
@@ -327,6 +327,31 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
                 RefreshEvent.history();
                 RefreshEvent.video();
                 onCastEvent(event);
+            }
+
+            @Override
+            public void error(int resId) {
+                Notify.show(resId);
+            }
+        };
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onSyncEvent(SyncEvent event) {
+        if (ApiConfig.get().getConfig().equals(event.getConfig())) {
+            History.sync(event.getHistory());
+        } else {
+            ApiConfig.get().clear().config(event.getConfig()).load(getCallback(event));
+        }
+    }
+
+    private Callback getCallback(SyncEvent event) {
+        return new Callback() {
+            @Override
+            public void success() {
+                RefreshEvent.history();
+                RefreshEvent.video();
+                onSyncEvent(event);
             }
 
             @Override
