@@ -1,7 +1,5 @@
 package com.fongmi.android.tv.server;
 
-import android.text.TextUtils;
-
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Config;
@@ -134,11 +132,9 @@ public class Nano extends NanoHTTPD {
     }
 
     private Response doSync(Map<String, String> params) {
-        String url = params.get("url");
-        if (TextUtils.isEmpty(url)) url = ApiConfig.getUrl();
-        if (TextUtils.isEmpty(url)) return createErrorResponse("");
-        Config config = Config.find(url, 0);
-        SyncEvent.post(config, History.arrayFrom(params.get("history")));
+        Config config = Config.find(params.get("url"), 0);
+        List<History> history = History.arrayFrom(params.get("history"));
+        SyncEvent.post(config, history);
         return createSuccessResponse(new Gson().toJson(History.get(config.getId())));
     }
 
