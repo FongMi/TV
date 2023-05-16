@@ -11,7 +11,7 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.db.AppDatabase;
-import com.fongmi.android.tv.net.Callback;
+import com.fongmi.android.tv.event.RefreshEvent;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
@@ -65,7 +65,8 @@ public class History {
     }
 
     public static List<History> arrayFrom(String str) {
-        Type listType = new TypeToken<List<History>>() {}.getType();
+        Type listType = new TypeToken<List<History>>() {
+        }.getType();
         List<History> items = new Gson().fromJson(str, listType);
         return items == null ? Collections.emptyList() : items;
     }
@@ -314,7 +315,7 @@ public class History {
         }
     }
 
-    private static void sync(List<History> targets) {
+    private static void startSync(List<History> targets) {
         for (History target : targets) {
             List<History> items = AppDatabase.get().getHistoryDao().findByName(ApiConfig.getCid(), target.getVodName());
             if (items.isEmpty()) {
@@ -330,10 +331,10 @@ public class History {
         }
     }
 
-    public static void sync(List<History> targets, Callback callback) {
+    public static void sync(List<History> targets) {
         App.execute(() -> {
-            sync(targets);
-            App.post(callback::success);
+            startSync(targets);
+            RefreshEvent.history();
         });
     }
 
