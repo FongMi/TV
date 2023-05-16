@@ -2,11 +2,16 @@ package com.fongmi.android.tv.server;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Device;
+import com.fongmi.android.tv.bean.History;
+import com.fongmi.android.tv.event.CastEvent;
+import com.fongmi.android.tv.event.SyncEvent;
 import com.fongmi.android.tv.server.process.InputRequestProcess;
 import com.fongmi.android.tv.server.process.RawRequestProcess;
 import com.fongmi.android.tv.server.process.RequestProcess;
 import com.fongmi.android.tv.utils.FileUtil;
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -72,15 +77,17 @@ public class Nano extends NanoHTTPD {
             case GET:
                 if (url.startsWith("/file")) return doFile(url);
                 else if (url.startsWith("/proxy")) return doProxy(session.getParms());
-                else if (url.startsWith("/device")) return createPlainTextResponse(NanoHTTPD.Response.Status.OK, Device.get().toString());
+                else if (url.startsWith("/device")) return createSuccessResponse(Device.get().toString());
                 break;
             case POST:
-                if (url.startsWith("/upload")) return doUpload(session.getParms(), files);
+                if (url.startsWith("/cast")) return doCast(session.getParms());
+                else if (url.startsWith("/sync")) return doSync(session.getParms());
+                else if (url.startsWith("/upload")) return doUpload(session.getParms(), files);
                 else if (url.startsWith("/newFolder")) return doNewFolder(session.getParms());
                 else if (url.startsWith("/delFolder") || url.startsWith("/delFile")) return doDelFolder(session.getParms());
                 break;
         }
-        return processes.get(0).doResponse(session, "");
+        return createErrorResponse(NanoHTTPD.Response.Status.NOT_FOUND, "Not Found");
     }
 
     private void parseBody(IHTTPSession session, Map<String, String> files) {
@@ -101,9 +108,9 @@ public class Nano extends NanoHTTPD {
             String path = url.substring(6);
             File file = FileUtil.getRootFile(path);
             if (file.isFile()) return newChunkedResponse(Response.Status.OK, "application/octet-stream", new FileInputStream(file));
-            else return createPlainTextResponse(Response.Status.OK, listFiles(file));
+            else return createSuccessResponse(listFiles(file));
         } catch (Exception e) {
-            return createPlainTextResponse(Response.Status.INTERNAL_ERROR, e.getMessage());
+            return createErrorResponse(e.getMessage());
         }
     }
 
@@ -112,8 +119,23 @@ public class Nano extends NanoHTTPD {
             Object[] rs = ApiConfig.get().proxyLocal(params);
             return newChunkedResponse(Response.Status.lookup((Integer) rs[0]), (String) rs[1], (InputStream) rs[2]);
         } catch (Exception e) {
-            return createPlainTextResponse(Response.Status.INTERNAL_ERROR, "500");
+            return createErrorResponse(e.getMessage());
         }
+    }
+
+    private Response doCast(Map<String, String> params) {
+        Config config = Config.find(params.get("config").trim(), 0);
+        Device device = Device.objectFrom(params.get("device").trim());
+        History history = History.objectFrom(params.get("history").trim());
+        CastEvent.post(config, device, history);
+        return createSuccessResponse();
+    }
+
+    private Response doSync(Map<String, String> params) {
+        Config config = Config.find(params.get("config").trim(), 0);
+        List<History> history = History.arrayFrom(params.get("history").trim());
+        SyncEvent.post(config, history);
+        return createSuccessResponse(new Gson().toJson(History.get(config.getId())));
     }
 
     private Response doUpload(Map<String, String> params, Map<String, String> files) {
@@ -124,20 +146,20 @@ public class Nano extends NanoHTTPD {
             if (fn.toLowerCase().endsWith(".zip")) FileUtil.unzip(temp, FileUtil.getRootPath() + File.separator + path);
             else FileUtil.copy(temp, FileUtil.getRootFile(path + File.separator + fn));
         }
-        return createPlainTextResponse(Response.Status.OK, "OK");
+        return createSuccessResponse();
     }
 
     private Response doNewFolder(Map<String, String> params) {
         String path = params.get("path");
         String name = params.get("name");
         FileUtil.getRootFile(path + File.separator + name).mkdirs();
-        return createPlainTextResponse(Response.Status.OK, "OK");
+        return createSuccessResponse();
     }
 
     private Response doDelFolder(Map<String, String> params) {
         String path = params.get("path");
         FileUtil.clearDir(FileUtil.getRootFile(path));
-        return createPlainTextResponse(Response.Status.OK, "OK");
+        return createSuccessResponse();
     }
 
     private String getParent(File root) {
@@ -171,7 +193,19 @@ public class Nano extends NanoHTTPD {
         return info.toString();
     }
 
-    public static Response createPlainTextResponse(Response.IStatus status, String text) {
+    public static Response createSuccessResponse() {
+        return createSuccessResponse("OK");
+    }
+
+    public static Response createSuccessResponse(String text) {
+        return newFixedLengthResponse(Response.Status.OK, MIME_PLAINTEXT, text);
+    }
+
+    public static Response createErrorResponse(String text) {
+        return createErrorResponse(Response.Status.INTERNAL_ERROR, text);
+    }
+
+    public static Response createErrorResponse(Response.IStatus status, String text) {
         return newFixedLengthResponse(status, MIME_PLAINTEXT, text);
     }
 
@@ -182,7 +216,5 @@ public class Nano extends NanoHTTPD {
         void onPush(String url);
 
         void onApi(String url);
-
-        void onCast(String device, String config, String history);
     }
 }

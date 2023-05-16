@@ -313,10 +313,10 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onCastEvent(CastEvent event) {
-        if (ApiConfig.getUrl().equals(event.getConfig())) {
+        if (ApiConfig.get().getConfig().equals(event.getConfig())) {
             DetailActivity.cast(this, event.getHistory().update(ApiConfig.getCid()));
         } else {
-            ApiConfig.get().clear().config(Config.find(event.getConfig(), 0)).load(getCallback(event));
+            ApiConfig.get().clear().config(event.getConfig()).load(getCallback(event));
         }
     }
 

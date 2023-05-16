@@ -1077,8 +1077,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     @Override
-    public void onCastTo(boolean mobile) {
-        if (mobile) return;
+    public void onCastTo() {
         checkPlayImg(false);
         mPlayers.pause();
     }

@@ -21,7 +21,6 @@ public class InputRequestProcess implements RequestProcess {
 
     @Override
     public NanoHTTPD.Response doResponse(NanoHTTPD.IHTTPSession session, String path) {
-        if (!path.equals("/action")) return Nano.createPlainTextResponse(NanoHTTPD.Response.Status.NOT_FOUND, "Error 404, file not found.");
         Map<String, String> params = session.getParms();
         switch (params.get("do")) {
             case "search":
@@ -33,10 +32,7 @@ public class InputRequestProcess implements RequestProcess {
             case "api":
                 nano.getListener().onApi(params.get("url").trim());
                 break;
-            case "cast":
-                nano.getListener().onCast(params.get("device").trim(), params.get("config").trim(), params.get("history").trim());
-                break;
         }
-        return Nano.createPlainTextResponse(NanoHTTPD.Response.Status.OK, "ok");
+        return Nano.createSuccessResponse();
     }
 }

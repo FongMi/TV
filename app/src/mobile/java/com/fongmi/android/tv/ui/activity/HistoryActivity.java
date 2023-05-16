@@ -10,12 +10,16 @@ import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.databinding.ActivityHistoryBinding;
 import com.fongmi.android.tv.event.RefreshEvent;
+import com.fongmi.android.tv.event.SyncEvent;
+import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.ui.adapter.HistoryAdapter;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.dialog.SyncDialog;
+import com.fongmi.android.tv.utils.Notify;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -77,6 +81,32 @@ public class HistoryActivity extends BaseActivity implements HistoryAdapter.OnCl
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefreshEvent(RefreshEvent event) {
         if (event.getType().equals(RefreshEvent.Type.HISTORY)) getHistory();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onSyncEvent(SyncEvent event) {
+        if (ApiConfig.get().getConfig().equals(event.getConfig())) {
+            History.sync(event.getHistory());
+            getHistory();
+        } else {
+            ApiConfig.get().clear().config(event.getConfig()).load(getCallback(event));
+        }
+    }
+
+    private Callback getCallback(SyncEvent event) {
+        return new Callback() {
+            @Override
+            public void success() {
+                RefreshEvent.config();
+                RefreshEvent.video();
+                onSyncEvent(event);
+            }
+
+            @Override
+            public void error(int resId) {
+                Notify.show(resId);
+            }
+        };
     }
 
     @Override

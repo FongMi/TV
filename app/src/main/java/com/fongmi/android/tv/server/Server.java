@@ -5,7 +5,6 @@ import android.net.wifi.WifiManager;
 import android.text.format.Formatter;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.event.CastEvent;
 import com.fongmi.android.tv.event.ServerEvent;
 
 import java.net.Inet4Address;
@@ -103,10 +102,5 @@ public class Server implements Nano.Listener {
     @Override
     public void onApi(String url) {
         if (url.length() > 0) ServerEvent.api(url);
-    }
-
-    @Override
-    public void onCast(String device, String config, String history) {
-        CastEvent.post(device, config, history);
     }
 }
