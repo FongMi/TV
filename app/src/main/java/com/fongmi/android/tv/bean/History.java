@@ -65,8 +65,7 @@ public class History {
     }
 
     public static List<History> arrayFrom(String str) {
-        Type listType = new TypeToken<List<History>>() {
-        }.getType();
+        Type listType = new TypeToken<List<History>>() {}.getType();
         List<History> items = new Gson().fromJson(str, listType);
         return items == null ? Collections.emptyList() : items;
     }
