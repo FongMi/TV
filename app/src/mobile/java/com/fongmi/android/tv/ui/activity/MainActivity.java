@@ -100,6 +100,12 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
         };
     }
 
+    private void setNavigation() {
+        mBinding.navigation.getMenu().findItem(R.id.vod).setVisible(true);
+        mBinding.navigation.getMenu().findItem(R.id.setting).setVisible(true);
+        mBinding.navigation.getMenu().findItem(R.id.live).setVisible(LiveConfig.hasUrl());
+    }
+
     private boolean openLive() {
         LiveActivity.start(this);
         return false;
@@ -114,10 +120,7 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
     @Override
     public void onRefreshEvent(RefreshEvent event) {
         super.onRefreshEvent(event);
-        if (!event.getType().equals(RefreshEvent.Type.CONFIG)) return;
-        mBinding.navigation.getMenu().findItem(R.id.vod).setVisible(true);
-        mBinding.navigation.getMenu().findItem(R.id.setting).setVisible(true);
-        mBinding.navigation.getMenu().findItem(R.id.live).setVisible(LiveConfig.hasUrl());
+        if (event.getType().equals(RefreshEvent.Type.CONFIG)) setNavigation();
     }
 
     @Override
@@ -137,7 +140,9 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
 
     @Override
     public void onBackPressed() {
-        if (mManager.isVisible(1)) {
+        if (!mBinding.navigation.getMenu().findItem(R.id.vod).isVisible()) {
+            setNavigation();
+        } else if (mManager.isVisible(1)) {
             mBinding.navigation.setSelectedItemId(R.id.vod);
         } else if (mManager.canBack(0)) {
             if (!confirm) setConfirm();
