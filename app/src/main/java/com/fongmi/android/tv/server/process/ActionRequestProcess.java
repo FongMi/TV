@@ -3,7 +3,6 @@ package com.fongmi.android.tv.server.process;
 import android.text.TextUtils;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Device;
@@ -96,7 +95,7 @@ public class ActionRequestProcess implements RequestProcess {
             body.add("targets", App.gson().toJson(History.get(Config.find(url, 0).getId())));
             OkHttp.newCall(OkHttp.client(1000), device.getIp().concat("/action?do=sync&type=history"), body.build()).execute();
         } catch (Exception e) {
-            App.post(() -> Notify.show(R.string.device_offline));
+            App.post(() -> Notify.show(e.getMessage()));
         }
     }
 
@@ -107,7 +106,7 @@ public class ActionRequestProcess implements RequestProcess {
             body.add("configs", App.gson().toJson(Config.findUrls()));
             OkHttp.newCall(OkHttp.client(1000), device.getIp().concat("/action?do=sync&type=keep"), body.build()).execute();
         } catch (Exception e) {
-            App.post(() -> Notify.show(R.string.device_offline));
+            App.post(() -> Notify.show(e.getMessage()));
         }
     }
 
@@ -153,6 +152,7 @@ public class ActionRequestProcess implements RequestProcess {
         return new Callback() {
             @Override
             public void success() {
+                RefreshEvent.history();
                 RefreshEvent.config();
                 RefreshEvent.video();
                 Keep.sync(configs, targets);
