@@ -17,7 +17,7 @@ public class Part {
 
     private static List<Part> arrayFrom(String str) {
         try {
-            Type listType = new TypeToken<ArrayList<Part>>() {}.getType();
+            Type listType = new TypeToken<List<Part>>() {}.getType();
             return new Gson().fromJson(str, listType);
         } catch (Exception e) {
             return new ArrayList<>();

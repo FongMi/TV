@@ -2,16 +2,11 @@ package com.fongmi.android.tv.server;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
-import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Device;
-import com.fongmi.android.tv.bean.History;
-import com.fongmi.android.tv.event.CastEvent;
-import com.fongmi.android.tv.event.SyncEvent;
-import com.fongmi.android.tv.server.process.InputRequestProcess;
+import com.fongmi.android.tv.server.process.ActionRequestProcess;
 import com.fongmi.android.tv.server.process.RawRequestProcess;
 import com.fongmi.android.tv.server.process.RequestProcess;
 import com.fongmi.android.tv.utils.FileUtil;
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -35,7 +30,6 @@ public class Nano extends NanoHTTPD {
 
     private List<RequestProcess> processes;
     private final SimpleDateFormat format;
-    private Listener listener;
 
     public Nano(int port) {
         super(port);
@@ -45,7 +39,7 @@ public class Nano extends NanoHTTPD {
 
     private void addRequestProcess() {
         processes = new ArrayList<>();
-        processes.add(new InputRequestProcess(this));
+        processes.add(new ActionRequestProcess());
         processes.add(new RawRequestProcess("/", R.raw.index, MIME_HTML));
         processes.add(new RawRequestProcess("/index.html", R.raw.index, MIME_HTML));
         processes.add(new RawRequestProcess("/ui.css", R.raw.ui, "text/css"));
@@ -54,12 +48,20 @@ public class Nano extends NanoHTTPD {
         processes.add(new RawRequestProcess("/favicon.ico", R.mipmap.ic_launcher, "image/x-icon"));
     }
 
-    public Listener getListener() {
-        return listener;
+    public static Response createSuccessResponse() {
+        return createSuccessResponse("OK");
     }
 
-    public void setListener(Listener listener) {
-        this.listener = listener;
+    public static Response createSuccessResponse(String text) {
+        return newFixedLengthResponse(Response.Status.OK, MIME_PLAINTEXT, text);
+    }
+
+    public static Response createErrorResponse(String text) {
+        return createErrorResponse(Response.Status.INTERNAL_ERROR, text);
+    }
+
+    public static Response createErrorResponse(Response.IStatus status, String text) {
+        return newFixedLengthResponse(status, MIME_PLAINTEXT, text);
     }
 
     @Override
@@ -80,9 +82,7 @@ public class Nano extends NanoHTTPD {
                 else if (url.startsWith("/device")) return createSuccessResponse(Device.get().toString());
                 break;
             case POST:
-                if (url.startsWith("/cast")) return doCast(session.getParms());
-                else if (url.startsWith("/sync")) return doSync(session.getParms());
-                else if (url.startsWith("/upload")) return doUpload(session.getParms(), files);
+                if (url.startsWith("/upload")) return doUpload(session.getParms(), files);
                 else if (url.startsWith("/newFolder")) return doNewFolder(session.getParms());
                 else if (url.startsWith("/delFolder") || url.startsWith("/delFile")) return doDelFolder(session.getParms());
                 break;
@@ -121,21 +121,6 @@ public class Nano extends NanoHTTPD {
         } catch (Exception e) {
             return createErrorResponse(e.getMessage());
         }
-    }
-
-    private Response doCast(Map<String, String> params) {
-        Config config = Config.find(params.get("url"), 0);
-        Device device = Device.objectFrom(params.get("device"));
-        History history = History.objectFrom(params.get("history"));
-        CastEvent.post(config, device, history);
-        return createSuccessResponse();
-    }
-
-    private Response doSync(Map<String, String> params) {
-        Config config = Config.find(params.get("url"), 0);
-        List<History> history = History.arrayFrom(params.get("history"));
-        SyncEvent.post(config, history);
-        return createSuccessResponse(new Gson().toJson(History.get(config.getId())));
     }
 
     private Response doUpload(Map<String, String> params, Map<String, String> files) {
@@ -191,30 +176,5 @@ public class Nano extends NanoHTTPD {
             files.add(obj);
         }
         return info.toString();
-    }
-
-    public static Response createSuccessResponse() {
-        return createSuccessResponse("OK");
-    }
-
-    public static Response createSuccessResponse(String text) {
-        return newFixedLengthResponse(Response.Status.OK, MIME_PLAINTEXT, text);
-    }
-
-    public static Response createErrorResponse(String text) {
-        return createErrorResponse(Response.Status.INTERNAL_ERROR, text);
-    }
-
-    public static Response createErrorResponse(Response.IStatus status, String text) {
-        return newFixedLengthResponse(status, MIME_PLAINTEXT, text);
-    }
-
-    public interface Listener {
-
-        void onSearch(String word);
-
-        void onPush(String url);
-
-        void onApi(String url);
     }
 }

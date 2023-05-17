@@ -18,14 +18,12 @@ import androidx.viewpager.widget.ViewPager;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Class;
-import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Hot;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.databinding.FragmentVodBinding;
 import com.fongmi.android.tv.event.CastEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
-import com.fongmi.android.tv.event.SyncEvent;
 import com.fongmi.android.tv.impl.FilterCallback;
 import com.fongmi.android.tv.impl.SiteCallback;
 import com.fongmi.android.tv.model.SiteViewModel;
@@ -37,12 +35,11 @@ import com.fongmi.android.tv.ui.activity.HistoryActivity;
 import com.fongmi.android.tv.ui.activity.KeepActivity;
 import com.fongmi.android.tv.ui.adapter.TypeAdapter;
 import com.fongmi.android.tv.ui.base.BaseFragment;
-import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.ui.custom.dialog.FilterDialog;
 import com.fongmi.android.tv.ui.custom.dialog.LinkDialog;
 import com.fongmi.android.tv.ui.custom.dialog.ReceiveDialog;
 import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
-import com.fongmi.android.tv.utils.Notify;
+import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.Trans;
 import com.google.common.net.HttpHeaders;
@@ -251,31 +248,6 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onCastEvent(CastEvent event) {
         ReceiveDialog.create().event(event).show(this);
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onSyncEvent(SyncEvent event) {
-        if (ApiConfig.get().getConfig().equals(event.getConfig())) {
-            History.sync(event.getHistory());
-        } else {
-            ApiConfig.get().clear().config(event.getConfig()).load(getCallback(event));
-        }
-    }
-
-    private Callback getCallback(SyncEvent event) {
-        return new Callback() {
-            @Override
-            public void success() {
-                RefreshEvent.config();
-                RefreshEvent.video();
-                onSyncEvent(event);
-            }
-
-            @Override
-            public void error(int resId) {
-                Notify.show(resId);
-            }
-        };
     }
 
     @Override

@@ -7,9 +7,9 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.databinding.AdapterCollectRecordBinding;
 import com.fongmi.android.tv.utils.Prefers;
-import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
@@ -19,11 +19,9 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.ViewHolder
 
     private final OnClickListener mListener;
     private final List<String> mItems;
-    private final Gson mGson;
 
     public RecordAdapter(OnClickListener listener) {
         this.mListener = listener;
-        this.mGson = new Gson();
         this.mItems = getItems();
         this.mListener.onDataChanged(mItems.size());
     }
@@ -37,7 +35,7 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.ViewHolder
 
     private List<String> getItems() {
         if (Prefers.getKeyword().isEmpty()) return new ArrayList<>();
-        return mGson.fromJson(Prefers.getKeyword(), new TypeToken<List<String>>() {}.getType());
+        return App.gson().fromJson(Prefers.getKeyword(), new TypeToken<List<String>>() {}.getType());
     }
 
     private void checkToAdd(String item) {
@@ -59,7 +57,7 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.ViewHolder
     public void add(String item) {
         checkToAdd(item);
         mListener.onDataChanged(getItemCount());
-        Prefers.putKeyword(mGson.toJson(mItems));
+        Prefers.putKeyword(App.gson().toJson(mItems));
     }
 
     @Override
@@ -95,7 +93,7 @@ public class RecordAdapter extends RecyclerView.Adapter<RecordAdapter.ViewHolder
             mItems.remove(getLayoutPosition());
             notifyItemRemoved(getLayoutPosition());
             mListener.onDataChanged(getItemCount());
-            Prefers.putKeyword(mGson.toJson(mItems));
+            Prefers.putKeyword(App.gson().toJson(mItems));
             return true;
         }
     }
