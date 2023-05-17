@@ -208,6 +208,12 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         return -1;
     }
 
+    private void setConfirm() {
+        confirm = true;
+        Notify.show(R.string.app_exit);
+        App.post(() -> confirm = false, 2000);
+    }
+
     @Override
     public void onItemClick(Func item) {
         switch (item.getResId()) {
@@ -355,14 +361,14 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     public void onBackPressed() {
-        if (mHistoryPresenter.isDelete()) {
+        if (mBinding.progressLayout.isProgress()) {
+            mBinding.progressLayout.showContent();
+        } else if (mHistoryPresenter.isDelete()) {
             setHistoryDelete(false);
         } else if (mBinding.recycler.getSelectedPosition() != 0) {
             mBinding.recycler.scrollToPosition(0);
         } else if (!confirm) {
-            confirm = true;
-            Notify.show(R.string.app_exit);
-            App.post(() -> confirm = false, 2000);
+            setConfirm();
         } else {
             finish();
         }
