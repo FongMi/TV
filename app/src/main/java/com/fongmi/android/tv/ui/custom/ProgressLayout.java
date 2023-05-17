@@ -84,6 +84,10 @@ public class ProgressLayout extends RelativeLayout {
         else showContent();
     }
 
+    public boolean isProgress() {
+        return mState == State.PROGRESS;
+    }
+
     public void switchState(State state) {
         if (mState == state) return;
         mState = state;
