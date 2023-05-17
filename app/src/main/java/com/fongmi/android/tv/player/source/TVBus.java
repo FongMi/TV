@@ -3,14 +3,12 @@ package com.fongmi.android.tv.player.source;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.api.LiveConfig;
 import com.fongmi.android.tv.bean.Core;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.tvbus.engine.Listener;
 import com.tvbus.engine.TVCore;
 
 public class TVBus implements Listener {
 
-    private final Gson gson;
     private TVCore tvcore;
     private String hls;
 
@@ -20,10 +18,6 @@ public class TVBus implements Listener {
 
     public static TVBus get() {
         return Loader.INSTANCE;
-    }
-
-    public TVBus() {
-        this.gson = new Gson();
     }
 
     private void init(Core core) {
@@ -66,7 +60,7 @@ public class TVBus implements Listener {
 
     @Override
     public void onPrepared(String result) {
-        JsonObject json = gson.fromJson(result, JsonObject.class);
+        JsonObject json = App.gson().fromJson(result, JsonObject.class);
         if (json.get("hls") == null) return;
         hls = json.get("hls").getAsString();
         onNotify();

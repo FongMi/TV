@@ -58,7 +58,7 @@ public class LiveConfig {
     }
 
     public static boolean hasUrl() {
-        return getUrl().length() > 0;
+        return getUrl() != null && getUrl().length() > 0;
     }
 
     public LiveConfig init() {
