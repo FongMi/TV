@@ -9,6 +9,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.File;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -61,7 +62,7 @@ public class Live {
     }
 
     public Live(String url) {
-        this.name = Uri.parse(url).getLastPathSegment();
+        this.name = url.startsWith("file") ? new File(url).getName() : Uri.parse(url).getLastPathSegment();
         this.url = url;
     }
 
