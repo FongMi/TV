@@ -25,7 +25,6 @@ import com.fongmi.android.tv.utils.ResUtil;
 import com.github.catvod.crawler.SpiderDebug;
 import com.google.common.collect.ImmutableList;
 
-import java.util.Collections;
 import java.util.Formatter;
 import java.util.List;
 import java.util.Locale;
@@ -337,13 +336,9 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     private void setMediaSource(Map<String, String> headers, String url) {
-        setMediaSource(Collections.emptyList(), headers, url);
-    }
-
-    private void setMediaSource(List<String> ads, Map<String, String> headers, String url) {
         SpiderDebug.log(errorCode + "," + url + "," + headers);
         if (isIjk()) ijkPlayer.setMediaSource(url, headers);
-        if (isExo()) exoPlayer.setMediaSource(ExoUtil.getSource(ads, headers, url, errorCode));
+        if (isExo()) exoPlayer.setMediaSource(ExoUtil.getSource(headers, url, errorCode));
         if (isExo()) exoPlayer.prepare();
         setTimeoutCheck(url);
     }
@@ -379,9 +374,9 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     @Override
-    public void onParseSuccess(List<String> ads, Map<String, String> headers, String url, String from) {
+    public void onParseSuccess(Map<String, String> headers, String url, String from) {
         if (from.length() > 0) Notify.show(ResUtil.getString(R.string.parse_from, from));
-        setMediaSource(ads, headers, url);
+        setMediaSource(headers, url);
     }
 
     @Override

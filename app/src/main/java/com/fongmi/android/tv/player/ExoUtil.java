@@ -33,6 +33,8 @@ import androidx.media3.extractor.ts.TsExtractor;
 import androidx.media3.ui.CaptionStyleCompat;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.bean.Rule;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Sub;
 import com.fongmi.android.tv.utils.FileUtil;
@@ -78,26 +80,31 @@ public class ExoUtil {
     }
 
     public static MediaSource getSource(Result result, int errorCode) {
-        return getSource(result.getAds(), result.getHeaders(), result.getRealUrl(), result.getSubs(), errorCode);
+        return getSource(result.getHeaders(), result.getRealUrl(), result.getSubs(), errorCode);
     }
 
-    public static MediaSource getSource(List<String> ads, Map<String, String> headers, String url, int errorCode) {
-        return getSource(ads, headers, url, Collections.emptyList(), errorCode);
+    public static MediaSource getSource(Map<String, String> headers, String url, int errorCode) {
+        return getSource(headers, url, Collections.emptyList(), errorCode);
     }
 
-    private static MediaSource getSource(List<String> ads, Map<String, String> headers, String url, List<Sub> subs, int errorCode) {
+    private static MediaSource getSource(Map<String, String> headers, String url, List<Sub> subs, int errorCode) {
         Uri uri = Uri.parse(url.trim().replace("\\", ""));
         if (uri.getUserInfo() != null) headers.put(HttpHeaders.AUTHORIZATION, "Basic " + Base64.encodeToString(uri.getUserInfo().getBytes(), Base64.NO_WRAP));
-        return new DefaultMediaSourceFactory(getDataSourceFactory(headers), getExtractorsFactory()).createMediaSource(getMediaItem(ads, uri, subs, errorCode));
+        return new DefaultMediaSourceFactory(getDataSourceFactory(headers), getExtractorsFactory()).createMediaSource(getMediaItem(uri, subs, errorCode));
     }
 
-    private static MediaItem getMediaItem(List<String> ads, Uri uri, List<Sub> subs, int errorCode) {
+    private static MediaItem getMediaItem(Uri uri, List<Sub> subs, int errorCode) {
         MediaItem.Builder builder = new MediaItem.Builder().setUri(uri);
         if (errorCode == PlaybackException.ERROR_CODE_PARSING_MANIFEST_MALFORMED) builder.setMimeType(MimeTypes.APPLICATION_OCTET);
         else if (errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED) builder.setMimeType(MimeTypes.APPLICATION_M3U8);
         if (subs.size() > 0) builder.setSubtitleConfigurations(getSubtitles(subs));
         builder.setAllowChunklessPreparation(Prefers.getDecode() == 1);
-        return builder.setAds(ads).build();
+        return builder.setAds(getRegex(uri)).build();
+    }
+
+    private static List<String> getRegex(Uri uri) {
+        for (Rule rule : ApiConfig.get().getRules()) for (String host : rule.getHosts()) if (uri.getHost().contains(host)) return rule.getRegex();
+        return Collections.emptyList();
     }
 
     private static List<MediaItem.SubtitleConfiguration> getSubtitles(List<Sub> subs) {

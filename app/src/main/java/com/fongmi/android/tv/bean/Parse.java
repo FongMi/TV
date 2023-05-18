@@ -102,14 +102,6 @@ public class Parse {
         this.activated = item.equals(this);
     }
 
-    public List<String> getAds() {
-        return getExt().getAds();
-    }
-
-    public void setAds(List<String> ads) {
-        getExt().setAds(ads);
-    }
-
     public Map<String, String> getHeaders() {
         return Json.toMap(getExt().getHeader());
     }
@@ -142,20 +134,10 @@ public class Parse {
 
     public static class Ext {
 
-        @SerializedName("ads")
-        private List<String> ads;
         @SerializedName("flag")
         private List<String> flag;
         @SerializedName("header")
         private JsonElement header;
-
-        public List<String> getAds() {
-            return ads == null ? Collections.emptyList() : ads;
-        }
-
-        public void setAds(List<String> ads) {
-            this.ads = ads;
-        }
 
         public void setFlag(List<String> flag) {
             this.flag = flag;

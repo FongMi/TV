@@ -19,7 +19,7 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Site;
-import com.fongmi.android.tv.impl.WebCallback;
+import com.fongmi.android.tv.impl.ParseCallback;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.crawler.Spider;
 
@@ -32,7 +32,7 @@ import java.util.Map;
 public class CustomWebView extends WebView {
 
     private WebResourceResponse empty;
-    private WebCallback callback;
+    private ParseCallback callback;
     private List<String> keys;
     private Runnable timer;
     private String from;
@@ -71,7 +71,7 @@ public class CustomWebView extends WebView {
         }
     }
 
-    public CustomWebView start(String key, String from, Map<String, String> headers, String url, WebCallback callback) {
+    public CustomWebView start(String key, String from, Map<String, String> headers, String url, ParseCallback callback) {
         App.post(timer, Constant.TIMEOUT_PARSE_WEB);
         this.callback = callback;
         setUserAgent(headers);
@@ -136,13 +136,13 @@ public class CustomWebView extends WebView {
     }
 
     private void onParseSuccess(Map<String, String> news, String url) {
-        if (callback != null) callback.onSniffSuccess(news, url, from);
+        if (callback != null) callback.onParseSuccess(news, url, from);
         App.post(() -> stop(false));
         callback = null;
     }
 
     private void onParseError() {
-        if (callback != null) callback.onSniffError();
+        if (callback != null) callback.onParseError();
         callback = null;
     }
 }
