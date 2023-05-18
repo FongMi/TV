@@ -94,8 +94,9 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     private ExecutorService mExecutor;
     private SiteViewModel mViewModel;
     private FlagAdapter mFlagAdapter;
-    private List<Dialog> mDialogs;
     private PiPReceiver mReceiver;
+    private List<Dialog> mDialogs;
+    private List<String> mBroken;
     private History mHistory;
     private Players mPlayers;
     private boolean fullscreen;
@@ -109,7 +110,6 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     private Runnable mR1;
     private Runnable mR2;
     private Runnable mR3;
-    private String mKey;
     private String url;
     private PiP mPiP;
 
@@ -210,11 +210,11 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mReceiver = new PiPReceiver(this);
         mPlayers = new Players().init();
         mDialogs = new ArrayList<>();
+        mBroken = new ArrayList<>();
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
         mR3 = this::setOrient;
         mPiP = new PiP();
-        mKey = getKey();
         setRecyclerView();
         setVideoView();
         setViewModel();
@@ -895,6 +895,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     private void onError(ErrorEvent event) {
         Clock.get().setCallback(null);
         showError(event.getMsg());
+        mBroken.add(getId());
         mPlayers.stop();
         startFlow();
     }
@@ -974,6 +975,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     private boolean mismatch(Vod item) {
         String keyword = getName();
+        if (mBroken.contains(item.getVodId())) return true;
         if (isAutoMode()) return !item.getVodName().equals(keyword);
         else return !item.getVodName().contains(keyword);
     }
@@ -993,7 +995,6 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     private void nextSite() {
         if (mSearchAdapter.getItemCount() == 0) return;
         Vod vod = mSearchAdapter.get(0);
-        if (vod.getSiteKey().equals(mKey)) return;
         Notify.show(getString(R.string.play_switch_site, vod.getSiteName()));
         mSearchAdapter.remove(0);
         setInitAuto(false);
