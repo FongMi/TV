@@ -2,6 +2,7 @@ package com.fongmi.android.tv.db.dao;
 
 import androidx.room.Dao;
 import androidx.room.Query;
+import androidx.room.RoomWarnings;
 
 import com.fongmi.android.tv.bean.Config;
 
@@ -13,6 +14,7 @@ public abstract class ConfigDao extends BaseDao<Config> {
     @Query("SELECT * FROM Config WHERE type = :type ORDER BY time DESC")
     public abstract List<Config> findByType(int type);
 
+    @SuppressWarnings(RoomWarnings.CURSOR_MISMATCH)
     @Query("SELECT id, url, type, time FROM Config WHERE type = :type ORDER BY time DESC")
     public abstract List<Config> findUrlByType(int type);
 
