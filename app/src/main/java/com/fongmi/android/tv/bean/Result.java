@@ -56,8 +56,6 @@ public class Result {
     private String key;
     @SerializedName("subs")
     private List<Sub> subs;
-    @SerializedName("ads")
-    private List<String> ads;
 
     public static Result fromJson(String str) {
         try {
@@ -190,14 +188,6 @@ public class Result {
 
     public List<Sub> getSubs() {
         return subs == null ? Collections.emptyList() : subs;
-    }
-
-    public List<String> getAds() {
-        return ads == null ? Collections.emptyList() : ads;
-    }
-
-    public void setAds(List<String> ads) {
-        this.ads = ads;
     }
 
     public String getRealUrl() {
