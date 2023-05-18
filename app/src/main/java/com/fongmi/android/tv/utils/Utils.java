@@ -26,8 +26,6 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Utils {
 
@@ -83,17 +81,6 @@ public class Utils {
 
     public static boolean hasPiP() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && App.get().getPackageManager().hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE);
-    }
-
-    public static boolean isVideoFormat(String url) {
-        return isVideoFormat(url, new HashMap<>());
-    }
-
-    public static boolean isVideoFormat(String url, Map<String, String> headers) {
-        if (Sniffer.CUSTOM.matcher(url).find()) return true;
-        if (headers.containsKey("Accept") && headers.get("Accept").startsWith("image")) return false;
-        if (url.contains("url=http") || url.contains("v=http") || url.contains(".css") || url.contains(".html")) return false;
-        return Sniffer.RULE.matcher(url).find();
     }
 
     public static boolean isAutoRotate() {
