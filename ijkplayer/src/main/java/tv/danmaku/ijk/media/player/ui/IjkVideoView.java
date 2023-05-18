@@ -254,6 +254,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     public void seekTo(int positionMs) {
         if (!isInPlaybackState()) return;
         onInfo(mPlayer, IMediaPlayer.MEDIA_INFO_BUFFERING_START, 0);
+        Log.e("DDD", "SEEKTO");
         mPlayer.seekTo(positionMs);
         mStartPosition = 0;
     }
@@ -481,8 +482,8 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     @Override
     public void onVideoSizeChanged(IMediaPlayer mp, int width, int height, int sar_num, int sar_den) {
-        mVideoWidth = width;
-        mVideoHeight = height;
+        mVideoWidth = mp.getVideoWidth();
+        mVideoHeight = mp.getVideoHeight();
         if (mVideoWidth != 0 && mVideoHeight != 0 && mRenderView != null) {
             mRenderView.setVideoSize(mVideoWidth, mVideoHeight);
             mRenderView.setVideoSampleAspectRatio(sar_num, sar_den);
