@@ -15,7 +15,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.Collections;
 import java.util.List;
 
-@Entity(ignoredColumns = {"type", "api", "playUrl", "playerType", "ext", "jar", "categories"})
+@Entity(ignoredColumns = {"type", "api", "playUrl", "playerType", "ext", "jar", "categories", "ads"})
 public class Site {
 
     @NonNull
@@ -44,6 +44,8 @@ public class Site {
     private String jar;
     @SerializedName("categories")
     private List<String> categories;
+    @SerializedName("ads")
+    private List<String> ads;
 
     private boolean activated;
 
@@ -146,6 +148,10 @@ public class Site {
 
     public List<String> getCategories() {
         return categories == null ? Collections.emptyList() : categories;
+    }
+
+    public List<String> getAds() {
+        return ads == null ? Collections.emptyList() : ads;
     }
 
     public boolean isActivated() {

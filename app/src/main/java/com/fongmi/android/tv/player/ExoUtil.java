@@ -78,26 +78,26 @@ public class ExoUtil {
     }
 
     public static MediaSource getSource(Result result, int errorCode) {
-        return getSource(result.getHeaders(), result.getRealUrl(), result.getSubs(), errorCode);
+        return getSource(result.getHeaders(), result.getRealUrl(), result.getSubs(), result.getAds(), errorCode);
     }
 
     public static MediaSource getSource(Map<String, String> headers, String url, int errorCode) {
-        return getSource(headers, url, Collections.emptyList(), errorCode);
+        return getSource(headers, url, Collections.emptyList(), Collections.emptyList(), errorCode);
     }
 
-    private static MediaSource getSource(Map<String, String> headers, String url, List<Sub> subs, int errorCode) {
+    private static MediaSource getSource(Map<String, String> headers, String url, List<Sub> subs, List<String> ads, int errorCode) {
         Uri uri = Uri.parse(url.trim().replace("\\", ""));
         if (uri.getUserInfo() != null) headers.put(HttpHeaders.AUTHORIZATION, "Basic " + Base64.encodeToString(uri.getUserInfo().getBytes(), Base64.NO_WRAP));
-        return new DefaultMediaSourceFactory(getDataSourceFactory(headers), getExtractorsFactory()).createMediaSource(getMediaItem(uri, subs, errorCode));
+        return new DefaultMediaSourceFactory(getDataSourceFactory(headers), getExtractorsFactory()).createMediaSource(getMediaItem(uri, subs, ads, errorCode));
     }
 
-    private static MediaItem getMediaItem(Uri uri, List<Sub> subs, int errorCode) {
+    private static MediaItem getMediaItem(Uri uri, List<Sub> subs, List<String> ads, int errorCode) {
         MediaItem.Builder builder = new MediaItem.Builder().setUri(uri);
         if (errorCode == PlaybackException.ERROR_CODE_PARSING_MANIFEST_MALFORMED) builder.setMimeType(MimeTypes.APPLICATION_OCTET);
         else if (errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED) builder.setMimeType(MimeTypes.APPLICATION_M3U8);
         if (subs.size() > 0) builder.setSubtitleConfigurations(getSubtitles(subs));
         builder.setAllowChunklessPreparation(Prefers.getDecode() == 1);
-        return builder.build();
+        return builder.setAds(ads).build();
     }
 
     private static List<MediaItem.SubtitleConfiguration> getSubtitles(List<Sub> subs) {
