@@ -14,6 +14,7 @@ import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.net.OkHttp;
+import com.fongmi.android.tv.utils.Sniffer;
 import com.fongmi.android.tv.utils.Trans;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.crawler.Spider;
@@ -161,7 +162,7 @@ public class SiteViewModel extends ViewModel {
                 result.setUrl(url);
                 result.setFlag(flag);
                 result.setPlayUrl(site.getPlayUrl());
-                result.setParse(Utils.isVideoFormat(url) && result.getPlayUrl().isEmpty() ? 0 : 1);
+                result.setParse(Sniffer.isVideo(url) && result.getPlayUrl().isEmpty() ? 0 : 1);
                 return result;
             }
         });
