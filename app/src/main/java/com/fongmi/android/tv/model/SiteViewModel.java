@@ -142,6 +142,7 @@ public class SiteViewModel extends ViewModel {
                 ApiConfig.get().setJar(site.getJar());
                 Result result = Result.objectFrom(playerContent);
                 if (result.getFlag().isEmpty()) result.setFlag(flag);
+                if (result.getAds().isEmpty()) result.setAds(site.getAds());
                 result.setKey(key);
                 return result;
             } else if (site.getType() == 4) {
@@ -152,6 +153,7 @@ public class SiteViewModel extends ViewModel {
                 SpiderDebug.log(body);
                 Result result = Result.fromJson(body);
                 if (result.getFlag().isEmpty()) result.setFlag(flag);
+                if (result.getAds().isEmpty()) result.setAds(site.getAds());
                 return result;
             } else {
                 String url = id;
@@ -160,6 +162,7 @@ public class SiteViewModel extends ViewModel {
                 Result result = new Result();
                 result.setUrl(url);
                 result.setFlag(flag);
+                result.setAds(site.getAds());
                 result.setPlayUrl(site.getPlayUrl());
                 result.setParse(Utils.isVideoFormat(url) && result.getPlayUrl().isEmpty() ? 0 : 1);
                 return result;

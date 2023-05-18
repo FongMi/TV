@@ -254,7 +254,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     public void seekTo(int positionMs) {
         if (!isInPlaybackState()) return;
         onInfo(mPlayer, IMediaPlayer.MEDIA_INFO_BUFFERING_START, 0);
-        Log.e("DDD", "SEEKTO");
         mPlayer.seekTo(positionMs);
         mStartPosition = 0;
     }
