@@ -19,24 +19,20 @@ public class Sniffer {
     }
 
     public static boolean isVideo(String url, Map<String, String> headers) {
-        if (match(url)) return true;
+        if (matchOrContain(url)) return true;
         if (headers.containsKey("Accept") && headers.get("Accept").startsWith("image")) return false;
         if (url.contains("url=http") || url.contains("v=http") || url.contains(".css") || url.contains(".html")) return false;
-        return RULE.matcher(url).find();
+        return match(url) || RULE.matcher(url).find();
+    }
+
+    private static boolean matchOrContain(String url) {
+        Uri uri = Uri.parse(url);
+        for (Rule rule : ApiConfig.get().getRules()) for (String host : rule.getHosts()) if (uri.getHost().contains(host)) for (String regex : rule.getRegex()) return Pattern.compile(regex).matcher(url).find() || url.contains(regex);
+        return false;
     }
 
     private static boolean match(String url) {
-        Uri uri = Uri.parse(url);
-        for (Rule rule : ApiConfig.get().getRules()) {
-            for (String host : rule.getHosts()) {
-                if (uri.getHost().contains(host)) {
-                    for (String regex : rule.getRegex()) return Pattern.compile(regex).matcher(url).find() || url.contains(regex);
-                }
-                if (host.equals("*")) {
-                    for (String regex : rule.getRegex()) return Pattern.compile(regex).matcher(url).find();
-                }
-            }
-        }
+        for (Rule rule : ApiConfig.get().getRules()) for (String host : rule.getHosts()) if (host.equals("*")) for (String regex : rule.getRegex()) return Pattern.compile(regex).matcher(url).find();
         return false;
     }
 }
