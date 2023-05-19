@@ -10,13 +10,13 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.viewbinding.ViewBinding;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.FragmentEpisodeBinding;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.ui.adapter.EpisodeAdapter;
 import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.base.ViewType;
-import com.google.gson.Gson;
 
 import java.util.List;
 
@@ -37,7 +37,7 @@ public class EpisodeFragment extends BaseFragment implements EpisodeAdapter.OnCl
     public static EpisodeFragment newInstance(int spanCount, List<Vod.Flag.Episode> items) {
         Bundle args = new Bundle();
         args.putInt("spanCount", spanCount);
-        args.putString("json", new Gson().toJson(items));
+        args.putString("json", App.gson().toJson(items));
         EpisodeFragment fragment = new EpisodeFragment();
         fragment.setArguments(args);
         return fragment;

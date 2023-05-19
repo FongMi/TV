@@ -7,12 +7,17 @@ import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.db.AppDatabase;
+import com.fongmi.android.tv.event.RefreshEvent;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.List;
 
 @Entity
@@ -57,6 +62,12 @@ public class History {
 
     public static History objectFrom(String str) {
         return new Gson().fromJson(str, History.class);
+    }
+
+    public static List<History> arrayFrom(String str) {
+        Type listType = new TypeToken<List<History>>() {}.getType();
+        List<History> items = new Gson().fromJson(str, listType);
+        return items == null ? Collections.emptyList() : items;
     }
 
     public History() {
@@ -235,7 +246,11 @@ public class History {
     }
 
     public static List<History> get() {
-        return AppDatabase.get().getHistoryDao().find(ApiConfig.getCid());
+        return get(ApiConfig.getCid());
+    }
+
+    public static List<History> get(int cid) {
+        return AppDatabase.get().getHistoryDao().find(cid);
     }
 
     public static History find(String key) {
@@ -297,6 +312,29 @@ public class History {
                 break;
             }
         }
+    }
+
+    private static void startSync(List<History> targets) {
+        for (History target : targets) {
+            List<History> items = AppDatabase.get().getHistoryDao().findByName(ApiConfig.getCid(), target.getVodName());
+            if (items.isEmpty()) {
+                target.update(ApiConfig.getCid());
+                continue;
+            }
+            for (History item : items) {
+                if (target.getCreateTime() > item.getCreateTime()) {
+                    target.update(ApiConfig.getCid());
+                    break;
+                }
+            }
+        }
+    }
+
+    public static void sync(List<History> targets) {
+        App.execute(() -> {
+            startSync(targets);
+            RefreshEvent.history();
+        });
     }
 
     @NonNull
