@@ -27,7 +27,6 @@ public class Sniffer {
 
     private static boolean matchOrContain(String url) {
         Uri uri = Uri.parse(url);
-        if (uri.getHost() == null) return false;
         for (Rule rule : ApiConfig.get().getRules()) for (String host : rule.getHosts()) if (uri.getHost().contains(host)) for (String regex : rule.getRegex()) return Pattern.compile(regex).matcher(url).find() || url.contains(regex);
         return false;
     }
