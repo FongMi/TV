@@ -3,8 +3,7 @@ package com.fongmi.android.tv.server.process;
 import android.text.TextUtils;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.Constant;
-import com.fongmi.android.tv.api.config.VodConfig;
+import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Device;
 import com.fongmi.android.tv.bean.History;
@@ -12,117 +11,71 @@ import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.event.CastEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.event.ServerEvent;
-import com.fongmi.android.tv.impl.Callback;
+import com.fongmi.android.tv.net.Callback;
+import com.fongmi.android.tv.net.OkHttp;
 import com.fongmi.android.tv.server.Nano;
-import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Notify;
-import com.github.catvod.net.OkHttp;
-import com.github.catvod.utils.Path;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import fi.iki.elonen.NanoHTTPD;
 import okhttp3.FormBody;
 
-public class Action implements Process {
+public class ActionRequestProcess implements RequestProcess {
 
     @Override
     public boolean isRequest(NanoHTTPD.IHTTPSession session, String path) {
-        return path.equals("/action");
+        return session.getMethod() == NanoHTTPD.Method.POST && path.equals("/action");
     }
 
     @Override
-    public NanoHTTPD.Response doResponse(NanoHTTPD.IHTTPSession session, String path, Map<String, String> files) {
+    public NanoHTTPD.Response doResponse(NanoHTTPD.IHTTPSession session, String path) {
         Map<String, String> params = session.getParms();
-        switch (Objects.requireNonNullElse(params.get("do"), "")) {
+        switch (params.get("do")) {
             case "search":
-                onSearch(params);
-                return Nano.success();
+                onSearch(params.get("word").trim());
+                break;
             case "push":
-                onPush(params);
-                return Nano.success();
-            case "setting":
-                onSetting(params);
-                return Nano.success();
-            case "file":
-                onFile(params);
-                return Nano.success();
-            case "refresh":
-                onRefresh(params);
-                return Nano.success();
+                onPush(params.get("url").trim());
+                break;
+            case "api":
+                onApi(params.get("url").trim());
+                break;
             case "cast":
                 onCast(params);
-                return Nano.success();
+                break;
             case "sync":
                 onSync(params);
-                return Nano.success();
-            default:
-                return Nano.error(null);
-        }
-    }
-
-    private void onSearch(Map<String, String> params) {
-        String word = params.get("word");
-        if (TextUtils.isEmpty(word)) return;
-        ServerEvent.search(word);
-    }
-
-    private void onPush(Map<String, String> params) {
-        String url = params.get("url");
-        if (TextUtils.isEmpty(url)) return;
-        ServerEvent.push(url);
-    }
-
-    private void onSetting(Map<String, String> params) {
-        String text = params.get("text");
-        if (TextUtils.isEmpty(text)) return;
-        ServerEvent.setting(text);
-    }
-
-    private void onFile(Map<String, String> params) {
-        String path = params.get("path");
-        if (TextUtils.isEmpty(path)) return;
-        if (path.endsWith(".xml")) RefreshEvent.danmaku(path);
-        else if (path.endsWith(".apk")) FileUtil.openFile(Path.local(path));
-        else if (path.endsWith(".srt") || path.endsWith(".ssa") || path.endsWith(".ass")) RefreshEvent.subtitle(path);
-        else ServerEvent.setting(path);
-    }
-
-    private void onRefresh(Map<String, String> params) {
-        String type = params.get("type");
-        String path = params.get("path");
-        if (TextUtils.isEmpty(type)) return;
-        switch (type) {
-            case "detail":
-                RefreshEvent.detail();
-                break;
-            case "player":
-                RefreshEvent.player();
-                break;
-            case "danmaku":
-                RefreshEvent.danmaku(path);
-                break;
-            case "subtitle":
-                RefreshEvent.subtitle(path);
                 break;
         }
+        return Nano.createSuccessResponse();
     }
 
-    private void onCast(Map<String, String> params) {
+    public void onSearch(String word) {
+        if (word.length() > 0) ServerEvent.search(word);
+    }
+
+    public void onPush(String url) {
+        if (url.length() > 0) ServerEvent.push(url);
+    }
+
+    public void onApi(String url) {
+        if (url.length() > 0) ServerEvent.api(url);
+    }
+
+    public void onCast(Map<String, String> params) {
         Config config = Config.find(params.get("url"), 0);
         Device device = Device.objectFrom(params.get("device"));
         History history = History.objectFrom(params.get("history"));
         CastEvent.post(config, device, history);
     }
 
-    private void onSync(Map<String, String> params) {
-        boolean sync = Objects.equals(params.get("mode"), "0");
-        boolean keep = Objects.equals(params.get("type"), "keep");
-        boolean history = Objects.equals(params.get("type"), "history");
+    public void onSync(Map<String, String> params) {
+        boolean keep = params.get("type").equals("keep");
+        boolean history = params.get("type").equals("history");
         Device device = Device.objectFrom(params.get("device"));
-        if (params.get("device") != null && sync) {
+        if (params.get("device") != null) {
             if (history) sendHistory(device, params);
             else if (keep) sendKeep(device);
         }
@@ -135,11 +88,11 @@ public class Action implements Process {
 
     private void sendHistory(Device device, Map<String, String> params) {
         try {
-            String url = Objects.requireNonNullElse(params.get("url"), VodConfig.getUrl());
+            String url = params.get("url");
             FormBody.Builder body = new FormBody.Builder();
-            body.add("url", url);
+            body.add("url", TextUtils.isEmpty(url) ? ApiConfig.getUrl() : url);
             body.add("targets", App.gson().toJson(History.get(Config.find(url, 0).getId())));
-            OkHttp.newCall(OkHttp.client(Constant.TIMEOUT_SYNC), device.getIp().concat("/action?do=sync&mode=0&type=history"), body.build()).execute();
+            OkHttp.newCall(OkHttp.client(1000), device.getIp().concat("/action?do=sync&type=history"), body.build()).execute();
         } catch (Exception e) {
             App.post(() -> Notify.show(e.getMessage()));
         }
@@ -150,7 +103,7 @@ public class Action implements Process {
             FormBody.Builder body = new FormBody.Builder();
             body.add("targets", App.gson().toJson(Keep.getVod()));
             body.add("configs", App.gson().toJson(Config.findUrls()));
-            OkHttp.newCall(OkHttp.client(Constant.TIMEOUT_SYNC), device.getIp().concat("/action?do=sync&mode=0&type=keep"), body.build()).execute();
+            OkHttp.newCall(OkHttp.client(1000), device.getIp().concat("/action?do=sync&type=keep"), body.build()).execute();
         } catch (Exception e) {
             App.post(() -> Notify.show(e.getMessage()));
         }
@@ -160,13 +113,11 @@ public class Action implements Process {
         String url = params.get("url");
         if (TextUtils.isEmpty(url)) return;
         Config config = Config.find(url, 0);
-        boolean replace = Objects.equals(params.get("mode"), "1");
         List<History> targets = History.arrayFrom(params.get("targets"));
-        if (VodConfig.get().getConfig().equals(config)) {
-            if (replace) History.delete(config.getId());
+        if (ApiConfig.get().getConfig().equals(config)) {
             History.sync(targets);
         } else {
-            VodConfig.load(config, getCallback(targets));
+            ApiConfig.get().clear().config(config).load(getCallback(targets));
         }
     }
 
@@ -180,20 +131,18 @@ public class Action implements Process {
             }
 
             @Override
-            public void error(String msg) {
-                Notify.show(msg);
+            public void error(int resId) {
+                Notify.show(resId);
             }
         };
     }
 
-    private void syncKeep(Map<String, String> params) {
+    public void syncKeep(Map<String, String> params) {
         List<Config> configs = Config.arrayFrom(params.get("configs"));
         List<Keep> targets = Keep.arrayFrom(params.get("targets"));
-        boolean replace = Objects.equals(params.get("mode"), "1");
-        if (VodConfig.getUrl().isEmpty() && configs.size() > 0) {
-            VodConfig.load(Config.find(configs.get(0), 0), getCallback(configs, targets));
+        if (ApiConfig.getUrl() == null && configs.size() > 0) {
+            ApiConfig.get().clear().config(Config.find(configs.get(0), 0)).load(getCallback(configs, targets));
         } else {
-            if (replace) Keep.deleteAll();
             Keep.sync(configs, targets);
         }
     }
@@ -209,8 +158,8 @@ public class Action implements Process {
             }
 
             @Override
-            public void error(String msg) {
-                Notify.show(msg);
+            public void error(int resId) {
+                Notify.show(resId);
             }
         };
     }
