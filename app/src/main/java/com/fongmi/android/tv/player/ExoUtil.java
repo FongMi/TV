@@ -103,7 +103,7 @@ public class ExoUtil {
     }
 
     private static List<String> getAdsRegex(Uri uri) {
-        for (Rule rule : ApiConfig.get().getRules()) for (String host : rule.getHosts()) if (uri.getHost().contains(host)) return rule.getRegex();
+        if (uri.getHost() != null) for (Rule rule : ApiConfig.get().getRules()) for (String host : rule.getHosts()) if (uri.getHost().contains(host)) return rule.getRegex();
         for (Rule rule : ApiConfig.get().getRules()) for (String host : rule.getHosts()) if (host.equals("*")) return rule.getRegex();
         return Collections.emptyList();
     }
