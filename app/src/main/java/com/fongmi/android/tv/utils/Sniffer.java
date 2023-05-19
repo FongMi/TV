@@ -14,11 +14,11 @@ public class Sniffer {
     public static final String CHROME = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36";
     public static final Pattern RULE = Pattern.compile("http((?!http).){12,}?\\.(m3u8|mp4|flv|avi|mkv|rm|wmv|mpg|m4a|mp3)\\?.*|http((?!http).){12,}\\.(m3u8|mp4|flv|avi|mkv|rm|wmv|mpg|m4a|mp3)|http((?!http).)*?video/tos*");
 
-    public static boolean isVideo(String url) {
-        return isVideo(url, new HashMap<>());
+    public static boolean isVideoFormat(String url) {
+        return isVideoFormat(url, new HashMap<>());
     }
 
-    public static boolean isVideo(String url, Map<String, String> headers) {
+    public static boolean isVideoFormat(String url, Map<String, String> headers) {
         if (matchOrContain(url)) return true;
         if (headers.containsKey("Accept") && headers.get("Accept").startsWith("image")) return false;
         if (url.contains("url=http") || url.contains("v=http") || url.contains(".css") || url.contains(".html")) return false;
