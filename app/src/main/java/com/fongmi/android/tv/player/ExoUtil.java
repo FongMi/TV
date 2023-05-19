@@ -99,11 +99,12 @@ public class ExoUtil {
         else if (errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED) builder.setMimeType(MimeTypes.APPLICATION_M3U8);
         if (subs.size() > 0) builder.setSubtitleConfigurations(getSubtitles(subs));
         builder.setAllowChunklessPreparation(Prefers.getDecode() == 1);
-        return builder.setAds(getRegex(uri)).build();
+        return builder.setAds(getAdsRegex(uri)).build();
     }
 
-    private static List<String> getRegex(Uri uri) {
+    private static List<String> getAdsRegex(Uri uri) {
         for (Rule rule : ApiConfig.get().getRules()) for (String host : rule.getHosts()) if (uri.getHost().contains(host)) return rule.getRegex();
+        for (Rule rule : ApiConfig.get().getRules()) for (String host : rule.getHosts()) if (host.equals("*")) return rule.getRegex();
         return Collections.emptyList();
     }
 
