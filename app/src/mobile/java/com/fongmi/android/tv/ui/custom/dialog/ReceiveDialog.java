@@ -71,12 +71,12 @@ public class ReceiveDialog extends BaseDialog {
     }
 
     private void onReceiveCast() {
-        if (ApiConfig.getUrl().equals(event.getConfig())) {
+        if (ApiConfig.get().getConfig().equals(event.getConfig())) {
             DetailActivity.cast(getActivity(), event.getHistory().update(ApiConfig.getCid()));
             dismiss();
         } else {
             showProgress();
-            ApiConfig.get().clear().config(Config.find(event.getConfig(), 0)).load(getCallback());
+            ApiConfig.get().clear().config(event.getConfig()).load(getCallback());
         }
     }
 

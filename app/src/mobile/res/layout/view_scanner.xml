@@ -18,7 +18,7 @@
         android:layout_gravity="bottom|center_horizontal"
         android:layout_marginBottom="16dp"
         android:background="@color/zxing_transparent"
-        android:text="@string/cast_scan"
+        android:text="@string/device_scan"
         android:textColor="@color/zxing_status_text"
         android:textSize="16sp" />
 
