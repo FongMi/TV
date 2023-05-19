@@ -21,7 +21,6 @@ import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.impl.ParseCallback;
 import com.fongmi.android.tv.utils.Sniffer;
-import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.crawler.Spider;
 
 import java.io.ByteArrayInputStream;
@@ -114,9 +113,9 @@ public class CustomWebView extends WebView {
             Site site = ApiConfig.get().getSite(key);
             Spider spider = ApiConfig.get().getCSP(site);
             if (spider.manualVideoCheck()) return spider.isVideoFormat(url);
-            return Sniffer.isVideo(url, headers);
+            return Sniffer.isVideoFormat(url, headers);
         } catch (Exception ignored) {
-            return Sniffer.isVideo(url, headers);
+            return Sniffer.isVideoFormat(url, headers);
         }
     }
 
