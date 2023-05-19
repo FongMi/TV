@@ -30,7 +30,6 @@ import com.fongmi.android.tv.ui.presenter.TypePresenter;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Trans;
 import com.fongmi.android.tv.utils.Utils;
-import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -178,7 +177,7 @@ public class VodActivity extends BaseActivity implements TypePresenter.OnClickLi
         @Override
         public Fragment getItem(int position) {
             Class type = (Class) mAdapter.get(position);
-            String filter = new Gson().toJson(type.getFilters());
+            String filter = App.gson().toJson(type.getFilters());
             return VodFragment.newInstance(getKey(), type.getTypeId(), filter, type.getTypeFlag().equals("1"));
         }
 

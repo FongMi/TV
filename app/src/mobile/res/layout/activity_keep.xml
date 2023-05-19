@@ -29,9 +29,18 @@
                 android:textStyle="bold" />
 
             <ImageView
+                android:id="@+id/sync"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginStart="16dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_action_sync" />
+
+            <ImageView
                 android:id="@+id/delete"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
+                android:layout_marginStart="16dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_action_delete"
                 android:visibility="gone"

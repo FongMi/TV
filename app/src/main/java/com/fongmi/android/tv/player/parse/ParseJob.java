@@ -148,7 +148,7 @@ public class ParseJob implements ParseCallback {
 
     private void checkResult(Result result) {
         if (result.getUrl().isEmpty()) onParseError();
-        else if (result.getParse() == 1) startWeb(Utils.checkProxy(result.getUrl()), result.getHeaders());
+        else if (result.getParse() == 1) startWeb(result.getHeaders(), Utils.checkProxy(result.getUrl()));
         else onParseSuccess(result.getHeaders(), result.getUrl(), result.getJxFrom());
     }
 
@@ -166,15 +166,15 @@ public class ParseJob implements ParseCallback {
     }
 
     private void startWeb(String key, Parse item, String webUrl) {
-        startWeb(key, item.getName(), item.getUrl() + webUrl, item.getHeaders());
+        startWeb(key, item.getName(), item.getHeaders(), item.getUrl() + webUrl);
     }
 
-    private void startWeb(String url, Map<String, String> headers) {
-        startWeb("", "", url, headers);
+    private void startWeb(Map<String, String> headers, String url) {
+        startWeb("", "", headers, url);
     }
 
-    private void startWeb(String key, String form, String url, Map<String, String> headers) {
-        App.post(() -> webViews.add(CustomWebView.create(App.get()).start(key, form, url, headers, this)));
+    private void startWeb(String key, String form, Map<String, String> headers, String url) {
+        App.post(() -> webViews.add(CustomWebView.create(App.get()).start(key, form, headers, url, this)));
     }
 
     private Map<String, String> getHeader(JsonObject object) {

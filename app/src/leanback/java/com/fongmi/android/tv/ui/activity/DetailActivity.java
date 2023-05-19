@@ -92,9 +92,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private CustomKeyDownVod mKeyDown;
     private ExecutorService mExecutor;
     private SiteViewModel mViewModel;
+    private List<String> mBroken;
     private History mHistory;
     private Players mPlayers;
-    private String mSiteKey;
     private boolean fullscreen;
     private boolean initTrack;
     private boolean initAuto;
@@ -210,9 +210,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mKeyDown = CustomKeyDownVod.create(this, mBinding.video);
         mFrameParams = mBinding.video.getLayoutParams();
         mPlayers = new Players().init();
+        mBroken = new ArrayList<>();
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
-        mSiteKey = getKey();
         setRecyclerView();
         setVideoView();
         setViewModel();
@@ -849,6 +849,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void onError(ErrorEvent event) {
         Clock.get().setCallback(null);
         showError(event.getMsg());
+        mBroken.add(getId());
         mPlayers.stop();
         startFlow();
     }
@@ -929,6 +930,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private boolean mismatch(Vod item) {
         String keyword = mBinding.part.getTag().toString();
+        if (mBroken.contains(item.getVodId())) return true;
         if (isAutoMode()) return !item.getVodName().equals(keyword);
         else return !item.getVodName().contains(keyword);
     }
@@ -948,7 +950,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void nextSite() {
         if (mSearchAdapter.size() == 0) return;
         Vod vod = (Vod) mSearchAdapter.get(0);
-        if (vod.getSiteKey().equals(mSiteKey)) return;
         Notify.show(getString(R.string.play_switch_site, vod.getSiteName()));
         mSearchAdapter.removeItems(0, 1);
         setInitAuto(false);

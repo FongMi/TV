@@ -197,7 +197,7 @@ public class Channel {
     }
 
     public String getCurrent() {
-        return getUrls().get(getLine());
+        return getUrls().isEmpty() ? "" : getUrls().get(getLine());
     }
 
     public boolean isOnly() {
@@ -205,7 +205,7 @@ public class Channel {
     }
 
     public boolean isLast() {
-        return getLine() == getUrls().size() - 1;
+        return getUrls().isEmpty() || getLine() == getUrls().size() - 1;
     }
 
     public String getLineText() {

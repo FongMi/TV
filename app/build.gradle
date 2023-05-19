@@ -22,8 +22,8 @@ android {
     productFlavors {
         leanback {
             dimension "default"
-            versionCode 76
-            versionName "1.7.6"
+            versionCode 77
+            versionName "1.7.7"
         }
     }
 
@@ -92,7 +92,7 @@ dependencies {
     implementation 'com.github.bassaer:materialdesigncolors:1.0.0'
     implementation 'com.github.bumptech.glide:glide:4.14.2'
     implementation('com.github.thegrizzlylabs:sardine-android:0.8') { exclude group: 'com.squareup.okhttp3', module: 'okhttp' }
-    implementation 'com.google.android.material:material:1.9.0-beta01'
+    implementation 'com.google.android.material:material:1.9.0'
     implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'com.google.zxing:core:3.4.1'
     implementation 'com.guolindev.permissionx:permissionx:1.7.1'

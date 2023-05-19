@@ -30,8 +30,8 @@ public class RawRequestProcess implements RequestProcess {
         try {
             InputStream is = App.get().getResources().openRawResource(resId);
             return Nano.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, mimeType + ";charset=utf-8", is, is.available());
-        } catch (IOException IOExc) {
-            return Nano.createPlainTextResponse(NanoHTTPD.Response.Status.INTERNAL_ERROR, "SERVER INTERNAL ERROR: IOException: " + IOExc.getMessage());
+        } catch (IOException e) {
+            return Nano.createErrorResponse(e.getMessage());
         }
     }
 }
