@@ -16,7 +16,6 @@ import com.whl.quickjs.wrapper.QuickJSContext;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
@@ -51,7 +50,7 @@ public class Global {
             ctx.getGlobalObject().setProperty(method.getName(), args -> {
                 try {
                     return method.invoke(this, args);
-                } catch (IllegalAccessException | InvocationTargetException e) {
+                } catch (Exception e) {
                     return null;
                 }
             });
