@@ -2,6 +2,7 @@ package com.fongmi.android.tv;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -11,6 +12,9 @@ import androidx.annotation.Nullable;
 import androidx.core.os.HandlerCompat;
 
 import com.fongmi.android.tv.ui.activity.CrashActivity;
+import com.fongmi.android.tv.utils.Prefers;
+import com.github.catvod.bean.Doh;
+import com.github.catvod.net.OkHttp;
 import com.google.gson.Gson;
 
 import java.util.concurrent.ExecutorService;
@@ -31,6 +35,12 @@ public class App extends Application {
         executor = Executors.newFixedThreadPool(Constant.THREAD_POOL);
         handler = HandlerCompat.createAsync(Looper.getMainLooper());
         gson = new Gson();
+    }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        setDoh(base);
     }
 
     public static App get() {
@@ -68,6 +78,14 @@ public class App extends Application {
 
     private void setActivity(Activity activity) {
         this.activity = activity;
+    }
+
+    private void setDoh(Context context) {
+        try {
+            OkHttp.get().setDoh(context, Doh.objectFrom(Prefers.getDoh()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

@@ -4,14 +4,15 @@ import android.text.TextUtils;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.bean.Rule;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Depot;
 import com.fongmi.android.tv.bean.Parse;
+import com.fongmi.android.tv.bean.Rule;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.utils.Json;
 import com.fongmi.android.tv.utils.Utils;
+import com.github.catvod.bean.Doh;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderNull;
 import com.google.gson.JsonElement;
@@ -29,10 +30,11 @@ import java.util.Map;
 
 public class ApiConfig {
 
+    private List<Doh> doh;
+    private List<Rule> rules;
     private List<Site> sites;
     private List<Parse> parses;
     private List<String> flags;
-    private List<Rule> rules;
     private JarLoader jarLoader;
     private PyLoader pyLoader;
     private JsLoader jsLoader;
@@ -84,9 +86,10 @@ public class ApiConfig {
         this.home = null;
         this.parse = null;
         this.config = Config.vod();
+        this.doh = new ArrayList<>();
+        this.rules = new ArrayList<>();
         this.sites = new ArrayList<>();
         this.flags = new ArrayList<>();
-        this.rules = new ArrayList<>();
         this.parses = new ArrayList<>();
         this.jarLoader = new JarLoader();
         this.pyLoader = new PyLoader();
@@ -104,9 +107,10 @@ public class ApiConfig {
         this.wall = null;
         this.home = null;
         this.parse = null;
+        this.doh.clear();
+        this.rules.clear();
         this.sites.clear();
         this.flags.clear();
-        this.rules.clear();
         this.parses.clear();
         this.jarLoader.clear();
         this.pyLoader.clear();
@@ -202,6 +206,7 @@ public class ApiConfig {
         if (home == null) setHome(sites.isEmpty() ? new Site() : sites.get(0));
         if (parse == null) setParse(parses.isEmpty() ? new Parse() : parses.get(0));
         setRules(Rule.arrayFrom(object.getAsJsonArray("rules")));
+        setDoh(Doh.arrayFrom(object.getAsJsonArray("doh")));
         setFlags(Json.safeListString(object, "flags"));
         setWall(Json.safeString(object, "wallpaper"));
         setAds(Json.safeListString(object, "ads"));
@@ -261,6 +266,22 @@ public class ApiConfig {
         return index == -1 ? null : getParses().get(index);
     }
 
+    public List<Doh> getDoh() {
+        return doh == null ? Collections.emptyList() : doh;
+    }
+
+    public void setDoh(List<Doh> doh) {
+        this.doh = doh;
+    }
+
+    public List<Rule> getRules() {
+        return rules == null ? Collections.emptyList() : rules;
+    }
+
+    public void setRules(List<Rule> rules) {
+        this.rules = rules;
+    }
+
     public List<Site> getSites() {
         return sites == null ? Collections.emptyList() : sites;
     }
@@ -288,14 +309,6 @@ public class ApiConfig {
 
     private void setFlags(List<String> flags) {
         this.flags.addAll(flags);
-    }
-
-    public List<Rule> getRules() {
-        return rules == null ? Collections.emptyList() : rules;
-    }
-
-    public void setRules(List<Rule> rules) {
-        this.rules = rules;
     }
 
     public String getAds() {
