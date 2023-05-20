@@ -30,6 +30,6 @@ android {
 
 dependencies {
     implementation project(':catvod')
-    implementation 'androidx.annotation:annotation:1.5.0
+    implementation 'androidx.annotation:annotation:1.5.0'
     api 'com.google.code.gson:gson:' + gsonVersion
 }
