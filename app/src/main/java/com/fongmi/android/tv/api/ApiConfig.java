@@ -257,12 +257,14 @@ public class ApiConfig {
     }
 
     public List<Doh> getDoh() {
-        return doh == null ? Collections.emptyList() : doh;
+        List<Doh> items = new ArrayList<>();
+        items.add(Doh.create(App.get()));
+        items.addAll(doh);
+        return items;
     }
 
     public void setDoh(List<Doh> doh) {
         this.doh = doh;
-        this.doh.add(0, Doh.create(App.get()));
     }
 
     public List<Rule> getRules() {

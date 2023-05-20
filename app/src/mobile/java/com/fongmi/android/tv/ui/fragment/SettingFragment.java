@@ -54,7 +54,6 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
     private String[] player;
     private String[] scale;
     private String[] size;
-    private String[] doh;
     private int type;
 
     public static SettingFragment newInstance() {
@@ -62,7 +61,13 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
     }
 
     private int getDohIndex() {
-        return ApiConfig.get().getDoh().indexOf(Doh.objectFrom(Prefers.getDoh()));
+        return Math.max(0, ApiConfig.get().getDoh().indexOf(Doh.objectFrom(Prefers.getDoh())));
+    }
+
+    private String[] getDohList() {
+        List<String> list = new ArrayList<>();
+        for (Doh item : ApiConfig.get().getDoh()) list.add(item.getName());
+        return list.toArray(new String[0]);
     }
 
     @Override
@@ -75,6 +80,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.vodUrl.setText(ApiConfig.getDesc());
         mBinding.liveUrl.setText(LiveConfig.getDesc());
         mBinding.wallUrl.setText(WallConfig.getDesc());
+        mBinding.dohText.setText(getDohList()[getDohIndex()]);
         mBinding.versionText.setText(BuildConfig.VERSION_NAME);
         mBinding.sizeText.setText((size = ResUtil.getStringArray(R.array.select_size))[Prefers.getSize()]);
         mBinding.scaleText.setText((scale = ResUtil.getStringArray(R.array.select_scale))[Prefers.getScale()]);
@@ -82,7 +88,6 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.decodeText.setText((decode = ResUtil.getStringArray(R.array.select_decode))[Prefers.getDecode()]);
         mBinding.renderText.setText((render = ResUtil.getStringArray(R.array.select_render))[Prefers.getRender()]);
         setCacheText();
-        setDohText();
     }
 
     private void setCacheText() {
@@ -92,14 +97,6 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
                 mBinding.cacheText.setText(result);
             }
         });
-    }
-
-    private void setDohText() {
-        List<String> list = new ArrayList<>();
-        List<Doh> dohList = ApiConfig.get().getDoh();
-        for (Doh doh : dohList) list.add(doh.getName());
-        list.toArray(doh = new String[list.size()]);
-        mBinding.dohText.setText(doh[getDohIndex()]);
     }
 
     @Override
@@ -297,9 +294,10 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
     }
 
     private void setDoh(View view) {
-        new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.setting_doh).setNegativeButton(R.string.dialog_negative, null).setSingleChoiceItems(doh, getDohIndex(), (dialog, which) -> {
+        String[] items = getDohList();
+        new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.setting_doh).setNegativeButton(R.string.dialog_negative, null).setSingleChoiceItems(items, getDohIndex(), (dialog, which) -> {
             Prefers.putDoh(ApiConfig.get().getDoh().get(which).toString());
-            mBinding.dohText.setText(doh[which]);
+            mBinding.dohText.setText(items[which]);
             App.restart(MainActivity.class);
         }).show();
     }
@@ -319,6 +317,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.vodUrl.setText(ApiConfig.getDesc());
         mBinding.liveUrl.setText(LiveConfig.getDesc());
         mBinding.wallUrl.setText(WallConfig.getDesc());
+        mBinding.dohText.setText(getDohList()[getDohIndex()]);
         mBinding.playerText.setText(player[Prefers.getPlayer()]);
         mBinding.decodeText.setText(decode[Prefers.getDecode()]);
         setCacheText();
