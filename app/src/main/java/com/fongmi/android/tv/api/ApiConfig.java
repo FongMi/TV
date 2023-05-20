@@ -256,22 +256,13 @@ public class ApiConfig {
         return jarLoader.jsonExtMix(flag, key, name, jxs, url);
     }
 
-    public Site getSite(String key) {
-        int index = getSites().indexOf(Site.get(key));
-        return index == -1 ? new Site() : getSites().get(index);
-    }
-
-    public Parse getParse(String name) {
-        int index = getParses().indexOf(Parse.get(name));
-        return index == -1 ? null : getParses().get(index);
-    }
-
     public List<Doh> getDoh() {
         return doh == null ? Collections.emptyList() : doh;
     }
 
     public void setDoh(List<Doh> doh) {
         this.doh = doh;
+        this.doh.add(0, Doh.create(App.get()));
     }
 
     public List<Rule> getRules() {
@@ -323,18 +314,33 @@ public class ApiConfig {
         return config == null ? Config.vod() : config;
     }
 
-    public String getWall() {
-        return TextUtils.isEmpty(wall) ? "" : wall;
-    }
-
-    private void setWall(String wall) {
-        this.wall = wall;
-        boolean load = !TextUtils.isEmpty(wall) && WallConfig.get().isSame(wall);
-        if (load) WallConfig.get().config(Config.find(wall, config.getName(), 2).update());
+    public Parse getParse() {
+        return parse == null ? new Parse() : parse;
     }
 
     public Site getHome() {
         return home == null ? new Site() : home;
+    }
+
+    public String getWall() {
+        return TextUtils.isEmpty(wall) ? "" : wall;
+    }
+
+    public Parse getParse(String name) {
+        int index = getParses().indexOf(Parse.get(name));
+        return index == -1 ? null : getParses().get(index);
+    }
+
+    public Site getSite(String key) {
+        int index = getSites().indexOf(Site.get(key));
+        return index == -1 ? new Site() : getSites().get(index);
+    }
+
+    public void setParse(Parse parse) {
+        this.parse = parse;
+        this.parse.setActivated(true);
+        config.parse(parse.getName()).update();
+        for (Parse item : getParses()) item.setActivated(parse);
     }
 
     public void setHome(Site home) {
@@ -344,14 +350,9 @@ public class ApiConfig {
         for (Site item : getSites()) item.setActivated(home);
     }
 
-    public Parse getParse() {
-        return parse == null ? new Parse() : parse;
-    }
-
-    public void setParse(Parse parse) {
-        this.parse = parse;
-        this.parse.setActivated(true);
-        config.parse(parse.getName()).update();
-        for (Parse item : getParses()) item.setActivated(parse);
+    private void setWall(String wall) {
+        this.wall = wall;
+        boolean load = !TextUtils.isEmpty(wall) && WallConfig.get().isSame(wall);
+        if (load) WallConfig.get().config(Config.find(wall, config.getName(), 2).update());
     }
 }

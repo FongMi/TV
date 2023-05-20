@@ -3,6 +3,7 @@ package com.fongmi.android.tv;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -76,16 +77,18 @@ public class App extends Application {
         for (Runnable r : runnable) get().handler.removeCallbacks(r);
     }
 
-    private void setActivity(Activity activity) {
-        this.activity = activity;
+    public static void restart(Class<?> clz) {
+        App.activity().startActivity(Intent.makeRestartActivityTask(new Intent(get(), clz).getComponent()));
+        android.os.Process.killProcess(android.os.Process.myPid());
+        System.exit(10);
     }
 
     private void setDoh(Context context) {
-        try {
-            OkHttp.get().setDoh(context, Doh.objectFrom(Prefers.getDoh()));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        OkHttp.get().setDoh(context, Doh.objectFrom(Prefers.getDoh()));
+    }
+
+    private void setActivity(Activity activity) {
+        this.activity = activity;
     }
 
     @Override
