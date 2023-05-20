@@ -1,22 +1,26 @@
-package com.fongmi.android.tv.net;
+package com.github.catvod.net;
 
 import com.fongmi.android.tv.Constant;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
+import okhttp3.Dns;
 import okhttp3.Headers;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import okhttp3.dnsoverhttps.DnsOverHttps;
 
 public class OkHttp {
 
-    private OkHttpClient mOk;
+    private String dns;
+    private DnsOverHttps doh;
+    private OkHttpClient client;
+    private OkHttpClient noRedirect;
 
     private static class Loader {
         static volatile OkHttp INSTANCE = new OkHttp();
@@ -26,13 +30,28 @@ public class OkHttp {
         return Loader.INSTANCE;
     }
 
+    public void setDns(String dns) {
+        this.dns = dns;
+    }
+
     public static OkHttpClient client() {
-        if (get().mOk != null) return get().mOk;
-        return get().mOk = client(Constant.TIMEOUT_HTTP);
+        if (get().client != null) return get().client;
+        return get().client = client(30 * 1000);
+    }
+
+    public static OkHttpClient noRedirect() {
+        if (get().noRedirect != null) return get().noRedirect;
+        return get().noRedirect = client().newBuilder().followRedirects(false).followSslRedirects(false).build();
+    }
+
+    public static Dns dns() {
+        if (get().doh != null) return get().doh;
+        if (get().dns == null) return Dns.SYSTEM;
+        return get().doh = new DnsOverHttps.Builder().client(client()).url(HttpUrl.get(get().dns)).build();
     }
 
     public static OkHttpClient client(int timeout) {
-        return new OkHttpClient.Builder().connectTimeout(timeout, TimeUnit.MILLISECONDS).hostnameVerifier(SSLSocketFactoryCompat.hostnameVerifier).sslSocketFactory(new SSLSocketFactoryCompat(), SSLSocketFactoryCompat.trustAllCert).build();
+        return new OkHttpClient.Builder().connectTimeout(timeout, TimeUnit.MILLISECONDS).dns(dns()).hostnameVerifier(SSLSocketFactoryCompat.hostnameVerifier).sslSocketFactory(new SSLSocketFactoryCompat(), SSLSocketFactoryCompat.trustAllCert).build();
     }
 
     public static Call newCall(String url) {

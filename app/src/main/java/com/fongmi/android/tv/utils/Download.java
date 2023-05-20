@@ -1,7 +1,7 @@
-package com.fongmi.android.tv.net;
+package com.fongmi.android.tv.utils;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.utils.FileUtil;
+import com.github.catvod.net.OkHttp;
 
 import java.io.BufferedInputStream;
 import java.io.File;

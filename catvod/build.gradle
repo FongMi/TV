@@ -10,3 +10,8 @@ android {
         targetSdk 29
     }
 }
+
+dependencies {
+    api 'com.squareup.okhttp3:okhttp:' + okhttpVersion
+    api 'com.squareup.okhttp3:okhttp-dnsoverhttps:' + okhttpVersion
+}
