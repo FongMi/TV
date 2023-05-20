@@ -12,6 +12,7 @@ android {
 }
 
 dependencies {
+    api 'com.google.code.gson:gson:' + gsonVersion
     api 'com.squareup.okhttp3:okhttp:' + okhttpVersion
     api 'com.squareup.okhttp3:okhttp-dnsoverhttps:' + okhttpVersion
 }
