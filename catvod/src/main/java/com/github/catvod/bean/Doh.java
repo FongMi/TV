@@ -36,8 +36,7 @@ public class Doh {
     }
 
     public static List<Doh> arrayFrom(JsonElement element) {
-        Type listType = new TypeToken<List<Doh>>() {
-        }.getType();
+        Type listType = new TypeToken<List<Doh>>() {}.getType();
         List<Doh> items = new Gson().fromJson(element, listType);
         return items == null ? new ArrayList<>() : items;
     }
@@ -61,10 +60,9 @@ public class Doh {
 
     public List<InetAddress> getHosts() {
         try {
-            if (getIps().isEmpty()) return null;
             List<InetAddress> list = new ArrayList<>();
             for (String ip : getIps()) list.add(InetAddress.getByName(ip));
-            return list;
+            return list.isEmpty() ? null : list;
         } catch (Exception ignored) {
             return null;
         }
