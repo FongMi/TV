@@ -1,4 +1,4 @@
-package com.fongmi.android.tv.net;
+package com.github.catvod.net;
 
 import java.io.IOException;
 import java.net.InetAddress;
