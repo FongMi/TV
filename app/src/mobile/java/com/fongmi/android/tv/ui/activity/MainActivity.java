@@ -103,12 +103,7 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
     private void setNavigation() {
         mBinding.navigation.getMenu().findItem(R.id.vod).setVisible(true);
         mBinding.navigation.getMenu().findItem(R.id.setting).setVisible(true);
-        mBinding.navigation.getMenu().findItem(R.id.live).setVisible(LiveConfig.hasUrl());
-    }
-
-    private boolean openLive() {
-        LiveActivity.start(this);
-        return false;
+        mBinding.navigation.getMenu().findItem(R.id.live).setVisible(false);
     }
 
     private void setConfirm() {
@@ -128,7 +123,6 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
         if (mBinding.navigation.getSelectedItemId() == item.getItemId()) return false;
         if (item.getItemId() == R.id.vod) return mManager.change(0);
         if (item.getItemId() == R.id.setting) return mManager.change(1);
-        if (item.getItemId() == R.id.live) return openLive();
         return false;
     }
 
