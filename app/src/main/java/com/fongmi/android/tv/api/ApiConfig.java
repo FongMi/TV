@@ -9,7 +9,7 @@ import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Depot;
 import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Site;
-import com.fongmi.android.tv.net.Callback;
+import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.utils.Json;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.crawler.Spider;

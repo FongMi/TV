@@ -6,9 +6,9 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Group;
 import com.fongmi.android.tv.bean.Live;
-import com.fongmi.android.tv.net.OkHttp;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Utils;
+import com.github.catvod.net.OkHttp;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

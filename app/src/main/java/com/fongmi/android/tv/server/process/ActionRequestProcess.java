@@ -11,10 +11,10 @@ import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.event.CastEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.event.ServerEvent;
-import com.fongmi.android.tv.net.Callback;
-import com.fongmi.android.tv.net.OkHttp;
+import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.server.Nano;
 import com.fongmi.android.tv.utils.Notify;
+import com.github.catvod.net.OkHttp;
 
 import java.util.List;
 import java.util.Map;

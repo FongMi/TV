@@ -1,7 +1,7 @@
 package com.fongmi.android.tv.player.source;
 
-import com.fongmi.android.tv.net.OkHttp;
 import com.fongmi.android.tv.utils.Sniffer;
+import com.github.catvod.net.OkHttp;
 import com.google.common.net.HttpHeaders;
 
 import java.util.Arrays;

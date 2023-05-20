@@ -23,7 +23,7 @@ android {
         leanback {
             dimension "default"
             versionCode 77
-            versionName "1.7.7"
+            versionName "20230520#1"
         }
     }
 
@@ -71,6 +71,7 @@ dependencies {
     implementation project(':ijkplayer')
     implementation project(':media-lib-database')
     implementation project(':media-lib-datasource')
+    implementation project(':media-lib-datasource-okhttp')
     implementation project(':media-lib-datasource-rtmp')
     implementation project(':media-lib-decoder-av1')
     implementation project(':media-lib-decoder-ffmpeg')
@@ -90,13 +91,14 @@ dependencies {
     implementation 'androidx.room:room-runtime:2.5.1'
     implementation 'cat.ereza:customactivityoncrash:2.4.0'
     implementation 'com.github.bassaer:materialdesigncolors:1.0.0'
-    implementation 'com.github.bumptech.glide:glide:4.14.2'
+    implementation 'com.github.bumptech.glide:glide:4.15.1'
     implementation('com.github.thegrizzlylabs:sardine-android:0.8') { exclude group: 'com.squareup.okhttp3', module: 'okhttp' }
     implementation 'com.google.android.material:material:1.9.0'
-    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.google.code.gson:gson:' + gsonVersion
     implementation 'com.google.zxing:core:3.4.1'
     implementation 'com.guolindev.permissionx:permissionx:1.7.1'
-    implementation 'com.squareup.okhttp3:okhttp:3.12.13'
+    implementation 'com.squareup.okhttp3:okhttp:' + okhttpVersion
+    implementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:' + okhttpVersion
     implementation 'me.jessyan:autosize:1.2.1'
     implementation 'net.java.dev.jna:jna:5.12.1'
     implementation 'org.apache.commons:commons-compress:1.20'
@@ -104,5 +106,5 @@ dependencies {
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
     implementation('org.simpleframework:simple-xml:2.7.1') { exclude group: 'stax', module: 'stax-api' exclude group: 'xpp3', module: 'xpp3' }
     annotationProcessor 'androidx.room:room-compiler:2.5.1'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.14.2'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.15.1'
 }
