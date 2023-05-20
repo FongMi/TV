@@ -1,4 +1,4 @@
-package com.fongmi.android.tv.net;
+package com.fongmi.android.tv.impl;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;

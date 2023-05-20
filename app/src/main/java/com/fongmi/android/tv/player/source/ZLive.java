@@ -1,7 +1,7 @@
 package com.fongmi.android.tv.player.source;
 
-import com.fongmi.android.tv.net.OkHttp;
 import com.fongmi.android.tv.utils.FileUtil;
+import com.github.catvod.net.OkHttp;
 
 public class ZLive {
 

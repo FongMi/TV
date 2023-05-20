@@ -1,9 +1,8 @@
 package com.hiker.drpy;
 
 import android.content.Context;
-import android.util.Log;
 
-import com.hiker.drpy.net.OkHttp;
+import com.github.catvod.net.OkHttp;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+
+import okhttp3.Headers;
 
 public class Module {
 
@@ -31,7 +32,7 @@ public class Module {
 
     public String load(Context context, String name) {
         if (cache.contains(name)) return cache.get(name);
-        if (name.startsWith("http")) cache.put(name, OkHttp.get().module(name));
+        if (name.startsWith("http")) cache.put(name, getModule(name));
         if (name.startsWith("assets")) cache.put(name, getAssets(context, name));
         return cache.get(name);
     }
@@ -44,6 +45,15 @@ public class Module {
             is.close();
             return new String(data, StandardCharsets.UTF_8);
         } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    private String getModule(String url) {
+        try {
+            return OkHttp.newCall(url, Headers.of("User-Agent", "Mozilla/5.0")).execute().body().string();
+        } catch (Exception e) {
             e.printStackTrace();
             return "";
         }
