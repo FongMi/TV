@@ -198,7 +198,7 @@ public class Site {
         Site item = find(getKey());
         if (item == null) return this;
         setChangeable(item.getChangeable());
-        if (getSearchable() != 0) setSearchable(item.getSearchable());
+        if (getSearchable() != 0) setSearchable(Math.max(1, item.getSearchable()));
         return this;
     }
 
