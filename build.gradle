@@ -9,6 +9,6 @@ task clean(type: Delete) {
 }
 
 project.ext {
-    gsonVersion = '2.10.1'
-    okhttpVersion = '4.11.0'
+    gsonVersion = '2.8.6'
+    okhttpVersion = '3.12.13'
 }
