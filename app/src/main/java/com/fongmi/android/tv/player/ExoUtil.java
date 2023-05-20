@@ -97,7 +97,7 @@ public class ExoUtil {
         MediaItem.Builder builder = new MediaItem.Builder().setUri(uri);
         if (errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED) builder.setMimeType(MimeTypes.APPLICATION_M3U8);
         if (subs.size() > 0) builder.setSubtitleConfigurations(getSubtitles(subs));
-        return builder.setAds(getAdsRegex(uri)).build();
+        return builder.build();
     }
 
     private static List<String> getAdsRegex(Uri uri) {
