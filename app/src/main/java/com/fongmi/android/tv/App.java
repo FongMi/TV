@@ -79,8 +79,7 @@ public class App extends Application {
 
     public static void restart(Class<?> clz) {
         App.activity().startActivity(Intent.makeRestartActivityTask(new Intent(get(), clz).getComponent()));
-        android.os.Process.killProcess(android.os.Process.myPid());
-        System.exit(10);
+        System.exit(0);
     }
 
     private void setDoh(Context context) {
