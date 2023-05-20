@@ -4,6 +4,7 @@ import android.net.Uri;
 
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Rule;
+import com.github.catvod.crawler.SpiderDebug;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +20,7 @@ public class Sniffer {
     }
 
     public static boolean isVideoFormat(String url, Map<String, String> headers) {
+        SpiderDebug.log(url);
         if (matchOrContain(url)) return true;
         if (headers.containsKey("Accept") && headers.get("Accept").startsWith("image")) return false;
         if (url.contains("url=http") || url.contains("v=http") || url.contains(".css") || url.contains(".html")) return false;
