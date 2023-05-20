@@ -20,7 +20,7 @@ import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.impl.ParseCallback;
-import com.fongmi.android.tv.utils.Utils;
+import com.fongmi.android.tv.utils.Sniffer;
 import com.github.catvod.crawler.Spider;
 
 import java.io.ByteArrayInputStream;
@@ -71,7 +71,7 @@ public class CustomWebView extends WebView {
         }
     }
 
-    public CustomWebView start(String key, String from, String url, Map<String, String> headers, ParseCallback callback) {
+    public CustomWebView start(String key, String from, Map<String, String> headers, String url, ParseCallback callback) {
         App.post(timer, Constant.TIMEOUT_PARSE_WEB);
         this.callback = callback;
         setUserAgent(headers);
@@ -113,9 +113,9 @@ public class CustomWebView extends WebView {
             Site site = ApiConfig.get().getSite(key);
             Spider spider = ApiConfig.get().getCSP(site);
             if (spider.manualVideoCheck()) return spider.isVideoFormat(url);
-            return Utils.isVideoFormat(url, headers);
+            return Sniffer.isVideoFormat(url, headers);
         } catch (Exception ignored) {
-            return Utils.isVideoFormat(url, headers);
+            return Sniffer.isVideoFormat(url, headers);
         }
     }
 

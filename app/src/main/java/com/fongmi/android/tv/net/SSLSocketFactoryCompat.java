@@ -20,7 +20,6 @@ public class SSLSocketFactoryCompat extends SSLSocketFactory {
     public static final HostnameVerifier hostnameVerifier = (hostname, session) -> true;
 
     public static final X509TrustManager trustAllCert = new X509TrustManager() {
-
         @Override
         public void checkClientTrusted(X509Certificate[] chain, String authType) {
         }

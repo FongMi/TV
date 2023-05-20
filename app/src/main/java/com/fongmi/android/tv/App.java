@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.core.os.HandlerCompat;
 
 import com.fongmi.android.tv.ui.activity.CrashActivity;
+import com.google.gson.Gson;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -23,15 +24,21 @@ public class App extends Application {
     private final Handler handler;
     private static App instance;
     private Activity activity;
+    private final Gson gson;
 
     public App() {
         instance = this;
         executor = Executors.newFixedThreadPool(Constant.THREAD_POOL);
         handler = HandlerCompat.createAsync(Looper.getMainLooper());
+        gson = new Gson();
     }
 
     public static App get() {
         return instance;
+    }
+
+    public static Gson gson() {
+        return get().gson;
     }
 
     public static Activity activity() {
