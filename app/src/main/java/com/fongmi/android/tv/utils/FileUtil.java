@@ -44,10 +44,6 @@ public class FileUtil {
         return new File(getRootPath() + File.separator + path);
     }
 
-    public static File getExternalCacheDir() {
-        return App.get().getExternalCacheDir();
-    }
-
     public static File getCacheDir() {
         return App.get().getCacheDir();
     }
@@ -190,14 +186,13 @@ public class FileUtil {
         new WebView(App.get()).clearCache(true);
         App.execute(() -> {
             clearDir(getCacheDir());
-            clearDir(getExternalCacheDir());
             App.post(callback::success);
         });
     }
 
     public static void getCacheSize(Callback callback) {
         App.execute(() -> {
-            String result = byteCountToDisplaySize(getFolderSize(getCacheDir()) + getFolderSize(getExternalCacheDir()));
+            String result = byteCountToDisplaySize(getFolderSize(getCacheDir()));
             App.post(() -> callback.success(result));
         });
     }

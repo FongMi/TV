@@ -21,13 +21,13 @@ android {
     productFlavors {
         leanback {
             dimension "mode"
-            versionCode 76
-            versionName "20230514#1"
+            versionCode 77
+            versionName "1.7.7"
         }
         mobile {
             dimension "mode"
-            versionCode 14
-            versionName "1.1.4"
+            versionCode 15
+            versionName "1.1.5"
         }
         java {
             dimension "api"
@@ -98,7 +98,7 @@ dependencies {
     implementation 'com.github.bassaer:materialdesigncolors:1.0.0'
     implementation 'com.github.bumptech.glide:glide:4.14.2'
     implementation('com.github.thegrizzlylabs:sardine-android:0.8') { exclude group: 'com.squareup.okhttp3', module: 'okhttp' }
-    implementation 'com.google.android.material:material:1.9.0-beta01'
+    implementation 'com.google.android.material:material:1.9.0'
     implementation 'com.google.code.gson:gson:2.10.1'
     implementation 'com.google.net.cronet:cronet-okhttp:0.1.0'
     implementation 'com.google.zxing:core:3.4.1'

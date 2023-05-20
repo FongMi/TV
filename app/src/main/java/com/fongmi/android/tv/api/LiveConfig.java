@@ -58,7 +58,7 @@ public class LiveConfig {
     }
 
     public static boolean hasUrl() {
-        return getUrl().length() > 0;
+        return getUrl() != null && getUrl().length() > 0;
     }
 
     public LiveConfig init() {
@@ -176,7 +176,7 @@ public class LiveConfig {
     }
 
     public void setKeep(Channel channel) {
-        if (channel.getGroup().isHidden() || home == null) return;
+        if (home == null || channel.getGroup().isHidden() || channel.getUrls().isEmpty()) return;
         Prefers.putKeep(home.getName() + AppDatabase.SYMBOL + channel.getGroup().getName() + AppDatabase.SYMBOL + channel.getName() + AppDatabase.SYMBOL + channel.getCurrent());
     }
 
