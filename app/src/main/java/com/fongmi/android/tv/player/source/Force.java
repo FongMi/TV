@@ -8,10 +8,10 @@ import android.os.IBinder;
 import android.os.SystemClock;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.Github;
-import com.fongmi.android.tv.net.OkHttp;
+import com.fongmi.android.tv.utils.Github;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.forcetech.Util;
+import com.github.catvod.net.OkHttp;
 
 import java.io.File;
 import java.util.HashSet;

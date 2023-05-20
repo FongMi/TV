@@ -3,11 +3,11 @@ package com.fongmi.android.tv.api;
 import android.content.Context;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.net.OkHttp;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderNull;
+import com.github.catvod.net.OkHttp;
 
 import org.json.JSONObject;
 

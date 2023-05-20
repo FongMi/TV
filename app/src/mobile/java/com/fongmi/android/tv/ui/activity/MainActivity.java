@@ -17,7 +17,7 @@ import com.fongmi.android.tv.api.LiveConfig;
 import com.fongmi.android.tv.api.WallConfig;
 import com.fongmi.android.tv.databinding.ActivityMainBinding;
 import com.fongmi.android.tv.event.RefreshEvent;
-import com.fongmi.android.tv.net.Callback;
+import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.utils.FileChooser;

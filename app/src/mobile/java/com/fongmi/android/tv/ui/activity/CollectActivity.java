@@ -28,8 +28,7 @@ import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.ActivityCollectBinding;
 import com.fongmi.android.tv.impl.SiteCallback;
 import com.fongmi.android.tv.model.SiteViewModel;
-import com.fongmi.android.tv.net.Callback;
-import com.fongmi.android.tv.net.OkHttp;
+import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.ui.adapter.CollectAdapter;
 import com.fongmi.android.tv.ui.adapter.RecordAdapter;
 import com.fongmi.android.tv.ui.adapter.VodAdapter;
@@ -42,6 +41,7 @@ import com.fongmi.android.tv.utils.PauseThreadPoolExecutor;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Utils;
+import com.github.catvod.net.OkHttp;
 
 import java.io.IOException;
 import java.util.ArrayList;
