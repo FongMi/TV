@@ -6,9 +6,6 @@ import android.util.ArrayMap;
 import com.github.catvod.bean.Doh;
 
 import java.io.File;
-import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -40,11 +37,9 @@ public class OkHttp {
         return Loader.INSTANCE;
     }
 
-    public void setDoh(Context context, Doh doh) throws Exception {
+    public void setDoh(Context context, Doh doh) {
         OkHttpClient dohClient = new OkHttpClient.Builder().cache(new Cache(new File(context.getCacheDir(), "http_cache"), CACHE)).build();
-        List<InetAddress> list = new ArrayList<>();
-        for (String ip : doh.getIps()) list.add(InetAddress.getByName(ip));
-        dns = doh.getUrl().isEmpty() ? null : new DnsOverHttps.Builder().client(dohClient).url(HttpUrl.get(doh.getUrl())).bootstrapDnsHosts(list).build();
+        dns = doh.getUrl().isEmpty() ? null : new DnsOverHttps.Builder().client(dohClient).url(HttpUrl.get(doh.getUrl())).bootstrapDnsHosts(doh.getHosts()).build();
         client = null;
         noRedirect = null;
     }

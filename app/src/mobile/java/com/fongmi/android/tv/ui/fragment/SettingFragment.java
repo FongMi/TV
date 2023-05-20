@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.viewbinding.ViewBinding;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.BuildConfig;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Updater;
@@ -22,10 +23,11 @@ import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.databinding.FragmentSettingBinding;
 import com.fongmi.android.tv.event.RefreshEvent;
+import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.impl.ConfigCallback;
 import com.fongmi.android.tv.impl.LiveCallback;
 import com.fongmi.android.tv.impl.SiteCallback;
-import com.fongmi.android.tv.impl.Callback;
+import com.fongmi.android.tv.ui.activity.MainActivity;
 import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.custom.dialog.ConfigDialog;
 import com.fongmi.android.tv.ui.custom.dialog.HistoryDialog;
@@ -37,8 +39,12 @@ import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Utils;
+import com.github.catvod.bean.Doh;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.permissionx.guolindev.PermissionX;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SettingFragment extends BaseFragment implements ConfigCallback, SiteCallback, LiveCallback {
 
@@ -48,10 +54,15 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
     private String[] player;
     private String[] scale;
     private String[] size;
+    private String[] doh;
     private int type;
 
     public static SettingFragment newInstance() {
         return new SettingFragment();
+    }
+
+    private int getDohIndex() {
+        return ApiConfig.get().getDoh().indexOf(Doh.objectFrom(Prefers.getDoh()));
     }
 
     @Override
@@ -71,6 +82,24 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.decodeText.setText((decode = ResUtil.getStringArray(R.array.select_decode))[Prefers.getDecode()]);
         mBinding.renderText.setText((render = ResUtil.getStringArray(R.array.select_render))[Prefers.getRender()]);
         setCacheText();
+        setDohText();
+    }
+
+    private void setCacheText() {
+        FileUtil.getCacheSize(new Callback() {
+            @Override
+            public void success(String result) {
+                mBinding.cacheText.setText(result);
+            }
+        });
+    }
+
+    private void setDohText() {
+        List<String> list = new ArrayList<>();
+        List<Doh> dohList = ApiConfig.get().getDoh();
+        for (Doh doh : dohList) list.add(doh.getName());
+        list.toArray(doh = new String[list.size()]);
+        mBinding.dohText.setText(doh[getDohIndex()]);
     }
 
     @Override
@@ -92,6 +121,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.render.setOnClickListener(this::setRender);
         mBinding.scale.setOnClickListener(this::setScale);
         mBinding.size.setOnClickListener(this::setSize);
+        mBinding.doh.setOnClickListener(this::setDoh);
     }
 
     @Override
@@ -266,20 +296,19 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         }).show();
     }
 
+    private void setDoh(View view) {
+        new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.setting_doh).setNegativeButton(R.string.dialog_negative, null).setSingleChoiceItems(doh, getDohIndex(), (dialog, which) -> {
+            Prefers.putDoh(ApiConfig.get().getDoh().get(which).toString());
+            mBinding.dohText.setText(doh[which]);
+            App.restart(MainActivity.class);
+        }).show();
+    }
+
     private void onCache(View view) {
         FileUtil.clearCache(new Callback() {
             @Override
             public void success() {
                 setCacheText();
-            }
-        });
-    }
-
-    private void setCacheText() {
-        FileUtil.getCacheSize(new Callback() {
-            @Override
-            public void success(String result) {
-                mBinding.cacheText.setText(result);
             }
         });
     }
