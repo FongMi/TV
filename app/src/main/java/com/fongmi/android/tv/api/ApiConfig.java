@@ -261,8 +261,8 @@ public class ApiConfig {
     }
 
     public List<Doh> getDoh() {
-        List<Doh> items = new ArrayList<>();
-        items.add(Doh.system(App.get()));
+        List<Doh> items = Doh.get(App.get());
+        items.removeAll(doh);
         items.addAll(doh);
         return items;
     }
