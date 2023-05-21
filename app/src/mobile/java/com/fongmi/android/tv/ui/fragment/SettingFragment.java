@@ -294,11 +294,10 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
     }
 
     private void setDoh(View view) {
-        String[] items = getDohList();
-        new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.setting_doh).setNegativeButton(R.string.dialog_negative, null).setSingleChoiceItems(items, getDohIndex(), (dialog, which) -> {
+        new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.setting_doh).setNegativeButton(R.string.dialog_negative, null).setSingleChoiceItems(getDohList(), getDohIndex(), (dialog, which) -> {
             Prefers.putDoh(ApiConfig.get().getDoh().get(which).toString());
-            mBinding.dohText.setText(items[which]);
-            App.restart(MainActivity.class);
+            App.post(() -> App.restart(MainActivity.class), 250);
+            dialog.dismiss();
         }).show();
     }
 
