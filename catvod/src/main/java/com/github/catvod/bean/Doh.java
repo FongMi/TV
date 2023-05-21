@@ -26,8 +26,12 @@ public class Doh {
     @SerializedName("ips")
     private List<String> ips;
 
-    public static Doh system(Context context) {
-        return new Doh().name(context.getString(R.string.system));
+    public static List<Doh> get(Context context) {
+        List<Doh> items = new ArrayList<>();
+        String[] urls = context.getResources().getStringArray(R.array.doh_url);
+        String[] names = context.getResources().getStringArray(R.array.doh_name);
+        for (int i = 0; i < names.length; i++) items.add(new Doh().name(names[i]).url(urls[i]));
+        return items;
     }
 
     public static Doh objectFrom(String str) {
@@ -43,6 +47,11 @@ public class Doh {
 
     public Doh name(String name) {
         this.name = name;
+        return this;
+    }
+
+    public Doh url(String url) {
+        this.url = url;
         return this;
     }
 
