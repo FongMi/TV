@@ -3,13 +3,13 @@ package com.github.catvod.bean;
 import android.content.Context;
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
+
 import com.github.catvod.crawler.R;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
-
-import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Type;
 import java.net.InetAddress;
@@ -40,7 +40,8 @@ public class Doh {
     }
 
     public static List<Doh> arrayFrom(JsonElement element) {
-        Type listType = new TypeToken<List<Doh>>() {}.getType();
+        Type listType = new TypeToken<List<Doh>>() {
+        }.getType();
         List<Doh> items = new Gson().fromJson(element, listType);
         return items == null ? new ArrayList<>() : items;
     }
@@ -85,7 +86,7 @@ public class Doh {
         return getUrl().equals(it.getUrl());
     }
 
-    @NotNull
+    @NonNull
     @Override
     public String toString() {
         return new Gson().toJson(this);
