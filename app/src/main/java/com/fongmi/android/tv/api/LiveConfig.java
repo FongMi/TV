@@ -61,6 +61,10 @@ public class LiveConfig {
         return getUrl() != null && getUrl().length() > 0;
     }
 
+    public static void load(Config config, Callback callback) {
+        get().clear().config(config).load(callback);
+    }
+
     public LiveConfig init() {
         this.home = null;
         this.config = Config.live();

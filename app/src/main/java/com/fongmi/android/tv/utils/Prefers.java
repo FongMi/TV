@@ -59,6 +59,14 @@ public class Prefers {
         }
     }
 
+    public static String getDoh() {
+        return getString("doh");
+    }
+
+    public static void putDoh(String doh) {
+        put("doh", doh);
+    }
+
     public static String getKeep() {
         return getString("keep");
     }
