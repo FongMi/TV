@@ -2,8 +2,6 @@ package com.fongmi.android.tv;
 
 import android.app.Activity;
 import android.app.Application;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -36,12 +34,6 @@ public class App extends Application {
         executor = Executors.newFixedThreadPool(Constant.THREAD_POOL);
         handler = HandlerCompat.createAsync(Looper.getMainLooper());
         gson = new Gson();
-    }
-
-    @Override
-    protected void attachBaseContext(Context base) {
-        super.attachBaseContext(base);
-        setDoh(base);
     }
 
     public static App get() {
@@ -77,15 +69,6 @@ public class App extends Application {
         for (Runnable r : runnable) get().handler.removeCallbacks(r);
     }
 
-    public static void restart(Class<?> clz) {
-        App.activity().startActivity(Intent.makeRestartActivityTask(new Intent(get(), clz).getComponent()));
-        System.exit(0);
-    }
-
-    private void setDoh(Context context) {
-        OkHttp.get().setDoh(context, Doh.objectFrom(Prefers.getDoh()));
-    }
-
     private void setActivity(Activity activity) {
         this.activity = activity;
     }
@@ -93,6 +76,7 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        OkHttp.get().setDoh(this, Doh.objectFrom(Prefers.getDoh()));
         CaocConfig.Builder.create().backgroundMode(CaocConfig.BACKGROUND_MODE_SILENT).errorActivity(CrashActivity.class).apply();
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
             @Override

@@ -44,6 +44,10 @@ public class WallConfig {
         return drawable;
     }
 
+    public static void load(Config config, Callback callback) {
+        get().clear().config(config).load(callback);
+    }
+
     public WallConfig init() {
         this.config = Config.wall();
         return this;

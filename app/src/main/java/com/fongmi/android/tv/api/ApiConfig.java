@@ -80,6 +80,10 @@ public class ApiConfig {
         return get().getParses().size() > 0;
     }
 
+    public static void load(Config config, Callback callback) {
+        get().clear().config(config).load(callback);
+    }
+
     public ApiConfig init() {
         this.ads = null;
         this.wall = null;
@@ -258,7 +262,7 @@ public class ApiConfig {
 
     public List<Doh> getDoh() {
         List<Doh> items = new ArrayList<>();
-        items.add(Doh.create(App.get()));
+        items.add(Doh.system(App.get()));
         items.addAll(doh);
         return items;
     }

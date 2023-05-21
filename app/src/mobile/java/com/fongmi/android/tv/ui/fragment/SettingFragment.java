@@ -27,7 +27,6 @@ import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.impl.ConfigCallback;
 import com.fongmi.android.tv.impl.LiveCallback;
 import com.fongmi.android.tv.impl.SiteCallback;
-import com.fongmi.android.tv.ui.activity.MainActivity;
 import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.custom.dialog.ConfigDialog;
 import com.fongmi.android.tv.ui.custom.dialog.HistoryDialog;
@@ -40,6 +39,7 @@ import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.bean.Doh;
+import com.github.catvod.net.OkHttp;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.permissionx.guolindev.PermissionX;
 
@@ -134,23 +134,23 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         switch (config.getType()) {
             case 0:
                 Notify.progress(getActivity());
+                ApiConfig.load(config, getCallback());
                 mBinding.vodUrl.setText(config.getDesc());
-                ApiConfig.get().clear().config(config).load(getCallback(config));
                 break;
             case 1:
                 Notify.progress(getActivity());
+                LiveConfig.load(config, getCallback());
                 mBinding.liveUrl.setText(config.getDesc());
-                LiveConfig.get().clear().config(config).load(getCallback(config));
                 break;
             case 2:
                 Notify.progress(getActivity());
+                WallConfig.load(config, getCallback());
                 mBinding.wallUrl.setText(config.getDesc());
-                WallConfig.get().clear().config(config).load(getCallback(config));
                 break;
         }
     }
 
-    private Callback getCallback(Config config) {
+    private Callback getCallback() {
         return new Callback() {
             @Override
             public void success() {
@@ -160,7 +160,6 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
             @Override
             public void error(int resId) {
                 Notify.show(resId);
-                config.delete();
                 setConfig();
             }
         };
@@ -295,10 +294,17 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
 
     private void setDoh(View view) {
         new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.setting_doh).setNegativeButton(R.string.dialog_negative, null).setSingleChoiceItems(getDohList(), getDohIndex(), (dialog, which) -> {
-            Prefers.putDoh(ApiConfig.get().getDoh().get(which).toString());
-            App.post(() -> App.restart(MainActivity.class), 250);
+            setDoh(ApiConfig.get().getDoh().get(which));
             dialog.dismiss();
         }).show();
+    }
+
+    private void setDoh(Doh doh) {
+        Notify.progress(getActivity());
+        Prefers.putDoh(doh.toString());
+        OkHttp.get().setDoh(App.get(), doh);
+        mBinding.dohText.setText(doh.getName());
+        ApiConfig.load(Config.vod(), getCallback());
     }
 
     private void onCache(View view) {

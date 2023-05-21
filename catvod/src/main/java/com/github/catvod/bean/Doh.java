@@ -26,7 +26,7 @@ public class Doh {
     @SerializedName("ips")
     private List<String> ips;
 
-    public static Doh create(Context context) {
+    public static Doh system(Context context) {
         return new Doh().name(context.getString(R.string.system));
     }
 
