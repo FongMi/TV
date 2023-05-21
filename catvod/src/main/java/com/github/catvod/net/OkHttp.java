@@ -1,5 +1,10 @@
 package com.github.catvod.net;
 
+import android.content.Context;
+
+import com.github.catvod.bean.Doh;
+
+import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
