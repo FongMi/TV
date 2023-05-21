@@ -7,6 +7,7 @@ import android.view.View;
 
 import androidx.viewbinding.ViewBinding;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.BuildConfig;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Updater;
@@ -20,10 +21,12 @@ import com.fongmi.android.tv.databinding.ActivitySettingBinding;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.impl.ConfigCallback;
+import com.fongmi.android.tv.impl.DohCallback;
 import com.fongmi.android.tv.impl.LiveCallback;
 import com.fongmi.android.tv.impl.SiteCallback;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.dialog.ConfigDialog;
+import com.fongmi.android.tv.ui.custom.dialog.DohDialog;
 import com.fongmi.android.tv.ui.custom.dialog.HistoryDialog;
 import com.fongmi.android.tv.ui.custom.dialog.LiveDialog;
 import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
@@ -32,9 +35,14 @@ import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Utils;
+import com.github.catvod.bean.Doh;
+import com.github.catvod.net.OkHttp;
 import com.permissionx.guolindev.PermissionX;
 
-public class SettingActivity extends BaseActivity implements ConfigCallback, SiteCallback, LiveCallback {
+import java.util.ArrayList;
+import java.util.List;
+
+public class SettingActivity extends BaseActivity implements ConfigCallback, SiteCallback, LiveCallback, DohCallback {
 
     private ActivitySettingBinding mBinding;
     private String[] quality;
@@ -49,6 +57,16 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         activity.startActivity(new Intent(activity, SettingActivity.class));
     }
 
+    private int getDohIndex() {
+        return Math.max(0, ApiConfig.get().getDoh().indexOf(Doh.objectFrom(Prefers.getDoh())));
+    }
+
+    private String[] getDohList() {
+        List<String> list = new ArrayList<>();
+        for (Doh item : ApiConfig.get().getDoh()) list.add(item.getName());
+        return list.toArray(new String[0]);
+    }
+
     @Override
     protected ViewBinding getBinding() {
         return mBinding = ActivitySettingBinding.inflate(getLayoutInflater());
@@ -59,6 +77,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.vodUrl.setText(ApiConfig.getDesc());
         mBinding.liveUrl.setText(LiveConfig.getDesc());
         mBinding.wallUrl.setText(WallConfig.getDesc());
+        mBinding.dohText.setText(getDohList()[getDohIndex()]);
         mBinding.versionText.setText(BuildConfig.VERSION_NAME);
         mBinding.sizeText.setText((size = ResUtil.getStringArray(R.array.select_size))[Prefers.getSize()]);
         mBinding.scaleText.setText((scale = ResUtil.getStringArray(R.array.select_scale))[Prefers.getScale()]);
@@ -67,6 +86,15 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.renderText.setText((render = ResUtil.getStringArray(R.array.select_render))[Prefers.getRender()]);
         mBinding.qualityText.setText((quality = ResUtil.getStringArray(R.array.select_quality))[Prefers.getQuality()]);
         setCacheText();
+    }
+
+    private void setCacheText() {
+        FileUtil.getCacheSize(new Callback() {
+            @Override
+            public void success(String result) {
+                mBinding.cacheText.setText(result);
+            }
+        });
     }
 
     @Override
@@ -89,6 +117,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.render.setOnClickListener(this::setRender);
         mBinding.scale.setOnClickListener(this::setScale);
         mBinding.size.setOnClickListener(this::setSize);
+        mBinding.doh.setOnClickListener(this::setDoh);
     }
 
     @Override
@@ -104,22 +133,23 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         switch (config.getType()) {
             case 0:
                 Notify.progress(this);
+                ApiConfig.load(config, getCallback());
                 mBinding.vodUrl.setText(config.getDesc());
-                ApiConfig.get().clear().config(config).load(getCallback(config));
                 break;
             case 1:
                 Notify.progress(this);
+                LiveConfig.load(config, getCallback());
                 mBinding.liveUrl.setText(config.getDesc());
-                LiveConfig.get().clear().config(config).load(getCallback(config));
                 break;
             case 2:
+                Notify.progress(this);
+                WallConfig.load(config, getCallback());
                 mBinding.wallUrl.setText(config.getDesc());
-                WallConfig.get().clear().config(config).load(getCallback(config));
                 break;
         }
     }
 
-    private Callback getCallback(Config config) {
+    private Callback getCallback() {
         return new Callback() {
             @Override
             public void success() {
@@ -129,7 +159,6 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
             @Override
             public void error(int resId) {
                 Notify.show(resId);
-                config.delete();
                 setConfig();
             }
         };
@@ -153,6 +182,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
                 break;
             case 2:
                 setCacheText();
+                Notify.dismiss();
                 mBinding.wallUrl.setText(WallConfig.getUrl());
                 break;
         }
@@ -263,20 +293,24 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         RefreshEvent.size();
     }
 
+    private void setDoh(View view) {
+        DohDialog.create(this).index(getDohIndex()).show();
+    }
+
+    @Override
+    public void setDoh(Doh doh) {
+        Notify.progress(getActivity());
+        Prefers.putDoh(doh.toString());
+        OkHttp.get().setDoh(App.get(), doh);
+        mBinding.dohText.setText(doh.getName());
+        ApiConfig.load(Config.vod(), getCallback());
+    }
+
     private void onCache(View view) {
         FileUtil.clearCache(new Callback() {
             @Override
             public void success() {
                 setCacheText();
-            }
-        });
-    }
-
-    private void setCacheText() {
-        FileUtil.getCacheSize(new Callback() {
-            @Override
-            public void success(String result) {
-                mBinding.cacheText.setText(result);
             }
         });
     }
