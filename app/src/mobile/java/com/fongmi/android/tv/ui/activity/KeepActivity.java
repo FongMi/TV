@@ -79,7 +79,7 @@ public class KeepActivity extends BaseActivity implements KeepAdapter.OnClickLis
     }
 
     private void loadConfig(Config config, Keep item) {
-        ApiConfig.get().clear().config(config).load(true, new Callback() {
+        ApiConfig.load(config, new Callback() {
             @Override
             public void success() {
                 DetailActivity.start(getActivity(), item.getSiteKey(), item.getVodId(), item.getVodName());

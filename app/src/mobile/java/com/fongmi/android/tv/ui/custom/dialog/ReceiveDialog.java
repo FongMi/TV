@@ -75,7 +75,7 @@ public class ReceiveDialog extends BaseDialog {
             dismiss();
         } else {
             showProgress();
-            ApiConfig.get().clear().config(event.getConfig()).load(getCallback());
+            ApiConfig.load(event.getConfig(), getCallback());
         }
     }
 

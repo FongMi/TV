@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.Cache;
 import okhttp3.Call;
 import okhttp3.Dns;
 import okhttp3.Headers;
@@ -16,8 +17,10 @@ import okhttp3.dnsoverhttps.DnsOverHttps;
 
 public class OkHttp {
 
-    private String dns;
-    private DnsOverHttps doh;
+    private static final int TIMEOUT = 30 * 1000;
+    private static final int CACHE = 50 * 1024 * 1024;
+
+    private DnsOverHttps dns;
     private OkHttpClient client;
     private OkHttpClient noRedirect;
 
@@ -29,13 +32,16 @@ public class OkHttp {
         return Loader.INSTANCE;
     }
 
-    public void setDns(String dns) {
-        this.dns = dns;
+    public void setDoh(Context context, Doh doh) {
+        OkHttpClient dohClient = new OkHttpClient.Builder().cache(new Cache(new File(context.getCacheDir(), "http_cache"), CACHE)).build();
+        dns = doh.getUrl().isEmpty() ? null : new DnsOverHttps.Builder().client(dohClient).url(HttpUrl.get(doh.getUrl())).bootstrapDnsHosts(doh.getHosts()).build();
+        client = null;
+        noRedirect = null;
     }
 
     public static OkHttpClient client() {
         if (get().client != null) return get().client;
-        return get().client = client(30 * 1000);
+        return get().client = client(TIMEOUT);
     }
 
     public static OkHttpClient noRedirect() {
@@ -44,9 +50,7 @@ public class OkHttp {
     }
 
     public static Dns dns() {
-        if (get().doh != null) return get().doh;
-        if (get().dns == null) return Dns.SYSTEM;
-        return get().doh = new DnsOverHttps.Builder().client(client()).url(HttpUrl.get(get().dns)).build();
+        return get().dns != null ? get().dns : Dns.SYSTEM;
     }
 
     public static OkHttpClient client(int timeout) {
