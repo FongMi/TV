@@ -321,7 +321,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         if (ApiConfig.get().getConfig().equals(event.getConfig())) {
             DetailActivity.cast(this, event.getHistory().update(ApiConfig.getCid()));
         } else {
-            ApiConfig.get().clear().config(event.getConfig()).load(getCallback(event));
+            ApiConfig.load(event.getConfig(), getCallback(event));
         }
     }
 

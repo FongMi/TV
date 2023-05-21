@@ -6,36 +6,35 @@ import android.view.WindowManager;
 
 import androidx.appcompat.app.AlertDialog;
 
-import com.fongmi.android.tv.bean.Config;
-import com.fongmi.android.tv.databinding.DialogHistoryBinding;
-import com.fongmi.android.tv.impl.ConfigCallback;
-import com.fongmi.android.tv.ui.adapter.ConfigAdapter;
+import com.fongmi.android.tv.databinding.DialogDohBinding;
+import com.fongmi.android.tv.impl.DohCallback;
+import com.fongmi.android.tv.ui.adapter.DohAdapter;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.github.catvod.bean.Doh;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-public class HistoryDialog implements ConfigAdapter.OnClickListener {
+public class DohDialog implements DohAdapter.OnClickListener {
 
-    private final DialogHistoryBinding binding;
-    private final ConfigCallback callback;
-    private final ConfigAdapter adapter;
+    private final DialogDohBinding binding;
+    private final DohCallback callback;
     private final AlertDialog dialog;
-    private int type;
+    private final DohAdapter adapter;
 
-    public static HistoryDialog create(Activity activity) {
-        return new HistoryDialog(activity);
+    public static DohDialog create(Activity activity) {
+        return new DohDialog(activity);
     }
 
-    public HistoryDialog type(int type) {
-        this.type = type;
+    public DohDialog index(int index) {
+        adapter.setSelect(index);
         return this;
     }
 
-    public HistoryDialog(Activity activity) {
-        this.callback = (ConfigCallback) activity;
-        this.binding = DialogHistoryBinding.inflate(LayoutInflater.from(activity));
+    public DohDialog(Activity activity) {
+        this.callback = (DohCallback) activity;
+        this.binding = DialogDohBinding.inflate(LayoutInflater.from(activity));
         this.dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).create();
-        this.adapter = new ConfigAdapter(this);
+        this.adapter = new DohAdapter(this);
     }
 
     public void show() {
@@ -44,9 +43,10 @@ public class HistoryDialog implements ConfigAdapter.OnClickListener {
     }
 
     private void setRecyclerView() {
+        binding.recycler.setAdapter(adapter);
         binding.recycler.setHasFixedSize(true);
-        binding.recycler.setAdapter(adapter.addAll(type));
         binding.recycler.addItemDecoration(new SpaceItemDecoration(1, 16));
+        binding.recycler.scrollToPosition(adapter.getSelect());
     }
 
     private void setDialog() {
@@ -59,13 +59,8 @@ public class HistoryDialog implements ConfigAdapter.OnClickListener {
     }
 
     @Override
-    public void onTextClick(Config item) {
-        callback.setConfig(item);
+    public void onItemClick(Doh item) {
+        callback.setDoh(item);
         dialog.dismiss();
-    }
-
-    @Override
-    public void onDeleteClick(Config item) {
-        if (adapter.remove(item) == 0) dialog.dismiss();
     }
 }
