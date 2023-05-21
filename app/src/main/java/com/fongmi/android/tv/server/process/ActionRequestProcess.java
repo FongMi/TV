@@ -118,7 +118,7 @@ public class ActionRequestProcess implements RequestProcess {
         if (ApiConfig.get().getConfig().equals(config)) {
             History.sync(targets);
         } else {
-            ApiConfig.get().clear().config(config).load(getCallback(targets));
+            ApiConfig.load(config, getCallback(targets));
         }
     }
 
@@ -142,7 +142,7 @@ public class ActionRequestProcess implements RequestProcess {
         List<Config> configs = Config.arrayFrom(params.get("configs"));
         List<Keep> targets = Keep.arrayFrom(params.get("targets"));
         if (ApiConfig.getUrl() == null && configs.size() > 0) {
-            ApiConfig.get().clear().config(Config.find(configs.get(0), 0)).load(getCallback(configs, targets));
+            ApiConfig.load(Config.find(configs.get(0), 0), getCallback(configs, targets));
         } else {
             Keep.sync(configs, targets);
         }
