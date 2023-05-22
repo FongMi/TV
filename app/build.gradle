@@ -23,7 +23,7 @@ android {
         leanback {
             dimension "default"
             versionCode 77
-            versionName "20230521#2"
+            versionName "20230523#2"
         }
     }
 
@@ -92,6 +92,8 @@ dependencies {
     implementation 'cat.ereza:customactivityoncrash:2.4.0'
     implementation 'com.github.bassaer:materialdesigncolors:1.0.0'
     implementation 'com.github.bumptech.glide:glide:4.15.1'
+    implementation 'com.github.bumptech.glide:annotations:4.15.1'
+    implementation 'com.github.bumptech.glide:okhttp3-integration:4.15.1'
     implementation('com.github.thegrizzlylabs:sardine-android:0.8') { exclude group: 'com.squareup.okhttp3', module: 'okhttp' }
     implementation 'com.google.android.material:material:1.9.0'
     implementation 'com.google.code.gson:gson:' + gsonVersion
