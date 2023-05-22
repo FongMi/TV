@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Config;
@@ -51,7 +52,7 @@ public class SyncDialog extends BaseDialog implements DeviceAdapter.OnClickListe
     }
 
     public SyncDialog() {
-        client = OkHttp.client(1000);
+        client = OkHttp.client(Constant.TIMEOUT_SYNC);
         body = new FormBody.Builder();
     }
 

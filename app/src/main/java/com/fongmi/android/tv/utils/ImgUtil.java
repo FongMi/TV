@@ -13,6 +13,7 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.load.model.LazyHeaders;
 import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.DrawableImageViewTarget;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.signature.ObjectKey;
 import com.fongmi.android.tv.App;
@@ -27,25 +28,25 @@ public class ImgUtil {
     public static void load(String url, ImageView view, ImageView.ScaleType scaleType) {
         view.setScaleType(scaleType);
         if (TextUtils.isEmpty(url)) view.setImageResource(R.drawable.ic_img_error);
-        else Glide.with(App.get()).asBitmap().load(getUrl(url)).skipMemoryCache(true).dontAnimate().sizeMultiplier(Prefers.getThumbnail()).signature(new ObjectKey(url + "_" + Prefers.getQuality())).placeholder(R.drawable.ic_img_loading).listener(getListener(view, scaleType)).into(view);
+        else Glide.with(App.get()).asBitmap().load(getUrl(url)).skipMemoryCache(true).dontAnimate().sizeMultiplier(Prefers.getThumbnail()).signature(new ObjectKey(url + "_" + Prefers.getQuality())).placeholder(R.drawable.ic_img_loading).listener(getListener(view, scaleType)).into(new DrawableImageViewTarget(view).waitForLayout().getView());
     }
 
     public static void loadKeep(String url, ImageView view) {
         view.setScaleType(ImageView.ScaleType.CENTER);
         if (TextUtils.isEmpty(url)) view.setImageResource(R.drawable.ic_img_error);
-        else Glide.with(App.get()).asBitmap().load(getUrl(url)).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).listener(getListener(view)).into(view);
+        else Glide.with(App.get()).asBitmap().load(getUrl(url)).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).listener(getListener(view)).into(new DrawableImageViewTarget(view).waitForLayout().getView());
     }
 
     public static void loadHistory(String url, ImageView view) {
         view.setScaleType(ImageView.ScaleType.CENTER);
         if (TextUtils.isEmpty(url)) view.setImageResource(R.drawable.ic_img_error);
-        else Glide.with(App.get()).asBitmap().load(getUrl(url)).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).listener(getListener(view)).into(view);
+        else Glide.with(App.get()).asBitmap().load(getUrl(url)).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).listener(getListener(view)).into(new DrawableImageViewTarget(view).waitForLayout().getView());
     }
 
     public static void loadLive(String url, ImageView view) {
         view.setVisibility(TextUtils.isEmpty(url) ? View.GONE : View.VISIBLE);
         if (TextUtils.isEmpty(url)) view.setImageResource(R.drawable.ic_img_empty);
-        else Glide.with(App.get()).asBitmap().load(url).skipMemoryCache(true).dontAnimate().signature(new ObjectKey(url)).error(R.drawable.ic_img_empty).into(view);
+        else Glide.with(App.get()).asBitmap().load(url).skipMemoryCache(true).dontAnimate().signature(new ObjectKey(url)).error(R.drawable.ic_img_empty).into(new DrawableImageViewTarget(view).waitForLayout().getView());
     }
 
     public static Object getUrl(String url) {

@@ -3,6 +3,7 @@ package com.fongmi.android.tv.server.process;
 import android.text.TextUtils;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Device;
@@ -92,7 +93,7 @@ public class ActionRequestProcess implements RequestProcess {
             FormBody.Builder body = new FormBody.Builder();
             body.add("url", TextUtils.isEmpty(url) ? ApiConfig.getUrl() : url);
             body.add("targets", App.gson().toJson(History.get(Config.find(url, 0).getId())));
-            OkHttp.newCall(OkHttp.client(1000), device.getIp().concat("/action?do=sync&type=history"), body.build()).execute();
+            OkHttp.newCall(OkHttp.client(Constant.TIMEOUT_SYNC), device.getIp().concat("/action?do=sync&type=history"), body.build()).execute();
         } catch (Exception e) {
             App.post(() -> Notify.show(e.getMessage()));
         }
@@ -103,7 +104,7 @@ public class ActionRequestProcess implements RequestProcess {
             FormBody.Builder body = new FormBody.Builder();
             body.add("targets", App.gson().toJson(Keep.getVod()));
             body.add("configs", App.gson().toJson(Config.findUrls()));
-            OkHttp.newCall(OkHttp.client(1000), device.getIp().concat("/action?do=sync&type=keep"), body.build()).execute();
+            OkHttp.newCall(OkHttp.client(Constant.TIMEOUT_SYNC), device.getIp().concat("/action?do=sync&type=keep"), body.build()).execute();
         } catch (Exception e) {
             App.post(() -> Notify.show(e.getMessage()));
         }

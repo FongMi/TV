@@ -21,6 +21,8 @@ public class Constant {
     public static final int TIMEOUT_HTTP = 30 * 1000;
     //代理超時時間
     public static final int TIMEOUT_GITHUB = 5 * 1000;
+    //代理超時時間
+    public static final int TIMEOUT_SYNC = 2 * 1000;
     //搜尋線程數量
     public static final int THREAD_POOL = 5;
 }

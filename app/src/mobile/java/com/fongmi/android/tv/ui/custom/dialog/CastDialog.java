@@ -13,6 +13,7 @@ import com.android.cast.dlna.dmc.DLNACastManager;
 import com.android.cast.dlna.dmc.OnDeviceRegistryListener;
 import com.android.cast.dlna.dmc.control.ICastInterface;
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Device;
@@ -57,7 +58,7 @@ public class CastDialog extends BaseDialog implements DeviceAdapter.OnClickListe
     }
 
     public CastDialog() {
-        client = OkHttp.client(1000);
+        client = OkHttp.client(Constant.TIMEOUT_SYNC);
         body = new FormBody.Builder();
         body.add("url", ApiConfig.getUrl());
         body.add("device", Device.get().toString());

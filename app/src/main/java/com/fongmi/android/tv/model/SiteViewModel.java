@@ -72,16 +72,7 @@ public class SiteViewModel extends ViewModel {
                 String body = OkHttp.newCall(site.getApi()).execute().body().string();
                 SpiderDebug.log(body);
                 Result result = site.getType() == 0 ? Result.fromXml(body) : Result.fromJson(body);
-                if (result.getList().isEmpty() || result.getList().get(0).getVodPic().length() > 0) return result;
-                ArrayList<String> ids = new ArrayList<>();
-                for (Vod item : result.getList()) ids.add(item.getVodId());
-                LinkedHashMap<String, String> params = new LinkedHashMap<>();
-                params.put("ac", site.getType() == 0 ? "videolist" : "detail");
-                params.put("ids", TextUtils.join(",", ids));
-                body = OkHttp.newCall(site.getApi(), params).execute().body().string();
-                List<Vod> items = site.getType() == 0 ? Result.fromXml(body).getList() : Result.fromJson(body).getList();
-                result.setList(items);
-                return result;
+                return fetchPic(site, result);
             }
         });
     }
@@ -172,7 +163,7 @@ public class SiteViewModel extends ViewModel {
         if (site.getType() == 3) {
             Spider spider = ApiConfig.get().getCSP(site);
             String searchContent = spider.searchContent(Trans.t2s(keyword), false);
-            SpiderDebug.log(searchContent);
+            SpiderDebug.log(site.getName() + "," + searchContent);
             post(site, Result.fromJson(searchContent));
         } else {
             LinkedHashMap<String, String> params = new LinkedHashMap<>();
@@ -180,9 +171,22 @@ public class SiteViewModel extends ViewModel {
             if (site.getType() != 0) params.put("ac", "detail");
             String body = OkHttp.newCall(site.getApi(), params).execute().body().string();
             SpiderDebug.log(site.getName() + "," + body);
-            if (site.getType() == 0) post(site, Result.fromXml(body));
-            else post(site, Result.fromJson(body));
+            Result result = site.getType() == 0 ? Result.fromXml(body) : Result.fromJson(body);
+            post(site, fetchPic(site, result));
         }
+    }
+
+    private Result fetchPic(Site site, Result result) throws Exception {
+        if (result.getList().isEmpty() || result.getList().get(0).getVodPic().length() > 0) return result;
+        ArrayList<String> ids = new ArrayList<>();
+        for (Vod item : result.getList()) ids.add(item.getVodId());
+        LinkedHashMap<String, String> params = new LinkedHashMap<>();
+        params.put("ac", site.getType() == 0 ? "videolist" : "detail");
+        params.put("ids", TextUtils.join(",", ids));
+        String body = OkHttp.newCall(site.getApi(), params).execute().body().string();
+        List<Vod> items = site.getType() == 0 ? Result.fromXml(body).getList() : Result.fromJson(body).getList();
+        result.setList(items);
+        return result;
     }
 
     private void post(Site site, Result result) {
