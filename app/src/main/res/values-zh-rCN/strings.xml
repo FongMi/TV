@@ -61,9 +61,9 @@
     <string name="setting_live">直播</string>
     <string name="setting_wall">壁纸</string>
     <string name="setting_player">播放器</string>
-    <string name="setting_player_ua">User Agent</string>
-    <string name="setting_player_tunnel">Tunnel Mode</string>
-    <string name="setting_player_http">Http Source</string>
+    <string name="setting_player_ua">User-Agent</string>
+    <string name="setting_player_tunnel">隧道模式</string>
+    <string name="setting_player_http">Http 数据源</string>
     <string name="setting_decode">解码方式</string>
     <string name="setting_render">渲染方式</string>
     <string name="setting_scale">缩放比例</string>

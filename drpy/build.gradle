@@ -8,7 +8,6 @@ android {
     defaultConfig {
         minSdk 21
         targetSdk 29
-        ndk { abiFilters "armeabi-v7a" }
     }
 }
 

@@ -9,7 +9,8 @@ android {
     defaultConfig {
         minSdk 21
         targetSdk 29
-        ndk { abiFilters "armeabi-v7a" }
+        //noinspection ChromeOsAbiSupport
+        ndk { abiFilters "armeabi-v7a", "arm64-v8a" }
         python {
             buildPython "C:/Users/FongMi.DIREK/Anaconda3/envs/py38/python.exe"
             pip {
