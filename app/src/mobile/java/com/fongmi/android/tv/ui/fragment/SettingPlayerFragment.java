@@ -40,6 +40,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback {
         mBinding.uaText.setText(Prefers.getUa());
         mBinding.tunnelText.setText(getSwitch(Prefers.isTunnel()));
         mBinding.httpText.setText((http = ResUtil.getStringArray(R.array.select_player_http))[Prefers.getHttp()]);
+        setVisible();
     }
 
     @Override
@@ -50,8 +51,8 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback {
     }
 
     private void setVisible() {
-        mBinding.tunnel.setVisibility(Prefers.getPlayer() == 0 ? View.VISIBLE : View.GONE);
         mBinding.http.setVisibility(Prefers.getPlayer() == 0 ? View.VISIBLE : View.GONE);
+        mBinding.tunnel.setVisibility(Prefers.getPlayer() == 0 ? View.VISIBLE : View.GONE);
     }
 
     private void onUa(View view) {
