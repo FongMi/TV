@@ -1157,5 +1157,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
 
     public static native void native_setLogLevel(int level);
 
+    public static native void native_setReqLevel(int level);
+
     public static native void native_setDot(int port);
 }
