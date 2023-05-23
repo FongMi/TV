@@ -12,6 +12,7 @@ import androidx.media3.database.DatabaseProvider;
 import androidx.media3.database.StandaloneDatabaseProvider;
 import androidx.media3.datasource.DataSource;
 import androidx.media3.datasource.DefaultDataSource;
+import androidx.media3.datasource.DefaultHttpDataSource;
 import androidx.media3.datasource.HttpDataSource;
 import androidx.media3.datasource.cache.Cache;
 import androidx.media3.datasource.cache.CacheDataSource;
@@ -39,7 +40,6 @@ import com.fongmi.android.tv.bean.Rule;
 import com.fongmi.android.tv.bean.Sub;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Prefers;
-import com.fongmi.android.tv.utils.Sniffer;
 import com.github.catvod.net.OkHttp;
 import com.google.common.net.HttpHeaders;
 
@@ -64,7 +64,7 @@ public class ExoUtil {
 
     public static TrackSelector buildTrackSelector() {
         DefaultTrackSelector trackSelector = new DefaultTrackSelector(App.get());
-        trackSelector.setParameters(trackSelector.buildUponParameters().setPreferredTextLanguage("zh"));
+        trackSelector.setParameters(trackSelector.buildUponParameters().setPreferredTextLanguage("zh").setTunnelingEnabled(Prefers.isTunnel()));
         return trackSelector;
     }
 
@@ -122,12 +122,11 @@ public class ExoUtil {
     }
 
     private static synchronized HttpDataSource.Factory getHttpDataSourceFactory() {
-        if (httpDataSourceFactory == null) httpDataSourceFactory = new OkHttpDataSource.Factory((Call.Factory) OkHttp.client());
+        if (httpDataSourceFactory == null) httpDataSourceFactory = Prefers.getHttp() == 0 ? new DefaultHttpDataSource.Factory().setAllowCrossProtocolRedirects(true) : new OkHttpDataSource.Factory((Call.Factory) OkHttp.client());
         return httpDataSourceFactory;
     }
 
     private static synchronized DataSource.Factory getDataSourceFactory(Map<String, String> headers) {
-        if (!headers.containsKey(HttpHeaders.USER_AGENT)) headers.put(HttpHeaders.USER_AGENT, Sniffer.CHROME);
         if (dataSourceFactory == null) dataSourceFactory = buildReadOnlyCacheDataSource(new DefaultDataSource.Factory(App.get(), getHttpDataSourceFactory()), getCache());
         httpDataSourceFactory.setDefaultRequestProperties(headers);
         return dataSourceFactory;
@@ -145,5 +144,14 @@ public class ExoUtil {
     private static synchronized Cache getCache() {
         if (cache == null) cache = new SimpleCache(FileUtil.getCacheDir("player"), new NoOpCacheEvictor(), getDatabase());
         return cache;
+    }
+
+    public static void reset() {
+        if (cache != null) cache.release();
+        httpDataSourceFactory = null;
+        dataSourceFactory = null;
+        extractorsFactory = null;
+        database = null;
+        cache = null;
     }
 }

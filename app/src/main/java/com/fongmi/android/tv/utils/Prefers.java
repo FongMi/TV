@@ -203,6 +203,30 @@ public class Prefers {
         put("update", update);
     }
 
+    public static String getUa() {
+        return getString("ua", Sniffer.CHROME);
+    }
+
+    public static void putUa(String ua) {
+        put("ua", ua);
+    }
+
+    public static boolean isTunnel() {
+        return getBoolean("exo_tunnel");
+    }
+
+    public static void putTunnel(boolean tunnel) {
+        put("exo_tunnel", tunnel);
+    }
+
+    public static int getHttp() {
+        return getInt("exo_http", 1);
+    }
+
+    public static void putHttp(int http) {
+        put("exo_http", http);
+    }
+
     public static float getThumbnail() {
         return 0.3f * getQuality() + 0.4f;
     }
