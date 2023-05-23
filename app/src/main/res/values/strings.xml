@@ -61,6 +61,9 @@
     <string name="setting_live">Live</string>
     <string name="setting_wall">Wallpaper</string>
     <string name="setting_player">Player</string>
+    <string name="setting_player_ua">User Agent</string>
+    <string name="setting_player_tunnel">Tunnel Mode</string>
+    <string name="setting_player_http">Http Source</string>
     <string name="setting_decode">Decode</string>
     <string name="setting_render">Render</string>
     <string name="setting_scale">Scale</string>
@@ -70,6 +73,8 @@
     <string name="setting_cache">Cache</string>
     <string name="setting_version">Version</string>
     <string name="setting_storage">Permission</string>
+    <string name="setting_off">OFF</string>
+    <string name="setting_on">ON</string>
 
     <!-- Search -->
     <string name="search_keyword">Keywords…</string>
@@ -118,6 +123,11 @@
     <string-array name="select_player">
         <item>EXO</item>
         <item>IJK</item>
+    </string-array>
+
+    <string-array name="select_player_http">
+        <item>Default</item>
+        <item>OkHttp</item>
     </string-array>
 
     <string-array name="select_render">

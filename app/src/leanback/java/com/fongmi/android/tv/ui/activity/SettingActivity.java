@@ -109,6 +109,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.vodHistory.setOnClickListener(this::onVodHistory);
         mBinding.version.setOnLongClickListener(this::onVersionDev);
         mBinding.liveHistory.setOnClickListener(this::onLiveHistory);
+        mBinding.player.setOnLongClickListener(this::onPlayerSetting);
         mBinding.wallDefault.setOnClickListener(this::setWallDefault);
         mBinding.wallRefresh.setOnClickListener(this::setWallRefresh);
         mBinding.quality.setOnClickListener(this::setQuality);
@@ -229,6 +230,11 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
 
     private void onLiveHistory(View view) {
         HistoryDialog.create(this).type(type = 1).show();
+    }
+
+    private boolean onPlayerSetting(View view) {
+        SettingPlayerActivity.start(this);
+        return true;
     }
 
     private void onVersion(View view) {
