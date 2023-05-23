@@ -8,5 +8,7 @@ android {
     defaultConfig {
         minSdk 16
         targetSdk 29
+        //noinspection ChromeOsAbiSupport
+        ndk { abiFilters "armeabi-v7a" }
     }
 }
