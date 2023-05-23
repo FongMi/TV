@@ -20,6 +20,7 @@ import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.ui.base.BaseActivity;
+import com.fongmi.android.tv.ui.fragment.SettingPlayerFragment;
 import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.ui.custom.FragmentStateManager;
 import com.fongmi.android.tv.ui.fragment.SettingFragment;
@@ -70,7 +71,10 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
         mManager = new FragmentStateManager(mBinding.container, getSupportFragmentManager()) {
             @Override
             public Fragment getItem(int position) {
-                return position == 0 ? VodFragment.newInstance() : SettingFragment.newInstance();
+                if (position == 0) return VodFragment.newInstance();
+                if (position == 1) return SettingFragment.newInstance();
+                if (position == 2) return SettingPlayerFragment.newInstance();
+                return null;
             }
         };
         if (savedInstanceState == null) mManager.change(0);
@@ -117,6 +121,10 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
         App.post(() -> confirm = false, 2000);
     }
 
+    public void change(int position) {
+        mManager.change(position);
+    }
+
     @Override
     public void onRefreshEvent(RefreshEvent event) {
         super.onRefreshEvent(event);
@@ -142,6 +150,8 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
     public void onBackPressed() {
         if (!mBinding.navigation.getMenu().findItem(R.id.vod).isVisible()) {
             setNavigation();
+        } else if (mManager.isVisible(2)) {
+            change(1);
         } else if (mManager.isVisible(1)) {
             mBinding.navigation.setSelectedItemId(R.id.vod);
         } else if (mManager.canBack(0)) {
