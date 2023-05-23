@@ -529,7 +529,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void onSetting() {
-        mControlDialog = ControlDialog.create().detail(mBinding).players(mPlayers).parse(isUseParse()).show(this);
+        mControlDialog = ControlDialog.create().detail(mBinding).history(mHistory).players(mPlayers).parse(isUseParse()).show(this);
     }
 
     private void onTrack(View view) {
@@ -1227,6 +1227,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         super.onStart();
         mPlayers.play();
         setStop(false);
+        Clock.start();
     }
 
     @Override
@@ -1234,18 +1235,6 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         super.onStop();
         mPlayers.pause();
         setStop(true);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Clock.start();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        RefreshEvent.history();
         Clock.stop();
     }
 
@@ -1265,6 +1254,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     protected void onDestroy() {
         super.onDestroy();
         mPlayers.release();
+        RefreshEvent.history();
         App.removeCallbacks(mR1, mR2, mR3);
     }
 }
