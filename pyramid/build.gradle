@@ -10,6 +10,8 @@ android {
     defaultConfig {
         minSdk 16
         targetSdk 29
+        //noinspection ChromeOsAbiSupport
+        ndk { abiFilters "armeabi-v7a" }
         python {
             buildPython "C:/Users/FongMi.DIREK/Anaconda3/envs/py38/python.exe"
             pip {
@@ -18,19 +20,6 @@ android {
                 install 'beautifulsoup4'
                 install "requests==2.27.1"
             }
-        }
-    }
-
-    productFlavors {
-        armeabi_v7a {
-            dimension "abi"
-            //noinspection ChromeOsAbiSupport
-            ndk { abiFilters "armeabi-v7a" }
-        }
-        arm64_v8a {
-            dimension "abi"
-            //noinspection ChromeOsAbiSupport
-            ndk { abiFilters "arm64-v8a" }
         }
     }
 
