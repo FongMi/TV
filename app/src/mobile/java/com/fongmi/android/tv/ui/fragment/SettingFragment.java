@@ -27,6 +27,7 @@ import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.impl.ConfigCallback;
 import com.fongmi.android.tv.impl.LiveCallback;
 import com.fongmi.android.tv.impl.SiteCallback;
+import com.fongmi.android.tv.ui.activity.MainActivity;
 import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.custom.dialog.ConfigDialog;
 import com.fongmi.android.tv.ui.custom.dialog.HistoryDialog;
@@ -70,6 +71,10 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         return list.toArray(new String[0]);
     }
 
+    private MainActivity getRoot() {
+        return (MainActivity) getActivity();
+    }
+
     @Override
     protected ViewBinding getBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
         return mBinding = FragmentSettingBinding.inflate(inflater, container, false);
@@ -111,6 +116,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.vodHistory.setOnClickListener(this::onVodHistory);
         mBinding.version.setOnLongClickListener(this::onVersionDev);
         mBinding.liveHistory.setOnClickListener(this::onLiveHistory);
+        mBinding.player.setOnLongClickListener(this::onPlayerSetting);
         mBinding.wallDefault.setOnClickListener(this::setWallDefault);
         mBinding.wallRefresh.setOnClickListener(this::setWallRefresh);
         mBinding.player.setOnClickListener(this::setPlayer);
@@ -231,6 +237,11 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
 
     private void onLiveHistory(View view) {
         HistoryDialog.create(this).type(type = 1).show();
+    }
+
+    private boolean onPlayerSetting(View view) {
+        getRoot().change(2);
+        return true;
     }
 
     private void onVersion(View view) {
