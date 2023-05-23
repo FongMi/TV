@@ -1109,7 +1109,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     @Override
     protected void onPause() {
         super.onPause();
-        RefreshEvent.history();
         onPause(false);
         Clock.stop();
     }
@@ -1132,6 +1131,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     protected void onDestroy() {
         super.onDestroy();
         mPlayers.release();
+        RefreshEvent.history();
         App.removeCallbacks(mR1, mR2);
     }
 }

@@ -13,6 +13,7 @@ import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.databinding.ActivityDetailBinding;
 import com.fongmi.android.tv.databinding.DialogControlBinding;
@@ -22,6 +23,7 @@ import com.fongmi.android.tv.ui.base.ViewType;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.android.material.slider.Slider;
 
 import java.util.Arrays;
 import java.util.List;
@@ -34,6 +36,7 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
     private final String[] scale;
     private Listener listener;
     private Players players;
+    private History history;
     private boolean parse;
 
     public static ControlDialog create() {
@@ -46,6 +49,11 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
 
     public ControlDialog detail(ActivityDetailBinding detail) {
         this.detail = detail;
+        return this;
+    }
+
+    public ControlDialog history(History history) {
+        this.history = history;
         return this;
     }
 
@@ -88,6 +96,7 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
 
     @Override
     protected void initEvent() {
+        binding.speed.addOnChangeListener(this::setSpeed);
         for (TextView view : scales) view.setOnClickListener(this::setScale);
         binding.text.setOnClickListener(v -> dismiss(detail.control.action.text));
         binding.audio.setOnClickListener(v -> dismiss(detail.control.action.audio));
@@ -99,7 +108,11 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
         binding.opening.setOnClickListener(v -> click(binding.opening, detail.control.action.opening));
         binding.ending.setOnLongClickListener(v -> longClick(binding.ending, detail.control.action.ending));
         binding.opening.setOnLongClickListener(v -> longClick(binding.opening, detail.control.action.opening));
-        binding.speed.addOnChangeListener((slider, value, fromUser) -> detail.control.action.speed.setText(players.setSpeed(value)));
+    }
+
+    private void setSpeed(@NonNull Slider slider, float value, boolean fromUser) {
+        detail.control.action.speed.setText(players.setSpeed(value));
+        if (history != null) history.setSpeed(players.getSpeed());
     }
 
     private void setScaleText() {
