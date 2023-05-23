@@ -56,17 +56,18 @@
             android:orientation="horizontal">
 
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_marginEnd="16dp"
                 android:text="@string/setting_player_http"
                 android:textColor="@color/white"
                 android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/httpText"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="end"
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 tools:text="OkHttp" />
@@ -84,17 +85,18 @@
             android:orientation="horizontal">
 
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_marginEnd="16dp"
                 android:text="@string/setting_player_tunnel"
                 android:textColor="@color/white"
                 android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/tunnelText"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="end"
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 tools:text="關" />
