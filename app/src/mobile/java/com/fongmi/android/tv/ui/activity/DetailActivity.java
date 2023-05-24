@@ -700,6 +700,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void showControl() {
+        mBinding.control.setting.setVisibility(mHistory == null || isFullscreen() ? View.GONE : View.VISIBLE);
         mBinding.control.share.setVisibility(getUrl() == null || isFullscreen() ? View.GONE : View.VISIBLE);
         mBinding.control.cast.setVisibility(getUrl() == null || isFullscreen() ? View.GONE : View.VISIBLE);
         mBinding.control.keep.setVisibility(mHistory == null || isFullscreen() ? View.GONE : View.VISIBLE);
@@ -707,7 +708,6 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mBinding.control.rotate.setVisibility(isFullscreen() && !isLock() ? View.VISIBLE : View.GONE);
         mBinding.control.back.setVisibility(isFullscreen() && !isLock() ? View.VISIBLE : View.GONE);
         mBinding.control.action.getRoot().setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
-        mBinding.control.setting.setVisibility(isFullscreen() ? View.GONE : View.VISIBLE);
         mBinding.control.lock.setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
         mBinding.control.center.setVisibility(isLock() ? View.GONE : View.VISIBLE);
         mBinding.control.bottom.setVisibility(isLock() ? View.GONE : View.VISIBLE);
