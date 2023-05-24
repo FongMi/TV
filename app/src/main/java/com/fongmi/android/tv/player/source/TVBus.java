@@ -21,10 +21,16 @@ public class TVBus implements Listener {
     }
 
     private void init(Core core) {
-        if (core == null) return;
-        tvcore = new TVCore().listener(this);
-        tvcore.auth(core.getAuth()).name(core.getName()).pass(core.getPass()).broker(core.getBroker());
-        tvcore.serv(0).play(8902).mode(1).init(App.get());
+        tvcore = new TVCore();
+        tvcore.listener(this);
+        tvcore.auth(core.getAuth());
+        tvcore.name(core.getName());
+        tvcore.pass(core.getPass());
+        tvcore.broker(core.getBroker());
+        tvcore.serv(0);
+        tvcore.play(8902);
+        tvcore.mode(1);
+        tvcore.init(App.get());
     }
 
     public String fetch(String url) throws InterruptedException {
