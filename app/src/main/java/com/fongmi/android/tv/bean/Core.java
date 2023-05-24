@@ -1,5 +1,7 @@
 package com.fongmi.android.tv.bean;
 
+import android.text.TextUtils;
+
 import com.google.gson.annotations.SerializedName;
 
 public class Core {
@@ -14,18 +16,18 @@ public class Core {
     private String broker;
 
     public String getAuth() {
-        return auth;
+        return TextUtils.isEmpty(auth) ? "" : auth;
     }
 
     public String getName() {
-        return name;
+        return TextUtils.isEmpty(name) ? "" : name;
     }
 
     public String getPass() {
-        return pass;
+        return TextUtils.isEmpty(pass) ? "" : pass;
     }
 
     public String getBroker() {
-        return broker;
+        return TextUtils.isEmpty(broker) ? "" : broker;
     }
 }
