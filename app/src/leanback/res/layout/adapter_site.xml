@@ -30,7 +30,7 @@
         android:focusableInTouchMode="true"
         android:padding="8dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_site_search_on" />
+        android:src="@drawable/ic_site_search" />
 
     <ImageView
         android:id="@+id/change"
@@ -42,6 +42,6 @@
         android:focusableInTouchMode="true"
         android:padding="8dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_site_change_on" />
+        android:src="@drawable/ic_site_change" />
 
 </LinearLayout>
