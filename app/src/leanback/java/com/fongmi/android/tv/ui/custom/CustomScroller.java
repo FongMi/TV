@@ -23,6 +23,7 @@ public class CustomScroller extends RecyclerView.OnScrollListener {
     }
 
     private boolean isBottom(RecyclerView view) {
+        if (view.getLayoutManager() == null || view.getLayoutManager().getItemCount() == 0) return false;
         View lastChild = view.getLayoutManager().getChildAt(view.getLayoutManager().getChildCount() - 1);
         int lastPosition = view.getLayoutManager().getPosition(lastChild);
         return lastPosition == view.getLayoutManager().getItemCount() - 1;
