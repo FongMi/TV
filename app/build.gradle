@@ -100,7 +100,6 @@ dependencies {
     implementation 'com.google.zxing:core:3.4.1'
     implementation 'com.guolindev.permissionx:permissionx:1.7.1'
     implementation 'com.squareup.okhttp3:okhttp:' + okhttpVersion
-    implementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:' + okhttpVersion
     implementation 'me.jessyan:autosize:1.2.1'
     implementation 'net.java.dev.jna:jna:5.12.1'
     implementation 'org.apache.commons:commons-compress:1.20'
