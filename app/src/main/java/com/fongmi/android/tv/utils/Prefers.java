@@ -220,7 +220,7 @@ public class Prefers {
     }
 
     public static int getHttp() {
-        return getInt("exo_http", 1);
+        return getInt("exo_http");
     }
 
     public static void putHttp(int http) {

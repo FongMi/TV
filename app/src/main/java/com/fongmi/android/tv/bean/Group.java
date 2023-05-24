@@ -110,7 +110,7 @@ public class Group {
     }
 
     public boolean skip() {
-        return isKeep();
+        return isKeep() || getChannel().isEmpty();
     }
 
     public void loadLogo(ImageView view) {
