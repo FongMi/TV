@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel;
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.api.LiveParser;
 import com.fongmi.android.tv.bean.Channel;
+import com.fongmi.android.tv.bean.Group;
 import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.player.source.BiliBili;
 import com.fongmi.android.tv.player.source.Force;
@@ -13,6 +14,7 @@ import com.fongmi.android.tv.player.source.TVBus;
 import com.fongmi.android.tv.player.source.Youtube;
 import com.fongmi.android.tv.player.source.ZLive;
 
+import java.util.Iterator;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -35,8 +37,14 @@ public class LiveViewModel extends ViewModel {
     public void getLive(Live item) {
         execute(LIVE, () -> {
             LiveParser.start(item);
+            verify(item);
             return item;
         });
+    }
+
+    private void verify(Live item) {
+        Iterator<Group> iterator = item.getGroups().iterator();
+        while (iterator.hasNext()) if (iterator.next().getChannel().isEmpty()) iterator.remove();
     }
 
     public void getUrl(Channel item) {
