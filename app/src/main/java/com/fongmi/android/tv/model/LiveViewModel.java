@@ -44,7 +44,7 @@ public class LiveViewModel extends ViewModel {
 
     private void verify(Live item) {
         Iterator<Group> iterator = item.getGroups().iterator();
-        while (iterator.hasNext()) if (iterator.next().getChannel().isEmpty()) iterator.remove();
+        while (iterator.hasNext()) if (iterator.next().isEmpty()) iterator.remove();
     }
 
     public void getUrl(Channel item) {

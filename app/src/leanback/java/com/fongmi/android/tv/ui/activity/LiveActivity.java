@@ -235,7 +235,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         if (position[0] >= mGroupAdapter.size()) return;
         mGroup = (Group) mGroupAdapter.get(position[0]);
         mBinding.group.setSelectedPosition(position[0]);
-        if (mGroup.getChannel().isEmpty()) return;
         mGroup.setPosition(position[1]);
         onItemClick(mGroup);
         onItemClick(mGroup.current());
@@ -499,6 +498,14 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         showProgress();
     }
 
+    private void release() {
+        mChannelAdapter.clear();
+        mGroupAdapter.clear();
+        mHides.clear();
+        mChannel = null;
+        mGroup = null;
+    }
+
     @Override
     public void onTrackClick(Track item) {
     }
@@ -507,8 +514,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     public void setLive(Live item) {
         LiveConfig.get().setHome(item);
         mPlayers.stop();
-        mHides.clear();
         hideControl();
+        release();
         getLive();
     }
 
@@ -584,19 +591,21 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void prevChannel() {
+        if (mGroup == null) return;
         int position = mGroup.getPosition() - 1;
         boolean limit = position < 0;
         if (Prefers.isAcross() & limit) prevGroup(true);
         else mGroup.setPosition(limit ? mChannelAdapter.size() - 1 : position);
-        setChannel(mGroup.current());
+        if (!mGroup.isEmpty()) setChannel(mGroup.current());
     }
 
     private void nextChannel() {
+        if (mGroup == null) return;
         int position = mGroup.getPosition() + 1;
         boolean limit = position > mChannelAdapter.size() - 1;
         if (Prefers.isAcross() && limit) nextGroup(true);
         else mGroup.setPosition(limit ? 0 : position);
-        setChannel(mGroup.current());
+        if (!mGroup.isEmpty()) setChannel(mGroup.current());
     }
 
     private void prevLine() {
@@ -640,6 +649,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     public boolean nextGroup(boolean skip) {
         int position = mBinding.group.getSelectedPosition() + 1;
         if (position > mGroupAdapter.size() - 1) position = 0;
+        if (mGroup.equals(mGroupAdapter.get(position))) return false;
         mGroup = (Group) mGroupAdapter.get(position);
         mBinding.group.setSelectedPosition(position);
         if (skip && mGroup.skip()) return nextGroup(true);
@@ -652,6 +662,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     public boolean prevGroup(boolean skip) {
         int position = mBinding.group.getSelectedPosition() - 1;
         if (position < 0) position = mGroupAdapter.size() - 1;
+        if (mGroup.equals(mGroupAdapter.get(position))) return false;
         mGroup = (Group) mGroupAdapter.get(position);
         mBinding.group.setSelectedPosition(position);
         if (skip && mGroup.skip()) return prevGroup(true);
@@ -662,9 +673,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public boolean dispatch(boolean check) {
-        boolean condition1 = mGroup != null && mChannel != null;
-        boolean condition2 = isGone(mBinding.recycler) && isGone(mBinding.control.getRoot());
-        return check ? condition1 && condition2 : condition1;
+        return !check || isGone(mBinding.recycler) && isGone(mBinding.control.getRoot());
     }
 
     @Override
@@ -701,6 +710,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public void onKeyLeft(int time) {
+        if (mChannel == null) return;
         if (mChannel.isOnly() && mPlayers.isVod()) App.post(() -> seekTo(time), 250);
         else if (!mChannel.isOnly()) prevLine();
         mKeyDown.resetTime();
@@ -708,6 +718,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public void onKeyRight(int time) {
+        if (mChannel == null) return;
         if (mChannel.isOnly() && mPlayers.isVod()) App.post(() -> seekTo(time), 250);
         else if (!mChannel.isOnly()) nextLine(true);
         mKeyDown.resetTime();
