@@ -73,7 +73,7 @@ public class LiveParser {
             String[] split = line.split(",");
             if (split.length < 2) continue;
             if (Thread.interrupted()) break;
-            if (line.contains("#genre#")) live.getGroups().add(Group.create(split[0]));
+            if (line.contains("#genre#")) live.getGroups().add(Group.create(split[0], live.isPass()));
             if (live.getGroups().isEmpty()) live.getGroups().add(Group.create(R.string.live_group));
             if (split[1].contains("://")) {
                 Group group = live.getGroups().get(live.getGroups().size() - 1);
