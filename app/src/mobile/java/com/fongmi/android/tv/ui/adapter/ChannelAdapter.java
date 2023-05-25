@@ -29,6 +29,11 @@ public class ChannelAdapter extends RecyclerView.Adapter<ChannelAdapter.ViewHold
         boolean onLongClick(Channel item);
     }
 
+    public void clear() {
+        mItems.clear();
+        notifyDataSetChanged();
+    }
+
     public void addAll(List<Channel> items) {
         mItems.clear();
         mItems.addAll(items);
