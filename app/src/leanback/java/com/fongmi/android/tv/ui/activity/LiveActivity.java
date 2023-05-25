@@ -649,7 +649,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     public boolean nextGroup(boolean skip) {
         int position = mBinding.group.getSelectedPosition() + 1;
         if (position > mGroupAdapter.size() - 1) position = 0;
-        if (mGroup == mGroupAdapter.get(position)) return false;
+        if (mGroup.equals(mGroupAdapter.get(position))) return false;
         mGroup = (Group) mGroupAdapter.get(position);
         mBinding.group.setSelectedPosition(position);
         if (skip && mGroup.skip()) return nextGroup(true);
@@ -662,7 +662,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     public boolean prevGroup(boolean skip) {
         int position = mBinding.group.getSelectedPosition() - 1;
         if (position < 0) position = mGroupAdapter.size() - 1;
-        if (mGroup == mGroupAdapter.get(position)) return false;
+        if (mGroup.equals(mGroupAdapter.get(position))) return false;
         mGroup = (Group) mGroupAdapter.get(position);
         mBinding.group.setSelectedPosition(position);
         if (skip && mGroup.skip()) return prevGroup(true);
