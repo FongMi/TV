@@ -234,7 +234,6 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         if (mGroupAdapter.getItemCount() == 1) return;
         if (position[0] >= mGroupAdapter.getItemCount()) return;
         mGroup = mGroupAdapter.get(position[0]);
-        if (mGroup.getChannel().isEmpty()) return;
         mGroup.setPosition(position[1]);
         onItemClick(mGroup);
         onItemClick(mGroup.current());
@@ -502,6 +501,14 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mBinding.control.lock.setImageResource(isLock() ? R.drawable.ic_control_lock_on : R.drawable.ic_control_lock_off);
     }
 
+    private void release() {
+        mChannelAdapter.clear();
+        mGroupAdapter.clear();
+        mHides.clear();
+        mChannel = null;
+        mGroup = null;
+    }
+
     @Override
     public void onTrackClick(Track item) {
     }
@@ -510,8 +517,8 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     public void setLive(Live item) {
         LiveConfig.get().setHome(item);
         mPlayers.stop();
-        mHides.clear();
         hideControl();
+        release();
         getLive();
     }
 
@@ -596,6 +603,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     private boolean prevGroup() {
         int position = mGroupAdapter.getPosition() - 1;
         if (position < 0) position = mGroupAdapter.getItemCount() - 1;
+        if (mGroup.equals(mGroupAdapter.get(position))) return false;
         mGroup = mGroupAdapter.get(position);
         mGroupAdapter.setSelected(position);
         if (mGroup.skip()) return prevGroup();
@@ -607,6 +615,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     private boolean nextGroup() {
         int position = mGroupAdapter.getPosition() + 1;
         if (position > mGroupAdapter.getItemCount() - 1) position = 0;
+        if (mGroup.equals(mGroupAdapter.get(position))) return false;
         mGroup = mGroupAdapter.get(position);
         mGroupAdapter.setSelected(position);
         if (mGroup.skip()) return nextGroup();
@@ -616,19 +625,21 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private void prevChannel() {
+        if (mGroup == null) return;
         int position = mGroup.getPosition() - 1;
         boolean limit = position < 0;
         if (Prefers.isAcross() & limit) prevGroup();
         else mGroup.setPosition(limit ? mChannelAdapter.getItemCount() - 1 : position);
-        onItemClick(mGroup.current());
+        if (!mGroup.isEmpty()) onItemClick(mGroup.current());
     }
 
     private void nextChannel() {
+        if (mGroup == null) return;
         int position = mGroup.getPosition() + 1;
         boolean limit = position > mChannelAdapter.getItemCount() - 1;
         if (Prefers.isAcross() && limit) nextGroup();
         else mGroup.setPosition(limit ? 0 : position);
-        onItemClick(mGroup.current());
+        if (!mGroup.isEmpty()) onItemClick(mGroup.current());
     }
 
     private void prevLine() {
@@ -713,12 +724,14 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
 
     @Override
     public void onFlingLeft() {
+        if (mChannel == null) return;
         if (mChannel.isOnly() && mPlayers.isVod()) App.post(this::seekTo, 250);
         else if (!mChannel.isOnly()) prevLine();
     }
 
     @Override
     public void onFlingRight() {
+        if (mChannel == null) return;
         if (mChannel.isOnly() && mPlayers.isVod()) App.post(this::seekTo, 250);
         else if (!mChannel.isOnly()) nextLine(true);
     }
