@@ -143,6 +143,11 @@ public class Group {
         else getChannel().get(index).getUrls().addAll(channel.getUrls());
     }
 
+    public Group live(Live live) {
+        if (!getLogo().startsWith("http")) setLogo(live.getLogo().replace("{name}", getName()).replace("{logo}", getLogo()));
+        return this;
+    }
+
     public Channel find(Channel channel) {
         int index = getChannel().indexOf(channel);
         if (index != -1) return getChannel().get(index);
