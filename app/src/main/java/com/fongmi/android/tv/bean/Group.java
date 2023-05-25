@@ -37,20 +37,28 @@ public class Group {
         return items == null ? Collections.emptyList() : items;
     }
 
-    public static Group create(String name) {
-        return new Group(name);
-    }
-
     public static Group create(@StringRes int resId) {
         return new Group(ResUtil.getString(resId));
     }
 
+    public static Group create(String name) {
+        return new Group(name);
+    }
+
+    public static Group create(String name, boolean pass) {
+        return new Group(name, pass);
+    }
+
     public Group(String name) {
+        this(name, false);
+    }
+
+    public Group(String name, boolean pass) {
         this.name = name;
         this.position = -1;
         if (!name.contains("_")) return;
         setName(name.split("_")[0]);
-        setPass(name.split("_")[1]);
+        setPass(pass ? "" : name.split("_")[1]);
     }
 
     public List<Channel> getChannel() {
