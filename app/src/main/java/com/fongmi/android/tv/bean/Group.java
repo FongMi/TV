@@ -117,8 +117,12 @@ public class Group {
         return getName().equals(ResUtil.getString(R.string.keep));
     }
 
+    public boolean isEmpty() {
+        return getChannel().isEmpty();
+    }
+
     public boolean skip() {
-        return isKeep() || getChannel().isEmpty();
+        return isKeep();
     }
 
     public void loadLogo(ImageView view) {
