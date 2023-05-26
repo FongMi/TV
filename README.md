@@ -27,6 +27,7 @@ playerType：播放器  (1：IJK、2：EXO)</code></pre>
 referer：參照位址
 epg：節目網址
 logo：台標網址
+pass：是否免密碼
 boot：是否自動開啟
 playerType：播放器</code></pre>
 
