@@ -2,8 +2,12 @@ package com.github.catvod.crawler;
 
 import android.content.Context;
 
+import com.github.catvod.net.OkHttp;
+
 import java.util.HashMap;
 import java.util.List;
+
+import okhttp3.Dns;
 
 public abstract class Spider {
 
@@ -44,5 +48,9 @@ public abstract class Spider {
 
     public boolean isVideoFormat(String url) {
         return false;
+    }
+
+    public static Dns safeDns() {
+        return OkHttp.dns();
     }
 }

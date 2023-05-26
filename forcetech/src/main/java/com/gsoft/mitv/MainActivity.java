@@ -12,8 +12,11 @@ public class MainActivity extends Service {
     private ForceTV forceTV;
     private IBinder binder;
 
-    static {
-        System.loadLibrary("mitv");
+    public MainActivity() {
+        try {
+            System.loadLibrary("mitv");
+        } catch (Throwable ignored) {
+        }
     }
 
     @Override

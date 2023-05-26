@@ -181,6 +181,10 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         return mBinding.ijk;
     }
 
+    private boolean isReplay() {
+        return Prefers.getReset() == 1;
+    }
+
     private boolean isFromCollect() {
         return getCallingActivity() != null && getCallingActivity().getShortClassName().contains(CollectActivity.class.getSimpleName());
     }
@@ -244,12 +248,14 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mBinding.control.action.loop.setOnClickListener(view -> onLoop());
         mBinding.control.action.scale.setOnClickListener(view -> onScale());
         mBinding.control.action.speed.setOnClickListener(view -> onSpeed());
+        mBinding.control.action.reset.setOnClickListener(view -> onReset());
         mBinding.control.action.player.setOnClickListener(view -> onPlayer());
         mBinding.control.action.decode.setOnClickListener(view -> onDecode());
         mBinding.control.action.ending.setOnClickListener(view -> onEnding());
         mBinding.control.action.opening.setOnClickListener(view -> onOpening());
         mBinding.control.action.episodes.setOnClickListener(view -> onEpisodes());
         mBinding.control.action.speed.setOnLongClickListener(view -> onSpeedLong());
+        mBinding.control.action.reset.setOnLongClickListener(view -> onResetToggle());
         mBinding.control.action.ending.setOnLongClickListener(view -> onEndingReset());
         mBinding.control.action.opening.setOnLongClickListener(view -> onOpeningReset());
         mBinding.video.setOnTouchListener((view, event) -> mKeyDown.onTouchEvent(event));
@@ -278,6 +284,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mBinding.control.action.player.setText(mPlayers.getPlayerText());
         getExo().setVisibility(mPlayers.isExo() ? View.VISIBLE : View.GONE);
         getIjk().setVisibility(mPlayers.isIjk() ? View.VISIBLE : View.GONE);
+        mBinding.control.action.reset.setText(ResUtil.getStringArray(R.array.select_reset)[Prefers.getReset()]);
         mBinding.video.addOnLayoutChangeListener((view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> mPiP.update(getActivity(), view));
     }
 
@@ -522,7 +529,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void onSetting() {
-        mControlDialog = ControlDialog.create().detail(mBinding).players(mPlayers).parse(isUseParse()).show(this);
+        mControlDialog = ControlDialog.create().detail(mBinding).history(mHistory).players(mPlayers).parse(isUseParse()).show(this);
     }
 
     private void onTrack(View view) {
@@ -563,10 +570,20 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void onReset() {
+        onReset(isReplay());
+    }
+
+    private void onReset(boolean replay) {
         Clock.get().setCallback(null);
         if (mFlagAdapter.getItemCount() == 0) return;
         if (mEpisodeAdapter.getItemCount() == 0) return;
-        getPlayer(getFlag(), getEpisode(), true);
+        getPlayer(getFlag(), getEpisode(), replay);
+    }
+
+    private boolean onResetToggle() {
+        Prefers.putReset(Math.abs(Prefers.getReset() - 1));
+        mBinding.control.action.reset.setText(ResUtil.getStringArray(R.array.select_reset)[Prefers.getReset()]);
+        return true;
     }
 
     private void onPlayer() {
@@ -693,13 +710,13 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void showControl() {
+        mBinding.control.setting.setVisibility(mHistory == null || isFullscreen() ? View.GONE : View.VISIBLE);
         mBinding.control.share.setVisibility(getUrl() == null || isFullscreen() ? View.GONE : View.VISIBLE);
         mBinding.control.keep.setVisibility(mHistory == null || isFullscreen() ? View.GONE : View.VISIBLE);
         mBinding.control.parse.setVisibility(isFullscreen() && isUseParse() ? View.VISIBLE : View.GONE);
         mBinding.control.rotate.setVisibility(isFullscreen() && !isLock() ? View.VISIBLE : View.GONE);
         mBinding.control.back.setVisibility(isFullscreen() && !isLock() ? View.VISIBLE : View.GONE);
         mBinding.control.action.getRoot().setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
-        mBinding.control.setting.setVisibility(isFullscreen() ? View.GONE : View.VISIBLE);
         mBinding.control.lock.setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
         mBinding.control.center.setVisibility(isLock() ? View.GONE : View.VISIBLE);
         mBinding.control.bottom.setVisibility(isLock() ? View.GONE : View.VISIBLE);
@@ -858,7 +875,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     private void checkEnded() {
         if (mBinding.control.action.loop.isActivated()) {
-            onReset();
+            onReset(true);
         } else {
             checkNext();
         }
@@ -1213,6 +1230,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         super.onStart();
         mPlayers.play();
         setStop(false);
+        Clock.start();
     }
 
     @Override
@@ -1220,18 +1238,6 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         super.onStop();
         mPlayers.pause();
         setStop(true);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Clock.start();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        RefreshEvent.history();
         Clock.stop();
     }
 
@@ -1251,6 +1257,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     protected void onDestroy() {
         super.onDestroy();
         mPlayers.release();
+        RefreshEvent.history();
         App.removeCallbacks(mR1, mR2, mR3);
     }
 }

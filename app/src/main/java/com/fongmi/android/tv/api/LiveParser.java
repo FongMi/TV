@@ -6,9 +6,9 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Group;
 import com.fongmi.android.tv.bean.Live;
-import com.fongmi.android.tv.net.OkHttp;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Utils;
+import com.github.catvod.net.OkHttp;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -48,7 +48,7 @@ public class LiveParser {
     private static void json(Live live, String text) {
         live.getGroups().addAll(Group.arrayFrom(text));
         for (Group group : live.getGroups()) {
-            for (Channel channel : group.getChannel()) {
+            for (Channel channel : group.live(live).getChannel()) {
                 channel.live(live);
             }
         }
@@ -73,7 +73,7 @@ public class LiveParser {
             String[] split = line.split(",");
             if (split.length < 2) continue;
             if (Thread.interrupted()) break;
-            if (line.contains("#genre#")) live.getGroups().add(Group.create(split[0]));
+            if (line.contains("#genre#")) live.getGroups().add(Group.create(split[0], live.isPass()));
             if (live.getGroups().isEmpty()) live.getGroups().add(Group.create(R.string.live_group));
             if (split[1].contains("://")) {
                 Group group = live.getGroups().get(live.getGroups().size() - 1);

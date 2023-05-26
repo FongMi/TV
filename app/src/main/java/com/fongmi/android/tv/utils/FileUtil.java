@@ -11,7 +11,7 @@ import android.webkit.WebView;
 import androidx.core.content.FileProvider;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.net.Callback;
+import com.fongmi.android.tv.impl.Callback;
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;

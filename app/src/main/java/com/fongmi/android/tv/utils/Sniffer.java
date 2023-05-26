@@ -4,6 +4,7 @@ import android.net.Uri;
 
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Rule;
+import com.github.catvod.crawler.SpiderDebug;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,7 +12,7 @@ import java.util.regex.Pattern;
 
 public class Sniffer {
 
-    public static final String CHROME = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36";
+    public static final String CHROME = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36";
     public static final Pattern RULE = Pattern.compile("http((?!http).){12,}?\\.(m3u8|mp4|flv|avi|mkv|rm|wmv|mpg|m4a|mp3)\\?.*|http((?!http).){12,}\\.(m3u8|mp4|flv|avi|mkv|rm|wmv|mpg|m4a|mp3)|http((?!http).)*?video/tos*");
 
     public static boolean isVideoFormat(String url) {
@@ -19,6 +20,7 @@ public class Sniffer {
     }
 
     public static boolean isVideoFormat(String url, Map<String, String> headers) {
+        SpiderDebug.log(url);
         if (matchOrContain(url)) return true;
         if (headers.containsKey("Accept") && headers.get("Accept").startsWith("image")) return false;
         if (url.contains("url=http") || url.contains("v=http") || url.contains(".css") || url.contains(".html")) return false;
@@ -27,6 +29,7 @@ public class Sniffer {
 
     private static boolean matchOrContain(String url) {
         Uri uri = Uri.parse(url);
+        if (uri.getHost() == null) return false;
         for (Rule rule : ApiConfig.get().getRules()) for (String host : rule.getHosts()) if (uri.getHost().contains(host)) for (String regex : rule.getRegex()) return Pattern.compile(regex).matcher(url).find() || url.contains(regex);
         return false;
     }

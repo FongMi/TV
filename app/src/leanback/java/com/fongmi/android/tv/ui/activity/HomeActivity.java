@@ -29,8 +29,8 @@ import com.fongmi.android.tv.databinding.ActivityHomeBinding;
 import com.fongmi.android.tv.event.CastEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.event.ServerEvent;
+import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.model.SiteViewModel;
-import com.fongmi.android.tv.net.Callback;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.CustomRowPresenter;
@@ -321,7 +321,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         if (ApiConfig.get().getConfig().equals(event.getConfig())) {
             DetailActivity.cast(this, event.getHistory().update(ApiConfig.getCid()));
         } else {
-            ApiConfig.get().clear().config(event.getConfig()).load(getCallback(event));
+            ApiConfig.load(event.getConfig(), getCallback(event));
         }
     }
 

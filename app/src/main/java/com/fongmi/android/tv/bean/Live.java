@@ -21,6 +21,8 @@ public class Live {
     private int type;
     @SerializedName("boot")
     private boolean boot;
+    @SerializedName("pass")
+    private boolean pass;
     @SerializedName("name")
     private String name;
     @SerializedName("group")
@@ -77,6 +79,10 @@ public class Live {
 
     public boolean isBoot() {
         return boot;
+    }
+
+    public boolean isPass() {
+        return pass;
     }
 
     public String getName() {
