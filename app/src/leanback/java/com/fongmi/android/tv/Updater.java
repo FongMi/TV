@@ -77,7 +77,7 @@ public class Updater implements Download.Callback {
     }
 
     private boolean need(int code, String name) {
-        return Prefers.getUpdate() && branch.equals(Github.DEV) ? !name.equals(BuildConfig.VERSION_NAME) && code >= BuildConfig.VERSION_CODE : code > BuildConfig.VERSION_CODE;
+        return Prefers.getUpdate() && (branch.equals(Github.DEV) ? !name.equals(BuildConfig.VERSION_NAME) && code >= BuildConfig.VERSION_CODE : code > BuildConfig.VERSION_CODE);
     }
 
     private void doInBackground() {
