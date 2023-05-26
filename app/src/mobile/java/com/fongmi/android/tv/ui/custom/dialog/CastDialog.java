@@ -13,6 +13,7 @@ import com.android.cast.dlna.dmc.DLNACastManager;
 import com.android.cast.dlna.dmc.OnDeviceRegistryListener;
 import com.android.cast.dlna.dmc.control.ICastInterface;
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Device;
@@ -22,13 +23,13 @@ import com.fongmi.android.tv.cast.CastVideo;
 import com.fongmi.android.tv.cast.ScanEvent;
 import com.fongmi.android.tv.cast.ScanTask;
 import com.fongmi.android.tv.databinding.DialogDeviceBinding;
-import com.fongmi.android.tv.net.Callback;
-import com.fongmi.android.tv.net.OkHttp;
+import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.ui.activity.ScanActivity;
 import com.fongmi.android.tv.ui.adapter.DeviceAdapter;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Notify;
+import com.github.catvod.net.OkHttp;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import org.greenrobot.eventbus.EventBus;
@@ -57,7 +58,7 @@ public class CastDialog extends BaseDialog implements DeviceAdapter.OnClickListe
     }
 
     public CastDialog() {
-        client = OkHttp.client(1000);
+        client = OkHttp.client(Constant.TIMEOUT_SYNC);
         body = new FormBody.Builder();
         body.add("url", ApiConfig.getUrl());
         body.add("device", Device.get().toString());

@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.viewbinding.ViewBinding;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.BuildConfig;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Updater;
@@ -22,10 +23,11 @@ import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.databinding.FragmentSettingBinding;
 import com.fongmi.android.tv.event.RefreshEvent;
+import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.impl.ConfigCallback;
 import com.fongmi.android.tv.impl.LiveCallback;
 import com.fongmi.android.tv.impl.SiteCallback;
-import com.fongmi.android.tv.net.Callback;
+import com.fongmi.android.tv.ui.activity.MainActivity;
 import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.custom.dialog.ConfigDialog;
 import com.fongmi.android.tv.ui.custom.dialog.HistoryDialog;
@@ -37,8 +39,13 @@ import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Utils;
+import com.github.catvod.bean.Doh;
+import com.github.catvod.net.OkHttp;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.permissionx.guolindev.PermissionX;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SettingFragment extends BaseFragment implements ConfigCallback, SiteCallback, LiveCallback {
 
@@ -54,6 +61,20 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         return new SettingFragment();
     }
 
+    private int getDohIndex() {
+        return Math.max(0, ApiConfig.get().getDoh().indexOf(Doh.objectFrom(Prefers.getDoh())));
+    }
+
+    private String[] getDohList() {
+        List<String> list = new ArrayList<>();
+        for (Doh item : ApiConfig.get().getDoh()) list.add(item.getName());
+        return list.toArray(new String[0]);
+    }
+
+    private MainActivity getRoot() {
+        return (MainActivity) getActivity();
+    }
+
     @Override
     protected ViewBinding getBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
         return mBinding = FragmentSettingBinding.inflate(inflater, container, false);
@@ -64,6 +85,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.vodUrl.setText(ApiConfig.getDesc());
         mBinding.liveUrl.setText(LiveConfig.getDesc());
         mBinding.wallUrl.setText(WallConfig.getDesc());
+        mBinding.dohText.setText(getDohList()[getDohIndex()]);
         mBinding.versionText.setText(BuildConfig.VERSION_NAME);
         mBinding.sizeText.setText((size = ResUtil.getStringArray(R.array.select_size))[Prefers.getSize()]);
         mBinding.scaleText.setText((scale = ResUtil.getStringArray(R.array.select_scale))[Prefers.getScale()]);
@@ -71,6 +93,15 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.decodeText.setText((decode = ResUtil.getStringArray(R.array.select_decode))[Prefers.getDecode()]);
         mBinding.renderText.setText((render = ResUtil.getStringArray(R.array.select_render))[Prefers.getRender()]);
         setCacheText();
+    }
+
+    private void setCacheText() {
+        FileUtil.getCacheSize(new Callback() {
+            @Override
+            public void success(String result) {
+                mBinding.cacheText.setText(result);
+            }
+        });
     }
 
     @Override
@@ -85,6 +116,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.vodHistory.setOnClickListener(this::onVodHistory);
         mBinding.version.setOnLongClickListener(this::onVersionDev);
         mBinding.liveHistory.setOnClickListener(this::onLiveHistory);
+        mBinding.player.setOnLongClickListener(this::onPlayerSetting);
         mBinding.wallDefault.setOnClickListener(this::setWallDefault);
         mBinding.wallRefresh.setOnClickListener(this::setWallRefresh);
         mBinding.player.setOnClickListener(this::setPlayer);
@@ -92,6 +124,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.render.setOnClickListener(this::setRender);
         mBinding.scale.setOnClickListener(this::setScale);
         mBinding.size.setOnClickListener(this::setSize);
+        mBinding.doh.setOnClickListener(this::setDoh);
     }
 
     @Override
@@ -107,23 +140,23 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         switch (config.getType()) {
             case 0:
                 Notify.progress(getActivity());
+                ApiConfig.load(config, getCallback());
                 mBinding.vodUrl.setText(config.getDesc());
-                ApiConfig.get().clear().config(config).load(getCallback(config));
                 break;
             case 1:
                 Notify.progress(getActivity());
+                LiveConfig.load(config, getCallback());
                 mBinding.liveUrl.setText(config.getDesc());
-                LiveConfig.get().clear().config(config).load(getCallback(config));
                 break;
             case 2:
                 Notify.progress(getActivity());
+                WallConfig.load(config, getCallback());
                 mBinding.wallUrl.setText(config.getDesc());
-                WallConfig.get().clear().config(config).load(getCallback(config));
                 break;
         }
     }
 
-    private Callback getCallback(Config config) {
+    private Callback getCallback() {
         return new Callback() {
             @Override
             public void success() {
@@ -133,7 +166,6 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
             @Override
             public void error(int resId) {
                 Notify.show(resId);
-                config.delete();
                 setConfig();
             }
         };
@@ -207,6 +239,11 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         HistoryDialog.create(this).type(type = 1).show();
     }
 
+    private boolean onPlayerSetting(View view) {
+        getRoot().change(2);
+        return true;
+    }
+
     private void onVersion(View view) {
         Updater.get().force().release().start();
     }
@@ -266,20 +303,26 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         }).show();
     }
 
+    private void setDoh(View view) {
+        new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.setting_doh).setNegativeButton(R.string.dialog_negative, null).setSingleChoiceItems(getDohList(), getDohIndex(), (dialog, which) -> {
+            setDoh(ApiConfig.get().getDoh().get(which));
+            dialog.dismiss();
+        }).show();
+    }
+
+    private void setDoh(Doh doh) {
+        Notify.progress(getActivity());
+        Prefers.putDoh(doh.toString());
+        OkHttp.get().setDoh(App.get(), doh);
+        mBinding.dohText.setText(doh.getName());
+        ApiConfig.load(Config.vod(), getCallback());
+    }
+
     private void onCache(View view) {
         FileUtil.clearCache(new Callback() {
             @Override
             public void success() {
                 setCacheText();
-            }
-        });
-    }
-
-    private void setCacheText() {
-        FileUtil.getCacheSize(new Callback() {
-            @Override
-            public void success(String result) {
-                mBinding.cacheText.setText(result);
             }
         });
     }
@@ -290,6 +333,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.vodUrl.setText(ApiConfig.getDesc());
         mBinding.liveUrl.setText(LiveConfig.getDesc());
         mBinding.wallUrl.setText(WallConfig.getDesc());
+        mBinding.dohText.setText(getDohList()[getDohIndex()]);
         mBinding.playerText.setText(player[Prefers.getPlayer()]);
         mBinding.decodeText.setText(decode[Prefers.getDecode()]);
         setCacheText();

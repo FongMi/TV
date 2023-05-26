@@ -61,14 +61,20 @@
     <string name="setting_live">直播</string>
     <string name="setting_wall">壁紙</string>
     <string name="setting_player">播放器</string>
+    <string name="setting_player_ua">User-Agent</string>
+    <string name="setting_player_http">連線方式</string>
+    <string name="setting_player_tunnel">隧道模式</string>
     <string name="setting_decode">解碼方式</string>
     <string name="setting_render">渲染方式</string>
     <string name="setting_scale">縮放比例</string>
     <string name="setting_quality">圖片品質</string>
     <string name="setting_size">圖片尺寸</string>
+    <string name="setting_doh">DoH</string>
     <string name="setting_cache">暫存</string>
     <string name="setting_version">版本</string>
     <string name="setting_storage">權限</string>
+    <string name="setting_off">關</string>
+    <string name="setting_on">開</string>
 
     <!-- Search -->
     <string name="search_keyword">關鍵字…</string>
@@ -117,6 +123,11 @@
     <string-array name="select_player">
         <item>EXO</item>
         <item>IJK</item>
+    </string-array>
+
+    <string-array name="select_player_http">
+        <item>預設</item>
+        <item>OkHttp</item>
     </string-array>
 
     <string-array name="select_quality">

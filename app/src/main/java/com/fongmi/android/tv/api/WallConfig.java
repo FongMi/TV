@@ -8,10 +8,10 @@ import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.event.RefreshEvent;
-import com.fongmi.android.tv.net.Callback;
-import com.fongmi.android.tv.net.OkHttp;
+import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Prefers;
+import com.github.catvod.net.OkHttp;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,6 +42,10 @@ public class WallConfig {
         if (get().drawable != null) return drawable;
         get().setDrawable(drawable);
         return drawable;
+    }
+
+    public static void load(Config config, Callback callback) {
+        get().clear().config(config).load(callback);
     }
 
     public WallConfig init() {

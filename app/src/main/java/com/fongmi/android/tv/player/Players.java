@@ -24,6 +24,7 @@ import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.github.catvod.crawler.SpiderDebug;
 import com.google.common.collect.ImmutableList;
+import com.google.common.net.HttpHeaders;
 
 import java.util.Formatter;
 import java.util.List;
@@ -327,8 +328,14 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         if (parseJob != null) parseJob.stop();
     }
 
+    private Map<String, String> checkHeaders(Map<String, String> headers) {
+        if (Prefers.getUa().isEmpty() || headers.containsKey(HttpHeaders.USER_AGENT) || headers.containsKey(HttpHeaders.USER_AGENT.toLowerCase())) return headers;
+        headers.put(HttpHeaders.USER_AGENT, Prefers.getUa());
+        return headers;
+    }
+
     private void setMediaSource(Result result) {
-        SpiderDebug.log(errorCode + "," + result.getRealUrl() + "," + result.getHeaders());
+        SpiderDebug.log(errorCode + "," + result.getRealUrl() + "," + checkHeaders(result.getHeaders()));
         if (isIjk()) ijkPlayer.setMediaSource(result.getRealUrl(), result.getHeaders());
         if (isExo()) exoPlayer.setMediaSource(ExoUtil.getSource(result, errorCode));
         if (isExo()) exoPlayer.prepare();
@@ -336,7 +343,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     private void setMediaSource(Map<String, String> headers, String url) {
-        SpiderDebug.log(errorCode + "," + url + "," + headers);
+        SpiderDebug.log(errorCode + "," + url + "," + checkHeaders(headers));
         if (isIjk()) ijkPlayer.setMediaSource(url, headers);
         if (isExo()) exoPlayer.setMediaSource(ExoUtil.getSource(headers, url, errorCode));
         if (isExo()) exoPlayer.prepare();

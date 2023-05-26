@@ -2,10 +2,10 @@ package com.fongmi.android.tv.api;
 
 import android.util.Base64;
 
-import com.fongmi.android.tv.net.OkHttp;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Json;
 import com.fongmi.android.tv.utils.Utils;
+import com.github.catvod.net.OkHttp;
 import com.google.common.io.BaseEncoding;
 
 import java.io.File;

@@ -179,11 +179,11 @@ public class Site {
     }
 
     public int getSearchIcon() {
-        return isSearchable() ? R.drawable.ic_site_search_on : R.drawable.ic_site_search_off;
+        return isSearchable() ? R.drawable.ic_site_search : R.drawable.ic_site_block;
     }
 
     public int getChangeIcon() {
-        return isChangeable() ? R.drawable.ic_site_change_on : R.drawable.ic_site_change_off;
+        return isChangeable() ? R.drawable.ic_site_change : R.drawable.ic_site_block;
     }
 
     public static Site find(String key) {
@@ -198,7 +198,7 @@ public class Site {
         Site item = find(getKey());
         if (item == null) return this;
         setChangeable(item.getChangeable());
-        if (getSearchable() != 0) setSearchable(item.getSearchable());
+        if (getSearchable() != 0) setSearchable(Math.max(1, item.getSearchable()));
         return this;
     }
 

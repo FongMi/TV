@@ -10,3 +10,10 @@ android {
         targetSdk 29
     }
 }
+
+dependencies {
+    implementation 'androidx.annotation:annotation:1.5.0'
+    api 'com.google.code.gson:gson:' + gsonVersion
+    api 'com.squareup.okhttp3:okhttp:' + okhttpVersion
+    api 'com.squareup.okhttp3:okhttp-dnsoverhttps:' + okhttpVersion
+}

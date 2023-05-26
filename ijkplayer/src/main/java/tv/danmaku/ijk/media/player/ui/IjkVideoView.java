@@ -14,6 +14,7 @@ import android.widget.MediaController;
 
 import androidx.annotation.NonNull;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -187,9 +188,11 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     private void fixUserAgent(Map<String, String> headers) {
-        if (!headers.containsKey(Utils.USER_AGENT)) headers.put(Utils.USER_AGENT, Utils.CHROME);
-        mPlayer.setOption(format, "user_agent", headers.get(Utils.USER_AGENT));
-        headers.remove(Utils.USER_AGENT);
+        for (String key : Arrays.asList(Utils.USER_AGENT, Utils.USER_AGENT.toLowerCase())) {
+            if (!headers.containsKey(key)) continue;
+            mPlayer.setOption(format, "user_agent", headers.get(key));
+            headers.remove(key);
+        }
     }
 
     private void bindSurfaceHolder(IMediaPlayer mp, IRenderView.ISurfaceHolder holder) {

@@ -27,6 +27,11 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
         void onItemClick(Group item);
     }
 
+    public void clear() {
+        mItems.clear();
+        notifyDataSetChanged();
+    }
+
     public void addAll(List<Group> items) {
         mItems.clear();
         mItems.addAll(items);

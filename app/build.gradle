@@ -4,13 +4,12 @@ plugins {
 
 android {
     compileSdk 33
-    flavorDimensions "mode", "api"
+    flavorDimensions "mode", "api", "abi"
 
     defaultConfig {
         applicationId "com.fongmi.android.tv"
         minSdk 21
         targetSdk 29
-        ndk { abiFilters "armeabi-v7a" }
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
@@ -21,19 +20,29 @@ android {
     productFlavors {
         leanback {
             dimension "mode"
-            versionCode 77
-            versionName "1.7.7"
+            versionCode 78
+            versionName "1.7.8"
         }
         mobile {
             dimension "mode"
-            versionCode 15
-            versionName "1.1.5"
+            versionCode 16
+            versionName "1.1.6"
         }
         java {
             dimension "api"
         }
         python {
             dimension "api"
+        }
+        armeabi_v7a {
+            dimension "abi"
+            //noinspection ChromeOsAbiSupport
+            ndk { abiFilters "armeabi-v7a" }
+        }
+        arm64_v8a {
+            dimension "abi"
+            //noinspection ChromeOsAbiSupport
+            ndk { abiFilters "arm64-v8a" }
         }
     }
 
@@ -61,7 +70,7 @@ android {
 
     android.applicationVariants.all { variant ->
         variant.outputs.all { output ->
-            outputFileName = "${variant.productFlavors[0].name}-${variant.productFlavors[1].name}.apk"
+            outputFileName = "${variant.productFlavors[0].name}-${variant.productFlavors[1].name}-${variant.productFlavors[2].name}.apk"
         }
     }
 
@@ -81,6 +90,7 @@ dependencies {
     pythonImplementation project(':pyramid')
     implementation 'androidx.media3:media3-database:1.0.2'
     implementation 'androidx.media3:media3-datasource:1.0.2'
+    implementation 'androidx.media3:media3-datasource-okhttp:1.0.2'
     implementation 'androidx.media3:media3-datasource-rtmp:1.0.2'
     implementation 'androidx.media3:media3-exoplayer:1.0.2'
     implementation 'androidx.media3:media3-exoplayer-dash:1.0.2'
@@ -96,14 +106,17 @@ dependencies {
     implementation 'androidx.room:room-runtime:2.5.1'
     implementation 'cat.ereza:customactivityoncrash:2.4.0'
     implementation 'com.github.bassaer:materialdesigncolors:1.0.0'
-    implementation 'com.github.bumptech.glide:glide:4.14.2'
+    implementation 'com.github.bumptech.glide:glide:4.15.1'
+    implementation 'com.github.bumptech.glide:annotations:4.15.1'
+    implementation 'com.github.bumptech.glide:okhttp3-integration:4.15.1'
     implementation('com.github.thegrizzlylabs:sardine-android:0.8') { exclude group: 'com.squareup.okhttp3', module: 'okhttp' }
     implementation 'com.google.android.material:material:1.9.0'
-    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'com.google.code.gson:gson:' + gsonVersion
     implementation 'com.google.net.cronet:cronet-okhttp:0.1.0'
     implementation 'com.google.zxing:core:3.4.1'
     implementation 'com.guolindev.permissionx:permissionx:1.7.1'
-    implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.10'
+    implementation 'com.squareup.okhttp3:okhttp:' + okhttpVersion
+    implementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:' + okhttpVersion
     implementation 'net.java.dev.jna:jna:5.12.1'
     implementation 'org.apache.commons:commons-compress:1.20'
     implementation 'org.chromium.net:cronet-embedded:101.4951.41'
@@ -116,5 +129,5 @@ dependencies {
     mobileImplementation 'com.github.devin1014.DLNA-Cast:dlna-dmc:V1.0.0'
     mobileImplementation('com.journeyapps:zxing-android-embedded:4.3.0') { transitive = false }
     annotationProcessor 'androidx.room:room-compiler:2.5.1'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.14.2'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.15.1'
 }

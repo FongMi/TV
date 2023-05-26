@@ -3,6 +3,7 @@ package com.fongmi.android.tv.server.process;
 import android.text.TextUtils;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Device;
@@ -11,10 +12,10 @@ import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.event.CastEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.event.ServerEvent;
-import com.fongmi.android.tv.net.Callback;
-import com.fongmi.android.tv.net.OkHttp;
+import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.server.Nano;
 import com.fongmi.android.tv.utils.Notify;
+import com.github.catvod.net.OkHttp;
 
 import java.util.List;
 import java.util.Map;
@@ -93,7 +94,7 @@ public class ActionRequestProcess implements RequestProcess {
             FormBody.Builder body = new FormBody.Builder();
             body.add("url", url);
             body.add("targets", App.gson().toJson(History.get(Config.find(url, 0).getId())));
-            OkHttp.newCall(OkHttp.client(1000), device.getIp().concat("/action?do=sync&type=history"), body.build()).execute();
+            OkHttp.newCall(OkHttp.client(Constant.TIMEOUT_SYNC), device.getIp().concat("/action?do=sync&type=history"), body.build()).execute();
         } catch (Exception e) {
             App.post(() -> Notify.show(e.getMessage()));
         }
@@ -104,7 +105,7 @@ public class ActionRequestProcess implements RequestProcess {
             FormBody.Builder body = new FormBody.Builder();
             body.add("targets", App.gson().toJson(Keep.getVod()));
             body.add("configs", App.gson().toJson(Config.findUrls()));
-            OkHttp.newCall(OkHttp.client(1000), device.getIp().concat("/action?do=sync&type=keep"), body.build()).execute();
+            OkHttp.newCall(OkHttp.client(Constant.TIMEOUT_SYNC), device.getIp().concat("/action?do=sync&type=keep"), body.build()).execute();
         } catch (Exception e) {
             App.post(() -> Notify.show(e.getMessage()));
         }
@@ -118,7 +119,7 @@ public class ActionRequestProcess implements RequestProcess {
         if (ApiConfig.get().getConfig().equals(config)) {
             History.sync(targets);
         } else {
-            ApiConfig.get().clear().config(config).load(getCallback(targets));
+            ApiConfig.load(config, getCallback(targets));
         }
     }
 
@@ -142,7 +143,7 @@ public class ActionRequestProcess implements RequestProcess {
         List<Config> configs = Config.arrayFrom(params.get("configs"));
         List<Keep> targets = Keep.arrayFrom(params.get("targets"));
         if (ApiConfig.getUrl() == null && configs.size() > 0) {
-            ApiConfig.get().clear().config(Config.find(configs.get(0), 0)).load(getCallback(configs, targets));
+            ApiConfig.load(Config.find(configs.get(0), 0), getCallback(configs, targets));
         } else {
             Keep.sync(configs, targets);
         }

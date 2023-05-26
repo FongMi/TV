@@ -12,7 +12,7 @@ import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.databinding.ActivityKeepBinding;
 import com.fongmi.android.tv.event.RefreshEvent;
-import com.fongmi.android.tv.net.Callback;
+import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.ui.adapter.KeepAdapter;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
@@ -54,7 +54,7 @@ public class KeepActivity extends BaseActivity implements KeepAdapter.OnClickLis
     }
 
     private void loadConfig(Config config, Keep item) {
-        ApiConfig.get().clear().config(config).load(true, new Callback() {
+        ApiConfig.load(config, new Callback() {
             @Override
             public void success() {
                 DetailActivity.start(getActivity(), item.getSiteKey(), item.getVodId(), item.getVodName());
