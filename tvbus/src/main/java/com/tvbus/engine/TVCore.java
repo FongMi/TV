@@ -1,7 +1,6 @@
 package com.tvbus.engine;
 
 import android.content.Context;
-import android.text.TextUtils;
 
 public class TVCore {
 
@@ -73,10 +72,10 @@ public class TVCore {
     }
 
     public void init(Context context) {
-        new Thread(() -> initRun(context)).start();
+        new Thread(() -> start(context)).start();
     }
 
-    private void initRun(Context context) {
+    private void start(Context context) {
         try {
             init(handle, context);
             run(handle);
