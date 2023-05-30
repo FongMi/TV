@@ -207,6 +207,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mKeyDown = CustomKeyDownVod.create(this, mBinding.video);
         mFrameParams = mBinding.video.getLayoutParams();
         mBinding.progressLayout.showProgress();
+        mBinding.swipeLayout.setEnabled(false);
         mReceiver = new PiPReceiver(this);
         mPlayers = new Players().init();
         mDialogs = new ArrayList<>();
