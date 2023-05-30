@@ -334,6 +334,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         getIntent().putExtra("key", item.getSiteKey());
         getIntent().putExtra("id", item.getVodId());
         mBinding.swipeLayout.setRefreshing(true);
+        mBinding.swipeLayout.setEnabled(false);
         mBinding.scroll.scrollTo(0, 0);
         Clock.get().setCallback(null);
         mPlayers.stop();
@@ -353,6 +354,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         if (isFromCollect()) {
             finish();
         } else if (getName().isEmpty()) {
+            mBinding.swipeLayout.setEnabled(true);
             mBinding.progressLayout.showEmpty();
         } else {
             checkSearch();
@@ -907,6 +909,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void onError(ErrorEvent event) {
+        mBinding.swipeLayout.setEnabled(true);
         Clock.get().setCallback(null);
         showError(event.getMsg());
         mBroken.add(getId());
