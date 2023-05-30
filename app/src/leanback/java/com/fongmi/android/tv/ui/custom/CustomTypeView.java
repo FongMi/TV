@@ -1,6 +1,7 @@
 package com.fongmi.android.tv.ui.custom;
 
 import android.content.Context;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 
@@ -39,10 +40,17 @@ public class CustomTypeView extends AppCompatTextView {
     }
 
     private boolean onKeyDown() {
-        App.post(() -> coolDown = false, 5000);
+        App.post(() -> coolDown = false, 3000);
         listener.onRefresh();
         coolDown = true;
         return true;
+    }
+
+    @Override
+    protected void onFocusChanged(boolean focused, int direction, Rect previouslyFocusedRect) {
+        super.onFocusChanged(focused, direction, previouslyFocusedRect);
+        App.post(() -> coolDown = false, 500);
+        if (focused) coolDown = true;
     }
 
     public interface Listener {
