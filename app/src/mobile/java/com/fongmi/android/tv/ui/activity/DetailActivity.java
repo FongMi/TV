@@ -860,6 +860,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
                 setTrackVisible(true);
                 checkPlayImg(mPlayers.isPlaying());
                 mBinding.control.size.setText(mPlayers.getSizeText());
+                if (isVisible(mBinding.control.getRoot())) showControl();
                 break;
             case Player.STATE_ENDED:
                 checkEnded();
