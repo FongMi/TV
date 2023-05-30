@@ -127,10 +127,6 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         start(activity, "push_agent", url, url);
     }
 
-    public static void start(Activity activity, String id, String name) {
-        start(activity, ApiConfig.get().getHome().getKey(), id, name);
-    }
-
     public static void start(Activity activity, String key, String id, String name) {
         Intent intent = new Intent(activity, DetailActivity.class);
         intent.putExtra("name", name);
