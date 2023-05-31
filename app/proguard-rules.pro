@@ -27,10 +27,6 @@
 -keep class okio.** { *; }
 -keep class okhttp3.** { *; }
 
-# Cronet
--keep class org.chromium.net.** { *; }
--keep class com.google.net.cronet.** { *; }
-
 # CatVod
 -keep class com.github.catvod.crawler.** { *; }
 -keep class * extends com.github.catvod.crawler.Spider
@@ -38,25 +34,37 @@
 # Cling
 -keep class org.fourthline.cling.** { *; }
 
+# Cronet
+-keep class org.chromium.net.** { *; }
+-keep class com.google.net.cronet.** { *; }
+
 # EXO
 -keep class org.xmlpull.v1.** { *; }
 
 # IJK
 -keep class tv.danmaku.ijk.media.player.** { *; }
--keep class tv.danmaku.ijk.media.player.IjkMediaPlayer { *; }
--keep class tv.danmaku.ijk.media.player.ffmpeg.FFmpegApi { *; }
+
+# Jsoup
+-keep class org.jsoup.**{ *; }
 
 # Sardine
 -keep class com.thegrizzlylabs.sardineandroid.** { *; }
 
+# Smbj
+-keep class com.hierynomus.** { *; }
+
 # TVBus
 -keep class com.tvbus.engine.** { *; }
+
+# XPath
+-keep class org.seimicrawler.xpath.**{ *; }
 
 # ZLive
 -keep class com.sun.jna.** { *; }
 -keep class com.east.android.zlive.** { *; }
 
 # Zxing
+-keep class com.google.zxing.** { *; }
 -keepclassmembers enum * {
     public static **[] values();
     public static ** valueOf(java.lang.String);
