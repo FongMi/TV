@@ -44,9 +44,6 @@
 # IJK
 -keep class tv.danmaku.ijk.media.player.** { *; }
 
-# Jsoup
--keep class org.jsoup.**{ *; }
-
 # Sardine
 -keep class com.thegrizzlylabs.sardineandroid.** { *; }
 
@@ -55,9 +52,6 @@
 
 # TVBus
 -keep class com.tvbus.engine.** { *; }
-
-# XPath
--keep class org.seimicrawler.xpath.**{ *; }
 
 # ZLive
 -keep class com.sun.jna.** { *; }
