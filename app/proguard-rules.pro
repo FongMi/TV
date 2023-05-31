@@ -49,6 +49,7 @@
 
 # Smbj
 -keep class com.hierynomus.** { *; }
+-keep class net.engio.mbassy.** { *; }
 
 # TVBus
 -keep class com.tvbus.engine.** { *; }
