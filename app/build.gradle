@@ -21,12 +21,12 @@ android {
         leanback {
             dimension "mode"
             versionCode 78
-            versionName "20230530#2"
+            versionName "20230531#2"
         }
         mobile {
             dimension "mode"
             versionCode 16
-            versionName "20230530#2"
+            versionName "20230531#2"
         }
         java {
             dimension "api"
@@ -107,7 +107,6 @@ dependencies {
     implementation 'androidx.preference:preference:1.2.0'
     implementation 'androidx.room:room-runtime:2.5.1'
     implementation 'cat.ereza:customactivityoncrash:2.4.0'
-    implementation 'cn.wanghaomiao:JsoupXpath:2.5.1'
     implementation 'com.github.bassaer:materialdesigncolors:1.0.0'
     implementation 'com.github.bumptech.glide:glide:4.15.1'
     implementation 'com.github.bumptech.glide:annotations:4.15.1'
