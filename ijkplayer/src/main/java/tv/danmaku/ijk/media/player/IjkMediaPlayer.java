@@ -20,12 +20,10 @@ package tv.danmaku.ijk.media.player;
 
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
-import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -33,14 +31,12 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
-import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 
 import java.io.FileDescriptor;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
@@ -329,39 +325,9 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         String scheme = uri.getScheme();
         if (ContentResolver.SCHEME_FILE.equals(scheme)) {
             setDataSource(uri.getPath());
-            return;
-        } else if (ContentResolver.SCHEME_CONTENT.equals(scheme) && Settings.AUTHORITY.equals(uri.getAuthority())) {
-            // Redirect ringtones to go directly to underlying provider
-            uri = RingtoneManager.getActualDefaultRingtoneUri(context, RingtoneManager.getDefaultType(uri));
-            if (uri == null) {
-                throw new FileNotFoundException("Failed to resolve default ringtone");
-            }
+        } else {
+            setDataSource(encodeSpaceChinese(uri.toString()), headers);
         }
-
-        AssetFileDescriptor fd = null;
-        try {
-            ContentResolver resolver = context.getContentResolver();
-            fd = resolver.openAssetFileDescriptor(uri, "r");
-            if (fd == null) {
-                return;
-            }
-            // Note: using getDeclaredLength so that our behavior is the same
-            // as previous versions when the content provider is returning
-            // a full file.
-            if (fd.getDeclaredLength() < 0) {
-                setDataSource(fd.getFileDescriptor());
-            } else {
-                setDataSource(fd.getFileDescriptor(), fd.getStartOffset(), fd.getDeclaredLength());
-            }
-            return;
-        } catch (SecurityException | IOException ignored) {
-        } finally {
-            if (fd != null) {
-                fd.close();
-            }
-        }
-
-        setDataSource(encodeSpaceChinese(uri.toString()), headers);
     }
 
     private String encodeSpaceChinese(String str) throws UnsupportedEncodingException {

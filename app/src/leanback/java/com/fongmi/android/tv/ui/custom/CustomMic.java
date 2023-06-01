@@ -76,6 +76,7 @@ public class CustomMic extends AppCompatImageView {
         startAnimation(flicker);
         startListening();
         setListen(true);
+        requestFocus();
     }
 
     public boolean stop() {

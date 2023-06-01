@@ -7,15 +7,15 @@ android {
 
     defaultConfig {
         minSdk 16
-        targetSdk 29
+        targetSdk 28
     }
 }
 
 dependencies {
     implementation project(':catvod')
     implementation 'androidx.annotation:annotation:1.5.0'
-    implementation 'org.jsoup:jsoup:1.15.3'
     implementation 'wang.harlon.quickjs:wrapper-android:0.18.8'
     api 'com.google.code.gson:gson:' + gsonVersion
     api 'com.squareup.okhttp3:okhttp:' + okhttpVersion
+    api 'org.jsoup:jsoup:' + jsoupVersion
 }

@@ -10,5 +10,6 @@ task clean(type: Delete) {
 
 project.ext {
     gsonVersion = '2.8.6'
+    jsoupVersion = '1.15.3'
     okhttpVersion = '3.12.13'
 }
