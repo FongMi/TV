@@ -9,7 +9,7 @@ android {
     defaultConfig {
         applicationId "com.fongmi.android.tv"
         minSdk 16
-        targetSdk 29
+        targetSdk 28
         multiDexEnabled true
         ndk { abiFilters "armeabi-v7a" }
         javaCompileOptions {
@@ -22,8 +22,8 @@ android {
     productFlavors {
         leanback {
             dimension "default"
-            versionCode 78
-            versionName "20230528#2"
+            versionCode 79
+            versionName "1.7.9"
         }
     }
 
@@ -99,11 +99,13 @@ dependencies {
     implementation 'com.google.code.gson:gson:' + gsonVersion
     implementation 'com.google.zxing:core:3.4.1'
     implementation 'com.guolindev.permissionx:permissionx:1.7.1'
+    implementation 'com.hierynomus:smbj:0.11.5'
     implementation 'com.squareup.okhttp3:okhttp:' + okhttpVersion
     implementation 'me.jessyan:autosize:1.2.1'
     implementation 'net.java.dev.jna:jna:5.12.1'
     implementation 'org.apache.commons:commons-compress:1.20'
     implementation 'org.greenrobot:eventbus:3.3.1'
+    implementation 'org.jsoup:jsoup:' + jsoupVersion
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
     implementation('org.simpleframework:simple-xml:2.7.1') { exclude group: 'stax', module: 'stax-api' exclude group: 'xpp3', module: 'xpp3' }
     annotationProcessor 'androidx.room:room-compiler:2.5.1'

@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         minSdk 16
-        targetSdk 29
+        targetSdk 28
         //noinspection ChromeOsAbiSupport
         ndk { abiFilters "armeabi-v7a" }
         python {
