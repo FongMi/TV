@@ -13,4 +13,5 @@ android {
 
 dependencies {
     implementation 'androidx.annotation:annotation:1.5.0'
+    api 'com.hierynomus:smbj:0.11.5'
 }
