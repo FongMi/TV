@@ -38,6 +38,10 @@ public class CustomTitleView extends AppCompatTextView {
         setOnClickListener(v -> listener.showDialog());
     }
 
+    private boolean hasEvent(KeyEvent event) {
+        return Utils.isEnterKey(event) || Utils.isLeftKey(event) || Utils.isRightKey(event);
+    }
+
     @Override
     protected void onFocusChanged(boolean focused, int direction, Rect previouslyFocusedRect) {
         super.onFocusChanged(focused, direction, previouslyFocusedRect);
@@ -69,10 +73,6 @@ public class CustomTitleView extends AppCompatTextView {
         if (next) position = position > 0 ? --position : items.size() - 1;
         else position = position < items.size() - 1 ? ++position : 0;
         return items.get(position);
-    }
-
-    private boolean hasEvent(KeyEvent event) {
-        return Utils.isEnterKey(event) || Utils.isLeftKey(event) || Utils.isRightKey(event);
     }
 
     public interface Listener extends SiteCallback {
