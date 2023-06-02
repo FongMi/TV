@@ -174,7 +174,7 @@
                 android:visibility="gone"
                 tools:visibility="visible" />
 
-            <TextView
+            <com.fongmi.android.tv.ui.custom.CustomOpEdView
                 android:id="@+id/opening"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -186,7 +186,7 @@
                 android:textSize="14sp"
                 tools:text="00:00" />
 
-            <TextView
+            <com.fongmi.android.tv.ui.custom.CustomOpEdView
                 android:id="@+id/ending"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

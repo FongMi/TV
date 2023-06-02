@@ -125,10 +125,6 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         start(activity, "push_agent", url, url);
     }
 
-    public static void start(Activity activity, String id, String name) {
-        start(activity, ApiConfig.get().getHome().getKey(), id, name);
-    }
-
     public static void start(Activity activity, String key, String id, String name) {
         Intent intent = new Intent(activity, DetailActivity.class);
         intent.putExtra("name", name);
@@ -209,6 +205,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mKeyDown = CustomKeyDownVod.create(this, mBinding.video);
         mFrameParams = mBinding.video.getLayoutParams();
         mBinding.progressLayout.showProgress();
+        mBinding.swipeLayout.setEnabled(false);
         mReceiver = new PiPReceiver(this);
         mPlayers = new Players().init();
         mDialogs = new ArrayList<>();
@@ -334,6 +331,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         getIntent().putExtra("key", item.getSiteKey());
         getIntent().putExtra("id", item.getVodId());
         mBinding.swipeLayout.setRefreshing(true);
+        mBinding.swipeLayout.setEnabled(false);
         mBinding.scroll.scrollTo(0, 0);
         Clock.get().setCallback(null);
         mPlayers.stop();
@@ -353,6 +351,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         if (isFromCollect()) {
             finish();
         } else if (getName().isEmpty()) {
+            mBinding.swipeLayout.setEnabled(true);
             mBinding.progressLayout.showEmpty();
         } else {
             checkSearch();
@@ -853,6 +852,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
                 setTrackVisible(true);
                 checkPlayImg(mPlayers.isPlaying());
                 mBinding.control.size.setText(mPlayers.getSizeText());
+                if (isVisible(mBinding.control.getRoot())) showControl();
                 break;
             case Player.STATE_ENDED:
                 checkEnded();
@@ -902,6 +902,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void onError(ErrorEvent event) {
+        mBinding.swipeLayout.setEnabled(true);
         Clock.get().setCallback(null);
         showError(event.getMsg());
         mBroken.add(getId());

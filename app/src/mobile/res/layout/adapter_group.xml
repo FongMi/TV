@@ -15,8 +15,8 @@
 
     <ImageView
         android:id="@+id/logo"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
+        android:layout_width="33dp"
+        android:layout_height="33dp"
         android:layout_marginEnd="12dp"
         android:scaleType="fitCenter"
         android:visibility="gone" />
