@@ -195,6 +195,11 @@ public class CastDialog extends BaseDialog implements DeviceAdapter.OnClickListe
     }
 
     @Override
+    public boolean onLongClick(Device item) {
+        return false;
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         EventBus.getDefault().unregister(this);
