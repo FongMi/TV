@@ -74,10 +74,11 @@ public class ActionRequestProcess implements RequestProcess {
     }
 
     public void onSync(Map<String, String> params) {
+        boolean sync = params.get("mode").equals("0");
         boolean keep = params.get("type").equals("keep");
         boolean history = params.get("type").equals("history");
         Device device = Device.objectFrom(params.get("device"));
-        if (params.get("device") != null) {
+        if (params.get("device") != null && sync) {
             if (history) sendHistory(device, params);
             else if (keep) sendKeep(device);
         }
@@ -94,7 +95,7 @@ public class ActionRequestProcess implements RequestProcess {
             FormBody.Builder body = new FormBody.Builder();
             body.add("url", url);
             body.add("targets", App.gson().toJson(History.get(Config.find(url, 0).getId())));
-            OkHttp.newCall(OkHttp.client(Constant.TIMEOUT_SYNC), device.getIp().concat("/action?do=sync&type=history"), body.build()).execute();
+            OkHttp.newCall(OkHttp.client(Constant.TIMEOUT_SYNC), device.getIp().concat("/action?do=sync&mode=0&type=history"), body.build()).execute();
         } catch (Exception e) {
             App.post(() -> Notify.show(e.getMessage()));
         }
@@ -105,7 +106,7 @@ public class ActionRequestProcess implements RequestProcess {
             FormBody.Builder body = new FormBody.Builder();
             body.add("targets", App.gson().toJson(Keep.getVod()));
             body.add("configs", App.gson().toJson(Config.findUrls()));
-            OkHttp.newCall(OkHttp.client(Constant.TIMEOUT_SYNC), device.getIp().concat("/action?do=sync&type=keep"), body.build()).execute();
+            OkHttp.newCall(OkHttp.client(Constant.TIMEOUT_SYNC), device.getIp().concat("/action?do=sync&mode=0&type=keep"), body.build()).execute();
         } catch (Exception e) {
             App.post(() -> Notify.show(e.getMessage()));
         }
@@ -115,8 +116,10 @@ public class ActionRequestProcess implements RequestProcess {
         String url = params.get("url");
         if (TextUtils.isEmpty(url)) return;
         Config config = Config.find(url, 0);
+        boolean replace = params.get("mode").equals("1");
         List<History> targets = History.arrayFrom(params.get("targets"));
         if (ApiConfig.get().getConfig().equals(config)) {
+            if (replace) History.delete(config.getId());
             History.sync(targets);
         } else {
             ApiConfig.load(config, getCallback(targets));
@@ -142,9 +145,11 @@ public class ActionRequestProcess implements RequestProcess {
     public void syncKeep(Map<String, String> params) {
         List<Config> configs = Config.arrayFrom(params.get("configs"));
         List<Keep> targets = Keep.arrayFrom(params.get("targets"));
+        boolean replace = params.get("mode").equals("1");
         if (ApiConfig.getUrl() == null && configs.size() > 0) {
             ApiConfig.load(Config.find(configs.get(0), 0), getCallback(configs, targets));
         } else {
+            if (replace) Keep.deleteAll();
             Keep.sync(configs, targets);
         }
     }
