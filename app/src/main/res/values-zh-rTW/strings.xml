@@ -21,6 +21,7 @@
     <string name="detail_type">類型：<xliff:g name="name">%s</xliff:g></string>
     <string name="detail_director">導演：<xliff:g name="name">%s</xliff:g></string>
     <string name="detail_actor">演員：<xliff:g name="name">%s</xliff:g></string>
+    <string name="detail_url">網址：<xliff:g name="name">%s</xliff:g></string>
     <string name="detail_content">簡介：<xliff:g name="name">%s</xliff:g></string>
     <string name="detail_desc">簡介</string>
 
