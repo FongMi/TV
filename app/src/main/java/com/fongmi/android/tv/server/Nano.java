@@ -1,5 +1,7 @@
 package com.fongmi.android.tv.server;
 
+import android.net.Uri;
+
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Device;
@@ -7,6 +9,8 @@ import com.fongmi.android.tv.server.process.ActionRequestProcess;
 import com.fongmi.android.tv.server.process.RawRequestProcess;
 import com.fongmi.android.tv.server.process.RequestProcess;
 import com.fongmi.android.tv.utils.FileUtil;
+import com.fongmi.android.tv.utils.M3U8;
+import com.fongmi.android.tv.utils.Sniffer;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -25,6 +29,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import fi.iki.elonen.NanoHTTPD;
+import okhttp3.Headers;
 
 public class Nano extends NanoHTTPD {
 
@@ -78,6 +83,7 @@ public class Nano extends NanoHTTPD {
         switch (session.getMethod()) {
             case GET:
                 if (url.startsWith("/file")) return doFile(url);
+                else if (url.startsWith("/m3u8")) return doM3u8(session);
                 else if (url.startsWith("/proxy")) return doProxy(session.getParms());
                 else if (url.startsWith("/device")) return createSuccessResponse(Device.get().toString());
                 break;
@@ -109,6 +115,17 @@ public class Nano extends NanoHTTPD {
             File file = FileUtil.getRootFile(path);
             if (file.isFile()) return newChunkedResponse(Response.Status.OK, "application/octet-stream", new FileInputStream(file));
             else return createSuccessResponse(listFiles(file));
+        } catch (Exception e) {
+            return createErrorResponse(e.getMessage());
+        }
+    }
+
+    private Response doM3u8(IHTTPSession session) {
+        try {
+            String url = session.getParms().get("url");
+            String result = M3U8.get(url, Headers.of(session.getHeaders()));
+            for (String ad : Sniffer.getAdsRegex(Uri.parse(url))) result = result.replaceAll(ad, "");
+            return newFixedLengthResponse(Response.Status.OK, NanoHTTPD.MIME_PLAINTEXT, result);
         } catch (Exception e) {
             return createErrorResponse(e.getMessage());
         }
