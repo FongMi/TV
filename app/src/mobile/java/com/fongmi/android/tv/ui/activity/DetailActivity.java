@@ -9,7 +9,6 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.text.Html;
-import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
@@ -227,7 +226,6 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     @Override
     @SuppressLint("ClickableViewAccessibility")
     protected void initEvent() {
-        mBinding.url.setOnClickListener(view -> onUrl());
         mBinding.name.setOnClickListener(view -> onName());
         mBinding.more.setOnClickListener(view -> onMore());
         mBinding.actor.setOnClickListener(view -> onActor());
@@ -380,7 +378,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void setText(TextView view, int resId, String text) {
-        view.setVisibility(TextUtils.isEmpty(text) ? View.GONE : View.VISIBLE);
+        view.setVisibility(text.isEmpty() ? View.GONE : View.VISIBLE);
         view.setText(resId > 0 ? getString(resId, text) : text);
         view.setTag(text);
     }
@@ -441,10 +439,6 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mFlagAdapter.reverse();
         setEpisodeAdapter(getFlag().getEpisodes());
         if (scroll) mBinding.episode.scrollToPosition(mEpisodeAdapter.getPosition());
-    }
-
-    private void onUrl() {
-        mBinding.url.setMaxLines(mBinding.url.getMaxLines() == 1 ? Integer.MAX_VALUE : 1);
     }
 
     private void onName() {
@@ -1094,7 +1088,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     public void setUrl(String url) {
-        setText(mBinding.url, R.string.detail_url, this.url = url);
+        this.url = url;
     }
 
     private void notifyItemChanged(RecyclerView.Adapter<?> adapter) {
