@@ -54,29 +54,29 @@ public class ActionRequestProcess implements RequestProcess {
         return Nano.createSuccessResponse();
     }
 
-    public void onSearch(Map<String, String> params) {
+    private void onSearch(Map<String, String> params) {
         String word = Objects.requireNonNullElse(params.get("word"), "");
         if (word.length() > 0) ServerEvent.search(word);
     }
 
-    public void onPush(Map<String, String> params) {
+    private void onPush(Map<String, String> params) {
         String url = Objects.requireNonNullElse(params.get("url"), "");
         if (url.length() > 0) ServerEvent.push(url);
     }
 
-    public void onApi(Map<String, String> params) {
+    private void onApi(Map<String, String> params) {
         String url = Objects.requireNonNullElse(params.get("url"), "");
         if (url.length() > 0) ServerEvent.api(url);
     }
 
-    public void onCast(Map<String, String> params) {
+    private void onCast(Map<String, String> params) {
         Config config = Config.find(params.get("url"), 0);
         Device device = Device.objectFrom(params.get("device"));
         History history = History.objectFrom(params.get("history"));
         CastEvent.post(config, device, history);
     }
 
-    public void onSync(Map<String, String> params) {
+    private void onSync(Map<String, String> params) {
         boolean sync = Objects.equals(params.get("mode"), "0");
         boolean keep = Objects.equals(params.get("type"), "keep");
         boolean history = Objects.equals(params.get("type"), "history");
@@ -145,7 +145,7 @@ public class ActionRequestProcess implements RequestProcess {
         };
     }
 
-    public void syncKeep(Map<String, String> params) {
+    private void syncKeep(Map<String, String> params) {
         List<Config> configs = Config.arrayFrom(params.get("configs"));
         List<Keep> targets = Keep.arrayFrom(params.get("targets"));
         boolean replace = Objects.equals(params.get("mode"), "1");
