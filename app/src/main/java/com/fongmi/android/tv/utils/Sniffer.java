@@ -41,6 +41,11 @@ public class Sniffer {
         return false;
     }
 
+    public static boolean isAds(Uri uri) {
+        if (uri.getHost() != null) for (Rule rule : ApiConfig.get().getRules()) for (String host : rule.getHosts()) if (uri.getHost().contains(host)) return true;
+        return false;
+    }
+
     public static List<String> getAdsRegex(Uri uri) {
         if (uri.getHost() != null) for (Rule rule : ApiConfig.get().getRules()) for (String host : rule.getHosts()) if (uri.getHost().contains(host)) return rule.getRegex();
         return Collections.emptyList();
