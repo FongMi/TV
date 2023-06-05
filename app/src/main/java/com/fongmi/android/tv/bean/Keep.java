@@ -139,7 +139,7 @@ public class Keep {
         return AppDatabase.get().getKeepDao().getLive();
     }
 
-    public void update(int cid) {
+    public void save(int cid) {
         setCid(cid);
         AppDatabase.get().getKeepDao().insertOrUpdate(this);
     }
@@ -157,7 +157,7 @@ public class Keep {
         for (Keep target : targets) {
             for (Config config : configs) {
                 if (target.getCid() == config.getId()) {
-                    target.update(Config.find(config, 0).getId());
+                    target.save(Config.find(config, 0).getId());
                 }
             }
         }

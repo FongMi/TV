@@ -261,15 +261,16 @@ public class History {
         AppDatabase.get().getHistoryDao().delete(cid);
     }
 
-    private void checkOpEd(History item) {
+    private void checkParam(History item) {
         if (getOpening() == 0) setOpening(item.getOpening());
         if (getEnding() == 0) setEnding(item.getEnding());
+        if (getSpeed() == 1) setSpeed(item.getSpeed());
     }
 
-    private void checkMerge(List<History> items) {
+    private void merge(List<History> items, boolean force) {
         for (History item : items) {
-            if (getKey().equals(item.getKey()) || Math.abs(item.getDuration() - getDuration()) > 10 * 60 * 1000) continue;
-            checkOpEd(item);
+            if (!force && (getKey().equals(item.getKey()) || Math.abs(item.getDuration() - getDuration()) > 10 * 60 * 1000)) continue;
+            checkParam(item);
             item.delete();
         }
     }
@@ -277,17 +278,21 @@ public class History {
     public void update(long position, long duration) {
         setPosition(position);
         setDuration(duration);
-        update();
+        merge(find(), false);
+        save();
     }
 
     public History update(int cid) {
-        setCid(cid);
-        update();
-        return this;
+        return update(cid, find());
     }
 
-    public History update() {
-        checkMerge(AppDatabase.get().getHistoryDao().findByName(ApiConfig.getCid(), getVodName()));
+    public History update(int cid, List<History> items) {
+        setCid(cid);
+        merge(items, true);
+        return save();
+    }
+
+    public History save() {
         AppDatabase.get().getHistoryDao().insertOrUpdate(this);
         return this;
     }
@@ -297,10 +302,14 @@ public class History {
         return this;
     }
 
+    public List<History> find() {
+        return AppDatabase.get().getHistoryDao().findByName(ApiConfig.getCid(), getVodName());
+    }
+
     public void findEpisode(List<Vod.Flag> flags) {
         setVodFlag(flags.get(0).getFlag());
         setVodRemarks(flags.get(0).getEpisodes().get(0).getName());
-        for (History item : AppDatabase.get().getHistoryDao().findByName(ApiConfig.getCid(), getVodName())) {
+        for (History item : find()) {
             if (getPosition() > 0) break;
             for (Vod.Flag flag : flags) {
                 Vod.Flag.Episode episode = flag.find(item.getVodRemarks());
@@ -308,7 +317,7 @@ public class History {
                 setVodFlag(flag.getFlag());
                 setPosition(item.getPosition());
                 setVodRemarks(episode.getName());
-                checkOpEd(item);
+                checkParam(item);
                 break;
             }
         }
@@ -316,14 +325,14 @@ public class History {
 
     private static void startSync(List<History> targets) {
         for (History target : targets) {
-            List<History> items = AppDatabase.get().getHistoryDao().findByName(ApiConfig.getCid(), target.getVodName());
+            List<History> items = target.find();
             if (items.isEmpty()) {
-                target.update(ApiConfig.getCid());
+                target.update(ApiConfig.getCid(), items);
                 continue;
             }
             for (History item : items) {
                 if (target.getCreateTime() > item.getCreateTime()) {
-                    target.update(ApiConfig.getCid());
+                    target.update(ApiConfig.getCid(), items);
                     break;
                 }
             }
