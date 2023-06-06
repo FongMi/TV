@@ -3,7 +3,6 @@ package com.fongmi.android.tv.player;
 import androidx.annotation.NonNull;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
-import androidx.media3.common.TrackSelectionOverride;
 import androidx.media3.common.util.Util;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.analytics.AnalyticsListener;
@@ -23,7 +22,6 @@ import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.github.catvod.crawler.SpiderDebug;
-import com.google.common.collect.ImmutableList;
 import com.google.common.net.HttpHeaders;
 
 import java.util.Formatter;
@@ -366,9 +364,9 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     private void setTrackExo(Track item) {
         if (item.isSelected()) {
-            exoPlayer.setTrackSelectionParameters(exoPlayer.getTrackSelectionParameters().buildUpon().setOverrideForType(new TrackSelectionOverride(exoPlayer.getCurrentTracks().getGroups().get(item.getGroup()).getMediaTrackGroup(), item.getTrack())).build());
+            ExoUtil.selectTrack(exoPlayer, item.getType(), item.getGroup(), item.getTrack());
         } else {
-            exoPlayer.setTrackSelectionParameters(exoPlayer.getTrackSelectionParameters().buildUpon().setOverrideForType(new TrackSelectionOverride(exoPlayer.getCurrentTracks().getGroups().get(item.getGroup()).getMediaTrackGroup(), ImmutableList.of())).build());
+            ExoUtil.deselectTrack(exoPlayer, item.getType(), item.getGroup(), item.getTrack());
         }
     }
 
