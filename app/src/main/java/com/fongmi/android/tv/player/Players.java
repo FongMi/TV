@@ -336,7 +336,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     private void setMediaSource(Result result) {
         SpiderDebug.log(errorCode + "," + result.getRealUrl() + "," + checkHeaders(result.getHeaders()));
-        if (isIjk()) ijkPlayer.setMediaSource(result.getRealUrl(), result.getHeaders());
+        if (isIjk()) ijkPlayer.setMediaSource(IjkUtil.getSource(result));
         if (isExo()) exoPlayer.setMediaSource(ExoUtil.getSource(result, errorCode));
         if (isExo()) exoPlayer.prepare();
         setTimeoutCheck(result.getRealUrl());
@@ -344,7 +344,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     private void setMediaSource(Map<String, String> headers, String url) {
         SpiderDebug.log(errorCode + "," + url + "," + checkHeaders(headers));
-        if (isIjk()) ijkPlayer.setMediaSource(url, headers);
+        if (isIjk()) ijkPlayer.setMediaSource(IjkUtil.getSource(headers, url));
         if (isExo()) exoPlayer.setMediaSource(ExoUtil.getSource(headers, url, errorCode));
         if (isExo()) exoPlayer.prepare();
         setTimeoutCheck(url);
