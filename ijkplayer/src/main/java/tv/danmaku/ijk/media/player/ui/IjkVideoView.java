@@ -21,6 +21,7 @@ import java.util.Map;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkTimedText;
+import tv.danmaku.ijk.media.player.MediaSource;
 import tv.danmaku.ijk.media.player.R;
 import tv.danmaku.ijk.media.player.misc.ITrackInfo;
 import tv.danmaku.ijk.media.player.misc.IjkTrackInfo;
@@ -155,8 +156,8 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         if (mRenderView != null) mRenderView.setAspectRatio(resizeMode);
     }
 
-    public void setMediaSource(String path, Map<String, String> headers) {
-        setVideoURI(Uri.parse(path.trim().replace("\\", "")), headers);
+    public void setMediaSource(MediaSource source) {
+        setVideoURI(source.getUri(), source.getHeaders());
     }
 
     private void setVideoURI(Uri uri, Map<String, String> headers) {

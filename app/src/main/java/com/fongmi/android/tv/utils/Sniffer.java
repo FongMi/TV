@@ -6,7 +6,9 @@ import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Rule;
 import com.github.catvod.crawler.SpiderDebug;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -37,5 +39,15 @@ public class Sniffer {
     private static boolean match(String url) {
         for (Rule rule : ApiConfig.get().getRules()) for (String host : rule.getHosts()) if (host.equals("*")) for (String regex : rule.getRegex()) return Pattern.compile(regex).matcher(url).find();
         return false;
+    }
+
+    public static boolean isAds(Uri uri) {
+        if (uri.getHost() != null) for (Rule rule : ApiConfig.get().getRules()) for (String host : rule.getHosts()) if (uri.getHost().contains(host)) return true;
+        return false;
+    }
+
+    public static List<String> getAdsRegex(Uri uri) {
+        if (uri.getHost() != null) for (Rule rule : ApiConfig.get().getRules()) for (String host : rule.getHosts()) if (uri.getHost().contains(host)) return rule.getRegex();
+        return Collections.emptyList();
     }
 }

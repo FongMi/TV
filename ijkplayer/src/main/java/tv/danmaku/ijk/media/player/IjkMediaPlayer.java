@@ -160,13 +160,11 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     private PowerManager.WakeLock mWakeLock = null;
     private boolean mScreenOnWhilePlaying;
     private boolean mStayAwake;
-    private boolean dotOpen;
 
     private int mVideoWidth;
     private int mVideoHeight;
     private int mVideoSarNum;
     private int mVideoSarDen;
-    private int dotPort;
 
     private String mDataSource;
 
