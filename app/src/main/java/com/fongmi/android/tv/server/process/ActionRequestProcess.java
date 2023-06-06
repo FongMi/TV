@@ -17,6 +17,7 @@ import com.fongmi.android.tv.server.Nano;
 import com.fongmi.android.tv.utils.Notify;
 import com.github.catvod.net.OkHttp;
 
+import java.util.Objects;
 import java.util.List;
 import java.util.Map;
 
@@ -54,17 +55,17 @@ public class ActionRequestProcess implements RequestProcess {
     }
 
     private void onSearch(Map<String, String> params) {
-        String word = Objects.requireNonNullElse(params.get("word"), "");
+        String word = Objects.requireNonNull(params.get("word"));
         if (word.length() > 0) ServerEvent.search(word);
     }
 
     private void onPush(Map<String, String> params) {
-        String url = Objects.requireNonNullElse(params.get("url"), "");
+        String url = Objects.requireNonNull(params.get("url"));
         if (url.length() > 0) ServerEvent.push(url);
     }
 
     private void onApi(Map<String, String> params) {
-        String url = Objects.requireNonNullElse(params.get("url"), "");
+        String url = Objects.requireNonNull(params.get("url"));
         if (url.length() > 0) ServerEvent.api(url);
     }
 
