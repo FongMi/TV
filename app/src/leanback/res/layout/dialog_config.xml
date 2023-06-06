@@ -18,6 +18,7 @@
         android:layout_marginStart="12dp"
         android:layout_marginLeft="12dp"
         android:layout_toEndOf="@+id/code"
+        android:layout_toRightOf="@+id/code"
         android:ellipsize="end"
         android:focusable="true"
         android:lineSpacingExtra="4dp"
@@ -36,6 +37,7 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/bottom"
         android:layout_alignStart="@+id/info"
+        android:layout_alignLeft="@+id/info"
         android:layout_marginBottom="10dp"
         android:hint="@string/dialog_config_hint"
         android:imeOptions="actionDone"
@@ -50,6 +52,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/info"
+        android:layout_alignLeft="@+id/info"
         android:layout_alignBottom="@+id/code"
         android:orientation="horizontal">
 
