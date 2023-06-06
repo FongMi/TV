@@ -84,29 +84,15 @@ public class ExoUtil {
     }
 
     public static void selectTrack(ExoPlayer player, int type, int group, int track) {
-        List<Tracks.Group> groups = player.getCurrentTracks().getGroups();
         List<Integer> trackIndices = new ArrayList<>();
-        for (int i = 0; i < groups.size(); i++) {
-            Tracks.Group trackGroup = groups.get(i);
-            if (trackGroup.getType() != type) continue;
-            for (int j = 0; j < trackGroup.length; j++) {
-                if (j == track || trackGroup.isTrackSelected(j)) trackIndices.add(j);
-            }
-        }
-        player.setTrackSelectionParameters(player.getTrackSelectionParameters().buildUpon().setOverrideForType(new TrackSelectionOverride(player.getCurrentTracks().getGroups().get(group).getMediaTrackGroup(), trackIndices)).build());
+        selectTrack(player, type, track, trackIndices);
+        setTrackParameters(player, group, trackIndices);
     }
 
     public static void deselectTrack(ExoPlayer player, int type, int group, int track) {
-        List<Tracks.Group> groups = player.getCurrentTracks().getGroups();
         List<Integer> trackIndices = new ArrayList<>();
-        for (int i = 0; i < groups.size(); i++) {
-            Tracks.Group trackGroup = groups.get(i);
-            if (trackGroup.getType() != type) continue;
-            for (int j = 0; j < trackGroup.length; j++) {
-                if (j != track && trackGroup.isTrackSelected(j)) trackIndices.add(j);
-            }
-        }
-        player.setTrackSelectionParameters(player.getTrackSelectionParameters().buildUpon().setOverrideForType(new TrackSelectionOverride(player.getCurrentTracks().getGroups().get(group).getMediaTrackGroup(), trackIndices)).build());
+        deselectTrack(player, type, track, trackIndices);
+        setTrackParameters(player, group, trackIndices);
     }
 
     public static MediaSource getSource(Result result, int errorCode) {
@@ -136,6 +122,32 @@ public class ExoUtil {
         List<MediaItem.SubtitleConfiguration> items = new ArrayList<>();
         for (Sub sub : subs) items.add(sub.getExo());
         return items;
+    }
+
+    private static void selectTrack(ExoPlayer player, int type, int track, List<Integer> trackIndices) {
+        List<Tracks.Group> groups = player.getCurrentTracks().getGroups();
+        for (int i = 0; i < groups.size(); i++) {
+            Tracks.Group trackGroup = groups.get(i);
+            if (trackGroup.getType() != type) continue;
+            for (int j = 0; j < trackGroup.length; j++) {
+                if (j == track || trackGroup.isTrackSelected(j)) trackIndices.add(j);
+            }
+        }
+    }
+
+    private static void deselectTrack(ExoPlayer player, int type, int track, List<Integer> trackIndices) {
+        List<Tracks.Group> groups = player.getCurrentTracks().getGroups();
+        for (int i = 0; i < groups.size(); i++) {
+            Tracks.Group trackGroup = groups.get(i);
+            if (trackGroup.getType() != type) continue;
+            for (int j = 0; j < trackGroup.length; j++) {
+                if (j != track && trackGroup.isTrackSelected(j)) trackIndices.add(j);
+            }
+        }
+    }
+
+    private static void setTrackParameters(ExoPlayer player, int group, List<Integer> trackIndices) {
+        player.setTrackSelectionParameters(player.getTrackSelectionParameters().buildUpon().setOverrideForType(new TrackSelectionOverride(player.getCurrentTracks().getGroups().get(group).getMediaTrackGroup(), trackIndices)).build());
     }
 
     private static synchronized ExtractorsFactory getExtractorsFactory() {
