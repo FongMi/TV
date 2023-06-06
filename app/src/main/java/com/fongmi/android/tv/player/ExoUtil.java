@@ -7,6 +7,7 @@ import android.util.Base64;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.MimeTypes;
 import androidx.media3.common.PlaybackException;
+import androidx.media3.common.TrackSelectionOverride;
 import androidx.media3.common.Tracks;
 import androidx.media3.database.DatabaseProvider;
 import androidx.media3.database.StandaloneDatabaseProvider;
@@ -21,6 +22,7 @@ import androidx.media3.datasource.cache.SimpleCache;
 import androidx.media3.datasource.okhttp.OkHttpDataSource;
 import androidx.media3.exoplayer.DefaultLoadControl;
 import androidx.media3.exoplayer.DefaultRenderersFactory;
+import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.LoadControl;
 import androidx.media3.exoplayer.RenderersFactory;
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory;
@@ -79,6 +81,32 @@ public class ExoUtil {
         int count = 0;
         for (Tracks.Group trackGroup : tracks.getGroups()) if (trackGroup.getType() == type) count += trackGroup.length;
         return count > 0;
+    }
+
+    public static void selectTrack(ExoPlayer player, int type, int group, int track) {
+        List<Tracks.Group> groups = player.getCurrentTracks().getGroups();
+        List<Integer> trackIndices = new ArrayList<>();
+        for (int i = 0; i < groups.size(); i++) {
+            Tracks.Group trackGroup = groups.get(i);
+            if (trackGroup.getType() != type) continue;
+            for (int j = 0; j < trackGroup.length; j++) {
+                if (j == track || trackGroup.isTrackSelected(j)) trackIndices.add(j);
+            }
+        }
+        player.setTrackSelectionParameters(player.getTrackSelectionParameters().buildUpon().setOverrideForType(new TrackSelectionOverride(player.getCurrentTracks().getGroups().get(group).getMediaTrackGroup(), trackIndices)).build());
+    }
+
+    public static void deselectTrack(ExoPlayer player, int type, int group, int track) {
+        List<Tracks.Group> groups = player.getCurrentTracks().getGroups();
+        List<Integer> trackIndices = new ArrayList<>();
+        for (int i = 0; i < groups.size(); i++) {
+            Tracks.Group trackGroup = groups.get(i);
+            if (trackGroup.getType() != type) continue;
+            for (int j = 0; j < trackGroup.length; j++) {
+                if (j != track && trackGroup.isTrackSelected(j)) trackIndices.add(j);
+            }
+        }
+        player.setTrackSelectionParameters(player.getTrackSelectionParameters().buildUpon().setOverrideForType(new TrackSelectionOverride(player.getCurrentTracks().getGroups().get(group).getMediaTrackGroup(), trackIndices)).build());
     }
 
     public static MediaSource getSource(Result result, int errorCode) {
