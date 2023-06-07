@@ -13,6 +13,7 @@ android {
 
 dependencies {
     implementation project(':catvod')
+    implementation project(':media-lib-common')
     implementation 'androidx.annotation:annotation:1.5.0'
     implementation 'wang.harlon.quickjs:wrapper-android:0.19.3'
     api 'com.google.code.gson:gson:' + gsonVersion
