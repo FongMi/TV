@@ -83,15 +83,15 @@ public class ExoUtil {
         return count > 0;
     }
 
-    public static void selectTrack(ExoPlayer player, int type, int group, int track) {
+    public static void selectTrack(ExoPlayer player, int group, int track) {
         List<Integer> trackIndices = new ArrayList<>();
-        selectTrack(player, type, track, trackIndices);
+        selectTrack(player, group, track, trackIndices);
         setTrackParameters(player, group, trackIndices);
     }
 
-    public static void deselectTrack(ExoPlayer player, int type, int group, int track) {
+    public static void deselectTrack(ExoPlayer player, int group, int track) {
         List<Integer> trackIndices = new ArrayList<>();
-        deselectTrack(player, type, track, trackIndices);
+        deselectTrack(player, group, track, trackIndices);
         setTrackParameters(player, group, trackIndices);
     }
 
@@ -124,27 +124,17 @@ public class ExoUtil {
         return items;
     }
 
-    private static void selectTrack(ExoPlayer player, int type, int track, List<Integer> trackIndices) {
-        List<Tracks.Group> groups = player.getCurrentTracks().getGroups();
-        for (int i = 0; i < groups.size(); i++) {
-            Tracks.Group trackGroup = groups.get(i);
-            if (trackGroup.getType() != type) continue;
-            for (int j = 0; j < trackGroup.length; j++) {
-                if (trackIndices.contains(j)) continue;
-                if (j == track || trackGroup.isTrackSelected(j)) trackIndices.add(j);
-            }
+    private static void selectTrack(ExoPlayer player, int group, int track, List<Integer> trackIndices) {
+        Tracks.Group trackGroup = player.getCurrentTracks().getGroups().get(group);
+        for (int i = 0; i < trackGroup.length; i++) {
+            if (i == track || trackGroup.isTrackSelected(i)) trackIndices.add(i);
         }
     }
 
-    private static void deselectTrack(ExoPlayer player, int type, int track, List<Integer> trackIndices) {
-        List<Tracks.Group> groups = player.getCurrentTracks().getGroups();
-        for (int i = 0; i < groups.size(); i++) {
-            Tracks.Group trackGroup = groups.get(i);
-            if (trackGroup.getType() != type) continue;
-            for (int j = 0; j < trackGroup.length; j++) {
-                if (trackIndices.contains(j)) continue;
-                if (j != track && trackGroup.isTrackSelected(j)) trackIndices.add(j);
-            }
+    private static void deselectTrack(ExoPlayer player, int group, int track, List<Integer> trackIndices) {
+        Tracks.Group trackGroup = player.getCurrentTracks().getGroups().get(group);
+        for (int i = 0; i < trackGroup.length; i++) {
+            if (i != track && trackGroup.isTrackSelected(i)) trackIndices.add(i);
         }
     }
 

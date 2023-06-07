@@ -364,9 +364,9 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     private void setTrackExo(Track item) {
         if (item.isSelected()) {
-            ExoUtil.selectTrack(exoPlayer, item.getType(), item.getGroup(), item.getTrack());
+            ExoUtil.selectTrack(exoPlayer, item.getGroup(), item.getTrack());
         } else {
-            ExoUtil.deselectTrack(exoPlayer, item.getType(), item.getGroup(), item.getTrack());
+            ExoUtil.deselectTrack(exoPlayer, item.getGroup(), item.getTrack());
         }
     }
 
