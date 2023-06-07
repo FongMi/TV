@@ -130,6 +130,7 @@ public class ExoUtil {
             Tracks.Group trackGroup = groups.get(i);
             if (trackGroup.getType() != type) continue;
             for (int j = 0; j < trackGroup.length; j++) {
+                if (trackIndices.contains(j)) continue;
                 if (j == track || trackGroup.isTrackSelected(j)) trackIndices.add(j);
             }
         }
@@ -141,6 +142,7 @@ public class ExoUtil {
             Tracks.Group trackGroup = groups.get(i);
             if (trackGroup.getType() != type) continue;
             for (int j = 0; j < trackGroup.length; j++) {
+                if (trackIndices.contains(j)) continue;
                 if (j != track && trackGroup.isTrackSelected(j)) trackIndices.add(j);
             }
         }
