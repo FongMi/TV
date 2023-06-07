@@ -2,6 +2,8 @@ package com.hiker.drpy;
 
 import android.content.Context;
 
+import androidx.media3.common.util.UriUtil;
+
 import com.whl.quickjs.android.QuickJSLoader;
 import com.whl.quickjs.wrapper.JSModule;
 
@@ -18,7 +20,7 @@ public class Loader {
         JSModule.setModuleLoader(new JSModule.ModuleLoader() {
             @Override
             public String convertModuleName(String moduleBaseName, String moduleName) {
-                return Module.convertModuleName(moduleBaseName, moduleName);
+                return UriUtil.resolve(moduleBaseName, moduleName);
             }
 
             @Override
