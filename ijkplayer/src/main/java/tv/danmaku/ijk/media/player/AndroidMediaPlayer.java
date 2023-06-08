@@ -296,6 +296,7 @@ public class AndroidMediaPlayer extends AbstractMediaPlayer {
     public float getSpeed() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             //return mInternalMediaPlayer.getPlaybackParams().getSpeed();
+            return 1.0f;
         } else {
             return 1.0f;
         }
