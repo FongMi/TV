@@ -65,25 +65,25 @@ public class AndroidTrackInfo implements ITrackInfo {
 
     @Override
     public int getChannelCount() {
-        if (mTrackInfo == null) return 0;
+        if (mTrackInfo == null || mTrackInfo.getFormat() == null) return 0;
         return mTrackInfo.getFormat().getInteger(MediaFormat.KEY_CHANNEL_COUNT);
     }
 
     @Override
     public int getBitrate() {
-        if (mTrackInfo == null) return 0;
+        if (mTrackInfo == null || mTrackInfo.getFormat() == null) return 0;
         return mTrackInfo.getFormat().getInteger(MediaFormat.KEY_BIT_RATE);
     }
 
     @Override
     public int getWidth() {
-        if (mTrackInfo == null) return 0;
+        if (mTrackInfo == null || mTrackInfo.getFormat() == null) return 0;
         return mTrackInfo.getFormat().getInteger(MediaFormat.KEY_WIDTH);
     }
 
     @Override
     public int getHeight() {
-        if (mTrackInfo == null) return 0;
+        if (mTrackInfo == null || mTrackInfo.getFormat() == null) return 0;
         return mTrackInfo.getFormat().getInteger(MediaFormat.KEY_HEIGHT);
     }
 
