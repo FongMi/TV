@@ -24,5 +24,15 @@ public interface ITrackInfo {
     int MEDIA_TRACK_TYPE_VIDEO = 2;
     int MEDIA_TRACK_TYPE_TEXT = 3;
 
+    String getLanguage();
+
     int getTrackType();
+
+    int getChannelCount();
+
+    int getBitrate();
+
+    int getWidth();
+
+    int getHeight();
 }

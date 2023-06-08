@@ -40,27 +40,28 @@ public class IjkTrackInfo implements ITrackInfo {
         }
     }
 
-    public IMediaFormat getFormat() {
-        return new IjkMediaFormat(mStreamMeta);
-    }
-
+    @Override
     public String getLanguage() {
         if (mStreamMeta == null || TextUtils.isEmpty(mStreamMeta.mLanguage)) return "und";
         return mStreamMeta.mLanguage;
     }
 
+    @Override
     public int getChannelCount() {
         return mStreamMeta.getChannelCount();
     }
 
+    @Override
     public int getBitrate() {
         return (int) mStreamMeta.mBitrate;
     }
 
+    @Override
     public int getWidth() {
         return mStreamMeta.mWidth;
     }
 
+    @Override
     public int getHeight() {
         return mStreamMeta.mHeight;
     }

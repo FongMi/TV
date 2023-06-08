@@ -18,13 +18,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import tv.danmaku.ijk.media.player.AndroidMediaPlayer;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkTimedText;
 import tv.danmaku.ijk.media.player.MediaSource;
 import tv.danmaku.ijk.media.player.R;
 import tv.danmaku.ijk.media.player.misc.ITrackInfo;
-import tv.danmaku.ijk.media.player.misc.IjkTrackInfo;
 
 public class IjkVideoView extends FrameLayout implements MediaController.MediaPlayerControl, IMediaPlayer.Listener, IRenderView.IRenderCallback {
 
@@ -68,7 +68,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     private final SubtitleView mSubtitleView;
     private final AudioManager mAudioManager;
     private final FrameLayout mContentFrame;
-    private IjkMediaPlayer mPlayer;
+    private IMediaPlayer mPlayer;
 
     public IjkVideoView(Context context) {
         this(context, null);
@@ -109,8 +109,8 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         return this;
     }
 
-    public void build() {
-        mPlayer = new IjkMediaPlayer();
+    public void build(int type) {
+        mPlayer = type == 0 ? new AndroidMediaPlayer() : new IjkMediaPlayer();
         mPlayer.setListener(this);
     }
 
@@ -332,11 +332,11 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     public boolean haveTrack(int type) {
         int count = 0;
         if (mPlayer == null) return false;
-        for (IjkTrackInfo trackInfo : getTrackInfo()) if (trackInfo.getTrackType() == type) ++count;
+        for (ITrackInfo trackInfo : getTrackInfo()) if (trackInfo.getTrackType() == type) ++count;
         return count > 0;
     }
 
-    public List<IjkTrackInfo> getTrackInfo() {
+    public List<ITrackInfo> getTrackInfo() {
         return mPlayer.getTrackInfo();
     }
 
@@ -346,9 +346,9 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     public void selectTrack(int type, int track) {
         int selected = getSelectedTrack(type);
-        List<IjkTrackInfo> trackInfos = getTrackInfo();
+        List<ITrackInfo> trackInfos = getTrackInfo();
         for (int index = 0; index < trackInfos.size(); index++) {
-            IjkTrackInfo trackInfo = trackInfos.get(index);
+            ITrackInfo trackInfo = trackInfos.get(index);
             if (trackInfo.getTrackType() != type) continue;
             if (index == track && selected != track) {
                 long position = getCurrentPosition();
@@ -361,9 +361,9 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     public void deselectTrack(int type, int track) {
         int selected = getSelectedTrack(type);
-        List<IjkTrackInfo> trackInfos = getTrackInfo();
+        List<ITrackInfo> trackInfos = getTrackInfo();
         for (int index = 0; index < trackInfos.size(); index++) {
-            IjkTrackInfo trackInfo = trackInfos.get(index);
+            ITrackInfo trackInfo = trackInfos.get(index);
             if (trackInfo.getTrackType() != type) continue;
             if (index == track && selected == track) {
                 long position = getCurrentPosition();
@@ -375,10 +375,10 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     private void setPreferredTextLanguage() {
-        List<IjkTrackInfo> trackInfos = getTrackInfo();
+        List<ITrackInfo> trackInfos = getTrackInfo();
         int selected = getSelectedTrack(ITrackInfo.MEDIA_TRACK_TYPE_TEXT);
         for (int index = 0; index < trackInfos.size(); index++) {
-            IjkTrackInfo trackInfo = trackInfos.get(index);
+            ITrackInfo trackInfo = trackInfos.get(index);
             if (trackInfo.getTrackType() != ITrackInfo.MEDIA_TRACK_TYPE_TEXT) continue;
             if (trackInfo.getLanguage().equals("zh") && index != selected) {
                 mPlayer.selectTrack(index);
@@ -454,11 +454,9 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     @Override
-    public void onInfo(IMediaPlayer mp, int what, int extra) {
-        mListener.onInfo(mp, what, extra);
-        if (what == IMediaPlayer.MEDIA_INFO_VIDEO_ROTATION_CHANGED) {
-            if (mRenderView != null) mRenderView.setVideoRotation(extra);
-        }
+    public boolean onInfo(IMediaPlayer mp, int what, int extra) {
+        if (what == IMediaPlayer.MEDIA_INFO_VIDEO_ROTATION_CHANGED && mRenderView != null) mRenderView.setVideoRotation(extra);
+        return mListener.onInfo(mp, what, extra);
     }
 
     @Override

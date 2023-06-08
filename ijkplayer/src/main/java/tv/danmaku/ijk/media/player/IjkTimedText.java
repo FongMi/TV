@@ -16,12 +16,20 @@
 
 package tv.danmaku.ijk.media.player;
 
+import android.graphics.Rect;
+
 public final class IjkTimedText {
 
     private final String mTextChars;
+    private final Rect mTextBounds;
 
-    public IjkTimedText(String text) {
+    public IjkTimedText(Rect bounds, String text) {
+        mTextBounds = bounds;
         mTextChars = text;
+    }
+
+    public Rect getBounds() {
+        return mTextBounds;
     }
 
     public String getText() {
