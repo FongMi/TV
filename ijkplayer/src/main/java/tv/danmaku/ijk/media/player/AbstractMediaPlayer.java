@@ -30,10 +30,6 @@ public abstract class AbstractMediaPlayer implements IMediaPlayer {
         if (mListener != null) mListener.onBufferingUpdate(this, percent);
     }
 
-    protected final void notifyOnSeekComplete() {
-        if (mListener != null) mListener.onSeekComplete(this);
-    }
-
     protected final void notifyOnVideoSizeChanged(int width, int height, int sarNum, int sarDen) {
         if (mListener != null) mListener.onVideoSizeChanged(this, width, height, sarNum, sarDen);
     }
@@ -42,8 +38,8 @@ public abstract class AbstractMediaPlayer implements IMediaPlayer {
         return mListener != null && mListener.onError(this, what, extra);
     }
 
-    protected final boolean notifyOnInfo(int what, int extra) {
-        return mListener != null && mListener.onInfo(this, what, extra);
+    protected final void notifyOnInfo(int what, int extra) {
+        if (mListener != null) mListener.onInfo(this, what, extra);
     }
 
     protected final void notifyOnTimedText(IjkTimedText text) {
