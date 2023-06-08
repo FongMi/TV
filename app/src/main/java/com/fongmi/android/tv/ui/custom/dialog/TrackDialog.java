@@ -21,7 +21,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import java.util.ArrayList;
 import java.util.List;
 
-import tv.danmaku.ijk.media.player.misc.IjkTrackInfo;
+import tv.danmaku.ijk.media.player.misc.ITrackInfo;
 
 public final class TrackDialog extends BaseDialog implements TrackAdapter.OnClickListener {
 
@@ -95,9 +95,9 @@ public final class TrackDialog extends BaseDialog implements TrackAdapter.OnClic
 
     private void addIjkTrack(List<Track> items) {
         int track = player.ijk().getSelectedTrack(type);
-        List<IjkTrackInfo> trackInfos = player.ijk().getTrackInfo();
+        List<ITrackInfo> trackInfos = player.ijk().getTrackInfo();
         for (int i = 0; i < trackInfos.size(); i++) {
-            IjkTrackInfo trackInfo = trackInfos.get(i);
+            ITrackInfo trackInfo = trackInfos.get(i);
             if (trackInfo.getTrackType() != type) continue;
             Track item = new Track(type, provider.getTrackName(trackInfo));
             item.setPlayer(player.getPlayer());

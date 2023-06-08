@@ -25,9 +25,11 @@ import android.view.SurfaceHolder;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import tv.danmaku.ijk.media.player.misc.IMediaDataSource;
+import tv.danmaku.ijk.media.player.misc.ITrackInfo;
 
 public interface IMediaPlayer {
     /*
@@ -48,12 +50,12 @@ public interface IMediaPlayer {
     int MEDIA_INFO_SUBTITLE_TIMED_OUT = 902;
 
     int MEDIA_INFO_VIDEO_ROTATION_CHANGED = 10001;
-    int MEDIA_INFO_AUDIO_RENDERING_START  = 10002;
-    int MEDIA_INFO_AUDIO_DECODED_START    = 10003;
-    int MEDIA_INFO_VIDEO_DECODED_START    = 10004;
-    int MEDIA_INFO_OPEN_INPUT             = 10005;
-    int MEDIA_INFO_FIND_STREAM_INFO       = 10006;
-    int MEDIA_INFO_COMPONENT_OPEN         = 10007;
+    int MEDIA_INFO_AUDIO_RENDERING_START = 10002;
+    int MEDIA_INFO_AUDIO_DECODED_START = 10003;
+    int MEDIA_INFO_VIDEO_DECODED_START = 10004;
+    int MEDIA_INFO_OPEN_INPUT = 10005;
+    int MEDIA_INFO_FIND_STREAM_INFO = 10006;
+    int MEDIA_INFO_COMPONENT_OPEN = 10007;
     int MEDIA_INFO_VIDEO_SEEK_RENDERING_START = 10008;
     int MEDIA_INFO_AUDIO_SEEK_RENDERING_START = 10009;
     int MEDIA_INFO_MEDIA_ACCURATE_SEEK_COMPLETE = 10100;
@@ -108,7 +110,21 @@ public interface IMediaPlayer {
 
     void setVolume(float leftVolume, float rightVolume);
 
+    void setSpeed(float speed);
+
+    float getSpeed();
+
     int getAudioSessionId();
+
+    int getSelectedTrack(int type);
+
+    void selectTrack(int track);
+
+    void deselectTrack(int track);
+
+    void setOption(int category, String name, String value);
+
+    void setOption(int category, String name, long value);
 
     MediaInfo getMediaInfo();
 
@@ -127,7 +143,7 @@ public interface IMediaPlayer {
     interface Listener {
         void onPrepared(IMediaPlayer mp);
         void onCompletion(IMediaPlayer mp);
-        void onInfo(IMediaPlayer mp, int what, int extra);
+        boolean onInfo(IMediaPlayer mp, int what, int extra);
         boolean onError(IMediaPlayer mp, int what, int extra);
         default void onSeekComplete(IMediaPlayer mp) {}
         default void onTimedText(IMediaPlayer mp, IjkTimedText text) {}
@@ -154,6 +170,11 @@ public interface IMediaPlayer {
     void setLooping(boolean looping);
 
     boolean isLooping();
+
+    /*--------------------
+     * AndroidMediaPlayer: JELLY_BEAN
+     */
+    List<ITrackInfo> getTrackInfo();
 
     /*--------------------
      * AndroidMediaPlayer: ICE_CREAM_SANDWICH:

@@ -92,7 +92,7 @@ public class Prefers {
     }
 
     public static int getPlayer() {
-        return getInt("player", 0);
+        return getInt("player", 2);
     }
 
     public static void putPlayer(int player) {

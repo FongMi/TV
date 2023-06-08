@@ -21,6 +21,7 @@ package tv.danmaku.ijk.media.player;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
@@ -511,12 +512,14 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         return mediaMeta.mStreams;
     }
 
-    public List<IjkTrackInfo> getTrackInfo() {
-        List<IjkTrackInfo> trackInfos = new ArrayList<>();
+    @Override
+    public List<ITrackInfo> getTrackInfo() {
+        List<ITrackInfo> trackInfos = new ArrayList<>();
         for (IjkMediaMeta.IjkStreamMeta streamMeta : getStreams()) trackInfos.add(new IjkTrackInfo(streamMeta));
         return trackInfos;
     }
 
+    @Override
     public int getSelectedTrack(int trackType) {
         switch (trackType) {
             case ITrackInfo.MEDIA_TRACK_TYPE_VIDEO:
@@ -530,6 +533,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         }
     }
 
+    @Override
     public void selectTrack(int track) {
         try {
             _setStreamSelected(track, true);
@@ -537,6 +541,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         }
     }
 
+    @Override
     public void deselectTrack(int track) {
         try {
             _setStreamSelected(track, false);
@@ -646,10 +651,12 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
 
     private native int _getLoopCount();
 
+    @Override
     public void setSpeed(float speed) {
         _setPropertyFloat(FFP_PROP_FLOAT_PLAYBACK_RATE, speed);
     }
 
+    @Override
     public float getSpeed() {
         return _getPropertyFloat(FFP_PROP_FLOAT_PLAYBACK_RATE, 0);
     }
@@ -922,7 +929,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
                     if (msg.obj == null) {
                         player.notifyOnTimedText(null);
                     } else {
-                        IjkTimedText text = new IjkTimedText((String) msg.obj);
+                        IjkTimedText text = new IjkTimedText(new Rect(0, 0, 1, 1), (String) msg.obj);
                         player.notifyOnTimedText(text);
                     }
                     return;

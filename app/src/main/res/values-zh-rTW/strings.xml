@@ -121,8 +121,9 @@
     </string-array>
 
     <string-array name="select_player">
-        <item>EXO</item>
+        <item>系統</item>
         <item>IJK</item>
+        <item>EXO</item>
     </string-array>
 
     <string-array name="select_player_http">
