@@ -133,24 +133,13 @@ public interface IMediaPlayer {
      */
     interface Listener {
         void onPrepared(IMediaPlayer mp);
-
         void onCompletion(IMediaPlayer mp);
-
         void onInfo(IMediaPlayer mp, int what, int extra);
-
         boolean onError(IMediaPlayer mp, int what, int extra);
-
-        default void onTimedText(IMediaPlayer mp, IjkTimedText text) {
-        }
-
-        default void onBufferingUpdate(IMediaPlayer mp, int percent) {
-        }
-
-        default void onBufferingUpdate(IMediaPlayer mp, long position) {
-        }
-
-        default void onVideoSizeChanged(IMediaPlayer mp, int width, int height, int sar_num, int sar_den) {
-        }
+        default void onTimedText(IMediaPlayer mp, IjkTimedText text) {}
+        default void onBufferingUpdate(IMediaPlayer mp, int percent) {}
+        default void onBufferingUpdate(IMediaPlayer mp, long position) {}
+        default void onVideoSizeChanged(IMediaPlayer mp, int width, int height, int sar_num, int sar_den) {}
     }
 
     /*--------------------
