@@ -41,6 +41,7 @@ import com.fongmi.android.tv.bean.Sub;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.Sniffer;
+import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.net.OkHttp;
 import com.google.common.net.HttpHeaders;
 
@@ -154,7 +155,7 @@ public class ExoUtil {
 
     private static synchronized DataSource.Factory getDataSourceFactory(Map<String, String> headers) {
         if (dataSourceFactory == null) dataSourceFactory = buildReadOnlyCacheDataSource(new DefaultDataSource.Factory(App.get(), getHttpDataSourceFactory()), getCache());
-        httpDataSourceFactory.setDefaultRequestProperties(headers);
+        httpDataSourceFactory.setDefaultRequestProperties(Utils.checkHeaders(headers));
         return dataSourceFactory;
     }
 
