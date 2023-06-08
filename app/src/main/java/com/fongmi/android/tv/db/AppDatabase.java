@@ -22,11 +22,12 @@ import com.fongmi.android.tv.db.dao.HistoryDao;
 import com.fongmi.android.tv.db.dao.KeepDao;
 import com.fongmi.android.tv.db.dao.SiteDao;
 import com.fongmi.android.tv.db.dao.TrackDao;
+import com.fongmi.android.tv.utils.Prefers;
 
 @Database(entities = {Keep.class, Site.class, Track.class, Config.class, Device.class, History.class}, version = AppDatabase.VERSION)
 public abstract class AppDatabase extends RoomDatabase {
 
-    public static final int VERSION = 22;
+    public static final int VERSION = 23;
     public static final String SYMBOL = "@@@";
 
     private static volatile AppDatabase instance;
@@ -49,6 +50,7 @@ public abstract class AppDatabase extends RoomDatabase {
                 .addMigrations(MIGRATION_19_20)
                 .addMigrations(MIGRATION_20_21)
                 .addMigrations(MIGRATION_21_22)
+                .addMigrations(MIGRATION_22_23)
                 .allowMainThreadQueries()
                 .fallbackToDestructiveMigration()
                 .build();
@@ -145,6 +147,15 @@ public abstract class AppDatabase extends RoomDatabase {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             database.execSQL("ALTER TABLE Device ADD COLUMN type INTEGER DEFAULT 0 NOT NULL");
+        }
+    };
+
+    static final Migration MIGRATION_22_23 = new Migration(22, 23) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("UPDATE History SET player = 2 WHERE player = 0");
+            if (Prefers.getLivePlayer() == 0) Prefers.putPlayer(2);
+            if (Prefers.getPlayer() == 0) Prefers.putPlayer(2);
         }
     };
 }
