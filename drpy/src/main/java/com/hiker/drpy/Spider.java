@@ -21,10 +21,10 @@ import java.util.concurrent.Future;
 public class Spider extends com.github.catvod.crawler.Spider {
 
     private ExecutorService executor;
-    private String key;
-    private String api;
     private QuickJSContext ctx;
     private JSObject jsObject;
+    private String key;
+    private String api;
 
     public Spider() {
     }
