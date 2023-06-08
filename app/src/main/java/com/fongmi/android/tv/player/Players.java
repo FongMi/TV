@@ -46,11 +46,11 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     private int player;
 
     public boolean isExo() {
-        return player == 0;
+        return player == 2;
     }
 
     public boolean isIjk() {
-        return player == 1;
+        return player != 2;
     }
 
     public Players init() {
@@ -81,7 +81,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     private void setupIjk(IjkVideoView view) {
         ijkPlayer = view.render(Prefers.getRender()).decode(decode);
         ijkPlayer.addListener(this);
-        ijkPlayer.build();
+        ijkPlayer.build(player);
     }
 
     public ExoPlayer exo() {
@@ -189,7 +189,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     public void togglePlayer() {
         stop();
-        setPlayer(player == 0 ? 1 : 0);
+        setPlayer(player == 2 ? 0 : ++player);
     }
 
     public void toggleDecode() {
@@ -403,16 +403,18 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     @Override
-    public void onInfo(IMediaPlayer mp, int what, int extra) {
+    public boolean onInfo(IMediaPlayer mp, int what, int extra) {
         switch (what) {
             case IMediaPlayer.MEDIA_INFO_BUFFERING_START:
                 PlayerEvent.state(Player.STATE_BUFFERING);
-                break;
+                return true;
             case IMediaPlayer.MEDIA_INFO_BUFFERING_END:
             case IMediaPlayer.MEDIA_INFO_VIDEO_SEEK_RENDERING_START:
             case IMediaPlayer.MEDIA_INFO_AUDIO_SEEK_RENDERING_START:
                 PlayerEvent.ready();
-                break;
+                return true;
+            default:
+                return true;
         }
     }
 
