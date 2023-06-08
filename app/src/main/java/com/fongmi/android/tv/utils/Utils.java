@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
 import android.provider.Settings;
@@ -17,6 +16,7 @@ import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 
 import androidx.fragment.app.FragmentActivity;
+import androidx.media3.common.util.UriUtil;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.server.Server;
@@ -109,12 +109,7 @@ public class Utils {
     public static String convert(String baseUrl, String text) {
         if (TextUtils.isEmpty(text)) return "";
         if (text.startsWith("clan")) return checkClan(text);
-        if (text.startsWith(".")) text = text.substring(1);
-        if (text.startsWith("/")) text = text.substring(1);
-        String last = Uri.parse(baseUrl).getLastPathSegment();
-        if (last == null) return Uri.parse(baseUrl).getScheme() + "://" + text;
-        int index = baseUrl.lastIndexOf(last);
-        return baseUrl.substring(0, index) + text;
+        return UriUtil.resolve(baseUrl, text);
     }
 
     public static String getMd5(String src) {
