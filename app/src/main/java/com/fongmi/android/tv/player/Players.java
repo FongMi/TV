@@ -81,7 +81,6 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     private void setupIjk(IjkVideoView view) {
         ijkPlayer = view.render(Prefers.getRender()).decode(decode);
         ijkPlayer.addListener(this);
-        ijkPlayer.setPlayer(player);
     }
 
     public ExoPlayer exo() {
@@ -190,7 +189,6 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     public void togglePlayer() {
         stop();
         setPlayer(player == 2 ? 0 : ++player);
-        if (isIjk()) ijkPlayer.setPlayer(player);
     }
 
     public void toggleDecode() {
