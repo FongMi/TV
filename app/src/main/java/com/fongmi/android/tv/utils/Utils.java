@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
 import android.provider.Settings;
@@ -17,15 +16,18 @@ import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 
 import androidx.fragment.app.FragmentActivity;
+import androidx.media3.common.util.UriUtil;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.server.Server;
+import com.google.common.net.HttpHeaders;
 import com.permissionx.guolindev.PermissionX;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
+import java.util.Map;
 
 public class Utils {
 
@@ -91,6 +93,12 @@ public class Utils {
         return PermissionX.isGranted(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
     }
 
+    public static Map<String, String> checkHeaders(Map<String, String> headers) {
+        if (Prefers.getUa().isEmpty() || headers.containsKey(HttpHeaders.USER_AGENT) || headers.containsKey(HttpHeaders.USER_AGENT.toLowerCase())) return headers;
+        headers.put(HttpHeaders.USER_AGENT, Prefers.getUa());
+        return headers;
+    }
+
     public static String checkProxy(String url) {
         if (url.startsWith("proxy://")) return url.replace("proxy://", Server.get().getAddress("proxy?"));
         return url;
@@ -109,12 +117,7 @@ public class Utils {
     public static String convert(String baseUrl, String text) {
         if (TextUtils.isEmpty(text)) return "";
         if (text.startsWith("clan")) return checkClan(text);
-        if (text.startsWith(".")) text = text.substring(1);
-        if (text.startsWith("/")) text = text.substring(1);
-        String last = Uri.parse(baseUrl).getLastPathSegment();
-        if (last == null) return Uri.parse(baseUrl).getScheme() + "://" + text;
-        int index = baseUrl.lastIndexOf(last);
-        return baseUrl.substring(0, index) + text;
+        return UriUtil.resolve(baseUrl, text);
     }
 
     public static String getMd5(String src) {
