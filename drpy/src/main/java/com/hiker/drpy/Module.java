@@ -64,7 +64,7 @@ public class Module {
             byte[] data = response.body().bytes();
             boolean cache = !uri.getHost().equals("127.0.0.1");
             if (cache) new Thread(() -> write(file, data)).start();
-            return new String(data, "UTF-8");
+            return new String(data, StandardCharsets.UTF_8);
         } catch (Exception e) {
             e.printStackTrace();
             return "";
