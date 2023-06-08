@@ -30,14 +30,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.os.ParcelFileDescriptor;
 import android.os.PowerManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 
-import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
@@ -166,8 +164,6 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     private int mVideoHeight;
     private int mVideoSarNum;
     private int mVideoSarDen;
-
-    private String mDataSource;
 
     /**
      * Default library loader
@@ -300,18 +296,6 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
      *
      * @param context the Context to use when resolving the Uri
      * @param uri     the Content URI of the data you want to play
-     * @throws IllegalStateException if it is called in an invalid state
-     */
-    @Override
-    public void setDataSource(Context context, Uri uri) throws IOException, IllegalArgumentException, SecurityException, IllegalStateException {
-        setDataSource(context, uri, null);
-    }
-
-    /**
-     * Sets the data source as a content Uri.
-     *
-     * @param context the Context to use when resolving the Uri
-     * @param uri     the Content URI of the data you want to play
      * @param headers the headers to be sent together with the request for the data
      *                Note that the cross domain redirection is allowed by default, but that can be
      *                changed with key/value pairs through the headers parameter with
@@ -355,7 +339,6 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
      */
     @Override
     public void setDataSource(String path) throws IOException, IllegalArgumentException, SecurityException, IllegalStateException {
-        mDataSource = path;
         _setDataSource(path, null, null);
     }
 
@@ -381,43 +364,6 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         setDataSource(path);
     }
 
-    /**
-     * Sets the data source (FileDescriptor) to use. It is the caller's responsibility
-     * to close the file descriptor. It is safe to do so as soon as this call returns.
-     *
-     * @param fd the FileDescriptor for the file you want to play
-     * @throws IllegalStateException if it is called in an invalid state
-     */
-    @Override
-    public void setDataSource(FileDescriptor fd) throws IOException, IllegalArgumentException, IllegalStateException {
-        try (ParcelFileDescriptor pfd = ParcelFileDescriptor.dup(fd)) {
-            _setDataSourceFd(pfd.getFd());
-        }
-    }
-
-    /**
-     * Sets the data source (FileDescriptor) to use.  The FileDescriptor must be
-     * seekable (N.B. a LocalSocket is not seekable). It is the caller's responsibility
-     * to close the file descriptor. It is safe to do so as soon as this call returns.
-     *
-     * @param fd     the FileDescriptor for the file you want to play
-     * @param offset the offset into the file where the data to be played starts, in bytes
-     * @param length the length in bytes of the data to be played
-     * @throws IllegalStateException if it is called in an invalid state
-     */
-    private void setDataSource(FileDescriptor fd, long offset, long length) throws IOException, IllegalArgumentException, IllegalStateException {
-        // FIXME: handle offset, length
-        setDataSource(fd);
-    }
-
-    public void setDataSource(IMediaDataSource mediaDataSource) throws IllegalArgumentException, SecurityException, IllegalStateException {
-        _setDataSource(mediaDataSource);
-    }
-
-    public void setAndroidIOCallback(IAndroidIO androidIO) throws IllegalArgumentException, SecurityException, IllegalStateException {
-        _setAndroidIOCallback(androidIO);
-    }
-
     private native void _setDataSource(String path, String[] keys, String[] values) throws IOException, IllegalArgumentException, SecurityException, IllegalStateException;
 
     private native void _setDataSourceFd(int fd) throws IOException, IllegalArgumentException, SecurityException, IllegalStateException;
@@ -425,11 +371,6 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     private native void _setDataSource(IMediaDataSource mediaDataSource) throws IllegalArgumentException, SecurityException, IllegalStateException;
 
     private native void _setAndroidIOCallback(IAndroidIO androidIO) throws IllegalArgumentException, SecurityException, IllegalStateException;
-
-    @Override
-    public String getDataSource() {
-        return mDataSource;
-    }
 
     @Override
     public void prepareAsync() throws IllegalStateException {
@@ -764,40 +705,6 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     public native int getAudioSessionId();
 
     @Override
-    public MediaInfo getMediaInfo() {
-        MediaInfo mediaInfo = new MediaInfo();
-        mediaInfo.mMediaPlayerName = "ijkplayer";
-        String videoCodecInfo = _getVideoCodecInfo();
-        if (!TextUtils.isEmpty(videoCodecInfo)) {
-            String[] nodes = videoCodecInfo.split(",");
-            if (nodes.length >= 2) {
-                mediaInfo.mVideoDecoder = nodes[0];
-                mediaInfo.mVideoDecoderImpl = nodes[1];
-            } else if (nodes.length >= 1) {
-                mediaInfo.mVideoDecoder = nodes[0];
-                mediaInfo.mVideoDecoderImpl = "";
-            }
-        }
-        String audioCodecInfo = _getAudioCodecInfo();
-        if (!TextUtils.isEmpty(audioCodecInfo)) {
-            String[] nodes = audioCodecInfo.split(",");
-            if (nodes.length >= 2) {
-                mediaInfo.mAudioDecoder = nodes[0];
-                mediaInfo.mAudioDecoderImpl = nodes[1];
-            } else if (nodes.length >= 1) {
-                mediaInfo.mAudioDecoder = nodes[0];
-                mediaInfo.mAudioDecoderImpl = "";
-            }
-        }
-        try {
-            mediaInfo.mMeta = IjkMediaMeta.parse(_getMediaMeta());
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-        return mediaInfo;
-    }
-
-    @Override
     public void setLogEnabled(boolean enable) {
         // do nothing
     }
@@ -892,22 +799,15 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
                     return;
                 case MEDIA_BUFFERING_UPDATE:
                     long bufferPosition = msg.arg1;
-                    if (bufferPosition < 0) {
-                        bufferPosition = 0;
-                    }
+                    if (bufferPosition < 0) bufferPosition = 0;
                     long percent = 0;
                     long duration = player.getDuration();
-                    if (duration > 0) {
-                        percent = bufferPosition * 100 / duration;
-                    }
-                    if (percent >= 100) {
-                        percent = 100;
-                    }
+                    if (duration > 0) percent = bufferPosition * 100 / duration;
+                    if (percent >= 100) percent = 100;
                     player.notifyOnBufferingUpdate(bufferPosition);
                     player.notifyOnBufferingUpdate((int) percent);
                     return;
                 case MEDIA_SEEK_COMPLETE:
-                    player.notifyOnSeekComplete();
                     return;
                 case MEDIA_SET_VIDEO_SIZE:
                     player.mVideoWidth = msg.arg1;

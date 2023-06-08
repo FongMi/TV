@@ -403,18 +403,16 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     @Override
-    public boolean onInfo(IMediaPlayer mp, int what, int extra) {
+    public void onInfo(IMediaPlayer mp, int what, int extra) {
         switch (what) {
             case IMediaPlayer.MEDIA_INFO_BUFFERING_START:
                 PlayerEvent.state(Player.STATE_BUFFERING);
-                return true;
+                break;
             case IMediaPlayer.MEDIA_INFO_BUFFERING_END:
             case IMediaPlayer.MEDIA_INFO_VIDEO_SEEK_RENDERING_START:
             case IMediaPlayer.MEDIA_INFO_AUDIO_SEEK_RENDERING_START:
                 PlayerEvent.ready();
-                return true;
-            default:
-                return true;
+                break;
         }
     }
 

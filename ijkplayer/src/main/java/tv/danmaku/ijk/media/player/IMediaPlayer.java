@@ -23,7 +23,6 @@ import android.net.Uri;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 
-import java.io.FileDescriptor;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -70,15 +69,9 @@ public interface IMediaPlayer {
 
     void setDisplay(SurfaceHolder sh);
 
-    void setDataSource(Context context, Uri uri) throws IOException, IllegalArgumentException, SecurityException, IllegalStateException;
-
     void setDataSource(Context context, Uri uri, Map<String, String> headers) throws IOException, IllegalArgumentException, SecurityException, IllegalStateException;
 
-    void setDataSource(FileDescriptor fd) throws IOException, IllegalArgumentException, IllegalStateException;
-
     void setDataSource(String path) throws IOException, IllegalArgumentException, SecurityException, IllegalStateException;
-
-    String getDataSource();
 
     void prepareAsync() throws IllegalStateException;
 
@@ -126,8 +119,6 @@ public interface IMediaPlayer {
 
     void setOption(int category, String name, long value);
 
-    MediaInfo getMediaInfo();
-
     @SuppressWarnings("EmptyMethod")
     @Deprecated
     void setLogEnabled(boolean enable);
@@ -142,14 +133,24 @@ public interface IMediaPlayer {
      */
     interface Listener {
         void onPrepared(IMediaPlayer mp);
+
         void onCompletion(IMediaPlayer mp);
-        boolean onInfo(IMediaPlayer mp, int what, int extra);
+
+        void onInfo(IMediaPlayer mp, int what, int extra);
+
         boolean onError(IMediaPlayer mp, int what, int extra);
-        default void onSeekComplete(IMediaPlayer mp) {}
-        default void onTimedText(IMediaPlayer mp, IjkTimedText text) {}
-        default void onBufferingUpdate(IMediaPlayer mp, int percent) {}
-        default void onBufferingUpdate(IMediaPlayer mp, long position) {}
-        default void onVideoSizeChanged(IMediaPlayer mp, int width, int height, int sar_num, int sar_den) {}
+
+        default void onTimedText(IMediaPlayer mp, IjkTimedText text) {
+        }
+
+        default void onBufferingUpdate(IMediaPlayer mp, int percent) {
+        }
+
+        default void onBufferingUpdate(IMediaPlayer mp, long position) {
+        }
+
+        default void onVideoSizeChanged(IMediaPlayer mp, int width, int height, int sar_num, int sar_den) {
+        }
     }
 
     /*--------------------
