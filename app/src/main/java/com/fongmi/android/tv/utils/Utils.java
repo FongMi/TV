@@ -20,12 +20,14 @@ import androidx.media3.common.util.UriUtil;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.server.Server;
+import com.google.common.net.HttpHeaders;
 import com.permissionx.guolindev.PermissionX;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
+import java.util.Map;
 
 public class Utils {
 
@@ -89,6 +91,12 @@ public class Utils {
 
     public static boolean hasPermission(FragmentActivity activity) {
         return PermissionX.isGranted(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+    }
+
+    public static Map<String, String> checkHeaders(Map<String, String> headers) {
+        if (Prefers.getUa().isEmpty() || headers.containsKey(HttpHeaders.USER_AGENT) || headers.containsKey(HttpHeaders.USER_AGENT.toLowerCase())) return headers;
+        headers.put(HttpHeaders.USER_AGENT, Prefers.getUa());
+        return headers;
     }
 
     public static String checkProxy(String url) {
