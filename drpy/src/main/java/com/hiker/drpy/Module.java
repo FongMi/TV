@@ -56,12 +56,14 @@ public class Module {
 
     private String getModule(Context context, String url) {
         try {
-            File file = getFile(context, url);
+            Uri uri = Uri.parse(url);
+            File file = getFile(context, uri);
             if (file.exists()) return read(file);
             Response response = OkHttp.newCall(url, Headers.of("User-Agent", "Mozilla/5.0")).execute();
             if (response.code() != 200) return "";
             byte[] data = response.body().bytes();
-            new Thread(() -> write(file, data)).start();
+            boolean cache = !uri.getHost().equals("127.0.0.1");
+            if (cache) new Thread(() -> write(file, data)).start();
             return new String(data, "UTF-8");
         } catch (Exception e) {
             e.printStackTrace();
@@ -69,8 +71,8 @@ public class Module {
         }
     }
 
-    private File getFile(Context context, String url) {
-        return new File(context.getCacheDir(), Uri.parse(url).getLastPathSegment());
+    private File getFile(Context context, Uri uri) {
+        return new File(context.getCacheDir(), uri.getLastPathSegment());
     }
 
     private void write(File file, byte[] data) {
@@ -81,6 +83,7 @@ public class Module {
             fos.close();
             chmod(file);
         } catch (Exception e) {
+            e.printStackTrace();
             file.delete();
         }
     }
