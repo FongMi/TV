@@ -18,185 +18,103 @@
 
 package tv.danmaku.ijk.media.player;
 
-import android.annotation.TargetApi;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.media.AudioManager;
-import android.media.MediaDataSource;
 import android.media.MediaPlayer;
 import android.media.TimedText;
 import android.net.Uri;
 import android.os.Build;
-import android.text.TextUtils;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 
-import java.io.FileDescriptor;
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Map;
 
 import tv.danmaku.ijk.media.player.misc.AndroidTrackInfo;
-import tv.danmaku.ijk.media.player.misc.IMediaDataSource;
 import tv.danmaku.ijk.media.player.misc.ITrackInfo;
 import tv.danmaku.ijk.media.player.pragma.DebugLog;
 
-public class AndroidMediaPlayer extends AbstractMediaPlayer {
+public class AndroidMediaPlayer extends AbstractMediaPlayer implements MediaPlayer.OnInfoListener, MediaPlayer.OnErrorListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnTimedTextListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnSeekCompleteListener, MediaPlayer.OnBufferingUpdateListener, MediaPlayer.OnVideoSizeChangedListener {
 
-    private final AndroidMediaPlayerListenerHolder mInternalListenerAdapter;
-    private final MediaPlayer mInternalMediaPlayer;
-    private MediaDataSource mMediaDataSource;
-    private String mDataSource;
-
-    private final Object mInitLock = new Object();
-    private boolean mIsReleased;
-
-    private static MediaInfo sMediaInfo;
+    private final MediaPlayer mMediaPlayer;
 
     public AndroidMediaPlayer() {
-        synchronized (mInitLock) {
-            mInternalMediaPlayer = new MediaPlayer();
-        }
-        mInternalMediaPlayer.setLooping(false);
-        mInternalMediaPlayer.setVolume(1.0f, 1.0f);
-        mInternalMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        mInternalListenerAdapter = new AndroidMediaPlayerListenerHolder(this);
-        attachInternalListeners();
-    }
-
-    public MediaPlayer getInternalMediaPlayer() {
-        return mInternalMediaPlayer;
+        mMediaPlayer = new MediaPlayer();
+        mMediaPlayer.setOnInfoListener(this);
+        mMediaPlayer.setOnErrorListener(this);
+        mMediaPlayer.setOnPreparedListener(this);
+        mMediaPlayer.setOnTimedTextListener(this);
+        mMediaPlayer.setOnCompletionListener(this);
+        mMediaPlayer.setOnSeekCompleteListener(this);
+        mMediaPlayer.setOnBufferingUpdateListener(this);
+        mMediaPlayer.setOnVideoSizeChangedListener(this);
     }
 
     @Override
     public void setDisplay(SurfaceHolder sh) {
-        synchronized (mInitLock) {
-            if (!mIsReleased) {
-                mInternalMediaPlayer.setDisplay(sh);
-            }
-        }
+        mMediaPlayer.setDisplay(sh);
     }
 
     @Override
     public void setSurface(Surface surface) {
-        mInternalMediaPlayer.setSurface(surface);
-    }
-
-    @Override
-    public void setDataSource(Context context, Uri uri) throws IOException, IllegalArgumentException, SecurityException, IllegalStateException {
-        mInternalMediaPlayer.setDataSource(context, uri);
+        mMediaPlayer.setSurface(surface);
     }
 
     @Override
     public void setDataSource(Context context, Uri uri, Map<String, String> headers) throws IOException, IllegalArgumentException, SecurityException, IllegalStateException {
-        mInternalMediaPlayer.setDataSource(context, uri, headers);
-    }
-
-    @Override
-    public void setDataSource(FileDescriptor fd) throws IOException, IllegalArgumentException, IllegalStateException {
-        mInternalMediaPlayer.setDataSource(fd);
+        String scheme = uri.getScheme();
+        if (ContentResolver.SCHEME_FILE.equals(scheme)) {
+            setDataSource(uri.getPath());
+        } else {
+            mMediaPlayer.setDataSource(context, uri, headers);
+        }
     }
 
     @Override
     public void setDataSource(String path) throws IOException, IllegalArgumentException, SecurityException, IllegalStateException {
-        mDataSource = path;
-        Uri uri = Uri.parse(path);
-        String scheme = uri.getScheme();
-        if (!TextUtils.isEmpty(scheme) && scheme.equalsIgnoreCase("file")) {
-            mInternalMediaPlayer.setDataSource(uri.getPath());
-        } else {
-            mInternalMediaPlayer.setDataSource(path);
-        }
-    }
-
-    @TargetApi(Build.VERSION_CODES.M)
-    @Override
-    public void setDataSource(IMediaDataSource mediaDataSource) {
-        releaseMediaDataSource();
-        mMediaDataSource = new MediaDataSourceProxy(mediaDataSource);
-        mInternalMediaPlayer.setDataSource(mMediaDataSource);
-    }
-
-    @TargetApi(Build.VERSION_CODES.M)
-    private static class MediaDataSourceProxy extends MediaDataSource {
-
-        private final IMediaDataSource mMediaDataSource;
-
-        public MediaDataSourceProxy(IMediaDataSource mediaDataSource) {
-            mMediaDataSource = mediaDataSource;
-        }
-
-        @Override
-        public int readAt(long position, byte[] buffer, int offset, int size) throws IOException {
-            return mMediaDataSource.readAt(position, buffer, offset, size);
-        }
-
-        @Override
-        public long getSize() throws IOException {
-            return mMediaDataSource.getSize();
-        }
-
-        @Override
-        public void close() throws IOException {
-            mMediaDataSource.close();
-        }
-    }
-
-    @Override
-    public String getDataSource() {
-        return mDataSource;
-    }
-
-    private void releaseMediaDataSource() {
-        if (mMediaDataSource != null) {
-            try {
-                mMediaDataSource.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            mMediaDataSource = null;
-        }
+        mMediaPlayer.setDataSource(path);
     }
 
     @Override
     public void prepareAsync() throws IllegalStateException {
-        mInternalMediaPlayer.prepareAsync();
+        mMediaPlayer.prepareAsync();
     }
 
     @Override
     public void start() throws IllegalStateException {
-        mInternalMediaPlayer.start();
+        mMediaPlayer.start();
     }
 
     @Override
     public void stop() throws IllegalStateException {
-        mInternalMediaPlayer.stop();
+        mMediaPlayer.stop();
     }
 
     @Override
     public void pause() throws IllegalStateException {
-        mInternalMediaPlayer.pause();
+        mMediaPlayer.pause();
     }
 
     @Override
     public void setScreenOnWhilePlaying(boolean screenOn) {
-        mInternalMediaPlayer.setScreenOnWhilePlaying(screenOn);
+        mMediaPlayer.setScreenOnWhilePlaying(screenOn);
     }
 
     @Override
     public List<ITrackInfo> getTrackInfo() {
-        return AndroidTrackInfo.fromMediaPlayer(mInternalMediaPlayer);
+        return AndroidTrackInfo.fromMediaPlayer(mMediaPlayer);
     }
 
     @Override
     public int getVideoWidth() {
-        return mInternalMediaPlayer.getVideoWidth();
+        return mMediaPlayer.getVideoWidth();
     }
 
     @Override
     public int getVideoHeight() {
-        return mInternalMediaPlayer.getVideoHeight();
+        return mMediaPlayer.getVideoHeight();
     }
 
     @Override
@@ -212,7 +130,7 @@ public class AndroidMediaPlayer extends AbstractMediaPlayer {
     @Override
     public boolean isPlaying() {
         try {
-            return mInternalMediaPlayer.isPlaying();
+            return mMediaPlayer.isPlaying();
         } catch (IllegalStateException e) {
             DebugLog.printStackTrace(e);
             return false;
@@ -221,7 +139,7 @@ public class AndroidMediaPlayer extends AbstractMediaPlayer {
 
     @Override
     public void seekTo(long msec) throws IllegalStateException {
-        mInternalMediaPlayer.seekTo((int) msec);
+        mMediaPlayer.seekTo((int) msec);
     }
 
     @Override
@@ -232,7 +150,7 @@ public class AndroidMediaPlayer extends AbstractMediaPlayer {
     @Override
     public long getCurrentPosition() {
         try {
-            return mInternalMediaPlayer.getCurrentPosition();
+            return mMediaPlayer.getCurrentPosition();
         } catch (IllegalStateException e) {
             DebugLog.printStackTrace(e);
             return 0;
@@ -242,7 +160,7 @@ public class AndroidMediaPlayer extends AbstractMediaPlayer {
     @Override
     public long getDuration() {
         try {
-            return mInternalMediaPlayer.getDuration();
+            return mMediaPlayer.getDuration();
         } catch (IllegalStateException e) {
             DebugLog.printStackTrace(e);
             return 0;
@@ -251,52 +169,45 @@ public class AndroidMediaPlayer extends AbstractMediaPlayer {
 
     @Override
     public void release() {
-        mIsReleased = true;
-        mInternalMediaPlayer.release();
-        releaseMediaDataSource();
         resetListeners();
-        attachInternalListeners();
+        mMediaPlayer.release();
     }
 
     @Override
     public void reset() {
         try {
-            mInternalMediaPlayer.reset();
+            mMediaPlayer.reset();
         } catch (IllegalStateException e) {
             DebugLog.printStackTrace(e);
         }
-        releaseMediaDataSource();
-        resetListeners();
-        attachInternalListeners();
     }
 
     @Override
     public void setLooping(boolean looping) {
-        mInternalMediaPlayer.setLooping(looping);
+        mMediaPlayer.setLooping(looping);
     }
 
     @Override
     public boolean isLooping() {
-        return mInternalMediaPlayer.isLooping();
+        return mMediaPlayer.isLooping();
     }
 
     @Override
     public void setVolume(float leftVolume, float rightVolume) {
-        mInternalMediaPlayer.setVolume(leftVolume, rightVolume);
+        mMediaPlayer.setVolume(leftVolume, rightVolume);
     }
 
     @Override
     public void setSpeed(float speed) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            //mInternalMediaPlayer.setPlaybackParams(mInternalMediaPlayer.getPlaybackParams().setSpeed(speed));
+            mMediaPlayer.setPlaybackParams(mMediaPlayer.getPlaybackParams().setSpeed(speed));
         }
     }
 
     @Override
     public float getSpeed() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            //return mInternalMediaPlayer.getPlaybackParams().getSpeed();
-            return 1.0f;
+            return mMediaPlayer.getPlaybackParams().getSpeed();
         } else {
             return 1.0f;
         }
@@ -304,22 +215,22 @@ public class AndroidMediaPlayer extends AbstractMediaPlayer {
 
     @Override
     public int getAudioSessionId() {
-        return mInternalMediaPlayer.getAudioSessionId();
+        return mMediaPlayer.getAudioSessionId();
     }
 
     @Override
     public int getSelectedTrack(int type) {
-        return mInternalMediaPlayer.getSelectedTrack(type);
+        return mMediaPlayer.getSelectedTrack(type);
     }
 
     @Override
     public void selectTrack(int track) {
-        mInternalMediaPlayer.selectTrack(track);
+        mMediaPlayer.selectTrack(track);
     }
 
     @Override
     public void deselectTrack(int track) {
-        mInternalMediaPlayer.deselectTrack(track);
+        mMediaPlayer.deselectTrack(track);
     }
 
     @Override
@@ -331,19 +242,6 @@ public class AndroidMediaPlayer extends AbstractMediaPlayer {
     }
 
     @Override
-    public MediaInfo getMediaInfo() {
-        if (sMediaInfo == null) {
-            MediaInfo module = new MediaInfo();
-            module.mVideoDecoder = "android";
-            module.mVideoDecoderImpl = "HW";
-            module.mAudioDecoder = "android";
-            module.mAudioDecoderImpl = "HW";
-            sMediaInfo = module;
-        }
-        return sMediaInfo;
-    }
-
-    @Override
     public void setLogEnabled(boolean enable) {
     }
 
@@ -352,99 +250,58 @@ public class AndroidMediaPlayer extends AbstractMediaPlayer {
         return true;
     }
 
-    /*--------------------
-     * misc
-     */
     @Override
     public void setWakeMode(Context context, int mode) {
-        mInternalMediaPlayer.setWakeMode(context, mode);
+        mMediaPlayer.setWakeMode(context, mode);
     }
 
     @Override
     public void setAudioStreamType(int streamtype) {
-        mInternalMediaPlayer.setAudioStreamType(streamtype);
+        mMediaPlayer.setAudioStreamType(streamtype);
     }
 
     @Override
     public void setKeepInBackground(boolean keepInBackground) {
     }
 
-    /*--------------------
-     * Listeners adapter
-     */
-    private void attachInternalListeners() {
-        mInternalMediaPlayer.setOnPreparedListener(mInternalListenerAdapter);
-        mInternalMediaPlayer.setOnBufferingUpdateListener(mInternalListenerAdapter);
-        mInternalMediaPlayer.setOnCompletionListener(mInternalListenerAdapter);
-        mInternalMediaPlayer.setOnSeekCompleteListener(mInternalListenerAdapter);
-        mInternalMediaPlayer.setOnVideoSizeChangedListener(mInternalListenerAdapter);
-        mInternalMediaPlayer.setOnErrorListener(mInternalListenerAdapter);
-        mInternalMediaPlayer.setOnInfoListener(mInternalListenerAdapter);
-        mInternalMediaPlayer.setOnTimedTextListener(mInternalListenerAdapter);
+    @Override
+    public void onBufferingUpdate(MediaPlayer mp, int percent) {
+        notifyOnBufferingUpdate(percent);
     }
 
-    private class AndroidMediaPlayerListenerHolder implements MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnBufferingUpdateListener, MediaPlayer.OnSeekCompleteListener, MediaPlayer.OnVideoSizeChangedListener, MediaPlayer.OnErrorListener, MediaPlayer.OnInfoListener, MediaPlayer.OnTimedTextListener {
+    @Override
+    public void onCompletion(MediaPlayer mp) {
+        notifyOnCompletion();
+    }
 
-        public final WeakReference<AndroidMediaPlayer> mWeakMediaPlayer;
+    @Override
+    public boolean onError(MediaPlayer mp, int what, int extra) {
+        return notifyOnError(what, extra);
+    }
 
-        public AndroidMediaPlayerListenerHolder(AndroidMediaPlayer mp) {
-            mWeakMediaPlayer = new WeakReference<>(mp);
-        }
+    @Override
+    public boolean onInfo(MediaPlayer mp, int what, int extra) {
+        notifyOnInfo(what, extra);
+        return true;
+    }
 
-        @Override
-        public boolean onInfo(MediaPlayer mp, int what, int extra) {
-            AndroidMediaPlayer self = mWeakMediaPlayer.get();
-            return self != null && notifyOnInfo(what, extra);
-        }
+    @Override
+    public void onPrepared(MediaPlayer mp) {
+        notifyOnPrepared();
+    }
 
-        @Override
-        public boolean onError(MediaPlayer mp, int what, int extra) {
-            AndroidMediaPlayer self = mWeakMediaPlayer.get();
-            return self != null && notifyOnError(what, extra);
-        }
+    @Override
+    public void onSeekComplete(MediaPlayer mp) {
+        notifyOnInfo(MEDIA_INFO_VIDEO_SEEK_RENDERING_START, 0);
+    }
 
-        @Override
-        public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
-            AndroidMediaPlayer self = mWeakMediaPlayer.get();
-            if (self == null) return;
-            notifyOnVideoSizeChanged(width, height, 1, 1);
-        }
+    @Override
+    public void onTimedText(MediaPlayer mp, TimedText text) {
+        if (text != null) notifyOnTimedText(new IjkTimedText(text.getBounds(), text.getText()));
+    }
 
-        @Override
-        public void onSeekComplete(MediaPlayer mp) {
-            AndroidMediaPlayer self = mWeakMediaPlayer.get();
-            if (self == null) return;
-            notifyOnSeekComplete();
-        }
-
-        @Override
-        public void onBufferingUpdate(MediaPlayer mp, int percent) {
-            AndroidMediaPlayer self = mWeakMediaPlayer.get();
-            if (self == null) return;
-            notifyOnBufferingUpdate(percent);
-        }
-
-        @Override
-        public void onCompletion(MediaPlayer mp) {
-            AndroidMediaPlayer self = mWeakMediaPlayer.get();
-            if (self == null) return;
-            notifyOnCompletion();
-        }
-
-        @Override
-        public void onPrepared(MediaPlayer mp) {
-            AndroidMediaPlayer self = mWeakMediaPlayer.get();
-            if (self == null) return;
-            notifyOnPrepared();
-        }
-
-        @Override
-        public void onTimedText(MediaPlayer mp, TimedText text) {
-            AndroidMediaPlayer self = mWeakMediaPlayer.get();
-            if (self == null) return;
-            IjkTimedText ijkText = null;
-            if (text != null) ijkText = new IjkTimedText(text.getBounds(), text.getText());
-            notifyOnTimedText(ijkText);
-        }
+    @Override
+    public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
+        notifyOnVideoSizeChanged(width, height, 1, 1);
     }
 }

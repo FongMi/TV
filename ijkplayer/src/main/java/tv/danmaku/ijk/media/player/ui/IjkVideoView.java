@@ -87,7 +87,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         mSubtitleView = findViewById(R.id.ijk_subtitle);
         mCurrentState = STATE_IDLE;
         mTargetState = STATE_IDLE;
-        mCurrentSpeed = 1;
+        mCurrentSpeed = 1.0f;
     }
 
     private void initAttr(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -172,7 +172,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
             mPlayer.reset();
             setOptions(uri);
             fixUserAgent(headers);
-            setSpeed(mCurrentSpeed);
             setRenderView(mCurrentRender);
             mAudioManager.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
             mPlayer.setDataSource(getContext(), uri, headers);
@@ -268,12 +267,12 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     public void setSpeed(float speed) {
-        if (mPlayer != null) mPlayer.setSpeed(speed);
         mCurrentSpeed = speed;
+        if (isInPlaybackState()) mPlayer.setSpeed(speed);
     }
 
     public float getSpeed() {
-        if (mPlayer != null) return mPlayer.getSpeed();
+        if (isInPlaybackState()) return mPlayer.getSpeed();
         return mCurrentSpeed;
     }
 
@@ -439,6 +438,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     public void onPrepared(IMediaPlayer mp) {
         setPreferredTextLanguage();
         mCurrentState = STATE_PREPARED;
+        if (mCurrentSpeed > 0) setSpeed(mCurrentSpeed);
         if (mStartPosition > 0) seekTo(mStartPosition);
         mListener.onPrepared(mPlayer);
         mVideoWidth = mp.getVideoWidth();
@@ -454,9 +454,9 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     @Override
-    public boolean onInfo(IMediaPlayer mp, int what, int extra) {
+    public void onInfo(IMediaPlayer mp, int what, int extra) {
         if (what == IMediaPlayer.MEDIA_INFO_VIDEO_ROTATION_CHANGED && mRenderView != null) mRenderView.setVideoRotation(extra);
-        return mListener.onInfo(mp, what, extra);
+        mListener.onInfo(mp, what, extra);
     }
 
     @Override
