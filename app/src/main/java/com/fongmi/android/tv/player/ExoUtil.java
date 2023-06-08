@@ -7,6 +7,7 @@ import android.util.Base64;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.MimeTypes;
 import androidx.media3.common.PlaybackException;
+import androidx.media3.common.TrackSelectionOverride;
 import androidx.media3.common.Tracks;
 import androidx.media3.database.DatabaseProvider;
 import androidx.media3.database.StandaloneDatabaseProvider;
@@ -21,6 +22,7 @@ import androidx.media3.datasource.cache.SimpleCache;
 import androidx.media3.datasource.okhttp.OkHttpDataSource;
 import androidx.media3.exoplayer.DefaultLoadControl;
 import androidx.media3.exoplayer.DefaultRenderersFactory;
+import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.LoadControl;
 import androidx.media3.exoplayer.RenderersFactory;
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory;
@@ -39,6 +41,7 @@ import com.fongmi.android.tv.bean.Sub;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.Sniffer;
+import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.net.OkHttp;
 import com.google.common.net.HttpHeaders;
 
@@ -81,6 +84,18 @@ public class ExoUtil {
         return count > 0;
     }
 
+    public static void selectTrack(ExoPlayer player, int group, int track) {
+        List<Integer> trackIndices = new ArrayList<>();
+        selectTrack(player, group, track, trackIndices);
+        setTrackParameters(player, group, trackIndices);
+    }
+
+    public static void deselectTrack(ExoPlayer player, int group, int track) {
+        List<Integer> trackIndices = new ArrayList<>();
+        deselectTrack(player, group, track, trackIndices);
+        setTrackParameters(player, group, trackIndices);
+    }
+
     public static MediaSource getSource(Result result, int errorCode) {
         return getSource(result.getHeaders(), result.getRealUrl(), result.getSubs(), errorCode);
     }
@@ -110,6 +125,24 @@ public class ExoUtil {
         return items;
     }
 
+    private static void selectTrack(ExoPlayer player, int group, int track, List<Integer> trackIndices) {
+        Tracks.Group trackGroup = player.getCurrentTracks().getGroups().get(group);
+        for (int i = 0; i < trackGroup.length; i++) {
+            if (i == track || trackGroup.isTrackSelected(i)) trackIndices.add(i);
+        }
+    }
+
+    private static void deselectTrack(ExoPlayer player, int group, int track, List<Integer> trackIndices) {
+        Tracks.Group trackGroup = player.getCurrentTracks().getGroups().get(group);
+        for (int i = 0; i < trackGroup.length; i++) {
+            if (i != track && trackGroup.isTrackSelected(i)) trackIndices.add(i);
+        }
+    }
+
+    private static void setTrackParameters(ExoPlayer player, int group, List<Integer> trackIndices) {
+        player.setTrackSelectionParameters(player.getTrackSelectionParameters().buildUpon().setOverrideForType(new TrackSelectionOverride(player.getCurrentTracks().getGroups().get(group).getMediaTrackGroup(), trackIndices)).build());
+    }
+
     private static synchronized ExtractorsFactory getExtractorsFactory() {
         if (extractorsFactory == null) extractorsFactory = new DefaultExtractorsFactory().setTsExtractorFlags(DefaultTsPayloadReaderFactory.FLAG_ENABLE_HDMV_DTS_AUDIO_STREAMS).setTsExtractorTimestampSearchBytes(TsExtractor.DEFAULT_TIMESTAMP_SEARCH_BYTES * 3);
         return extractorsFactory;
@@ -122,7 +155,7 @@ public class ExoUtil {
 
     private static synchronized DataSource.Factory getDataSourceFactory(Map<String, String> headers) {
         if (dataSourceFactory == null) dataSourceFactory = buildReadOnlyCacheDataSource(new DefaultDataSource.Factory(App.get(), getHttpDataSourceFactory()), getCache());
-        httpDataSourceFactory.setDefaultRequestProperties(headers);
+        httpDataSourceFactory.setDefaultRequestProperties(Utils.checkHeaders(headers));
         return dataSourceFactory;
     }
 

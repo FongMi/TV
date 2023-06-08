@@ -1,6 +1,9 @@
 package com.fongmi.android.tv.utils;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.RectF;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
@@ -17,6 +20,8 @@ import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.signature.ObjectKey;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
+
+import java.io.ByteArrayOutputStream;
 
 public class ImgUtil {
 
@@ -57,6 +62,32 @@ public class ImgUtil {
         if (url.contains("@Referer=")) builder.addHeader("Referer", param = url.split("@Referer=")[1].split("@")[0]);
         if (url.contains("@User-Agent=")) builder.addHeader("User-Agent", param = url.split("@User-Agent=")[1].split("@")[0]);
         return new GlideUrl(param == null ? url : url.split("@")[0], builder.build());
+    }
+
+    public static byte[] resize(byte[] bytes) {
+        Bitmap bitmap = crop(BitmapFactory.decodeByteArray(bytes, 0, bytes.length));
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        return baos.toByteArray();
+    }
+
+    private static Bitmap crop(Bitmap source) {
+        int newWidth = ResUtil.getScreenWidth();
+        int newHeight = ResUtil.getScreenHeight();
+        int sourceWidth = source.getWidth();
+        int sourceHeight = source.getHeight();
+        float xScale = (float) newWidth / sourceWidth;
+        float yScale = (float) newHeight / sourceHeight;
+        float scale = Math.max(xScale, yScale);
+        float scaledWidth = scale * sourceWidth;
+        float scaledHeight = scale * sourceHeight;
+        float left = (newWidth - scaledWidth) / 2;
+        float top = (newHeight - scaledHeight) / 2;
+        RectF rectF = new RectF(left, top, left + scaledWidth, top + scaledHeight);
+        Bitmap dest = Bitmap.createBitmap(newWidth, newHeight, source.getConfig());
+        Canvas canvas = new Canvas(dest);
+        canvas.drawBitmap(source, null, rectF, null);
+        return dest;
     }
 
     private static RequestListener<Bitmap> getListener(ImageView view) {

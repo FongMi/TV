@@ -3,7 +3,6 @@ package com.fongmi.android.tv.player;
 import androidx.annotation.NonNull;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
-import androidx.media3.common.TrackSelectionOverride;
 import androidx.media3.common.util.Util;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.analytics.AnalyticsListener;
@@ -23,8 +22,6 @@ import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.github.catvod.crawler.SpiderDebug;
-import com.google.common.collect.ImmutableList;
-import com.google.common.net.HttpHeaders;
 
 import java.util.Formatter;
 import java.util.List;
@@ -328,14 +325,8 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         if (parseJob != null) parseJob.stop();
     }
 
-    private Map<String, String> checkHeaders(Map<String, String> headers) {
-        if (Prefers.getUa().isEmpty() || headers.containsKey(HttpHeaders.USER_AGENT) || headers.containsKey(HttpHeaders.USER_AGENT.toLowerCase())) return headers;
-        headers.put(HttpHeaders.USER_AGENT, Prefers.getUa());
-        return headers;
-    }
-
     private void setMediaSource(Result result) {
-        SpiderDebug.log(errorCode + "," + result.getRealUrl() + "," + checkHeaders(result.getHeaders()));
+        SpiderDebug.log(errorCode + "," + result.getRealUrl());
         if (isIjk()) ijkPlayer.setMediaSource(IjkUtil.getSource(result));
         if (isExo()) exoPlayer.setMediaSource(ExoUtil.getSource(result, errorCode));
         if (isExo()) exoPlayer.prepare();
@@ -343,7 +334,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     private void setMediaSource(Map<String, String> headers, String url) {
-        SpiderDebug.log(errorCode + "," + url + "," + checkHeaders(headers));
+        SpiderDebug.log(errorCode + "," + url);
         if (isIjk()) ijkPlayer.setMediaSource(IjkUtil.getSource(headers, url));
         if (isExo()) exoPlayer.setMediaSource(ExoUtil.getSource(headers, url, errorCode));
         if (isExo()) exoPlayer.prepare();
@@ -366,9 +357,9 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     private void setTrackExo(Track item) {
         if (item.isSelected()) {
-            exoPlayer.setTrackSelectionParameters(exoPlayer.getTrackSelectionParameters().buildUpon().setOverrideForType(new TrackSelectionOverride(exoPlayer.getCurrentTracks().getGroups().get(item.getGroup()).getMediaTrackGroup(), item.getTrack())).build());
+            ExoUtil.selectTrack(exoPlayer, item.getGroup(), item.getTrack());
         } else {
-            exoPlayer.setTrackSelectionParameters(exoPlayer.getTrackSelectionParameters().buildUpon().setOverrideForType(new TrackSelectionOverride(exoPlayer.getCurrentTracks().getGroups().get(item.getGroup()).getMediaTrackGroup(), ImmutableList.of())).build());
+            ExoUtil.deselectTrack(exoPlayer, item.getGroup(), item.getTrack());
         }
     }
 

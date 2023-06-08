@@ -1,17 +1,24 @@
 package com.hiker.drpy;
 
 import android.content.Context;
+import android.net.Uri;
 
 import com.github.catvod.net.OkHttp;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import okhttp3.Headers;
+import okhttp3.Response;
 
 public class Module {
 
@@ -31,7 +38,7 @@ public class Module {
 
     public String load(Context context, String name) {
         if (cache.contains(name)) return cache.get(name);
-        if (name.startsWith("http")) cache.put(name, getModule(name));
+        if (name.startsWith("http")) cache.put(name, getModule(context, name));
         if (name.startsWith("assets")) cache.put(name, getAssets(context, name));
         return cache.get(name);
     }
@@ -49,74 +56,59 @@ public class Module {
         }
     }
 
-    private String getModule(String url) {
+    private String getModule(Context context, String url) {
         try {
-            return OkHttp.newCall(url, Headers.of("User-Agent", "Mozilla/5.0")).execute().body().string();
+            Uri uri = Uri.parse(url);
+            File file = getFile(context, uri);
+            if (file.exists()) return read(file);
+            Response response = OkHttp.newCall(url, Headers.of("User-Agent", "Mozilla/5.0")).execute();
+            if (response.code() != 200) return "";
+            byte[] data = response.body().bytes();
+            boolean cache = !uri.getHost().equals("127.0.0.1");
+            if (cache) new Thread(() -> write(file, data)).start();
+            return new String(data, "UTF-8");
         } catch (Exception e) {
             e.printStackTrace();
             return "";
         }
     }
 
-    private static boolean isRemote(String name) {
-        return name.startsWith("http://") || name.startsWith("https://") || name.startsWith("assets://");
+    private File getFile(Context context, Uri uri) {
+        return new File(context.getCacheDir(), uri.getLastPathSegment());
     }
 
-    public static String convertModuleName(String moduleBaseName, String moduleName) {
-        if (moduleName == null || moduleName.length() == 0 || isRemote(moduleName)) {
-            return moduleName;
+    private void write(File file, byte[] data) {
+        try {
+            FileOutputStream fos = new FileOutputStream(file);
+            fos.write(data);
+            fos.flush();
+            fos.close();
+            chmod(file);
+        } catch (Exception e) {
+            e.printStackTrace();
+            file.delete();
         }
-        moduleName = moduleName.replace("//", "/");
-        if (moduleName.startsWith("./")) {
-            moduleName = moduleName.substring(2);
+    }
+
+    private String read(File file) {
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+            StringBuilder sb = new StringBuilder();
+            String text;
+            while ((text = br.readLine()) != null) sb.append(text).append("\n");
+            br.close();
+            return sb.toString();
+        } catch (Exception e) {
+            return "";
         }
-        if (moduleName.charAt(0) == '/') {
-            return moduleName;
+    }
+
+    private void chmod(File file) {
+        try {
+            Process process = Runtime.getRuntime().exec("chmod 777 " + file);
+            process.waitFor();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        if (moduleBaseName == null || moduleBaseName.length() == 0) {
-            return moduleName;
-        }
-        if (!isRemote(moduleBaseName)) {
-            moduleBaseName = moduleBaseName.replace("//", "/");
-        }
-        if (moduleBaseName.startsWith("./")) {
-            moduleBaseName = moduleBaseName.substring(2);
-        }
-        if (moduleBaseName.equals("/")) {
-            return "/" + moduleName;
-        }
-        if (moduleBaseName.endsWith("/")) {
-            return moduleBaseName + moduleName;
-        }
-        String[] parentSplit = moduleBaseName.split("/");
-        String[] pathSplit = moduleName.split("/");
-        List<String> parentStack = new ArrayList<>();
-        List<String> pathStack = new ArrayList<>();
-        Collections.addAll(parentStack, parentSplit);
-        Collections.addAll(pathStack, pathSplit);
-        while (!pathStack.isEmpty()) {
-            String tmp = pathStack.get(0);
-            if (tmp.equals("..")) {
-                pathStack.remove(0);
-                parentStack.remove(parentStack.size() - 1);
-            } else {
-                break;
-            }
-        }
-        if (!parentStack.isEmpty()) {
-            parentStack.remove(parentStack.size() - 1);
-        }
-        StringBuilder builder = new StringBuilder();
-        if (moduleBaseName.startsWith("/")) {
-            builder.append("/");
-        }
-        for (String it : parentStack) {
-            builder.append(it).append("/");
-        }
-        for (String it : pathStack) {
-            builder.append(it).append("/");
-        }
-        builder.deleteCharAt(builder.length() - 1);
-        return builder.toString();
     }
 }
