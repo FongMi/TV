@@ -199,18 +199,14 @@ public class AndroidMediaPlayer extends AbstractMediaPlayer implements MediaPlay
 
     @Override
     public void setSpeed(float speed) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            mMediaPlayer.setPlaybackParams(mMediaPlayer.getPlaybackParams().setSpeed(speed));
-        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return;
+        mMediaPlayer.setPlaybackParams(mMediaPlayer.getPlaybackParams().setSpeed(speed));
     }
 
     @Override
     public float getSpeed() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            return mMediaPlayer.getPlaybackParams().getSpeed();
-        } else {
-            return 1.0f;
-        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return 1.0f;
+        return mMediaPlayer.getPlaybackParams().getSpeed();
     }
 
     @Override
