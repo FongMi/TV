@@ -37,6 +37,9 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     public static final int IJK = 1;
     public static final int EXO = 2;
 
+    public static final int SOFT = 0;
+    public static final int HARD = 1;
+
     private IjkVideoView ijkPlayer;
     private StringBuilder builder;
     private Formatter formatter;
@@ -51,6 +54,10 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     public static boolean isExo(int type) {
         return type == EXO;
+    }
+
+    public static boolean isHard() {
+        return Prefers.getDecode() == HARD;
     }
 
     public boolean isExo() {
@@ -201,7 +208,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     public void toggleDecode() {
-        setDecode(decode == 0 ? 1 : 0);
+        setDecode(decode == HARD ? SOFT : HARD);
         Prefers.putDecode(decode);
     }
 

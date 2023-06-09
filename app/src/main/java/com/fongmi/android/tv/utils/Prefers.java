@@ -109,7 +109,7 @@ public class Prefers {
     }
 
     public static int getDecode() {
-        return getInt("decode", 1);
+        return getInt("decode", Players.HARD);
     }
 
     public static void putDecode(int decode) {
