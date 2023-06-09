@@ -28,6 +28,10 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback {
         return getString(value ? R.string.setting_on : R.string.setting_off);
     }
 
+    private boolean isExo() {
+        return Prefers.getPlayer() == 2;
+    }
+
     @Override
     protected ViewBinding getBinding() {
         return mBinding = ActivitySettingPlayerBinding.inflate(getLayoutInflater());
@@ -38,8 +42,8 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback {
         mBinding.uaText.setText(Prefers.getUa());
         mBinding.tunnelText.setText(getSwitch(Prefers.isTunnel()));
         mBinding.httpText.setText((http = ResUtil.getStringArray(R.array.select_player_http))[Prefers.getHttp()]);
-        mBinding.tunnel.setVisibility(Prefers.getPlayer() == 0 ? View.VISIBLE : View.GONE);
-        mBinding.http.setVisibility(Prefers.getPlayer() == 0 ? View.VISIBLE : View.GONE);
+        mBinding.tunnel.setVisibility(isExo() ? View.VISIBLE : View.GONE);
+        mBinding.http.setVisibility(isExo() ? View.VISIBLE : View.GONE);
     }
 
     @Override
