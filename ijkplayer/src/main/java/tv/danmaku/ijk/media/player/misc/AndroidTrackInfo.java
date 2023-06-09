@@ -33,26 +33,25 @@ public class AndroidTrackInfo implements ITrackInfo {
         return fromTrackInfo(mp.getTrackInfo());
     }
 
-    private static List<ITrackInfo> fromTrackInfo(MediaPlayer.TrackInfo[] trackInfos) {
-        if (trackInfos == null) return Collections.emptyList();
-        List<ITrackInfo> androidTrackInfo = new ArrayList<>();
-        for (MediaPlayer.TrackInfo trackInfo : trackInfos) androidTrackInfo.add(new AndroidTrackInfo(trackInfo));
-        return androidTrackInfo;
+    private static List<ITrackInfo> fromTrackInfo(MediaPlayer.TrackInfo[] items) {
+        if (items == null) return Collections.emptyList();
+        List<ITrackInfo> trackInfos = new ArrayList<>();
+        for (MediaPlayer.TrackInfo item : items) trackInfos.add(new AndroidTrackInfo(item));
+        return trackInfos;
     }
 
     private AndroidTrackInfo(MediaPlayer.TrackInfo trackInfo) {
-        mTrackInfo = trackInfo;
-        initTrackType();
+        initTrackType(mTrackInfo = trackInfo);
     }
 
-    private void initTrackType() {
-        if (mTrackInfo == null) {
+    private void initTrackType(MediaPlayer.TrackInfo trackInfo) {
+        if (trackInfo == null) {
             setTrackType(MEDIA_TRACK_TYPE_UNKNOWN);
-        } else if (mTrackInfo.getTrackType() == MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_VIDEO) {
+        } else if (trackInfo.getTrackType() == MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_VIDEO) {
             setTrackType(ITrackInfo.MEDIA_TRACK_TYPE_VIDEO);
-        } else if (mTrackInfo.getTrackType() == MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_AUDIO) {
+        } else if (trackInfo.getTrackType() == MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_AUDIO) {
             setTrackType(ITrackInfo.MEDIA_TRACK_TYPE_AUDIO);
-        } else if (mTrackInfo.getTrackType() == MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_TIMEDTEXT || mTrackInfo.getTrackType() == MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_SUBTITLE) {
+        } else if (trackInfo.getTrackType() == MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_TIMEDTEXT || trackInfo.getTrackType() == MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_SUBTITLE) {
             setTrackType(ITrackInfo.MEDIA_TRACK_TYPE_TEXT);
         }
     }
