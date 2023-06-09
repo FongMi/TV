@@ -179,6 +179,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private void setPlayerView() {
+        getIjk().setPlayer(mPlayers.getPlayer());
         mBinding.control.action.player.setText(mPlayers.getPlayerText());
         getExo().setVisibility(mPlayers.isExo() ? View.VISIBLE : View.GONE);
         getIjk().setVisibility(mPlayers.isIjk() ? View.VISIBLE : View.GONE);
@@ -308,7 +309,6 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
 
     private void onPlayer() {
         mPlayers.togglePlayer();
-        mPlayers.set(getExo(), getIjk());
         Prefers.putLivePlayer(mPlayers.getPlayer());
         setPlayerView();
         setR1Callback();
