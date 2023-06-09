@@ -154,7 +154,7 @@ public abstract class AppDatabase extends RoomDatabase {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             database.execSQL("UPDATE History SET player = 2 WHERE player = 0");
-            if (Prefers.getLivePlayer() == 0) Prefers.putPlayer(2);
+            if (Prefers.getLivePlayer() == 0) Prefers.putLivePlayer(2);
             if (Prefers.getPlayer() == 0) Prefers.putPlayer(2);
         }
     };
