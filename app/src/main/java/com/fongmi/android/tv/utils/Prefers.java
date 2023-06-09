@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import androidx.preference.PreferenceManager;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.player.Players;
 
 public class Prefers {
 
@@ -92,7 +93,7 @@ public class Prefers {
     }
 
     public static int getPlayer() {
-        return getInt("player", 2);
+        return getInt("player", Players.EXO);
     }
 
     public static void putPlayer(int player) {
@@ -108,7 +109,7 @@ public class Prefers {
     }
 
     public static int getDecode() {
-        return getInt("decode", 1);
+        return getInt("decode", Players.HARD);
     }
 
     public static void putDecode(int decode) {

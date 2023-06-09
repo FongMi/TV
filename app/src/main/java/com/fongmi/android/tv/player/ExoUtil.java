@@ -115,7 +115,7 @@ public class ExoUtil {
         if (errorCode == PlaybackException.ERROR_CODE_PARSING_MANIFEST_MALFORMED) builder.setMimeType(MimeTypes.APPLICATION_OCTET);
         else if (errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED || errorCode == PlaybackException.ERROR_CODE_IO_UNSPECIFIED) builder.setMimeType(MimeTypes.APPLICATION_M3U8);
         if (subs.size() > 0) builder.setSubtitleConfigurations(getSubtitles(subs));
-        builder.setAllowChunklessPreparation(Prefers.getDecode() == 1);
+        builder.setAllowChunklessPreparation(Players.isHard());
         return builder.setAds(Sniffer.getAdsRegex(uri)).build();
     }
 
