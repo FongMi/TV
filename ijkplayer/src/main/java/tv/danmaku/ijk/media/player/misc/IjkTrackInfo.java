@@ -17,7 +17,12 @@
 
 package tv.danmaku.ijk.media.player.misc;
 
+import android.os.Bundle;
 import android.text.TextUtils;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import tv.danmaku.ijk.media.player.IjkMediaMeta;
 
@@ -26,7 +31,19 @@ public class IjkTrackInfo implements ITrackInfo {
     private final IjkMediaMeta.IjkStreamMeta mStreamMeta;
     private int mTrackType = MEDIA_TRACK_TYPE_UNKNOWN;
 
-    public IjkTrackInfo(IjkMediaMeta.IjkStreamMeta streamMeta) {
+    public static List<ITrackInfo> fromMediaMeta(Bundle bundle) {
+        if (bundle == null) return Collections.emptyList();
+        return fromMediaMeta(IjkMediaMeta.parse(bundle));
+    }
+
+    private static List<ITrackInfo> fromMediaMeta(IjkMediaMeta mediaMeta) {
+        if (mediaMeta == null) return Collections.emptyList();
+        List<ITrackInfo> trackInfos = new ArrayList<>();
+        for (IjkMediaMeta.IjkStreamMeta streamMeta : mediaMeta.mStreams) trackInfos.add(new IjkTrackInfo(streamMeta));
+        return trackInfos;
+    }
+
+    private IjkTrackInfo(IjkMediaMeta.IjkStreamMeta streamMeta) {
         initTrackType(mStreamMeta = streamMeta);
     }
 
@@ -40,27 +57,28 @@ public class IjkTrackInfo implements ITrackInfo {
         }
     }
 
-    public IMediaFormat getFormat() {
-        return new IjkMediaFormat(mStreamMeta);
-    }
-
+    @Override
     public String getLanguage() {
         if (mStreamMeta == null || TextUtils.isEmpty(mStreamMeta.mLanguage)) return "und";
         return mStreamMeta.mLanguage;
     }
 
+    @Override
     public int getChannelCount() {
         return mStreamMeta.getChannelCount();
     }
 
+    @Override
     public int getBitrate() {
         return (int) mStreamMeta.mBitrate;
     }
 
+    @Override
     public int getWidth() {
         return mStreamMeta.mWidth;
     }
 
+    @Override
     public int getHeight() {
         return mStreamMeta.mHeight;
     }

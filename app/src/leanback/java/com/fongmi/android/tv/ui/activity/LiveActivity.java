@@ -307,6 +307,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void onPlayer() {
         mPlayers.togglePlayer();
+        mPlayers.set(getExo(), getIjk());
         Prefers.putLivePlayer(mPlayers.getPlayer());
         setPlayerView();
         getUrl();
