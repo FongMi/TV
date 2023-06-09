@@ -588,7 +588,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
 
     @Override
     public float getSpeed() {
-        return _getPropertyFloat(FFP_PROP_FLOAT_PLAYBACK_RATE, 0);
+        return _getPropertyFloat(FFP_PROP_FLOAT_PLAYBACK_RATE, 1.0f);
     }
 
     public int getVideoDecoder() {
