@@ -42,6 +42,10 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     private static final int STATE_PAUSED = 4;
     private static final int STATE_PLAYBACK_COMPLETED = 5;
 
+    private static final int PLAYER_NONE = -1;
+    private static final int PLAYER_SYS = 0;
+    private static final int PLAYER_IJK = 1;
+
     private static final int RENDER_SURFACE_VIEW = 0;
     private static final int RENDER_TEXTURE_VIEW = 1;
 
@@ -52,6 +56,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     private int mCurrentState;
     private int mCurrentDecode;
     private int mCurrentRender;
+    private int mCurrentPlayer;
     private int mCurrentAspectRatio;
     private int mStartPosition;
 
@@ -85,6 +90,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         if (attrs != null) initAttr(context, attrs, defStyleAttr);
         mContentFrame = findViewById(R.id.ijk_content_frame);
         mSubtitleView = findViewById(R.id.ijk_subtitle);
+        mCurrentPlayer = PLAYER_NONE;
         mCurrentState = STATE_IDLE;
         mTargetState = STATE_IDLE;
         mCurrentSpeed = 1.0f;
@@ -110,11 +116,14 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     public void setPlayer(int type) {
+        if (mCurrentPlayer == type) return;
+        if (mPlayer != null) release();
+        mCurrentPlayer = type;
         switch (type) {
-            case 0:
+            case PLAYER_SYS:
                 mPlayer = new AndroidMediaPlayer().setListener(this);
                 break;
-            case 1:
+            case PLAYER_IJK:
                 mPlayer = new IjkMediaPlayer().setListener(this);
                 break;
         }
@@ -214,6 +223,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     public void release() {
         if (mPlayer == null) return;
+        mCurrentPlayer = PLAYER_NONE;
         mPlayer.release();
         mPlayer = null;
         reset();
