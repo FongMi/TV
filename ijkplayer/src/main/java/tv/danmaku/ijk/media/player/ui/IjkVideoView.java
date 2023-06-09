@@ -110,8 +110,14 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     public void setPlayer(int type) {
-        mPlayer = type == 0 ? new AndroidMediaPlayer() : new IjkMediaPlayer();
-        mPlayer.setListener(this);
+        switch (type) {
+            case 0:
+                mPlayer = new AndroidMediaPlayer().setListener(this);
+                break;
+            case 1:
+                mPlayer = new IjkMediaPlayer().setListener(this);
+                break;
+        }
     }
 
     public void addListener(IMediaPlayer.Listener listener) {

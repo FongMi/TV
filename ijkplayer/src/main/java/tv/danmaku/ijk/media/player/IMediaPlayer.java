@@ -126,7 +126,7 @@ public interface IMediaPlayer {
     @Deprecated
     boolean isPlayable();
 
-    void setListener(Listener listener);
+    IMediaPlayer setListener(Listener listener);
 
     /*--------------------
      * Listeners
