@@ -42,7 +42,6 @@ import java.lang.ref.WeakReference;
 import java.net.URLEncoder;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -445,19 +444,9 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         }
     }
 
-    private List<IjkMediaMeta.IjkStreamMeta> getStreams() {
-        Bundle bundle = getMediaMeta();
-        if (bundle == null) return Collections.emptyList();
-        IjkMediaMeta mediaMeta = IjkMediaMeta.parse(bundle);
-        if (mediaMeta == null) return Collections.emptyList();
-        return mediaMeta.mStreams;
-    }
-
     @Override
     public List<ITrackInfo> getTrackInfo() {
-        List<ITrackInfo> trackInfos = new ArrayList<>();
-        for (IjkMediaMeta.IjkStreamMeta streamMeta : getStreams()) trackInfos.add(new IjkTrackInfo(streamMeta));
-        return trackInfos;
+        return IjkTrackInfo.fromMediaMeta(getMediaMeta());
     }
 
     @Override
