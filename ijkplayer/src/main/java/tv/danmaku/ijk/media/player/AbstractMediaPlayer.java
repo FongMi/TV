@@ -6,8 +6,9 @@ public abstract class AbstractMediaPlayer implements IMediaPlayer {
 
     private Listener mListener;
 
-    public final void setListener(Listener listener) {
+    public final IMediaPlayer setListener(Listener listener) {
         mListener = listener;
+        return this;
     }
 
     public void resetListeners() {

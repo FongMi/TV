@@ -287,7 +287,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void setPlayerView() {
         mBinding.control.player.setText(mPlayers.getPlayerText());
-        if (mPlayers.isIjk()) getIjk().setPlayer(mPlayers.getPlayer());
         getExo().setVisibility(mPlayers.isExo() ? View.VISIBLE : View.GONE);
         getIjk().setVisibility(mPlayers.isIjk() ? View.VISIBLE : View.GONE);
         mBinding.control.reset.setText(ResUtil.getStringArray(R.array.select_reset)[Prefers.getReset()]);
@@ -644,6 +643,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void onPlayer() {
         mPlayers.togglePlayer();
+        mPlayers.set(getExo(), getIjk());
         Prefers.putPlayer(mPlayers.getPlayer());
         mHistory.setPlayer(mPlayers.getPlayer());
         setPlayerView();
