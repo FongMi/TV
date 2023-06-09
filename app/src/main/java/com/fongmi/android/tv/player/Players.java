@@ -33,6 +33,10 @@ import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
 public class Players implements Player.Listener, IMediaPlayer.Listener, AnalyticsListener, ParseCallback {
 
+    public static final int SYS = 0;
+    public static final int IJK = 1;
+    public static final int EXO = 2;
+
     private IjkVideoView ijkPlayer;
     private StringBuilder builder;
     private Formatter formatter;
@@ -45,12 +49,16 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     private int decode;
     private int player;
 
+    public static boolean isExo(int type) {
+        return type == EXO;
+    }
+
     public boolean isExo() {
-        return player == 2;
+        return player == EXO;
     }
 
     public boolean isIjk() {
-        return player != 2;
+        return player == SYS || player == IJK;
     }
 
     public Players init() {
@@ -189,7 +197,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     public void togglePlayer() {
         stop();
-        setPlayer(player == 2 ? 0 : ++player);
+        setPlayer(player == EXO ? SYS : ++player);
     }
 
     public void toggleDecode() {
