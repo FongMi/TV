@@ -34,7 +34,6 @@ import java.util.Map;
 
 import tv.danmaku.ijk.media.player.misc.AndroidTrackInfo;
 import tv.danmaku.ijk.media.player.misc.ITrackInfo;
-import tv.danmaku.ijk.media.player.pragma.DebugLog;
 
 public class AndroidMediaPlayer extends AbstractMediaPlayer implements MediaPlayer.OnInfoListener, MediaPlayer.OnErrorListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnTimedTextListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnSeekCompleteListener, MediaPlayer.OnBufferingUpdateListener, MediaPlayer.OnVideoSizeChangedListener {
 
@@ -132,7 +131,6 @@ public class AndroidMediaPlayer extends AbstractMediaPlayer implements MediaPlay
         try {
             return mMediaPlayer.isPlaying();
         } catch (IllegalStateException e) {
-            DebugLog.printStackTrace(e);
             return false;
         }
     }
@@ -152,7 +150,6 @@ public class AndroidMediaPlayer extends AbstractMediaPlayer implements MediaPlay
         try {
             return mMediaPlayer.getCurrentPosition();
         } catch (IllegalStateException e) {
-            DebugLog.printStackTrace(e);
             return 0;
         }
     }
@@ -162,7 +159,6 @@ public class AndroidMediaPlayer extends AbstractMediaPlayer implements MediaPlay
         try {
             return mMediaPlayer.getDuration();
         } catch (IllegalStateException e) {
-            DebugLog.printStackTrace(e);
             return 0;
         }
     }
@@ -175,11 +171,7 @@ public class AndroidMediaPlayer extends AbstractMediaPlayer implements MediaPlay
 
     @Override
     public void reset() {
-        try {
-            mMediaPlayer.reset();
-        } catch (IllegalStateException e) {
-            DebugLog.printStackTrace(e);
-        }
+        mMediaPlayer.reset();
     }
 
     @Override
@@ -216,17 +208,29 @@ public class AndroidMediaPlayer extends AbstractMediaPlayer implements MediaPlay
 
     @Override
     public int getSelectedTrack(int type) {
-        return mMediaPlayer.getSelectedTrack(type);
+        try {
+            return mMediaPlayer.getSelectedTrack(type);
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     @Override
     public void selectTrack(int track) {
-        mMediaPlayer.selectTrack(track);
+        try {
+            mMediaPlayer.selectTrack(track);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void deselectTrack(int track) {
-        mMediaPlayer.deselectTrack(track);
+        try {
+            mMediaPlayer.deselectTrack(track);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
