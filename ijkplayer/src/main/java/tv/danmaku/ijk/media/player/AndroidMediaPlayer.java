@@ -227,6 +227,7 @@ public class AndroidMediaPlayer extends AbstractMediaPlayer implements MediaPlay
 
     private int getTrack(int type) {
         try {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return 0;
             return mMediaPlayer.getSelectedTrack(type);
         } catch (Exception e) {
             return -1;
