@@ -6,8 +6,9 @@ public abstract class AbstractMediaPlayer implements IMediaPlayer {
 
     private Listener mListener;
 
-    public final void setListener(Listener listener) {
+    public final IMediaPlayer setListener(Listener listener) {
         mListener = listener;
+        return this;
     }
 
     public void resetListeners() {
@@ -28,10 +29,6 @@ public abstract class AbstractMediaPlayer implements IMediaPlayer {
 
     protected final void notifyOnBufferingUpdate(int percent) {
         if (mListener != null) mListener.onBufferingUpdate(this, percent);
-    }
-
-    protected final void notifyOnSeekComplete() {
-        if (mListener != null) mListener.onSeekComplete(this);
     }
 
     protected final void notifyOnVideoSizeChanged(int width, int height, int sarNum, int sarDen) {
