@@ -17,7 +17,12 @@
 
 package tv.danmaku.ijk.media.player.misc;
 
+import android.os.Bundle;
 import android.text.TextUtils;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import tv.danmaku.ijk.media.player.IjkMediaMeta;
 
@@ -26,7 +31,19 @@ public class IjkTrackInfo implements ITrackInfo {
     private final IjkMediaMeta.IjkStreamMeta mStreamMeta;
     private int mTrackType = MEDIA_TRACK_TYPE_UNKNOWN;
 
-    public IjkTrackInfo(IjkMediaMeta.IjkStreamMeta streamMeta) {
+    public static List<ITrackInfo> fromMediaMeta(Bundle bundle) {
+        if (bundle == null) return Collections.emptyList();
+        return fromMediaMeta(IjkMediaMeta.parse(bundle));
+    }
+
+    private static List<ITrackInfo> fromMediaMeta(IjkMediaMeta mediaMeta) {
+        if (mediaMeta == null) return Collections.emptyList();
+        List<ITrackInfo> trackInfos = new ArrayList<>();
+        for (IjkMediaMeta.IjkStreamMeta streamMeta : mediaMeta.mStreams) trackInfos.add(new IjkTrackInfo(streamMeta));
+        return trackInfos;
+    }
+
+    private IjkTrackInfo(IjkMediaMeta.IjkStreamMeta streamMeta) {
         initTrackType(mStreamMeta = streamMeta);
     }
 
