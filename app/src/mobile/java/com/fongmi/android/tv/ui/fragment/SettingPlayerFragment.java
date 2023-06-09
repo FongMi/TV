@@ -30,6 +30,10 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback {
         return getString(value ? R.string.setting_on : R.string.setting_off);
     }
 
+    private boolean isExo() {
+        return Prefers.getPlayer() == 2;
+    }
+
     @Override
     protected ViewBinding getBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
         return mBinding = FragmentSettingPlayerBinding.inflate(inflater, container, false);
@@ -51,8 +55,8 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback {
     }
 
     private void setVisible() {
-        mBinding.http.setVisibility(Prefers.getPlayer() == 0 ? View.VISIBLE : View.GONE);
-        mBinding.tunnel.setVisibility(Prefers.getPlayer() == 0 ? View.VISIBLE : View.GONE);
+        mBinding.http.setVisibility(isExo() ? View.VISIBLE : View.GONE);
+        mBinding.tunnel.setVisibility(isExo() ? View.VISIBLE : View.GONE);
     }
 
     private void onUa(View view) {
