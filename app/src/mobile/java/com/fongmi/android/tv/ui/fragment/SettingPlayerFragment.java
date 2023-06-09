@@ -12,6 +12,7 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.FragmentSettingPlayerBinding;
 import com.fongmi.android.tv.impl.UaCallback;
 import com.fongmi.android.tv.player.ExoUtil;
+import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.custom.dialog.UaDialog;
 import com.fongmi.android.tv.utils.Prefers;
@@ -28,10 +29,6 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback {
 
     private String getSwitch(boolean value) {
         return getString(value ? R.string.setting_on : R.string.setting_off);
-    }
-
-    private boolean isExo() {
-        return Prefers.getPlayer() == 2;
     }
 
     @Override
@@ -55,8 +52,8 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback {
     }
 
     private void setVisible() {
-        mBinding.http.setVisibility(isExo() ? View.VISIBLE : View.GONE);
-        mBinding.tunnel.setVisibility(isExo() ? View.VISIBLE : View.GONE);
+        mBinding.http.setVisibility(Players.isExo(Prefers.getPlayer()) ? View.VISIBLE : View.GONE);
+        mBinding.tunnel.setVisibility(Players.isExo(Prefers.getPlayer()) ? View.VISIBLE : View.GONE);
     }
 
     private void onUa(View view) {
