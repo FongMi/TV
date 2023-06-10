@@ -112,11 +112,12 @@ public class ExoUtil {
 
     private static MediaItem getMediaItem(Uri uri, List<Sub> subs, int errorCode) {
         MediaItem.Builder builder = new MediaItem.Builder().setUri(uri);
-        if (errorCode == PlaybackException.ERROR_CODE_PARSING_MANIFEST_MALFORMED) builder.setMimeType(MimeTypes.APPLICATION_OCTET);
-        else if (errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED || errorCode == PlaybackException.ERROR_CODE_IO_UNSPECIFIED) builder.setMimeType(MimeTypes.APPLICATION_M3U8);
+        if (errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED || errorCode == PlaybackException.ERROR_CODE_IO_UNSPECIFIED) builder.setMimeType(MimeTypes.APPLICATION_M3U8);
+        else if (errorCode == PlaybackException.ERROR_CODE_PARSING_MANIFEST_MALFORMED) builder.setMimeType(MimeTypes.APPLICATION_OCTET);
         if (subs.size() > 0) builder.setSubtitleConfigurations(getSubtitles(subs));
         builder.setAllowChunklessPreparation(Players.isHard());
-        return builder.setAds(Sniffer.getAdsRegex(uri)).build();
+        builder.setAds(Sniffer.getAdsRegex(uri));
+        return builder.build();
     }
 
     private static List<MediaItem.SubtitleConfiguration> getSubtitles(List<Sub> subs) {
