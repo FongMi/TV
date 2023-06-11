@@ -278,6 +278,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void setPlayerView() {
+        getIjk().setPlayer(mPlayers.getPlayer());
         mBinding.control.action.player.setText(mPlayers.getPlayerText());
         getExo().setVisibility(mPlayers.isExo() ? View.VISIBLE : View.GONE);
         getIjk().setVisibility(mPlayers.isIjk() ? View.VISIBLE : View.GONE);

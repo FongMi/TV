@@ -134,7 +134,17 @@ public class SyncDialog extends BaseDialog implements DeviceAdapter.OnClickListe
 
     @Override
     public void onItemClick(Device item) {
-        OkHttp.newCall(client, item.getIp().concat("/action?do=sync&type=").concat(type), body.build()).enqueue(new Callback() {
+        OkHttp.newCall(client, item.getIp().concat("/action?do=sync&mode=0&type=").concat(type), body.build()).enqueue(getCallback());
+    }
+
+    @Override
+    public boolean onLongClick(Device item) {
+        OkHttp.newCall(client, item.getIp().concat("/action?do=sync&mode=1&type=").concat(type), body.build()).enqueue(getCallback());
+        return true;
+    }
+
+    private Callback getCallback() {
+        return new Callback() {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) {
                 App.post(() -> onSuccess());
@@ -144,7 +154,7 @@ public class SyncDialog extends BaseDialog implements DeviceAdapter.OnClickListe
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 App.post(() -> onError());
             }
-        });
+        };
     }
 
     @Override

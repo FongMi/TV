@@ -36,13 +36,13 @@ public class ActionRequestProcess implements RequestProcess {
         Map<String, String> params = session.getParms();
         switch (Objects.requireNonNullElse(params.get("do"), "")) {
             case "search":
-                onSearch(params.get("word").trim());
+                onSearch(params);
                 break;
             case "push":
-                onPush(params.get("url").trim());
+                onPush(params);
                 break;
             case "api":
-                onApi(params.get("url").trim());
+                onApi(params);
                 break;
             case "cast":
                 onCast(params);
@@ -54,30 +54,34 @@ public class ActionRequestProcess implements RequestProcess {
         return Nano.createSuccessResponse();
     }
 
-    public void onSearch(String word) {
+    private void onSearch(Map<String, String> params) {
+        String word = Objects.requireNonNullElse(params.get("word"), "");
         if (word.length() > 0) ServerEvent.search(word);
     }
 
-    public void onPush(String url) {
+    private void onPush(Map<String, String> params) {
+        String url = Objects.requireNonNullElse(params.get("url"), "");
         if (url.length() > 0) ServerEvent.push(url);
     }
 
-    public void onApi(String url) {
+    private void onApi(Map<String, String> params) {
+        String url = Objects.requireNonNullElse(params.get("url"), "");
         if (url.length() > 0) ServerEvent.api(url);
     }
 
-    public void onCast(Map<String, String> params) {
+    private void onCast(Map<String, String> params) {
         Config config = Config.find(params.get("url"), 0);
         Device device = Device.objectFrom(params.get("device"));
         History history = History.objectFrom(params.get("history"));
         CastEvent.post(config, device, history);
     }
 
-    public void onSync(Map<String, String> params) {
-        boolean keep = params.get("type").equals("keep");
-        boolean history = params.get("type").equals("history");
+    private void onSync(Map<String, String> params) {
+        boolean sync = Objects.equals(params.get("mode"), "0");
+        boolean keep = Objects.equals(params.get("type"), "keep");
+        boolean history = Objects.equals(params.get("type"), "history");
         Device device = Device.objectFrom(params.get("device"));
-        if (params.get("device") != null) {
+        if (params.get("device") != null && sync) {
             if (history) sendHistory(device, params);
             else if (keep) sendKeep(device);
         }
@@ -94,7 +98,7 @@ public class ActionRequestProcess implements RequestProcess {
             FormBody.Builder body = new FormBody.Builder();
             body.add("url", url);
             body.add("targets", App.gson().toJson(History.get(Config.find(url, 0).getId())));
-            OkHttp.newCall(OkHttp.client(Constant.TIMEOUT_SYNC), device.getIp().concat("/action?do=sync&type=history"), body.build()).execute();
+            OkHttp.newCall(OkHttp.client(Constant.TIMEOUT_SYNC), device.getIp().concat("/action?do=sync&mode=0&type=history"), body.build()).execute();
         } catch (Exception e) {
             App.post(() -> Notify.show(e.getMessage()));
         }
@@ -105,7 +109,7 @@ public class ActionRequestProcess implements RequestProcess {
             FormBody.Builder body = new FormBody.Builder();
             body.add("targets", App.gson().toJson(Keep.getVod()));
             body.add("configs", App.gson().toJson(Config.findUrls()));
-            OkHttp.newCall(OkHttp.client(Constant.TIMEOUT_SYNC), device.getIp().concat("/action?do=sync&type=keep"), body.build()).execute();
+            OkHttp.newCall(OkHttp.client(Constant.TIMEOUT_SYNC), device.getIp().concat("/action?do=sync&mode=0&type=keep"), body.build()).execute();
         } catch (Exception e) {
             App.post(() -> Notify.show(e.getMessage()));
         }
@@ -115,8 +119,10 @@ public class ActionRequestProcess implements RequestProcess {
         String url = params.get("url");
         if (TextUtils.isEmpty(url)) return;
         Config config = Config.find(url, 0);
+        boolean replace = Objects.equals(params.get("mode"), "1");
         List<History> targets = History.arrayFrom(params.get("targets"));
         if (ApiConfig.get().getConfig().equals(config)) {
+            if (replace) History.delete(config.getId());
             History.sync(targets);
         } else {
             ApiConfig.load(config, getCallback(targets));
@@ -139,12 +145,14 @@ public class ActionRequestProcess implements RequestProcess {
         };
     }
 
-    public void syncKeep(Map<String, String> params) {
+    private void syncKeep(Map<String, String> params) {
         List<Config> configs = Config.arrayFrom(params.get("configs"));
         List<Keep> targets = Keep.arrayFrom(params.get("targets"));
+        boolean replace = Objects.equals(params.get("mode"), "1");
         if (ApiConfig.getUrl() == null && configs.size() > 0) {
             ApiConfig.load(Config.find(configs.get(0), 0), getCallback(configs, targets));
         } else {
+            if (replace) Keep.deleteAll();
             Keep.sync(configs, targets);
         }
     }

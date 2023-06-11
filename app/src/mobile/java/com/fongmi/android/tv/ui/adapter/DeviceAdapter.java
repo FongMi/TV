@@ -26,6 +26,8 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder
     public interface OnClickListener {
 
         void onItemClick(Device item);
+
+        boolean onLongClick(Device item);
     }
 
     public void addAll(List<Device> items) {
@@ -71,6 +73,7 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.ViewHolder
         holder.binding.host.setText(item.getHost());
         holder.binding.type.setImageResource(getIcon(item));
         holder.binding.getRoot().setOnClickListener(v -> mListener.onItemClick(item));
+        holder.binding.getRoot().setOnLongClickListener(v -> mListener.onLongClick(item));
     }
 
     private int getIcon(Device item) {
