@@ -87,7 +87,7 @@ dependencies {
     implementation project(':catvod')
     implementation project(':forcetech')
     implementation project(':ijkplayer')
-    pythonImplementation project(':pyramid')
+    //pythonImplementation project(':pyramid')
     implementation 'androidx.media3:media3-database:1.0.2'
     implementation 'androidx.media3:media3-datasource:1.0.2'
     implementation 'androidx.media3:media3-datasource-okhttp:1.0.2'
