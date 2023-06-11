@@ -26,15 +26,11 @@ public class SubtitleView extends TextView {
 
     public SubtitleView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        strokeWidth = Utils.dp2px(getContext(), 0.6f);
+        strokeWidth = Utils.dp2px(getContext(), 0.8f);
     }
 
     public void onSubtitleChanged(String text) {
-        if (TextUtils.isEmpty(text)) {
-            setText("");
-        } else {
-            setText(Html.fromHtml(text.replaceAll("\\{\\\\.*?\\}", "")));
-        }
+        setText(TextUtils.isEmpty(text) ? "" : Html.fromHtml(text.replaceAll("\\{\\\\.*?\\}", "")));
     }
 
     @Override
