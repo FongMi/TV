@@ -118,7 +118,7 @@ public class Live {
     }
 
     public int getPlayerType() {
-        return playerType == null ? -1 : playerType == 1 ? 1 : 0;
+        return playerType == null ? -1 : playerType;
     }
 
     public List<Channel> getChannels() {

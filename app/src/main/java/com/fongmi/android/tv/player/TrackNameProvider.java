@@ -15,7 +15,7 @@ import com.fongmi.android.tv.App;
 
 import java.util.Locale;
 
-import tv.danmaku.ijk.media.player.misc.IjkTrackInfo;
+import tv.danmaku.ijk.media.player.misc.ITrackInfo;
 
 public class TrackNameProvider {
 
@@ -38,7 +38,7 @@ public class TrackNameProvider {
         return TextUtils.isEmpty(trackName) ? resources.getString(R.string.exo_track_unknown) : trackName;
     }
 
-    public String getTrackName(IjkTrackInfo trackInfo) {
+    public String getTrackName(ITrackInfo trackInfo) {
         String trackName;
         int trackType = trackInfo.getTrackType();
         if (trackType == C.TRACK_TYPE_VIDEO) {
