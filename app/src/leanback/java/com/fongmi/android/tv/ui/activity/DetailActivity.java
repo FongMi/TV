@@ -1,8 +1,10 @@
 package com.fongmi.android.tv.ui.activity;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.text.Html;
 import android.util.TypedValue;
 import android.view.KeyEvent;
@@ -13,6 +15,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentActivity;
 import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.ItemBridgeAdapter;
 import androidx.leanback.widget.OnChildViewHolderSelectedListener;
@@ -54,16 +57,19 @@ import com.fongmi.android.tv.ui.presenter.ParsePresenter;
 import com.fongmi.android.tv.ui.presenter.PartPresenter;
 import com.fongmi.android.tv.ui.presenter.SearchPresenter;
 import com.fongmi.android.tv.utils.Clock;
+import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Traffic;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.net.OkHttp;
+import com.permissionx.guolindev.PermissionX;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -103,6 +109,20 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private int mCurrent;
     private Runnable mR1;
     private Runnable mR2;
+
+    public static void push(FragmentActivity activity, Uri uri) {
+        if (uri.getScheme().startsWith("smb") || uri.getScheme().startsWith("http")) {
+            push(activity, uri.toString(), true);
+        } else {
+            file(activity, FileChooser.getPathFromUri(activity, uri));
+        }
+    }
+
+    public static void file(FragmentActivity activity, String path) {
+        String name = new File(path).getName();
+        if (Utils.hasPermission(activity)) start(activity, "push_agent", "file://" + path, name, true);
+        else PermissionX.init(activity).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> start(activity, "push_agent", "file://" + path, name, true));
+    }
 
     public static void cast(Activity activity, History history) {
         start(activity, history.getSiteKey(), history.getVodId(), history.getVodName(), true, true);
