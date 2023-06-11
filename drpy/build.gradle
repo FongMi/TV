@@ -13,8 +13,8 @@ android {
 
 dependencies {
     implementation project(':catvod')
-    implementation project(':media-lib-common')
     implementation 'androidx.annotation:annotation:1.5.0'
+    implementation 'androidx.media3:media3-common:1.0.2'
     implementation 'wang.harlon.quickjs:wrapper-android:0.19.3'
     api 'com.google.code.gson:gson:' + gsonVersion
     api 'com.squareup.okhttp3:okhttp:' + okhttpVersion
