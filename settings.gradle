@@ -24,7 +24,7 @@ include ':drpy'
 include ':zlive'
 include ':tvbus'
 include ':catvod'
-include ':pyramid'
+//include ':pyramid'
 include ':forcetech'
 include ':ijkplayer'
 rootProject.name = "TV"
