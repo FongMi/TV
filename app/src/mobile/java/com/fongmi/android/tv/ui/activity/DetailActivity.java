@@ -7,6 +7,7 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.TypedValue;
@@ -61,6 +62,7 @@ import com.fongmi.android.tv.ui.custom.dialog.EpisodeGridDialog;
 import com.fongmi.android.tv.ui.custom.dialog.EpisodeListDialog;
 import com.fongmi.android.tv.ui.custom.dialog.TrackDialog;
 import com.fongmi.android.tv.utils.Clock;
+import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.PiP;
 import com.fongmi.android.tv.utils.Prefers;
@@ -113,10 +115,18 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     private String url;
     private PiP mPiP;
 
-    public static void file(FragmentActivity activity, String url) {
-        String name = new File(url).getName();
-        if (Utils.hasPermission(activity)) start(activity, "push_agent", "file://" + url, name);
-        else PermissionX.init(activity).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> start(activity, "push_agent", "file://" + url, name));
+    public static void push(FragmentActivity activity, Uri uri) {
+        if (uri.getScheme().startsWith("smb") || uri.getScheme().startsWith("http")) {
+            push(activity, uri.toString());
+        } else {
+            file(activity, FileChooser.getPathFromUri(activity, uri));
+        }
+    }
+
+    public static void file(FragmentActivity activity, String path) {
+        String name = new File(path).getName();
+        if (Utils.hasPermission(activity)) start(activity, "push_agent", "file://" + path, name);
+        else PermissionX.init(activity).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> start(activity, "push_agent", "file://" + path, name));
     }
 
     public static void cast(Activity activity, History history) {

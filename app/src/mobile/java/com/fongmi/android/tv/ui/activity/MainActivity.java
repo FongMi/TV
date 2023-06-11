@@ -2,6 +2,7 @@ package com.fongmi.android.tv.ui.activity;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -20,10 +21,9 @@ import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.ui.base.BaseActivity;
-import com.fongmi.android.tv.ui.fragment.SettingPlayerFragment;
-import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.ui.custom.FragmentStateManager;
 import com.fongmi.android.tv.ui.fragment.SettingFragment;
+import com.fongmi.android.tv.ui.fragment.SettingPlayerFragment;
 import com.fongmi.android.tv.ui.fragment.VodFragment;
 import com.fongmi.android.tv.utils.Notify;
 import com.google.android.material.navigation.NavigationBarView;
@@ -61,9 +61,9 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
     private void checkAction(Intent intent) {
         boolean push = ApiConfig.hasPush() && intent.getAction() != null;
         if (push && intent.getAction().equals(Intent.ACTION_SEND) && intent.getType().equals("text/plain")) {
-            DetailActivity.push(this, intent.getStringExtra(Intent.EXTRA_TEXT));
+            DetailActivity.push(this, Uri.parse(intent.getStringExtra(Intent.EXTRA_TEXT)));
         } else if (push && intent.getAction().equals(Intent.ACTION_VIEW)) {
-            DetailActivity.file(this, FileChooser.getPathFromUri(this, intent.getData()));
+            DetailActivity.push(this, intent.getData());
         }
     }
 
