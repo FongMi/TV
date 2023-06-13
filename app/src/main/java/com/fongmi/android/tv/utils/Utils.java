@@ -173,6 +173,7 @@ public class Utils {
         try {
             if (text.startsWith("上") || text.startsWith("下")) return -1;
             if (text.contains(".")) text = text.substring(0, text.lastIndexOf("."));
+            if (text.startsWith("4k")) text = text.replace("4k", "");
             return Integer.parseInt(text.replaceAll("\\D+", ""));
         } catch (Exception e) {
             return -1;
