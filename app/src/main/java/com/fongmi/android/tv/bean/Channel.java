@@ -253,7 +253,7 @@ public class Channel {
     }
 
     public boolean isYoutube() {
-        return Uri.parse(getCurrent()).getHost().equals("www.youtube.com");
+        return Uri.parse(getCurrent()).getHost().contains("youtube.com");
     }
 
     public boolean isBiliBili() {

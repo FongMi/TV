@@ -8,6 +8,6 @@ public class Utils {
     public static final String USER_AGENT = "User-Agent";
 
     public static float dp2px(Context context, float dpValue) {
-        return Math.round((dpValue * context.getResources().getDisplayMetrics().densityDpi) / DisplayMetrics.DENSITY_DEFAULT);
+        return (dpValue * context.getResources().getDisplayMetrics().densityDpi) / DisplayMetrics.DENSITY_DEFAULT;
     }
 }
