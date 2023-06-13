@@ -22,20 +22,14 @@ public class TVBus implements Listener {
 
     private void init(Core core) {
         tvcore = new TVCore();
-        tvcore.listener(this);
-        tvcore.auth(core.getAuth());
-        tvcore.name(core.getName());
-        tvcore.pass(core.getPass());
-        tvcore.broker(core.getBroker());
-        tvcore.serv(0);
-        tvcore.play(8902);
-        tvcore.mode(1);
+        tvcore.auth(core.getAuth()).broker(core.getBroker());
+        tvcore.name(core.getName()).pass(core.getPass());
+        tvcore.serv(0).play(8902).mode(1).listener(this);
         tvcore.init(App.get());
     }
 
     public String fetch(String url) throws InterruptedException {
         if (tvcore == null) init(LiveConfig.get().getHome().getCore());
-        if (tvcore == null) return "";
         tvcore.start(url);
         onWait();
         return hls;

@@ -1,5 +1,7 @@
 package com.fongmi.android.tv.ui.activity;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.view.KeyEvent;
 import android.view.View;
 
@@ -69,6 +71,12 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     }
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        checkAction(intent);
+    }
+
+    @Override
     protected void initView() {
         mBinding.progressLayout.showProgress();
         Updater.get().start();
@@ -89,6 +97,15 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
                 if (mHistoryPresenter.isDelete()) setHistoryDelete(false);
             }
         });
+    }
+
+    private void checkAction(Intent intent) {
+        boolean push = ApiConfig.hasPush() && intent.getAction() != null;
+        if (push && intent.getAction().equals(Intent.ACTION_SEND) && intent.getType().equals("text/plain")) {
+            DetailActivity.push(this, Uri.parse(intent.getStringExtra(Intent.EXTRA_TEXT)));
+        } else if (push && intent.getAction().equals(Intent.ACTION_VIEW)) {
+            DetailActivity.push(this, intent.getData());
+        }
     }
 
     private void setRecyclerView() {
@@ -128,6 +145,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
             @Override
             public void success() {
                 mBinding.progressLayout.showContent();
+                checkAction(getIntent());
                 getHistory();
                 getVideo();
                 setFocus();
