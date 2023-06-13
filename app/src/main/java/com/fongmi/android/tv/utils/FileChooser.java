@@ -53,13 +53,14 @@ public class FileChooser {
     public static String getPathFromUri(Context context, Uri uri) {
         if (uri == null) return null;
         String path = null;
-        if (DocumentsContract.isDocumentUri(context, uri)) path = getPathFromDocumentUri(context, uri);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && DocumentsContract.isDocumentUri(context, uri)) path = getPathFromDocumentUri(context, uri);
         else if (ContentResolver.SCHEME_CONTENT.equals(uri.getScheme())) path = getDataColumn(context, uri);
         else if (ContentResolver.SCHEME_FILE.equalsIgnoreCase(uri.getScheme())) path = uri.getPath();
         return path != null ? path : createFileFromUri(context, uri).getAbsolutePath();
     }
 
     private static String getPathFromDocumentUri(Context context, Uri uri) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) return null;
         String docId = DocumentsContract.getDocumentId(uri);
         String[] split = docId.split(":");
         if (isExternalStorageDocument(uri)) return getPath(docId, split);
@@ -103,7 +104,7 @@ public class FileChooser {
     private static File createFileFromUri(Context context, Uri uri) {
         String[] projection = {MediaStore.MediaColumns.DISPLAY_NAME};
         Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
-        try (cursor) {
+        try {
             if (cursor == null || !cursor.moveToFirst()) return null;
             InputStream is = context.getContentResolver().openInputStream(uri);
             if (is == null) return null;
@@ -124,7 +125,7 @@ public class FileChooser {
     private static String getDataColumn(Context context, Uri uri) {
         String[] projection = {MediaStore.MediaColumns.DATA};
         Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
-        try (cursor) {
+        try {
             if (cursor == null || !cursor.moveToFirst()) return null;
             return cursor.getString(cursor.getColumnIndexOrThrow(projection[0]));
         } catch (Exception e) {
@@ -135,7 +136,7 @@ public class FileChooser {
     private static String getNameColumn(Context context, Uri uri) {
         String[] projection = {MediaStore.MediaColumns.DISPLAY_NAME};
         Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
-        try (cursor) {
+        try {
             if (cursor == null || !cursor.moveToFirst()) return null;
             return cursor.getString(cursor.getColumnIndexOrThrow(projection[0]));
         } catch (Exception e) {
