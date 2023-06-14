@@ -6,11 +6,14 @@ import com.hiker.drpy.method.Global;
 import com.hiker.drpy.method.Local;
 import com.whl.quickjs.android.QuickJSLoader;
 import com.whl.quickjs.wrapper.JSArray;
+import com.whl.quickjs.wrapper.JSFunction;
 import com.whl.quickjs.wrapper.JSObject;
 import com.whl.quickjs.wrapper.QuickJSContext;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -23,6 +26,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
     private ExecutorService executor;
     private QuickJSContext ctx;
     private JSObject jsObject;
+    private Timer timer;
     private String key;
     private String api;
 
@@ -30,8 +34,9 @@ public class Spider extends com.github.catvod.crawler.Spider {
     }
 
     public Spider(String api) {
-        this.executor = Executors.newSingleThreadExecutor();
         this.key = "__" + UUID.randomUUID().toString().replace("-", "") + "__";
+        this.executor = Executors.newSingleThreadExecutor();
+        this.timer = new Timer("timer");
         this.api = api;
     }
 
@@ -104,6 +109,28 @@ public class Spider extends com.github.catvod.crawler.Spider {
         Global.create(ctx).setProperty();
         QuickJSLoader.initConsoleLog(ctx);
         ctx.getGlobalObject().setProperty("local", Local.class);
+        setTimeout();
+    }
+
+    private void setTimeout() {
+        ctx.getGlobalObject().setProperty("setTimeout", args -> {
+            int delay = args.length > 1 ? (int) args[1] : 0;
+            JSFunction func = (JSFunction) args[0];
+            func.hold();
+            schedule(func, delay);
+            return null;
+        });
+    }
+
+    private void schedule(JSFunction func, int delay) {
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                executor.submit(() -> {
+                    func.call();
+                });
+            }
+        }, delay);
     }
 
     private String getContent(Context context) {
