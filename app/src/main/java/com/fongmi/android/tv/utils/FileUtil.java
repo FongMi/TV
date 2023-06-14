@@ -44,6 +44,14 @@ public class FileUtil {
         return new File(getRootPath() + File.separator + path);
     }
 
+    public static File getFilesDir() {
+        return App.get().getFilesDir();
+    }
+
+    public static File getFilesFile(String fileName) {
+        return new File(getFilesDir(), fileName);
+    }
+
     public static File getCacheDir() {
         return App.get().getCacheDir();
     }
@@ -65,7 +73,7 @@ public class FileUtil {
     }
 
     public static File getWall(int index) {
-        return getCacheFile("wallpaper_" + index);
+        return getFilesFile("wallpaper_" + index);
     }
 
     public static File getLocal(String path) {
