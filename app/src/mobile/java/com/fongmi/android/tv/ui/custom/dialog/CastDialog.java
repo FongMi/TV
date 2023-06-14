@@ -131,8 +131,8 @@ public class CastDialog extends BaseDialog implements DeviceAdapter.OnClickListe
     }
 
     private void onRefresh(boolean clear) {
+        if (fm) ScanTask.create(this).start(adapter.getIps());
         DLNACastManager.getInstance().search(null, 15);
-        ScanTask.create(this).start(adapter.getIps());
         if (clear) adapter.clear();
     }
 
