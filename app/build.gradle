@@ -22,8 +22,8 @@ android {
     productFlavors {
         leanback {
             dimension "default"
-            versionCode 81
-            versionName "1.8.1"
+            versionCode 82
+            versionName "1.8.2"
         }
     }
 

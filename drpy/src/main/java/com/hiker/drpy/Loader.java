@@ -16,7 +16,7 @@ public class Loader {
         }
     }
 
-    public void init(Context context) {
+    public static void init(Context context) {
         JSModule.setModuleLoader(new JSModule.ModuleLoader() {
             @Override
             public String convertModuleName(String moduleBaseName, String moduleName) {
