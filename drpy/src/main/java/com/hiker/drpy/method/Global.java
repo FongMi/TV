@@ -67,7 +67,7 @@ public class Global {
 
     @Keep
     @JSMethod
-    public JSObject setTimeout(JSFunction func, int delay) {
+    public Object setTimeout(JSFunction func, int delay) {
         func.hold();
         schedule(func, delay);
         return null;
