@@ -22,7 +22,7 @@ public class JsLoader {
 
     private void init() {
         try {
-            new Loader().init(App.get());
+            Loader.init(App.get());
         } catch (Throwable e) {
             e.printStackTrace();
         }
