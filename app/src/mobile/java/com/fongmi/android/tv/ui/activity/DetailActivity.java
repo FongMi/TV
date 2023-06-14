@@ -241,8 +241,8 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mBinding.actor.setOnClickListener(view -> onActor());
         mBinding.content.setOnClickListener(view -> onContent());
         mBinding.reverse.setOnClickListener(view -> onReverse());
-        mBinding.control.back.setOnClickListener(view -> onFull());
         mBinding.control.cast.setOnClickListener(view -> onCast());
+        mBinding.control.back.setOnClickListener(view -> onFull());
         mBinding.control.full.setOnClickListener(view -> onFull());
         mBinding.control.keep.setOnClickListener(view -> onKeep());
         mBinding.control.lock.setOnClickListener(view -> onLock());
@@ -475,13 +475,13 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         reverseEpisode(false);
     }
 
+    private void onCast() {
+        CastDialog.create().history(mHistory).video(CastVideo.get(getName(), getUrl())).fm(true).show(this);
+    }
+
     private void onFull() {
         setR1Callback();
         toggleFullscreen();
-    }
-
-    private void onCast() {
-        CastDialog.create().history(mHistory).video(CastVideo.get(getName(), getUrl())).show(this);
     }
 
     private void onKeep() {
@@ -728,13 +728,13 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     private void showControl() {
         mBinding.control.setting.setVisibility(mHistory == null || isFullscreen() ? View.GONE : View.VISIBLE);
-        mBinding.control.share.setVisibility(getUrl() == null || isFullscreen() ? View.GONE : View.VISIBLE);
-        mBinding.control.cast.setVisibility(getUrl() == null || isFullscreen() ? View.GONE : View.VISIBLE);
         mBinding.control.keep.setVisibility(mHistory == null || isFullscreen() ? View.GONE : View.VISIBLE);
         mBinding.control.parse.setVisibility(isFullscreen() && isUseParse() ? View.VISIBLE : View.GONE);
         mBinding.control.rotate.setVisibility(isFullscreen() && !isLock() ? View.VISIBLE : View.GONE);
         mBinding.control.back.setVisibility(isFullscreen() && !isLock() ? View.VISIBLE : View.GONE);
         mBinding.control.action.getRoot().setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
+        mBinding.control.share.setVisibility(getUrl() == null ? View.GONE : View.VISIBLE);
+        mBinding.control.cast.setVisibility(getUrl() == null ? View.GONE : View.VISIBLE);
         mBinding.control.lock.setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
         mBinding.control.center.setVisibility(isLock() ? View.GONE : View.VISIBLE);
         mBinding.control.bottom.setVisibility(isLock() ? View.GONE : View.VISIBLE);
