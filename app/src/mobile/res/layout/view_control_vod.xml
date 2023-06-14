@@ -49,8 +49,9 @@
                 android:id="@+id/cast"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
+                android:layout_marginEnd="8dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="4dp"
                 android:src="@drawable/ic_control_cast" />
 
             <ImageView
@@ -58,15 +59,17 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="4dp"
                 android:src="@drawable/ic_control_share" />
 
             <ImageView
                 android:id="@+id/keep"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="4dp"
                 android:src="@drawable/ic_control_keep_off" />
 
             <ImageView
@@ -74,6 +77,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="4dp"
                 android:src="@drawable/ic_control_setting" />
 
         </LinearLayout>
@@ -144,7 +148,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
-        android:layout_marginEnd="24dp"
+        android:layout_marginEnd="16dp"
         android:gravity="center"
         android:orientation="vertical">
 
