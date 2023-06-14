@@ -49,6 +49,11 @@
       "name": "JSON",
       "type": 1,
       "url": "https://github.com/live.json"
+    },
+    {
+      "name": "Proxy",
+      "type": 2,
+      "url": "proxy://do=live&type=today"
     }
   ]
 }
