@@ -222,7 +222,6 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     private void getLive() {
         mPlayers.setPlayer(getPlayerType());
         mViewModel.getLive(getHome());
-        TVBus.get().quit();
         setPlayerView();
         setDecodeView();
         showProgress();
@@ -883,7 +882,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mPlayers.release();
         Force.get().stop();
         ZLive.get().stop();
-        TVBus.get().quit();
+        TVBus.get().stop();
         App.removeCallbacks(mR1, mR2, mR3);
     }
 }
