@@ -216,7 +216,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private void getLive() {
         mPlayers.setPlayer(getPlayerType());
         mViewModel.getLive(getHome());
-        TVBus.get().quit();
         setPlayerView();
         setDecodeView();
         showProgress();
@@ -784,7 +783,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mPlayers.release();
         Force.get().stop();
         ZLive.get().stop();
-        TVBus.get().quit();
+        TVBus.get().stop();
         App.removeCallbacks(mR1, mR2, mR3, mR4);
     }
 }

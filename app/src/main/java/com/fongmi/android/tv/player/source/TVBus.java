@@ -48,16 +48,8 @@ public class TVBus implements Listener {
     }
 
     public void stop() {
-        if (hls == null) return;
-        tvcore.stop();
-        hls = null;
-    }
-
-    public void quit() {
-        if (tvcore == null) return;
-        tvcore.stop();
-        tvcore = null;
-        hls = null;
+        if (tvcore != null) tvcore.stop();
+        if (hls != null) hls = null;
     }
 
     @Override
