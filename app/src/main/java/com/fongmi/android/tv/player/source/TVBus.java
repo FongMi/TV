@@ -21,7 +21,7 @@ public class TVBus implements Listener {
     }
 
     private void init(Core core) {
-        tvcore = TVCore.get();
+        tvcore = new TVCore();
         tvcore.auth(core.getAuth()).broker(core.getBroker());
         tvcore.name(core.getName()).pass(core.getPass());
         tvcore.serv(0).play(8902).mode(1).listener(this);
