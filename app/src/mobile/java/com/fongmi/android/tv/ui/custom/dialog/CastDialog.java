@@ -1,6 +1,7 @@
 package com.fongmi.android.tv.ui.custom.dialog;
 
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -52,6 +53,7 @@ public class CastDialog extends BaseDialog implements DeviceAdapter.OnClickListe
     private DeviceAdapter adapter;
     private Listener listener;
     private CastVideo video;
+    private boolean fm;
 
     public static CastDialog create() {
         return new CastDialog();
@@ -76,6 +78,11 @@ public class CastDialog extends BaseDialog implements DeviceAdapter.OnClickListe
         return this;
     }
 
+    public CastDialog fm(boolean fm) {
+        this.fm = fm;
+        return this;
+    }
+
     public void show(FragmentActivity activity) {
         for (Fragment f : activity.getSupportFragmentManager().getFragments()) if (f instanceof BottomSheetDialogFragment) return;
         show(activity.getSupportFragmentManager(), null);
@@ -89,6 +96,7 @@ public class CastDialog extends BaseDialog implements DeviceAdapter.OnClickListe
 
     @Override
     protected void initView() {
+        binding.scan.setVisibility(fm ? View.VISIBLE : View.GONE);
         EventBus.getDefault().register(this);
         setRecyclerView();
         getDevice();
@@ -107,7 +115,7 @@ public class CastDialog extends BaseDialog implements DeviceAdapter.OnClickListe
     }
 
     private void getDevice() {
-        adapter.addAll(Device.getAll());
+        if (fm) adapter.addAll(Device.getAll());
         adapter.addAll(CastDevice.get().getAll());
         if (CastDevice.get().isEmpty()) App.post(() -> onRefresh(false), 1000);
     }
@@ -123,8 +131,8 @@ public class CastDialog extends BaseDialog implements DeviceAdapter.OnClickListe
     }
 
     private void onRefresh(boolean clear) {
+        if (fm) ScanTask.create(this).start(adapter.getIps());
         DLNACastManager.getInstance().search(null, 15);
-        ScanTask.create(this).start(adapter.getIps());
         if (clear) adapter.clear();
     }
 
