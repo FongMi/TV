@@ -7,6 +7,7 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.TypedValue;
@@ -37,6 +38,7 @@ import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Track;
 import com.fongmi.android.tv.bean.Vod;
+import com.fongmi.android.tv.cast.CastVideo;
 import com.fongmi.android.tv.databinding.ActivityDetailBinding;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.event.ErrorEvent;
@@ -54,11 +56,13 @@ import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.base.ViewType;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
+import com.fongmi.android.tv.ui.custom.dialog.CastDialog;
 import com.fongmi.android.tv.ui.custom.dialog.ControlDialog;
 import com.fongmi.android.tv.ui.custom.dialog.EpisodeGridDialog;
 import com.fongmi.android.tv.ui.custom.dialog.EpisodeListDialog;
 import com.fongmi.android.tv.ui.custom.dialog.TrackDialog;
 import com.fongmi.android.tv.utils.Clock;
+import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.PiP;
 import com.fongmi.android.tv.utils.Prefers;
@@ -80,7 +84,7 @@ import java.util.concurrent.Executors;
 
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class DetailActivity extends BaseActivity implements Clock.Callback, CustomKeyDownVod.Listener, PiPReceiver.Listener, TrackDialog.Listener, ControlDialog.Listener, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, ParseAdapter.OnClickListener {
+public class DetailActivity extends BaseActivity implements Clock.Callback, CustomKeyDownVod.Listener, CastDialog.Listener, PiPReceiver.Listener, TrackDialog.Listener, ControlDialog.Listener, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, ParseAdapter.OnClickListener {
 
     private ViewGroup.LayoutParams mFrameParams;
     private ActivityDetailBinding mBinding;
@@ -111,10 +115,18 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     private String url;
     private PiP mPiP;
 
-    public static void file(FragmentActivity activity, String url) {
-        String name = new File(url).getName();
-        if (Utils.hasPermission(activity)) start(activity, "push_agent", "file://" + url, name);
-        else PermissionX.init(activity).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> start(activity, "push_agent", "file://" + url, name));
+    public static void push(FragmentActivity activity, Uri uri) {
+        if (uri.getScheme().startsWith("smb") || uri.getScheme().startsWith("http")) {
+            push(activity, uri.toString());
+        } else {
+            file(activity, FileChooser.getPathFromUri(activity, uri));
+        }
+    }
+
+    public static void file(FragmentActivity activity, String path) {
+        String name = new File(path).getName();
+        if (Utils.hasPermission(activity)) start(activity, "push_agent", "file://" + path, name);
+        else PermissionX.init(activity).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> start(activity, "push_agent", "file://" + path, name));
     }
 
     public static void cast(Activity activity, History history) {
@@ -229,6 +241,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mBinding.actor.setOnClickListener(view -> onActor());
         mBinding.content.setOnClickListener(view -> onContent());
         mBinding.reverse.setOnClickListener(view -> onReverse());
+        mBinding.control.cast.setOnClickListener(view -> onCast());
         mBinding.control.back.setOnClickListener(view -> onFull());
         mBinding.control.full.setOnClickListener(view -> onFull());
         mBinding.control.keep.setOnClickListener(view -> onKeep());
@@ -460,6 +473,10 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     private void onReverse() {
         mHistory.setRevSort(!mHistory.isRevSort());
         reverseEpisode(false);
+    }
+
+    private void onCast() {
+        CastDialog.create().history(mHistory).video(CastVideo.get(getName(), getUrl())).fm(true).show(this);
     }
 
     private void onFull() {
@@ -711,12 +728,13 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     private void showControl() {
         mBinding.control.setting.setVisibility(mHistory == null || isFullscreen() ? View.GONE : View.VISIBLE);
-        mBinding.control.share.setVisibility(getUrl() == null || isFullscreen() ? View.GONE : View.VISIBLE);
         mBinding.control.keep.setVisibility(mHistory == null || isFullscreen() ? View.GONE : View.VISIBLE);
         mBinding.control.parse.setVisibility(isFullscreen() && isUseParse() ? View.VISIBLE : View.GONE);
         mBinding.control.rotate.setVisibility(isFullscreen() && !isLock() ? View.VISIBLE : View.GONE);
         mBinding.control.back.setVisibility(isFullscreen() && !isLock() ? View.VISIBLE : View.GONE);
         mBinding.control.action.getRoot().setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
+        mBinding.control.share.setVisibility(getUrl() == null ? View.GONE : View.VISIBLE);
+        mBinding.control.cast.setVisibility(getUrl() == null ? View.GONE : View.VISIBLE);
         mBinding.control.lock.setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
         mBinding.control.center.setVisibility(isLock() ? View.GONE : View.VISIBLE);
         mBinding.control.bottom.setVisibility(isLock() ? View.GONE : View.VISIBLE);
@@ -1086,6 +1104,12 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     private void notifyItemChanged(RecyclerView.Adapter<?> adapter) {
         adapter.notifyItemRangeChanged(0, adapter.getItemCount());
+    }
+
+    @Override
+    public void onCastTo() {
+        checkPlayImg(false);
+        mPlayers.pause();
     }
 
     @Override

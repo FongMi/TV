@@ -47,7 +47,7 @@ public class LiveViewModel extends ViewModel {
         while (iterator.hasNext()) if (iterator.next().isEmpty()) iterator.remove();
     }
 
-    public void getUrl(Channel item) {
+    public void fetch(Channel item) {
         execute(CHANNEL, () -> {
             TVBus.get().stop();
             String url = item.getCurrent().split("\\$")[0];

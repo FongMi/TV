@@ -3,7 +3,6 @@ package com.fongmi.android.tv.bean;
 import android.net.Uri;
 import android.text.TextUtils;
 
-import com.fongmi.android.tv.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
@@ -152,7 +151,7 @@ public class Live {
     }
 
     private void setProxy() {
-        this.url = Utils.checkProxy(getChannels().get(0).getUrls().get(0));
+        this.url = getChannels().get(0).getUrls().get(0);
         this.name = getChannels().get(0).getName();
         this.type = 2;
     }

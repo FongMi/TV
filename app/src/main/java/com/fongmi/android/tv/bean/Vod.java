@@ -216,6 +216,7 @@ public class Vod {
         private List<Episode> episodes;
 
         private boolean activated;
+        private int position;
 
         public Flag() {
             this.episodes = new ArrayList<>();
@@ -225,6 +226,7 @@ public class Vod {
             this.episodes = new ArrayList<>();
             this.show = Trans.s2t(flag);
             this.flag = flag;
+            this.position = -1;
         }
 
         public String getShow() {
@@ -252,6 +254,14 @@ public class Vod {
             if (activated) item.episodes = episodes;
         }
 
+        public int getPosition() {
+            return position;
+        }
+
+        public void setPosition(int position) {
+            this.position = position;
+        }
+
         public void createEpisode(String data) {
             String[] urls = data.contains("#") ? data.split("#") : new String[]{data};
             for (int i = 0; i < urls.length; i++) {
@@ -263,8 +273,13 @@ public class Vod {
         }
 
         public void toggle(boolean activated, Episode episode) {
-            if (activated) for (Episode item : getEpisodes()) item.setActivated(episode);
+            if (activated) setActivated(episode);
             else for (Episode item : getEpisodes()) item.deactivated();
+        }
+
+        private void setActivated(Episode episode) {
+            setPosition(getEpisodes().indexOf(episode));
+            for (int i = 0; i < getEpisodes().size(); i++) getEpisodes().get(i).setActivated(i == getPosition());
         }
 
         public Episode find(String remarks) {
@@ -274,7 +289,7 @@ public class Vod {
             for (Vod.Flag.Episode item : getEpisodes()) if (item.rule2(number)) return item;
             for (Vod.Flag.Episode item : getEpisodes()) if (item.rule3(remarks)) return item;
             for (Vod.Flag.Episode item : getEpisodes()) if (item.rule4(remarks)) return item;
-            return null;
+            return getPosition() != -1 ? getEpisodes().get(getPosition()) : null;
         }
 
         @Override
@@ -338,8 +353,8 @@ public class Vod {
                 this.activated = false;
             }
 
-            private void setActivated(Episode item) {
-                this.activated = item.equals(this);
+            public void setActivated(boolean activated) {
+                this.activated = activated;
             }
 
             public boolean rule1(String name) {
