@@ -6,17 +6,8 @@ public class TVCore {
 
     private long handle;
 
-    private static class Loader {
-        static volatile TVCore INSTANCE = new TVCore();
-    }
-
-    public static TVCore get() {
-        return Loader.INSTANCE;
-    }
-
     public TVCore() {
         try {
-            PmsHook.inject();
             System.loadLibrary("tvcore");
             handle = initialise();
         } catch (Throwable ignored) {
