@@ -29,7 +29,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import fi.iki.elonen.NanoHTTPD;
-import okhttp3.Headers;
 
 public class Nano extends NanoHTTPD {
 
@@ -123,7 +122,7 @@ public class Nano extends NanoHTTPD {
     private Response doM3u8(IHTTPSession session) {
         try {
             String url = session.getParms().get("url");
-            String result = M3U8.get(url, Headers.of(session.getHeaders()));
+            String result = M3U8.get(url, session.getHeaders());
             for (String ad : Sniffer.getAdsRegex(Uri.parse(url))) result = result.replaceAll(ad, "");
             return newFixedLengthResponse(Response.Status.OK, NanoHTTPD.MIME_PLAINTEXT, result);
         } catch (Exception e) {
