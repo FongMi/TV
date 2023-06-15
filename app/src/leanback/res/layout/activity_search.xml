@@ -66,7 +66,7 @@
             android:background="@null"
             android:hint="@string/search_keyword"
             android:imeOptions="actionDone"
-            android:inputType="textCapCharacters|textAutoCorrect|textAutoComplete"
+            android:inputType="textCapWords|textAutoCorrect|textAutoComplete"
             android:letterSpacing="0.02"
             android:maxLength="255"
             android:nextFocusRight="@id/word"
