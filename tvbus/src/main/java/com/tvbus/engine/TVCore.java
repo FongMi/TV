@@ -15,59 +15,75 @@ public class TVCore {
         }
     }
 
-    public void listener(Listener listener) {
+    public TVCore listener(Listener listener) {
         try {
             setListener(handle, listener);
+            return this;
         } catch (Throwable ignored) {
+            return this;
         }
     }
 
-    public void play(int port) {
+    public TVCore play(int port) {
         try {
             setPlayPort(handle, port);
+            return this;
         } catch (Throwable ignored) {
+            return this;
         }
     }
 
-    public void serv(int port) {
+    public TVCore serv(int port) {
         try {
             setServPort(handle, port);
+            return this;
         } catch (Throwable ignored) {
+            return this;
         }
     }
 
-    public void mode(int mode) {
+    public TVCore mode(int mode) {
         try {
             setRunningMode(handle, mode);
+            return this;
         } catch (Throwable ignored) {
+            return this;
         }
     }
 
-    public void auth(String str) {
+    public TVCore auth(String str) {
         try {
-            setAuthUrl(handle, str);
+            if (str.length() > 0) setAuthUrl(handle, str);
+            return this;
         } catch (Throwable ignored) {
+            return this;
         }
     }
 
-    public void broker(String str) {
+    public TVCore broker(String str) {
         try {
-            setMKBroker(handle, str);
+            if (str.length() > 0) setMKBroker(handle, str);
+            return this;
         } catch (Throwable ignored) {
+            return this;
         }
     }
 
-    public void name(String str) {
+    public TVCore name(String str) {
         try {
-            setUsername(handle, str);
+            if (str.length() > 0) setUsername(handle, str);
+            return this;
         } catch (Throwable ignored) {
+            return this;
         }
     }
 
-    public void pass(String str) {
+    public TVCore pass(String str) {
         try {
-            setPassword(handle, str);
+            if (str.length() > 0) setPassword(handle, str);
+            return this;
         } catch (Throwable ignored) {
+            return this;
         }
     }
 

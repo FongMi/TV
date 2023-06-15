@@ -9,6 +9,7 @@ import com.github.catvod.net.OkHttp;
 import com.google.gson.Gson;
 import com.hiker.drpy.Parser;
 import com.whl.quickjs.wrapper.JSArray;
+import com.whl.quickjs.wrapper.JSFunction;
 import com.whl.quickjs.wrapper.JSMethod;
 import com.whl.quickjs.wrapper.JSObject;
 import com.whl.quickjs.wrapper.QuickJSContext;
@@ -18,6 +19,9 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
@@ -30,16 +34,20 @@ import okhttp3.Response;
 
 public class Global {
 
+    private final ExecutorService executor;
     private final QuickJSContext ctx;
     private final Parser parser;
+    private final Timer timer;
     private final Gson gson;
 
-    public static Global create(QuickJSContext jsContext) {
-        return new Global(jsContext);
+    public static Global create(QuickJSContext ctx, ExecutorService executor) {
+        return new Global(ctx, executor);
     }
 
-    private Global(QuickJSContext ctx) {
+    private Global(QuickJSContext ctx, ExecutorService executor) {
         this.parser = new Parser();
+        this.executor = executor;
+        this.timer = new Timer();
         this.gson = new Gson();
         this.ctx = ctx;
     }
@@ -55,6 +63,14 @@ public class Global {
                 }
             });
         }
+    }
+
+    @Keep
+    @JSMethod
+    public Object setTimeout(JSFunction func, int delay) {
+        func.hold();
+        schedule(func, delay);
+        return null;
     }
 
     @Keep
@@ -127,6 +143,17 @@ public class Global {
         } catch (Exception e) {
             return "";
         }
+    }
+
+    private void schedule(JSFunction func, int delay) {
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                executor.submit(() -> {
+                    func.call();
+                });
+            }
+        }, delay);
     }
 
     private Call call(String url, JSONObject object, Headers headers) {
