@@ -21,7 +21,7 @@ public class TVBus implements Listener {
     }
 
     private void init(Core core) {
-        tvcore = new TVCore();
+        tvcore = TVCore.get();
         tvcore.auth(core.getAuth()).broker(core.getBroker());
         tvcore.name(core.getName()).pass(core.getPass());
         tvcore.serv(0).play(8902).mode(1).listener(this);
@@ -48,14 +48,16 @@ public class TVBus implements Listener {
     }
 
     public void stop() {
-        if (tvcore == null) return;
+        if (hls == null) return;
         tvcore.stop();
+        hls = null;
     }
 
     public void quit() {
         if (tvcore == null) return;
-        tvcore.quit();
+        tvcore.stop();
         tvcore = null;
+        hls = null;
     }
 
     @Override

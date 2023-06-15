@@ -62,11 +62,11 @@ public class PmsHook implements InvocationHandler {
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if (!method.getName().equals("getPackageInfo")) return method.invoke(base, args);
         String pkg = (String) args[0];
-        int flag = (Integer) args[1];
-        if (flag != 64 || !name.equals(pkg)) return method.invoke(base, args);
+        Number flag = (Number) args[1];
+        if (flag.intValue() != 64 || !name.equals(pkg)) return method.invoke(base, args);
         PackageInfo info = (PackageInfo) method.invoke(base, args);
-        info.signatures = new Signature[this.sign.length];
-        for (int i = 0; i < info.signatures.length; i++) info.signatures[i] = new Signature(this.sign[i]);
+        info.signatures = new Signature[sign.length];
+        for (int i = 0; i < info.signatures.length; i++) info.signatures[i] = new Signature(sign[i]);
         return info;
     }
 }
