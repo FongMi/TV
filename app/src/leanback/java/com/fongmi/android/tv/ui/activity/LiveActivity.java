@@ -216,6 +216,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private void getLive() {
         mPlayers.setPlayer(getPlayerType());
         mViewModel.getLive(getHome());
+        TVBus.get().quit();
         setPlayerView();
         setDecodeView();
         showProgress();
