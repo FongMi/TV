@@ -1,7 +1,6 @@
 package com.fongmi.android.tv;
 
 import android.app.Activity;
-import android.app.Application;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
