@@ -2,6 +2,8 @@ package com.hiker.drpy;
 
 import android.text.TextUtils;
 
+import androidx.media3.common.util.UriUtil;
+
 import com.hiker.drpy.bean.Cache;
 import com.hiker.drpy.bean.Info;
 
@@ -9,7 +11,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -97,8 +98,7 @@ public class Parser {
 
     public String joinUrl(String parent, String child) {
         try {
-            if (TextUtils.isEmpty(parent)) return child;
-            return new URL(new URL(parent), child).toString();
+            return UriUtil.resolve(parent, child);
         } catch (Throwable e) {
             return "";
         }
