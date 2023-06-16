@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.ItemBridgeAdapter;
@@ -73,6 +74,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -107,7 +109,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private boolean autoMode;
     private boolean useParse;
     private int currentFlag;
-    private int toggleCount;
     private Runnable mR1;
     private Runnable mR2;
 
@@ -756,7 +757,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                List<String> items = List.of(source);
+                List<String> items = Arrays.asList(source);
                 App.post(() -> mPartAdapter.setItems(items, null));
             }
         });
@@ -803,7 +804,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void checkKeep() {
-        mBinding.keep.setCompoundDrawablesRelativeWithIntrinsicBounds(Keep.find(getHistoryKey()) == null ? R.drawable.ic_detail_keep_off : R.drawable.ic_detail_keep_on, 0, 0, 0);
+        mBinding.keep.setCompoundDrawablesWithIntrinsicBounds(ResourcesCompat.getDrawable(getResources(), Keep.find(getHistoryKey()) == null ? R.drawable.ic_detail_keep_off : R.drawable.ic_detail_keep_on, getTheme()), null, null, null);
     }
 
     private void createKeep() {
@@ -848,7 +849,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
                 break;
             case Player.STATE_READY:
                 stopSearch();
-                resetToggle();
                 hideProgress();
                 mPlayers.reset();
                 setDefaultTrack();
@@ -891,24 +891,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onErrorEvent(ErrorEvent event) {
-        if (!event.isRetry() || mPlayers.addRetry() > 3) checkError(event);
+        if (!event.isRetry() || mPlayers.addRetry() > 3) onError(event);
         else onRefresh();
-    }
-
-    private void checkError(ErrorEvent event) {
-        if (getSite().getPlayerType() == -1 && event.isFormat() && getToggleCount() < 3) {
-            toggleCount++;
-            nextPlayer();
-        } else {
-            resetToggle();
-            onError(event);
-        }
-    }
-
-    private void nextPlayer() {
-        mPlayers.togglePlayer();
-        setPlayerView();
-        onRefresh();
     }
 
     private void onError(ErrorEvent event) {
@@ -1080,14 +1064,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     public void setCurrentFlag(int currentFlag) {
         this.currentFlag = currentFlag;
-    }
-
-    public int getToggleCount() {
-        return toggleCount;
-    }
-
-    public void resetToggle() {
-        this.toggleCount = 0;
     }
 
     @Override
