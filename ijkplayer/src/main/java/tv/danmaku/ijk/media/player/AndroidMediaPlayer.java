@@ -29,6 +29,7 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -103,7 +104,11 @@ public class AndroidMediaPlayer extends AbstractMediaPlayer implements MediaPlay
 
     @Override
     public List<ITrackInfo> getTrackInfo() {
-        return AndroidTrackInfo.fromMediaPlayer(mMediaPlayer);
+        try {
+            return AndroidTrackInfo.fromMediaPlayer(mMediaPlayer);
+        } catch (Exception e) {
+            return Collections.emptyList();
+        }
     }
 
     @Override
