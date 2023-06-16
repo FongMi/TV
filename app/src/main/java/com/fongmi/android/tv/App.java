@@ -17,7 +17,6 @@ import com.fongmi.android.tv.utils.Prefers;
 import com.github.catvod.bean.Doh;
 import com.github.catvod.net.OkHttp;
 import com.google.gson.Gson;
-import com.tvbus.engine.PmsHook;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -80,10 +79,8 @@ public class App extends MultiDexApplication {
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
         MultiDex.install(this);
-        PmsHook.inject(base);
     }
 
-    @Override
     public void onCreate() {
         super.onCreate();
         OkHttp.get().setDoh(this, Doh.objectFrom(Prefers.getDoh()));

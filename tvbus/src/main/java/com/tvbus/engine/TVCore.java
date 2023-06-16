@@ -8,6 +8,7 @@ public class TVCore {
 
     public TVCore() {
         try {
+            PmsHook.inject();
             System.loadLibrary("tvcore");
             handle = initialise();
         } catch (Throwable ignored) {

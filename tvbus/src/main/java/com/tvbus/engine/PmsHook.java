@@ -19,11 +19,17 @@ public class PmsHook implements InvocationHandler {
     private String name;
     private Object base;
 
-    public static void inject(Context context) {
-        new PmsHook().hook(context);
+    public static void inject() {
+        new PmsHook().hook();
     }
 
-    private void hook(Context context) {
+    private Context getCtx() throws Throwable {
+        Class<?> activityThreadClass = Class.forName("android.app.ActivityThread");
+        Method method = activityThreadClass.getMethod("currentApplication");
+        return (Context) method.invoke(null);
+    }
+
+    private void hook() {
         try {
             Class<?> activityThreadClass = Class.forName("android.app.ActivityThread");
             Class<?> iPackageManagerInterface = Class.forName("android.content.pm.IPackageManager");
@@ -31,6 +37,7 @@ public class PmsHook implements InvocationHandler {
             Field sPackageManagerField = activityThreadClass.getDeclaredField("sPackageManager");
             Object currentActivityThread = currentActivityThreadMethod.invoke(null);
             sPackageManagerField.setAccessible(true);
+            Context context = getCtx();
             this.sign = getSign(context);
             this.name = context.getPackageName();
             this.base = sPackageManagerField.get(currentActivityThread);
