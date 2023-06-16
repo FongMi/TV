@@ -89,7 +89,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     private Runnable mR1;
     private Runnable mR2;
     private Runnable mR3;
-    private int startPlayer;
+    private int toggleCount;
     private boolean rotate;
     private boolean stop;
     private boolean lock;
@@ -149,7 +149,6 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mR2 = this::setTraffic;
         mR3 = this::hideInfo;
         mPiP = new PiP();
-        setStartPlayer(-1);
         setRecyclerView();
         setVideoView();
         setViewModel();
@@ -575,11 +574,11 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
                 break;
             case Player.STATE_READY:
                 checkRotate();
+                resetToggle();
                 hideProgress();
                 mPlayers.reset();
                 setSpeedVisible();
                 setTrackVisible(true);
-                setStartPlayer(mPlayers.getPlayer());
                 mPiP.update(this, mPlayers.isPlaying());
                 mBinding.control.size.setText(mPlayers.getSizeText());
                 if (isVisible(mBinding.control.getRoot())) showControl();
@@ -614,9 +613,11 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private void checkError(ErrorEvent event) {
-        if (event.isFormat() && getStartPlayer() != mPlayers.getPlayer()) {
+        if (event.isFormat() && getToggleCount() < 3) {
+            toggleCount++;
             onPlayer();
         } else {
+            resetToggle();
             onError(event);
         }
     }
@@ -729,12 +730,12 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         this.url = url;
     }
 
-    public int getStartPlayer() {
-        return startPlayer;
+    public int getToggleCount() {
+        return toggleCount;
     }
 
-    public void setStartPlayer(int startPlayer) {
-        this.startPlayer = startPlayer;
+    public void resetToggle() {
+        this.toggleCount = 0;
     }
 
     @Override

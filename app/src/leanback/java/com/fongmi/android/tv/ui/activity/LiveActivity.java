@@ -89,7 +89,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private Runnable mR3;
     private Runnable mR4;
     private boolean confirm;
-    private int startPlayer;
+    private int toggleCount;
     private int count;
 
     public static void start(Activity activity) {
@@ -138,7 +138,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mKeyDown = CustomKeyDownLive.create(this);
         mFormatDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         mFormatTime = new SimpleDateFormat("yyyy-MM-ddHH:mm", Locale.getDefault());
-        setStartPlayer(-1);
         setRecyclerView();
         setVideoView();
         setViewModel();
@@ -550,11 +549,11 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
                 showProgress();
                 break;
             case Player.STATE_READY:
+                resetToggle();
                 hideProgress();
                 mPlayers.reset();
                 setSpeedVisible();
                 setTrackVisible(true);
-                setStartPlayer(mPlayers.getPlayer());
                 break;
             case Player.STATE_ENDED:
                 nextChannel();
@@ -579,9 +578,11 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void checkError(ErrorEvent event) {
-        if (event.isFormat() && getStartPlayer() != mPlayers.getPlayer()) {
+        if (event.isFormat() && getToggleCount() < 3) {
+            toggleCount++;
             onPlayer();
         } else {
+            resetToggle();
             onError(event);
         }
     }
@@ -645,12 +646,12 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         App.post(() -> confirm = false, 2000);
     }
 
-    public int getStartPlayer() {
-        return startPlayer;
+    public int getToggleCount() {
+        return toggleCount;
     }
 
-    public void setStartPlayer(int startPlayer) {
-        this.startPlayer = startPlayer;
+    public void resetToggle() {
+        this.toggleCount = 0;
     }
 
     @Override

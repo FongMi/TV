@@ -109,7 +109,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     private boolean rotate;
     private boolean stop;
     private boolean lock;
-    private int startPlayer;
+    private int toggleCount;
     private Runnable mR1;
     private Runnable mR2;
     private Runnable mR3;
@@ -227,7 +227,6 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mR2 = this::setTraffic;
         mR3 = this::setOrient;
         mPiP = new PiP();
-        setStartPlayer(-1);
         setRecyclerView();
         setVideoView();
         setViewModel();
@@ -866,12 +865,12 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
             case Player.STATE_READY:
                 stopSearch();
                 checkRotate();
+                resetToggle();
                 hideProgress();
                 mPlayers.reset();
                 setDefaultTrack();
                 setTrackVisible(true);
                 checkPlayImg(mPlayers.isPlaying());
-                setStartPlayer(mPlayers.getPlayer());
                 mHistory.setPlayer(mPlayers.getPlayer());
                 mBinding.control.size.setText(mPlayers.getSizeText());
                 if (isVisible(mBinding.control.getRoot())) showControl();
@@ -924,9 +923,11 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void checkError(ErrorEvent event) {
-        if (event.isFormat() && getStartPlayer() != mPlayers.getPlayer()) {
+        if (event.isFormat() && getToggleCount() < 3) {
+            toggleCount++;
             onPlayer();
         } else {
+            resetToggle();
             onError(event);
         }
     }
@@ -1113,12 +1114,12 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         this.url = url;
     }
 
-    public int getStartPlayer() {
-        return startPlayer;
+    public int getToggleCount() {
+        return toggleCount;
     }
 
-    public void setStartPlayer(int startPlayer) {
-        this.startPlayer = startPlayer;
+    public void resetToggle() {
+        this.toggleCount = 0;
     }
 
     private void notifyItemChanged(RecyclerView.Adapter<?> adapter) {
