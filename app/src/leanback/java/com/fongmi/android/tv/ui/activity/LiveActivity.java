@@ -578,13 +578,19 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void checkError(ErrorEvent event) {
-        if (event.isFormat() && getToggleCount() < 3) {
+        if (getHome().getPlayerType() == -1 && event.isFormat() && getToggleCount() < 3) {
             toggleCount++;
-            onPlayer();
+            nextPlayer();
         } else {
             resetToggle();
             onError(event);
         }
+    }
+
+    private void nextPlayer() {
+        mPlayers.togglePlayer();
+        setPlayerView();
+        fetch();
     }
 
     private void onError(ErrorEvent event) {

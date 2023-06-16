@@ -896,13 +896,19 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void checkError(ErrorEvent event) {
-        if (event.isFormat() && getToggleCount() < 3) {
+        if (getSite().getPlayerType() == -1 && event.isFormat() && getToggleCount() < 3) {
             toggleCount++;
-            onPlayer();
+            nextPlayer();
         } else {
             resetToggle();
             onError(event);
         }
+    }
+
+    private void nextPlayer() {
+        mPlayers.togglePlayer();
+        setPlayerView();
+        onRefresh();
     }
 
     private void onError(ErrorEvent event) {
