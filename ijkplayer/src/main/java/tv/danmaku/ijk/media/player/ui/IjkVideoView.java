@@ -14,7 +14,6 @@ import android.widget.MediaController;
 
 import androidx.annotation.NonNull;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -186,7 +185,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         try {
             mPlayer.reset();
             setOptions(uri);
-            fixUserAgent(headers);
             setRenderView(mCurrentRender);
             mAudioManager.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
             mPlayer.setDataSource(getContext(), uri, headers);
@@ -199,14 +197,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
             onError(mPlayer, MediaPlayer.MEDIA_ERROR_UNKNOWN, 0);
             mCurrentState = STATE_ERROR;
             mTargetState = STATE_ERROR;
-        }
-    }
-
-    private void fixUserAgent(Map<String, String> headers) {
-        for (String key : Arrays.asList(Utils.USER_AGENT, Utils.USER_AGENT.toLowerCase())) {
-            if (!headers.containsKey(key)) continue;
-            mPlayer.setOption(format, "user_agent", headers.get(key));
-            headers.remove(key);
         }
     }
 
