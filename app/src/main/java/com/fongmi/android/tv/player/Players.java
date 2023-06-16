@@ -400,7 +400,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     @Override
     public void onPlayerError(@NonNull PlaybackException error) {
         this.errorCode = error.errorCode;
-        ErrorEvent.format();
+        ErrorEvent.format(true);
     }
 
     @Override
@@ -433,7 +433,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     @Override
     public boolean onError(IMediaPlayer mp, int what, int extra) {
-        ErrorEvent.format();
+        ErrorEvent.format(false);
         return true;
     }
 
