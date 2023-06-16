@@ -89,7 +89,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private Runnable mR3;
     private Runnable mR4;
     private boolean confirm;
-    private int toggleCount;
     private int count;
 
     public static void start(Activity activity) {
@@ -549,7 +548,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
                 showProgress();
                 break;
             case Player.STATE_READY:
-                resetToggle();
                 hideProgress();
                 mPlayers.reset();
                 setSpeedVisible();
@@ -573,24 +571,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onErrorEvent(ErrorEvent event) {
-        if (!event.isRetry() || mPlayers.addRetry() > 3) checkError(event);
+        if (!event.isRetry() || mPlayers.addRetry() > 3) onError(event);
         else fetch();
-    }
-
-    private void checkError(ErrorEvent event) {
-        if (getHome().getPlayerType() == -1 && event.isFormat() && getToggleCount() < 3) {
-            toggleCount++;
-            nextPlayer();
-        } else {
-            resetToggle();
-            onError(event);
-        }
-    }
-
-    private void nextPlayer() {
-        mPlayers.togglePlayer();
-        setPlayerView();
-        fetch();
     }
 
     private void onError(ErrorEvent event) {
@@ -650,14 +632,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         confirm = true;
         Notify.show(R.string.app_exit);
         App.post(() -> confirm = false, 2000);
-    }
-
-    public int getToggleCount() {
-        return toggleCount;
-    }
-
-    public void resetToggle() {
-        this.toggleCount = 0;
     }
 
     @Override
