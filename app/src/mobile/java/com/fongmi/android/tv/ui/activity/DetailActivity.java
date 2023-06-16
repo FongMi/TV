@@ -109,6 +109,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     private boolean rotate;
     private boolean stop;
     private boolean lock;
+    private int startPlayer;
     private Runnable mR1;
     private Runnable mR2;
     private Runnable mR3;
@@ -226,6 +227,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mR2 = this::setTraffic;
         mR3 = this::setOrient;
         mPiP = new PiP();
+        setStartPlayer(-1);
         setRecyclerView();
         setVideoView();
         setViewModel();
@@ -606,7 +608,6 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     private void onPlayer() {
         mPlayers.togglePlayer();
         Prefers.putPlayer(mPlayers.getPlayer());
-        mHistory.setPlayer(mPlayers.getPlayer());
         setPlayerView();
         setR1Callback();
         onRefresh();
@@ -870,6 +871,8 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
                 setDefaultTrack();
                 setTrackVisible(true);
                 checkPlayImg(mPlayers.isPlaying());
+                setStartPlayer(mPlayers.getPlayer());
+                mHistory.setPlayer(mPlayers.getPlayer());
                 mBinding.control.size.setText(mPlayers.getSizeText());
                 if (isVisible(mBinding.control.getRoot())) showControl();
                 break;
@@ -916,8 +919,16 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onErrorEvent(ErrorEvent event) {
-        if (!event.isRetry() || mPlayers.addRetry() > 3) onError(event);
+        if (!event.isRetry() || mPlayers.addRetry() > 3) checkError(event);
         else onRefresh();
+    }
+
+    private void checkError(ErrorEvent event) {
+        if (event.isFormat() && getStartPlayer() != mPlayers.getPlayer()) {
+            onPlayer();
+        } else {
+            onError(event);
+        }
     }
 
     private void onError(ErrorEvent event) {
@@ -1100,6 +1111,14 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public int getStartPlayer() {
+        return startPlayer;
+    }
+
+    public void setStartPlayer(int startPlayer) {
+        this.startPlayer = startPlayer;
     }
 
     private void notifyItemChanged(RecyclerView.Adapter<?> adapter) {

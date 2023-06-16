@@ -89,6 +89,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     private Runnable mR1;
     private Runnable mR2;
     private Runnable mR3;
+    private int startPlayer;
     private boolean rotate;
     private boolean stop;
     private boolean lock;
@@ -148,6 +149,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mR2 = this::setTraffic;
         mR3 = this::hideInfo;
         mPiP = new PiP();
+        setStartPlayer(-1);
         setRecyclerView();
         setVideoView();
         setViewModel();
@@ -577,6 +579,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
                 mPlayers.reset();
                 setSpeedVisible();
                 setTrackVisible(true);
+                setStartPlayer(mPlayers.getPlayer());
                 mPiP.update(this, mPlayers.isPlaying());
                 mBinding.control.size.setText(mPlayers.getSizeText());
                 if (isVisible(mBinding.control.getRoot())) showControl();
@@ -606,8 +609,16 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onErrorEvent(ErrorEvent event) {
-        if (!event.isRetry() || mPlayers.addRetry() > 3) onError(event);
+        if (!event.isRetry() || mPlayers.addRetry() > 3) checkError(event);
         else fetch();
+    }
+
+    private void checkError(ErrorEvent event) {
+        if (event.isFormat() && getStartPlayer() != mPlayers.getPlayer()) {
+            onPlayer();
+        } else {
+            onError(event);
+        }
     }
 
     private void onError(ErrorEvent event) {
@@ -716,6 +727,14 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public int getStartPlayer() {
+        return startPlayer;
+    }
+
+    public void setStartPlayer(int startPlayer) {
+        this.startPlayer = startPlayer;
     }
 
     @Override
