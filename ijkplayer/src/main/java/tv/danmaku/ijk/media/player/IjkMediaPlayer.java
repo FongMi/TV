@@ -42,6 +42,7 @@ import java.lang.ref.WeakReference;
 import java.net.URLEncoder;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -55,6 +56,7 @@ import tv.danmaku.ijk.media.player.misc.IMediaDataSource;
 import tv.danmaku.ijk.media.player.misc.ITrackInfo;
 import tv.danmaku.ijk.media.player.misc.IjkTrackInfo;
 import tv.danmaku.ijk.media.player.pragma.DebugLog;
+import tv.danmaku.ijk.media.player.ui.Utils;
 
 /**
  * @author bbcallen
@@ -349,16 +351,19 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
      * @throws IllegalStateException if it is called in an invalid state
      */
     public void setDataSource(String path, Map<String, String> headers) throws IOException, IllegalArgumentException, SecurityException, IllegalStateException {
-        if (headers != null && !headers.isEmpty()) {
-            StringBuilder sb = new StringBuilder();
-            for (Map.Entry<String, String> entry : headers.entrySet()) {
-                sb.append(entry.getKey());
-                sb.append(":");
-                String value = entry.getValue();
-                if (!TextUtils.isEmpty(value)) sb.append(entry.getValue());
-                sb.append("\r\n");
-                setOption(OPT_CATEGORY_FORMAT, "headers", sb.toString());
-            }
+        for (String key : Arrays.asList(Utils.USER_AGENT, Utils.USER_AGENT.toLowerCase())) {
+            if (!headers.containsKey(key)) continue;
+            setOption(OPT_CATEGORY_FORMAT, "user_agent", headers.get(key));
+            headers.remove(key);
+        }
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, String> entry : headers.entrySet()) {
+            sb.append(entry.getKey());
+            sb.append(":");
+            String value = entry.getValue();
+            if (!TextUtils.isEmpty(value)) sb.append(entry.getValue());
+            sb.append("\r\n");
+            setOption(OPT_CATEGORY_FORMAT, "headers", sb.toString());
         }
         setDataSource(path);
     }
