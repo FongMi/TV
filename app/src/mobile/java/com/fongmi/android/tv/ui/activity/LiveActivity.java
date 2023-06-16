@@ -613,7 +613,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private void checkError(ErrorEvent event) {
-        if (event.isFormat() && getToggleCount() < 3) {
+        if (getHome().getPlayerType() == -1 && event.isFormat() && getToggleCount() < 3) {
             toggleCount++;
             onPlayer();
         } else {

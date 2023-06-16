@@ -923,7 +923,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void checkError(ErrorEvent event) {
-        if (event.isFormat() && getToggleCount() < 3) {
+        if (getSite().getPlayerType() == -1 && event.isFormat() && getToggleCount() < 3) {
             toggleCount++;
             onPlayer();
         } else {
