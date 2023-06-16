@@ -106,8 +106,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private boolean initAuto;
     private boolean autoMode;
     private boolean useParse;
-    private int startPlayer;
     private int currentFlag;
+    private int toggleCount;
     private Runnable mR1;
     private Runnable mR2;
 
@@ -234,7 +234,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBroken = new ArrayList<>();
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
-        setStartPlayer(-1);
         setRecyclerView();
         setVideoView();
         setViewModel();
@@ -849,11 +848,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
                 break;
             case Player.STATE_READY:
                 stopSearch();
+                resetToggle();
                 hideProgress();
                 mPlayers.reset();
                 setDefaultTrack();
                 setTrackVisible(true);
-                setStartPlayer(mPlayers.getPlayer());
                 mHistory.setPlayer(mPlayers.getPlayer());
                 mBinding.widget.size.setText(mPlayers.getSizeText());
                 break;
@@ -897,9 +896,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void checkError(ErrorEvent event) {
-        if (event.isFormat() && getStartPlayer() != mPlayers.getPlayer()) {
+        if (event.isFormat() && getToggleCount() < 3) {
+            toggleCount++;
             onPlayer();
         } else {
+            resetToggle();
             onError(event);
         }
     }
@@ -1067,20 +1068,20 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         this.useParse = useParse;
     }
 
-    public int getStartPlayer() {
-        return startPlayer;
-    }
-
-    public void setStartPlayer(int startPlayer) {
-        this.startPlayer = startPlayer;
-    }
-
     public int getCurrentFlag() {
         return currentFlag;
     }
 
     public void setCurrentFlag(int currentFlag) {
         this.currentFlag = currentFlag;
+    }
+
+    public int getToggleCount() {
+        return toggleCount;
+    }
+
+    public void resetToggle() {
+        this.toggleCount = 0;
     }
 
     @Override
