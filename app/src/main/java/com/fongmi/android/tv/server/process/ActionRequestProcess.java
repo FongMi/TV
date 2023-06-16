@@ -149,7 +149,7 @@ public class ActionRequestProcess implements RequestProcess {
         List<Config> configs = Config.arrayFrom(params.get("configs"));
         List<Keep> targets = Keep.arrayFrom(params.get("targets"));
         boolean replace = Objects.equals(params.get("mode"), "1");
-        if (ApiConfig.getUrl() == null && configs.size() > 0) {
+        if (ApiConfig.getUrl().isEmpty() && configs.size() > 0) {
             ApiConfig.load(Config.find(configs.get(0), 0), getCallback(configs, targets));
         } else {
             if (replace) Keep.deleteAll();
