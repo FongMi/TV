@@ -37,7 +37,8 @@ public class Config {
     private String parse;
 
     public static List<Config> arrayFrom(String str) {
-        Type listType = new TypeToken<List<Config>>() {}.getType();
+        Type listType = new TypeToken<List<Config>>() {
+        }.getType();
         List<Config> items = new Gson().fromJson(str, listType);
         return items == null ? Collections.emptyList() : items;
     }
@@ -148,6 +149,10 @@ public class Config {
         return this;
     }
 
+    public boolean isEmpty() {
+        return TextUtils.isEmpty(getUrl());
+    }
+
     public String getDesc() {
         if (!TextUtils.isEmpty(getName())) return getName();
         if (!TextUtils.isEmpty(getUrl())) return getUrl();
@@ -210,11 +215,13 @@ public class Config {
     }
 
     public Config insert() {
+        if (isEmpty()) return this;
         setId(Math.toIntExact(AppDatabase.get().getConfigDao().insert(this)));
         return this;
     }
 
     public Config update() {
+        if (isEmpty()) return this;
         setTime(System.currentTimeMillis());
         AppDatabase.get().getConfigDao().update(this);
         return this;

@@ -192,8 +192,10 @@ public class ApiConfig {
     }
 
     private void initLive(JsonObject object) {
-        boolean load = object.has("lives") && LiveConfig.get().isSame(config.getUrl());
-        if (load) LiveConfig.get().clear().config(Config.find(config, 1).update()).parse(object);
+        boolean live = object.has("lives");
+        boolean same = LiveConfig.get().isSame(config.getUrl());
+        if (live) Config.find(config, 1).update();
+        if (live && same) LiveConfig.get().clear().config(Config.find(config, 1)).parse(object);
         else LiveConfig.get().load();
     }
 
