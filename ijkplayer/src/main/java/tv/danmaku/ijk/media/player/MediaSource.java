@@ -2,7 +2,6 @@ package tv.danmaku.ijk.media.player;
 
 import android.net.Uri;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class MediaSource {
@@ -16,7 +15,7 @@ public class MediaSource {
     }
 
     public Map<String, String> getHeaders() {
-        return headers == null ? new HashMap<>() : headers;
+        return headers;
     }
 
     public Uri getUri() {
