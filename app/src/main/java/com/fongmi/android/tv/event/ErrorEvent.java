@@ -53,7 +53,7 @@ public class ErrorEvent {
     }
 
     public boolean isFormat() {
-        return getType() == Type.FORMAT;
+        return Type.FORMAT.equals(getType());
     }
 
     public String getMsg() {
