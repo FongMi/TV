@@ -97,13 +97,13 @@ public class ParseJob implements ParseCallback {
         }
     }
 
-    private void jsonParse(Parse item, String webUrl, boolean simple) throws Exception {
+    private void jsonParse(Parse item, String webUrl, boolean error) throws Exception {
         String body = OkHttp.newCall(item.getUrl() + webUrl, Headers.of(item.getHeaders())).execute().body().string();
         JsonObject object = JsonParser.parseString(body).getAsJsonObject();
         object = object.has("data") ? object.getAsJsonObject("data") : object;
         boolean illegal = body.contains("不存在") || body.contains("已过期");
         String url = illegal ? "" : Json.safeString(object, "url");
-        checkResult(getHeader(object), url, item.getName(), simple);
+        checkResult(getHeader(object), url, item.getName(), error);
     }
 
     private void jsonExtend(String webUrl) throws Exception {
@@ -138,8 +138,12 @@ public class ParseJob implements ParseCallback {
         }
     }
 
-    private void checkResult(Map<String, String> headers, String url, String from, boolean simple) {
-        if (simple || isPass(headers, url)) onParseSuccess(headers, url, from);
+    private void checkResult(Map<String, String> headers, String url, String from, boolean error) {
+        if (isPass(headers, url)) {
+            onParseSuccess(headers, url, from);
+        } else if (error) {
+            onParseError();
+        }
     }
 
     private void checkResult(Result result) {
