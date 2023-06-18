@@ -271,7 +271,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mBinding.control.action.opening.setOnLongClickListener(view -> onOpeningReset());
         mBinding.video.setOnTouchListener((view, event) -> mKeyDown.onTouchEvent(event));
         mBinding.control.action.getRoot().setOnTouchListener(this::onActionTouch);
-        mBinding.swipeLayout.setOnRefreshListener(this::getDetail);
+        mBinding.swipeLayout.setOnRefreshListener(this::onSwipeRefresh);
         mBinding.control.seek.setListener(mPlayers);
     }
 
@@ -659,6 +659,11 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     private boolean onActionTouch(View v, MotionEvent e) {
         setR1Callback();
         return false;
+    }
+
+    private void onSwipeRefresh() {
+        if (mBinding.progressLayout.isEmpty()) getDetail();
+        else onRefresh();
     }
 
     private void toggleFullscreen() {
