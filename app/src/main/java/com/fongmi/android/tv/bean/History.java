@@ -299,6 +299,7 @@ public class History {
 
     public History delete() {
         AppDatabase.get().getHistoryDao().delete(ApiConfig.getCid(), getKey());
+        AppDatabase.get().getTrackDao().delete(getKey());
         return this;
     }
 
