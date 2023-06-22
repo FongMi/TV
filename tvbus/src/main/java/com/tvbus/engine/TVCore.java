@@ -113,13 +113,6 @@ public class TVCore {
         }
     }
 
-    public void quit() {
-        try {
-            quit(handle);
-        } catch (Throwable ignored) {
-        }
-    }
-
     private native long initialise();
 
     private native int init(long handle, Context context);
@@ -129,8 +122,6 @@ public class TVCore {
     private native void start(long handle, String url);
 
     private native void stop(long handle);
-
-    private native void quit(long handle);
 
     private native void setServPort(long handle, int iPort);
 

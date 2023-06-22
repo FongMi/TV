@@ -109,6 +109,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     private boolean rotate;
     private boolean stop;
     private boolean lock;
+    private int toggleCount;
     private Runnable mR1;
     private Runnable mR2;
     private Runnable mR3;
@@ -270,7 +271,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mBinding.control.action.opening.setOnLongClickListener(view -> onOpeningReset());
         mBinding.video.setOnTouchListener((view, event) -> mKeyDown.onTouchEvent(event));
         mBinding.control.action.getRoot().setOnTouchListener(this::onActionTouch);
-        mBinding.swipeLayout.setOnRefreshListener(this::getDetail);
+        mBinding.swipeLayout.setOnRefreshListener(this::onSwipeRefresh);
         mBinding.control.seek.setListener(mPlayers);
     }
 
@@ -606,7 +607,6 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     private void onPlayer() {
         mPlayers.togglePlayer();
         Prefers.putPlayer(mPlayers.getPlayer());
-        mHistory.setPlayer(mPlayers.getPlayer());
         setPlayerView();
         setR1Callback();
         onRefresh();
@@ -659,6 +659,11 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     private boolean onActionTouch(View v, MotionEvent e) {
         setR1Callback();
         return false;
+    }
+
+    private void onSwipeRefresh() {
+        if (mBinding.progressLayout.isEmpty()) getDetail();
+        else onRefresh();
     }
 
     private void toggleFullscreen() {
@@ -865,11 +870,13 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
             case Player.STATE_READY:
                 stopSearch();
                 checkRotate();
+                resetToggle();
                 hideProgress();
                 mPlayers.reset();
                 setDefaultTrack();
                 setTrackVisible(true);
                 checkPlayImg(mPlayers.isPlaying());
+                mHistory.setPlayer(mPlayers.getPlayer());
                 mBinding.control.size.setText(mPlayers.getSizeText());
                 if (isVisible(mBinding.control.getRoot())) showControl();
                 break;
@@ -916,8 +923,24 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onErrorEvent(ErrorEvent event) {
-        if (!event.isRetry() || mPlayers.addRetry() > 3) onError(event);
+        if (!event.isRetry() || mPlayers.addRetry() > 3) checkError(event);
         else onRefresh();
+    }
+
+    private void checkError(ErrorEvent event) {
+        if (getSite().getPlayerType() == -1 && event.isFormat() && getToggleCount() < 3) {
+            toggleCount++;
+            nextPlayer();
+        } else {
+            resetToggle();
+            onError(event);
+        }
+    }
+
+    private void nextPlayer() {
+        mPlayers.togglePlayer();
+        setPlayerView();
+        onRefresh();
     }
 
     private void onError(ErrorEvent event) {
@@ -1100,6 +1123,14 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public int getToggleCount() {
+        return toggleCount;
+    }
+
+    public void resetToggle() {
+        this.toggleCount = 0;
     }
 
     private void notifyItemChanged(RecyclerView.Adapter<?> adapter) {

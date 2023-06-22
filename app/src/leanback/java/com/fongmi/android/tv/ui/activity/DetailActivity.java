@@ -106,7 +106,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private boolean initAuto;
     private boolean autoMode;
     private boolean useParse;
-    private int mCurrent;
+    private int currentFlag;
+    private int toggleCount;
     private Runnable mR1;
     private Runnable mR2;
 
@@ -450,8 +451,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void setEpisodeActivated(Vod.Flag.Episode item) {
         if (shouldEnterFullscreen(item)) return;
-        mCurrent = mBinding.flag.getSelectedPosition();
-        for (int i = 0; i < mFlagAdapter.size(); i++) ((Vod.Flag) mFlagAdapter.get(i)).toggle(mCurrent == i, item);
+        setCurrentFlag(mBinding.flag.getSelectedPosition());
+        for (int i = 0; i < mFlagAdapter.size(); i++) ((Vod.Flag) mFlagAdapter.get(i)).toggle(getCurrentFlag() == i, item);
         mBinding.episode.setSelectedPosition(getEpisodePosition());
         notifyItemChanged(mBinding.episode, mEpisodeAdapter);
         if (mEpisodeAdapter.size() == 0) return;
@@ -506,7 +507,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.video.setForeground(null);
         getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 24);
         mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
-        mBinding.flag.setSelectedPosition(mCurrent);
+        mBinding.flag.setSelectedPosition(getCurrentFlag());
         mKeyDown.setFull(true);
         setFullscreen(true);
         onPlay();
@@ -665,7 +666,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void onPlayer() {
         mPlayers.togglePlayer();
         Prefers.putPlayer(mPlayers.getPlayer());
-        mHistory.setPlayer(mPlayers.getPlayer());
         setPlayerView();
         onRefresh();
     }
@@ -803,7 +803,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void checkKeep() {
-        mBinding.keep.setCompoundDrawablesRelativeWithIntrinsicBounds(Keep.find(getHistoryKey()) == null ? R.drawable.ic_detail_keep_off : R.drawable.ic_detail_keep_on, 0, 0, 0);
+        mBinding.keep.setCompoundDrawablesWithIntrinsicBounds(Keep.find(getHistoryKey()) == null ? R.drawable.ic_detail_keep_off : R.drawable.ic_detail_keep_on, 0, 0, 0);
     }
 
     private void createKeep() {
@@ -848,10 +848,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
                 break;
             case Player.STATE_READY:
                 stopSearch();
+                resetToggle();
                 hideProgress();
                 mPlayers.reset();
                 setDefaultTrack();
                 setTrackVisible(true);
+                mHistory.setPlayer(mPlayers.getPlayer());
                 mBinding.widget.size.setText(mPlayers.getSizeText());
                 break;
             case Player.STATE_ENDED:
@@ -889,8 +891,24 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onErrorEvent(ErrorEvent event) {
-        if (!event.isRetry() || mPlayers.addRetry() > 3) onError(event);
+        if (!event.isRetry() || mPlayers.addRetry() > 3) checkError(event);
         else onRefresh();
+    }
+
+    private void checkError(ErrorEvent event) {
+        if (getSite().getPlayerType() == -1 && event.isFormat() && getToggleCount() < 3) {
+            toggleCount++;
+            nextPlayer();
+        } else {
+            resetToggle();
+            onError(event);
+        }
+    }
+
+    private void nextPlayer() {
+        mPlayers.togglePlayer();
+        setPlayerView();
+        onRefresh();
     }
 
     private void onError(ErrorEvent event) {
@@ -1054,6 +1072,22 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     public void setUseParse(boolean useParse) {
         this.useParse = useParse;
+    }
+
+    public int getCurrentFlag() {
+        return currentFlag;
+    }
+
+    public void setCurrentFlag(int currentFlag) {
+        this.currentFlag = currentFlag;
+    }
+
+    public int getToggleCount() {
+        return toggleCount;
+    }
+
+    public void resetToggle() {
+        this.toggleCount = 0;
     }
 
     @Override

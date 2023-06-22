@@ -84,6 +84,7 @@ public final class TrackDialog extends BaseDialog implements TrackAdapter.OnClic
             if (trackGroup.getType() != type) continue;
             for (int j = 0; j < trackGroup.length; j++) {
                 Track item = new Track(type, provider.getTrackName(trackGroup.getTrackFormat(j)));
+                item.setAdaptive(trackGroup.isAdaptiveSupported());
                 item.setSelected(trackGroup.isTrackSelected(j));
                 item.setPlayer(player.getPlayer());
                 item.setGroup(i);
@@ -111,6 +112,7 @@ public final class TrackDialog extends BaseDialog implements TrackAdapter.OnClic
     public void onItemClick(Track item) {
         if (listener != null) listener.onTrackClick(item);
         player.setTrack(List.of(item));
+        if (item.isAdaptive()) return;
         dismiss();
     }
 

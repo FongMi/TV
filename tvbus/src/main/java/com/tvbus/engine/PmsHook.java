@@ -23,7 +23,7 @@ public class PmsHook implements InvocationHandler {
         new PmsHook().hook();
     }
 
-    private Context getContext() throws Throwable {
+    private Context getCtx() throws Throwable {
         Class<?> activityThreadClass = Class.forName("android.app.ActivityThread");
         Method method = activityThreadClass.getMethod("currentApplication");
         return (Context) method.invoke(null);
@@ -37,12 +37,13 @@ public class PmsHook implements InvocationHandler {
             Field sPackageManagerField = activityThreadClass.getDeclaredField("sPackageManager");
             Object currentActivityThread = currentActivityThreadMethod.invoke(null);
             sPackageManagerField.setAccessible(true);
-            this.sign = getSign(getContext());
-            this.name = getContext().getPackageName();
+            Context context = getCtx();
+            this.sign = getSign(context);
+            this.name = context.getPackageName();
             this.base = sPackageManagerField.get(currentActivityThread);
             Object proxy = Proxy.newProxyInstance(iPackageManagerInterface.getClassLoader(), new Class<?>[]{iPackageManagerInterface}, this);
             sPackageManagerField.set(currentActivityThread, proxy);
-            PackageManager pm = getContext().getPackageManager();
+            PackageManager pm = context.getPackageManager();
             Field mPmField = pm.getClass().getDeclaredField("mPM");
             mPmField.setAccessible(true);
             mPmField.set(pm, proxy);
@@ -62,11 +63,11 @@ public class PmsHook implements InvocationHandler {
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if (!method.getName().equals("getPackageInfo")) return method.invoke(base, args);
         String pkg = (String) args[0];
-        int flag = (Integer) args[1];
-        if (flag != 64 || !name.equals(pkg)) return method.invoke(base, args);
+        Number flag = (Number) args[1];
+        if (flag.intValue() != 64 || !name.equals(pkg)) return method.invoke(base, args);
         PackageInfo info = (PackageInfo) method.invoke(base, args);
-        info.signatures = new Signature[this.sign.length];
-        for (int i = 0; i < info.signatures.length; i++) info.signatures[i] = new Signature(this.sign[i]);
+        info.signatures = new Signature[sign.length];
+        for (int i = 0; i < info.signatures.length; i++) info.signatures[i] = new Signature(sign[i]);
         return info;
     }
 }

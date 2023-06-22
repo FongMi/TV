@@ -19,7 +19,7 @@ public class IjkUtil {
 
     public static MediaSource getSource(Map<String, String> headers, String url) {
         Uri uri = Uri.parse(url.trim().replace("\\", ""));
-        if (Sniffer.isAds(uri)) uri = Uri.parse(Server.get().getAddress(true).concat("/m3u8?url=").concat(url));
+        if (Sniffer.isAds(uri)) uri = Uri.parse(Server.get().getAddress().concat("/m3u8?url=").concat(url));
         return new MediaSource(Utils.checkHeaders(headers), uri);
     }
 }
