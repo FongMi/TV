@@ -17,4 +17,7 @@ public abstract class TrackDao extends BaseDao<Track> {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public abstract Long insert(Track item);
+
+    @Query("DELETE FROM Track WHERE `key` = :key")
+    public abstract void delete(String key);
 }

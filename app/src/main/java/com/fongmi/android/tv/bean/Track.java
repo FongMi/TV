@@ -22,6 +22,7 @@ public class Track {
     private String key;
     private String name;
     private boolean selected;
+    private boolean adaptive;
 
     public Track(int type, String name) {
         this.type = type;
@@ -90,6 +91,14 @@ public class Track {
 
     public void setSelected(boolean selected) {
         this.selected = selected;
+    }
+
+    public boolean isAdaptive() {
+        return adaptive;
+    }
+
+    public void setAdaptive(boolean adaptive) {
+        this.adaptive = adaptive;
     }
 
     public boolean isExo(int player) {

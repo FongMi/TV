@@ -89,6 +89,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     private Runnable mR1;
     private Runnable mR2;
     private Runnable mR3;
+    private int toggleCount;
     private boolean rotate;
     private boolean stop;
     private boolean lock;
@@ -573,6 +574,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
                 break;
             case Player.STATE_READY:
                 checkRotate();
+                resetToggle();
                 hideProgress();
                 mPlayers.reset();
                 setSpeedVisible();
@@ -606,8 +608,24 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onErrorEvent(ErrorEvent event) {
-        if (!event.isRetry() || mPlayers.addRetry() > 3) onError(event);
+        if (!event.isRetry() || mPlayers.addRetry() > 3) checkError(event);
         else fetch();
+    }
+
+    private void checkError(ErrorEvent event) {
+        if (getHome().getPlayerType() == -1 && event.isFormat() && getToggleCount() < 3) {
+            toggleCount++;
+            nextPlayer();
+        } else {
+            resetToggle();
+            onError(event);
+        }
+    }
+
+    private void nextPlayer() {
+        mPlayers.togglePlayer();
+        setPlayerView();
+        fetch();
     }
 
     private void onError(ErrorEvent event) {
@@ -716,6 +734,14 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public int getToggleCount() {
+        return toggleCount;
+    }
+
+    public void resetToggle() {
+        this.toggleCount = 0;
     }
 
     @Override
@@ -882,7 +908,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mPlayers.release();
         Force.get().stop();
         ZLive.get().stop();
-        TVBus.get().quit();
+        TVBus.get().stop();
         App.removeCallbacks(mR1, mR2, mR3);
     }
 }
