@@ -326,6 +326,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
             mBinding.control.parse.setVisibility(isFullscreen() && isUseParse() ? View.VISIBLE : View.GONE);
             int timeout = getSite().isChangeable() ? Constant.TIMEOUT_PLAY : -1;
             mPlayers.start(result, isUseParse(), timeout);
+            mBinding.swipeLayout.setRefreshing(false);
         });
         mViewModel.result.observe(this, result -> {
             mBinding.swipeLayout.setRefreshing(false);
