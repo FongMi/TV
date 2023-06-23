@@ -20,13 +20,13 @@ android {
     productFlavors {
         leanback {
             dimension "mode"
-            versionCode 82
-            versionName "20230617#3"
+            versionCode 200
+            versionName "20230623#1"
         }
         mobile {
             dimension "mode"
-            versionCode 20
-            versionName "20230617#3"
+            versionCode 200
+            versionName "20230623#1"
         }
         java {
             dimension "api"
@@ -105,7 +105,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.5.1'
     implementation 'androidx.preference:preference:1.2.0'
-    implementation 'androidx.room:room-runtime:2.5.1'
+    implementation 'androidx.room:room-runtime:2.5.2'
     implementation 'cat.ereza:customactivityoncrash:2.4.0'
     implementation 'com.github.bassaer:materialdesigncolors:1.0.0'
     implementation 'com.github.bumptech.glide:glide:4.15.1'
@@ -132,6 +132,6 @@ dependencies {
     mobileImplementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     mobileImplementation 'com.github.devin1014.DLNA-Cast:dlna-dmc:V1.0.0'
     mobileImplementation('com.journeyapps:zxing-android-embedded:4.3.0') { transitive = false }
-    annotationProcessor 'androidx.room:room-compiler:2.5.1'
+    annotationProcessor 'androidx.room:room-compiler:2.5.2'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.15.1'
 }
