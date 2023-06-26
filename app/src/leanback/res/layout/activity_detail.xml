@@ -195,6 +195,7 @@
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:gravity="center"
+            android:singleLine="true"
             android:text="@string/detail_desc"
             android:textColor="@color/white"
             android:textSize="16sp"
@@ -204,15 +205,32 @@
             android:id="@+id/keep"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
             android:background="@drawable/selector_item"
             android:drawablePadding="6dp"
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:gravity="center"
+            android:singleLine="true"
             android:text="@string/keep"
             android:textColor="@color/white"
             android:textSize="16sp"
             app:drawableStartCompat="@drawable/ic_detail_keep_off" />
+
+        <TextView
+            android:id="@+id/change1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/selector_item"
+            android:drawablePadding="6dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:gravity="center"
+            android:singleLine="true"
+            android:text="@string/play_change"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:drawableStartCompat="@drawable/ic_detail_change" />
 
     </LinearLayout>
 
