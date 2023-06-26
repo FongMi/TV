@@ -36,6 +36,7 @@
     <string name="play_next">下集</string>
     <string name="play_prev">上集</string>
     <string name="play_loop">循环</string>
+    <string name="play_change">换源</string>
     <string name="play_forward">→</string>
     <string name="play_backward">←</string>
     <string name="play_invert">反转</string>
