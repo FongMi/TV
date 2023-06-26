@@ -242,12 +242,14 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mBinding.actor.setOnClickListener(view -> onActor());
         mBinding.content.setOnClickListener(view -> onContent());
         mBinding.reverse.setOnClickListener(view -> onReverse());
+        mBinding.name.setOnLongClickListener(view -> onChange());
         mBinding.control.cast.setOnClickListener(view -> onCast());
         mBinding.control.back.setOnClickListener(view -> onFull());
         mBinding.control.full.setOnClickListener(view -> onFull());
         mBinding.control.keep.setOnClickListener(view -> onKeep());
         mBinding.control.lock.setOnClickListener(view -> onLock());
         mBinding.control.share.setOnClickListener(view -> onShare());
+        mBinding.control.title.setOnClickListener(view -> onChange());
         mBinding.control.play.setOnClickListener(view -> checkPlay());
         mBinding.control.next.setOnClickListener(view -> checkNext());
         mBinding.control.prev.setOnClickListener(view -> checkPrev());
@@ -475,6 +477,12 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     private void onReverse() {
         mHistory.setRevSort(!mHistory.isRevSort());
         reverseEpisode(false);
+    }
+
+    private boolean onChange() {
+        mBroken.add(getId());
+        checkSearch();
+        return true;
     }
 
     private void onCast() {
