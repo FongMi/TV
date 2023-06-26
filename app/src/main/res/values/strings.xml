@@ -36,6 +36,7 @@
     <string name="play_next">Next</string>
     <string name="play_prev">Prev</string>
     <string name="play_loop">Loop</string>
+    <string name="play_change">Change</string>
     <string name="play_forward">→</string>
     <string name="play_backward">←</string>
     <string name="play_invert">Invert</string>

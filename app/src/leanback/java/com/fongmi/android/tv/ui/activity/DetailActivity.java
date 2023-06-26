@@ -248,6 +248,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.desc.setOnClickListener(view -> onDesc());
         mBinding.keep.setOnClickListener(view -> onKeep());
         mBinding.video.setOnClickListener(view -> onVideo());
+        mBinding.change1.setOnClickListener(view -> onChange());
         mBinding.control.text.setOnClickListener(this::onTrack);
         mBinding.control.audio.setOnClickListener(this::onTrack);
         mBinding.control.video.setOnClickListener(this::onTrack);
@@ -264,6 +265,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.player.setOnClickListener(view -> onPlayer());
         mBinding.control.decode.setOnClickListener(view -> onDecode());
         mBinding.control.ending.setOnClickListener(view -> onEnding());
+        mBinding.control.change2.setOnClickListener(view -> onChange());
         mBinding.control.opening.setOnClickListener(view -> onOpening());
         mBinding.control.speed.setOnLongClickListener(view -> onSpeedLong());
         mBinding.control.reset.setOnLongClickListener(view -> onResetToggle());
@@ -538,6 +540,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void onVideo() {
         if (!isFullscreen()) enterFullscreen();
+    }
+
+    private void onChange() {
+        mBroken.add(getId());
+        checkSearch();
     }
 
     private void onLoop() {
