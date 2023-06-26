@@ -149,9 +149,7 @@ public class Global {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                executor.submit(() -> {
-                    func.call();
-                });
+                if (!executor.isShutdown()) executor.submit(() -> { func.call(); });
             }
         }, delay);
     }
