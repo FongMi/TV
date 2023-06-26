@@ -666,7 +666,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void onPlayer() {
         mPlayers.togglePlayer();
-        Prefers.putPlayer(mPlayers.getPlayer());
         setPlayerView();
         onRefresh();
     }
