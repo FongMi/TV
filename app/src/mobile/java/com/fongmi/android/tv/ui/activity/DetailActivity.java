@@ -249,12 +249,12 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mBinding.control.keep.setOnClickListener(view -> onKeep());
         mBinding.control.lock.setOnClickListener(view -> onLock());
         mBinding.control.share.setOnClickListener(view -> onShare());
-        mBinding.control.title.setOnClickListener(view -> onChange());
         mBinding.control.play.setOnClickListener(view -> checkPlay());
         mBinding.control.next.setOnClickListener(view -> checkNext());
         mBinding.control.prev.setOnClickListener(view -> checkPrev());
         mBinding.control.rotate.setOnClickListener(view -> onRotate());
         mBinding.control.setting.setOnClickListener(view -> onSetting());
+        mBinding.control.title.setOnLongClickListener(view -> onChange());
         mBinding.control.action.text.setOnClickListener(this::onTrack);
         mBinding.control.action.audio.setOnClickListener(this::onTrack);
         mBinding.control.action.video.setOnClickListener(this::onTrack);
