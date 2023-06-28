@@ -866,15 +866,15 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     @Override
     protected void onStart() {
         super.onStart();
-        mPlayers.play();
         setStop(false);
+        if (PiP.notIn(this)) mPlayers.play();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        mPlayers.pause();
         setStop(true);
+        if (PiP.notIn(this)) mPlayers.pause();
     }
 
     @Override
