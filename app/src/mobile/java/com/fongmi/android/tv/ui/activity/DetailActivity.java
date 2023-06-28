@@ -1287,16 +1287,18 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     @Override
     protected void onStart() {
         super.onStart();
-        mPlayers.play();
         setStop(false);
+        if (PiP.isIn(this)) return;
+        mPlayers.play();
         Clock.start();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        mPlayers.pause();
         setStop(true);
+        if (PiP.isIn(this)) return;
+        mPlayers.pause();
         Clock.stop();
     }
 
@@ -1316,6 +1318,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     protected void onDestroy() {
         super.onDestroy();
         mPlayers.release();
+        Clock.get().release();
         RefreshEvent.history();
         App.removeCallbacks(mR1, mR2, mR3);
     }
