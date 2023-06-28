@@ -337,23 +337,15 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mViewModel.search.observe(this, result -> setSearch(result.getList()));
         mViewModel.player.observe(this, result -> {
             setUseParse(ApiConfig.hasParse() && ((result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx() == 1));
-            mBinding.control.parseLayout.setVisibility(isUseParse() ? View.VISIBLE : View.GONE);
+            mBinding.control.parse.setVisibility(isUseParse() ? View.VISIBLE : View.GONE);
             int timeout = getSite().isChangeable() ? Constant.TIMEOUT_PLAY : -1;
             mPlayers.start(result, isUseParse(), timeout);
-            resetFocus();
         });
         mViewModel.result.observe(this, result -> {
             if (result.getList().isEmpty()) setEmpty();
             else setDetail(result.getList().get(0));
             Notify.dismiss();
         });
-    }
-
-    private void resetFocus() {
-        findViewById(R.id.timeBar).setNextFocusUpId(isUseParse() ? R.id.parse : R.id.next);
-        for (int i = 0; i < mBinding.control.actionLayout.getChildCount(); i++) {
-            mBinding.control.actionLayout.getChildAt(i).setNextFocusDownId(isUseParse() ? R.id.parse : R.id.timeBar);
-        }
     }
 
     private void checkCast() {
