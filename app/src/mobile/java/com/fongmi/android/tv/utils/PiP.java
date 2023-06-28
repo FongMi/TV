@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.app.PictureInPictureParams;
 import android.app.RemoteAction;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Rect;
 import android.graphics.drawable.Icon;
 import android.os.Build;
@@ -12,6 +13,8 @@ import android.util.Rational;
 import android.view.View;
 
 import androidx.media3.ui.R;
+
+import com.fongmi.android.tv.App;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,13 +31,17 @@ public class PiP {
 
     private PictureInPictureParams.Builder builder;
 
+    private boolean noPiP() {
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.O || !App.get().getPackageManager().hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE);
+    }
+
     public PiP() {
-        if (!Utils.hasPiP()) return;
+        if (noPiP()) return;
         this.builder = new PictureInPictureParams.Builder();
     }
 
     public void update(Activity activity, View view) {
-        if (!Utils.hasPiP()) return;
+        if (noPiP()) return;
         Rect sourceRectHint = new Rect();
         view.getGlobalVisibleRect(sourceRectHint);
         builder.setSourceRectHint(sourceRectHint);
@@ -42,7 +49,7 @@ public class PiP {
     }
 
     public void update(Activity activity, boolean play) {
-        if (!Utils.hasPiP()) return;
+        if (noPiP()) return;
         List<RemoteAction> actions = new ArrayList<>();
         int icon = play ? R.drawable.exo_icon_pause : R.drawable.exo_icon_play;
         actions.add(new RemoteAction(Icon.createWithResource(activity, R.drawable.exo_icon_previous), "", "", PendingIntent.getBroadcast(activity, CONTROL_TYPE_PREV, new Intent(ACTION_MEDIA_CONTROL).putExtra(EXTRA_CONTROL_TYPE, CONTROL_TYPE_PREV), PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE)));
@@ -53,7 +60,7 @@ public class PiP {
 
     public void enter(Activity activity, boolean four) {
         try {
-            if (!Utils.hasPiP() || activity.isInPictureInPictureMode()) return;
+            if (noPiP() || activity.isInPictureInPictureMode()) return;
             builder.setAspectRatio(new Rational(four ? 4 : 16, four ? 3 : 9));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) builder.setAutoEnterEnabled(true);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) builder.setSeamlessResizeEnabled(true);
