@@ -129,7 +129,7 @@ public class Live {
     }
 
     public Core getCore() {
-        return core;
+        return core == null ? new Core() : core;
     }
 
     public boolean isActivated() {
