@@ -544,6 +544,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void onChange() {
         mBroken.add(getId());
+        setAutoMode(true);
         checkSearch();
     }
 
