@@ -101,9 +101,9 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     private void checkAction(Intent intent) {
         boolean push = ApiConfig.hasPush() && intent.getAction() != null;
-        if (push && intent.getAction().equals(Intent.ACTION_SEND) && intent.getType().equals("text/plain")) {
+        if (push && intent.getAction().equals(Intent.ACTION_SEND)) {
             DetailActivity.push(this, Uri.parse(intent.getStringExtra(Intent.EXTRA_TEXT)));
-        } else if (push && intent.getAction().equals(Intent.ACTION_VIEW) && intent.getData() != null && intent.getData().getScheme() != null) {
+        } else if (push && intent.getAction().equals(Intent.ACTION_VIEW) && intent.getData() != null) {
             DetailActivity.push(this, intent.getData());
         }
     }

@@ -123,7 +123,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     private PiP mPiP;
 
     public static void push(FragmentActivity activity, Uri uri) {
-        if (uri.getScheme().startsWith("smb") || uri.getScheme().startsWith("http")) {
+        if ("smb".equals(uri.getScheme()) || "http".equals(uri.getScheme()) || "https".equals(uri.getScheme())) {
             push(activity, uri.toString());
         } else {
             file(activity, FileChooser.getPathFromUri(activity, uri));
