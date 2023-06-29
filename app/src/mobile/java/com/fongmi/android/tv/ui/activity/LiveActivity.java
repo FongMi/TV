@@ -40,6 +40,7 @@ import com.fongmi.android.tv.player.source.Force;
 import com.fongmi.android.tv.player.source.TVBus;
 import com.fongmi.android.tv.player.source.ZLive;
 import com.fongmi.android.tv.receiver.PiPReceiver;
+import com.fongmi.android.tv.service.PlaybackService;
 import com.fongmi.android.tv.ui.adapter.ChannelAdapter;
 import com.fongmi.android.tv.ui.adapter.GroupAdapter;
 import com.fongmi.android.tv.ui.base.BaseActivity;
@@ -867,14 +868,22 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     protected void onStart() {
         super.onStart();
         setStop(false);
-        if (PiP.notIn(this)) mPlayers.play();
+        if (PiP.isIn(this)) {
+            PlaybackService.stop();
+        } else {
+            mPlayers.play();
+        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         setStop(true);
-        if (PiP.notIn(this)) mPlayers.pause();
+        if (PiP.isIn(this)) {
+            PlaybackService.start();
+        } else {
+            mPlayers.pause();
+        }
     }
 
     @Override

@@ -50,6 +50,7 @@ import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.receiver.PiPReceiver;
+import com.fongmi.android.tv.service.PlaybackService;
 import com.fongmi.android.tv.ui.adapter.EpisodeAdapter;
 import com.fongmi.android.tv.ui.adapter.FlagAdapter;
 import com.fongmi.android.tv.ui.adapter.ParseAdapter;
@@ -1302,18 +1303,24 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     protected void onStart() {
         super.onStart();
         setStop(false);
-        if (PiP.isIn(this)) return;
-        mPlayers.play();
-        Clock.start();
+        if (PiP.isIn(this)) {
+            PlaybackService.stop();
+        } else {
+            mPlayers.play();
+            Clock.start();
+        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         setStop(true);
-        if (PiP.isIn(this)) return;
-        mPlayers.pause();
-        Clock.stop();
+        if (PiP.isIn(this)) {
+            PlaybackService.start();
+        } else {
+            mPlayers.pause();
+            Clock.stop();
+        }
     }
 
     @Override
