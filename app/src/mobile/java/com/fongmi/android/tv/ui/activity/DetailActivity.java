@@ -89,8 +89,8 @@ import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 public class DetailActivity extends BaseActivity implements Clock.Callback, CustomKeyDownVod.Listener, CastDialog.Listener, PiPReceiver.Listener, TrackDialog.Listener, ControlDialog.Listener, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, ParseAdapter.OnClickListener {
 
     private ViewGroup.LayoutParams mFrameParams;
-    private Observer<Result> mObservePlayer;
     private Observer<Result> mObserveDetail;
+    private Observer<Result> mObservePlayer;
     private Observer<Result> mObserveSearch;
     private ActivityDetailBinding mBinding;
     private EpisodeAdapter mEpisodeAdapter;
@@ -225,8 +225,8 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mBinding.progressLayout.showProgress();
         mBinding.swipeLayout.setEnabled(false);
         mReceiver = new PiPReceiver(this);
-        mObservePlayer = this::setPlayer;
         mObserveDetail = this::setDetail;
+        mObservePlayer = this::setPlayer;
         mObserveSearch = this::setSearch;
         mPlayers = new Players().init();
         mDialogs = new ArrayList<>();
