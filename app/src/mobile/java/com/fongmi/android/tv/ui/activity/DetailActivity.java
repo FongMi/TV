@@ -21,6 +21,7 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ShareCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.media3.common.C;
 import androidx.media3.common.Player;
@@ -35,6 +36,7 @@ import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.bean.Parse;
+import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Track;
 import com.fongmi.android.tv.bean.Vod;
@@ -87,6 +89,9 @@ import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 public class DetailActivity extends BaseActivity implements Clock.Callback, CustomKeyDownVod.Listener, CastDialog.Listener, PiPReceiver.Listener, TrackDialog.Listener, ControlDialog.Listener, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, ParseAdapter.OnClickListener {
 
     private ViewGroup.LayoutParams mFrameParams;
+    private Observer<Result> mObservePlayer;
+    private Observer<Result> mObserveDetail;
+    private Observer<Result> mObserveSearch;
     private ActivityDetailBinding mBinding;
     private EpisodeAdapter mEpisodeAdapter;
     private SearchAdapter mSearchAdapter;
@@ -220,6 +225,9 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mBinding.progressLayout.showProgress();
         mBinding.swipeLayout.setEnabled(false);
         mReceiver = new PiPReceiver(this);
+        mObservePlayer = this::setPlayer;
+        mObserveDetail = this::setDetail;
+        mObserveSearch = this::setSearch;
         mPlayers = new Players().init();
         mDialogs = new ArrayList<>();
         mBroken = new ArrayList<>();
@@ -321,20 +329,9 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
-        mViewModel.search.observe(this, result -> setSearch(result.getList()));
-        mViewModel.player.observe(this, result -> {
-            setUseParse(ApiConfig.hasParse() && ((result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx() == 1));
-            if (mControlDialog != null && mControlDialog.isVisible()) mControlDialog.setParseVisible(isUseParse());
-            mBinding.control.parse.setVisibility(isFullscreen() && isUseParse() ? View.VISIBLE : View.GONE);
-            int timeout = getSite().isChangeable() ? Constant.TIMEOUT_PLAY : -1;
-            mPlayers.start(result, isUseParse(), timeout);
-            mBinding.swipeLayout.setRefreshing(false);
-        });
-        mViewModel.result.observe(this, result -> {
-            mBinding.swipeLayout.setRefreshing(false);
-            if (result.getList().isEmpty()) setEmpty();
-            else setDetail(result.getList().get(0));
-        });
+        mViewModel.result.observeForever(mObserveDetail);
+        mViewModel.player.observeForever(mObservePlayer);
+        mViewModel.search.observeForever(mObserveSearch);
         mViewModel.episode.observe(this, episode -> {
             onItemClick(episode);
             hideSheet();
@@ -357,12 +354,10 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         getDetail();
     }
 
-    private void getPlayer(Vod.Flag flag, Vod.Flag.Episode episode, boolean replay) {
-        mBinding.control.title.setText(getString(R.string.detail_title, mBinding.name.getText(), episode.getName()));
-        mViewModel.playerContent(getKey(), flag.getFlag(), episode.getUrl());
-        updateHistory(episode, replay);
-        showProgress();
-        setUrl(null);
+    private void setDetail(Result result) {
+        mBinding.swipeLayout.setRefreshing(false);
+        if (result.getList().isEmpty()) setEmpty();
+        else setDetail(result.getList().get(0));
     }
 
     private void setEmpty() {
@@ -405,6 +400,23 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         if (!item.getTypeName().isEmpty()) sb.append(getString(R.string.detail_type, item.getTypeName())).append("  ");
         view.setVisibility(sb.length() == 0 ? View.GONE : View.VISIBLE);
         view.setText(Utils.substring(sb.toString(), 2));
+    }
+
+    private void getPlayer(Vod.Flag flag, Vod.Flag.Episode episode, boolean replay) {
+        mBinding.control.title.setText(getString(R.string.detail_title, mBinding.name.getText(), episode.getName()));
+        mViewModel.playerContent(getKey(), flag.getFlag(), episode.getUrl());
+        updateHistory(episode, replay);
+        showProgress();
+        setUrl(null);
+    }
+
+    private void setPlayer(Result result) {
+        setUseParse(ApiConfig.hasParse() && ((result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx() == 1));
+        if (mControlDialog != null && mControlDialog.isVisible()) mControlDialog.setParseVisible(isUseParse());
+        mBinding.control.parse.setVisibility(isFullscreen() && isUseParse() ? View.VISIBLE : View.GONE);
+        int timeout = getSite().isChangeable() ? Constant.TIMEOUT_PLAY : -1;
+        mPlayers.start(result, isUseParse(), timeout);
+        mBinding.swipeLayout.setRefreshing(false);
     }
 
     @Override
@@ -1015,7 +1027,8 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         }
     }
 
-    private void setSearch(List<Vod> items) {
+    private void setSearch(Result result) {
+        List<Vod> items = result.getList();
         Iterator<Vod> iterator = items.iterator();
         while (iterator.hasNext()) if (mismatch(iterator.next())) iterator.remove();
         mBinding.search.setVisibility(View.VISIBLE);
@@ -1322,5 +1335,8 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         Clock.get().release();
         RefreshEvent.history();
         App.removeCallbacks(mR1, mR2, mR3);
+        mViewModel.result.removeObserver(mObserveDetail);
+        mViewModel.player.removeObserver(mObservePlayer);
+        mViewModel.search.removeObserver(mObserveSearch);
     }
 }
