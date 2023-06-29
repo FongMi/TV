@@ -23,10 +23,10 @@ public class PlaybackService extends Service {
     }
 
     @Override
-    public void onCreate() {
-        super.onCreate();
+    public int onStartCommand(Intent intent, int flags, int startId) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, Notify.DEFAULT).setVisibility(NotificationCompat.VISIBILITY_PUBLIC).setSmallIcon(R.drawable.ic_logo);
         startForeground(9527, builder.build());
+        return START_STICKY;
     }
 
     @Nullable
