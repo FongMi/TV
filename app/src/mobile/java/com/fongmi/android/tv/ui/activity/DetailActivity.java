@@ -1341,6 +1341,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mPlayers.release();
         Clock.get().release();
         RefreshEvent.history();
+        PlaybackService.stop();
         App.removeCallbacks(mR1, mR2, mR3);
         mViewModel.result.removeObserver(mObserveDetail);
         mViewModel.player.removeObserver(mObservePlayer);

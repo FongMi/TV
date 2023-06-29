@@ -21,12 +21,12 @@ android {
         leanback {
             dimension "mode"
             versionCode 200
-            versionName "20230629#1"
+            versionName "20230629#2"
         }
         mobile {
             dimension "mode"
             versionCode 200
-            versionName "20230629#1"
+            versionName "20230629#2"
         }
         java {
             dimension "api"

@@ -918,6 +918,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         Force.get().stop();
         ZLive.get().stop();
         TVBus.get().stop();
+        PlaybackService.stop();
         App.removeCallbacks(mR1, mR2, mR3);
     }
 }
