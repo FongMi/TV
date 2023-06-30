@@ -205,6 +205,11 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     @Override
+    protected boolean hackStatusBar() {
+        return false;
+    }
+
+    @Override
     protected ViewBinding getBinding() {
         return mBinding = ActivityDetailBinding.inflate(getLayoutInflater());
     }
