@@ -890,7 +890,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onErrorEvent(ErrorEvent event) {
-        if (!event.isRetry() || mPlayers.addRetry() > 1) checkError(event);
+        if (mPlayers.addRetry() > event.getRetry()) checkError(event);
         else onRefresh();
     }
 
