@@ -205,7 +205,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     @Override
-    protected boolean hackStatusBar() {
+    protected boolean transparent() {
         return false;
     }
 

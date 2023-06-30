@@ -30,7 +30,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (hackStatusBar()) hackStatusBar(this);
+        if (transparent()) setTransparent(this);
         setContentView(getBinding().getRoot());
         EventBus.getDefault().register(this);
         setWall();
@@ -42,7 +42,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         return this;
     }
 
-    protected boolean hackStatusBar() {
+    protected boolean transparent() {
         return true;
     }
 
@@ -75,7 +75,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
     }
 
-    private void hackStatusBar(Activity activity) {
+    private void setTransparent(Activity activity) {
         activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         activity.getWindow().setStatusBarColor(Color.TRANSPARENT);
