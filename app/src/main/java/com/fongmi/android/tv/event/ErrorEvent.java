@@ -8,29 +8,29 @@ import org.greenrobot.eventbus.EventBus;
 public class ErrorEvent {
 
     private final Type type;
-    private final boolean retry;
+    private final int retry;
 
     public static void url() {
-        EventBus.getDefault().post(new ErrorEvent(Type.URL, false));
+        EventBus.getDefault().post(new ErrorEvent(Type.URL, 0));
     }
 
     public static void parse() {
-        EventBus.getDefault().post(new ErrorEvent(Type.PARSE, false));
+        EventBus.getDefault().post(new ErrorEvent(Type.PARSE, 0));
     }
 
-    public static void format() {
-        EventBus.getDefault().post(new ErrorEvent(Type.FORMAT, true));
+    public static void format(int retry) {
+        EventBus.getDefault().post(new ErrorEvent(Type.FORMAT, retry));
     }
 
     public static void episode() {
-        EventBus.getDefault().post(new ErrorEvent(Type.EPISODE, false));
+        EventBus.getDefault().post(new ErrorEvent(Type.EPISODE, 0));
     }
 
     public static void timeout() {
-        EventBus.getDefault().post(new ErrorEvent(Type.TIMEOUT, false));
+        EventBus.getDefault().post(new ErrorEvent(Type.TIMEOUT, 0));
     }
 
-    public ErrorEvent(Type type, boolean retry) {
+    public ErrorEvent(Type type, int retry) {
         this.type = type;
         this.retry = retry;
     }
@@ -48,7 +48,7 @@ public class ErrorEvent {
         return type;
     }
 
-    public boolean isRetry() {
+    public int getRetry() {
         return retry;
     }
 

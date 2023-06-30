@@ -945,7 +945,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onErrorEvent(ErrorEvent event) {
-        if (!event.isRetry() || mPlayers.addRetry() > 1) checkError(event);
+        if (mPlayers.addRetry() > event.getRetry()) checkError(event);
         else onRefresh();
     }
 
