@@ -18,8 +18,8 @@ public class ErrorEvent {
         EventBus.getDefault().post(new ErrorEvent(Type.PARSE, false));
     }
 
-    public static void format(boolean retry) {
-        EventBus.getDefault().post(new ErrorEvent(Type.FORMAT, retry));
+    public static void format() {
+        EventBus.getDefault().post(new ErrorEvent(Type.FORMAT, true));
     }
 
     public static void episode() {
