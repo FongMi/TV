@@ -1,9 +1,11 @@
 package com.fongmi.android.tv.ui.base;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewbinding.ViewBinding;
@@ -28,6 +30,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (hackStatusBar()) hackStatusBar(this);
         setContentView(getBinding().getRoot());
         EventBus.getDefault().register(this);
         setWall();
@@ -37,6 +40,10 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     protected Activity getActivity() {
         return this;
+    }
+
+    protected boolean hackStatusBar() {
+        return true;
     }
 
     protected boolean customWall() {
@@ -66,6 +73,12 @@ public abstract class BaseActivity extends AppCompatActivity {
         } catch (Exception e) {
             getWindow().setBackgroundDrawableResource(R.drawable.wallpaper_1);
         }
+    }
+
+    private void hackStatusBar(Activity activity) {
+        activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        activity.getWindow().setStatusBarColor(Color.TRANSPARENT);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
