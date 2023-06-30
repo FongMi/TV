@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.text.Html;
+import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.View;
@@ -237,8 +238,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         setRecyclerView();
         setVideoView();
         setViewModel();
-        getDetail();
         checkCast();
+        checkId();
     }
 
     @Override
@@ -353,16 +354,21 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         else mBinding.progressLayout.showProgress();
     }
 
+    private void checkId() {
+        if (TextUtils.isEmpty(getId())) setEmpty();
+        else getDetail();
+    }
+
     private void getDetail() {
         mViewModel.detailContent(getKey(), getId());
     }
 
     private void getDetail(Vod item) {
+        if (mBinding.progressLayout.isContent()) Notify.progress(this);
         getIntent().putExtra("key", item.getSiteKey());
         getIntent().putExtra("id", item.getVodId());
         mBinding.scroll.scrollTo(0, 0);
         Clock.get().setCallback(null);
-        Notify.progress(this);
         mPlayers.stop();
         hideProgress();
         getDetail();

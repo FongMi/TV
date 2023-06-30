@@ -88,6 +88,10 @@ public class ProgressLayout extends RelativeLayout {
         return mState == State.PROGRESS;
     }
 
+    public boolean isContent() {
+        return mState == State.CONTENT;
+    }
+
     public boolean isEmpty() {
         return mState == State.EMPTY;
     }
