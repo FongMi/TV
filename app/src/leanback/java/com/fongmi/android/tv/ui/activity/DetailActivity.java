@@ -355,7 +355,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void checkId() {
-        if (TextUtils.isEmpty(getId())) setEmpty();
+        if (TextUtils.isEmpty(getId()) || getId().startsWith("msearch:")) setEmpty();
         else getDetail();
     }
 

@@ -10,6 +10,7 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
+import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
@@ -221,7 +222,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mBinding.swipeLayout.setRefreshing(true);
         getIntent().putExtras(intent);
         setOrient();
-        getDetail();
+        checkId();
     }
 
     @Override
@@ -245,7 +246,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         setVideoView();
         setViewModel();
         showProgress();
-        getDetail();
+        checkId();
     }
 
     @Override
@@ -342,6 +343,11 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
             onItemClick(episode);
             hideSheet();
         });
+    }
+
+    private void checkId() {
+        if (TextUtils.isEmpty(getId()) || getId().startsWith("msearch:")) setEmpty();
+        else getDetail();
     }
 
     private void getDetail() {
