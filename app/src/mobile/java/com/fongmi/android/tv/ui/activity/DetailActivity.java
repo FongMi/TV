@@ -362,7 +362,6 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mBinding.scroll.scrollTo(0, 0);
         Clock.get().setCallback(null);
         mPlayers.stop();
-        hideProgress();
         getDetail();
     }
 
