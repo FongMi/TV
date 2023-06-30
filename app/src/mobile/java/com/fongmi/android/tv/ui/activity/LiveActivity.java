@@ -609,7 +609,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onErrorEvent(ErrorEvent event) {
-        if (!event.isRetry() || mPlayers.addRetry() > 1) checkError(event);
+        if (mPlayers.addRetry() > event.getRetry()) checkError(event);
         else fetch();
     }
 
