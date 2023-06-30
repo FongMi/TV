@@ -79,7 +79,7 @@ public class Parse {
     }
 
     public String getUrl() {
-        return TextUtils.isEmpty(url) ? "" : Utils.checkProxy(url);
+        return TextUtils.isEmpty(url) ? "" : Utils.convert(url);
     }
 
     public void setUrl(String url) {

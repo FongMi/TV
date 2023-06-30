@@ -4,6 +4,7 @@ import android.net.Uri;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.api.LiveConfig;
 import com.fongmi.android.tv.bean.Device;
 import com.fongmi.android.tv.server.process.ActionRequestProcess;
 import com.fongmi.android.tv.server.process.RawRequestProcess;
@@ -90,6 +91,7 @@ public class Nano extends NanoHTTPD {
                 if (url.startsWith("/upload")) return doUpload(session.getParms(), files);
                 else if (url.startsWith("/newFolder")) return doNewFolder(session.getParms());
                 else if (url.startsWith("/delFolder") || url.startsWith("/delFile")) return doDelFolder(session.getParms());
+                else if (url.startsWith("/tvbus")) return createSuccessResponse(LiveConfig.get().getHome().getCore().getResp());
                 break;
         }
         return createErrorResponse(NanoHTTPD.Response.Status.NOT_FOUND, "Not Found");
