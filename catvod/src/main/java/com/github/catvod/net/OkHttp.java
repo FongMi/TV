@@ -22,7 +22,7 @@ import okhttp3.dnsoverhttps.DnsOverHttps;
 
 public class OkHttp {
 
-    private static final int TIMEOUT = 30 * 1000;
+    public static final int TIMEOUT = 30 * 1000;
     private static final int CACHE = 50 * 1024 * 1024;
 
     private DnsOverHttps dns;
