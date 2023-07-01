@@ -40,7 +40,7 @@ public class M3U8 {
     private static String resolve(String base, String line) {
         if (line.startsWith(TAG_KEY)) {
             Matcher matcher = REGEX_URI.matcher(line);
-            String value = matcher.find() ? matcher.group(1) : "";
+            String value = matcher.find() ? matcher.group(1) : null;
             return value == null ? line : line.replace(value, UriUtil.resolve(base, value));
         } else {
             return UriUtil.resolve(base, line);
