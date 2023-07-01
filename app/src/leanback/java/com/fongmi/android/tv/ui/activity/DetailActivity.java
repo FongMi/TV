@@ -540,9 +540,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onChange() {
-        mBroken.add(getId());
-        setAutoMode(true);
-        checkSearch();
+        if (getSite().isChangeable()) checkSearch();
+        else checkFlag();
     }
 
     private void onLoop() {
@@ -912,7 +911,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void onError(ErrorEvent event) {
         Clock.get().setCallback(null);
         showError(event.getMsg());
-        mBroken.add(getId());
         mPlayers.stop();
         startFlow();
     }
@@ -1015,6 +1013,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         Vod vod = (Vod) mSearchAdapter.get(0);
         Notify.show(getString(R.string.play_switch_site, vod.getSiteName()));
         mSearchAdapter.removeItems(0, 1);
+        mBroken.add(getId());
         setInitAuto(false);
         getDetail(vod);
     }
