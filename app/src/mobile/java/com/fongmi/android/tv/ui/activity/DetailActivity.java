@@ -378,7 +378,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
             mBinding.swipeLayout.setEnabled(true);
             mBinding.progressLayout.showEmpty();
         } else {
-            checkSearch();
+            checkSearch(false);
         }
     }
 
@@ -503,7 +503,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private boolean onChange() {
-        if (getSite().isChangeable()) checkSearch();
+        if (getSite().isChangeable()) checkSearch(true);
         else checkFlag();
         return true;
     }
@@ -999,13 +999,13 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     private void checkFlag() {
         int position = isGone(mBinding.flag) ? -1 : mFlagAdapter.getPosition();
-        if (position == mFlagAdapter.getItemCount() - 1) checkSearch();
+        if (position == mFlagAdapter.getItemCount() - 1) checkSearch(false);
         else nextFlag(position);
     }
 
-    private void checkSearch() {
+    private void checkSearch(boolean force) {
         if (mSearchAdapter.getItemCount() == 0) initSearch(getName(), true);
-        else if (isAutoMode()) nextSite();
+        else if (isAutoMode() || force) nextSite();
     }
 
     private void initSearch(String keyword, boolean auto) {
@@ -1071,12 +1071,12 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     private void nextSite() {
         if (mSearchAdapter.getItemCount() == 0) return;
-        Vod vod = mSearchAdapter.get(0);
-        Notify.show(getString(R.string.play_switch_site, vod.getSiteName()));
+        Vod item = mSearchAdapter.get(0);
+        Notify.show(getString(R.string.play_switch_site, item.getSiteName()));
         mSearchAdapter.remove(0);
         mBroken.add(getId());
         setInitAuto(false);
-        getDetail(vod);
+        getDetail(item);
     }
 
     private boolean isFullscreen() {
