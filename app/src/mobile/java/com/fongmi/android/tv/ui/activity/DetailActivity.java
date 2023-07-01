@@ -503,9 +503,8 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private boolean onChange() {
-        mBroken.add(getId());
-        setAutoMode(true);
-        checkSearch();
+        if (getSite().isChangeable()) checkSearch();
+        else checkFlag();
         return true;
     }
 
@@ -973,7 +972,6 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mBinding.swipeLayout.setEnabled(true);
         Clock.get().setCallback(null);
         showError(event.getMsg());
-        mBroken.add(getId());
         mPlayers.stop();
         startFlow();
     }
@@ -1076,6 +1074,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         Vod vod = mSearchAdapter.get(0);
         Notify.show(getString(R.string.play_switch_site, vod.getSiteName()));
         mSearchAdapter.remove(0);
+        mBroken.add(getId());
         setInitAuto(false);
         getDetail(vod);
     }
