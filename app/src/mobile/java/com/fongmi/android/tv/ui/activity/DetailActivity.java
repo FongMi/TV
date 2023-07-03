@@ -613,10 +613,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void onRefresh() {
-        Clock.get().setCallback(null);
-        if (mFlagAdapter.getItemCount() == 0) return;
-        if (mEpisodeAdapter.getItemCount() == 0) return;
-        getPlayer(getFlag(), getEpisode(), false);
+        onReset(false);
     }
 
     private void onReset() {

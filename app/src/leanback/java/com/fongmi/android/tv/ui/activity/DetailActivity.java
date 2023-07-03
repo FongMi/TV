@@ -594,10 +594,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onRefresh() {
-        Clock.get().setCallback(null);
-        if (mFlagAdapter.size() == 0) return;
-        if (mEpisodeAdapter.size() == 0) return;
-        getPlayer(getFlag(), getEpisode(), false);
+        onReset(false);
     }
 
     private void onReset() {
