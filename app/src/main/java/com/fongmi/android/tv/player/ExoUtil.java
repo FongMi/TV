@@ -97,27 +97,34 @@ public class ExoUtil {
     }
 
     public static MediaSource getSource(Result result, int errorCode) {
-        return getSource(result.getHeaders(), result.getRealUrl(), result.getSubs(), errorCode);
+        return getSource(result.getHeaders(), result.getRealUrl(), result.getFormat(), result.getSubs(), errorCode);
     }
 
     public static MediaSource getSource(Map<String, String> headers, String url, int errorCode) {
-        return getSource(headers, url, Collections.emptyList(), errorCode);
+        return getSource(headers, url, null, Collections.emptyList(), errorCode);
     }
 
-    private static MediaSource getSource(Map<String, String> headers, String url, List<Sub> subs, int errorCode) {
+    private static MediaSource getSource(Map<String, String> headers, String url, String format, List<Sub> subs, int errorCode) {
         Uri uri = Uri.parse(url.trim().replace("\\", ""));
+        String mimeType = getMimeType(format, errorCode);
         if (uri.getUserInfo() != null) headers.put(HttpHeaders.AUTHORIZATION, "Basic " + Base64.encodeToString(uri.getUserInfo().getBytes(), Base64.NO_WRAP));
-        return new DefaultMediaSourceFactory(getDataSourceFactory(headers), getExtractorsFactory()).createMediaSource(getMediaItem(uri, subs, errorCode));
+        return new DefaultMediaSourceFactory(getDataSourceFactory(headers), getExtractorsFactory()).createMediaSource(getMediaItem(uri, mimeType, subs));
     }
 
-    private static MediaItem getMediaItem(Uri uri, List<Sub> subs, int errorCode) {
+    private static MediaItem getMediaItem(Uri uri, String mimeType, List<Sub> subs) {
         MediaItem.Builder builder = new MediaItem.Builder().setUri(uri);
-        if (errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED || errorCode == PlaybackException.ERROR_CODE_IO_UNSPECIFIED) builder.setMimeType(MimeTypes.APPLICATION_M3U8);
-        else if (errorCode == PlaybackException.ERROR_CODE_PARSING_MANIFEST_MALFORMED) builder.setMimeType(MimeTypes.APPLICATION_OCTET);
         if (subs.size() > 0) builder.setSubtitleConfigurations(getSubtitles(subs));
         builder.setAllowChunklessPreparation(Players.isHard());
+        if (mimeType != null) builder.setMimeType(mimeType);
         builder.setAds(Sniffer.getAdsRegex(uri));
         return builder.build();
+    }
+
+    private static String getMimeType(String format, int errorCode) {
+        if (format != null) return format;
+        if (errorCode == PlaybackException.ERROR_CODE_PARSING_MANIFEST_MALFORMED) return MimeTypes.APPLICATION_OCTET;
+        if (errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED || errorCode == PlaybackException.ERROR_CODE_IO_UNSPECIFIED) return MimeTypes.APPLICATION_M3U8;
+        return null;
     }
 
     private static List<MediaItem.SubtitleConfiguration> getSubtitles(List<Sub> subs) {
