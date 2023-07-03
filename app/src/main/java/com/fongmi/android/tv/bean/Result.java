@@ -48,6 +48,8 @@ public class Result {
     private Integer parse;
     @SerializedName("jx")
     private Integer jx;
+    @SerializedName("format")
+    private String format;
     @SerializedName("flag")
     private String flag;
     @SerializedName("url")
@@ -160,6 +162,10 @@ public class Result {
 
     public void setJx(Integer jx) {
         this.jx = jx;
+    }
+
+    public String getFormat() {
+        return format;
     }
 
     public String getFlag() {
