@@ -20,13 +20,13 @@ android {
     productFlavors {
         leanback {
             dimension "mode"
-            versionCode 200
-            versionName "20230701#2"
+            versionCode 201
+            versionName "2.0.1"
         }
         mobile {
             dimension "mode"
-            versionCode 200
-            versionName "20230701#2"
+            versionCode 201
+            versionName "2.0.1"
         }
         java {
             dimension "api"
