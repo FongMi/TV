@@ -2,6 +2,7 @@ package com.fongmi.android.tv.bean;
 
 import android.text.TextUtils;
 
+import com.fongmi.android.tv.utils.Utils;
 import com.google.gson.annotations.SerializedName;
 
 public class Core {
@@ -14,9 +15,11 @@ public class Core {
     private String pass;
     @SerializedName("broker")
     private String broker;
+    @SerializedName("resp")
+    private String resp;
 
     public String getAuth() {
-        return TextUtils.isEmpty(auth) ? "" : auth;
+        return TextUtils.isEmpty(auth) ? "" : Utils.convert(auth);
     }
 
     public String getName() {
@@ -29,5 +32,9 @@ public class Core {
 
     public String getBroker() {
         return TextUtils.isEmpty(broker) ? "" : broker;
+    }
+
+    public String getResp() {
+        return TextUtils.isEmpty(resp) ? "" : resp;
     }
 }

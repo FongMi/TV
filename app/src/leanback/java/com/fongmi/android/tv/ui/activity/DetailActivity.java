@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.text.Html;
+import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.View;
@@ -113,7 +114,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private Runnable mR2;
 
     public static void push(FragmentActivity activity, Uri uri) {
-        if (uri.getScheme().startsWith("smb") || uri.getScheme().startsWith("http")) {
+        if ("smb".equals(uri.getScheme()) || "http".equals(uri.getScheme()) || "https".equals(uri.getScheme())) {
             push(activity, uri.toString(), true);
         } else {
             file(activity, FileChooser.getPathFromUri(activity, uri));
@@ -238,8 +239,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         setRecyclerView();
         setVideoView();
         setViewModel();
-        getDetail();
         checkCast();
+        checkId();
     }
 
     @Override
@@ -354,18 +355,22 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         else mBinding.progressLayout.showProgress();
     }
 
+    private void checkId() {
+        if (TextUtils.isEmpty(getId()) || getId().startsWith("msearch:")) setEmpty();
+        else getDetail();
+    }
+
     private void getDetail() {
         mViewModel.detailContent(getKey(), getId());
     }
 
     private void getDetail(Vod item) {
+        if (mBinding.progressLayout.isContent()) Notify.progress(this);
         getIntent().putExtra("key", item.getSiteKey());
         getIntent().putExtra("id", item.getVodId());
         mBinding.scroll.scrollTo(0, 0);
         Clock.get().setCallback(null);
-        Notify.progress(this);
         mPlayers.stop();
-        hideProgress();
         getDetail();
     }
 
@@ -383,7 +388,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         } else if (getName().isEmpty()) {
             mBinding.progressLayout.showEmpty();
         } else {
-            checkSearch();
+            checkSearch(false);
         }
     }
 
@@ -536,9 +541,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onChange() {
-        mBroken.add(getId());
-        setAutoMode(true);
-        checkSearch();
+        if (getSite().isChangeable()) checkSearch(true);
+        else checkFlag();
     }
 
     private void onLoop() {
@@ -591,10 +595,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onRefresh() {
-        Clock.get().setCallback(null);
-        if (mFlagAdapter.size() == 0) return;
-        if (mEpisodeAdapter.size() == 0) return;
-        getPlayer(getFlag(), getEpisode(), false);
+        onReset(false);
     }
 
     private void onReset() {
@@ -890,14 +891,13 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onErrorEvent(ErrorEvent event) {
-        if (!event.isRetry() || mPlayers.addRetry() > 3) onError(event);
+        if (mPlayers.addRetry() > event.getRetry()) onError(event);
         else onRefresh();
     }
 
     private void onError(ErrorEvent event) {
         Clock.get().setCallback(null);
         showError(event.getMsg());
-        mBroken.add(getId());
         mPlayers.stop();
         startFlow();
     }
@@ -925,13 +925,13 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void checkFlag() {
         int position = isGone(mBinding.flag) ? -1 : mBinding.flag.getSelectedPosition();
-        if (position == mFlagAdapter.size() - 1) checkSearch();
+        if (position == mFlagAdapter.size() - 1) checkSearch(false);
         else nextFlag(position);
     }
 
-    private void checkSearch() {
+    private void checkSearch(boolean force) {
         if (mSearchAdapter.size() == 0) initSearch(getName(), true);
-        else if (isAutoMode()) nextSite();
+        else if (isAutoMode() || force) nextSite();
     }
 
     private void initSearch(String keyword, boolean auto) {
@@ -997,11 +997,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void nextSite() {
         if (mSearchAdapter.size() == 0) return;
-        Vod vod = (Vod) mSearchAdapter.get(0);
-        Notify.show(getString(R.string.play_switch_site, vod.getSiteName()));
+        Vod item = (Vod) mSearchAdapter.get(0);
+        Notify.show(getString(R.string.play_switch_site, item.getSiteName()));
         mSearchAdapter.removeItems(0, 1);
+        mBroken.add(getId());
         setInitAuto(false);
-        getDetail(vod);
+        getDetail(item);
     }
 
     private void onPause(boolean visible) {
