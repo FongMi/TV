@@ -48,10 +48,10 @@ public class Result {
     private Integer parse;
     @SerializedName("jx")
     private Integer jx;
-    @SerializedName("format")
-    private String format;
     @SerializedName("flag")
     private String flag;
+    @SerializedName("format")
+    private String format;
     @SerializedName("url")
     private String url;
     @SerializedName("key")
