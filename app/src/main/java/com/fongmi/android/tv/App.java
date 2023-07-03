@@ -13,6 +13,7 @@ import androidx.multidex.MultiDex;
 import androidx.multidex.MultiDexApplication;
 
 import com.fongmi.android.tv.ui.activity.CrashActivity;
+import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.github.catvod.bean.Doh;
 import com.github.catvod.net.OkHttp;
@@ -83,6 +84,7 @@ public class App extends MultiDexApplication {
 
     public void onCreate() {
         super.onCreate();
+        Notify.createChannel();
         OkHttp.get().setDoh(this, Doh.objectFrom(Prefers.getDoh()));
         CaocConfig.Builder.create().backgroundMode(CaocConfig.BACKGROUND_MODE_SILENT).errorActivity(CrashActivity.class).apply();
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {

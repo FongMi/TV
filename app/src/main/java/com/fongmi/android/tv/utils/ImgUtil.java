@@ -55,7 +55,7 @@ public class ImgUtil {
 
     public static Object getUrl(String url) {
         String param = null;
-        url = Utils.checkProxy(url);
+        url = Utils.convert(url);
         if (url.startsWith("data:")) return url;
         LazyHeaders.Builder builder = new LazyHeaders.Builder();
         if (url.contains("@Cookie=")) builder.addHeader("Cookie", param = url.split("@Cookie=")[1].split("@")[0]);

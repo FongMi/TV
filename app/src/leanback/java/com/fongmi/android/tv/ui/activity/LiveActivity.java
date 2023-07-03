@@ -571,7 +571,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onErrorEvent(ErrorEvent event) {
-        if (!event.isRetry() || mPlayers.addRetry() > 3) onError(event);
+        if (mPlayers.addRetry() > event.getRetry()) onError(event);
         else fetch();
     }
 
