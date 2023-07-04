@@ -10,6 +10,7 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
+import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
@@ -21,6 +22,7 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ShareCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.media3.common.C;
 import androidx.media3.common.Player;
@@ -35,6 +37,7 @@ import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.bean.Parse;
+import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Track;
 import com.fongmi.android.tv.bean.Vod;
@@ -48,6 +51,7 @@ import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.receiver.PiPReceiver;
+import com.fongmi.android.tv.service.PlaybackService;
 import com.fongmi.android.tv.ui.adapter.EpisodeAdapter;
 import com.fongmi.android.tv.ui.adapter.FlagAdapter;
 import com.fongmi.android.tv.ui.adapter.ParseAdapter;
@@ -87,6 +91,9 @@ import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 public class DetailActivity extends BaseActivity implements Clock.Callback, CustomKeyDownVod.Listener, CastDialog.Listener, PiPReceiver.Listener, TrackDialog.Listener, ControlDialog.Listener, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, ParseAdapter.OnClickListener {
 
     private ViewGroup.LayoutParams mFrameParams;
+    private Observer<Result> mObserveDetail;
+    private Observer<Result> mObservePlayer;
+    private Observer<Result> mObserveSearch;
     private ActivityDetailBinding mBinding;
     private EpisodeAdapter mEpisodeAdapter;
     private SearchAdapter mSearchAdapter;
@@ -117,7 +124,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     private PiP mPiP;
 
     public static void push(FragmentActivity activity, Uri uri) {
-        if (uri.getScheme().startsWith("smb") || uri.getScheme().startsWith("http")) {
+        if ("smb".equals(uri.getScheme()) || "http".equals(uri.getScheme()) || "https".equals(uri.getScheme())) {
             push(activity, uri.toString());
         } else {
             file(activity, FileChooser.getPathFromUri(activity, uri));
@@ -199,6 +206,11 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     @Override
+    protected boolean transparent() {
+        return false;
+    }
+
+    @Override
     protected ViewBinding getBinding() {
         return mBinding = ActivityDetailBinding.inflate(getLayoutInflater());
     }
@@ -210,7 +222,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mBinding.swipeLayout.setRefreshing(true);
         getIntent().putExtras(intent);
         setOrient();
-        getDetail();
+        checkId();
     }
 
     @Override
@@ -220,6 +232,9 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mBinding.progressLayout.showProgress();
         mBinding.swipeLayout.setEnabled(false);
         mReceiver = new PiPReceiver(this);
+        mObserveDetail = this::setDetail;
+        mObservePlayer = this::setPlayer;
+        mObserveSearch = this::setSearch;
         mPlayers = new Players().init();
         mDialogs = new ArrayList<>();
         mBroken = new ArrayList<>();
@@ -231,7 +246,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         setVideoView();
         setViewModel();
         showProgress();
-        getDetail();
+        checkId();
     }
 
     @Override
@@ -242,6 +257,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mBinding.actor.setOnClickListener(view -> onActor());
         mBinding.content.setOnClickListener(view -> onContent());
         mBinding.reverse.setOnClickListener(view -> onReverse());
+        mBinding.name.setOnLongClickListener(view -> onChange());
         mBinding.control.cast.setOnClickListener(view -> onCast());
         mBinding.control.back.setOnClickListener(view -> onFull());
         mBinding.control.full.setOnClickListener(view -> onFull());
@@ -253,6 +269,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mBinding.control.prev.setOnClickListener(view -> checkPrev());
         mBinding.control.rotate.setOnClickListener(view -> onRotate());
         mBinding.control.setting.setOnClickListener(view -> onSetting());
+        mBinding.control.title.setOnLongClickListener(view -> onChange());
         mBinding.control.action.text.setOnClickListener(this::onTrack);
         mBinding.control.action.audio.setOnClickListener(this::onTrack);
         mBinding.control.action.video.setOnClickListener(this::onTrack);
@@ -319,23 +336,18 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
-        mViewModel.search.observe(this, result -> setSearch(result.getList()));
-        mViewModel.player.observe(this, result -> {
-            setUseParse(ApiConfig.hasParse() && ((result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx() == 1));
-            if (mControlDialog != null && mControlDialog.isVisible()) mControlDialog.setParseVisible(isUseParse());
-            mBinding.control.parse.setVisibility(isFullscreen() && isUseParse() ? View.VISIBLE : View.GONE);
-            int timeout = getSite().isChangeable() ? Constant.TIMEOUT_PLAY : -1;
-            mPlayers.start(result, isUseParse(), timeout);
-        });
-        mViewModel.result.observe(this, result -> {
-            mBinding.swipeLayout.setRefreshing(false);
-            if (result.getList().isEmpty()) setEmpty();
-            else setDetail(result.getList().get(0));
-        });
+        mViewModel.result.observeForever(mObserveDetail);
+        mViewModel.player.observeForever(mObservePlayer);
+        mViewModel.search.observeForever(mObserveSearch);
         mViewModel.episode.observe(this, episode -> {
             onItemClick(episode);
             hideSheet();
         });
+    }
+
+    private void checkId() {
+        if (TextUtils.isEmpty(getId()) || getId().startsWith("msearch:")) setEmpty();
+        else getDetail();
     }
 
     private void getDetail() {
@@ -350,16 +362,13 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mBinding.scroll.scrollTo(0, 0);
         Clock.get().setCallback(null);
         mPlayers.stop();
-        hideProgress();
         getDetail();
     }
 
-    private void getPlayer(Vod.Flag flag, Vod.Flag.Episode episode, boolean replay) {
-        mBinding.control.title.setText(getString(R.string.detail_title, mBinding.name.getText(), episode.getName()));
-        mViewModel.playerContent(getKey(), flag.getFlag(), episode.getUrl());
-        updateHistory(episode, replay);
-        showProgress();
-        setUrl(null);
+    private void setDetail(Result result) {
+        mBinding.swipeLayout.setRefreshing(false);
+        if (result.getList().isEmpty()) setEmpty();
+        else setDetail(result.getList().get(0));
     }
 
     private void setEmpty() {
@@ -369,7 +378,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
             mBinding.swipeLayout.setEnabled(true);
             mBinding.progressLayout.showEmpty();
         } else {
-            checkSearch();
+            checkSearch(false);
         }
     }
 
@@ -402,6 +411,23 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         if (!item.getTypeName().isEmpty()) sb.append(getString(R.string.detail_type, item.getTypeName())).append("  ");
         view.setVisibility(sb.length() == 0 ? View.GONE : View.VISIBLE);
         view.setText(Utils.substring(sb.toString(), 2));
+    }
+
+    private void getPlayer(Vod.Flag flag, Vod.Flag.Episode episode, boolean replay) {
+        mBinding.control.title.setText(getString(R.string.detail_title, mBinding.name.getText(), episode.getName()));
+        mViewModel.playerContent(getKey(), flag.getFlag(), episode.getUrl());
+        updateHistory(episode, replay);
+        showProgress();
+        setUrl(null);
+    }
+
+    private void setPlayer(Result result) {
+        setUseParse(ApiConfig.hasParse() && ((result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx() == 1));
+        if (mControlDialog != null && mControlDialog.isVisible()) mControlDialog.setParseVisible(isUseParse());
+        mBinding.control.parse.setVisibility(isFullscreen() && isUseParse() ? View.VISIBLE : View.GONE);
+        int timeout = getSite().isChangeable() ? Constant.TIMEOUT_PLAY : -1;
+        mPlayers.start(result, isUseParse(), timeout);
+        mBinding.swipeLayout.setRefreshing(false);
     }
 
     @Override
@@ -474,6 +500,12 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     private void onReverse() {
         mHistory.setRevSort(!mHistory.isRevSort());
         reverseEpisode(false);
+    }
+
+    private boolean onChange() {
+        if (getSite().isChangeable()) checkSearch(true);
+        else checkFlag();
+        return true;
     }
 
     private void onCast() {
@@ -581,10 +613,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void onRefresh() {
-        Clock.get().setCallback(null);
-        if (mFlagAdapter.getItemCount() == 0) return;
-        if (mEpisodeAdapter.getItemCount() == 0) return;
-        getPlayer(getFlag(), getEpisode(), false);
+        onReset(false);
     }
 
     private void onReset() {
@@ -606,7 +635,6 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     private void onPlayer() {
         mPlayers.togglePlayer();
-        Prefers.putPlayer(mPlayers.getPlayer());
         setPlayerView();
         setR1Callback();
         onRefresh();
@@ -923,31 +951,24 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onErrorEvent(ErrorEvent event) {
-        if (!event.isRetry() || mPlayers.addRetry() > 3) checkError(event);
+        if (mPlayers.addRetry() > event.getRetry()) checkError(event);
         else onRefresh();
     }
 
     private void checkError(ErrorEvent event) {
         if (getSite().getPlayerType() == -1 && event.isFormat() && getToggleCount() < 3) {
             toggleCount++;
-            nextPlayer();
+            onPlayer();
         } else {
             resetToggle();
             onError(event);
         }
     }
 
-    private void nextPlayer() {
-        mPlayers.togglePlayer();
-        setPlayerView();
-        onRefresh();
-    }
-
     private void onError(ErrorEvent event) {
         mBinding.swipeLayout.setEnabled(true);
         Clock.get().setCallback(null);
         showError(event.getMsg());
-        mBroken.add(getId());
         mPlayers.stop();
         startFlow();
     }
@@ -975,13 +996,13 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     private void checkFlag() {
         int position = isGone(mBinding.flag) ? -1 : mFlagAdapter.getPosition();
-        if (position == mFlagAdapter.getItemCount() - 1) checkSearch();
+        if (position == mFlagAdapter.getItemCount() - 1) checkSearch(false);
         else nextFlag(position);
     }
 
-    private void checkSearch() {
+    private void checkSearch(boolean force) {
         if (mSearchAdapter.getItemCount() == 0) initSearch(getName(), true);
-        else if (isAutoMode()) nextSite();
+        else if (isAutoMode() || force) nextSite();
     }
 
     private void initSearch(String keyword, boolean auto) {
@@ -993,7 +1014,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     private void startSearch(String keyword) {
         mSearchAdapter.clear();
-        mExecutor = Executors.newFixedThreadPool(Constant.THREAD_POOL);
+        mExecutor = Executors.newFixedThreadPool(Constant.THREAD_POOL * 2);
         for (Site site : ApiConfig.get().getSites()) {
             if (site.getKey().equals(getKey())) continue;
             if (isAutoMode() && !site.isChangeable()) continue;
@@ -1012,7 +1033,8 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         }
     }
 
-    private void setSearch(List<Vod> items) {
+    private void setSearch(Result result) {
+        List<Vod> items = result.getList();
         Iterator<Vod> iterator = items.iterator();
         while (iterator.hasNext()) if (mismatch(iterator.next())) iterator.remove();
         mBinding.search.setVisibility(View.VISIBLE);
@@ -1046,11 +1068,12 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     private void nextSite() {
         if (mSearchAdapter.getItemCount() == 0) return;
-        Vod vod = mSearchAdapter.get(0);
-        Notify.show(getString(R.string.play_switch_site, vod.getSiteName()));
+        Vod item = mSearchAdapter.get(0);
+        Notify.show(getString(R.string.play_switch_site, item.getSiteName()));
         mSearchAdapter.remove(0);
+        mBroken.add(getId());
         setInitAuto(false);
-        getDetail(vod);
+        getDetail(item);
     }
 
     private boolean isFullscreen() {
@@ -1285,17 +1308,25 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     @Override
     protected void onStart() {
         super.onStart();
-        mPlayers.play();
         setStop(false);
-        Clock.start();
+        if (PiP.isIn(this)) {
+            PlaybackService.stop();
+        } else {
+            mPlayers.play();
+            Clock.start();
+        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        mPlayers.pause();
         setStop(true);
-        Clock.stop();
+        if (PiP.isIn(this)) {
+            PlaybackService.start();
+        } else {
+            mPlayers.pause();
+            Clock.stop();
+        }
     }
 
     @Override
@@ -1314,7 +1345,12 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     protected void onDestroy() {
         super.onDestroy();
         mPlayers.release();
+        Clock.get().release();
         RefreshEvent.history();
+        PlaybackService.stop();
         App.removeCallbacks(mR1, mR2, mR3);
+        mViewModel.result.removeObserver(mObserveDetail);
+        mViewModel.player.removeObserver(mObservePlayer);
+        mViewModel.search.removeObserver(mObserveSearch);
     }
 }

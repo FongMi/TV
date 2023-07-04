@@ -40,6 +40,7 @@ import com.fongmi.android.tv.player.source.Force;
 import com.fongmi.android.tv.player.source.TVBus;
 import com.fongmi.android.tv.player.source.ZLive;
 import com.fongmi.android.tv.receiver.PiPReceiver;
+import com.fongmi.android.tv.service.PlaybackService;
 import com.fongmi.android.tv.ui.adapter.ChannelAdapter;
 import com.fongmi.android.tv.ui.adapter.GroupAdapter;
 import com.fongmi.android.tv.ui.base.BaseActivity;
@@ -608,7 +609,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onErrorEvent(ErrorEvent event) {
-        if (!event.isRetry() || mPlayers.addRetry() > 3) checkError(event);
+        if (mPlayers.addRetry() > event.getRetry()) checkError(event);
         else fetch();
     }
 
@@ -866,15 +867,23 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     @Override
     protected void onStart() {
         super.onStart();
-        mPlayers.play();
         setStop(false);
+        if (PiP.isIn(this)) {
+            PlaybackService.stop();
+        } else {
+            mPlayers.play();
+        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        mPlayers.pause();
         setStop(true);
+        if (PiP.isIn(this)) {
+            PlaybackService.start();
+        } else {
+            mPlayers.pause();
+        }
     }
 
     @Override
@@ -909,6 +918,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         Force.get().stop();
         ZLive.get().stop();
         TVBus.get().stop();
+        PlaybackService.stop();
         App.removeCallbacks(mR1, mR2, mR3);
     }
 }

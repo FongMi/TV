@@ -149,16 +149,14 @@ public class Global {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                executor.submit(() -> {
-                    func.call();
-                });
+                if (!executor.isShutdown()) executor.submit(() -> { func.call(); });
             }
         }, delay);
     }
 
     private Call call(String url, JSONObject object, Headers headers) {
         int redirect = object.optInt("redirect", 1);
-        int timeout = object.optInt("timeout", 10000);
+        int timeout = object.optInt("timeout", OkHttp.TIMEOUT);
         OkHttpClient client = redirect == 1 ? OkHttp.client() : OkHttp.noRedirect();
         client.newBuilder().connectTimeout(timeout, TimeUnit.MILLISECONDS);
         return client.newCall(getRequest(url, object, headers));

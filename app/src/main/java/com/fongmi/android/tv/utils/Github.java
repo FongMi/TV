@@ -8,6 +8,7 @@ import com.github.catvod.net.OkHttp;
 import java.io.IOException;
 
 import okhttp3.OkHttpClient;
+import okhttp3.Response;
 
 public class Github {
 
@@ -39,8 +40,9 @@ public class Github {
     private void check(String url) {
         try {
             if (getProxy().length() > 0) return;
-            int code = OkHttp.newCall(client, url).execute().code();
-            if (code == 200) setProxy(url);
+            Response response = OkHttp.newCall(client, url).execute();
+            if (response.code() == 200) setProxy(url);
+            response.close();
         } catch (IOException ignored) {
         }
     }
