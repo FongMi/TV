@@ -2,6 +2,7 @@ package com.hiker.drpy.method;
 
 import android.text.TextUtils;
 import android.util.Base64;
+import android.util.Log;
 
 import androidx.annotation.Keep;
 
@@ -158,7 +159,7 @@ public class Global {
         int redirect = object.optInt("redirect", 1);
         int timeout = object.optInt("timeout", OkHttp.TIMEOUT);
         OkHttpClient client = redirect == 1 ? OkHttp.client() : OkHttp.noRedirect();
-        client.newBuilder().connectTimeout(timeout, TimeUnit.MILLISECONDS);
+        client = client.newBuilder().connectTimeout(timeout, TimeUnit.MILLISECONDS).readTimeout(timeout, TimeUnit.MILLISECONDS).writeTimeout(timeout, TimeUnit.MILLISECONDS).build();
         return client.newCall(getRequest(url, object, headers));
     }
 
