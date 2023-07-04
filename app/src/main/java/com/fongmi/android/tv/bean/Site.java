@@ -125,7 +125,7 @@ public class Site {
     }
 
     public Integer getChangeable() {
-        return changeable == null ? 0 : changeable;
+        return changeable == null ? 1 : changeable;
     }
 
     public void setChangeable(Integer changeable) {
