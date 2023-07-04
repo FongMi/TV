@@ -37,8 +37,7 @@ public class Config {
     private String parse;
 
     public static List<Config> arrayFrom(String str) {
-        Type listType = new TypeToken<List<Config>>() {
-        }.getType();
+        Type listType = new TypeToken<List<Config>>() {}.getType();
         List<Config> items = new Gson().fromJson(str, listType);
         return items == null ? Collections.emptyList() : items;
     }

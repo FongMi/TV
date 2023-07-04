@@ -4,7 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
 import android.provider.Settings;
@@ -81,10 +81,6 @@ public class Utils {
         window.getDecorView().setSystemUiVisibility(flags);
     }
 
-    public static boolean hasPiP() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && App.get().getPackageManager().hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE);
-    }
-
     public static boolean isAutoRotate() {
         return Settings.System.getInt(App.get().getContentResolver(), Settings.System.ACCELEROMETER_ROTATION, 0) == 1;
     }
@@ -99,25 +95,24 @@ public class Utils {
         return headers;
     }
 
-    public static String checkProxy(String url) {
-        if (url.startsWith("proxy://")) return url.replace("proxy://", Server.get().getAddress("proxy?"));
-        return url;
-    }
-
     public static String checkClan(String text) {
         if (text.contains("/localhost/")) text = text.replace("/localhost/", "/");
         if (text.startsWith("clan")) text = text.replace("clan", "file");
         return text;
     }
 
-    public static String convert(String text) {
-        return text.startsWith("file") ? Server.get().getAddress(text) : text;
-    }
-
     public static String convert(String baseUrl, String text) {
         if (TextUtils.isEmpty(text)) return "";
         if (text.startsWith("clan")) return checkClan(text);
         return UriUtil.resolve(baseUrl, text);
+    }
+
+    public static String convert(String url) {
+        Uri uri = Uri.parse(url);
+        if ("file".equals(uri.getScheme())) return Server.get().getAddress(url);
+        if ("local".equals(uri.getScheme())) return Server.get().getAddress(uri.getHost());
+        if ("proxy".equals(uri.getScheme())) return url.replace("proxy://", Server.get().getAddress("proxy?"));
+        return url;
     }
 
     public static String getMd5(String src) {
