@@ -114,9 +114,7 @@ public class ExoUtil {
     private static MediaItem getMediaItem(Uri uri, String mimeType, List<Sub> subs) {
         MediaItem.Builder builder = new MediaItem.Builder().setUri(uri);
         if (subs.size() > 0) builder.setSubtitleConfigurations(getSubtitles(subs));
-        builder.setAllowChunklessPreparation(Players.isHard());
         if (mimeType != null) builder.setMimeType(mimeType);
-        builder.setAds(Sniffer.getAdsRegex(uri));
         return builder.build();
     }
 
