@@ -157,7 +157,7 @@ public class Global {
 
     private Call call(String url, JSONObject object, Headers headers) {
         int redirect = object.optInt("redirect", 1);
-        int timeout = object.optInt("timeout", OkHttp.TIMEOUT);
+        int timeout = object.optInt("timeout", 10000);
         OkHttpClient client = redirect == 1 ? OkHttp.client() : OkHttp.noRedirect();
         client = client.newBuilder().connectTimeout(timeout, TimeUnit.MILLISECONDS).readTimeout(timeout, TimeUnit.MILLISECONDS).writeTimeout(timeout, TimeUnit.MILLISECONDS).build();
         return client.newCall(getRequest(url, object, headers));
