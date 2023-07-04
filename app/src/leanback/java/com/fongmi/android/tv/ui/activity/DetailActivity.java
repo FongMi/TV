@@ -838,8 +838,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     public void onPlayerEvent(PlayerEvent event) {
         switch (event.getState()) {
             case 0:
-                checkPosition();
+                setPosition();
+                setInitTrack(true);
                 setTrackVisible(false);
+                Clock.get().setCallback(this);
                 break;
             case Player.STATE_IDLE:
                 break;
@@ -862,10 +864,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         }
     }
 
-    private void checkPosition() {
+    private void setPosition() {
         mPlayers.seekTo(Math.max(mHistory.getOpening(), mHistory.getPosition()), false);
-        Clock.get().setCallback(this);
-        setInitTrack(true);
     }
 
     private void checkEnded() {
@@ -896,7 +896,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void checkError(ErrorEvent event) {
-        if (getSite().getPlayerType() == -1 && event.isFormat() && getToggleCount() < 2) {
+        if (getSite().getPlayerType() == -1 && event.isFormat() && getToggleCount() < 2 && mPlayers.getPlayer() != Players.SYS) {
             toggleCount++;
             nextPlayer();
         } else {
