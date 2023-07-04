@@ -204,7 +204,12 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     public void togglePlayer() {
         stop();
-        setPlayer(player == EXO ? SYS : ++player);
+        setPlayer(isExo() ? SYS : ++player);
+    }
+
+    public void nextPlayer() {
+        stop();
+        setPlayer(isExo() ? IJK : EXO);
     }
 
     public void toggleDecode() {

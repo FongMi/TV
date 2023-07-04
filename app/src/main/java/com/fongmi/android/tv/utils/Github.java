@@ -13,8 +13,7 @@ import okhttp3.Response;
 public class Github {
 
     public static final String A = "https://raw.githubusercontent.com/";
-    public static final String B = "https://raw.iqiq.io/";
-    public static final String C = "https://ghproxy.com/";
+    public static final String B = "https://ghproxy.com/";
     public static final String REPO = "FongMi/TV/";
     public static final String RELEASE = "release";
     public static final String KITKAT = "kitkat";
@@ -34,7 +33,6 @@ public class Github {
         client = OkHttp.client(Constant.TIMEOUT_GITHUB);
         check(A);
         check(B);
-        check(C);
     }
 
     private void check(String url) {
@@ -42,13 +40,12 @@ public class Github {
             if (getProxy().length() > 0) return;
             Response response = OkHttp.newCall(client, url).execute();
             if (response.code() == 200) setProxy(url);
-            response.close();
         } catch (IOException ignored) {
         }
     }
 
     private void setProxy(String url) {
-        this.proxy = url.equals(C) ? url + A + REPO : url + REPO;
+        this.proxy = url.equals(B) ? url + A + REPO : url + REPO;
     }
 
     private String getProxy() {
