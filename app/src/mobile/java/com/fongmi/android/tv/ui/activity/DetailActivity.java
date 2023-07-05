@@ -380,6 +380,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
             showEmpty();
         } else {
             checkSearch(false);
+            App.post(mR4, 5000);
         }
     }
 
@@ -1024,7 +1025,6 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         setAutoMode(auto);
         setInitAuto(auto);
         startSearch(keyword);
-        App.post(mR4, 10000);
     }
 
     private void startSearch(String keyword) {
