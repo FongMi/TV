@@ -1,5 +1,7 @@
 package com.fongmi.android.tv.player;
 
+import android.text.TextUtils;
+
 import androidx.annotation.NonNull;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
@@ -393,8 +395,9 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     @Override
     public void onParseSuccess(Map<String, String> headers, String url, String from) {
-        if (from.length() > 0) Notify.show(ResUtil.getString(R.string.parse_from, from));
         setMediaSource(headers, url);
+        if (TextUtils.isEmpty(from)) return;
+        Notify.show(ResUtil.getString(R.string.parse_from, from));
     }
 
     @Override
