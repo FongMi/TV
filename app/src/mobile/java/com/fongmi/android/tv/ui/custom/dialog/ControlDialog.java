@@ -1,5 +1,6 @@
 package com.fongmi.android.tv.ui.custom.dialog;
 
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -83,6 +84,8 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
 
     @Override
     protected void initView() {
+        if (players == null) dismiss();
+        if (players == null) return;
         binding.speed.setValue(Math.max(players.getSpeed(), 1.0f));
         binding.player.setText(detail.control.action.player.getText());
         binding.decode.setText(detail.control.action.decode.getText());
