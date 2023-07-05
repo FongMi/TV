@@ -105,7 +105,7 @@ public class Site {
     }
 
     public int getPlayerType() {
-        return playerType == null ? -1 : playerType;
+        return playerType == null ? -1 : Math.min(playerType, 2);
     }
 
     public Integer getSearchable() {
