@@ -196,6 +196,7 @@
             android:clipToPadding="false"
             android:orientation="horizontal"
             android:padding="8dp"
+            android:visibility="gone"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:itemCount="5"
             tools:listitem="@layout/adapter_parse_dark" />
