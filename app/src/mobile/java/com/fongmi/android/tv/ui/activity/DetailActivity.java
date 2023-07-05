@@ -886,9 +886,11 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     public void onPlayerEvent(PlayerEvent event) {
         switch (event.getState()) {
             case 0:
-                checkPosition();
-                setUrl(event.getUrl());
+                setPosition();
+                setInitTrack(true);
                 setTrackVisible(false);
+                setUrl(event.getUrl());
+                Clock.get().setCallback(this);
                 break;
             case Player.STATE_IDLE:
                 break;
@@ -914,10 +916,8 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         }
     }
 
-    private void checkPosition() {
+    private void setPosition() {
         mPlayers.seekTo(Math.max(mHistory.getOpening(), mHistory.getPosition()), false);
-        Clock.get().setCallback(this);
-        setInitTrack(true);
     }
 
     private void checkRotate() {
@@ -956,13 +956,19 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void checkError(ErrorEvent event) {
-        if (getSite().getPlayerType() == -1 && event.isFormat() && getToggleCount() < 3) {
+        if (getSite().getPlayerType() == -1 && event.isFormat() && getToggleCount() < 2 && mPlayers.getPlayer() != Players.SYS) {
             toggleCount++;
-            onPlayer();
+            nextPlayer();
         } else {
             resetToggle();
             onError(event);
         }
+    }
+
+    private void nextPlayer() {
+        mPlayers.nextPlayer();
+        setPlayerView();
+        onRefresh();
     }
 
     private void onError(ErrorEvent event) {
