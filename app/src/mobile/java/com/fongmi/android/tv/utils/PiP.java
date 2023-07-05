@@ -49,7 +49,11 @@ public class PiP {
         Rect sourceRectHint = new Rect();
         view.getGlobalVisibleRect(sourceRectHint);
         builder.setSourceRectHint(sourceRectHint);
-        activity.setPictureInPictureParams(builder.build());
+        try {
+            activity.setPictureInPictureParams(builder.build());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void update(Activity activity, boolean play) {
@@ -59,7 +63,11 @@ public class PiP {
         actions.add(new RemoteAction(Icon.createWithResource(activity, R.drawable.exo_icon_previous), "", "", PendingIntent.getBroadcast(activity, CONTROL_TYPE_PREV, new Intent(ACTION_MEDIA_CONTROL).putExtra(EXTRA_CONTROL_TYPE, CONTROL_TYPE_PREV), PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE)));
         actions.add(new RemoteAction(Icon.createWithResource(activity, icon), "", "", PendingIntent.getBroadcast(activity, play ? CONTROL_TYPE_PAUSE : CONTROL_TYPE_PLAY, new Intent(ACTION_MEDIA_CONTROL).putExtra(EXTRA_CONTROL_TYPE, play ? CONTROL_TYPE_PAUSE : CONTROL_TYPE_PLAY), PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE)));
         actions.add(new RemoteAction(Icon.createWithResource(activity, R.drawable.exo_icon_next), "", "", PendingIntent.getBroadcast(activity, CONTROL_TYPE_NEXT, new Intent(ACTION_MEDIA_CONTROL).putExtra(EXTRA_CONTROL_TYPE, CONTROL_TYPE_NEXT), PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE)));
-        activity.setPictureInPictureParams(builder.setActions(actions).build());
+        try {
+            activity.setPictureInPictureParams(builder.setActions(actions).build());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void enter(Activity activity, boolean four) {
