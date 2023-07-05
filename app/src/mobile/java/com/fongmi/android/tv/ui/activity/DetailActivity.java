@@ -120,6 +120,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     private Runnable mR1;
     private Runnable mR2;
     private Runnable mR3;
+    private Runnable mR4;
     private String url;
     private PiP mPiP;
 
@@ -241,6 +242,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
         mR3 = this::setOrient;
+        mR4 = this::showEmpty;
         mPiP = new PiP();
         setRecyclerView();
         setVideoView();
@@ -375,11 +377,17 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         if (isFromCollect()) {
             finish();
         } else if (getName().isEmpty()) {
-            mBinding.swipeLayout.setEnabled(true);
-            mBinding.progressLayout.showEmpty();
+            showEmpty();
         } else {
             checkSearch(false);
         }
+    }
+
+    private void showEmpty() {
+        if (!mBinding.progressLayout.isProgress()) return;
+        showError(getString(R.string.error_play_url));
+        mBinding.swipeLayout.setEnabled(true);
+        mBinding.progressLayout.showEmpty();
     }
 
     private void setDetail(Vod item) {
@@ -1016,6 +1024,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         setAutoMode(auto);
         setInitAuto(auto);
         startSearch(keyword);
+        App.post(mR4, 10000);
     }
 
     private void startSearch(String keyword) {
@@ -1046,6 +1055,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mBinding.search.setVisibility(View.VISIBLE);
         mSearchAdapter.addAll(items);
         if (isInitAuto()) nextSite();
+        App.removeCallbacks(mR4);
     }
 
     private void setSearch(Vod item) {
@@ -1354,7 +1364,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         Clock.get().release();
         RefreshEvent.history();
         PlaybackService.stop();
-        App.removeCallbacks(mR1, mR2, mR3);
+        App.removeCallbacks(mR1, mR2, mR3, mR4);
         mViewModel.result.removeObserver(mObserveDetail);
         mViewModel.player.removeObserver(mObservePlayer);
         mViewModel.search.removeObserver(mObserveSearch);
