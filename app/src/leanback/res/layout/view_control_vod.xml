@@ -18,6 +18,7 @@
         android:layout_marginBottom="16dp"
         android:clipChildren="false"
         android:clipToPadding="false"
+        android:visibility="gone"
         tools:layout_height="36dp" />
 
     <HorizontalScrollView
