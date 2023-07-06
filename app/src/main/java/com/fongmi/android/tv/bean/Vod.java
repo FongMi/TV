@@ -5,6 +5,8 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 
+import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Trans;
 import com.fongmi.android.tv.utils.Utils;
 import com.google.gson.Gson;
@@ -20,6 +22,7 @@ import org.simpleframework.xml.Text;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -306,6 +309,12 @@ public class Vod {
             for (Vod.Flag.Episode item : getEpisodes()) if (item.rule3(remarks)) return item;
             for (Vod.Flag.Episode item : getEpisodes()) if (item.rule4(remarks)) return item;
             return getPosition() != -1 ? getEpisodes().get(getPosition()) : null;
+        }
+
+        public static List<Flag> create(String flag, String name, String url) {
+            Vod.Flag item = new Vod.Flag(flag);
+            item.getEpisodes().add(new Vod.Flag.Episode(name, url));
+            return Arrays.asList(item);
         }
 
         @Override
