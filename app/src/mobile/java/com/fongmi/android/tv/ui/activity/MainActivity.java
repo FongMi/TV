@@ -59,10 +59,9 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
     }
 
     private void checkAction(Intent intent) {
-        boolean push = ApiConfig.hasPush() && intent.getAction() != null;
-        if (push && intent.getAction().equals(Intent.ACTION_SEND)) {
+        if (Intent.ACTION_SEND.equals(intent.getAction())) {
             DetailActivity.push(this, Uri.parse(intent.getStringExtra(Intent.EXTRA_TEXT)));
-        } else if (push && intent.getAction().equals(Intent.ACTION_VIEW) && intent.getData() != null) {
+        } else if (Intent.ACTION_VIEW.equals(intent.getAction()) && intent.getData() != null) {
             DetailActivity.push(this, intent.getData());
         }
     }

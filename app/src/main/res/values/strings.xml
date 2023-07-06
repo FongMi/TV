@@ -57,6 +57,9 @@
     <string name="parse_god">Super</string>
     <string name="parse_from">Parse from: <xliff:g name="name">%s</xliff:g></string>
 
+    <!-- Push -->
+    <string name="push">Push</string>
+
     <!-- Setting -->
     <string name="setting_vod">Vod</string>
     <string name="setting_live">Live</string>

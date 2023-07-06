@@ -6,13 +6,17 @@ import android.util.ArrayMap;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+import androidx.media3.common.util.Log;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.BuildConfig;
 import com.fongmi.android.tv.Constant;
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Vod;
+import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Sniffer;
 import com.fongmi.android.tv.utils.Trans;
 import com.fongmi.android.tv.utils.Utils;
@@ -20,6 +24,7 @@ import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.OkHttp;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -49,8 +54,8 @@ public class SiteViewModel extends ViewModel {
     }
 
     public void homeContent() {
-        Site site = ApiConfig.get().getHome();
         execute(result, () -> {
+            Site site = ApiConfig.get().getHome();
             if (site.getType() == 3) {
                 Spider spider = ApiConfig.get().getCSP(site);
                 String homeContent = spider.homeContent(true);
@@ -78,8 +83,8 @@ public class SiteViewModel extends ViewModel {
     }
 
     public void categoryContent(String key, String tid, String page, boolean filter, HashMap<String, String> extend) {
-        Site site = ApiConfig.get().getSite(key);
         execute(result, () -> {
+            Site site = ApiConfig.get().getSite(key);
             if (site.getType() == 3) {
                 Spider spider = ApiConfig.get().getCSP(site);
                 String categoryContent = spider.categoryContent(tid, page, filter, extend);
@@ -101,8 +106,8 @@ public class SiteViewModel extends ViewModel {
     }
 
     public void detailContent(String key, String id) {
-        Site site = ApiConfig.get().getSite(key);
         execute(result, () -> {
+            Site site = ApiConfig.get().getSite(key);
             if (site.getType() == 3) {
                 Spider spider = ApiConfig.get().getCSP(site);
                 String detailContent = spider.detailContent(Arrays.asList(id));
@@ -111,6 +116,16 @@ public class SiteViewModel extends ViewModel {
                 Result result = Result.fromJson(detailContent);
                 if (!result.getList().isEmpty()) result.getList().get(0).setVodFlags();
                 return result;
+            } else if (key.equals("push_agent")) {
+                Vod vod = new Vod();
+                vod.setVodId(id);
+                vod.setVodName(id);
+                vod.setVodContent(id);
+                Vod.Flag flag = new Vod.Flag(ResUtil.getString(R.string.push));
+                flag.getEpisodes().add(new Vod.Flag.Episode(ResUtil.getString(R.string.play), id));
+                vod.setVodPic("https://pic.rmb.bdstatic.com/bjh/1d0b02d0f57f0a42201f92caba5107ed.jpeg");
+                vod.setVodFlags(List.of(flag));
+                return Result.vod(vod);
             } else {
                 ArrayMap<String, String> params = new ArrayMap<>();
                 params.put("ac", site.getType() == 0 ? "videolist" : "detail");
@@ -125,8 +140,8 @@ public class SiteViewModel extends ViewModel {
     }
 
     public void playerContent(String key, String flag, String id) {
-        Site site = ApiConfig.get().getSite(key);
         execute(player, () -> {
+            Site site = ApiConfig.get().getSite(key);
             if (site.getType() == 3) {
                 Spider spider = ApiConfig.get().getCSP(site);
                 String playerContent = spider.playerContent(flag, id, ApiConfig.get().getFlags());
@@ -144,6 +159,12 @@ public class SiteViewModel extends ViewModel {
                 SpiderDebug.log(body);
                 Result result = Result.fromJson(body);
                 if (result.getFlag().isEmpty()) result.setFlag(flag);
+                return result;
+            } else if (key.equals("push_agent")) {
+                Result result = new Result();
+                result.setFlag(flag);
+                result.setParse(0);
+                result.setUrl(id);
                 return result;
             } else {
                 String url = id;
