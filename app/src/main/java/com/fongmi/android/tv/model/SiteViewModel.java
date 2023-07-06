@@ -120,7 +120,6 @@ public class SiteViewModel extends ViewModel {
                 Vod vod = new Vod();
                 vod.setVodId(id);
                 vod.setVodName(id);
-                vod.setVodContent(id);
                 Vod.Flag flag = new Vod.Flag(ResUtil.getString(R.string.push));
                 flag.getEpisodes().add(new Vod.Flag.Episode(ResUtil.getString(R.string.play), id));
                 vod.setVodPic("https://pic.rmb.bdstatic.com/bjh/1d0b02d0f57f0a42201f92caba5107ed.jpeg");
