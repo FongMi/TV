@@ -90,8 +90,8 @@
     <string name="dialog_config_url">請輸入網址…</string>
 
     <!-- Error -->
-    <string name="error_config_get">配置取得失敗</string>
-    <string name="error_config_parse">配置解析失敗</string>
+    <string name="error_config_get">配置取得失敗\n<xliff:g name="name">%s</xliff:g></string>
+    <string name="error_config_parse">配置解析失敗\n<xliff:g name="name">%s</xliff:g></string>
     <string name="error_play_next">已經是最後一集了！</string>
     <string name="error_play_prev">已經是第一集了！</string>
     <string name="error_play_parse">播放網址解析失敗</string>

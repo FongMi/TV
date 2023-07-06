@@ -90,8 +90,8 @@
     <string name="dialog_config_url">Please enter the url…</string>
 
     <!-- Error -->
-    <string name="error_config_get">Configuration get failed</string>
-    <string name="error_config_parse">Configuration parse failed</string>
+    <string name="error_config_get">Configuration get failed\n<xliff:g name="name">%s</xliff:g></string>
+    <string name="error_config_parse">Configuration parse failed\n<xliff:g name="name">%s</xliff:g></string>
     <string name="error_play_next">It\'s the last episode!</string>
     <string name="error_play_prev">It\'s the first episode!</string>
     <string name="error_play_parse">Unable to parse url</string>
