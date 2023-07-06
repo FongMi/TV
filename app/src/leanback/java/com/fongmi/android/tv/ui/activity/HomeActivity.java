@@ -152,10 +152,10 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
             }
 
             @Override
-            public void error(int resId) {
+            public void error(String msg) {
                 mBinding.progressLayout.showContent();
                 result = Result.empty();
-                Notify.show(resId);
+                Notify.show(msg);
                 setFocus();
             }
         };
@@ -353,8 +353,8 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
             }
 
             @Override
-            public void error(int resId) {
-                Notify.show(resId);
+            public void error(String msg) {
+                Notify.show(msg);
             }
         };
     }
