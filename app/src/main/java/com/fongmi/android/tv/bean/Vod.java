@@ -140,24 +140,12 @@ public class Vod {
         return TextUtils.isEmpty(vodContent) ? "" : vodContent.trim().replace("\n", "<br>");
     }
 
-    public void setVodContent(String vodContent) {
-        this.vodContent = vodContent;
-    }
-
     public String getVodPlayFrom() {
         return TextUtils.isEmpty(vodPlayFrom) ? "" : vodPlayFrom;
     }
 
-    public void setVodPlayFrom(String vodPlayFrom) {
-        this.vodPlayFrom = vodPlayFrom;
-    }
-
     public String getVodPlayUrl() {
         return TextUtils.isEmpty(vodPlayUrl) ? "" : vodPlayUrl;
-    }
-
-    public void setVodPlayUrl(String vodPlayUrl) {
-        this.vodPlayUrl = vodPlayUrl;
     }
 
     public String getVodTag() {
