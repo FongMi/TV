@@ -110,9 +110,7 @@ public class Result {
     }
 
     public static Result vod(Vod item) {
-        Result result = new Result();
-        result.setList(Arrays.asList(item));
-        return result;
+        return list(Arrays.asList(item));
     }
 
     public List<Class> getTypes() {
