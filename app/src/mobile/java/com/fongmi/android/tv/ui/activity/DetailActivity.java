@@ -315,6 +315,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mBinding.control.action.player.setText(mPlayers.getPlayerText());
         getExo().setVisibility(mPlayers.isExo() ? View.VISIBLE : View.GONE);
         getIjk().setVisibility(mPlayers.isIjk() ? View.VISIBLE : View.GONE);
+        if (mControlDialog != null && mControlDialog.isVisible()) mControlDialog.updatePlayer();
         mBinding.control.action.reset.setText(ResUtil.getStringArray(R.array.select_reset)[Prefers.getReset()]);
         mBinding.video.addOnLayoutChangeListener((view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> mPiP.update(getActivity(), view));
     }
@@ -459,9 +460,14 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     @Override
     public void onItemClick(Parse item) {
+        setParse(item);
+        onRefresh();
+    }
+
+    private void setParse(Parse item) {
         ApiConfig.get().setParse(item);
         notifyItemChanged(mParseAdapter);
-        onRefresh();
+        if (mControlDialog != null && mControlDialog.isVisible()) mControlDialog.updateParse();
     }
 
     private void setEpisodeAdapter(List<Vod.Flag.Episode> items) {
@@ -1005,8 +1011,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     private void initParse() {
         if (mParseAdapter.getItemCount() == 0) return;
-        ApiConfig.get().setParse(mParseAdapter.first());
-        notifyItemChanged(mParseAdapter);
+        setParse(mParseAdapter.first());
     }
 
     private void checkFlag() {
