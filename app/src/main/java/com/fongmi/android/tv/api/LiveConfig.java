@@ -97,8 +97,9 @@ public class LiveConfig {
         try {
             parseConfig(Decoder.getJson(config.getUrl()), callback);
         } catch (Exception e) {
+            if (TextUtils.isEmpty(config.getUrl())) App.post(() -> callback.error(""));
+            else App.post(() -> callback.error(ResUtil.getString(R.string.error_config_get, e.getMessage())));
             e.printStackTrace();
-            App.post(() -> callback.error(TextUtils.isEmpty(config.getUrl()) ? "" : ResUtil.getString(R.string.error_config_get, e.getMessage())));
         }
     }
 
