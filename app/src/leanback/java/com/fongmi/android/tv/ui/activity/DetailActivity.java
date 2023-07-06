@@ -122,6 +122,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     public static void file(FragmentActivity activity, String path) {
+        if (TextUtils.isEmpty(path)) return;
         String name = new File(path).getName();
         if (Utils.hasPermission(activity)) start(activity, "push_agent", "file://" + path, name, true);
         else PermissionX.init(activity).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> start(activity, "push_agent", "file://" + path, name, true));
