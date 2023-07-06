@@ -164,8 +164,8 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
             }
 
             @Override
-            public void error(int resId) {
-                Notify.show(resId);
+            public void error(String msg) {
+                Notify.show(msg);
                 setConfig();
             }
         };

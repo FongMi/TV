@@ -11,6 +11,7 @@ import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.Prefers;
+import com.fongmi.android.tv.utils.ResUtil;
 import com.github.catvod.net.OkHttp;
 
 import java.io.File;
@@ -84,7 +85,7 @@ public class WallConfig {
             App.post(callback::success);
             config.update();
         } catch (Exception e) {
-            App.post(() -> callback.error(R.string.error_config_parse));
+            App.post(() -> callback.error(ResUtil.getString(R.string.error_config_parse, e.getMessage())));
             config(Config.find(ApiConfig.get().getWall(), 2));
             e.printStackTrace();
         }

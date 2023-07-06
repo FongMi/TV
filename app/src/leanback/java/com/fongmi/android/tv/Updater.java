@@ -128,8 +128,8 @@ public class Updater implements Download.Callback {
     }
 
     @Override
-    public void error(String message) {
-        Notify.show(message);
+    public void error(String msg) {
+        Notify.show(msg);
         dismiss();
     }
 

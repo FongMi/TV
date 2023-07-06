@@ -15,6 +15,7 @@ import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.utils.Json;
 import com.fongmi.android.tv.utils.Prefers;
+import com.fongmi.android.tv.utils.ResUtil;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -97,7 +98,7 @@ public class LiveConfig {
             parseConfig(Decoder.getJson(config.getUrl()), callback);
         } catch (Exception e) {
             e.printStackTrace();
-            App.post(() -> callback.error(TextUtils.isEmpty(config.getUrl()) ? 0 : R.string.error_config_get));
+            App.post(() -> callback.error(TextUtils.isEmpty(config.getUrl()) ? "" : ResUtil.getString(R.string.error_config_get, e.getMessage())));
         }
     }
 

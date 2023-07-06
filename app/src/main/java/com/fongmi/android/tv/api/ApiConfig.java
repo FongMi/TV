@@ -11,6 +11,7 @@ import com.fongmi.android.tv.bean.Rule;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.utils.Json;
+import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.bean.Doh;
 import com.github.catvod.crawler.Spider;
@@ -123,30 +124,23 @@ public class ApiConfig {
     }
 
     public void load(Callback callback) {
-        load(false, callback);
-    }
-
-    public void load(boolean cache, Callback callback) {
-        new Thread(() -> {
-            if (cache) loadCache(callback);
-            else loadConfig(callback);
-        }).start();
+        new Thread(() -> loadConfig(callback)).start();
     }
 
     private void loadConfig(Callback callback) {
         try {
             checkJson(JsonParser.parseString(Decoder.getJson(config.getUrl())).getAsJsonObject(), callback);
         } catch (Exception e) {
-            if (TextUtils.isEmpty(config.getUrl())) App.post(() -> callback.error(0));
-            else loadCache(callback);
+            if (TextUtils.isEmpty(config.getUrl())) App.post(() -> callback.error(""));
+            else loadCache(callback, e);
             LiveConfig.get().load();
             e.printStackTrace();
         }
     }
 
-    private void loadCache(Callback callback) {
+    private void loadCache(Callback callback, Exception e) {
         if (!TextUtils.isEmpty(config.getJson())) checkJson(JsonParser.parseString(config.getJson()).getAsJsonObject(), callback);
-        else App.post(() -> callback.error(R.string.error_config_get));
+        else App.post(() -> callback.error(ResUtil.getString(R.string.error_config_get, e.getMessage())));
     }
 
     private void checkJson(JsonObject object, Callback callback) {
@@ -177,7 +171,7 @@ public class ApiConfig {
             App.post(callback::success);
         } catch (Throwable e) {
             e.printStackTrace();
-            App.post(() -> callback.error(R.string.error_config_parse));
+            App.post(() -> callback.error(ResUtil.getString(R.string.error_config_parse, e.getMessage())));
         }
     }
 
