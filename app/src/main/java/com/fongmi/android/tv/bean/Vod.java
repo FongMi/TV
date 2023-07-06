@@ -92,8 +92,16 @@ public class Vod {
         return TextUtils.isEmpty(vodId) ? "" : vodId.trim();
     }
 
+    public void setVodId(String vodId) {
+        this.vodId = vodId;
+    }
+
     public String getVodName() {
         return TextUtils.isEmpty(vodName) ? "" : vodName.trim();
+    }
+
+    public void setVodName(String vodName) {
+        this.vodName = vodName;
     }
 
     public String getTypeName() {
@@ -102,6 +110,10 @@ public class Vod {
 
     public String getVodPic() {
         return TextUtils.isEmpty(vodPic) ? "" : vodPic.trim();
+    }
+
+    public void setVodPic(String vodPic) {
+        this.vodPic = vodPic;
     }
 
     public String getVodRemarks() {
@@ -128,12 +140,24 @@ public class Vod {
         return TextUtils.isEmpty(vodContent) ? "" : vodContent.trim().replace("\n", "<br>");
     }
 
+    public void setVodContent(String vodContent) {
+        this.vodContent = vodContent;
+    }
+
     public String getVodPlayFrom() {
         return TextUtils.isEmpty(vodPlayFrom) ? "" : vodPlayFrom;
     }
 
+    public void setVodPlayFrom(String vodPlayFrom) {
+        this.vodPlayFrom = vodPlayFrom;
+    }
+
     public String getVodPlayUrl() {
         return TextUtils.isEmpty(vodPlayUrl) ? "" : vodPlayUrl;
+    }
+
+    public void setVodPlayUrl(String vodPlayUrl) {
+        this.vodPlayUrl = vodPlayUrl;
     }
 
     public String getVodTag() {
@@ -142,6 +166,10 @@ public class Vod {
 
     public List<Flag> getVodFlags() {
         return vodFlags = vodFlags == null ? new ArrayList<>() : vodFlags;
+    }
+
+    public void setVodFlags(List<Flag> vodFlags) {
+        this.vodFlags = vodFlags;
     }
 
     public Site getSite() {
