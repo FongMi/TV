@@ -17,6 +17,7 @@ import org.simpleframework.xml.Path;
 import org.simpleframework.xml.Root;
 import org.simpleframework.xml.core.Persister;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -105,6 +106,12 @@ public class Result {
     public static Result list(List<Vod> items) {
         Result result = new Result();
         result.setList(items);
+        return result;
+    }
+
+    public static Result vod(Vod item) {
+        Result result = new Result();
+        result.setList(Arrays.asList(item));
         return result;
     }
 

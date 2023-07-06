@@ -100,10 +100,9 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     }
 
     private void checkAction(Intent intent) {
-        boolean push = ApiConfig.hasPush() && intent.getAction() != null;
-        if (push && intent.getAction().equals(Intent.ACTION_SEND)) {
+        if (Intent.ACTION_SEND.equals(intent.getAction())) {
             DetailActivity.push(this, Uri.parse(intent.getStringExtra(Intent.EXTRA_TEXT)));
-        } else if (push && intent.getAction().equals(Intent.ACTION_VIEW) && intent.getData() != null) {
+        } else if (Intent.ACTION_VIEW.equals(intent.getAction()) && intent.getData() != null) {
             DetailActivity.push(this, intent.getData());
         }
     }
@@ -329,7 +328,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
                 CollectActivity.start(this, event.getText(), true);
                 break;
             case PUSH:
-                if (ApiConfig.hasPush()) DetailActivity.push(this, event.getText(), true);
+                DetailActivity.push(this, event.getText(), true);
                 break;
         }
     }
