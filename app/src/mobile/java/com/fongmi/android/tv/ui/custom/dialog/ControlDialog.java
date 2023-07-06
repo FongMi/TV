@@ -160,6 +160,14 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
         dismiss();
     }
 
+    public void updateParse() {
+        binding.parse.getAdapter().notifyItemRangeChanged(0, binding.parse.getAdapter().getItemCount());
+    }
+
+    public void updatePlayer() {
+        binding.player.setText(detail.control.action.player.getText());
+    }
+
     public void setParseVisible(boolean visible) {
         binding.parse.setVisibility(visible ? View.VISIBLE : View.GONE);
         binding.parseText.setVisibility(visible ? View.VISIBLE : View.GONE);
