@@ -1,6 +1,5 @@
 package com.fongmi.android.tv.ui.custom.dialog;
 
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

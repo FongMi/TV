@@ -5,8 +5,6 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 
-import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Trans;
 import com.fongmi.android.tv.utils.Utils;
 import com.google.gson.Gson;
