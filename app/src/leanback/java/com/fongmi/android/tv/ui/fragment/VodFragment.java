@@ -203,7 +203,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     private void showFilter() {
         List<ListRow> rows = new ArrayList<>();
         for (Filter filter : mFilters) rows.add(getRow(filter));
-        App.post(() -> mBinding.recycler.smoothScrollToPosition(0), 48);
+        App.post(() -> mBinding.recycler.scrollToPosition(0), 48);
         mAdapter.addAll(0, rows);
         hideProgress();
     }
