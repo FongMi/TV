@@ -382,15 +382,15 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
             showEmpty();
         } else {
             checkSearch(false);
-            App.post(mR4, 5000);
+            App.post(mR4, 10000);
         }
     }
 
     private void showEmpty() {
-        if (!mBinding.progressLayout.isProgress()) return;
         showError(getString(R.string.error_play_url));
         mBinding.swipeLayout.setEnabled(true);
         mBinding.progressLayout.showEmpty();
+        stopSearch();
     }
 
     private void setDetail(Vod item) {

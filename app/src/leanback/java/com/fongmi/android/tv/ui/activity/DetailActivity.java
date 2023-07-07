@@ -391,12 +391,13 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
             showEmpty();
         } else {
             checkSearch(false);
-            App.post(mR3, 5000);
+            App.post(mR3, 10000);
         }
     }
 
     private void showEmpty() {
         mBinding.progressLayout.showEmpty();
+        stopSearch();
     }
 
     private void setDetail(Vod item) {
