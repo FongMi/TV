@@ -296,7 +296,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     public void start(Result result, boolean useParse, int timeout) {
         if (result.getUrl().isEmpty()) {
             ErrorEvent.url();
-        } else if (result.getParse(1) == 1 || result.getJx() == 1) {
+        } else if (result.getParse() == 1 || result.getJx() == 1) {
             stopParse();
             parseJob = ParseJob.create(this).start(result, useParse);
         } else {

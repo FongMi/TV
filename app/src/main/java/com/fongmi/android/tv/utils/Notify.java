@@ -11,7 +11,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.ViewProgressBinding;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 

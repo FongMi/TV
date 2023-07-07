@@ -8,7 +8,6 @@ import android.view.View;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.databinding.ActivityPushBinding;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.ui.base.BaseActivity;
