@@ -16,7 +16,6 @@ import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.utils.Json;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
-import com.fongmi.android.tv.utils.ResUtil;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;

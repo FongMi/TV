@@ -1,7 +1,6 @@
 package com.fongmi.android.tv.impl;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.StringRes;
 
 import java.io.IOException;
 

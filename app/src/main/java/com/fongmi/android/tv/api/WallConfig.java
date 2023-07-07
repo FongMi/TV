@@ -12,7 +12,6 @@ import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
-import com.fongmi.android.tv.utils.ResUtil;
 import com.github.catvod.net.OkHttp;
 
 import java.io.File;
