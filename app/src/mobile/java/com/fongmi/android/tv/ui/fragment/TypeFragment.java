@@ -114,9 +114,8 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     }
 
     private void getVideo(String typeId, String page) {
-        if (isFolder()) mTypeIds.add(typeId);
-        if (isFolder()) mBinding.recycler.scrollToPosition(0);
         if (page.equals("1")) mAdapter.clear();
+        if (isFolder()) mBinding.recycler.scrollToPosition(0);
         if (page.equals("1") && !mBinding.swipeLayout.isRefreshing()) mBinding.progressLayout.showProgress();
         if (isHome() && page.equals("1")) setAdapter(getParent().getResult());
         else mViewModel.categoryContent(getKey(), typeId, page, true, mExtends);
@@ -136,12 +135,6 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         getVideo(getTypeId(), String.valueOf(mScroller.addPage()));
     }
 
-    private void refresh(int num) {
-        String typeId = mTypeIds.get(mTypeIds.size() - num);
-        mTypeIds = mTypeIds.subList(0, mTypeIds.size() - num);
-        getVideo(typeId, "1");
-    }
-
     public void setFilter(String key, String value) {
         mExtends.put(key, value);
         onRefresh();
@@ -149,8 +142,8 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     @Override
     public void onRefresh() {
-        if (isFolder()) refresh(1);
-        else getVideo();
+        if (mTypeIds.isEmpty()) getVideo();
+        else getVideo(mTypeIds.get(mTypeIds.size() - 1), "1");
     }
 
     @Override
@@ -162,6 +155,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     @Override
     public void onItemClick(Vod item) {
+        if (item.isFolder()) mTypeIds.add(item.getVodId());
         if (item.isFolder()) getVideo(item.getVodId(), "1");
         else DetailActivity.start(getActivity(), getKey(), item.getVodId(), item.getVodName());
     }
@@ -174,8 +168,9 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     @Override
     public boolean canBack() {
-        if (mTypeIds.size() < 2) return true;
-        refresh(2);
+        if (mTypeIds.isEmpty()) return true;
+        mTypeIds = mTypeIds.subList(0, mTypeIds.size() - 1);
+        onRefresh();
         return false;
     }
 }
