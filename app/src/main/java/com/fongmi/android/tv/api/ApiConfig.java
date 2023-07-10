@@ -22,6 +22,8 @@ import com.google.gson.JsonParser;
 
 import org.json.JSONObject;
 
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -232,23 +234,29 @@ public class ApiConfig {
         boolean py = site.getApi().startsWith("py_");
         boolean csp = site.getApi().startsWith("csp_");
         if (js) return jsLoader.getSpider(site.getKey(), site.getApi(), site.getExt());
-        if (py) return pyLoader.getSpider(site.getKey(), site.getApi(), site.getExt());
-        if (csp) return jarLoader.getSpider(site.getKey(), site.getApi(), site.getExt(), site.getJar());
+        else if (py) return pyLoader.getSpider(site.getKey(), site.getApi(), site.getExt());
+        else if (csp) return jarLoader.getSpider(site.getKey(), site.getApi(), site.getExt(), site.getJar());
         else return new SpiderNull();
     }
 
     public void setRecent(Site site) {
         boolean js = site.getApi().contains(".js");
+        boolean py = site.getApi().startsWith("py_");
         boolean csp = site.getApi().startsWith("csp_");
         if (js) jsLoader.setRecent(site.getKey());
-        if (csp) jarLoader.setRecent(site.getJar());
+        else if (py) pyLoader.setRecent(site.getJar());
+        else if (csp) jarLoader.setRecent(site.getJar());
     }
 
-    public Object[] proxyLocal(Map<?, ?> param) {
-        if (param.containsKey("do") && param.get("do").equals("js")) {
-            return jsLoader.proxyInvoke(param);
+    public Object[] proxyLocal(Map<?, ?> params) {
+        if (params.containsKey("do") && params.get("do").equals("port")) {
+            return new Object[]{200, "text/plain; charset=utf-8", new ByteArrayInputStream("ok".getBytes(StandardCharsets.UTF_8))};
+        } else if (params.containsKey("do") && params.get("do").equals("js")) {
+            return jsLoader.proxyInvoke(params);
+        } else if (params.containsKey("do") && params.get("do").equals("py")) {
+            return pyLoader.proxyInvoke(params);
         } else {
-            return jarLoader.proxyInvoke(param);
+            return jarLoader.proxyInvoke(params);
         }
     }
 
