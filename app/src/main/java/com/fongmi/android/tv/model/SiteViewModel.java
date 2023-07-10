@@ -57,7 +57,7 @@ public class SiteViewModel extends ViewModel {
                 Spider spider = ApiConfig.get().getCSP(site);
                 String homeContent = spider.homeContent(true);
                 SpiderDebug.log(homeContent);
-                ApiConfig.get().setJar(site.getJar());
+                ApiConfig.get().setRecent(site);
                 Result result = Result.fromJson(homeContent);
                 if (result.getList().size() > 0) return result;
                 String homeVideoContent = spider.homeVideoContent();
@@ -86,7 +86,7 @@ public class SiteViewModel extends ViewModel {
                 Spider spider = ApiConfig.get().getCSP(site);
                 String categoryContent = spider.categoryContent(tid, page, filter, extend);
                 SpiderDebug.log(categoryContent);
-                ApiConfig.get().setJar(site.getJar());
+                ApiConfig.get().setRecent(site);
                 return Result.fromJson(categoryContent);
             } else {
                 ArrayMap<String, String> params = new ArrayMap<>();
@@ -109,7 +109,7 @@ public class SiteViewModel extends ViewModel {
                 Spider spider = ApiConfig.get().getCSP(site);
                 String detailContent = spider.detailContent(Arrays.asList(id));
                 SpiderDebug.log(detailContent);
-                ApiConfig.get().setJar(site.getJar());
+                ApiConfig.get().setRecent(site);
                 Result result = Result.fromJson(detailContent);
                 if (!result.getList().isEmpty()) result.getList().get(0).setVodFlags();
                 return result;
@@ -140,7 +140,7 @@ public class SiteViewModel extends ViewModel {
                 Spider spider = ApiConfig.get().getCSP(site);
                 String playerContent = spider.playerContent(flag, id, ApiConfig.get().getFlags());
                 SpiderDebug.log(playerContent);
-                ApiConfig.get().setJar(site.getJar());
+                ApiConfig.get().setRecent(site);
                 Result result = Result.objectFrom(playerContent);
                 if (result.getFlag().isEmpty()) result.setFlag(flag);
                 result.setKey(key);
