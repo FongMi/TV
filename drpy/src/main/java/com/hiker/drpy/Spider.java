@@ -9,8 +9,12 @@ import com.whl.quickjs.wrapper.JSArray;
 import com.whl.quickjs.wrapper.JSObject;
 import com.whl.quickjs.wrapper.QuickJSContext;
 
+import org.json.JSONArray;
+
+import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -90,6 +94,27 @@ public class Spider extends com.github.catvod.crawler.Spider {
             executor.shutdownNow();
             ctx.destroy();
         });
+    }
+
+    public Object[] doProxy(Map<?, ?> params) throws Exception {
+        return submit(() -> {
+            JSObject obj = ctx.createNewJSObject();
+            for (Object key : params.keySet()) obj.setProperty((String) key, (String) params.get(key));
+            JSONArray array = new JSONArray(((JSArray) jsObject.getJSFunction("proxy").call(obj)).stringify());
+            Object[] objects = new Object[3];
+            objects[0] = array.get(0);
+            objects[1] = array.opt(1);
+            Object o = array.opt(2);
+            if (o instanceof JSONArray) {
+                JSONArray a = (JSONArray) o;
+                byte[] bytes = new byte[a.length()];
+                for (int i = 0; i < a.length(); i++) bytes[i] = (byte) a.optInt(i);
+                objects[2] = new ByteArrayInputStream(bytes);
+            } else {
+                objects[2] = new ByteArrayInputStream(o.toString().getBytes());
+            }
+            return objects;
+        }).get();
     }
 
     private void initJS(Context context, String extend) {

@@ -237,12 +237,19 @@ public class ApiConfig {
         else return new SpiderNull();
     }
 
-    public void setJar(String key) {
-        jarLoader.setJar(key);
+    public void setRecent(Site site) {
+        boolean js = site.getApi().contains(".js");
+        boolean csp = site.getApi().startsWith("csp_");
+        if (js) jsLoader.setRecent(site.getKey());
+        if (csp) jarLoader.setRecent(site.getJar());
     }
 
     public Object[] proxyLocal(Map<?, ?> param) {
-        return jarLoader.proxyInvoke(param);
+        if (param.containsKey("do") && param.get("do").equals("js")) {
+            return jsLoader.proxyInvoke(param);
+        } else {
+            return jarLoader.proxyInvoke(param);
+        }
     }
 
     public JSONObject jsonExt(String key, LinkedHashMap<String, String> jxs, String url) throws Exception {
