@@ -150,7 +150,11 @@ public class Result {
     }
 
     public Integer getParse() {
-        return parse == null ? 0 : parse;
+        return getParse(0);
+    }
+
+    public Integer getParse(Integer def) {
+        return parse == null ? def : parse;
     }
 
     public void setParse(Integer parse) {
