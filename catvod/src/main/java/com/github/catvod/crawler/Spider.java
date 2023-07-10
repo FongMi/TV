@@ -6,6 +6,7 @@ import com.github.catvod.net.OkHttp;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.Dns;
 
@@ -52,6 +53,13 @@ public abstract class Spider {
 
     public boolean isVideoFormat(String url) {
         return false;
+    }
+
+    public Object[] proxyLocal(Map<?, ?> params) throws Exception {
+        return null;
+    }
+
+    public void destroy() {
     }
 
     public static Dns safeDns() {

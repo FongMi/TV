@@ -2,11 +2,11 @@ package com.hiker.drpy.method;
 
 import android.text.TextUtils;
 import android.util.Base64;
-import android.util.Log;
 
 import androidx.annotation.Keep;
 
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.spider.Proxy;
 import com.google.gson.Gson;
 import com.hiker.drpy.Parser;
 import com.whl.quickjs.wrapper.JSArray;
@@ -64,6 +64,12 @@ public class Global {
                 }
             });
         }
+    }
+
+    @Keep
+    @JSMethod
+    public String getProxy(boolean local) {
+        return Proxy.getUrl("js");
     }
 
     @Keep
