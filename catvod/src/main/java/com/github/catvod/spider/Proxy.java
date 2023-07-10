@@ -19,12 +19,12 @@ public class Proxy {
         }
     }
 
-    public static String getUrl(String type) {
+    public static String getUrl() {
         try {
             adjustPort();
-            return "http://127.0.0.1:" + port + "/proxy?do=" + type;
+            return "http://127.0.0.1:" + port + "/proxy";
         } catch (Exception e) {
-            return "http://127.0.0.1:9978/proxy?do=" + type;
+            return "http://127.0.0.1:9978/proxy";
         }
     }
 }

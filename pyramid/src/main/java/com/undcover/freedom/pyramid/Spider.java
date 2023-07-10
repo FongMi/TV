@@ -110,6 +110,6 @@ public class Spider extends com.github.catvod.crawler.Spider {
     }
 
     private String replaceUrl(String content) {
-        return content.replace("http://127.0.0.1:UndCover/proxy", Proxy.getUrl("py"));
+        return content.replace("http://127.0.0.1:UndCover/proxy", Proxy.getUrl());
     }
 }
