@@ -47,11 +47,11 @@ public abstract class Spider {
         return "";
     }
 
-    public boolean manualVideoCheck() {
+    public boolean manualVideoCheck() throws Exception {
         return false;
     }
 
-    public boolean isVideoFormat(String url) {
+    public boolean isVideoFormat(String url) throws Exception {
         return false;
     }
 
