@@ -69,7 +69,7 @@ public class Global {
     @Keep
     @JSMethod
     public String getProxy(boolean local) {
-        return Proxy.getUrl("js");
+        return Proxy.getUrl() + "?do=js";
     }
 
     @Keep
