@@ -44,8 +44,8 @@ public class Spider extends com.github.catvod.crawler.Spider {
         return executor.submit(callable);
     }
 
-    private String post(String func, Object... args) throws ExecutionException, InterruptedException {
-        return submit(() -> (String) jsObject.getJSFunction(func).call(args)).get();
+    private Object call(String func, Object... args) throws ExecutionException, InterruptedException {
+        return submit(() -> jsObject.getJSFunction(func).call(args)).get();
     }
 
     @Override
@@ -56,34 +56,44 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
     @Override
     public String homeContent(boolean filter) throws Exception {
-        return post("home", filter);
+        return (String) call("home", filter);
     }
 
     @Override
     public String homeVideoContent() throws Exception {
-        return post("homeVod");
+        return (String) call("homeVod");
     }
 
     @Override
     public String categoryContent(String tid, String pg, boolean filter, HashMap<String, String> extend) throws Exception {
         JSObject obj = submit(() -> convert(extend)).get();
-        return post("category", tid, pg, filter, obj);
+        return (String) call("category", tid, pg, filter, obj);
     }
 
     @Override
     public String detailContent(List<String> ids) throws Exception {
-        return post("detail", ids.get(0));
+        return (String) call("detail", ids.get(0));
     }
 
     @Override
     public String searchContent(String key, boolean quick) throws Exception {
-        return post("search", key, quick);
+        return (String) call("search", key, quick);
     }
 
     @Override
     public String playerContent(String flag, String id, List<String> vipFlags) throws Exception {
         JSArray array = submit(() -> convert(vipFlags)).get();
-        return post("play", flag, id, array);
+        return (String) call("play", flag, id, array);
+    }
+
+    @Override
+    public boolean manualVideoCheck() throws Exception {
+        return (Boolean) call("manualVideoCheck");
+    }
+
+    @Override
+    public boolean isVideoFormat(String url) throws Exception {
+        return (Boolean) call("isVideoFormat", url);
     }
 
     @Override
@@ -93,17 +103,9 @@ public class Spider extends com.github.catvod.crawler.Spider {
             for (Object key : params.keySet()) obj.setProperty((String) key, (String) params.get(key));
             JSONArray array = new JSONArray(((JSArray) jsObject.getJSFunction("proxy").call(obj)).stringify());
             Object[] result = new Object[3];
-            result[0] = array.get(0);
+            result[0] = array.opt(0);
             result[1] = array.opt(1);
-            Object o = array.opt(2);
-            if (o instanceof JSONArray) {
-                JSONArray a = (JSONArray) o;
-                byte[] bytes = new byte[a.length()];
-                for (int i = 0; i < a.length(); i++) bytes[i] = (byte) a.optInt(i);
-                result[2] = new ByteArrayInputStream(bytes);
-            } else {
-                result[2] = new ByteArrayInputStream(o.toString().getBytes());
-            }
+            result[2] = getStream(array.opt(2));
             return result;
         }).get();
     }
@@ -149,5 +151,16 @@ public class Spider extends com.github.catvod.crawler.Spider {
         if (items == null || items.isEmpty()) return array;
         for (int i = 0; i < items.size(); i++) array.set(items.get(i), i);
         return array;
+    }
+
+    private ByteArrayInputStream getStream(Object o) {
+        if (o instanceof JSONArray) {
+            JSONArray a = (JSONArray) o;
+            byte[] bytes = new byte[a.length()];
+            for (int i = 0; i < a.length(); i++) bytes[i] = (byte) a.optInt(i);
+            return new ByteArrayInputStream(bytes);
+        } else {
+            return new ByteArrayInputStream(o.toString().getBytes());
+        }
     }
 }

@@ -5,7 +5,6 @@ import android.util.ArrayMap;
 
 import com.chaquo.python.PyObject;
 import com.github.catvod.net.OkHttp;
-import com.github.catvod.spider.Proxy;
 import com.google.gson.Gson;
 
 import org.json.JSONObject;
@@ -71,6 +70,16 @@ public class Spider extends com.github.catvod.crawler.Spider {
     }
 
     @Override
+    public boolean manualVideoCheck() {
+        return app.callAttr("manualVideoCheck", obj).toBoolean();
+    }
+
+    @Override
+    public boolean isVideoFormat(String url) {
+        return app.callAttr("isVideoFormat", obj, url).toBoolean();
+    }
+
+    @Override
     public Object[] proxyLocal(Map<?, ?> params) throws Exception {
         List<PyObject> list = app.callAttr("localProxy", params).asList();
         int code = list.get(0).toInt();
@@ -84,7 +93,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
         if (object.optString("type").equals("stream")) {
             return new Object[]{code, type, OkHttp.newCall(url, param, header).execute().body().byteStream()};
         } else {
-            content = replaceUrl(content.isEmpty() ? OkHttp.newCall(url, header).execute().body().string() : content);
+            if (content.isEmpty()) content = OkHttp.newCall(url, header).execute().body().string();
             return new Object[]{code, type, new ByteArrayInputStream(content.getBytes())};
         }
     }
@@ -107,9 +116,5 @@ public class Spider extends com.github.catvod.crawler.Spider {
             params.put(key, object.optString(key));
         }
         return params;
-    }
-
-    private String replaceUrl(String content) {
-        return content.replace("http://127.0.0.1:UndCover/proxy", Proxy.getUrl());
     }
 }
