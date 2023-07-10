@@ -1,4 +1,4 @@
-package com.fongmi.android.tv.player.parse;
+package com.fongmi.android.tv.player;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
