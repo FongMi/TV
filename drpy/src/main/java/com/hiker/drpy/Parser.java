@@ -22,7 +22,7 @@ public class Parser {
 
     private final Pattern p1 = Pattern.compile("url\\((.*?)\\)", Pattern.MULTILINE | Pattern.DOTALL);
     private final Pattern p2 = Pattern.compile(":eq|:lt|:gt|:first|:last|^body$|^#");
-    private final Pattern p3 = Pattern.compile("(url|src|href|-original|-src|-play|-url)$", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+    private final Pattern p3 = Pattern.compile("(url|src|href|-original|-src|-play|-url|style)$", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
 
     private final Cache cache;
 
