@@ -88,12 +88,12 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
     @Override
     public boolean manualVideoCheck() throws Exception {
-        return (Boolean) call("manualVideoCheck");
+        return (Boolean) call("enableSniffer");
     }
 
     @Override
     public boolean isVideoFormat(String url) throws Exception {
-        return (Boolean) call("isVideoFormat", url);
+        return (Boolean) call("isVideo", url);
     }
 
     @Override
