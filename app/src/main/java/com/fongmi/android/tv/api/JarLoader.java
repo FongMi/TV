@@ -34,6 +34,7 @@ public class JarLoader {
     }
 
     public void clear() {
+        for (Spider spider : spiders.values()) spider.destroy();
         this.loaders.clear();
         this.methods.clear();
         this.spiders.clear();
@@ -116,6 +117,8 @@ public class JarLoader {
 
     public Object[] proxyInvoke(Map<?, ?> params) {
         try {
+            Spider spider = spiders.get(recent);
+            if (spider != null) return spider.proxyLocal(params);
             Method method = methods.get(Utils.getMd5(recent));
             if (method != null) return (Object[]) method.invoke(null, params);
             else return null;

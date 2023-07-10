@@ -80,6 +80,11 @@ def searchContent(ru, key, quick):
     return formatJo
 
 
+def localProxy(ru, param):
+    result = ru.localProxy(str2json(param))
+    return result
+
+
 def run():
     pass
 

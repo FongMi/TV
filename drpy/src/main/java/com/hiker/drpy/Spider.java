@@ -24,14 +24,11 @@ import java.util.concurrent.Future;
 
 public class Spider extends com.github.catvod.crawler.Spider {
 
-    private ExecutorService executor;
+    private final ExecutorService executor;
     private QuickJSContext ctx;
     private JSObject jsObject;
-    private String key;
-    private String api;
-
-    public Spider() {
-    }
+    private final String key;
+    private final String api;
 
     public Spider(String api) {
         this.key = "__" + UUID.randomUUID().toString().replace("-", "") + "__";
@@ -89,32 +86,34 @@ public class Spider extends com.github.catvod.crawler.Spider {
         return post("play", flag, id, array);
     }
 
-    public void destroy() {
-        submit(() -> {
-            executor.shutdownNow();
-            ctx.destroy();
-        });
-    }
-
-    public Object[] doProxy(Map<?, ?> params) throws Exception {
+    @Override
+    public Object[] proxyLocal(Map<?, ?> params) throws Exception {
         return submit(() -> {
             JSObject obj = ctx.createNewJSObject();
             for (Object key : params.keySet()) obj.setProperty((String) key, (String) params.get(key));
             JSONArray array = new JSONArray(((JSArray) jsObject.getJSFunction("proxy").call(obj)).stringify());
-            Object[] objects = new Object[3];
-            objects[0] = array.get(0);
-            objects[1] = array.opt(1);
+            Object[] result = new Object[3];
+            result[0] = array.get(0);
+            result[1] = array.opt(1);
             Object o = array.opt(2);
             if (o instanceof JSONArray) {
                 JSONArray a = (JSONArray) o;
                 byte[] bytes = new byte[a.length()];
                 for (int i = 0; i < a.length(); i++) bytes[i] = (byte) a.optInt(i);
-                objects[2] = new ByteArrayInputStream(bytes);
+                result[2] = new ByteArrayInputStream(bytes);
             } else {
-                objects[2] = new ByteArrayInputStream(o.toString().getBytes());
+                result[2] = new ByteArrayInputStream(o.toString().getBytes());
             }
-            return objects;
+            return result;
         }).get();
+    }
+
+    @Override
+    public void destroy() {
+        submit(() -> {
+            executor.shutdownNow();
+            ctx.destroy();
+        });
     }
 
     private void initJS(Context context, String extend) {
