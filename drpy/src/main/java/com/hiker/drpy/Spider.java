@@ -88,7 +88,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
     @Override
     public boolean manualVideoCheck() throws Exception {
-        return (Boolean) call("enableSniffer");
+        return (Boolean) call("sniffer");
     }
 
     @Override
