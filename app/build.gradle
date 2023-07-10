@@ -85,6 +85,7 @@ dependencies {
     implementation project(':tvbus')
     implementation project(':zlive')
     implementation project(':catvod')
+    implementation project(':jianpian')
     implementation project(':forcetech')
     implementation project(':ijkplayer')
     pythonImplementation project(':pyramid')
