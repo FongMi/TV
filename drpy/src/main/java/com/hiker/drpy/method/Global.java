@@ -6,7 +6,7 @@ import android.util.Base64;
 import androidx.annotation.Keep;
 
 import com.github.catvod.net.OkHttp;
-import com.github.catvod.spider.Proxy;
+import com.hiker.drpy.Proxy;
 import com.google.gson.Gson;
 import com.hiker.drpy.Parser;
 import com.whl.quickjs.wrapper.JSArray;
