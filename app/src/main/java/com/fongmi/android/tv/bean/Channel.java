@@ -1,6 +1,5 @@
 package com.fongmi.android.tv.bean;
 
-import android.net.Uri;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
@@ -234,30 +233,6 @@ public class Channel {
 
     public void setLine(String line) {
         setLine(getUrls().indexOf(line));
-    }
-
-    public String getScheme() {
-        return Uri.parse(getCurrent()).getScheme().toLowerCase();
-    }
-
-    public boolean isForce() {
-        return getScheme().startsWith("p") || getScheme().equals("mitv");
-    }
-
-    public boolean isZLive() {
-        return getScheme().startsWith("zlive");
-    }
-
-    public boolean isTVBus() {
-        return getScheme().startsWith("tvbus");
-    }
-
-    public boolean isYoutube() {
-        return Uri.parse(getCurrent()).getHost().contains("youtube.com");
-    }
-
-    public boolean isBiliBili() {
-        return Uri.parse(getCurrent()).getHost().equals("live.bilibili.com");
     }
 
     public Map<String, String> getHeaders() {

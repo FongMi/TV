@@ -14,6 +14,7 @@ import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Vod;
+import com.fongmi.android.tv.player.source.Source;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Sniffer;
 import com.fongmi.android.tv.utils.Trans;
@@ -135,6 +136,7 @@ public class SiteViewModel extends ViewModel {
 
     public void playerContent(String key, String flag, String id) {
         execute(player, () -> {
+            Source.stop();
             Site site = ApiConfig.get().getSite(key);
             if (site.getType() == 3) {
                 Spider spider = ApiConfig.get().getCSP(site);
@@ -143,6 +145,7 @@ public class SiteViewModel extends ViewModel {
                 ApiConfig.get().setRecent(site);
                 Result result = Result.objectFrom(playerContent);
                 if (result.getFlag().isEmpty()) result.setFlag(flag);
+                result.setUrl(Source.getUrl(result.getUrl()));
                 result.setKey(key);
                 return result;
             } else if (site.getType() == 4) {
