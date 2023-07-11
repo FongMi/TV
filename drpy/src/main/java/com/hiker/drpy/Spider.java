@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -44,7 +43,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
         return executor.submit(callable);
     }
 
-    private Object call(String func, Object... args) throws ExecutionException, InterruptedException {
+    private Object call(String func, Object... args) throws Exception {
         return submit(() -> jsObject.getJSFunction(func).call(args)).get();
     }
 
