@@ -5,7 +5,7 @@ import android.net.Uri;
 public class Source {
 
     private static String getScheme(Uri uri) {
-        return uri.getScheme().toLowerCase();
+        return uri.getScheme() == null ? "" : uri.getScheme().toLowerCase();
     }
 
     private static boolean isHttp(Uri uri) {
@@ -33,7 +33,7 @@ public class Source {
     }
 
     private static boolean isJianPian(Uri uri) {
-        return uri.getScheme().equals("tvbox-xg");
+        return getScheme(uri).equals("tvbox-xg");
     }
 
     public static String getUrl(String url) throws Exception {
