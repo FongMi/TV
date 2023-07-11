@@ -43,8 +43,10 @@ public class JianPian {
         return "http://127.0.0.1:" + p2p.port + "/" + URLEncoder.encode(Uri.parse(url).getLastPathSegment(), "GBK");
     }
 
-    private void set(String text) {
-        url = URLDecoder.decode(text).replace("tvbox-xg:", "");
+    private void set(String text) throws Exception {
+        text = text.replace("tvbox-xg://", "").replace("tvbox-xg:", "");
+        String[] split = URLDecoder.decode(text, "UTF-8").split("\\|");
+        url = split[0].replace("xg://", "ftp://").replace("xgplay://", "ftp://");
     }
 
     private void start() {
