@@ -9,8 +9,8 @@ public class P2PClass {
     public String path;
     public int port;
 
-    public P2PClass(Context context, String so) {
-        System.load(so);
+    public P2PClass(Context context, String lib) {
+        System.load(lib);
         String cache = context.getCacheDir().getAbsolutePath();
         File file = new File(path = cache + "/jpali");
         if (!file.exists()) file.mkdirs();
