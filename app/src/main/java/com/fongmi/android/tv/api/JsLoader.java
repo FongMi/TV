@@ -3,7 +3,6 @@ package com.fongmi.android.tv.api;
 import com.fongmi.android.tv.App;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderNull;
-import com.hiker.drpy.Loader;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,11 +27,7 @@ public class JsLoader {
     }
 
     private void init() {
-        try {
-            Loader.init(App.get());
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
+
     }
 
     public Spider getSpider(String key, String api, String ext) {
