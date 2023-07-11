@@ -8,6 +8,10 @@ public class Source {
         return uri.getScheme() == null ? "" : uri.getScheme().toLowerCase();
     }
 
+    private static String getHost(Uri uri) {
+        return uri.getHost() == null ? "" : uri.getHost();
+    }
+
     private static boolean isHttp(Uri uri) {
         return getScheme(uri).startsWith("http");
     }
@@ -24,30 +28,30 @@ public class Source {
         return getScheme(uri).startsWith("tvbus");
     }
 
+    private static boolean isJianPian(Uri uri) {
+        return getScheme(uri).equals("tvbox-xg");
+    }
+
     private static boolean isYoutube(Uri uri) {
-        return uri.getHost().contains("youtube.com");
+        return getHost(uri).contains("youtube.com");
     }
 
     private static boolean isBiliBili(Uri uri) {
-        return uri.getHost().equals("live.bilibili.com");
-    }
-
-    private static boolean isJianPian(Uri uri) {
-        return getScheme(uri).equals("tvbox-xg");
+        return getHost(uri).equals("live.bilibili.com");
     }
 
     public static String getUrl(String url) throws Exception {
         Uri uri = Uri.parse(url);
         if (isHttp(uri)) {
             if (isYoutube(uri)) return Youtube.get().fetch(url);
-            else if (isBiliBili(uri)) return BiliBili.get().fetch(url);
-            else return url;
+            if (isBiliBili(uri)) return BiliBili.get().fetch(url);
+            return url;
         } else {
             if (isForce(uri)) return Force.get().fetch(url);
-            else if (isZLive(uri)) return ZLive.get().fetch(url);
-            else if (isTVBus(uri)) return TVBus.get().fetch(url);
-            else if (isJianPian(uri)) return JianPian.get().fetch(url);
-            else return url;
+            if (isZLive(uri)) return ZLive.get().fetch(url);
+            if (isTVBus(uri)) return TVBus.get().fetch(url);
+            if (isJianPian(uri)) return JianPian.get().fetch(url);
+            return url;
         }
     }
 

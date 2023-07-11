@@ -156,6 +156,7 @@ public class SiteViewModel extends ViewModel {
                 SpiderDebug.log(body);
                 Result result = Result.fromJson(body);
                 if (result.getFlag().isEmpty()) result.setFlag(flag);
+                result.setUrl(Source.getUrl(result.getUrl()));
                 return result;
             } else if (key.equals("push_agent")) {
                 Result result = new Result();
