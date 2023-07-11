@@ -244,7 +244,7 @@ public class ApiConfig {
         boolean py = site.getApi().startsWith("py_");
         boolean csp = site.getApi().startsWith("csp_");
         if (js) jsLoader.setRecent(site.getKey());
-        else if (py) pyLoader.setRecent(site.getJar());
+        else if (py) pyLoader.setRecent(site.getKey());
         else if (csp) jarLoader.setRecent(site.getJar());
     }
 

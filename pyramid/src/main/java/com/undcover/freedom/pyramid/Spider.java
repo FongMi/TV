@@ -81,7 +81,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
     @Override
     public Object[] proxyLocal(Map<?, ?> params) throws Exception {
-        List<PyObject> list = app.callAttr("localProxy", params).asList();
+        List<PyObject> list = app.callAttr("localProxy", obj, gson.toJson(params)).asList();
         int code = list.get(0).toInt();
         String type = list.get(1).toString();
         String action = list.get(2).toString();
