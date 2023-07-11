@@ -35,7 +35,7 @@ public class Force {
     }
 
     private void init(String url) throws Exception {
-        File file = FileUtil.getCacheFile(Util.so(url));
+        File file = FileUtil.getFilesFile(Util.so(url));
         String path = Github.get().getReleasePath("/other/jniLibs/" + file.getName());
         if (!file.exists()) FileUtil.write(file, OkHttp.newCall(path).execute().body().bytes());
         App.get().bindService(Util.intent(App.get(), url, file), mConn, Context.BIND_AUTO_CREATE);

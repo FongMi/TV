@@ -28,8 +28,7 @@ public class JianPian {
 
     private void init() throws Exception {
         if (p2p != null) return;
-        String name = "libp2p-jp-" + BuildConfig.FLAVOR_abi + ".so";
-        File file = FileUtil.getCacheFile(name);
+        File file = FileUtil.getFilesFile("libp2p-jp-" + BuildConfig.FLAVOR_abi + ".so");
         String path = Github.get().getReleasePath("/other/jniLibs/" + file.getName());
         if (!file.exists()) FileUtil.write(file, OkHttp.newCall(path).execute().body().bytes());
         p2p = new P2PClass(App.get(), file.getAbsolutePath());
