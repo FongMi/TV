@@ -15,6 +15,7 @@ dependencies {
     implementation project(':catvod')
     implementation project(':media-lib-common')
     implementation 'androidx.annotation:annotation:1.5.0'
+    implementation 'androidx.preference:preference:1.2.0'
     implementation 'wang.harlon.quickjs:wrapper-android:0.20.2'
     api 'com.google.code.gson:gson:' + gsonVersion
     api 'com.squareup.okhttp3:okhttp:' + okhttpVersion
