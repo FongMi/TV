@@ -42,7 +42,7 @@ public class Sniffer {
     }
 
     public static boolean isAds(Uri uri) {
-        if (uri.getHost() != null) for (Rule rule : ApiConfig.get().getRules()) for (String host : rule.getHosts()) if (uri.getHost().contains(host)) return true;
+        if (uri.getHost() != null) for (Rule rule : ApiConfig.get().getRules()) for (String host : rule.getHosts()) if (uri.getHost().contains(host)) for (String regex : rule.getRegex()) if (regex.contains("#EXTINF")) return true;
         return false;
     }
 
