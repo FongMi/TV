@@ -257,6 +257,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.text.setOnClickListener(this::onTrack);
         mBinding.control.audio.setOnClickListener(this::onTrack);
         mBinding.control.video.setOnClickListener(this::onTrack);
+        mBinding.control.speed.setAddListener(this::onSpeedAdd);
+        mBinding.control.speed.setSubListener(this::onSpeedSub);
         mBinding.control.ending.setAddListener(this::onEndingAdd);
         mBinding.control.ending.setSubListener(this::onEndingSub);
         mBinding.control.opening.setAddListener(this::onOpeningAdd);
@@ -601,6 +603,16 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.speed.setText(mPlayers.toggleSpeed());
         mHistory.setSpeed(mPlayers.getSpeed());
         return true;
+    }
+
+    private void onSpeedAdd() {
+        mBinding.control.speed.setText(mPlayers.addSpeed(0.25f));
+        mHistory.setSpeed(mPlayers.getSpeed());
+    }
+
+    private void onSpeedSub() {
+        mBinding.control.speed.setText(mPlayers.subSpeed(0.25f));
+        mHistory.setSpeed(mPlayers.getSpeed());
     }
 
     private void onRefresh() {
@@ -1158,6 +1170,22 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mPlayers.seekTo(time);
         showProgress();
         onPlay();
+    }
+
+    @Override
+    public void onSpeedUp() {
+        if (!mPlayers.isPlaying()) return;
+        mBinding.control.speed.setText(mPlayers.setSpeed(mPlayers.getSpeed() < 3 ? 3 : 5));
+        mBinding.widget.speed.startAnimation(ResUtil.getAnim(R.anim.forward));
+        mBinding.widget.speed.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onSpeedEnd() {
+        if (!mPlayers.isPlaying()) return;
+        mBinding.control.speed.setText(mPlayers.setSpeed(mHistory.getSpeed()));
+        mBinding.widget.speed.setVisibility(View.GONE);
+        mBinding.widget.speed.clearAnimation();
     }
 
     @Override
