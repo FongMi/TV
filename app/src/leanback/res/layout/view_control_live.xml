@@ -45,6 +45,7 @@
             android:background="@drawable/selector_text"
             android:focusable="true"
             android:focusableInTouchMode="true"
+            android:nextFocusLeft="@id/across"
             android:textColor="@color/white"
             android:textSize="14sp"
             tools:text="EXO" />
@@ -177,6 +178,7 @@
             android:background="@drawable/selector_text"
             android:focusable="true"
             android:focusableInTouchMode="true"
+            android:nextFocusRight="@id/player"
             android:text="@string/play_across"
             android:textColor="@color/text"
             android:textSize="14sp" />
