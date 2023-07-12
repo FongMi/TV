@@ -196,6 +196,14 @@ public class Prefers {
         put("across", across);
     }
 
+    public static boolean isChange() {
+        return getBoolean("change", true);
+    }
+
+    public static void putChange(boolean change) {
+        put("change", change);
+    }
+
     public static boolean getUpdate() {
         return getBoolean("update", true);
     }
