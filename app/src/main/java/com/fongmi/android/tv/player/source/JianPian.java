@@ -34,17 +34,17 @@ public class JianPian {
         p2p = new P2PClass(App.get(), file.getAbsolutePath());
     }
 
-    public String fetch(String text) throws Exception {
+    public String fetch(String u) throws Exception {
         init();
         stop();
-        set(text);
+        set(u);
         start();
         return "http://127.0.0.1:" + p2p.port + "/" + URLEncoder.encode(Uri.parse(url).getLastPathSegment(), "GBK");
     }
 
-    private void set(String text) throws Exception {
-        text = text.replace("tvbox-xg://", "").replace("tvbox-xg:", "");
-        String[] split = URLDecoder.decode(text, "UTF-8").split("\\|");
+    private void set(String u) throws Exception {
+        u = u.replace("tvbox-xg://", "").replace("tvbox-xg:", "");
+        String[] split = URLDecoder.decode(u, "UTF-8").split("\\|");
         url = split[0].replace("xg://", "ftp://").replace("xgplay://", "ftp://");
     }
 
