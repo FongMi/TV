@@ -190,17 +190,25 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         float speed = getSpeed();
         float addon = speed >= 2 ? 1f : 0.25f;
         speed = speed == 5 ? 0.25f : speed + addon;
-        exoPlayer.setPlaybackSpeed(speed);
-        ijkPlayer.setSpeed(speed);
-        return getSpeedText();
+        return setSpeed(speed);
+    }
+
+    public String addSpeed(float value) {
+        float speed = getSpeed();
+        speed = Math.min(speed + value, 5);
+        return setSpeed(speed);
+    }
+
+    public String subSpeed(float value) {
+        float speed = getSpeed();
+        speed = Math.max(speed - value, 0.25f);
+        return setSpeed(speed);
     }
 
     public String toggleSpeed() {
         float speed = getSpeed();
         speed = speed == 1 ? 3f : 1f;
-        exoPlayer.setPlaybackSpeed(speed);
-        ijkPlayer.setSpeed(speed);
-        return getSpeedText();
+        return setSpeed(speed);
     }
 
     public void togglePlayer() {
