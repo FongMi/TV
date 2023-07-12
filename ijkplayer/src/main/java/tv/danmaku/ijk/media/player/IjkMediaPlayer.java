@@ -358,13 +358,11 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         }
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, String> entry : headers.entrySet()) {
-            sb.append(entry.getKey());
-            sb.append(":");
             String value = entry.getValue();
-            if (!TextUtils.isEmpty(value)) sb.append(entry.getValue());
-            sb.append("\r\n");
-            setOption(OPT_CATEGORY_FORMAT, "headers", sb.toString());
+            if (TextUtils.isEmpty(value)) continue;
+            sb.append(entry.getKey()).append(": ").append(value).append("\r\n");
         }
+        setOption(OPT_CATEGORY_FORMAT, "headers", sb.toString());
         setDataSource(path);
     }
 
