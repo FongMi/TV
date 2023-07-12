@@ -114,7 +114,7 @@
                 android:textSize="14sp"
                 tools:text="硬解" />
 
-            <TextView
+            <com.fongmi.android.tv.ui.custom.CustomUpDownView
                 android:id="@+id/speed"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -188,7 +188,7 @@
                 android:visibility="gone"
                 tools:visibility="visible" />
 
-            <com.fongmi.android.tv.ui.custom.CustomOpEdView
+            <com.fongmi.android.tv.ui.custom.CustomUpDownView
                 android:id="@+id/opening"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -201,7 +201,7 @@
                 android:textSize="14sp"
                 tools:text="00:00" />
 
-            <com.fongmi.android.tv.ui.custom.CustomOpEdView
+            <com.fongmi.android.tv.ui.custom.CustomUpDownView
                 android:id="@+id/ending"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
