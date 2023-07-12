@@ -1,12 +1,14 @@
 package com.undcover.freedom.pyramid;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.ArrayMap;
 
 import com.chaquo.python.PyObject;
 import com.github.catvod.net.OkHttp;
 import com.google.gson.Gson;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
@@ -88,8 +90,8 @@ public class Spider extends com.github.catvod.crawler.Spider {
         String content = list.get(3).toString();
         JSONObject object = new JSONObject(action);
         String url = object.optString("url");
-        Headers header = getHeader(object.getJSONObject("header"));
-        ArrayMap<String, String> param = getParam(object.getJSONObject("param"));
+        Headers header = getHeader(object.optString("header"));
+        ArrayMap<String, String> param = getParam(object.optString("param"));
         if (object.optString("type").equals("stream")) {
             return new Object[]{code, type, OkHttp.newCall(url, param, header).execute().body().byteStream()};
         } else {
@@ -98,9 +100,10 @@ public class Spider extends com.github.catvod.crawler.Spider {
         }
     }
 
-    private Headers getHeader(JSONObject object) {
+    private Headers getHeader(String header) throws JSONException {
         Headers.Builder builder = new Headers.Builder();
-        if (object == null) return builder.build();
+        if (TextUtils.isEmpty(header)) return builder.build();
+        JSONObject object = new JSONObject(header);
         for (Iterator<String> iterator = object.keys(); iterator.hasNext(); ) {
             String key = iterator.next();
             builder.add(key, object.optString(key));
@@ -108,9 +111,10 @@ public class Spider extends com.github.catvod.crawler.Spider {
         return builder.build();
     }
 
-    private ArrayMap<String, String> getParam(JSONObject object) {
+    private ArrayMap<String, String> getParam(String param) throws JSONException {
         ArrayMap<String, String> params = new ArrayMap<>();
-        if (object == null) return params;
+        if (TextUtils.isEmpty(param)) return params;
+        JSONObject object = new JSONObject(param);
         for (Iterator<String> iterator = object.keys(); iterator.hasNext(); ) {
             String key = iterator.next();
             params.put(key, object.optString(key));
