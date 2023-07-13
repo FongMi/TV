@@ -6,12 +6,14 @@ import com.hiker.drpy.method.Global;
 import com.hiker.drpy.method.Local;
 import com.whl.quickjs.android.QuickJSLoader;
 import com.whl.quickjs.wrapper.JSArray;
+import com.whl.quickjs.wrapper.JSMethod;
 import com.whl.quickjs.wrapper.JSObject;
 import com.whl.quickjs.wrapper.QuickJSContext;
 
 import org.json.JSONArray;
 
 import java.io.ByteArrayInputStream;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,18 +23,22 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import dalvik.system.DexClassLoader;
+
 public class Spider extends com.github.catvod.crawler.Spider {
 
     private final ExecutorService executor;
+    private final DexClassLoader dex;
     private QuickJSContext ctx;
     private JSObject jsObject;
     private final String key;
     private final String api;
 
-    public Spider(String api) {
+    public Spider(String api, DexClassLoader dex) {
         this.key = "__" + UUID.randomUUID().toString().replace("-", "") + "__";
         this.executor = Executors.newSingleThreadExecutor();
         this.api = api;
+        this.dex = dex;
     }
 
     private void submit(Runnable runnable) {
@@ -119,6 +125,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
     private void initJS(Context context, String extend) {
         if (ctx == null) createCtx();
+        if (dex != null) createDex();
         ctx.evaluateModule(getContent(context), api);
         jsObject = (JSObject) ctx.getProperty(ctx.getGlobalObject(), key);
         jsObject.getJSFunction("init").call(extend);
@@ -129,6 +136,34 @@ public class Spider extends com.github.catvod.crawler.Spider {
         QuickJSLoader.initConsoleLog(ctx);
         Global.create(ctx, executor).setProperty();
         ctx.getGlobalObject().setProperty("local", Local.class);
+    }
+
+    private void createDex() {
+        try {
+            Class<?> apiClz = dex.loadClass("com.github.catvod.js.Method");
+            JSObject apiObj = ctx.getGlobalObject().getJSObject("jsapi");
+            injectApi(apiClz, apiObj);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void injectApi(Class<?> apiClz, JSObject apiObj) throws Exception {
+        for (Class<?> clz : apiClz.getDeclaredClasses()) {
+            Object javaObj = clz.getDeclaredConstructor(apiClz).newInstance(apiClz.getDeclaredConstructor(QuickJSContext.class).newInstance(ctx));
+            JSObject clzObj = ctx.createNewJSObject();
+            for (Method method : clz.getDeclaredMethods()) {
+                if (!method.isAnnotationPresent(JSMethod.class)) continue;
+                clzObj.setProperty(method.getName(), args -> {
+                    try {
+                        return method.invoke(javaObj, args);
+                    } catch (Exception e) {
+                        return null;
+                    }
+                });
+            }
+            apiObj.setProperty(clz.getSimpleName(), clzObj);
+        }
     }
 
     private String getContent(Context context) {
