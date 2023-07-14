@@ -5,7 +5,7 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 
 import com.fongmi.android.tv.gson.FilterAdapter;
-import com.fongmi.android.tv.utils.Json;
+import com.github.catvod.utils.Json;
 import com.fongmi.android.tv.utils.Trans;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
