@@ -1,5 +1,7 @@
 package com.fongmi.android.tv.player;
 
+import android.text.TextUtils;
+
 import androidx.annotation.NonNull;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
@@ -17,7 +19,6 @@ import com.fongmi.android.tv.bean.Track;
 import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.impl.ParseCallback;
-import com.fongmi.android.tv.player.parse.ParseJob;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
@@ -189,17 +190,25 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         float speed = getSpeed();
         float addon = speed >= 2 ? 1f : 0.25f;
         speed = speed == 5 ? 0.25f : speed + addon;
-        exoPlayer.setPlaybackSpeed(speed);
-        ijkPlayer.setSpeed(speed);
-        return getSpeedText();
+        return setSpeed(speed);
+    }
+
+    public String addSpeed(float value) {
+        float speed = getSpeed();
+        speed = Math.min(speed + value, 5);
+        return setSpeed(speed);
+    }
+
+    public String subSpeed(float value) {
+        float speed = getSpeed();
+        speed = Math.max(speed - value, 0.25f);
+        return setSpeed(speed);
     }
 
     public String toggleSpeed() {
         float speed = getSpeed();
         speed = speed == 1 ? 3f : 1f;
-        exoPlayer.setPlaybackSpeed(speed);
-        ijkPlayer.setSpeed(speed);
-        return getSpeedText();
+        return setSpeed(speed);
     }
 
     public void togglePlayer() {
@@ -393,8 +402,9 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     @Override
     public void onParseSuccess(Map<String, String> headers, String url, String from) {
-        if (from.length() > 0) Notify.show(ResUtil.getString(R.string.parse_from, from));
         setMediaSource(headers, url);
+        if (TextUtils.isEmpty(from)) return;
+        Notify.show(ResUtil.getString(R.string.parse_from, from));
     }
 
     @Override

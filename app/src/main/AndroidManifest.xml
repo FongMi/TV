@@ -41,6 +41,11 @@
 
         </provider>
 
+        <provider
+            android:name="com.hiker.drpy.Loader"
+            android:authorities="com.hiker.drpy.provider"
+            android:exported="false" />
+
         <activity
             android:name=".ui.activity.CrashActivity"
             android:process=":error_activity" />

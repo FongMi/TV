@@ -20,6 +20,7 @@ import org.simpleframework.xml.Text;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -92,8 +93,16 @@ public class Vod {
         return TextUtils.isEmpty(vodId) ? "" : vodId.trim();
     }
 
+    public void setVodId(String vodId) {
+        this.vodId = vodId;
+    }
+
     public String getVodName() {
         return TextUtils.isEmpty(vodName) ? "" : vodName.trim();
+    }
+
+    public void setVodName(String vodName) {
+        this.vodName = vodName;
     }
 
     public String getTypeName() {
@@ -102,6 +111,10 @@ public class Vod {
 
     public String getVodPic() {
         return TextUtils.isEmpty(vodPic) ? "" : vodPic.trim();
+    }
+
+    public void setVodPic(String vodPic) {
+        this.vodPic = vodPic;
     }
 
     public String getVodRemarks() {
@@ -142,6 +155,10 @@ public class Vod {
 
     public List<Flag> getVodFlags() {
         return vodFlags = vodFlags == null ? new ArrayList<>() : vodFlags;
+    }
+
+    public void setVodFlags(List<Flag> vodFlags) {
+        this.vodFlags = vodFlags;
     }
 
     public Site getSite() {
@@ -290,6 +307,12 @@ public class Vod {
             for (Vod.Flag.Episode item : getEpisodes()) if (item.rule3(remarks)) return item;
             for (Vod.Flag.Episode item : getEpisodes()) if (item.rule4(remarks)) return item;
             return getPosition() != -1 ? getEpisodes().get(getPosition()) : null;
+        }
+
+        public static List<Flag> create(String flag, String name, String url) {
+            Vod.Flag item = new Vod.Flag(flag);
+            item.getEpisodes().add(new Vod.Flag.Episode(name, url));
+            return Arrays.asList(item);
         }
 
         @Override

@@ -141,7 +141,6 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         boolean first = page.equals("1");
         if (first) mLast = null;
         if (first) showProgress();
-        if (isFolder()) mTypeIds.add(typeId);
         if (isFolder() && !mOpen) mBinding.recycler.moveToTop();
         int filterSize = mOpen ? mFilters.size() : 0;
         boolean clear = first && mAdapter.size() > filterSize;
@@ -186,12 +185,6 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         return new ListRow(adapter);
     }
 
-    private void refresh(int num) {
-        String typeId = mTypeIds.get(mTypeIds.size() - num);
-        mTypeIds = mTypeIds.subList(0, mTypeIds.size() - num);
-        getVideo(typeId, "1");
-    }
-
     private void showProgress() {
         if (!mOpen) mBinding.progress.getRoot().setVisibility(View.VISIBLE);
     }
@@ -203,7 +196,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     private void showFilter() {
         List<ListRow> rows = new ArrayList<>();
         for (Filter filter : mFilters) rows.add(getRow(filter));
-        App.post(() -> mBinding.recycler.smoothScrollToPosition(0), 48);
+        App.post(() -> mBinding.recycler.scrollToPosition(0), 48);
         mAdapter.addAll(0, rows);
         hideProgress();
     }
@@ -219,20 +212,22 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     }
 
     public void onRefresh() {
-        if (isFolder()) refresh(1);
-        else getVideo();
+        if (mTypeIds.isEmpty()) getVideo();
+        else getVideo(mTypeIds.get(mTypeIds.size() - 1), "1");
     }
 
     public boolean canGoBack() {
-        return mTypeIds.size() > 1;
+        return !mTypeIds.isEmpty();
     }
 
     public void goBack() {
-        refresh(2);
+        mTypeIds = mTypeIds.subList(0, mTypeIds.size() - 1);
+        onRefresh();
     }
 
     @Override
     public void onItemClick(Vod item) {
+        if (item.isFolder()) mTypeIds.add(item.getVodId());
         if (item.isFolder()) getVideo(item.getVodId(), "1");
         else DetailActivity.start(getActivity(), getKey(), item.getVodId(), item.getVodName());
     }

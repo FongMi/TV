@@ -23,7 +23,7 @@ android {
         leanback {
             dimension "default"
             versionCode 202
-            versionName "2.0.2"
+            versionName "20230714#1"
         }
     }
 
@@ -67,6 +67,7 @@ dependencies {
     implementation project(':zlive')
     implementation project(':catvod')
     implementation project(':pyramid')
+    implementation project(':jianpian')
     implementation project(':forcetech')
     implementation project(':ijkplayer')
     implementation project(':media-lib-database')

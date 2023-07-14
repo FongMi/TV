@@ -12,6 +12,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.ref.WeakReference;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ConcurrentHashMap;
 
 import okhttp3.Headers;
@@ -20,6 +22,7 @@ import okhttp3.Response;
 public class Module {
 
     private final ConcurrentHashMap<String, String> cache;
+    private WeakReference<Context> context;
 
     private static class Loader {
         static volatile Module INSTANCE = new Module();
@@ -33,45 +36,53 @@ public class Module {
         this.cache = new ConcurrentHashMap<>();
     }
 
-    public String load(Context context, String name) {
+    private Context getContext() {
+        return context.get();
+    }
+
+    public static void setContext(Context context) {
+        get().context = new WeakReference<>(context);
+    }
+
+    public String load(String name) {
         if (cache.contains(name)) return cache.get(name);
-        if (name.startsWith("http")) cache.put(name, getModule(context, name));
-        if (name.startsWith("assets")) cache.put(name, getAssets(context, name));
+        if (name.startsWith("http")) cache.put(name, getModule(name));
+        if (name.startsWith("assets")) cache.put(name, getAssets(name));
         return cache.get(name);
     }
 
-    private String getAssets(Context context, String name) {
+    private String getAssets(String name) {
         try {
-            InputStream is = context.getAssets().open(name.substring(9));
+            InputStream is = getContext().getAssets().open(name.substring(9));
             byte[] data = new byte[is.available()];
             is.read(data);
             is.close();
-            return new String(data, "UTF-8");
+            return new String(data, StandardCharsets.UTF_8);
         } catch (IOException e) {
             e.printStackTrace();
             return "";
         }
     }
 
-    private String getModule(Context context, String url) {
+    private String getModule(String url) {
         try {
             Uri uri = Uri.parse(url);
-            File file = getFile(context, uri);
+            File file = getFile(uri);
             if (file.exists()) return read(file);
             Response response = OkHttp.newCall(url, Headers.of("User-Agent", "Mozilla/5.0")).execute();
             if (response.code() != 200) return "";
             byte[] data = response.body().bytes();
             boolean cache = !uri.getHost().equals("127.0.0.1");
             if (cache) new Thread(() -> write(file, data)).start();
-            return new String(data, "UTF-8");
+            return new String(data, StandardCharsets.UTF_8);
         } catch (Exception e) {
             e.printStackTrace();
             return "";
         }
     }
 
-    private File getFile(Context context, Uri uri) {
-        return new File(context.getCacheDir(), uri.getLastPathSegment());
+    private File getFile(Uri uri) {
+        return new File(getContext().getCacheDir(), uri.getLastPathSegment());
     }
 
     private void write(File file, byte[] data) {

@@ -116,7 +116,7 @@ public class ExoUtil {
         if (subs.size() > 0) builder.setSubtitleConfigurations(getSubtitles(subs));
         builder.setAllowChunklessPreparation(Players.isHard());
         if (mimeType != null) builder.setMimeType(mimeType);
-        builder.setAds(Sniffer.getAdsRegex(uri));
+        builder.setAds(Sniffer.getRegex(uri));
         return builder.build();
     }
 
