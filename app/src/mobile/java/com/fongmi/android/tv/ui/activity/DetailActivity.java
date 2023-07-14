@@ -1068,6 +1068,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mBinding.search.setVisibility(View.VISIBLE);
         mSearchAdapter.addAll(items);
         if (isInitAuto()) nextSite();
+        if (items.isEmpty()) return;
         App.removeCallbacks(mR4);
     }
 
