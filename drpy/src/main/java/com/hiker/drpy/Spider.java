@@ -57,7 +57,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
     @Override
     public void init(Context context, String extend) throws Exception {
         super.init(context, extend);
-        submit(() -> initJS(context, extend));
+        submit(() -> initJS(extend));
     }
 
     @Override
@@ -124,10 +124,11 @@ public class Spider extends com.github.catvod.crawler.Spider {
         });
     }
 
-    private void initJS(Context context, String extend) {
+    private void initJS(String extend) {
         if (ctx == null) createCtx();
         if (dex != null) createDex();
-        ctx.evaluateModule(getContent(context), api);
+        String content = getContent();
+        ctx.evaluateModule(content, api);
         jsObject = (JSObject) ctx.getProperty(ctx.getGlobalObject(), key);
         jsObject.getJSFunction("init").call(Json.valid(extend) ? ctx.parse(extend) : extend);
     }
@@ -164,11 +165,11 @@ public class Spider extends com.github.catvod.crawler.Spider {
         }
     }
 
-    private String getContent(Context context) {
-        return Module.get().load(context, api)
-                .replace("export default{", "globalThis." + key + " ={")
-                .replace("export default {", "globalThis." + key + " ={")
-                .replace("__JS_SPIDER__", "globalThis." + key);
+    private String getContent() {
+        String content = Module.get().load(api);
+        content = content.replaceAll("export default.*?[{]", "globalThis." + key + " = {");
+        content = content.replace("__JS_SPIDER__", "globalThis." + key);
+        return content;
     }
 
     private JSObject convert(HashMap<String, String> map) {
