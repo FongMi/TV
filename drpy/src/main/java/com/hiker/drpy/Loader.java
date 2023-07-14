@@ -30,7 +30,7 @@ public class Loader extends ContentProvider {
 
             @Override
             public String getModuleScript(String moduleName) {
-                return Module.get().load(getContext(), moduleName);
+                return Module.get().load(moduleName);
             }
         });
     }
@@ -38,6 +38,7 @@ public class Loader extends ContentProvider {
     @Override
     public boolean onCreate() {
         Prefers.setContext(getContext());
+        Module.setContext(getContext());
         setModuleLoader();
         return true;
     }
