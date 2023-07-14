@@ -19,17 +19,19 @@ import java.util.List;
 public class CustomVerticalGridView extends VerticalGridView {
 
     private List<View> views;
+    private boolean moveTop;
 
     public CustomVerticalGridView(@NonNull Context context) {
-        super(context);
+        this(context, null);
     }
 
     public CustomVerticalGridView(@NonNull Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs, 0);
     }
 
     public CustomVerticalGridView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        setMoveTop(true);
     }
 
     @Override
@@ -51,10 +53,14 @@ public class CustomVerticalGridView extends VerticalGridView {
         this.views = Arrays.asList(views);
     }
 
+    public void setMoveTop(boolean moveTop) {
+        this.moveTop = moveTop;
+    }
+
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (event.getAction() != KeyEvent.ACTION_DOWN) return super.dispatchKeyEvent(event);
-        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) return moveToTop();
+        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK && moveTop) return moveToTop();
         return super.dispatchKeyEvent(event);
     }
 

@@ -233,12 +233,14 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     }
 
     public void goBack() {
+        if (mPages.size() == 1) mBinding.recycler.setMoveTop(true);
         mPages.remove(mPage = getLastPage());
         onRefresh();
     }
 
     @Override
     public void onItemClick(Vod item) {
+        if (item.isFolder()) mBinding.recycler.setMoveTop(false);
         if (item.isFolder()) mPages.add(Page.get(item.getVodId(), mBinding.recycler.getSelectedPosition()));
         if (item.isFolder()) getVideo(item.getVodId(), "1");
         else DetailActivity.start(getActivity(), getKey(), item.getVodId(), item.getVodName());
