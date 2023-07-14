@@ -185,9 +185,9 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     @Override
     public void onItemClick(Vod item) {
+        if (item.isFolder()) mPages.add(Page.get(item.getVodId(), findPosition()));
         if (item.isFolder()) getVideo(item.getVodId(), "1");
         else DetailActivity.start(getActivity(), getKey(), item.getVodId(), item.getVodName());
-        if (item.isFolder()) mPages.add(Page.get(item.getVodId(), findPosition()));
     }
 
     @Override
