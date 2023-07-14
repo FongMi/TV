@@ -18,8 +18,6 @@ import java.util.List;
 
 public class CustomVerticalGridView extends VerticalGridView {
 
-    private boolean pressUp;
-    private boolean pressDown;
     private List<View> views;
 
     public CustomVerticalGridView(@NonNull Context context) {
@@ -40,10 +38,9 @@ public class CustomVerticalGridView extends VerticalGridView {
         setOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable ViewHolder child, int position, int subposition) {
-                if (views == null) return;
-                if (pressUp && position == 0) {
+                if (position == 0) {
                     for (View view : views) view.setVisibility(View.VISIBLE);
-                } else if (pressDown && position == 1) {
+                } else if (position > 0) {
                     for (View view : views) view.setVisibility(View.GONE);
                 }
             }
@@ -57,27 +54,15 @@ public class CustomVerticalGridView extends VerticalGridView {
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (event.getAction() != KeyEvent.ACTION_DOWN) return super.dispatchKeyEvent(event);
-        pressUp = false;
-        pressDown = false;
-        switch (event.getKeyCode()) {
-            case KeyEvent.KEYCODE_DPAD_UP:
-                pressUp = true;
-                return super.dispatchKeyEvent(event);
-            case KeyEvent.KEYCODE_DPAD_DOWN:
-                pressDown = true;
-                return super.dispatchKeyEvent(event);
-            case KeyEvent.KEYCODE_BACK:
-                return moveToTop();
-            default:
-                return super.dispatchKeyEvent(event);
-        }
+        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) return moveToTop();
+        return super.dispatchKeyEvent(event);
     }
 
     public boolean moveToTop() {
         if (views == null || getSelectedPosition() == 0 || getAdapter() == null || getAdapter().getItemCount() == 0) return false;
-        for (View view : views) view.setVisibility(View.VISIBLE);
         for (View view : views) if (view.getId() == R.id.recycler) view.requestFocus();
-        scrollToPosition(0);
+        for (View view : views) view.setVisibility(View.VISIBLE);
+        setSelectedPosition(0);
         return true;
     }
 }
