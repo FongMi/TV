@@ -13,6 +13,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.Product;
+import com.fongmi.android.tv.bean.Page;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.FragmentTypeBinding;
@@ -34,8 +35,9 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     private FragmentTypeBinding mBinding;
     private CustomScroller mScroller;
     private SiteViewModel mViewModel;
-    private List<String> mTypeIds;
     private VodAdapter mAdapter;
+    private List<Page> mPages;
+    private Page mPage;
 
     public static TypeFragment newInstance(String key, String typeId, boolean folder) {
         Bundle args = new Bundle();
@@ -67,6 +69,10 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         return (VodFragment) getParentFragment();
     }
 
+    private Page getLastPage() {
+        return mPages.get(mPages.size() - 1);
+    }
+
     @Override
     protected ViewBinding getBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
         return mBinding = FragmentTypeBinding.inflate(inflater, container, false);
@@ -75,8 +81,8 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     @Override
     protected void initView() {
         mScroller = new CustomScroller(this);
-        mTypeIds = new ArrayList<>();
         mExtends = new HashMap<>();
+        mPages = new ArrayList<>();
         setRecyclerView();
         setViewModel();
     }
@@ -108,14 +114,13 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     }
 
     private void getVideo() {
-        mTypeIds.clear();
+        mPages.clear();
         mScroller.reset();
         getVideo(getTypeId(), "1");
     }
 
     private void getVideo(String typeId, String page) {
         if (page.equals("1")) mAdapter.clear();
-        if (isFolder()) mBinding.recycler.scrollToPosition(0);
         if (page.equals("1") && !mBinding.swipeLayout.isRefreshing()) mBinding.progressLayout.showProgress();
         if (isHome() && page.equals("1")) setAdapter(getParent().getResult());
         else mViewModel.categoryContent(getKey(), typeId, page, true, mExtends);
@@ -127,12 +132,37 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         mBinding.swipeLayout.setRefreshing(false);
         mScroller.endLoading(size == 0);
         mAdapter.addAll(result.getList());
+        checkPosition();
         checkPage(size);
+    }
+
+    private void checkPosition() {
+        if (mPage != null) scrollToPosition(mPage.getPosition());
+        else if (isFolder()) mBinding.recycler.scrollToPosition(0);
+        mPage = null;
     }
 
     private void checkPage(int count) {
         if (count == 0 || mAdapter.getItemCount() >= 40 || isFolder() || isHome()) return;
         getVideo(getTypeId(), String.valueOf(mScroller.addPage()));
+    }
+
+    private int findPosition() {
+        if (mBinding.recycler.getLayoutManager() instanceof LinearLayoutManager) {
+            return ((LinearLayoutManager) mBinding.recycler.getLayoutManager()).findFirstVisibleItemPosition();
+        } else if (mBinding.recycler.getLayoutManager() instanceof GridLayoutManager) {
+            return ((GridLayoutManager) mBinding.recycler.getLayoutManager()).findFirstVisibleItemPosition();
+        } else {
+            return 0;
+        }
+    }
+
+    private void scrollToPosition(int position) {
+        if (mBinding.recycler.getLayoutManager() instanceof LinearLayoutManager) {
+            ((LinearLayoutManager) mBinding.recycler.getLayoutManager()).scrollToPositionWithOffset(position, 0);
+        } else if (mBinding.recycler.getLayoutManager() instanceof GridLayoutManager) {
+            ((GridLayoutManager) mBinding.recycler.getLayoutManager()).scrollToPositionWithOffset(position, 0);
+        }
     }
 
     public void setFilter(String key, String value) {
@@ -142,8 +172,8 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     @Override
     public void onRefresh() {
-        if (mTypeIds.isEmpty()) getVideo();
-        else getVideo(mTypeIds.get(mTypeIds.size() - 1), "1");
+        if (mPages.isEmpty()) getVideo();
+        else getVideo(getLastPage().getVodId(), "1");
     }
 
     @Override
@@ -155,8 +185,8 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     @Override
     public void onItemClick(Vod item) {
-        if (item.isFolder()) mTypeIds.add(item.getVodId());
         if (item.isFolder()) getVideo(item.getVodId(), "1");
+        if (item.isFolder()) mPages.add(Page.get(item.getVodId(), findPosition()));
         else DetailActivity.start(getActivity(), getKey(), item.getVodId(), item.getVodName());
     }
 
@@ -168,8 +198,9 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     @Override
     public boolean canBack() {
-        if (mTypeIds.isEmpty()) return true;
-        mTypeIds = mTypeIds.subList(0, mTypeIds.size() - 1);
+        if (mPages.isEmpty()) return true;
+        mPage = getLastPage();
+        mPages.remove(mPage);
         onRefresh();
         return false;
     }
