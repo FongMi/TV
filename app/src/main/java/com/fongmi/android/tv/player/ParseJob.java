@@ -7,7 +7,7 @@ import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.impl.ParseCallback;
 import com.fongmi.android.tv.ui.custom.CustomWebView;
-import com.fongmi.android.tv.utils.Json;
+import com.github.catvod.utils.Json;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.net.OkHttp;
 import com.google.gson.JsonObject;
@@ -71,13 +71,13 @@ public class ParseJob implements ParseCallback {
         return () -> {
             try {
                 doInBackground(result.getKey(), result.getUrl(), result.getFlag());
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 onParseError();
             }
         };
     }
 
-    private void doInBackground(String key, String webUrl, String flag) throws Exception {
+    private void doInBackground(String key, String webUrl, String flag) throws Throwable {
         switch (parse.getType()) {
             case 0: //嗅探
                 startWeb(key, parse, webUrl);
@@ -106,13 +106,13 @@ public class ParseJob implements ParseCallback {
         checkResult(getHeader(object), url, item.getName(), error);
     }
 
-    private void jsonExtend(String webUrl) throws Exception {
+    private void jsonExtend(String webUrl) throws Throwable {
         LinkedHashMap<String, String> jxs = new LinkedHashMap<>();
         for (Parse item : ApiConfig.get().getParses()) if (item.getType() == 1) jxs.put(item.getName(), item.extUrl());
         checkResult(Result.fromObject(ApiConfig.get().jsonExt(parse.getUrl(), jxs, webUrl)));
     }
 
-    private void jsonMix(String webUrl, String flag) throws Exception {
+    private void jsonMix(String webUrl, String flag) throws Throwable {
         LinkedHashMap<String, HashMap<String, String>> jxs = new LinkedHashMap<>();
         for (Parse item : ApiConfig.get().getParses()) jxs.put(item.getName(), item.mixMap());
         checkResult(Result.fromObject(ApiConfig.get().jsonExtMix(flag, parse.getUrl(), parse.getName(), jxs, webUrl)));

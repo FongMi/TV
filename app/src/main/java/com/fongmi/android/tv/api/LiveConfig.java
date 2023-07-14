@@ -13,7 +13,7 @@ import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.impl.Callback;
-import com.fongmi.android.tv.utils.Json;
+import com.github.catvod.utils.Json;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.google.gson.JsonElement;

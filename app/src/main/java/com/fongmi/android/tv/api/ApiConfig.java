@@ -10,7 +10,7 @@ import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Rule;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.impl.Callback;
-import com.fongmi.android.tv.utils.Json;
+import com.github.catvod.utils.Json;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.bean.Doh;
@@ -260,11 +260,11 @@ public class ApiConfig {
         }
     }
 
-    public JSONObject jsonExt(String key, LinkedHashMap<String, String> jxs, String url) throws Exception {
+    public JSONObject jsonExt(String key, LinkedHashMap<String, String> jxs, String url) throws Throwable {
         return jarLoader.jsonExt(key, jxs, url);
     }
 
-    public JSONObject jsonExtMix(String flag, String key, String name, LinkedHashMap<String, HashMap<String, String>> jxs, String url) throws Exception {
+    public JSONObject jsonExtMix(String flag, String key, String name, LinkedHashMap<String, HashMap<String, String>> jxs, String url) throws Throwable {
         return jarLoader.jsonExtMix(flag, key, name, jxs, url);
     }
 
