@@ -3,7 +3,6 @@ package com.fongmi.android.tv.player.source;
 import android.net.Uri;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.BuildConfig;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Github;
 import com.github.catvod.net.OkHttp;
@@ -28,7 +27,7 @@ public class JianPian {
 
     private void init() throws Exception {
         if (p2p != null) return;
-        File file = FileUtil.getFilesFile("libp2p-jp-" + BuildConfig.FLAVOR_abi + ".so");
+        File file = FileUtil.getFilesFile("libp2p-jp-armeabi_v7a.so");
         String path = Github.get().getReleasePath("/other/jniLibs/" + file.getName());
         if (!file.exists()) FileUtil.write(file, OkHttp.newCall(path).execute().body().bytes());
         p2p = new P2PClass(App.get(), file.getAbsolutePath());
