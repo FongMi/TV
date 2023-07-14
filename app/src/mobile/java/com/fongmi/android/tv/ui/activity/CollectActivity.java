@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
@@ -37,7 +36,6 @@ import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.base.ViewType;
 import com.fongmi.android.tv.ui.custom.CustomTextListener;
 import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
-import com.fongmi.android.tv.utils.PauseThreadPoolExecutor;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Utils;
@@ -46,18 +44,18 @@ import com.github.catvod.net.OkHttp;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import okhttp3.Call;
 import okhttp3.Response;
 
 public class CollectActivity extends BaseActivity implements SiteCallback, WordAdapter.OnClickListener, RecordAdapter.OnClickListener, CollectAdapter.OnClickListener, VodAdapter.OnClickListener {
 
-    private PauseThreadPoolExecutor mExecutor;
     private ActivityCollectBinding mBinding;
     private CollectAdapter mCollectAdapter;
     private RecordAdapter mRecordAdapter;
+    private ExecutorService mExecutor;
     private WordAdapter mWordAdapter;
     private SiteViewModel mViewModel;
     private VodAdapter mVodAdapter;
@@ -180,7 +178,7 @@ public class CollectActivity extends BaseActivity implements SiteCallback, WordA
         mBinding.view.setVisibility(View.VISIBLE);
         mBinding.result.setVisibility(View.VISIBLE);
         if (mExecutor != null) mExecutor.shutdownNow();
-        mExecutor = new PauseThreadPoolExecutor(Constant.THREAD_POOL * 2, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
+        mExecutor = Executors.newCachedThreadPool();
         String keyword = mBinding.keyword.getText().toString().trim();
         for (Site site : mSites) mExecutor.execute(() -> search(site, keyword));
         App.post(() -> mRecordAdapter.add(keyword), 250);
@@ -269,18 +267,6 @@ public class CollectActivity extends BaseActivity implements SiteCallback, WordA
     @Override
     public boolean onLongClick(Vod item) {
         return false;
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (mExecutor != null) mExecutor.resume();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (mExecutor != null) mExecutor.pause();
     }
 
     @Override

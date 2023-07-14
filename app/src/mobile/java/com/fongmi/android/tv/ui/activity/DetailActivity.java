@@ -1046,7 +1046,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     private void startSearch(String keyword) {
         mSearchAdapter.clear();
-        mExecutor = Executors.newFixedThreadPool(Constant.THREAD_POOL * 2);
+        mExecutor = Executors.newCachedThreadPool();
         List<Site> sites = new ArrayList<>();
         List<Site> items = ApiConfig.get().getSites();
         for (Site item : items) if (isPass(item, false)) sites.add(item);
