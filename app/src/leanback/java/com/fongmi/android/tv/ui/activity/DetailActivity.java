@@ -1013,6 +1013,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mSearchAdapter.addAll(mSearchAdapter.size(), items);
         mBinding.search.setVisibility(View.VISIBLE);
         if (isInitAuto()) nextSite();
+        if (items.isEmpty()) return;
         App.removeCallbacks(mR3);
     }
 
