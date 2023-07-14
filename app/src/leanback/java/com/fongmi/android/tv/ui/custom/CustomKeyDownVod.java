@@ -25,6 +25,7 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
     private final View videoView;
     private boolean changeBright;
     private boolean changeVolume;
+    private boolean changeSpeed;
     private boolean touch;
     private boolean full;
     private float bright;
@@ -71,11 +72,16 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
         } else if (event.getAction() == KeyEvent.ACTION_UP && (Utils.isLeftKey(event) || Utils.isRightKey(event))) {
             App.post(() -> listener.onSeekTo(holdTime), 250);
         } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isUpKey(event)) {
-            listener.onKeyUp();
+            if (changeSpeed) listener.onSpeedEnd();
+            else listener.onKeyUp();
+            changeSpeed = false;
         } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isDownKey(event)) {
             listener.onKeyDown();
         } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isEnterKey(event)) {
             listener.onKeyCenter();
+        } else if (event.isLongPress() && Utils.isUpKey(event)) {
+            listener.onSpeedUp();
+            changeSpeed = true;
         }
     }
 
@@ -171,6 +177,10 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
         void onSeeking(int time);
 
         void onSeekTo(int time);
+
+        void onSpeedUp();
+
+        void onSpeedEnd();
 
         void onKeyUp();
 

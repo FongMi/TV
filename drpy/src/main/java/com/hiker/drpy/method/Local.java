@@ -2,30 +2,26 @@ package com.hiker.drpy.method;
 
 import androidx.annotation.Keep;
 
+import com.hiker.drpy.Prefers;
 import com.whl.quickjs.wrapper.JSMethod;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class Local {
 
-    private final Map<String, String> maps = new HashMap<>();
-
     @Keep
     @JSMethod
-    public String get(String R_KEY, String k) {
-        return maps.get("js_engine_" + R_KEY + "_" + k);
+    public String get(String rule, String key) {
+        return Prefers.get("js_engine_" + rule + "_" + key);
     }
 
     @Keep
     @JSMethod
-    public void set(String R_KEY, String k, String v) {
-        maps.put("js_engine_" + R_KEY + "_" + k, v);
+    public void set(String rule, String key, String value) {
+        Prefers.put("js_engine_" + rule + "_" + key, value);
     }
 
     @Keep
     @JSMethod
-    public void delete(String R_KEY, String k) {
-        maps.remove("js_engine_" + R_KEY + "_" + k);
+    public void delete(String rule, String key) {
+        Prefers.remove("js_engine_" + rule + "_" + key);
     }
 }

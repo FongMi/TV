@@ -34,6 +34,11 @@ public class Notify {
         notifyMgr.createNotificationChannel(new NotificationChannel(DEFAULT, "預設", NotificationManager.IMPORTANCE_HIGH));
     }
 
+    public static String getError(int resId, Throwable e) {
+        if (TextUtils.isEmpty(e.getMessage())) return ResUtil.getString(resId);
+        return ResUtil.getString(resId) + "\n" + e.getMessage();
+    }
+
     public static void show(int resId) {
         if (resId != 0) show(ResUtil.getString(resId));
     }
@@ -43,7 +48,8 @@ public class Notify {
     }
 
     public static void progress(Context context) {
-        dismiss(); get().create(context);
+        dismiss();
+        get().create(context);
     }
 
     public static void dismiss() {

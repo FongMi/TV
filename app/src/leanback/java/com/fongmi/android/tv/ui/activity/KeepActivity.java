@@ -63,8 +63,8 @@ public class KeepActivity extends BaseActivity implements KeepAdapter.OnClickLis
             }
 
             @Override
-            public void error(int resId) {
-                Notify.show(resId);
+            public void error(String msg) {
+                Notify.show(msg);
             }
         });
     }

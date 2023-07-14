@@ -1,4 +1,4 @@
-package com.fongmi.android.tv.utils;
+package com.github.catvod.utils;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
