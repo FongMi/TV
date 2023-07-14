@@ -45,13 +45,12 @@ public class JarLoader {
     }
 
     private void load(String key, File file) {
-        DexClassLoader loader = new DexClassLoader(file.getAbsolutePath(), FileUtil.getCachePath(), null, App.get().getClassLoader());
-        loaders.put(key, loader);
-        setContext(key);
-        getProxy(key);
+        loaders.put(key, new DexClassLoader(file.getAbsolutePath(), FileUtil.getCachePath(), null, App.get().getClassLoader()));
+        invokeInit(key);
+        putProxy(key);
     }
 
-    private void setContext(String key) {
+    private void invokeInit(String key) {
         try {
             Class<?> clz = loaders.get(key).loadClass("com.github.catvod.spider.Init");
             Method method = clz.getMethod("init", Context.class);
@@ -61,7 +60,7 @@ public class JarLoader {
         }
     }
 
-    private void getProxy(String key) {
+    private void putProxy(String key) {
         try {
             Class<?> clz = loaders.get(key).loadClass("com.github.catvod.spider.Proxy");
             Method method = clz.getMethod("proxy", Map.class);
