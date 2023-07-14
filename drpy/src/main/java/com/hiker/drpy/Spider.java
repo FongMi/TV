@@ -2,6 +2,7 @@ package com.hiker.drpy;
 
 import android.content.Context;
 
+import com.github.catvod.utils.Json;
 import com.hiker.drpy.method.Global;
 import com.hiker.drpy.method.Local;
 import com.whl.quickjs.android.QuickJSLoader;
@@ -128,7 +129,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
         if (dex != null) createDex();
         ctx.evaluateModule(getContent(context), api);
         jsObject = (JSObject) ctx.getProperty(ctx.getGlobalObject(), key);
-        jsObject.getJSFunction("init").call(extend);
+        jsObject.getJSFunction("init").call(Json.valid(extend) ? ctx.parse(extend) : extend);
     }
 
     private void createCtx() {
@@ -140,29 +141,26 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
     private void createDex() {
         try {
-            Class<?> apiClz = dex.loadClass("com.github.catvod.js.Method");
-            JSObject apiObj = ctx.getGlobalObject().getJSObject("jsapi");
-            injectApi(apiClz, apiObj);
-        } catch (Exception e) {
+            JSObject obj = ctx.createNewJSObject();
+            Class<?> clz = dex.loadClass("com.github.catvod.js.Method");
+            ctx.getGlobalObject().setProperty("jsapi", obj);
+            inject(clz, obj);
+        } catch (Throwable e) {
             e.printStackTrace();
         }
     }
 
-    private void injectApi(Class<?> apiClz, JSObject apiObj) throws Exception {
-        for (Class<?> clz : apiClz.getDeclaredClasses()) {
-            Object javaObj = clz.getDeclaredConstructor(apiClz).newInstance(apiClz.getDeclaredConstructor(QuickJSContext.class).newInstance(ctx));
-            JSObject clzObj = ctx.createNewJSObject();
-            for (Method method : clz.getDeclaredMethods()) {
-                if (!method.isAnnotationPresent(JSMethod.class)) continue;
-                clzObj.setProperty(method.getName(), args -> {
-                    try {
-                        return method.invoke(javaObj, args);
-                    } catch (Exception e) {
-                        return null;
-                    }
-                });
-            }
-            apiObj.setProperty(clz.getSimpleName(), clzObj);
+    private void inject(Class<?> clz, JSObject jsObj) throws Throwable {
+        Object javaObj = clz.getDeclaredConstructor(QuickJSContext.class).newInstance(ctx);
+        for (Method method : clz.getMethods()) {
+            if (!method.isAnnotationPresent(JSMethod.class)) continue;
+            jsObj.setProperty(method.getName(), args -> {
+                try {
+                    return method.invoke(javaObj, args);
+                } catch (Throwable e) {
+                    return null;
+                }
+            });
         }
     }
 

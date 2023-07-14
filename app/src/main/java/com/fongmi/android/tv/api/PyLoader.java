@@ -23,7 +23,7 @@ public class PyLoader {
 
     public void clear() {
         for (Spider spider : spiders.values()) spider.destroy();
-        this.spiders.clear();
+        spiders.clear();
     }
 
     public void setRecent(String recent) {
@@ -56,7 +56,7 @@ public class PyLoader {
             Spider spider = spiders.get(recent);
             if (spider != null) return spider.proxyLocal(params);
             else return null;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
             return null;
         }
