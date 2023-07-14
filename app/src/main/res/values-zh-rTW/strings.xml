@@ -57,6 +57,9 @@
     <string name="parse_god">超級解析</string>
     <string name="parse_from">解析來自：<xliff:g name="name">%s</xliff:g></string>
 
+    <!-- Push -->
+    <string name="push">推送</string>
+
     <!-- Setting -->
     <string name="setting_vod">點播</string>
     <string name="setting_live">直播</string>

@@ -139,8 +139,8 @@ public class ActionRequestProcess implements RequestProcess {
             }
 
             @Override
-            public void error(int resId) {
-                Notify.show(resId);
+            public void error(String msg) {
+                Notify.show(msg);
             }
         };
     }
@@ -168,8 +168,8 @@ public class ActionRequestProcess implements RequestProcess {
             }
 
             @Override
-            public void error(int resId) {
-                Notify.show(resId);
+            public void error(String msg) {
+                Notify.show(msg);
             }
         };
     }

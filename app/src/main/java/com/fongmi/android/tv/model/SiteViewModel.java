@@ -8,10 +8,13 @@ import androidx.lifecycle.ViewModel;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Vod;
+import com.fongmi.android.tv.player.source.Source;
+import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Sniffer;
 import com.fongmi.android.tv.utils.Trans;
 import com.fongmi.android.tv.utils.Utils;
@@ -49,13 +52,13 @@ public class SiteViewModel extends ViewModel {
     }
 
     public void homeContent() {
-        Site site = ApiConfig.get().getHome();
         execute(result, () -> {
+            Site site = ApiConfig.get().getHome();
             if (site.getType() == 3) {
                 Spider spider = ApiConfig.get().getCSP(site);
                 String homeContent = spider.homeContent(true);
                 SpiderDebug.log(homeContent);
-                ApiConfig.get().setJar(site.getJar());
+                ApiConfig.get().setRecent(site);
                 Result result = Result.fromJson(homeContent);
                 if (result.getList().size() > 0) return result;
                 String homeVideoContent = spider.homeVideoContent();
@@ -78,13 +81,13 @@ public class SiteViewModel extends ViewModel {
     }
 
     public void categoryContent(String key, String tid, String page, boolean filter, HashMap<String, String> extend) {
-        Site site = ApiConfig.get().getSite(key);
         execute(result, () -> {
+            Site site = ApiConfig.get().getSite(key);
             if (site.getType() == 3) {
                 Spider spider = ApiConfig.get().getCSP(site);
                 String categoryContent = spider.categoryContent(tid, page, filter, extend);
                 SpiderDebug.log(categoryContent);
-                ApiConfig.get().setJar(site.getJar());
+                ApiConfig.get().setRecent(site);
                 return Result.fromJson(categoryContent);
             } else {
                 LinkedHashMap<String, String> params = new LinkedHashMap<>();
@@ -101,16 +104,23 @@ public class SiteViewModel extends ViewModel {
     }
 
     public void detailContent(String key, String id) {
-        Site site = ApiConfig.get().getSite(key);
         execute(result, () -> {
+            Site site = ApiConfig.get().getSite(key);
             if (site.getType() == 3) {
                 Spider spider = ApiConfig.get().getCSP(site);
                 String detailContent = spider.detailContent(Arrays.asList(id));
                 SpiderDebug.log(detailContent);
-                ApiConfig.get().setJar(site.getJar());
+                ApiConfig.get().setRecent(site);
                 Result result = Result.fromJson(detailContent);
                 if (!result.getList().isEmpty()) result.getList().get(0).setVodFlags();
                 return result;
+            } else if (key.equals("push_agent")) {
+                Vod vod = new Vod();
+                vod.setVodId(id);
+                vod.setVodName(id);
+                vod.setVodPic("https://pic.rmb.bdstatic.com/bjh/1d0b02d0f57f0a42201f92caba5107ed.jpeg");
+                vod.setVodFlags(Vod.Flag.create(ResUtil.getString(R.string.push), ResUtil.getString(R.string.play), id));
+                return Result.vod(vod);
             } else {
                 LinkedHashMap<String, String> params = new LinkedHashMap<>();
                 params.put("ac", site.getType() == 0 ? "videolist" : "detail");
@@ -125,15 +135,17 @@ public class SiteViewModel extends ViewModel {
     }
 
     public void playerContent(String key, String flag, String id) {
-        Site site = ApiConfig.get().getSite(key);
         execute(player, () -> {
+            Source.stop();
+            Site site = ApiConfig.get().getSite(key);
             if (site.getType() == 3) {
                 Spider spider = ApiConfig.get().getCSP(site);
                 String playerContent = spider.playerContent(flag, id, ApiConfig.get().getFlags());
                 SpiderDebug.log(playerContent);
-                ApiConfig.get().setJar(site.getJar());
+                ApiConfig.get().setRecent(site);
                 Result result = Result.objectFrom(playerContent);
                 if (result.getFlag().isEmpty()) result.setFlag(flag);
+                result.setUrl(Source.getUrl(result.getUrl()));
                 result.setKey(key);
                 return result;
             } else if (site.getType() == 4) {
@@ -144,6 +156,13 @@ public class SiteViewModel extends ViewModel {
                 SpiderDebug.log(body);
                 Result result = Result.fromJson(body);
                 if (result.getFlag().isEmpty()) result.setFlag(flag);
+                result.setUrl(Source.getUrl(result.getUrl()));
+                return result;
+            } else if (key.equals("push_agent")) {
+                Result result = new Result();
+                result.setFlag(flag);
+                result.setParse(0);
+                result.setUrl(id);
                 return result;
             } else {
                 String url = id;

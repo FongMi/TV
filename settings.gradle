@@ -26,6 +26,7 @@ include ':zlive'
 include ':tvbus'
 include ':catvod'
 include ':pyramid'
+include ':jianpian'
 include ':forcetech'
 include ':ijkplayer'
 rootProject.name = "TV"

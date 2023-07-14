@@ -25,38 +25,47 @@ public class JarLoader {
     private final ConcurrentHashMap<String, DexClassLoader> loaders;
     private final ConcurrentHashMap<String, Method> methods;
     private final ConcurrentHashMap<String, Spider> spiders;
-    private String jar;
+    private String recent;
 
     public JarLoader() {
-        this.loaders = new ConcurrentHashMap<>();
-        this.methods = new ConcurrentHashMap<>();
-        this.spiders = new ConcurrentHashMap<>();
+        loaders = new ConcurrentHashMap<>();
+        methods = new ConcurrentHashMap<>();
+        spiders = new ConcurrentHashMap<>();
     }
 
     public void clear() {
-        this.loaders.clear();
-        this.methods.clear();
-        this.spiders.clear();
+        for (Spider spider : spiders.values()) spider.destroy();
+        loaders.clear();
+        methods.clear();
+        spiders.clear();
     }
 
-    public void setJar(String jar) {
-        this.jar = jar;
+    public void setRecent(String recent) {
+        this.recent = recent;
     }
 
-    private void load(String key, File file) throws Throwable {
-        DexClassLoader loader = new DexClassLoader(file.getAbsolutePath(), FileUtil.getCachePath(), null, App.get().getClassLoader());
-        Class<?> classInit = loader.loadClass("com.github.catvod.spider.Init");
-        Method method = classInit.getMethod("init", Context.class);
-        method.invoke(classInit, App.get());
-        loaders.put(key, loader);
+    private void load(String key, File file) {
+        loaders.put(key, new DexClassLoader(file.getAbsolutePath(), FileUtil.getCachePath(), null, App.get().getClassLoader()));
+        invokeInit(key);
         putProxy(key);
+    }
+
+    private void invokeInit(String key) {
+        try {
+            Class<?> clz = loaders.get(key).loadClass("com.github.catvod.spider.Init");
+            Method method = clz.getMethod("init", Context.class);
+            method.invoke(clz, App.get());
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
     }
 
     private void putProxy(String key) {
         try {
-            Class<?> classProxy = loaders.get(key).loadClass("com.github.catvod.spider.Proxy");
-            methods.put(key, classProxy.getMethod("proxy", Map.class));
-        } catch (Exception e) {
+            Class<?> clz = loaders.get(key).loadClass("com.github.catvod.spider.Proxy");
+            Method method = clz.getMethod("proxy", Map.class);
+            methods.put(key, method);
+        } catch (Throwable e) {
             e.printStackTrace();
         }
     }
@@ -69,7 +78,7 @@ public class JarLoader {
         }
     }
 
-    public void parseJar(String key, String jar) throws Throwable {
+    public void parseJar(String key, String jar) {
         String[] texts = jar.split(";md5;");
         String md5 = !jar.startsWith("file") && texts.length > 1 ? texts[1].trim() : "";
         jar = texts[0];
@@ -84,6 +93,11 @@ public class JarLoader {
         } else if (!jar.isEmpty()) {
             parseJar(key, Utils.convert(ApiConfig.getUrl(), jar));
         }
+    }
+
+    public DexClassLoader getLoader(String key, String jar) {
+        if (!loaders.containsKey(key)) parseJar(key, jar);
+        return loaders.get(key);
     }
 
     public Spider getSpider(String key, String api, String ext, String jar) {
@@ -102,13 +116,13 @@ public class JarLoader {
         }
     }
 
-    public JSONObject jsonExt(String key, LinkedHashMap<String, String> jxs, String url) throws Exception {
+    public JSONObject jsonExt(String key, LinkedHashMap<String, String> jxs, String url) throws Throwable {
         Class<?> clz = loaders.get("").loadClass("com.github.catvod.parser.Json" + key);
         Method method = clz.getMethod("parse", LinkedHashMap.class, String.class);
         return (JSONObject) method.invoke(null, jxs, url);
     }
 
-    public JSONObject jsonExtMix(String flag, String key, String name, LinkedHashMap<String, HashMap<String, String>> jxs, String url) throws Exception {
+    public JSONObject jsonExtMix(String flag, String key, String name, LinkedHashMap<String, HashMap<String, String>> jxs, String url) throws Throwable {
         Class<?> clz = loaders.get("").loadClass("com.github.catvod.parser.Mix" + key);
         Method method = clz.getMethod("parse", LinkedHashMap.class, String.class, String.class, String.class);
         return (JSONObject) method.invoke(null, jxs, name, flag, url);
@@ -116,10 +130,10 @@ public class JarLoader {
 
     public Object[] proxyInvoke(Map<?, ?> params) {
         try {
-            Method method = methods.get(Utils.getMd5(jar));
+            Method method = methods.get(Utils.getMd5(recent));
             if (method != null) return (Object[]) method.invoke(null, params);
             else return null;
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
             return null;
         }

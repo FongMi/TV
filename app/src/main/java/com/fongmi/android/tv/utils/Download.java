@@ -62,7 +62,7 @@ public class Download {
 
         void progress(int progress);
 
-        void error(String message);
+        void error(String msg);
 
         void success(File file);
     }
