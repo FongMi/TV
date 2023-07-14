@@ -2,7 +2,6 @@ package com.undcover.freedom.pyramid;
 
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.ArrayMap;
 
 import com.chaquo.python.PyObject;
 import com.github.catvod.net.OkHttp;
@@ -14,6 +13,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -91,7 +91,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
         JSONObject object = new JSONObject(action);
         String url = object.optString("url");
         Headers header = getHeader(object.optString("header"));
-        ArrayMap<String, String> param = getParam(object.optString("param"));
+        LinkedHashMap<String, String> param = getParam(object.optString("param"));
         if (object.optString("type").equals("stream")) {
             return new Object[]{code, type, OkHttp.newCall(url, param, header).execute().body().byteStream()};
         } else {
@@ -111,8 +111,8 @@ public class Spider extends com.github.catvod.crawler.Spider {
         return builder.build();
     }
 
-    private ArrayMap<String, String> getParam(String param) throws JSONException {
-        ArrayMap<String, String> params = new ArrayMap<>();
+    private LinkedHashMap<String, String> getParam(String param) throws JSONException {
+        LinkedHashMap<String, String> params = new LinkedHashMap<>();
         if (TextUtils.isEmpty(param)) return params;
         JSONObject object = new JSONObject(param);
         for (Iterator<String> iterator = object.keys(); iterator.hasNext(); ) {

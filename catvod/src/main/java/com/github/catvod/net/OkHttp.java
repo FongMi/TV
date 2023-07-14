@@ -78,7 +78,7 @@ public class OkHttp {
         return client().newCall(new Request.Builder().url(buildUrl(url, params)).build());
     }
 
-    public static Call newCall(String url, ArrayMap<String, String> params, Headers headers) {
+    public static Call newCall(String url, LinkedHashMap<String, String> params, Headers headers) {
         return client().newCall(new Request.Builder().url(buildUrl(url, params)).headers(headers).build());
     }
 
