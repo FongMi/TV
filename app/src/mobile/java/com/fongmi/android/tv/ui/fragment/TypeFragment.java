@@ -186,8 +186,8 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     @Override
     public void onItemClick(Vod item) {
         if (item.isFolder()) getVideo(item.getVodId(), "1");
-        if (item.isFolder()) mPages.add(Page.get(item.getVodId(), findPosition()));
         else DetailActivity.start(getActivity(), getKey(), item.getVodId(), item.getVodName());
+        if (item.isFolder()) mPages.add(Page.get(item.getVodId(), findPosition()));
     }
 
     @Override
@@ -199,8 +199,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     @Override
     public boolean canBack() {
         if (mPages.isEmpty()) return true;
-        mPage = getLastPage();
-        mPages.remove(mPage);
+        mPages.remove(mPage = getLastPage());
         onRefresh();
         return false;
     }
