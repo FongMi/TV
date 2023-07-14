@@ -1,24 +1,22 @@
 package com.undcover.freedom.pyramid;
 
 import android.content.Context;
-
-import androidx.collection.ArrayMap;
+import android.text.TextUtils;
 
 import com.chaquo.python.PyObject;
-import com.github.catvod.Proxy;
 import com.github.catvod.net.OkHttp;
-import com.github.catvod.utils.Json;
-import com.google.common.net.HttpHeaders;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import fi.iki.elonen.NanoHTTPD;
 import okhttp3.Headers;
 
 public class Spider extends com.github.catvod.crawler.Spider {
@@ -69,13 +67,8 @@ public class Spider extends com.github.catvod.crawler.Spider {
     }
 
     @Override
-    public String searchContent(String key, boolean quick, String pg) {
-        return app.callAttr("searchContentPage", obj, key, quick, pg).toString();
-    }
-
-    @Override
     public String playerContent(String flag, String id, List<String> vipFlags) {
-        return replaceProxy(app.callAttr("playerContent", obj, flag, id, gson.toJson(vipFlags)).toString());
+        return app.callAttr("playerContent", obj, flag, id, gson.toJson(vipFlags)).toString();
     }
 
     @Override
@@ -89,29 +82,43 @@ public class Spider extends com.github.catvod.crawler.Spider {
     }
 
     @Override
-    public Object[] proxyLocal(Map<String, String> params) throws Exception {
+    public Object[] proxyLocal(Map<?, ?> params) throws Exception {
         List<PyObject> list = app.callAttr("localProxy", obj, gson.toJson(params)).asList();
-        JsonObject action = JsonParser.parseString(list.get(2).toString()).getAsJsonObject();
-        Map<String, String> headers = Json.toMap(action.get("header"));
-        String url = action.get("url").getAsString();
-        String content = list.get(3).toString();
-        String type = list.get(1).toString();
         int code = list.get(0).toInt();
-        if (action.get("type").getAsString().equals("redirect")) {
-            NanoHTTPD.Response response = NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.lookup(code), NanoHTTPD.MIME_HTML, "");
-            for (Map.Entry<String, String> entry : headers.entrySet()) response.addHeader(entry.getKey(), entry.getValue());
-            response.addHeader(HttpHeaders.LOCATION, url);
-            return new Object[]{response};
-        } else if (action.get("type").getAsString().equals("stream")) {
-            ArrayMap<String, String> param = Json.toArrayMap(action.get("param"));
-            return new Object[]{code, type, OkHttp.newCall(url, Headers.of(headers), param).execute().body().byteStream()};
+        String type = list.get(1).toString();
+        String action = list.get(2).toString();
+        String content = list.get(3).toString();
+        JSONObject object = new JSONObject(action);
+        String url = object.optString("url");
+        Headers header = getHeader(object.optString("header"));
+        LinkedHashMap<String, String> param = getParam(object.optString("param"));
+        if (object.optString("type").equals("stream")) {
+            return new Object[]{code, type, OkHttp.newCall(url, param, header).execute().body().byteStream()};
         } else {
-            if (content.isEmpty()) content = OkHttp.newCall(url, Headers.of(headers)).execute().body().string();
-            return new Object[]{code, type, new ByteArrayInputStream(replaceProxy(content).getBytes())};
+            if (content.isEmpty()) content = OkHttp.newCall(url, header).execute().body().string();
+            return new Object[]{code, type, new ByteArrayInputStream(content.getBytes())};
         }
     }
 
-    private String replaceProxy(String content) {
-        return content.replace("http://127.0.0.1:UndCover/proxy", Proxy.getUrl(true));
+    private Headers getHeader(String header) throws JSONException {
+        Headers.Builder builder = new Headers.Builder();
+        if (TextUtils.isEmpty(header)) return builder.build();
+        JSONObject object = new JSONObject(header);
+        for (Iterator<String> iterator = object.keys(); iterator.hasNext(); ) {
+            String key = iterator.next();
+            builder.add(key, object.optString(key));
+        }
+        return builder.build();
+    }
+
+    private LinkedHashMap<String, String> getParam(String param) throws JSONException {
+        LinkedHashMap<String, String> params = new LinkedHashMap<>();
+        if (TextUtils.isEmpty(param)) return params;
+        JSONObject object = new JSONObject(param);
+        for (Iterator<String> iterator = object.keys(); iterator.hasNext(); ) {
+            String key = iterator.next();
+            params.put(key, object.optString(key));
+        }
+        return params;
     }
 }
