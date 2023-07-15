@@ -149,8 +149,13 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     public static void start(Activity activity, String key, String id, String name) {
+        start(activity, key, id, name, null);
+    }
+
+    public static void start(Activity activity, String key, String id, String name, String mark) {
         Intent intent = new Intent(activity, DetailActivity.class);
         intent.putExtra("name", name);
+        intent.putExtra("mark", mark);
         intent.putExtra("key", key);
         intent.putExtra("id", id);
         activity.startActivity(intent);
@@ -158,6 +163,10 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     private String getName() {
         return getIntent().getStringExtra("name");
+    }
+
+    private String getMark() {
+        return getIntent().getStringExtra("mark");
     }
 
     private String getKey() {
@@ -833,6 +842,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     private void checkHistory(Vod item) {
         mHistory = History.find(getHistoryKey());
         mHistory = mHistory == null ? createHistory(item) : mHistory;
+        if (!TextUtils.isEmpty(getMark())) mHistory.setVodRemarks(getMark());
         mBinding.control.action.opening.setText(mHistory.getOpening() == 0 ? getString(R.string.play_op) : mPlayers.stringToTime(mHistory.getOpening()));
         mBinding.control.action.ending.setText(mHistory.getEnding() == 0 ? getString(R.string.play_ed) : mPlayers.stringToTime(mHistory.getEnding()));
         mBinding.control.action.speed.setText(mPlayers.setSpeed(mHistory.getSpeed()));
