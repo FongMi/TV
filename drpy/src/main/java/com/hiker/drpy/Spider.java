@@ -146,18 +146,18 @@ public class Spider extends com.github.catvod.crawler.Spider {
             Class<?> clz = dex.loadClass("com.github.catvod.js.Method");
             Class<?>[] classes = clz.getDeclaredClasses();
             ctx.getGlobalObject().setProperty("jsapi", obj);
-            if (classes.length == 0) injectSingle(clz, obj);
-            if (classes.length > 0) injectMultiple(clz, obj);
+            if (classes.length == 0) invokeSingle(clz, obj);
+            if (classes.length >= 1) invokeMultiple(clz, obj);
         } catch (Throwable e) {
             e.printStackTrace();
         }
     }
 
-    private void injectSingle(Class<?> clz, JSObject jsObj) throws Throwable {
+    private void invokeSingle(Class<?> clz, JSObject jsObj) throws Throwable {
         invoke(clz, jsObj, clz.getDeclaredConstructor(QuickJSContext.class).newInstance(ctx));
     }
 
-    private void injectMultiple(Class<?> clz, JSObject jsObj) throws Throwable {
+    private void invokeMultiple(Class<?> clz, JSObject jsObj) throws Throwable {
         for (Class<?> subClz : clz.getDeclaredClasses()) {
             Object javaObj = subClz.getDeclaredConstructor(clz).newInstance(clz.getDeclaredConstructor(QuickJSContext.class).newInstance(ctx));
             JSObject subObj = ctx.createNewJSObject();
