@@ -140,6 +140,8 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     }
 
     private void checkPosition() {
+        if (mPage != null && mPage.getPosition() > 0) mBinding.recycler.hideHeader();
+        if (mPage != null && mPage.getPosition() < 1) mBinding.recycler.showHeader();
         if (mPage != null) mBinding.recycler.setSelectedPosition(mPage.getPosition());
         else if (isFolder() && !mOpen) mBinding.recycler.moveToTop();
         mPage = null;
