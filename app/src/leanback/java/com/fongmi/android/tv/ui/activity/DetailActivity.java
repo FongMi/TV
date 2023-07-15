@@ -812,6 +812,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void checkHistory(Vod item) {
         mHistory = History.find(getHistoryKey());
         mHistory = mHistory == null ? createHistory(item) : mHistory;
+        if (!TextUtils.isEmpty(getMark())) mHistory.setVodRemarks(getMark());
         mBinding.control.opening.setText(mHistory.getOpening() == 0 ? getString(R.string.play_op) : mPlayers.stringToTime(mHistory.getOpening()));
         mBinding.control.ending.setText(mHistory.getEnding() == 0 ? getString(R.string.play_ed) : mPlayers.stringToTime(mHistory.getEnding()));
         mBinding.control.speed.setText(mPlayers.setSpeed(mHistory.getSpeed()));
@@ -824,7 +825,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private History createHistory(Vod item) {
         History history = new History();
         history.setKey(getHistoryKey());
-        history.setVodRemarks(getMark());
         history.setCid(ApiConfig.getCid());
         history.setVodPic(item.getVodPic());
         history.setVodName(item.getVodName());

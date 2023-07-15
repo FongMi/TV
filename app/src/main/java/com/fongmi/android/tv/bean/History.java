@@ -311,7 +311,7 @@ public class History {
     public void findEpisode(List<Vod.Flag> flags) {
         if (flags.size() > 0) {
             setVodFlag(flags.get(0).getFlag());
-            if (getVodRemarks().isEmpty() && flags.get(0).getEpisodes().size() > 0) {
+            if (flags.get(0).getEpisodes().size() > 0) {
                 setVodRemarks(flags.get(0).getEpisodes().get(0).getName());
             }
         }
