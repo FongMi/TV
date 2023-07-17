@@ -1048,19 +1048,16 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         startSearch(keyword);
     }
 
-    private boolean isPass(Site item, boolean searchOnly) {
-        if (isAutoMode() && !item.isChangeable() && !searchOnly) return false;
-        if (isAutoMode() && item.getKey().equals(getKey())) return false;
+    private boolean isPass(Site item) {
+        if (isAutoMode() && !item.isChangeable()) return false;
         return item.isSearchable();
     }
 
     private void startSearch(String keyword) {
         mSearchAdapter.clear();
-        mExecutor = Executors.newCachedThreadPool();
         List<Site> sites = new ArrayList<>();
-        List<Site> items = ApiConfig.get().getSites();
-        for (Site item : items) if (isPass(item, false)) sites.add(item);
-        if (sites.isEmpty()) for (Site item : items) if (isPass(item, true)) sites.add(item);
+        mExecutor = Executors.newCachedThreadPool();
+        for (Site item : ApiConfig.get().getSites()) if (isPass(item)) sites.add(item);
         for (Site site : sites) mExecutor.execute(() -> search(site, keyword));
     }
 
