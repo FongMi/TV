@@ -1277,6 +1277,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         super.onDestroy();
         Source.stopAll();
         mPlayers.release();
+        Clock.get().release();
         RefreshEvent.history();
         App.removeCallbacks(mR1, mR2, mR3);
     }
