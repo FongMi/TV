@@ -67,7 +67,6 @@
                 <data android:scheme="https" />
                 <data android:mimeType="video/*" />
                 <data android:mimeType="audio/*" />
-                <data android:mimeType="application/vnd.apple.mpegurl" />
             </intent-filter>
         </activity>
 

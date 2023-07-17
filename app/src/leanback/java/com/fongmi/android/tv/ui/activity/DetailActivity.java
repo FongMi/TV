@@ -365,7 +365,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mViewModel.result.observe(this, result -> {
             if (result.getList().isEmpty()) setEmpty();
             else setDetail(result.getList().get(0));
-            Notify.dismiss();
         });
     }
 
@@ -384,7 +383,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void getDetail(Vod item) {
-        if (mBinding.progressLayout.isContent()) Notify.progress(this);
         getIntent().putExtra("key", item.getSiteKey());
         getIntent().putExtra("id", item.getVodId());
         mBinding.scroll.scrollTo(0, 0);
@@ -982,19 +980,17 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.part.setTag(keyword);
     }
 
-    private boolean isPass(Site item, boolean searchOnly) {
-        if (isAutoMode() && !item.isChangeable() && !searchOnly) return false;
+    private boolean isPass(Site item) {
+        if (isAutoMode() && !item.isChangeable()) return false;
         if (isAutoMode() && item.getKey().equals(getKey())) return false;
         return item.isSearchable();
     }
 
     private void startSearch(String keyword) {
         mSearchAdapter.clear();
-        mExecutor = Executors.newFixedThreadPool(Constant.THREAD_POOL);
         List<Site> sites = new ArrayList<>();
-        List<Site> items = ApiConfig.get().getSites();
-        for (Site item : items) if (isPass(item, false)) sites.add(item);
-        if (sites.isEmpty()) for (Site item : items) if (isPass(item, true)) sites.add(item);
+        mExecutor = Executors.newFixedThreadPool(Constant.THREAD_POOL);
+        for (Site site : ApiConfig.get().getSites()) if (isPass(site)) sites.add(site);
         for (Site site : sites) mExecutor.execute(() -> search(site, keyword));
     }
 
