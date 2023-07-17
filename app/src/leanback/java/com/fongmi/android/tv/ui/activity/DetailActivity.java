@@ -131,7 +131,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     public static void cast(Activity activity, History history) {
-        start(activity, history.getSiteKey(), history.getVodId(), history.getVodName(), true, true);
+        start(activity, history.getSiteKey(), history.getVodId(), history.getVodName(), null, true, true);
     }
 
     public static void push(Activity activity, String url, boolean clear) {
@@ -146,15 +146,24 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         start(activity, key, id, name, false);
     }
 
-    public static void start(Activity activity, String key, String id, String name, boolean clear) {
-        start(activity, key, id, name, clear, false);
+    public static void start(Activity activity, String key, String id, String name, String mark) {
+        start(activity, key, id, name, mark, false);
     }
 
-    public static void start(Activity activity, String key, String id, String name, boolean clear, boolean cast) {
+    public static void start(Activity activity, String key, String id, String name, boolean clear) {
+        start(activity, key, id, name, null, clear, false);
+    }
+
+    public static void start(Activity activity, String key, String id, String name, String mark, boolean clear) {
+        start(activity, key, id, name, mark, clear, false);
+    }
+
+    public static void start(Activity activity, String key, String id, String name, String mark, boolean clear, boolean cast) {
         Intent intent = new Intent(activity, DetailActivity.class);
         if (clear) intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra("cast", cast);
         intent.putExtra("name", name);
+        intent.putExtra("mark", mark);
         intent.putExtra("key", key);
         intent.putExtra("id", id);
         activity.startActivityForResult(intent, 1000);
@@ -166,6 +175,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private String getName() {
         return getIntent().getStringExtra("name");
+    }
+
+    private String getMark() {
+        return getIntent().getStringExtra("mark");
     }
 
     private String getKey() {
@@ -800,6 +813,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void checkHistory(Vod item) {
         mHistory = History.find(getHistoryKey());
         mHistory = mHistory == null ? createHistory(item) : mHistory;
+        if (!TextUtils.isEmpty(getMark())) mHistory.setVodRemarks(getMark());
         mBinding.control.opening.setText(mHistory.getOpening() == 0 ? getString(R.string.play_op) : mPlayers.stringToTime(mHistory.getOpening()));
         mBinding.control.ending.setText(mHistory.getEnding() == 0 ? getString(R.string.play_ed) : mPlayers.stringToTime(mHistory.getEnding()));
         mBinding.control.speed.setText(mPlayers.setSpeed(mHistory.getSpeed()));
@@ -1239,6 +1253,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         super.onDestroy();
         Source.stopAll();
         mPlayers.release();
+        Clock.get().release();
         RefreshEvent.history();
         App.removeCallbacks(mR1, mR2, mR3);
     }

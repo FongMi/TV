@@ -144,25 +144,43 @@ public class Spider extends com.github.catvod.crawler.Spider {
         try {
             JSObject obj = ctx.createNewJSObject();
             Class<?> clz = dex.loadClass("com.github.catvod.js.Method");
+            Class<?>[] classes = clz.getDeclaredClasses();
             ctx.getGlobalObject().setProperty("jsapi", obj);
-            inject(clz, obj);
+            if (classes.length == 0) invokeSingle(clz, obj);
+            if (classes.length >= 1) invokeMultiple(clz, obj);
         } catch (Throwable e) {
             e.printStackTrace();
         }
     }
 
-    private void inject(Class<?> clz, JSObject jsObj) throws Throwable {
-        Object javaObj = clz.getDeclaredConstructor(QuickJSContext.class).newInstance(ctx);
+    private void invokeSingle(Class<?> clz, JSObject jsObj) throws Throwable {
+        invoke(clz, jsObj, clz.getDeclaredConstructor(QuickJSContext.class).newInstance(ctx));
+    }
+
+    private void invokeMultiple(Class<?> clz, JSObject jsObj) throws Throwable {
+        for (Class<?> subClz : clz.getDeclaredClasses()) {
+            Object javaObj = subClz.getDeclaredConstructor(clz).newInstance(clz.getDeclaredConstructor(QuickJSContext.class).newInstance(ctx));
+            JSObject subObj = ctx.createNewJSObject();
+            invoke(subClz, subObj, javaObj);
+            jsObj.setProperty(subClz.getSimpleName(), subObj);
+        }
+    }
+
+    private void invoke(Class<?> clz, JSObject jsObj, Object javaObj) {
         for (Method method : clz.getMethods()) {
             if (!method.isAnnotationPresent(JSMethod.class)) continue;
-            jsObj.setProperty(method.getName(), args -> {
-                try {
-                    return method.invoke(javaObj, args);
-                } catch (Throwable e) {
-                    return null;
-                }
-            });
+            invoke(jsObj, method, javaObj);
         }
+    }
+
+    private void invoke(JSObject jsObj, Method method, Object javaObj) {
+        jsObj.setProperty(method.getName(), args -> {
+            try {
+                return method.invoke(javaObj, args);
+            } catch (Throwable e) {
+                return null;
+            }
+        });
     }
 
     private String getContent() {
