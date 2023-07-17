@@ -1050,6 +1050,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     private boolean isPass(Site item) {
         if (isAutoMode() && !item.isChangeable()) return false;
+        if (isAutoMode() && item.getKey().equals(getKey())) return false;
         return item.isSearchable();
     }
 
