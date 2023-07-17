@@ -6,8 +6,8 @@ import android.widget.ImageView;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.utils.ImgUtil;
-import com.github.catvod.utils.Json;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.github.catvod.utils.Json;
 import com.google.common.net.HttpHeaders;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
