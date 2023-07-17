@@ -32,7 +32,7 @@ public class Clock {
     }
 
     public static void stop() {
-        get().release();
+        if (get().timer != null) get().timer.cancel();
     }
 
     public static void start() {
@@ -52,6 +52,11 @@ public class Clock {
         this.callback = callback;
     }
 
+    public void release() {
+        if (timer != null) timer.cancel();
+        if (callback != null) callback = null;
+    }
+
     private void run(TextView view) {
         timer = new Timer();
         timer.schedule(new TimerTask() {
@@ -69,11 +74,6 @@ public class Clock {
             if (view != null) view.setText(formatter.format(date));
         } catch (Exception ignored) {
         }
-    }
-
-    public void release() {
-        if (timer != null) timer.cancel();
-        if (callback != null) callback = null;
     }
 
     public interface Callback {
