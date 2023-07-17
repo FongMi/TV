@@ -184,10 +184,9 @@ public class Spider extends com.github.catvod.crawler.Spider {
     }
 
     private String getContent() {
-        String content = Module.get().load(api);
-        content = content.replaceAll("export default.*?[{]", "globalThis." + key + " = {");
-        content = content.replace("__JS_SPIDER__", "globalThis." + key);
-        return content;
+        return Module.get().load(api)
+                .replace("__JS_SPIDER__", "globalThis." + key)
+                .replaceAll("export default.*?[{]", "globalThis." + key + " = {");
     }
 
     private JSObject convert(HashMap<String, String> map) {
