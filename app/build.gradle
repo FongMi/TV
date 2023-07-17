@@ -23,7 +23,7 @@ android {
         leanback {
             dimension "default"
             versionCode 202
-            versionName "20230714#1"
+            versionName "20230717#1"
         }
     }
 
@@ -98,7 +98,7 @@ dependencies {
     implementation('com.github.thegrizzlylabs:sardine-android:0.8') { exclude group: 'com.squareup.okhttp3', module: 'okhttp' }
     implementation 'com.google.android.material:material:1.9.0'
     implementation 'com.google.code.gson:gson:' + gsonVersion
-    implementation 'com.google.zxing:core:3.4.1'
+    implementation 'com.google.zxing:core:3.3.0'
     implementation 'com.guolindev.permissionx:permissionx:1.7.1'
     implementation 'com.hierynomus:smbj:0.11.5'
     implementation 'com.squareup.okhttp3:okhttp:' + okhttpVersion
