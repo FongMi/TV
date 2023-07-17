@@ -20,6 +20,7 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Filter;
+import com.fongmi.android.tv.bean.Page;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.FragmentVodBinding;
 import com.fongmi.android.tv.model.SiteViewModel;
@@ -48,8 +49,9 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     private CustomScroller mScroller;
     private SiteViewModel mViewModel;
     private List<Filter> mFilters;
-    private List<String> mTypeIds;
+    private List<Page> mPages;
     private boolean mOpen;
+    private Page mPage;
 
     public static VodFragment newInstance(String key, String typeId, String filter, boolean folder) {
         Bundle args = new Bundle();
@@ -78,6 +80,10 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         return getArguments().getBoolean("folder");
     }
 
+    private Page getLastPage() {
+        return mPages.get(mPages.size() - 1);
+    }
+
     @Override
     protected ViewBinding getBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
         return mBinding = FragmentVodBinding.inflate(inflater, container, false);
@@ -85,7 +91,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
 
     @Override
     protected void initView() {
-        mTypeIds = new ArrayList<>();
+        mPages = new ArrayList<>();
         mExtends = new HashMap<>();
         mFilters = Filter.arrayFrom(getFilter());
         setRecyclerView();
@@ -115,6 +121,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
             int size = result.getList().size();
             mScroller.endLoading(size == 0);
             addVideo(result.getList());
+            checkPosition();
             checkPage(size);
             hideProgress();
         });
@@ -132,6 +139,14 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         getVideo(getTypeId(), "1");
     }
 
+    private void checkPosition() {
+        if (mPage != null && mPage.getPosition() > 0) mBinding.recycler.hideHeader();
+        if (mPage != null && mPage.getPosition() < 1) mBinding.recycler.showHeader();
+        if (mPage != null) mBinding.recycler.setSelectedPosition(mPage.getPosition());
+        else if (isFolder() && !mOpen) mBinding.recycler.moveToTop();
+        mPage = null;
+    }
+
     private void checkPage(int count) {
         if (count == 0 || mAdapter.size() >= 4 || isFolder()) return;
         getVideo(getTypeId(), String.valueOf(mScroller.addPage()));
@@ -141,7 +156,6 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         boolean first = page.equals("1");
         if (first) mLast = null;
         if (first) showProgress();
-        if (isFolder() && !mOpen) mBinding.recycler.moveToTop();
         int filterSize = mOpen ? mFilters.size() : 0;
         boolean clear = first && mAdapter.size() > filterSize;
         if (clear) mAdapter.removeItems(filterSize, mAdapter.size() - filterSize);
@@ -212,24 +226,30 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     }
 
     public void onRefresh() {
-        if (mTypeIds.isEmpty()) getVideo();
-        else getVideo(mTypeIds.get(mTypeIds.size() - 1), "1");
+        if (mPages.isEmpty()) getVideo();
+        else getVideo(getLastPage().getVodId(), "1");
     }
 
     public boolean canGoBack() {
-        return !mTypeIds.isEmpty();
+        return !mPages.isEmpty();
     }
 
     public void goBack() {
-        mTypeIds = mTypeIds.subList(0, mTypeIds.size() - 1);
+        if (mPages.size() == 1) mBinding.recycler.setMoveTop(true);
+        mPages.remove(mPage = getLastPage());
         onRefresh();
     }
 
     @Override
     public void onItemClick(Vod item) {
-        if (item.isFolder()) mTypeIds.add(item.getVodId());
-        if (item.isFolder()) getVideo(item.getVodId(), "1");
-        else DetailActivity.start(getActivity(), getKey(), item.getVodId(), item.getVodName());
+        if (item.isFolder()) {
+            mPages.add(Page.get(item.getVodId(), mBinding.recycler.getSelectedPosition()));
+            mBinding.recycler.setMoveTop(false);
+            getVideo(item.getVodId(), "1");
+        } else {
+            if (!isFolder()) DetailActivity.start(getActivity(), getKey(), item.getVodId(), item.getVodName());
+            else DetailActivity.start(getActivity(), getKey(), item.getVodId(), item.getVodName(), item.getVodName());
+        }
     }
 
     @Override
