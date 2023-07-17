@@ -364,7 +364,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mViewModel.result.observe(this, result -> {
             if (result.getList().isEmpty()) setEmpty();
             else setDetail(result.getList().get(0));
-            Notify.dismiss();
         });
     }
 
@@ -383,7 +382,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void getDetail(Vod item) {
-        if (mBinding.progressLayout.isContent()) Notify.progress(this);
         getIntent().putExtra("key", item.getSiteKey());
         getIntent().putExtra("id", item.getVodId());
         mBinding.scroll.scrollTo(0, 0);
