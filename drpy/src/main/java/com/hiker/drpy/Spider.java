@@ -3,6 +3,7 @@ package com.hiker.drpy;
 import android.content.Context;
 
 import com.github.catvod.utils.Json;
+import com.hiker.drpy.method.Function;
 import com.hiker.drpy.method.Global;
 import com.hiker.drpy.method.Local;
 import com.whl.quickjs.android.QuickJSLoader;
@@ -23,6 +24,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import dalvik.system.DexClassLoader;
 
@@ -35,11 +38,12 @@ public class Spider extends com.github.catvod.crawler.Spider {
     private final String key;
     private final String api;
 
-    public Spider(String api, DexClassLoader dex) {
+    public Spider(String api, DexClassLoader dex) throws Exception {
         this.key = "__" + UUID.randomUUID().toString().replace("-", "") + "__";
         this.executor = Executors.newSingleThreadExecutor();
         this.api = api;
         this.dex = dex;
+        initializeJS();
     }
 
     private void submit(Runnable runnable) {
@@ -51,13 +55,12 @@ public class Spider extends com.github.catvod.crawler.Spider {
     }
 
     private Object call(String func, Object... args) throws Exception {
-        return submit(() -> jsObject.getJSFunction(func).call(args)).get();
+        return submit(Function.call(jsObject, func, args)).get();
     }
 
     @Override
     public void init(Context context, String extend) throws Exception {
-        super.init(context, extend);
-        submit(() -> initJS(extend));
+        call("init", Json.valid(extend) ? ctx.parse(extend) : extend);
     }
 
     @Override
@@ -124,13 +127,14 @@ public class Spider extends com.github.catvod.crawler.Spider {
         });
     }
 
-    private void initJS(String extend) {
-        if (ctx == null) createCtx();
-        if (dex != null) createDex();
-        String content = getContent();
-        ctx.evaluateModule(content, api);
-        jsObject = (JSObject) ctx.getProperty(ctx.getGlobalObject(), key);
-        jsObject.getJSFunction("init").call(Json.valid(extend) ? ctx.parse(extend) : extend);
+    private void initializeJS() throws Exception {
+        submit(() -> {
+            if (ctx == null) createCtx();
+            if (dex != null) createDex();
+            ctx.evaluateModule(getContent(), api);
+            jsObject = (JSObject) ctx.getProperty(ctx.getGlobalObject(), key);
+            return null;
+        }).get();
     }
 
     private void createCtx() {
@@ -184,9 +188,20 @@ public class Spider extends com.github.catvod.crawler.Spider {
     }
 
     private String getContent() {
-        return Module.get().load(api)
-                .replace("__JS_SPIDER__", "globalThis." + key)
-                .replaceAll("export default.*?[{]", "globalThis." + key + " = {");
+        String content = Module.get().load(api);
+        if (content.contains("__jsEvalReturn")) {
+            return catvod(content);
+        } else if (content.contains("__JS_SPIDER__")) {
+            return content.replace("__JS_SPIDER__", "globalThis." + key);
+        } else {
+            return content.replaceAll("export default.*?[{]", "globalThis." + key + " = {");
+        }
+    }
+
+    private String catvod(String content) {
+        String[] split = content.split("export\\s+function\\s+__jsEvalReturn.*?[{]");
+        Matcher matcher = Pattern.compile("\\s?return\\s?([\\s+\\S]*)\\s?\\}").matcher(split[1]);
+        return matcher.find() ? split[0].concat("globalThis." + key + " = ").concat(matcher.group(1)) : content;
     }
 
     private JSObject convert(HashMap<String, String> map) {
