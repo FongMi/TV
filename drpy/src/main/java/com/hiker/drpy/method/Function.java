@@ -6,7 +6,7 @@ import com.whl.quickjs.wrapper.JSObject;
 
 import java.util.concurrent.Callable;
 
-public class Function implements Callable<Object> {
+public class Function implements Callable<Object[]> {
 
     private final JSObject jsObject;
     private final Object[] args;
@@ -24,10 +24,10 @@ public class Function implements Callable<Object> {
     }
 
     @Override
-    public Object call() throws Exception {
+    public Object[] call() throws Exception {
         JSFunction func = jsObject.getJSFunction(name);
         boolean async = func.getJSFunction("toString").call().toString().startsWith("async");
-        return async ? async(func) : func.call(args);
+        return new Object[]{async ? async(func) : func.call(args)};
     }
 
     private Object async(JSFunction func) {
@@ -40,7 +40,8 @@ public class Function implements Callable<Object> {
     private final JSCallFunction jsCallFunction = new JSCallFunction() {
         @Override
         public Object call(Object... args) {
-            return result = args[0];
+            result = args[0];
+            return null;
         }
     };
 }
