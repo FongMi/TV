@@ -10,16 +10,16 @@ import androidx.appcompat.widget.AppCompatTextView;
 
 import com.fongmi.android.tv.utils.Utils;
 
-public class CustomOpEdView extends AppCompatTextView {
+public class CustomUpDownView extends AppCompatTextView {
 
     private AddListener addListener;
     private SubListener subListener;
 
-    public CustomOpEdView(@NonNull Context context) {
+    public CustomUpDownView(@NonNull Context context) {
         super(context);
     }
 
-    public CustomOpEdView(@NonNull Context context, @Nullable AttributeSet attrs) {
+    public CustomUpDownView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
     }
 

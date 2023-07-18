@@ -5,8 +5,8 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 
 import com.fongmi.android.tv.gson.FilterAdapter;
-import com.fongmi.android.tv.utils.Json;
 import com.fongmi.android.tv.utils.Trans;
+import com.github.catvod.utils.Json;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
@@ -17,6 +17,7 @@ import org.simpleframework.xml.Path;
 import org.simpleframework.xml.Root;
 import org.simpleframework.xml.core.Persister;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -106,6 +107,10 @@ public class Result {
         Result result = new Result();
         result.setList(items);
         return result;
+    }
+
+    public static Result vod(Vod item) {
+        return list(Arrays.asList(item));
     }
 
     public List<Class> getTypes() {

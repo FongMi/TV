@@ -1,7 +1,6 @@
 package com.fongmi.android.tv.impl;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.StringRes;
 
 import java.io.IOException;
 
@@ -16,7 +15,7 @@ public class Callback implements okhttp3.Callback {
     public void success(String result) {
     }
 
-    public void error(@StringRes int resId) {
+    public void error(String msg) {
     }
 
     @Override

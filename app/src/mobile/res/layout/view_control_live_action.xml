@@ -81,5 +81,11 @@
             android:text="@string/play_across"
             android:textColor="@color/text" />
 
+        <TextView
+            android:id="@+id/change"
+            style="@style/Control.Action"
+            android:text="@string/play_change"
+            android:textColor="@color/text" />
+
     </LinearLayout>
 </HorizontalScrollView>

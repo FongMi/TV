@@ -6,13 +6,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class PauseThreadPoolExecutor extends ThreadPoolExecutor {
+public class PauseExecutor extends ThreadPoolExecutor {
 
     private final ReentrantLock pauseLock;
     private final Condition condition;
     private boolean isPaused;
 
-    public PauseThreadPoolExecutor(int corePoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue) {
+    public PauseExecutor(int corePoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue) {
         super(corePoolSize, corePoolSize, keepAliveTime, unit, workQueue);
         pauseLock = new ReentrantLock();
         condition = pauseLock.newCondition();

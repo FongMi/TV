@@ -8,11 +8,7 @@ import com.fongmi.android.tv.api.LiveParser;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Group;
 import com.fongmi.android.tv.bean.Live;
-import com.fongmi.android.tv.player.source.BiliBili;
-import com.fongmi.android.tv.player.source.Force;
-import com.fongmi.android.tv.player.source.TVBus;
-import com.fongmi.android.tv.player.source.Youtube;
-import com.fongmi.android.tv.player.source.ZLive;
+import com.fongmi.android.tv.player.source.Source;
 
 import java.util.Iterator;
 import java.util.concurrent.Callable;
@@ -49,14 +45,8 @@ public class LiveViewModel extends ViewModel {
 
     public void fetch(Channel item) {
         execute(CHANNEL, () -> {
-            TVBus.get().stop();
-            String url = item.getCurrent().split("\\$")[0];
-            if (item.isForce()) item.setUrl(Force.get().fetch(url));
-            else if (item.isZLive()) item.setUrl(ZLive.get().fetch(url));
-            else if (item.isTVBus()) item.setUrl(TVBus.get().fetch(url));
-            else if (item.isYoutube()) item.setUrl(Youtube.get().fetch(url));
-            else if (item.isBiliBili()) item.setUrl(BiliBili.get().fetch(url));
-            else item.setUrl(url);
+            Source.stop();
+            item.setUrl(Source.getUrl(item.getCurrent().split("\\$")[0]));
             return item;
         });
     }

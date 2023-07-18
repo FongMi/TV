@@ -36,9 +36,7 @@ import com.fongmi.android.tv.impl.LiveCallback;
 import com.fongmi.android.tv.impl.PassCallback;
 import com.fongmi.android.tv.model.LiveViewModel;
 import com.fongmi.android.tv.player.Players;
-import com.fongmi.android.tv.player.source.Force;
-import com.fongmi.android.tv.player.source.TVBus;
-import com.fongmi.android.tv.player.source.ZLive;
+import com.fongmi.android.tv.player.source.Source;
 import com.fongmi.android.tv.receiver.PiPReceiver;
 import com.fongmi.android.tv.service.PlaybackService;
 import com.fongmi.android.tv.ui.adapter.ChannelAdapter;
@@ -173,6 +171,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mBinding.control.action.scale.setOnClickListener(view -> onScale());
         mBinding.control.action.speed.setOnClickListener(view -> onSpeed());
         mBinding.control.action.across.setOnClickListener(view -> onAcross());
+        mBinding.control.action.change.setOnClickListener(view -> onChange());
         mBinding.control.action.player.setOnClickListener(view -> onPlayer());
         mBinding.control.action.decode.setOnClickListener(view -> onDecode());
         mBinding.control.action.speed.setOnLongClickListener(view -> onSpeedLong());
@@ -203,6 +202,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         setScale(Prefers.getLiveScale());
         mBinding.control.action.speed.setText(mPlayers.getSpeedText());
         mBinding.control.action.across.setActivated(Prefers.isAcross());
+        mBinding.control.action.change.setActivated(Prefers.isChange());
         mBinding.control.action.home.setVisibility(LiveConfig.isOnly() ? View.GONE : View.VISIBLE);
     }
 
@@ -324,6 +324,12 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         setR1Callback();
         Prefers.putAcross(!Prefers.isAcross());
         mBinding.control.action.across.setActivated(Prefers.isAcross());
+    }
+
+    private void onChange() {
+        setR1Callback();
+        Prefers.putChange(!Prefers.isChange());
+        mBinding.control.action.change.setActivated(Prefers.isChange());
     }
 
     private void onPlayer() {
@@ -630,18 +636,18 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private void onError(ErrorEvent event) {
+        showError(event.getMsg());
         mPlayers.stop();
-        startFlow(event);
+        startFlow();
     }
 
-    private void startFlow(ErrorEvent event) {
+    private void startFlow() {
+        if (!Prefers.isChange()) return;
         if (!mChannel.isLast()) {
             nextLine(true);
         } else if (isGone(mBinding.recycler)) {
             mChannel.setLine(0);
             nextChannel();
-        } else {
-            showError(event.getMsg());
         }
     }
 
@@ -914,10 +920,8 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        Source.stopAll();
         mPlayers.release();
-        Force.get().stop();
-        ZLive.get().stop();
-        TVBus.get().stop();
         PlaybackService.stop();
         App.removeCallbacks(mR1, mR2, mR3);
     }

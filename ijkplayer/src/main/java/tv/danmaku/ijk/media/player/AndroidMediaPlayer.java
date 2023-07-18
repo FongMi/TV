@@ -68,8 +68,14 @@ public class AndroidMediaPlayer extends AbstractMediaPlayer implements MediaPlay
         if (ContentResolver.SCHEME_FILE.equals(scheme)) {
             setDataSource(uri.getPath());
         } else {
-            mMediaPlayer.setDataSource(context, uri, headers);
+            mMediaPlayer.setDataSource(context, uri, checkRange(headers));
         }
+    }
+
+    private Map<String, String> checkRange(Map<String, String> headers) {
+        if (headers.containsKey("Range")) return headers;
+        headers.put("Range", "bytes=0-");
+        return headers;
     }
 
     @Override
@@ -89,7 +95,7 @@ public class AndroidMediaPlayer extends AbstractMediaPlayer implements MediaPlay
 
     @Override
     public void stop() throws IllegalStateException {
-        mMediaPlayer.stop();
+        if (mMediaPlayer.isPlaying()) mMediaPlayer.stop();
     }
 
     @Override
