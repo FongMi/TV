@@ -22,8 +22,6 @@ import com.google.gson.JsonParser;
 
 import org.json.JSONObject;
 
-import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -249,9 +247,7 @@ public class ApiConfig {
     }
 
     public Object[] proxyLocal(Map<?, ?> params) {
-        if (params.containsKey("do") && params.get("do").equals("port")) {
-            return new Object[]{200, "text/plain; charset=utf-8", new ByteArrayInputStream("ok".getBytes(StandardCharsets.UTF_8))};
-        } else if (params.containsKey("do") && params.get("do").equals("js")) {
+        if (params.containsKey("do") && params.get("do").equals("js")) {
             return jsLoader.proxyInvoke(params);
         } else if (params.containsKey("do") && params.get("do").equals("py")) {
             return pyLoader.proxyInvoke(params);

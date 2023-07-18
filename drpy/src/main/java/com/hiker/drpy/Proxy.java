@@ -1,32 +1,14 @@
 package com.hiker.drpy;
 
-import com.github.catvod.net.OkHttp;
-
 public class Proxy {
 
     private static int port;
 
-    static void tryPort() {
-        if (port > 0) return;
-        int port = 9978;
-        while (port < 9999) {
-            boolean ok = string(port).equals("ok");
-            if (ok) Proxy.port = port;
-            if (ok) break;
-            port++;
-        }
-    }
-
-    private static String string(int port) {
-        try {
-            return OkHttp.newCall("http://127.0.0.1:" + port + "/proxy?do=port").execute().body().string();
-        } catch (Exception e) {
-            return "";
-        }
+    public static void set(int port) {
+        Proxy.port = port;
     }
 
     public static String getUrl() {
-        tryPort();
         return "http://127.0.0.1:" + port + "/proxy";
     }
 }
