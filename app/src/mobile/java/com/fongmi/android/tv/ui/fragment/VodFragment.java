@@ -163,8 +163,8 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
 
     private void setFabVisible(int position) {
         if (mAdapter.getItemCount() == 0) {
-            mBinding.link.setVisibility(View.GONE);
             mBinding.filter.setVisibility(View.GONE);
+            mBinding.link.setVisibility(View.VISIBLE);
         } else if (mAdapter.get(position).getFilters().size() > 0) {
             mBinding.link.setVisibility(View.GONE);
             mBinding.filter.show();
@@ -179,8 +179,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     }
 
     private void onLink(View view) {
-        if (ApiConfig.hasPush()) LinkDialog.create(this).show();
-        else mBinding.link.hide();
+        LinkDialog.create(this).show();
     }
 
     private void onLogo(View view) {

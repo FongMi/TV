@@ -44,6 +44,9 @@
 # IJK
 -keep class tv.danmaku.ijk.media.player.** { *; }
 
+# Jianpian
+-keep class com.p2p.** { *; }
+
 # Sardine
 -keep class com.thegrizzlylabs.sardineandroid.** { *; }
 

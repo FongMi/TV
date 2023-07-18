@@ -163,6 +163,15 @@
         </LinearLayout>
     </LinearLayout>
 
+    <ImageView
+        android:id="@+id/speed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center"
+        android:layout_marginTop="24dp"
+        android:src="@drawable/ic_widget_forward"
+        android:visibility="gone" />
+
     <LinearLayout
         android:id="@+id/bright"
         android:layout_width="wrap_content"

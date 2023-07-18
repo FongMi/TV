@@ -83,6 +83,8 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
 
     @Override
     protected void initView() {
+        if (players == null) dismiss();
+        if (players == null) return;
         binding.speed.setValue(Math.max(players.getSpeed(), 1.0f));
         binding.player.setText(detail.control.action.player.getText());
         binding.decode.setText(detail.control.action.decode.getText());
@@ -155,6 +157,14 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
     private void dismiss(View view) {
         App.post(view::performClick, 200);
         dismiss();
+    }
+
+    public void updateParse() {
+        binding.parse.getAdapter().notifyItemRangeChanged(0, binding.parse.getAdapter().getItemCount());
+    }
+
+    public void updatePlayer() {
+        binding.player.setText(detail.control.action.player.getText());
     }
 
     public void setParseVisible(boolean visible) {
