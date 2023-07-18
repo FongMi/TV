@@ -5,6 +5,7 @@ import android.net.wifi.WifiManager;
 import android.text.format.Formatter;
 
 import com.fongmi.android.tv.App;
+import com.hiker.drpy.Proxy;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -46,6 +47,7 @@ public class Server {
         do {
             try {
                 nano = new Nano(port);
+                Proxy.set(port);
                 nano.start();
                 break;
             } catch (Exception e) {

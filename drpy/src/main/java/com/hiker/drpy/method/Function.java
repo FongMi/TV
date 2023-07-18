@@ -40,8 +40,7 @@ public class Function implements Callable<Object[]> {
     private final JSCallFunction jsCallFunction = new JSCallFunction() {
         @Override
         public Object call(Object... args) {
-            result = args[0];
-            return null;
+            return result = args[0];
         }
     };
 }
