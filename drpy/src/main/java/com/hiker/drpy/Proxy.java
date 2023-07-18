@@ -10,14 +10,14 @@ public class Proxy {
         if (port > 0) return;
         int port = 9978;
         while (port < 9999) {
-            boolean ok = string().equals("ok");
+            boolean ok = string(port).equals("ok");
             if (ok) Proxy.port = port;
             if (ok) break;
             port++;
         }
     }
 
-    private static String string() {
+    private static String string(int port) {
         try {
             return OkHttp.newCall("http://127.0.0.1:" + port + "/proxy?do=port").execute().body().string();
         } catch (Exception e) {

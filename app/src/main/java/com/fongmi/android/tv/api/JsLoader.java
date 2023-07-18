@@ -54,8 +54,8 @@ public class JsLoader {
     public Object[] proxyInvoke(Map<?, ?> params) {
         try {
             Spider spider = spiders.get(recent);
-            if (spider != null) return spider.proxyLocal(params);
-            else return null;
+            if (spider == null) return null;
+            return spider.proxyLocal(params);
         } catch (Throwable e) {
             e.printStackTrace();
             return null;
