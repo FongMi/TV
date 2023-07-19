@@ -406,8 +406,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
             showEmpty();
         } else {
             mBinding.name.setText(getName());
-            checkSearch(false);
             App.post(mR3, 10000);
+            checkSearch(false);
         }
     }
 
