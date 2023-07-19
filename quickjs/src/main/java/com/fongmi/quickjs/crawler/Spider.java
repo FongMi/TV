@@ -28,8 +28,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import dalvik.system.DexClassLoader;
 
@@ -184,20 +182,15 @@ public class Spider extends com.github.catvod.crawler.Spider {
     }
 
     private String getContent() {
+        String global = "globalThis." + key;
         String content = Module.get().load(api);
         if (content.contains("__jsEvalReturn")) {
-            return catvod(content);
+            return content.concat(global).concat(" = __jsEvalReturn()");
         } else if (content.contains("__JS_SPIDER__")) {
-            return content.replace("__JS_SPIDER__", "globalThis." + key);
+            return content.replace("__JS_SPIDER__", global);
         } else {
-            return content.replaceAll("export default.*?[{]", "globalThis." + key + " = {");
+            return content.replaceAll("export default.*?[{]", global + " = {");
         }
-    }
-
-    private String catvod(String content) {
-        String[] split = content.split("export\\s+function\\s+__jsEvalReturn.*?[{]");
-        Matcher matcher = Pattern.compile("\\s?return\\s?([\\s+\\S]*)\\s?\\}").matcher(split[1]);
-        return matcher.find() ? split[0].concat("globalThis." + key + " = ").concat(matcher.group(1)) : content;
     }
 
     private JSObject convert(HashMap<String, String> map) {

@@ -9,6 +9,7 @@ import com.fongmi.quickjs.bean.Req;
 import com.fongmi.quickjs.utils.Parser;
 import com.fongmi.quickjs.utils.Proxy;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.Json;
 import com.google.gson.Gson;
 import com.whl.quickjs.wrapper.JSArray;
 import com.whl.quickjs.wrapper.JSFunction;
@@ -19,12 +20,14 @@ import com.whl.quickjs.wrapper.QuickJSContext;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.URLEncoder;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
+import okhttp3.FormBody;
 import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -161,7 +164,7 @@ public class Global {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                if (!executor.isShutdown()) executor.submit(() -> {func.call();});
+                if (!executor.isShutdown()) executor.submit(() -> { func.call(); });
             }
         }, delay);
     }
@@ -183,9 +186,17 @@ public class Global {
     }
 
     private RequestBody getPostBody(Req req, String contentType) {
+        if (req.getData() != null && req.getPostType().equals("form")) return getFormBody(req);
         if (req.getData() != null) return RequestBody.create(gson.toJson(req.getData()), MediaType.get("application/json"));
         if (req.getBody() != null && contentType != null) return RequestBody.create(gson.toJson(req.getBody()), MediaType.get(contentType));
         return RequestBody.create("", null);
+    }
+
+    private RequestBody getFormBody(Req req) {
+        FormBody.Builder formBody = new FormBody.Builder();
+        Map<String, String> params = Json.toMap(req.getData());
+        for (String key : params.keySet()) formBody.add(key, params.get(key));
+        return formBody.build();
     }
 
     private String getCharset(Headers headers) {
