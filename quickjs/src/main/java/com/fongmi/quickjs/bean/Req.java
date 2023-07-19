@@ -47,11 +47,11 @@ public class Req {
     }
 
     public String getBody() {
-        return TextUtils.isEmpty(body) ? "" : body;
+        return TextUtils.isEmpty(body) ? "" : body.trim();
     }
 
     public String getData() {
-        return TextUtils.isEmpty(data) ? "" : data;
+        return TextUtils.isEmpty(data) ? "" : data.trim();
     }
 
     private JsonElement getHeaders() {
