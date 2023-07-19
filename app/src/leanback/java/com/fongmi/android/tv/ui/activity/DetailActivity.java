@@ -405,6 +405,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         } else if (getName().isEmpty()) {
             showEmpty();
         } else {
+            mBinding.name.setText(getName());
             checkSearch(false);
             App.post(mR3, 10000);
         }
@@ -418,7 +419,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void setDetail(Vod item) {
         mBinding.progressLayout.showContent();
         mBinding.video.setTag(item.getVodPic());
-        mBinding.name.setText(item.getVodName());
+        mBinding.name.setText(item.getVodName(getName()));
         setText(mBinding.remark, 0, item.getVodRemarks());
         setText(mBinding.year, R.string.detail_year, item.getVodYear());
         setText(mBinding.area, R.string.detail_area, item.getVodArea());
@@ -985,7 +986,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void checkSearch(boolean force) {
-        if (mSearchAdapter.size() == 0) initSearch(getName(), true);
+        if (mSearchAdapter.size() == 0) initSearch(mBinding.name.getText().toString(), true);
         else if (isAutoMode() || force) nextSite();
     }
 
