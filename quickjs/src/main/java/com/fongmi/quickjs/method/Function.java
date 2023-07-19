@@ -25,11 +25,12 @@ public class Function implements Callable<Object[]> {
 
     @Override
     public Object[] call() throws Exception {
-        JSFunction func = jsObject.getJSFunction(name);
-        JSObject object = (JSObject) func.call(args);
-        JSFunction then = object.getJSFunction("then");
-        if (then == null) return new Object[]{object};
-        then.call(jsCallFunction);
+        Object object = jsObject.getJSFunction(name).call(args);
+        boolean jsObj = object instanceof JSObject;
+        if (!jsObj) return new Object[]{object};
+        JSObject promise = (JSObject) object;
+        JSFunction then = promise.getJSFunction("then");
+        if (then != null) then.call(jsCallFunction);
         return new Object[]{result};
     }
 
