@@ -161,9 +161,7 @@ public class Global {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                if (!executor.isShutdown()) executor.submit(() -> {
-                    func.call();
-                });
+                if (!executor.isShutdown()) executor.submit(() -> { func.call(); });
             }
         }, delay);
     }
@@ -185,8 +183,8 @@ public class Global {
     }
 
     private RequestBody getPostBody(Req req, String contentType) {
-        if (req.getData().length() > 0) return RequestBody.create(req.getData(), MediaType.get("application/json"));
-        if (req.getBody().length() > 0 && contentType != null) return RequestBody.create(req.getBody(), MediaType.get(contentType));
+        if (!req.getData().isEmpty()) return RequestBody.create(req.getData(), MediaType.get("application/json"));
+        if (!req.getBody().isEmpty() && contentType != null) return RequestBody.create(req.getBody(), MediaType.get(contentType));
         return RequestBody.create("", null);
     }
 
