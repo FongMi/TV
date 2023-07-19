@@ -17,6 +17,8 @@ public class Req {
     private Integer redirect;
     @SerializedName("timeout")
     private Integer timeout;
+    @SerializedName("postType")
+    private String postType;
     @SerializedName("method")
     private String method;
     @SerializedName("body")
@@ -40,6 +42,10 @@ public class Req {
 
     public Integer getTimeout() {
         return timeout == null ? 10000 : timeout;
+    }
+
+    public String getPostType() {
+        return TextUtils.isEmpty(postType) ? "" : postType;
     }
 
     public String getMethod() {

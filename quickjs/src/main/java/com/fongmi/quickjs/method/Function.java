@@ -26,15 +26,11 @@ public class Function implements Callable<Object[]> {
     @Override
     public Object[] call() throws Exception {
         JSFunction func = jsObject.getJSFunction(name);
-        boolean async = func.getJSFunction("toString").call().toString().startsWith("async");
-        return new Object[]{async ? async(func) : func.call(args)};
-    }
-
-    private Object async(JSFunction func) {
-        JSObject promise = (JSObject) func.call(args);
-        JSFunction then = promise.getJSFunction("then");
+        JSObject object = (JSObject) func.call(args);
+        JSFunction then = object.getJSFunction("then");
+        if (then == null) return new Object[]{object};
         then.call(jsCallFunction);
-        return result;
+        return new Object[]{result};
     }
 
     private final JSCallFunction jsCallFunction = new JSCallFunction() {
