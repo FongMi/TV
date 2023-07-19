@@ -51,7 +51,7 @@ public class PyLoader {
         }
     }
 
-    public Object[] proxyInvoke(Map<?, ?> params) {
+    public Object[] proxyInvoke(Map<String, String> params) {
         try {
             Spider spider = spiders.get(recent);
             if (spider == null) return null;
