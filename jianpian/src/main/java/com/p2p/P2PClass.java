@@ -16,7 +16,7 @@ public class P2PClass {
     private void init(Context context) {
         try {
             String path = context.getCacheDir().getAbsolutePath();
-            File file = new File(path + "/jpali");
+            File file = new File(path + File.separator + "jpali");
             if (!file.exists()) file.mkdirs();
             port = P2Pdoxstarthttpd("TEST3E63BAAECDAA79BEAA91853490A69F08".getBytes(), path.getBytes());
         } catch (Exception e) {
