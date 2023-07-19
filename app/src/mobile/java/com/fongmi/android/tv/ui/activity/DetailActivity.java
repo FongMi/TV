@@ -392,8 +392,9 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         } else if (getName().isEmpty()) {
             showEmpty();
         } else {
-            checkSearch(false);
+            mBinding.name.setText(getName());
             App.post(mR4, 10000);
+            checkSearch(false);
         }
     }
 
@@ -407,7 +408,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     private void setDetail(Vod item) {
         mBinding.progressLayout.showContent();
         mBinding.video.setTag(item.getVodPic());
-        mBinding.name.setText(item.getVodName());
+        mBinding.name.setText(item.getVodName(getName()));
         setText(mBinding.remark, 0, item.getVodRemarks());
         setText(mBinding.site, R.string.detail_site, getSite().getName());
         setText(mBinding.actor, R.string.detail_actor, Html.fromHtml(item.getVodActor()).toString());
@@ -537,7 +538,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void onCast() {
-        CastDialog.create().history(mHistory).video(CastVideo.get(getName(), getUrl())).fm(true).show(this);
+        CastDialog.create().history(mHistory).video(CastVideo.get(mBinding.name.getText().toString(), getUrl())).fm(true).show(this);
     }
 
     private void onFull() {
@@ -1038,7 +1039,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void checkSearch(boolean force) {
-        if (mSearchAdapter.getItemCount() == 0) initSearch(getName(), true);
+        if (mSearchAdapter.getItemCount() == 0) initSearch(mBinding.name.getText().toString(), true);
         else if (isAutoMode() || force) nextSite();
     }
 
@@ -1091,7 +1092,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private boolean mismatch(Vod item) {
-        String keyword = getName();
+        String keyword = mBinding.name.getText().toString();
         if (mBroken.contains(item.getVodId())) return true;
         if (isAutoMode()) return !item.getVodName().equals(keyword);
         else return !item.getVodName().contains(keyword);
