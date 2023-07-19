@@ -1,4 +1,4 @@
-package com.hiker.drpy.method;
+package com.fongmi.quickjs.method;
 
 import com.whl.quickjs.wrapper.JSCallFunction;
 import com.whl.quickjs.wrapper.JSFunction;
