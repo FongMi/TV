@@ -1,8 +1,8 @@
-package com.hiker.drpy;
+package com.fongmi.quickjs.utils;
 
 public class Proxy {
 
-    private static int port;
+    private static int port = 9978;
 
     public static void set(int port) {
         Proxy.port = port;

@@ -1,15 +1,15 @@
-package com.hiker.drpy.method;
+package com.fongmi.quickjs.method;
 
 import android.text.TextUtils;
 import android.util.Base64;
 
 import androidx.annotation.Keep;
 
+import com.fongmi.quickjs.bean.Req;
+import com.fongmi.quickjs.utils.Parser;
+import com.fongmi.quickjs.utils.Proxy;
 import com.github.catvod.net.OkHttp;
 import com.google.gson.Gson;
-import com.hiker.drpy.Parser;
-import com.hiker.drpy.Proxy;
-import com.hiker.drpy.bean.Req;
 import com.whl.quickjs.wrapper.JSArray;
 import com.whl.quickjs.wrapper.JSFunction;
 import com.whl.quickjs.wrapper.JSMethod;
