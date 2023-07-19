@@ -1,4 +1,4 @@
-package com.hiker.drpy.bean;
+package com.fongmi.quickjs.bean;
 
 import android.text.TextUtils;
 

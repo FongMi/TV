@@ -1,8 +1,8 @@
-package com.hiker.drpy.method;
+package com.fongmi.quickjs.method;
 
 import androidx.annotation.Keep;
 
-import com.hiker.drpy.Prefers;
+import com.fongmi.quickjs.utils.Prefers;
 import com.whl.quickjs.wrapper.JSMethod;
 
 public class Local {

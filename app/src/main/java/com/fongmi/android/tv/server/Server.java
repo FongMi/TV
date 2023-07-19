@@ -5,7 +5,7 @@ import android.net.wifi.WifiManager;
 import android.text.format.Formatter;
 
 import com.fongmi.android.tv.App;
-import com.hiker.drpy.Proxy;
+import com.fongmi.quickjs.utils.Proxy;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
