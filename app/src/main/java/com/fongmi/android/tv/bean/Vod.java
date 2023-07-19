@@ -84,8 +84,7 @@ public class Vod {
     private Site site;
 
     public static List<Vod> arrayFrom(String str) {
-        Type listType = new TypeToken<List<Vod>>() {
-        }.getType();
+        Type listType = new TypeToken<List<Vod>>() {}.getType();
         List<Vod> items = new Gson().fromJson(str, listType);
         return items == null ? Collections.emptyList() : items;
     }
@@ -195,7 +194,8 @@ public class Vod {
     }
 
     public String getVodName(String name) {
-        return getVodName().isEmpty() ? name : getVodName();
+        if (getVodName().isEmpty()) setVodName(name);
+        return getVodName();
     }
 
     public void trans() {
@@ -350,8 +350,7 @@ public class Vod {
             }
 
             public static List<Episode> arrayFrom(String str) {
-                Type listType = new TypeToken<List<Episode>>() {
-                }.getType();
+                Type listType = new TypeToken<List<Episode>>() {}.getType();
                 List<Episode> items = new Gson().fromJson(str, listType);
                 return items == null ? Collections.emptyList() : items;
             }
