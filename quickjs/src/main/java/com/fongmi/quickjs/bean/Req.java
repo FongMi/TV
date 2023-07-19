@@ -20,9 +20,9 @@ public class Req {
     @SerializedName("method")
     private String method;
     @SerializedName("body")
-    private String body;
+    private JsonElement body;
     @SerializedName("data")
-    private String data;
+    private JsonElement data;
     @SerializedName("headers")
     private JsonElement headers;
 
@@ -46,12 +46,12 @@ public class Req {
         return TextUtils.isEmpty(method) ? "get" : method;
     }
 
-    public String getBody() {
-        return TextUtils.isEmpty(body) ? "" : body.trim();
+    public JsonElement getBody() {
+        return body;
     }
 
-    public String getData() {
-        return TextUtils.isEmpty(data) ? "" : data.trim();
+    public JsonElement getData() {
+        return data;
     }
 
     private JsonElement getHeaders() {
