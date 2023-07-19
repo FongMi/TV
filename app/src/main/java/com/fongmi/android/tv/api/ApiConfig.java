@@ -246,7 +246,7 @@ public class ApiConfig {
         else if (csp) jarLoader.setRecent(site.getJar());
     }
 
-    public Object[] proxyLocal(Map<?, ?> params) {
+    public Object[] proxyLocal(Map<String, String> params) {
         if (params.containsKey("do") && params.get("do").equals("js")) {
             return jsLoader.proxyInvoke(params);
         } else if (params.containsKey("do") && params.get("do").equals("py")) {

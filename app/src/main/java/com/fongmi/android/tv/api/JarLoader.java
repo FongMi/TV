@@ -128,7 +128,7 @@ public class JarLoader {
         return (JSONObject) method.invoke(null, jxs, name, flag, url);
     }
 
-    public Object[] proxyInvoke(Map<?, ?> params) {
+    public Object[] proxyInvoke(Map<String, String> params) {
         try {
             Method method = methods.get(Utils.getMd5(recent));
             if (method == null) return null;

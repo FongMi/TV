@@ -7,6 +7,7 @@ import com.fongmi.quickjs.bean.Res;
 import com.fongmi.quickjs.method.Function;
 import com.fongmi.quickjs.method.Global;
 import com.fongmi.quickjs.method.Local;
+import com.fongmi.quickjs.utils.JSUtil;
 import com.fongmi.quickjs.utils.Module;
 import com.github.catvod.utils.Json;
 import com.whl.quickjs.android.QuickJSLoader;
@@ -77,7 +78,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
     @Override
     public String categoryContent(String tid, String pg, boolean filter, HashMap<String, String> extend) throws Exception {
-        JSObject obj = submit(() -> convert(extend)).get();
+        JSObject obj = submit(() -> JSUtil.toObj(ctx, extend)).get();
         return (String) call("category", tid, pg, filter, obj)[0];
     }
 
@@ -93,7 +94,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
     @Override
     public String playerContent(String flag, String id, List<String> vipFlags) throws Exception {
-        JSArray array = submit(() -> convert(vipFlags)).get();
+        JSArray array = submit(() -> JSUtil.toArray(ctx, vipFlags)).get();
         return (String) call("play", flag, id, array)[0];
     }
 
@@ -108,7 +109,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
     }
 
     @Override
-    public Object[] proxyLocal(Map<?, ?> params) throws Exception {
+    public Object[] proxyLocal(Map<String, String> params) throws Exception {
         if ("catvod".equals(params.get("from"))) return proxy2(params);
         else return submit(() -> proxy1(params)).get();
     }
@@ -193,24 +194,9 @@ public class Spider extends com.github.catvod.crawler.Spider {
         }
     }
 
-    private JSObject convert(HashMap<String, String> map) {
-        JSObject obj = ctx.createNewJSObject();
-        if (map == null || map.isEmpty()) return obj;
-        for (String s : map.keySet()) obj.setProperty(s, map.get(s));
-        return obj;
-    }
-
-    private JSArray convert(List<String> items) {
-        JSArray array = ctx.createNewJSArray();
-        if (items == null || items.isEmpty()) return array;
-        for (int i = 0; i < items.size(); i++) array.set(items.get(i), i);
-        return array;
-    }
-
-    private Object[] proxy1(Map<?, ?> params) throws Exception {
-        JSObject obj = ctx.createNewJSObject();
-        for (Object key : params.keySet()) obj.setProperty((String) key, (String) params.get(key));
-        JSONArray array = new JSONArray(((JSArray) jsObject.getJSFunction("proxy").call(obj)).stringify());
+    private Object[] proxy1(Map<String, String> params) throws Exception {
+        JSObject object = JSUtil.toObj(ctx, params);
+        JSONArray array = new JSONArray(((JSArray) jsObject.getJSFunction("proxy").call(object)).stringify());
         Object[] result = new Object[3];
         result[0] = array.opt(0);
         result[1] = array.opt(1);
@@ -218,10 +204,10 @@ public class Spider extends com.github.catvod.crawler.Spider {
         return result;
     }
 
-    private Object[] proxy2(Map<?, ?> params) throws Exception {
-        String url = (String) params.get("url");
-        String header = (String) params.get("header");
-        JSArray array = submit(() -> convert(Arrays.asList(url.split("/")))).get();
+    private Object[] proxy2(Map<String, String> params) throws Exception {
+        String url = params.get("url");
+        String header = params.get("header");
+        JSArray array = submit(() -> JSUtil.toArray(ctx, Arrays.asList(url.split("/")))).get();
         Object object = submit(() -> ctx.parse(header)).get();
         String json = (String) call("proxy", array, object)[0];
         Res res = Res.objectFrom(json);
