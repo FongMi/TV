@@ -8,17 +8,20 @@ import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.ActivitySettingPlayerBinding;
+import com.fongmi.android.tv.impl.SubtitleCallback;
 import com.fongmi.android.tv.impl.UaCallback;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.base.BaseActivity;
+import com.fongmi.android.tv.ui.custom.dialog.SubtitleDialog;
 import com.fongmi.android.tv.ui.custom.dialog.UaDialog;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 
-public class SettingPlayerActivity extends BaseActivity implements UaCallback {
+public class SettingPlayerActivity extends BaseActivity implements UaCallback, SubtitleCallback {
 
     private ActivitySettingPlayerBinding mBinding;
+    private String[] subtitle;
     private String[] http;
 
     public static void start(Activity activity) {
@@ -38,9 +41,10 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback {
     protected void initView() {
         mBinding.uaText.setText(Prefers.getUa());
         mBinding.tunnelText.setText(getSwitch(Prefers.isTunnel()));
-        mBinding.httpText.setText((http = ResUtil.getStringArray(R.array.select_player_http))[Prefers.getHttp()]);
-        mBinding.tunnel.setVisibility(Players.isExo(Prefers.getPlayer()) ? View.VISIBLE : View.GONE);
         mBinding.http.setVisibility(Players.isExo(Prefers.getPlayer()) ? View.VISIBLE : View.GONE);
+        mBinding.tunnel.setVisibility(Players.isExo(Prefers.getPlayer()) ? View.VISIBLE : View.GONE);
+        mBinding.httpText.setText((http = ResUtil.getStringArray(R.array.select_exo_http))[Prefers.getHttp()]);
+        mBinding.subtitleText.setText((subtitle = ResUtil.getStringArray(R.array.select_subtitle))[Prefers.getSubtitle()]);
     }
 
     @Override
@@ -48,10 +52,15 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback {
         mBinding.ua.setOnClickListener(this::onUa);
         mBinding.http.setOnClickListener(this::setHttp);
         mBinding.tunnel.setOnClickListener(this::setTunnel);
+        mBinding.subtitle.setOnClickListener(this::onSubtitle);
     }
 
     private void onUa(View view) {
         UaDialog.create(this).show();
+    }
+
+    private void onSubtitle(View view) {
+        SubtitleDialog.create(this).show();
     }
 
     private void setHttp(View view) {
@@ -70,5 +79,11 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback {
     public void setUa(String ua) {
         mBinding.uaText.setText(ua);
         Prefers.putUa(ua);
+    }
+
+    @Override
+    public void setSubtitle(int position) {
+        mBinding.subtitleText.setText(subtitle[position]);
+        Prefers.putSubtitle(position);
     }
 }

@@ -68,6 +68,7 @@
     <string name="setting_player_ua">User-Agent</string>
     <string name="setting_player_http">HTTP method</string>
     <string name="setting_player_tunnel">Tunnel mode</string>
+    <string name="setting_player_subtitle">Subtitle size</string>
     <string name="setting_decode">Decode</string>
     <string name="setting_render">Render</string>
     <string name="setting_scale">Scale</string>
@@ -135,7 +136,7 @@
         <item>EXO</item>
     </string-array>
 
-    <string-array name="select_player_http">
+    <string-array name="select_exo_http">
         <item>Default</item>
         <item>OkHttp</item>
     </string-array>
@@ -169,6 +170,19 @@
     <string-array name="select_reset">
         <item>Reset</item>
         <item>Replay</item>
+    </string-array>
+
+    <string-array name="select_subtitle">
+        <item>Default</item>
+        <item>14sp</item>
+        <item>16sp</item>
+        <item>18sp</item>
+        <item>20sp</item>
+        <item>22sp</item>
+        <item>24sp</item>
+        <item>26sp</item>
+        <item>28sp</item>
+        <item>30sp</item>
     </string-array>
 
 </resources>

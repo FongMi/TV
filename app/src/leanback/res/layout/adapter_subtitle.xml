@@ -11,4 +11,4 @@
     android:singleLine="true"
     android:textColor="@color/text"
     android:textSize="18sp"
-    tools:text="Google" />
+    tools:text="14sp" />
