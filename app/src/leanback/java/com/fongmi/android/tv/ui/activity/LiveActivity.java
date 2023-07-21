@@ -193,12 +193,12 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private void setVideoView() {
         mPlayers.set(getExo(), getIjk());
         setScale(Prefers.getLiveScale());
-        findViewById(R.id.timeBar).setNextFocusUpId(R.id.home);
         mBinding.control.speed.setText(mPlayers.getSpeedText());
         mBinding.control.invert.setActivated(Prefers.isInvert());
         mBinding.control.across.setActivated(Prefers.isAcross());
         mBinding.control.change.setActivated(Prefers.isChange());
         mBinding.control.home.setVisibility(LiveConfig.isOnly() ? View.GONE : View.VISIBLE);
+        findViewById(R.id.timeBar).setNextFocusUpId(R.id.player);
         setSubtitleView();
     }
 
