@@ -20,7 +20,6 @@ dependencyResolutionManagement {
     }
 }
 include ':app'
-include ':zlive'
 include ':tvbus'
 include ':catvod'
 include ':pyramid'
