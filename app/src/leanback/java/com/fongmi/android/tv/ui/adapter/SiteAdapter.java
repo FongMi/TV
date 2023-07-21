@@ -31,15 +31,15 @@ public class SiteAdapter extends RecyclerView.Adapter<SiteAdapter.ViewHolder> {
 
     public void setType(int type) {
         this.type = type;
-        notifyItemRangeChanged(0, getItemCount());
+        notifyDataSetChanged();
     }
 
     public void selectAll() {
-        setEnable(true);
+        setEnable(true, true);
     }
 
     public void cancelAll() {
-        setEnable(false);
+        setEnable(false, true);
     }
 
     @Override
@@ -85,17 +85,18 @@ public class SiteAdapter extends RecyclerView.Adapter<SiteAdapter.ViewHolder> {
     }
 
     private boolean setLongListener(Site item) {
-        if (type == 1) setEnable(!item.isSearchable());
-        if (type == 2) setEnable(!item.isChangeable());
-        if (type == 3) setEnable(!item.isRecordable());
+        if (type == 1) setEnable(!item.isSearchable(), false);
+        if (type == 2) setEnable(!item.isChangeable(), false);
+        if (type == 3) setEnable(!item.isRecordable(), false);
         return true;
     }
 
-    private void setEnable(boolean enable) {
+    private void setEnable(boolean enable, boolean dynamic) {
         if (type == 1) for (Site site : ApiConfig.get().getSites()) site.setSearchable(enable).save();
         if (type == 2) for (Site site : ApiConfig.get().getSites()) site.setChangeable(enable).save();
         if (type == 3) for (Site site : ApiConfig.get().getSites()) site.setRecordable(enable).save();
-        notifyItemRangeChanged(0, getItemCount());
+        if (dynamic) notifyItemRangeChanged(0, getItemCount());
+        else notifyDataSetChanged();
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {

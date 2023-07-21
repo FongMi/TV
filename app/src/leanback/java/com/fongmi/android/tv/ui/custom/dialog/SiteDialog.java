@@ -5,11 +5,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.GridLayoutManager;
 
-import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.databinding.DialogSiteBinding;
@@ -17,12 +15,9 @@ import com.fongmi.android.tv.impl.SiteCallback;
 import com.fongmi.android.tv.ui.adapter.SiteAdapter;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.utils.ResUtil;
-import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-import java.util.List;
-
-public class SiteDialog implements SiteAdapter.OnClickListener, ChipGroup.OnCheckedStateChangeListener {
+public class SiteDialog implements SiteAdapter.OnClickListener {
 
     private final DialogSiteBinding binding;
     private final SiteCallback callback;
@@ -42,22 +37,29 @@ public class SiteDialog implements SiteAdapter.OnClickListener, ChipGroup.OnChec
     }
 
     public SiteDialog search() {
-        binding.group.check(R.id.search);
-        this.type = 1;
+        type = 1;
+        action();
+        return this;
+    }
+
+    public SiteDialog action() {
+        binding.action.setVisibility(View.VISIBLE);
         return this;
     }
 
     public void show() {
+        binding.search.setOnClickListener(v -> setType(v.isActivated() ? 0 : 1));
+        binding.change.setOnClickListener(v -> setType(v.isActivated() ? 0 : 2));
+        binding.record.setOnClickListener(v -> setType(v.isActivated() ? 0 : 3));
         binding.select.setOnClickListener(v -> adapter.selectAll());
         binding.cancel.setOnClickListener(v -> adapter.cancelAll());
-        binding.group.setOnCheckedStateChangeListener(this);
         setRecyclerView();
         setType(type);
         setDialog();
     }
 
     private int getSpanCount() {
-        return adapter.getItemCount() >= 12 ? 2 : 1;
+        return adapter.getItemCount() >= 10 ? 2 : 1;
     }
 
     private float getWidth() {
@@ -83,8 +85,9 @@ public class SiteDialog implements SiteAdapter.OnClickListener, ChipGroup.OnChec
     }
 
     private void setType(int type) {
-        binding.select.setVisibility(type == 0 ? View.GONE : View.VISIBLE);
-        binding.cancel.setVisibility(type == 0 ? View.GONE : View.VISIBLE);
+        binding.search.setActivated(type == 1);
+        binding.change.setActivated(type == 2);
+        binding.record.setActivated(type == 3);
         adapter.setType(type);
     }
 
@@ -92,13 +95,5 @@ public class SiteDialog implements SiteAdapter.OnClickListener, ChipGroup.OnChec
     public void onItemClick(Site item) {
         callback.setSite(item);
         dialog.dismiss();
-    }
-
-    @Override
-    public void onCheckedChanged(@NonNull ChipGroup group, @NonNull List<Integer> checkedIds) {
-        if (checkedIds.size() == 0) setType(0);
-        else if (checkedIds.get(0) == R.id.search) setType(1);
-        else if (checkedIds.get(0) == R.id.change) setType(2);
-        else if (checkedIds.get(0) == R.id.record) setType(3);
     }
 }
