@@ -14,7 +14,6 @@
         android:ellipsize="middle"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        android:gravity="center"
         android:singleLine="true"
         android:textColor="@color/white"
         android:textSize="18sp"

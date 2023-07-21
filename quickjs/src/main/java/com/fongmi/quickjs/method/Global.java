@@ -6,6 +6,7 @@ import android.util.Base64;
 import androidx.annotation.Keep;
 
 import com.fongmi.quickjs.bean.Req;
+import com.fongmi.quickjs.utils.JSUtil;
 import com.fongmi.quickjs.utils.Parser;
 import com.fongmi.quickjs.utils.Proxy;
 import com.github.catvod.net.OkHttp;
@@ -20,6 +21,7 @@ import com.whl.quickjs.wrapper.QuickJSContext;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.URLEncoder;
+import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -97,7 +99,7 @@ public class Global {
             Req req = Req.objectFrom(ctx.stringify(object));
             Headers headers = Headers.of(req.getHeader());
             Response response = call(url, req, headers).execute();
-            for (String name : response.headers().names()) jsHeader.setProperty(name, response.header(name));
+            setHeader(response, jsHeader);
             jsObject.setProperty("headers", jsHeader);
             setContent(jsObject, headers, req.getBuffer(), response.body().bytes());
             return jsObject;
@@ -164,7 +166,7 @@ public class Global {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                if (!executor.isShutdown()) executor.submit(() -> { func.call(); });
+                if (!executor.isShutdown()) executor.submit(() -> {func.call();});
             }
         }, delay);
     }
@@ -197,6 +199,13 @@ public class Global {
         Map<String, String> params = Json.toMap(req.getData());
         for (String key : params.keySet()) formBody.add(key, params.get(key));
         return formBody.build();
+    }
+
+    private void setHeader(Response response, JSObject object) {
+        for (Map.Entry<String, List<String>> entry : response.headers().toMultimap().entrySet()) {
+            if (entry.getValue().size() == 1) object.setProperty(entry.getKey(), entry.getValue().get(0));
+            if (entry.getValue().size() >= 2) object.setProperty(entry.getKey(), JSUtil.toArray(ctx, entry.getValue()));
+        }
     }
 
     private String getCharset(Headers headers) {

@@ -1,8 +1,119 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.fongmi.android.tv.ui.custom.CustomRecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/recycler"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="16dp"
-    app:maxHeight="352dp" />
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingTop="16dp"
+        android:paddingEnd="16dp">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:orientation="horizontal"
+            app:chipSpacingHorizontal="12dp"
+            app:singleLine="true"
+            app:singleSelection="true">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/search"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:text="@string/dialog_site_search"
+                android:textColor="@color/text"
+                android:textSize="18sp"
+                app:chipBackgroundColor="@color/chip"
+                app:chipCornerRadius="4dp"
+                app:chipMinTouchTargetSize="0dp"
+                app:textEndPadding="8dp"
+                app:textStartPadding="8dp" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/change"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:text="@string/dialog_site_change"
+                android:textColor="@color/text"
+                android:textSize="18sp"
+                app:chipBackgroundColor="@color/chip"
+                app:chipCornerRadius="4dp"
+                app:chipMinTouchTargetSize="0dp"
+                app:textEndPadding="8dp"
+                app:textStartPadding="8dp" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/record"
+                style="@style/Widget.MaterialComponents.Chip.Choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:text="@string/dialog_site_record"
+                android:textColor="@color/text"
+                android:textSize="18sp"
+                app:chipBackgroundColor="@color/chip"
+                app:chipCornerRadius="4dp"
+                app:chipMinTouchTargetSize="0dp"
+                app:textEndPadding="8dp"
+                app:textStartPadding="8dp" />
+
+        </com.google.android.material.chip.ChipGroup>
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/select"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:text="@string/dialog_site_select"
+            android:textColor="@color/text"
+            android:textSize="18sp"
+            android:visibility="gone"
+            app:chipBackgroundColor="@color/chip"
+            app:chipCornerRadius="4dp"
+            app:chipMinTouchTargetSize="0dp"
+            app:textEndPadding="8dp"
+            app:textStartPadding="8dp" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:text="@string/dialog_site_cancel"
+            android:textColor="@color/text"
+            android:textSize="18sp"
+            android:visibility="gone"
+            app:chipBackgroundColor="@color/chip"
+            app:chipCornerRadius="4dp"
+            app:chipMinTouchTargetSize="0dp"
+            app:textEndPadding="8dp"
+            app:textStartPadding="8dp" />
+
+    </LinearLayout>
+
+    <com.fongmi.android.tv.ui.custom.CustomRecyclerView
+        android:id="@+id/recycler"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        app:maxHeight="352dp"
+        tools:listitem="@layout/adapter_site" />
+
+</LinearLayout>

@@ -867,7 +867,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     public void onTimeChanged() {
         long current = mPlayers.getPosition();
         long duration = mPlayers.getDuration();
-        if (current >= 0 && duration > 0) App.execute(() -> mHistory.update(current, duration));
+        if (current >= 0 && duration > 0 && getSite().isRecordable()) App.execute(() -> mHistory.update(current, duration));
         if (mHistory.getEnding() > 0 && duration > 0 && mHistory.getEnding() + current >= duration) {
             Clock.get().setCallback(null);
             checkNext();
