@@ -38,6 +38,8 @@ public class Site {
     private Integer filterable;
     @SerializedName("changeable")
     private Integer changeable;
+    @SerializedName("recordable")
+    private Integer recordable;
     @SerializedName("ext")
     private String ext;
     @SerializedName("jar")
@@ -132,6 +134,14 @@ public class Site {
         this.changeable = changeable;
     }
 
+    public Integer getRecordable() {
+        return recordable == null ? 1 : recordable;
+    }
+
+    public void setRecordable(Integer recordable) {
+        this.recordable = recordable;
+    }
+
     public String getExt() {
         return TextUtils.isEmpty(ext) ? "" : ext;
     }
@@ -175,6 +185,15 @@ public class Site {
 
     public Site setChangeable(boolean changeable) {
         setChangeable(changeable ? 1 : 0);
+        return this;
+    }
+
+    public boolean isRecordable() {
+        return getRecordable() == 1;
+    }
+
+    public Site setRecordable(boolean recordable) {
+        setRecordable(recordable ? 1 : 0);
         return this;
     }
 
