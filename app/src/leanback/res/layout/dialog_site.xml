@@ -25,69 +25,62 @@
         android:visibility="gone"
         tools:visibility="visible">
 
-        <TextView
+        <ImageView
             android:id="@+id/search"
-            android:layout_width="wrap_content"
+            android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="@drawable/selector_text"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            android:gravity="center"
-            android:text="@string/dialog_site_search"
-            android:textColor="@color/text"
-            android:textSize="18sp" />
+            android:padding="8dp"
+            android:src="@drawable/ic_site_search"
+            app:tint="@color/text" />
 
-        <TextView
+        <ImageView
             android:id="@+id/change"
-            android:layout_width="wrap_content"
+            android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginTop="16dp"
             android:background="@drawable/selector_text"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            android:gravity="center"
-            android:text="@string/dialog_site_change"
-            android:textColor="@color/text"
-            android:textSize="18sp" />
+            android:padding="8dp"
+            android:src="@drawable/ic_site_change"
+            app:tint="@color/text" />
 
-        <TextView
+        <ImageView
             android:id="@+id/record"
-            android:layout_width="wrap_content"
+            android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginTop="16dp"
             android:background="@drawable/selector_text"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            android:gravity="center"
-            android:text="@string/dialog_site_record"
-            android:textColor="@color/text"
-            android:textSize="18sp" />
+            android:padding="8dp"
+            android:src="@drawable/ic_site_record"
+            app:tint="@color/text" />
 
-        <TextView
+        <ImageView
             android:id="@+id/select"
-            android:layout_width="wrap_content"
+            android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginTop="16dp"
             android:background="@drawable/selector_text"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            android:gravity="center"
-            android:text="@string/dialog_site_select"
-            android:textColor="@color/white"
-            android:textSize="18sp" />
+            android:padding="8dp"
+            android:src="@drawable/ic_site_select" />
 
-        <TextView
+        <ImageView
             android:id="@+id/cancel"
-            android:layout_width="wrap_content"
+            android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginTop="16dp"
             android:background="@drawable/selector_text"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            android:gravity="center"
-            android:text="@string/dialog_site_cancel"
-            android:textColor="@color/white"
-            android:textSize="18sp" />
+            android:padding="8dp"
+            android:src="@drawable/ic_site_cancel" />
 
     </LinearLayout>
 </LinearLayout>

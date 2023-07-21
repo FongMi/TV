@@ -90,11 +90,6 @@
     <!-- Dialog -->
     <string name="dialog_positive">确定</string>
     <string name="dialog_negative">取消</string>
-    <string name="dialog_site_search">搜索</string>
-    <string name="dialog_site_change">换源</string>
-    <string name="dialog_site_record">无痕</string>
-    <string name="dialog_site_select">全选</string>
-    <string name="dialog_site_cancel">反选</string>
     <string name="dialog_config_hint">请输入接口…</string>
     <string name="dialog_config_url">请输入地址…</string>
 

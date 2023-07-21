@@ -6,7 +6,6 @@ import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.gson.StringAdapter;
 import com.google.gson.JsonElement;
@@ -195,14 +194,6 @@ public class Site {
     public Site setRecordable(boolean recordable) {
         setRecordable(recordable ? 1 : 0);
         return this;
-    }
-
-    public int getSearchIcon() {
-        return isSearchable() ? R.drawable.ic_site_search : R.drawable.ic_site_block;
-    }
-
-    public int getChangeIcon() {
-        return isChangeable() ? R.drawable.ic_site_change : R.drawable.ic_site_block;
     }
 
     public static Site find(String key) {
