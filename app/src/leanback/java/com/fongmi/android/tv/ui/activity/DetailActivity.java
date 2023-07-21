@@ -352,8 +352,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
             getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         } else {
             getExo().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
-            getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 14 + Prefers.getSubtitle() * 2);
-            getExo().getSubtitleView().setFixedTextSize(TypedValue.COMPLEX_UNIT_SP, 14 + Prefers.getSubtitle() * 2);
+            getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 14 + (Prefers.getSubtitle() - 1) * 2);
+            getExo().getSubtitleView().setFixedTextSize(TypedValue.COMPLEX_UNIT_SP, 14 + (Prefers.getSubtitle() - 1) * 2);
         }
     }
 
