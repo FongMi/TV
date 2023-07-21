@@ -35,11 +35,11 @@ public class SiteAdapter extends RecyclerView.Adapter<SiteAdapter.ViewHolder> {
     }
 
     public void selectAll() {
-        setEnable(true, true);
+        setEnable(true);
     }
 
     public void cancelAll() {
-        setEnable(false, true);
+        setEnable(false);
     }
 
     @Override
@@ -85,18 +85,17 @@ public class SiteAdapter extends RecyclerView.Adapter<SiteAdapter.ViewHolder> {
     }
 
     private boolean setLongListener(Site item) {
-        if (type == 1) setEnable(!item.isSearchable(), false);
-        if (type == 2) setEnable(!item.isChangeable(), false);
-        if (type == 3) setEnable(!item.isRecordable(), false);
+        if (type == 1) setEnable(!item.isSearchable());
+        if (type == 2) setEnable(!item.isChangeable());
+        if (type == 3) setEnable(!item.isRecordable());
         return true;
     }
 
-    private void setEnable(boolean enable, boolean dynamic) {
+    private void setEnable(boolean enable) {
         if (type == 1) for (Site site : ApiConfig.get().getSites()) site.setSearchable(enable).save();
         if (type == 2) for (Site site : ApiConfig.get().getSites()) site.setChangeable(enable).save();
         if (type == 3) for (Site site : ApiConfig.get().getSites()) site.setRecordable(enable).save();
-        if (dynamic) notifyItemRangeChanged(0, getItemCount());
-        else notifyDataSetChanged();
+        notifyItemRangeChanged(0, getItemCount());
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
