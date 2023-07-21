@@ -72,7 +72,7 @@ public class SiteAdapter extends RecyclerView.Adapter<SiteAdapter.ViewHolder> {
     private boolean getChecked(Site item) {
         if (type == 1) return item.isSearchable();
         if (type == 2) return item.isChangeable();
-        if (type == 3) return item.isRecordable();
+        if (type == 3) return !item.isRecordable();
         return false;
     }
 

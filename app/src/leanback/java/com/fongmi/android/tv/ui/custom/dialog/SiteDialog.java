@@ -59,11 +59,11 @@ public class SiteDialog implements SiteAdapter.OnClickListener {
     }
 
     private int getSpanCount() {
-        return adapter.getItemCount() >= 10 ? 2 : 1;
+        return Math.max(1, Math.min(adapter.getItemCount() / 20, 3));
     }
 
     private float getWidth() {
-        return getSpanCount() == 2 ? 0.6f : 0.4f;
+        return 0.4f + (getSpanCount() - 1) * 0.2f;
     }
 
     private void setRecyclerView() {
