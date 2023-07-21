@@ -90,11 +90,6 @@
     <!-- Dialog -->
     <string name="dialog_positive">OK</string>
     <string name="dialog_negative">Cancel</string>
-    <string name="dialog_site_search">搜尋</string>
-    <string name="dialog_site_change">換源</string>
-    <string name="dialog_site_record">無痕</string>
-    <string name="dialog_site_select">全選</string>
-    <string name="dialog_site_cancel">反選</string>
     <string name="dialog_config_hint">Please enter the config…</string>
     <string name="dialog_config_url">Please enter the url…</string>
 

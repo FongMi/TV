@@ -35,11 +35,11 @@ public class SiteAdapter extends RecyclerView.Adapter<SiteAdapter.ViewHolder> {
     }
 
     public void selectAll() {
-        setEnable(true);
+        setEnable(type != 3);
     }
 
     public void cancelAll() {
-        setEnable(false);
+        setEnable(type == 3);
     }
 
     @Override
