@@ -217,7 +217,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
     }
 
     private void onVodHome(View view) {
-        SiteDialog.create(this).all().show();
+        SiteDialog.create(this).show();
     }
 
     private void onLiveHome(View view) {
