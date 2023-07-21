@@ -78,9 +78,9 @@ public class SiteAdapter extends RecyclerView.Adapter<SiteAdapter.ViewHolder> {
 
     private void setListener(Site item, int position) {
         if (type == 0) mListener.onItemClick(item);
-        if (type == 1) item.setSearchable(!item.isSearchable());
-        if (type == 2) item.setChangeable(!item.isChangeable());
-        if (type == 3) item.setRecordable(!item.isRecordable());
+        if (type == 1) item.setSearchable(!item.isSearchable()).save();
+        if (type == 2) item.setChangeable(!item.isChangeable()).save();
+        if (type == 3) item.setRecordable(!item.isRecordable()).save();
         if (type != 0) notifyItemChanged(position);
     }
 
