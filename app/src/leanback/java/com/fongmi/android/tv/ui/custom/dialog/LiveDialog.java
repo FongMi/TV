@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.WindowManager;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.fongmi.android.tv.api.LiveConfig;
 import com.fongmi.android.tv.bean.Live;
@@ -19,18 +20,18 @@ public class LiveDialog implements LiveAdapter.OnClickListener {
 
     private final DialogLiveBinding binding;
     private final LiveCallback callback;
-    private final AlertDialog dialog;
     private final LiveAdapter adapter;
+    private final AlertDialog dialog;
 
     public static LiveDialog create(Activity activity) {
         return new LiveDialog(activity);
     }
 
     public LiveDialog(Activity activity) {
+        this.adapter = new LiveAdapter(this);
         this.callback = (LiveCallback) activity;
         this.binding = DialogLiveBinding.inflate(LayoutInflater.from(activity));
         this.dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).create();
-        this.adapter = new LiveAdapter(this);
     }
 
     public void show() {
@@ -38,17 +39,22 @@ public class LiveDialog implements LiveAdapter.OnClickListener {
         setDialog();
     }
 
+    private int getSpanCount() {
+        return adapter.getItemCount() >= 12 ? 2 : 1;
+    }
+
     private void setRecyclerView() {
         binding.recycler.setAdapter(adapter);
         binding.recycler.setHasFixedSize(true);
-        binding.recycler.addItemDecoration(new SpaceItemDecoration(1, 16));
+        binding.recycler.addItemDecoration(new SpaceItemDecoration(getSpanCount(), 16));
+        binding.recycler.setLayoutManager(new GridLayoutManager(dialog.getContext(), getSpanCount()));
         binding.recycler.scrollToPosition(LiveConfig.getHomeIndex());
     }
 
     private void setDialog() {
         if (adapter.getItemCount() == 0) return;
         WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
-        params.width = (int) (ResUtil.getScreenWidth() * 0.4f);
+        params.width = (int) (ResUtil.getScreenWidth() * getSpanCount() * 0.4f);
         dialog.getWindow().setAttributes(params);
         dialog.getWindow().setDimAmount(0);
         dialog.show();

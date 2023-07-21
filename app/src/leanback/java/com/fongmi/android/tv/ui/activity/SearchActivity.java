@@ -150,7 +150,7 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
 
     @Override
     public void showDialog() {
-        SiteDialog.create(this).search().show();
+        SiteDialog.create(this).show();
     }
 
     @Override
