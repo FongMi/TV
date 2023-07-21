@@ -905,7 +905,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void setPosition() {
-        mPlayers.seekTo(Math.max(mHistory.getOpening(), mHistory.getPosition()), false);
+        if (getSite().isRecordable()) mPlayers.seekTo(Math.max(mHistory.getOpening(), mHistory.getPosition()), false);
     }
 
     private void checkEnded() {
