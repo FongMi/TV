@@ -40,7 +40,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback {
     protected void initView() {
         mBinding.uaText.setText(Prefers.getUa());
         mBinding.tunnelText.setText(getSwitch(Prefers.isTunnel()));
-        mBinding.httpText.setText((http = ResUtil.getStringArray(R.array.select_player_http))[Prefers.getHttp()]);
+        mBinding.httpText.setText((http = ResUtil.getStringArray(R.array.select_exo_http))[Prefers.getHttp()]);
         setVisible();
     }
 

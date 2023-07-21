@@ -220,6 +220,14 @@ public class Prefers {
         put("ua", ua);
     }
 
+    public static int getSubtitle() {
+        return getInt("subtitle");
+    }
+
+    public static void putSubtitle(int subtitle) {
+        put("subtitle", subtitle);
+    }
+
     public static boolean isTunnel() {
         return getBoolean("exo_tunnel");
     }

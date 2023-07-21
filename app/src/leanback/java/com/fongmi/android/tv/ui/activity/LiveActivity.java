@@ -3,6 +3,7 @@ package com.fongmi.android.tv.ui.activity;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.View;
 
@@ -35,6 +36,7 @@ import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.impl.LiveCallback;
 import com.fongmi.android.tv.impl.PassCallback;
 import com.fongmi.android.tv.model.LiveViewModel;
+import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.player.source.Source;
 import com.fongmi.android.tv.ui.base.BaseActivity;
@@ -197,6 +199,19 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.control.across.setActivated(Prefers.isAcross());
         mBinding.control.change.setActivated(Prefers.isChange());
         mBinding.control.home.setVisibility(LiveConfig.isOnly() ? View.GONE : View.VISIBLE);
+        setSubtitleView();
+    }
+
+    private void setSubtitleView() {
+        if (Prefers.getSubtitle() == 0) {
+            getExo().getSubtitleView().setUserDefaultTextSize();
+            getExo().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
+            getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        } else {
+            getExo().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
+            getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 14 + Prefers.getSubtitle() * 2);
+            getExo().getSubtitleView().setFixedTextSize(TypedValue.COMPLEX_UNIT_SP, 14 + Prefers.getSubtitle() * 2);
+        }
     }
 
     private void setScale(int scale) {
