@@ -40,7 +40,7 @@ public class LiveDialog implements LiveAdapter.OnClickListener {
     }
 
     private int getSpanCount() {
-        return adapter.getItemCount() >= 12 ? 2 : 1;
+        return adapter.getItemCount() >= 8 ? 2 : 1;
     }
 
     private float getWidth() {
