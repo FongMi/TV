@@ -1,5 +1,6 @@
 package com.fongmi.android.tv.ui.adapter;
 
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.databinding.AdapterSiteBinding;
+import com.fongmi.android.tv.utils.Prefers;
 
 import java.util.List;
 
@@ -60,13 +62,11 @@ public class SiteAdapter extends RecyclerView.Adapter<SiteAdapter.ViewHolder> {
         holder.binding.check.setChecked(getChecked(item));
         holder.binding.text.setSelected(item.isActivated());
         holder.binding.text.setActivated(item.isActivated());
-        holder.binding.check.setVisibility(getVisible(item));
+        holder.binding.check.setEnabled(type != 1 || item.getSearchable() != 0);
+        holder.binding.check.setVisibility(type == 0 ? View.GONE : View.VISIBLE);
         holder.binding.getRoot().setOnLongClickListener(v -> setLongListener(item));
         holder.binding.getRoot().setOnClickListener(v -> setListener(item, position));
-    }
-
-    private int getVisible(Site item) {
-        return type == 0 || (type == 1 && item.getSearchable() == 0) ? View.GONE : View.VISIBLE;
+        holder.binding.text.setGravity(Prefers.getSiteMode() == 0 ? Gravity.CENTER : Gravity.START);
     }
 
     private boolean getChecked(Site item) {
