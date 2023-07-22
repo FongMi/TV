@@ -244,6 +244,14 @@ public class Prefers {
         put("exo_http", http);
     }
 
+    public static int getSiteMode() {
+        return getInt("site_mode");
+    }
+
+    public static void putSiteMode(int mode) {
+        put("site_mode", mode);
+    }
+
     public static float getThumbnail() {
         return 0.3f * getQuality() + 0.4f;
     }

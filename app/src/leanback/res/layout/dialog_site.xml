@@ -12,7 +12,7 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        app:maxHeight="264dp"
+        app:maxHeight="262dp"
         tools:itemCount="5"
         tools:listitem="@layout/adapter_site" />
 
@@ -60,19 +60,17 @@
             android:src="@drawable/ic_site_record"
             app:tint="@color/text" />
 
-        <ImageView
-            android:id="@+id/select"
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/check"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginTop="16dp"
             android:background="@drawable/selector_text"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:padding="8dp"
-            android:src="@drawable/ic_site_select" />
+            android:checked="true"
+            app:buttonTint="@color/white" />
 
         <ImageView
-            android:id="@+id/cancel"
+            android:id="@+id/mode"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginTop="16dp"
@@ -80,7 +78,7 @@
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:padding="8dp"
-            android:src="@drawable/ic_site_cancel" />
+            tools:src="@drawable/ic_site_list" />
 
     </LinearLayout>
 </LinearLayout>

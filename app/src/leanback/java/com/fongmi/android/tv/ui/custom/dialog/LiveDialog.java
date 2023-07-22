@@ -39,26 +39,18 @@ public class LiveDialog implements LiveAdapter.OnClickListener {
         setDialog();
     }
 
-    private int getSpanCount() {
-        return Math.max(1, Math.min(adapter.getItemCount() / 20, 3));
-    }
-
-    private float getWidth() {
-        return 0.4f + (getSpanCount() - 1) * 0.2f;
-    }
-
     private void setRecyclerView() {
         binding.recycler.setAdapter(adapter);
         binding.recycler.setHasFixedSize(true);
-        binding.recycler.addItemDecoration(new SpaceItemDecoration(getSpanCount(), 16));
-        binding.recycler.setLayoutManager(new GridLayoutManager(dialog.getContext(), getSpanCount()));
+        binding.recycler.addItemDecoration(new SpaceItemDecoration(1, 16));
+        binding.recycler.setLayoutManager(new GridLayoutManager(dialog.getContext(), 1));
         binding.recycler.scrollToPosition(LiveConfig.getHomeIndex());
     }
 
     private void setDialog() {
         if (adapter.getItemCount() == 0) return;
         WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
-        params.width = (int) (ResUtil.getScreenWidth() * getWidth());
+        params.width = (int) (ResUtil.getScreenWidth() * 0.4f);
         dialog.getWindow().setAttributes(params);
         dialog.getWindow().setDimAmount(0);
         dialog.show();
