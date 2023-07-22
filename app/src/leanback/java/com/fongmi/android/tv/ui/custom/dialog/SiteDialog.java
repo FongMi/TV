@@ -8,6 +8,7 @@ import android.widget.CompoundButton;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
@@ -22,6 +23,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class SiteDialog implements SiteAdapter.OnClickListener, CompoundButton.OnCheckedChangeListener {
 
+    private RecyclerView.ItemDecoration decoration;
     private final DialogSiteBinding binding;
     private final SiteCallback callback;
     private final SiteAdapter adapter;
@@ -89,9 +91,10 @@ public class SiteDialog implements SiteAdapter.OnClickListener, CompoundButton.O
         binding.recycler.setAdapter(adapter);
         binding.recycler.setHasFixedSize(true);
         binding.recycler.setItemAnimator(null);
-        binding.recycler.addItemDecoration(new SpaceItemDecoration(getCount(), 16));
+        if (decoration != null) binding.recycler.removeItemDecoration(decoration);
+        binding.recycler.addItemDecoration(decoration = new SpaceItemDecoration(getCount(), 16));
         binding.recycler.setLayoutManager(new GridLayoutManager(dialog.getContext(), getCount()));
-        binding.recycler.scrollToPosition(ApiConfig.getHomeIndex());
+        if (!binding.mode.hasFocus()) binding.recycler.scrollToPosition(ApiConfig.getHomeIndex());
     }
 
     private void setDialog() {
@@ -118,9 +121,8 @@ public class SiteDialog implements SiteAdapter.OnClickListener, CompoundButton.O
     }
 
     private void setMode(View view) {
-        Prefers.putSiteMode(Prefers.getSiteMode() == 1 ? 0 : 1);
-        dialog.dismiss();
-        setMode();
+        Prefers.putSiteMode(Math.abs(Prefers.getSiteMode() - 1));
+        initView();
     }
 
     @Override
