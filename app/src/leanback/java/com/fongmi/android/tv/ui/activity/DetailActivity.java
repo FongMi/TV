@@ -342,19 +342,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void setVideoView() {
         mPlayers.set(getExo(), getIjk());
-        setSubtitleView();
-    }
-
-    private void setSubtitleView() {
-        if (Prefers.getSubtitle() == 0) {
-            getExo().getSubtitleView().setUserDefaultTextSize();
-            getExo().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
-            getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-        } else {
-            getExo().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
-            getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 14 + (Prefers.getSubtitle() - 1) * 2);
-            getExo().getSubtitleView().setFixedTextSize(TypedValue.COMPLEX_UNIT_SP, 14 + (Prefers.getSubtitle() - 1) * 2);
-        }
+        getExo().getSubtitleView().setUserDefaultTextSize();
+        getExo().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
+        getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
     }
 
     private void setScale(int scale) {
@@ -540,6 +530,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void enterFullscreen() {
         mBinding.video.setForeground(null);
+        getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 24);
         mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
         mBinding.flag.setSelectedPosition(getCurrentFlag());
         mKeyDown.setFull(true);
@@ -549,6 +540,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void exitFullscreen() {
         mBinding.video.setForeground(ResUtil.getDrawable(R.drawable.selector_video));
+        getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         mBinding.video.setLayoutParams(mFrameParams);
         mKeyDown.setFull(false);
         setFullscreen(false);

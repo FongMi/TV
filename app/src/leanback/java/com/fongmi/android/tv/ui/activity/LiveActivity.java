@@ -193,25 +193,15 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private void setVideoView() {
         mPlayers.set(getExo(), getIjk());
         setScale(Prefers.getLiveScale());
+        getExo().getSubtitleView().setUserDefaultTextSize();
+        getExo().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
+        getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         mBinding.control.speed.setText(mPlayers.getSpeedText());
         mBinding.control.invert.setActivated(Prefers.isInvert());
         mBinding.control.across.setActivated(Prefers.isAcross());
         mBinding.control.change.setActivated(Prefers.isChange());
         mBinding.control.home.setVisibility(LiveConfig.isOnly() ? View.GONE : View.VISIBLE);
         findViewById(R.id.timeBar).setNextFocusUpId(R.id.player);
-        setSubtitleView();
-    }
-
-    private void setSubtitleView() {
-        if (Prefers.getSubtitle() == 0) {
-            getExo().getSubtitleView().setUserDefaultTextSize();
-            getExo().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
-            getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-        } else {
-            getExo().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
-            getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 14 + (Prefers.getSubtitle() - 1) * 2);
-            getExo().getSubtitleView().setFixedTextSize(TypedValue.COMPLEX_UNIT_SP, 14 + (Prefers.getSubtitle() - 1) * 2);
-        }
     }
 
     private void setScale(int scale) {
