@@ -4,20 +4,23 @@ import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.CompoundButton;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.GridLayoutManager;
 
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.databinding.DialogSiteBinding;
 import com.fongmi.android.tv.impl.SiteCallback;
 import com.fongmi.android.tv.ui.adapter.SiteAdapter;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
+import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-public class SiteDialog implements SiteAdapter.OnClickListener {
+public class SiteDialog implements SiteAdapter.OnClickListener, CompoundButton.OnCheckedChangeListener {
 
     private final DialogSiteBinding binding;
     private final SiteCallback callback;
@@ -38,7 +41,6 @@ public class SiteDialog implements SiteAdapter.OnClickListener {
 
     public SiteDialog search() {
         type = 1;
-        action();
         return this;
     }
 
@@ -51,25 +53,30 @@ public class SiteDialog implements SiteAdapter.OnClickListener {
         binding.search.setOnClickListener(v -> setType(v.isActivated() ? 0 : 1));
         binding.change.setOnClickListener(v -> setType(v.isActivated() ? 0 : 2));
         binding.record.setOnClickListener(v -> setType(v.isActivated() ? 0 : 3));
-        binding.select.setOnClickListener(v -> adapter.selectAll());
-        binding.cancel.setOnClickListener(v -> adapter.cancelAll());
+        binding.check.setOnCheckedChangeListener(this);
+        binding.mode.setOnClickListener(this::setMode);
+        binding.mode.setImageResource(getIcon());
         setRecyclerView();
         setType(type);
         setDialog();
     }
 
     private int getSpanCount() {
-        return Math.max(1, Math.min(adapter.getItemCount() / 20, 3));
+        return Prefers.getSiteMode() == 0 ? 1 : Math.max(1, Math.min((int) (Math.ceil(adapter.getItemCount() / 20.0f)), 3));
     }
 
     private float getWidth() {
         return 0.4f + (getSpanCount() - 1) * 0.2f;
     }
 
+    private int getIcon() {
+        return Prefers.getSiteMode() == 0 ? R.drawable.ic_site_grid : R.drawable.ic_site_list;
+    }
+
     private void setRecyclerView() {
         binding.recycler.setAdapter(adapter);
         binding.recycler.setHasFixedSize(true);
-        binding.recycler.getItemAnimator().setChangeDuration(0);
+        binding.recycler.setItemAnimator(null);
         binding.recycler.addItemDecoration(new SpaceItemDecoration(getSpanCount(), 16));
         binding.recycler.setLayoutManager(new GridLayoutManager(dialog.getContext(), getSpanCount()));
         binding.recycler.scrollToPosition(ApiConfig.getHomeIndex());
@@ -88,7 +95,20 @@ public class SiteDialog implements SiteAdapter.OnClickListener {
         binding.search.setActivated(type == 1);
         binding.change.setActivated(type == 2);
         binding.record.setActivated(type == 3);
+        binding.check.setEnabled(type != 0);
         adapter.setType(type);
+    }
+
+    private void setMode(View view) {
+        Prefers.putSiteMode(Prefers.getSiteMode() == 1 || adapter.getItemCount() < 20 ? 0 : 1);
+        binding.mode.setImageResource(getIcon());
+        dialog.dismiss();
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if (isChecked) adapter.selectAll();
+        else adapter.cancelAll();
     }
 
     @Override
