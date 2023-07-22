@@ -32,6 +32,8 @@
             android:background="@drawable/selector_text"
             android:focusable="true"
             android:focusableInTouchMode="true"
+            android:nextFocusUp="@id/search"
+            android:nextFocusDown="@id/change"
             android:padding="8dp"
             android:src="@drawable/ic_site_search"
             app:tint="@color/text" />
@@ -44,6 +46,8 @@
             android:background="@drawable/selector_text"
             android:focusable="true"
             android:focusableInTouchMode="true"
+            android:nextFocusUp="@id/search"
+            android:nextFocusDown="@id/record"
             android:padding="8dp"
             android:src="@drawable/ic_site_change"
             app:tint="@color/text" />
@@ -56,6 +60,8 @@
             android:background="@drawable/selector_text"
             android:focusable="true"
             android:focusableInTouchMode="true"
+            android:nextFocusUp="@id/change"
+            android:nextFocusDown="@id/check"
             android:padding="8dp"
             android:src="@drawable/ic_site_record"
             app:tint="@color/text" />
@@ -67,6 +73,8 @@
             android:layout_marginTop="16dp"
             android:background="@drawable/selector_text"
             android:checked="true"
+            android:nextFocusUp="@id/record"
+            android:nextFocusDown="@id/mode"
             app:buttonTint="@color/white" />
 
         <ImageView
@@ -77,6 +85,8 @@
             android:background="@drawable/selector_text"
             android:focusable="true"
             android:focusableInTouchMode="true"
+            android:nextFocusUp="@id/check"
+            android:nextFocusDown="@id/mode"
             android:padding="8dp"
             tools:src="@drawable/ic_site_list" />
 
