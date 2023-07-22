@@ -845,6 +845,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mHistory = History.find(getHistoryKey());
         mHistory = mHistory == null ? createHistory(item) : mHistory;
         if (!TextUtils.isEmpty(getMark())) mHistory.setVodRemarks(getMark());
+        if (!getSite().isRecordable() && mHistory.getKey().equals(getHistoryKey())) mHistory.delete();
         mBinding.control.action.opening.setText(mHistory.getOpening() == 0 ? getString(R.string.play_op) : mPlayers.stringToTime(mHistory.getOpening()));
         mBinding.control.action.ending.setText(mHistory.getEnding() == 0 ? getString(R.string.play_ed) : mPlayers.stringToTime(mHistory.getEnding()));
         mBinding.control.action.speed.setText(mPlayers.setSpeed(mHistory.getSpeed()));
@@ -906,10 +907,11 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     @Override
     public void onTimeChanged() {
-        long current = mPlayers.getPosition();
-        long duration = mPlayers.getDuration();
-        if (current >= 0 && duration > 0) App.execute(() -> mHistory.update(current, duration));
-        if (mHistory.getEnding() > 0 && duration > 0 && mHistory.getEnding() + current >= duration) {
+        long position, duration;
+        mHistory.setPosition(position = mPlayers.getPosition());
+        mHistory.setDuration(duration = mPlayers.getDuration());
+        if (position >= 0 && duration > 0 && getSite().isRecordable()) App.execute(() -> mHistory.update());
+        if (mHistory.getEnding() > 0 && duration > 0 && mHistory.getEnding() + position >= duration) {
             Clock.get().setCallback(null);
             checkNext();
         }
