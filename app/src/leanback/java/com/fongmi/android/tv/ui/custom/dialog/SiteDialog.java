@@ -50,35 +50,47 @@ public class SiteDialog implements SiteAdapter.OnClickListener, CompoundButton.O
     }
 
     public void show() {
-        binding.search.setOnClickListener(v -> setType(v.isActivated() ? 0 : 1));
-        binding.change.setOnClickListener(v -> setType(v.isActivated() ? 0 : 2));
-        binding.record.setOnClickListener(v -> setType(v.isActivated() ? 0 : 3));
-        binding.check.setOnCheckedChangeListener(this);
-        binding.mode.setOnClickListener(this::setMode);
-        binding.mode.setImageResource(getIcon());
-        setRecyclerView();
         setType(type);
-        setDialog();
+        initView();
+        initEvent();
     }
 
-    private int getSpanCount() {
-        return Prefers.getSiteMode() == 0 ? 1 : Math.max(1, Math.min((int) (Math.ceil(adapter.getItemCount() / 20.0f)), 3));
+    private boolean list() {
+        return Prefers.getSiteMode() == 0 || adapter.getItemCount() < 20;
     }
 
-    private float getWidth() {
-        return 0.4f + (getSpanCount() - 1) * 0.2f;
+    private int getCount() {
+        return list() ? 1 : Math.max(1, Math.min((int) (Math.ceil(adapter.getItemCount() / 20.0f)), 3));
     }
 
     private int getIcon() {
-        return Prefers.getSiteMode() == 0 ? R.drawable.ic_site_grid : R.drawable.ic_site_list;
+        return list() ? R.drawable.ic_site_grid : R.drawable.ic_site_list;
+    }
+
+    private float getWidth() {
+        return 0.4f + (getCount() - 1) * 0.2f;
+    }
+
+    private void initView() {
+        setRecyclerView();
+        setDialog();
+        setMode();
+    }
+
+    private void initEvent() {
+        binding.check.setOnCheckedChangeListener(this);
+        binding.mode.setOnClickListener(this::setMode);
+        binding.search.setOnClickListener(v -> setType(v.isActivated() ? 0 : 1));
+        binding.change.setOnClickListener(v -> setType(v.isActivated() ? 0 : 2));
+        binding.record.setOnClickListener(v -> setType(v.isActivated() ? 0 : 3));
     }
 
     private void setRecyclerView() {
         binding.recycler.setAdapter(adapter);
         binding.recycler.setHasFixedSize(true);
         binding.recycler.setItemAnimator(null);
-        binding.recycler.addItemDecoration(new SpaceItemDecoration(getSpanCount(), 16));
-        binding.recycler.setLayoutManager(new GridLayoutManager(dialog.getContext(), getSpanCount()));
+        binding.recycler.addItemDecoration(new SpaceItemDecoration(getCount(), 16));
+        binding.recycler.setLayoutManager(new GridLayoutManager(dialog.getContext(), getCount()));
         binding.recycler.scrollToPosition(ApiConfig.getHomeIndex());
     }
 
@@ -91,6 +103,12 @@ public class SiteDialog implements SiteAdapter.OnClickListener, CompoundButton.O
         dialog.show();
     }
 
+    private void setMode() {
+        if (adapter.getItemCount() < 20) Prefers.putSiteMode(0);
+        binding.mode.setEnabled(adapter.getItemCount() >= 20);
+        binding.mode.setImageResource(getIcon());
+    }
+
     private void setType(int type) {
         binding.search.setActivated(type == 1);
         binding.change.setActivated(type == 2);
@@ -100,9 +118,9 @@ public class SiteDialog implements SiteAdapter.OnClickListener, CompoundButton.O
     }
 
     private void setMode(View view) {
-        Prefers.putSiteMode(Prefers.getSiteMode() == 1 || adapter.getItemCount() < 20 ? 0 : 1);
-        binding.mode.setImageResource(getIcon());
+        Prefers.putSiteMode(Prefers.getSiteMode() == 1 ? 0 : 1);
         dialog.dismiss();
+        setMode();
     }
 
     @Override
