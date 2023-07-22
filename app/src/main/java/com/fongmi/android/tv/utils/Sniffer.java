@@ -1,12 +1,14 @@
 package com.fongmi.android.tv.utils;
 
 import android.net.Uri;
+import android.text.TextUtils;
 
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Rule;
 import com.github.catvod.crawler.SpiderDebug;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -53,9 +55,7 @@ public class Sniffer {
 
     public static List<String> getRegex(Uri uri) {
         if (uri.getHost() == null) return Collections.emptyList();
-        List<String> hosts = new ArrayList<>();
-        hosts.add(uri.getHost());
-        hosts.add(uri.getQueryParameter("url"));
+        String hosts = TextUtils.join(",", Arrays.asList(uri.getHost(), uri.getQueryParameter("url")));
         for (Rule rule : ApiConfig.get().getRules()) for (String host : rule.getHosts()) if (hosts.contains(host)) return rule.getRegex();
         return Collections.emptyList();
     }
