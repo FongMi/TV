@@ -116,8 +116,7 @@ public class SiteDialog implements SiteAdapter.OnClickListener, CompoundButton.O
         binding.search.setActivated(type == 1);
         binding.change.setActivated(type == 2);
         binding.record.setActivated(type == 3);
-        binding.check.setEnabled(type != 0);
-        adapter.setType(type);
+        adapter.setType(this.type = type);
     }
 
     private void setMode(View view) {
@@ -127,7 +126,8 @@ public class SiteDialog implements SiteAdapter.OnClickListener, CompoundButton.O
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        if (isChecked) adapter.selectAll();
+        if (type == 0) buttonView.setChecked(!isChecked);
+        else if (isChecked) adapter.selectAll();
         else adapter.cancelAll();
     }
 
