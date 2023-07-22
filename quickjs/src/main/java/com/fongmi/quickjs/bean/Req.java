@@ -22,7 +22,7 @@ public class Req {
     @SerializedName("method")
     private String method;
     @SerializedName("body")
-    private JsonElement body;
+    private String body;
     @SerializedName("data")
     private JsonElement data;
     @SerializedName("headers")
@@ -52,7 +52,7 @@ public class Req {
         return TextUtils.isEmpty(method) ? "get" : method;
     }
 
-    public JsonElement getBody() {
+    public String getBody() {
         return body;
     }
 
