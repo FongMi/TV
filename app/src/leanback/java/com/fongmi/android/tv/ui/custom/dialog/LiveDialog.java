@@ -45,7 +45,7 @@ public class LiveDialog implements LiveAdapter.OnClickListener {
         binding.recycler.setHasFixedSize(true);
         binding.recycler.addItemDecoration(new SpaceItemDecoration(1, 16));
         binding.recycler.setLayoutManager(new GridLayoutManager(dialog.getContext(), 1));
-        App.post(() -> binding.recycler.scrollToPosition(LiveConfig.getHomeIndex()), 16);
+        binding.recycler.post(() -> binding.recycler.scrollToPosition(LiveConfig.getHomeIndex()));
     }
 
     private void setDialog() {

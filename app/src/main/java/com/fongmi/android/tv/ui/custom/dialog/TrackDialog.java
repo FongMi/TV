@@ -10,7 +10,6 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.media3.common.Tracks;
 import androidx.viewbinding.ViewBinding;
 
-import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.bean.Track;
 import com.fongmi.android.tv.databinding.DialogTrackBinding;
 import com.fongmi.android.tv.player.Players;
@@ -68,7 +67,7 @@ public final class TrackDialog extends BaseDialog implements TrackAdapter.OnClic
         binding.recycler.setHasFixedSize(true);
         binding.recycler.setAdapter(adapter.addAll(getTrack()));
         binding.recycler.addItemDecoration(new SpaceItemDecoration(1, 16));
-        App.post(() -> binding.recycler.scrollToPosition(adapter.getSelected()), 16);
+        binding.recycler.post(() -> binding.recycler.scrollToPosition(adapter.getSelected()));
     }
 
     private List<Track> getTrack() {
