@@ -10,6 +10,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Site;
@@ -94,7 +95,7 @@ public class SiteDialog implements SiteAdapter.OnClickListener, CompoundButton.O
         if (decoration != null) binding.recycler.removeItemDecoration(decoration);
         binding.recycler.addItemDecoration(decoration = new SpaceItemDecoration(getCount(), 16));
         binding.recycler.setLayoutManager(new GridLayoutManager(dialog.getContext(), getCount()));
-        if (!binding.mode.hasFocus()) binding.recycler.scrollToPosition(ApiConfig.getHomeIndex());
+        if (!binding.mode.hasFocus()) App.post(() -> binding.recycler.scrollToPosition(ApiConfig.getHomeIndex()), 16);
     }
 
     private void setDialog() {

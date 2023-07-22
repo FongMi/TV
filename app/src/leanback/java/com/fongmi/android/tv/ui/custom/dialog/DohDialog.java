@@ -6,6 +6,7 @@ import android.view.WindowManager;
 
 import androidx.appcompat.app.AlertDialog;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.databinding.DialogDohBinding;
 import com.fongmi.android.tv.impl.DohCallback;
 import com.fongmi.android.tv.ui.adapter.DohAdapter;
@@ -46,7 +47,7 @@ public class DohDialog implements DohAdapter.OnClickListener {
         binding.recycler.setAdapter(adapter);
         binding.recycler.setHasFixedSize(true);
         binding.recycler.addItemDecoration(new SpaceItemDecoration(1, 16));
-        binding.recycler.scrollToPosition(adapter.getSelect());
+        App.post(() -> binding.recycler.scrollToPosition(adapter.getSelect()), 16);
     }
 
     private void setDialog() {
