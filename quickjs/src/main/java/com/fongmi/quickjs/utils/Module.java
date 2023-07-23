@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ConcurrentHashMap;
 
 import okhttp3.Headers;
@@ -57,7 +56,7 @@ public class Module {
             byte[] data = new byte[is.available()];
             is.read(data);
             is.close();
-            return new String(data, StandardCharsets.UTF_8);
+            return new String(data, "UTF-8");
         } catch (IOException e) {
             e.printStackTrace();
             return "";
@@ -74,7 +73,7 @@ public class Module {
             byte[] data = response.body().bytes();
             boolean cache = !uri.getHost().equals("127.0.0.1");
             if (cache) new Thread(() -> write(file, data)).start();
-            return new String(data, StandardCharsets.UTF_8);
+            return new String(data, "UTF-8");
         } catch (Exception e) {
             e.printStackTrace();
             return "";
