@@ -193,6 +193,11 @@ public class Vod {
         return getVodTag().equals("folder");
     }
 
+    public String getVodName(String name) {
+        if (getVodName().isEmpty()) setVodName(name);
+        return getVodName();
+    }
+
     public void trans() {
         if (Trans.pass()) return;
         this.vodName = Trans.s2t(vodName);

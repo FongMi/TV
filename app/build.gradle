@@ -22,8 +22,8 @@ android {
     productFlavors {
         leanback {
             dimension "default"
-            versionCode 202
-            versionName "20230718#1"
+            versionCode 203
+            versionName "2.0.3"
         }
     }
 
@@ -62,11 +62,10 @@ android {
 }
 
 dependencies {
-    implementation project(':drpy')
     implementation project(':tvbus')
-    implementation project(':zlive')
     implementation project(':catvod')
     implementation project(':pyramid')
+    implementation project(':quickjs')
     implementation project(':jianpian')
     implementation project(':forcetech')
     implementation project(':ijkplayer')
@@ -103,7 +102,7 @@ dependencies {
     implementation 'com.hierynomus:smbj:0.11.5'
     implementation 'com.squareup.okhttp3:okhttp:' + okhttpVersion
     implementation 'me.jessyan:autosize:1.2.1'
-    implementation 'net.java.dev.jna:jna:5.12.1'
+    implementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:' + okhttpVersion
     implementation 'org.apache.commons:commons-compress:1.20'
     implementation 'org.greenrobot:eventbus:3.3.1'
     implementation 'org.jsoup:jsoup:' + jsoupVersion

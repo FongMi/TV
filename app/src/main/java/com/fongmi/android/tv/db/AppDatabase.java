@@ -27,7 +27,7 @@ import com.fongmi.android.tv.utils.Prefers;
 @Database(entities = {Keep.class, Site.class, Track.class, Config.class, Device.class, History.class}, version = AppDatabase.VERSION)
 public abstract class AppDatabase extends RoomDatabase {
 
-    public static final int VERSION = 24;
+    public static final int VERSION = 25;
     public static final String SYMBOL = "@@@";
 
     private static volatile AppDatabase instance;
@@ -52,6 +52,7 @@ public abstract class AppDatabase extends RoomDatabase {
                 .addMigrations(MIGRATION_21_22)
                 .addMigrations(MIGRATION_22_23)
                 .addMigrations(MIGRATION_23_24)
+                .addMigrations(MIGRATION_24_25)
                 .allowMainThreadQueries()
                 .fallbackToDestructiveMigration()
                 .build();
@@ -164,6 +165,13 @@ public abstract class AppDatabase extends RoomDatabase {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             database.execSQL("ALTER TABLE Track ADD COLUMN `adaptive` INTEGER NOT NULL DEFAULT 0");
+        }
+    };
+
+    static final Migration MIGRATION_24_25 = new Migration(24, 25) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE Site ADD COLUMN recordable INTEGER DEFAULT 1");
         }
     };
 }

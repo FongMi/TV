@@ -1,4 +1,4 @@
-package com.hiker.drpy.method;
+package com.fongmi.quickjs.method;
 
 import com.whl.quickjs.wrapper.JSCallFunction;
 import com.whl.quickjs.wrapper.JSFunction;
@@ -6,7 +6,7 @@ import com.whl.quickjs.wrapper.JSObject;
 
 import java.util.concurrent.Callable;
 
-public class Function implements Callable<Object> {
+public class Function implements Callable<Object[]> {
 
     private final JSObject jsObject;
     private final Object[] args;
@@ -24,17 +24,14 @@ public class Function implements Callable<Object> {
     }
 
     @Override
-    public Object call() throws Exception {
-        JSFunction func = jsObject.getJSFunction(name);
-        boolean async = func.getJSFunction("toString").call().toString().startsWith("async");
-        return async ? async(func) : func.call(args);
-    }
-
-    private Object async(JSFunction func) {
-        JSObject promise = (JSObject) func.call(args);
+    public Object[] call() throws Exception {
+        result = jsObject.getJSFunction(name).call(args);
+        boolean jsObj = result instanceof JSObject;
+        if (!jsObj) return new Object[]{result};
+        JSObject promise = (JSObject) result;
         JSFunction then = promise.getJSFunction("then");
-        then.call(jsCallFunction);
-        return result;
+        if (then != null) then.call(jsCallFunction);
+        return new Object[]{result};
     }
 
     private final JSCallFunction jsCallFunction = new JSCallFunction() {
