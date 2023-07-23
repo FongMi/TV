@@ -191,9 +191,9 @@ public class Global {
 
     private RequestBody getPostBody(Req req, String contentType) {
         if (req.getData() != null && req.getPostType().equals("form")) return getFormBody(req);
-        if (req.getData() != null) return RequestBody.create(gson.toJson(req.getData()), MediaType.get("application/json"));
-        if (req.getBody() != null && contentType != null) return RequestBody.create(req.getBody(), MediaType.get(contentType));
-        return RequestBody.create("", null);
+        if (req.getData() != null) return RequestBody.create(MediaType.get("application/json"), gson.toJson(req.getData()));
+        if (req.getBody() != null && contentType != null) return RequestBody.create(MediaType.get(contentType), req.getBody());
+        return RequestBody.create(null, "");
     }
 
     private RequestBody getFormBody(Req req) {
