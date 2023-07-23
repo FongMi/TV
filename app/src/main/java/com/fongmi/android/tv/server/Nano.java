@@ -128,7 +128,7 @@ public class Nano extends NanoHTTPD {
             String url = session.getParms().get("url");
             String result = M3U8.get(url, session.getHeaders());
             for (String ad : Sniffer.getRegex(Uri.parse(url))) result = result.replaceAll(ad, "");
-            return newChunkedResponse(Response.Status.OK, NanoHTTPD.MIME_PLAINTEXT, new ByteArrayInputStream(result.getBytes(StandardCharsets.UTF_8)));
+            return newChunkedResponse(Response.Status.OK, NanoHTTPD.MIME_PLAINTEXT, new ByteArrayInputStream(result.getBytes("UTF-8")));
         } catch (Exception e) {
             return createErrorResponse(e.getMessage());
         }
