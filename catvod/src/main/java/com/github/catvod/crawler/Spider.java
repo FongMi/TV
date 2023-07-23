@@ -55,7 +55,7 @@ public abstract class Spider {
         return false;
     }
 
-    public Object[] proxyLocal(Map<?, ?> params) throws Exception {
+    public Object[] proxyLocal(Map<String, String> params) throws Exception {
         return null;
     }
 

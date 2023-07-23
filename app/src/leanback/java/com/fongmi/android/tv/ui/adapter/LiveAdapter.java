@@ -42,12 +42,12 @@ public class LiveAdapter extends RecyclerView.Adapter<LiveAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Live item = mItems.get(position);
         holder.binding.text.setText(item.getName());
+        holder.binding.text.setSelected(item.isActivated());
         holder.binding.text.setActivated(item.isActivated());
-        holder.binding.getRoot().setSelected(item.isActivated());
         holder.binding.text.setOnClickListener(v -> mListener.onItemClick(item));
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder {
 
         private final AdapterLiveBinding binding;
 

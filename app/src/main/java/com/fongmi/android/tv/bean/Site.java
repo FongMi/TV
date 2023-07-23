@@ -6,7 +6,6 @@ import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.gson.StringAdapter;
 import com.google.gson.JsonElement;
@@ -38,6 +37,8 @@ public class Site {
     private Integer filterable;
     @SerializedName("changeable")
     private Integer changeable;
+    @SerializedName("recordable")
+    private Integer recordable;
     @SerializedName("ext")
     private String ext;
     @SerializedName("jar")
@@ -132,6 +133,14 @@ public class Site {
         this.changeable = changeable;
     }
 
+    public Integer getRecordable() {
+        return recordable == null ? 1 : recordable;
+    }
+
+    public void setRecordable(Integer recordable) {
+        this.recordable = recordable;
+    }
+
     public String getExt() {
         return TextUtils.isEmpty(ext) ? "" : ext;
     }
@@ -178,12 +187,13 @@ public class Site {
         return this;
     }
 
-    public int getSearchIcon() {
-        return isSearchable() ? R.drawable.ic_site_search : R.drawable.ic_site_block;
+    public boolean isRecordable() {
+        return getRecordable() == 1;
     }
 
-    public int getChangeIcon() {
-        return isChangeable() ? R.drawable.ic_site_change : R.drawable.ic_site_block;
+    public Site setRecordable(boolean recordable) {
+        setRecordable(recordable ? 1 : 0);
+        return this;
     }
 
     public static Site find(String key) {
@@ -198,6 +208,7 @@ public class Site {
         Site item = find(getKey());
         if (item == null) return this;
         setChangeable(item.getChangeable());
+        setRecordable(item.getRecordable());
         if (getSearchable() != 0) setSearchable(Math.max(1, item.getSearchable()));
         return this;
     }
