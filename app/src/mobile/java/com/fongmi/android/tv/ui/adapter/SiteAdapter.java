@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.databinding.AdapterSiteBinding;
@@ -68,8 +69,8 @@ public class SiteAdapter extends RecyclerView.Adapter<SiteAdapter.ViewHolder> {
         holder.binding.text.setFocusable(on);
         holder.binding.text.setSelected(on && item.isActivated());
         holder.binding.text.setActivated(on && item.isActivated());
-        holder.binding.search.setImageResource(item.getSearchIcon());
-        holder.binding.change.setImageResource(item.getChangeIcon());
+        holder.binding.search.setImageResource(getSearchIcon(item));
+        holder.binding.change.setImageResource(getChangeIcon(item));
         holder.binding.search.setVisibility(search ? View.VISIBLE : View.GONE);
         holder.binding.change.setVisibility(change ? View.VISIBLE : View.GONE);
         holder.binding.text.setOnClickListener(v -> mListener.onTextClick(item));
@@ -77,6 +78,14 @@ public class SiteAdapter extends RecyclerView.Adapter<SiteAdapter.ViewHolder> {
         holder.binding.change.setOnClickListener(v -> mListener.onChangeClick(position, item));
         holder.binding.search.setOnLongClickListener(v -> mListener.onSearchLongClick(item));
         holder.binding.change.setOnLongClickListener(v -> mListener.onChangeLongClick(item));
+    }
+
+    private int getSearchIcon(Site item) {
+        return item.isSearchable() ? R.drawable.ic_site_search : R.drawable.ic_site_block;
+    }
+
+    private int getChangeIcon(Site item) {
+        return item.isChangeable() ? R.drawable.ic_site_change : R.drawable.ic_site_block;
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {

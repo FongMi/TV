@@ -1,11 +1,15 @@
-package com.hiker.drpy;
+package com.fongmi.quickjs.crawler;
 
 import android.content.Context;
+import android.util.Base64;
 
+import com.fongmi.quickjs.bean.Res;
+import com.fongmi.quickjs.method.Function;
+import com.fongmi.quickjs.method.Global;
+import com.fongmi.quickjs.method.Local;
+import com.fongmi.quickjs.utils.JSUtil;
+import com.fongmi.quickjs.utils.Module;
 import com.github.catvod.utils.Json;
-import com.hiker.drpy.method.Function;
-import com.hiker.drpy.method.Global;
-import com.hiker.drpy.method.Local;
 import com.whl.quickjs.android.QuickJSLoader;
 import com.whl.quickjs.wrapper.JSArray;
 import com.whl.quickjs.wrapper.JSMethod;
@@ -16,6 +20,7 @@ import org.json.JSONArray;
 
 import java.io.ByteArrayInputStream;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,8 +29,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import dalvik.system.DexClassLoader;
 
@@ -54,7 +57,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
         return executor.submit(callable);
     }
 
-    private Object call(String func, Object... args) throws Exception {
+    private Object[] call(String func, Object... args) throws Exception {
         return submit(Function.call(jsObject, func, args)).get();
     }
 
@@ -65,58 +68,50 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
     @Override
     public String homeContent(boolean filter) throws Exception {
-        return (String) call("home", filter);
+        return (String) call("home", filter)[0];
     }
 
     @Override
     public String homeVideoContent() throws Exception {
-        return (String) call("homeVod");
+        return (String) call("homeVod")[0];
     }
 
     @Override
     public String categoryContent(String tid, String pg, boolean filter, HashMap<String, String> extend) throws Exception {
-        JSObject obj = submit(() -> convert(extend)).get();
-        return (String) call("category", tid, pg, filter, obj);
+        JSObject obj = submit(() -> JSUtil.toObj(ctx, extend)).get();
+        return (String) call("category", tid, pg, filter, obj)[0];
     }
 
     @Override
     public String detailContent(List<String> ids) throws Exception {
-        return (String) call("detail", ids.get(0));
+        return (String) call("detail", ids.get(0))[0];
     }
 
     @Override
     public String searchContent(String key, boolean quick) throws Exception {
-        return (String) call("search", key, quick);
+        return (String) call("search", key, quick)[0];
     }
 
     @Override
     public String playerContent(String flag, String id, List<String> vipFlags) throws Exception {
-        JSArray array = submit(() -> convert(vipFlags)).get();
-        return (String) call("play", flag, id, array);
+        JSArray array = submit(() -> JSUtil.toArray(ctx, vipFlags)).get();
+        return (String) call("play", flag, id, array)[0];
     }
 
     @Override
     public boolean manualVideoCheck() throws Exception {
-        return (Boolean) call("sniffer");
+        return (Boolean) call("sniffer")[0];
     }
 
     @Override
     public boolean isVideoFormat(String url) throws Exception {
-        return (Boolean) call("isVideo", url);
+        return (Boolean) call("isVideo", url)[0];
     }
 
     @Override
-    public Object[] proxyLocal(Map<?, ?> params) throws Exception {
-        return submit(() -> {
-            JSObject obj = ctx.createNewJSObject();
-            for (Object key : params.keySet()) obj.setProperty((String) key, (String) params.get(key));
-            JSONArray array = new JSONArray(((JSArray) jsObject.getJSFunction("proxy").call(obj)).stringify());
-            Object[] result = new Object[3];
-            result[0] = array.opt(0);
-            result[1] = array.opt(1);
-            result[2] = getStream(array.opt(2));
-            return result;
-        }).get();
+    public Object[] proxyLocal(Map<String, String> params) throws Exception {
+        if ("catvod".equals(params.get("from"))) return proxy2(params);
+        else return submit(() -> proxy1(params)).get();
     }
 
     @Override
@@ -188,34 +183,39 @@ public class Spider extends com.github.catvod.crawler.Spider {
     }
 
     private String getContent() {
+        String global = "globalThis." + key;
         String content = Module.get().load(api);
         if (content.contains("__jsEvalReturn")) {
-            return catvod(content);
+            return content.concat(global).concat(" = __jsEvalReturn()");
         } else if (content.contains("__JS_SPIDER__")) {
-            return content.replace("__JS_SPIDER__", "globalThis." + key);
+            return content.replace("__JS_SPIDER__", global);
         } else {
-            return content.replaceAll("export default.*?[{]", "globalThis." + key + " = {");
+            return content.replaceAll("export default.*?[{]", global + " = {");
         }
     }
 
-    private String catvod(String content) {
-        String[] split = content.split("export\\s+function\\s+__jsEvalReturn.*?[{]");
-        Matcher matcher = Pattern.compile("\\s?return\\s?([\\s+\\S]*)\\s?\\}").matcher(split[1]);
-        return matcher.find() ? split[0].concat("globalThis." + key + " = ").concat(matcher.group(1)) : content;
+    private Object[] proxy1(Map<String, String> params) throws Exception {
+        JSObject object = JSUtil.toObj(ctx, params);
+        JSONArray array = new JSONArray(((JSArray) jsObject.getJSFunction("proxy").call(object)).stringify());
+        Object[] result = new Object[3];
+        result[0] = array.opt(0);
+        result[1] = array.opt(1);
+        result[2] = getStream(array.opt(2));
+        return result;
     }
 
-    private JSObject convert(HashMap<String, String> map) {
-        JSObject obj = ctx.createNewJSObject();
-        if (map == null || map.isEmpty()) return obj;
-        for (String s : map.keySet()) obj.setProperty(s, map.get(s));
-        return obj;
-    }
-
-    private JSArray convert(List<String> items) {
-        JSArray array = ctx.createNewJSArray();
-        if (items == null || items.isEmpty()) return array;
-        for (int i = 0; i < items.size(); i++) array.set(items.get(i), i);
-        return array;
+    private Object[] proxy2(Map<String, String> params) throws Exception {
+        String url = params.get("url");
+        String header = params.get("header");
+        JSArray array = submit(() -> JSUtil.toArray(ctx, Arrays.asList(url.split("/")))).get();
+        Object object = submit(() -> ctx.parse(header)).get();
+        String json = (String) call("proxy", array, object)[0];
+        Res res = Res.objectFrom(json);
+        Object[] result = new Object[3];
+        result[0] = 200;
+        result[1] = "application/octet-stream";
+        result[2] = new ByteArrayInputStream(Base64.decode(res.getContent(), Base64.DEFAULT));
+        return result;
     }
 
     private ByteArrayInputStream getStream(Object o) {
@@ -229,3 +229,4 @@ public class Spider extends com.github.catvod.crawler.Spider {
         }
     }
 }
+

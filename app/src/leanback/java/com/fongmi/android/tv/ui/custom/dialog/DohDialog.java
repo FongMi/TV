@@ -46,7 +46,7 @@ public class DohDialog implements DohAdapter.OnClickListener {
         binding.recycler.setAdapter(adapter);
         binding.recycler.setHasFixedSize(true);
         binding.recycler.addItemDecoration(new SpaceItemDecoration(1, 16));
-        binding.recycler.scrollToPosition(adapter.getSelect());
+        binding.recycler.post(() -> binding.recycler.scrollToPosition(adapter.getSelect()));
     }
 
     private void setDialog() {

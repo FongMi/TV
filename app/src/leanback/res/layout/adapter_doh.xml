@@ -1,20 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/text"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-
-    <TextView
-        android:id="@+id/text"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:background="@drawable/selector_text"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:gravity="center"
-        android:singleLine="true"
-        android:textColor="@color/text"
-        android:textSize="18sp"
-        tools:text="Google" />
-
-</LinearLayout>
+    android:layout_height="40dp"
+    android:background="@drawable/selector_text"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:gravity="center"
+    android:singleLine="true"
+    android:textColor="@color/text"
+    android:textSize="18sp"
+    tools:text="Google" />

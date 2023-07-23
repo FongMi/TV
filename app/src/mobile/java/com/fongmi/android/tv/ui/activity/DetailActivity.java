@@ -392,8 +392,9 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         } else if (getName().isEmpty()) {
             showEmpty();
         } else {
-            checkSearch(false);
+            mBinding.name.setText(getName());
             App.post(mR4, 10000);
+            checkSearch(false);
         }
     }
 
@@ -407,7 +408,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     private void setDetail(Vod item) {
         mBinding.progressLayout.showContent();
         mBinding.video.setTag(item.getVodPic());
-        mBinding.name.setText(item.getVodName());
+        mBinding.name.setText(item.getVodName(getName()));
         setText(mBinding.remark, 0, item.getVodRemarks());
         setText(mBinding.site, R.string.detail_site, getSite().getName());
         setText(mBinding.actor, R.string.detail_actor, Html.fromHtml(item.getVodActor()).toString());
@@ -537,7 +538,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void onCast() {
-        CastDialog.create().history(mHistory).video(CastVideo.get(getName(), getUrl())).fm(true).show(this);
+        CastDialog.create().history(mHistory).video(CastVideo.get(mBinding.name.getText().toString(), getUrl())).fm(true).show(this);
     }
 
     private void onFull() {
@@ -905,10 +906,11 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     @Override
     public void onTimeChanged() {
-        long current = mPlayers.getPosition();
-        long duration = mPlayers.getDuration();
-        if (current >= 0 && duration > 0) App.execute(() -> mHistory.update(current, duration));
-        if (mHistory.getEnding() > 0 && duration > 0 && mHistory.getEnding() + current >= duration) {
+        long position, duration;
+        mHistory.setPosition(position = mPlayers.getPosition());
+        mHistory.setDuration(duration = mPlayers.getDuration());
+        if (position >= 0 && duration > 0) App.execute(() -> mHistory.update());
+        if (mHistory.getEnding() > 0 && duration > 0 && mHistory.getEnding() + position >= duration) {
             Clock.get().setCallback(null);
             checkNext();
         }
@@ -1038,7 +1040,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void checkSearch(boolean force) {
-        if (mSearchAdapter.getItemCount() == 0) initSearch(getName(), true);
+        if (mSearchAdapter.getItemCount() == 0) initSearch(mBinding.name.getText().toString(), true);
         else if (isAutoMode() || force) nextSite();
     }
 
@@ -1058,7 +1060,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     private void startSearch(String keyword) {
         mSearchAdapter.clear();
         List<Site> sites = new ArrayList<>();
-        mExecutor = Executors.newCachedThreadPool();
+        mExecutor = Executors.newFixedThreadPool(Constant.THREAD_POOL * 2);
         for (Site item : ApiConfig.get().getSites()) if (isPass(item)) sites.add(item);
         for (Site site : sites) mExecutor.execute(() -> search(site, keyword));
     }
@@ -1091,7 +1093,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private boolean mismatch(Vod item) {
-        String keyword = getName();
+        String keyword = mBinding.name.getText().toString();
         if (mBroken.contains(item.getVodId())) return true;
         if (isAutoMode()) return !item.getVodName().equals(keyword);
         else return !item.getVodName().contains(keyword);

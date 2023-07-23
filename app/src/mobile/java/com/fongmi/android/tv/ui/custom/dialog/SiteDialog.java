@@ -71,7 +71,7 @@ public class SiteDialog implements SiteAdapter.OnClickListener {
         binding.recycler.setItemAnimator(null);
         binding.recycler.setHasFixedSize(true);
         binding.recycler.addItemDecoration(new SpaceItemDecoration(1, 8));
-        binding.recycler.scrollToPosition(ApiConfig.getHomeIndex());
+        binding.recycler.post(() -> binding.recycler.scrollToPosition(ApiConfig.getHomeIndex()));
     }
 
     private void setDialog() {
