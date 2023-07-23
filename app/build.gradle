@@ -102,7 +102,6 @@ dependencies {
     implementation 'com.hierynomus:smbj:0.11.5'
     implementation 'com.squareup.okhttp3:okhttp:' + okhttpVersion
     implementation 'me.jessyan:autosize:1.2.1'
-    implementation 'com.squareup.okhttp3:okhttp-dnsoverhttps:' + okhttpVersion
     implementation 'org.apache.commons:commons-compress:1.20'
     implementation 'org.greenrobot:eventbus:3.3.1'
     implementation 'org.jsoup:jsoup:' + jsoupVersion

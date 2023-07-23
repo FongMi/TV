@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="40dp"
@@ -26,10 +27,11 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_marginStart="12dp"
-        android:buttonTint="@color/white"
+        android:layout_marginLeft="12dp"
         android:clickable="false"
         android:enabled="false"
         android:focusable="false"
-        android:focusableInTouchMode="false" />
+        android:focusableInTouchMode="false"
+        app:buttonTint="@color/white" />
 
 </LinearLayout>
