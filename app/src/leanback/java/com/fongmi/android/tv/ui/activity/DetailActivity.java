@@ -344,7 +344,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mPlayers.set(getExo(), getIjk());
         getExo().getSubtitleView().setUserDefaultTextSize();
         getExo().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
-        getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+        getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
     }
 
     private void setScale(int scale) {
@@ -405,8 +405,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         } else if (getName().isEmpty()) {
             showEmpty();
         } else {
-            checkSearch(false);
+            mBinding.name.setText(getName());
             App.post(mR3, 10000);
+            checkSearch(false);
         }
     }
 
@@ -418,7 +419,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void setDetail(Vod item) {
         mBinding.progressLayout.showContent();
         mBinding.video.setTag(item.getVodPic());
-        mBinding.name.setText(item.getVodName());
+        mBinding.name.setText(item.getVodName(getName()));
         setText(mBinding.remark, 0, item.getVodRemarks());
         setText(mBinding.year, R.string.detail_year, item.getVodYear());
         setText(mBinding.area, R.string.detail_area, item.getVodArea());
@@ -812,6 +813,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mHistory = History.find(getHistoryKey());
         mHistory = mHistory == null ? createHistory(item) : mHistory;
         if (!TextUtils.isEmpty(getMark())) mHistory.setVodRemarks(getMark());
+        if (!getSite().isRecordable() && mHistory.getKey().equals(getHistoryKey())) mHistory.delete();
         mBinding.control.opening.setText(mHistory.getOpening() == 0 ? getString(R.string.play_op) : mPlayers.stringToTime(mHistory.getOpening()));
         mBinding.control.ending.setText(mHistory.getEnding() == 0 ? getString(R.string.play_ed) : mPlayers.stringToTime(mHistory.getEnding()));
         mBinding.control.speed.setText(mPlayers.setSpeed(mHistory.getSpeed()));
@@ -864,10 +866,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     @Override
     public void onTimeChanged() {
-        long current = mPlayers.getPosition();
-        long duration = mPlayers.getDuration();
-        if (current >= 0 && duration > 0) App.execute(() -> mHistory.update(current, duration));
-        if (mHistory.getEnding() > 0 && duration > 0 && mHistory.getEnding() + current >= duration) {
+        long position, duration;
+        mHistory.setPosition(position = mPlayers.getPosition());
+        mHistory.setDuration(duration = mPlayers.getDuration());
+        if (position >= 0 && duration > 0 && getSite().isRecordable()) App.execute(() -> mHistory.update());
+        if (mHistory.getEnding() > 0 && duration > 0 && mHistory.getEnding() + position >= duration) {
             Clock.get().setCallback(null);
             checkNext();
         }
@@ -985,7 +988,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void checkSearch(boolean force) {
-        if (mSearchAdapter.size() == 0) initSearch(getName(), true);
+        if (mSearchAdapter.size() == 0) initSearch(mBinding.name.getText().toString(), true);
         else if (isAutoMode() || force) nextSite();
     }
 

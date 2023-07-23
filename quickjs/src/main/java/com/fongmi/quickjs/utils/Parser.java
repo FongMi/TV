@@ -1,11 +1,11 @@
-package com.hiker.drpy;
+package com.fongmi.quickjs.utils;
 
 import android.text.TextUtils;
 
 import androidx.media3.common.util.UriUtil;
 
-import com.hiker.drpy.bean.Cache;
-import com.hiker.drpy.bean.Info;
+import com.fongmi.quickjs.bean.Cache;
+import com.fongmi.quickjs.bean.Info;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;

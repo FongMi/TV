@@ -130,7 +130,7 @@
         <item>EXO</item>
     </string-array>
 
-    <string-array name="select_player_http">
+    <string-array name="select_exo_http">
         <item>预设</item>
         <item>OkHttp</item>
     </string-array>

@@ -6,7 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:ellipsize="marquee"
-    android:gravity="center"
     android:singleLine="true"
     android:textColor="@color/control"
     android:textSize="14sp"

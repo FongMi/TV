@@ -2,46 +2,34 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="40dp"
+    android:background="@drawable/selector_text"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:gravity="center_vertical"
     android:orientation="horizontal">
 
     <TextView
         android:id="@+id/text"
         android:layout_width="0dp"
-        android:layout_height="40dp"
+        android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:background="@drawable/selector_text"
         android:ellipsize="marquee"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
         android:gravity="center"
         android:singleLine="true"
         android:textColor="@color/text"
         android:textSize="18sp"
         tools:text="泥巴" />
 
-    <ImageView
-        android:id="@+id/search"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/check"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
         android:layout_marginStart="12dp"
-        android:background="@drawable/selector_text"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:padding="8dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/ic_site_search" />
-
-    <ImageView
-        android:id="@+id/change"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="12dp"
-        android:background="@drawable/selector_text"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:padding="8dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/ic_site_change" />
+        android:buttonTint="@color/white"
+        android:clickable="false"
+        android:enabled="false"
+        android:focusable="false"
+        android:focusableInTouchMode="false" />
 
 </LinearLayout>

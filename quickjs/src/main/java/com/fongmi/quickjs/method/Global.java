@@ -1,31 +1,35 @@
-package com.hiker.drpy.method;
+package com.fongmi.quickjs.method;
 
 import android.text.TextUtils;
 import android.util.Base64;
 
 import androidx.annotation.Keep;
 
+import com.fongmi.quickjs.bean.Req;
+import com.fongmi.quickjs.utils.JSUtil;
+import com.fongmi.quickjs.utils.Parser;
+import com.fongmi.quickjs.utils.Proxy;
 import com.github.catvod.net.OkHttp;
-import com.hiker.drpy.Proxy;
+import com.github.catvod.utils.Json;
 import com.google.gson.Gson;
-import com.hiker.drpy.Parser;
 import com.whl.quickjs.wrapper.JSArray;
 import com.whl.quickjs.wrapper.JSFunction;
 import com.whl.quickjs.wrapper.JSMethod;
 import com.whl.quickjs.wrapper.JSObject;
 import com.whl.quickjs.wrapper.QuickJSContext;
 
-import org.json.JSONObject;
-
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
-import java.util.Iterator;
+import java.net.URLEncoder;
+import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
+import okhttp3.FormBody;
 import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -68,13 +72,19 @@ public class Global {
 
     @Keep
     @JSMethod
-    public String getProxy(boolean local) {
+    public String getProxy(Boolean local) {
         return Proxy.getUrl() + "?do=js";
     }
 
     @Keep
     @JSMethod
-    public Object setTimeout(JSFunction func, int delay) {
+    public String js2Proxy(Boolean dynamic, Integer siteType, String siteKey, String url, JSObject headers) {
+        return getProxy(true) + "&from=catvod" + "&header=" + URLEncoder.encode(ctx.stringify(headers)) + "&url=" + URLEncoder.encode(url);
+    }
+
+    @Keep
+    @JSMethod
+    public Object setTimeout(JSFunction func, Integer delay) {
         func.hold();
         schedule(func, delay);
         return null;
@@ -86,12 +96,12 @@ public class Global {
         try {
             JSObject jsObject = ctx.createNewJSObject();
             JSObject jsHeader = ctx.createNewJSObject();
-            JSONObject obj = new JSONObject(ctx.stringify(object));
-            Headers headers = getHeader(obj.optJSONObject("headers"));
-            Response response = call(url, obj, headers).execute();
-            for (String name : response.headers().names()) jsHeader.setProperty(name, response.header(name));
+            Req req = Req.objectFrom(ctx.stringify(object));
+            Headers headers = Headers.of(req.getHeader());
+            Response response = call(url, req, headers).execute();
+            setHeader(response, jsHeader);
             jsObject.setProperty("headers", jsHeader);
-            setContent(jsObject, headers, obj.optInt("buffer"), response.body().bytes());
+            setContent(jsObject, headers, req.getBuffer(), response.body().bytes());
             return jsObject;
         } catch (Throwable e) {
             JSObject jsObject = ctx.createNewJSObject();
@@ -156,46 +166,48 @@ public class Global {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                if (!executor.isShutdown()) executor.submit(() -> { func.call(); });
+                if (!executor.isShutdown()) executor.submit(() -> {
+                    func.call();
+                });
             }
         }, delay);
     }
 
-    private Call call(String url, JSONObject object, Headers headers) {
-        int redirect = object.optInt("redirect", 1);
-        int timeout = object.optInt("timeout", 10000);
-        OkHttpClient client = redirect == 1 ? OkHttp.client() : OkHttp.noRedirect();
-        client = client.newBuilder().connectTimeout(timeout, TimeUnit.MILLISECONDS).readTimeout(timeout, TimeUnit.MILLISECONDS).writeTimeout(timeout, TimeUnit.MILLISECONDS).build();
-        return client.newCall(getRequest(url, object, headers));
+    private Call call(String url, Req req, Headers headers) {
+        OkHttpClient client = req.getRedirect() == 1 ? OkHttp.client() : OkHttp.noRedirect();
+        client = client.newBuilder().connectTimeout(req.getTimeout(), TimeUnit.MILLISECONDS).readTimeout(req.getTimeout(), TimeUnit.MILLISECONDS).writeTimeout(req.getTimeout(), TimeUnit.MILLISECONDS).build();
+        return client.newCall(getRequest(url, req, headers));
     }
 
-    private Request getRequest(String url, JSONObject object, Headers headers) {
-        String method = object.optString("method", "get");
-        if (method.equalsIgnoreCase("post")) {
-            return new Request.Builder().url(url).headers(headers).post(getPostBody(object, headers.get("Content-Type"))).build();
-        } else if (method.equalsIgnoreCase("header")) {
+    private Request getRequest(String url, Req req, Headers headers) {
+        if (req.getMethod().equalsIgnoreCase("post")) {
+            return new Request.Builder().url(url).headers(headers).post(getPostBody(req, headers.get("Content-Type"))).build();
+        } else if (req.getMethod().equalsIgnoreCase("header")) {
             return new Request.Builder().url(url).headers(headers).head().build();
         } else {
             return new Request.Builder().url(url).headers(headers).get().build();
         }
     }
 
-    private RequestBody getPostBody(JSONObject object, String contentType) {
-        String body = object.optString("body").trim();
-        String data = object.optString("data").trim();
-        if (data.length() > 0) return RequestBody.create(data, MediaType.get("application/json"));
-        if (body.length() > 0 && contentType != null) return RequestBody.create(body, MediaType.get(contentType));
+    private RequestBody getPostBody(Req req, String contentType) {
+        if (req.getData() != null && req.getPostType().equals("form")) return getFormBody(req);
+        if (req.getData() != null) return RequestBody.create(gson.toJson(req.getData()), MediaType.get("application/json"));
+        if (req.getBody() != null && contentType != null) return RequestBody.create(req.getBody(), MediaType.get(contentType));
         return RequestBody.create("", null);
     }
 
-    private Headers getHeader(JSONObject object) {
-        Headers.Builder builder = new Headers.Builder();
-        if (object == null) return builder.build();
-        for (Iterator<String> iterator = object.keys(); iterator.hasNext(); ) {
-            String key = iterator.next();
-            builder.add(key, object.optString(key));
+    private RequestBody getFormBody(Req req) {
+        FormBody.Builder formBody = new FormBody.Builder();
+        Map<String, String> params = Json.toMap(req.getData());
+        for (String key : params.keySet()) formBody.add(key, params.get(key));
+        return formBody.build();
+    }
+
+    private void setHeader(Response response, JSObject object) {
+        for (Map.Entry<String, List<String>> entry : response.headers().toMultimap().entrySet()) {
+            if (entry.getValue().size() == 1) object.setProperty(entry.getKey(), entry.getValue().get(0));
+            if (entry.getValue().size() >= 2) object.setProperty(entry.getKey(), JSUtil.toArray(ctx, entry.getValue()));
         }
-        return builder.build();
     }
 
     private String getCharset(Headers headers) {

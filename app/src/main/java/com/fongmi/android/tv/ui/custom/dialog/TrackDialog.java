@@ -65,9 +65,9 @@ public final class TrackDialog extends BaseDialog implements TrackAdapter.OnClic
     @Override
     protected void initView() {
         binding.recycler.setHasFixedSize(true);
-        binding.recycler.addItemDecoration(new SpaceItemDecoration(1, 16));
         binding.recycler.setAdapter(adapter.addAll(getTrack()));
-        binding.recycler.scrollToPosition(adapter.getSelected());
+        binding.recycler.addItemDecoration(new SpaceItemDecoration(1, 16));
+        binding.recycler.post(() -> binding.recycler.scrollToPosition(adapter.getSelected()));
     }
 
     private List<Track> getTrack() {
