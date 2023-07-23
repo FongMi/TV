@@ -38,9 +38,9 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback {
     protected void initView() {
         mBinding.uaText.setText(Prefers.getUa());
         mBinding.tunnelText.setText(getSwitch(Prefers.isTunnel()));
-        mBinding.httpText.setText((http = ResUtil.getStringArray(R.array.select_player_http))[Prefers.getHttp()]);
-        mBinding.tunnel.setVisibility(Players.isExo(Prefers.getPlayer()) ? View.VISIBLE : View.GONE);
         mBinding.http.setVisibility(Players.isExo(Prefers.getPlayer()) ? View.VISIBLE : View.GONE);
+        mBinding.tunnel.setVisibility(Players.isExo(Prefers.getPlayer()) ? View.VISIBLE : View.GONE);
+        mBinding.httpText.setText((http = ResUtil.getStringArray(R.array.select_exo_http))[Prefers.getHttp()]);
     }
 
     @Override

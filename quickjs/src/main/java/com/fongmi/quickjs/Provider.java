@@ -1,4 +1,4 @@
-package com.hiker.drpy;
+package com.fongmi.quickjs;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
@@ -9,10 +9,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.media3.common.util.UriUtil;
 
+import com.fongmi.quickjs.utils.Module;
+import com.fongmi.quickjs.utils.Prefers;
 import com.whl.quickjs.android.QuickJSLoader;
 import com.whl.quickjs.wrapper.JSModule;
 
-public class Loader extends ContentProvider {
+public class Provider extends ContentProvider {
 
     static {
         try {

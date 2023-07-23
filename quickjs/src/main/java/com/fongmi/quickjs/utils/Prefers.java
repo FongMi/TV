@@ -1,4 +1,4 @@
-package com.hiker.drpy;
+package com.fongmi.quickjs.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;

@@ -15,9 +15,11 @@ import com.fongmi.android.tv.utils.Sniffer;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -126,7 +128,7 @@ public class Nano extends NanoHTTPD {
             String url = session.getParms().get("url");
             String result = M3U8.get(url, session.getHeaders());
             for (String ad : Sniffer.getRegex(Uri.parse(url))) result = result.replaceAll(ad, "");
-            return newFixedLengthResponse(Response.Status.OK, NanoHTTPD.MIME_PLAINTEXT, result);
+            return newChunkedResponse(Response.Status.OK, NanoHTTPD.MIME_PLAINTEXT, new ByteArrayInputStream(result.getBytes(StandardCharsets.UTF_8)));
         } catch (Exception e) {
             return createErrorResponse(e.getMessage());
         }

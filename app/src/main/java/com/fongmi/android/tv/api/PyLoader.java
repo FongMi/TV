@@ -51,11 +51,11 @@ public class PyLoader {
         }
     }
 
-    public Object[] proxyInvoke(Map<?, ?> params) {
+    public Object[] proxyInvoke(Map<String, String> params) {
         try {
             Spider spider = spiders.get(recent);
-            if (spider != null) return spider.proxyLocal(params);
-            else return null;
+            if (spider == null) return null;
+            return spider.proxyLocal(params);
         } catch (Throwable e) {
             e.printStackTrace();
             return null;

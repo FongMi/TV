@@ -276,9 +276,7 @@ public class History {
         }
     }
 
-    public void update(long position, long duration) {
-        setPosition(position);
-        setDuration(duration);
+    public void update() {
         merge(find(), false);
         save();
     }
