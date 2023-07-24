@@ -50,7 +50,7 @@ import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
-import com.fongmi.android.tv.player.extractor.Source;
+import com.fongmi.android.tv.player.Source;
 import com.fongmi.android.tv.receiver.PiPReceiver;
 import com.fongmi.android.tv.service.PlaybackService;
 import com.fongmi.android.tv.ui.adapter.EpisodeAdapter;
@@ -1391,9 +1391,9 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Source.stopAll();
         mPlayers.release();
         Clock.get().release();
+        Source.get().destroy();
         RefreshEvent.history();
         PlaybackService.stop();
         App.removeCallbacks(mR1, mR2, mR3, mR4);

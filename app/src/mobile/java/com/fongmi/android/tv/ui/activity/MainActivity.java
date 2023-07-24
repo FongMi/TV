@@ -19,6 +19,7 @@ import com.fongmi.android.tv.api.WallConfig;
 import com.fongmi.android.tv.databinding.ActivityMainBinding;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.impl.Callback;
+import com.fongmi.android.tv.player.Source;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.FragmentStateManager;
@@ -165,6 +166,7 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
         WallConfig.get().clear();
         LiveConfig.get().clear();
         ApiConfig.get().clear();
+        Source.get().release();
         Server.get().stop();
     }
 }
