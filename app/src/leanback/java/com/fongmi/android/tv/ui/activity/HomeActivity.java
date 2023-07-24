@@ -33,6 +33,7 @@ import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.event.ServerEvent;
 import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.model.SiteViewModel;
+import com.fongmi.android.tv.player.Source;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.CustomRowPresenter;
@@ -57,10 +58,10 @@ import java.util.List;
 
 public class HomeActivity extends BaseActivity implements CustomTitleView.Listener, VodPresenter.OnClickListener, FuncPresenter.OnClickListener, HistoryPresenter.OnClickListener {
 
-    private ActivityHomeBinding mBinding;
-    private ArrayObjectAdapter mAdapter;
     private ArrayObjectAdapter mHistoryAdapter;
-    private HistoryPresenter mHistoryPresenter;
+    private ActivityHomeBinding mBinding;
+    private HistoryPresenter mPresenter;
+    private ArrayObjectAdapter mAdapter;
     private SiteViewModel mViewModel;
     private boolean confirm;
     private Result result;
@@ -94,7 +95,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
                 mBinding.toolbar.setVisibility(position == 0 ? View.VISIBLE : View.GONE);
-                if (mHistoryPresenter.isDelete()) setHistoryDelete(false);
+                if (mPresenter.isDelete()) setHistoryDelete(false);
             }
         });
     }
@@ -130,7 +131,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         mAdapter.add(getFuncRow());
         mAdapter.add(R.string.home_history);
         mAdapter.add(R.string.home_recommend);
-        mHistoryAdapter = new ArrayObjectAdapter(mHistoryPresenter = new HistoryPresenter(this));
+        mHistoryAdapter = new ArrayObjectAdapter(mPresenter = new HistoryPresenter(this));
     }
 
     private void initConfig() {
@@ -204,14 +205,14 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         int historyIndex = getHistoryIndex();
         int recommendIndex = getRecommendIndex();
         boolean exist = recommendIndex - historyIndex == 2;
-        if (renew) mHistoryAdapter = new ArrayObjectAdapter(mHistoryPresenter = new HistoryPresenter(this));
+        if (renew) mHistoryAdapter = new ArrayObjectAdapter(mPresenter = new HistoryPresenter(this));
         if ((items.isEmpty() && exist) || (renew && exist)) mAdapter.removeItems(historyIndex, 1);
         if ((items.size() > 0 && !exist) || (renew && exist)) mAdapter.add(historyIndex, new ListRow(mHistoryAdapter));
         mHistoryAdapter.setItems(items, null);
     }
 
     private void setHistoryDelete(boolean delete) {
-        mHistoryPresenter.setDelete(delete);
+        mPresenter.setDelete(delete);
         mHistoryAdapter.notifyArrayItemRangeChanged(0, mHistoryAdapter.size());
     }
 
@@ -276,7 +277,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         mHistoryAdapter.remove(item.delete());
         if (mHistoryAdapter.size() > 0) return;
         mAdapter.removeItems(getHistoryIndex(), 1);
-        mHistoryPresenter.setDelete(false);
+        mPresenter.setDelete(false);
     }
 
     @Override
@@ -380,7 +381,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     public void onBackPressed() {
         if (mBinding.progressLayout.isProgress()) {
             mBinding.progressLayout.showContent();
-        } else if (mHistoryPresenter.isDelete()) {
+        } else if (mPresenter.isDelete()) {
             setHistoryDelete(false);
         } else if (mBinding.recycler.getSelectedPosition() != 0) {
             mBinding.recycler.scrollToPosition(0);
@@ -397,6 +398,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         WallConfig.get().clear();
         LiveConfig.get().clear();
         ApiConfig.get().clear();
+        Source.get().release();
         Server.get().stop();
     }
 }

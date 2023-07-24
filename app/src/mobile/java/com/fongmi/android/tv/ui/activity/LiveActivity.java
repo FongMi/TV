@@ -36,7 +36,7 @@ import com.fongmi.android.tv.impl.LiveCallback;
 import com.fongmi.android.tv.impl.PassCallback;
 import com.fongmi.android.tv.model.LiveViewModel;
 import com.fongmi.android.tv.player.Players;
-import com.fongmi.android.tv.player.source.Source;
+import com.fongmi.android.tv.player.extractor.Source;
 import com.fongmi.android.tv.receiver.PiPReceiver;
 import com.fongmi.android.tv.service.PlaybackService;
 import com.fongmi.android.tv.ui.adapter.ChannelAdapter;

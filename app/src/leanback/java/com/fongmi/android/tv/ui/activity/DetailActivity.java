@@ -47,7 +47,7 @@ import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
-import com.fongmi.android.tv.player.source.Source;
+import com.fongmi.android.tv.player.Source;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
 import com.fongmi.android.tv.ui.custom.dialog.DescDialog;
@@ -1275,9 +1275,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Source.stopAll();
         mPlayers.release();
         Clock.get().release();
+        Source.get().destroy();
         RefreshEvent.history();
         App.removeCallbacks(mR1, mR2, mR3);
     }

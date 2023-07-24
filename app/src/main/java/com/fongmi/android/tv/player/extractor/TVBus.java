@@ -1,23 +1,21 @@
-package com.fongmi.android.tv.player.source;
+package com.fongmi.android.tv.player.extractor;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.api.LiveConfig;
 import com.fongmi.android.tv.bean.Core;
+import com.fongmi.android.tv.player.Source;
 import com.google.gson.JsonObject;
 import com.tvbus.engine.Listener;
 import com.tvbus.engine.TVCore;
 
-public class TVBus implements Listener {
+public class TVBus implements Source.Extractor, Listener {
 
     private TVCore tvcore;
     private String hls;
 
-    private static class Loader {
-        static volatile TVBus INSTANCE = new TVBus();
-    }
-
-    public static TVBus get() {
-        return Loader.INSTANCE;
+    @Override
+    public boolean match(String scheme, String host) {
+        return scheme.equals("tvbus");
     }
 
     private void init(Core core) {
@@ -28,7 +26,8 @@ public class TVBus implements Listener {
         tvcore.init(App.get());
     }
 
-    public String fetch(String url) throws InterruptedException {
+    @Override
+    public String fetch(String url) throws Exception {
         if (tvcore == null) init(LiveConfig.get().getHome().getCore());
         tvcore.start(url);
         onWait();
@@ -47,9 +46,20 @@ public class TVBus implements Listener {
         }
     }
 
+    @Override
     public void stop() {
         if (tvcore != null) tvcore.stop();
         if (hls != null) hls = null;
+    }
+
+    @Override
+    public void destroy() {
+        stop();
+    }
+
+    @Override
+    public void release() {
+        tvcore = null;
     }
 
     @Override
