@@ -37,8 +37,8 @@ public class Source {
 
     public String fetch(String url) throws Exception {
         Uri uri = Uri.parse(url);
-        String host = Objects.requireNonNullElse(uri.getHost(), "");
-        String scheme = Objects.requireNonNullElse(uri.getScheme(), "");
+        String host = Objects.requireNonNullElse(uri.getHost(), "").toLowerCase();
+        String scheme = Objects.requireNonNullElse(uri.getScheme(), "").toLowerCase();
         for (Extractor extractor : extractors) if (extractor.match(scheme, host)) return extractor.fetch(url);
         return url;
     }
