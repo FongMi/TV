@@ -1,9 +1,10 @@
-package com.fongmi.android.tv.player.source;
+package com.fongmi.android.tv.player.extractor;
 
 import android.net.Uri;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.BuildConfig;
+import com.fongmi.android.tv.player.Source;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Github;
 import com.github.catvod.net.OkHttp;
@@ -13,17 +14,14 @@ import java.io.File;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 
-public class JianPian {
+public class JianPian implements Source.Extractor {
 
     private P2PClass p2p;
     private String url;
 
-    private static class Loader {
-        static volatile JianPian INSTANCE = new JianPian();
-    }
-
-    public static JianPian get() {
-        return Loader.INSTANCE;
+    @Override
+    public boolean match(String scheme, String host) {
+        return scheme.equals("tvbox-xg");
     }
 
     private void init() throws Exception {
@@ -34,6 +32,7 @@ public class JianPian {
         p2p = new P2PClass(App.get(), file.getAbsolutePath());
     }
 
+    @Override
     public String fetch(String u) throws Exception {
         init();
         stop();
@@ -58,6 +57,7 @@ public class JianPian {
         }
     }
 
+    @Override
     public void stop() {
         try {
             if (p2p == null || url == null) return;
@@ -66,6 +66,22 @@ public class JianPian {
             url = null;
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void destroy() {
+        stop();
+    }
+
+    @Override
+    public void release() {
+        try {
+            if (p2p != null) p2p.P2Pdoxendhttpd();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            p2p = null;
         }
     }
 }

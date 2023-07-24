@@ -14,7 +14,7 @@ import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Vod;
-import com.fongmi.android.tv.player.source.Source;
+import com.fongmi.android.tv.player.Source;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Sniffer;
 import com.fongmi.android.tv.utils.Trans;
@@ -136,7 +136,7 @@ public class SiteViewModel extends ViewModel {
 
     public void playerContent(String key, String flag, String id) {
         execute(player, () -> {
-            Source.stop();
+            Source.get().stop();
             Site site = ApiConfig.get().getSite(key);
             if (site.getType() == 3) {
                 Spider spider = ApiConfig.get().getCSP(site);
@@ -145,7 +145,7 @@ public class SiteViewModel extends ViewModel {
                 ApiConfig.get().setRecent(site);
                 Result result = Result.objectFrom(playerContent);
                 if (result.getFlag().isEmpty()) result.setFlag(flag);
-                result.setUrl(Source.getUrl(result.getUrl()));
+                result.setUrl(Source.get().fetch(result.getUrl()));
                 result.setKey(key);
                 return result;
             } else if (site.getType() == 4) {
@@ -156,13 +156,13 @@ public class SiteViewModel extends ViewModel {
                 SpiderDebug.log(body);
                 Result result = Result.fromJson(body);
                 if (result.getFlag().isEmpty()) result.setFlag(flag);
-                result.setUrl(Source.getUrl(result.getUrl()));
+                result.setUrl(Source.get().fetch(result.getUrl()));
                 return result;
             } else if (key.equals("push_agent")) {
                 Result result = new Result();
-                result.setFlag(flag);
                 result.setParse(0);
-                result.setUrl(id);
+                result.setFlag(flag);
+                result.setUrl(Source.get().fetch(result.getUrl()));
                 return result;
             } else {
                 String url = id;
