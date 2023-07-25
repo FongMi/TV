@@ -3,6 +3,7 @@ package com.xunlei.downloadlib;
 import android.os.Looper;
 
 public class Daemon {
+
     private static volatile boolean shouldStop;
     private static Thread thread = null;
     private static Looper looper = null;

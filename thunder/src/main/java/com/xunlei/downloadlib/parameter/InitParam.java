@@ -1,5 +1,11 @@
 package com.xunlei.downloadlib.parameter;
 
+import android.util.Base64;
+
+import com.xunlei.downloadlib.android.XLUtil;
+
+import java.nio.charset.StandardCharsets;
+
 public class InitParam {
 
     public String mAppKey;
@@ -9,19 +15,10 @@ public class InitParam {
     public String mStatCfgSavePath;
     public String mStatSavePath;
 
-    public InitParam() {
-    }
-
-    public InitParam(String str, String str2, String str3, String str4, int i, int i2) {
-        this.mAppKey = str;
-        this.mAppVersion = str2;
-        this.mStatSavePath = str3;
-        this.mStatCfgSavePath = str4;
-        this.mPermissionLevel = i;
-        this.mQueryConfOnInit = i2;
-    }
-
-    public boolean checkMemberVar() {
-        return this.mAppKey != null && this.mAppVersion != null && this.mStatSavePath != null && this.mStatCfgSavePath != null;
+    public String getSoKey() {
+        String[] split = this.mAppKey.split("==");
+        String replace = split[0].replace('^', '=');
+        String str = new String(Base64.decode(replace.substring(2, replace.length() - 2), 0), StandardCharsets.UTF_8);
+        return XLUtil.generateAppKey("com.android.providers.downloads", Short.parseShort(str.split(";")[0]), (byte) 1);
     }
 }

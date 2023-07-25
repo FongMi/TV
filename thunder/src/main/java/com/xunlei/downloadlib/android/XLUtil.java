@@ -8,13 +8,7 @@ import android.net.wifi.WifiManager;
 import android.telephony.TelephonyManager;
 import android.util.Base64;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Map;
+import java.util.UUID;
 
 public class XLUtil {
 
@@ -26,15 +20,17 @@ public class XLUtil {
         return "000000000000000";
     }
 
-    public static String getPeerId() {
-        return getIMEI() + "V";
+    public static String generatePeerId() {
+        String uuid = UUID.randomUUID().toString().replace("-", "");
+        uuid = uuid.substring(0, 12).toUpperCase() + "004V";
+        return uuid;
     }
 
     public static GuidInfo generateGuid() {
         GuidInfo guidInfo = new GuidInfo();
-        GuidType guid_type = GuidType.DEFAULT;
+        GuidType guidType = GuidType.DEFAULT;
         guidInfo.mGuid = getIMEI() + "_" + getMAC();
-        guidInfo.mType = guid_type;
+        guidInfo.mType = guidType;
         return guidInfo;
     }
 
@@ -89,25 +85,6 @@ public class XLUtil {
         return i;
     }
 
-    public static String getMd5(String str) {
-        try {
-            char[] cArr = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
-            MessageDigest instance = MessageDigest.getInstance("MD5");
-            byte[] bytes = str.getBytes();
-            instance.update(bytes, 0, bytes.length);
-            byte[] digest = instance.digest();
-            StringBuilder sb = new StringBuilder(32);
-            for (byte b : digest) {
-                sb.append(cArr[(b >> 4) & 15]);
-                sb.append(cArr[(b) & 15]);
-            }
-            return sb.toString();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            return str;
-        }
-    }
-
     public static String generateAppKey(String str, short s, byte b) {
         int length = str.length();
         int i = length + 1;
@@ -119,12 +96,6 @@ public class XLUtil {
         bArr[length + 2] = (byte) ((s >> 8) & 255);
         bArr[length + 3] = b;
         return new String(Base64.encode(bArr, 0)).trim();
-    }
-
-    public static Map<String, Object> parseJSONString(String str) {
-        Type type = new TypeToken<Map<String, Object>>() {
-        }.getType();
-        return new Gson().fromJson(str, type);
     }
 
     public static NetWorkCarrier getNetWorkCarrier(Context context) {
