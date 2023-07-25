@@ -1,6 +1,7 @@
 package com.xunlei.downloadlib.parameter;
 
 public class PeerResourceParam {
+
     public int mCapabilityFlag;
     public int mInternalIp;
     public String mJmpKey;
@@ -72,9 +73,6 @@ public class PeerResourceParam {
     }
 
     public boolean checkMemberVar() {
-        if (this.mPeerId == null || this.mJmpKey == null || this.mVipCdnAuth == null) {
-            return false;
-        }
-        return true;
+        return this.mPeerId != null && this.mJmpKey != null && this.mVipCdnAuth != null;
     }
 }

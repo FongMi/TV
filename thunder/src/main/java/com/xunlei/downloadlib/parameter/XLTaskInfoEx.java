@@ -1,6 +1,7 @@
 package com.xunlei.downloadlib.parameter;
 
 public class XLTaskInfoEx {
+
     public int mErrorCode;
     public int mInfoLen;
     public int mOriginResState;

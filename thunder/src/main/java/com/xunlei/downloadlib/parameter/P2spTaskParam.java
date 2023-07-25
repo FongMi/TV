@@ -1,6 +1,7 @@
 package com.xunlei.downloadlib.parameter;
 
 public class P2spTaskParam {
+
     public String mCookie;
     public int mCreateMode;
     public String mFileName;
@@ -63,9 +64,6 @@ public class P2spTaskParam {
     }
 
     public boolean checkMemberVar() {
-        if (this.mFileName == null || this.mFilePath == null || this.mUrl == null || this.mCookie == null || this.mRefUrl == null || this.mUser == null || this.mPass == null) {
-            return false;
-        }
-        return true;
+        return this.mFileName != null && this.mFilePath != null && this.mUrl != null && this.mCookie != null && this.mRefUrl != null && this.mUser != null && this.mPass != null;
     }
 }

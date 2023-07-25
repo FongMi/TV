@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class XLTaskInfo implements Parcelable {
+
     public static final Creator<XLTaskInfo> CREATOR = new Creator<XLTaskInfo>() {
         @Override
         public XLTaskInfo createFromParcel(Parcel parcel) {
@@ -15,6 +16,7 @@ public class XLTaskInfo implements Parcelable {
             return new XLTaskInfo[i];
         }
     };
+
     public int mAdditionalResCount;
     public long mAdditionalResPeerBytes;
     public long mAdditionalResPeerSpeed;
@@ -41,39 +43,7 @@ public class XLTaskInfo implements Parcelable {
     public long mTaskId;
     public int mTaskStatus;
 
-    public int describeContents() {
-        return 0;
-    }
-
     public XLTaskInfo() {
-    }
-
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeLong(this.mTaskId);
-        parcel.writeString(this.mFileName);
-        parcel.writeInt(this.mInfoLen);
-        parcel.writeInt(this.mTaskStatus);
-        parcel.writeInt(this.mErrorCode);
-        parcel.writeLong(this.mFileSize);
-        parcel.writeLong(this.mDownloadSize);
-        parcel.writeLong(this.mDownloadSpeed);
-        parcel.writeInt(this.mQueryIndexStatus);
-        parcel.writeString(this.mCid);
-        parcel.writeString(this.mGcid);
-        parcel.writeLong(this.mOriginSpeed);
-        parcel.writeLong(this.mOriginRecvBytes);
-        parcel.writeLong(this.mP2SSpeed);
-        parcel.writeLong(this.mP2SRecvBytes);
-        parcel.writeLong(this.mP2PSpeed);
-        parcel.writeLong(this.mP2PRecvBytes);
-        parcel.writeInt(this.mAdditionalResCount);
-        parcel.writeInt(this.mAdditionalResType);
-        parcel.writeLong(this.mAdditionalResVipSpeed);
-        parcel.writeLong(this.mAdditionalResVipRecvBytes);
-        parcel.writeLong(this.mAdditionalResPeerSpeed);
-        parcel.writeLong(this.mAdditionalResPeerBytes);
-        parcel.writeLong(this.mScdnSpeed);
-        parcel.writeLong(this.mScdnRecvBytes);
     }
 
     public XLTaskInfo(Parcel parcel) {
@@ -102,5 +72,37 @@ public class XLTaskInfo implements Parcelable {
         this.mAdditionalResPeerBytes = parcel.readLong();
         this.mScdnSpeed = parcel.readLong();
         this.mScdnRecvBytes = parcel.readLong();
+    }
+
+    public int describeContents() {
+        return 0;
+    }
+
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeLong(this.mTaskId);
+        parcel.writeString(this.mFileName);
+        parcel.writeInt(this.mInfoLen);
+        parcel.writeInt(this.mTaskStatus);
+        parcel.writeInt(this.mErrorCode);
+        parcel.writeLong(this.mFileSize);
+        parcel.writeLong(this.mDownloadSize);
+        parcel.writeLong(this.mDownloadSpeed);
+        parcel.writeInt(this.mQueryIndexStatus);
+        parcel.writeString(this.mCid);
+        parcel.writeString(this.mGcid);
+        parcel.writeLong(this.mOriginSpeed);
+        parcel.writeLong(this.mOriginRecvBytes);
+        parcel.writeLong(this.mP2SSpeed);
+        parcel.writeLong(this.mP2SRecvBytes);
+        parcel.writeLong(this.mP2PSpeed);
+        parcel.writeLong(this.mP2PRecvBytes);
+        parcel.writeInt(this.mAdditionalResCount);
+        parcel.writeInt(this.mAdditionalResType);
+        parcel.writeLong(this.mAdditionalResVipSpeed);
+        parcel.writeLong(this.mAdditionalResVipRecvBytes);
+        parcel.writeLong(this.mAdditionalResPeerSpeed);
+        parcel.writeLong(this.mAdditionalResPeerBytes);
+        parcel.writeLong(this.mScdnSpeed);
+        parcel.writeLong(this.mScdnRecvBytes);
     }
 }

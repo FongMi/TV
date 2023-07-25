@@ -1,6 +1,7 @@
 package com.xunlei.downloadlib.parameter;
 
 public class CIDTaskParam {
+
     public String mBcid;
     public String mCid;
     public int mCreateMode;
@@ -54,9 +55,6 @@ public class CIDTaskParam {
     }
 
     public boolean checkMemberVar() {
-        if (this.mCid == null || this.mGcid == null || this.mBcid == null || this.mFilePath == null || this.mFileName == null) {
-            return false;
-        }
-        return true;
+        return this.mCid != null && this.mGcid != null && this.mBcid != null && this.mFilePath != null && this.mFileName != null;
     }
 }

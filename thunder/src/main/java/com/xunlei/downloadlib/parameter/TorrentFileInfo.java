@@ -1,6 +1,7 @@
 package com.xunlei.downloadlib.parameter;
 
 public class TorrentFileInfo {
+
     public int mFileIndex;
     public String mFileName;
     public long mFileSize;
@@ -9,6 +10,5 @@ public class TorrentFileInfo {
     public String playUrl;
     public String hash;
     public String torrentPath;
-
     public boolean isSelected;
 }

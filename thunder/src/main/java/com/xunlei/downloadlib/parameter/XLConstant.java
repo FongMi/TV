@@ -2,13 +2,6 @@ package com.xunlei.downloadlib.parameter;
 
 public class XLConstant {
 
-    public static class QuickInfoState {
-        public static final int QI_FAILED = 3;
-        public static final int QI_FINISH = 2;
-        public static final int QI_STOP = 0;
-        public static final int QI_TRY = 1;
-    }
-
     public enum XLCreateTaskMode {
         NEW_TASK,
         CONTINUE_TASK
@@ -21,11 +14,42 @@ public class XLConstant {
         GDHS_ERROR
     }
 
+    public enum XLManagerStatus {
+        MANAGER_UNINIT,
+        MANAGER_INIT_FAIL,
+        MANAGER_RUNNING
+    }
+
+    public enum XLNetWorkCarrier {
+        NWC_Unknow,
+        NWC_CMCC,
+        NWC_CU,
+        NWC_CT
+    }
+
+    public enum XLQueryIndexStatus {
+        QIS_UNQUERY,
+        QIS_QUERYING,
+        QIS_QUERY_HAVE_INFO,
+        QIS_QUERY_HAVENT_INFO
+    }
+
+    public enum XLResStrategy {
+        RUS_PRIOR_USE
+    }
+
+    public static class QuickInfoState {
+        public static final int QI_FAILED = 3;
+        public static final int QI_FINISH = 2;
+        public static final int QI_STOP = 0;
+        public static final int QI_TRY = 1;
+    }
+
     public static class XLErrorCode {
-        public static final int ADD_RESOURCE_ERROR = 9122;//添加资源错误
-        public static final int ALREADY_INIT = 9101;//已经初始化
-        public static final int APPKEY_CHECKER_ERROR = 9901;//key 检查错误
-        public static final int APPNAME_APPKEY_ERROR = 9116;//app name key错误
+        public static final int ADD_RESOURCE_ERROR = 9122;
+        public static final int ALREADY_INIT = 9101;
+        public static final int APPKEY_CHECKER_ERROR = 9901;
+        public static final int APPNAME_APPKEY_ERROR = 9116;
         public static final int ASYN_FILE_E_BASE = 111300;
         public static final int ASYN_FILE_E_EMPTY_FILE = 111305;
         public static final int ASYN_FILE_E_FILE_CLOSING = 111308;
@@ -35,22 +59,22 @@ public class XLConstant {
         public static final int ASYN_FILE_E_OP_BUSY = 111302;
         public static final int ASYN_FILE_E_OP_NONE = 111301;
         public static final int ASYN_FILE_E_TOO_MUCH_DATA = 111307;
-        public static final int BAD_DIR_PATH = 111083;//错误的目录路径
+        public static final int BAD_DIR_PATH = 111083;
         public static final int BT_SUB_TASK_NOT_SELECT = 9306;
-        public static final int BUFFER_OVERFLOW = 111039;//缓冲区溢出
+        public static final int BUFFER_OVERFLOW = 111039;
         public static final int COMMON_ERRCODE_BASE = 111024;
         public static final int CONF_MGR_ERRCODE_BASE = 111159;
         public static final int CONTINUE_NO_NAME = 9115;
         public static final int CORRECT_CDN_ERROR = 111180;
         public static final int CORRECT_TIMES_TOO_MUCH = 111179;
         public static final int CREATE_FILE_FAIL = 111139;
-        public static final int CREATE_THREAD_ERROR = 9117;//创建线程错误
+        public static final int CREATE_THREAD_ERROR = 9117;
         public static final int DATA_MGR_ERRCODE_BASE = 111119;
-        public static final int DISK_FULL = 9110;//磁盘已满
+        public static final int DISK_FULL = 9110;
         public static final int DISPATCHER_ERRCODE_BASE = 111118;
-        public static final int DNS_INVALID_ADDR = 111078;//DNS无效地址
+        public static final int DNS_INVALID_ADDR = 111078;
         public static final int DNS_NO_SERVER = 111077;
-        public static final int DOWNLOAD_MANAGER_ERROR = 9900;//下载管理器错误
+        public static final int DOWNLOAD_MANAGER_ERROR = 9900;
         public static final int DYNAMIC_PARAM_FAIL = 9114;
         public static final int ERROR_INVALID_INADDR = 111050;
         public static final int ERR_DPLAY_ALL_SEND_COMPLETE = 118000;
@@ -98,14 +122,14 @@ public class XLConstant {
         public static final int FILE_CFG_TRY_FIX = 111129;
         public static final int FILE_CFG_WRITE_ERROR = 111133;
         public static final int FILE_CREATING = 111145;
-        public static final int FILE_EXISTED = 9109;//文件已存在
-        public static final int FILE_INVALID_PARA = 111144;//文件无效参数
-        public static final int FILE_NAME_TOO_LONG = 9125;//文件名太长
-        public static final int FILE_NOT_EXIST = 111143;//文件不存在
-        public static final int FILE_PATH_TOO_LONG = 111120;//文件路径太长
-        public static final int FILE_SIZE_NOT_BELIEVE = 111141;//文件大小不可信
-        public static final int FILE_SIZE_TOO_SMALL = 111142;//文件太小
-        public static final int FILE_TOO_BIG = 111086;//文件太大
+        public static final int FILE_EXISTED = 9109;
+        public static final int FILE_INVALID_PARA = 111144;
+        public static final int FILE_NAME_TOO_LONG = 9125;
+        public static final int FILE_NOT_EXIST = 111143;
+        public static final int FILE_PATH_TOO_LONG = 111120;
+        public static final int FILE_SIZE_NOT_BELIEVE = 111141;
+        public static final int FILE_SIZE_TOO_SMALL = 111142;
+        public static final int FILE_TOO_BIG = 111086;
         public static final int FIL_INFO_INVALID_DATA = 111146;
         public static final int FIL_INFO_RECVED_DATA = 111147;
         public static final int FULL_PATH_NAME_OCCUPIED = 9128;
@@ -114,7 +138,7 @@ public class XLConstant {
         public static final int HTTP_HUB_CLIENT_E_BASE = 115100;
         public static final int HTTP_SERVER_NOT_START = 9400;
         public static final int INDEX_NOT_READY = 9303;
-        public static final int INSUFFICIENT_DISK_SPACE = 111085;//磁盘空间不足
+        public static final int INSUFFICIENT_DISK_SPACE = 111085;
         public static final int INVALID_ARGUMENT = 111041;
         public static final int INVALID_ITERATOR = 111038;
         public static final int INVALID_SOCKET_DESCRIPTOR = 111048;
@@ -126,7 +150,7 @@ public class XLConstant {
         public static final int MAP_KEY_NOT_FOUND = 111037;
         public static final int MAP_UNINIT = 111035;
         public static final int NET_BROKEN_PIPE = 111170;
-        public static final int NET_CONNECTION_REFUSED = 111171;//拒绝的网络连接
+        public static final int NET_CONNECTION_REFUSED = 111171;
         public static final int NET_CONNECT_SSL_ERR = 111169;
         public static final int NET_NORMAL_CLOSE = 111175;
         public static final int NET_OP_CANCEL = 111173;
@@ -135,7 +159,7 @@ public class XLConstant {
         public static final int NET_UNKNOWN_ERROR = 111174;
         public static final int NOT_FULL_PATH_NAME = 9404;
         public static final int NOT_IMPLEMENT = 111057;
-        public static final int NO_ENOUGH_BUFFER = 9301;//缓冲区不足
+        public static final int NO_ENOUGH_BUFFER = 9301;
         public static final int NO_ERROR = 9000;
         public static final int ONE_PATH_LEVEL_NAME_TOO_LONG = 9126;
         public static final int OPEN_FILE_ERR = 111128;
@@ -163,21 +187,21 @@ public class XLConstant {
         public static final int SETTINGS_ERR_LIST_EMPTY = 111166;
         public static final int SETTINGS_ERR_UNKNOWN = 111160;
         public static final int TARGET_THREAD_STOPING = 111025;
-        public static final int TASK_ALREADY_EXIST = 9103;//已经存在
-        public static final int TASK_ALREADY_RUNNING = 9106;//已经运行
-        public static final int TASK_ALREADY_STOPPED = 9105;//已停止
-        public static final int TASK_CONTROL_STRATEGY = 9501;//控制策略
-        public static final int TASK_FAILURE_ALL_SUBTASK_FAILED = 114009;//加载字幕失败
+        public static final int TASK_ALREADY_EXIST = 9103;
+        public static final int TASK_ALREADY_RUNNING = 9106;
+        public static final int TASK_ALREADY_STOPPED = 9105;
+        public static final int TASK_CONTROL_STRATEGY = 9501;
+        public static final int TASK_FAILURE_ALL_SUBTASK_FAILED = 114009;
         public static final int TASK_FAILURE_BTHUB_NO_RECORD = 114008;
         public static final int TASK_FAILURE_CANNOT_START_SUBTASK = 114003;
         public static final int TASK_FAILURE_EMULE_NO_RECORD = 114101;
-        public static final int TASK_FAILURE_GET_TORRENT_FAILED = 114006;//任务失败，侵权
+        public static final int TASK_FAILURE_GET_TORRENT_FAILED = 114006;
         public static final int TASK_FAILURE_NO_DATA_PIPE = 111136;
-        public static final int TASK_FAILURE_PARSE_TORRENT_FAILED = 114005;//任务分析失败，侵权
+        public static final int TASK_FAILURE_PARSE_TORRENT_FAILED = 114005;
         public static final int TASK_FAILURE_PART_SUBTASK_FAILED = 114011;
         public static final int TASK_FAILURE_QUERY_BT_HUB_FAILED = 114004;
         public static final int TASK_FAILURE_QUERY_EMULE_HUB_FAILED = 114001;
-        public static final int TASK_FAILURE_SAVE_TORRENT_FAILED = 114007;//任务保存失败，侵权
+        public static final int TASK_FAILURE_SAVE_TORRENT_FAILED = 114007;
         public static final int TASK_FAILURE_SUBTASK_FAILED = 114002;
         public static final int TASK_FAILURE_THEONLY_SUBTASK_FAILED = 114010;
         public static final int TASK_FAIL_LONG_TIME_NO_RECV_DATA = 111176;
@@ -197,53 +221,29 @@ public class XLConstant {
         public static final int TASK_TYPE_NOT_SUPPORT = 9121;
         public static final int TASK_UNKNOWN_ERROR = 9403;
         public static final int TASK_USE_TOO_MUCH_MEM = 111031;
-        public static final int THUNDER_URL_PARSE_ERROR = 9305;//网址URL解析错误
-        public static final int TOO_MUCH_TASK = 9111;//太多任务
-        public static final int TORRENT_IMCOMPLETE = 9304;//侵权
-        public static final int TORRENT_PARSE_ERROR = 9302;//解析错误
+        public static final int THUNDER_URL_PARSE_ERROR = 9305;
+        public static final int TOO_MUCH_TASK = 9111;
+        public static final int TORRENT_IMCOMPLETE = 9304;
+        public static final int TORRENT_PARSE_ERROR = 9302;
         public static final int URL_IS_TOO_LONG = 111047;
-        public static final int URL_PARSER_ERROR = 111046;//URL解析器错误
-        public static final int VIDEO_CACHE_FINISH = 9410;//视频缓存完成
+        public static final int URL_PARSER_ERROR = 111046;
+        public static final int VIDEO_CACHE_FINISH = 9410;
         public static final int WRITE_FILE_ERR = 111127;
     }
 
-    public enum XLManagerStatus {
-        MANAGER_UNINIT,
-        MANAGER_INIT_FAIL,
-        MANAGER_RUNNING
-    }
-
-    public enum XLNetWorkCarrier {
-        NWC_Unknow,
-        NWC_CMCC,
-        NWC_CU,
-        NWC_CT
-    }
-
     public static class XLOriginResState {
-        public static final int ORIGIN_RES_CHECKING = 1;//检查
-        public static final int ORIGIN_RES_DEATH_LINK = 3;//死亡链接
-        public static final int ORIGIN_RES_UNUSED = 0;//没用过
-        public static final int ORIGIN_RES_VALID_LINK = 2;//有效链接
-    }
-
-    public enum XLQueryIndexStatus {
-        QIS_UNQUERY,//取消查询
-        QIS_QUERYING,//查询
-        QIS_QUERY_HAVE_INFO,//查询信息
-        QIS_QUERY_HAVENT_INFO//查询拥有信息
-    }
-
-    public enum XLResStrategy {
-        RUS_PRIOR_USE//RUS事先使用
+        public static final int ORIGIN_RES_CHECKING = 1;
+        public static final int ORIGIN_RES_DEATH_LINK = 3;
+        public static final int ORIGIN_RES_UNUSED = 0;
+        public static final int ORIGIN_RES_VALID_LINK = 2;
     }
 
     public static class XLTaskStatus {
-        public static final int TASK_FAILED = 3;//失败
-        public static final int TASK_IDLE = 0;//空闲
-        public static final int TASK_RUNNING = 1;//下载中
-        public static final int TASK_STOPPED = 4;//停止中
-        public static final int TASK_SUCCESS = 2;//成功
+        public static final int TASK_FAILED = 3;
+        public static final int TASK_IDLE = 0;
+        public static final int TASK_RUNNING = 1;
+        public static final int TASK_STOPPED = 4;
+        public static final int TASK_SUCCESS = 2;
     }
 
     public static class XLTaskType {
