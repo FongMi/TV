@@ -27,10 +27,10 @@ import com.xunlei.downloadlib.parameter.XLTaskLocalUrl;
 public class XLDownloadManager {
 
     private final String TAG = XLDownloadManager.class.getSimpleName();
+    private final XLLoader loader;
 
     private XLConstant.XLManagerStatus state;
     private NetworkChangeReceiver receiver;
-    private final XLLoader loader;
     private Context context;
 
     public XLDownloadManager() {
