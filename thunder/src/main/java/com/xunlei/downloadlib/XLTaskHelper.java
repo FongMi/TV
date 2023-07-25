@@ -48,7 +48,7 @@ public class XLTaskHelper {
     public XLTaskHelper() {
         this.seq = new AtomicInteger(0);
         this.requestHeaders = new ArrayList<>();
-        this.downloadManager = XLDownloadManager.get();
+        this.downloadManager = new XLDownloadManager();
     }
 
     public void init(Context context, String a, String b) {
@@ -75,7 +75,7 @@ public class XLTaskHelper {
             if (code != XLConstant.XLErrorCode.NO_ERROR) return -1;
             fileName = getFileName.getFileName();
         }
-        if (url.startsWith("ftp://") || url.startsWith("http://") || url.startsWith("https://")) {
+        if (url.startsWith("ftp://")) {
             P2spTaskParam taskParam = new P2spTaskParam();
             taskParam.setCreateMode(1);
             taskParam.setFileName(fileName);
@@ -106,20 +106,18 @@ public class XLTaskHelper {
         return getTaskId.getTaskId();
     }
 
-    public void addHeader(String key, String str2) {
-        requestHeaders.add(Pair.create(key, str2));
+    public void addHeader(String key, String value) {
+        requestHeaders.add(Pair.create(key, value));
     }
 
     private Collection<Pair<String, String>> getHeaders() {
         return Collections.unmodifiableList(this.requestHeaders);
     }
 
-    private void addRequestHeadersToXlEngine(long j) {
-        if (downloadManager != null) {
-            for (Pair<String, String> pair : this.getHeaders()) {
-                if (!(pair.first == null || pair.second == null)) {
-                    downloadManager.setHttpHeaderProperty(j, pair.first, pair.second);
-                }
+    private void addRequestHeadersToXlEngine(long taskId) {
+        for (Pair<String, String> pair : this.getHeaders()) {
+            if (!(pair.first == null || pair.second == null)) {
+                downloadManager.setHttpHeaderProperty(taskId, pair.first, pair.second);
             }
         }
     }
@@ -217,9 +215,13 @@ public class XLTaskHelper {
         return taskInfo;
     }
 
-    public synchronized BtSubTaskDetail getBtSubTaskInfo(long taskId, int fileIndex) {
+    public synchronized BtSubTaskDetail getBtSubTaskInfo(long taskId, int index) {
         BtSubTaskDetail subTaskDetail = new BtSubTaskDetail();
-        downloadManager.getBtSubTaskInfo(taskId, fileIndex, subTaskDetail);
+        downloadManager.getBtSubTaskInfo(taskId, index, subTaskDetail);
         return subTaskDetail;
+    }
+
+    public void release() {
+        downloadManager.release();
     }
 }

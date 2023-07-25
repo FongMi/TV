@@ -6,6 +6,7 @@ import com.fongmi.android.tv.player.extractor.BiliBili;
 import com.fongmi.android.tv.player.extractor.Force;
 import com.fongmi.android.tv.player.extractor.JianPian;
 import com.fongmi.android.tv.player.extractor.TVBus;
+import com.fongmi.android.tv.player.extractor.Thunder;
 import com.fongmi.android.tv.player.extractor.Youtube;
 import com.fongmi.android.tv.player.extractor.ZLive;
 
@@ -30,6 +31,7 @@ public class Source {
         extractors.add(new BiliBili());
         extractors.add(new Force());
         extractors.add(new JianPian());
+        extractors.add(new Thunder());
         extractors.add(new TVBus());
         extractors.add(new Youtube());
         extractors.add(new ZLive());

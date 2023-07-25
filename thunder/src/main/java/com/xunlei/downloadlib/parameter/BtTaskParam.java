@@ -8,17 +8,6 @@ public class BtTaskParam {
     public int mSeqId;
     public String mTorrentPath;
 
-    public BtTaskParam() {
-    }
-
-    public BtTaskParam(String str, String str2, int i, int i2, int i3) {
-        this.mTorrentPath = str;
-        this.mFilePath = str2;
-        this.mMaxConcurrent = i;
-        this.mCreateMode = i2;
-        this.mSeqId = i3;
-    }
-
     public void setTorrentPath(String str) {
         this.mTorrentPath = str;
     }
@@ -37,9 +26,5 @@ public class BtTaskParam {
 
     public void setSeqId(int i) {
         this.mSeqId = i;
-    }
-
-    public boolean checkMemberVar() {
-        return this.mTorrentPath != null && this.mFilePath != null;
     }
 }
