@@ -1,0 +1,17 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdk 33
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 28
+    }
+}
+
+dependencies {
+    implementation 'androidx.preference:preference:1.2.0'
+}
+
+
+
