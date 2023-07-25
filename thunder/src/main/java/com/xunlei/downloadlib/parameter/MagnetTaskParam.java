@@ -1,6 +1,7 @@
 package com.xunlei.downloadlib.parameter;
 
 public class MagnetTaskParam {
+
     public String mFileName;
     public String mFilePath;
     public String mUrl;
@@ -26,12 +27,7 @@ public class MagnetTaskParam {
         this.mFilePath = str;
     }
 
-
-
     public boolean checkMemberVar() {
-        if (this.mFileName == null || this.mFilePath == null || this.mUrl == null) {
-            return false;
-        }
-        return true;
+        return this.mFileName != null && this.mFilePath != null && this.mUrl != null;
     }
 }

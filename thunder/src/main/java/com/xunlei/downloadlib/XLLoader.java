@@ -16,7 +16,11 @@ import com.xunlei.downloadlib.parameter.XLTaskInfoEx;
 import com.xunlei.downloadlib.parameter.XLTaskLocalUrl;
 
 class XLLoader {
-    private static final String TAG = "XLLoader";
+
+    public XLLoader() {
+        System.loadLibrary("xl_stat");
+        System.loadLibrary("xl_thunder_sdk");
+    }
 
     public native boolean XYVodSDK_getSdkEnabled();
 
@@ -157,10 +161,4 @@ class XLLoader {
     public native int switchOriginToAllResDownload(long j);
 
     public native int unInit();
-
-    public XLLoader() {
-        System.loadLibrary("xl_stat");
-        System.loadLibrary("xl_thunder_sdk");
-    }
-
 }

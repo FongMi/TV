@@ -1,6 +1,7 @@
 package com.xunlei.downloadlib.parameter;
 
 public class ServerResourceParam {
+
     public String mCookie;
     public String mRefUrl;
     public int mResType;
@@ -36,9 +37,6 @@ public class ServerResourceParam {
     }
 
     public boolean checkMemberVar() {
-        if (this.mUrl == null || this.mRefUrl == null || this.mCookie == null) {
-            return false;
-        }
-        return true;
+        return this.mUrl != null && this.mRefUrl != null && this.mCookie != null;
     }
 }

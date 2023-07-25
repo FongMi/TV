@@ -8,7 +8,6 @@ import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
 
-import com.xunlei.downloadlib.android.XLLog;
 import com.xunlei.downloadlib.android.XLUtil;
 import com.xunlei.downloadlib.parameter.BtIndexSet;
 import com.xunlei.downloadlib.parameter.BtSubTaskDetail;
@@ -44,12 +43,13 @@ import java.util.TimerTask;
 import java.util.UUID;
 
 public class XLDownloadManager {
+
     private static final int GET_GUID_FIRST_TIME = 5000;
     private static final int GET_GUID_INTERVAL_TIME = 60000;
     private static final int QUERY_GUID_COUNT = 5;
     private static final String TAG = "XLDownloadManager";
-    private static boolean mAllowExecution = true;
     public static XLConstant.XLManagerStatus mDownloadManagerState = XLConstant.XLManagerStatus.MANAGER_UNINIT;
+    private static boolean mAllowExecution = true;
     private static Map<String, Object> mErrcodeStringMap = null;
     private static XLDownloadManager mInstance = null;
     private static boolean mIsLoadErrcodeMsg = false;
@@ -62,7 +62,16 @@ public class XLDownloadManager {
     private int mQueryGuidCount;
     private NetworkChangeReceiver mReceiver;
 
-    static /* synthetic */ int access$208(XLDownloadManager xLDownloadManager) {
+    private XLDownloadManager() {
+        this.mLoader = null;
+        this.mContext = null;
+        this.mReceiver = null;
+        this.mAppkeyChecker = null;
+        this.mQueryGuidCount = 0;
+        this.mLoader = new XLLoader();
+    }
+
+    static int access$208(XLDownloadManager xLDownloadManager) {
         int i = xLDownloadManager.mQueryGuidCount;
         xLDownloadManager.mQueryGuidCount = i + 1;
         return i;
@@ -79,124 +88,31 @@ public class XLDownloadManager {
         return xLDownloadManager;
     }
 
-    private static synchronized XLDownloadManager getInstance(String str) {
-        XLDownloadManager xLDownloadManager;
-        synchronized (XLDownloadManager.class) {
-            if (mInstance == null) {
-                mInstance = new XLDownloadManager(str);
-            }
-            xLDownloadManager = mInstance;
-        }
-        return xLDownloadManager;
-    }
-
-    public static synchronized XLDownloadManager getInstance(Context context) {
-        XLDownloadManager xLDownloadManager;
-        synchronized (XLDownloadManager.class) {
-            if (mInstance == null) {
-                mInstance = new XLDownloadManager(context);
-            }
-            xLDownloadManager = mInstance;
-        }
-        return xLDownloadManager;
-    }
-
-    private XLDownloadManager() {
-        this.mLoader = null;
-        this.mContext = null;
-        this.mReceiver = null;
-        this.mAppkeyChecker = null;
-        this.mQueryGuidCount = 0;
-        this.mLoader = new XLLoader();
-        XLLog.init(new File(Environment.getExternalStorageDirectory().getPath(), "xunlei_ds_log.ini").getPath());
-    }
-
-    private XLDownloadManager(String str) {
-        this.mLoader = null;
-        this.mContext = null;
-        this.mReceiver = null;
-        this.mAppkeyChecker = null;
-        this.mQueryGuidCount = 0;
-        this.mLoader = new XLLoader();
-        XLLog.init(new File(Environment.getExternalStorageDirectory().getPath(), "xunlei_ds_log.ini").getPath());
-    }
-
-    private XLDownloadManager(Context context) {
-        this.mLoader = null;
-        this.mContext = null;
-        this.mReceiver = null;
-        this.mAppkeyChecker = null;
-        this.mQueryGuidCount = 0;
-        this.mLoader = new XLLoader();
-        XLLog.init(new File(Environment.getExternalStorageDirectory().getPath(), "xunlei_ds_log.ini").getPath());
-    }
-
     public XLConstant.XLManagerStatus getManagerStatus() {
         return mDownloadManagerState;
     }
 
-    private class NetworkChangeHandlerThread implements Runnable {
-        private boolean m_allow_execution = true;
-        private Context m_context = null;
-        private XLLoader m_loader = null;
-
-        public NetworkChangeHandlerThread(Context context, XLLoader xLLoader, boolean z) {
-            this.m_context = context;
-            this.m_loader = xLLoader;
-            this.m_allow_execution = z;
-        }
-
-        public void run() {
-            if (this.m_allow_execution) {
-                int networkType = XLUtil.getNetworkType(this.m_context);
-                XLLog.d(XLDownloadManager.TAG, "NetworkChangeHandlerThread nettype=" + networkType);
-                XLDownloadManager.this.notifyNetWorkType(networkType, this.m_loader);
-                String bssid = XLUtil.getBSSID(this.m_context);
-                XLLog.d(XLDownloadManager.TAG, "NetworkChangeHandlerThread bssid=" + bssid);
-                XLDownloadManager.this.notifyWifiBSSID(bssid, this.m_loader);
-                XLUtil.NetWorkCarrier netWorkCarrier = XLUtil.getNetWorkCarrier(this.m_context);
-                XLLog.d(XLDownloadManager.TAG, "NetworkChangeHandlerThread NetWorkCarrier=" + netWorkCarrier);
-                XLDownloadManager.this.notifyNetWorkCarrier(netWorkCarrier.ordinal());
-            }
-        }
-    }
-
-    private class NetworkChangeReceiver extends BroadcastReceiver {
-        private static final String TAG = "TAG_DownloadReceiver";
-
-        public NetworkChangeReceiver() {
-        }
-
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (action != null && action.equals("android.net.conn.CONNECTIVITY_CHANGE")) {
-                XLDownloadManager xLDownloadManager = XLDownloadManager.this;
-                new Thread(new NetworkChangeHandlerThread(context, xLDownloadManager.mLoader, XLDownloadManager.mAllowExecution)).start();
-            }
-        }
-    }
-
     private void doMonitorNetworkChange() {
-        XLLog.i(TAG, "doMonitorNetworkChange()");
+        Log.i(TAG, "doMonitorNetworkChange()");
         if (this.mContext != null && this.mReceiver == null) {
             this.mReceiver = new NetworkChangeReceiver();
             IntentFilter intentFilter = new IntentFilter();
             intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
-            XLLog.i(TAG, "register Receiver");
+            Log.i(TAG, "register Receiver");
             this.mContext.registerReceiver(this.mReceiver, intentFilter);
         }
     }
 
     private void undoMonitorNetworkChange() {
         NetworkChangeReceiver networkChangeReceiver;
-        XLLog.i(TAG, "undoMonitorNetworkChange()");
+        Log.i(TAG, "undoMonitorNetworkChange()");
         Context context = this.mContext;
         if (context != null && (networkChangeReceiver = this.mReceiver) != null) {
             try {
                 context.unregisterReceiver(networkChangeReceiver);
-                XLLog.i(TAG, "unregister Receiver");
+                Log.i(TAG, "unregister Receiver");
             } catch (IllegalArgumentException unused) {
-                XLLog.e(TAG, "Receiver not registered");
+                Log.e(TAG, "Receiver not registered");
             }
             this.mReceiver = null;
         }
@@ -225,17 +141,17 @@ public class XLDownloadManager {
                 this.mContext = context;
                 mAllowExecution = z;
                 if (mDownloadManagerState == XLConstant.XLManagerStatus.MANAGER_RUNNING) {
-                    XLLog.i(TAG, "XLDownloadManager is already init");
+                    Log.i(TAG, "XLDownloadManager is already init");
                     return XLConstant.XLErrorCode.DOWNLOAD_MANAGER_ERROR;
                 }
                 if (this.mLoader != null) {
                     XLAppKeyChecker xLAppKeyChecker = new XLAppKeyChecker(context, initParam.mAppKey);
                     this.mAppkeyChecker = xLAppKeyChecker;
                     if (!xLAppKeyChecker.verify()) {
-                        XLLog.i(TAG, "appKey check failed");
+                        Log.i(TAG, "appKey check failed");
                         return XLConstant.XLErrorCode.APPKEY_CHECKER_ERROR;
                     }
-                    XLLog.i(TAG, "appKey check successful");
+                    Log.i(TAG, "appKey check successful");
                     i = this.mLoader.init(this.mAppkeyChecker.getSoAppKey(), "com.android.providers.downloads", initParam.mAppVersion, "", getPeerid(), getGuid(), initParam.mStatSavePath, initParam.mStatCfgSavePath, mAllowExecution ? XLUtil.getNetworkType(context) : 0, initParam.mPermissionLevel, initParam.mQueryConfOnInit);
                     if (i != 9000) {
                         mDownloadManagerState = XLConstant.XLManagerStatus.MANAGER_INIT_FAIL;
@@ -254,7 +170,7 @@ public class XLDownloadManager {
     public synchronized int uninit() {
         int i = XLConstant.XLErrorCode.DOWNLOAD_MANAGER_ERROR;
         if (mRunningRefCount != 0) {
-            XLLog.i(TAG, "some function of XLDownloadManager is running, uninit failed!");
+            Log.i(TAG, "some function of XLDownloadManager is running, uninit failed!");
             return XLConstant.XLErrorCode.DOWNLOAD_MANAGER_ERROR;
         }
         if (!(mDownloadManagerState == XLConstant.XLManagerStatus.MANAGER_UNINIT || this.mLoader == null)) {
@@ -274,7 +190,7 @@ public class XLDownloadManager {
             try {
                 return xLLoader.notifyNetWorkType(i);
             } catch (Error e) {
-                XLLog.e(TAG, "notifyNetWorkType failed," + e.getMessage());
+                Log.e(TAG, "notifyNetWorkType failed," + e.getMessage());
             }
         }
         return XLConstant.XLErrorCode.DOWNLOAD_MANAGER_ERROR;
@@ -339,7 +255,7 @@ public class XLDownloadManager {
         XLLoader xLLoader;
         increRefCount();
         int stopTask = (mDownloadManagerState != XLConstant.XLManagerStatus.MANAGER_RUNNING || (xLLoader = this.mLoader) == null) ? XLConstant.XLErrorCode.DOWNLOAD_MANAGER_ERROR : xLLoader.stopTask(j);
-        XLLog.i(TAG, "XLStopTask()----- ret=" + stopTask);
+        Log.i(TAG, "XLStopTask()----- ret=" + stopTask);
         decreRefCount();
         return stopTask;
     }
@@ -348,7 +264,7 @@ public class XLDownloadManager {
         XLLoader xLLoader;
         increRefCount();
         int stopTaskWithReason = (mDownloadManagerState != XLConstant.XLManagerStatus.MANAGER_RUNNING || (xLLoader = this.mLoader) == null) ? XLConstant.XLErrorCode.DOWNLOAD_MANAGER_ERROR : xLLoader.stopTaskWithReason(j, i);
-        XLLog.i(TAG, "XLStopTask()----- ret=" + stopTaskWithReason);
+        Log.i(TAG, "XLStopTask()----- ret=" + stopTaskWithReason);
         decreRefCount();
         return stopTaskWithReason;
     }
@@ -382,7 +298,7 @@ public class XLDownloadManager {
         if (serverResourceParam != null && serverResourceParam.checkMemberVar()) {
             increRefCount();
             if (mDownloadManagerState == XLConstant.XLManagerStatus.MANAGER_RUNNING && this.mLoader != null) {
-                XLLog.i(TAG, "respara.mUrl=" + serverResourceParam.mUrl);
+                Log.i(TAG, "respara.mUrl=" + serverResourceParam.mUrl);
                 i = this.mLoader.addServerResource(j, serverResourceParam.mUrl, serverResourceParam.mRefUrl, serverResourceParam.mCookie, serverResourceParam.mResType, serverResourceParam.mStrategy);
             }
             decreRefCount();
@@ -406,21 +322,21 @@ public class XLDownloadManager {
     }
 
     public int addScdnResource(long j, ScdnResourceParam scdnResourceParam) {
-        XLLog.d(TAG, "XLDownloadManager::addScdnResource beg, taskId=[" + j + "]");
+        Log.d(TAG, "XLDownloadManager::addScdnResource beg, taskId=[" + j + "]");
         if (scdnResourceParam == null || scdnResourceParam.unixPath.isEmpty()) {
             return XLConstant.XLErrorCode.INVALID_ARGUMENT;
         }
         if (this.mLoader == null) {
-            XLLog.e(TAG, "XLDownloadManager::addScdnResource mLoader is null, taskId=[" + j + "]");
+            Log.e(TAG, "XLDownloadManager::addScdnResource mLoader is null, taskId=[" + j + "]");
             return XLConstant.XLErrorCode.DOWNLOAD_MANAGER_ERROR;
         } else if (mDownloadManagerState != XLConstant.XLManagerStatus.MANAGER_RUNNING) {
-            XLLog.e(TAG, "XLDownloadManager::addScdnResource not running, taskId=[" + j + "]");
+            Log.e(TAG, "XLDownloadManager::addScdnResource not running, taskId=[" + j + "]");
             return XLConstant.XLErrorCode.DOWNLOAD_MANAGER_ERROR;
         } else {
             increRefCount();
             int addScdnResource = this.mLoader.addScdnResource(j, scdnResourceParam.unixPath);
             decreRefCount();
-            XLLog.d(TAG, "XLDownloadManager::addScdnResource end, ret=[" + addScdnResource + "]");
+            Log.d(TAG, "XLDownloadManager::addScdnResource end, ret=[" + addScdnResource + "]");
             return addScdnResource;
         }
     }
@@ -480,7 +396,7 @@ public class XLDownloadManager {
             try {
                 return xLLoader.setNotifyWifiBSSID(str);
             } catch (Error e) {
-                XLLog.e(TAG, "setNotifyWifiBSSID failed," + e.getMessage());
+                Log.e(TAG, "setNotifyWifiBSSID failed," + e.getMessage());
             }
         }
         return XLConstant.XLErrorCode.DOWNLOAD_MANAGER_ERROR;
@@ -546,12 +462,12 @@ public class XLDownloadManager {
 
     private String getPeerid() {
         String peerid;
-        if (mAllowExecution && (peerid = XLUtil.getPeerid(this.mContext)) != null) {
+        if (mAllowExecution && (peerid = XLUtil.getPeerId(this.mContext)) != null) {
             return peerid;
         }
 //        return "08318B49CB04004V";
         String uuid = PreferenceMgr.getString(mContext, "phoneId5", null);
-        if(uuid == null || uuid.isEmpty()) {
+        if (uuid == null || uuid.isEmpty()) {
             uuid = UUID.randomUUID().toString().replace("-", "");
             uuid = uuid.substring(0, 12).toUpperCase() + "004V";
             Log.d(TAG, "getPeerid3: " + uuid);
@@ -567,7 +483,7 @@ public class XLDownloadManager {
         new XLUtil.GuidInfo();
         XLUtil.GuidInfo generateGuid = XLUtil.generateGuid(this.mContext);
         if (generateGuid.mType != XLUtil.GUID_TYPE.ALL) {
-            XLLog.i(TAG, "Start the GetGuidTimer");
+            Log.i(TAG, "Start the GetGuidTimer");
             startGetGuidTimer();
         }
         return generateGuid.mGuid;
@@ -606,7 +522,7 @@ public class XLDownloadManager {
             timer.cancel();
             this.mGetGuidTimer.purge();
             this.mGetGuidTimer = null;
-            XLLog.i(TAG, "stopGetGuidTimer");
+            Log.i(TAG, "stopGetGuidTimer");
         }
         TimerTask timerTask = this.mGetGuidTimerTask;
         if (timerTask instanceof TimerTask) {
@@ -761,31 +677,31 @@ public class XLDownloadManager {
 
     public int btAddServerResource(long j, int i, ServerResourceParam serverResourceParam) {
         if (serverResourceParam == null) {
-            XLLog.e(TAG, "btAddServerResource serverResPara is null, task=[" + j + ":" + i + "]");
+            Log.e(TAG, "btAddServerResource serverResPara is null, task=[" + j + ":" + i + "]");
             return 9112;
         }
-        XLLog.d(TAG, "btAddServerResource beg, task=[" + j + ":" + i + "] mUrl=[" + serverResourceParam.mUrl + "] mRefUrl=[" + serverResourceParam.mRefUrl + "] mCookie=[" + serverResourceParam.mCookie + "] mResType=[" + serverResourceParam.mResType + "] mStrategy=[" + serverResourceParam.mStrategy + "]");
+        Log.d(TAG, "btAddServerResource beg, task=[" + j + ":" + i + "] mUrl=[" + serverResourceParam.mUrl + "] mRefUrl=[" + serverResourceParam.mRefUrl + "] mCookie=[" + serverResourceParam.mCookie + "] mResType=[" + serverResourceParam.mResType + "] mStrategy=[" + serverResourceParam.mStrategy + "]");
         if (!serverResourceParam.checkMemberVar()) {
-            XLLog.e(TAG, "btAddServerResource checkMemberVar failed, task=[" + j + ":" + i + "] mUrl=[" + serverResourceParam.mUrl + "] mRefUrl=[" + serverResourceParam.mRefUrl + "] mCookie=[" + serverResourceParam.mCookie + "]");
+            Log.e(TAG, "btAddServerResource checkMemberVar failed, task=[" + j + ":" + i + "] mUrl=[" + serverResourceParam.mUrl + "] mRefUrl=[" + serverResourceParam.mRefUrl + "] mCookie=[" + serverResourceParam.mCookie + "]");
             return 9112;
         }
         try {
             increRefCount();
             if (this.mLoader == null) {
-                XLLog.e(TAG, "btAddServerResource mLoader is null, task=[" + j + ":" + i + "]");
+                Log.e(TAG, "btAddServerResource mLoader is null, task=[" + j + ":" + i + "]");
                 return XLConstant.XLErrorCode.DOWNLOAD_MANAGER_ERROR;
             } else if (XLConstant.XLManagerStatus.MANAGER_RUNNING != mDownloadManagerState) {
-                XLLog.e(TAG, "btAddServerResource mDownloadManagerState is invaild, task=[" + j + ":" + i + "] mDownloadManagerState=[" + mDownloadManagerState + "]");
+                Log.e(TAG, "btAddServerResource mDownloadManagerState is invaild, task=[" + j + ":" + i + "] mDownloadManagerState=[" + mDownloadManagerState + "]");
                 decreRefCount();
                 return XLConstant.XLErrorCode.DOWNLOAD_MANAGER_ERROR;
             } else {
                 int btAddServerResource = this.mLoader.btAddServerResource(j, i, serverResourceParam.mUrl, serverResourceParam.mRefUrl, serverResourceParam.mCookie, serverResourceParam.mResType, serverResourceParam.mStrategy);
                 if (9000 != btAddServerResource) {
-                    XLLog.e(TAG, "btAddServerResource btAddServerResource failed, task=[" + j + ":" + i + "] errno=[" + btAddServerResource + "]");
+                    Log.e(TAG, "btAddServerResource btAddServerResource failed, task=[" + j + ":" + i + "] errno=[" + btAddServerResource + "]");
                     decreRefCount();
                     return btAddServerResource;
                 }
-                XLLog.d(TAG, "btAddServerResource end success, task=[" + j + ":" + i + "]");
+                Log.d(TAG, "btAddServerResource end success, task=[" + j + ":" + i + "]");
                 decreRefCount();
                 return 9000;
             }
@@ -796,31 +712,31 @@ public class XLDownloadManager {
 
     public int btAddPeerResource(long j, int i, PeerResourceParam peerResourceParam) {
         if (peerResourceParam == null) {
-            XLLog.e(TAG, "btAddPeerResource peerResPara is null, task=[" + j + ":" + i + "]");
+            Log.e(TAG, "btAddPeerResource peerResPara is null, task=[" + j + ":" + i + "]");
             return 9112;
         }
-        XLLog.d(TAG, "btAddPeerResource beg, task=[" + j + ":" + i + "] mPeerId=[" + peerResourceParam.mPeerId + "] mUserId=[" + peerResourceParam.mUserId + "] mJmpKey=[" + peerResourceParam.mJmpKey + "] mVipCdnAuth=[" + peerResourceParam.mVipCdnAuth + "] mInternalIp=[" + peerResourceParam.mInternalIp + "] mTcpPort=[" + peerResourceParam.mTcpPort + "] mUdpPort=[" + peerResourceParam.mUdpPort + "] mResLevel=[" + peerResourceParam.mResLevel + "] mResPriority=[" + peerResourceParam.mResPriority + "] mCapabilityFlag=[" + peerResourceParam.mCapabilityFlag + "] mResType=[" + peerResourceParam.mResType + "]");
+        Log.d(TAG, "btAddPeerResource beg, task=[" + j + ":" + i + "] mPeerId=[" + peerResourceParam.mPeerId + "] mUserId=[" + peerResourceParam.mUserId + "] mJmpKey=[" + peerResourceParam.mJmpKey + "] mVipCdnAuth=[" + peerResourceParam.mVipCdnAuth + "] mInternalIp=[" + peerResourceParam.mInternalIp + "] mTcpPort=[" + peerResourceParam.mTcpPort + "] mUdpPort=[" + peerResourceParam.mUdpPort + "] mResLevel=[" + peerResourceParam.mResLevel + "] mResPriority=[" + peerResourceParam.mResPriority + "] mCapabilityFlag=[" + peerResourceParam.mCapabilityFlag + "] mResType=[" + peerResourceParam.mResType + "]");
         if (!peerResourceParam.checkMemberVar()) {
-            XLLog.e(TAG, "btAddPeerResource peerResPara checkMemberVar failed, task=[" + j + ":" + i + "]");
+            Log.e(TAG, "btAddPeerResource peerResPara checkMemberVar failed, task=[" + j + ":" + i + "]");
             return 9112;
         }
         try {
             increRefCount();
             if (this.mLoader == null) {
-                XLLog.e(TAG, "btAddPeerResource mLoader is null, task=[" + j + ":" + i + "]");
+                Log.e(TAG, "btAddPeerResource mLoader is null, task=[" + j + ":" + i + "]");
                 return XLConstant.XLErrorCode.DOWNLOAD_MANAGER_ERROR;
             } else if (XLConstant.XLManagerStatus.MANAGER_RUNNING != mDownloadManagerState) {
-                XLLog.e(TAG, "btAddPeerResource mDownloadManagerState is invaild, task=[" + j + ":" + i + "] mDownloadManagerState=[" + mDownloadManagerState + "]");
+                Log.e(TAG, "btAddPeerResource mDownloadManagerState is invaild, task=[" + j + ":" + i + "] mDownloadManagerState=[" + mDownloadManagerState + "]");
                 decreRefCount();
                 return XLConstant.XLErrorCode.DOWNLOAD_MANAGER_ERROR;
             } else {
                 int btAddPeerResource = this.mLoader.btAddPeerResource(j, i, peerResourceParam.mPeerId, peerResourceParam.mUserId, peerResourceParam.mJmpKey, peerResourceParam.mVipCdnAuth, peerResourceParam.mInternalIp, peerResourceParam.mTcpPort, peerResourceParam.mUdpPort, peerResourceParam.mResLevel, peerResourceParam.mResPriority, peerResourceParam.mCapabilityFlag, peerResourceParam.mResType);
                 if (9000 != btAddPeerResource) {
-                    XLLog.e(TAG, "btAddPeerResource btAddPeerResource failed, task=[" + j + ":" + i + "] errno=[" + btAddPeerResource + "]");
+                    Log.e(TAG, "btAddPeerResource btAddPeerResource failed, task=[" + j + ":" + i + "] errno=[" + btAddPeerResource + "]");
                     decreRefCount();
                     return btAddPeerResource;
                 }
-                XLLog.d(TAG, "btAddPeerResource end success, task=[" + j + ":" + i + "]");
+                Log.d(TAG, "btAddPeerResource end success, task=[" + j + ":" + i + "]");
                 decreRefCount();
                 return 9000;
             }
@@ -839,7 +755,7 @@ public class XLDownloadManager {
 
     private void loadErrcodeString(Context context) {
         if (context == null) {
-            XLLog.e(TAG, "loadErrcodeString, context invalid");
+            Log.e(TAG, "loadErrcodeString, context invalid");
         } else {
             mErrcodeStringMap = XLUtil.parseJSONString(ErrorCodeToMsg.ErrCodeToMsg);
         }
@@ -854,7 +770,7 @@ public class XLDownloadManager {
             if (obj != null) {
                 str = obj.toString().trim();
             }
-            XLLog.i(TAG, "errcode:" + i + ", errcodeMsg:" + str);
+            Log.i(TAG, "errcode:" + i + ", errcodeMsg:" + str);
         }
         return str;
     }
@@ -900,61 +816,61 @@ public class XLDownloadManager {
     }
 
     public int setSpeedLimit(long j, long j2) {
-        XLLog.d(TAG, "debug: XLDownloadManager::setSpeedLimit beg, maxDownloadSpeed=[" + j + "] maxUploadSpeed=[" + j2 + "]");
+        Log.d(TAG, "debug: XLDownloadManager::setSpeedLimit beg, maxDownloadSpeed=[" + j + "] maxUploadSpeed=[" + j2 + "]");
         XLLoader xLLoader = this.mLoader;
         if (xLLoader == null) {
-            XLLog.e(TAG, "error: XLDownloadManager::setSpeedLimit mLoader is null, maxDownloadSpeed=[" + j + "] maxUploadSpeed=[" + j2 + "] ret=[" + XLConstant.XLErrorCode.DOWNLOAD_MANAGER_ERROR + "]");
+            Log.e(TAG, "error: XLDownloadManager::setSpeedLimit mLoader is null, maxDownloadSpeed=[" + j + "] maxUploadSpeed=[" + j2 + "] ret=[" + XLConstant.XLErrorCode.DOWNLOAD_MANAGER_ERROR + "]");
             return XLConstant.XLErrorCode.DOWNLOAD_MANAGER_ERROR;
         }
         int speedLimit = xLLoader.setSpeedLimit(j, j2);
-        XLLog.d(TAG, "debug: XLDownloadManager::setSpeedLimit end, maxDownloadSpeed=[" + j + "] maxUploadSpeed=[" + j2 + "] ret=[" + speedLimit + "]");
+        Log.d(TAG, "debug: XLDownloadManager::setSpeedLimit end, maxDownloadSpeed=[" + j + "] maxUploadSpeed=[" + j2 + "] ret=[" + speedLimit + "]");
         return speedLimit;
     }
 
     public int setBtPriorSubTask(long j, int i) {
-        XLLog.d(TAG, "XLDownloadManager::setBtPriorSubTask beg, taskId=[" + j + "] fileIndex=[" + i + "]");
+        Log.d(TAG, "XLDownloadManager::setBtPriorSubTask beg, taskId=[" + j + "] fileIndex=[" + i + "]");
         XLLoader xLLoader = this.mLoader;
         if (xLLoader == null) {
-            XLLog.e(TAG, "XLDownloadManager::setBtPriorSubTask mLoader is null, taskId=[" + j + "] fileIndex=[" + i + "]");
+            Log.e(TAG, "XLDownloadManager::setBtPriorSubTask mLoader is null, taskId=[" + j + "] fileIndex=[" + i + "]");
             return XLConstant.XLErrorCode.DOWNLOAD_MANAGER_ERROR;
         }
         int btPriorSubTask = xLLoader.setBtPriorSubTask(j, i);
         if (9000 != btPriorSubTask) {
-            XLLog.e(TAG, "XLDownloadManager::setBtPriorSubTask end, taskId=[" + j + "] fileIndex=[" + i + "] ret=[" + btPriorSubTask + "]");
+            Log.e(TAG, "XLDownloadManager::setBtPriorSubTask end, taskId=[" + j + "] fileIndex=[" + i + "] ret=[" + btPriorSubTask + "]");
             return btPriorSubTask;
         }
-        XLLog.d(TAG, " XLDownloadManager::setBtPriorSubTask end, taskId=[" + j + "] fileIndex=[" + i + "]");
+        Log.d(TAG, " XLDownloadManager::setBtPriorSubTask end, taskId=[" + j + "] fileIndex=[" + i + "]");
         return 9000;
     }
 
     public int getMaxDownloadSpeed(MaxDownloadSpeedParam maxDownloadSpeedParam) {
         XLLoader xLLoader = this.mLoader;
         if (xLLoader == null) {
-            XLLog.e(TAG, "XLDownloadManager::getMaxDownloadSpeed mLoader is null");
+            Log.e(TAG, "XLDownloadManager::getMaxDownloadSpeed mLoader is null");
             return XLConstant.XLErrorCode.DOWNLOAD_MANAGER_ERROR;
         }
         int maxDownloadSpeed = xLLoader.getMaxDownloadSpeed(maxDownloadSpeedParam);
         if (9000 != maxDownloadSpeed) {
-            XLLog.e(TAG, "XLDownloadManager::getMaxDownloadSpeed end, ret=[" + maxDownloadSpeed + "]");
+            Log.e(TAG, "XLDownloadManager::getMaxDownloadSpeed end, ret=[" + maxDownloadSpeed + "]");
             return maxDownloadSpeed;
         }
-        XLLog.d(TAG, "XLDownloadManager::getMaxDownloadSpeed end, speed=[" + maxDownloadSpeedParam.mSpeed + "] ret=[" + maxDownloadSpeed + "]");
+        Log.d(TAG, "XLDownloadManager::getMaxDownloadSpeed end, speed=[" + maxDownloadSpeedParam.mSpeed + "] ret=[" + maxDownloadSpeed + "]");
         return maxDownloadSpeed;
     }
 
     public int statExternalInfo(long j, int i, String str, String str2) {
-        XLLog.d(TAG, "XLDownloadManager::statExternalInfo beg, taskId=[" + j + "] fileIndex=[" + i + "] key=[" + str + "] value=[" + str2 + "]");
+        Log.d(TAG, "XLDownloadManager::statExternalInfo beg, taskId=[" + j + "] fileIndex=[" + i + "] key=[" + str + "] value=[" + str2 + "]");
         XLLoader xLLoader = this.mLoader;
         if (xLLoader == null) {
-            XLLog.e(TAG, "XLDownloadManager::statExternalInfo mLoader is null, taskId=[" + j + "] fileIndex=[" + i + "]");
+            Log.e(TAG, "XLDownloadManager::statExternalInfo mLoader is null, taskId=[" + j + "] fileIndex=[" + i + "]");
             return XLConstant.XLErrorCode.DOWNLOAD_MANAGER_ERROR;
         }
         int statExternalInfo = xLLoader.statExternalInfo(j, i, str, str2);
         if (9000 != statExternalInfo) {
-            XLLog.e(TAG, "XLDownloadManager::statExternalInfo end, taskId=[" + j + "] fileIndex=[" + i + "] ret=[" + statExternalInfo + "]");
+            Log.e(TAG, "XLDownloadManager::statExternalInfo end, taskId=[" + j + "] fileIndex=[" + i + "] ret=[" + statExternalInfo + "]");
             return statExternalInfo;
         }
-        XLLog.d(TAG, "XLDownloadManager::statExternalInfo end, taskId=[" + j + "] fileIndex=[" + i + "] ret=[" + statExternalInfo + "]");
+        Log.d(TAG, "XLDownloadManager::statExternalInfo end, taskId=[" + j + "] fileIndex=[" + i + "] ret=[" + statExternalInfo + "]");
         return statExternalInfo;
     }
 
@@ -1047,5 +963,46 @@ public class XLDownloadManager {
             return false;
         }
         return xLLoader.XYVodSDK_getSdkEnabled();
+    }
+
+    private class NetworkChangeHandlerThread implements Runnable {
+        private boolean m_allow_execution = true;
+        private Context m_context = null;
+        private XLLoader m_loader = null;
+
+        public NetworkChangeHandlerThread(Context context, XLLoader xLLoader, boolean z) {
+            this.m_context = context;
+            this.m_loader = xLLoader;
+            this.m_allow_execution = z;
+        }
+
+        public void run() {
+            if (this.m_allow_execution) {
+                int networkType = XLUtil.getNetworkType(this.m_context);
+                Log.d(XLDownloadManager.TAG, "NetworkChangeHandlerThread nettype=" + networkType);
+                XLDownloadManager.this.notifyNetWorkType(networkType, this.m_loader);
+                String bssid = XLUtil.getBSSID(this.m_context);
+                Log.d(XLDownloadManager.TAG, "NetworkChangeHandlerThread bssid=" + bssid);
+                XLDownloadManager.this.notifyWifiBSSID(bssid, this.m_loader);
+                XLUtil.NetWorkCarrier netWorkCarrier = XLUtil.getNetWorkCarrier(this.m_context);
+                Log.d(XLDownloadManager.TAG, "NetworkChangeHandlerThread NetWorkCarrier=" + netWorkCarrier);
+                XLDownloadManager.this.notifyNetWorkCarrier(netWorkCarrier.ordinal());
+            }
+        }
+    }
+
+    private class NetworkChangeReceiver extends BroadcastReceiver {
+        private static final String TAG = "TAG_DownloadReceiver";
+
+        public NetworkChangeReceiver() {
+        }
+
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (action != null && action.equals("android.net.conn.CONNECTIVITY_CHANGE")) {
+                XLDownloadManager xLDownloadManager = XLDownloadManager.this;
+                new Thread(new NetworkChangeHandlerThread(context, xLDownloadManager.mLoader, XLDownloadManager.mAllowExecution)).start();
+            }
+        }
     }
 }

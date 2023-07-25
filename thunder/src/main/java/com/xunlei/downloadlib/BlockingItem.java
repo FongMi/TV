@@ -6,6 +6,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class BlockingItem<T> {
+
     final Lock lock = new ReentrantLock();
     final Condition notEmpty = lock.newCondition();
 
@@ -25,8 +26,7 @@ public class BlockingItem<T> {
     public T take() throws InterruptedException {
         lock.lock();
         try {
-            while (item == null)
-                notEmpty.await();
+            while (item == null) notEmpty.await();
             T t = item;
             item = null;
             return t;
@@ -38,9 +38,7 @@ public class BlockingItem<T> {
     public T tryTake(long waitMs) throws InterruptedException {
         lock.lock();
         try {
-            while (item == null)
-                if (!notEmpty.await(waitMs, TimeUnit.MILLISECONDS))
-                    return null;
+            while (item == null) if (!notEmpty.await(waitMs, TimeUnit.MILLISECONDS)) return null;
             T t = item;
             item = null;
             return t;

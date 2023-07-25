@@ -39,9 +39,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class XLTaskHelper {
     @SuppressLint("StaticFieldLeak")
     private static XLDownloadManager mXlDownloadManager;
+    private static volatile XLTaskHelper instance = null;
+    private final List<Pair<String, String>> mRequestHeaders = new ArrayList<>();
+    private AtomicInteger seq = new AtomicInteger(0);
+
+    private XLTaskHelper() {
+    }
 
     public static void init(Context context, String a, String b) {
-        if(mXlDownloadManager != null){
+        if (mXlDownloadManager != null) {
             return;
         }
         mXlDownloadManager = XLDownloadManager.getInstance();
@@ -64,14 +70,6 @@ public class XLTaskHelper {
 
     }
 
-
-    private AtomicInteger seq = new AtomicInteger(0);
-
-    private XLTaskHelper() {
-    }
-
-    private static volatile XLTaskHelper instance = null;
-
     public static XLTaskHelper instance() {
         if (instance == null) {
             synchronized (XLTaskHelper.class) {
@@ -83,7 +81,6 @@ public class XLTaskHelper {
         }
         return instance;
     }
-
 
     /**
      * 添加迅雷链接任务 支持thunder:// ftp:// ed2k:// http:// https:// 协议
@@ -140,8 +137,6 @@ public class XLTaskHelper {
         return getTaskId.getTaskId();
     }
 
-    private final List<Pair<String, String>> mRequestHeaders = new ArrayList<>();
-
     public void addHeader(String key, String str2) {
         mRequestHeaders.add(Pair.create(key, str2));
     }
@@ -159,6 +154,7 @@ public class XLTaskHelper {
             }
         }
     }
+
     /**
      * 通过链接获取文件名
      *
@@ -325,7 +321,7 @@ public class XLTaskHelper {
      */
     public synchronized BtSubTaskDetail getBtSubTaskInfo(long taskId, int fileIndex) {
         BtSubTaskDetail subTaskDetail = new BtSubTaskDetail();
-         mXlDownloadManager.getBtSubTaskInfo(taskId, fileIndex, subTaskDetail);
+        mXlDownloadManager.getBtSubTaskInfo(taskId, fileIndex, subTaskDetail);
         return subTaskDetail;
     }
 

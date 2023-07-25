@@ -1,6 +1,7 @@
 package com.xunlei.downloadlib.parameter;
 
 public class EmuleTaskParam {
+
     public int mCreateMode;
     public String mFileName;
     public String mFilePath;
@@ -39,9 +40,6 @@ public class EmuleTaskParam {
     }
 
     public boolean checkMemberVar() {
-        if (this.mFileName == null || this.mFilePath == null || this.mUrl == null) {
-            return false;
-        }
-        return true;
+        return this.mFileName != null && this.mFilePath != null && this.mUrl != null;
     }
 }

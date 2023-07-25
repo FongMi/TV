@@ -1,6 +1,7 @@
 package com.xunlei.downloadlib.parameter;
 
 public class BtTaskParam {
+
     public int mCreateMode;
     public String mFilePath;
     public int mMaxConcurrent;
@@ -39,9 +40,6 @@ public class BtTaskParam {
     }
 
     public boolean checkMemberVar() {
-        if (this.mTorrentPath == null || this.mFilePath == null) {
-            return false;
-        }
-        return true;
+        return this.mTorrentPath != null && this.mFilePath != null;
     }
 }

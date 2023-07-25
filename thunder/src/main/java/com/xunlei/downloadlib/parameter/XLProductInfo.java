@@ -1,6 +1,7 @@
 package com.xunlei.downloadlib.parameter;
 
 public class XLProductInfo {
+
     public String mProductKey;
     public String mProductName;
 

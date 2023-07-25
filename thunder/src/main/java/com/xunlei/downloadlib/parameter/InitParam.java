@@ -1,6 +1,7 @@
 package com.xunlei.downloadlib.parameter;
 
 public class InitParam {
+
     public String mAppKey;
     public String mAppVersion;
     public int mPermissionLevel;
@@ -21,9 +22,6 @@ public class InitParam {
     }
 
     public boolean checkMemberVar() {
-        if (this.mAppKey == null || this.mAppVersion == null || this.mStatSavePath == null || this.mStatCfgSavePath == null) {
-            return false;
-        }
-        return true;
+        return this.mAppKey != null && this.mAppVersion != null && this.mStatSavePath != null && this.mStatCfgSavePath != null;
     }
 }
