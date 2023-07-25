@@ -84,6 +84,7 @@ dependencies {
     implementation project(':tvbus')
     implementation project(':catvod')
     implementation project(':quickjs')
+    implementation project(':thunder')
     implementation project(':jianpian')
     implementation project(':forcetech')
     implementation project(':ijkplayer')

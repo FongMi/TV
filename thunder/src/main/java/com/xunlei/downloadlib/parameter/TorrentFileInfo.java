@@ -1,5 +1,7 @@
 package com.xunlei.downloadlib.parameter;
 
+import android.text.TextUtils;
+
 public class TorrentFileInfo {
 
     public int mFileIndex;
@@ -17,7 +19,7 @@ public class TorrentFileInfo {
     }
 
     public String getFileName() {
-        return mFileName;
+        return TextUtils.isEmpty(mFileName) ? "" : mFileName;
     }
 
     public long getFileSize() {
@@ -46,5 +48,9 @@ public class TorrentFileInfo {
 
     public boolean isSelected() {
         return isSelected;
+    }
+
+    public String getExt() {
+        return getFileName().contains(".") ? getFileName().substring(getFileName().lastIndexOf(".") + 1) : "";
     }
 }

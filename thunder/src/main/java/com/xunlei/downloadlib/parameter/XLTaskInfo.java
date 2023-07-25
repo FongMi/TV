@@ -74,10 +74,107 @@ public class XLTaskInfo implements Parcelable {
         this.mScdnRecvBytes = parcel.readLong();
     }
 
-    public int describeContents() {
-        return 0;
+    public int getAdditionalResCount() {
+        return mAdditionalResCount;
     }
 
+    public long getAdditionalResPeerBytes() {
+        return mAdditionalResPeerBytes;
+    }
+
+    public long getAdditionalResPeerSpeed() {
+        return mAdditionalResPeerSpeed;
+    }
+
+    public int getAdditionalResType() {
+        return mAdditionalResType;
+    }
+
+    public long getAdditionalResVipRecvBytes() {
+        return mAdditionalResVipRecvBytes;
+    }
+
+    public long getAdditionalResVipSpeed() {
+        return mAdditionalResVipSpeed;
+    }
+
+    public String getCid() {
+        return mCid;
+    }
+
+    public long getDownloadSize() {
+        return mDownloadSize;
+    }
+
+    public long getDownloadSpeed() {
+        return mDownloadSpeed;
+    }
+
+    public int getErrorCode() {
+        return mErrorCode;
+    }
+
+    public String getFileName() {
+        return mFileName;
+    }
+
+    public long getFileSize() {
+        return mFileSize;
+    }
+
+    public String getGcid() {
+        return mGcid;
+    }
+
+    public int getInfoLen() {
+        return mInfoLen;
+    }
+
+    public long getOriginRecvBytes() {
+        return mOriginRecvBytes;
+    }
+
+    public long getOriginSpeed() {
+        return mOriginSpeed;
+    }
+
+    public long getP2PRecvBytes() {
+        return mP2PRecvBytes;
+    }
+
+    public long getP2PSpeed() {
+        return mP2PSpeed;
+    }
+
+    public long getP2SRecvBytes() {
+        return mP2SRecvBytes;
+    }
+
+    public long getP2SSpeed() {
+        return mP2SSpeed;
+    }
+
+    public int getQueryIndexStatus() {
+        return mQueryIndexStatus;
+    }
+
+    public long getScdnRecvBytes() {
+        return mScdnRecvBytes;
+    }
+
+    public long getScdnSpeed() {
+        return mScdnSpeed;
+    }
+
+    public long getTaskId() {
+        return mTaskId;
+    }
+
+    public int getTaskStatus() {
+        return mTaskStatus;
+    }
+
+    @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeLong(this.mTaskId);
         parcel.writeString(this.mFileName);
@@ -104,5 +201,10 @@ public class XLTaskInfo implements Parcelable {
         parcel.writeLong(this.mAdditionalResPeerBytes);
         parcel.writeLong(this.mScdnSpeed);
         parcel.writeLong(this.mScdnRecvBytes);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 }
