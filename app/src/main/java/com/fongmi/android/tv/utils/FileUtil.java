@@ -13,11 +13,8 @@ import androidx.core.content.FileProvider;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.impl.Callback;
 
-import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
-import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
-import org.apache.commons.compress.utils.IOUtils;
+import org.chromium.base.FileUtils;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,7 +27,10 @@ import java.security.MessageDigest;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 public class FileUtil {
 
@@ -120,12 +120,13 @@ public class FileUtil {
     }
 
     public static void unzip(File target, String path) {
-        try (ZipArchiveInputStream in = new ZipArchiveInputStream(new BufferedInputStream(new FileInputStream(target)))) {
-            ZipArchiveEntry entry;
-            while ((entry = in.getNextZipEntry()) != null) {
+        try (ZipFile zip = new ZipFile(target.getAbsolutePath())) {
+            Enumeration<?> entries = (Enumeration<?>) zip.entries();
+            while (entries.hasMoreElements()) {
+                ZipEntry entry = (ZipEntry) entries.nextElement();
                 File out = new File(path, entry.getName());
                 if (entry.isDirectory()) out.mkdirs();
-                else copy(in, out);
+                else copy(zip.getInputStream(entry), out);
             }
         } catch (Exception ignored) {
         }
@@ -133,14 +134,14 @@ public class FileUtil {
 
     public static void copy(File in, File out) {
         try {
-            IOUtils.copy(new FileInputStream(in), new FileOutputStream(out));
+            FileUtils.copyStream(new FileInputStream(in), new FileOutputStream(out));
         } catch (Exception ignored) {
         }
     }
 
     public static void copy(InputStream in, File out) {
         try {
-            IOUtils.copy(in, new FileOutputStream(out));
+            FileUtils.copyStream(in, new FileOutputStream(out));
         } catch (Exception ignored) {
         }
     }
