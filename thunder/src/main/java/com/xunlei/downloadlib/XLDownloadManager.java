@@ -44,27 +44,30 @@ import java.util.UUID;
 
 public class XLDownloadManager {
 
-    private static final int GET_GUID_FIRST_TIME = 5000;
-    private static final int GET_GUID_INTERVAL_TIME = 60000;
-    private static final int QUERY_GUID_COUNT = 5;
-    private static final String TAG = "XLDownloadManager";
     public static XLConstant.XLManagerStatus mDownloadManagerState = XLConstant.XLManagerStatus.MANAGER_UNINIT;
+
+    private static final String TAG = XLDownloadManager.class.getSimpleName();
     private static boolean mAllowExecution = true;
-    private static Map<String, Object> mErrcodeStringMap = null;
-    private static XLDownloadManager mInstance = null;
-    private static boolean mIsLoadErrcodeMsg = false;
+    private static Map<String, Object> mErrcodeStringMap;
+    private static boolean mIsLoadErrcodeMsg;
     private static int mRunningRefCount = 0;
     private XLAppKeyChecker mAppkeyChecker;
-    private Context mContext;
     private Timer mGetGuidTimer;
     private TimerTask mGetGuidTimerTask;
     private XLLoader mLoader;
     private int mQueryGuidCount;
     private NetworkChangeReceiver mReceiver;
 
+    private static class Loader {
+        static volatile XLDownloadManager INSTANCE = new XLDownloadManager();
+    }
+
+    public static XLDownloadManager get() {
+        return Loader.INSTANCE;
+    }
+
     private XLDownloadManager() {
         this.mLoader = null;
-        this.mContext = null;
         this.mReceiver = null;
         this.mAppkeyChecker = null;
         this.mQueryGuidCount = 0;
@@ -75,17 +78,6 @@ public class XLDownloadManager {
         int i = xLDownloadManager.mQueryGuidCount;
         xLDownloadManager.mQueryGuidCount = i + 1;
         return i;
-    }
-
-    public static synchronized XLDownloadManager getInstance() {
-        XLDownloadManager xLDownloadManager;
-        synchronized (XLDownloadManager.class) {
-            if (mInstance == null) {
-                mInstance = new XLDownloadManager();
-            }
-            xLDownloadManager = mInstance;
-        }
-        return xLDownloadManager;
     }
 
     public XLConstant.XLManagerStatus getManagerStatus() {
@@ -462,7 +454,7 @@ public class XLDownloadManager {
 
     private String getPeerid() {
         String peerid;
-        if (mAllowExecution && (peerid = XLUtil.getPeerId(this.mContext)) != null) {
+        if (mAllowExecution && (peerid = XLUtil.getPeerId()) != null) {
             return peerid;
         }
 //        return "08318B49CB04004V";
@@ -481,7 +473,7 @@ public class XLDownloadManager {
             return "00000000000000_000000000000";
         }
         new XLUtil.GuidInfo();
-        XLUtil.GuidInfo generateGuid = XLUtil.generateGuid(this.mContext);
+        XLUtil.GuidInfo generateGuid = XLUtil.generateGuid();
         if (generateGuid.mType != XLUtil.GUID_TYPE.ALL) {
             Log.i(TAG, "Start the GetGuidTimer");
             startGetGuidTimer();
@@ -498,7 +490,7 @@ public class XLDownloadManager {
                 if (XLDownloadManager.this.mQueryGuidCount < 5) {
                     XLDownloadManager.access$208(XLDownloadManager.this);
                     new XLUtil.GuidInfo();
-                    XLUtil.GuidInfo generateGuid = XLUtil.generateGuid(XLDownloadManager.this.mContext);
+                    XLUtil.GuidInfo generateGuid = XLUtil.generateGuid();
                     if (generateGuid.mType == XLUtil.GUID_TYPE.ALL) {
                         XLDownloadManager.this.stopGetGuidTimer();
                     }
