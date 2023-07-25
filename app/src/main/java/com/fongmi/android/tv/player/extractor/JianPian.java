@@ -17,7 +17,7 @@ import java.net.URLEncoder;
 public class JianPian implements Source.Extractor {
 
     private P2PClass p2p;
-    private String url;
+    private String path;
 
     @Override
     public boolean match(String scheme, String host) {
@@ -33,25 +33,25 @@ public class JianPian implements Source.Extractor {
     }
 
     @Override
-    public String fetch(String u) throws Exception {
+    public String fetch(String url) throws Exception {
         init();
         stop();
-        set(u);
+        set(url);
         start();
-        return "http://127.0.0.1:" + p2p.port + "/" + URLEncoder.encode(Uri.parse(url).getLastPathSegment(), "GBK");
+        return "http://127.0.0.1:" + p2p.port + "/" + URLEncoder.encode(Uri.parse(path).getLastPathSegment(), "GBK");
     }
 
-    private void set(String u) throws Exception {
-        u = u.replace("tvbox-xg://", "").replace("tvbox-xg:", "");
-        String[] split = URLDecoder.decode(u, "UTF-8").split("\\|");
-        url = split[0].replace("xg://", "ftp://").replace("xgplay://", "ftp://");
+    private void set(String url) throws Exception {
+        url = url.replace("tvbox-xg://", "").replace("tvbox-xg:", "");
+        String[] split = URLDecoder.decode(url, "UTF-8").split("\\|");
+        path = split[0].replace("xg://", "ftp://").replace("xgplay://", "ftp://");
     }
 
     private void start() {
         try {
-            if (p2p == null || url == null) return;
-            p2p.P2Pdoxstart(url.getBytes("GBK"));
-            p2p.P2Pdoxadd(url.getBytes("GBK"));
+            if (p2p == null || path == null) return;
+            p2p.P2Pdoxstart(path.getBytes("GBK"));
+            p2p.P2Pdoxadd(path.getBytes("GBK"));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -60,10 +60,10 @@ public class JianPian implements Source.Extractor {
     @Override
     public void stop() {
         try {
-            if (p2p == null || url == null) return;
-            p2p.P2Pdoxpause(url.getBytes("GBK"));
-            p2p.P2Pdoxdel(url.getBytes("GBK"));
-            url = null;
+            if (p2p == null || path == null) return;
+            p2p.P2Pdoxpause(path.getBytes("GBK"));
+            p2p.P2Pdoxdel(path.getBytes("GBK"));
+            path = null;
         } catch (Exception e) {
             e.printStackTrace();
         }
