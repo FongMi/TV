@@ -6,8 +6,6 @@ import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Pair;
 
-import androidx.annotation.Nullable;
-
 import com.xunlei.downloadlib.parameter.BtIndexSet;
 import com.xunlei.downloadlib.parameter.BtSubTaskDetail;
 import com.xunlei.downloadlib.parameter.BtTaskParam;
@@ -66,7 +64,7 @@ public class XLTaskHelper {
         downloadManager.setSpeedLimit(-1, -1);
     }
 
-    public synchronized long addThunderTask(String url, String savePath, @Nullable String fileName) {
+    public synchronized long addThunderTask(String url, String savePath, String fileName) {
         if (url.startsWith("thunder://")) url = downloadManager.parserThunderUrl(url);
         GetTaskId getTaskId = new GetTaskId();
         if (TextUtils.isEmpty(fileName)) {
@@ -106,29 +104,6 @@ public class XLTaskHelper {
         return getTaskId.getTaskId();
     }
 
-    public void addHeader(String key, String value) {
-        requestHeaders.add(Pair.create(key, value));
-    }
-
-    private Collection<Pair<String, String>> getHeaders() {
-        return Collections.unmodifiableList(this.requestHeaders);
-    }
-
-    private void addRequestHeadersToXlEngine(long taskId) {
-        for (Pair<String, String> pair : this.getHeaders()) {
-            if (!(pair.first == null || pair.second == null)) {
-                downloadManager.setHttpHeaderProperty(taskId, pair.first, pair.second);
-            }
-        }
-    }
-
-    public synchronized String getFileName(String url) {
-        if (url.startsWith("thunder://")) url = downloadManager.parserThunderUrl(url);
-        GetFileName getFileName = new GetFileName();
-        downloadManager.getFileNameFromUrl(url, getFileName);
-        return getFileName.getFileName();
-    }
-
     public synchronized long addMagnetTask(String url, String savePath, String fileName) throws Exception {
         if (url.startsWith("magnet:?")) {
             if (TextUtils.isEmpty(fileName)) {
@@ -149,12 +124,6 @@ public class XLTaskHelper {
         } else {
             throw new Exception("url illegal: " + url);
         }
-    }
-
-    public synchronized TorrentInfo getTorrentInfo(String torrentPath) {
-        TorrentInfo torrentInfo = new TorrentInfo();
-        downloadManager.getTorrentInfo(torrentPath, torrentInfo);
-        return torrentInfo;
     }
 
     public synchronized long addTorrentTask(String torrentPath, String savePath, int index) {
@@ -184,6 +153,35 @@ public class XLTaskHelper {
         downloadManager.startTask(getTaskId.getTaskId());
         downloadManager.setTaskGsState(getTaskId.getTaskId(), index, 2);
         return getTaskId.getTaskId();
+    }
+
+    public void addHeader(String key, String value) {
+        requestHeaders.add(Pair.create(key, value));
+    }
+
+    private Collection<Pair<String, String>> getHeaders() {
+        return Collections.unmodifiableList(this.requestHeaders);
+    }
+
+    private void addRequestHeadersToXlEngine(long taskId) {
+        for (Pair<String, String> pair : this.getHeaders()) {
+            if (!(pair.first == null || pair.second == null)) {
+                downloadManager.setHttpHeaderProperty(taskId, pair.first, pair.second);
+            }
+        }
+    }
+
+    public synchronized String getFileName(String url) {
+        if (url.startsWith("thunder://")) url = downloadManager.parserThunderUrl(url);
+        GetFileName getFileName = new GetFileName();
+        downloadManager.getFileNameFromUrl(url, getFileName);
+        return getFileName.getFileName();
+    }
+
+    public synchronized TorrentInfo getTorrentInfo(String torrentPath) {
+        TorrentInfo torrentInfo = new TorrentInfo();
+        downloadManager.getTorrentInfo(torrentPath, torrentInfo);
+        return torrentInfo;
     }
 
     public synchronized String getLocalUrl(String filePath) {

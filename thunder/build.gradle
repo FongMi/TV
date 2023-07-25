@@ -8,11 +8,3 @@ android {
         targetSdkVersion 28
     }
 }
-
-dependencies {
-    implementation 'androidx.annotation:annotation:' + annotationVersion
-    implementation 'com.google.code.gson:gson:' + gsonVersion
-}
-
-
-
