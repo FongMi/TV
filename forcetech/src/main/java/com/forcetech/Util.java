@@ -41,9 +41,9 @@ public class Util {
         return name.toLowerCase();
     }
 
-    public static Intent intent(Context context, String scheme) {
+    public static Intent intent(Context context, String scheme, String path) {
         Intent intent = new Intent(context, clz(scheme));
-        intent.putExtra("scheme", scheme);
+        intent.putExtra("path", path);
         return intent;
     }
 

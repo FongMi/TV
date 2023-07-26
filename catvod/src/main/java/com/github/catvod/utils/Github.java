@@ -66,8 +66,8 @@ public class Github {
     public static String getSo(String name) {
         try {
             File file = Path.so(name);
-            String path = getReleasePath("/other/jniLibs/" + file.getName());
-            if (!file.exists() || file.length() == 0) Path.write(file, OkHttp.newCall(path).execute().body().bytes());
+            String url = getReleasePath("/other/jniLibs/".concat(file.getName()));
+            if (file.length() < 300) Path.write(file, OkHttp.newCall(url).execute().body().bytes());
             return file.getAbsolutePath();
         } catch (Exception e) {
             return "";

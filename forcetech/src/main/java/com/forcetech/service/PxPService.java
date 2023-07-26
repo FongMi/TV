@@ -23,7 +23,7 @@ public abstract class PxPService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         forceTV = new ForceTV();
-        forceTV.start(intent.getStringExtra("scheme"), getPort());
+        forceTV.start(intent.getStringExtra("path"), getPort());
         return binder;
     }
 

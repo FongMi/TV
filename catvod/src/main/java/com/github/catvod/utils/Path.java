@@ -87,7 +87,7 @@ public class Path {
     }
 
     public static File so(String name) {
-        return new File(so(), "lib".concat(name).concat(".so"));
+        return new File("mitv".equals(name) ? cache() : so(), "lib".concat(name).concat(".so"));
     }
 
     public static File js(String name) {

@@ -11,6 +11,7 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.player.Source;
 import com.forcetech.Util;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.Github;
 
 import java.util.HashSet;
 
@@ -26,7 +27,7 @@ public class Force implements Source.Extractor {
     }
 
     private void init(String scheme) {
-        App.get().bindService(Util.intent(App.get(), scheme), mConn, Context.BIND_AUTO_CREATE);
+        App.get().bindService(Util.intent(App.get(), scheme, Github.getSo(scheme)), mConn, Context.BIND_AUTO_CREATE);
     }
 
     @Override
