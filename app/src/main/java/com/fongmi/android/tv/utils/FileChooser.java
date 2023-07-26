@@ -13,6 +13,8 @@ import android.provider.MediaStore;
 
 import androidx.fragment.app.Fragment;
 
+import com.github.catvod.utils.Path;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -110,7 +112,7 @@ public class FileChooser {
             int count;
             byte[] buffer = new byte[4096];
             int column = cursor.getColumnIndexOrThrow(projection[0]);
-            File file = new File(FileUtil.getCachePath(), cursor.getString(column));
+            File file = Path.cache(cursor.getString(column));
             FileOutputStream os = new FileOutputStream(file);
             while ((count = is.read(buffer)) != -1) os.write(buffer, 0, count);
             os.close();

@@ -3,7 +3,7 @@ package tv.danmaku.ijk.media.player.ui;
 import android.content.Context;
 import android.util.DisplayMetrics;
 
-public class Utils {
+public class Util {
 
     public static final String USER_AGENT = "User-Agent";
 

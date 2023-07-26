@@ -78,7 +78,7 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         Notify.createChannel();
-        OkHttp.get().setDoh(this, Doh.objectFrom(Prefers.getDoh()));
+        OkHttp.get().setDoh(Doh.objectFrom(Prefers.getDoh()));
         CaocConfig.Builder.create().backgroundMode(CaocConfig.BACKGROUND_MODE_SILENT).errorActivity(CrashActivity.class).apply();
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
             @Override

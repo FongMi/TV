@@ -56,7 +56,7 @@ import tv.danmaku.ijk.media.player.misc.IMediaDataSource;
 import tv.danmaku.ijk.media.player.misc.ITrackInfo;
 import tv.danmaku.ijk.media.player.misc.IjkTrackInfo;
 import tv.danmaku.ijk.media.player.pragma.DebugLog;
-import tv.danmaku.ijk.media.player.ui.Utils;
+import tv.danmaku.ijk.media.player.ui.Util;
 
 /**
  * @author bbcallen
@@ -351,7 +351,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
      * @throws IllegalStateException if it is called in an invalid state
      */
     public void setDataSource(String path, Map<String, String> headers) throws IOException, IllegalArgumentException, SecurityException, IllegalStateException {
-        for (String key : Arrays.asList(Utils.USER_AGENT, Utils.USER_AGENT.toLowerCase())) {
+        for (String key : Arrays.asList(Util.USER_AGENT, Util.USER_AGENT.toLowerCase())) {
             if (!headers.containsKey(key)) continue;
             setOption(OPT_CATEGORY_FORMAT, "user_agent", headers.get(key));
             headers.remove(key);

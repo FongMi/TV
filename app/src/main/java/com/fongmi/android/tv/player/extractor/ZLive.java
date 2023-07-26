@@ -1,8 +1,8 @@
 package com.fongmi.android.tv.player.extractor;
 
 import com.fongmi.android.tv.player.Source;
-import com.fongmi.android.tv.utils.FileUtil;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.Path;
 
 public class ZLive implements Source.Extractor {
 
@@ -34,7 +34,7 @@ public class ZLive implements Source.Extractor {
         String server = split[2];
         String uuid = split[3];
         String param = "&group=5850&mac=00:00:00:00:00:00&dir=";
-        String result = getLive(uuid) + "&server=" + server + param + FileUtil.getCachePath();
+        String result = getLive(uuid) + "&server=" + server + param + Path.cache();
         OkHttp.newCall(getOpen(uuid)).execute();
         return result;
     }

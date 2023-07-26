@@ -40,8 +40,18 @@
         </provider>
 
         <provider
+            android:name="com.github.catvod.Provider"
+            android:authorities="com.github.catvod.provider"
+            android:exported="false" />
+
+        <provider
             android:name="com.fongmi.quickjs.Provider"
             android:authorities="com.fongmi.quickjs.provider"
+            android:exported="false" />
+
+        <provider
+            android:name="com.xunlei.Provider"
+            android:authorities="com.xunlei.provider"
             android:exported="false" />
 
         <activity

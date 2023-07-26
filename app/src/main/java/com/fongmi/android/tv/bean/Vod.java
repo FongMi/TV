@@ -305,7 +305,7 @@ public class Vod {
         }
 
         public Episode find(String remarks) {
-            int number = Utils.getDigit(remarks);
+            int number = Utils.digit(remarks);
             if (getEpisodes().size() == 1) return getEpisodes().get(0);
             for (Vod.Flag.Episode item : getEpisodes()) if (item.rule1(remarks)) return item;
             for (Vod.Flag.Episode item : getEpisodes()) if (item.rule2(number)) return item;
@@ -356,7 +356,7 @@ public class Vod {
             }
 
             public Episode(String name, String url) {
-                this.number = Utils.getDigit(name);
+                this.number = Utils.digit(name);
                 this.name = Trans.s2t(name);
                 this.url = url;
             }

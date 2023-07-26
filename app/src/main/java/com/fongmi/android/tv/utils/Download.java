@@ -2,6 +2,7 @@ package com.fongmi.android.tv.utils;
 
 import com.fongmi.android.tv.App;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.Path;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -32,10 +33,10 @@ public class Download {
 
     private void doInBackground() {
         try {
-            FileUtil.clearDir(file);
+            Path.clear(file);
             Response response = OkHttp.newCall(url).execute();
             download(response.body().byteStream(), Double.parseDouble(response.header("Content-Length", "1")));
-            App.post(() -> callback.success(FileUtil.chmod(file)));
+            App.post(() -> callback.success(Path.chmod(file)));
         } catch (Exception e) {
             App.post(() -> callback.error(e.getMessage()));
         }

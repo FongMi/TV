@@ -35,10 +35,6 @@ public class Util {
         return scheme.toLowerCase();
     }
 
-    public static String so(String url) {
-        return "lib" + scheme(url) + ".so";
-    }
-
     public static String trans(ComponentName o) {
         String name = o.getClassName();
         name = name.substring(name.lastIndexOf(".") + 1);
@@ -47,14 +43,14 @@ public class Util {
         return name.toLowerCase();
     }
 
-    public static Intent intent(Context context, String url, File file) {
-        Intent intent = new Intent(context, clz(url));
+    public static Intent intent(Context context, String scheme, File file) {
+        Intent intent = new Intent(context, clz(scheme));
         intent.putExtra("path", file.getAbsolutePath());
         return intent;
     }
 
-    private static Class<?> clz(String url) {
-        switch (scheme(url)) {
+    private static Class<?> clz(String scheme) {
+        switch (scheme) {
             case "p2p":
                 return P2PService.class;
             case "p3p":
@@ -76,8 +72,8 @@ public class Util {
         }
     }
 
-    public static int port(String url) {
-        switch (scheme(url)) {
+    public static int port(String scheme) {
+        switch (scheme) {
             case "p2p":
                 return P2P;
             case "p3p":

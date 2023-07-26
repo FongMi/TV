@@ -7,7 +7,6 @@ import android.view.View;
 
 import androidx.viewbinding.ViewBinding;
 
-import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.BuildConfig;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Updater;
@@ -305,9 +304,9 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
 
     @Override
     public void setDoh(Doh doh) {
+        OkHttp.get().setDoh(doh);
         Notify.progress(getActivity());
         Prefers.putDoh(doh.toString());
-        OkHttp.get().setDoh(App.get(), doh);
         mBinding.dohText.setText(doh.getName());
         ApiConfig.load(Config.vod(), getCallback());
     }

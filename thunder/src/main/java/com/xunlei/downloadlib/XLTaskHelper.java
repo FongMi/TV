@@ -49,10 +49,10 @@ public class XLTaskHelper {
         this.downloadManager = new XLDownloadManager();
     }
 
-    public void init(Context context, String a, String b) {
+    public void init(Context context, String key, String version) {
         InitParam param = new InitParam();
-        param.mAppKey = a;
-        param.mAppVersion = b;
+        param.mAppKey = key;
+        param.mAppVersion = version;
         param.mStatSavePath = context.getFilesDir().getPath();
         param.mStatCfgSavePath = context.getFilesDir().getPath();
         param.mPermissionLevel = 1;
@@ -69,61 +69,45 @@ public class XLTaskHelper {
         GetTaskId getTaskId = new GetTaskId();
         if (TextUtils.isEmpty(fileName)) {
             GetFileName getFileName = new GetFileName();
-            int code = downloadManager.getFileNameFromUrl(url, getFileName);
-            if (code != XLConstant.XLErrorCode.NO_ERROR) return -1;
+            downloadManager.getFileNameFromUrl(url, getFileName);
             fileName = getFileName.getFileName();
         }
-        if (url.startsWith("ftp://")) {
-            P2spTaskParam taskParam = new P2spTaskParam();
-            taskParam.setCreateMode(1);
-            taskParam.setFileName(fileName);
-            taskParam.setFilePath(savePath);
-            taskParam.setUrl(url);
-            taskParam.setSeqId(seq.incrementAndGet());
-            taskParam.setCookie("");
-            taskParam.setRefUrl("");
-            taskParam.setUser("");
-            taskParam.setPass("");
-            int code = downloadManager.createP2spTask(taskParam, getTaskId);
+        if (url.startsWith("magnet:?")) {
+            MagnetTaskParam param = new MagnetTaskParam();
+            param.setFileName(fileName);
+            param.setFilePath(savePath);
+            param.setUrl(url);
+            int code = downloadManager.createBtMagnetTask(param, getTaskId);
+            if (code != XLConstant.XLErrorCode.NO_ERROR) return -1;
+        } else if (url.startsWith("ftp://")) {
+            P2spTaskParam param = new P2spTaskParam();
+            param.setCreateMode(1);
+            param.setFileName(fileName);
+            param.setFilePath(savePath);
+            param.setUrl(url);
+            param.setSeqId(seq.incrementAndGet());
+            param.setCookie("");
+            param.setRefUrl("");
+            param.setUser("");
+            param.setPass("");
+            int code = downloadManager.createP2spTask(param, getTaskId);
             if (code != XLConstant.XLErrorCode.NO_ERROR) return -1;
             downloadManager.setDownloadTaskOrigin(getTaskId.getTaskId(), "out_app/out_app_paste");
             downloadManager.setOriginUserAgent(getTaskId.getTaskId(), "AndroidDownloadManager/5.41.2.4980 (Linux; U; Android 4.4.4; Build/KTU84Q)");
             addRequestHeadersToXlEngine(getTaskId.getTaskId());
         } else if (url.startsWith("ed2k://")) {
-            EmuleTaskParam taskParam = new EmuleTaskParam();
-            taskParam.setFilePath(savePath);
-            taskParam.setFileName(fileName);
-            taskParam.setUrl(url);
-            taskParam.setSeqId(seq.incrementAndGet());
-            taskParam.setCreateMode(1);
-            int code = downloadManager.createEmuleTask(taskParam, getTaskId);
+            EmuleTaskParam param = new EmuleTaskParam();
+            param.setFilePath(savePath);
+            param.setFileName(fileName);
+            param.setUrl(url);
+            param.setSeqId(seq.incrementAndGet());
+            param.setCreateMode(1);
+            int code = downloadManager.createEmuleTask(param, getTaskId);
             if (code != XLConstant.XLErrorCode.NO_ERROR) return -1;
         }
         downloadManager.startTask(getTaskId.getTaskId());
         downloadManager.setTaskGsState(getTaskId.getTaskId(), 0, 2);
         return getTaskId.getTaskId();
-    }
-
-    public synchronized long addMagnetTask(String url, String savePath, String fileName) throws Exception {
-        if (url.startsWith("magnet:?")) {
-            if (TextUtils.isEmpty(fileName)) {
-                GetFileName getFileName = new GetFileName();
-                downloadManager.getFileNameFromUrl(url, getFileName);
-                fileName = getFileName.getFileName();
-            }
-            MagnetTaskParam magnetTaskParam = new MagnetTaskParam();
-            magnetTaskParam.setFileName(fileName);
-            magnetTaskParam.setFilePath(savePath);
-            magnetTaskParam.setUrl(url);
-            GetTaskId getTaskId = new GetTaskId();
-            int code = downloadManager.createBtMagnetTask(magnetTaskParam, getTaskId);
-            if (code != XLConstant.XLErrorCode.NO_ERROR) return -1;
-            downloadManager.startTask(getTaskId.getTaskId());
-            downloadManager.setTaskGsState(getTaskId.getTaskId(), 0, 2);
-            return getTaskId.getTaskId();
-        } else {
-            throw new Exception("url illegal: " + url);
-        }
     }
 
     public synchronized long addTorrentTask(String torrentPath, String savePath, int index) {
