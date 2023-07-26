@@ -23,6 +23,7 @@ import com.xunlei.downloadlib.parameter.XLConstant;
 import com.xunlei.downloadlib.parameter.XLTaskInfo;
 import com.xunlei.downloadlib.parameter.XLTaskLocalUrl;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -156,9 +157,9 @@ public class XLTaskHelper {
         return getFileName.getFileName();
     }
 
-    public synchronized TorrentInfo getTorrentInfo(String torrentPath) {
+    public synchronized TorrentInfo getTorrentInfo(File file) {
         TorrentInfo torrentInfo = new TorrentInfo();
-        downloadManager.getTorrentInfo(torrentPath, torrentInfo);
+        downloadManager.getTorrentInfo(file.getAbsolutePath(), torrentInfo);
         return torrentInfo;
     }
 

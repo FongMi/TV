@@ -18,11 +18,15 @@ import com.fongmi.android.tv.player.Source;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Sniffer;
 import com.fongmi.android.tv.utils.Trans;
-import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.Path;
+import com.github.catvod.utils.Util;
+import com.xunlei.downloadlib.XLTaskHelper;
+import com.xunlei.downloadlib.parameter.TorrentFileInfo;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -92,7 +96,7 @@ public class SiteViewModel extends ViewModel {
             } else {
                 ArrayMap<String, String> params = new ArrayMap<>();
                 if (site.getType() == 1 && !extend.isEmpty()) params.put("f", App.gson().toJson(extend));
-                else if (site.getType() == 4) params.put("ext", Utils.getBase64(App.gson().toJson(extend)));
+                else if (site.getType() == 4) params.put("ext", Util.base64(App.gson().toJson(extend)));
                 params.put("ac", site.getType() == 0 ? "videolist" : "detail");
                 params.put("t", tid);
                 params.put("pg", page);
@@ -113,6 +117,7 @@ public class SiteViewModel extends ViewModel {
                 ApiConfig.get().setRecent(site);
                 Result result = Result.fromJson(detailContent);
                 if (!result.getList().isEmpty()) result.getList().get(0).setVodFlags();
+                if (!result.getList().isEmpty()) checkThunder(result);
                 return result;
             } else if (key.equals("push_agent")) {
                 Vod vod = new Vod();
@@ -129,6 +134,7 @@ public class SiteViewModel extends ViewModel {
                 SpiderDebug.log(body);
                 Result result = site.getType() == 0 ? Result.fromXml(body) : Result.fromJson(body);
                 if (!result.getList().isEmpty()) result.getList().get(0).setVodFlags();
+                if (!result.getList().isEmpty()) checkThunder(result);
                 return result;
             }
         });
@@ -206,6 +212,22 @@ public class SiteViewModel extends ViewModel {
         List<Vod> items = site.getType() == 0 ? Result.fromXml(body).getList() : Result.fromJson(body).getList();
         result.setList(items);
         return result;
+    }
+
+    private void checkThunder(Result result) {
+        for (Vod.Flag flag : result.getList().get(0).getVodFlags()) {
+            List<Vod.Flag.Episode> items = new ArrayList<>();
+            for (Vod.Flag.Episode episode : flag.getEpisodes()) {
+                String scheme = Util.scheme(episode.getUrl());
+                if (!scheme.equals("magnet") && !scheme.equals("thunder")) continue;
+                File torrent = Path.thunder(XLTaskHelper.get().getFileName(episode.getUrl()));
+                long taskId = XLTaskHelper.get().addThunderTask(episode.getUrl(), Path.thunder().getAbsolutePath(), torrent.getName());
+                while (XLTaskHelper.get().getTaskInfo(taskId).getTaskStatus() == 2) XLTaskHelper.get().stopTask(taskId);
+                TorrentFileInfo[] infoArray = XLTaskHelper.get().getTorrentInfo(torrent).getSubFileInfo();
+                for (TorrentFileInfo info : infoArray) if (Sniffer.isMedia(info.getExt())) items.add(new Vod.Flag.Episode(info.getFileName(), info.getPlayUrl(torrent)));
+                if (items.size() > 0) flag.setEpisodes(items);
+            }
+        }
     }
 
     private void post(Site site, Result result) {
