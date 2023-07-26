@@ -221,7 +221,7 @@ public class SiteViewModel extends ViewModel {
                 String scheme = Util.scheme(episode.getUrl());
                 if (!scheme.equals("magnet") && !scheme.equals("thunder")) continue;
                 File torrent = Path.thunder(XLTaskHelper.get().getFileName(episode.getUrl()));
-                long taskId = XLTaskHelper.get().addThunderTask(episode.getUrl(), Path.thunder().getAbsolutePath(), torrent.getName());
+                long taskId = XLTaskHelper.get().addThunderTask(episode.getUrl(), torrent.getParent(), torrent.getName());
                 while (XLTaskHelper.get().getTaskInfo(taskId).getTaskStatus() == 2) XLTaskHelper.get().stopTask(taskId);
                 TorrentFileInfo[] infoArray = XLTaskHelper.get().getTorrentInfo(torrent).getSubFileInfo();
                 for (TorrentFileInfo info : infoArray) if (Sniffer.isMedia(info.getExt())) items.add(new Vod.Flag.Episode(info.getFileName(), info.getPlayUrl(torrent)));

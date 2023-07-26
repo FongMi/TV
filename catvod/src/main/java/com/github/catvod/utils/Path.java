@@ -78,6 +78,10 @@ public class Path {
         return new File(root(), name);
     }
 
+    public static File root(String child, String name) {
+        return new File(check(new File(root(), child)), name);
+    }
+
     public static File cache(String name) {
         return new File(cache(), name);
     }
@@ -100,6 +104,10 @@ public class Path {
 
     public static File thunder(String name) {
         return new File(thunder(), name);
+    }
+
+    public static File thunder(String child, String name) {
+        return new File(check(new File(thunder(), child)), name);
     }
 
     public static File local(String path) {
@@ -189,7 +197,7 @@ public class Path {
         if (dir.delete()) SpiderDebug.log("Deleted:" + dir.getAbsolutePath());
     }
 
-    public static void unzip(File target, String path) {
+    public static void unzip(File target, File path) {
         try (ZipFile zip = new ZipFile(target.getAbsolutePath())) {
             Enumeration<?> entries = (Enumeration<?>) zip.entries();
             while (entries.hasMoreElements()) {
