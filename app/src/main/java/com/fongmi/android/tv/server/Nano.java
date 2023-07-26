@@ -167,7 +167,7 @@ public class Nano extends NanoHTTPD {
     }
 
     private String getParent(File root) {
-        return root.equals(Path.root()) ? "." : root.getParent().replace(Path.rootPath() + File.separator, "").replace(Path.rootPath(), "");
+        return root.equals(Path.root()) ? "." : root.getParent().replace(Path.rootPath(), "");
     }
 
     private String listFiles(File root) {
