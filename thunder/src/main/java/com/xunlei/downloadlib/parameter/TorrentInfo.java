@@ -25,6 +25,6 @@ public class TorrentInfo {
     }
 
     public TorrentFileInfo[] getSubFileInfo() {
-        return mSubFileInfo;
+        return mSubFileInfo == null ? new TorrentFileInfo[0] : mSubFileInfo;
     }
 }

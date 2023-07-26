@@ -147,8 +147,8 @@ public class Nano extends NanoHTTPD {
         for (String k : files.keySet()) {
             String fn = params.get(k);
             File temp = new File(files.get(k));
-            if (fn.toLowerCase().endsWith(".zip")) Path.unzip(temp, Path.rootPath() + File.separator + path);
-            else Path.copy(temp, Path.root(path + File.separator + fn));
+            if (fn.toLowerCase().endsWith(".zip")) Path.unzip(temp, Path.root(path));
+            else Path.copy(temp, Path.root(path, fn));
         }
         return createSuccessResponse();
     }
@@ -156,7 +156,7 @@ public class Nano extends NanoHTTPD {
     private Response doNewFolder(Map<String, String> params) {
         String path = params.get("path");
         String name = params.get("name");
-        Path.root(path + File.separator + name).mkdirs();
+        Path.root(path, name).mkdirs();
         return createSuccessResponse();
     }
 
@@ -188,7 +188,7 @@ public class Nano extends NanoHTTPD {
         for (File file : list) {
             JsonObject obj = new JsonObject();
             obj.addProperty("name", file.getName());
-            obj.addProperty("path", file.getAbsolutePath().replace(Path.rootPath() + File.separator, ""));
+            obj.addProperty("path", file.getAbsolutePath().replace(Path.rootPath(), ""));
             obj.addProperty("time", format.format(new Date(file.lastModified())));
             obj.addProperty("dir", file.isDirectory() ? 1 : 0);
             files.add(obj);

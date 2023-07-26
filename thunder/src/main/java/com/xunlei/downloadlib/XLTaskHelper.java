@@ -6,7 +6,6 @@ import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Pair;
 
-import com.github.catvod.utils.Path;
 import com.xunlei.downloadlib.parameter.BtIndexSet;
 import com.xunlei.downloadlib.parameter.BtSubTaskDetail;
 import com.xunlei.downloadlib.parameter.BtTaskParam;
@@ -14,7 +13,6 @@ import com.xunlei.downloadlib.parameter.EmuleTaskParam;
 import com.xunlei.downloadlib.parameter.GetDownloadLibVersion;
 import com.xunlei.downloadlib.parameter.GetFileName;
 import com.xunlei.downloadlib.parameter.GetTaskId;
-import com.xunlei.downloadlib.parameter.InitParam;
 import com.xunlei.downloadlib.parameter.MagnetTaskParam;
 import com.xunlei.downloadlib.parameter.P2spTaskParam;
 import com.xunlei.downloadlib.parameter.TorrentFileInfo;
@@ -51,8 +49,8 @@ public class XLTaskHelper {
         this.downloadManager = new XLDownloadManager();
     }
 
-    public void init(Context context, String key, String version) {
-        downloadManager.init(context, new InitParam(key, version, Path.thunder().getAbsolutePath()));
+    public void init(Context context) {
+        downloadManager.init(context);
         downloadManager.getDownloadLibVersion(new GetDownloadLibVersion());
         downloadManager.setOSVersion(Build.VERSION.INCREMENTAL + "_alpha");
         downloadManager.setStatReportSwitch(false);
@@ -105,16 +103,16 @@ public class XLTaskHelper {
         return getTaskId.getTaskId();
     }
 
-    public synchronized long addTorrentTask(String torrentPath, String savePath, int index) {
+    public synchronized long addTorrentTask(File torrent, File cache, int index) {
         TorrentInfo torrentInfo = new TorrentInfo();
-        downloadManager.getTorrentInfo(torrentPath, torrentInfo);
+        downloadManager.getTorrentInfo(torrent.getAbsolutePath(), torrentInfo);
         TorrentFileInfo[] fileInfos = torrentInfo.mSubFileInfo;
         BtTaskParam taskParam = new BtTaskParam();
         taskParam.setCreateMode(1);
-        taskParam.setFilePath(savePath);
         taskParam.setMaxConcurrent(3);
         taskParam.setSeqId(seq.incrementAndGet());
-        taskParam.setTorrentPath(torrentPath);
+        taskParam.setFilePath(cache.getAbsolutePath());
+        taskParam.setTorrentPath(torrent.getAbsolutePath());
         GetTaskId getTaskId = new GetTaskId();
         int code = downloadManager.createBtTask(taskParam, getTaskId);
         if (code != XLConstant.XLErrorCode.NO_ERROR) return -1;
@@ -163,9 +161,9 @@ public class XLTaskHelper {
         return torrentInfo;
     }
 
-    public synchronized String getLocalUrl(String filePath) {
+    public synchronized String getLocalUrl(File file) {
         XLTaskLocalUrl localUrl = new XLTaskLocalUrl();
-        downloadManager.getLocalUrl(filePath, localUrl);
+        downloadManager.getLocalUrl(file.getAbsolutePath(), localUrl);
         return localUrl.mStrUrl;
     }
 

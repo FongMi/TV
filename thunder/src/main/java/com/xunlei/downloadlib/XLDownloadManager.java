@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.os.Build;
 import android.util.Log;
 
+import com.github.catvod.utils.Path;
 import com.xunlei.downloadlib.android.XLUtil;
 import com.xunlei.downloadlib.parameter.BtIndexSet;
 import com.xunlei.downloadlib.parameter.BtSubTaskDetail;
@@ -20,7 +21,6 @@ import com.xunlei.downloadlib.parameter.MagnetTaskParam;
 import com.xunlei.downloadlib.parameter.P2spTaskParam;
 import com.xunlei.downloadlib.parameter.ThunderUrlInfo;
 import com.xunlei.downloadlib.parameter.TorrentInfo;
-import com.xunlei.downloadlib.parameter.XLConstant;
 import com.xunlei.downloadlib.parameter.XLTaskInfo;
 import com.xunlei.downloadlib.parameter.XLTaskLocalUrl;
 
@@ -29,35 +29,36 @@ public class XLDownloadManager {
     private final String TAG = XLDownloadManager.class.getSimpleName();
     private final XLLoader loader;
 
-    private XLConstant.XLManagerStatus state;
     private NetworkChangeReceiver receiver;
     private Context context;
+    private boolean init;
 
     public XLDownloadManager() {
         loader = new XLLoader();
-        state = XLConstant.XLManagerStatus.MANAGER_UNINIT;
     }
 
-    public synchronized void init(Context context, InitParam param) {
-        if (state == XLConstant.XLManagerStatus.MANAGER_RUNNING) {
+    public synchronized void init(Context context) {
+        if (init) {
             Log.i(TAG, "XLDownloadManager is already init");
             return;
         }
         this.context = context;
+        InitParam param = new InitParam(Path.thunder().getAbsolutePath());
         int code = loader.init(param.getSoKey(), "com.android.providers.downloads", param.mAppVersion, "", getPeerId(), getGuid(), param.mStatSavePath, param.mStatCfgSavePath, XLUtil.getNetworkType(context), param.mPermissionLevel, param.mQueryConfOnInit);
         if (code != 9000) {
-            state = XLConstant.XLManagerStatus.MANAGER_INIT_FAIL;
+            init = false;
             Log.i(TAG, "XLDownloadManager init fail");
         } else {
-            state = XLConstant.XLManagerStatus.MANAGER_RUNNING;
             setLocalProperty("PhoneModel", Build.MODEL);
             registerReceiver();
+            init = true;
         }
     }
 
     public synchronized void release() {
         unregisterReceiver();
         loader.unInit();
+        init = false;
     }
 
     private void registerReceiver() {
@@ -75,7 +76,6 @@ public class XLDownloadManager {
     }
 
     private void notifyNetWorkType(int type) {
-        if (state != XLConstant.XLManagerStatus.MANAGER_RUNNING) return;
         try {
             loader.notifyNetWorkType(type);
         } catch (Error e) {
