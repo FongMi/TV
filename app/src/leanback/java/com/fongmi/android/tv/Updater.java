@@ -9,7 +9,7 @@ import androidx.appcompat.app.AlertDialog;
 import com.fongmi.android.tv.databinding.DialogUpdateBinding;
 import com.fongmi.android.tv.utils.Download;
 import com.fongmi.android.tv.utils.FileUtil;
-import com.fongmi.android.tv.utils.Github;
+import com.github.catvod.utils.Github;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
@@ -41,11 +41,11 @@ public class Updater implements Download.Callback {
     }
 
     private String getJson() {
-        return Github.get().getBranchPath(branch, "/release/" + BuildConfig.FLAVOR_mode + ".json");
+        return Github.getBranchPath(branch, "/release/" + BuildConfig.FLAVOR_mode + ".json");
     }
 
     private String getApk() {
-        return Github.get().getBranchPath(branch, "/release/" + BuildConfig.FLAVOR_mode + "-" + BuildConfig.FLAVOR_api + "-" + BuildConfig.FLAVOR_abi + ".apk");
+        return Github.getBranchPath(branch, "/release/" + BuildConfig.FLAVOR_mode + "-" + BuildConfig.FLAVOR_api + "-" + BuildConfig.FLAVOR_abi + ".apk");
     }
 
     private Updater() {

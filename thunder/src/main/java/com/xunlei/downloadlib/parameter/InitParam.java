@@ -12,8 +12,17 @@ public class InitParam {
     public String mAppVersion;
     public int mPermissionLevel;
     public int mQueryConfOnInit;
-    public String mStatCfgSavePath;
     public String mStatSavePath;
+    public String mStatCfgSavePath;
+
+    public InitParam(String key, String version, String path) {
+        this.mAppKey = key;
+        this.mAppVersion = version;
+        this.mPermissionLevel = 1;
+        this.mQueryConfOnInit = 0;
+        this.mStatSavePath = path;
+        this.mStatCfgSavePath = path;
+    }
 
     public String getSoKey() {
         String[] split = this.mAppKey.split("==");

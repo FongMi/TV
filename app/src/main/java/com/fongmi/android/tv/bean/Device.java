@@ -10,7 +10,6 @@ import androidx.room.PrimaryKey;
 import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.server.Server;
-import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.utils.Util;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
@@ -34,8 +33,8 @@ public class Device {
 
     public static Device get() {
         Device device = new Device();
-        device.setUuid(Utils.getDeviceId());
-        device.setName(Utils.getDeviceName());
+        device.setUuid(Util.getDeviceId());
+        device.setName(Util.getDeviceName());
         device.setIp(Server.get().getAddress());
         device.setType(Product.getDeviceType());
         return device;

@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Pair;
 
+import com.github.catvod.utils.Path;
 import com.xunlei.downloadlib.parameter.BtIndexSet;
 import com.xunlei.downloadlib.parameter.BtSubTaskDetail;
 import com.xunlei.downloadlib.parameter.BtTaskParam;
@@ -50,17 +51,10 @@ public class XLTaskHelper {
     }
 
     public void init(Context context, String key, String version) {
-        InitParam param = new InitParam();
-        param.mAppKey = key;
-        param.mAppVersion = version;
-        param.mStatSavePath = context.getFilesDir().getPath();
-        param.mStatCfgSavePath = context.getFilesDir().getPath();
-        param.mPermissionLevel = 1;
-        param.mQueryConfOnInit = 0;
-        downloadManager.init(context, param);
-        downloadManager.setStatReportSwitch(false);
+        downloadManager.init(context, new InitParam(key, version, Path.thunder().getAbsolutePath()));
         downloadManager.getDownloadLibVersion(new GetDownloadLibVersion());
         downloadManager.setOSVersion(Build.VERSION.INCREMENTAL + "_alpha");
+        downloadManager.setStatReportSwitch(false);
         downloadManager.setSpeedLimit(-1, -1);
     }
 

@@ -14,7 +14,7 @@ public class Provider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        XLTaskHelper.get().init(getContext(), "xzNjAwMQ^^yb==0^852^083dbcff^cee25055f125a2fde", "21.01.07.800002");
+        new Thread(() -> XLTaskHelper.get().init(getContext(), "xzNjAwMQ^^yb==0^852^083dbcff^cee25055f125a2fde", "21.01.07.800002")).start();
         return true;
     }
 

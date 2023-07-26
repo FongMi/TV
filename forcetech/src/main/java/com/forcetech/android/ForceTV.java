@@ -1,10 +1,12 @@
 package com.forcetech.android;
 
+import com.github.catvod.utils.Github;
+
 public class ForceTV {
 
     public void start(String lib, int port) {
         try {
-            System.load(lib);
+            System.load(Github.getSo(lib));
             start(port, 20 * 1024 * 1024);
         } catch (Throwable ignored) {
         }

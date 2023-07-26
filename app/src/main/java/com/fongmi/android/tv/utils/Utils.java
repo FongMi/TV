@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.os.Build;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.text.TextUtils;
@@ -18,7 +17,6 @@ import androidx.media3.common.util.UriUtil;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.server.Server;
-import com.github.catvod.Init;
 import com.github.catvod.utils.Util;
 import com.google.common.net.HttpHeaders;
 import com.permissionx.guolindev.PermissionX;
@@ -61,8 +59,8 @@ public class Utils {
     }
 
     public static void toggleFullscreen(Activity activity, boolean fullscreen) {
-        if (fullscreen) Utils.hideSystemUI(activity);
-        else Utils.showSystemUI(activity);
+        if (fullscreen) hideSystemUI(activity);
+        else showSystemUI(activity);
     }
 
     public static void showSystemUI(Activity activity) {
@@ -101,16 +99,6 @@ public class Utils {
         if (Prefers.getUa().isEmpty() || headers.containsKey(HttpHeaders.USER_AGENT) || headers.containsKey(HttpHeaders.USER_AGENT.toLowerCase())) return headers;
         headers.put(HttpHeaders.USER_AGENT, Prefers.getUa());
         return headers;
-    }
-
-    public static String getDeviceId() {
-        return Settings.Secure.getString(Init.getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
-    }
-
-    public static String getDeviceName() {
-        String model = Build.MODEL;
-        String manufacturer = Build.MANUFACTURER;
-        return model.startsWith(manufacturer) ? model : manufacturer + " " + model;
     }
 
     public static String checkClan(String text) {

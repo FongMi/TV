@@ -2,14 +2,9 @@ package com.fongmi.android.tv.player.extractor;
 
 import android.net.Uri;
 
-import com.fongmi.android.tv.BuildConfig;
 import com.fongmi.android.tv.player.Source;
-import com.fongmi.android.tv.utils.Github;
-import com.github.catvod.net.OkHttp;
-import com.github.catvod.utils.Path;
 import com.p2p.P2PClass;
 
-import java.io.File;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 
@@ -23,12 +18,8 @@ public class JianPian implements Source.Extractor {
         return scheme.equals("tvbox-xg");
     }
 
-    private void init() throws Exception {
-        if (p2p != null) return;
-        File file = Path.so("jpa_" + BuildConfig.FLAVOR_abi);
-        String path = Github.get().getReleasePath("/other/jniLibs/" + file.getName());
-        if (!file.exists()) Path.write(file, OkHttp.newCall(path).execute().body().bytes());
-        p2p = new P2PClass(file.getAbsolutePath());
+    private void init() {
+        if (p2p == null) p2p = new P2PClass();
     }
 
     @Override

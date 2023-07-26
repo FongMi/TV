@@ -9,12 +9,9 @@ import android.os.SystemClock;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.player.Source;
-import com.fongmi.android.tv.utils.Github;
 import com.forcetech.Util;
 import com.github.catvod.net.OkHttp;
-import com.github.catvod.utils.Path;
 
-import java.io.File;
 import java.util.HashSet;
 
 import okhttp3.Headers;
@@ -28,11 +25,8 @@ public class Force implements Source.Extractor {
         return scheme.startsWith("p") || scheme.equals("mitv");
     }
 
-    private void init(String scheme) throws Exception {
-        File file = Path.so(scheme);
-        String path = Github.get().getReleasePath("/other/jniLibs/" + file.getName());
-        if (!file.exists()) Path.write(file, OkHttp.newCall(path).execute().body().bytes());
-        App.get().bindService(Util.intent(App.get(), scheme, file), mConn, Context.BIND_AUTO_CREATE);
+    private void init(String scheme) {
+        App.get().bindService(Util.intent(App.get(), scheme), mConn, Context.BIND_AUTO_CREATE);
     }
 
     @Override
