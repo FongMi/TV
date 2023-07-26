@@ -22,7 +22,7 @@ import java.util.zip.ZipFile;
 public class Path {
 
     private static File check(File file) {
-        if (!file.exists()) file.mkdir();
+        if (!file.exists()) file.mkdirs();
         return file;
     }
 
