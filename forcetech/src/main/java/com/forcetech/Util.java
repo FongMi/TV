@@ -15,8 +15,6 @@ import com.forcetech.service.P8PService;
 import com.forcetech.service.P9PService;
 import com.gsoft.mitv.MainActivity;
 
-import java.io.File;
-
 public class Util {
 
     public static int MTV = 9002;
@@ -43,9 +41,9 @@ public class Util {
         return name.toLowerCase();
     }
 
-    public static Intent intent(Context context, String scheme, File file) {
+    public static Intent intent(Context context, String scheme) {
         Intent intent = new Intent(context, clz(scheme));
-        intent.putExtra("path", file.getAbsolutePath());
+        intent.putExtra("scheme", scheme);
         return intent;
     }
 

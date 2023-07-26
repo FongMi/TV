@@ -1,8 +1,12 @@
 package com.github.catvod.utils;
 
 import android.net.Uri;
+import android.os.Build;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Base64;
+
+import com.github.catvod.Init;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,6 +15,16 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class Util {
+
+    public static String getDeviceId() {
+        return Settings.Secure.getString(Init.getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+    }
+
+    public static String getDeviceName() {
+        String model = Build.MODEL;
+        String manufacturer = Build.MANUFACTURER;
+        return model.startsWith(manufacturer) ? model : manufacturer + " " + model;
+    }
 
     public static String base64(String ext) {
         return base64(ext.getBytes());

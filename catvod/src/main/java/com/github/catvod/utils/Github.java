@@ -1,10 +1,10 @@
-package com.fongmi.android.tv.utils;
+package com.github.catvod.utils;
 
 import android.text.TextUtils;
 
-import com.fongmi.android.tv.Constant;
 import com.github.catvod.net.OkHttp;
 
+import java.io.File;
 import java.io.IOException;
 
 import okhttp3.OkHttpClient;
@@ -12,6 +12,7 @@ import okhttp3.Response;
 
 public class Github {
 
+    public static final int TIMEOUT = 5 * 1000;
     public static final String A = "https://raw.githubusercontent.com/";
     public static final String B = "https://fongmi.cachefly.net/";
     public static final String C = "https://ghproxy.com/";
@@ -26,12 +27,12 @@ public class Github {
         static volatile Github INSTANCE = new Github();
     }
 
-    public static Github get() {
+    private static Github get() {
         return Loader.INSTANCE;
     }
 
-    public Github() {
-        client = OkHttp.client(Constant.TIMEOUT_GITHUB);
+    private Github() {
+        client = OkHttp.client(TIMEOUT);
         check(A);
         check(B);
         check(C);
@@ -54,11 +55,22 @@ public class Github {
         return TextUtils.isEmpty(proxy) ? "" : proxy;
     }
 
-    public String getReleasePath(String path) {
-        return getProxy() + RELEASE + path;
+    public static String getReleasePath(String path) {
+        return get().getProxy() + RELEASE + path;
     }
 
-    public String getBranchPath(String branch, String path) {
-        return getProxy() + branch + path;
+    public static String getBranchPath(String branch, String path) {
+        return get().getProxy() + branch + path;
+    }
+
+    public static String getSo(String name) {
+        try {
+            File file = Path.so(name);
+            String path = getReleasePath("/other/jniLibs/" + file.getName());
+            if (!file.exists() || file.length() == 0) Path.write(file, OkHttp.newCall(path).execute().body().bytes());
+            return file.getAbsolutePath();
+        } catch (Exception e) {
+            return "";
+        }
     }
 }

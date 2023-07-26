@@ -103,9 +103,8 @@ public class Path {
     }
 
     public static File local(String path) {
-        String root = root().getAbsolutePath();
-        if (path.contains(root)) return new File(path);
-        return new File(path.replace("file:/", root));
+        if (path.contains(rootPath())) return new File(path);
+        return new File(path.replace("file:/", rootPath()));
     }
 
     public static String asset(String fileName) {

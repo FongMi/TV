@@ -2,10 +2,24 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdk 33
+    flavorDimensions "abi"
 
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 28
+    }
+
+    productFlavors {
+        armeabi_v7a {
+            dimension "abi"
+            //noinspection ChromeOsAbiSupport
+            ndk { abiFilters "armeabi-v7a" }
+        }
+        arm64_v8a {
+            dimension "abi"
+            //noinspection ChromeOsAbiSupport
+            ndk { abiFilters "arm64-v8a" }
+        }
     }
 }
 
