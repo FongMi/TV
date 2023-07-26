@@ -1,34 +1,15 @@
 package com.fongmi.quickjs.utils;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 
 import androidx.preference.PreferenceManager;
 
-import java.lang.ref.WeakReference;
+import com.github.catvod.Init;
 
 public class Prefers {
 
-    private WeakReference<Context> context;
-
-    private static class Loader {
-        static volatile Prefers INSTANCE = new Prefers();
-    }
-
-    private static Prefers get() {
-        return Loader.INSTANCE;
-    }
-
-    private Context getContext() {
-        return context.get();
-    }
-
-    public static void setContext(Context context) {
-        get().context = new WeakReference<>(context);
-    }
-
     private static SharedPreferences getPrefers() {
-        return PreferenceManager.getDefaultSharedPreferences(get().getContext());
+        return PreferenceManager.getDefaultSharedPreferences(Init.getContext());
     }
 
     public static String get(String key, String defaultValue) {

@@ -1,6 +1,5 @@
 package com.fongmi.android.tv.bean;
 
-import android.net.Uri;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
@@ -12,6 +11,7 @@ import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.utils.Utils;
+import com.github.catvod.utils.Util;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
@@ -105,7 +105,7 @@ public class Device {
     }
 
     public String getHost() {
-        return isDLNA() ? getUuid() : Uri.parse(getIp()).getHost();
+        return isDLNA() ? getUuid() : Util.host(getIp());
     }
 
     public Device save() {

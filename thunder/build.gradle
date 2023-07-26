@@ -8,3 +8,8 @@ android {
         targetSdkVersion 28
     }
 }
+
+dependencies {
+    implementation project(':catvod')
+    implementation 'androidx.annotation:annotation:' + annotationVersion
+}

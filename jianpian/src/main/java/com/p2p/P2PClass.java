@@ -28,8 +28,8 @@ public class P2PClass {
         return doxstarthttpd(bArr, bArr2);
     }
 
-    public int P2Pdoxendhttpd() {
-        return doxendhttpd();
+    public void P2Pdoxendhttpd() {
+        doxendhttpd();
     }
 
     public void P2Pdoxstart(byte[] bArr) {

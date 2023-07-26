@@ -1,7 +1,6 @@
 package com.fongmi.quickjs.method;
 
 import android.text.TextUtils;
-import android.util.Base64;
 
 import androidx.annotation.Keep;
 
@@ -11,8 +10,8 @@ import com.fongmi.quickjs.utils.Parser;
 import com.fongmi.quickjs.utils.Proxy;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Json;
+import com.github.catvod.utils.Util;
 import com.google.gson.Gson;
-import com.whl.quickjs.wrapper.JSArray;
 import com.whl.quickjs.wrapper.JSFunction;
 import com.whl.quickjs.wrapper.JSMethod;
 import com.whl.quickjs.wrapper.JSObject;
@@ -220,12 +219,10 @@ public class Global {
     private void setContent(JSObject jsObject, Headers headers, int buffer, byte[] bytes) throws UnsupportedEncodingException {
         switch (buffer) {
             case 1:
-                JSArray array = ctx.createNewJSArray();
-                for (int i = 0; i < bytes.length; i++) array.set(bytes[i], i);
-                jsObject.setProperty("content", array);
+                jsObject.setProperty("content", JSUtil.toArray(ctx, bytes));
                 break;
             case 2:
-                jsObject.setProperty("content", Base64.encodeToString(bytes, Base64.DEFAULT));
+                jsObject.setProperty("content", Util.base64(bytes));
                 break;
             default:
                 jsObject.setProperty("content", new String(bytes, getCharset(headers)));

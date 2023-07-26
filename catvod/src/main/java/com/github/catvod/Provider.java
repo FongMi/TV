@@ -1,4 +1,4 @@
-package com.fongmi.quickjs;
+package com.github.catvod;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
@@ -7,38 +7,12 @@ import android.net.Uri;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.media3.common.util.UriUtil;
-
-import com.fongmi.quickjs.utils.Module;
-import com.whl.quickjs.android.QuickJSLoader;
-import com.whl.quickjs.wrapper.JSModule;
 
 public class Provider extends ContentProvider {
 
-    static {
-        try {
-            QuickJSLoader.init();
-        } catch (Throwable ignored) {
-        }
-    }
-
-    private void setModuleLoader() {
-        JSModule.setModuleLoader(new JSModule.ModuleLoader() {
-            @Override
-            public String convertModuleName(String moduleBaseName, String moduleName) {
-                return UriUtil.resolve(moduleBaseName, moduleName);
-            }
-
-            @Override
-            public String getModuleScript(String moduleName) {
-                return Module.get().load(moduleName);
-            }
-        });
-    }
-
     @Override
     public boolean onCreate() {
-        setModuleLoader();
+        Init.setContext(getContext());
         return true;
     }
 

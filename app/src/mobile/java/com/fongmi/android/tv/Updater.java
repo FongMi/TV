@@ -37,7 +37,7 @@ public class Updater implements Download.Callback {
     }
 
     private File getFile() {
-        return FileUtil.getCacheFile(branch + ".apk");
+        return Path.cache(branch.concat(".apk"));
     }
 
     private String getJson() {

@@ -1,7 +1,5 @@
 package com.fongmi.android.tv.player;
 
-import android.net.Uri;
-
 import com.fongmi.android.tv.player.extractor.BiliBili;
 import com.fongmi.android.tv.player.extractor.Force;
 import com.fongmi.android.tv.player.extractor.JianPian;
@@ -9,10 +7,10 @@ import com.fongmi.android.tv.player.extractor.TVBus;
 import com.fongmi.android.tv.player.extractor.Thunder;
 import com.fongmi.android.tv.player.extractor.Youtube;
 import com.fongmi.android.tv.player.extractor.ZLive;
+import com.github.catvod.utils.Util;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class Source {
 
@@ -38,9 +36,8 @@ public class Source {
     }
 
     public String fetch(String url) throws Exception {
-        Uri uri = Uri.parse(url);
-        String host = Objects.requireNonNullElse(uri.getHost(), "").toLowerCase();
-        String scheme = Objects.requireNonNullElse(uri.getScheme(), "").toLowerCase();
+        String host = Util.host(url);
+        String scheme = Util.scheme(url);
         for (Extractor extractor : extractors) if (extractor.match(scheme, host)) return extractor.fetch(url);
         return url;
     }

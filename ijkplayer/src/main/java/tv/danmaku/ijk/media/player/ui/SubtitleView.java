@@ -26,7 +26,7 @@ public class SubtitleView extends TextView {
 
     public SubtitleView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        strokeWidth = Utils.dp2px(getContext(), 0.8f);
+        strokeWidth = Util.dp2px(getContext(), 0.8f);
     }
 
     public void onSubtitleChanged(String text) {
