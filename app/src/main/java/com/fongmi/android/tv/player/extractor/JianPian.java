@@ -2,7 +2,6 @@ package com.fongmi.android.tv.player.extractor;
 
 import android.net.Uri;
 
-import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.BuildConfig;
 import com.fongmi.android.tv.player.Source;
 import com.fongmi.android.tv.utils.Github;
@@ -26,10 +25,10 @@ public class JianPian implements Source.Extractor {
 
     private void init() throws Exception {
         if (p2p != null) return;
-        File file = Path.so("p2p-jp-" + BuildConfig.FLAVOR_abi);
+        File file = Path.so("jpa_" + BuildConfig.FLAVOR_abi);
         String path = Github.get().getReleasePath("/other/jniLibs/" + file.getName());
         if (!file.exists()) Path.write(file, OkHttp.newCall(path).execute().body().bytes());
-        p2p = new P2PClass(App.get(), file.getAbsolutePath());
+        p2p = new P2PClass(file.getAbsolutePath());
     }
 
     @Override

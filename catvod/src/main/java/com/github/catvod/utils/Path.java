@@ -42,20 +42,16 @@ public class Path {
         return root().getAbsolutePath();
     }
 
-    public static String cachePath() {
-        return cache().getAbsolutePath();
-    }
-
-    public static String filesPath() {
-        return files().getAbsolutePath();
-    }
-
     public static File so() {
         return check(new File(files() + File.separator + "so"));
     }
 
     public static File js() {
         return check(new File(cache() + File.separator + "js"));
+    }
+
+    public static File py() {
+        return check(new File(cache() + File.separator + "py"));
     }
 
     public static File jar() {
@@ -68,6 +64,10 @@ public class Path {
 
     public static File exo() {
         return check(new File(cache() + File.separator + "exo"));
+    }
+
+    public static File jpa() {
+        return check(new File(cache() + File.separator + "jpa"));
     }
 
     public static File thunder() {
