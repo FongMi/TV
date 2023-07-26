@@ -2,52 +2,43 @@ package com.xunlei.downloadlib.parameter;
 
 import android.text.TextUtils;
 
+import java.io.File;
+
 public class TorrentFileInfo {
 
-    public int mFileIndex;
-    public String mFileName;
-    public long mFileSize;
-    public int mRealIndex;
-    public String mSubPath;
-    public String playUrl;
-    public String hash;
-    public String torrentPath;
     public boolean isSelected;
+    public String mFileName;
+    public String mSubPath;
+    public int mFileIndex;
+    public int mRealIndex;
+    public long mFileSize;
 
-    public int getFileIndex() {
-        return mFileIndex;
+    public boolean isSelected() {
+        return isSelected;
     }
 
     public String getFileName() {
         return TextUtils.isEmpty(mFileName) ? "" : mFileName;
     }
 
-    public long getFileSize() {
-        return mFileSize;
+    public String getSubPath() {
+        return mSubPath;
+    }
+
+    public int getFileIndex() {
+        return mFileIndex;
     }
 
     public int getRealIndex() {
         return mRealIndex;
     }
 
-    public String getSubPath() {
-        return mSubPath;
+    public long getFileSize() {
+        return mFileSize;
     }
 
-    public String getPlayUrl() {
-        return playUrl;
-    }
-
-    public String getHash() {
-        return hash;
-    }
-
-    public String getTorrentPath() {
-        return torrentPath;
-    }
-
-    public boolean isSelected() {
-        return isSelected;
+    public String getPlayUrl(File file) {
+        return "torrent://" + file.getAbsolutePath() + "/" + getFileIndex();
     }
 
     public String getExt() {

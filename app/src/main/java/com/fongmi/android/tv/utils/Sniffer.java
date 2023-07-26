@@ -19,6 +19,8 @@ public class Sniffer {
 
     public static final String CHROME = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36";
     public static final Pattern RULE = Pattern.compile("http((?!http).){12,}?\\.(m3u8|mp4|flv|avi|mkv|rm|wmv|mpg|m4a|mp3)\\?.*|http((?!http).){12,}\\.(m3u8|mp4|flv|avi|mkv|rm|wmv|mpg|m4a|mp3)|http((?!http).)*?video/tos*");
+    public static final List<String> VIDEO = Arrays.asList("avi", "flv", "mkv", "mov", "mp4", "mpeg", "mpe", "mpg", "wmv");
+    public static final List<String> AUDIO = Arrays.asList("aac", "ape", "flac", "mp3", "m4a", "ogg");
 
     private static boolean matchOrContain(String url) {
         for (String regex : getRegex(Uri.parse(url))) return Pattern.compile(regex).matcher(url).find() || url.contains(regex);
@@ -28,6 +30,10 @@ public class Sniffer {
     private static boolean match(String url) {
         for (String regex : getRegex()) return Pattern.compile(regex).matcher(url).find();
         return false;
+    }
+
+    public static boolean isMedia(String ext) {
+        return VIDEO.contains(ext) || AUDIO.contains(ext);
     }
 
     public static boolean isVideoFormat(String url) {
