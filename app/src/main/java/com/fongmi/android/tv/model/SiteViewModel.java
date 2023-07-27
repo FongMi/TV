@@ -226,8 +226,8 @@ public class SiteViewModel extends ViewModel {
                 File folder = Path.thunder(Util.md5(episode.getUrl()));
                 GetTaskId taskId = XLTaskHelper.get().addThunderTask(episode.getUrl(), folder);
                 while (XLTaskHelper.get().getTaskInfo(taskId).getTaskStatus() != 2) SystemClock.sleep(10);
-                TorrentFileInfo[] infoArray = XLTaskHelper.get().getTorrentInfo(taskId.getSaveFile()).getSubFileInfo();
-                for (TorrentFileInfo info : infoArray) if (Sniffer.isMedia(info.getExt())) items.add(new Vod.Flag.Episode(info.getFileName(), info.getPlayUrl(taskId.getSaveFile())));
+                List<TorrentFileInfo> medias = XLTaskHelper.get().getTorrentInfo(taskId.getSaveFile()).getMedias();
+                for (TorrentFileInfo media : medias) items.add(new Vod.Flag.Episode(media.getFileName(), media.getPlayUrl(taskId.getSaveFile())));
                 if (items.size() > 0) flag.setEpisodes(items);
                 XLTaskHelper.get().stopTask(taskId);
             }
