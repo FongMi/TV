@@ -115,11 +115,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private Runnable mR3;
 
     public static void push(FragmentActivity activity, Uri uri) {
-        if ("smb".equals(uri.getScheme()) || "http".equals(uri.getScheme()) || "https".equals(uri.getScheme())) {
-            push(activity, uri.toString(), true);
-        } else {
-            file(activity, FileChooser.getPathFromUri(activity, uri));
-        }
+        if (Sniffer.isPush(uri)) push(activity, uri.toString(), true);
+        else file(activity, FileChooser.getPathFromUri(activity, uri));
     }
 
     public static void file(FragmentActivity activity, String path) {

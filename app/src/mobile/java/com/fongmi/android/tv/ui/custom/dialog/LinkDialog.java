@@ -1,8 +1,8 @@
 package com.fongmi.android.tv.ui.custom.dialog;
 
 import android.content.DialogInterface;
+import android.net.Uri;
 import android.text.TextUtils;
-import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -15,6 +15,7 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.DialogLinkBinding;
 import com.fongmi.android.tv.ui.activity.DetailActivity;
 import com.fongmi.android.tv.utils.FileChooser;
+import com.fongmi.android.tv.utils.Sniffer;
 import com.fongmi.android.tv.utils.Utils;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -48,7 +49,7 @@ public class LinkDialog {
     private void initView() {
         CharSequence text = Utils.getClipText();
         binding.input.setEndIconOnClickListener(this::onChoose);
-        if (!TextUtils.isEmpty(text) && Patterns.WEB_URL.matcher(text).matches()) binding.text.setText(text);
+        if (!TextUtils.isEmpty(text) && (Sniffer.isPush(Uri.parse(text.toString())))) binding.text.setText(text);
     }
 
     private void initEvent() {
