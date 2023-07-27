@@ -156,8 +156,13 @@ public class XLTaskHelper {
     }
 
     public synchronized void deleteTask(GetTaskId taskId) {
-        Path.clear(taskId.getSavePath());
+        new Thread(() -> deleteFile(taskId.getSavePath())).start();
         stopTask(taskId);
+    }
+
+    private static void deleteFile(File dir) {
+        if (dir.isDirectory()) for (File file : Path.list(dir)) deleteFile(file);
+        if (!dir.getAbsolutePath().endsWith(".torrent")) dir.delete();
     }
 
     public synchronized void stopTask(GetTaskId taskId) {
