@@ -2,29 +2,29 @@ package com.xunlei.downloadlib.parameter;
 
 public class BtTaskParam {
 
-    public int mCreateMode;
-    public String mFilePath;
-    public int mMaxConcurrent;
     public int mSeqId;
+    public int mCreateMode;
+    public int mMaxConcurrent;
+    public String mFilePath;
     public String mTorrentPath;
 
-    public void setTorrentPath(String str) {
-        this.mTorrentPath = str;
+    public void setSeqId(int seqId) {
+        this.mSeqId = seqId;
     }
 
-    public void setFilePath(String str) {
-        this.mFilePath = str;
+    public void setCreateMode(int createMode) {
+        this.mCreateMode = createMode;
     }
 
-    public void setMaxConcurrent(int i) {
-        this.mMaxConcurrent = i;
+    public void setMaxConcurrent(int maxConcurrent) {
+        this.mMaxConcurrent = maxConcurrent;
     }
 
-    public void setCreateMode(int i) {
-        this.mCreateMode = i;
+    public void setFilePath(String filePath) {
+        this.mFilePath = filePath;
     }
 
-    public void setSeqId(int i) {
-        this.mSeqId = i;
+    public void setTorrentPath(String torrentPath) {
+        this.mTorrentPath = torrentPath;
     }
 }

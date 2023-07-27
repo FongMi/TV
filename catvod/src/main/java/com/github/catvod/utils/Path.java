@@ -105,11 +105,7 @@ public class Path {
     }
 
     public static File thunder(String name) {
-        return new File(thunder(), name);
-    }
-
-    public static File thunder(String child, String name) {
-        return new File(check(new File(thunder(), child)), name);
+        return check(new File(thunder(), name));
     }
 
     public static File local(String path) {
@@ -191,10 +187,6 @@ public class Path {
     public static List<File> list(File dir) {
         File[] files = dir.listFiles();
         return files == null ? Collections.emptyList() : Arrays.asList(files);
-    }
-
-    public static void clear(String path) {
-        clear(new File(path));
     }
 
     public static void clear(File dir) {

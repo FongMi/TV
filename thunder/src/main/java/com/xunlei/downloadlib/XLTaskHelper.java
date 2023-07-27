@@ -47,29 +47,33 @@ public class XLTaskHelper {
         downloadManager = new XLDownloadManager(Init.getContext());
     }
 
-    public synchronized GetTaskId addThunderTask(String url, String savePath, String fileName) {
+    public synchronized GetTaskId addThunderTask(String url, File savePath) {
+        return addThunderTask(url, savePath, null);
+    }
+
+    public synchronized GetTaskId addThunderTask(String url, File savePath, String fileName) {
+        GetTaskId taskId = new GetTaskId(savePath, fileName);
         if (url.startsWith("thunder://")) url = downloadManager.parserThunderUrl(url);
-        GetTaskId taskId = new GetTaskId();
-        taskId.setSavePath(savePath);
         if (TextUtils.isEmpty(fileName)) {
             GetFileName getFileName = new GetFileName();
             downloadManager.getFileNameFromUrl(url, getFileName);
             fileName = getFileName.getFileName();
+            taskId.setFileName(fileName);
         }
         if (url.startsWith("magnet:?")) {
             MagnetTaskParam param = new MagnetTaskParam();
+            param.setFilePath(savePath.getAbsolutePath());
             param.setFileName(fileName);
-            param.setFilePath(savePath);
             param.setUrl(url);
             int code = downloadManager.createBtMagnetTask(param, taskId);
             if (code != XLConstant.XLErrorCode.NO_ERROR) return taskId;
         } else if (url.startsWith("ftp://")) {
             P2spTaskParam param = new P2spTaskParam();
-            param.setCreateMode(1);
-            param.setFileName(fileName);
-            param.setFilePath(savePath);
-            param.setUrl(url);
+            param.setFilePath(savePath.getAbsolutePath());
             param.setSeqId(seq.incrementAndGet());
+            param.setFileName(fileName);
+            param.setCreateMode(1);
+            param.setUrl(url);
             param.setCookie("");
             param.setRefUrl("");
             param.setUser("");
@@ -81,11 +85,11 @@ public class XLTaskHelper {
             addRequestHeadersToXlEngine(taskId.getTaskId());
         } else if (url.startsWith("ed2k://")) {
             EmuleTaskParam param = new EmuleTaskParam();
-            param.setFilePath(savePath);
-            param.setFileName(fileName);
-            param.setUrl(url);
+            param.setFilePath(savePath.getAbsolutePath());
             param.setSeqId(seq.incrementAndGet());
+            param.setFileName(fileName);
             param.setCreateMode(1);
+            param.setUrl(url);
             int code = downloadManager.createEmuleTask(param, taskId);
             if (code != XLConstant.XLErrorCode.NO_ERROR) return taskId;
         }
@@ -94,18 +98,17 @@ public class XLTaskHelper {
         return taskId;
     }
 
-    public synchronized GetTaskId addTorrentTask(File torrent, String savePath, int index) {
+    public synchronized GetTaskId addTorrentTask(File torrent, File savePath, int index) {
         TorrentInfo torrentInfo = new TorrentInfo();
         downloadManager.getTorrentInfo(torrent.getAbsolutePath(), torrentInfo);
         TorrentFileInfo[] fileInfos = torrentInfo.mSubFileInfo;
         BtTaskParam taskParam = new BtTaskParam();
         taskParam.setCreateMode(1);
         taskParam.setMaxConcurrent(3);
-        taskParam.setFilePath(savePath);
         taskParam.setSeqId(seq.incrementAndGet());
+        taskParam.setFilePath(savePath.getAbsolutePath());
         taskParam.setTorrentPath(torrent.getAbsolutePath());
-        GetTaskId taskId = new GetTaskId();
-        taskId.setSavePath(savePath);
+        GetTaskId taskId = new GetTaskId(savePath);
         int code = downloadManager.createBtTask(taskParam, taskId);
         if (code != XLConstant.XLErrorCode.NO_ERROR) return taskId;
         if (fileInfos.length > 1) {
@@ -140,22 +143,15 @@ public class XLTaskHelper {
         }
     }
 
-    public synchronized String getFileName(String url) {
-        if (url.startsWith("thunder://")) url = downloadManager.parserThunderUrl(url);
-        GetFileName getFileName = new GetFileName();
-        downloadManager.getFileNameFromUrl(url, getFileName);
-        return getFileName.getFileName();
-    }
-
     public synchronized TorrentInfo getTorrentInfo(File file) {
         TorrentInfo torrentInfo = new TorrentInfo();
         downloadManager.getTorrentInfo(file.getAbsolutePath(), torrentInfo);
         return torrentInfo;
     }
 
-    public synchronized String getLocalUrl(String path) {
+    public synchronized String getLocalUrl(File file) {
         XLTaskLocalUrl localUrl = new XLTaskLocalUrl();
-        downloadManager.getLocalUrl(path, localUrl);
+        downloadManager.getLocalUrl(file.getAbsolutePath(), localUrl);
         return localUrl.mStrUrl;
     }
 
