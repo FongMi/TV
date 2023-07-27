@@ -47,8 +47,7 @@
 # Jianpian
 -keep class com.p2p.** { *; }
 
-# NewPipeExtractor
--keep class org.schabi.newpipe.extractor.timeago.patterns.** { *; }
+# Mozilla
 -keep class org.mozilla.javascript.** { *; }
 
 # Sardine
