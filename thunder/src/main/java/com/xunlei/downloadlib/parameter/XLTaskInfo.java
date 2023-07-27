@@ -174,6 +174,10 @@ public class XLTaskInfo implements Parcelable {
         return mTaskStatus;
     }
 
+    public void setTaskStatus(int taskStatus) {
+        this.mTaskStatus = taskStatus;
+    }
+
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeLong(this.mTaskId);

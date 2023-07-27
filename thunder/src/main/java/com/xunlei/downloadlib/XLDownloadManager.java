@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.os.Build;
 import android.util.Log;
 
+import com.github.catvod.Init;
 import com.xunlei.downloadlib.android.XLUtil;
 import com.xunlei.downloadlib.parameter.BtIndexSet;
 import com.xunlei.downloadlib.parameter.BtSubTaskDetail;
@@ -26,43 +27,33 @@ import com.xunlei.downloadlib.parameter.XLTaskLocalUrl;
 public class XLDownloadManager {
 
     private final String TAG = XLDownloadManager.class.getSimpleName();
-    private final XLLoader loader;
+    private XLLoader loader;
 
     private NetworkChangeReceiver receiver;
-    private final Context context;
-    private boolean init;
+    private Context context;
 
-    public XLDownloadManager(Context context) {
+    public XLDownloadManager() {
+        this.context = Init.getContext();
         this.loader = new XLLoader();
-        this.context = context;
         this.init();
     }
 
-    public synchronized void init() {
-        if (init) {
-            Log.i(TAG, "XLDownloadManager is already init");
-            return;
-        }
+    public void init() {
         InitParam param = new InitParam(context.getFilesDir().getAbsolutePath());
-        int code = loader.init(param.getSoKey(), "com.android.providers.downloads", param.mAppVersion, "", getPeerId(), getGuid(), param.mStatSavePath, param.mStatCfgSavePath, XLUtil.getNetworkType(context), param.mPermissionLevel, param.mQueryConfOnInit);
-        if (code != 9000) {
-            init = false;
-            Log.i(TAG, "XLDownloadManager init fail");
-        } else {
-            getDownloadLibVersion(new GetDownloadLibVersion());
-            setOSVersion(Build.VERSION.INCREMENTAL + "_alpha");
-            setLocalProperty("PhoneModel", Build.MODEL);
-            setStatReportSwitch(false);
-            setSpeedLimit(-1, -1);
-            registerReceiver();
-            init = true;
-        }
+        loader.init(param.getSoKey(), "com.android.providers.downloads", param.mAppVersion, "", getPeerId(), getGuid(), param.mStatSavePath, param.mStatCfgSavePath, XLUtil.getNetworkType(context), param.mPermissionLevel, param.mQueryConfOnInit);
+        getDownloadLibVersion(new GetDownloadLibVersion());
+        setOSVersion(Build.VERSION.INCREMENTAL + "_alpha");
+        setLocalProperty("PhoneModel", Build.MODEL);
+        setStatReportSwitch(false);
+        setSpeedLimit(-1, -1);
+        registerReceiver();
     }
 
-    public synchronized void release() {
+    public void release() {
         unregisterReceiver();
         loader.unInit();
-        init = false;
+        context = null;
+        loader = null;
     }
 
     private void registerReceiver() {
