@@ -57,6 +57,9 @@
 # TVBus
 -keep class com.tvbus.engine.** { *; }
 
+# XunLei
+-keep class com.xunlei.downloadlib.** { *; }
+
 # ZLive
 -keep class com.sun.jna.** { *; }
 -keep class com.east.android.zlive.** { *; }

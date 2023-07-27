@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.android.cast.dlna.core.ICast;
 import com.fongmi.android.tv.server.Server;
-import com.fongmi.android.tv.utils.FileUtil;
+import com.github.catvod.utils.Path;
 
 import java.util.UUID;
 
@@ -18,7 +18,7 @@ public class CastVideo implements ICast {
     }
 
     private CastVideo(String name, String url) {
-        if (url.startsWith("file")) url = Server.get().getAddress() + "/" + url.replace(FileUtil.getRootPath(), "");
+        if (url.startsWith("file")) url = Server.get().getAddress() + "/" + url.replace(Path.rootPath(), "");
         this.name = name;
         this.url = url;
     }
