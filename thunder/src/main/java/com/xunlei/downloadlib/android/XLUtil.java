@@ -8,25 +8,33 @@ import android.net.wifi.WifiManager;
 import android.telephony.TelephonyManager;
 import android.util.Base64;
 
+import java.util.Random;
 import java.util.UUID;
 
 public class XLUtil {
 
     public static String getMAC() {
-        return "020000000000";
+        return random("ABCDEF0123456", 12).toUpperCase();
     }
 
     public static String getIMEI() {
-        return "000000000000000";
+        return random("0123456", 15);
     }
 
-    public static String generatePeerId() {
+    public static String getPeerId() {
         String uuid = UUID.randomUUID().toString().replace("-", "");
         uuid = uuid.substring(0, 12).toUpperCase() + "004V";
         return uuid;
     }
 
-    public static GuidInfo generateGuid() {
+    private static String random(String base, int length) {
+        Random random = new Random();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < length; i++) sb.append(base.charAt(random.nextInt(base.length())));
+        return sb.toString();
+    }
+
+    public static GuidInfo getGuid() {
         GuidInfo guidInfo = new GuidInfo();
         GuidType guidType = GuidType.DEFAULT;
         guidInfo.mGuid = getIMEI() + "_" + getMAC();

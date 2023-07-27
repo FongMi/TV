@@ -89,12 +89,12 @@ public class XLDownloadManager {
 
     private String getPeerId() {
         String uuid = Prefers.getString(context, "phoneId5", "");
-        if (uuid.isEmpty()) Prefers.put(context, "phoneId5", XLUtil.generatePeerId());
+        if (uuid.isEmpty()) Prefers.put(context, "phoneId5", XLUtil.getPeerId());
         return uuid;
     }
 
     private String getGuid() {
-        return XLUtil.generateGuid().mGuid;
+        return XLUtil.getGuid().mGuid;
     }
 
     public void releaseTask(long taskId) {
