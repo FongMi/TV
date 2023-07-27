@@ -53,12 +53,7 @@ public class TVBus implements Source.Extractor, Listener {
     }
 
     @Override
-    public void destroy() {
-        stop();
-    }
-
-    @Override
-    public void release() {
+    public void exit() {
         tvcore = null;
     }
 

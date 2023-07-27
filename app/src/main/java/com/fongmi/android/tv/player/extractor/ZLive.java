@@ -50,11 +50,6 @@ public class ZLive implements Source.Extractor {
     }
 
     @Override
-    public void destroy() {
-        stop();
-    }
-
-    @Override
-    public void release() {
+    public void exit() {
     }
 }

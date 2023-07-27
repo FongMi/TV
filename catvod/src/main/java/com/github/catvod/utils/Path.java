@@ -1,9 +1,9 @@
 package com.github.catvod.utils;
 
 import android.os.Environment;
+import android.util.Log;
 
 import com.github.catvod.Init;
-import com.github.catvod.crawler.SpiderDebug;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,6 +20,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 public class Path {
+
+    private static final String TAG = Path.class.getSimpleName();
 
     private static File check(File file) {
         if (!file.exists()) file.mkdirs();
@@ -191,10 +193,14 @@ public class Path {
         return files == null ? Collections.emptyList() : Arrays.asList(files);
     }
 
+    public static void clear(String path) {
+        clear(new File(path));
+    }
+
     public static void clear(File dir) {
         if (dir == null) return;
         if (dir.isDirectory()) for (File file : list(dir)) clear(file);
-        if (dir.delete()) SpiderDebug.log("Deleted:" + dir.getAbsolutePath());
+        if (dir.delete()) Log.d(TAG, "Deleted:" + dir.getAbsolutePath());
     }
 
     public static void unzip(File target, File path) {
