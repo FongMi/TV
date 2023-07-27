@@ -921,7 +921,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     protected void onDestroy() {
         super.onDestroy();
         mPlayers.release();
-        Source.get().destroy();
+        Source.get().stop();
         PlaybackService.stop();
         App.removeCallbacks(mR1, mR2, mR3);
     }

@@ -166,7 +166,7 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
         WallConfig.get().clear();
         LiveConfig.get().clear();
         ApiConfig.get().clear();
-        Source.get().release();
+        Source.get().exit();
         Server.get().stop();
     }
 }

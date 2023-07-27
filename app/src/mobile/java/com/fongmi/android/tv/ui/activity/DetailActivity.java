@@ -74,6 +74,7 @@ import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Traffic;
 import com.fongmi.android.tv.utils.Utils;
+import com.github.catvod.utils.Util;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.permissionx.guolindev.PermissionX;
 
@@ -434,7 +435,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         if (!item.getVodArea().isEmpty()) sb.append(getString(R.string.detail_area, item.getVodArea())).append("  ");
         if (!item.getTypeName().isEmpty()) sb.append(getString(R.string.detail_type, item.getTypeName())).append("  ");
         view.setVisibility(sb.length() == 0 ? View.GONE : View.VISIBLE);
-        view.setText(Utils.substring(sb.toString(), 2));
+        view.setText(Util.substring(sb.toString(), 2));
     }
 
     private void getPlayer(Vod.Flag flag, Vod.Flag.Episode episode, boolean replay) {
@@ -1392,8 +1393,8 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     protected void onDestroy() {
         super.onDestroy();
         mPlayers.release();
+        Source.get().stop();
         Clock.get().release();
-        Source.get().destroy();
         RefreshEvent.history();
         PlaybackService.stop();
         App.removeCallbacks(mR1, mR2, mR3, mR4);
