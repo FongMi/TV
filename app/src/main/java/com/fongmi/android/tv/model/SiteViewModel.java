@@ -119,7 +119,7 @@ public class SiteViewModel extends ViewModel {
                 ApiConfig.get().setRecent(site);
                 Result result = Result.fromJson(detailContent);
                 if (!result.getList().isEmpty()) result.getList().get(0).setVodFlags();
-                if (!result.getList().isEmpty()) checkThunder(result);
+                if (!result.getList().isEmpty()) checkThunder(result.getList().get(0).getVodFlags());
                 return result;
             } else if (key.equals("push_agent")) {
                 Vod vod = new Vod();
@@ -127,6 +127,7 @@ public class SiteViewModel extends ViewModel {
                 vod.setVodName(id);
                 vod.setVodPic("https://pic.rmb.bdstatic.com/bjh/1d0b02d0f57f0a42201f92caba5107ed.jpeg");
                 vod.setVodFlags(Vod.Flag.create(ResUtil.getString(R.string.push), ResUtil.getString(R.string.play), id));
+                checkThunder(vod.getVodFlags());
                 return Result.vod(vod);
             } else {
                 ArrayMap<String, String> params = new ArrayMap<>();
@@ -136,7 +137,7 @@ public class SiteViewModel extends ViewModel {
                 SpiderDebug.log(body);
                 Result result = site.getType() == 0 ? Result.fromXml(body) : Result.fromJson(body);
                 if (!result.getList().isEmpty()) result.getList().get(0).setVodFlags();
-                if (!result.getList().isEmpty()) checkThunder(result);
+                if (!result.getList().isEmpty()) checkThunder(result.getList().get(0).getVodFlags());
                 return result;
             }
         });
@@ -216,8 +217,8 @@ public class SiteViewModel extends ViewModel {
         return result;
     }
 
-    private void checkThunder(Result result) {
-        for (Vod.Flag flag : result.getList().get(0).getVodFlags()) {
+    private void checkThunder(List<Vod.Flag> flags) {
+        for (Vod.Flag flag : flags) {
             List<Vod.Flag.Episode> items = new ArrayList<>();
             for (Vod.Flag.Episode episode : flag.getEpisodes()) {
                 String scheme = Util.scheme(episode.getUrl());
