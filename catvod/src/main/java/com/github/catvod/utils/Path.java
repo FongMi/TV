@@ -197,7 +197,7 @@ public class Path {
 
     public static void unzip(File target, File path) {
         try (ZipFile zip = new ZipFile(target.getAbsolutePath())) {
-            Enumeration<?> entries = (Enumeration<?>) zip.entries();
+            Enumeration<?> entries = zip.entries();
             while (entries.hasMoreElements()) {
                 ZipEntry entry = (ZipEntry) entries.nextElement();
                 File out = new File(path, entry.getName());
