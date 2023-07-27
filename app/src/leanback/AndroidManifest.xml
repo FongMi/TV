@@ -65,6 +65,17 @@
                 <data android:mimeType="video/*" />
                 <data android:mimeType="audio/*" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="ftp" />
+                <data android:scheme="ed2k" />
+                <data android:scheme="magnet" />
+                <data android:scheme="thunder" />
+            </intent-filter>
         </activity>
 
         <activity

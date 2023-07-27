@@ -72,6 +72,7 @@ import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.PiP;
 import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.Sniffer;
 import com.fongmi.android.tv.utils.Traffic;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.utils.Util;
@@ -127,11 +128,8 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     private PiP mPiP;
 
     public static void push(FragmentActivity activity, Uri uri) {
-        if ("smb".equals(uri.getScheme()) || "http".equals(uri.getScheme()) || "https".equals(uri.getScheme())) {
-            push(activity, uri.toString());
-        } else {
-            file(activity, FileChooser.getPathFromUri(activity, uri));
-        }
+        if (Sniffer.isPush(uri)) push(activity, uri.toString());
+        else file(activity, FileChooser.getPathFromUri(activity, uri));
     }
 
     public static void file(FragmentActivity activity, String path) {
