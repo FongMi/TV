@@ -60,12 +60,7 @@ public class JianPian implements Source.Extractor {
     }
 
     @Override
-    public void destroy() {
-        stop();
-    }
-
-    @Override
-    public void release() {
+    public void exit() {
         try {
             if (p2p != null) p2p.P2Pdoxendhttpd();
         } catch (Exception e) {

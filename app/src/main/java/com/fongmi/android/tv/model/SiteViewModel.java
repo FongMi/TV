@@ -1,6 +1,7 @@
 package com.fongmi.android.tv.model;
 
 import android.net.Uri;
+import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.ArrayMap;
 
@@ -24,6 +25,7 @@ import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Path;
 import com.github.catvod.utils.Util;
 import com.xunlei.downloadlib.XLTaskHelper;
+import com.xunlei.downloadlib.parameter.GetTaskId;
 import com.xunlei.downloadlib.parameter.TorrentFileInfo;
 
 import java.io.File;
@@ -220,12 +222,13 @@ public class SiteViewModel extends ViewModel {
             for (Vod.Flag.Episode episode : flag.getEpisodes()) {
                 String scheme = Util.scheme(episode.getUrl());
                 if (!scheme.equals("magnet") && !scheme.equals("thunder")) continue;
-                File torrent = Path.thunder(XLTaskHelper.get().getFileName(episode.getUrl()));
-                long taskId = XLTaskHelper.get().addThunderTask(episode.getUrl(), torrent.getParent(), torrent.getName());
-                while (XLTaskHelper.get().getTaskInfo(taskId).getTaskStatus() == 2) XLTaskHelper.get().stopTask(taskId);
+                File torrent = Path.thunder(Util.md5(episode.getUrl()), XLTaskHelper.get().getFileName(episode.getUrl()));
+                GetTaskId taskId = XLTaskHelper.get().addThunderTask(episode.getUrl(), torrent.getParent(), torrent.getName());
+                while (XLTaskHelper.get().getTaskInfo(taskId).getTaskStatus() != 2) SystemClock.sleep(10);
                 TorrentFileInfo[] infoArray = XLTaskHelper.get().getTorrentInfo(torrent).getSubFileInfo();
                 for (TorrentFileInfo info : infoArray) if (Sniffer.isMedia(info.getExt())) items.add(new Vod.Flag.Episode(info.getFileName(), info.getPlayUrl(torrent)));
                 if (items.size() > 0) flag.setEpisodes(items);
+                XLTaskHelper.get().stopTask(taskId);
             }
         }
     }

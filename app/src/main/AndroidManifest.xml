@@ -49,11 +49,6 @@
             android:authorities="com.fongmi.quickjs.provider"
             android:exported="false" />
 
-        <provider
-            android:name="com.xunlei.Provider"
-            android:authorities="com.xunlei.provider"
-            android:exported="false" />
-
         <activity
             android:name=".ui.activity.CrashActivity"
             android:process=":error_activity" />

@@ -49,11 +49,7 @@ public class Force implements Source.Extractor {
     }
 
     @Override
-    public void destroy() {
-    }
-
-    @Override
-    public void release() {
+    public void exit() {
         try {
             if (!set.isEmpty()) App.get().unbindService(mConn);
         } catch (Exception e) {

@@ -1,16 +1,14 @@
 package com.xunlei.downloadlib;
 
-import android.content.Context;
-import android.os.Build;
-import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Pair;
 
+import com.github.catvod.Init;
+import com.github.catvod.utils.Path;
 import com.xunlei.downloadlib.parameter.BtIndexSet;
 import com.xunlei.downloadlib.parameter.BtSubTaskDetail;
 import com.xunlei.downloadlib.parameter.BtTaskParam;
 import com.xunlei.downloadlib.parameter.EmuleTaskParam;
-import com.xunlei.downloadlib.parameter.GetDownloadLibVersion;
 import com.xunlei.downloadlib.parameter.GetFileName;
 import com.xunlei.downloadlib.parameter.GetTaskId;
 import com.xunlei.downloadlib.parameter.MagnetTaskParam;
@@ -44,22 +42,15 @@ public class XLTaskHelper {
     }
 
     public XLTaskHelper() {
-        this.seq = new AtomicInteger(0);
-        this.requestHeaders = new ArrayList<>();
-        this.downloadManager = new XLDownloadManager();
+        seq = new AtomicInteger(0);
+        requestHeaders = new ArrayList<>();
+        downloadManager = new XLDownloadManager(Init.getContext());
     }
 
-    public void init(Context context) {
-        downloadManager.init(context);
-        downloadManager.getDownloadLibVersion(new GetDownloadLibVersion());
-        downloadManager.setOSVersion(Build.VERSION.INCREMENTAL + "_alpha");
-        downloadManager.setStatReportSwitch(false);
-        downloadManager.setSpeedLimit(-1, -1);
-    }
-
-    public synchronized long addThunderTask(String url, String savePath, String fileName) {
+    public synchronized GetTaskId addThunderTask(String url, String savePath, String fileName) {
         if (url.startsWith("thunder://")) url = downloadManager.parserThunderUrl(url);
-        GetTaskId getTaskId = new GetTaskId();
+        GetTaskId taskId = new GetTaskId();
+        taskId.setSavePath(savePath);
         if (TextUtils.isEmpty(fileName)) {
             GetFileName getFileName = new GetFileName();
             downloadManager.getFileNameFromUrl(url, getFileName);
@@ -70,8 +61,8 @@ public class XLTaskHelper {
             param.setFileName(fileName);
             param.setFilePath(savePath);
             param.setUrl(url);
-            int code = downloadManager.createBtMagnetTask(param, getTaskId);
-            if (code != XLConstant.XLErrorCode.NO_ERROR) return -1;
+            int code = downloadManager.createBtMagnetTask(param, taskId);
+            if (code != XLConstant.XLErrorCode.NO_ERROR) return taskId;
         } else if (url.startsWith("ftp://")) {
             P2spTaskParam param = new P2spTaskParam();
             param.setCreateMode(1);
@@ -83,11 +74,11 @@ public class XLTaskHelper {
             param.setRefUrl("");
             param.setUser("");
             param.setPass("");
-            int code = downloadManager.createP2spTask(param, getTaskId);
-            if (code != XLConstant.XLErrorCode.NO_ERROR) return -1;
-            downloadManager.setDownloadTaskOrigin(getTaskId.getTaskId(), "out_app/out_app_paste");
-            downloadManager.setOriginUserAgent(getTaskId.getTaskId(), "AndroidDownloadManager/5.41.2.4980 (Linux; U; Android 4.4.4; Build/KTU84Q)");
-            addRequestHeadersToXlEngine(getTaskId.getTaskId());
+            int code = downloadManager.createP2spTask(param, taskId);
+            if (code != XLConstant.XLErrorCode.NO_ERROR) return taskId;
+            downloadManager.setDownloadTaskOrigin(taskId.getTaskId(), "out_app/out_app_paste");
+            downloadManager.setOriginUserAgent(taskId.getTaskId(), "AndroidDownloadManager/5.41.2.4980 (Linux; U; Android 4.4.4; Build/KTU84Q)");
+            addRequestHeadersToXlEngine(taskId.getTaskId());
         } else if (url.startsWith("ed2k://")) {
             EmuleTaskParam param = new EmuleTaskParam();
             param.setFilePath(savePath);
@@ -95,27 +86,28 @@ public class XLTaskHelper {
             param.setUrl(url);
             param.setSeqId(seq.incrementAndGet());
             param.setCreateMode(1);
-            int code = downloadManager.createEmuleTask(param, getTaskId);
-            if (code != XLConstant.XLErrorCode.NO_ERROR) return -1;
+            int code = downloadManager.createEmuleTask(param, taskId);
+            if (code != XLConstant.XLErrorCode.NO_ERROR) return taskId;
         }
-        downloadManager.startTask(getTaskId.getTaskId());
-        downloadManager.setTaskGsState(getTaskId.getTaskId(), 0, 2);
-        return getTaskId.getTaskId();
+        downloadManager.startTask(taskId.getTaskId());
+        downloadManager.setTaskGsState(taskId.getTaskId(), 0, 2);
+        return taskId;
     }
 
-    public synchronized long addTorrentTask(File torrent, File cache, int index) {
+    public synchronized GetTaskId addTorrentTask(File torrent, String savePath, int index) {
         TorrentInfo torrentInfo = new TorrentInfo();
         downloadManager.getTorrentInfo(torrent.getAbsolutePath(), torrentInfo);
         TorrentFileInfo[] fileInfos = torrentInfo.mSubFileInfo;
         BtTaskParam taskParam = new BtTaskParam();
         taskParam.setCreateMode(1);
         taskParam.setMaxConcurrent(3);
+        taskParam.setFilePath(savePath);
         taskParam.setSeqId(seq.incrementAndGet());
-        taskParam.setFilePath(cache.getAbsolutePath());
         taskParam.setTorrentPath(torrent.getAbsolutePath());
-        GetTaskId getTaskId = new GetTaskId();
-        int code = downloadManager.createBtTask(taskParam, getTaskId);
-        if (code != XLConstant.XLErrorCode.NO_ERROR) return -1;
+        GetTaskId taskId = new GetTaskId();
+        taskId.setSavePath(savePath);
+        int code = downloadManager.createBtTask(taskParam, taskId);
+        if (code != XLConstant.XLErrorCode.NO_ERROR) return taskId;
         if (fileInfos.length > 1) {
             List<Integer> list = new CopyOnWriteArrayList<>();
             for (TorrentFileInfo fileInfo : fileInfos) {
@@ -125,11 +117,11 @@ public class XLTaskHelper {
             }
             BtIndexSet btIndexSet = new BtIndexSet(list.size());
             for (int i = 0; i < list.size(); i++) btIndexSet.mIndexSet[i] = list.get(i);
-            downloadManager.deselectBtSubTask(getTaskId.getTaskId(), btIndexSet);
+            downloadManager.deselectBtSubTask(taskId.getTaskId(), btIndexSet);
         }
-        downloadManager.startTask(getTaskId.getTaskId());
-        downloadManager.setTaskGsState(getTaskId.getTaskId(), index, 2);
-        return getTaskId.getTaskId();
+        downloadManager.startTask(taskId.getTaskId());
+        downloadManager.setTaskGsState(taskId.getTaskId(), index, 2);
+        return taskId;
     }
 
     public void addHeader(String key, String value) {
@@ -137,11 +129,11 @@ public class XLTaskHelper {
     }
 
     private Collection<Pair<String, String>> getHeaders() {
-        return Collections.unmodifiableList(this.requestHeaders);
+        return Collections.unmodifiableList(requestHeaders);
     }
 
     private void addRequestHeadersToXlEngine(long taskId) {
-        for (Pair<String, String> pair : this.getHeaders()) {
+        for (Pair<String, String> pair : getHeaders()) {
             if (!(pair.first == null || pair.second == null)) {
                 downloadManager.setHttpHeaderProperty(taskId, pair.first, pair.second);
             }
@@ -161,38 +153,31 @@ public class XLTaskHelper {
         return torrentInfo;
     }
 
-    public synchronized String getLocalUrl(File file) {
+    public synchronized String getLocalUrl(String path) {
         XLTaskLocalUrl localUrl = new XLTaskLocalUrl();
-        downloadManager.getLocalUrl(file.getAbsolutePath(), localUrl);
+        downloadManager.getLocalUrl(path, localUrl);
         return localUrl.mStrUrl;
     }
 
-    public synchronized void deleteTask(long taskId, String savePath) {
+    public synchronized void deleteTask(GetTaskId taskId) {
+        Path.clear(taskId.getSavePath());
         stopTask(taskId);
-        if (TextUtils.isEmpty(savePath)) return;
-        new Handler(Daemon.looper()).post(() -> {
-            try {
-                new LinuxFileCommand(Runtime.getRuntime()).deleteDirectory(savePath);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
     }
 
-    public synchronized void stopTask(long taskId) {
-        downloadManager.stopTask(taskId);
-        downloadManager.releaseTask(taskId);
+    public synchronized void stopTask(GetTaskId taskId) {
+        downloadManager.stopTask(taskId.getTaskId());
+        downloadManager.releaseTask(taskId.getTaskId());
     }
 
-    public synchronized XLTaskInfo getTaskInfo(long taskId) {
+    public synchronized XLTaskInfo getTaskInfo(GetTaskId taskId) {
         XLTaskInfo taskInfo = new XLTaskInfo();
-        downloadManager.getTaskInfo(taskId, 1, taskInfo);
+        downloadManager.getTaskInfo(taskId.getTaskId(), 1, taskInfo);
         return taskInfo;
     }
 
-    public synchronized BtSubTaskDetail getBtSubTaskInfo(long taskId, int index) {
+    public synchronized BtSubTaskDetail getBtSubTaskInfo(GetTaskId taskId, int index) {
         BtSubTaskDetail subTaskDetail = new BtSubTaskDetail();
-        downloadManager.getBtSubTaskInfo(taskId, index, subTaskDetail);
+        downloadManager.getBtSubTaskInfo(taskId.getTaskId(), index, subTaskDetail);
         return subTaskDetail;
     }
 

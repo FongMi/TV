@@ -47,14 +47,9 @@ public class Source {
         for (Extractor extractor : extractors) extractor.stop();
     }
 
-    public void destroy() {
+    public void exit() {
         if (extractors == null) return;
-        for (Extractor extractor : extractors) extractor.destroy();
-    }
-
-    public void release() {
-        if (extractors == null) return;
-        for (Extractor extractor : extractors) extractor.release();
+        for (Extractor extractor : extractors) extractor.exit();
     }
 
     public interface Extractor {
@@ -65,8 +60,6 @@ public class Source {
 
         void stop();
 
-        void destroy();
-
-        void release();
+        void exit();
     }
 }

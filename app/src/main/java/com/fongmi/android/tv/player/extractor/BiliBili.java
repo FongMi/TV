@@ -30,10 +30,6 @@ public class BiliBili implements Source.Extractor {
     }
 
     @Override
-    public void destroy() {
-    }
-
-    @Override
-    public void release() {
+    public void exit() {
     }
 }

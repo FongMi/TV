@@ -7,7 +7,6 @@ import android.content.IntentFilter;
 import android.os.Build;
 import android.util.Log;
 
-import com.github.catvod.utils.Path;
 import com.xunlei.downloadlib.android.XLUtil;
 import com.xunlei.downloadlib.parameter.BtIndexSet;
 import com.xunlei.downloadlib.parameter.BtSubTaskDetail;
@@ -30,26 +29,31 @@ public class XLDownloadManager {
     private final XLLoader loader;
 
     private NetworkChangeReceiver receiver;
-    private Context context;
+    private final Context context;
     private boolean init;
 
-    public XLDownloadManager() {
-        loader = new XLLoader();
+    public XLDownloadManager(Context context) {
+        this.loader = new XLLoader();
+        this.context = context;
+        this.init();
     }
 
-    public synchronized void init(Context context) {
+    public synchronized void init() {
         if (init) {
             Log.i(TAG, "XLDownloadManager is already init");
             return;
         }
-        this.context = context;
-        InitParam param = new InitParam(Path.thunder().getAbsolutePath());
+        InitParam param = new InitParam(context.getFilesDir().getAbsolutePath());
         int code = loader.init(param.getSoKey(), "com.android.providers.downloads", param.mAppVersion, "", getPeerId(), getGuid(), param.mStatSavePath, param.mStatCfgSavePath, XLUtil.getNetworkType(context), param.mPermissionLevel, param.mQueryConfOnInit);
         if (code != 9000) {
             init = false;
             Log.i(TAG, "XLDownloadManager init fail");
         } else {
+            getDownloadLibVersion(new GetDownloadLibVersion());
+            setOSVersion(Build.VERSION.INCREMENTAL + "_alpha");
             setLocalProperty("PhoneModel", Build.MODEL);
+            setStatReportSwitch(false);
+            setSpeedLimit(-1, -1);
             registerReceiver();
             init = true;
         }
@@ -84,8 +88,8 @@ public class XLDownloadManager {
     }
 
     private String getPeerId() {
-        String uuid = PreferenceMgr.getString(context, "phoneId5", "");
-        if (uuid.isEmpty()) PreferenceMgr.put(context, "phoneId5", XLUtil.generatePeerId());
+        String uuid = Prefers.getString(context, "phoneId5", "");
+        if (uuid.isEmpty()) Prefers.put(context, "phoneId5", XLUtil.generatePeerId());
         return uuid;
     }
 

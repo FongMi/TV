@@ -3,9 +3,9 @@ package com.xunlei.downloadlib;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-public class PreferenceMgr {
+public class Prefers {
 
-    private static final String FILE_NAME = "share_data";
+    private static final String FILE_NAME = "thunder_data";
 
     public static void put(Context context, String key, Object object) {
         put(context, FILE_NAME, key, object);

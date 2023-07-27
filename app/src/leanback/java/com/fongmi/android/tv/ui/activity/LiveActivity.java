@@ -817,7 +817,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     protected void onDestroy() {
         super.onDestroy();
         mPlayers.release();
-        Source.get().destroy();
+        Source.get().stop();
         App.removeCallbacks(mR1, mR2, mR3, mR4);
     }
 }
