@@ -106,10 +106,6 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         mAdapter.setSize(Product.getSpec(getActivity()));
     }
 
-    private void setViewType(boolean list) {
-
-    }
-
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mViewModel.result.observe(getViewLifecycleOwner(), this::setAdapter);
