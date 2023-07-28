@@ -197,6 +197,10 @@ public class Vod {
         return getVodTag().equals("file");
     }
 
+    public boolean isList() {
+        return isFolder() || isFile();
+    }
+
     public String getVodName(String name) {
         if (getVodName().isEmpty()) setVodName(name);
         return getVodName();
