@@ -222,7 +222,7 @@ public class SiteViewModel extends ViewModel {
                 if (!scheme.equals("magnet") && !scheme.equals("thunder")) continue;
                 magnets.add(Magnet.get(episode.getUrl()));
             }
-            for (Future<List<TorrentFileInfo>> future : Executors.newCachedThreadPool().invokeAll(magnets, 3000, TimeUnit.MILLISECONDS)) {
+            for (Future<List<TorrentFileInfo>> future : Executors.newCachedThreadPool().invokeAll(magnets, 5000, TimeUnit.MILLISECONDS)) {
                 List<TorrentFileInfo> files = future.get();
                 if (files.size() > 0) flag.getEpisodes().clear();
                 for (TorrentFileInfo file : files) flag.getEpisodes().add(Vod.Flag.Episode.create(file.getFileName(), file.getPlayUrl()));
