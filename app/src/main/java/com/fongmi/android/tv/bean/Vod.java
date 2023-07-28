@@ -193,10 +193,6 @@ public class Vod {
         return getVodTag().equals("folder");
     }
 
-    public boolean isCover() {
-        return getVodTag().equals("cover");
-    }
-
     public boolean isFile() {
         return getVodTag().equals("file");
     }

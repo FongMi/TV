@@ -21,7 +21,6 @@ package tv.danmaku.ijk.media.player;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
@@ -819,12 +818,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
                     player.notifyOnInfo(msg.arg1, msg.arg2);
                     return;
                 case MEDIA_TIMED_TEXT:
-                    if (msg.obj == null) {
-                        player.notifyOnTimedText(null);
-                    } else {
-                        IjkTimedText text = new IjkTimedText(new Rect(0, 0, 1, 1), (String) msg.obj);
-                        player.notifyOnTimedText(text);
-                    }
+                    player.notifyOnTimedText(msg.obj == null ? null : IjkTimedText.create(msg.obj.toString()));
                     return;
                 case MEDIA_NOP: // interface test message - ignore
                     break;
