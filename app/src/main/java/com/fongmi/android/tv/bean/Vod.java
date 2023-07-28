@@ -189,6 +189,10 @@ public class Vod {
         return getVodRemarks().isEmpty() ? View.GONE : View.VISIBLE;
     }
 
+    public boolean isCover() {
+        return getVodTag().equals("cover");
+    }
+
     public boolean isFolder() {
         return getVodTag().equals("folder");
     }
