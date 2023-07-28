@@ -103,9 +103,13 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     private void setRecyclerView() {
         mBinding.recycler.setHasFixedSize(true);
         mBinding.recycler.setAdapter(mAdapter = new VodAdapter(this));
-        mBinding.recycler.setLayoutManager(isFolder() ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getContext(), Product.getColumn()));
-        mAdapter.setViewType(isFolder() ? ViewType.FOLDER : ViewType.GRID);
         mAdapter.setSize(Product.getSpec(getActivity()));
+        setViewType(isFolder());
+    }
+
+    private void setViewType(boolean list) {
+        mBinding.recycler.setLayoutManager(list ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getContext(), Product.getColumn()));
+        mAdapter.setViewType(list ? ViewType.FOLDER : ViewType.GRID);
     }
 
     private void setViewModel() {
@@ -139,10 +143,8 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     private void addVideo(List<Vod> items) {
         if (items.isEmpty()) return;
         boolean list = isFolder() || mPages.size() > 0 && items.get(0).isFile();
-        int type = list ? ViewType.FOLDER : ViewType.GRID;
-        boolean change = type != mAdapter.getViewType();
-        if (change) mBinding.recycler.setLayoutManager(list ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getContext(), Product.getColumn()));
-        if (change) mAdapter.setViewType(type);
+        int viewType = list ? ViewType.FOLDER : ViewType.GRID;
+        if (viewType != mAdapter.getViewType()) setViewType(list);
         mAdapter.addAll(items);
     }
 
