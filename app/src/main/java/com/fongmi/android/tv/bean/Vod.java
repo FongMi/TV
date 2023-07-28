@@ -193,6 +193,10 @@ public class Vod {
         return getVodTag().equals("folder");
     }
 
+    public boolean isCover() {
+        return getVodTag().equals("cover");
+    }
+
     public boolean isFile() {
         return getVodTag().equals("file");
     }
@@ -226,6 +230,14 @@ public class Vod {
             if (item.getUrls() == null) continue;
             item.createEpisode(item.getUrls());
         }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Vod)) return false;
+        Vod it = (Vod) obj;
+        return getVodId().equals(it.getVodId());
     }
 
     public static class Flag {
