@@ -26,9 +26,7 @@ public class Thunder implements Source.Extractor {
 
     @Override
     public String fetch(String url) throws Exception {
-        Uri uri = Uri.parse(url);
-        boolean torrent = "torrent".equals(uri.getScheme());
-        return torrent ? addTorrentTask(uri) : addThunderTask(url);
+        return Util.scheme(url).equals("torrent") ? addTorrentTask(Uri.parse(url)) : addThunderTask(url);
     }
 
     private String addTorrentTask(Uri uri) {
