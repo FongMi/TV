@@ -103,6 +103,8 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     private void setRecyclerView() {
         mBinding.recycler.setHasFixedSize(true);
         mBinding.recycler.setAdapter(mAdapter = new VodAdapter(this));
+        mBinding.recycler.setLayoutManager(isFolder() ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getContext(), Product.getColumn()));
+        mAdapter.setViewType(isFolder() ? ViewType.FOLDER : ViewType.GRID);
         mAdapter.setSize(Product.getSpec(getActivity()));
     }
 
@@ -137,8 +139,10 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     private void addVideo(List<Vod> items) {
         if (items.isEmpty()) return;
         boolean list = isFolder() || mPages.size() > 0 && items.get(0).isFile();
-        mBinding.recycler.setLayoutManager(list ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getContext(), Product.getColumn()));
-        mAdapter.setViewType(list ? ViewType.FOLDER : ViewType.GRID);
+        int type = list ? ViewType.FOLDER : ViewType.GRID;
+        boolean change = type != mAdapter.getViewType();
+        if (change) mBinding.recycler.setLayoutManager(list ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getContext(), Product.getColumn()));
+        if (change) mAdapter.setViewType(type);
         mAdapter.addAll(items);
     }
 
