@@ -4,12 +4,9 @@ import java.io.File;
 
 public class GetTaskId {
 
-    private long mTaskId;
-    private File mSavePath;
-    private String mFileName;
-
-    public GetTaskId() {
-    }
+    public long mTaskId;
+    public File mSavePath;
+    public String mFileName;
 
     public GetTaskId(File savePath) {
         this.mSavePath = savePath;

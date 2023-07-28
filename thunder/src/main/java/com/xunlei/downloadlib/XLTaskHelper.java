@@ -53,7 +53,7 @@ public class XLTaskHelper {
         if (TextUtils.isEmpty(fileName)) {
             GetFileName getFileName = new GetFileName();
             getManager().getFileNameFromUrl(url, getFileName);
-            fileName = getFileName.getFileName();
+            fileName = getFileName.mFileName;
             taskId.setFileName(fileName);
         }
         if (url.startsWith("magnet:?")) {
@@ -94,8 +94,7 @@ public class XLTaskHelper {
     }
 
     public synchronized GetTaskId addTorrentTask(File torrent, File savePath, int index) {
-        TorrentInfo torrentInfo = new TorrentInfo();
-        getManager().getTorrentInfo(torrent.getAbsolutePath(), torrentInfo);
+        TorrentInfo torrentInfo = getTorrentInfo(torrent);
         TorrentFileInfo[] fileInfos = torrentInfo.mSubFileInfo;
         BtTaskParam taskParam = new BtTaskParam();
         taskParam.setCreateMode(1);
@@ -122,10 +121,9 @@ public class XLTaskHelper {
         return taskId;
     }
 
-
     public synchronized TorrentInfo getTorrentInfo(File file) {
-        TorrentInfo torrentInfo = new TorrentInfo();
-        getManager().getTorrentInfo(file.getAbsolutePath(), torrentInfo);
+        TorrentInfo torrentInfo = new TorrentInfo(file);
+        getManager().getTorrentInfo(torrentInfo);
         return torrentInfo;
     }
 

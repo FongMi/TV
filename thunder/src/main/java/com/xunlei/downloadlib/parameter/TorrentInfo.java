@@ -2,31 +2,25 @@ package com.xunlei.downloadlib.parameter;
 
 import com.xunlei.downloadlib.Util;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TorrentInfo {
 
-    public int mFileCount;
-    public String mInfoHash;
-    public boolean mIsMultiFiles;
-    public String mMultiFileBaseFolder;
     public TorrentFileInfo[] mSubFileInfo;
+    public String mMultiFileBaseFolder;
+    public boolean mIsMultiFiles;
+    public String mInfoHash;
+    public int mFileCount;
+    public File mFile;
 
-    public int getFileCount() {
-        return mFileCount;
+    public TorrentInfo(File file) {
+        this.mFile = file;
     }
 
-    public String getInfoHash() {
-        return mInfoHash;
-    }
-
-    public boolean isMultiFiles() {
-        return mIsMultiFiles;
-    }
-
-    public String getMultiFileBaseFolder() {
-        return mMultiFileBaseFolder;
+    public File getFile() {
+        return mFile;
     }
 
     private TorrentFileInfo[] getSubFileInfo() {
@@ -35,7 +29,7 @@ public class TorrentInfo {
 
     public List<TorrentFileInfo> getMedias() {
         List<TorrentFileInfo> items = new ArrayList<>();
-        for (TorrentFileInfo item : getSubFileInfo()) if (Util.isMedia(item.getExt())) items.add(item);
+        for (TorrentFileInfo item : getSubFileInfo()) if (Util.isMedia(item.getExt())) items.add(item.file(getFile()));
         return items;
     }
 }
