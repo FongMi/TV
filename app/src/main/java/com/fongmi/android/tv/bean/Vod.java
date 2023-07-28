@@ -196,20 +196,12 @@ public class Vod {
         return getVodRemarks().isEmpty() ? View.GONE : View.VISIBLE;
     }
 
-    public boolean isCover() {
-        return getVodTag().equals("cover");
-    }
-
     public boolean isFolder() {
         return getVodTag().equals("folder");
     }
 
-    public boolean isFile() {
-        return getVodTag().equals("file");
-    }
-
-    public boolean isList() {
-        return getVodShow().isEmpty() ? (isFolder() || isFile()) : getVodShow().equals("list");
+    public boolean isList(boolean folder) {
+        return getVodShow().isEmpty() ? folder : getVodShow().equals("list");
     }
 
     public String getVodName(String name) {
