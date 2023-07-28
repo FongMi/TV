@@ -77,6 +77,9 @@ public class Vod {
     @SerializedName("vod_tag")
     private String vodTag;
 
+    @SerializedName("vod_show")
+    private String vodShow;
+
     @Path("dl")
     @ElementList(entry = "dd", required = false, inline = true)
     private List<Flag> vodFlags;
@@ -153,6 +156,10 @@ public class Vod {
         return TextUtils.isEmpty(vodTag) ? "" : vodTag;
     }
 
+    public String getVodShow() {
+        return TextUtils.isEmpty(vodShow) ? "" : vodShow;
+    }
+
     public List<Flag> getVodFlags() {
         return vodFlags = vodFlags == null ? new ArrayList<>() : vodFlags;
     }
@@ -202,7 +209,7 @@ public class Vod {
     }
 
     public boolean isList() {
-        return isFolder() || isFile();
+        return getVodShow().isEmpty() ? (isFolder() || isFile()) : getVodShow().equals("list");
     }
 
     public String getVodName(String name) {
