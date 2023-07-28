@@ -142,7 +142,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     private void addVideo(List<Vod> items) {
         if (items.isEmpty()) return;
-        boolean list = mPages.isEmpty() ? isFolder() : items.get(0).isList();
+        boolean list = items.get(0).isList(isFolder());
         int viewType = list ? ViewType.FOLDER : ViewType.GRID;
         if (viewType != mAdapter.getViewType()) setViewType(list);
         mAdapter.addAll(items);
@@ -196,7 +196,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     @Override
     public void onItemClick(Vod item) {
-        if (item.isFolder() || item.isCover()) {
+        if (item.isFolder()) {
             mPages.add(Page.get(item.getVodId(), findPosition()));
             getVideo(item.getVodId(), "1");
         } else {
