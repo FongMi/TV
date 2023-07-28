@@ -134,7 +134,6 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         mBinding.progressLayout.showContent(isFolder(), size);
         mBinding.swipeLayout.setRefreshing(false);
         mScroller.endLoading(size == 0);
-        mAdapter.addAll(result.getList());
         addVideo(result.getList());
         checkPosition();
         checkPage(size);
