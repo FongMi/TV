@@ -240,7 +240,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
 
     @Override
     public void onItemClick(Vod item) {
-        if (item.isFolder() || item.isCover()) {
+        if (item.isFolder()) {
             mPages.add(Page.get(item.getVodId(), mBinding.recycler.getSelectedPosition()));
             mBinding.recycler.setMoveTop(false);
             getVideo(item.getVodId(), "1");

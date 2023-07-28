@@ -316,7 +316,7 @@ public class AndroidMediaPlayer extends AbstractMediaPlayer implements MediaPlay
 
     @Override
     public void onTimedText(MediaPlayer mp, TimedText text) {
-        if (text != null) notifyOnTimedText(new IjkTimedText(text.getBounds(), text.getText()));
+        if (text != null) notifyOnTimedText(IjkTimedText.create(text.getText()));
     }
 
     @Override
