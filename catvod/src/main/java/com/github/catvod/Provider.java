@@ -8,10 +8,14 @@ import android.net.Uri;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.orhanobut.logger.AndroidLogAdapter;
+import com.orhanobut.logger.Logger;
+
 public class Provider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
+        Logger.addLogAdapter(new AndroidLogAdapter());
         Init.setContext(getContext());
         return true;
     }

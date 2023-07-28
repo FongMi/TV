@@ -42,6 +42,6 @@ public class TorrentFileInfo {
     }
 
     public String getExt() {
-        return getFileName().contains(".") ? getFileName().substring(getFileName().lastIndexOf(".") + 1) : "";
+        return getFileName().contains(".") ? getFileName().substring(getFileName().lastIndexOf(".") + 1).toLowerCase() : "";
     }
 }
