@@ -82,6 +82,10 @@ public class XLTaskInfo implements Parcelable {
         this.mTaskStatus = taskStatus;
     }
 
+    public String getErrorMsg() {
+        return Error.get(mErrorCode);
+    }
+
     @Override
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeLong(this.mTaskId);
