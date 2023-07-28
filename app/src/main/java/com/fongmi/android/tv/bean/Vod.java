@@ -197,7 +197,7 @@ public class Vod {
     }
 
     public boolean isFolder() {
-        return getVodTag().equals("folder");
+        return getVodTag().equals("folder") || getVodTag().equals("cover");
     }
 
     public boolean isList(boolean folder) {
