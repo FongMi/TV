@@ -107,9 +107,9 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         setViewType(isFolder());
     }
 
-    private void setViewType(boolean list) {
-        mBinding.recycler.setLayoutManager(list ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getContext(), Product.getColumn()));
-        mAdapter.setViewType(list ? ViewType.FOLDER : ViewType.GRID);
+    private void setViewType(boolean folder) {
+        mBinding.recycler.setLayoutManager(folder ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getContext(), Product.getColumn()));
+        mAdapter.setViewType(folder ? ViewType.FOLDER : ViewType.GRID);
     }
 
     private void setViewModel() {
@@ -142,9 +142,9 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     private void addVideo(List<Vod> items) {
         if (items.isEmpty()) return;
-        boolean list = isFolder() || mPages.size() > 0 && items.get(0).isFile();
-        int viewType = list ? ViewType.FOLDER : ViewType.GRID;
-        if (viewType != mAdapter.getViewType()) setViewType(list);
+        boolean folder = isFolder() || mPages.size() > 0 && items.get(0).isFile();
+        int viewType = folder ? ViewType.FOLDER : ViewType.GRID;
+        if (viewType != mAdapter.getViewType()) setViewType(folder);
         mAdapter.addAll(items);
     }
 
