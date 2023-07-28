@@ -136,10 +136,6 @@ public class XLDownloadManager {
         loader.setMiUiVersion(str);
     }
 
-    public void setHttpHeaderProperty(long taskId, String key, String value) {
-        loader.setHttpHeaderProperty(taskId, key, value);
-    }
-
     public void getDownloadLibVersion(GetDownloadLibVersion version) {
         loader.getDownloadLibVersion(version);
     }
@@ -168,16 +164,12 @@ public class XLDownloadManager {
         return loader.createBtTask(param.mTorrentPath, param.mFilePath, param.mMaxConcurrent, param.mCreateMode, param.mSeqId, taskId);
     }
 
-    public void getTorrentInfo(String path, TorrentInfo info) {
-        loader.getTorrentInfo(path, info);
+    public void getTorrentInfo(TorrentInfo info) {
+        loader.getTorrentInfo(info.getFile().getAbsolutePath(), info);
     }
 
     public void getBtSubTaskInfo(long taskId, int index, BtSubTaskDetail detail) {
         loader.getBtSubTaskInfo(taskId, index, detail);
-    }
-
-    public void selectBtSubTask(long taskId, BtIndexSet btIndexSet) {
-        loader.selectBtSubTask(taskId, btIndexSet);
     }
 
     public void deselectBtSubTask(long taskId, BtIndexSet btIndexSet) {
@@ -190,8 +182,8 @@ public class XLDownloadManager {
         return thunderUrlInfo.mUrl;
     }
 
-    public int getFileNameFromUrl(String url, GetFileName name) {
-        return loader.getFileNameFromUrl(url, name);
+    public void getFileNameFromUrl(String url, GetFileName name) {
+        loader.getFileNameFromUrl(url, name);
     }
 
     public void setSpeedLimit(long min, long max) {

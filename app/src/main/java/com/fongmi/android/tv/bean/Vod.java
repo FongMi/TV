@@ -20,7 +20,6 @@ import org.simpleframework.xml.Text;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -87,7 +86,8 @@ public class Vod {
     private Site site;
 
     public static List<Vod> arrayFrom(String str) {
-        Type listType = new TypeToken<List<Vod>>() {}.getType();
+        Type listType = new TypeToken<List<Vod>>() {
+        }.getType();
         List<Vod> items = new Gson().fromJson(str, listType);
         return items == null ? Collections.emptyList() : items;
     }
@@ -286,10 +286,6 @@ public class Vod {
             return episodes;
         }
 
-        public void setEpisodes(List<Episode> episodes) {
-            this.episodes = episodes;
-        }
-
         public boolean isActivated() {
             return activated;
         }
@@ -312,7 +308,7 @@ public class Vod {
             for (int i = 0; i < urls.length; i++) {
                 String[] split = urls[i].split("\\$");
                 String number = String.format(Locale.getDefault(), "%02d", i + 1);
-                Episode episode = split.length > 1 ? new Vod.Flag.Episode(split[0].isEmpty() ? number : split[0].trim(), split[1]) : new Vod.Flag.Episode(number, urls[i]);
+                Episode episode = split.length > 1 ? Episode.create(split[0].isEmpty() ? number : split[0].trim(), split[1]) : Episode.create(number, urls[i]);
                 if (!getEpisodes().contains(episode)) getEpisodes().add(episode);
             }
         }
@@ -330,17 +326,17 @@ public class Vod {
         public Episode find(String remarks) {
             int number = Utils.digit(remarks);
             if (getEpisodes().size() == 1) return getEpisodes().get(0);
-            for (Vod.Flag.Episode item : getEpisodes()) if (item.rule1(remarks)) return item;
-            for (Vod.Flag.Episode item : getEpisodes()) if (item.rule2(number)) return item;
-            for (Vod.Flag.Episode item : getEpisodes()) if (item.rule3(remarks)) return item;
-            for (Vod.Flag.Episode item : getEpisodes()) if (item.rule4(remarks)) return item;
+            for (Episode item : getEpisodes()) if (item.rule1(remarks)) return item;
+            for (Episode item : getEpisodes()) if (item.rule2(number)) return item;
+            for (Episode item : getEpisodes()) if (item.rule3(remarks)) return item;
+            for (Episode item : getEpisodes()) if (item.rule4(remarks)) return item;
             return getPosition() != -1 ? getEpisodes().get(getPosition()) : null;
         }
 
         public static List<Flag> create(String flag, String name, String url) {
             Vod.Flag item = new Vod.Flag(flag);
-            item.getEpisodes().add(new Vod.Flag.Episode(name, url));
-            return Arrays.asList(item);
+            item.getEpisodes().add(Episode.create(name, url));
+            return List.of(item);
         }
 
         @Override
@@ -363,10 +359,12 @@ public class Vod {
             private final String name;
             @SerializedName("url")
             private final String url;
-
             private final int number;
-
             private boolean activated;
+
+            public static Episode create(String name, String url) {
+                return new Episode(name, url);
+            }
 
             public static Episode objectFrom(String str) {
                 return new Gson().fromJson(str, Episode.class);

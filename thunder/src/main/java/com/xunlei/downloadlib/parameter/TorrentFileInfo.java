@@ -9,36 +9,30 @@ public class TorrentFileInfo {
     public boolean isSelected;
     public String mFileName;
     public String mSubPath;
+    public long mFileSize;
     public int mFileIndex;
     public int mRealIndex;
-    public long mFileSize;
-
-    public boolean isSelected() {
-        return isSelected;
-    }
+    public File mFile;
 
     public String getFileName() {
         return TextUtils.isEmpty(mFileName) ? "" : mFileName;
-    }
-
-    public String getSubPath() {
-        return mSubPath;
     }
 
     public int getFileIndex() {
         return mFileIndex;
     }
 
-    public int getRealIndex() {
-        return mRealIndex;
+    public File getFile() {
+        return mFile;
     }
 
-    public long getFileSize() {
-        return mFileSize;
+    public TorrentFileInfo file(File file) {
+        this.mFile = file;
+        return this;
     }
 
-    public String getPlayUrl(File file) {
-        return "torrent://" + file.getAbsolutePath() + "?name=" + getFileName() + "&index=" + getFileIndex();
+    public String getPlayUrl() {
+        return "torrent://" + getFile().getAbsolutePath() + "?name=" + getFileName() + "&index=" + getFileIndex();
     }
 
     public String getExt() {

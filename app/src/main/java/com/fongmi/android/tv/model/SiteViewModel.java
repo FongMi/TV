@@ -1,7 +1,6 @@
 package com.fongmi.android.tv.model;
 
 import android.net.Uri;
-import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.ArrayMap;
 
@@ -16,19 +15,16 @@ import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.player.Source;
+import com.fongmi.android.tv.player.extractor.Magnet;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Sniffer;
 import com.fongmi.android.tv.utils.Trans;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.OkHttp;
-import com.github.catvod.utils.Path;
 import com.github.catvod.utils.Util;
-import com.xunlei.downloadlib.XLTaskHelper;
-import com.xunlei.downloadlib.parameter.GetTaskId;
 import com.xunlei.downloadlib.parameter.TorrentFileInfo;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -36,6 +32,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 public class SiteViewModel extends ViewModel {
@@ -217,19 +214,18 @@ public class SiteViewModel extends ViewModel {
         return result;
     }
 
-    private void checkThunder(List<Vod.Flag> flags) {
+    private void checkThunder(List<Vod.Flag> flags) throws Exception {
         for (Vod.Flag flag : flags) {
-            List<Vod.Flag.Episode> items = new ArrayList<>();
+            List<Magnet> magnets = new ArrayList<>();
             for (Vod.Flag.Episode episode : flag.getEpisodes()) {
                 String scheme = Util.scheme(episode.getUrl());
                 if (!scheme.equals("magnet") && !scheme.equals("thunder")) continue;
-                File folder = Path.thunder(Util.md5(episode.getUrl()));
-                GetTaskId taskId = XLTaskHelper.get().addThunderTask(episode.getUrl(), folder);
-                while (XLTaskHelper.get().getTaskInfo(taskId).getTaskStatus() != 2) SystemClock.sleep(10);
-                List<TorrentFileInfo> medias = XLTaskHelper.get().getTorrentInfo(taskId.getSaveFile()).getMedias();
-                for (TorrentFileInfo media : medias) items.add(new Vod.Flag.Episode(media.getFileName(), media.getPlayUrl(taskId.getSaveFile())));
-                if (items.size() > 0) flag.setEpisodes(items);
-                XLTaskHelper.get().stopTask(taskId);
+                magnets.add(Magnet.get(episode.getUrl()));
+            }
+            for (Future<List<TorrentFileInfo>> future : Executors.newCachedThreadPool().invokeAll(magnets, 3000, TimeUnit.MILLISECONDS)) {
+                List<TorrentFileInfo> files = future.get();
+                if (files.size() > 0) flag.getEpisodes().clear();
+                for (TorrentFileInfo file : files) flag.getEpisodes().add(Vod.Flag.Episode.create(file.getFileName(), file.getPlayUrl()));
             }
         }
     }
