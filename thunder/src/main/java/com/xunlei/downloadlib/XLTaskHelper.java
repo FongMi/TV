@@ -164,7 +164,7 @@ public class XLTaskHelper {
     }
 
     public void release() {
-        manager.release();
+        if (manager != null) manager.release();
         manager = null;
         seq = null;
     }

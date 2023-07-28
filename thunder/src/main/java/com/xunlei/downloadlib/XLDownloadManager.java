@@ -50,8 +50,8 @@ public class XLDownloadManager {
     }
 
     public void release() {
+        if (loader != null) loader.unInit();
         unregisterReceiver();
-        loader.unInit();
         context = null;
         loader = null;
     }
