@@ -26,6 +26,7 @@ import com.github.catvod.utils.Util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -220,6 +221,7 @@ public class SiteViewModel extends ViewModel {
             for (Vod.Flag.Episode episode : flag.getEpisodes()) if (Sniffer.isThunder(episode.getUrl())) magnets.add(Magnet.get(episode.getUrl()));
             ExecutorService executor = Executors.newCachedThreadPool();
             for (Future<List<Vod.Flag.Episode>> future : executor.invokeAll(magnets, 15, TimeUnit.SECONDS)) items.addAll(future.get());
+            if (items.size() > 0) Collections.sort(items, (o1, o2) -> o1.getName().compareTo(o2.getName()));
             if (items.size() > 0) flag.setEpisodes(items);
             executor.shutdownNow();
         }
