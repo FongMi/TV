@@ -14,6 +14,7 @@ import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Vod;
+import com.fongmi.android.tv.exception.ExtractException;
 import com.fongmi.android.tv.player.Source;
 import com.fongmi.android.tv.player.extractor.Magnet;
 import com.fongmi.android.tv.utils.ResUtil;
@@ -240,7 +241,8 @@ public class SiteViewModel extends ViewModel {
                 result.postValue(executor.submit(callable).get(Constant.TIMEOUT_VOD, TimeUnit.MILLISECONDS));
             } catch (Throwable e) {
                 if (e instanceof InterruptedException || Thread.interrupted()) return;
-                result.postValue(Result.empty());
+                if (e.getCause() instanceof ExtractException) result.postValue(Result.error(e.getCause().getMessage()));
+                else result.postValue(Result.empty());
                 e.printStackTrace();
             }
         });
