@@ -30,14 +30,14 @@ public class Thunder implements Source.Extractor {
     }
 
     private String addTorrentTask(Uri uri) {
-        File file = new File(uri.getPath());
+        File torrent = new File(uri.getPath());
         String name = uri.getQueryParameter("name");
         int index = Integer.parseInt(uri.getQueryParameter("index"));
-        taskId = XLTaskHelper.get().addTorrentTask(file, Objects.requireNonNull(file.getParentFile()), index);
+        taskId = XLTaskHelper.get().addTorrentTask(torrent, Objects.requireNonNull(torrent.getParentFile()), index);
         while (true) {
             XLTaskInfo taskInfo = XLTaskHelper.get().getBtSubTaskInfo(taskId, index).mTaskInfo;
             if (taskInfo.mTaskStatus == 3) App.post(() -> Notify.show(taskInfo.getErrorMsg()));
-            if (taskInfo.mTaskStatus != 0) return XLTaskHelper.get().getLocalUrl(new File(file.getParent(), name));
+            if (taskInfo.mTaskStatus != 0) return XLTaskHelper.get().getLocalUrl(new File(torrent.getParent(), name));
             else SystemClock.sleep(50);
         }
     }

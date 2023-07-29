@@ -286,6 +286,10 @@ public class Vod {
             return episodes;
         }
 
+        public void setEpisodes(List<Episode> episodes) {
+            this.episodes = episodes;
+        }
+
         public boolean isActivated() {
             return activated;
         }

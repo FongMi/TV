@@ -182,8 +182,10 @@ public class XLDownloadManager {
         return thunderUrlInfo.mUrl;
     }
 
-    public void getFileNameFromUrl(String url, GetFileName name) {
-        loader.getFileNameFromUrl(url, name);
+    public String getFileNameFromUrl(String url) {
+        GetFileName getFileName = new GetFileName();
+        loader.getFileNameFromUrl(url, getFileName);
+        return getFileName.getFileName();
     }
 
     public void setSpeedLimit(long min, long max) {

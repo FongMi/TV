@@ -7,14 +7,16 @@ public class GetTaskId {
     public long mTaskId;
     public File mSavePath;
     public String mFileName;
+    public String mRealUrl;
 
     public GetTaskId(File savePath) {
         this.mSavePath = savePath;
     }
 
-    public GetTaskId(File savePath, String fileName) {
+    public GetTaskId(File savePath, String fileName, String realUrl) {
         this.mSavePath = savePath;
         this.mFileName = fileName;
+        this.mRealUrl = realUrl;
     }
 
     public long getTaskId() {
@@ -29,8 +31,8 @@ public class GetTaskId {
         return mFileName;
     }
 
-    public void setFileName(String fileName) {
-        this.mFileName = fileName;
+    public String getRealUrl() {
+        return mRealUrl;
     }
 
     public File getSaveFile() {
