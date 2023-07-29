@@ -16,6 +16,6 @@ dependencies {
     implementation project(':media-lib-common')
     implementation 'androidx.annotation:annotation:' + annotationVersion
     implementation 'androidx.preference:preference:1.2.0'
-    implementation 'wang.harlon.quickjs:wrapper-android:0.20.2'
+    implementation 'wang.harlon.quickjs:wrapper-android:0.21.0'
     api 'org.jsoup:jsoup:' + jsoupVersion
 }
