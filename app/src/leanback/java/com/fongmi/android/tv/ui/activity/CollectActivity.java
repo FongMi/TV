@@ -189,7 +189,8 @@ public class CollectActivity extends BaseActivity {
         @NonNull
         @Override
         public Fragment getItem(int position) {
-            return CollectFragment.newInstance(((Collect) mAdapter.get(position)).getList());
+            Collect collect = (Collect) mAdapter.get(position);
+            return CollectFragment.newInstance(getKeyword(), collect.getSite(), collect.getList());
         }
 
         @Override

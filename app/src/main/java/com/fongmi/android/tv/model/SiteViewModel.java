@@ -201,6 +201,29 @@ public class SiteViewModel extends ViewModel {
         }
     }
 
+    public void searchContent(Site site, String keyword, String page) {
+        execute(search, () -> {
+            if (site.getType() == 3) {
+                Spider spider = ApiConfig.get().getCSP(site);
+                String searchContent = spider.searchContent(Trans.t2s(keyword), false, page);
+                SpiderDebug.log(site.getName() + "," + searchContent);
+                Result result = Result.fromJson(searchContent);
+                for (Vod vod : result.getList()) vod.setSite(site);
+                return result;
+            } else {
+                ArrayMap<String, String> params = new ArrayMap<>();
+                params.put("wd", Trans.t2s(keyword));
+                params.put("pg", page);
+                if (site.getType() != 0) params.put("ac", "detail");
+                String body = OkHttp.newCall(site.getApi(), params).execute().body().string();
+                SpiderDebug.log(site.getName() + "," + body);
+                Result result = site.getType() == 0 ? Result.fromXml(body) : Result.fromJson(body);
+                for (Vod vod : result.getList()) vod.setSite(site);
+                return fetchPic(site, result);
+            }
+        });
+    }
+
     private Result fetchPic(Site site, Result result) throws Exception {
         if (result.getList().isEmpty() || result.getList().get(0).getVodPic().length() > 0) return result;
         ArrayList<String> ids = new ArrayList<>();
