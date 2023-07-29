@@ -1,13 +1,10 @@
 package com.xunlei.downloadlib;
 
-import android.text.TextUtils;
-
 import com.github.catvod.utils.Path;
 import com.xunlei.downloadlib.parameter.BtIndexSet;
 import com.xunlei.downloadlib.parameter.BtSubTaskDetail;
 import com.xunlei.downloadlib.parameter.BtTaskParam;
 import com.xunlei.downloadlib.parameter.EmuleTaskParam;
-import com.xunlei.downloadlib.parameter.GetFileName;
 import com.xunlei.downloadlib.parameter.GetTaskId;
 import com.xunlei.downloadlib.parameter.MagnetTaskParam;
 import com.xunlei.downloadlib.parameter.P2spTaskParam;
@@ -43,27 +40,30 @@ public class XLTaskHelper {
         return manager = manager == null ? new XLDownloadManager() : manager;
     }
 
-    public synchronized GetTaskId addThunderTask(String url, File savePath) {
-        return addThunderTask(url, savePath, null);
+    private GetTaskId startTask(GetTaskId taskId, int index) {
+        getManager().startTask(taskId.getTaskId());
+        getManager().setTaskGsState(taskId.getTaskId(), index, 2);
+        return taskId;
     }
 
-    public synchronized GetTaskId addThunderTask(String url, File savePath, String fileName) {
-        GetTaskId taskId = new GetTaskId(savePath, fileName);
+    public synchronized GetTaskId parse(String url, File savePath) {
         if (url.startsWith("thunder://")) url = getManager().parserThunderUrl(url);
-        if (TextUtils.isEmpty(fileName)) {
-            GetFileName getFileName = new GetFileName();
-            getManager().getFileNameFromUrl(url, getFileName);
-            fileName = getFileName.mFileName;
-            taskId.setFileName(fileName);
-        }
-        if (url.startsWith("magnet:?")) {
-            MagnetTaskParam param = new MagnetTaskParam();
-            param.setFilePath(savePath.getAbsolutePath());
-            param.setFileName(fileName);
-            param.setUrl(url);
-            int code = getManager().createBtMagnetTask(param, taskId);
-            if (code != XLConstant.XLErrorCode.NO_ERROR) return taskId;
-        } else if (url.startsWith("ftp://")) {
+        String fileName = getManager().getFileNameFromUrl(url);
+        GetTaskId taskId = new GetTaskId(savePath, fileName, url);
+        if (!url.startsWith("magnet:?")) return taskId;
+        MagnetTaskParam param = new MagnetTaskParam();
+        param.setFilePath(savePath.getAbsolutePath());
+        param.setFileName(fileName);
+        param.setUrl(url);
+        int code = getManager().createBtMagnetTask(param, taskId);
+        if (code != XLConstant.XLErrorCode.NO_ERROR) return taskId;
+        return startTask(taskId, 0);
+    }
+
+    public synchronized GetTaskId addThunderTask(String url, File savePath) {
+        String fileName = getManager().getFileNameFromUrl(url);
+        GetTaskId taskId = new GetTaskId(savePath, fileName, url);
+        if (url.startsWith("ftp://")) {
             P2spTaskParam param = new P2spTaskParam();
             param.setFilePath(savePath.getAbsolutePath());
             param.setSeqId(getSeq().incrementAndGet());
@@ -88,9 +88,7 @@ public class XLTaskHelper {
             int code = getManager().createEmuleTask(param, taskId);
             if (code != XLConstant.XLErrorCode.NO_ERROR) return taskId;
         }
-        getManager().startTask(taskId.getTaskId());
-        getManager().setTaskGsState(taskId.getTaskId(), 0, 2);
-        return taskId;
+        return startTask(taskId, 0);
     }
 
     public synchronized GetTaskId addTorrentTask(File torrent, File savePath, int index) {
@@ -116,9 +114,7 @@ public class XLTaskHelper {
             for (int i = 0; i < list.size(); i++) btIndexSet.mIndexSet[i] = list.get(i);
             getManager().deselectBtSubTask(taskId.getTaskId(), btIndexSet);
         }
-        getManager().startTask(taskId.getTaskId());
-        getManager().setTaskGsState(taskId.getTaskId(), index, 2);
-        return taskId;
+        return startTask(taskId, index);
     }
 
     public synchronized TorrentInfo getTorrentInfo(File file) {

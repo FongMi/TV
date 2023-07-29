@@ -23,7 +23,6 @@ import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Util;
-import com.xunlei.downloadlib.parameter.TorrentFileInfo;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -217,16 +216,12 @@ public class SiteViewModel extends ViewModel {
     private void checkThunder(List<Vod.Flag> flags) throws Exception {
         for (Vod.Flag flag : flags) {
             List<Magnet> magnets = new ArrayList<>();
-            for (Vod.Flag.Episode episode : flag.getEpisodes()) {
-                String scheme = Util.scheme(episode.getUrl());
-                if (!scheme.equals("magnet") && !scheme.equals("thunder")) continue;
-                magnets.add(Magnet.get(episode.getUrl()));
-            }
-            for (Future<List<TorrentFileInfo>> future : Executors.newCachedThreadPool().invokeAll(magnets, 5000, TimeUnit.MILLISECONDS)) {
-                List<TorrentFileInfo> files = future.get();
-                if (files.size() > 0) flag.getEpisodes().clear();
-                for (TorrentFileInfo file : files) flag.getEpisodes().add(Vod.Flag.Episode.create(file.getFileName(), file.getPlayUrl()));
-            }
+            List<Vod.Flag.Episode> items = new ArrayList<>();
+            for (Vod.Flag.Episode episode : flag.getEpisodes()) if (Sniffer.isThunder(episode.getUrl())) magnets.add(Magnet.get(episode.getUrl()));
+            ExecutorService executor = Executors.newCachedThreadPool();
+            for (Future<List<Vod.Flag.Episode>> future : executor.invokeAll(magnets, 15, TimeUnit.SECONDS)) items.addAll(future.get());
+            if (items.size() > 0) flag.setEpisodes(items);
+            executor.shutdownNow();
         }
     }
 
