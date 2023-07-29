@@ -32,7 +32,7 @@ public class TorrentFileInfo {
     }
 
     public String getPlayUrl() {
-        return "torrent://" + getFile().getAbsolutePath() + "?name=" + getFileName() + "&index=" + getFileIndex();
+        return "magnet://" + getFile().getAbsolutePath() + "?name=" + getFileName() + "&index=" + getFileIndex();
     }
 
     public String getExt() {

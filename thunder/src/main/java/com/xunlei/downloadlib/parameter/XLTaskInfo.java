@@ -83,7 +83,7 @@ public class XLTaskInfo implements Parcelable {
     }
 
     public String getErrorMsg() {
-        return Error.get(mErrorCode);
+        return ErrorCode.get(mErrorCode);
     }
 
     @Override

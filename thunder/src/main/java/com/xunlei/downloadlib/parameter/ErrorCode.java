@@ -1,6 +1,6 @@
 package com.xunlei.downloadlib.parameter;
 
-public class Error {
+public class ErrorCode {
 
     public static String get(int code) {
         switch (code) {

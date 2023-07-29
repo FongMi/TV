@@ -60,6 +60,9 @@ public class Result {
     @SerializedName("subs")
     private List<Sub> subs;
 
+    private boolean error;
+    private String msg;
+
     public static Result fromJson(String str) {
         try {
             Result result = FilterAdapter.gson().fromJson(str, Result.class);
@@ -90,6 +93,13 @@ public class Result {
     }
 
     public static Result empty() {
+        return new Result();
+    }
+
+    public static Result error(String msg) {
+        Result result = new Result();
+        result.setError(true);
+        result.setMsg(msg);
         return new Result();
     }
 
@@ -199,6 +209,22 @@ public class Result {
 
     public List<Sub> getSubs() {
         return subs == null ? Collections.emptyList() : subs;
+    }
+
+    public boolean isError() {
+        return error;
+    }
+
+    public void setError(boolean error) {
+        this.error = error;
+    }
+
+    public String getMsg() {
+        return msg;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
     }
 
     public String getRealUrl() {
