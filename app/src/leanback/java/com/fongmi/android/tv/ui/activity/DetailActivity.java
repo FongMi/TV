@@ -466,7 +466,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void seamless(Vod.Flag flag, boolean force) {
         if (!force && !getSite().isChangeable()) return;
-        Vod.Flag.Episode episode = flag.find(mHistory.getVodRemarks());
+        Vod.Flag.Episode episode = flag.find(mHistory.getVodRemarks(), getMark() == null);
         if (episode == null || episode.isActivated()) return;
         mHistory.setVodRemarks(episode.getName());
         setEpisodeActivated(episode);

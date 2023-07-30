@@ -329,14 +329,16 @@ public class Vod {
             for (int i = 0; i < getEpisodes().size(); i++) getEpisodes().get(i).setActivated(i == getPosition());
         }
 
-        public Episode find(String remarks) {
+        public Episode find(String remarks, boolean strict) {
             int number = Utils.digit(remarks);
+            if (getEpisodes().size() == 0) return null;
             if (getEpisodes().size() == 1) return getEpisodes().get(0);
+            if (getPosition() != -1) return getEpisodes().get(getPosition());
             for (Episode item : getEpisodes()) if (item.rule1(remarks)) return item;
             for (Episode item : getEpisodes()) if (item.rule2(number)) return item;
             for (Episode item : getEpisodes()) if (item.rule3(remarks)) return item;
             for (Episode item : getEpisodes()) if (item.rule4(remarks)) return item;
-            return getPosition() != -1 ? getEpisodes().get(getPosition()) : null;
+            return strict ? null : getEpisodes().get(0);
         }
 
         public Episode check(Episode episode) {
