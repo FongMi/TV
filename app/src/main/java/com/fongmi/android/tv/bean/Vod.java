@@ -21,6 +21,7 @@ import org.simpleframework.xml.Text;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -86,8 +87,7 @@ public class Vod {
     private Site site;
 
     public static List<Vod> arrayFrom(String str) {
-        Type listType = new TypeToken<List<Vod>>() {
-        }.getType();
+        Type listType = new TypeToken<List<Vod>>() {}.getType();
         List<Vod> items = new Gson().fromJson(str, listType);
         return items == null ? Collections.emptyList() : items;
     }
@@ -286,10 +286,6 @@ public class Vod {
             return episodes;
         }
 
-        public void setEpisodes(List<Episode> episodes) {
-            this.episodes = episodes;
-        }
-
         public boolean isActivated() {
             return activated;
         }
@@ -313,8 +309,14 @@ public class Vod {
                 String[] split = urls[i].split("\\$");
                 String number = String.format(Locale.getDefault(), "%02d", i + 1);
                 Episode episode = split.length > 1 ? Episode.create(split[0].isEmpty() ? number : split[0].trim(), split[1]) : Episode.create(number, urls[i]);
-                if (!getEpisodes().contains(episode)) getEpisodes().add(episode);
+                getEpisodes().add(check(episode));
             }
+        }
+
+        public void createEpisode(List<Episode> items) {
+            getEpisodes().clear();
+            Episode.Sorter.sort(items);
+            for (Vod.Flag.Episode item : items) getEpisodes().add(check(item));
         }
 
         public void toggle(boolean activated, Episode episode) {
@@ -335,6 +337,11 @@ public class Vod {
             for (Episode item : getEpisodes()) if (item.rule3(remarks)) return item;
             for (Episode item : getEpisodes()) if (item.rule4(remarks)) return item;
             return getPosition() != -1 ? getEpisodes().get(getPosition()) : null;
+        }
+
+        public Episode check(Episode episode) {
+            while (getEpisodes().contains(episode)) check(episode.rename());
+            return episode;
         }
 
         public static List<Flag> create(String flag, String name, String url) {
@@ -360,9 +367,10 @@ public class Vod {
         public static class Episode {
 
             @SerializedName("name")
-            private final String name;
+            private String name;
             @SerializedName("url")
-            private final String url;
+            private String url;
+
             private final int number;
             private boolean activated;
 
@@ -390,8 +398,17 @@ public class Vod {
                 return name;
             }
 
+            public void setName(String name) {
+                this.name = name;
+            }
+
             public String getUrl() {
                 return url;
+            }
+
+            public Episode rename() {
+                setName(getName().concat("_"));
+                return this;
             }
 
             public int getNumber() {
@@ -432,6 +449,18 @@ public class Vod {
                 if (!(obj instanceof Episode)) return false;
                 Episode it = (Episode) obj;
                 return getUrl().equals(it.getUrl()) || getName().equals(it.getName());
+            }
+
+            static class Sorter implements Comparator<Episode> {
+
+                public static void sort(List<Episode> items) {
+                    Collections.sort(items, new Sorter());
+                }
+
+                @Override
+                public int compare(Episode o1, Episode o2) {
+                    return Integer.compare(o1.getNumber(), o2.getNumber());
+                }
             }
         }
     }
