@@ -202,7 +202,7 @@ public class SiteViewModel extends ViewModel {
     }
 
     public void searchContent(Site site, String keyword, String page) {
-        execute(search, () -> {
+        execute(result, () -> {
             if (site.getType() == 3) {
                 Spider spider = ApiConfig.get().getCSP(site);
                 String searchContent = spider.searchContent(Trans.t2s(keyword), false, page);

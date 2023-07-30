@@ -13,9 +13,9 @@ public class Collect {
     private boolean activated;
 
     public static Collect all() {
-        Collect all = new Collect(Site.get("all", ResUtil.getString(R.string.all)), new ArrayList<>());
-        all.setActivated(true);
-        return all;
+        Collect item = new Collect(Site.get("all", ResUtil.getString(R.string.all)), new ArrayList<>());
+        item.setActivated(true);
+        return item;
     }
 
     public static Collect create(List<Vod> list) {
@@ -41,5 +41,9 @@ public class Collect {
 
     public void setActivated(boolean activated) {
         this.activated = activated;
+    }
+
+    public boolean isAll() {
+        return getSite().getKey().equals("all");
     }
 }

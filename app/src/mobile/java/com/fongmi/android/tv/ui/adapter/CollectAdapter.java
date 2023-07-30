@@ -48,6 +48,10 @@ public class CollectAdapter extends RecyclerView.Adapter<CollectAdapter.ViewHold
         return 0;
     }
 
+    public Collect getActivated() {
+        return mItems.get(getPosition());
+    }
+
     public void setActivated(int position) {
         for (int i = 0; i < mItems.size(); i++) mItems.get(i).setActivated(i == position);
         notifyDataSetChanged();
