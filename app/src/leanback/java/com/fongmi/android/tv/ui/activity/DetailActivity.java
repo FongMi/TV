@@ -61,7 +61,7 @@ import com.fongmi.android.tv.ui.presenter.SearchPresenter;
 import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.Notify;
-import com.fongmi.android.tv.utils.Prefers;
+import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Sniffer;
 import com.fongmi.android.tv.utils.Traffic;
@@ -213,15 +213,15 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private int getPlayer() {
-        return mHistory != null && mHistory.getPlayer() != -1 ? mHistory.getPlayer() : getSite().getPlayerType() != -1 ? getSite().getPlayerType() : Prefers.getPlayer();
+        return mHistory != null && mHistory.getPlayer() != -1 ? mHistory.getPlayer() : getSite().getPlayerType() != -1 ? getSite().getPlayerType() : Setting.getPlayer();
     }
 
     private int getScale() {
-        return mHistory != null && mHistory.getScale() != -1 ? mHistory.getScale() : Prefers.getScale();
+        return mHistory != null && mHistory.getScale() != -1 ? mHistory.getScale() : Setting.getScale();
     }
 
     private PlayerView getExo() {
-        return Prefers.getRender() == 0 ? mBinding.surface : mBinding.texture;
+        return Setting.getRender() == 0 ? mBinding.surface : mBinding.texture;
     }
 
     private IjkVideoView getIjk() {
@@ -229,7 +229,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private boolean isReplay() {
-        return Prefers.getReset() == 1;
+        return Setting.getReset() == 1;
     }
 
     private boolean isFromCollect() {
@@ -331,7 +331,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.player.setText(mPlayers.getPlayerText());
         getExo().setVisibility(mPlayers.isExo() ? View.VISIBLE : View.GONE);
         getIjk().setVisibility(mPlayers.isIjk() ? View.VISIBLE : View.GONE);
-        mBinding.control.reset.setText(ResUtil.getStringArray(R.array.select_reset)[Prefers.getReset()]);
+        mBinding.control.reset.setText(ResUtil.getStringArray(R.array.select_reset)[Setting.getReset()]);
     }
 
     private void setDecodeView() {
@@ -643,8 +643,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private boolean onResetToggle() {
-        Prefers.putReset(Math.abs(Prefers.getReset() - 1));
-        mBinding.control.reset.setText(ResUtil.getStringArray(R.array.select_reset)[Prefers.getReset()]);
+        Setting.putReset(Math.abs(Setting.getReset() - 1));
+        mBinding.control.reset.setText(ResUtil.getStringArray(R.array.select_reset)[Setting.getReset()]);
         return true;
     }
 

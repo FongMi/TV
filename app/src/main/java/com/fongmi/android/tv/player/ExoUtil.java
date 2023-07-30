@@ -37,7 +37,7 @@ import androidx.media3.ui.CaptionStyleCompat;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Sub;
-import com.fongmi.android.tv.utils.Prefers;
+import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.utils.Sniffer;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.net.OkHttp;
@@ -66,12 +66,12 @@ public class ExoUtil {
 
     public static TrackSelector buildTrackSelector() {
         DefaultTrackSelector trackSelector = new DefaultTrackSelector(App.get());
-        trackSelector.setParameters(trackSelector.buildUponParameters().setPreferredTextLanguage("zh").setTunnelingEnabled(Prefers.isTunnel()));
+        trackSelector.setParameters(trackSelector.buildUponParameters().setPreferredTextLanguage("zh").setTunnelingEnabled(Setting.isTunnel()));
         return trackSelector;
     }
 
     public static RenderersFactory buildRenderersFactory() {
-        return new DefaultRenderersFactory(App.get()).setExtensionRendererMode(Math.abs(Prefers.getDecode() - 2));
+        return new DefaultRenderersFactory(App.get()).setExtensionRendererMode(Math.abs(Setting.getDecode() - 2));
     }
 
     public static CaptionStyleCompat getCaptionStyle() {
@@ -157,7 +157,7 @@ public class ExoUtil {
     }
 
     private static synchronized HttpDataSource.Factory getHttpDataSourceFactory() {
-        if (httpDataSourceFactory == null) httpDataSourceFactory = Prefers.getHttp() == 0 ? new DefaultHttpDataSource.Factory().setAllowCrossProtocolRedirects(true) : new OkHttpDataSource.Factory((Call.Factory) OkHttp.client());
+        if (httpDataSourceFactory == null) httpDataSourceFactory = Setting.getHttp() == 0 ? new DefaultHttpDataSource.Factory().setAllowCrossProtocolRedirects(true) : new OkHttpDataSource.Factory((Call.Factory) OkHttp.client());
         return httpDataSourceFactory;
     }
 

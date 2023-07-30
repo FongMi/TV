@@ -20,6 +20,7 @@ import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.signature.ObjectKey;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.Setting;
 import com.github.catvod.utils.Json;
 import com.github.catvod.utils.Util;
 import com.google.gson.JsonParser;
@@ -36,7 +37,7 @@ public class ImgUtil {
     public static void load(String url, ImageView view, ImageView.ScaleType scaleType) {
         view.setScaleType(scaleType);
         if (TextUtils.isEmpty(url)) view.setImageResource(R.drawable.ic_img_error);
-        else Glide.with(App.get()).asBitmap().load(checkUrl(url)).skipMemoryCache(true).dontAnimate().sizeMultiplier(Prefers.getThumbnail()).signature(new ObjectKey(url + "_" + Prefers.getQuality())).placeholder(R.drawable.ic_img_loading).listener(getListener(view, scaleType)).into(view);
+        else Glide.with(App.get()).asBitmap().load(checkUrl(url)).skipMemoryCache(true).dontAnimate().sizeMultiplier(Setting.getThumbnail()).signature(new ObjectKey(url + "_" + Setting.getQuality())).placeholder(R.drawable.ic_img_loading).listener(getListener(view, scaleType)).into(view);
     }
 
     public static void loadKeep(String url, ImageView view) {

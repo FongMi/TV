@@ -8,6 +8,7 @@ import android.os.Build;
 import android.util.Log;
 
 import com.github.catvod.Init;
+import com.github.catvod.utils.Prefers;
 import com.xunlei.downloadlib.android.XLUtil;
 import com.xunlei.downloadlib.parameter.BtIndexSet;
 import com.xunlei.downloadlib.parameter.BtSubTaskDetail;
@@ -33,7 +34,7 @@ public class XLDownloadManager {
     private Context context;
 
     public XLDownloadManager() {
-        this.context = Init.getContext();
+        this.context = Init.context();
         this.loader = new XLLoader();
         this.init();
     }
@@ -79,8 +80,8 @@ public class XLDownloadManager {
     }
 
     private String getPeerId() {
-        String uuid = Prefers.getString(context, "phoneId5", "");
-        if (uuid.isEmpty()) Prefers.put(context, "phoneId5", XLUtil.getPeerId());
+        String uuid = Prefers.getString("phoneId5", "");
+        if (uuid.isEmpty()) Prefers.put("phoneId5", XLUtil.getPeerId());
         return uuid;
     }
 

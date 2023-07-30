@@ -33,11 +33,11 @@ public class Path {
     }
 
     public static File cache() {
-        return Init.getContext().getCacheDir();
+        return Init.context().getCacheDir();
     }
 
     public static File files() {
-        return Init.getContext().getFilesDir();
+        return Init.context().getFilesDir();
     }
 
     public static String rootPath() {
@@ -115,7 +115,7 @@ public class Path {
 
     public static String asset(String fileName) {
         try {
-            return read(Init.getContext().getAssets().open(fileName));
+            return read(Init.context().getAssets().open(fileName));
         } catch (Exception e) {
             return "";
         }

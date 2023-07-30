@@ -16,6 +16,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.media3.common.util.UriUtil;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.server.Server;
 import com.github.catvod.utils.Util;
 import com.google.common.net.HttpHeaders;
@@ -96,8 +97,8 @@ public class Utils {
     }
 
     public static Map<String, String> checkHeaders(Map<String, String> headers) {
-        if (Prefers.getUa().isEmpty() || headers.containsKey(HttpHeaders.USER_AGENT) || headers.containsKey(HttpHeaders.USER_AGENT.toLowerCase())) return headers;
-        headers.put(HttpHeaders.USER_AGENT, Prefers.getUa());
+        if (Setting.getUa().isEmpty() || headers.containsKey(HttpHeaders.USER_AGENT) || headers.containsKey(HttpHeaders.USER_AGENT.toLowerCase())) return headers;
+        headers.put(HttpHeaders.USER_AGENT, Setting.getUa());
         return headers;
     }
 

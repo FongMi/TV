@@ -20,6 +20,10 @@ public class Init {
         return get().context.get();
     }
 
+    public static Context context() {
+        return get().context.get();
+    }
+
     public static void setContext(Context context) {
         get().context = new WeakReference<>(context);
     }

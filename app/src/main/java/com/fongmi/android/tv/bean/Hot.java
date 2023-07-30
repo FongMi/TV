@@ -1,6 +1,6 @@
 package com.fongmi.android.tv.bean;
 
-import com.fongmi.android.tv.utils.Prefers;
+import com.fongmi.android.tv.Setting;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
@@ -20,7 +20,7 @@ public class Hot {
         try {
             List<String> items = new ArrayList<>();
             for (Data item : objectFrom(str).getData()) items.add(item.getTitle());
-            if (items.size() > 0) Prefers.putHot(str);
+            if (items.size() > 0) Setting.putHot(str);
             return items;
         } catch (Exception e) {
             return new ArrayList<>();

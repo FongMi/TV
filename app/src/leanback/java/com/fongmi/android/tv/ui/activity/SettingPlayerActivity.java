@@ -13,7 +13,7 @@ import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.dialog.UaDialog;
-import com.fongmi.android.tv.utils.Prefers;
+import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.utils.ResUtil;
 
 public class SettingPlayerActivity extends BaseActivity implements UaCallback {
@@ -36,11 +36,11 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback {
 
     @Override
     protected void initView() {
-        mBinding.uaText.setText(Prefers.getUa());
-        mBinding.tunnelText.setText(getSwitch(Prefers.isTunnel()));
-        mBinding.http.setVisibility(Players.isExo(Prefers.getPlayer()) ? View.VISIBLE : View.GONE);
-        mBinding.tunnel.setVisibility(Players.isExo(Prefers.getPlayer()) ? View.VISIBLE : View.GONE);
-        mBinding.httpText.setText((http = ResUtil.getStringArray(R.array.select_exo_http))[Prefers.getHttp()]);
+        mBinding.uaText.setText(Setting.getUa());
+        mBinding.tunnelText.setText(getSwitch(Setting.isTunnel()));
+        mBinding.http.setVisibility(Players.isExo(Setting.getPlayer()) ? View.VISIBLE : View.GONE);
+        mBinding.tunnel.setVisibility(Players.isExo(Setting.getPlayer()) ? View.VISIBLE : View.GONE);
+        mBinding.httpText.setText((http = ResUtil.getStringArray(R.array.select_exo_http))[Setting.getHttp()]);
     }
 
     @Override
@@ -55,20 +55,20 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback {
     }
 
     private void setHttp(View view) {
-        int index = Prefers.getHttp();
-        Prefers.putHttp(index = index == http.length - 1 ? 0 : ++index);
+        int index = Setting.getHttp();
+        Setting.putHttp(index = index == http.length - 1 ? 0 : ++index);
         mBinding.httpText.setText(http[index]);
         ExoUtil.reset();
     }
 
     private void setTunnel(View view) {
-        Prefers.putTunnel(!Prefers.isTunnel());
-        mBinding.tunnelText.setText(getSwitch(Prefers.isTunnel()));
+        Setting.putTunnel(!Setting.isTunnel());
+        mBinding.tunnelText.setText(getSwitch(Setting.isTunnel()));
     }
 
     @Override
     public void setUa(String ua) {
         mBinding.uaText.setText(ua);
-        Prefers.putUa(ua);
+        Setting.putUa(ua);
     }
 }
