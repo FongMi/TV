@@ -42,8 +42,4 @@ public class Collect {
     public void setActivated(boolean activated) {
         this.activated = activated;
     }
-
-    public boolean isAll() {
-        return getSite().getKey().equals("all");
-    }
 }
