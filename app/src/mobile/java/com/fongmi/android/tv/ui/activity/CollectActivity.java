@@ -18,6 +18,7 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Collect;
 import com.fongmi.android.tv.bean.Hot;
@@ -38,7 +39,6 @@ import com.fongmi.android.tv.ui.base.ViewType;
 import com.fongmi.android.tv.ui.custom.CustomScroller;
 import com.fongmi.android.tv.ui.custom.CustomTextListener;
 import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
-import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.net.OkHttp;
@@ -133,7 +133,7 @@ public class CollectActivity extends BaseActivity implements CustomScroller.Call
     }
 
     private void setViewType() {
-        mVodAdapter.setViewType(Prefers.getViewType());
+        mVodAdapter.setViewType(Setting.getViewType());
         boolean grid = mVodAdapter.getViewType() == ViewType.GRID;
         GridLayoutManager manager = (GridLayoutManager) mBinding.recycler.getLayoutManager();
         mBinding.view.setImageResource(grid ? R.drawable.ic_action_list : R.drawable.ic_action_grid);
@@ -205,7 +205,7 @@ public class CollectActivity extends BaseActivity implements CustomScroller.Call
 
     private void getHot() {
         mBinding.word.setText(R.string.search_hot);
-        mWordAdapter.addAll(Hot.get(Prefers.getHot()));
+        mWordAdapter.addAll(Hot.get(Setting.getHot()));
     }
 
     private void getSuggest(String text) {
@@ -226,7 +226,7 @@ public class CollectActivity extends BaseActivity implements CustomScroller.Call
 
     private void toggleView(View view) {
         mVodAdapter.setViewType(mVodAdapter.getViewType() == ViewType.GRID ? ViewType.LIST : ViewType.GRID);
-        Prefers.putViewType(mVodAdapter.getViewType());
+        Setting.putViewType(mVodAdapter.getViewType());
         setViewType();
     }
 

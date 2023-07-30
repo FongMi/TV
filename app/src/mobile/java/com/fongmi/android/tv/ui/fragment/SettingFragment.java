@@ -13,6 +13,7 @@ import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.BuildConfig;
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.Updater;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.api.LiveConfig;
@@ -35,7 +36,6 @@ import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
 import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Notify;
-import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.bean.Doh;
@@ -62,7 +62,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
     }
 
     private int getDohIndex() {
-        return Math.max(0, ApiConfig.get().getDoh().indexOf(Doh.objectFrom(Prefers.getDoh())));
+        return Math.max(0, ApiConfig.get().getDoh().indexOf(Doh.objectFrom(Setting.getDoh())));
     }
 
     private String[] getDohList() {
@@ -87,11 +87,11 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.wallUrl.setText(WallConfig.getDesc());
         mBinding.dohText.setText(getDohList()[getDohIndex()]);
         mBinding.versionText.setText(BuildConfig.VERSION_NAME);
-        mBinding.sizeText.setText((size = ResUtil.getStringArray(R.array.select_size))[Prefers.getSize()]);
-        mBinding.scaleText.setText((scale = ResUtil.getStringArray(R.array.select_scale))[Prefers.getScale()]);
-        mBinding.playerText.setText((player = ResUtil.getStringArray(R.array.select_player))[Prefers.getPlayer()]);
-        mBinding.decodeText.setText((decode = ResUtil.getStringArray(R.array.select_decode))[Prefers.getDecode()]);
-        mBinding.renderText.setText((render = ResUtil.getStringArray(R.array.select_render))[Prefers.getRender()]);
+        mBinding.sizeText.setText((size = ResUtil.getStringArray(R.array.select_size))[Setting.getSize()]);
+        mBinding.scaleText.setText((scale = ResUtil.getStringArray(R.array.select_scale))[Setting.getScale()]);
+        mBinding.playerText.setText((player = ResUtil.getStringArray(R.array.select_player))[Setting.getPlayer()]);
+        mBinding.decodeText.setText((decode = ResUtil.getStringArray(R.array.select_decode))[Setting.getDecode()]);
+        mBinding.renderText.setText((render = ResUtil.getStringArray(R.array.select_render))[Setting.getRender()]);
         setCacheText();
     }
 
@@ -254,7 +254,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
     }
 
     private void setWallDefault(View view) {
-        WallConfig.refresh(Prefers.getWall() == 4 ? 1 : Prefers.getWall() + 1);
+        WallConfig.refresh(Setting.getWall() == 4 ? 1 : Setting.getWall() + 1);
     }
 
     private void setWallRefresh(View view) {
@@ -269,35 +269,35 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
     }
 
     private void setPlayer(View view) {
-        int index = Prefers.getPlayer();
-        Prefers.putPlayer(index = index == player.length - 1 ? 0 : ++index);
+        int index = Setting.getPlayer();
+        Setting.putPlayer(index = index == player.length - 1 ? 0 : ++index);
         mBinding.playerText.setText(player[index]);
     }
 
     private void setDecode(View view) {
-        int index = Prefers.getDecode();
-        Prefers.putDecode(index = index == decode.length - 1 ? 0 : ++index);
+        int index = Setting.getDecode();
+        Setting.putDecode(index = index == decode.length - 1 ? 0 : ++index);
         mBinding.decodeText.setText(decode[index]);
     }
 
     private void setRender(View view) {
-        int index = Prefers.getRender();
-        Prefers.putRender(index = index == render.length - 1 ? 0 : ++index);
+        int index = Setting.getRender();
+        Setting.putRender(index = index == render.length - 1 ? 0 : ++index);
         mBinding.renderText.setText(render[index]);
     }
 
     private void setScale(View view) {
-        new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.setting_scale).setNegativeButton(R.string.dialog_negative, null).setSingleChoiceItems(scale, Prefers.getScale(), (dialog, which) -> {
+        new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.setting_scale).setNegativeButton(R.string.dialog_negative, null).setSingleChoiceItems(scale, Setting.getScale(), (dialog, which) -> {
             mBinding.scaleText.setText(scale[which]);
-            Prefers.putScale(which);
+            Setting.putScale(which);
             dialog.dismiss();
         }).show();
     }
 
     private void setSize(View view) {
-        new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.setting_size).setNegativeButton(R.string.dialog_negative, null).setSingleChoiceItems(size, Prefers.getSize(), (dialog, which) -> {
+        new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.setting_size).setNegativeButton(R.string.dialog_negative, null).setSingleChoiceItems(size, Setting.getSize(), (dialog, which) -> {
             mBinding.sizeText.setText(size[which]);
-            Prefers.putSize(which);
+            Setting.putSize(which);
             RefreshEvent.size();
             dialog.dismiss();
         }).show();
@@ -313,7 +313,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
     private void setDoh(Doh doh) {
         OkHttp.get().setDoh(doh);
         Notify.progress(getActivity());
-        Prefers.putDoh(doh.toString());
+        Setting.putDoh(doh.toString());
         mBinding.dohText.setText(doh.getName());
         ApiConfig.load(Config.vod(), getCallback());
     }
@@ -334,8 +334,8 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.liveUrl.setText(LiveConfig.getDesc());
         mBinding.wallUrl.setText(WallConfig.getDesc());
         mBinding.dohText.setText(getDohList()[getDohIndex()]);
-        mBinding.playerText.setText(player[Prefers.getPlayer()]);
-        mBinding.decodeText.setText(decode[Prefers.getDecode()]);
+        mBinding.playerText.setText(player[Setting.getPlayer()]);
+        mBinding.decodeText.setText(decode[Setting.getDecode()]);
         setCacheText();
     }
 
