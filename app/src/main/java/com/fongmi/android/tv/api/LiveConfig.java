@@ -14,7 +14,7 @@ import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.utils.Notify;
-import com.fongmi.android.tv.utils.Prefers;
+import com.fongmi.android.tv.Setting;
 import com.github.catvod.utils.Json;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -168,7 +168,7 @@ public class LiveConfig {
     }
 
     private int[] getKeep(List<Group> items) {
-        String[] splits = Prefers.getKeep().split(AppDatabase.SYMBOL);
+        String[] splits = Setting.getKeep().split(AppDatabase.SYMBOL);
         if (!home.getName().equals(splits[0])) return new int[]{1, 0};
         for (int i = 0; i < items.size(); i++) {
             Group group = items.get(i);
@@ -183,7 +183,7 @@ public class LiveConfig {
 
     public void setKeep(Channel channel) {
         if (home == null || channel.getGroup().isHidden() || channel.getUrls().isEmpty()) return;
-        Prefers.putKeep(home.getName() + AppDatabase.SYMBOL + channel.getGroup().getName() + AppDatabase.SYMBOL + channel.getName() + AppDatabase.SYMBOL + channel.getCurrent());
+        Setting.putKeep(home.getName() + AppDatabase.SYMBOL + channel.getGroup().getName() + AppDatabase.SYMBOL + channel.getName() + AppDatabase.SYMBOL + channel.getCurrent());
     }
 
     public int[] find(List<Group> items) {

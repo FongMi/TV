@@ -2,7 +2,7 @@ package com.fongmi.quickjs.method;
 
 import androidx.annotation.Keep;
 
-import com.fongmi.quickjs.utils.Prefers;
+import com.github.catvod.utils.Prefers;
 import com.whl.quickjs.wrapper.JSMethod;
 
 public class Local {
@@ -10,7 +10,7 @@ public class Local {
     @Keep
     @JSMethod
     public String get(String rule, String key) {
-        return Prefers.get("js_engine_" + rule + "_" + key);
+        return Prefers.getString("js_engine_" + rule + "_" + key);
     }
 
     @Keep

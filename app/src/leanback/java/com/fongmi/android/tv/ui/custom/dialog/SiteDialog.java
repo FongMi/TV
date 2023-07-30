@@ -17,7 +17,7 @@ import com.fongmi.android.tv.databinding.DialogSiteBinding;
 import com.fongmi.android.tv.impl.SiteCallback;
 import com.fongmi.android.tv.ui.adapter.SiteAdapter;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
-import com.fongmi.android.tv.utils.Prefers;
+import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -58,7 +58,7 @@ public class SiteDialog implements SiteAdapter.OnClickListener, CompoundButton.O
     }
 
     private boolean list() {
-        return Prefers.getSiteMode() == 0 || adapter.getItemCount() < 20;
+        return Setting.getSiteMode() == 0 || adapter.getItemCount() < 20;
     }
 
     private int getCount() {
@@ -107,7 +107,7 @@ public class SiteDialog implements SiteAdapter.OnClickListener, CompoundButton.O
     }
 
     private void setMode() {
-        if (adapter.getItemCount() < 20) Prefers.putSiteMode(0);
+        if (adapter.getItemCount() < 20) Setting.putSiteMode(0);
         binding.mode.setEnabled(adapter.getItemCount() >= 20);
         binding.mode.setImageResource(getIcon());
     }
@@ -120,7 +120,7 @@ public class SiteDialog implements SiteAdapter.OnClickListener, CompoundButton.O
     }
 
     private void setMode(View view) {
-        Prefers.putSiteMode(Math.abs(Prefers.getSiteMode() - 1));
+        Setting.putSiteMode(Math.abs(Setting.getSiteMode() - 1));
         initView();
     }
 

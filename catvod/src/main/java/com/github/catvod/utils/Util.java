@@ -17,7 +17,7 @@ import java.security.NoSuchAlgorithmException;
 public class Util {
 
     public static String getDeviceId() {
-        return Settings.Secure.getString(Init.getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+        return Settings.Secure.getString(Init.context().getContentResolver(), Settings.Secure.ANDROID_ID);
     }
 
     public static String getDeviceName() {
