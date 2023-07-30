@@ -149,7 +149,7 @@ public class CollectActivity extends BaseActivity implements CustomScroller.Call
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mViewModel.search.observe(this, result -> {
-            if (mCollectAdapter.getActivated().isAll()) mVodAdapter.addAll(result.getList());
+            if (mCollectAdapter.getPosition() == 0) mVodAdapter.addAll(result.getList());
             mCollectAdapter.add(Collect.create(result.getList()));
             mCollectAdapter.add(result.getList());
         });
@@ -283,7 +283,7 @@ public class CollectActivity extends BaseActivity implements CustomScroller.Call
 
     @Override
     public void onLoadMore(String page) {
-        if (mCollectAdapter.getActivated().isAll()) return;
+        if (mCollectAdapter.getPosition() == 0) return;
         mViewModel.searchContent(mCollectAdapter.getActivated().getSite(), mBinding.keyword.getText().toString(), page);
         mScroller.setLoading(true);
     }
