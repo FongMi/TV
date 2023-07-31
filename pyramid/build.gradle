@@ -11,7 +11,7 @@ android {
         targetSdk 29
         ndk { abiFilters "armeabi-v7a" }
         python {
-            buildPython "C:/Users/FongMi.DIREK/Anaconda3/envs/py38/python.exe"
+            buildPython "C:/Users/FongMi/AppData/Local/Programs/Python/Python38/python.exe"
             pip {
                 install "lxml"
                 install 'pycryptodome'
