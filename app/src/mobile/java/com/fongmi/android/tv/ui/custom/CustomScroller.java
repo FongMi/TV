@@ -20,7 +20,7 @@ public class CustomScroller extends RecyclerView.OnScrollListener {
 
     @Override
     public void onScrolled(@NonNull RecyclerView view, int dx, int dy) {
-        if (!isEnable() || isLoading() || view.getScrollState() == RecyclerView.SCROLL_STATE_IDLE || callback == null) return;
+        if (isDisable() || isLoading() || view.getScrollState() == RecyclerView.SCROLL_STATE_IDLE || callback == null) return;
         if (!view.canScrollVertically(1) && dy > 0) callback.onLoadMore(String.valueOf(++page));
     }
 
@@ -33,6 +33,10 @@ public class CustomScroller extends RecyclerView.OnScrollListener {
         return ++page;
     }
 
+    public void setPage(int page) {
+        this.page = page;
+    }
+
     public boolean isLoading() {
         return loading;
     }
@@ -41,12 +45,8 @@ public class CustomScroller extends RecyclerView.OnScrollListener {
         this.loading = loading;
     }
 
-    public boolean isEnable() {
-        return enable;
-    }
-
-    public void setEnable(boolean enable) {
-        this.enable = enable;
+    public boolean isDisable() {
+        return !enable;
     }
 
     public void setEnable(int pageCount) {
