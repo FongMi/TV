@@ -2,6 +2,7 @@ package com.fongmi.android.tv;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -77,9 +78,14 @@ public class App extends Application {
     }
 
     @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        Init.set(base);
+    }
+
+    @Override
     public void onCreate() {
         super.onCreate();
-        Init.setContext(this);
         Notify.createChannel();
         Logger.addLogAdapter(new AndroidLogAdapter());
         OkHttp.get().setDoh(Doh.objectFrom(Setting.getDoh()));
