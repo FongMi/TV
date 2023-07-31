@@ -37,7 +37,7 @@ public class Updater implements Download.Callback {
     }
 
     private File getFile() {
-        return Path.cache(branch.concat(".apk"));
+        return Path.cache("update.apk");
     }
 
     private String getJson() {
@@ -46,10 +46,6 @@ public class Updater implements Download.Callback {
 
     private String getApk() {
         return Github.getApk(dev, BuildConfig.FLAVOR_mode + "-" + BuildConfig.FLAVOR_api + "-" + BuildConfig.FLAVOR_abi);
-    }
-
-    private Updater() {
-        this.branch = Github.RELEASE;
     }
 
     public Updater force() {
