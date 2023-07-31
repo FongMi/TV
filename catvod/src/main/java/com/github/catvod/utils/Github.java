@@ -16,9 +16,7 @@ public class Github {
     public static final String A = "https://raw.githubusercontent.com/";
     public static final String B = "https://fongmi.cachefly.net/";
     public static final String C = "https://ghproxy.com/";
-    public static final String REPO = "FongMi/TV/";
-    public static final String RELEASE = "release";
-    public static final String DEV = "dev";
+    public static final String M = "FongMi/Release/main";
 
     private final OkHttpClient client;
     private String proxy;
@@ -48,26 +46,29 @@ public class Github {
     }
 
     private void setProxy(String url) {
-        this.proxy = url.equals(C) ? url + A + REPO : url + REPO;
+        this.proxy = url.equals(C) ? url + A + M : url + M;
     }
 
     private String getProxy() {
         return TextUtils.isEmpty(proxy) ? "" : proxy;
     }
 
-    public static String getReleasePath(String path) {
-        return get().getProxy() + RELEASE + path;
+    private static String getUrl(String path, String name) {
+        return get().getProxy() + "/" + path + "/" + name;
     }
 
-    public static String getBranchPath(String branch, String path) {
-        return get().getProxy() + branch + path;
+    public static String getJson(boolean dev, String name) {
+        return getUrl("apk/" + (dev ? "dev" : "release"), name + ".json");
+    }
+
+    public static String getApk(boolean dev, String name) {
+        return getUrl("apk/" + (dev ? "dev" : "release"), name + ".apk");
     }
 
     public static String getSo(String name) {
         try {
             File file = Path.so(name);
-            String url = getReleasePath("/other/jniLibs/".concat(file.getName()));
-            if (file.length() < 300) Path.write(file, OkHttp.newCall(url).execute().body().bytes());
+            if (file.length() < 300) Path.write(file, OkHttp.newCall(getUrl("so", file.getName())).execute().body().bytes());
             return file.getAbsolutePath();
         } catch (Exception e) {
             return "";
