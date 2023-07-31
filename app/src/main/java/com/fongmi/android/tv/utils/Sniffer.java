@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Rule;
 import com.github.catvod.crawler.SpiderDebug;
+import com.github.catvod.utils.Util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,6 +20,8 @@ public class Sniffer {
 
     public static final String CHROME = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36";
     public static final Pattern RULE = Pattern.compile("http((?!http).){12,}?\\.(m3u8|mp4|flv|avi|mkv|rm|wmv|mpg|m4a|mp3)\\?.*|http((?!http).){12,}\\.(m3u8|mp4|flv|avi|mkv|rm|wmv|mpg|m4a|mp3)|http((?!http).)*?video/tos*");
+    public static final List<String> PUSH = Arrays.asList("http", "https", "smb", "thunder", "magnet", "ed2k", "ftp");
+    public static final List<String> THUNDER = Arrays.asList("thunder", "magnet", "ed2k", "ftp");
 
     private static boolean matchOrContain(String url) {
         for (String regex : getRegex(Uri.parse(url))) return Pattern.compile(regex).matcher(url).find() || url.contains(regex);
@@ -28,6 +31,14 @@ public class Sniffer {
     private static boolean match(String url) {
         for (String regex : getRegex()) return Pattern.compile(regex).matcher(url).find();
         return false;
+    }
+
+    public static boolean isPush(Uri uri) {
+        return PUSH.contains(uri.getScheme());
+    }
+
+    public static boolean isThunder(String url) {
+        return THUNDER.contains(Util.scheme(url));
     }
 
     public static boolean isVideoFormat(String url) {

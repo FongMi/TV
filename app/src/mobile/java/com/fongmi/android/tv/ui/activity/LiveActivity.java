@@ -20,6 +20,7 @@ import androidx.viewbinding.ViewBinding;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.api.LiveConfig;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Epg;
@@ -36,7 +37,7 @@ import com.fongmi.android.tv.impl.LiveCallback;
 import com.fongmi.android.tv.impl.PassCallback;
 import com.fongmi.android.tv.model.LiveViewModel;
 import com.fongmi.android.tv.player.Players;
-import com.fongmi.android.tv.player.source.Source;
+import com.fongmi.android.tv.player.Source;
 import com.fongmi.android.tv.receiver.PiPReceiver;
 import com.fongmi.android.tv.service.PlaybackService;
 import com.fongmi.android.tv.ui.adapter.ChannelAdapter;
@@ -50,7 +51,6 @@ import com.fongmi.android.tv.ui.custom.dialog.TrackDialog;
 import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.PiP;
-import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Traffic;
 import com.fongmi.android.tv.utils.Utils;
@@ -101,7 +101,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private PlayerView getExo() {
-        return Prefers.getRender() == 0 ? mBinding.surface : mBinding.texture;
+        return Setting.getRender() == 0 ? mBinding.surface : mBinding.texture;
     }
 
     private IjkVideoView getIjk() {
@@ -117,7 +117,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private int getPlayerType() {
-        return getHome().getPlayerType() != -1 ? getHome().getPlayerType() : Prefers.getLivePlayer();
+        return getHome().getPlayerType() != -1 ? getHome().getPlayerType() : Setting.getLivePlayer();
     }
 
     @Override
@@ -199,10 +199,10 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
 
     private void setVideoView() {
         mPlayers.set(getExo(), getIjk());
-        setScale(Prefers.getLiveScale());
+        setScale(Setting.getLiveScale());
         mBinding.control.action.speed.setText(mPlayers.getSpeedText());
-        mBinding.control.action.across.setActivated(Prefers.isAcross());
-        mBinding.control.action.change.setActivated(Prefers.isChange());
+        mBinding.control.action.across.setActivated(Setting.isAcross());
+        mBinding.control.action.change.setActivated(Setting.isChange());
         mBinding.control.action.home.setVisibility(LiveConfig.isOnly() ? View.GONE : View.VISIBLE);
     }
 
@@ -302,9 +302,9 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private void onScale() {
-        int index = Prefers.getLiveScale();
+        int index = Setting.getLiveScale();
         String[] array = ResUtil.getStringArray(R.array.select_scale);
-        Prefers.putLiveScale(index = index == array.length - 1 ? 0 : ++index);
+        Setting.putLiveScale(index = index == array.length - 1 ? 0 : ++index);
         setScale(index);
         setR1Callback();
     }
@@ -322,19 +322,19 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
 
     private void onAcross() {
         setR1Callback();
-        Prefers.putAcross(!Prefers.isAcross());
-        mBinding.control.action.across.setActivated(Prefers.isAcross());
+        Setting.putAcross(!Setting.isAcross());
+        mBinding.control.action.across.setActivated(Setting.isAcross());
     }
 
     private void onChange() {
         setR1Callback();
-        Prefers.putChange(!Prefers.isChange());
-        mBinding.control.action.change.setActivated(Prefers.isChange());
+        Setting.putChange(!Setting.isChange());
+        mBinding.control.action.change.setActivated(Setting.isChange());
     }
 
     private void onPlayer() {
         mPlayers.togglePlayer();
-        Prefers.putLivePlayer(mPlayers.getPlayer());
+        Setting.putLivePlayer(mPlayers.getPlayer());
         setPlayerView();
         setR1Callback();
         fetch();
@@ -642,7 +642,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private void startFlow() {
-        if (!Prefers.isChange()) return;
+        if (!Setting.isChange()) return;
         if (!mChannel.isLast()) {
             nextLine(true);
         } else if (isGone(mBinding.recycler)) {
@@ -679,7 +679,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         if (mGroup == null) return;
         int position = mGroup.getPosition() - 1;
         boolean limit = position < 0;
-        if (Prefers.isAcross() & limit) prevGroup();
+        if (Setting.isAcross() & limit) prevGroup();
         else mGroup.setPosition(limit ? mChannelAdapter.getItemCount() - 1 : position);
         if (!mGroup.isEmpty()) onItemClick(mGroup.current());
     }
@@ -688,7 +688,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         if (mGroup == null) return;
         int position = mGroup.getPosition() + 1;
         boolean limit = position > mChannelAdapter.getItemCount() - 1;
-        if (Prefers.isAcross() && limit) nextGroup();
+        if (Setting.isAcross() && limit) nextGroup();
         else mGroup.setPosition(limit ? 0 : position);
         if (!mGroup.isEmpty()) onItemClick(mGroup.current());
     }
@@ -839,7 +839,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     @Override
     protected void onUserLeaveHint() {
         super.onUserLeaveHint();
-        mPiP.enter(this, Prefers.getLiveScale() == 2);
+        mPiP.enter(this, Setting.getLiveScale() == 2);
         if (isLock()) App.post(this::onLock, 500);
     }
 
@@ -920,8 +920,8 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Source.stopAll();
         mPlayers.release();
+        Source.get().stop();
         PlaybackService.stop();
         App.removeCallbacks(mR1, mR2, mR3);
     }

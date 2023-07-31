@@ -6,48 +6,39 @@
 
         <service
             android:name="com.forcetech.service.P2PService"
-            android:exported="false"
-            android:process=":p2p" />
+            android:exported="false" />
 
         <service
             android:name="com.forcetech.service.P3PService"
-            android:exported="false"
-            android:process=":p3p" />
+            android:exported="false" />
 
         <service
             android:name="com.forcetech.service.P4PService"
-            android:exported="false"
-            android:process=":p4p" />
+            android:exported="false" />
 
         <service
             android:name="com.forcetech.service.P5PService"
-            android:exported="false"
-            android:process=":p5p" />
+            android:exported="false" />
 
         <service
             android:name="com.forcetech.service.P6PService"
-            android:exported="false"
-            android:process=":p6p" />
+            android:exported="false" />
 
         <service
             android:name="com.forcetech.service.P7PService"
-            android:exported="false"
-            android:process=":p7p" />
+            android:exported="false" />
 
         <service
             android:name="com.forcetech.service.P8PService"
-            android:exported="false"
-            android:process=":p8p" />
+            android:exported="false" />
 
         <service
             android:name="com.forcetech.service.P9PService"
-            android:exported="false"
-            android:process=":p9p" />
+            android:exported="false" />
 
         <service
             android:name="com.gsoft.mitv.MainActivity"
-            android:exported="false"
-            android:process=":mitv" />
+            android:exported="false" />
 
     </application>
 </manifest>

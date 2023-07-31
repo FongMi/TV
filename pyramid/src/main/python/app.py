@@ -30,8 +30,7 @@ def download_file(name, ext):
 
 
 def init_py(path, name, ext):
-    create_file(path)
-    py_name = path + name + '.py'
+    py_name = path + '/' + name + '.py'
     download_file(py_name, ext)
     return SourceFileLoader(name, py_name).load_module().Spider()
 

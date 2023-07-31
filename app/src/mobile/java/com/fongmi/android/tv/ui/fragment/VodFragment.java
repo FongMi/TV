@@ -16,6 +16,7 @@ import androidx.viewbinding.ViewBinding;
 import androidx.viewpager.widget.ViewPager;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Class;
 import com.fongmi.android.tv.bean.Hot;
@@ -39,7 +40,6 @@ import com.fongmi.android.tv.ui.custom.dialog.LinkDialog;
 import com.fongmi.android.tv.ui.custom.dialog.ReceiveDialog;
 import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
 import com.fongmi.android.tv.utils.FileChooser;
-import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.Trans;
 import com.github.catvod.net.OkHttp;
 import com.google.common.net.HttpHeaders;
@@ -126,7 +126,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     }
 
     private void initHot() {
-        mHots = Hot.get(Prefers.getHot());
+        mHots = Hot.get(Setting.getHot());
         App.post(mRunnable = this::updateHot, 0);
     }
 

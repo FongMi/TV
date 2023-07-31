@@ -4,12 +4,9 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.net.Uri;
-import android.os.Build;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.text.TextUtils;
-import android.util.Base64;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
@@ -19,13 +16,12 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.media3.common.util.UriUtil;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.server.Server;
+import com.github.catvod.utils.Util;
 import com.google.common.net.HttpHeaders;
 import com.permissionx.guolindev.PermissionX;
 
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Map;
 
@@ -64,8 +60,8 @@ public class Utils {
     }
 
     public static void toggleFullscreen(Activity activity, boolean fullscreen) {
-        if (fullscreen) Utils.hideSystemUI(activity);
-        else Utils.showSystemUI(activity);
+        if (fullscreen) hideSystemUI(activity);
+        else showSystemUI(activity);
     }
 
     public static void showSystemUI(Activity activity) {
@@ -81,6 +77,13 @@ public class Utils {
         window.getDecorView().setSystemUiVisibility(flags);
     }
 
+    public static void hideKeyboard(View view) {
+        InputMethodManager imm = (InputMethodManager) App.get().getSystemService(Context.INPUT_METHOD_SERVICE);
+        IBinder windowToken = view.getWindowToken();
+        if (imm == null || windowToken == null) return;
+        imm.hideSoftInputFromWindow(windowToken, 0);
+    }
+
     public static boolean isAutoRotate() {
         return Settings.System.getInt(App.get().getContentResolver(), Settings.System.ACCELEROMETER_ROTATION, 0) == 1;
     }
@@ -89,9 +92,13 @@ public class Utils {
         return PermissionX.isGranted(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
     }
 
+    public static CharSequence getClipText() {
+        return ((ClipboardManager) App.get().getSystemService(Context.CLIPBOARD_SERVICE)).getText();
+    }
+
     public static Map<String, String> checkHeaders(Map<String, String> headers) {
-        if (Prefers.getUa().isEmpty() || headers.containsKey(HttpHeaders.USER_AGENT) || headers.containsKey(HttpHeaders.USER_AGENT.toLowerCase())) return headers;
-        headers.put(HttpHeaders.USER_AGENT, Prefers.getUa());
+        if (Setting.getUa().isEmpty() || headers.containsKey(HttpHeaders.USER_AGENT) || headers.containsKey(HttpHeaders.USER_AGENT.toLowerCase())) return headers;
+        headers.put(HttpHeaders.USER_AGENT, Setting.getUa());
         return headers;
     }
 
@@ -108,52 +115,12 @@ public class Utils {
     }
 
     public static String convert(String url) {
-        Uri uri = Uri.parse(url);
-        if ("file".equals(uri.getScheme())) return Server.get().getAddress(url);
-        if ("local".equals(uri.getScheme())) return Server.get().getAddress(uri.getHost());
-        if ("proxy".equals(uri.getScheme())) return url.replace("proxy://", Server.get().getAddress("proxy?"));
+        String host = Util.host(url);
+        String scheme = Util.scheme(url);
+        if ("file".equals(scheme)) return Server.get().getAddress(url);
+        if ("local".equals(scheme)) return Server.get().getAddress(host);
+        if ("proxy".equals(scheme)) return url.replace("proxy://", Server.get().getAddress("proxy?"));
         return url;
-    }
-
-    public static String getMd5(String src) {
-        try {
-            if (TextUtils.isEmpty(src)) return "";
-            MessageDigest digest = MessageDigest.getInstance("MD5");
-            byte[] bytes = digest.digest(src.getBytes());
-            BigInteger no = new BigInteger(1, bytes);
-            StringBuilder sb = new StringBuilder(no.toString(16));
-            while (sb.length() < 32) sb.insert(0, "0");
-            return sb.toString().toLowerCase();
-        } catch (NoSuchAlgorithmException e) {
-            return "";
-        }
-    }
-
-    public static String getDeviceId() {
-        return Settings.Secure.getString(App.get().getContentResolver(), Settings.Secure.ANDROID_ID);
-    }
-
-    public static String getDeviceName() {
-        String model = Build.MODEL;
-        String manufacturer = Build.MANUFACTURER;
-        return model.startsWith(manufacturer) ? model : manufacturer + " " + model;
-    }
-
-    public static String getBase64(String ext) {
-        return Base64.encodeToString(ext.getBytes(), Base64.DEFAULT | Base64.NO_WRAP);
-    }
-
-    public static String substring(String text) {
-        return substring(text, 1);
-    }
-
-    public static String substring(String text, int num) {
-        if (text != null && text.length() > num) return text.substring(0, text.length() - num);
-        return text;
-    }
-
-    public static CharSequence getClipText() {
-        return ((ClipboardManager) App.get().getSystemService(Context.CLIPBOARD_SERVICE)).getText();
     }
 
     public static long format(SimpleDateFormat format, String src) {
@@ -164,7 +131,7 @@ public class Utils {
         }
     }
 
-    public static int getDigit(String text) {
+    public static int digit(String text) {
         try {
             if (text.startsWith("上") || text.startsWith("下")) return -1;
             if (text.contains(".")) text = text.substring(0, text.lastIndexOf("."));
@@ -172,14 +139,6 @@ public class Utils {
             return Integer.parseInt(text.replaceAll("\\D+", ""));
         } catch (Exception e) {
             return -1;
-        }
-    }
-
-    public static void hideKeyboard(View view) {
-        InputMethodManager imm = (InputMethodManager) App.get().getSystemService(Context.INPUT_METHOD_SERVICE);
-        IBinder windowToken = view.getWindowToken();
-        if (imm != null && windowToken != null) {
-            imm.hideSoftInputFromWindow(windowToken, 0);
         }
     }
 }

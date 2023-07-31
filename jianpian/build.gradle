@@ -4,6 +4,7 @@ plugins {
 
 android {
     compileSdk 33
+    flavorDimensions "abi"
 
     defaultConfig {
         minSdk 21
@@ -11,4 +12,21 @@ android {
         //noinspection ChromeOsAbiSupport
         ndk { abiFilters "armeabi-v7a" }
     }
+
+    productFlavors {
+        armeabi_v7a {
+            dimension "abi"
+            //noinspection ChromeOsAbiSupport
+            ndk { abiFilters "armeabi-v7a" }
+        }
+        arm64_v8a {
+            dimension "abi"
+            //noinspection ChromeOsAbiSupport
+            ndk { abiFilters "arm64-v8a" }
+        }
+    }
+}
+
+dependencies {
+    implementation project(':catvod')
 }

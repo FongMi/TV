@@ -6,6 +6,7 @@
     android:layout_height="wrap_content"
     android:clipChildren="false"
     android:clipToPadding="false"
+    android:overScrollMode="never"
     android:paddingTop="10dp"
     android:paddingBottom="10dp"
     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />

@@ -54,7 +54,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     }
 
     private String getTypeId() {
-        return getArguments().getString("typeId");
+        return mPages.isEmpty() ? getArguments().getString("typeId") : getLastPage().getVodId();
     }
 
     private boolean isFolder() {
@@ -103,9 +103,13 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     private void setRecyclerView() {
         mBinding.recycler.setHasFixedSize(true);
         mBinding.recycler.setAdapter(mAdapter = new VodAdapter(this));
-        mBinding.recycler.setLayoutManager(isFolder() ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getContext(), Product.getColumn()));
-        mAdapter.setViewType(isFolder() ? ViewType.FOLDER : ViewType.GRID);
         mAdapter.setSize(Product.getSpec(getActivity()));
+        setViewType(isFolder());
+    }
+
+    private void setViewType(boolean folder) {
+        mBinding.recycler.setLayoutManager(folder ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getContext(), Product.getColumn()));
+        mAdapter.setViewType(folder ? ViewType.FOLDER : ViewType.GRID);
     }
 
     private void setViewModel() {
@@ -114,7 +118,6 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     }
 
     private void getVideo() {
-        mPages.clear();
         mScroller.reset();
         getVideo(getTypeId(), "1");
     }
@@ -131,9 +134,17 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         mBinding.progressLayout.showContent(isFolder(), size);
         mBinding.swipeLayout.setRefreshing(false);
         mScroller.endLoading(size == 0);
-        mAdapter.addAll(result.getList());
+        addVideo(result.getList());
         checkPosition();
         checkPage(size);
+    }
+
+    private void addVideo(List<Vod> items) {
+        if (items.isEmpty()) return;
+        boolean list = items.get(0).isList(isFolder());
+        int viewType = list ? ViewType.FOLDER : ViewType.GRID;
+        if (viewType != mAdapter.getViewType()) setViewType(list);
+        mAdapter.addAll(items);
     }
 
     private void checkPosition() {
@@ -172,8 +183,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     @Override
     public void onRefresh() {
-        if (mPages.isEmpty()) getVideo();
-        else getVideo(getLastPage().getVodId(), "1");
+        getVideo();
     }
 
     @Override

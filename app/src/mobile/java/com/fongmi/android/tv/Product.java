@@ -2,7 +2,6 @@ package com.fongmi.android.tv;
 
 import android.content.Context;
 
-import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 
 public class Product {
@@ -12,7 +11,7 @@ public class Product {
     }
 
     public static int getColumn() {
-        return Math.abs(Prefers.getSize() - 5);
+        return Math.abs(Setting.getSize() - 5);
     }
 
     public static void bootLive() {

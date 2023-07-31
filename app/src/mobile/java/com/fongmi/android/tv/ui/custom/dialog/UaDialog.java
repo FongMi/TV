@@ -9,9 +9,9 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.databinding.DialogUaBinding;
 import com.fongmi.android.tv.impl.UaCallback;
-import com.fongmi.android.tv.utils.Prefers;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class UaDialog {
@@ -42,7 +42,7 @@ public class UaDialog {
     }
 
     private void initView() {
-        String ua = Prefers.getUa();
+        String ua = Setting.getUa();
         binding.text.setText(ua);
         binding.text.setSelection(TextUtils.isEmpty(ua) ? 0 : ua.length());
     }
