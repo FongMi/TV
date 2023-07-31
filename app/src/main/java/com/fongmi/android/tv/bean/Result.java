@@ -80,16 +80,20 @@ public class Result {
         }
     }
 
-    public static Result fromObject(JSONObject object) {
-        return object == null ? empty() : objectFrom(object.toString());
-    }
-
     public static Result objectFrom(String str) {
         try {
             return new Gson().fromJson(str, Result.class);
         } catch (Exception e) {
             return empty();
         }
+    }
+
+    public static Result fromType(int type, String str) {
+        return type == 0 ? fromXml(str) : fromJson(str);
+    }
+
+    public static Result fromObject(JSONObject object) {
+        return object == null ? empty() : objectFrom(object.toString());
     }
 
     public static Result empty() {
