@@ -40,11 +40,11 @@ public class Updater implements Download.Callback {
     }
 
     private String getJson() {
-        return Github.getJson(dev, BuildConfig.FLAVOR_mode);
+        return Github.getJson("leanback");
     }
 
     private String getApk() {
-        return Github.getApk(dev, BuildConfig.FLAVOR_mode + "-" + BuildConfig.FLAVOR_api + "-" + BuildConfig.FLAVOR_abi);
+        return Github.getApk("leanback-4.x");
     }
 
     public Updater force() {

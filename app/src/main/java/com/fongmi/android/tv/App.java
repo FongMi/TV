@@ -13,6 +13,13 @@ import androidx.multidex.MultiDex;
 import androidx.multidex.MultiDexApplication;
 
 import com.fongmi.android.tv.ui.activity.CrashActivity;
+import com.fongmi.android.tv.utils.Notify;
+import com.github.catvod.Init;
+import com.github.catvod.bean.Doh;
+import com.github.catvod.net.OkHttp;
+import com.google.gson.Gson;
+import com.orhanobut.logger.AndroidLogAdapter;
+import com.orhanobut.logger.Logger;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -25,18 +32,24 @@ public class App extends MultiDexApplication {
     private final Handler handler;
     private static App instance;
     private Activity activity;
+    private final Gson gson;
 
     public App() {
         instance = this;
-        executor = Executors.newFixedThreadPool(5);
+        executor = Executors.newFixedThreadPool(Constant.THREAD_POOL);
         handler = HandlerCompat.createAsync(Looper.getMainLooper());
+        gson = new Gson();
     }
 
     public static App get() {
         return instance;
     }
 
-    public static Activity getActivity() {
+    public static Gson gson() {
+        return get().gson;
+    }
+
+    public static Activity activity() {
         return get().activity;
     }
 
@@ -50,7 +63,7 @@ public class App extends MultiDexApplication {
 
     public static void post(Runnable runnable, long delayMillis) {
         get().handler.removeCallbacks(runnable);
-        get().handler.postDelayed(runnable, delayMillis);
+        if (delayMillis >= 0) get().handler.postDelayed(runnable, delayMillis);
     }
 
     public static void removeCallbacks(Runnable runnable) {
@@ -69,41 +82,45 @@ public class App extends MultiDexApplication {
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
         MultiDex.install(this);
+        Init.set(base);
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
+        Notify.createChannel();
+        Logger.addLogAdapter(new AndroidLogAdapter());
+        OkHttp.get().setDoh(Doh.objectFrom(Setting.getDoh()));
         CaocConfig.Builder.create().backgroundMode(CaocConfig.BACKGROUND_MODE_SILENT).errorActivity(CrashActivity.class).apply();
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
             @Override
             public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {
-                if (activity != getActivity()) setActivity(activity);
+                if (activity != activity()) setActivity(activity);
             }
 
             @Override
             public void onActivityStarted(@NonNull Activity activity) {
-                if (activity != getActivity()) setActivity(activity);
+                if (activity != activity()) setActivity(activity);
             }
 
             @Override
             public void onActivityResumed(@NonNull Activity activity) {
-                if (activity != getActivity()) setActivity(activity);
+                if (activity != activity()) setActivity(activity);
             }
 
             @Override
             public void onActivityPaused(@NonNull Activity activity) {
-                if (activity == getActivity()) setActivity(null);
+                if (activity == activity()) setActivity(null);
             }
 
             @Override
             public void onActivityStopped(@NonNull Activity activity) {
-                if (activity == getActivity()) setActivity(null);
+                if (activity == activity()) setActivity(null);
             }
 
             @Override
             public void onActivityDestroyed(@NonNull Activity activity) {
-                if (activity == getActivity()) setActivity(null);
+                if (activity == activity()) setActivity(null);
             }
 
             @Override

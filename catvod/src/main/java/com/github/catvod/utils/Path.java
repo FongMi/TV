@@ -135,7 +135,7 @@ public class Path {
             byte[] data = new byte[is.available()];
             is.read(data);
             is.close();
-            return new String(data, StandardCharsets.UTF_8);
+            return new String(data, "UTF-8");
         } catch (IOException e) {
             e.printStackTrace();
             return "";
