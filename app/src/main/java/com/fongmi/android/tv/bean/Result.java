@@ -59,6 +59,8 @@ public class Result {
     private String key;
     @SerializedName("subs")
     private List<Sub> subs;
+    @SerializedName("pagecount")
+    private int pagecount;
 
     private boolean error;
     private String msg;
@@ -213,6 +215,10 @@ public class Result {
 
     public List<Sub> getSubs() {
         return subs == null ? Collections.emptyList() : subs;
+    }
+
+    public int getPageCount() {
+        return pagecount;
     }
 
     public boolean isError() {

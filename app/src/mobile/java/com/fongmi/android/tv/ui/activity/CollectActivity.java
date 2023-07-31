@@ -154,11 +154,10 @@ public class CollectActivity extends BaseActivity implements CustomScroller.Call
             mCollectAdapter.add(result.getList());
         });
         mViewModel.result.observe(this, result -> {
-            int size = result.getList().size();
-            mScroller.endLoading(size == 0);
-            boolean same = size > 0 && mCollectAdapter.getActivated().getSite().equals(result.getList().get(0).getSite());
+            boolean same = result.getList().size() > 0 && mCollectAdapter.getActivated().getSite().equals(result.getList().get(0).getSite());
             if (same) mCollectAdapter.getActivated().getList().addAll(result.getList());
             if (same) mVodAdapter.addAll(result.getList());
+            mScroller.endLoading(result);
         });
     }
 
@@ -231,6 +230,7 @@ public class CollectActivity extends BaseActivity implements CustomScroller.Call
     }
 
     private void showAgent() {
+        mScroller.reset();
         mVodAdapter.clear();
         mCollectAdapter.clear();
         mBinding.view.setVisibility(View.GONE);
@@ -268,6 +268,7 @@ public class CollectActivity extends BaseActivity implements CustomScroller.Call
         mBinding.recycler.scrollToPosition(0);
         mCollectAdapter.setActivated(position);
         mVodAdapter.clear().addAll(item.getList());
+        mScroller.setEnable(true);
     }
 
     @Override
