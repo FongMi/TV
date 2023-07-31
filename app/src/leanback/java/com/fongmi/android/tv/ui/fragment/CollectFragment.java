@@ -9,18 +9,21 @@ import androidx.annotation.Nullable;
 import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.ItemBridgeAdapter;
 import androidx.leanback.widget.ListRow;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.viewbinding.ViewBinding;
 
-import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.bean.Collect;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.FragmentVodBinding;
+import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.ui.activity.DetailActivity;
 import com.fongmi.android.tv.ui.activity.VodActivity;
 import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.custom.CustomRowPresenter;
+import com.fongmi.android.tv.ui.custom.CustomScroller;
 import com.fongmi.android.tv.ui.custom.CustomSelector;
 import com.fongmi.android.tv.ui.presenter.VodPresenter;
 import com.fongmi.android.tv.utils.ResUtil;
@@ -29,19 +32,27 @@ import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CollectFragment extends BaseFragment implements VodPresenter.OnClickListener {
+public class CollectFragment extends BaseFragment implements CustomScroller.Callback, VodPresenter.OnClickListener {
 
     private FragmentVodBinding mBinding;
     private ArrayObjectAdapter mAdapter;
     private ArrayObjectAdapter mLast;
-    private String json;
+    private CustomScroller mScroller;
+    private SiteViewModel mViewModel;
+    private Collect mCollect;
+    private String mKeyword;
 
-    public static CollectFragment newInstance(List<Vod> items) {
-        return new CollectFragment().setJson(App.gson().toJson(items));
+    public static CollectFragment newInstance(String keyword, Collect collect) {
+        return new CollectFragment().setKeyword(keyword).setCollect(collect);
     }
 
-    private CollectFragment setJson(String json) {
-        this.json = json;
+    private CollectFragment setKeyword(String keyword) {
+        this.mKeyword = keyword;
+        return this;
+    }
+
+    private CollectFragment setCollect(Collect collect) {
+        this.mCollect = collect;
         return this;
     }
 
@@ -52,16 +63,31 @@ public class CollectFragment extends BaseFragment implements VodPresenter.OnClic
 
     @Override
     protected void initView() {
+        setRecyclerView();
+        setViewModel();
+    }
+
+    private void setRecyclerView() {
         CustomSelector selector = new CustomSelector();
         selector.addPresenter(ListRow.class, new CustomRowPresenter(16), VodPresenter.class);
         mBinding.recycler.setAdapter(new ItemBridgeAdapter(mAdapter = new ArrayObjectAdapter(selector)));
         mBinding.recycler.setHeader(getActivity().findViewById(R.id.result), getActivity().findViewById(R.id.recycler));
+        mBinding.recycler.addOnScrollListener(mScroller = new CustomScroller(this));
         mBinding.recycler.setVerticalSpacing(ResUtil.dp2px(16));
+    }
+
+    private void setViewModel() {
+        mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
+        mViewModel.result.observe(this, result -> {
+            int size = result.getList().size();
+            mScroller.endLoading(size == 0);
+            addVideo(result.getList());
+        });
     }
 
     @Override
     protected void initData() {
-        addVideo(Vod.arrayFrom(json));
+        addVideo(mCollect.getList());
     }
 
     private boolean checkLastSize(List<Vod> items) {
@@ -95,6 +121,13 @@ public class CollectFragment extends BaseFragment implements VodPresenter.OnClic
     @Override
     public boolean onLongClick(Vod item) {
         return false;
+    }
+
+    @Override
+    public void onLoadMore(String page) {
+        if (mCollect.getSite().getKey().equals("all")) return;
+        mViewModel.searchContent(mCollect.getSite(), mKeyword, page);
+        mScroller.setLoading(true);
     }
 
     @Override

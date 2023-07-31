@@ -13,6 +13,7 @@ import androidx.media3.ui.PlayerView;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Track;
@@ -20,7 +21,6 @@ import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.impl.ParseCallback;
 import com.fongmi.android.tv.utils.Notify;
-import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.github.catvod.crawler.SpiderDebug;
 
@@ -58,7 +58,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     public static boolean isHard() {
-        return Prefers.getDecode() == HARD;
+        return Setting.getDecode() == HARD;
     }
 
     public boolean isExo() {
@@ -70,8 +70,8 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     public Players init() {
-        player = Prefers.getPlayer();
-        decode = Prefers.getDecode();
+        player = Setting.getPlayer();
+        decode = Setting.getDecode();
         builder = new StringBuilder();
         runnable = ErrorEvent::timeout;
         timeout = Constant.TIMEOUT_PLAY;
@@ -95,7 +95,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     private void setupIjk(IjkVideoView view) {
-        ijkPlayer = view.render(Prefers.getRender()).decode(decode);
+        ijkPlayer = view.render(Setting.getRender()).decode(decode);
         ijkPlayer.addListener(this);
         ijkPlayer.setPlayer(player);
     }
@@ -223,7 +223,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     public void toggleDecode() {
         setDecode(decode == HARD ? SOFT : HARD);
-        Prefers.putDecode(decode);
+        Setting.putDecode(decode);
     }
 
     public String getPositionTime(long time) {
@@ -301,7 +301,9 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     public void start(Result result, boolean useParse, int timeout) {
-        if (result.getUrl().isEmpty()) {
+        if (result.isError()) {
+            ErrorEvent.extract(result.getMsg());
+        } else if (result.getUrl().isEmpty()) {
             ErrorEvent.url();
         } else if (result.getParse(1) == 1 || result.getJx() == 1) {
             stopParse();

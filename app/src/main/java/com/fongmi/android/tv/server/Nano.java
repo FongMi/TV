@@ -9,9 +9,9 @@ import com.fongmi.android.tv.bean.Device;
 import com.fongmi.android.tv.server.process.ActionRequestProcess;
 import com.fongmi.android.tv.server.process.RawRequestProcess;
 import com.fongmi.android.tv.server.process.RequestProcess;
-import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.M3U8;
 import com.fongmi.android.tv.utils.Sniffer;
+import com.github.catvod.utils.Path;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -114,8 +114,7 @@ public class Nano extends NanoHTTPD {
 
     private Response doFile(String url) {
         try {
-            String path = url.substring(6);
-            File file = FileUtil.getRootFile(path);
+            File file = Path.root(url.substring(6));
             if (file.isFile()) return newChunkedResponse(Response.Status.OK, "application/octet-stream", new FileInputStream(file));
             else return createSuccessResponse(listFiles(file));
         } catch (Exception e) {
@@ -148,8 +147,8 @@ public class Nano extends NanoHTTPD {
         for (String k : files.keySet()) {
             String fn = params.get(k);
             File temp = new File(files.get(k));
-            if (fn.toLowerCase().endsWith(".zip")) FileUtil.unzip(temp, FileUtil.getRootPath() + File.separator + path);
-            else FileUtil.copy(temp, FileUtil.getRootFile(path + File.separator + fn));
+            if (fn.toLowerCase().endsWith(".zip")) Path.unzip(temp, Path.root(path));
+            else Path.copy(temp, Path.root(path, fn));
         }
         return createSuccessResponse();
     }
@@ -157,19 +156,18 @@ public class Nano extends NanoHTTPD {
     private Response doNewFolder(Map<String, String> params) {
         String path = params.get("path");
         String name = params.get("name");
-        FileUtil.getRootFile(path + File.separator + name).mkdirs();
+        Path.root(path, name).mkdirs();
         return createSuccessResponse();
     }
 
     private Response doDelFolder(Map<String, String> params) {
         String path = params.get("path");
-        FileUtil.clearDir(FileUtil.getRootFile(path));
+        Path.clear(Path.root(path));
         return createSuccessResponse();
     }
 
     private String getParent(File root) {
-        if (root.getAbsolutePath().equals(FileUtil.getRootPath())) return ".";
-        return root.getParentFile().getAbsolutePath().replace(FileUtil.getRootPath() + File.separator, "").replace(FileUtil.getRootPath(), "");
+        return root.equals(Path.root()) ? "." : root.getParent().replace(Path.rootPath(), "");
     }
 
     private String listFiles(File root) {
@@ -190,7 +188,7 @@ public class Nano extends NanoHTTPD {
         for (File file : list) {
             JsonObject obj = new JsonObject();
             obj.addProperty("name", file.getName());
-            obj.addProperty("path", file.getAbsolutePath().replace(FileUtil.getRootPath() + File.separator, ""));
+            obj.addProperty("path", file.getAbsolutePath().replace(Path.rootPath(), ""));
             obj.addProperty("time", format.format(new Date(file.lastModified())));
             obj.addProperty("dir", file.isDirectory() ? 1 : 0);
             files.add(obj);

@@ -9,6 +9,7 @@ public class ErrorEvent {
 
     private final Type type;
     private final int retry;
+    private String msg;
 
     public static void url() {
         EventBus.getDefault().post(new ErrorEvent(Type.URL, 0));
@@ -30,9 +31,19 @@ public class ErrorEvent {
         EventBus.getDefault().post(new ErrorEvent(Type.TIMEOUT, 0));
     }
 
+    public static void extract(String msg) {
+        EventBus.getDefault().post(new ErrorEvent(Type.EXTRACT, 0, msg));
+    }
+
     public ErrorEvent(Type type, int retry) {
         this.type = type;
         this.retry = retry;
+    }
+
+    public ErrorEvent(Type type, int retry, String msg) {
+        this.type = type;
+        this.retry = retry;
+        this.msg = msg;
     }
 
     private int getResId() {
@@ -57,10 +68,10 @@ public class ErrorEvent {
     }
 
     public String getMsg() {
-        return getResId() == -1 ? "" : ResUtil.getString(getResId());
+        return getResId() == -1 ? msg : ResUtil.getString(getResId());
     }
 
     public enum Type {
-        URL, PARSE, FORMAT, EPISODE, TIMEOUT
+        URL, PARSE, FORMAT, EPISODE, TIMEOUT, EXTRACT
     }
 }

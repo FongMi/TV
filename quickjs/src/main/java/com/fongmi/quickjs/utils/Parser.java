@@ -21,8 +21,9 @@ import java.util.regex.Pattern;
 public class Parser {
 
     private final Pattern p1 = Pattern.compile("url\\((.*?)\\)", Pattern.MULTILINE | Pattern.DOTALL);
-    private final Pattern p2 = Pattern.compile(":eq|:lt|:gt|:first|:last|^body$|^#");
-    private final Pattern p3 = Pattern.compile("(url|src|href|-original|-src|-play|-url|style)$", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+    private final Pattern NO_ADD = Pattern.compile(":eq|:lt|:gt|:first|:last|^body$|^#");
+    private final Pattern JOIN_URL = Pattern.compile("(url|src|href|-original|-src|-play|-url|style)$", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
+    private final Pattern SPEC_URL = Pattern.compile("^(ftp|magnet|thunder|ws):", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE);
 
     private final Cache cache;
 
@@ -46,13 +47,13 @@ public class Parser {
     private String parseHikerToJq(String parse, boolean first) {
         if (!parse.contains("&&")) {
             String[] split = parse.split(" ");
-            return (p2.matcher(split[split.length - 1]).find() || !first) ? parse : parse + ":eq(0)";
+            return (NO_ADD.matcher(split[split.length - 1]).find() || !first) ? parse : parse + ":eq(0)";
         }
         String[] parses = parse.split("&&");
         List<String> items = new ArrayList<>();
         for (int i = 0; i < parses.length; i++) {
             String[] split = parses[i].split(" ");
-            if (p2.matcher(split[split.length - 1]).find()) {
+            if (NO_ADD.matcher(split[split.length - 1]).find()) {
                 items.add(parses[i]);
             } else {
                 if (!first && i >= parses.length - 1) items.add(parses[i]);
@@ -150,10 +151,13 @@ public class Parser {
             if (option.toLowerCase().contains("style") && result.contains("url(")) {
                 Matcher matcher = p1.matcher(result);
                 if (matcher.find()) result = matcher.group(1);
+                if (result != null) result = result.replaceAll("^['|\"](.*)['|\"]$", "$1");
             }
-            if (!TextUtils.isEmpty(result) && !TextUtils.isEmpty(addUrl) && p3.matcher(option).find()) {
-                if (result.contains("http")) result = result.substring(result.indexOf("http"));
-                else result = joinUrl(addUrl, result);
+            if (!TextUtils.isEmpty(result) && !TextUtils.isEmpty(addUrl)) {
+                if (JOIN_URL.matcher(option).find() && !SPEC_URL.matcher(result).find()) {
+                    if (result.contains("http")) result = result.substring(result.indexOf("http"));
+                    else result = joinUrl(addUrl, result);
+                }
             }
             return result;
         }

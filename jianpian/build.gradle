@@ -8,7 +8,9 @@ android {
     defaultConfig {
         minSdk 16
         targetSdk 28
-        //noinspection ChromeOsAbiSupport
-        ndk { abiFilters "armeabi-v7a" }
     }
+}
+
+dependencies {
+    implementation project(':catvod')
 }

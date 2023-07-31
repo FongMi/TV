@@ -6,9 +6,9 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Group;
 import com.fongmi.android.tv.bean.Live;
-import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.Path;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -96,7 +96,7 @@ public class LiveParser {
 
     private static String getText(String url) {
         try {
-            if (url.startsWith("file")) return FileUtil.read(url);
+            if (url.startsWith("file")) return Path.read(url);
             if (url.startsWith("http")) return OkHttp.newCall(url).execute().body().string();
             if (url.endsWith(".txt") || url.endsWith(".m3u")) return getText(Utils.convert(LiveConfig.getUrl(), url));
             if (url.length() > 0 && url.length() % 4 == 0) return getText(new String(Base64.decode(url, Base64.DEFAULT)));

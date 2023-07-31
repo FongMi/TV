@@ -21,7 +21,6 @@ package tv.danmaku.ijk.media.player;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
@@ -56,7 +55,7 @@ import tv.danmaku.ijk.media.player.misc.IMediaDataSource;
 import tv.danmaku.ijk.media.player.misc.ITrackInfo;
 import tv.danmaku.ijk.media.player.misc.IjkTrackInfo;
 import tv.danmaku.ijk.media.player.pragma.DebugLog;
-import tv.danmaku.ijk.media.player.ui.Utils;
+import tv.danmaku.ijk.media.player.ui.Util;
 
 /**
  * @author bbcallen
@@ -351,7 +350,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
      * @throws IllegalStateException if it is called in an invalid state
      */
     public void setDataSource(String path, Map<String, String> headers) throws IOException, IllegalArgumentException, SecurityException, IllegalStateException {
-        for (String key : Arrays.asList(Utils.USER_AGENT, Utils.USER_AGENT.toLowerCase())) {
+        for (String key : Arrays.asList(Util.USER_AGENT, Util.USER_AGENT.toLowerCase())) {
             if (!headers.containsKey(key)) continue;
             setOption(OPT_CATEGORY_FORMAT, "user_agent", headers.get(key));
             headers.remove(key);
@@ -819,12 +818,8 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
                     player.notifyOnInfo(msg.arg1, msg.arg2);
                     return;
                 case MEDIA_TIMED_TEXT:
-                    if (msg.obj == null) {
-                        player.notifyOnTimedText(null);
-                    } else {
-                        IjkTimedText text = new IjkTimedText(new Rect(0, 0, 1, 1), (String) msg.obj);
-                        player.notifyOnTimedText(text);
-                    }
+                    player.notifyOnTimedText(msg.obj == null ? null : IjkTimedText.create(msg.obj.toString()));
+                    //player.notifyOnTimedText(IjkTimedText.create((msg.arg1 >= 2 || msg.obj == null) ? "" : msg.obj.toString()));
                     return;
                 case MEDIA_NOP: // interface test message - ignore
                     break;

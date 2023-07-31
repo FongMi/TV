@@ -9,11 +9,11 @@ import androidx.appcompat.app.AlertDialog;
 import com.fongmi.android.tv.databinding.DialogUpdateBinding;
 import com.fongmi.android.tv.utils.Download;
 import com.fongmi.android.tv.utils.FileUtil;
-import com.fongmi.android.tv.utils.Github;
 import com.fongmi.android.tv.utils.Notify;
-import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.Github;
+import com.github.catvod.utils.Path;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.json.JSONObject;
@@ -35,20 +35,20 @@ public class Updater implements Download.Callback {
     }
 
     private File getFile() {
-        return FileUtil.getCacheFile(BuildConfig.FLAVOR + ".apk");
+        return Path.cache("update.apk");
     }
 
     private String getJson() {
-        return Github.get().getKitkatPath("/release/" + BuildConfig.FLAVOR + ".json");
+        return Github.getJson("leanback");
     }
 
     private String getApk() {
-        return Github.get().getKitkatPath("/release/" + BuildConfig.FLAVOR + ".apk");
+        return Github.getApk("leanback");
     }
 
     public Updater force() {
         Notify.show(R.string.update_check);
-        Prefers.putUpdate(true);
+        Setting.putUpdate(true);
         return this;
     }
 
@@ -61,8 +61,8 @@ public class Updater implements Download.Callback {
         App.execute(this::doInBackground);
     }
 
-    private boolean need(int code) {
-        return code > BuildConfig.VERSION_CODE && Prefers.getUpdate();
+    private boolean need(String name) {
+        return Setting.getUpdate() && !name.equals(BuildConfig.VERSION_NAME);
     }
 
     private void doInBackground() {
@@ -70,8 +70,7 @@ public class Updater implements Download.Callback {
             JSONObject object = new JSONObject(OkHttp.newCall(getJson()).execute().body().string());
             String name = object.optString("name");
             String desc = object.optString("desc");
-            int code = object.optInt("code");
-            if (need(code)) App.post(() -> show(App.activity(), name, desc));
+            if (need(name)) App.post(() -> show(App.activity(), name, desc));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -91,7 +90,7 @@ public class Updater implements Download.Callback {
     }
 
     private void cancel(View view) {
-        Prefers.putUpdate(false);
+        Setting.putUpdate(false);
         dismiss();
     }
 

@@ -10,7 +10,6 @@ import androidx.annotation.Nullable;
 import androidx.media3.common.util.UriUtil;
 
 import com.fongmi.quickjs.utils.Module;
-import com.fongmi.quickjs.utils.Prefers;
 import com.whl.quickjs.android.QuickJSLoader;
 import com.whl.quickjs.wrapper.JSModule;
 
@@ -39,8 +38,6 @@ public class Provider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        Prefers.setContext(getContext());
-        Module.setContext(getContext());
         setModuleLoader();
         return true;
     }

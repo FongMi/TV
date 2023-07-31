@@ -11,8 +11,8 @@ import com.fongmi.quickjs.utils.Parser;
 import com.fongmi.quickjs.utils.Proxy;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Json;
+import com.github.catvod.utils.Util;
 import com.google.gson.Gson;
-import com.whl.quickjs.wrapper.JSArray;
 import com.whl.quickjs.wrapper.JSFunction;
 import com.whl.quickjs.wrapper.JSMethod;
 import com.whl.quickjs.wrapper.JSObject;
@@ -21,12 +21,18 @@ import com.whl.quickjs.wrapper.QuickJSContext;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 
 import okhttp3.Call;
 import okhttp3.FormBody;
@@ -80,6 +86,26 @@ public class Global {
     @JSMethod
     public String js2Proxy(Boolean dynamic, Integer siteType, String siteKey, String url, JSObject headers) {
         return getProxy(true) + "&from=catvod" + "&header=" + URLEncoder.encode(ctx.stringify(headers)) + "&url=" + URLEncoder.encode(url);
+    }
+
+    @Keep
+    @JSMethod
+    public String aesX(String mode, boolean encrypt, String input, boolean inBase64, String key, String iv, boolean outBase64) {
+        try {
+            byte[] keyBuf = key.getBytes();
+            if (keyBuf.length < 16) keyBuf = Arrays.copyOf(keyBuf, 16);
+            byte[] ivBuf = iv == null ? new byte[0] : iv.getBytes();
+            if (ivBuf.length < 16) ivBuf = Arrays.copyOf(ivBuf, 16);
+            Cipher cipher = Cipher.getInstance(mode + "Padding");
+            SecretKeySpec keySpec = new SecretKeySpec(keyBuf, "AES");
+            if (iv == null) cipher.init(encrypt ? Cipher.ENCRYPT_MODE : Cipher.DECRYPT_MODE, keySpec);
+            else cipher.init(encrypt ? Cipher.ENCRYPT_MODE : Cipher.DECRYPT_MODE, keySpec, new IvParameterSpec(ivBuf));
+            byte[] inBuf = inBase64 ? Base64.decode(input, Base64.DEFAULT) : input.getBytes("UTF-8");
+            return outBase64 ? Base64.encodeToString(cipher.doFinal(inBuf), Base64.DEFAULT) : new String(cipher.doFinal(inBuf), "UTF-8");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 
     @Keep
@@ -220,12 +246,10 @@ public class Global {
     private void setContent(JSObject jsObject, Headers headers, int buffer, byte[] bytes) throws UnsupportedEncodingException {
         switch (buffer) {
             case 1:
-                JSArray array = ctx.createNewJSArray();
-                for (int i = 0; i < bytes.length; i++) array.set(bytes[i], i);
-                jsObject.setProperty("content", array);
+                jsObject.setProperty("content", JSUtil.toArray(ctx, bytes));
                 break;
             case 2:
-                jsObject.setProperty("content", Base64.encodeToString(bytes, Base64.DEFAULT));
+                jsObject.setProperty("content", Util.base64(bytes));
                 break;
             default:
                 jsObject.setProperty("content", new String(bytes, getCharset(headers)));

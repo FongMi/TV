@@ -20,8 +20,8 @@ import org.simpleframework.xml.Text;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -76,6 +76,9 @@ public class Vod {
 
     @SerializedName("vod_tag")
     private String vodTag;
+
+    @SerializedName("vod_show")
+    private String vodShow;
 
     @Path("dl")
     @ElementList(entry = "dd", required = false, inline = true)
@@ -153,6 +156,10 @@ public class Vod {
         return TextUtils.isEmpty(vodTag) ? "" : vodTag;
     }
 
+    public String getVodShow() {
+        return TextUtils.isEmpty(vodShow) ? "" : vodShow;
+    }
+
     public List<Flag> getVodFlags() {
         return vodFlags = vodFlags == null ? new ArrayList<>() : vodFlags;
     }
@@ -190,7 +197,11 @@ public class Vod {
     }
 
     public boolean isFolder() {
-        return getVodTag().equals("folder");
+        return getVodTag().equals("folder") || getVodTag().equals("cover");
+    }
+
+    public boolean isList(boolean folder) {
+        return getVodShow().isEmpty() ? folder : getVodShow().equals("list");
     }
 
     public String getVodName(String name) {
@@ -222,6 +233,14 @@ public class Vod {
             if (item.getUrls() == null) continue;
             item.createEpisode(item.getUrls());
         }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Vod)) return false;
+        Vod it = (Vod) obj;
+        return getVodId().equals(it.getVodId());
     }
 
     public static class Flag {
@@ -289,9 +308,15 @@ public class Vod {
             for (int i = 0; i < urls.length; i++) {
                 String[] split = urls[i].split("\\$");
                 String number = String.format(Locale.getDefault(), "%02d", i + 1);
-                Episode episode = split.length > 1 ? new Vod.Flag.Episode(split[0].isEmpty() ? number : split[0].trim(), split[1]) : new Vod.Flag.Episode(number, urls[i]);
-                if (!getEpisodes().contains(episode)) getEpisodes().add(episode);
+                Episode episode = split.length > 1 ? Episode.create(split[0].isEmpty() ? number : split[0].trim(), split[1]) : Episode.create(number, urls[i]);
+                getEpisodes().add(check(episode));
             }
+        }
+
+        public void createEpisode(List<Episode> items) {
+            getEpisodes().clear();
+            Episode.Sorter.sort(items);
+            for (Vod.Flag.Episode item : items) getEpisodes().add(check(item));
         }
 
         public void toggle(boolean activated, Episode episode) {
@@ -304,20 +329,27 @@ public class Vod {
             for (int i = 0; i < getEpisodes().size(); i++) getEpisodes().get(i).setActivated(i == getPosition());
         }
 
-        public Episode find(String remarks) {
-            int number = Utils.getDigit(remarks);
+        public Episode find(String remarks, boolean strict) {
+            int number = Utils.digit(remarks);
+            if (getEpisodes().size() == 0) return null;
             if (getEpisodes().size() == 1) return getEpisodes().get(0);
-            for (Vod.Flag.Episode item : getEpisodes()) if (item.rule1(remarks)) return item;
-            for (Vod.Flag.Episode item : getEpisodes()) if (item.rule2(number)) return item;
-            for (Vod.Flag.Episode item : getEpisodes()) if (item.rule3(remarks)) return item;
-            for (Vod.Flag.Episode item : getEpisodes()) if (item.rule4(remarks)) return item;
-            return getPosition() != -1 ? getEpisodes().get(getPosition()) : null;
+            if (getPosition() != -1) return getEpisodes().get(getPosition());
+            for (Episode item : getEpisodes()) if (item.rule1(remarks)) return item;
+            for (Episode item : getEpisodes()) if (item.rule2(number)) return item;
+            for (Episode item : getEpisodes()) if (item.rule3(remarks)) return item;
+            for (Episode item : getEpisodes()) if (item.rule4(remarks)) return item;
+            return strict ? null : getEpisodes().get(0);
+        }
+
+        public Episode check(Episode episode) {
+            while (getEpisodes().contains(episode)) check(episode.rename());
+            return episode;
         }
 
         public static List<Flag> create(String flag, String name, String url) {
             Vod.Flag item = new Vod.Flag(flag);
-            item.getEpisodes().add(new Vod.Flag.Episode(name, url));
-            return Arrays.asList(item);
+            item.getEpisodes().add(Episode.create(name, url));
+            return List.of(item);
         }
 
         @Override
@@ -337,13 +369,16 @@ public class Vod {
         public static class Episode {
 
             @SerializedName("name")
-            private final String name;
+            private String name;
             @SerializedName("url")
-            private final String url;
+            private String url;
 
             private final int number;
-
             private boolean activated;
+
+            public static Episode create(String name, String url) {
+                return new Episode(name, url);
+            }
 
             public static Episode objectFrom(String str) {
                 return new Gson().fromJson(str, Episode.class);
@@ -356,7 +391,7 @@ public class Vod {
             }
 
             public Episode(String name, String url) {
-                this.number = Utils.getDigit(name);
+                this.number = Utils.digit(name);
                 this.name = Trans.s2t(name);
                 this.url = url;
             }
@@ -365,8 +400,17 @@ public class Vod {
                 return name;
             }
 
+            public void setName(String name) {
+                this.name = name;
+            }
+
             public String getUrl() {
                 return url;
+            }
+
+            public Episode rename() {
+                setName(getName().concat("_"));
+                return this;
             }
 
             public int getNumber() {
@@ -407,6 +451,18 @@ public class Vod {
                 if (!(obj instanceof Episode)) return false;
                 Episode it = (Episode) obj;
                 return getUrl().equals(it.getUrl()) || getName().equals(it.getName());
+            }
+
+            static class Sorter implements Comparator<Episode> {
+
+                public static void sort(List<Episode> items) {
+                    Collections.sort(items, new Sorter());
+                }
+
+                @Override
+                public int compare(Episode o1, Episode o2) {
+                    return Integer.compare(o1.getNumber(), o2.getNumber());
+                }
             }
         }
     }

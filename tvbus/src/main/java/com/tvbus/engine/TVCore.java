@@ -2,6 +2,8 @@ package com.tvbus.engine;
 
 import android.content.Context;
 
+import com.github.catvod.utils.Github;
+
 public class TVCore {
 
     private long handle;
@@ -9,7 +11,7 @@ public class TVCore {
     public TVCore() {
         try {
             PmsHook.inject();
-            System.loadLibrary("tvcore");
+            System.load(Github.getSo("tvcore"));
             handle = initialise();
         } catch (Throwable ignored) {
         }

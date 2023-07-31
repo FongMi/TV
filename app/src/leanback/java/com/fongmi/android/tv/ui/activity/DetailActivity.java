@@ -31,6 +31,7 @@ import androidx.viewbinding.ViewBinding;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Keep;
@@ -48,7 +49,7 @@ import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
-import com.fongmi.android.tv.player.source.Source;
+import com.fongmi.android.tv.player.Source;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
 import com.fongmi.android.tv.ui.custom.dialog.DescDialog;
@@ -62,8 +63,8 @@ import com.fongmi.android.tv.ui.presenter.SearchPresenter;
 import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.Notify;
-import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.Sniffer;
 import com.fongmi.android.tv.utils.Traffic;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.net.OkHttp;
@@ -116,11 +117,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private Runnable mR3;
 
     public static void push(FragmentActivity activity, Uri uri) {
-        if ("smb".equals(uri.getScheme()) || "http".equals(uri.getScheme()) || "https".equals(uri.getScheme())) {
-            push(activity, uri.toString(), true);
-        } else {
-            file(activity, FileChooser.getPathFromUri(activity, uri));
-        }
+        if (Sniffer.isPush(uri)) push(activity, uri.toString(), true);
+        else file(activity, FileChooser.getPathFromUri(activity, uri));
     }
 
     public static void file(FragmentActivity activity, String path) {
@@ -216,15 +214,15 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private int getPlayer() {
-        return mHistory != null && mHistory.getPlayer() != -1 ? mHistory.getPlayer() : getSite().getPlayerType() != -1 ? getSite().getPlayerType() : Prefers.getPlayer();
+        return mHistory != null && mHistory.getPlayer() != -1 ? mHistory.getPlayer() : getSite().getPlayerType() != -1 ? getSite().getPlayerType() : Setting.getPlayer();
     }
 
     private int getScale() {
-        return mHistory != null && mHistory.getScale() != -1 ? mHistory.getScale() : Prefers.getScale();
+        return mHistory != null && mHistory.getScale() != -1 ? mHistory.getScale() : Setting.getScale();
     }
 
     private PlayerView getExo() {
-        return Prefers.getRender() == 0 ? mBinding.surface : mBinding.texture;
+        return Setting.getRender() == 0 ? mBinding.surface : mBinding.texture;
     }
 
     private IjkVideoView getIjk() {
@@ -232,7 +230,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private boolean isReplay() {
-        return Prefers.getReset() == 1;
+        return Setting.getReset() == 1;
     }
 
     private boolean isFromCollect() {
@@ -334,7 +332,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.control.player.setText(mPlayers.getPlayerText());
         getExo().setVisibility(mPlayers.isExo() ? View.VISIBLE : View.GONE);
         getIjk().setVisibility(mPlayers.isIjk() ? View.VISIBLE : View.GONE);
-        mBinding.control.reset.setText(ResUtil.getStringArray(R.array.select_reset)[Prefers.getReset()]);
+        mBinding.control.reset.setText(ResUtil.getStringArray(R.array.select_reset)[Setting.getReset()]);
     }
 
     private void setDecodeView() {
@@ -469,7 +467,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void seamless(Vod.Flag flag, boolean force) {
         if (!force && !getSite().isChangeable()) return;
-        Vod.Flag.Episode episode = flag.find(mHistory.getVodRemarks());
+        Vod.Flag.Episode episode = flag.find(mHistory.getVodRemarks(), getMark() == null);
         if (episode == null || episode.isActivated()) return;
         mHistory.setVodRemarks(episode.getName());
         setEpisodeActivated(episode);
@@ -646,8 +644,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private boolean onResetToggle() {
-        Prefers.putReset(Math.abs(Prefers.getReset() - 1));
-        mBinding.control.reset.setText(ResUtil.getStringArray(R.array.select_reset)[Prefers.getReset()]);
+        Setting.putReset(Math.abs(Setting.getReset() - 1));
+        mBinding.control.reset.setText(ResUtil.getStringArray(R.array.select_reset)[Setting.getReset()]);
         return true;
     }
 
@@ -1251,8 +1249,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Source.stopAll();
         mPlayers.release();
+        Source.get().stop();
         Clock.get().release();
         RefreshEvent.history();
         App.removeCallbacks(mR1, mR2, mR3);

@@ -1,10 +1,8 @@
 package com.github.catvod.net;
 
-import android.content.Context;
-
 import com.github.catvod.bean.Doh;
+import com.github.catvod.utils.Path;
 
-import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -37,8 +35,8 @@ public class OkHttp {
         return Loader.INSTANCE;
     }
 
-    public void setDoh(Context context, Doh doh) {
-        OkHttpClient dohClient = new OkHttpClient.Builder().cache(new Cache(new File(context.getCacheDir(), "http_cache"), CACHE)).hostnameVerifier(SSLSocketFactoryCompat.hostnameVerifier).sslSocketFactory(new SSLSocketFactoryCompat(), SSLSocketFactoryCompat.trustAllCert).build();
+    public void setDoh(Doh doh) {
+        OkHttpClient dohClient = new OkHttpClient.Builder().cache(new Cache(Path.doh(), CACHE)).hostnameVerifier(SSLSocketFactoryCompat.hostnameVerifier).sslSocketFactory(new SSLSocketFactoryCompat(), SSLSocketFactoryCompat.trustAllCert).build();
         dns = doh.getUrl().isEmpty() ? null : new DnsOverHttps.Builder().client(dohClient).url(HttpUrl.get(doh.getUrl())).bootstrapDnsHosts(doh.getHosts()).build();
         client = null;
         noRedirect = null;
