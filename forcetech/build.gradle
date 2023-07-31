@@ -12,3 +12,7 @@ android {
         ndk { abiFilters "armeabi-v7a" }
     }
 }
+
+dependencies {
+    implementation project(':catvod')
+}

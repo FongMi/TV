@@ -8,10 +8,10 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.databinding.AdapterSiteBinding;
-import com.fongmi.android.tv.utils.Prefers;
 
 import java.util.List;
 
@@ -66,7 +66,7 @@ public class SiteAdapter extends RecyclerView.Adapter<SiteAdapter.ViewHolder> {
         holder.binding.check.setVisibility(type == 0 ? View.GONE : View.VISIBLE);
         holder.binding.getRoot().setOnLongClickListener(v -> setLongListener(item));
         holder.binding.getRoot().setOnClickListener(v -> setListener(item, position));
-        holder.binding.text.setGravity(Prefers.getSiteMode() == 0 ? Gravity.CENTER : Gravity.START);
+        holder.binding.text.setGravity(Setting.getSiteMode() == 0 ? Gravity.CENTER : Gravity.START);
     }
 
     private boolean getChecked(Site item) {

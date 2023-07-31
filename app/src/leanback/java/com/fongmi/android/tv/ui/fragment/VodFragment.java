@@ -69,7 +69,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     }
 
     private String getTypeId() {
-        return getArguments().getString("typeId");
+        return mPages.isEmpty() ? getArguments().getString("typeId") : getLastPage().getVodId();
     }
 
     private String getFilter() {
@@ -139,19 +139,6 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         getVideo(getTypeId(), "1");
     }
 
-    private void checkPosition() {
-        if (mPage != null && mPage.getPosition() > 0) mBinding.recycler.hideHeader();
-        if (mPage != null && mPage.getPosition() < 1) mBinding.recycler.showHeader();
-        if (mPage != null) mBinding.recycler.setSelectedPosition(mPage.getPosition());
-        else if (isFolder() && !mOpen) mBinding.recycler.moveToTop();
-        mPage = null;
-    }
-
-    private void checkPage(int count) {
-        if (count == 0 || mAdapter.size() >= 4 || isFolder()) return;
-        getVideo(getTypeId(), String.valueOf(mScroller.addPage()));
-    }
-
     private void getVideo(String typeId, String page) {
         boolean first = page.equals("1");
         if (first) mLast = null;
@@ -163,11 +150,23 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     }
 
     private void addVideo(List<Vod> items) {
-        if (isFolder()) {
-            mAdapter.addAll(mAdapter.size(), items);
-        } else {
-            addGrid(items);
-        }
+        if (items.isEmpty()) return;
+        boolean list = items.get(0).isList(isFolder());
+        if (list) mAdapter.addAll(mAdapter.size(), items);
+        else addGrid(items);
+    }
+
+    private void checkPosition() {
+        if (mPage != null && mPage.getPosition() > 0) mBinding.recycler.hideHeader();
+        if (mPage != null && mPage.getPosition() < 1) mBinding.recycler.showHeader();
+        if (mPage != null) mBinding.recycler.setSelectedPosition(mPage.getPosition());
+        else if (isFolder() && !mOpen) mBinding.recycler.moveToTop();
+        mPage = null;
+    }
+
+    private void checkPage(int count) {
+        if (count == 0 || mAdapter.size() >= 4 || isFolder()) return;
+        getVideo(getTypeId(), String.valueOf(mScroller.addPage()));
     }
 
     private boolean checkLastSize(List<Vod> items) {
@@ -226,8 +225,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     }
 
     public void onRefresh() {
-        if (mPages.isEmpty()) getVideo();
-        else getVideo(getLastPage().getVodId(), "1");
+        getVideo();
     }
 
     public boolean canGoBack() {

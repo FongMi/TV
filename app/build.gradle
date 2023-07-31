@@ -23,7 +23,7 @@ android {
         leanback {
             dimension "default"
             versionCode 203
-            versionName "2.0.3"
+            versionName "20230731#3"
         }
     }
 
@@ -66,6 +66,7 @@ dependencies {
     implementation project(':catvod')
     implementation project(':pyramid')
     implementation project(':quickjs')
+    implementation project(':thunder')
     implementation project(':jianpian')
     implementation project(':forcetech')
     implementation project(':ijkplayer')
@@ -87,24 +88,20 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.leanback:leanback:1.2.0-alpha02'
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.5.1'
-    implementation 'androidx.preference:preference:1.2.0'
     implementation 'androidx.room:room-runtime:2.5.2'
     implementation 'cat.ereza:customactivityoncrash:2.4.0'
     implementation 'com.github.bassaer:materialdesigncolors:1.0.0'
     implementation 'com.github.bumptech.glide:glide:4.15.1'
     implementation 'com.github.bumptech.glide:annotations:4.15.1'
     implementation 'com.github.bumptech.glide:okhttp3-integration:4.15.1'
-    implementation('com.github.thegrizzlylabs:sardine-android:0.8') { exclude group: 'com.squareup.okhttp3', module: 'okhttp' }
+    implementation 'com.github.TeamNewPipe:NewPipeExtractor:8495ad619e'
     implementation 'com.google.android.material:material:1.9.0'
-    implementation 'com.google.code.gson:gson:' + gsonVersion
+    implementation 'com.google.net.cronet:cronet-okhttp:0.1.0'
     implementation 'com.google.zxing:core:3.3.0'
     implementation 'com.guolindev.permissionx:permissionx:1.7.1'
-    implementation 'com.hierynomus:smbj:0.11.5'
-    implementation 'com.squareup.okhttp3:okhttp:' + okhttpVersion
     implementation 'me.jessyan:autosize:1.2.1'
-    implementation 'org.apache.commons:commons-compress:1.20'
+    implementation 'org.chromium.net:cronet-embedded:101.4951.41'
     implementation 'org.greenrobot:eventbus:3.3.1'
-    implementation 'org.jsoup:jsoup:' + jsoupVersion
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
     implementation('org.simpleframework:simple-xml:2.7.1') { exclude group: 'stax', module: 'stax-api' exclude group: 'xpp3', module: 'xpp3' }
     annotationProcessor 'androidx.room:room-compiler:2.5.2'

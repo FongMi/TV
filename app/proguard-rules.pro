@@ -47,6 +47,9 @@
 # Jianpian
 -keep class com.p2p.** { *; }
 
+# Mozilla
+-keep class org.mozilla.javascript.** { *; }
+
 # Sardine
 -keep class com.thegrizzlylabs.sardineandroid.** { *; }
 
@@ -56,6 +59,9 @@
 
 # TVBus
 -keep class com.tvbus.engine.** { *; }
+
+# XunLei
+-keep class com.xunlei.downloadlib.** { *; }
 
 # ZLive
 -keep class com.sun.jna.** { *; }

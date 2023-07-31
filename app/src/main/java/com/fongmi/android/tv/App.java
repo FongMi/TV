@@ -14,10 +14,12 @@ import androidx.multidex.MultiDexApplication;
 
 import com.fongmi.android.tv.ui.activity.CrashActivity;
 import com.fongmi.android.tv.utils.Notify;
-import com.fongmi.android.tv.utils.Prefers;
+import com.github.catvod.Init;
 import com.github.catvod.bean.Doh;
 import com.github.catvod.net.OkHttp;
 import com.google.gson.Gson;
+import com.orhanobut.logger.AndroidLogAdapter;
+import com.orhanobut.logger.Logger;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -80,12 +82,15 @@ public class App extends MultiDexApplication {
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
         MultiDex.install(this);
+		Init.set(base);
     }
 
+    @Override
     public void onCreate() {
         super.onCreate();
         Notify.createChannel();
-        OkHttp.get().setDoh(this, Doh.objectFrom(Prefers.getDoh()));
+        Logger.addLogAdapter(new AndroidLogAdapter());
+        OkHttp.get().setDoh(Doh.objectFrom(Setting.getDoh()));
         CaocConfig.Builder.create().backgroundMode(CaocConfig.BACKGROUND_MODE_SILENT).errorActivity(CrashActivity.class).apply();
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
             @Override

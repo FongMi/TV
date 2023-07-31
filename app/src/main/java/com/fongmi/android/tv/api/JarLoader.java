@@ -3,11 +3,11 @@ package com.fongmi.android.tv.api;
 import android.content.Context;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.utils.FileUtil;
-import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderNull;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.Path;
+import com.github.catvod.utils.Util;
 
 import org.json.JSONObject;
 
@@ -45,7 +45,7 @@ public class JarLoader {
     }
 
     private void load(String key, File file) {
-        loaders.put(key, new DexClassLoader(file.getAbsolutePath(), FileUtil.getCachePath(), null, App.get().getClassLoader()));
+        loaders.put(key, new DexClassLoader(file.getAbsolutePath(), Path.jar().getAbsolutePath(), null, App.get().getClassLoader()));
         invokeInit(key);
         putProxy(key);
     }
@@ -70,11 +70,11 @@ public class JarLoader {
         }
     }
 
-    private File download(String jar) {
+    private File download(String url) {
         try {
-            return FileUtil.write(FileUtil.getJar(jar), OkHttp.newCall(jar).execute().body().bytes());
+            return Path.write(Path.jar(url), OkHttp.newCall(url).execute().body().bytes());
         } catch (Exception e) {
-            return FileUtil.getJar(jar);
+            return Path.jar(url);
         }
     }
 
@@ -84,14 +84,14 @@ public class JarLoader {
         jar = texts[0];
         if (jar.startsWith("img+")) {
             load(key, Decoder.getSpider(jar, md5));
-        } else if (md5.length() > 0 && FileUtil.equals(jar, md5)) {
-            load(key, FileUtil.getJar(jar));
+        } else if (md5.length() > 0 && Util.equals(jar, md5)) {
+            load(key, Path.jar(jar));
         } else if (jar.startsWith("http")) {
             load(key, download(jar));
         } else if (jar.startsWith("file")) {
-            load(key, FileUtil.getLocal(jar));
+            load(key, Path.local(jar));
         } else if (!jar.isEmpty()) {
-            parseJar(key, Utils.convert(ApiConfig.getUrl(), jar));
+            parseJar(key, com.fongmi.android.tv.utils.Utils.convert(ApiConfig.getUrl(), jar));
         }
     }
 
@@ -102,7 +102,7 @@ public class JarLoader {
 
     public Spider getSpider(String key, String api, String ext, String jar) {
         try {
-            String jaKey = Utils.getMd5(jar);
+            String jaKey = Util.md5(jar);
             String spKey = jaKey + key;
             if (spiders.containsKey(spKey)) return spiders.get(spKey);
             if (!loaders.containsKey(jaKey)) parseJar(jaKey, jar);
@@ -130,7 +130,7 @@ public class JarLoader {
 
     public Object[] proxyInvoke(Map<String, String> params) {
         try {
-            Method method = methods.get(Utils.getMd5(recent));
+            Method method = methods.get(Util.md5(recent));
             if (method == null) return null;
             return (Object[]) method.invoke(null, params);
         } catch (Throwable e) {

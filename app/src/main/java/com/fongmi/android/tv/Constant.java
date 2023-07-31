@@ -19,8 +19,6 @@ public class Constant {
     public static final int TIMEOUT_PARSE_WEB = 15 * 1000;
     //直播解析時間
     public static final int TIMEOUT_PARSE_LIVE = 10 * 1000;
-    //代理超時時間
-    public static final int TIMEOUT_GITHUB = 5 * 1000;
     //同步超時時間
     public static final int TIMEOUT_SYNC = 2 * 1000;
     //搜尋線程數量

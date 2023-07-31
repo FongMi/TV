@@ -7,6 +7,7 @@ import androidx.annotation.Keep;
 import com.chaquo.python.PyObject;
 import com.chaquo.python.Python;
 import com.chaquo.python.android.AndroidPlatform;
+import com.github.catvod.utils.Path;
 
 public class Loader {
 
@@ -16,8 +17,8 @@ public class Loader {
     @Keep
     private void init(Context context) {
         if (!Python.isStarted()) Python.start(new AndroidPlatform(context));
-        cache = context.getCacheDir().getAbsolutePath() + "/plugin/";
         app = Python.getInstance().getModule("app");
+        cache = Path.py().getAbsolutePath();
     }
 
     @Keep

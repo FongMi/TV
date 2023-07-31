@@ -2,10 +2,11 @@ package com.fongmi.android.tv.api;
 
 import android.util.Base64;
 
-import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Json;
+import com.github.catvod.utils.Path;
+import com.github.catvod.utils.Util;
 import com.google.common.io.BaseEncoding;
 
 import java.io.File;
@@ -45,21 +46,21 @@ public class Decoder {
         }
     }
 
-    public static File getSpider(String jar, String md5) {
+    public static File getSpider(String url, String md5) {
         try {
-            File file = FileUtil.getJar(jar);
-            if (md5.length() > 0 && FileUtil.equals(jar, md5)) return file;
-            String data = extract(getData(jar.substring(4)));
-            if (data.isEmpty()) return FileUtil.getJar(jar);
-            return FileUtil.write(file, Base64.decode(data, Base64.DEFAULT));
+            File file = Path.jar(url);
+            if (md5.length() > 0 && Util.equals(url, md5)) return file;
+            String data = extract(getData(url.substring(4)));
+            if (data.isEmpty()) return Path.jar(url);
+            return Path.write(file, Base64.decode(data, Base64.DEFAULT));
         } catch (Exception ignored) {
-            return FileUtil.getJar(jar);
+            return Path.jar(url);
         }
     }
 
     private static String getData(String url) throws Exception {
         if (url.startsWith("http")) return OkHttp.newCall(url).execute().body().string();
-        if (url.startsWith("file")) return FileUtil.read(url);
+        if (url.startsWith("file")) return Path.read(url);
         throw new Exception();
     }
 

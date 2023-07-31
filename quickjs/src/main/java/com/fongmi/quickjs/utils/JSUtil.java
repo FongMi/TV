@@ -16,6 +16,13 @@ public class JSUtil {
         return array;
     }
 
+    public static JSArray toArray(QuickJSContext ctx, byte[] bytes) {
+        JSArray array = ctx.createNewJSArray();
+        if (bytes == null || bytes.length == 0) return array;
+        for (int i = 0; i < bytes.length; i++) array.set(bytes[i], i);
+        return array;
+    }
+
     public static JSObject toObj(QuickJSContext ctx, Map<String, String> map) {
         JSObject obj = ctx.createNewJSObject();
         if (map == null || map.isEmpty()) return obj;

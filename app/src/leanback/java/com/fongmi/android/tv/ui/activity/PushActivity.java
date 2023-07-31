@@ -1,8 +1,8 @@
 package com.fongmi.android.tv.ui.activity;
 
 import android.app.Activity;
-import android.content.ClipboardManager;
 import android.content.Intent;
+import android.text.TextUtils;
 import android.view.View;
 
 import androidx.viewbinding.ViewBinding;
@@ -13,6 +13,7 @@ import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.utils.QRCode;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.Utils;
 
 public class PushActivity extends BaseActivity {
 
@@ -36,7 +37,7 @@ public class PushActivity extends BaseActivity {
     }
 
     private void onClip(View view) {
-        CharSequence text = ((ClipboardManager) getSystemService(CLIPBOARD_SERVICE)).getText();
-        if (text != null) DetailActivity.push(this, text.toString(), false);
+        CharSequence text = Utils.getClipText();
+        if (!TextUtils.isEmpty(text)) DetailActivity.push(this, text.toString(), false);
     }
 }
