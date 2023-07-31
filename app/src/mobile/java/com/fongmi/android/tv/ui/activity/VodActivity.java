@@ -43,6 +43,15 @@ public class VodActivity extends BaseActivity {
         Result result = Result.fromJson(getResult());
         Class type = result.getTypes().get(0);
         mBinding.text.setText(type.getTypeName());
-        getSupportFragmentManager().beginTransaction().replace(R.id.container, TypeFragment.newInstance(getKey(), type.getTypeId(), type.getTypeFlag().equals("1"))).commitAllowingStateLoss();
+        getSupportFragmentManager().beginTransaction().replace(R.id.container, TypeFragment.newInstance(getKey(), type.getTypeId(), type.getTypeFlag().equals("1")), "0").commitAllowingStateLoss();
+    }
+
+    private TypeFragment getFragment() {
+        return (TypeFragment) getSupportFragmentManager().findFragmentByTag("0");
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (getFragment().canBack()) super.onBackPressed();
     }
 }
