@@ -44,7 +44,7 @@ public class Updater implements Download.Callback {
     }
 
     private String getApk() {
-        return Github.getApk("leanback-4.x");
+        return Github.getApk("leanback");
     }
 
     public Updater force() {
