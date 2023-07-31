@@ -268,7 +268,7 @@ public class CollectActivity extends BaseActivity implements CustomScroller.Call
         mBinding.recycler.scrollToPosition(0);
         mCollectAdapter.setActivated(position);
         mVodAdapter.clear().addAll(item.getList());
-        mScroller.setEnable(true);
+        mScroller.setPage(item.getPage());
     }
 
     @Override
@@ -284,8 +284,10 @@ public class CollectActivity extends BaseActivity implements CustomScroller.Call
 
     @Override
     public void onLoadMore(String page) {
-        if (mCollectAdapter.getPosition() == 0) return;
-        mViewModel.searchContent(mCollectAdapter.getActivated().getSite(), mBinding.keyword.getText().toString(), page);
+        Collect activated = mCollectAdapter.getActivated();
+        if (activated.getSite().getKey().equals("all")) return;
+        mViewModel.searchContent(activated.getSite(), mBinding.keyword.getText().toString(), page);
+        activated.setPage(Integer.parseInt(page));
         mScroller.setLoading(true);
     }
 
