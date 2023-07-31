@@ -77,8 +77,7 @@ public class SiteViewModel extends ViewModel {
             } else {
                 String body = OkHttp.newCall(site.getApi()).execute().body().string();
                 SpiderDebug.log(body);
-                Result result = site.getType() == 0 ? Result.fromXml(body) : Result.fromJson(body);
-                return fetchPic(site, result);
+                return fetchPic(site, Result.fromType(site.getType(), body));
             }
         });
     }
@@ -101,7 +100,7 @@ public class SiteViewModel extends ViewModel {
                 params.put("pg", page);
                 String body = OkHttp.newCall(site.getApi(), params).execute().body().string();
                 SpiderDebug.log(body);
-                return site.getType() == 0 ? Result.fromXml(body) : Result.fromJson(body);
+                return Result.fromType(site.getType(), body);
             }
         });
     }
@@ -132,7 +131,7 @@ public class SiteViewModel extends ViewModel {
                 params.put("ids", id);
                 String body = OkHttp.newCall(site.getApi(), params).execute().body().string();
                 SpiderDebug.log(body);
-                Result result = site.getType() == 0 ? Result.fromXml(body) : Result.fromJson(body);
+                Result result = Result.fromType(site.getType(), body);
                 if (!result.getList().isEmpty()) result.getList().get(0).setVodFlags();
                 if (!result.getList().isEmpty()) checkThunder(result.getList().get(0).getVodFlags());
                 return result;
@@ -195,8 +194,7 @@ public class SiteViewModel extends ViewModel {
             params.put("wd", Trans.t2s(keyword));
             String body = OkHttp.newCall(site.getApi(), params).execute().body().string();
             SpiderDebug.log(site.getName() + "," + body);
-            Result result = site.getType() == 0 ? Result.fromXml(body) : Result.fromJson(body);
-            post(site, fetchPic(site, result));
+            post(site, fetchPic(site, Result.fromType(site.getType(), body)));
         }
     }
 
@@ -215,9 +213,9 @@ public class SiteViewModel extends ViewModel {
                 params.put("pg", page);
                 String body = OkHttp.newCall(site.getApi(), params).execute().body().string();
                 SpiderDebug.log(site.getName() + "," + body);
-                Result result = site.getType() == 0 ? Result.fromXml(body) : Result.fromJson(body);
+                Result result = fetchPic(site, Result.fromType(site.getType(), body));
                 for (Vod vod : result.getList()) vod.setSite(site);
-                return fetchPic(site, result);
+                return result;
             }
         });
     }
@@ -230,8 +228,7 @@ public class SiteViewModel extends ViewModel {
         params.put("ac", site.getType() == 0 ? "videolist" : "detail");
         params.put("ids", TextUtils.join(",", ids));
         String body = OkHttp.newCall(site.getApi(), params).execute().body().string();
-        List<Vod> items = site.getType() == 0 ? Result.fromXml(body).getList() : Result.fromJson(body).getList();
-        result.setList(items);
+        result.setList(Result.fromType(site.getType(), body).getList());
         return result;
     }
 
