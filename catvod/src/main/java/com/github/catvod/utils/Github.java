@@ -57,12 +57,12 @@ public class Github {
         return get().getProxy() + "/" + path + "/" + name;
     }
 
-    public static String getJson(boolean dev, String name) {
-        return getUrl("apk/" + (dev ? "dev" : "release"), name + ".json");
+    public static String getJson(String name) {
+        return getUrl("apk/kitkat", name + ".json");
     }
 
-    public static String getApk(boolean dev, String name) {
-        return getUrl("apk/" + (dev ? "dev" : "release"), name + ".apk");
+    public static String getApk(String name) {
+        return getUrl("apk/kitkat", name + ".apk");
     }
 
     public static String getSo(String name) {

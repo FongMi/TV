@@ -27,7 +27,7 @@ public class InitParam {
     public String getSoKey() {
         String[] split = mAppKey.split("==");
         String replace = split[0].replace('^', '=');
-        String str = new String(Base64.decode(replace.substring(2, replace.length() - 2), 0), StandardCharsets.UTF_8);
+        String str = new String(Base64.decode(replace.substring(2, replace.length() - 2), 0), "UTF-8");
         return XLUtil.generateAppKey("com.android.providers.downloads", Short.parseShort(str.split(";")[0]), (byte) 1);
     }
 }
