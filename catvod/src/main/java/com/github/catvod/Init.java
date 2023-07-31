@@ -16,11 +16,11 @@ public class Init {
         return Loader.INSTANCE;
     }
 
-    public static Context context() {
-        return get().context.get();
+    public static void set(Context context) {
+        get().context = new WeakReference<>(context);
     }
 
-    public static void setContext(Context context) {
-        get().context = new WeakReference<>(context);
+    public static Context context() {
+        return get().context.get();
     }
 }
