@@ -22,7 +22,7 @@ public class CustomScroller extends RecyclerView.OnScrollListener {
 
     @Override
     public void onScrollStateChanged(@NonNull RecyclerView view, int newState) {
-        if (!isEnable() || isLoading() || newState != RecyclerView.SCROLL_STATE_IDLE) return;
+        if (isDisable() || isLoading() || newState != RecyclerView.SCROLL_STATE_IDLE) return;
         if (isBottom(view)) callback.onLoadMore(String.valueOf(++page));
     }
 
@@ -49,8 +49,8 @@ public class CustomScroller extends RecyclerView.OnScrollListener {
         this.loading = loading;
     }
 
-    public boolean isEnable() {
-        return enable;
+    public boolean isDisable() {
+        return !enable;
     }
 
     public void setEnable(int pageCount) {
