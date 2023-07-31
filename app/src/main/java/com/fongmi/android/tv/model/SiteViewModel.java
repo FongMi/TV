@@ -193,7 +193,6 @@ public class SiteViewModel extends ViewModel {
         } else {
             ArrayMap<String, String> params = new ArrayMap<>();
             params.put("wd", Trans.t2s(keyword));
-            if (site.getType() != 0) params.put("ac", "detail");
             String body = OkHttp.newCall(site.getApi(), params).execute().body().string();
             SpiderDebug.log(site.getName() + "," + body);
             Result result = site.getType() == 0 ? Result.fromXml(body) : Result.fromJson(body);
@@ -214,7 +213,6 @@ public class SiteViewModel extends ViewModel {
                 ArrayMap<String, String> params = new ArrayMap<>();
                 params.put("wd", Trans.t2s(keyword));
                 params.put("pg", page);
-                if (site.getType() != 0) params.put("ac", "detail");
                 String body = OkHttp.newCall(site.getApi(), params).execute().body().string();
                 SpiderDebug.log(site.getName() + "," + body);
                 Result result = site.getType() == 0 ? Result.fromXml(body) : Result.fromJson(body);
