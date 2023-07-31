@@ -28,19 +28,19 @@ public class XLTaskHelper {
         static volatile XLTaskHelper INSTANCE = new XLTaskHelper();
     }
 
-    public static XLTaskHelper get() {
+    public synchronized static XLTaskHelper get() {
         return Loader.INSTANCE;
     }
 
-    private AtomicInteger getSeq() {
+    private synchronized AtomicInteger getSeq() {
         return seq = seq == null ? new AtomicInteger(0) : seq;
     }
 
-    private XLDownloadManager getManager() {
+    private synchronized XLDownloadManager getManager() {
         return manager = manager == null ? new XLDownloadManager() : manager;
     }
 
-    private GetTaskId startTask(GetTaskId taskId, int index) {
+    private synchronized GetTaskId startTask(GetTaskId taskId, int index) {
         getManager().startTask(taskId.getTaskId());
         getManager().setTaskGsState(taskId.getTaskId(), index, 2);
         return taskId;
@@ -134,7 +134,7 @@ public class XLTaskHelper {
         stopTask(taskId);
     }
 
-    private static void deleteFile(File dir) {
+    private synchronized void deleteFile(File dir) {
         if (dir.isDirectory()) for (File file : Path.list(dir)) deleteFile(file);
         if (!dir.getAbsolutePath().endsWith(".torrent")) dir.delete();
     }
@@ -157,7 +157,7 @@ public class XLTaskHelper {
         return subTaskDetail;
     }
 
-    public void release() {
+    public synchronized void release() {
         if (manager != null) manager.release();
         manager = null;
         seq = null;
