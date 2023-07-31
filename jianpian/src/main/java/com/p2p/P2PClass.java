@@ -8,7 +8,7 @@ public class P2PClass {
     public int port;
 
     public P2PClass() {
-        System.load(Github.getSo("jpa_" + BuildConfig.FLAVOR));
+        System.load(Github.getSo("jpa_armeabi_v7a"));
         this.port = P2Pdoxstarthttpd("TEST3E63BAAECDAA79BEAA91853490A69F08".getBytes(), Path.jpa().getAbsolutePath().getBytes());
     }
 

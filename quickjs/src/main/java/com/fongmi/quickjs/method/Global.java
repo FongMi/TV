@@ -100,8 +100,8 @@ public class Global {
             SecretKeySpec keySpec = new SecretKeySpec(keyBuf, "AES");
             if (iv == null) cipher.init(encrypt ? Cipher.ENCRYPT_MODE : Cipher.DECRYPT_MODE, keySpec);
             else cipher.init(encrypt ? Cipher.ENCRYPT_MODE : Cipher.DECRYPT_MODE, keySpec, new IvParameterSpec(ivBuf));
-            byte[] inBuf = inBase64 ? Base64.decode(input, Base64.DEFAULT) : input.getBytes(StandardCharsets.UTF_8);
-            return outBase64 ? Base64.encodeToString(cipher.doFinal(inBuf), Base64.DEFAULT) : new String(cipher.doFinal(inBuf), StandardCharsets.UTF_8);
+            byte[] inBuf = inBase64 ? Base64.decode(input, Base64.DEFAULT) : input.getBytes("UTF-8");
+            return outBase64 ? Base64.encodeToString(cipher.doFinal(inBuf), Base64.DEFAULT) : new String(cipher.doFinal(inBuf), "UTF-8");
         } catch (Exception e) {
             e.printStackTrace();
             return "";
