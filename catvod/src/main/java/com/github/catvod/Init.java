@@ -16,10 +16,6 @@ public class Init {
         return Loader.INSTANCE;
     }
 
-    public static Context getContext() {
-        return get().context.get();
-    }
-
     public static Context context() {
         return get().context.get();
     }
