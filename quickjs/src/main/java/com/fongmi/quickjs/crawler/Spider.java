@@ -93,6 +93,11 @@ public class Spider extends com.github.catvod.crawler.Spider {
     }
 
     @Override
+    public String searchContent(String key, boolean quick, String pg) throws Exception {
+        return (String) call("search", key, quick, pg)[0];
+    }
+
+    @Override
     public String playerContent(String flag, String id, List<String> vipFlags) throws Exception {
         JSArray array = submit(() -> JSUtil.toArray(ctx, vipFlags)).get();
         return (String) call("play", flag, id, array)[0];

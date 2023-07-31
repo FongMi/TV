@@ -11,11 +11,11 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
 
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.databinding.DialogUaBinding;
 import com.fongmi.android.tv.event.ServerEvent;
 import com.fongmi.android.tv.impl.UaCallback;
 import com.fongmi.android.tv.server.Server;
-import com.fongmi.android.tv.utils.Prefers;
 import com.fongmi.android.tv.utils.QRCode;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -56,7 +56,7 @@ public class UaDialog implements DialogInterface.OnDismissListener {
     }
 
     private void initView() {
-        String ua = Prefers.getUa();
+        String ua = Setting.getUa();
         String address = Server.get().getAddress();
         binding.text.setText(ua);
         binding.code.setImageBitmap(QRCode.getBitmap(address, 200, 0));

@@ -13,12 +13,12 @@ android {
         //noinspection ChromeOsAbiSupport
         ndk { abiFilters "armeabi-v7a" }
         python {
-            buildPython "C:/Users/FongMi.DIREK/Anaconda3/envs/py38/python.exe"
+            version "3.8"
             pip {
                 install "lxml"
+                install "requests"
                 install 'pycryptodome'
                 install 'beautifulsoup4'
-                install "requests==2.27.1"
             }
         }
     }
@@ -32,6 +32,4 @@ android {
 
 dependencies {
     implementation project(':catvod')
-    implementation 'androidx.annotation:annotation:1.5.0'
-    api 'com.google.code.gson:gson:' + gsonVersion
 }

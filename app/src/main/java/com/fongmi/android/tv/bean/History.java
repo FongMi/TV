@@ -316,7 +316,7 @@ public class History {
         for (History item : find()) {
             if (getPosition() > 0) break;
             for (Vod.Flag flag : flags) {
-                Vod.Flag.Episode episode = flag.find(item.getVodRemarks());
+                Vod.Flag.Episode episode = flag.find(item.getVodRemarks(), true);
                 if (episode == null) continue;
                 setVodFlag(flag.getFlag());
                 setPosition(item.getPosition());

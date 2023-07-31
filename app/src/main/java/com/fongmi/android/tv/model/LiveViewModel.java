@@ -8,7 +8,7 @@ import com.fongmi.android.tv.api.LiveParser;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Group;
 import com.fongmi.android.tv.bean.Live;
-import com.fongmi.android.tv.player.source.Source;
+import com.fongmi.android.tv.player.Source;
 
 import java.util.Iterator;
 import java.util.concurrent.Callable;
@@ -45,8 +45,8 @@ public class LiveViewModel extends ViewModel {
 
     public void fetch(Channel item) {
         execute(CHANNEL, () -> {
-            Source.stop();
-            item.setUrl(Source.getUrl(item.getCurrent().split("\\$")[0]));
+            Source.get().stop();
+            item.setUrl(Source.get().fetch(item.getCurrent().split("\\$")[0]));
             return item;
         });
     }

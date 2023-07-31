@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
-import com.fongmi.android.tv.utils.Prefers;
+import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Utils;
 
@@ -59,10 +59,10 @@ public class CustomKeyDownLive extends GestureDetector.SimpleOnGestureListener {
         } else if (event.getAction() == KeyEvent.ACTION_DOWN && Utils.isRightKey(event)) {
             listener.onSeeking(addTime());
         } else if (event.getAction() == KeyEvent.ACTION_DOWN && Utils.isUpKey(event)) {
-            if (Prefers.isInvert()) listener.onKeyDown();
+            if (Setting.isInvert()) listener.onKeyDown();
             else listener.onKeyUp();
         } else if (event.getAction() == KeyEvent.ACTION_DOWN && Utils.isDownKey(event)) {
-            if (Prefers.isInvert()) listener.onKeyUp();
+            if (Setting.isInvert()) listener.onKeyUp();
             else listener.onKeyDown();
         } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isLeftKey(event)) {
             listener.onKeyLeft(holdTime);
