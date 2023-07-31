@@ -37,20 +37,20 @@ public class CustomScroller extends RecyclerView.OnScrollListener {
         return loading;
     }
 
-    public boolean isEnable() {
-        return enable;
-    }
-
     public void setLoading(boolean loading) {
         this.loading = loading;
     }
 
-    public void setEnable(int pageCount) {
-        this.enable = page < pageCount || pageCount == 0;
+    public boolean isEnable() {
+        return enable;
     }
 
     public void setEnable(boolean enable) {
         this.enable = enable;
+    }
+
+    public void setEnable(int pageCount) {
+        this.enable = page < pageCount || pageCount == 0;
     }
 
     public void endLoading(Result result) {

@@ -5,20 +5,24 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.fongmi.android.tv.bean.Result;
+
 public class CustomScroller extends RecyclerView.OnScrollListener {
 
     private final Callback callback;
     private boolean loading;
+    private boolean enable;
     private int page;
 
     public CustomScroller(Callback callback) {
         this.callback = callback;
+        this.enable = true;
         this.page = 1;
     }
 
     @Override
     public void onScrollStateChanged(@NonNull RecyclerView view, int newState) {
-        if (isLoading() || newState != RecyclerView.SCROLL_STATE_IDLE) return;
+        if (!isEnable() || isLoading() || newState != RecyclerView.SCROLL_STATE_IDLE) return;
         if (isBottom(view)) callback.onLoadMore(String.valueOf(++page));
     }
 
@@ -45,8 +49,17 @@ public class CustomScroller extends RecyclerView.OnScrollListener {
         this.loading = loading;
     }
 
-    public void endLoading(boolean empty) {
-        if (empty) page--;
+    public boolean isEnable() {
+        return enable;
+    }
+
+    public void setEnable(int pageCount) {
+        this.enable = page < pageCount || pageCount == 0;
+    }
+
+    public void endLoading(Result result) {
+        if (result.getList().isEmpty()) page--;
+        setEnable(result.getPageCount());
         setLoading(false);
     }
 
