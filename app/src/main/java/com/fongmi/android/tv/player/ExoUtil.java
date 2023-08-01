@@ -163,7 +163,7 @@ public class ExoUtil {
 
     private static synchronized DataSource.Factory getDataSourceFactory(Map<String, String> headers) {
         if (dataSourceFactory == null) dataSourceFactory = buildReadOnlyCacheDataSource(new DefaultDataSource.Factory(App.get(), getHttpDataSourceFactory()), getCache());
-        httpDataSourceFactory.setDefaultRequestProperties(Utils.checkHeaders(headers));
+        httpDataSourceFactory.setDefaultRequestProperties(Utils.checkUa(headers));
         return dataSourceFactory;
     }
 

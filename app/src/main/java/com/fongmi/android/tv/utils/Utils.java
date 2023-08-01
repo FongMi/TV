@@ -95,7 +95,7 @@ public class Utils {
         return ((ClipboardManager) App.get().getSystemService(Context.CLIPBOARD_SERVICE)).getText();
     }
 
-    public static Map<String, String> checkHeaders(Map<String, String> headers) {
+    public static Map<String, String> checkUa(Map<String, String> headers) {
         if (Setting.getUa().isEmpty() || headers.containsKey(HttpHeaders.USER_AGENT) || headers.containsKey(HttpHeaders.USER_AGENT.toLowerCase())) return headers;
         headers.put(HttpHeaders.USER_AGENT, Setting.getUa());
         return headers;
