@@ -112,8 +112,8 @@ public class Global {
     public JSObject req(String url, JSObject object) {
         try {
             Req req = Req.objectFrom(ctx.stringify(object));
-            Response response = JSUtil.call(url, req).execute();
-            return JSUtil.toResponse(ctx, response, req);
+            Response res = JSUtil.call(url, req).execute();
+            return JSUtil.toResponse(ctx, res, req);
         } catch (Throwable e) {
             return JSUtil.toFailure(ctx);
         }
