@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
@@ -16,6 +17,7 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.load.model.LazyHeaders;
 import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.signature.ObjectKey;
 import com.fongmi.android.tv.App;
@@ -33,6 +35,10 @@ public class ImgUtil {
 
     public static void load(String url, ImageView view) {
         load(url, view, ImageView.ScaleType.CENTER);
+    }
+
+    public static void load(String url, CustomTarget<Drawable> target) {
+        if (!TextUtils.isEmpty(url)) Glide.with(App.get()).load(checkUrl(url)).dontAnimate().into(target);
     }
 
     public static void load(String url, ImageView view, ImageView.ScaleType scaleType) {
