@@ -3,6 +3,8 @@ package com.fongmi.android.tv.player.extractor;
 import android.os.SystemClock;
 
 import com.fongmi.android.tv.bean.Vod;
+import com.fongmi.android.tv.utils.Download;
+import com.fongmi.android.tv.utils.Sniffer;
 import com.github.catvod.utils.Path;
 import com.github.catvod.utils.Util;
 import com.xunlei.downloadlib.XLTaskHelper;
@@ -27,10 +29,12 @@ public class Magnet implements Callable<List<Vod.Flag.Episode>> {
 
     @Override
     public List<Vod.Flag.Episode> call() {
+        boolean torrent = Sniffer.isTorrent(url);
         List<Vod.Flag.Episode> episodes = new ArrayList<>();
         GetTaskId taskId = XLTaskHelper.get().parse(url, Path.thunder(Util.md5(url)));
-        if (!taskId.getRealUrl().startsWith("magnet")) return List.of(Vod.Flag.Episode.create(taskId.getFileName(), taskId.getRealUrl()));
-        while (XLTaskHelper.get().getTaskInfo(taskId).getTaskStatus() != 2) SystemClock.sleep(10);
+        if (!torrent && !taskId.getRealUrl().startsWith("magnet")) return List.of(Vod.Flag.Episode.create(taskId.getFileName(), taskId.getRealUrl()));
+        if (torrent) Download.create(url, taskId.getSaveFile()).start();
+        else while (XLTaskHelper.get().getTaskInfo(taskId).getTaskStatus() != 2) SystemClock.sleep(10);
         List<TorrentFileInfo> medias = XLTaskHelper.get().getTorrentInfo(taskId.getSaveFile()).getMedias();
         for (TorrentFileInfo media : medias) episodes.add(Vod.Flag.Episode.create(media.getFileName(), media.getPlayUrl()));
         XLTaskHelper.get().stopTask(taskId);
