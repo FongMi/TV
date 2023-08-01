@@ -330,7 +330,7 @@ public class Vod {
         }
 
         public Episode find(String remarks, boolean strict) {
-            int number = Utils.digit(remarks);
+            int number = Utils.getDigit(remarks);
             if (getEpisodes().size() == 0) return null;
             if (getEpisodes().size() == 1) return getEpisodes().get(0);
             if (getPosition() != -1) return getEpisodes().get(getPosition());
@@ -391,7 +391,7 @@ public class Vod {
             }
 
             public Episode(String name, String url) {
-                this.number = Utils.digit(name);
+                this.number = Utils.getDigit(name);
                 this.name = Trans.s2t(name);
                 this.url = url;
             }

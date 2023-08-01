@@ -22,7 +22,6 @@ import com.github.catvod.utils.Util;
 import com.google.common.net.HttpHeaders;
 import com.permissionx.guolindev.PermissionX;
 
-import java.text.SimpleDateFormat;
 import java.util.Map;
 
 public class Utils {
@@ -123,15 +122,7 @@ public class Utils {
         return url;
     }
 
-    public static long format(SimpleDateFormat format, String src) {
-        try {
-            return format.parse(src).getTime();
-        } catch (Exception e) {
-            return 0;
-        }
-    }
-
-    public static int digit(String text) {
+    public static int getDigit(String text) {
         try {
             if (text.startsWith("上") || text.startsWith("下")) return -1;
             if (text.contains(".")) text = text.substring(0, text.lastIndexOf("."));

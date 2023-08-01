@@ -13,6 +13,7 @@ import java.io.FileInputStream;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
 
 public class Util {
 
@@ -53,10 +54,6 @@ public class Util {
         return host == null ? "" : host.toLowerCase();
     }
 
-    public static boolean equals(String name, String md5) {
-        return md5(Path.jar(name)).equalsIgnoreCase(md5);
-    }
-
     public static String md5(String src) {
         try {
             if (TextUtils.isEmpty(src)) return "";
@@ -84,6 +81,18 @@ public class Util {
             return sb.toString();
         } catch (Exception e) {
             return "";
+        }
+    }
+
+    public static boolean equals(String name, String md5) {
+        return md5(Path.jar(name)).equalsIgnoreCase(md5);
+    }
+
+    public static long format(SimpleDateFormat format, String src) {
+        try {
+            return format.parse(src).getTime();
+        } catch (Exception e) {
+            return 0;
         }
     }
 }
