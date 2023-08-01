@@ -75,26 +75,6 @@ public class Global {
 
     @Keep
     @JSMethod
-    public String aesX(String mode, boolean encrypt, String input, boolean inBase64, String key, String iv, boolean outBase64) {
-        try {
-            byte[] keyBuf = key.getBytes();
-            if (keyBuf.length < 16) keyBuf = Arrays.copyOf(keyBuf, 16);
-            byte[] ivBuf = iv == null ? new byte[0] : iv.getBytes();
-            if (ivBuf.length < 16) ivBuf = Arrays.copyOf(ivBuf, 16);
-            Cipher cipher = Cipher.getInstance(mode + "Padding");
-            SecretKeySpec keySpec = new SecretKeySpec(keyBuf, "AES");
-            if (iv == null) cipher.init(encrypt ? Cipher.ENCRYPT_MODE : Cipher.DECRYPT_MODE, keySpec);
-            else cipher.init(encrypt ? Cipher.ENCRYPT_MODE : Cipher.DECRYPT_MODE, keySpec, new IvParameterSpec(ivBuf));
-            byte[] inBuf = inBase64 ? Base64.decode(input, Base64.DEFAULT) : input.getBytes(StandardCharsets.UTF_8);
-            return outBase64 ? Base64.encodeToString(cipher.doFinal(inBuf), Base64.DEFAULT) : new String(cipher.doFinal(inBuf), StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "";
-        }
-    }
-
-    @Keep
-    @JSMethod
     public Object setTimeout(JSFunction func, Integer delay) {
         func.hold();
         schedule(func, delay);
@@ -169,13 +149,31 @@ public class Global {
         }
     }
 
+    @Keep
+    @JSMethod
+    public String aesX(String mode, boolean encrypt, String input, boolean inBase64, String key, String iv, boolean outBase64) {
+        try {
+            byte[] keyBuf = key.getBytes();
+            if (keyBuf.length < 16) keyBuf = Arrays.copyOf(keyBuf, 16);
+            byte[] ivBuf = iv == null ? new byte[0] : iv.getBytes();
+            if (ivBuf.length < 16) ivBuf = Arrays.copyOf(ivBuf, 16);
+            Cipher cipher = Cipher.getInstance(mode + "Padding");
+            SecretKeySpec keySpec = new SecretKeySpec(keyBuf, "AES");
+            if (iv == null) cipher.init(encrypt ? Cipher.ENCRYPT_MODE : Cipher.DECRYPT_MODE, keySpec);
+            else cipher.init(encrypt ? Cipher.ENCRYPT_MODE : Cipher.DECRYPT_MODE, keySpec, new IvParameterSpec(ivBuf));
+            byte[] inBuf = inBase64 ? Base64.decode(input, Base64.DEFAULT) : input.getBytes(StandardCharsets.UTF_8);
+            return outBase64 ? Base64.encodeToString(cipher.doFinal(inBuf), Base64.DEFAULT) : new String(cipher.doFinal(inBuf), StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
     private void schedule(JSFunction func, int delay) {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                if (!executor.isShutdown()) executor.submit(() -> {
-                    func.call();
-                });
+                if (!executor.isShutdown()) executor.submit(() -> {func.call();});
             }
         }, delay);
     }
