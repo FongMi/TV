@@ -450,7 +450,7 @@ public class Vod {
                 if (this == obj) return true;
                 if (!(obj instanceof Episode)) return false;
                 Episode it = (Episode) obj;
-                return (!TextUtils.isEmpty(getUrl()) && !TextUtils.isEmpty(it.getUrl()) && getUrl().equals(it.getUrl())) || (!TextUtils.isEmpty(getName()) && !TextUtils.isEmpty(it.getName()) && getName().equals(it.getName()));
+                return getUrl().equals(it.getUrl()) && getName().equals(it.getName());
             }
 
             static class Sorter implements Comparator<Episode> {

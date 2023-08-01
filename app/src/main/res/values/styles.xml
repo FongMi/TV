@@ -19,7 +19,6 @@
         <item name="use_artwork">true</item>
         <item name="use_controller">false</item>
         <item name="animation_enabled">false</item>
-        <item name="default_artwork">@drawable/radio</item>
     </style>
 
     <style name="Player.Vod">
