@@ -23,22 +23,21 @@ public class Sniffer {
     public static final List<String> PUSH = Arrays.asList("http", "https", "smb", "thunder", "magnet", "ed2k", "ftp");
     public static final List<String> THUNDER = Arrays.asList("thunder", "magnet", "ed2k", "ftp");
 
-    private static boolean matchOrContain(String url) {
-        for (String regex : getRegex(Uri.parse(url))) return Pattern.compile(regex).matcher(url).find() || url.contains(regex);
-        return false;
-    }
-
-    private static boolean match(String url) {
-        for (String regex : getRegex()) return Pattern.compile(regex).matcher(url).find();
-        return false;
-    }
-
     public static boolean isPush(Uri uri) {
         return PUSH.contains(uri.getScheme());
     }
 
     public static boolean isThunder(String url) {
-        return THUNDER.contains(Util.scheme(url));
+        return THUNDER.contains(Util.scheme(url)) || isTorrent(url);
+    }
+
+    public static boolean isTorrent(String url) {
+        return url.startsWith("http") && url.endsWith(".torrent");
+    }
+
+    public static boolean isAds(Uri uri) {
+        for (String regex : getRegex(uri)) if (regex.contains("#EXTINF")) return true;
+        return false;
     }
 
     public static boolean isVideoFormat(String url) {
@@ -53,11 +52,6 @@ public class Sniffer {
         return match(url) || RULE.matcher(url).find();
     }
 
-    public static boolean isAds(Uri uri) {
-        for (String regex : getRegex(uri)) if (regex.contains("#EXTINF")) return true;
-        return false;
-    }
-
     public static List<String> getRegex() {
         List<String> regex = new ArrayList<>();
         for (Rule rule : ApiConfig.get().getRules()) for (String host : rule.getHosts()) if (host.equals("*")) regex.addAll(rule.getRegex());
@@ -69,5 +63,15 @@ public class Sniffer {
         String hosts = TextUtils.join(",", Arrays.asList(uri.getHost(), uri.getQueryParameter("url")));
         for (Rule rule : ApiConfig.get().getRules()) for (String host : rule.getHosts()) if (hosts.contains(host)) return rule.getRegex();
         return Collections.emptyList();
+    }
+
+    private static boolean matchOrContain(String url) {
+        for (String regex : getRegex(Uri.parse(url))) return Pattern.compile(regex).matcher(url).find() || url.contains(regex);
+        return false;
+    }
+
+    private static boolean match(String url) {
+        for (String regex : getRegex()) return Pattern.compile(regex).matcher(url).find();
+        return false;
     }
 }
