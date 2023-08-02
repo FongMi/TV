@@ -22,6 +22,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback {
 
     private FragmentSettingPlayerBinding mBinding;
     private String[] http;
+    private String[] flag;
 
     public static SettingPlayerFragment newInstance() {
         return new SettingPlayerFragment();
@@ -40,6 +41,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback {
     protected void initView() {
         mBinding.uaText.setText(Setting.getUa());
         mBinding.tunnelText.setText(getSwitch(Setting.isTunnel()));
+        mBinding.flagText.setText((flag = ResUtil.getStringArray(R.array.select_flag))[Setting.getFlag()]);
         mBinding.httpText.setText((http = ResUtil.getStringArray(R.array.select_exo_http))[Setting.getHttp()]);
         setVisible();
     }
@@ -48,6 +50,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback {
     protected void initEvent() {
         mBinding.ua.setOnClickListener(this::onUa);
         mBinding.http.setOnClickListener(this::setHttp);
+        mBinding.flag.setOnClickListener(this::setFlag);
         mBinding.tunnel.setOnClickListener(this::setTunnel);
     }
 
@@ -65,6 +68,12 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback {
         Setting.putHttp(index = index == http.length - 1 ? 0 : ++index);
         mBinding.httpText.setText(http[index]);
         ExoUtil.reset();
+    }
+
+    private void setFlag(View view) {
+        int index = Setting.getFlag();
+        Setting.putFlag(index = index == flag.length - 1 ? 0 : ++index);
+        mBinding.flagText.setText(flag[index]);
     }
 
     private void setTunnel(View view) {

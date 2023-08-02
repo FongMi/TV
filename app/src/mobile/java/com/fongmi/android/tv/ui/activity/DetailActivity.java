@@ -7,6 +7,7 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
@@ -19,6 +20,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ShareCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -30,6 +32,7 @@ import androidx.media3.ui.PlayerView;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
+import com.bumptech.glide.request.transition.Transition;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
@@ -48,6 +51,7 @@ import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
+import com.fongmi.android.tv.impl.CustomTarget;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
@@ -69,6 +73,7 @@ import com.fongmi.android.tv.ui.custom.dialog.EpisodeListDialog;
 import com.fongmi.android.tv.ui.custom.dialog.TrackDialog;
 import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.FileChooser;
+import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.PiP;
 import com.fongmi.android.tv.utils.ResUtil;
@@ -416,6 +421,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mBinding.contentLayout.setVisibility(mBinding.content.getVisibility());
         mFlagAdapter.addAll(item.getVodFlags());
         setOther(mBinding.other, item);
+        setArtwork(item.getVodPic());
         checkHistory(item);
         checkFlag(item);
         checkKeepImg();
@@ -441,6 +447,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mViewModel.playerContent(getKey(), flag.getFlag(), episode.getUrl());
         updateHistory(episode, replay);
         showProgress();
+        hidePreview();
         setUrl(null);
     }
 
@@ -494,11 +501,14 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void seamless(Vod.Flag flag, boolean force) {
-        if (!force && !getSite().isChangeable()) return;
-        Vod.Flag.Episode episode = flag.find(mHistory.getVodRemarks(), getMark() == null);
-        if (episode == null || episode.isActivated()) return;
-        mHistory.setVodRemarks(episode.getName());
-        onItemClick(episode);
+        if (Setting.getFlag() == 1 && mHistory.isNew()) {
+            hideProgress();
+        } else if (Setting.getFlag() == 0 || force) {
+            Vod.Flag.Episode episode = flag.find(mHistory.getVodRemarks(), getMark() == null);
+            if (episode == null || episode.isActivated()) return;
+            mHistory.setVodRemarks(episode.getName());
+            onItemClick(episode);
+        }
     }
 
     private void reverseEpisode(boolean scroll) {
@@ -531,8 +541,8 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private boolean onChange() {
-        if (getSite().isChangeable()) checkSearch(true);
-        else checkFlag();
+        if (isFullscreen()) checkFlag();
+        else checkSearch(true);
         return true;
     }
 
@@ -816,6 +826,17 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mDialogs.clear();
     }
 
+    private void showPreview(Drawable resource) {
+        if (Setting.getFlag() == 0 || isVisible(mBinding.widget.progress)) return;
+        mBinding.widget.preview.setVisibility(View.VISIBLE);
+        mBinding.widget.preview.setImageDrawable(resource);
+    }
+
+    private void hidePreview() {
+        mBinding.widget.preview.setVisibility(View.VISIBLE);
+        mBinding.widget.preview.setImageDrawable(null);
+    }
+
     private void setTraffic() {
         Traffic.setSpeed(mBinding.widget.traffic);
         App.post(mR2, Constant.INTERVAL_TRAFFIC);
@@ -827,6 +848,23 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     private void setR1Callback() {
         App.post(mR1, Constant.INTERVAL_HIDE);
+    }
+
+    private void setArtwork(String url) {
+        ImgUtil.load(url, R.drawable.radio, new CustomTarget() {
+            @Override
+            public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                getExo().setDefaultArtwork(resource);
+                getIjk().setDefaultArtwork(resource);
+                showPreview(resource);
+            }
+
+            @Override
+            public void onLoadFailed(@Nullable Drawable error) {
+                getExo().setDefaultArtwork(error);
+                getIjk().setDefaultArtwork(error);
+            }
+        });
     }
 
     private void checkFlag(Vod item) {
