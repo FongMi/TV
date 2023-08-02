@@ -183,6 +183,14 @@ public class Setting {
         Prefers.put("exo_http", http);
     }
 
+    public static boolean isManual() {
+        return Prefers.getBoolean("manual");
+    }
+
+    public static void putManual(boolean manual) {
+        Prefers.put("manual", manual);
+    }
+
     public static int getSiteMode() {
         return Prefers.getInt("site_mode");
     }

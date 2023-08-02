@@ -37,8 +37,9 @@ public class ImgUtil {
         load(url, view, ImageView.ScaleType.CENTER);
     }
 
-    public static void load(String url, CustomTarget<Drawable> target) {
-        if (!TextUtils.isEmpty(url)) Glide.with(App.get()).load(checkUrl(url)).dontAnimate().into(target);
+    public static void load(String url, int error, CustomTarget<Drawable> target) {
+        if (TextUtils.isEmpty(url)) target.onLoadFailed(ResUtil.getDrawable(error));
+        else Glide.with(App.get()).load(checkUrl(url)).error(error).dontAnimate().into(target);
     }
 
     public static void load(String url, ImageView view, ImageView.ScaleType scaleType) {

@@ -38,6 +38,7 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback {
     protected void initView() {
         mBinding.uaText.setText(Setting.getUa());
         mBinding.tunnelText.setText(getSwitch(Setting.isTunnel()));
+        mBinding.manualText.setText(getSwitch(Setting.isManual()));
         mBinding.http.setVisibility(Players.isExo(Setting.getPlayer()) ? View.VISIBLE : View.GONE);
         mBinding.tunnel.setVisibility(Players.isExo(Setting.getPlayer()) ? View.VISIBLE : View.GONE);
         mBinding.httpText.setText((http = ResUtil.getStringArray(R.array.select_exo_http))[Setting.getHttp()]);
@@ -48,6 +49,7 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback {
         mBinding.ua.setOnClickListener(this::onUa);
         mBinding.http.setOnClickListener(this::setHttp);
         mBinding.tunnel.setOnClickListener(this::setTunnel);
+        mBinding.manual.setOnClickListener(this::setManual);
     }
 
     private void onUa(View view) {
@@ -64,6 +66,11 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback {
     private void setTunnel(View view) {
         Setting.putTunnel(!Setting.isTunnel());
         mBinding.tunnelText.setText(getSwitch(Setting.isTunnel()));
+    }
+
+    private void setManual(View view) {
+        Setting.putManual(!Setting.isManual());
+        mBinding.manualText.setText(getSwitch(Setting.isManual()));
     }
 
     @Override

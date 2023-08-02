@@ -68,6 +68,7 @@
     <string name="setting_player_ua">User-Agent</string>
     <string name="setting_player_http">连线方式</string>
     <string name="setting_player_tunnel">隧道模式</string>
+    <string name="setting_player_manual">手动播放</string>
     <string name="setting_decode">解码方式</string>
     <string name="setting_render">渲染方式</string>
     <string name="setting_scale">缩放比例</string>

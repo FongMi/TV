@@ -261,6 +261,7 @@ public class Vod {
 
         public Flag() {
             this.episodes = new ArrayList<>();
+            this.position = -1;
         }
 
         public Flag(String flag) {
@@ -333,11 +334,11 @@ public class Vod {
             int number = Utils.getDigit(remarks);
             if (getEpisodes().size() == 0) return null;
             if (getEpisodes().size() == 1) return getEpisodes().get(0);
-            if (getPosition() != -1) return getEpisodes().get(getPosition());
             for (Episode item : getEpisodes()) if (item.rule1(remarks)) return item;
             for (Episode item : getEpisodes()) if (item.rule2(number)) return item;
             for (Episode item : getEpisodes()) if (item.rule3(remarks)) return item;
             for (Episode item : getEpisodes()) if (item.rule4(remarks)) return item;
+            if (getPosition() != -1) return getEpisodes().get(getPosition());
             return strict ? null : getEpisodes().get(0);
         }
 
@@ -443,6 +444,10 @@ public class Vod {
 
             public boolean rule4(String name) {
                 return name.toLowerCase().contains(getName().toLowerCase());
+            }
+
+            public boolean equals(Episode episode) {
+                return rule1(episode.getName());
             }
 
             @Override
