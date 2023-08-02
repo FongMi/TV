@@ -68,7 +68,7 @@
     <string name="setting_player_ua">User-Agent</string>
     <string name="setting_player_http">連線方式</string>
     <string name="setting_player_tunnel">隧道模式</string>
-    <string name="setting_player_manual">手動播放</string>
+    <string name="setting_player_flag">線路播放</string>
     <string name="setting_decode">解碼方式</string>
     <string name="setting_render">渲染方式</string>
     <string name="setting_scale">縮放比例</string>
@@ -134,6 +134,11 @@
     <string-array name="select_exo_http">
         <item>預設</item>
         <item>OkHttp</item>
+    </string-array>
+
+    <string-array name="select_flag">
+        <item>自動</item>
+        <item>手動</item>
     </string-array>
 
     <string-array name="select_quality">

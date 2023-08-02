@@ -471,9 +471,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void seamless(Vod.Flag flag, boolean force) {
-        if (Setting.isManual() && mHistory.isNew()) {
+        if (Setting.getFlag() == 1 && mHistory.isNew()) {
             hideProgress();
-        } else if (!Setting.isManual() || force) {
+        } else if (Setting.getFlag() == 0 || force) {
             Vod.Flag.Episode episode = flag.find(mHistory.getVodRemarks(), getMark() == null);
             if (episode == null || episode.isActivated()) return;
             mHistory.setVodRemarks(episode.getName());
@@ -779,7 +779,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void showPreview(Drawable resource) {
-        if (!Setting.isManual() || isVisible(mBinding.widget.progress)) return;
+        if (Setting.getFlag() == 0 || isVisible(mBinding.widget.progress)) return;
         mBinding.widget.preview.setVisibility(View.VISIBLE);
         mBinding.widget.preview.setImageDrawable(resource);
     }

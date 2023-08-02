@@ -20,6 +20,7 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback {
 
     private ActivitySettingPlayerBinding mBinding;
     private String[] http;
+    private String[] flag;
 
     public static void start(Activity activity) {
         activity.startActivity(new Intent(activity, SettingPlayerActivity.class));
@@ -38,9 +39,9 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback {
     protected void initView() {
         mBinding.uaText.setText(Setting.getUa());
         mBinding.tunnelText.setText(getSwitch(Setting.isTunnel()));
-        mBinding.manualText.setText(getSwitch(Setting.isManual()));
         mBinding.http.setVisibility(Players.isExo(Setting.getPlayer()) ? View.VISIBLE : View.GONE);
         mBinding.tunnel.setVisibility(Players.isExo(Setting.getPlayer()) ? View.VISIBLE : View.GONE);
+        mBinding.flagText.setText((flag = ResUtil.getStringArray(R.array.select_flag))[Setting.getFlag()]);
         mBinding.httpText.setText((http = ResUtil.getStringArray(R.array.select_exo_http))[Setting.getHttp()]);
     }
 
@@ -48,8 +49,8 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback {
     protected void initEvent() {
         mBinding.ua.setOnClickListener(this::onUa);
         mBinding.http.setOnClickListener(this::setHttp);
+        mBinding.flag.setOnClickListener(this::setFlag);
         mBinding.tunnel.setOnClickListener(this::setTunnel);
-        mBinding.manual.setOnClickListener(this::setManual);
     }
 
     private void onUa(View view) {
@@ -63,14 +64,15 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback {
         ExoUtil.reset();
     }
 
+    private void setFlag(View view) {
+        int index = Setting.getFlag();
+        Setting.putFlag(index = index == flag.length - 1 ? 0 : ++index);
+        mBinding.flagText.setText(flag[index]);
+    }
+
     private void setTunnel(View view) {
         Setting.putTunnel(!Setting.isTunnel());
         mBinding.tunnelText.setText(getSwitch(Setting.isTunnel()));
-    }
-
-    private void setManual(View view) {
-        Setting.putManual(!Setting.isManual());
-        mBinding.manualText.setText(getSwitch(Setting.isManual()));
     }
 
     @Override
