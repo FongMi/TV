@@ -363,10 +363,8 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
             ITrackInfo trackInfo = trackInfos.get(index);
             if (trackInfo.getTrackType() != type) continue;
             if (index == track && selected != track) {
-                long position = getCurrentPosition();
                 mSubtitleView.setText("");
                 mPlayer.selectTrack(index);
-                if (position != 0) seekTo(position);
                 updateForCurrentTrackSelections();
             }
         }
@@ -379,10 +377,8 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
             ITrackInfo trackInfo = trackInfos.get(index);
             if (trackInfo.getTrackType() != type) continue;
             if (index == track && selected == track) {
-                long position = getCurrentPosition();
                 mSubtitleView.setText("");
                 mPlayer.deselectTrack(track);
-                if (position != 0) seekTo(position);
                 updateForCurrentTrackSelections();
             }
         }
@@ -413,7 +409,9 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         int select = getSelectedTrack(ITrackInfo.MEDIA_TRACK_TYPE_VIDEO);
         if (select >= 0) {
             mArtworkView.setVisibility(GONE);
+            setRenderView(mCurrentRender);
         } else {
+            removeRenderView();
             setDrawableArtwork(mDefaultArtwork);
         }
     }
