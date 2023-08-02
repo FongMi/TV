@@ -106,7 +106,7 @@ public class Result {
         Result result = new Result();
         result.setError(true);
         result.setMsg(msg);
-        return new Result();
+        return result;
     }
 
     public static Result folder(Vod item) {
