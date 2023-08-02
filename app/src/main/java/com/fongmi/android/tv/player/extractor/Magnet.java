@@ -14,6 +14,7 @@ import com.xunlei.downloadlib.parameter.TorrentFileInfo;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 
 public class Magnet implements Callable<List<Vod.Flag.Episode>> {
 
@@ -39,5 +40,12 @@ public class Magnet implements Callable<List<Vod.Flag.Episode>> {
         for (TorrentFileInfo media : medias) episodes.add(Vod.Flag.Episode.create(media.getFileName(), media.getPlayUrl()));
         XLTaskHelper.get().stopTask(taskId);
         return episodes;
+    }
+
+    public static void addAll(List<Vod.Flag.Episode> items, Future<List<Vod.Flag.Episode>> future) {
+        try {
+            items.addAll(future.get());
+        } catch (Exception ignored) {
+        }
     }
 }

@@ -238,7 +238,7 @@ public class SiteViewModel extends ViewModel {
             List<Vod.Flag.Episode> items = new ArrayList<>();
             for (Vod.Flag.Episode episode : flag.getEpisodes()) if (Sniffer.isThunder(episode.getUrl())) magnets.add(Magnet.get(episode.getUrl()));
             ExecutorService executor = Executors.newFixedThreadPool(Constant.THREAD_POOL * 2);
-            for (Future<List<Vod.Flag.Episode>> future : executor.invokeAll(magnets, 30, TimeUnit.SECONDS)) items.addAll(future.get());
+            for (Future<List<Vod.Flag.Episode>> future : executor.invokeAll(magnets, 30, TimeUnit.SECONDS)) Magnet.addAll(items, future);
             if (items.size() > 0) flag.createEpisode(items);
             executor.shutdownNow();
         }
