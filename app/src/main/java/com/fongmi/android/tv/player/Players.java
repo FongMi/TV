@@ -308,6 +308,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         } else if (result.getParse(1) == 1 || result.getJx() == 1) {
             stopParse();
             parseJob = ParseJob.create(this).start(result, useParse);
+            this.timeout = timeout;
         } else {
             this.timeout = timeout;
             setMediaSource(result);
