@@ -3,9 +3,10 @@ package com.fongmi.quickjs.method;
 import android.util.Base64;
 
 import androidx.annotation.Keep;
+import androidx.annotation.NonNull;
 
 import com.fongmi.quickjs.bean.Req;
-import com.fongmi.quickjs.utils.JSUtil;
+import com.fongmi.quickjs.utils.Connect;
 import com.fongmi.quickjs.utils.Parser;
 import com.fongmi.quickjs.utils.Proxy;
 import com.google.gson.Gson;
@@ -14,6 +15,7 @@ import com.whl.quickjs.wrapper.JSMethod;
 import com.whl.quickjs.wrapper.JSObject;
 import com.whl.quickjs.wrapper.QuickJSContext;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -26,6 +28,8 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.Response;
 
 public class Global {
@@ -83,20 +87,20 @@ public class Global {
 
     @Keep
     @JSMethod
-    public void _http(String url, JSObject options) {
-
+    public JSObject _http(String url, JSObject options) throws IOException {
+        JSFunction complete = options.getJSFunction("complete");
+        if (complete == null) return req(url, options);
+        Req req = Req.objectFrom(ctx.stringify(options));
+        Connect.to(url, req).enqueue(getCallback(complete, req));
+        return null;
     }
 
     @Keep
     @JSMethod
-    public JSObject req(String url, JSObject object) {
-        try {
-            Req req = Req.objectFrom(ctx.stringify(object));
-            Response res = JSUtil.call(url, req).execute();
-            return JSUtil.toResponse(ctx, res, req);
-        } catch (Throwable e) {
-            return JSUtil.toFailure(ctx);
-        }
+    public JSObject req(String url, JSObject options) throws IOException {
+        Req req = Req.objectFrom(ctx.stringify(options));
+        Response res = Connect.to(url, req).execute();
+        return Connect.success(ctx, req, res);
     }
 
     @Keep
@@ -169,11 +173,31 @@ public class Global {
         }
     }
 
+    private Callback getCallback(JSFunction complete, Req req) {
+        return new Callback() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response res) {
+                executor.submit(() -> {
+                    complete.call(Connect.success(ctx, req, res));
+                });
+            }
+
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                executor.submit(() -> {
+                    complete.call(Connect.error(ctx));
+                });
+            }
+        };
+    }
+
     private void schedule(JSFunction func, int delay) {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                if (!executor.isShutdown()) executor.submit(() -> {func.call();});
+                if (!executor.isShutdown()) executor.submit(() -> {
+                    func.call();
+                });
             }
         }, delay);
     }

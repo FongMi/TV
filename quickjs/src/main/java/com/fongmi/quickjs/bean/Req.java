@@ -48,7 +48,7 @@ public class Req {
     }
 
     public String getPostType() {
-        return TextUtils.isEmpty(postType) ? "" : postType;
+        return TextUtils.isEmpty(postType) ? "json" : postType;
     }
 
     public String getMethod() {
