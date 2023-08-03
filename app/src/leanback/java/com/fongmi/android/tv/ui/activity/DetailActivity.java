@@ -471,14 +471,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void seamless(Vod.Flag flag, boolean force) {
-        if (Setting.getFlag() == 1 && mHistory.isNew()) {
-            hideProgress();
-        } else if (Setting.getFlag() == 0 || force) {
-            Vod.Flag.Episode episode = flag.find(mHistory.getVodRemarks(), getMark() == null);
-            if (episode == null || episode.isActivated()) return;
-            mHistory.setVodRemarks(episode.getName());
-            setEpisodeActivated(episode);
-        }
+        if (Setting.getFlag() == 1 && (mHistory.isNew() || !force)) return;
+        Vod.Flag.Episode episode = flag.find(mHistory.getVodRemarks(), getMark() == null);
+        if (episode == null || episode.isActivated()) return;
+        mHistory.setVodRemarks(episode.getName());
+        setEpisodeActivated(episode);
+        hidePreview();
     }
 
     private void setEpisodeActivated(Vod.Flag.Episode item) {
@@ -779,14 +777,14 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         hideInfo();
     }
 
-    private void showPreview(Drawable resource) {
-        if (Setting.getFlag() == 0 || isVisible(mBinding.widget.progress)) return;
+    private void showPreview(Drawable preview) {
+        if (Setting.getFlag() == 0 || isGone(mBinding.widget.preview)) return;
         mBinding.widget.preview.setVisibility(View.VISIBLE);
-        mBinding.widget.preview.setImageDrawable(resource);
+        mBinding.widget.preview.setImageDrawable(preview);
     }
 
     private void hidePreview() {
-        mBinding.widget.preview.setVisibility(View.VISIBLE);
+        mBinding.widget.preview.setVisibility(View.GONE);
         mBinding.widget.preview.setImageDrawable(null);
     }
 
