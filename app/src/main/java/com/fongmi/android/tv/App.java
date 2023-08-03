@@ -18,7 +18,9 @@ import com.github.catvod.bean.Doh;
 import com.github.catvod.net.OkHttp;
 import com.google.gson.Gson;
 import com.orhanobut.logger.AndroidLogAdapter;
+import com.orhanobut.logger.LogAdapter;
 import com.orhanobut.logger.Logger;
+import com.orhanobut.logger.PrettyFormatStrategy;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -87,7 +89,7 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         Notify.createChannel();
-        Logger.addLogAdapter(new AndroidLogAdapter());
+        Logger.addLogAdapter(getLogAdapter());
         OkHttp.get().setDoh(Doh.objectFrom(Setting.getDoh()));
         CaocConfig.Builder.create().backgroundMode(CaocConfig.BACKGROUND_MODE_SILENT).errorActivity(CrashActivity.class).apply();
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
@@ -125,5 +127,14 @@ public class App extends Application {
             public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {
             }
         });
+    }
+
+    private LogAdapter getLogAdapter() {
+        return new AndroidLogAdapter(PrettyFormatStrategy.newBuilder().showThreadInfo(false).tag("").build()) {
+            @Override
+            public boolean isLoggable(int priority, String tag) {
+                return true;
+            }
+        };
     }
 }
