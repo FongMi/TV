@@ -296,7 +296,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         if (channel.getUrl().isEmpty()) {
             ErrorEvent.url();
         } else {
-            setMediaSource(channel.getHeaders(), channel.getUrl());
+            setMediaSource(channel);
         }
     }
 
@@ -363,6 +363,14 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         if (isExo()) exoPlayer.setMediaSource(ExoUtil.getSource(result, errorCode));
         if (isExo()) exoPlayer.prepare();
         setTimeoutCheck(result.getRealUrl());
+    }
+
+    private void setMediaSource(Channel channel) {
+        SpiderDebug.log(errorCode + "," + channel.getUrl());
+        if (isIjk()) ijkPlayer.setMediaSource(IjkUtil.getSource(channel));
+        if (isExo()) exoPlayer.setMediaSource(ExoUtil.getSource(channel, errorCode));
+        if (isExo()) exoPlayer.prepare();
+        setTimeoutCheck(channel.getUrl());
     }
 
     private void setMediaSource(Map<String, String> headers, String url) {
