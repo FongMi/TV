@@ -304,20 +304,24 @@ public class Vod {
             this.position = position;
         }
 
+        private void checkToAdd(Episode episode) {
+            if (!getEpisodes().contains(episode)) getEpisodes().add(episode);
+        }
+
         public void createEpisode(String data) {
             String[] urls = data.contains("#") ? data.split("#") : new String[]{data};
             for (int i = 0; i < urls.length; i++) {
                 String[] split = urls[i].split("\\$");
                 String number = String.format(Locale.getDefault(), "%02d", i + 1);
                 Episode episode = split.length > 1 ? Episode.create(split[0].isEmpty() ? number : split[0].trim(), split[1]) : Episode.create(number, urls[i]);
-                getEpisodes().add(check(episode));
+                checkToAdd(episode);
             }
         }
 
         public void createEpisode(List<Episode> items) {
             getEpisodes().clear();
             Episode.Sorter.sort(items);
-            for (Vod.Flag.Episode item : items) getEpisodes().add(check(item));
+            for (Vod.Flag.Episode item : items) checkToAdd(item);
         }
 
         public void toggle(boolean activated, Episode episode) {
@@ -340,11 +344,6 @@ public class Vod {
             for (Episode item : getEpisodes()) if (item.rule4(remarks)) return item;
             if (getPosition() != -1) return getEpisodes().get(getPosition());
             return strict ? null : getEpisodes().get(0);
-        }
-
-        public Episode check(Episode episode) {
-            while (getEpisodes().contains(episode)) check(episode.rename());
-            return episode;
         }
 
         public static List<Flag> create(String flag, String name, String url) {
@@ -407,11 +406,6 @@ public class Vod {
 
             public String getUrl() {
                 return url;
-            }
-
-            public Episode rename() {
-                setName(getName().concat("_"));
-                return this;
             }
 
             public int getNumber() {
