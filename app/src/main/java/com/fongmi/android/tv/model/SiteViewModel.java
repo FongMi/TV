@@ -183,10 +183,10 @@ public class SiteViewModel extends ViewModel {
         });
     }
 
-    public void searchContent(Site site, String keyword) throws Throwable {
+    public void searchContent(Site site, String keyword, boolean quick) throws Throwable {
         if (site.getType() == 3) {
             Spider spider = ApiConfig.get().getCSP(site);
-            String searchContent = spider.searchContent(Trans.t2s(keyword), false);
+            String searchContent = spider.searchContent(Trans.t2s(keyword), quick);
             SpiderDebug.log(site.getName() + "," + searchContent);
             post(site, Result.fromJson(searchContent));
         } else {

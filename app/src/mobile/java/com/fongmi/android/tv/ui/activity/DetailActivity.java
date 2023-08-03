@@ -1106,7 +1106,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     private void search(Site site, String keyword) {
         try {
-            mViewModel.searchContent(site, keyword);
+            mViewModel.searchContent(site, keyword, true);
         } catch (Throwable ignored) {
         }
     }
