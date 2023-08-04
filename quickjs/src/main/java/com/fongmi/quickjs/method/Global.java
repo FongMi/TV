@@ -87,7 +87,7 @@ public class Global {
 
     @Keep
     @JSMethod
-    public JSObject _http(String url, JSObject options) throws IOException {
+    public JSObject _http(String url, JSObject options) {
         JSFunction complete = options.getJSFunction("complete");
         if (complete == null) return req(url, options);
         Req req = Req.objectFrom(ctx.stringify(options));
@@ -97,10 +97,14 @@ public class Global {
 
     @Keep
     @JSMethod
-    public JSObject req(String url, JSObject options) throws IOException {
-        Req req = Req.objectFrom(ctx.stringify(options));
-        Response res = Connect.to(url, req).execute();
-        return Connect.success(ctx, req, res);
+    public JSObject req(String url, JSObject options) {
+        try {
+            Req req = Req.objectFrom(ctx.stringify(options));
+            Response res = Connect.to(url, req).execute();
+            return Connect.success(ctx, req, res);
+        } catch (Exception e) {
+            return Connect.error(ctx);
+        }
     }
 
     @Keep
@@ -177,16 +181,12 @@ public class Global {
         return new Callback() {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response res) {
-                executor.submit(() -> {
-                    complete.call(Connect.success(ctx, req, res));
-                });
+                if (!executor.isShutdown()) executor.submit(() -> {complete.call(Connect.success(ctx, req, res));});
             }
 
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                executor.submit(() -> {
-                    complete.call(Connect.error(ctx));
-                });
+                if (!executor.isShutdown()) executor.submit(() -> {complete.call(Connect.error(ctx));});
             }
         };
     }
@@ -195,9 +195,7 @@ public class Global {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                if (!executor.isShutdown()) executor.submit(() -> {
-                    func.call();
-                });
+                if (!executor.isShutdown()) executor.submit(() -> {func.call();});
             }
         }, delay);
     }
