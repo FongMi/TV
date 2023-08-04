@@ -6,7 +6,7 @@ import com.whl.quickjs.wrapper.JSObject;
 
 import java.util.concurrent.Callable;
 
-public class Function implements Callable<Object[]> {
+public class Function implements Callable<Object> {
 
     private final JSObject jsObject;
     private final Object[] args;
@@ -24,14 +24,13 @@ public class Function implements Callable<Object[]> {
     }
 
     @Override
-    public Object[] call() throws Exception {
+    public Object call() throws Exception {
         result = jsObject.getJSFunction(name).call(args);
-        boolean jsObj = result instanceof JSObject;
-        if (!jsObj) return new Object[]{result};
+        if (!(result instanceof JSObject)) return result;
         JSObject promise = (JSObject) result;
         JSFunction then = promise.getJSFunction("then");
         if (then != null) then.call(jsCallFunction);
-        return new Object[]{result};
+        return result;
     }
 
     private final JSCallFunction jsCallFunction = new JSCallFunction() {

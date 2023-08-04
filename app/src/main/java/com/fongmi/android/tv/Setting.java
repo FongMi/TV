@@ -183,6 +183,14 @@ public class Setting {
         Prefers.put("exo_http", http);
     }
 
+    public static int getFlag() {
+        return Prefers.getInt("flag");
+    }
+
+    public static void putFlag(int mode) {
+        Prefers.put("flag", mode);
+    }
+
     public static int getSiteMode() {
         return Prefers.getInt("site_mode");
     }

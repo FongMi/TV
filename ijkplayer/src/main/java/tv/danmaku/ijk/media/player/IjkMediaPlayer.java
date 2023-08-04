@@ -177,9 +177,9 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         synchronized (IjkMediaPlayer.class) {
             if (!mIsLibLoaded) {
                 if (libLoader == null) libLoader = sLocalLibLoader;
-                libLoader.loadLibrary("ijkffmpeg");
+                libLoader.loadLibrary("ffmpeg");
                 libLoader.loadLibrary("ijksdl");
-                libLoader.loadLibrary("player");
+                libLoader.loadLibrary("ijkplayer");
                 mIsLibLoaded = true;
             }
         }
@@ -453,8 +453,8 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     }
 
     @Override
-    public int getSelectedTrack(int trackType) {
-        switch (trackType) {
+    public int getSelectedTrack(int type) {
+        switch (type) {
             case ITrackInfo.MEDIA_TRACK_TYPE_VIDEO:
                 return (int) _getPropertyLong(FFP_PROP_INT64_SELECTED_VIDEO_STREAM, -1);
             case ITrackInfo.MEDIA_TRACK_TYPE_AUDIO:

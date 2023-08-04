@@ -149,4 +149,12 @@
             app:trackColor="@color/grey_500" />
 
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/preview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitCenter"
+        android:visibility="invisible" />
+
 </FrameLayout>

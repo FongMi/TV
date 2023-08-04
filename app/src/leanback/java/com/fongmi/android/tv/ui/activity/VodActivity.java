@@ -138,6 +138,10 @@ public class VodActivity extends BaseActivity implements TypePresenter.OnClickLi
         mAdapter.notifyArrayItemRangeChanged(0, mAdapter.size());
     }
 
+    private VodFragment getFragment() {
+        return (VodFragment) mPageAdapter.instantiateItem(mBinding.pager, mBinding.pager.getCurrentItem());
+    }
+
     @Override
     public void onItemClick(Class item) {
         updateFilter(item);
@@ -160,10 +164,6 @@ public class VodActivity extends BaseActivity implements TypePresenter.OnClickLi
         if (item.getFilter() != null && item.getFilter()) updateFilter(item);
         else if (getFragment().canGoBack()) getFragment().goBack();
         else super.onBackPressed();
-    }
-
-    private VodFragment getFragment() {
-        return (VodFragment) mPageAdapter.instantiateItem(mBinding.pager, mBinding.pager.getCurrentItem());
     }
 
     class PageAdapter extends FragmentStatePagerAdapter {

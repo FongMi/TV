@@ -26,7 +26,7 @@ public class Updater implements Download.Callback {
 
     private DialogUpdateBinding binding;
     private AlertDialog dialog;
-    private String branch;
+    private boolean dev;
 
     private static class Loader {
         static volatile Updater INSTANCE = new Updater();
@@ -37,19 +37,15 @@ public class Updater implements Download.Callback {
     }
 
     private File getFile() {
-        return Path.cache(branch.concat(".apk"));
+        return Path.cache("update.apk");
     }
 
     private String getJson() {
-        return Github.getBranchPath(branch, "/release/" + BuildConfig.FLAVOR_mode + ".json");
+        return Github.getJson(dev, BuildConfig.FLAVOR_mode);
     }
 
     private String getApk() {
-        return Github.getBranchPath(branch, "/release/" + BuildConfig.FLAVOR_mode + "-" + BuildConfig.FLAVOR_api + "-" + BuildConfig.FLAVOR_abi + ".apk");
-    }
-
-    private Updater() {
-        this.branch = Github.RELEASE;
+        return Github.getApk(dev, BuildConfig.FLAVOR_mode + "-" + BuildConfig.FLAVOR_api + "-" + BuildConfig.FLAVOR_abi);
     }
 
     public Updater force() {
@@ -59,12 +55,12 @@ public class Updater implements Download.Callback {
     }
 
     public Updater release() {
-        this.branch = Github.RELEASE;
+        this.dev = false;
         return this;
     }
 
     public Updater dev() {
-        this.branch = Github.DEV;
+        this.dev = true;
         return this;
     }
 
@@ -78,7 +74,7 @@ public class Updater implements Download.Callback {
     }
 
     private boolean need(int code, String name) {
-        return Setting.getUpdate() && (branch.equals(Github.DEV) ? !name.equals(BuildConfig.VERSION_NAME) && code >= BuildConfig.VERSION_CODE : code > BuildConfig.VERSION_CODE);
+        return Setting.getUpdate() && (dev ? !name.equals(BuildConfig.VERSION_NAME) && code >= BuildConfig.VERSION_CODE : code > BuildConfig.VERSION_CODE);
     }
 
     private void doInBackground() {

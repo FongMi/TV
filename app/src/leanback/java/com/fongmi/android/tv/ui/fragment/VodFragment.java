@@ -119,7 +119,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mViewModel.result.observe(getViewLifecycleOwner(), result -> {
             int size = result.getList().size();
-            mScroller.endLoading(size == 0);
+            mScroller.endLoading(result);
             addVideo(result.getList());
             checkPosition();
             checkPage(size);
@@ -165,7 +165,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     }
 
     private void checkPage(int count) {
-        if (count == 0 || mAdapter.size() >= 4 || isFolder()) return;
+        if (mScroller.isDisable() || count == 0 || mAdapter.size() >= 4 || isFolder()) return;
         getVideo(getTypeId(), String.valueOf(mScroller.addPage()));
     }
 

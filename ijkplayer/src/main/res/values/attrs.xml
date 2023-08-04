@@ -2,9 +2,11 @@
 <resources>
 
     <attr name="keep_content_on_player_reset" format="boolean" />
+    <attr name="default_artwork" format="reference"/>
 
     <declare-styleable name="IjkVideoView">
         <attr name="keep_content_on_player_reset" />
+        <attr name="default_artwork"/>
     </declare-styleable>
 
 </resources>

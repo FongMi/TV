@@ -22,7 +22,6 @@ import com.github.catvod.utils.Util;
 import com.google.common.net.HttpHeaders;
 import com.permissionx.guolindev.PermissionX;
 
-import java.text.SimpleDateFormat;
 import java.util.Map;
 
 public class Utils {
@@ -96,7 +95,7 @@ public class Utils {
         return ((ClipboardManager) App.get().getSystemService(Context.CLIPBOARD_SERVICE)).getText();
     }
 
-    public static Map<String, String> checkHeaders(Map<String, String> headers) {
+    public static Map<String, String> checkUa(Map<String, String> headers) {
         if (Setting.getUa().isEmpty() || headers.containsKey(HttpHeaders.USER_AGENT) || headers.containsKey(HttpHeaders.USER_AGENT.toLowerCase())) return headers;
         headers.put(HttpHeaders.USER_AGENT, Setting.getUa());
         return headers;
@@ -123,19 +122,15 @@ public class Utils {
         return url;
     }
 
-    public static long format(SimpleDateFormat format, String src) {
-        try {
-            return format.parse(src).getTime();
-        } catch (Exception e) {
-            return 0;
-        }
-    }
-
-    public static int digit(String text) {
+    public static int getDigit(String text) {
         try {
             if (text.startsWith("上") || text.startsWith("下")) return -1;
             if (text.contains(".")) text = text.substring(0, text.lastIndexOf("."));
             if (text.startsWith("4k")) text = text.replace("4k", "");
+            if (text.contains("H264")) text = text.replace("H264", "");
+            if (text.contains("H265")) text = text.replace("H265", "");
+            if (text.contains("1080p")) text = 1080 + text.replace("1080p", "");
+            if (text.contains("2160p")) text = 2160 + text.replace("2160p", "");
             return Integer.parseInt(text.replaceAll("\\D+", ""));
         } catch (Exception e) {
             return -1;

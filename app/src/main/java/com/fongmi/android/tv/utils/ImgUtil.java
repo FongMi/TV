@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
@@ -16,6 +17,7 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.load.model.LazyHeaders;
 import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.target.Target;
 import com.bumptech.glide.signature.ObjectKey;
 import com.fongmi.android.tv.App;
@@ -23,6 +25,7 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
 import com.github.catvod.utils.Json;
 import com.github.catvod.utils.Util;
+import com.google.common.net.HttpHeaders;
 import com.google.gson.JsonParser;
 
 import java.io.ByteArrayOutputStream;
@@ -32,6 +35,11 @@ public class ImgUtil {
 
     public static void load(String url, ImageView view) {
         load(url, view, ImageView.ScaleType.CENTER);
+    }
+
+    public static void load(String url, int error, CustomTarget<Drawable> target) {
+        if (TextUtils.isEmpty(url)) target.onLoadFailed(ResUtil.getDrawable(error));
+        else Glide.with(App.get()).load(checkUrl(url)).error(error).dontAnimate().into(target);
     }
 
     public static void load(String url, ImageView view, ImageView.ScaleType scaleType) {
@@ -69,15 +77,22 @@ public class ImgUtil {
         if (url.startsWith("data:")) return url;
         LazyHeaders.Builder builder = new LazyHeaders.Builder();
         if (url.contains("@Headers=")) addHeader(builder, param = url.split("@Headers=")[1].split("@")[0]);
-        if (url.contains("@Cookie=")) builder.addHeader("Cookie", param = url.split("@Cookie=")[1].split("@")[0]);
-        if (url.contains("@Referer=")) builder.addHeader("Referer", param = url.split("@Referer=")[1].split("@")[0]);
-        if (url.contains("@User-Agent=")) builder.addHeader("User-Agent", param = url.split("@User-Agent=")[1].split("@")[0]);
+        if (url.contains("@Cookie=")) builder.addHeader(HttpHeaders.COOKIE, param = url.split("@Cookie=")[1].split("@")[0]);
+        if (url.contains("@Referer=")) builder.addHeader(HttpHeaders.REFERER, param = url.split("@Referer=")[1].split("@")[0]);
+        if (url.contains("@User-Agent=")) builder.addHeader(HttpHeaders.USER_AGENT, param = url.split("@User-Agent=")[1].split("@")[0]);
         return new GlideUrl(param == null ? url : url.split("@")[0], builder.build());
     }
 
     private static void addHeader(LazyHeaders.Builder builder, String header) {
         Map<String, String> map = Json.toMap(JsonParser.parseString(header));
-        for (Map.Entry<String, String> entry : map.entrySet()) builder.addHeader(entry.getKey(), entry.getValue());
+        for (Map.Entry<String, String> entry : map.entrySet()) builder.addHeader(replace(entry.getKey()), entry.getValue());
+    }
+
+    private static String replace(String key) {
+        if (key.equals("user-agent")) return HttpHeaders.USER_AGENT;
+        if (key.equals("referer")) return HttpHeaders.REFERER;
+        if (key.equals("cookie")) return HttpHeaders.COOKIE;
+        return key;
     }
 
     public static byte[] resize(byte[] bytes) {

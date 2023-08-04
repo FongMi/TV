@@ -20,6 +20,7 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback {
 
     private ActivitySettingPlayerBinding mBinding;
     private String[] http;
+    private String[] flag;
 
     public static void start(Activity activity) {
         activity.startActivity(new Intent(activity, SettingPlayerActivity.class));
@@ -40,6 +41,7 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback {
         mBinding.tunnelText.setText(getSwitch(Setting.isTunnel()));
         mBinding.http.setVisibility(Players.isExo(Setting.getPlayer()) ? View.VISIBLE : View.GONE);
         mBinding.tunnel.setVisibility(Players.isExo(Setting.getPlayer()) ? View.VISIBLE : View.GONE);
+        mBinding.flagText.setText((flag = ResUtil.getStringArray(R.array.select_flag))[Setting.getFlag()]);
         mBinding.httpText.setText((http = ResUtil.getStringArray(R.array.select_exo_http))[Setting.getHttp()]);
     }
 
@@ -47,6 +49,7 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback {
     protected void initEvent() {
         mBinding.ua.setOnClickListener(this::onUa);
         mBinding.http.setOnClickListener(this::setHttp);
+        mBinding.flag.setOnClickListener(this::setFlag);
         mBinding.tunnel.setOnClickListener(this::setTunnel);
     }
 
@@ -59,6 +62,12 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback {
         Setting.putHttp(index = index == http.length - 1 ? 0 : ++index);
         mBinding.httpText.setText(http[index]);
         ExoUtil.reset();
+    }
+
+    private void setFlag(View view) {
+        int index = Setting.getFlag();
+        Setting.putFlag(index = index == flag.length - 1 ? 0 : ++index);
+        mBinding.flagText.setText(flag[index]);
     }
 
     private void setTunnel(View view) {

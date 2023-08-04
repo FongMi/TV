@@ -130,7 +130,7 @@ public class CollectActivity extends BaseActivity {
 
     private void search(Site site) {
         try {
-            mViewModel.searchContent(site, getKeyword());
+            mViewModel.searchContent(site, getKeyword(), false);
         } catch (Throwable ignored) {
         }
     }

@@ -15,7 +15,7 @@ public class JianPian implements Source.Extractor {
 
     @Override
     public boolean match(String scheme, String host) {
-        return scheme.equals("tvbox-xg");
+        return scheme.equals("tvbox-xg") || scheme.equals("jianpian");
     }
 
     private void init() {
@@ -31,10 +31,11 @@ public class JianPian implements Source.Extractor {
         return "http://127.0.0.1:" + p2p.port + "/" + URLEncoder.encode(Uri.parse(path).getLastPathSegment(), "GBK");
     }
 
-    private void set(String url) throws Exception {
-        url = url.replace("tvbox-xg://", "").replace("tvbox-xg:", "");
-        String[] split = URLDecoder.decode(url, "UTF-8").split("\\|");
-        path = split[0].replace("xg://", "ftp://").replace("xgplay://", "ftp://");
+    private void set(String url) {
+        path = URLDecoder.decode(url).split("\\|")[0];
+        path = path.replace("jianpian://pathtype=url&path=", "");
+        path = path.replace("tvbox-xg://", "").replace("tvbox-xg:", "");
+        path = path.replace("xg://", "ftp://").replace("xgplay://", "ftp://");
     }
 
     private void start() {

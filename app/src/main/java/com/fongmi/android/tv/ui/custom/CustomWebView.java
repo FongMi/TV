@@ -24,16 +24,12 @@ import com.fongmi.android.tv.utils.Sniffer;
 import com.github.catvod.crawler.Spider;
 
 import java.io.ByteArrayInputStream;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class CustomWebView extends WebView {
 
     private WebResourceResponse empty;
     private ParseCallback callback;
-    private List<String> keys;
     private Runnable timer;
     private String from;
     private String key;
@@ -50,7 +46,6 @@ public class CustomWebView extends WebView {
     @SuppressLint("SetJavaScriptEnabled")
     public void initSettings() {
         this.timer = () -> stop(true);
-        this.keys = Arrays.asList("user-agent", "referer", "origin");
         this.empty = new WebResourceResponse("text/plain", "utf-8", new ByteArrayInputStream("".getBytes()));
         getSettings().setUseWideViewPort(true);
         getSettings().setDatabaseEnabled(true);
@@ -120,11 +115,9 @@ public class CustomWebView extends WebView {
     }
 
     private void post(Map<String, String> headers, String url) {
-        Map<String, String> news = new HashMap<>();
         String cookie = CookieManager.getInstance().getCookie(url);
-        if (!TextUtils.isEmpty(cookie)) news.put("cookie", cookie);
-        for (String key : headers.keySet()) if (keys.contains(key.toLowerCase())) news.put(key, headers.get(key));
-        onParseSuccess(news, url);
+        if (cookie != null) headers.put("cookie", cookie);
+        onParseSuccess(headers, url);
     }
 
     public void stop(boolean error) {

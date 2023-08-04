@@ -133,7 +133,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         int size = result.getList().size();
         mBinding.progressLayout.showContent(isFolder(), size);
         mBinding.swipeLayout.setRefreshing(false);
-        mScroller.endLoading(size == 0);
+        mScroller.endLoading(result);
         addVideo(result.getList());
         checkPosition();
         checkPage(size);
@@ -154,7 +154,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     }
 
     private void checkPage(int count) {
-        if (count == 0 || mAdapter.getItemCount() >= 40 || isFolder() || isHome()) return;
+        if (mScroller.isDisable() || count == 0 || mAdapter.getItemCount() >= 40 || isFolder() || isHome()) return;
         getVideo(getTypeId(), String.valueOf(mScroller.addPage()));
     }
 
