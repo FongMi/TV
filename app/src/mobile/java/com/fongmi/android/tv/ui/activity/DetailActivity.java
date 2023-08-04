@@ -422,6 +422,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mFlagAdapter.addAll(item.getVodFlags());
         setOther(mBinding.other, item);
         setArtwork(item.getVodPic());
+        App.removeCallbacks(mR4);
         checkHistory(item);
         checkFlag(item);
         checkKeepImg();

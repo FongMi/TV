@@ -436,6 +436,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.video.requestFocus();
         setArtwork(item.getVodPic());
         getPart(item.getVodName());
+        App.removeCallbacks(mR3);
         checkHistory(item);
         checkFlag(item);
         checkKeep();
