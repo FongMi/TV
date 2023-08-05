@@ -862,6 +862,8 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
             public void onLoadFailed(@Nullable Drawable error) {
                 getExo().setDefaultArtwork(error);
                 getIjk().setDefaultArtwork(error);
+                hideProgress();
+                hidePreview();
             }
         });
     }
