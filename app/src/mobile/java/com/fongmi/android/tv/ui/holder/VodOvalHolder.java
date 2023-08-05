@@ -20,15 +20,16 @@ public class VodOvalHolder extends BaseVodHolder {
     }
 
     public VodOvalHolder size(int[] size) {
-        this.itemView.getLayoutParams().width = size[0];
-        this.itemView.getLayoutParams().height = size[1];
+        this.binding.image.getLayoutParams().width = size[0];
+        this.binding.image.getLayoutParams().height = size[1];
         return this;
     }
 
     @Override
     public void initView(Vod item) {
-        ImgUtil.load(item.getVodPic(), binding.image);
+        binding.name.setText(item.getVodName());
         binding.getRoot().setOnClickListener(v -> listener.onItemClick(item));
         binding.getRoot().setOnLongClickListener(v -> listener.onLongClick(item));
+        ImgUtil.load(item.getVodPic(), binding.image);
     }
 }
