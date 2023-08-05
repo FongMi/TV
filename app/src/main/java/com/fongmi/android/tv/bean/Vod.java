@@ -304,24 +304,19 @@ public class Vod {
             this.position = position;
         }
 
-        private void checkToAdd(Episode episode) {
-            if (!getEpisodes().contains(episode)) getEpisodes().add(episode);
-        }
-
         public void createEpisode(String data) {
             String[] urls = data.contains("#") ? data.split("#") : new String[]{data};
             for (int i = 0; i < urls.length; i++) {
                 String[] split = urls[i].split("\\$");
                 String number = String.format(Locale.getDefault(), "%02d", i + 1);
                 Episode episode = split.length > 1 ? Episode.create(split[0].isEmpty() ? number : split[0].trim(), split[1]) : Episode.create(number, urls[i]);
-                checkToAdd(episode);
+                if (!getEpisodes().contains(episode)) getEpisodes().add(episode);
             }
         }
 
         public void createEpisode(List<Episode> items) {
             getEpisodes().clear();
-            Episode.Sorter.sort(items);
-            for (Vod.Flag.Episode item : items) checkToAdd(item);
+            getEpisodes().addAll(items);
         }
 
         public void toggle(boolean activated, Episode episode) {
@@ -452,10 +447,11 @@ public class Vod {
                 return getUrl().equals(it.getUrl()) && getName().equals(it.getName());
             }
 
-            static class Sorter implements Comparator<Episode> {
+            public static class Sorter implements Comparator<Episode> {
 
-                public static void sort(List<Episode> items) {
+                public static List<Episode> sort(List<Episode> items) {
                     Collections.sort(items, new Sorter());
+                    return items;
                 }
 
                 @Override
