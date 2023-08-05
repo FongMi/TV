@@ -8,13 +8,14 @@ import androidx.room.PrimaryKey;
 
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.gson.StringAdapter;
+import com.fongmi.android.tv.ui.base.ViewType;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.Collections;
 import java.util.List;
 
-@Entity(ignoredColumns = {"type", "api", "playUrl", "playerType", "ext", "jar", "categories"})
+@Entity(ignoredColumns = {"type", "api", "playUrl", "viewType", "playerType", "ext", "jar", "categories"})
 public class Site {
 
     @NonNull
@@ -29,6 +30,8 @@ public class Site {
     private String api;
     @SerializedName("playUrl")
     private String playUrl;
+    @SerializedName("viewType")
+    private Integer viewType;
     @SerializedName("playerType")
     private Integer playerType;
     @SerializedName("searchable")
@@ -99,6 +102,10 @@ public class Site {
 
     public void setApi(String api) {
         this.api = api;
+    }
+
+    public Integer getViewType() {
+        return viewType == null ? ViewType.GRID : viewType;
     }
 
     public String getPlayUrl() {

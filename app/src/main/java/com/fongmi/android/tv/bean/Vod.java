@@ -5,6 +5,7 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 
+import com.fongmi.android.tv.ui.base.ViewType;
 import com.fongmi.android.tv.utils.Trans;
 import com.fongmi.android.tv.utils.Utils;
 import com.google.gson.Gson;
@@ -200,8 +201,14 @@ public class Vod {
         return getVodTag().equals("folder") || getVodTag().equals("cover");
     }
 
-    public boolean isList(boolean folder) {
-        return getVodShow().isEmpty() ? folder : getVodShow().equals("list");
+    public int getViewType(int viewType) {
+        if (getVodShow().isEmpty()) return viewType;
+        if (getVodShow().equals("grid")) return ViewType.GRID;
+        if (getVodShow().equals("land")) return ViewType.LAND;
+        if (getVodShow().equals("oval")) return ViewType.OVAL;
+        if (getVodShow().equals("full")) return ViewType.FULL;
+        if (getVodShow().equals("list")) return ViewType.FOLDER;
+        return ViewType.GRID;
     }
 
     public String getVodName(String name) {

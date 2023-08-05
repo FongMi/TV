@@ -8,22 +8,27 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.AdapterVodFolderBinding;
+import com.fongmi.android.tv.databinding.AdapterVodFullBinding;
 import com.fongmi.android.tv.databinding.AdapterVodGridBinding;
 import com.fongmi.android.tv.databinding.AdapterVodListBinding;
+import com.fongmi.android.tv.databinding.AdapterVodOvalBinding;
+import com.fongmi.android.tv.ui.base.BaseVodHolder;
 import com.fongmi.android.tv.ui.base.ViewType;
 import com.fongmi.android.tv.ui.holder.VodFolderHolder;
+import com.fongmi.android.tv.ui.holder.VodFullHolder;
 import com.fongmi.android.tv.ui.holder.VodGridHolder;
 import com.fongmi.android.tv.ui.holder.VodListHolder;
+import com.fongmi.android.tv.ui.holder.VodOvalHolder;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class VodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class VodAdapter extends RecyclerView.Adapter<BaseVodHolder> {
 
     private final OnClickListener mListener;
     private final List<Vod> mItems;
-    private int width, height;
     private int viewType;
+    private int[] size;
 
     public VodAdapter(OnClickListener listener) {
         this.mListener = listener;
@@ -39,12 +44,11 @@ public class VodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     public void setSize(int[] size) {
-        this.width = size[0];
-        this.height = size[1];
+        this.size = size;
     }
 
     public int getWidth() {
-        return width;
+        return size[0];
     }
 
     public int getViewType() {
@@ -53,6 +57,14 @@ public class VodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     public void setViewType(int viewType) {
         this.viewType = viewType;
+    }
+
+    public boolean isList() {
+        return viewType == ViewType.LIST || viewType == ViewType.FOLDER || viewType == ViewType.FULL;
+    }
+
+    public boolean isGrid() {
+        return viewType == ViewType.GRID || viewType == ViewType.LAND || viewType == ViewType.OVAL;
     }
 
     public void addAll(List<Vod> items) {
@@ -77,29 +89,25 @@ public class VodAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         return viewType;
     }
 
-    @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        if (viewType == ViewType.FOLDER) return new VodFolderHolder(AdapterVodFolderBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), mListener);
-        if (viewType == ViewType.LIST) return new VodListHolder(AdapterVodListBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), mListener);
-        VodGridHolder holder = new VodGridHolder(AdapterVodGridBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), mListener);
-        holder.itemView.getLayoutParams().width = width;
-        holder.itemView.getLayoutParams().height = height;
-        return holder;
+    public void onBindViewHolder(@NonNull BaseVodHolder holder, int position) {
+        holder.initView(mItems.get(position));
     }
 
+    @NonNull
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+    public BaseVodHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         switch (viewType) {
-            case ViewType.GRID:
-                ((VodGridHolder) holder).initView(mItems.get(position));
-                break;
-            case ViewType.LIST:
-                ((VodListHolder) holder).initView(mItems.get(position));
-                break;
             case ViewType.FOLDER:
-                ((VodFolderHolder) holder).initView(mItems.get(position));
-                break;
+                return new VodFolderHolder(AdapterVodFolderBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), mListener);
+            case ViewType.LIST:
+                return new VodListHolder(AdapterVodListBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), mListener);
+            case ViewType.FULL:
+                return new VodFullHolder(AdapterVodFullBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+            case ViewType.OVAL:
+                return new VodOvalHolder(AdapterVodOvalBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), mListener).size(size);
+            default:
+                return new VodGridHolder(AdapterVodGridBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), mListener).size(size);
         }
     }
 }

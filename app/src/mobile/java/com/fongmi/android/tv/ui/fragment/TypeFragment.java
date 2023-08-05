@@ -13,8 +13,10 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.Product;
+import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Page;
 import com.fongmi.android.tv.bean.Result;
+import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.FragmentTypeBinding;
 import com.fongmi.android.tv.model.SiteViewModel;
@@ -65,12 +67,20 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         return getTypeId().equals("home");
     }
 
+    private Site getSite() {
+        return ApiConfig.get().getSite(getKey());
+    }
+
     private VodFragment getParent() {
         return (VodFragment) getParentFragment();
     }
 
     private Page getLastPage() {
         return mPages.get(mPages.size() - 1);
+    }
+
+    private int getDefaultViewType() {
+        return isFolder() ? ViewType.FOLDER : getSite().getViewType();
     }
 
     @Override
@@ -103,13 +113,13 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     private void setRecyclerView() {
         mBinding.recycler.setHasFixedSize(true);
         mBinding.recycler.setAdapter(mAdapter = new VodAdapter(this));
-        mAdapter.setSize(Product.getSpec(getActivity()));
-        setViewType(isFolder());
+        setViewType(getDefaultViewType());
     }
 
-    private void setViewType(boolean folder) {
-        mBinding.recycler.setLayoutManager(folder ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getContext(), Product.getColumn()));
-        mAdapter.setViewType(folder ? ViewType.FOLDER : ViewType.GRID);
+    private void setViewType(int viewType) {
+        mAdapter.setViewType(viewType);
+        mAdapter.setSize(Product.getSpec(getActivity(), viewType));
+        mBinding.recycler.setLayoutManager(mAdapter.isList() ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getContext(), Product.getColumn()));
     }
 
     private void setViewModel() {
@@ -141,9 +151,8 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     private void addVideo(List<Vod> items) {
         if (items.isEmpty()) return;
-        boolean list = items.get(0).isList(isFolder());
-        int viewType = list ? ViewType.FOLDER : ViewType.GRID;
-        if (viewType != mAdapter.getViewType()) setViewType(list);
+        int viewType = items.get(0).getViewType(getDefaultViewType());
+        if (viewType != mAdapter.getViewType()) setViewType(viewType);
         mAdapter.addAll(items);
     }
 

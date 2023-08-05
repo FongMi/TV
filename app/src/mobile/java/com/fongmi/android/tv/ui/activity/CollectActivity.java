@@ -92,7 +92,6 @@ public class CollectActivity extends BaseActivity implements CustomScroller.Call
         mScroller = new CustomScroller(this);
         mSites = new ArrayList<>();
         setRecyclerView();
-        setLayoutSize();
         setViewModel();
         checkKeyword();
         setViewType();
@@ -129,18 +128,13 @@ public class CollectActivity extends BaseActivity implements CustomScroller.Call
         mBinding.wordRecycler.setAdapter(mWordAdapter = new WordAdapter(this));
         mBinding.recordRecycler.setHasFixedSize(true);
         mBinding.recordRecycler.setAdapter(mRecordAdapter = new RecordAdapter(this));
-        mVodAdapter.setSize(Product.getSpec(this, ResUtil.dp2px(64), 3));
     }
 
     private void setViewType() {
         mVodAdapter.setViewType(Setting.getViewType());
-        boolean grid = mVodAdapter.getViewType() == ViewType.GRID;
-        GridLayoutManager manager = (GridLayoutManager) mBinding.recycler.getLayoutManager();
-        mBinding.view.setImageResource(grid ? R.drawable.ic_action_list : R.drawable.ic_action_grid);
-        manager.setSpanCount(grid ? 2 : 1);
-    }
-
-    private void setLayoutSize() {
+        mVodAdapter.setSize(Product.getSpec(this, ResUtil.dp2px(64), 3));
+        ((GridLayoutManager) mBinding.recycler.getLayoutManager()).setSpanCount(mVodAdapter.isGrid() ? 2 : 1);
+        mBinding.view.setImageResource(mVodAdapter.isGrid() ? R.drawable.ic_action_list : R.drawable.ic_action_grid);
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mBinding.collect.getLayoutParams();
         params.width = mVodAdapter.getWidth() + ResUtil.dp2px(24);
         mBinding.collect.setLayoutParams(params);
@@ -224,8 +218,7 @@ public class CollectActivity extends BaseActivity implements CustomScroller.Call
     }
 
     private void toggleView(View view) {
-        mVodAdapter.setViewType(mVodAdapter.getViewType() == ViewType.GRID ? ViewType.LIST : ViewType.GRID);
-        Setting.putViewType(mVodAdapter.getViewType());
+        Setting.putViewType(mVodAdapter.isGrid() ? ViewType.LIST : ViewType.GRID);
         setViewType();
     }
 

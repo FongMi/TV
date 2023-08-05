@@ -2,6 +2,7 @@ package com.fongmi.android.tv;
 
 import android.content.Context;
 
+import com.fongmi.android.tv.ui.base.ViewType;
 import com.fongmi.android.tv.utils.ResUtil;
 
 public class Product {
@@ -18,13 +19,26 @@ public class Product {
     }
 
     public static int[] getSpec(Context context) {
-        return getSpec(context, ResUtil.dp2px(32) + ResUtil.dp2px(16 * (getColumn() - 1)), getColumn());
+        return getSpec(context, ViewType.GRID);
+    }
+
+    public static int[] getSpec(Context context, int viewType) {
+        return getSpec(context, ResUtil.dp2px(32) + ResUtil.dp2px(16 * (getColumn() - 1)), getColumn(), viewType);
     }
 
     public static int[] getSpec(Context context, int space, int column) {
+        return getSpec(context, space, column, ViewType.GRID);
+    }
+
+    public static int[] getSpec(Context context, int space, int column, int viewType) {
         int base = ResUtil.getScreenWidth(context) - space;
         int width = base / column;
-        int height = (int) (width / 0.75f);
-        return new int[]{width, height};
+        return new int[]{width, getHeight(viewType, width)};
+    }
+
+    private static int getHeight(int viewType, int value) {
+        if (viewType == ViewType.GRID) return (int) (value / 0.75f);
+        if (viewType == ViewType.LAND) return (int) (value * 0.75f);
+        return value;
     }
 }
