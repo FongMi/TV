@@ -62,7 +62,5 @@ public class JianPian implements Source.Extractor {
 
     @Override
     public void exit() {
-        path = null;
-        p2p = null;
     }
 }
