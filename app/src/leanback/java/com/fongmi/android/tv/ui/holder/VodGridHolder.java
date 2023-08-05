@@ -1,14 +1,14 @@
 package com.fongmi.android.tv.ui.holder;
 
 import androidx.annotation.NonNull;
-import androidx.leanback.widget.Presenter;
 
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.AdapterVodGridBinding;
+import com.fongmi.android.tv.ui.base.BaseVodHolder;
 import com.fongmi.android.tv.ui.presenter.VodPresenter;
 import com.fongmi.android.tv.utils.ImgUtil;
 
-public class VodGridHolder extends Presenter.ViewHolder {
+public class VodGridHolder extends BaseVodHolder {
 
     private final VodPresenter.OnClickListener listener;
     public final AdapterVodGridBinding binding;
@@ -19,6 +19,13 @@ public class VodGridHolder extends Presenter.ViewHolder {
         this.listener = listener;
     }
 
+    public VodGridHolder size(int[] size) {
+        binding.getRoot().getLayoutParams().width = size[0];
+        binding.getRoot().getLayoutParams().height = size[1];
+        return this;
+    }
+
+    @Override
     public void initView(Vod item) {
         binding.name.setText(item.getVodName());
         binding.year.setText(item.getVodYear());

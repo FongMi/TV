@@ -19,8 +19,10 @@ import androidx.viewbinding.ViewBinding;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Filter;
 import com.fongmi.android.tv.bean.Page;
+import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.FragmentVodBinding;
 import com.fongmi.android.tv.model.SiteViewModel;
@@ -80,8 +82,16 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         return getArguments().getBoolean("folder");
     }
 
+    private Site getSite() {
+        return ApiConfig.get().getSite(getKey());
+    }
+
     private Page getLastPage() {
         return mPages.get(mPages.size() - 1);
+    }
+
+    private int getDefaultViewType() {
+        return isFolder() ? ViewType.FOLDER : getSite().getViewType();
     }
 
     @Override
@@ -151,9 +161,9 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
 
     private void addVideo(List<Vod> items) {
         if (items.isEmpty()) return;
-        boolean list = items.get(0).isList(isFolder());
-        if (list) mAdapter.addAll(mAdapter.size(), items);
-        else addGrid(items);
+        int viewType = items.get(0).getViewType(getDefaultViewType());
+        if (viewType == ViewType.FOLDER) mAdapter.addAll(mAdapter.size(), items);
+        else addGrid(items, viewType);
     }
 
     private void checkPosition() {
@@ -169,21 +179,21 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         getVideo(getTypeId(), String.valueOf(mScroller.addPage()));
     }
 
-    private boolean checkLastSize(List<Vod> items) {
+    private boolean checkLastSize(List<Vod> items, int viewType) {
         if (mLast == null || items.size() == 0) return false;
-        int size = Product.getColumn() - mLast.size();
+        int size = Product.getColumn(viewType) - mLast.size();
         if (size == 0) return false;
         size = Math.min(size, items.size());
         mLast.addAll(mLast.size(), new ArrayList<>(items.subList(0, size)));
-        addGrid(new ArrayList<>(items.subList(size, items.size())));
+        addGrid(new ArrayList<>(items.subList(size, items.size())), viewType);
         return true;
     }
 
-    private void addGrid(List<Vod> items) {
-        if (checkLastSize(items)) return;
+    private void addGrid(List<Vod> items, int viewType) {
+        if (checkLastSize(items, viewType)) return;
         List<ListRow> rows = new ArrayList<>();
-        for (List<Vod> part : Lists.partition(items, Product.getColumn())) {
-            mLast = new ArrayObjectAdapter(new VodPresenter(this));
+        for (List<Vod> part : Lists.partition(items, Product.getColumn(viewType))) {
+            mLast = new ArrayObjectAdapter(new VodPresenter(this, viewType));
             mLast.setItems(part, null);
             rows.add(new ListRow(mLast));
         }

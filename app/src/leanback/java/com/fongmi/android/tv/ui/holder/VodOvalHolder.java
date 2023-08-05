@@ -4,16 +4,16 @@ import androidx.annotation.NonNull;
 
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.AdapterVodOvalBinding;
-import com.fongmi.android.tv.ui.adapter.VodAdapter;
 import com.fongmi.android.tv.ui.base.BaseVodHolder;
+import com.fongmi.android.tv.ui.presenter.VodPresenter;
 import com.fongmi.android.tv.utils.ImgUtil;
 
 public class VodOvalHolder extends BaseVodHolder {
 
-    private final VodAdapter.OnClickListener listener;
-    private final AdapterVodOvalBinding binding;
+    private final VodPresenter.OnClickListener listener;
+    public final AdapterVodOvalBinding binding;
 
-    public VodOvalHolder(@NonNull AdapterVodOvalBinding binding, VodAdapter.OnClickListener listener) {
+    public VodOvalHolder(@NonNull AdapterVodOvalBinding binding, VodPresenter.OnClickListener listener) {
         super(binding.getRoot());
         this.binding = binding;
         this.listener = listener;

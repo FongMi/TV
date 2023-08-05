@@ -20,8 +20,8 @@ public class VodGridHolder extends BaseVodHolder {
     }
 
     public VodGridHolder size(int[] size) {
-        this.itemView.getLayoutParams().width = size[0];
-        this.itemView.getLayoutParams().height = size[1];
+        itemView.getLayoutParams().width = size[0];
+        itemView.getLayoutParams().height = size[1];
         return this;
     }
 
