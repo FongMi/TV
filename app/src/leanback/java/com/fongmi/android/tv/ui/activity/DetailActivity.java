@@ -811,6 +811,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
             public void onLoadFailed(@Nullable Drawable error) {
                 getExo().setDefaultArtwork(error);
                 getIjk().setDefaultArtwork(error);
+                hideProgress();
+                hidePreview();
             }
         });
     }
