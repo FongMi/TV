@@ -22,11 +22,9 @@ public class VodListHolder extends BaseVodHolder {
     @Override
     public void initView(Vod item) {
         binding.name.setText(item.getVodName());
-        binding.year.setText(item.getVodYear());
         binding.site.setText(item.getSiteName());
         binding.remark.setText(item.getVodRemarks());
         binding.site.setVisibility(item.getSiteVisible());
-        binding.year.setVisibility(item.getYearVisible());
         binding.remark.setVisibility(item.getRemarkVisible());
         binding.getRoot().setOnClickListener(v -> listener.onItemClick(item));
         binding.getRoot().setOnLongClickListener(v -> listener.onLongClick(item));

@@ -14,7 +14,7 @@
         android:layout_height="match_parent"
         android:background="@color/black_10"
         android:scaleType="center"
-        app:shapeAppearanceOverlay="@style/Vod.List"
+        app:shapeAppearanceOverlay="@style/Vod.Grid"
         tools:src="@drawable/ic_img_loading" />
 
     <TextView
