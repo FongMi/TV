@@ -207,7 +207,8 @@ public class Vod {
         if (getVodShow().equals("land")) return ViewType.LAND;
         if (getVodShow().equals("oval")) return ViewType.OVAL;
         if (getVodShow().equals("full")) return ViewType.FULL;
-        if (getVodShow().equals("list")) return ViewType.FOLDER;
+        if (getVodShow().equals("list")) return ViewType.LIST;
+        if (getVodShow().equals("folder")) return ViewType.FOLDER;
         return ViewType.GRID;
     }
 

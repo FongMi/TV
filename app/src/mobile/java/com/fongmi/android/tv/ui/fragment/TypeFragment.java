@@ -119,7 +119,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     private void setViewType(int viewType) {
         mAdapter.setViewType(viewType);
         mAdapter.setSize(Product.getSpec(getActivity(), viewType));
-        mBinding.recycler.setLayoutManager(mAdapter.isList() ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getContext(), Product.getColumn()));
+        mBinding.recycler.setLayoutManager(mAdapter.isList() ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getContext(), Product.getColumn(viewType)));
     }
 
     private void setViewModel() {
