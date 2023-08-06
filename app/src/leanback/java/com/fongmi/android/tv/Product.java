@@ -27,6 +27,7 @@ public class Product {
     public static int[] getSpec(int viewType) {
         int column = getColumn(viewType);
         int space = ResUtil.dp2px(48) + ResUtil.dp2px(16 * (column - 1));
+        if (viewType == ViewType.OVAL) space += ResUtil.dp2px(column * 16);
         return getSpec(space, column, viewType);
     }
 
