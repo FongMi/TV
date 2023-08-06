@@ -78,8 +78,8 @@ public class Vod {
     @SerializedName("vod_tag")
     private String vodTag;
 
-    @SerializedName("vod_show")
-    private String vodShow;
+    @SerializedName("style")
+    private Style style;
 
     @Path("dl")
     @ElementList(entry = "dd", required = false, inline = true)
@@ -157,8 +157,8 @@ public class Vod {
         return TextUtils.isEmpty(vodTag) ? "" : vodTag;
     }
 
-    public String getVodShow() {
-        return TextUtils.isEmpty(vodShow) ? "" : vodShow;
+    public Style getStyle() {
+        return style;
     }
 
     public List<Flag> getVodFlags() {
@@ -201,14 +201,8 @@ public class Vod {
         return getVodTag().equals("folder") || getVodTag().equals("cover");
     }
 
-    public int getViewType(int viewType) {
-        if (getVodShow().isEmpty()) return viewType;
-        if (getVodShow().equals("grid")) return ViewType.GRID;
-        if (getVodShow().equals("land")) return ViewType.LAND;
-        if (getVodShow().equals("oval")) return ViewType.OVAL;
-        if (getVodShow().equals("full")) return ViewType.FULL;
-        if (getVodShow().equals("list")) return ViewType.FOLDER;
-        return ViewType.GRID;
+    public Style getStyle(Style style) {
+        return getStyle() == null ? style : getStyle();
     }
 
     public String getVodName(String name) {
@@ -465,6 +459,68 @@ public class Vod {
                 public int compare(Episode o1, Episode o2) {
                     return Integer.compare(o1.getNumber(), o2.getNumber());
                 }
+            }
+        }
+    }
+
+    public static class Style {
+
+        @SerializedName("type")
+        private String type;
+        @SerializedName("ratio")
+        private Float ratio;
+
+        public static Style rect() {
+            return new Style("rect", 0.75f);
+        }
+
+        public static Style list() {
+            return new Style("list");
+        }
+
+        public Style(String type) {
+            this.type = type;
+        }
+
+        public Style(String type, Float ratio) {
+            this.type = type;
+            this.ratio = ratio;
+        }
+
+        public String getType() {
+            return TextUtils.isEmpty(type) ? "rect" : type;
+        }
+
+        public Float getRatio() {
+            return ratio == null || ratio <= 0 ? (isOval() ? 1.0f : 0.75f) : Math.min(4, ratio);
+        }
+
+        public boolean isLand() {
+            return getRatio() > 1.0f;
+        }
+
+        public boolean isOval() {
+            return getType().equals("oval");
+        }
+
+        public boolean isFull() {
+            return getType().equals("full");
+        }
+
+        public boolean isFolder() {
+            return getType().equals("list");
+        }
+
+        public int getViewType() {
+            switch (getType()) {
+                case "oval":
+                    return ViewType.OVAL;
+                case "full":
+                    return ViewType.FULL;
+                case "list":
+                    return ViewType.LIST;
+                default:
+                    return ViewType.RECT;
             }
         }
     }

@@ -11,7 +11,7 @@ import com.fongmi.android.tv.utils.ImgUtil;
 public class VodOvalHolder extends BaseVodHolder {
 
     private final VodPresenter.OnClickListener listener;
-    public final AdapterVodOvalBinding binding;
+    private final AdapterVodOvalBinding binding;
 
     public VodOvalHolder(@NonNull AdapterVodOvalBinding binding, VodPresenter.OnClickListener listener) {
         super(binding.getRoot());

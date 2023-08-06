@@ -5,17 +5,17 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 
 import com.fongmi.android.tv.bean.Vod;
-import com.fongmi.android.tv.databinding.AdapterVodFolderBinding;
+import com.fongmi.android.tv.databinding.AdapterVodListBinding;
 import com.fongmi.android.tv.ui.base.BaseVodHolder;
 import com.fongmi.android.tv.ui.presenter.VodPresenter;
 import com.fongmi.android.tv.utils.ImgUtil;
 
-public class VodFolderHolder extends BaseVodHolder {
+public class VodListHolder extends BaseVodHolder {
 
     private final VodPresenter.OnClickListener listener;
-    public final AdapterVodFolderBinding binding;
+    private final AdapterVodListBinding binding;
 
-    public VodFolderHolder(@NonNull AdapterVodFolderBinding binding, VodPresenter.OnClickListener listener) {
+    public VodListHolder(@NonNull AdapterVodListBinding binding, VodPresenter.OnClickListener listener) {
         super(binding.getRoot());
         this.binding = binding;
         this.listener = listener;

@@ -8,14 +8,13 @@ import androidx.room.PrimaryKey;
 
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.gson.StringAdapter;
-import com.fongmi.android.tv.ui.base.ViewType;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.Collections;
 import java.util.List;
 
-@Entity(ignoredColumns = {"type", "api", "playUrl", "viewType", "playerType", "ext", "jar", "categories"})
+@Entity(ignoredColumns = {"type", "api", "playUrl", "playerType", "ext", "jar", "style", "categories"})
 public class Site {
 
     @NonNull
@@ -30,8 +29,6 @@ public class Site {
     private String api;
     @SerializedName("playUrl")
     private String playUrl;
-    @SerializedName("viewType")
-    private Integer viewType;
     @SerializedName("playerType")
     private Integer playerType;
     @SerializedName("searchable")
@@ -46,6 +43,8 @@ public class Site {
     private String ext;
     @SerializedName("jar")
     private String jar;
+    @SerializedName("style")
+    private Vod.Style style;
     @SerializedName("categories")
     private List<String> categories;
 
@@ -104,10 +103,6 @@ public class Site {
         this.api = api;
     }
 
-    public Integer getViewType() {
-        return viewType == null ? ViewType.GRID : viewType;
-    }
-
     public String getPlayUrl() {
         return TextUtils.isEmpty(playUrl) ? "" : playUrl;
     }
@@ -158,6 +153,10 @@ public class Site {
 
     public String getJar() {
         return TextUtils.isEmpty(jar) ? "" : jar;
+    }
+
+    public Vod.Style getStyle() {
+        return style == null ? Vod.Style.rect() : style;
     }
 
     public List<String> getCategories() {

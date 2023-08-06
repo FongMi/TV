@@ -1,7 +1,7 @@
 package com.fongmi.android.tv;
 
+import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.ui.activity.LiveActivity;
-import com.fongmi.android.tv.ui.base.ViewType;
 import com.fongmi.android.tv.utils.ResUtil;
 
 public class Product {
@@ -14,9 +14,9 @@ public class Product {
         return Math.abs(Setting.getSize() - 7);
     }
 
-    public static int getColumn(int viewType) {
-        if (viewType == ViewType.LAND) return getColumn() - 1;
-        if (viewType == ViewType.FULL) return 3;
+    public static int getColumn(Vod.Style style) {
+        if (style.isLand()) return getColumn() - 1;
+        if (style.isFull()) return 3;
         return getColumn();
     }
 
@@ -24,23 +24,18 @@ public class Product {
         LiveActivity.start(App.activity());
     }
 
-    public static int[] getSpec(int viewType) {
-        int column = getColumn(viewType);
+    public static int[] getSpec(Vod.Style style) {
+        int column = getColumn(style);
         int space = ResUtil.dp2px(48) + ResUtil.dp2px(16 * (column - 1));
-        if (viewType == ViewType.OVAL) space += ResUtil.dp2px(column * 16);
-        return getSpec(space, column, viewType);
+        if (style.isOval()) space += ResUtil.dp2px(column * 16);
+        return getSpec(space, column, style);
     }
 
-    private static int[] getSpec(int space, int column, int viewType) {
+    private static int[] getSpec(int space, int column, Vod.Style style) {
         int base = ResUtil.getScreenWidth() - space;
         int width = base / column;
-        return new int[]{width, getHeight(viewType, width)};
-    }
-
-    private static int getHeight(int viewType, int value) {
-        if (viewType == ViewType.LAND) return (int) (value * 0.75f);
-        if (viewType == ViewType.OVAL) return value;
-        return (int) (value / 0.75f);
+        int height = (int) (width / style.getRatio());
+        return new int[]{width, height};
     }
 
     public static int getEms() {

@@ -9,7 +9,7 @@ import com.fongmi.android.tv.utils.ImgUtil;
 
 public class VodFullHolder extends BaseVodHolder {
 
-    public final AdapterVodFullBinding binding;
+    private final AdapterVodFullBinding binding;
 
     public VodFullHolder(@NonNull AdapterVodFullBinding binding) {
         super(binding.getRoot());

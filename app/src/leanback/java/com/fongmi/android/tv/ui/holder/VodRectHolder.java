@@ -3,23 +3,23 @@ package com.fongmi.android.tv.ui.holder;
 import androidx.annotation.NonNull;
 
 import com.fongmi.android.tv.bean.Vod;
-import com.fongmi.android.tv.databinding.AdapterVodGridBinding;
+import com.fongmi.android.tv.databinding.AdapterVodRectBinding;
 import com.fongmi.android.tv.ui.base.BaseVodHolder;
 import com.fongmi.android.tv.ui.presenter.VodPresenter;
 import com.fongmi.android.tv.utils.ImgUtil;
 
-public class VodGridHolder extends BaseVodHolder {
+public class VodRectHolder extends BaseVodHolder {
 
     private final VodPresenter.OnClickListener listener;
-    public final AdapterVodGridBinding binding;
+    private final AdapterVodRectBinding binding;
 
-    public VodGridHolder(@NonNull AdapterVodGridBinding binding, VodPresenter.OnClickListener listener) {
+    public VodRectHolder(@NonNull AdapterVodRectBinding binding, VodPresenter.OnClickListener listener) {
         super(binding.getRoot());
         this.binding = binding;
         this.listener = listener;
     }
 
-    public VodGridHolder size(int[] size) {
+    public VodRectHolder size(int[] size) {
         binding.getRoot().getLayoutParams().width = size[0];
         binding.getRoot().getLayoutParams().height = size[1];
         return this;
