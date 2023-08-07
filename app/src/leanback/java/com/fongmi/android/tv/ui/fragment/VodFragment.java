@@ -161,7 +161,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     private void addVideo(List<Vod> items) {
         if (items.isEmpty()) return;
         Vod.Style style = items.get(0).getStyle(getStyle());
-        if (style.isFolder()) mAdapter.addAll(mAdapter.size(), items);
+        if (style.isList()) mAdapter.addAll(mAdapter.size(), items);
         else addGrid(items, style);
     }
 
