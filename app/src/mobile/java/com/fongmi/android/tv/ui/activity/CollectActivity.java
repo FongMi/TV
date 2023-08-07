@@ -132,7 +132,7 @@ public class CollectActivity extends BaseActivity implements CustomScroller.Call
     }
 
     private void setViewType() {
-        setViewType(Setting.getViewType());
+        setViewType(Setting.getViewType(ViewType.GRID));
     }
 
     private void setViewType(int viewType) {

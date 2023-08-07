@@ -102,8 +102,8 @@ public class Setting {
         Prefers.put("hot", hot);
     }
 
-    public static int getViewType() {
-        return Prefers.getInt("viewType");
+    public static int getViewType(int viewType) {
+        return Prefers.getInt("viewType", viewType);
     }
 
     public static void putViewType(int viewType) {
