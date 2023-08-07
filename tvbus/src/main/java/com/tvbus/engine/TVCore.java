@@ -8,10 +8,10 @@ public class TVCore {
 
     private long handle;
 
-    public TVCore() {
+    public TVCore(String name, String sign) {
         try {
-            PmsHook.inject();
-            System.load(Github.getSo("tvcore"));
+            PmsHook.get().inject(sign);
+            System.load(Github.getSo(name));
             handle = initialise();
         } catch (Throwable ignored) {
         }
