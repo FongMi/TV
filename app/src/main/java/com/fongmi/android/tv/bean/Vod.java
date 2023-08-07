@@ -199,7 +199,11 @@ public class Vod {
     }
 
     public boolean isFolder() {
-        return getVodTag().equals("folder") || getVodTag().equals("cover");
+        return getVodTag().equals("folder");
+    }
+
+    public boolean isComic() {
+        return getVodTag().equals("comic");
     }
 
     public Style getStyle(Style style) {
