@@ -4,6 +4,7 @@ import android.text.TextUtils;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.fongmi.android.tv.ui.base.ViewType;
 import com.fongmi.android.tv.utils.Trans;
@@ -466,7 +467,7 @@ public class Vod {
     public static class Style {
 
         @SerializedName("type")
-        private String type;
+        private final String type;
         @SerializedName("ratio")
         private Float ratio;
 
@@ -495,8 +496,8 @@ public class Vod {
             return ratio == null || ratio <= 0 ? (isOval() ? 1.0f : 0.75f) : Math.min(4, ratio);
         }
 
-        public boolean isLand() {
-            return getRatio() > 1.0f;
+        public boolean isRect() {
+            return getType().equals("rect");
         }
 
         public boolean isOval() {
@@ -507,8 +508,12 @@ public class Vod {
             return getType().equals("full");
         }
 
-        public boolean isFolder() {
+        public boolean isList() {
             return getType().equals("list");
+        }
+
+        public boolean isLand() {
+            return isRect() && getRatio() > 1.0f;
         }
 
         public int getViewType() {
@@ -522,6 +527,14 @@ public class Vod {
                 default:
                     return ViewType.RECT;
             }
+        }
+
+        @Override
+        public boolean equals(@Nullable Object obj) {
+            if (this == obj) return true;
+            if (!(obj instanceof Style)) return false;
+            Style it = (Style) obj;
+            return getType().equals(it.getType()) && getRatio().equals(it.getRatio());
         }
     }
 }

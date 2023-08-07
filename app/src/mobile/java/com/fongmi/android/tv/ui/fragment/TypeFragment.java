@@ -24,7 +24,6 @@ import com.fongmi.android.tv.ui.activity.CollectActivity;
 import com.fongmi.android.tv.ui.activity.DetailActivity;
 import com.fongmi.android.tv.ui.adapter.VodAdapter;
 import com.fongmi.android.tv.ui.base.BaseFragment;
-import com.fongmi.android.tv.ui.base.ViewType;
 import com.fongmi.android.tv.ui.custom.CustomScroller;
 
 import java.util.ArrayList;
@@ -79,8 +78,8 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         return mPages.get(mPages.size() - 1);
     }
 
-    private int getDefaultViewType() {
-        return isFolder() ? ViewType.FOLDER : getSite().getViewType();
+    private Vod.Style getStyle() {
+        return isFolder() ? Vod.Style.list() : getSite().getStyle();
     }
 
     @Override
@@ -113,13 +112,13 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     private void setRecyclerView() {
         mBinding.recycler.setHasFixedSize(true);
         mBinding.recycler.setAdapter(mAdapter = new VodAdapter(this));
-        setViewType(getDefaultViewType());
+        setStyle(getStyle());
     }
 
-    private void setViewType(int viewType) {
-        mAdapter.setViewType(viewType);
-        mAdapter.setSize(Product.getSpec(getActivity(), viewType));
-        mBinding.recycler.setLayoutManager(mAdapter.isList() ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getContext(), Product.getColumn(viewType)));
+    private void setStyle(Vod.Style style) {
+        mAdapter.setStyle(style);
+        mAdapter.setSize(Product.getSpec(getActivity(), style));
+        mBinding.recycler.setLayoutManager(mAdapter.isLinear() ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getContext(), Product.getColumn(style)));
     }
 
     private void setViewModel() {
@@ -151,8 +150,8 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     private void addVideo(List<Vod> items) {
         if (items.isEmpty()) return;
-        int viewType = items.get(0).getViewType(getDefaultViewType());
-        if (viewType != mAdapter.getViewType()) setViewType(viewType);
+        Vod.Style style = items.get(0).getStyle(getStyle());
+        if (!style.equals(mAdapter.getStyle())) setStyle(style);
         mAdapter.addAll(items);
     }
 
