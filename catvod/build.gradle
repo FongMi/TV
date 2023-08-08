@@ -20,6 +20,5 @@ dependencies {
     api 'com.hierynomus:smbj:0.11.5'
     api 'com.orhanobut:logger:2.2.0'
     api 'com.squareup.okhttp3:okhttp:' + okhttpVersion
-    api 'org.conscrypt:conscrypt-android:2.5.2'
     api 'org.jsoup:jsoup:' + jsoupVersion
 }
