@@ -1,0 +1,13 @@
+plugins {
+    id 'com.android.library'
+}
+
+android {
+    namespace 'com.fongmi.hook'
+    compileSdk 33
+
+    defaultConfig {
+        minSdk 21
+        targetSdk 28
+    }
+}

@@ -2,7 +2,6 @@ package com.fongmi.android.tv;
 
 
 import com.fongmi.android.tv.player.Players;
-import com.fongmi.android.tv.utils.Sniffer;
 import com.github.catvod.utils.Prefers;
 
 public class Setting {
@@ -103,8 +102,8 @@ public class Setting {
         Prefers.put("hot", hot);
     }
 
-    public static int getViewType() {
-        return Prefers.getInt("viewType");
+    public static int getViewType(int viewType) {
+        return Prefers.getInt("viewType", viewType);
     }
 
     public static void putViewType(int viewType) {
@@ -160,7 +159,7 @@ public class Setting {
     }
 
     public static String getUa() {
-        return Prefers.getString("ua", Sniffer.CHROME);
+        return Prefers.getString("ua");
     }
 
     public static void putUa(String ua) {
@@ -181,6 +180,14 @@ public class Setting {
 
     public static void putHttp(int http) {
         Prefers.put("exo_http", http);
+    }
+
+    public static int getFlag() {
+        return Prefers.getInt("flag");
+    }
+
+    public static void putFlag(int mode) {
+        Prefers.put("flag", mode);
     }
 
     public static int getSiteMode() {

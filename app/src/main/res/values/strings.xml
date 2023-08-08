@@ -68,6 +68,7 @@
     <string name="setting_player_ua">User-Agent</string>
     <string name="setting_player_http">HTTP method</string>
     <string name="setting_player_tunnel">Tunnel mode</string>
+    <string name="setting_player_flag">Flag play</string>
     <string name="setting_decode">Decode</string>
     <string name="setting_render">Render</string>
     <string name="setting_scale">Scale</string>
@@ -133,6 +134,11 @@
     <string-array name="select_exo_http">
         <item>Default</item>
         <item>OkHttp</item>
+    </string-array>
+
+    <string-array name="select_flag">
+        <item>Auto</item>
+        <item>Manual</item>
     </string-array>
 
     <string-array name="select_render">

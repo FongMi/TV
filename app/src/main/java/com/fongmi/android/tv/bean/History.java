@@ -65,8 +65,7 @@ public class History {
     }
 
     public static List<History> arrayFrom(String str) {
-        Type listType = new TypeToken<List<History>>() {
-        }.getType();
+        Type listType = new TypeToken<List<History>>() {}.getType();
         List<History> items = new Gson().fromJson(str, listType);
         return items == null ? Collections.emptyList() : items;
     }
@@ -244,6 +243,10 @@ public class History {
 
     public int getRevPlayHint() {
         return isRevPlay() ? R.string.play_backward_hint : R.string.play_forward_hint;
+    }
+
+    public boolean isNew() {
+        return getCreateTime() == 0 && getPosition() == 0;
     }
 
     public static List<History> get() {

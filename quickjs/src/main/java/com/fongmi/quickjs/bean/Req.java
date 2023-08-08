@@ -7,7 +7,10 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class Req {
 
@@ -45,7 +48,7 @@ public class Req {
     }
 
     public String getPostType() {
-        return TextUtils.isEmpty(postType) ? "" : postType;
+        return TextUtils.isEmpty(postType) ? "json" : postType;
     }
 
     public String getMethod() {
@@ -66,5 +69,17 @@ public class Req {
 
     public Map<String, String> getHeader() {
         return Json.toMap(getHeaders());
+    }
+
+    public String getCharset() {
+        Map<String, String> header = getHeader();
+        List<String> keys = Arrays.asList("Content-Type", "content-type");
+        for (String key : keys) if (header.containsKey(key)) return getCharset(Objects.requireNonNull(header.get(key)));
+        return "UTF-8";
+    }
+
+    private String getCharset(String value) {
+        for (String text : value.split(";")) if (text.contains("charset=")) return text.split("=")[1];
+        return "UTF-8";
     }
 }

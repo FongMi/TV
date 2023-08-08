@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.text.Html;
 import android.text.TextUtils;
@@ -28,6 +29,7 @@ import androidx.media3.ui.PlayerView;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
+import com.bumptech.glide.request.transition.Transition;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
@@ -46,6 +48,7 @@ import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.impl.Callback;
+import com.fongmi.android.tv.impl.CustomTarget;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
@@ -59,9 +62,10 @@ import com.fongmi.android.tv.ui.presenter.EpisodePresenter;
 import com.fongmi.android.tv.ui.presenter.FlagPresenter;
 import com.fongmi.android.tv.ui.presenter.ParsePresenter;
 import com.fongmi.android.tv.ui.presenter.PartPresenter;
-import com.fongmi.android.tv.ui.presenter.SearchPresenter;
+import com.fongmi.android.tv.ui.presenter.QuickPresenter;
 import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.FileChooser;
+import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Sniffer;
@@ -93,9 +97,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private ViewGroup.LayoutParams mFrameParams;
     private EpisodePresenter mEpisodePresenter;
     private ArrayObjectAdapter mEpisodeAdapter;
-    private ArrayObjectAdapter mSearchAdapter;
     private ArrayObjectAdapter mArrayAdapter;
     private ArrayObjectAdapter mParseAdapter;
+    private ArrayObjectAdapter mQuickAdapter;
     private ArrayObjectAdapter mFlagAdapter;
     private ArrayObjectAdapter mPartAdapter;
     private ActivityDetailBinding mBinding;
@@ -318,9 +322,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.part.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.part.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         mBinding.part.setAdapter(new ItemBridgeAdapter(mPartAdapter = new ArrayObjectAdapter(mPartPresenter = new PartPresenter(item -> initSearch(item, false)))));
-        mBinding.search.setHorizontalSpacing(ResUtil.dp2px(8));
-        mBinding.search.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-        mBinding.search.setAdapter(new ItemBridgeAdapter(mSearchAdapter = new ArrayObjectAdapter(new SearchPresenter(this::setSearch))));
+        mBinding.quick.setHorizontalSpacing(ResUtil.dp2px(8));
+        mBinding.quick.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+        mBinding.quick.setAdapter(new ItemBridgeAdapter(mQuickAdapter = new ArrayObjectAdapter(new QuickPresenter(this::setSearch))));
         mBinding.control.parse.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.control.parse.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         mBinding.control.parse.setAdapter(new ItemBridgeAdapter(mParseAdapter = new ArrayObjectAdapter(new ParsePresenter(this::setParseActivated))));
@@ -395,6 +399,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mViewModel.playerContent(getKey(), flag.getFlag(), episode.getUrl());
         updateHistory(episode, replay);
         showProgress();
+        hidePreview();
         hideCenter();
     }
 
@@ -430,7 +435,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mFlagAdapter.setItems(item.getVodFlags(), null);
         mBinding.content.setMaxLines(getMaxLines());
         mBinding.video.requestFocus();
+        setArtwork(item.getVodPic());
         getPart(item.getVodName());
+        App.removeCallbacks(mR3);
         checkHistory(item);
         checkFlag(item);
         checkKeep();
@@ -466,11 +473,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void seamless(Vod.Flag flag, boolean force) {
-        if (!force && !getSite().isChangeable()) return;
+        if (Setting.getFlag() == 1 && (mHistory.isNew() || !force)) return;
         Vod.Flag.Episode episode = flag.find(mHistory.getVodRemarks(), getMark() == null);
         if (episode == null || episode.isActivated()) return;
         mHistory.setVodRemarks(episode.getName());
         setEpisodeActivated(episode);
+        hidePreview();
     }
 
     private void setEpisodeActivated(Vod.Flag.Episode item) {
@@ -565,8 +573,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onChange() {
-        if (getSite().isChangeable()) checkSearch(true);
-        else checkFlag();
+        if (isFullscreen()) checkFlag();
+        else checkSearch(true);
     }
 
     private void onLoop() {
@@ -771,6 +779,17 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         hideInfo();
     }
 
+    private void showPreview(Drawable preview) {
+        if (Setting.getFlag() == 0 || isGone(mBinding.widget.preview)) return;
+        mBinding.widget.preview.setVisibility(View.VISIBLE);
+        mBinding.widget.preview.setImageDrawable(preview);
+    }
+
+    private void hidePreview() {
+        mBinding.widget.preview.setVisibility(View.GONE);
+        mBinding.widget.preview.setImageDrawable(null);
+    }
+
     private void setTraffic() {
         Traffic.setSpeed(mBinding.widget.traffic);
         App.post(mR2, Constant.INTERVAL_TRAFFIC);
@@ -778,6 +797,25 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void setR1Callback() {
         App.post(mR1, Constant.INTERVAL_HIDE);
+    }
+
+    private void setArtwork(String url) {
+        ImgUtil.load(url, R.drawable.radio, new CustomTarget() {
+            @Override
+            public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                getExo().setDefaultArtwork(resource);
+                getIjk().setDefaultArtwork(resource);
+                showPreview(resource);
+            }
+
+            @Override
+            public void onLoadFailed(@Nullable Drawable error) {
+                getExo().setDefaultArtwork(error);
+                getIjk().setDefaultArtwork(error);
+                hideProgress();
+                hidePreview();
+            }
+        });
     }
 
     private void getPart(String source) {
@@ -970,7 +1008,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void checkSearch(boolean force) {
-        if (mSearchAdapter.size() == 0) initSearch(mBinding.name.getText().toString(), true);
+        if (mQuickAdapter.size() == 0) initSearch(mBinding.name.getText().toString(), true);
         else if (isAutoMode() || force) nextSite();
     }
 
@@ -989,7 +1027,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void startSearch(String keyword) {
-        mSearchAdapter.clear();
+        mQuickAdapter.clear();
         List<Site> sites = new ArrayList<>();
         mExecutor = Executors.newFixedThreadPool(Constant.THREAD_POOL);
         for (Site site : ApiConfig.get().getSites()) if (isPass(site)) sites.add(site);
@@ -1002,7 +1040,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void search(Site site, String keyword) {
         try {
-            mViewModel.searchContent(site, keyword);
+            mViewModel.searchContent(site, keyword, true);
         } catch (Throwable ignored) {
         }
     }
@@ -1010,8 +1048,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void setSearch(List<Vod> items) {
         Iterator<Vod> iterator = items.iterator();
         while (iterator.hasNext()) if (mismatch(iterator.next())) iterator.remove();
-        mSearchAdapter.addAll(mSearchAdapter.size(), items);
-        mBinding.search.setVisibility(View.VISIBLE);
+        mQuickAdapter.addAll(mQuickAdapter.size(), items);
+        mBinding.quick.setVisibility(View.VISIBLE);
         if (isInitAuto()) nextSite();
         if (items.isEmpty()) return;
         App.removeCallbacks(mR3);
@@ -1042,10 +1080,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void nextSite() {
-        if (mSearchAdapter.size() == 0) return;
-        Vod item = (Vod) mSearchAdapter.get(0);
+        if (mQuickAdapter.size() == 0) return;
+        Vod item = (Vod) mQuickAdapter.get(0);
         Notify.show(getString(R.string.play_switch_site, item.getSiteName()));
-        mSearchAdapter.removeItems(0, 1);
+        mQuickAdapter.removeItems(0, 1);
         mBroken.add(getId());
         setInitAuto(false);
         getDetail(item);

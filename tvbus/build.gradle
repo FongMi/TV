@@ -12,5 +12,6 @@ android {
 }
 
 dependencies {
+    implementation project(':hook')
     implementation project(':catvod')
 }

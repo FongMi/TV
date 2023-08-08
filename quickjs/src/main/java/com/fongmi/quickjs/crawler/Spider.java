@@ -10,6 +10,7 @@ import com.fongmi.quickjs.method.Local;
 import com.fongmi.quickjs.utils.JSUtil;
 import com.fongmi.quickjs.utils.Module;
 import com.github.catvod.utils.Json;
+import com.github.catvod.utils.Path;
 import com.whl.quickjs.android.QuickJSLoader;
 import com.whl.quickjs.wrapper.JSArray;
 import com.whl.quickjs.wrapper.JSMethod;
@@ -57,8 +58,8 @@ public class Spider extends com.github.catvod.crawler.Spider {
         return executor.submit(callable);
     }
 
-    private Object[] call(String func, Object... args) throws Exception {
-        return submit(Function.call(jsObject, func, args)).get();
+    private Object call(String func, Object... args) throws Exception {
+        return executor.submit((Function.call(jsObject, func, args))).get();
     }
 
     @Override
@@ -68,49 +69,49 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
     @Override
     public String homeContent(boolean filter) throws Exception {
-        return (String) call("home", filter)[0];
+        return (String) call("home", filter);
     }
 
     @Override
     public String homeVideoContent() throws Exception {
-        return (String) call("homeVod")[0];
+        return (String) call("homeVod");
     }
 
     @Override
     public String categoryContent(String tid, String pg, boolean filter, HashMap<String, String> extend) throws Exception {
         JSObject obj = submit(() -> JSUtil.toObj(ctx, extend)).get();
-        return (String) call("category", tid, pg, filter, obj)[0];
+        return (String) call("category", tid, pg, filter, obj);
     }
 
     @Override
     public String detailContent(List<String> ids) throws Exception {
-        return (String) call("detail", ids.get(0))[0];
+        return (String) call("detail", ids.get(0));
     }
 
     @Override
     public String searchContent(String key, boolean quick) throws Exception {
-        return (String) call("search", key, quick)[0];
+        return (String) call("search", key, quick);
     }
 
     @Override
     public String searchContent(String key, boolean quick, String pg) throws Exception {
-        return (String) call("search", key, quick, pg)[0];
+        return (String) call("search", key, quick, pg);
     }
 
     @Override
     public String playerContent(String flag, String id, List<String> vipFlags) throws Exception {
         JSArray array = submit(() -> JSUtil.toArray(ctx, vipFlags)).get();
-        return (String) call("play", flag, id, array)[0];
+        return (String) call("play", flag, id, array);
     }
 
     @Override
     public boolean manualVideoCheck() throws Exception {
-        return (Boolean) call("sniffer")[0];
+        return (Boolean) call("sniffer");
     }
 
     @Override
     public boolean isVideoFormat(String url) throws Exception {
-        return (Boolean) call("isVideo", url)[0];
+        return (Boolean) call("isVideo", url);
     }
 
     @Override
@@ -142,6 +143,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
         QuickJSLoader.initConsoleLog(ctx);
         Global.create(ctx, executor).setProperty();
         ctx.getGlobalObject().setProperty("local", Local.class);
+        ctx.getGlobalObject().getContext().evaluate(Path.asset("js/lib/http.js"));
     }
 
     private void createDex() {
@@ -191,6 +193,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
         String global = "globalThis." + key;
         String content = Module.get().load(api);
         if (content.contains("__jsEvalReturn")) {
+            ctx.evaluate("req = http");
             return content.concat(global).concat(" = __jsEvalReturn()");
         } else if (content.contains("__JS_SPIDER__")) {
             return content.replace("__JS_SPIDER__", global);
@@ -214,7 +217,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
         String header = params.get("header");
         JSArray array = submit(() -> JSUtil.toArray(ctx, Arrays.asList(url.split("/")))).get();
         Object object = submit(() -> ctx.parse(header)).get();
-        String json = (String) call("proxy", array, object)[0];
+        String json = (String) call("proxy", array, object);
         Res res = Res.objectFrom(json);
         Object[] result = new Object[3];
         result[0] = 200;

@@ -13,6 +13,5 @@ android {
 
 dependencies {
     implementation project(':catvod')
-    implementation project(':media-lib-common')
-    implementation 'wang.harlon.quickjs:wrapper-android:0.21.0'
+    implementation 'wang.harlon.quickjs:wrapper-android:0.21.1'
 }

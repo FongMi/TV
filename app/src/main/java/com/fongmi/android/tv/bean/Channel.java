@@ -37,6 +37,8 @@ public class Channel {
     private String referer;
     @SerializedName("header")
     private JsonElement header;
+    @SerializedName("drm")
+    private Drm drm;
 
     private boolean selected;
     private Group group;
@@ -129,6 +131,14 @@ public class Channel {
 
     public void setHeader(JsonElement header) {
         this.header = header;
+    }
+
+    public Drm getDrm() {
+        return drm;
+    }
+
+    public void setDrm(Drm drm) {
+        this.drm = drm;
     }
 
     public Group getGroup() {

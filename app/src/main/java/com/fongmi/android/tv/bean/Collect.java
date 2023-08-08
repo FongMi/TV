@@ -11,6 +11,7 @@ public class Collect {
     private final Site site;
     private final List<Vod> list;
     private boolean activated;
+    private int page;
 
     public static Collect all() {
         Collect item = new Collect(Site.get("all", ResUtil.getString(R.string.all)), new ArrayList<>());
@@ -41,5 +42,13 @@ public class Collect {
 
     public void setActivated(boolean activated) {
         this.activated = activated;
+    }
+
+    public int getPage() {
+        return Math.max(1, page);
+    }
+
+    public void setPage(int page) {
+        this.page = page;
     }
 }

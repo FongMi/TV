@@ -19,6 +19,10 @@ public class Download {
     private final String url;
     private final Callback callback;
 
+    public static Download create(String url, File file) {
+        return create(url, file, null);
+    }
+
     public static Download create(String url, File file, Callback callback) {
         return new Download(url, file, callback);
     }
@@ -30,7 +34,8 @@ public class Download {
     }
 
     public void start() {
-        App.execute(this::doInBackground);
+        if (callback == null) doInBackground();
+        else App.execute(this::doInBackground);
     }
 
     private void doInBackground() {
@@ -38,9 +43,9 @@ public class Download {
             Path.clear(file);
             Response response = OkHttp.newCall(url).execute();
             download(response.body().byteStream(), Double.parseDouble(response.header("Content-Length", "1")));
-            App.post(() -> callback.success(Path.chmod(file)));
+            if (callback != null) App.post(() -> callback.success(Path.chmod(file)));
         } catch (Exception e) {
-            App.post(() -> callback.error(e.getMessage()));
+            if (callback != null) App.post(() -> callback.error(e.getMessage()));
         }
     }
 
@@ -54,7 +59,7 @@ public class Download {
                 totalBytes += readBytes;
                 os.write(buffer, 0, readBytes);
                 int progress = (int) (totalBytes / length * 100.0);
-                App.post(() -> callback.progress(progress));
+                if (callback != null) App.post(() -> callback.progress(progress));
             }
         }
     }

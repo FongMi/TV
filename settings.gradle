@@ -21,6 +21,7 @@ dependencyResolutionManagement {
     }
 }
 include ':app'
+include ':hook'
 include ':tvbus'
 include ':catvod'
 include ':pyramid'

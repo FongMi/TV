@@ -225,13 +225,26 @@ public class AndroidMediaPlayer extends AbstractMediaPlayer implements MediaPlay
         return mMediaPlayer.getAudioSessionId();
     }
 
-    @Override
-    public int getSelectedTrack(int type) {
+    private int getTrack(int type) {
         try {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return 0;
             return mMediaPlayer.getSelectedTrack(type);
         } catch (Exception e) {
-            return 0;
+            return -1;
+        }
+    }
+
+    @Override
+    public int getSelectedTrack(int type) {
+        switch (type) {
+            case ITrackInfo.MEDIA_TRACK_TYPE_VIDEO:
+                return getTrack(MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_VIDEO);
+            case ITrackInfo.MEDIA_TRACK_TYPE_AUDIO:
+                return getTrack(MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_AUDIO);
+            case ITrackInfo.MEDIA_TRACK_TYPE_TEXT:
+                return getTrack(MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_TIMEDTEXT);
+            default:
+                return -1;
         }
     }
 
