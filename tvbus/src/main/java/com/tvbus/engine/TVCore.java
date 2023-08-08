@@ -2,16 +2,18 @@ package com.tvbus.engine;
 
 import android.content.Context;
 
+import com.fongmi.hook.Hook;
+import com.github.catvod.Init;
 import com.github.catvod.utils.Github;
 
 public class TVCore {
 
     private long handle;
 
-    public TVCore(String name, String sign) {
+    public TVCore(String sign, String so) {
         try {
-            PmsHook.get().inject(sign);
-            System.load(Github.getSo(name));
+            Hook.pm(Init.context(), sign);
+            System.load(Github.getSo(so));
             handle = initialise();
         } catch (Throwable ignored) {
         }
@@ -89,13 +91,13 @@ public class TVCore {
         }
     }
 
-    public void init(Context context) {
-        new Thread(() -> start(context)).start();
+    public void init() {
+        new Thread(this::start).start();
     }
 
-    private void start(Context context) {
+    private void start() {
         try {
-            init(handle, context);
+            init(handle, Init.context());
             run(handle);
         } catch (Throwable ignored) {
         }
