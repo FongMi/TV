@@ -3,6 +3,7 @@ package com.github.catvod.net;
 import com.github.catvod.bean.Doh;
 import com.github.catvod.utils.Path;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -10,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 import okhttp3.Cache;
 import okhttp3.Call;
+import okhttp3.ConnectionSpec;
 import okhttp3.Dns;
 import okhttp3.Headers;
 import okhttp3.HttpUrl;
@@ -36,7 +38,7 @@ public class OkHttp {
     }
 
     public void setDoh(Doh doh) {
-        OkHttpClient dohClient = new OkHttpClient.Builder().cache(new Cache(Path.doh(), CACHE)).hostnameVerifier(SSLSocketFactoryCompat.hostnameVerifier).sslSocketFactory(new SSLSocketFactoryCompat(), SSLSocketFactoryCompat.trustAllCert).build();
+        OkHttpClient dohClient = new OkHttpClient.Builder().connectionSpecs(Arrays.asList(ConnectionSpec.RESTRICTED_TLS, ConnectionSpec.COMPATIBLE_TLS, ConnectionSpec.MODERN_TLS, ConnectionSpec.CLEARTEXT)).cache(new Cache(Path.doh(), CACHE)).sslSocketFactory(SSLCompat.get(), SSLCompat.TM).build();
         dns = doh.getUrl().isEmpty() ? null : new DnsOverHttps.Builder().client(dohClient).url(HttpUrl.get(doh.getUrl())).bootstrapDnsHosts(doh.getHosts()).build();
         client = null;
         noRedirect = null;
@@ -57,7 +59,7 @@ public class OkHttp {
     }
 
     public static OkHttpClient client(int timeout) {
-        return new OkHttpClient.Builder().connectTimeout(timeout, TimeUnit.MILLISECONDS).readTimeout(timeout, TimeUnit.MILLISECONDS).writeTimeout(timeout, TimeUnit.MILLISECONDS).dns(dns()).hostnameVerifier(SSLSocketFactoryCompat.hostnameVerifier).sslSocketFactory(new SSLSocketFactoryCompat(), SSLSocketFactoryCompat.trustAllCert).build();
+        return new OkHttpClient.Builder().connectionSpecs(Arrays.asList(ConnectionSpec.RESTRICTED_TLS, ConnectionSpec.COMPATIBLE_TLS, ConnectionSpec.MODERN_TLS, ConnectionSpec.CLEARTEXT)).connectTimeout(timeout, TimeUnit.MILLISECONDS).readTimeout(timeout, TimeUnit.MILLISECONDS).writeTimeout(timeout, TimeUnit.MILLISECONDS).dns(dns()).sslSocketFactory(SSLCompat.get(), SSLCompat.TM).build();
     }
 
     public static Call newCall(String url) {

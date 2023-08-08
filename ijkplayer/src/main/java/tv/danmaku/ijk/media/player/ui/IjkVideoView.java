@@ -104,7 +104,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     private void initAttr(Context context, AttributeSet attrs, int defStyleAttr) {
         TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.IjkVideoView, defStyleAttr, 0);
         try {
-            mDefaultArtwork = context.getDrawable(a.getResourceId(R.styleable.IjkVideoView_default_artwork, 0));
+            mDefaultArtwork = context.getResources().getDrawable(a.getResourceId(R.styleable.IjkVideoView_default_artwork, 0));
             mKeepContentOnPlayerReset = a.getBoolean(R.styleable.IjkVideoView_keep_content_on_player_reset, mKeepContentOnPlayerReset);
         } finally {
             a.recycle();
