@@ -22,6 +22,9 @@ import com.orhanobut.logger.LogAdapter;
 import com.orhanobut.logger.Logger;
 import com.orhanobut.logger.PrettyFormatStrategy;
 
+import org.conscrypt.Conscrypt;
+
+import java.security.Security;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -90,6 +93,7 @@ public class App extends Application {
         super.onCreate();
         Notify.createChannel();
         Logger.addLogAdapter(getLogAdapter());
+        Security.insertProviderAt(Conscrypt.newProvider(), 1);
         OkHttp.get().setDoh(Doh.objectFrom(Setting.getDoh()));
         CaocConfig.Builder.create().backgroundMode(CaocConfig.BACKGROUND_MODE_SILENT).errorActivity(CrashActivity.class).apply();
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {

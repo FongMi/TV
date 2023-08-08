@@ -117,6 +117,7 @@ dependencies {
     implementation 'com.google.zxing:core:3.3.0'
     implementation 'com.guolindev.permissionx:permissionx:1.7.1'
     implementation 'org.chromium.net:cronet-embedded:101.4951.41'
+    implementation 'org.conscrypt:conscrypt-android:2.5.2'
     implementation 'org.greenrobot:eventbus:3.3.1'
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
     implementation('org.simpleframework:simple-xml:2.7.1') { exclude group: 'stax', module: 'stax-api' exclude group: 'xpp3', module: 'xpp3' }
