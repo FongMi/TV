@@ -93,7 +93,6 @@ public class App extends Application {
         super.onCreate();
         Notify.createChannel();
         Logger.addLogAdapter(getLogAdapter());
-        Security.insertProviderAt(Conscrypt.newProvider(), 1);
         OkHttp.get().setDoh(Doh.objectFrom(Setting.getDoh()));
         CaocConfig.Builder.create().backgroundMode(CaocConfig.BACKGROUND_MODE_SILENT).errorActivity(CrashActivity.class).apply();
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
