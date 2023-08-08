@@ -2,6 +2,8 @@ package com.fongmi.android.tv.bean;
 
 import android.text.TextUtils;
 
+import androidx.annotation.Nullable;
+
 import com.fongmi.android.tv.utils.Utils;
 import com.google.gson.annotations.SerializedName;
 
@@ -48,5 +50,13 @@ public class Core {
 
     public String getSo() {
         return !TextUtils.isEmpty(so) ? so : "tvcore";
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Core)) return false;
+        Core it = (Core) obj;
+        return getSo().equals(it.getSo());
     }
 }

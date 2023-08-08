@@ -659,7 +659,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private void setConfirm() {
         confirm = true;
         Notify.show(R.string.app_exit);
-        App.post(() -> confirm = false, 2000);
+        App.post(() -> confirm = false, 5000);
     }
 
     public int getToggleCount() {
