@@ -295,7 +295,7 @@
                 android:paddingBottom="8dp" />
 
             <androidx.leanback.widget.HorizontalGridView
-                android:id="@+id/search"
+                android:id="@+id/quick"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"

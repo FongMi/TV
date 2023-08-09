@@ -229,7 +229,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     private void setConfirm() {
         confirm = true;
         Notify.show(R.string.app_exit);
-        App.post(() -> confirm = false, 2000);
+        App.post(() -> confirm = false, 5000);
     }
 
     @Override
@@ -398,7 +398,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         WallConfig.get().clear();
         LiveConfig.get().clear();
         ApiConfig.get().clear();
-        Source.get().exit();
         Server.get().stop();
+        Source.get().exit();
     }
 }

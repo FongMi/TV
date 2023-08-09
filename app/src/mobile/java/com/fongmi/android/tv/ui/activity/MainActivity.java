@@ -113,7 +113,7 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
     private void setConfirm() {
         confirm = true;
         Notify.show(R.string.app_exit);
-        App.post(() -> confirm = false, 2000);
+        App.post(() -> confirm = false, 5000);
     }
 
     public void change(int position) {

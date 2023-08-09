@@ -13,8 +13,10 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.Product;
+import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Page;
 import com.fongmi.android.tv.bean.Result;
+import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.FragmentTypeBinding;
 import com.fongmi.android.tv.model.SiteViewModel;
@@ -22,7 +24,6 @@ import com.fongmi.android.tv.ui.activity.CollectActivity;
 import com.fongmi.android.tv.ui.activity.DetailActivity;
 import com.fongmi.android.tv.ui.adapter.VodAdapter;
 import com.fongmi.android.tv.ui.base.BaseFragment;
-import com.fongmi.android.tv.ui.base.ViewType;
 import com.fongmi.android.tv.ui.custom.CustomScroller;
 
 import java.util.ArrayList;
@@ -65,12 +66,20 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         return getTypeId().equals("home");
     }
 
+    private Site getSite() {
+        return ApiConfig.get().getSite(getKey());
+    }
+
     private VodFragment getParent() {
         return (VodFragment) getParentFragment();
     }
 
     private Page getLastPage() {
         return mPages.get(mPages.size() - 1);
+    }
+
+    private Vod.Style getStyle() {
+        return isFolder() ? Vod.Style.list() : getSite().getStyle();
     }
 
     @Override
@@ -103,13 +112,13 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     private void setRecyclerView() {
         mBinding.recycler.setHasFixedSize(true);
         mBinding.recycler.setAdapter(mAdapter = new VodAdapter(this));
-        mAdapter.setSize(Product.getSpec(getActivity()));
-        setViewType(isFolder());
+        setStyle(getStyle());
     }
 
-    private void setViewType(boolean folder) {
-        mBinding.recycler.setLayoutManager(folder ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getContext(), Product.getColumn()));
-        mAdapter.setViewType(folder ? ViewType.FOLDER : ViewType.GRID);
+    private void setStyle(Vod.Style style) {
+        mAdapter.setStyle(style);
+        mAdapter.setSize(Product.getSpec(getActivity(), style));
+        mBinding.recycler.setLayoutManager(mAdapter.isLinear() ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getContext(), Product.getColumn(style)));
     }
 
     private void setViewModel() {
@@ -141,9 +150,8 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     private void addVideo(List<Vod> items) {
         if (items.isEmpty()) return;
-        boolean list = items.get(0).isList(isFolder());
-        int viewType = list ? ViewType.FOLDER : ViewType.GRID;
-        if (viewType != mAdapter.getViewType()) setViewType(list);
+        Vod.Style style = items.get(0).getStyle(getStyle());
+        if (!style.equals(mAdapter.getStyle())) setStyle(style);
         mAdapter.addAll(items);
     }
 

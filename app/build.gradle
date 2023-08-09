@@ -21,12 +21,12 @@ android {
         leanback {
             dimension "mode"
             versionCode 203
-            versionName "20230803#2"
+            versionName "20230809#1"
         }
         mobile {
             dimension "mode"
             versionCode 203
-            versionName "20230803#2"
+            versionName "20230809#1"
         }
         java {
             dimension "api"
@@ -81,6 +81,7 @@ android {
 }
 
 dependencies {
+    implementation project(':hook')
     implementation project(':tvbus')
     implementation project(':catvod')
     implementation project(':quickjs')

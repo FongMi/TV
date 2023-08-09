@@ -61,7 +61,7 @@ import com.fongmi.android.tv.ui.presenter.EpisodePresenter;
 import com.fongmi.android.tv.ui.presenter.FlagPresenter;
 import com.fongmi.android.tv.ui.presenter.ParsePresenter;
 import com.fongmi.android.tv.ui.presenter.PartPresenter;
-import com.fongmi.android.tv.ui.presenter.SearchPresenter;
+import com.fongmi.android.tv.ui.presenter.QuickPresenter;
 import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.ImgUtil;
@@ -95,9 +95,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private ViewGroup.LayoutParams mFrameParams;
     private EpisodePresenter mEpisodePresenter;
     private ArrayObjectAdapter mEpisodeAdapter;
-    private ArrayObjectAdapter mSearchAdapter;
     private ArrayObjectAdapter mArrayAdapter;
     private ArrayObjectAdapter mParseAdapter;
+    private ArrayObjectAdapter mQuickAdapter;
     private ArrayObjectAdapter mFlagAdapter;
     private ArrayObjectAdapter mPartAdapter;
     private ActivityDetailBinding mBinding;
@@ -321,9 +321,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.part.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.part.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         mBinding.part.setAdapter(new ItemBridgeAdapter(mPartAdapter = new ArrayObjectAdapter(mPartPresenter = new PartPresenter(item -> initSearch(item, false)))));
-        mBinding.search.setHorizontalSpacing(ResUtil.dp2px(8));
-        mBinding.search.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-        mBinding.search.setAdapter(new ItemBridgeAdapter(mSearchAdapter = new ArrayObjectAdapter(new SearchPresenter(this::setSearch))));
+        mBinding.quick.setHorizontalSpacing(ResUtil.dp2px(8));
+        mBinding.quick.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+        mBinding.quick.setAdapter(new ItemBridgeAdapter(mQuickAdapter = new ArrayObjectAdapter(new QuickPresenter(this::setSearch))));
         mBinding.control.parse.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.control.parse.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         mBinding.control.parse.setAdapter(new ItemBridgeAdapter(mParseAdapter = new ArrayObjectAdapter(new ParsePresenter(this::setParseActivated))));
@@ -811,6 +811,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
             public void onLoadFailed(@Nullable Drawable error) {
                 getExo().setDefaultArtwork(error);
                 getIjk().setDefaultArtwork(error);
+                hideProgress();
+                hidePreview();
             }
         });
     }
@@ -1022,7 +1024,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void checkSearch(boolean force) {
-        if (mSearchAdapter.size() == 0) initSearch(mBinding.name.getText().toString(), true);
+        if (mQuickAdapter.size() == 0) initSearch(mBinding.name.getText().toString(), true);
         else if (isAutoMode() || force) nextSite();
     }
 
@@ -1041,7 +1043,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void startSearch(String keyword) {
-        mSearchAdapter.clear();
+        mQuickAdapter.clear();
         List<Site> sites = new ArrayList<>();
         mExecutor = Executors.newFixedThreadPool(Constant.THREAD_POOL);
         for (Site site : ApiConfig.get().getSites()) if (isPass(site)) sites.add(site);
@@ -1062,8 +1064,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void setSearch(List<Vod> items) {
         Iterator<Vod> iterator = items.iterator();
         while (iterator.hasNext()) if (mismatch(iterator.next())) iterator.remove();
-        mSearchAdapter.addAll(mSearchAdapter.size(), items);
-        mBinding.search.setVisibility(View.VISIBLE);
+        mQuickAdapter.addAll(mQuickAdapter.size(), items);
+        mBinding.quick.setVisibility(View.VISIBLE);
         if (isInitAuto()) nextSite();
         if (items.isEmpty()) return;
         App.removeCallbacks(mR3);
@@ -1094,10 +1096,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void nextSite() {
-        if (mSearchAdapter.size() == 0) return;
-        Vod item = (Vod) mSearchAdapter.get(0);
+        if (mQuickAdapter.size() == 0) return;
+        Vod item = (Vod) mQuickAdapter.get(0);
         Notify.show(getString(R.string.play_switch_site, item.getSiteName()));
-        mSearchAdapter.removeItems(0, 1);
+        mQuickAdapter.removeItems(0, 1);
         mBroken.add(getId());
         setInitAuto(false);
         getDetail(item);

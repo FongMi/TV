@@ -61,6 +61,15 @@
                 <data android:scheme="magnet" />
                 <data android:scheme="thunder" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="mitv" />
+                <data android:scheme="jianpian" />
+            </intent-filter>
         </activity>
 
         <activity

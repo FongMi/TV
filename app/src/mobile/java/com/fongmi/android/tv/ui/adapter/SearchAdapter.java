@@ -6,30 +6,52 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.bean.Vod;
-import com.fongmi.android.tv.databinding.AdapterSearchBinding;
+import com.fongmi.android.tv.databinding.AdapterVodOneBinding;
+import com.fongmi.android.tv.databinding.AdapterVodRectBinding;
+import com.fongmi.android.tv.ui.base.BaseVodHolder;
+import com.fongmi.android.tv.ui.base.ViewType;
+import com.fongmi.android.tv.ui.holder.VodOneHolder;
+import com.fongmi.android.tv.ui.holder.VodRectHolder;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder> {
+public class SearchAdapter extends RecyclerView.Adapter<BaseVodHolder> {
 
-    private final OnClickListener mListener;
+    private final VodAdapter.OnClickListener mListener;
     private final List<Vod> mItems;
+    private int viewType;
+    private int[] size;
 
-    public SearchAdapter(OnClickListener listener) {
+    public SearchAdapter(VodAdapter.OnClickListener listener) {
         this.mListener = listener;
         this.mItems = new ArrayList<>();
     }
 
-    public interface OnClickListener {
-
-        void onItemClick(Vod item);
+    public void setViewType(int viewType) {
+        Setting.putViewType(this.viewType = viewType);
     }
 
-    public void clear() {
-        mItems.clear();
-        notifyDataSetChanged();
+    public void setSize(int[] size) {
+        this.size = size;
+    }
+
+    public int getWidth() {
+        return size[0];
+    }
+
+    public boolean isList() {
+        return viewType == ViewType.LIST;
+    }
+
+    public boolean isGrid() {
+        return viewType == ViewType.GRID;
+    }
+
+    public void setAll(List<Vod> items) {
+        clear().addAll(items);
     }
 
     public void addAll(List<Vod> items) {
@@ -38,13 +60,10 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         notifyItemRangeInserted(position, items.size());
     }
 
-    public Vod get(int position) {
-        return mItems.get(position);
-    }
-
-    public void remove(int position) {
-        mItems.remove(position);
-        notifyItemRemoved(position);
+    public SearchAdapter clear() {
+        mItems.clear();
+        notifyDataSetChanged();
+        return this;
     }
 
     @Override
@@ -52,28 +71,20 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         return mItems.size();
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        return viewType;
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull BaseVodHolder holder, int position) {
+        holder.initView(mItems.get(position));
+    }
+
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(AdapterSearchBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Vod item = mItems.get(position);
-        holder.binding.name.setText(item.getVodName());
-        holder.binding.site.setText(item.getSiteName());
-        holder.binding.remark.setText(item.getVodRemarks());
-        holder.binding.getRoot().setOnClickListener(v -> mListener.onItemClick(item));
-    }
-
-    static class ViewHolder extends RecyclerView.ViewHolder {
-
-        private final AdapterSearchBinding binding;
-
-        ViewHolder(@NonNull AdapterSearchBinding binding) {
-            super(binding.getRoot());
-            this.binding = binding;
-        }
+    public BaseVodHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        if (viewType == ViewType.LIST) return new VodOneHolder(AdapterVodOneBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), mListener);
+        else return new VodRectHolder(AdapterVodRectBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), mListener).size(size);
     }
 }

@@ -32,6 +32,7 @@ import com.fongmi.android.tv.impl.SiteCallback;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.ui.adapter.CollectAdapter;
 import com.fongmi.android.tv.ui.adapter.RecordAdapter;
+import com.fongmi.android.tv.ui.adapter.SearchAdapter;
 import com.fongmi.android.tv.ui.adapter.VodAdapter;
 import com.fongmi.android.tv.ui.adapter.WordAdapter;
 import com.fongmi.android.tv.ui.base.BaseActivity;
@@ -56,12 +57,12 @@ public class CollectActivity extends BaseActivity implements CustomScroller.Call
 
     private ActivityCollectBinding mBinding;
     private CollectAdapter mCollectAdapter;
+    private SearchAdapter mSearchAdapter;
     private RecordAdapter mRecordAdapter;
     private ExecutorService mExecutor;
     private WordAdapter mWordAdapter;
     private CustomScroller mScroller;
     private SiteViewModel mViewModel;
-    private VodAdapter mVodAdapter;
     private List<Site> mSites;
 
     public static void start(Activity activity) {
@@ -92,7 +93,6 @@ public class CollectActivity extends BaseActivity implements CustomScroller.Call
         mScroller = new CustomScroller(this);
         mSites = new ArrayList<>();
         setRecyclerView();
-        setLayoutSize();
         setViewModel();
         checkKeyword();
         setViewType();
@@ -124,39 +124,38 @@ public class CollectActivity extends BaseActivity implements CustomScroller.Call
         mBinding.collect.setAdapter(mCollectAdapter = new CollectAdapter(this));
         mBinding.recycler.setHasFixedSize(true);
         mBinding.recycler.addOnScrollListener(mScroller);
-        mBinding.recycler.setAdapter(mVodAdapter = new VodAdapter(this));
+        mBinding.recycler.setAdapter(mSearchAdapter = new SearchAdapter(this));
         mBinding.wordRecycler.setHasFixedSize(true);
         mBinding.wordRecycler.setAdapter(mWordAdapter = new WordAdapter(this));
         mBinding.recordRecycler.setHasFixedSize(true);
         mBinding.recordRecycler.setAdapter(mRecordAdapter = new RecordAdapter(this));
-        mVodAdapter.setSize(Product.getSpec(this, ResUtil.dp2px(64), 3));
     }
 
     private void setViewType() {
-        mVodAdapter.setViewType(Setting.getViewType());
-        boolean grid = mVodAdapter.getViewType() == ViewType.GRID;
-        GridLayoutManager manager = (GridLayoutManager) mBinding.recycler.getLayoutManager();
-        mBinding.view.setImageResource(grid ? R.drawable.ic_action_list : R.drawable.ic_action_grid);
-        manager.setSpanCount(grid ? 2 : 1);
+        setViewType(Setting.getViewType(ViewType.GRID));
     }
 
-    private void setLayoutSize() {
+    private void setViewType(int viewType) {
+        mSearchAdapter.setViewType(viewType);
+        mSearchAdapter.setSize(Product.getSpec(this, ResUtil.dp2px(64), 3));
+        ((GridLayoutManager) mBinding.recycler.getLayoutManager()).setSpanCount(mSearchAdapter.isGrid() ? 2 : 1);
+        mBinding.view.setImageResource(mSearchAdapter.isGrid() ? R.drawable.ic_action_list : R.drawable.ic_action_grid);
         RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mBinding.collect.getLayoutParams();
-        params.width = mVodAdapter.getWidth() + ResUtil.dp2px(24);
+        params.width = mSearchAdapter.getWidth() + ResUtil.dp2px(24);
         mBinding.collect.setLayoutParams(params);
     }
 
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mViewModel.search.observe(this, result -> {
-            if (mCollectAdapter.getPosition() == 0) mVodAdapter.addAll(result.getList());
+            if (mCollectAdapter.getPosition() == 0) mSearchAdapter.addAll(result.getList());
             mCollectAdapter.add(Collect.create(result.getList()));
             mCollectAdapter.add(result.getList());
         });
         mViewModel.result.observe(this, result -> {
             boolean same = result.getList().size() > 0 && mCollectAdapter.getActivated().getSite().equals(result.getList().get(0).getSite());
             if (same) mCollectAdapter.getActivated().getList().addAll(result.getList());
-            if (same) mVodAdapter.addAll(result.getList());
+            if (same) mSearchAdapter.addAll(result.getList());
             mScroller.endLoading(result);
         });
     }
@@ -181,7 +180,7 @@ public class CollectActivity extends BaseActivity implements CustomScroller.Call
 
     private void search() {
         if (empty()) return;
-        mVodAdapter.clear();
+        mSearchAdapter.clear();
         mCollectAdapter.clear();
         Utils.hideKeyboard(mBinding.keyword);
         mBinding.site.setVisibility(View.GONE);
@@ -224,14 +223,12 @@ public class CollectActivity extends BaseActivity implements CustomScroller.Call
     }
 
     private void toggleView(View view) {
-        mVodAdapter.setViewType(mVodAdapter.getViewType() == ViewType.GRID ? ViewType.LIST : ViewType.GRID);
-        Setting.putViewType(mVodAdapter.getViewType());
-        setViewType();
+        setViewType(mSearchAdapter.isGrid() ? ViewType.LIST : ViewType.GRID);
     }
 
     private void showAgent() {
         mScroller.reset();
-        mVodAdapter.clear();
+        mSearchAdapter.clear();
         mCollectAdapter.clear();
         mBinding.view.setVisibility(View.GONE);
         mBinding.result.setVisibility(View.GONE);
@@ -267,7 +264,7 @@ public class CollectActivity extends BaseActivity implements CustomScroller.Call
     public void onItemClick(int position, Collect item) {
         mBinding.recycler.scrollToPosition(0);
         mCollectAdapter.setActivated(position);
-        mVodAdapter.clear().addAll(item.getList());
+        mSearchAdapter.setAll(item.getList());
         mScroller.setPage(item.getPage());
     }
 

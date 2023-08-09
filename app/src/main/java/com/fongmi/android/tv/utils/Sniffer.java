@@ -20,7 +20,7 @@ public class Sniffer {
 
     public static final String CHROME = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36";
     public static final Pattern RULE = Pattern.compile("http((?!http).){12,}?\\.(m3u8|mp4|flv|avi|mkv|rm|wmv|mpg|m4a|mp3)\\?.*|http((?!http).){12,}\\.(m3u8|mp4|flv|avi|mkv|rm|wmv|mpg|m4a|mp3)|http((?!http).)*?video/tos*");
-    public static final List<String> PUSH = Arrays.asList("http", "https", "smb", "thunder", "magnet", "ed2k", "ftp");
+    public static final List<String> PUSH = Arrays.asList("smb", "http", "https", "thunder", "magnet", "ed2k", "ftp", "mitv", "jianpian");
     public static final List<String> THUNDER = Arrays.asList("thunder", "magnet", "ed2k", "ftp");
 
     public static boolean isPush(Uri uri) {

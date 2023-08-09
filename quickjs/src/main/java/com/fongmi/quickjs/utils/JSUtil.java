@@ -19,7 +19,7 @@ public class JSUtil {
     public static JSArray toArray(QuickJSContext ctx, byte[] bytes) {
         JSArray array = ctx.createNewJSArray();
         if (bytes == null || bytes.length == 0) return array;
-        for (int i = 0; i < bytes.length; i++) array.set(bytes[i], i);
+        for (int i = 0; i < bytes.length; i++) array.set((int) bytes[i], i);
         return array;
     }
 

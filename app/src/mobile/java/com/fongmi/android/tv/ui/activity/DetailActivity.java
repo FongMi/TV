@@ -61,7 +61,7 @@ import com.fongmi.android.tv.service.PlaybackService;
 import com.fongmi.android.tv.ui.adapter.EpisodeAdapter;
 import com.fongmi.android.tv.ui.adapter.FlagAdapter;
 import com.fongmi.android.tv.ui.adapter.ParseAdapter;
-import com.fongmi.android.tv.ui.adapter.SearchAdapter;
+import com.fongmi.android.tv.ui.adapter.QuickAdapter;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.base.ViewType;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
@@ -104,8 +104,8 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     private Observer<Result> mObserveSearch;
     private ActivityDetailBinding mBinding;
     private EpisodeAdapter mEpisodeAdapter;
-    private SearchAdapter mSearchAdapter;
     private ControlDialog mControlDialog;
+    private QuickAdapter mQuickAdapter;
     private ParseAdapter mParseAdapter;
     private CustomKeyDownVod mKeyDown;
     private ExecutorService mExecutor;
@@ -318,7 +318,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mBinding.episode.setItemAnimator(null);
         mBinding.episode.addItemDecoration(new SpaceItemDecoration(8));
         mBinding.episode.setAdapter(mEpisodeAdapter = new EpisodeAdapter(this, ViewType.LIST));
-        mBinding.search.setAdapter(mSearchAdapter = new SearchAdapter(this::setSearch));
+        mBinding.quick.setAdapter(mQuickAdapter = new QuickAdapter(this::setSearch));
         mBinding.control.parse.setHasFixedSize(true);
         mBinding.control.parse.setItemAnimator(null);
         mBinding.control.parse.addItemDecoration(new SpaceItemDecoration(8));
@@ -862,6 +862,8 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
             public void onLoadFailed(@Nullable Drawable error) {
                 getExo().setDefaultArtwork(error);
                 getIjk().setDefaultArtwork(error);
+                hideProgress();
+                hidePreview();
             }
         });
     }
@@ -1076,7 +1078,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void checkSearch(boolean force) {
-        if (mSearchAdapter.getItemCount() == 0) initSearch(mBinding.name.getText().toString(), true);
+        if (mQuickAdapter.getItemCount() == 0) initSearch(mBinding.name.getText().toString(), true);
         else if (isAutoMode() || force) nextSite();
     }
 
@@ -1094,7 +1096,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void startSearch(String keyword) {
-        mSearchAdapter.clear();
+        mQuickAdapter.clear();
         List<Site> sites = new ArrayList<>();
         mExecutor = Executors.newFixedThreadPool(Constant.THREAD_POOL * 2);
         for (Site item : ApiConfig.get().getSites()) if (isPass(item)) sites.add(item);
@@ -1116,8 +1118,8 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         List<Vod> items = result.getList();
         Iterator<Vod> iterator = items.iterator();
         while (iterator.hasNext()) if (mismatch(iterator.next())) iterator.remove();
-        mBinding.search.setVisibility(View.VISIBLE);
-        mSearchAdapter.addAll(items);
+        mBinding.quick.setVisibility(View.VISIBLE);
+        mQuickAdapter.addAll(items);
         if (isInitAuto()) nextSite();
         if (items.isEmpty()) return;
         App.removeCallbacks(mR4);
@@ -1148,10 +1150,10 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void nextSite() {
-        if (mSearchAdapter.getItemCount() == 0) return;
-        Vod item = mSearchAdapter.get(0);
+        if (mQuickAdapter.getItemCount() == 0) return;
+        Vod item = mQuickAdapter.get(0);
         Notify.show(getString(R.string.play_switch_site, item.getSiteName()));
-        mSearchAdapter.remove(0);
+        mQuickAdapter.remove(0);
         mBroken.add(getId());
         setInitAuto(false);
         getDetail(item);

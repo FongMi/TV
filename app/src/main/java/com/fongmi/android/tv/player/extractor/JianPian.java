@@ -62,12 +62,5 @@ public class JianPian implements Source.Extractor {
 
     @Override
     public void exit() {
-        try {
-            if (p2p != null) p2p.P2Pdoxendhttpd();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            p2p = null;
-        }
     }
 }

@@ -7,27 +7,31 @@ import androidx.leanback.widget.Presenter;
 
 import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.bean.Vod;
-import com.fongmi.android.tv.databinding.AdapterVodFolderBinding;
-import com.fongmi.android.tv.databinding.AdapterVodGridBinding;
+import com.fongmi.android.tv.databinding.AdapterVodFullBinding;
+import com.fongmi.android.tv.databinding.AdapterVodListBinding;
+import com.fongmi.android.tv.databinding.AdapterVodOvalBinding;
+import com.fongmi.android.tv.databinding.AdapterVodRectBinding;
+import com.fongmi.android.tv.ui.base.BaseVodHolder;
 import com.fongmi.android.tv.ui.base.ViewType;
-import com.fongmi.android.tv.ui.holder.VodFolderHolder;
-import com.fongmi.android.tv.ui.holder.VodGridHolder;
-import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.ui.holder.VodFullHolder;
+import com.fongmi.android.tv.ui.holder.VodListHolder;
+import com.fongmi.android.tv.ui.holder.VodOvalHolder;
+import com.fongmi.android.tv.ui.holder.VodRectHolder;
 
 public class VodPresenter extends Presenter {
 
     private final OnClickListener mListener;
-    private final int viewType;
-    private int width, height;
+    private final Vod.Style style;
+    private final int[] size;
 
     public VodPresenter(OnClickListener listener) {
-        this(listener, ViewType.GRID);
+        this(listener, Vod.Style.rect());
     }
 
-    public VodPresenter(OnClickListener listener, int viewType) {
+    public VodPresenter(OnClickListener listener, Vod.Style style) {
         this.mListener = listener;
-        this.viewType = viewType;
-        setLayoutSize();
+        this.style = style;
+        this.size = Product.getSpec(style);
     }
 
     public interface OnClickListener {
@@ -37,32 +41,23 @@ public class VodPresenter extends Presenter {
         boolean onLongClick(Vod item);
     }
 
-    private void setLayoutSize() {
-        int space = ResUtil.dp2px(48) + ResUtil.dp2px(16 * (Product.getColumn() - 1));
-        int base = ResUtil.getScreenWidth() - space;
-        width = base / Product.getColumn();
-        height = (int) (width / 0.75f);
-    }
-
     @Override
     public Presenter.ViewHolder onCreateViewHolder(ViewGroup parent) {
-        if (viewType == ViewType.FOLDER) return new VodFolderHolder(AdapterVodFolderBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), mListener);
-        VodGridHolder holder = new VodGridHolder(AdapterVodGridBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), mListener);
-        holder.binding.getRoot().getLayoutParams().width = width;
-        holder.binding.getRoot().getLayoutParams().height = height;
-        return holder;
+        switch (style.getViewType()) {
+            case ViewType.LIST:
+                return new VodListHolder(AdapterVodListBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), mListener);
+            case ViewType.FULL:
+                return new VodFullHolder(AdapterVodFullBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false)).size(size);
+            case ViewType.OVAL:
+                return new VodOvalHolder(AdapterVodOvalBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), mListener).size(size);
+            default:
+                return new VodRectHolder(AdapterVodRectBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), mListener).size(size);
+        }
     }
 
     @Override
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object object) {
-        switch (viewType) {
-            case ViewType.GRID:
-                ((VodGridHolder) viewHolder).initView((Vod) object);
-                break;
-            case ViewType.FOLDER:
-                ((VodFolderHolder) viewHolder).initView((Vod) object);
-                break;
-        }
+        ((BaseVodHolder) viewHolder).initView((Vod) object);
     }
 
     @Override

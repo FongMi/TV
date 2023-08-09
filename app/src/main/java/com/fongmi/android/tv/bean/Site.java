@@ -14,7 +14,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.Collections;
 import java.util.List;
 
-@Entity(ignoredColumns = {"type", "api", "playUrl", "playerType", "ext", "jar", "categories"})
+@Entity(ignoredColumns = {"type", "api", "playUrl", "playerType", "ext", "jar", "style", "categories"})
 public class Site {
 
     @NonNull
@@ -43,6 +43,8 @@ public class Site {
     private String ext;
     @SerializedName("jar")
     private String jar;
+    @SerializedName("style")
+    private Vod.Style style;
     @SerializedName("categories")
     private List<String> categories;
 
@@ -151,6 +153,10 @@ public class Site {
 
     public String getJar() {
         return TextUtils.isEmpty(jar) ? "" : jar;
+    }
+
+    public Vod.Style getStyle() {
+        return style == null ? Vod.Style.rect() : style;
     }
 
     public List<String> getCategories() {

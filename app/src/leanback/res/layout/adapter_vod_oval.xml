@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/black_20"
+        android:layout_margin="8dp"
+        android:scaleType="center"
+        app:shapeAppearanceOverlay="@style/Vod.Circle"
+        tools:src="@drawable/ic_img_loading" />
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/image"
+        android:layout_alignStart="@+id/image"
+        android:layout_alignEnd="@+id/image"
+        android:layout_marginTop="4dp"
+        android:ellipsize="marquee"
+        android:gravity="center"
+        android:singleLine="true"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        tools:text="蜘蛛人" />
+
+    <FrameLayout
+        android:id="@+id/frame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/image"
+        android:layout_alignTop="@+id/image"
+        android:layout_alignEnd="@+id/image"
+        android:layout_alignBottom="@+id/image"
+        android:background="@drawable/selector_vod_oval"
+        android:duplicateParentState="true" />
+
+</RelativeLayout>

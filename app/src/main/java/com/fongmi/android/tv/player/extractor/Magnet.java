@@ -19,6 +19,7 @@ import java.util.concurrent.Future;
 public class Magnet implements Callable<List<Vod.Flag.Episode>> {
 
     private final String url;
+    private int time;
 
     public static Magnet get(String url) {
         return new Magnet(url);
@@ -28,6 +29,11 @@ public class Magnet implements Callable<List<Vod.Flag.Episode>> {
         this.url = url;
     }
 
+    private void sleep() {
+        SystemClock.sleep(10);
+        time += 10;
+    }
+
     @Override
     public List<Vod.Flag.Episode> call() {
         boolean torrent = Sniffer.isTorrent(url);
@@ -35,7 +41,7 @@ public class Magnet implements Callable<List<Vod.Flag.Episode>> {
         GetTaskId taskId = XLTaskHelper.get().parse(url, Path.thunder(Util.md5(url)));
         if (!torrent && !taskId.getRealUrl().startsWith("magnet")) return List.of(Vod.Flag.Episode.create(taskId.getFileName(), taskId.getRealUrl()));
         if (torrent) Download.create(url, taskId.getSaveFile()).start();
-        else while (XLTaskHelper.get().getTaskInfo(taskId).getTaskStatus() != 2) SystemClock.sleep(10);
+        else while (XLTaskHelper.get().getTaskInfo(taskId).getTaskStatus() != 2 && time < 5000) sleep();
         List<TorrentFileInfo> medias = XLTaskHelper.get().getTorrentInfo(taskId.getSaveFile()).getMedias();
         for (TorrentFileInfo media : medias) episodes.add(Vod.Flag.Episode.create(media.getFileName(), media.getPlayUrl()));
         XLTaskHelper.get().stopTask(taskId);
@@ -44,7 +50,7 @@ public class Magnet implements Callable<List<Vod.Flag.Episode>> {
 
     public static void addAll(List<Vod.Flag.Episode> items, Future<List<Vod.Flag.Episode>> future) {
         try {
-            items.addAll(future.get());
+            items.addAll(Vod.Flag.Episode.Sorter.sort(future.get()));
         } catch (Exception ignored) {
         }
     }
