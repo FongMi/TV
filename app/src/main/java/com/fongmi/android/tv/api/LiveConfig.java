@@ -3,7 +3,6 @@ package com.fongmi.android.tv.api;
 import android.text.TextUtils;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.bean.Channel;
@@ -14,6 +13,7 @@ import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.impl.Callback;
+import com.fongmi.android.tv.ui.activity.LiveActivity;
 import com.fongmi.android.tv.utils.Notify;
 import com.github.catvod.utils.Json;
 import com.google.gson.JsonElement;
@@ -141,8 +141,13 @@ public class LiveConfig {
         if (!object.has("lives")) return;
         for (JsonElement element : Json.safeListElement(object, "lives")) parse(Live.objectFrom(element).check());
         if (home == null) setHome(lives.isEmpty() ? new Live() : lives.get(0));
-        if (home.isBoot()) App.post(Product::bootLive);
+        if (home.isBoot() || Setting.isBootLive()) App.post(this::bootLive);
         if (callback != null) App.post(callback::success);
+    }
+
+    private void bootLive() {
+        LiveActivity.start(App.activity());
+        Setting.putBootLive(false);
     }
 
     public void parse(JsonObject object) {

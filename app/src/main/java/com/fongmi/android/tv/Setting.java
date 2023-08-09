@@ -126,6 +126,14 @@ public class Setting {
         Prefers.put("scale_live", scale);
     }
 
+    public static boolean isBootLive() {
+        return Prefers.getBoolean("boot_live");
+    }
+
+    public static void putBootLive(boolean boot) {
+        Prefers.put("boot_live", boot);
+    }
+
     public static boolean isInvert() {
         return Prefers.getBoolean("invert");
     }

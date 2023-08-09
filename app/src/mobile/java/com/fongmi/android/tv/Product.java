@@ -19,9 +19,6 @@ public class Product {
         return style.isLand() ? getColumn() - 1 : getColumn();
     }
 
-    public static void bootLive() {
-    }
-
     public static int[] getSpec(Context context) {
         return getSpec(context, Vod.Style.rect());
     }

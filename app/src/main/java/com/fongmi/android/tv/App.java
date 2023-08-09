@@ -78,12 +78,21 @@ public class App extends Application {
         for (Runnable r : runnable) get().handler.removeCallbacks(r);
     }
 
+    public void setHook(boolean hook) {
+        this.hook = hook;
+    }
+
     private void setActivity(Activity activity) {
         this.activity = activity;
     }
 
-    public void setHook(boolean hook) {
-        this.hook = hook;
+    private LogAdapter getLogAdapter() {
+        return new AndroidLogAdapter(PrettyFormatStrategy.newBuilder().showThreadInfo(false).tag("").build()) {
+            @Override
+            public boolean isLoggable(int priority, String tag) {
+                return true;
+            }
+        };
     }
 
     @Override
@@ -146,14 +155,5 @@ public class App extends Application {
     public String getPackageName() {
         if (!hook) return getBaseContext().getPackageName();
         return LiveConfig.get().getHome().getCore().getPkg();
-    }
-
-    private LogAdapter getLogAdapter() {
-        return new AndroidLogAdapter(PrettyFormatStrategy.newBuilder().showThreadInfo(false).tag("").build()) {
-            @Override
-            public boolean isLoggable(int priority, String tag) {
-                return true;
-            }
-        };
     }
 }
