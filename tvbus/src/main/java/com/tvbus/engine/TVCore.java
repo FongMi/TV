@@ -2,7 +2,6 @@ package com.tvbus.engine;
 
 import android.content.Context;
 
-import com.fongmi.hook.Hook;
 import com.github.catvod.Init;
 import com.github.catvod.utils.Github;
 
@@ -10,9 +9,8 @@ public class TVCore {
 
     private long handle;
 
-    public TVCore(String so, String sign) {
+    public TVCore(String so) {
         try {
-            Hook.pm(Init.context(), sign);
             System.load(Github.getSo(so));
             handle = initialise();
         } catch (Throwable ignored) {

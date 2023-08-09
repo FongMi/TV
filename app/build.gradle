@@ -81,6 +81,7 @@ android {
 }
 
 dependencies {
+    implementation project(':hook')
     implementation project(':tvbus')
     implementation project(':catvod')
     implementation project(':quickjs')
