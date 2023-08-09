@@ -5,6 +5,7 @@ import android.text.TextUtils;
 
 import androidx.annotation.Nullable;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.utils.Utils;
 import com.google.gson.annotations.SerializedName;
 
@@ -60,7 +61,7 @@ public class Core {
     }
 
     public PackageManager getPackageManager() {
-        return null;
+        return App.get().getPackageManager();
     }
 
     @Override

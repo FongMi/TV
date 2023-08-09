@@ -141,7 +141,7 @@ public class LiveConfig {
         if (!object.has("lives")) return;
         for (JsonElement element : Json.safeListElement(object, "lives")) parse(Live.objectFrom(element).check());
         if (home == null) setHome(lives.isEmpty() ? new Live() : lives.get(0));
-        if (home.isBoot()) App.post(Product::bootLive);
+        if (home.isBoot() || Setting.isBootLive()) App.post(Product::bootLive);
         if (callback != null) App.post(callback::success);
     }
 

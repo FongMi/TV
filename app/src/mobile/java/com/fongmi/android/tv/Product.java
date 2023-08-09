@@ -3,6 +3,7 @@ package com.fongmi.android.tv;
 import android.content.Context;
 
 import com.fongmi.android.tv.bean.Vod;
+import com.fongmi.android.tv.ui.activity.LiveActivity;
 import com.fongmi.android.tv.utils.ResUtil;
 
 public class Product {
@@ -20,6 +21,7 @@ public class Product {
     }
 
     public static void bootLive() {
+        LiveActivity.start(App.activity());
     }
 
     public static int[] getSpec(Context context) {
