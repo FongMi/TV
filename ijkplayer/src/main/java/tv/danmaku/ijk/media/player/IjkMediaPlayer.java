@@ -177,9 +177,9 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
         synchronized (IjkMediaPlayer.class) {
             if (!mIsLibLoaded) {
                 if (libLoader == null) libLoader = sLocalLibLoader;
-                libLoader.loadLibrary("ffmpeg");
+                libLoader.loadLibrary("ijkffmpeg");
                 libLoader.loadLibrary("ijksdl");
-                libLoader.loadLibrary("ijkplayer");
+                libLoader.loadLibrary("player");
                 mIsLibLoaded = true;
             }
         }
@@ -818,7 +818,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
                     player.notifyOnInfo(msg.arg1, msg.arg2);
                     return;
                 case MEDIA_TIMED_TEXT:
-                    player.notifyOnTimedText(IjkTimedText.create((msg.arg1 >= 2 || msg.obj == null) ? "" : msg.obj.toString()));
+                    player.notifyOnTimedText(msg.obj == null ? null : IjkTimedText.create(msg.obj.toString()));
                     return;
                 case MEDIA_NOP: // interface test message - ignore
                     break;

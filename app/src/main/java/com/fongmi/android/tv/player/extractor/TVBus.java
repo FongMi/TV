@@ -1,10 +1,10 @@
 package com.fongmi.android.tv.player.extractor;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.api.LiveConfig;
 import com.fongmi.android.tv.bean.Core;
 import com.fongmi.android.tv.player.Source;
-import com.fongmi.android.tv.utils.Notify;
 import com.google.gson.JsonObject;
 import com.tvbus.engine.Listener;
 import com.tvbus.engine.TVCore;
@@ -21,7 +21,8 @@ public class TVBus implements Source.Extractor, Listener {
     }
 
     private void init(Core core) {
-        tvcore = new TVCore(core.getSo(), core.getSign());
+        App.get().setHook(true);
+        tvcore = new TVCore(core.getSo());
         tvcore.auth(core.getAuth()).broker(core.getBroker());
         tvcore.name(core.getName()).pass(core.getPass());
         tvcore.serv(0).play(8902).mode(1).listener(this);
@@ -50,8 +51,8 @@ public class TVBus implements Source.Extractor, Listener {
     }
 
     private void change() {
-        App.post(() -> Notify.show("內核已切換，正在重新啟動。"));
-        App.post(() -> System.exit(0), 1000);
+        App.post(() -> System.exit(0), 250);
+        Setting.putBootLive(true);
     }
 
     @Override

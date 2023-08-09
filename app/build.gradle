@@ -22,8 +22,8 @@ android {
     productFlavors {
         leanback {
             dimension "default"
-            versionCode 203
-            versionName "20230807#2"
+            versionCode 204
+            versionName "2.0.4"
         }
     }
 
@@ -62,6 +62,7 @@ android {
 }
 
 dependencies {
+    implementation project(':hook')
     implementation project(':tvbus')
     implementation project(':catvod')
     implementation project(':pyramid')

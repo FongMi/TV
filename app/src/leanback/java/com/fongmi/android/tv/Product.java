@@ -20,10 +20,6 @@ public class Product {
         return getColumn();
     }
 
-    public static void bootLive() {
-        LiveActivity.start(App.activity());
-    }
-
     public static int[] getSpec(Vod.Style style) {
         int column = getColumn(style);
         int space = ResUtil.dp2px(48) + ResUtil.dp2px(16 * (column - 1));
