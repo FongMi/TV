@@ -456,7 +456,7 @@ public class Vod {
             public static class Sorter implements Comparator<Episode> {
 
                 public static List<Episode> sort(List<Episode> items) {
-                    Collections.sort(items, new Sorter());
+                    if (items.size() > 1) Collections.sort(items, new Sorter());
                     return items;
                 }
 

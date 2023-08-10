@@ -7,6 +7,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.AdapterEpisodeGridBinding;
 import com.fongmi.android.tv.databinding.AdapterEpisodeListBinding;
@@ -84,8 +85,8 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Vod.Flag.Episode item = mItems.get(position);
-        if (holder.gridBinding != null) holder.initView(holder.gridBinding.text, item);
-        if (holder.listBinding != null) holder.initView(holder.listBinding.text, item);
+        if (holder.gridBinding != null) holder.initView(holder.gridBinding.text, item, false);
+        if (holder.listBinding != null) holder.initView(holder.listBinding.text, item, true);
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -103,10 +104,11 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
             this.gridBinding = binding;
         }
 
-        void initView(TextView view, Vod.Flag.Episode item) {
+        void initView(TextView view, Vod.Flag.Episode item, boolean ems) {
             view.setText(item.getName());
             view.setSelected(item.isActivated());
             view.setActivated(item.isActivated());
+            if (ems) view.setMaxEms(Product.getEms());
             view.setOnClickListener(v -> mListener.onItemClick(item));
         }
     }
