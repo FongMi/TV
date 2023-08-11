@@ -22,6 +22,7 @@ import org.simpleframework.xml.Text;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -350,7 +351,7 @@ public class Vod {
         public static List<Flag> create(String flag, String name, String url) {
             Vod.Flag item = new Vod.Flag(flag);
             item.getEpisodes().add(Episode.create(name, url));
-            return List.of(item);
+            return Arrays.asList(item);
         }
 
         @Override

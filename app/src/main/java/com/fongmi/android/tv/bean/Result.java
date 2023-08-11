@@ -115,7 +115,7 @@ public class Result {
         type.setTypeFlag("1");
         type.setTypeId(item.getVodId());
         type.setTypeName(item.getVodName());
-        result.setTypes(List.of(type));
+        result.setTypes(Arrays.asList(type));
         return result;
     }
 

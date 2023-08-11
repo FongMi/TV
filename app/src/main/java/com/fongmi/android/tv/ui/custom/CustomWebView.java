@@ -6,9 +6,7 @@ import android.net.http.SslError;
 import android.text.TextUtils;
 import android.webkit.CookieManager;
 import android.webkit.SslErrorHandler;
-import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -22,8 +20,10 @@ import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.impl.ParseCallback;
 import com.fongmi.android.tv.utils.Sniffer;
 import com.github.catvod.crawler.Spider;
+import com.github.catvod.utils.Util;
 
 import java.io.ByteArrayInputStream;
+import java.util.HashMap;
 import java.util.Map;
 
 public class CustomWebView extends WebView {
@@ -53,7 +53,6 @@ public class CustomWebView extends WebView {
         getSettings().setJavaScriptEnabled(true);
         getSettings().setLoadWithOverviewMode(true);
         getSettings().setJavaScriptCanOpenWindowsAutomatically(false);
-        getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         setWebViewClient(webViewClient());
     }
 
@@ -80,14 +79,12 @@ public class CustomWebView extends WebView {
         return new WebViewClient() {
             @Nullable
             @Override
-            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-                String url = request.getUrl().toString();
-                String host = request.getUrl().getHost();
+            public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
+                String host = Util.host(url);
                 if (TextUtils.isEmpty(host)) return empty;
                 if (ApiConfig.get().getAds().contains(host)) return empty;
-                Map<String, String> headers = request.getRequestHeaders();
-                if (isVideoFormat(url, headers)) post(headers, url);
-                return super.shouldInterceptRequest(view, request);
+                if (isVideoFormat(url)) post(url);
+                return super.shouldInterceptRequest(view, url);
             }
 
             @Override
@@ -103,18 +100,19 @@ public class CustomWebView extends WebView {
         };
     }
 
-    private boolean isVideoFormat(String url, Map<String, String> headers) {
+    private boolean isVideoFormat(String url) {
         try {
             Site site = ApiConfig.get().getSite(key);
             Spider spider = ApiConfig.get().getCSP(site);
             if (spider.manualVideoCheck()) return spider.isVideoFormat(url);
-            return Sniffer.isVideoFormat(url, headers);
+            return Sniffer.isVideoFormat(url);
         } catch (Exception ignored) {
-            return Sniffer.isVideoFormat(url, headers);
+            return Sniffer.isVideoFormat(url);
         }
     }
 
-    private void post(Map<String, String> headers, String url) {
+    private void post(String url) {
+        Map<String, String> headers = new HashMap<>();
         String cookie = CookieManager.getInstance().getCookie(url);
         if (cookie != null) headers.put("cookie", cookie);
         onParseSuccess(headers, url);
@@ -128,8 +126,8 @@ public class CustomWebView extends WebView {
         else callback = null;
     }
 
-    private void onParseSuccess(Map<String, String> news, String url) {
-        if (callback != null) callback.onParseSuccess(news, url, from);
+    private void onParseSuccess(Map<String, String> headers, String url) {
+        if (callback != null) callback.onParseSuccess(headers, url, from);
         App.post(() -> stop(false));
         callback = null;
     }

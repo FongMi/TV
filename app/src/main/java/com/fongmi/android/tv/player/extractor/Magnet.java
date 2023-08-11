@@ -12,6 +12,7 @@ import com.xunlei.downloadlib.parameter.GetTaskId;
 import com.xunlei.downloadlib.parameter.TorrentFileInfo;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -39,7 +40,7 @@ public class Magnet implements Callable<List<Vod.Flag.Episode>> {
         boolean torrent = Sniffer.isTorrent(url);
         List<Vod.Flag.Episode> episodes = new ArrayList<>();
         GetTaskId taskId = XLTaskHelper.get().parse(url, Path.thunder(Util.md5(url)));
-        if (!torrent && !taskId.getRealUrl().startsWith("magnet")) return List.of(Vod.Flag.Episode.create(taskId.getFileName(), taskId.getRealUrl()));
+        if (!torrent && !taskId.getRealUrl().startsWith("magnet")) return Arrays.asList(Vod.Flag.Episode.create(taskId.getFileName(), taskId.getRealUrl()));
         if (torrent) Download.create(url, taskId.getSaveFile()).start();
         else while (XLTaskHelper.get().getTaskInfo(taskId).getTaskStatus() != 2 && time < 5000) sleep();
         List<TorrentFileInfo> medias = XLTaskHelper.get().getTorrentInfo(taskId.getSaveFile()).getMedias();
