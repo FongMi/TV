@@ -2,6 +2,7 @@
 .idea
 *build
 *.jks
+*ore.java
 /local.properties
 /media
 /Release
