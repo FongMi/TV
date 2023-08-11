@@ -46,12 +46,12 @@ public class Util {
 
     public static String scheme(String url) {
         String scheme = Uri.parse(url).getScheme();
-        return scheme == null ? "" : scheme.toLowerCase();
+        return scheme == null ? "" : scheme.toLowerCase().trim();
     }
 
     public static String host(String url) {
         String host = Uri.parse(url).getHost();
-        return host == null ? "" : host.toLowerCase();
+        return host == null ? "" : host.toLowerCase().trim();
     }
 
     public static String md5(String src) {

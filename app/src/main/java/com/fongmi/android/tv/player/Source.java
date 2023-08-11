@@ -36,8 +36,8 @@ public class Source {
     }
 
     public String fetch(String url) throws Exception {
-        String host = Util.host(url).trim();
-        String scheme = Util.scheme(url).trim();
+        String host = Util.host(url);
+        String scheme = Util.scheme(url);
         for (Extractor extractor : extractors) if (extractor.match(scheme, host)) return extractor.fetch(url.trim());
         return url;
     }
