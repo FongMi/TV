@@ -24,7 +24,7 @@ android {
             dimension "default"
             versionCode 204
             versionName "20230811"
-        }
+		}
     }
 
     buildFeatures {
