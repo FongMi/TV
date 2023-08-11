@@ -1,7 +1,6 @@
 package com.fongmi.android.tv;
 
 import com.fongmi.android.tv.bean.Vod;
-import com.fongmi.android.tv.ui.activity.LiveActivity;
 import com.fongmi.android.tv.utils.ResUtil;
 
 public class Product {

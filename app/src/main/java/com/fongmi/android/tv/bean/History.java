@@ -214,7 +214,7 @@ public class History {
     }
 
     public String getSiteName() {
-        return ApiConfig.getSiteName(getSiteKey());
+        return ApiConfig.get().getSite(getSiteKey()).getName();
     }
 
     public String getSiteKey() {

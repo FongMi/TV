@@ -128,8 +128,8 @@ public class CustomWebView extends WebView {
         else callback = null;
     }
 
-    private void onParseSuccess(Map<String, String> news, String url) {
-        if (callback != null) callback.onParseSuccess(news, url, from);
+    private void onParseSuccess(Map<String, String> headers, String url) {
+        if (callback != null) callback.onParseSuccess(headers, url, from);
         App.post(() -> stop(false));
         callback = null;
     }
