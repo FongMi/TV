@@ -21,11 +21,12 @@ public class TVBus implements Source.Extractor, Listener {
     }
 
     private void init(Core core) {
-        App.get().setHook(true);
+        App.get().setHook(core.hook());
         tvcore = new TVCore(core.getSo());
         tvcore.auth(core.getAuth()).broker(core.getBroker());
         tvcore.name(core.getName()).pass(core.getPass());
         tvcore.serv(0).play(8902).mode(1).listener(this);
+        App.get().setHook(false);
         tvcore.init();
     }
 

@@ -150,7 +150,7 @@ public class App extends MultiDexApplication {
     @Override
     public PackageManager getPackageManager() {
         if (!hook) return getBaseContext().getPackageManager();
-        return LiveConfig.get().getHome().getCore().getPackageManager();
+        return LiveConfig.get().getHome().getCore();
     }
 
     @Override

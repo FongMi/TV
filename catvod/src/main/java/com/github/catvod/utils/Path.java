@@ -1,5 +1,6 @@
 package com.github.catvod.utils;
 
+import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
 
@@ -93,6 +94,7 @@ public class Path {
     }
 
     public static File so(String name) {
+        if (name.startsWith("http")) return new File(so(), Uri.parse(name).getLastPathSegment());
         return new File("mitv".equals(name) ? cache() : so(), "lib".concat(name).concat(".so"));
     }
 
