@@ -124,6 +124,7 @@ dependencies {
     leanbackImplementation 'androidx.leanback:leanback:1.2.0-alpha02'
     leanbackImplementation 'me.jessyan:autosize:1.2.1'
     mobileImplementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+    mobileImplementation 'com.github.chrisbanes:PhotoView:2.3.0'
     mobileImplementation 'com.github.devin1014.DLNA-Cast:dlna-dmc:V1.0.0'
     mobileImplementation('com.journeyapps:zxing-android-embedded:4.3.0') { transitive = false }
     annotationProcessor 'androidx.room:room-compiler:2.5.2'

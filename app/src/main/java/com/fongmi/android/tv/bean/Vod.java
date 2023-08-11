@@ -202,8 +202,8 @@ public class Vod {
         return getVodTag().equals("folder");
     }
 
-    public boolean isComic() {
-        return getVodTag().equals("comic");
+    public boolean isManga() {
+        return getVodTag().equals("manga");
     }
 
     public Style getStyle(Style style) {
