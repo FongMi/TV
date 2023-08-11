@@ -148,7 +148,7 @@ public class App extends Application {
     @Override
     public PackageManager getPackageManager() {
         if (!hook) return getBaseContext().getPackageManager();
-        return LiveConfig.get().getHome().getCore().getPackageManager();
+        return LiveConfig.get().getHome().getCore();
     }
 
     @Override
