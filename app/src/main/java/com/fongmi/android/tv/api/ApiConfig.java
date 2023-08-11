@@ -69,10 +69,6 @@ public class ApiConfig {
         return get().getSites().indexOf(get().getHome());
     }
 
-    public static String getSiteName(String key) {
-        return get().getSite(key).getName();
-    }
-
     public static boolean hasParse() {
         return get().getParses().size() > 0;
     }
