@@ -167,7 +167,7 @@ public class SiteViewModel extends ViewModel {
                 Result result = new Result();
                 result.setParse(0);
                 result.setFlag(flag);
-                result.setUrl(Source.get().fetch(result.getUrl()));
+                result.setUrl(Source.get().fetch(id));
                 return result;
             } else {
                 String url = id;

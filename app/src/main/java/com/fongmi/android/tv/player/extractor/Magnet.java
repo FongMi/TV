@@ -51,7 +51,8 @@ public class Magnet implements Callable<List<Vod.Flag.Episode>> {
     public static void addAll(List<Vod.Flag.Episode> items, Future<List<Vod.Flag.Episode>> future) {
         try {
             items.addAll(Vod.Flag.Episode.Sorter.sort(future.get()));
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

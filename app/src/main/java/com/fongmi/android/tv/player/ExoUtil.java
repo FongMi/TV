@@ -37,7 +37,6 @@ import androidx.media3.ui.CaptionStyleCompat;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.bean.Channel;
-import com.fongmi.android.tv.bean.Drm;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Sub;
 import com.fongmi.android.tv.utils.Utils;
@@ -98,28 +97,27 @@ public class ExoUtil {
     }
 
     public static MediaSource getSource(Result result, int errorCode) {
-        return getSource(result.getHeaders(), result.getRealUrl(), result.getFormat(), result.getSubs(), null, errorCode);
+        return getSource(result.getHeaders(), result.getRealUrl(), result.getFormat(), result.getSubs(), errorCode);
     }
 
     public static MediaSource getSource(Channel channel, int errorCode) {
-        return getSource(channel.getHeaders(), channel.getUrl(), null, Collections.emptyList(), channel.getDrm(), errorCode);
+        return getSource(channel.getHeaders(), channel.getUrl(), null, Collections.emptyList(), errorCode);
     }
 
     public static MediaSource getSource(Map<String, String> headers, String url, int errorCode) {
-        return getSource(headers, url, null, Collections.emptyList(), null, errorCode);
+        return getSource(headers, url, null, Collections.emptyList(), errorCode);
     }
 
-    private static MediaSource getSource(Map<String, String> headers, String url, String format, List<Sub> subs, Drm drm, int errorCode) {
+    private static MediaSource getSource(Map<String, String> headers, String url, String format, List<Sub> subs, int errorCode) {
         Uri uri = Uri.parse(url.trim().replace("\\", ""));
         String mimeType = getMimeType(format, errorCode);
         if (uri.getUserInfo() != null) headers.put(HttpHeaders.AUTHORIZATION, "Basic " + Util.base64(uri.getUserInfo()));
-        return new DefaultMediaSourceFactory(getDataSourceFactory(headers), getExtractorsFactory()).createMediaSource(getMediaItem(uri, mimeType, subs, drm));
+        return new DefaultMediaSourceFactory(getDataSourceFactory(headers), getExtractorsFactory()).createMediaSource(getMediaItem(uri, mimeType, subs));
     }
 
-    private static MediaItem getMediaItem(Uri uri, String mimeType, List<Sub> subs, Drm drm) {
+    private static MediaItem getMediaItem(Uri uri, String mimeType, List<Sub> subs) {
         MediaItem.Builder builder = new MediaItem.Builder().setUri(uri);
         if (subs.size() > 0) builder.setSubtitleConfigurations(getSubtitles(subs));
-        if (drm != null) builder.setDrmConfiguration(drm.get());
         if (mimeType != null) builder.setMimeType(mimeType);
         return builder.build();
     }
