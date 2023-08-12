@@ -24,7 +24,6 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
 import com.github.catvod.utils.Json;
-import com.github.catvod.utils.Util;
 import com.google.common.net.HttpHeaders;
 import com.google.gson.JsonParser;
 
@@ -39,36 +38,31 @@ public class ImgUtil {
 
     public static void load(String url, int error, CustomTarget<Drawable> target) {
         if (TextUtils.isEmpty(url)) target.onLoadFailed(ResUtil.getDrawable(error));
-        else Glide.with(App.get()).load(checkUrl(url)).error(error).dontAnimate().into(target);
+        else Glide.with(App.get()).load(getUrl(url)).error(error).dontAnimate().into(target);
     }
 
     public static void load(String url, ImageView view, ImageView.ScaleType scaleType) {
         view.setScaleType(scaleType);
         if (TextUtils.isEmpty(url)) view.setImageResource(R.drawable.ic_img_error);
-        else Glide.with(App.get()).asBitmap().load(checkUrl(url)).skipMemoryCache(true).dontAnimate().sizeMultiplier(Setting.getThumbnail()).signature(new ObjectKey(url + "_" + Setting.getQuality())).placeholder(R.drawable.ic_img_loading).listener(getListener(view, scaleType)).into(view);
+        else Glide.with(App.get()).asBitmap().load(getUrl(url)).skipMemoryCache(true).dontAnimate().sizeMultiplier(Setting.getThumbnail()).signature(new ObjectKey(url + "_" + Setting.getQuality())).placeholder(R.drawable.ic_img_loading).listener(getListener(view, scaleType)).into(view);
     }
 
     public static void loadKeep(String url, ImageView view) {
         view.setScaleType(ImageView.ScaleType.CENTER);
         if (TextUtils.isEmpty(url)) view.setImageResource(R.drawable.ic_img_error);
-        else Glide.with(App.get()).asBitmap().load(checkUrl(url)).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).listener(getListener(view)).into(view);
+        else Glide.with(App.get()).asBitmap().load(getUrl(url)).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).listener(getListener(view)).into(view);
     }
 
     public static void loadHistory(String url, ImageView view) {
         view.setScaleType(ImageView.ScaleType.CENTER);
         if (TextUtils.isEmpty(url)) view.setImageResource(R.drawable.ic_img_error);
-        else Glide.with(App.get()).asBitmap().load(checkUrl(url)).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).listener(getListener(view)).into(view);
+        else Glide.with(App.get()).asBitmap().load(getUrl(url)).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).listener(getListener(view)).into(view);
     }
 
     public static void loadLive(String url, ImageView view) {
         view.setVisibility(TextUtils.isEmpty(url) ? View.GONE : View.VISIBLE);
         if (TextUtils.isEmpty(url)) view.setImageResource(R.drawable.ic_img_empty);
         else Glide.with(App.get()).asBitmap().load(url).skipMemoryCache(true).dontAnimate().signature(new ObjectKey(url)).error(R.drawable.ic_img_empty).into(view);
-    }
-
-    private static Object checkUrl(String url) {
-        if (Util.host(url).contains("doubanio.com") && !url.contains("@")) url = url.concat("@User-Agent=com.douban.frodo");
-        return getUrl(url);
     }
 
     private static Object getUrl(String url) {
