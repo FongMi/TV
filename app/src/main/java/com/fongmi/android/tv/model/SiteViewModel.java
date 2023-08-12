@@ -25,6 +25,7 @@ import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Util;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -71,6 +72,7 @@ public class SiteViewModel extends ViewModel {
             } else if (site.getType() == 4) {
                 ArrayMap<String, String> params = new ArrayMap<>();
                 params.put("filter", "true");
+                params.put("extend", fetchExt(site));
                 String body = OkHttp.newCall(site.getApi(), params).execute().body().string();
                 SpiderDebug.log(body);
                 return Result.fromJson(body);
@@ -157,6 +159,7 @@ public class SiteViewModel extends ViewModel {
                 ArrayMap<String, String> params = new ArrayMap<>();
                 params.put("play", id);
                 params.put("flag", flag);
+                params.put("extend", fetchExt(site));
                 String body = OkHttp.newCall(site.getApi(), params).execute().body().string();
                 SpiderDebug.log(body);
                 Result result = Result.fromJson(body);
@@ -218,6 +221,11 @@ public class SiteViewModel extends ViewModel {
                 return result;
             }
         });
+    }
+
+    private String fetchExt(Site site) throws IOException {
+        if (site.getExt().startsWith("http")) site.setExt(OkHttp.newCall(site.getExt()).execute().body().string());
+        return site.getExt();
     }
 
     private Result fetchPic(Site site, Result result) throws Exception {
