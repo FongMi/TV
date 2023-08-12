@@ -28,10 +28,11 @@ public class VodAdapter extends RecyclerView.Adapter<BaseVodHolder> {
     private Vod.Style style;
     private int[] size;
 
-    public VodAdapter(OnClickListener listener) {
+    public VodAdapter(OnClickListener listener, Vod.Style style, int[] size) {
         this.mListener = listener;
         this.mItems = new ArrayList<>();
-        this.style = Vod.Style.rect();
+        this.style = style;
+        this.size = size;
     }
 
     public interface OnClickListener {
@@ -41,16 +42,8 @@ public class VodAdapter extends RecyclerView.Adapter<BaseVodHolder> {
         boolean onLongClick(Vod item);
     }
 
-    public void setSize(int[] size) {
-        this.size = size;
-    }
-
     public Vod.Style getStyle() {
         return style;
-    }
-
-    public void setStyle(Vod.Style style) {
-        this.style = style;
     }
 
     public boolean isLinear() {
