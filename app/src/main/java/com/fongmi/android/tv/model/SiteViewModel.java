@@ -36,6 +36,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.Response;
+
 public class SiteViewModel extends ViewModel {
 
     public MutableLiveData<Vod.Flag.Episode> episode;
@@ -224,7 +226,10 @@ public class SiteViewModel extends ViewModel {
     }
 
     private String fetchExt(Site site) throws IOException {
-        if (site.getExt().startsWith("http")) site.setExt(OkHttp.newCall(site.getExt()).execute().body().string());
+        if (!site.getExt().startsWith("http")) return site.getExt();
+        Response res = OkHttp.newCall(site.getExt()).execute();
+        if (res.code() != 200) return "";
+        site.setExt(res.body().string());
         return site.getExt();
     }
 
