@@ -151,6 +151,7 @@ public class CastDialog extends BaseDialog implements DeviceAdapter.OnClickListe
 
     @Override
     public void onSuccess(String result) {
+        DLNACastManager.getInstance().play();
         listener.onCastTo();
         dismiss();
     }
@@ -186,10 +187,8 @@ public class CastDialog extends BaseDialog implements DeviceAdapter.OnClickListe
 
     @Override
     public void onItemClick(Device item) {
-        if (item.isDLNA()) {
-            DLNACastManager.getInstance().cast(CastDevice.get().find(item), video);
-            DLNACastManager.getInstance().play();
-        } else OkHttp.newCall(client, item.getIp().concat("/action?do=cast"), body.build()).enqueue(new Callback() {
+        if (item.isDLNA()) DLNACastManager.getInstance().cast(CastDevice.get().find(item), video);
+        else OkHttp.newCall(client, item.getIp().concat("/action?do=cast"), body.build()).enqueue(new Callback() {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 boolean ok = response.body().string().equals("OK");
