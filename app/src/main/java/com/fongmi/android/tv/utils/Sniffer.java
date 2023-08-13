@@ -58,9 +58,13 @@ public class Sniffer {
         return regex;
     }
 
+    public static List<String> getRegex(String key) {
+        for (Rule rule : ApiConfig.get().getRules()) for (String host : rule.getHosts()) if (host.equals(key)) return rule.getRegex();
+        return Collections.emptyList();
+    }
+
     public static List<String> getRegex(Uri uri) {
-        if (uri.getHost() == null) return Collections.emptyList();
-        String hosts = TextUtils.join(",", Arrays.asList(uri.getHost(), uri.getQueryParameter("url")));
+        String hosts = TextUtils.join(",", Arrays.asList(Util.host(uri), Util.host(uri.getQueryParameter("url"))));
         for (Rule rule : ApiConfig.get().getRules()) for (String host : rule.getHosts()) if (hosts.contains(host)) return rule.getRegex();
         return Collections.emptyList();
     }

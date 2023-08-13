@@ -45,7 +45,7 @@ public class Util {
     }
 
     public static String scheme(String url) {
-        return scheme(Uri.parse(url));
+        return url == null ? "" : scheme(Uri.parse(url));
     }
 
     public static String scheme(Uri uri) {
@@ -54,7 +54,7 @@ public class Util {
     }
 
     public static String host(String url) {
-        return host(Uri.parse(url));
+        return url == null ? "" : host(Uri.parse(url));
     }
 
     public static String host(Uri uri) {

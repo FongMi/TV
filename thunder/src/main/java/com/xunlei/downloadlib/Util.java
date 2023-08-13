@@ -2,6 +2,7 @@ package com.xunlei.downloadlib;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class Util {
 
@@ -10,5 +11,10 @@ public class Util {
 
     public static boolean isMedia(String ext) {
         return VIDEO.contains(ext) || AUDIO.contains(ext);
+    }
+
+    public static boolean notAd(List<String> ads, String name) {
+        for (String regex : ads) if (name.contains(regex) || Pattern.compile(regex).matcher(name).find()) return false;
+        return true;
     }
 }
