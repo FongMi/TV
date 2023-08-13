@@ -65,7 +65,7 @@ public class ImgUtil {
         else Glide.with(App.get()).asBitmap().load(url).skipMemoryCache(true).dontAnimate().signature(new ObjectKey(url)).error(R.drawable.ic_img_empty).into(view);
     }
 
-    private static Object getUrl(String url) {
+    public static Object getUrl(String url) {
         String param = null;
         url = Utils.convert(url);
         if (url.startsWith("data:")) return url;
