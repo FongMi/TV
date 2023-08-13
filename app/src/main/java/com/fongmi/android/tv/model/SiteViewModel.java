@@ -73,8 +73,9 @@ public class SiteViewModel extends ViewModel {
                 return result;
             } else if (site.getType() == 4) {
                 ArrayMap<String, String> params = new ArrayMap<>();
+                String extend = fetchExt(site);
                 params.put("filter", "true");
-                params.put("extend", fetchExt(site));
+                if (extend.length() > 0) params.put("extend", extend);
                 String body = OkHttp.newCall(site.getApi(), params).execute().body().string();
                 SpiderDebug.log(body);
                 return Result.fromJson(body);
@@ -159,9 +160,10 @@ public class SiteViewModel extends ViewModel {
                 return result;
             } else if (site.getType() == 4) {
                 ArrayMap<String, String> params = new ArrayMap<>();
+                String extend = fetchExt(site);
                 params.put("play", id);
                 params.put("flag", flag);
-                params.put("extend", fetchExt(site));
+                if (extend.length() > 0) params.put("extend", extend);
                 String body = OkHttp.newCall(site.getApi(), params).execute().body().string();
                 SpiderDebug.log(body);
                 Result result = Result.fromJson(body);
