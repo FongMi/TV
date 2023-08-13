@@ -2,7 +2,6 @@ package com.xunlei.downloadlib;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Pattern;
 
 public class Util {
 
@@ -14,7 +13,7 @@ public class Util {
     }
 
     public static boolean notAd(List<String> ads, String name) {
-        for (String regex : ads) if (name.contains(regex) || Pattern.compile(regex).matcher(name).find()) return false;
+        for (String ad : ads) if (name.contains(ad)) return false;
         return true;
     }
 }
