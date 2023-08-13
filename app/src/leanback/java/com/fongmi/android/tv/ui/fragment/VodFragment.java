@@ -169,7 +169,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         if (mPage != null && mPage.getPosition() > 0) mBinding.recycler.hideHeader();
         if (mPage != null && mPage.getPosition() < 1) mBinding.recycler.showHeader();
         if (mPage != null) mBinding.recycler.setSelectedPosition(mPage.getPosition());
-        else if (mScroller.getPage() == 1 && !mOpen) mBinding.recycler.moveToTop();
+        else if (mScroller.first() && !mOpen) mBinding.recycler.moveToTop();
         mPage = null;
     }
 

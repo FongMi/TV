@@ -138,7 +138,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     private void setAdapter(Result result) {
         int size = result.getList().size();
-        mBinding.progressLayout.showContent(isFolder(), size);
+        mBinding.progressLayout.showContent(mScroller.first(), size);
         mBinding.swipeLayout.setRefreshing(false);
         mScroller.endLoading(result);
         addVideo(result.getList());
@@ -155,7 +155,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     private void checkPosition() {
         if (mPage != null) scrollToPosition(mPage.getPosition());
-        else if (mScroller.getPage() == 1) mBinding.recycler.scrollToPosition(0);
+        else if (mScroller.first()) mBinding.recycler.scrollToPosition(0);
         mPage = null;
     }
 

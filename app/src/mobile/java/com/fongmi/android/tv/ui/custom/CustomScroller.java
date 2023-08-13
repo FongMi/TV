@@ -33,8 +33,8 @@ public class CustomScroller extends RecyclerView.OnScrollListener {
         return ++page;
     }
 
-    public int getPage() {
-        return page;
+    public boolean first() {
+        return page == 1;
     }
 
     public void setPage(int page) {
