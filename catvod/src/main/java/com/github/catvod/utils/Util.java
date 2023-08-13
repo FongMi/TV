@@ -45,12 +45,20 @@ public class Util {
     }
 
     public static String scheme(String url) {
-        String scheme = Uri.parse(url).getScheme();
+        return scheme(Uri.parse(url));
+    }
+
+    public static String scheme(Uri uri) {
+        String scheme = uri.getScheme();
         return scheme == null ? "" : scheme.toLowerCase().trim();
     }
 
     public static String host(String url) {
-        String host = Uri.parse(url).getHost();
+        return host(Uri.parse(url));
+    }
+
+    public static String host(Uri uri) {
+        String host = uri.getHost();
         return host == null ? "" : host.toLowerCase().trim();
     }
 
