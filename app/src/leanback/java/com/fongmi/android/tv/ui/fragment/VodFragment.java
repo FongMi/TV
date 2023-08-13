@@ -169,12 +169,12 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         if (mPage != null && mPage.getPosition() > 0) mBinding.recycler.hideHeader();
         if (mPage != null && mPage.getPosition() < 1) mBinding.recycler.showHeader();
         if (mPage != null) mBinding.recycler.setSelectedPosition(mPage.getPosition());
-        else if (isFolder() && !mOpen) mBinding.recycler.moveToTop();
+        else if (mScroller.getPage() == 1 && !mOpen) mBinding.recycler.moveToTop();
         mPage = null;
     }
 
     private void checkPage(int count) {
-        if (mScroller.isDisable() || count == 0 || mAdapter.size() >= 5 || isFolder()) return;
+        if (mScroller.isDisable() || count == 0 || mAdapter.size() >= 5) return;
         getVideo(getTypeId(), String.valueOf(mScroller.addPage()));
     }
 
@@ -267,7 +267,6 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
 
     @Override
     public void onLoadMore(String page) {
-        if (isFolder()) return;
         mScroller.setLoading(true);
         getVideo(getTypeId(), page);
     }

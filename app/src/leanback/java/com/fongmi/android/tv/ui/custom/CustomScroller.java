@@ -41,6 +41,10 @@ public class CustomScroller extends RecyclerView.OnScrollListener {
         return ++page;
     }
 
+    public int getPage() {
+        return page;
+    }
+
     public boolean isLoading() {
         return loading;
     }
