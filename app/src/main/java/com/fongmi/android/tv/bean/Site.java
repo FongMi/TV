@@ -148,7 +148,7 @@ public class Site {
     }
 
     public void setExt(String ext) {
-        this.ext = ext;
+        this.ext = ext.trim();
     }
 
     public String getJar() {
