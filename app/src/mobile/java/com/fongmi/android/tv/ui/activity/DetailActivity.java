@@ -540,8 +540,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private boolean onChange() {
-        if (isFullscreen()) checkFlag();
-        else checkSearch(true);
+        checkSearch(true);
         return true;
     }
 
