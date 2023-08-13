@@ -122,7 +122,7 @@ public class SiteViewModel extends ViewModel {
                 if (!result.getList().isEmpty()) result.getList().get(0).setVodFlags();
                 if (!result.getList().isEmpty()) checkThunder(result.getList().get(0).getVodFlags());
                 return result;
-            } else if (key.equals("push_agent")) {
+            } else if (site.isEmpty() && key.equals("push_agent")) {
                 Vod vod = new Vod();
                 vod.setVodId(id);
                 vod.setVodName(id);
@@ -170,7 +170,7 @@ public class SiteViewModel extends ViewModel {
                 if (result.getFlag().isEmpty()) result.setFlag(flag);
                 result.setUrl(Source.get().fetch(result.getUrl()));
                 return result;
-            } else if (key.equals("push_agent")) {
+            } else if (site.isEmpty() && key.equals("push_agent")) {
                 Result result = new Result();
                 result.setParse(0);
                 result.setFlag(flag);

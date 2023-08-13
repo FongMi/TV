@@ -210,6 +210,10 @@ public class Site {
         AppDatabase.get().getSiteDao().insertOrUpdate(this);
     }
 
+    public boolean isEmpty() {
+        return getKey().isEmpty() && getName().isEmpty();
+    }
+
     public Site sync() {
         Site item = find(getKey());
         if (item == null) return this;
