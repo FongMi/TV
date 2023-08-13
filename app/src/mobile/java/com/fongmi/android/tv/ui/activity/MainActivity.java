@@ -18,6 +18,7 @@ import com.fongmi.android.tv.api.LiveConfig;
 import com.fongmi.android.tv.api.WallConfig;
 import com.fongmi.android.tv.databinding.ActivityMainBinding;
 import com.fongmi.android.tv.event.RefreshEvent;
+import com.fongmi.android.tv.event.ServerEvent;
 import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.player.Source;
 import com.fongmi.android.tv.server.Server;
@@ -28,6 +29,9 @@ import com.fongmi.android.tv.ui.fragment.SettingPlayerFragment;
 import com.fongmi.android.tv.ui.fragment.VodFragment;
 import com.fongmi.android.tv.utils.Notify;
 import com.google.android.material.navigation.NavigationBarView;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 public class MainActivity extends BaseActivity implements NavigationBarView.OnItemSelectedListener {
 
@@ -129,6 +133,12 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
     public void onRefreshEvent(RefreshEvent event) {
         super.onRefreshEvent(event);
         if (event.getType().equals(RefreshEvent.Type.CONFIG)) setNavigation();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onServerEvent(ServerEvent event) {
+        if (event.getType() != ServerEvent.Type.PUSH) return;
+        DetailActivity.push(this, event.getText());
     }
 
     @Override
