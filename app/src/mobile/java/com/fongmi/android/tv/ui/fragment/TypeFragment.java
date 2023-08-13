@@ -155,12 +155,12 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     private void checkPosition() {
         if (mPage != null) scrollToPosition(mPage.getPosition());
-        else if (isFolder()) mBinding.recycler.scrollToPosition(0);
+        else if (mScroller.getPage() == 1) mBinding.recycler.scrollToPosition(0);
         mPage = null;
     }
 
     private void checkPage(int count) {
-        if (mScroller.isDisable() || count == 0 || mAdapter.getItemCount() >= 40 || isFolder() || isHome()) return;
+        if (mScroller.isDisable() || count == 0 || mAdapter.getItemCount() >= 40 || isHome()) return;
         getVideo(getTypeId(), String.valueOf(mScroller.addPage()));
     }
 
@@ -194,7 +194,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     @Override
     public void onLoadMore(String page) {
-        if (isFolder() || isHome()) return;
+        if (isHome()) return;
         mScroller.setLoading(true);
         getVideo(getTypeId(), page);
     }
