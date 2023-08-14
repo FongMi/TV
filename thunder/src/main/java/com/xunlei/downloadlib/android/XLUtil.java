@@ -34,12 +34,8 @@ public class XLUtil {
         return sb.toString();
     }
 
-    public static GuidInfo getGuid() {
-        GuidInfo guidInfo = new GuidInfo();
-        GuidType guidType = GuidType.DEFAULT;
-        guidInfo.mGuid = getIMEI() + "_" + getMAC();
-        guidInfo.mType = guidType;
-        return guidInfo;
+    public static String getGuid() {
+        return getIMEI() + "_" + getMAC();
     }
 
     public static String getBSSID(Context context) {
@@ -119,19 +115,7 @@ public class XLUtil {
         }
     }
 
-    public enum GuidType {
-        DEFAULT,
-    }
-
     public enum NetWorkCarrier {
-        UNKNOWN,
-        CMCC,
-        CU,
-        CT
-    }
-
-    public static class GuidInfo {
-        public String mGuid = null;
-        public GuidType mType = GuidType.DEFAULT;
+        UNKNOWN, CMCC, CU, CT
     }
 }
