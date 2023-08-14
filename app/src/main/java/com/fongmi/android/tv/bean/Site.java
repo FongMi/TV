@@ -228,6 +228,6 @@ public class Site {
         if (this == obj) return true;
         if (!(obj instanceof Site)) return false;
         Site it = (Site) obj;
-        return getKey().equals(it.getKey());
+        return getKey().equalsIgnoreCase(it.getKey());
     }
 }
