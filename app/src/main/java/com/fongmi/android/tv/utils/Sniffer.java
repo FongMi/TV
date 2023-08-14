@@ -64,6 +64,7 @@ public class Sniffer {
     }
 
     public static List<String> getRegex(Uri uri) {
+        if (uri.getHost() == null) return Collections.emptyList();
         String hosts = TextUtils.join(",", Arrays.asList(Util.host(uri), Util.host(uri.getQueryParameter("url"))));
         for (Rule rule : ApiConfig.get().getRules()) for (String host : rule.getHosts()) if (hosts.contains(host)) return rule.getRegex();
         return Collections.emptyList();
