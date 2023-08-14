@@ -32,6 +32,7 @@ public class Download {
     }
 
     public void start() {
+        if (url.startsWith("file")) return;
         if (callback == null) doInBackground();
         else App.execute(this::doInBackground);
     }

@@ -32,7 +32,7 @@ public class Sniffer {
     }
 
     public static boolean isTorrent(String url) {
-        return url.startsWith("http") && url.endsWith(".torrent");
+        return (url.startsWith("http") || url.startsWith("file")) && url.endsWith(".torrent");
     }
 
     public static boolean isAds(Uri uri) {

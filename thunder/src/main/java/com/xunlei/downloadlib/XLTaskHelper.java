@@ -47,6 +47,7 @@ public class XLTaskHelper {
     }
 
     public synchronized GetTaskId parse(String url, File savePath) {
+        if (url.startsWith("file://")) return new GetTaskId(url, savePath);
         if (url.startsWith("thunder://")) url = getManager().parserThunderUrl(url);
         String fileName = getManager().getFileNameFromUrl(url);
         GetTaskId taskId = new GetTaskId(savePath, fileName, url);
