@@ -41,10 +41,15 @@ public class ImgUtil {
         else Glide.with(App.get()).load(getUrl(url)).error(error).dontAnimate().into(target);
     }
 
+    public static void load(String url, ImageView view, CustomTarget<Bitmap> target) {
+        if (TextUtils.isEmpty(url)) view.setImageResource(R.drawable.ic_img_error);
+        else Glide.with(App.get()).asBitmap().load(getUrl(url)).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).skipMemoryCache(true).dontAnimate().signature(new ObjectKey(url + "_" + Setting.getQuality())).into(target);
+    }
+
     public static void load(String url, ImageView view, ImageView.ScaleType scaleType) {
         view.setScaleType(scaleType);
         if (TextUtils.isEmpty(url)) view.setImageResource(R.drawable.ic_img_error);
-        else Glide.with(App.get()).asBitmap().load(getUrl(url)).skipMemoryCache(true).dontAnimate().sizeMultiplier(Setting.getThumbnail()).signature(new ObjectKey(url + "_" + Setting.getQuality())).placeholder(R.drawable.ic_img_loading).listener(getListener(view, scaleType)).into(view);
+        else Glide.with(App.get()).asBitmap().load(getUrl(url)).placeholder(R.drawable.ic_img_loading).skipMemoryCache(true).dontAnimate().sizeMultiplier(Setting.getThumbnail()).signature(new ObjectKey(url + "_" + Setting.getQuality())).listener(getListener(view, scaleType)).into(view);
     }
 
     public static void loadKeep(String url, ImageView view) {
@@ -62,7 +67,7 @@ public class ImgUtil {
     public static void loadLive(String url, ImageView view) {
         view.setVisibility(TextUtils.isEmpty(url) ? View.GONE : View.VISIBLE);
         if (TextUtils.isEmpty(url)) view.setImageResource(R.drawable.ic_img_empty);
-        else Glide.with(App.get()).asBitmap().load(url).skipMemoryCache(true).dontAnimate().signature(new ObjectKey(url)).error(R.drawable.ic_img_empty).into(view);
+        else Glide.with(App.get()).asBitmap().load(url).error(R.drawable.ic_img_empty).skipMemoryCache(true).dontAnimate().signature(new ObjectKey(url)).into(view);
     }
 
     public static Object getUrl(String url) {
