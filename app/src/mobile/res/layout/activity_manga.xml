@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:keepScreenOn="true">
+
+        <ImageView
+            android:id="@+id/pic"
+            android:layout_width="120dp"
+            android:layout_height="168dp"
+            android:layout_margin="16dp" />
+
+        <LinearLayout
+            android:id="@+id/info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_toEndOf="@+id/pic"
+            android:gravity="center_vertical"
+            android:minHeight="168dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                tools:text="海賊王" />
+
+            <TextView
+                android:id="@+id/author"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:singleLine="true"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                tools:text="尾田榮一郎" />
+
+            <TextView
+                android:id="@+id/site"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:singleLine="true"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                tools:text="漫畫人" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/action"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/info"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="@color/transparent"
+                android:text="@string/keep"
+                app:icon="@drawable/ic_action_keep"
+                app:iconGravity="textTop" />
+
+            <com.google.android.material.button.MaterialButton
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="@color/transparent"
+                android:text="@string/keep"
+                app:icon="@drawable/ic_action_keep"
+                app:iconGravity="textTop" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/action"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:ellipsize="end"
+            android:lineSpacingExtra="4dp"
+            android:maxLines="2"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            tools:text="相傳22年前，在一個童話般的世界裡，曾經擁有一切的海賊王在走上斷頭台的時候對人們狂笑道：“想要我的財寶是嗎，想要就給你們！去找吧，全世界的寶藏都在那裡！”……自此開始，全世界勇敢的男人都離開了平庸的生活，走向了大海，向著埋藏海賊王寶藏的偉大航道挺進！世界簡直成為了大海賊時代！在某個村子的小孩莫奇。 D.路飛對“海賊王”甚為仰慕，立志要成為新一代的海賊王。因此他希望駐紮在村子的海盜團能帶他出海，可是遭船長紅發撒古斯拒絕。有一天路飛不小心偷吃了撒古斯帶來的戰利品－惡魔果實，成為了永遠不能游泳的橡皮人，令他的海盜夢想泡湯。後來路飛被一群討厭撒古斯的人捉了，在被海獸吃掉之際，被撒古斯救走，而撒古斯的手也犧牲了。撒古斯臨行前將草帽送給路飛，使他重燃起當海賊王的決心。事隔十年，苦練一身橡皮絕技的少年路飛揚帆出發，開始找尋One Piece的冒險…… 傳說開始了！ ！大家帶著新的誓言，終到達了“偉大航道”的入口。路飛他們攀山、過海，眼看就要闖進去了，面前郤出現了一個黑團？ ！圍繞著“大秘寶one piece”而展開的海洋冒險故事現在開始！" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/episode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/content"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:stackFromEnd="true" />
+
+    </RelativeLayout>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
