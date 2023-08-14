@@ -508,10 +508,6 @@ public class Vod {
             return getType().equals("oval");
         }
 
-        public boolean isFull() {
-            return getType().equals("full");
-        }
-
         public boolean isList() {
             return getType().equals("list");
         }
@@ -524,8 +520,6 @@ public class Vod {
             switch (getType()) {
                 case "oval":
                     return ViewType.OVAL;
-                case "full":
-                    return ViewType.FULL;
                 case "list":
                     return ViewType.LIST;
                 default:
