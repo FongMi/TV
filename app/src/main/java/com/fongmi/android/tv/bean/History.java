@@ -226,11 +226,11 @@ public class History {
     }
 
     public Vod.Flag getFlag() {
-        return new Vod.Flag(getVodFlag());
+        return Vod.Flag.create(getVodFlag());
     }
 
     public Vod.Flag.Episode getEpisode() {
-        return new Vod.Flag.Episode(getVodRemarks(), getEpisodeUrl());
+        return Vod.Flag.Episode.create(getVodRemarks(), getEpisodeUrl());
     }
 
     public int getSiteVisible() {

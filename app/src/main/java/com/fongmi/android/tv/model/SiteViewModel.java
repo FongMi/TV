@@ -24,6 +24,7 @@ import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Util;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -34,6 +35,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+
+import okhttp3.Response;
 
 public class SiteViewModel extends ViewModel {
 
@@ -70,7 +73,9 @@ public class SiteViewModel extends ViewModel {
                 return result;
             } else if (site.getType() == 4) {
                 LinkedHashMap<String, String> params = new LinkedHashMap<>();
+                String extend = fetchExt(site);
                 params.put("filter", "true");
+                if (extend.length() > 0) params.put("extend", extend);
                 String body = OkHttp.newCall(site.getApi(), params).execute().body().string();
                 SpiderDebug.log(body);
                 return Result.fromJson(body);
@@ -117,7 +122,7 @@ public class SiteViewModel extends ViewModel {
                 if (!result.getList().isEmpty()) result.getList().get(0).setVodFlags();
                 if (!result.getList().isEmpty()) checkThunder(result.getList().get(0).getVodFlags());
                 return result;
-            } else if (key.equals("push_agent")) {
+            } else if (site.isEmpty() && key.equals("push_agent")) {
                 Vod vod = new Vod();
                 vod.setVodId(id);
                 vod.setVodName(id);
@@ -155,15 +160,17 @@ public class SiteViewModel extends ViewModel {
                 return result;
             } else if (site.getType() == 4) {
                 LinkedHashMap<String, String> params = new LinkedHashMap<>();
+                String extend = fetchExt(site);
                 params.put("play", id);
                 params.put("flag", flag);
+                if (extend.length() > 0) params.put("extend", extend);
                 String body = OkHttp.newCall(site.getApi(), params).execute().body().string();
                 SpiderDebug.log(body);
                 Result result = Result.fromJson(body);
                 if (result.getFlag().isEmpty()) result.setFlag(flag);
                 result.setUrl(Source.get().fetch(result.getUrl()));
                 return result;
-            } else if (key.equals("push_agent")) {
+            } else if (site.isEmpty() && key.equals("push_agent")) {
                 Result result = new Result();
                 result.setParse(0);
                 result.setFlag(flag);
@@ -218,6 +225,14 @@ public class SiteViewModel extends ViewModel {
                 return result;
             }
         });
+    }
+
+    private String fetchExt(Site site) throws IOException {
+        if (!site.getExt().startsWith("http")) return site.getExt();
+        Response res = OkHttp.newCall(site.getExt()).execute();
+        if (res.code() != 200) return "";
+        site.setExt(res.body().string());
+        return site.getExt();
     }
 
     private Result fetchPic(Site site, Result result) throws Exception {

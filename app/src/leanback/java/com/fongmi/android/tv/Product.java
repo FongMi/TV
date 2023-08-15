@@ -14,9 +14,7 @@ public class Product {
     }
 
     public static int getColumn(Vod.Style style) {
-        if (style.isLand()) return getColumn() - 1;
-        if (style.isFull()) return 3;
-        return getColumn();
+        return style.isLand() ? getColumn() - 1 : getColumn();
     }
 
     public static int[] getSpec(Vod.Style style) {

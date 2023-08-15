@@ -148,7 +148,7 @@ public class Site {
     }
 
     public void setExt(String ext) {
-        this.ext = ext;
+        this.ext = ext.trim();
     }
 
     public String getJar() {
@@ -208,6 +208,10 @@ public class Site {
 
     public void save() {
         AppDatabase.get().getSiteDao().insertOrUpdate(this);
+    }
+
+    public boolean isEmpty() {
+        return getKey().isEmpty() && getName().isEmpty();
     }
 
     public Site sync() {

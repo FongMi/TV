@@ -23,7 +23,7 @@ android {
         leanback {
             dimension "default"
             versionCode 204
-            versionName "20230811"
+            versionName "20230815#2"
         }
     }
 

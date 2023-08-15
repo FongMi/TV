@@ -573,8 +573,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onChange() {
-        if (isFullscreen()) checkFlag();
-        else checkSearch(true);
+        checkSearch(true);
     }
 
     private void onLoop() {

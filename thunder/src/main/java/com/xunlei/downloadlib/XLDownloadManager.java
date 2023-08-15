@@ -40,7 +40,7 @@ public class XLDownloadManager {
     }
 
     public void init() {
-        InitParam param = new InitParam(context.getFilesDir().getAbsolutePath());
+        InitParam param = new InitParam(context.getFilesDir().getPath());
         loader.init(param.getSoKey(), "com.android.providers.downloads", param.mAppVersion, "", getPeerId(), getGuid(), param.mStatSavePath, param.mStatCfgSavePath, XLUtil.getNetworkType(context), param.mPermissionLevel, param.mQueryConfOnInit);
         getDownloadLibVersion(new GetDownloadLibVersion());
         setOSVersion(Build.VERSION.INCREMENTAL + "_alpha");
@@ -86,7 +86,7 @@ public class XLDownloadManager {
     }
 
     private String getGuid() {
-        return XLUtil.getGuid().mGuid;
+        return XLUtil.getGuid();
     }
 
     public void releaseTask(long taskId) {
