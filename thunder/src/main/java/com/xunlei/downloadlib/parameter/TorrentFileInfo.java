@@ -2,6 +2,8 @@ package com.xunlei.downloadlib.parameter;
 
 import android.text.TextUtils;
 
+import com.github.catvod.utils.Util;
+
 import java.io.File;
 
 public class TorrentFileInfo {
@@ -18,6 +20,10 @@ public class TorrentFileInfo {
         return TextUtils.isEmpty(mFileName) ? "" : mFileName;
     }
 
+    public long getFileSize() {
+        return mFileSize;
+    }
+
     public int getFileIndex() {
         return mFileIndex;
     }
@@ -29,6 +35,10 @@ public class TorrentFileInfo {
     public TorrentFileInfo file(File file) {
         this.mFile = file;
         return this;
+    }
+
+    public String getSize() {
+        return Util.size(mFileSize);
     }
 
     public String getPlayUrl() {
