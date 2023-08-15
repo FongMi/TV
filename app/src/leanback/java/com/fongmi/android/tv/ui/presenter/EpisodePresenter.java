@@ -36,10 +36,10 @@ public class EpisodePresenter extends Presenter {
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object object) {
         Vod.Flag.Episode item = (Vod.Flag.Episode) object;
         ViewHolder holder = (ViewHolder) viewHolder;
-        holder.binding.text.setText(item.getName());
         holder.binding.text.setMaxEms(Product.getEms());
         holder.binding.text.setNextFocusDownId(nextFocus);
         holder.binding.text.setActivated(item.isActivated());
+        holder.binding.text.setText(item.getDesc().concat(item.getName()));
         setOnClickListener(holder, view -> mListener.onItemClick(item));
     }
 
