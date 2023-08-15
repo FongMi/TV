@@ -137,29 +137,29 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     }
 
     private void setAdapter(Result result) {
+        boolean first = mScroller.first();
         int size = result.getList().size();
-        mBinding.progressLayout.showContent(mScroller.first(), size);
+        mBinding.progressLayout.showContent(first, size);
         mBinding.swipeLayout.setRefreshing(false);
+        if (size > 0) addVideo(result);
         mScroller.endLoading(result);
-        addVideo(result.getList());
-        checkPosition();
-        checkPage(size);
+        checkPosition(first);
+        checkMore(size);
     }
 
-    private void addVideo(List<Vod> items) {
-        if (items.isEmpty()) return;
-        Vod.Style style = items.get(0).getStyle(getStyle());
+    private void addVideo(Result result) {
+        Vod.Style style = result.getList().get(0).getStyle(getStyle());
         if (!style.equals(mAdapter.getStyle())) setStyle(style);
-        mAdapter.addAll(items);
+        mAdapter.addAll(result.getList());
     }
 
-    private void checkPosition() {
+    private void checkPosition(boolean first) {
         if (mPage != null) scrollToPosition(mPage.getPosition());
-        else if (mScroller.first()) mBinding.recycler.scrollToPosition(0);
+        else if (first) mBinding.recycler.scrollToPosition(0);
         mPage = null;
     }
 
-    private void checkPage(int count) {
+    private void checkMore(int count) {
         if (mScroller.isDisable() || count == 0 || mAdapter.getItemCount() >= 40 || isHome()) return;
         getVideo(getTypeId(), String.valueOf(mScroller.addPage()));
     }

@@ -22,6 +22,7 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Filter;
 import com.fongmi.android.tv.bean.Page;
+import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.FragmentVodBinding;
@@ -127,11 +128,12 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mViewModel.result.observe(getViewLifecycleOwner(), result -> {
+            boolean first = mScroller.first();
             int size = result.getList().size();
+            if (size > 0) addVideo(result);
             mScroller.endLoading(result);
-            addVideo(result.getList());
-            checkPosition();
-            checkPage(size);
+            checkPosition(first);
+            checkMore(size);
             hideProgress();
         });
     }
@@ -158,22 +160,21 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         mViewModel.categoryContent(getKey(), typeId, page, true, mExtends);
     }
 
-    private void addVideo(List<Vod> items) {
-        if (items.isEmpty()) return;
-        Vod.Style style = items.get(0).getStyle(getStyle());
-        if (style.isList()) mAdapter.addAll(mAdapter.size(), items);
-        else addGrid(items, style);
+    private void addVideo(Result result) {
+        Vod.Style style = result.getList().get(0).getStyle(getStyle());
+        if (style.isList()) mAdapter.addAll(mAdapter.size(), result.getList());
+        else addGrid(result.getList(), style);
     }
 
-    private void checkPosition() {
+    private void checkPosition(boolean first) {
         if (mPage != null && mPage.getPosition() > 0) mBinding.recycler.hideHeader();
         if (mPage != null && mPage.getPosition() < 1) mBinding.recycler.showHeader();
         if (mPage != null) mBinding.recycler.setSelectedPosition(mPage.getPosition());
-        else if (mScroller.first() && !mOpen) mBinding.recycler.moveToTop();
+        else if (first && !mOpen) mBinding.recycler.moveToTop();
         mPage = null;
     }
 
-    private void checkPage(int count) {
+    private void checkMore(int count) {
         if (mScroller.isDisable() || count == 0 || mAdapter.size() >= 5) return;
         getVideo(getTypeId(), String.valueOf(mScroller.addPage()));
     }
