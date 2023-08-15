@@ -105,10 +105,10 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
         }
 
         void initView(TextView view, Vod.Flag.Episode item, boolean ems) {
-            view.setText(item.getName());
             view.setSelected(item.isActivated());
             view.setActivated(item.isActivated());
             if (ems) view.setMaxEms(Product.getEms());
+            view.setText(item.getDesc().concat(item.getName()));
             view.setOnClickListener(v -> mListener.onItemClick(item));
         }
     }

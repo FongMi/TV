@@ -89,7 +89,8 @@ public class Vod {
     private Site site;
 
     public static List<Vod> arrayFrom(String str) {
-        Type listType = new TypeToken<List<Vod>>() {}.getType();
+        Type listType = new TypeToken<List<Vod>>() {
+        }.getType();
         List<Vod> items = new Gson().fromJson(str, listType);
         return items == null ? Collections.emptyList() : items;
     }
@@ -231,11 +232,11 @@ public class Vod {
         String[] playUrls = getVodPlayUrl().split("\\$\\$\\$");
         for (int i = 0; i < playFlags.length; i++) {
             if (playFlags[i].isEmpty() || i >= playUrls.length) continue;
-            Vod.Flag item = new Vod.Flag(playFlags[i].trim());
+            Flag item = Flag.create(playFlags[i].trim());
             item.createEpisode(playUrls[i]);
             getVodFlags().add(item);
         }
-        for (Vod.Flag item : getVodFlags()) {
+        for (Flag item : getVodFlags()) {
             if (item.getUrls() == null) continue;
             item.createEpisode(item.getUrls());
         }
@@ -264,6 +265,10 @@ public class Vod {
 
         private boolean activated;
         private int position;
+
+        public static Flag create(String flag) {
+            return new Flag(flag);
+        }
 
         public Flag() {
             this.episodes = new ArrayList<>();
@@ -348,7 +353,7 @@ public class Vod {
         }
 
         public static List<Flag> create(String flag, String name, String url) {
-            Vod.Flag item = new Vod.Flag(flag);
+            Flag item = Flag.create(flag);
             item.getEpisodes().add(Episode.create(name, url));
             return List.of(item);
         }
@@ -371,6 +376,8 @@ public class Vod {
 
             @SerializedName("name")
             private String name;
+            @SerializedName("desc")
+            private String desc;
             @SerializedName("url")
             private String url;
 
@@ -378,7 +385,11 @@ public class Vod {
             private boolean activated;
 
             public static Episode create(String name, String url) {
-                return new Episode(name, url);
+                return new Episode(name, "", url);
+            }
+
+            public static Episode create(String name, String desc, String url) {
+                return new Episode(name, desc, url);
             }
 
             public static Episode objectFrom(String str) {
@@ -391,9 +402,10 @@ public class Vod {
                 return items == null ? Collections.emptyList() : items;
             }
 
-            public Episode(String name, String url) {
+            public Episode(String name, String desc, String url) {
                 this.number = Utils.getDigit(name);
                 this.name = Trans.s2t(name);
+                this.desc = Trans.s2t(desc);
                 this.url = url;
             }
 
@@ -403,6 +415,10 @@ public class Vod {
 
             public void setName(String name) {
                 this.name = name;
+            }
+
+            public String getDesc() {
+                return desc;
             }
 
             public String getUrl() {

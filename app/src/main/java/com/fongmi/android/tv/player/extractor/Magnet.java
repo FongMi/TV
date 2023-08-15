@@ -45,7 +45,7 @@ public class Magnet implements Callable<List<Vod.Flag.Episode>> {
         if (torrent) Download.create(url, taskId.getSaveFile()).start();
         else while (XLTaskHelper.get().getTaskInfo(taskId).getTaskStatus() != 2 && time < 5000) sleep();
         List<TorrentFileInfo> medias = XLTaskHelper.get().getTorrentInfo(taskId.getSaveFile()).getMedias(ads);
-        for (TorrentFileInfo media : medias) episodes.add(Vod.Flag.Episode.create(media.getFileName(), media.getPlayUrl()));
+        for (TorrentFileInfo media : medias) episodes.add(Vod.Flag.Episode.create(media.getFileName(), media.getSize(), media.getPlayUrl()));
         XLTaskHelper.get().stopTask(taskId);
         return episodes;
     }

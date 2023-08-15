@@ -13,9 +13,12 @@ import java.io.FileInputStream;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 
 public class Util {
+
+    public static final String[] UNITS = new String[]{"bytes", "KB", "MB", "GB", "TB"};
 
     public static String getDeviceId() {
         return Settings.Secure.getString(Init.context().getContentResolver(), Settings.Secure.ANDROID_ID);
@@ -102,5 +105,11 @@ public class Util {
         } catch (Exception e) {
             return 0;
         }
+    }
+
+    public static String size(long size) {
+        if (size <= 0) return "";
+        int group = (int) (Math.log10(size) / Math.log10(1024));
+        return "[" + new DecimalFormat("###0.#").format(size / Math.pow(1024, group)) + " " + UNITS[group] + "] ";
     }
 }
