@@ -40,8 +40,8 @@ import com.fongmi.android.tv.ui.custom.dialog.LinkDialog;
 import com.fongmi.android.tv.ui.custom.dialog.ReceiveDialog;
 import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
 import com.fongmi.android.tv.utils.FileChooser;
-import com.fongmi.android.tv.utils.Trans;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.Trans;
 import com.google.common.net.HttpHeaders;
 
 import org.greenrobot.eventbus.EventBus;
