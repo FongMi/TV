@@ -262,6 +262,7 @@ public class ApiConfig {
 
     public List<Doh> getDoh() {
         List<Doh> items = Doh.get(App.get());
+        if (doh == null) return items;
         items.removeAll(doh);
         items.addAll(doh);
         return items;
