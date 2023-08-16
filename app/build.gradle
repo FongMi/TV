@@ -21,12 +21,12 @@ android {
         leanback {
             dimension "mode"
             versionCode 204
-            versionName "20230816"
+            versionName "20230816#2"
         }
         mobile {
             dimension "mode"
             versionCode 204
-            versionName "20230816"
+            versionName "20230816#2"
         }
         java {
             dimension "api"
@@ -104,6 +104,7 @@ dependencies {
     implementation project(':media-lib-session')
     implementation project(':media-lib-ui')
     implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.biometric:biometric:1.1.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.5.1'
     implementation 'androidx.room:room-runtime:2.5.2'
     implementation 'cat.ereza:customactivityoncrash:2.4.0'

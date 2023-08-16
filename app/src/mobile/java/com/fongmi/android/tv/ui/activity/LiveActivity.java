@@ -48,6 +48,7 @@ import com.fongmi.android.tv.ui.custom.dialog.CastDialog;
 import com.fongmi.android.tv.ui.custom.dialog.LiveDialog;
 import com.fongmi.android.tv.ui.custom.dialog.PassDialog;
 import com.fongmi.android.tv.ui.custom.dialog.TrackDialog;
+import com.fongmi.android.tv.utils.Biometric;
 import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.PiP;
@@ -71,7 +72,7 @@ import okhttp3.Call;
 import okhttp3.Response;
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class LiveActivity extends BaseActivity implements CustomKeyDownLive.Listener, CastDialog.Listener, PiPReceiver.Listener, TrackDialog.Listener, PassCallback, LiveCallback, GroupAdapter.OnClickListener, ChannelAdapter.OnClickListener {
+public class LiveActivity extends BaseActivity implements CustomKeyDownLive.Listener, CastDialog.Listener, PiPReceiver.Listener, TrackDialog.Listener, Biometric.Callback, PassCallback, LiveCallback, GroupAdapter.OnClickListener, ChannelAdapter.OnClickListener {
 
     private ChannelAdapter mChannelAdapter;
     private ActivityLiveBinding mBinding;
@@ -451,7 +452,8 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mChannelAdapter.setSelected(item.getPosition());
         mBinding.channel.scrollToPosition(Math.max(item.getPosition(), 0));
         if (!item.isKeep() || ++count < 5 || mHides.isEmpty()) return;
-        PassDialog.create().show(this);
+        if (Biometric.enable()) Biometric.show(this);
+        else PassDialog.create().show(this);
         resetPass();
     }
 
@@ -555,11 +557,20 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
 
     @Override
     public void setPass(String pass) {
+        unlock(pass);
+    }
+
+    @Override
+    public void onBiometricSuccess() {
+        unlock(null);
+    }
+
+    private void unlock(String pass) {
         boolean first = true;
         Iterator<Group> iterator = mHides.iterator();
         while (iterator.hasNext()) {
             Group item = iterator.next();
-            if (!item.getPass().equals(pass)) continue;
+            if (pass != null && !pass.equals(item.getPass())) continue;
             mGroupAdapter.add(item);
             if (first) onItemClick(item);
             iterator.remove();
