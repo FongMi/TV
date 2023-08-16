@@ -460,7 +460,6 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         int timeout = getSite().isChangeable() ? Constant.TIMEOUT_PLAY : -1;
         mPlayers.start(result, isUseParse(), timeout);
         mBinding.swipeLayout.setRefreshing(false);
-        Notify.show(result.getMsg());
     }
 
     @Override

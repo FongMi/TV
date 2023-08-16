@@ -61,8 +61,6 @@ public class Result {
     private List<Sub> subs;
     @SerializedName("pagecount")
     private int pagecount;
-    @SerializedName("error")
-    private boolean error;
     @SerializedName("msg")
     private String msg;
 
@@ -105,7 +103,6 @@ public class Result {
 
     public static Result error(String msg) {
         Result result = new Result();
-        result.setError(true);
         result.setMsg(msg);
         return result;
     }
@@ -222,20 +219,16 @@ public class Result {
         return pagecount;
     }
 
-    public boolean isError() {
-        return error;
-    }
-
-    public void setError(boolean error) {
-        this.error = error;
-    }
-
     public String getMsg() {
-        return msg;
+        return TextUtils.isEmpty(msg) ? "" : msg;
     }
 
     public void setMsg(String msg) {
         this.msg = msg;
+    }
+
+    public boolean hasMsg() {
+        return !TextUtils.isEmpty(getMsg());
     }
 
     public String getRealUrl() {

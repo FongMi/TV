@@ -301,7 +301,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     public void start(Result result, boolean useParse, int timeout) {
-        if (result.isError()) {
+        if (result.hasMsg()) {
             ErrorEvent.extract(result.getMsg());
         } else if (result.getUrl().isEmpty()) {
             ErrorEvent.url();
