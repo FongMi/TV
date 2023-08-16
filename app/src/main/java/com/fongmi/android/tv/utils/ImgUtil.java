@@ -79,7 +79,8 @@ public class ImgUtil {
         if (url.contains("@Cookie=")) builder.addHeader(HttpHeaders.COOKIE, param = url.split("@Cookie=")[1].split("@")[0]);
         if (url.contains("@Referer=")) builder.addHeader(HttpHeaders.REFERER, param = url.split("@Referer=")[1].split("@")[0]);
         if (url.contains("@User-Agent=")) builder.addHeader(HttpHeaders.USER_AGENT, param = url.split("@User-Agent=")[1].split("@")[0]);
-        return new GlideUrl(param == null ? url : url.split("@")[0], builder.build());
+        url = param == null ? url : url.split("@")[0];
+        return TextUtils.isEmpty(url) ? null : new GlideUrl(url, builder.build());
     }
 
     private static void addHeader(LazyHeaders.Builder builder, String header) {
