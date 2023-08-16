@@ -1,4 +1,4 @@
-package com.fongmi.android.tv.utils;
+package com.github.catvod.utils;
 
 import android.text.TextUtils;
 
@@ -51,10 +51,18 @@ public class Trans {
     }
 
     public static String s2t(String text) {
-        return pass() ? text : get().get(text, get().s2t);
+        return s2t(pass(), text);
     }
 
     public static String t2s(String text) {
-        return pass() ? text : get().get(text, get().t2s);
+        return t2s(pass(), text);
+    }
+
+    public static String s2t(boolean pass, String text) {
+        return pass ? text : get().get(text, get().s2t);
+    }
+
+    public static String t2s(boolean pass, String text) {
+        return pass ? text : get().get(text, get().t2s);
     }
 }

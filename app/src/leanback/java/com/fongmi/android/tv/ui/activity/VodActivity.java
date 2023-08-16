@@ -28,7 +28,7 @@ import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.fragment.VodFragment;
 import com.fongmi.android.tv.ui.presenter.TypePresenter;
 import com.fongmi.android.tv.utils.ResUtil;
-import com.fongmi.android.tv.utils.Trans;
+import com.github.catvod.utils.Trans;
 import com.fongmi.android.tv.utils.Utils;
 
 import java.util.ArrayList;

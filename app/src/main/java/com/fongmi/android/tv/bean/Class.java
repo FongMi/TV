@@ -2,7 +2,7 @@ package com.fongmi.android.tv.bean;
 
 import android.text.TextUtils;
 
-import com.fongmi.android.tv.utils.Trans;
+import com.github.catvod.utils.Trans;
 import com.google.gson.annotations.SerializedName;
 
 import org.simpleframework.xml.Attribute;

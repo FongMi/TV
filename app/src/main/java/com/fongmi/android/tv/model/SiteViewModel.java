@@ -19,7 +19,7 @@ import com.fongmi.android.tv.player.Source;
 import com.fongmi.android.tv.player.extractor.Magnet;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Sniffer;
-import com.fongmi.android.tv.utils.Trans;
+import com.github.catvod.utils.Trans;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.OkHttp;
