@@ -25,6 +25,7 @@ public class VodListHolder extends BaseVodHolder {
     public void initView(Vod item) {
         binding.name.setText(item.getVodName());
         binding.remark.setText(item.getVodRemarks());
+        binding.name.setVisibility(item.getNameVisible());
         binding.remark.setVisibility(item.getRemarkVisible());
         binding.getRoot().setOnClickListener(v -> listener.onItemClick(item));
         binding.getRoot().setOnLongClickListener(v -> listener.onLongClick(item));

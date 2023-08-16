@@ -61,8 +61,9 @@ public class Result {
     private List<Sub> subs;
     @SerializedName("pagecount")
     private int pagecount;
-
+    @SerializedName("error")
     private boolean error;
+    @SerializedName("msg")
     private String msg;
 
     public static Result fromJson(String str) {

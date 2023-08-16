@@ -195,6 +195,10 @@ public class Vod {
         return getSite() != null || getVodYear().length() < 4 ? View.GONE : View.VISIBLE;
     }
 
+    public int getNameVisible() {
+        return getVodName().isEmpty() ? View.GONE : View.VISIBLE;
+    }
+
     public int getRemarkVisible() {
         return getVodRemarks().isEmpty() ? View.GONE : View.VISIBLE;
     }
