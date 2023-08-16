@@ -388,6 +388,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mBinding.swipeLayout.setRefreshing(false);
         if (result.getList().isEmpty()) setEmpty();
         else setDetail(result.getList().get(0));
+        Notify.show(result.getMsg());
     }
 
     private void setEmpty() {
@@ -459,6 +460,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         int timeout = getSite().isChangeable() ? Constant.TIMEOUT_PLAY : -1;
         mPlayers.start(result, isUseParse(), timeout);
         mBinding.swipeLayout.setRefreshing(false);
+        Notify.show(result.getMsg());
     }
 
     @Override
