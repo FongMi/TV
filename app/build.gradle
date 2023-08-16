@@ -21,12 +21,12 @@ android {
         leanback {
             dimension "mode"
             versionCode 204
-            versionName "20230815#2"
+            versionName "20230816"
         }
         mobile {
             dimension "mode"
             versionCode 204
-            versionName "20230815#2"
+            versionName "20230816"
         }
         java {
             dimension "api"
@@ -69,8 +69,7 @@ android {
     }
 
     android.applicationVariants.all { variant ->
-        variant.outputs.all { output ->
-            outputFileName = "${variant.productFlavors[0].name}-${variant.productFlavors[1].name}-${variant.productFlavors[2].name}.apk"
+        variant.outputs.all { output -> outputFileName = "${variant.productFlavors[0].name}-${variant.productFlavors[1].name}-${variant.productFlavors[2].name}.apk"
         }
     }
 
