@@ -8,7 +8,9 @@ import com.fongmi.android.tv.gson.FilterAdapter;
 import com.fongmi.android.tv.gson.UrlAdapter;
 import com.github.catvod.utils.Json;
 import com.github.catvod.utils.Trans;
+import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
@@ -19,6 +21,7 @@ import org.simpleframework.xml.Path;
 import org.simpleframework.xml.Root;
 import org.simpleframework.xml.core.Persister;
 
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -39,9 +42,7 @@ public class Result {
     private List<Vod> list;
 
     @SerializedName("filters")
-    @JsonAdapter(FilterAdapter.class)
     private LinkedHashMap<String, List<Filter>> filters;
-
     @SerializedName("header")
     private JsonElement header;
     @SerializedName("playUrl")
@@ -78,7 +79,9 @@ public class Result {
 
     public static Result fromJson(String str) {
         try {
-            Result result = objectFrom(str);
+            Type type = new TypeToken<LinkedHashMap<String, List<Filter>>>() {}.getType();
+            Gson gson = new GsonBuilder().registerTypeAdapter(type, new FilterAdapter()).create();
+            Result result = gson.fromJson(str, Result.class);
             return result == null ? empty() : result.trans();
         } catch (Exception e) {
             return empty();
