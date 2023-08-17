@@ -169,11 +169,16 @@ public class ApiConfig {
 
     private void initSite(JsonObject object) {
         for (JsonElement element : Json.safeListElement(object, "sites")) {
-            Site site = Site.objectFrom(element).sync();
+            Site site = Site.objectFrom(element);
+            if (sites.contains(site)) continue;
             site.setApi(parseApi(site.getApi()));
             site.setExt(parseExt(site.getExt()));
-            if (site.getKey().equals(config.getHome())) setHome(site);
-            if (!sites.contains(site)) sites.add(site);
+            sites.add(site.sync());
+        }
+        for (Site site : sites) {
+            if (site.getKey().equals(config.getHome())) {
+                setHome(site);
+            }
         }
     }
 
