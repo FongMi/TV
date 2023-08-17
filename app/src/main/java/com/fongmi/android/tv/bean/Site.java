@@ -114,7 +114,7 @@ public class Site {
     }
 
     public Integer getTimeout() {
-        return timeout == null ? Constant.TIMEOUT_PLAY : timeout;
+        return timeout == null ? Constant.TIMEOUT_PLAY : Math.max(timeout, 1) * 1000;
     }
 
     public int getPlayerType() {

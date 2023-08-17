@@ -11,7 +11,6 @@ import androidx.media3.exoplayer.analytics.AnalyticsListener;
 import androidx.media3.ui.PlayerView;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.bean.Channel;
@@ -74,7 +73,6 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         decode = Setting.getDecode();
         builder = new StringBuilder();
         runnable = ErrorEvent::timeout;
-        timeout = Constant.TIMEOUT_PLAY;
         formatter = new Formatter(builder, Locale.getDefault());
         return this;
     }
@@ -292,10 +290,11 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         }
     }
 
-    public void start(Channel channel) {
+    public void start(Channel channel, int timeout) {
         if (channel.getUrl().isEmpty()) {
             ErrorEvent.url();
         } else {
+            this.timeout = timeout;
             setMediaSource(channel);
         }
     }

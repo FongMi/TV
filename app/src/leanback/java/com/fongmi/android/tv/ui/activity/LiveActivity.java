@@ -213,7 +213,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(LiveViewModel.class);
-        mViewModel.channel.observe(this, result -> mPlayers.start(result));
+        mViewModel.channel.observe(this, result -> mPlayers.start(result, getHome().getTimeout()));
         mViewModel.live.observe(this, live -> {
             hideProgress();
             setGroup(live);
