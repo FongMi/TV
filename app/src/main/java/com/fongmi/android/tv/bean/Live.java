@@ -174,6 +174,6 @@ public class Live {
         if (this == obj) return true;
         if (!(obj instanceof Live)) return false;
         Live it = (Live) obj;
-        return getName().equals(it.getName()) && getUrl().equals(it.getUrl());
+        return getName().equals(it.getName());
     }
 }
