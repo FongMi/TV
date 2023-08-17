@@ -457,7 +457,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         setUseParse(ApiConfig.hasParse() && ((result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx() == 1));
         if (mControlDialog != null && mControlDialog.isVisible()) mControlDialog.setParseVisible(isUseParse());
         mBinding.control.parse.setVisibility(isFullscreen() && isUseParse() ? View.VISIBLE : View.GONE);
-        int timeout = getSite().isChangeable() ? Constant.TIMEOUT_PLAY : -1;
+        int timeout = getSite().isChangeable() ? getSite().getTimeout() : -1;
         mPlayers.start(result, isUseParse(), timeout);
         mBinding.swipeLayout.setRefreshing(false);
     }

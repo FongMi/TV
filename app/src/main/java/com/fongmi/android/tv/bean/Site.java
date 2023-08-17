@@ -6,15 +6,18 @@ import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.db.AppDatabase;
-import com.fongmi.android.tv.gson.StringAdapter;
+import com.fongmi.android.tv.gson.ExtAdapter;
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.Collections;
 import java.util.List;
 
-@Entity(ignoredColumns = {"type", "api", "playUrl", "playerType", "ext", "jar", "style", "categories"})
+@Entity(ignoredColumns = {"type", "api", "playUrl", "timeout", "playerType", "ext", "jar", "style", "categories"})
 public class Site {
 
     @NonNull
@@ -29,6 +32,8 @@ public class Site {
     private String api;
     @SerializedName("playUrl")
     private String playUrl;
+    @SerializedName("timeout")
+    private Integer timeout;
     @SerializedName("playerType")
     private Integer playerType;
     @SerializedName("searchable")
@@ -39,6 +44,7 @@ public class Site {
     private Integer changeable;
     @SerializedName("recordable")
     private Integer recordable;
+    @JsonAdapter(ExtAdapter.class)
     @SerializedName("ext")
     private String ext;
     @SerializedName("jar")
@@ -52,7 +58,7 @@ public class Site {
 
     public static Site objectFrom(JsonElement element) {
         try {
-            return StringAdapter.gson().fromJson(element, Site.class);
+            return new Gson().fromJson(element, Site.class);
         } catch (Exception e) {
             return new Site();
         }
@@ -105,6 +111,10 @@ public class Site {
 
     public String getPlayUrl() {
         return TextUtils.isEmpty(playUrl) ? "" : playUrl;
+    }
+
+    public Integer getTimeout() {
+        return timeout == null ? Constant.TIMEOUT_PLAY : timeout;
     }
 
     public int getPlayerType() {

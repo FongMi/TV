@@ -361,7 +361,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mViewModel.player.observe(this, result -> {
             setUseParse(ApiConfig.hasParse() && ((result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx() == 1));
             mBinding.control.parse.setVisibility(isUseParse() ? View.VISIBLE : View.GONE);
-            int timeout = getSite().isChangeable() ? Constant.TIMEOUT_PLAY : -1;
+            int timeout = getSite().isChangeable() ? getSite().getTimeout() : -1;
             mPlayers.start(result, isUseParse(), timeout);
         });
         mViewModel.result.observe(this, result -> {

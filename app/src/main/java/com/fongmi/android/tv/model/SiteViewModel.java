@@ -153,7 +153,7 @@ public class SiteViewModel extends ViewModel {
                 String playerContent = spider.playerContent(flag, id, ApiConfig.get().getFlags());
                 SpiderDebug.log(playerContent);
                 ApiConfig.get().setRecent(site);
-                Result result = Result.objectFrom(playerContent);
+                Result result = Result.fromJson(playerContent);
                 if (result.getFlag().isEmpty()) result.setFlag(flag);
                 result.setUrl(Source.get().fetch(result.getUrl()));
                 result.setKey(key);

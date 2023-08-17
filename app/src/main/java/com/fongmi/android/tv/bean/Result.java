@@ -5,10 +5,12 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 
 import com.fongmi.android.tv.gson.FilterAdapter;
-import com.github.catvod.utils.Trans;
+import com.fongmi.android.tv.gson.UrlAdapter;
 import com.github.catvod.utils.Json;
+import com.github.catvod.utils.Trans;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 
 import org.json.JSONObject;
@@ -37,6 +39,7 @@ public class Result {
     private List<Vod> list;
 
     @SerializedName("filters")
+    @JsonAdapter(FilterAdapter.class)
     private LinkedHashMap<String, List<Filter>> filters;
 
     @SerializedName("header")
@@ -54,6 +57,7 @@ public class Result {
     @SerializedName("format")
     private String format;
     @SerializedName("url")
+    @JsonAdapter(UrlAdapter.class)
     private String url;
     @SerializedName("key")
     private String key;
@@ -64,9 +68,17 @@ public class Result {
     @SerializedName("msg")
     private String msg;
 
+    public static Result objectFrom(String str) {
+        try {
+            return new Gson().fromJson(str, Result.class);
+        } catch (Exception e) {
+            return empty();
+        }
+    }
+
     public static Result fromJson(String str) {
         try {
-            Result result = FilterAdapter.gson().fromJson(str, Result.class);
+            Result result = objectFrom(str);
             return result == null ? empty() : result.trans();
         } catch (Exception e) {
             return empty();
@@ -76,14 +88,6 @@ public class Result {
     public static Result fromXml(String str) {
         try {
             return new Persister().read(Result.class, str).trans();
-        } catch (Exception e) {
-            return empty();
-        }
-    }
-
-    public static Result objectFrom(String str) {
-        try {
-            return new Gson().fromJson(str, Result.class);
         } catch (Exception e) {
             return empty();
         }
