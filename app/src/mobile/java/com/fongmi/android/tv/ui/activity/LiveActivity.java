@@ -117,8 +117,8 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         return LiveConfig.get().getHome();
     }
 
-    private int getPlayerType() {
-        return getHome().getPlayerType() != -1 ? getHome().getPlayerType() : Setting.getLivePlayer();
+    private int getPlayerType(int playerType) {
+        return playerType != -1 ? playerType : getHome().getPlayerType() != -1 ? getHome().getPlayerType() : Setting.getLivePlayer();
     }
 
     @Override
@@ -215,7 +215,11 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
 
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(LiveViewModel.class);
-        mViewModel.channel.observe(this, result -> mPlayers.start(result, getHome().getTimeout()));
+        mViewModel.channel.observe(this, result -> {
+            mPlayers.setPlayer(getPlayerType(result.getPlayerType()));
+            mPlayers.start(result, getHome().getTimeout());
+            setPlayerView();
+        });
         mViewModel.live.observe(this, live -> {
             hideProgress();
             setGroup(live);
@@ -223,9 +227,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private void getLive() {
-        mPlayers.setPlayer(getPlayerType());
         mViewModel.getLive(getHome());
-        setPlayerView();
         setDecodeView();
         showProgress();
     }

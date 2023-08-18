@@ -37,6 +37,8 @@ public class Channel {
     private String referer;
     @SerializedName("header")
     private JsonElement header;
+    @SerializedName("playerType")
+    private Integer playerType;
 
     private boolean selected;
     private Group group;
@@ -129,6 +131,14 @@ public class Channel {
 
     public void setHeader(JsonElement header) {
         this.header = header;
+    }
+
+    public Integer getPlayerType() {
+        return playerType == null ? -1 : Math.min(playerType, 2);
+    }
+
+    public void setPlayerType(Integer playerType) {
+        this.playerType = playerType;
     }
 
     public Group getGroup() {
@@ -227,6 +237,7 @@ public class Channel {
         if (live.getUa().length() > 0 && getUa().isEmpty()) setUa(live.getUa());
         if (live.getHeader() != null && getHeader() == null) setHeader(live.getHeader());
         if (live.getReferer().length() > 0 && getReferer().isEmpty()) setReferer(live.getReferer());
+        if (live.getPlayerType() != -1 && getPlayerType() == -1) setPlayerType(live.getPlayerType());
         if (!getEpg().startsWith("http")) setEpg(live.getEpg().replace("{name}", getName()).replace("{epg}", getEpg()));
         if (!getLogo().startsWith("http")) setLogo(live.getLogo().replace("{name}", getName()).replace("{logo}", getLogo()));
     }

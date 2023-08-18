@@ -69,7 +69,9 @@ public class LiveParser {
     }
 
     private static void txt(Live live, String text) {
+        Setting setting = Setting.create();
         for (String line : text.split("\n")) {
+            setting.check(line);
             String[] split = line.split(",");
             if (split.length < 2) continue;
             if (Thread.interrupted()) break;
@@ -77,7 +79,9 @@ public class LiveParser {
             if (live.getGroups().isEmpty()) live.getGroups().add(Group.create(R.string.live_group));
             if (split[1].contains("://")) {
                 Group group = live.getGroups().get(live.getGroups().size() - 1);
-                group.find(Channel.create(split[0])).addUrls(split[1].split("#"));
+                Channel channel = group.find(Channel.create(split[0]));
+                channel.addUrls(split[1].split("#"));
+                setting.copy(channel);
             }
         }
     }
@@ -104,6 +108,60 @@ public class LiveParser {
         } catch (Exception e) {
             e.printStackTrace();
             return "";
+        }
+    }
+
+    private static class Setting {
+
+        public String ua;
+        public String referer;
+        public Integer player;
+
+        public static Setting create() {
+            return new Setting();
+        }
+
+        public void check(String line) {
+            if (line.startsWith("ua")) ua(line);
+            if (line.startsWith("player")) player(line);
+            if (line.startsWith("referer")) referer(line);
+            if (line.contains("#genre#")) clear();
+        }
+
+        public void copy(Channel channel) {
+            if (ua != null) channel.setUa(ua);
+            if (referer != null) channel.setReferer(referer);
+            if (player != null) channel.setPlayerType(player);
+        }
+
+        private void ua(String line) {
+            try {
+                ua = line.split("=")[1].trim();
+            } catch (Exception e) {
+                ua = null;
+            }
+        }
+
+        private void referer(String line) {
+            try {
+                referer = line.split("=")[1].trim();
+            } catch (Exception e) {
+                referer = null;
+            }
+        }
+
+        private void player(String line) {
+            try {
+                player = Integer.parseInt(line.split("=")[1].trim());
+            } catch (Exception e) {
+                player = null;
+            }
+        }
+
+        private void clear() {
+            player = null;
+            referer = null;
+            ua = null;
         }
     }
 }
