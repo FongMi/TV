@@ -1,5 +1,7 @@
 package com.fongmi.android.tv.bean;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
@@ -18,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Entity(ignoredColumns = {"type", "api", "playUrl", "timeout", "playerType", "ext", "jar", "style", "categories"})
-public class Site {
+public class Site implements Parcelable {
 
     @NonNull
     @PrimaryKey
@@ -75,6 +77,9 @@ public class Site {
         site.setKey(key);
         site.setName(name);
         return site;
+    }
+
+    public Site() {
     }
 
     public String getKey() {
@@ -240,4 +245,60 @@ public class Site {
         Site it = (Site) obj;
         return getKey().equals(it.getKey());
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.key);
+        dest.writeString(this.name);
+        dest.writeValue(this.type);
+        dest.writeString(this.api);
+        dest.writeString(this.playUrl);
+        dest.writeValue(this.timeout);
+        dest.writeValue(this.playerType);
+        dest.writeValue(this.searchable);
+        dest.writeValue(this.filterable);
+        dest.writeValue(this.changeable);
+        dest.writeValue(this.recordable);
+        dest.writeString(this.ext);
+        dest.writeString(this.jar);
+        dest.writeParcelable(this.style, flags);
+        dest.writeStringList(this.categories);
+        dest.writeByte(this.activated ? (byte) 1 : (byte) 0);
+    }
+
+    private Site(Parcel in) {
+        this.key = in.readString();
+        this.api = in.readString();
+        this.ext = in.readString();
+        this.jar = in.readString();
+        this.name = in.readString();
+        this.playUrl = in.readString();
+        this.activated = in.readByte() != 0;
+        this.categories = in.createStringArrayList();
+        this.style = in.readParcelable(Vod.Style.class.getClassLoader());
+        this.type = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.timeout = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.playerType = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.searchable = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.filterable = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.changeable = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.recordable = (Integer) in.readValue(Integer.class.getClassLoader());
+    }
+
+    public static final Creator<Site> CREATOR = new Creator<>() {
+        @Override
+        public Site createFromParcel(Parcel source) {
+            return new Site(source);
+        }
+
+        @Override
+        public Site[] newArray(int size) {
+            return new Site[size];
+        }
+    };
 }

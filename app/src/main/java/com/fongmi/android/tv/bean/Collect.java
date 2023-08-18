@@ -1,12 +1,15 @@
 package com.fongmi.android.tv.bean;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.utils.ResUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Collect {
+public class Collect implements Parcelable {
 
     private final Site site;
     private final List<Vod> list;
@@ -51,4 +54,36 @@ public class Collect {
     public void setPage(int page) {
         this.page = page;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeParcelable(site, flags);
+        dest.writeList(list);
+        dest.writeByte(activated ? (byte) 1 : (byte) 0);
+        dest.writeInt(page);
+    }
+
+    private Collect(Parcel in) {
+        site = in.readParcelable(Site.class.getClassLoader());
+        in.readList(list = new ArrayList<>(), Vod.class.getClassLoader());
+        activated = in.readByte() != 0;
+        page = in.readInt();
+    }
+
+    public static final Creator<Collect> CREATOR = new Creator<>() {
+        @Override
+        public Collect createFromParcel(Parcel source) {
+            return new Collect(source);
+        }
+
+        @Override
+        public Collect[] newArray(int size) {
+            return new Collect[size];
+        }
+    };
 }

@@ -1,5 +1,7 @@
 package com.fongmi.android.tv.bean;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.TextUtils;
 import android.view.View;
 
@@ -488,10 +490,10 @@ public class Vod {
         }
     }
 
-    public static class Style {
+    public static class Style implements Parcelable {
 
         @SerializedName("type")
-        private final String type;
+        private String type;
         @SerializedName("ratio")
         private Float ratio;
 
@@ -554,5 +556,33 @@ public class Vod {
             Style it = (Style) obj;
             return getType().equals(it.getType()) && getRatio().equals(it.getRatio());
         }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeString(this.type);
+            dest.writeValue(this.ratio);
+        }
+
+        private Style(Parcel in) {
+            this.type = in.readString();
+            this.ratio = (Float) in.readValue(Float.class.getClassLoader());
+        }
+
+        public static final Creator<Style> CREATOR = new Creator<>() {
+            @Override
+            public Style createFromParcel(Parcel source) {
+                return new Style(source);
+            }
+
+            @Override
+            public Style[] newArray(int size) {
+                return new Style[size];
+            }
+        };
     }
 }
