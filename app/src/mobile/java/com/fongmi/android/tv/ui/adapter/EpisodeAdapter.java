@@ -23,9 +23,13 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
     private final int viewType;
 
     public EpisodeAdapter(OnClickListener listener, int viewType) {
-        this.mItems = new ArrayList<>();
+        this(listener, viewType, new ArrayList<>());
+    }
+
+    public EpisodeAdapter(OnClickListener listener, int viewType, ArrayList<Vod.Flag.Episode> items) {
         this.mListener = listener;
         this.viewType = viewType;
+        this.mItems = items;
     }
 
     public interface OnClickListener {

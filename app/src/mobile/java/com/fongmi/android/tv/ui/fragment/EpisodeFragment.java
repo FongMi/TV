@@ -24,10 +24,13 @@ public class EpisodeFragment extends BaseFragment implements EpisodeAdapter.OnCl
 
     private FragmentEpisodeBinding mBinding;
     private SiteViewModel mViewModel;
-    private EpisodeAdapter mAdapter;
 
     private int getSpanCount() {
         return getArguments().getInt("spanCount");
+    }
+
+    private ArrayList<Vod.Flag.Episode> getItems() {
+        return getArguments().getParcelableArrayList("items");
     }
 
     public static EpisodeFragment newInstance(int spanCount, List<Vod.Flag.Episode> items) {
@@ -48,23 +51,19 @@ public class EpisodeFragment extends BaseFragment implements EpisodeAdapter.OnCl
     protected void initView() {
         setRecyclerView();
         setViewModel();
-        setEpisode();
     }
 
     private void setRecyclerView() {
+        EpisodeAdapter adapter;
         mBinding.recycler.setHasFixedSize(true);
         mBinding.recycler.setItemAnimator(null);
-        mBinding.recycler.setAdapter(mAdapter = new EpisodeAdapter(this, ViewType.GRID));
+        mBinding.recycler.setLayoutManager(new GridLayoutManager(getContext(), getSpanCount()));
+        mBinding.recycler.setAdapter(adapter = new EpisodeAdapter(this, ViewType.GRID, getItems()));
+        mBinding.recycler.scrollToPosition(adapter.getPosition());
     }
 
     private void setViewModel() {
         mViewModel = new ViewModelProvider(requireActivity()).get(SiteViewModel.class);
-    }
-
-    private void setEpisode() {
-        mAdapter.addAll(getArguments().getParcelableArrayList("items"));
-        mBinding.recycler.setLayoutManager(new GridLayoutManager(getContext(), getSpanCount()));
-        mBinding.recycler.scrollToPosition(mAdapter.getPosition());
     }
 
     @Override
