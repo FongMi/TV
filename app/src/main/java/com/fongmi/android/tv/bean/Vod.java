@@ -9,8 +9,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.fongmi.android.tv.ui.base.ViewType;
-import com.github.catvod.utils.Trans;
 import com.fongmi.android.tv.utils.Utils;
+import com.github.catvod.utils.Trans;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
@@ -91,8 +91,7 @@ public class Vod {
     private Site site;
 
     public static List<Vod> arrayFrom(String str) {
-        Type listType = new TypeToken<List<Vod>>() {
-        }.getType();
+        Type listType = new TypeToken<List<Vod>>() {}.getType();
         List<Vod> items = new Gson().fromJson(str, listType);
         return items == null ? Collections.emptyList() : items;
     }
@@ -378,7 +377,7 @@ public class Vod {
             return new Gson().toJson(this);
         }
 
-        public static class Episode {
+        public static class Episode implements Parcelable {
 
             @SerializedName("name")
             private String name;
@@ -400,12 +399,6 @@ public class Vod {
 
             public static Episode objectFrom(String str) {
                 return new Gson().fromJson(str, Episode.class);
-            }
-
-            public static List<Episode> arrayFrom(String str) {
-                Type listType = new TypeToken<List<Episode>>() {}.getType();
-                List<Episode> items = new Gson().fromJson(str, listType);
-                return items == null ? Collections.emptyList() : items;
             }
 
             public Episode(String name, String desc, String url) {
@@ -474,6 +467,40 @@ public class Vod {
                 Episode it = (Episode) obj;
                 return getUrl().equals(it.getUrl()) && getName().equals(it.getName());
             }
+
+            @Override
+            public int describeContents() {
+                return 0;
+            }
+
+            @Override
+            public void writeToParcel(Parcel dest, int flags) {
+                dest.writeString(this.name);
+                dest.writeString(this.desc);
+                dest.writeString(this.url);
+                dest.writeInt(this.number);
+                dest.writeByte(this.activated ? (byte) 1 : (byte) 0);
+            }
+
+            private Episode(Parcel in) {
+                this.name = in.readString();
+                this.desc = in.readString();
+                this.url = in.readString();
+                this.number = in.readInt();
+                this.activated = in.readByte() != 0;
+            }
+
+            public static final Creator<Episode> CREATOR = new Creator<>() {
+                @Override
+                public Episode createFromParcel(Parcel source) {
+                    return new Episode(source);
+                }
+
+                @Override
+                public Episode[] newArray(int size) {
+                    return new Episode[size];
+                }
+            };
 
             public static class Sorter implements Comparator<Episode> {
 

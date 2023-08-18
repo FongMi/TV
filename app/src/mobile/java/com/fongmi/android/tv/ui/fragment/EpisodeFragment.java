@@ -10,7 +10,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.viewbinding.ViewBinding;
 
-import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.FragmentEpisodeBinding;
 import com.fongmi.android.tv.model.SiteViewModel;
@@ -18,6 +17,7 @@ import com.fongmi.android.tv.ui.adapter.EpisodeAdapter;
 import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.base.ViewType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class EpisodeFragment extends BaseFragment implements EpisodeAdapter.OnClickListener {
@@ -30,14 +30,10 @@ public class EpisodeFragment extends BaseFragment implements EpisodeAdapter.OnCl
         return getArguments().getInt("spanCount");
     }
 
-    private String getJson() {
-        return getArguments().getString("json");
-    }
-
     public static EpisodeFragment newInstance(int spanCount, List<Vod.Flag.Episode> items) {
         Bundle args = new Bundle();
         args.putInt("spanCount", spanCount);
-        args.putString("json", App.gson().toJson(items));
+        args.putParcelableArrayList("items", new ArrayList<>(items));
         EpisodeFragment fragment = new EpisodeFragment();
         fragment.setArguments(args);
         return fragment;
@@ -66,7 +62,7 @@ public class EpisodeFragment extends BaseFragment implements EpisodeAdapter.OnCl
     }
 
     private void setEpisode() {
-        mAdapter.addAll(Vod.Flag.Episode.arrayFrom(getJson()));
+        mAdapter.addAll(getArguments().getParcelableArrayList("items"));
         mBinding.recycler.setLayoutManager(new GridLayoutManager(getContext(), getSpanCount()));
         mBinding.recycler.scrollToPosition(mAdapter.getPosition());
     }
