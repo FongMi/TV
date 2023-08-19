@@ -19,16 +19,17 @@ import com.fongmi.android.tv.player.Source;
 import com.fongmi.android.tv.player.extractor.Magnet;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Sniffer;
-import com.github.catvod.utils.Trans;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.Trans;
 import com.github.catvod.utils.Util;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -249,14 +250,23 @@ public class SiteViewModel extends ViewModel {
 
     private void checkThunder(List<Vod.Flag> flags) throws Exception {
         for (Vod.Flag flag : flags) {
-            List<Magnet> magnets = new ArrayList<>();
-            List<Vod.Flag.Episode> items = new ArrayList<>();
-            for (Vod.Flag.Episode episode : flag.getEpisodes()) if (Sniffer.isThunder(episode.getUrl())) magnets.add(Magnet.get(episode.getUrl()));
+            List<Magnet> items = getMagnet(flag);
             ExecutorService executor = Executors.newFixedThreadPool(Constant.THREAD_POOL * 2);
-            for (Future<List<Vod.Flag.Episode>> future : executor.invokeAll(magnets, 30, TimeUnit.SECONDS)) Magnet.addAll(items, future);
-            if (items.size() > 0) flag.createEpisode(items);
+            for (Future<List<Vod.Flag.Episode>> future : executor.invokeAll(items, 30, TimeUnit.SECONDS)) flag.getEpisodes().addAll(Vod.Flag.Episode.Sorter.sort(future.get()));
             executor.shutdownNow();
         }
+    }
+
+    private List<Magnet> getMagnet(Vod.Flag flag) {
+        Iterator<Vod.Flag.Episode> iterator = flag.getEpisodes().iterator();
+        List<Magnet> items = new ArrayList<>();
+        while (iterator.hasNext()) {
+            String url = iterator.next().getUrl();
+            if (!Sniffer.isThunder(url)) continue;
+            items.add(Magnet.get(url));
+            iterator.remove();
+        }
+        return items;
     }
 
     private void post(Site site, Result result) {

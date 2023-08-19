@@ -330,11 +330,6 @@ public class Vod {
             }
         }
 
-        public void createEpisode(List<Episode> items) {
-            getEpisodes().clear();
-            getEpisodes().addAll(items);
-        }
-
         public void toggle(boolean activated, Episode episode) {
             if (activated) setActivated(episode);
             else for (Episode item : getEpisodes()) item.deactivated();
