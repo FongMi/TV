@@ -1053,7 +1053,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void stopSearch() {
-        if (mExecutor != null) mExecutor.shutdownNow();
+        if (mExecutor == null) return;
+        mExecutor.shutdownNow();
+        mExecutor = null;
     }
 
     private void search(Site site, String keyword) {
@@ -1311,6 +1313,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     @Override
     protected void onDestroy() {
+        stopSearch();
         super.onDestroy();
         mPlayers.release();
         Source.get().stop();

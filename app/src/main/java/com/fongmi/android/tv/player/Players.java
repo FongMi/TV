@@ -111,6 +111,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     public void setPlayer(int player) {
+        if (this.player != player) stop();
         this.player = player;
     }
 
@@ -210,12 +211,10 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     public void togglePlayer() {
-        stop();
         setPlayer(isExo() ? SYS : ++player);
     }
 
     public void nextPlayer() {
-        stop();
         setPlayer(isExo() ? IJK : EXO);
     }
 

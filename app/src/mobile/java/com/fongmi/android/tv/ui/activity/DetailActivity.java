@@ -239,6 +239,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
         mBinding.swipeLayout.setRefreshing(true);
         getIntent().putExtras(intent);
+        stopSearch();
         setOrient();
         checkId();
     }
@@ -1106,7 +1107,9 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void stopSearch() {
-        if (mExecutor != null) mExecutor.shutdownNow();
+        if (mExecutor == null) return;
+        mExecutor.shutdownNow();
+        mExecutor = null;
     }
 
     private void search(Site site, String keyword) {
@@ -1430,6 +1433,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        stopSearch();
         mPlayers.release();
         Source.get().stop();
         Clock.get().release();
