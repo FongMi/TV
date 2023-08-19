@@ -221,7 +221,9 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void getLive() {
+        mPlayers.setPlayer(getPlayerType(-1));
         mViewModel.getLive(getHome());
+        setPlayerView();
         setDecodeView();
         showProgress();
     }

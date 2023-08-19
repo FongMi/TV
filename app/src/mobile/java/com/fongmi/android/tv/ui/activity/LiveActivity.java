@@ -223,7 +223,9 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private void getLive() {
+        mPlayers.setPlayer(getPlayerType(-1));
         mViewModel.getLive(getHome());
+        setPlayerView();
         setDecodeView();
         showProgress();
     }
