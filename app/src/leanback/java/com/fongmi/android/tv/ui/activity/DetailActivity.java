@@ -1313,8 +1313,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     @Override
     protected void onDestroy() {
-        stopSearch();
         super.onDestroy();
+        stopSearch();
         mPlayers.release();
         Source.get().stop();
         Clock.get().release();
