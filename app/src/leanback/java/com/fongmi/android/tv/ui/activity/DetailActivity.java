@@ -379,8 +379,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void checkId() {
-        if (getId().startsWith("push://")) getIntent().putExtra("key", "push_agent");
-        if (getId().startsWith("push://")) getIntent().putExtra("id", getId().substring(7));
+        if (getId().startsWith("push://")) getIntent().putExtra("key", "push_agent").putExtra("id", getId().substring(7));
         if (TextUtils.isEmpty(getId()) || getId().startsWith("msearch:")) setEmpty();
         else getDetail();
     }
