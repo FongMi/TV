@@ -1,16 +1,19 @@
 package com.fongmi.android.tv.bean;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.gson.FilterAdapter;
+import com.fongmi.android.tv.gson.MsgAdapter;
 import com.fongmi.android.tv.gson.UrlAdapter;
 import com.github.catvod.utils.Json;
 import com.github.catvod.utils.Trans;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
@@ -22,6 +25,7 @@ import org.simpleframework.xml.Root;
 import org.simpleframework.xml.core.Persister;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -29,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 @Root(name = "rss", strict = false)
-public class Result {
+public class Result implements Parcelable {
 
     @Path("class")
     @ElementList(entry = "ty", required = false, inline = true)
@@ -42,6 +46,7 @@ public class Result {
     private List<Vod> list;
 
     @SerializedName("filters")
+    @JsonAdapter(FilterAdapter.class)
     private LinkedHashMap<String, List<Filter>> filters;
     @SerializedName("header")
     private JsonElement header;
@@ -65,7 +70,8 @@ public class Result {
     @SerializedName("subs")
     private List<Sub> subs;
     @SerializedName("pagecount")
-    private int pagecount;
+    private Integer pagecount;
+    @JsonAdapter(MsgAdapter.class)
     @SerializedName("msg")
     private String msg;
 
@@ -78,14 +84,8 @@ public class Result {
     }
 
     public static Result fromJson(String str) {
-        try {
-            Type type = new TypeToken<LinkedHashMap<String, List<Filter>>>() {}.getType();
-            Gson gson = new GsonBuilder().registerTypeAdapter(type, new FilterAdapter()).create();
-            Result result = gson.fromJson(str, Result.class);
-            return result == null ? empty() : result.trans();
-        } catch (Exception e) {
-            return empty();
-        }
+        Result result = objectFrom(str);
+        return result == null ? empty() : result.trans();
     }
 
     public static Result fromXml(String str) {
@@ -132,6 +132,9 @@ public class Result {
 
     public static Result vod(Vod item) {
         return list(Arrays.asList(item));
+    }
+
+    public Result() {
     }
 
     public List<Class> getTypes() {
@@ -222,8 +225,8 @@ public class Result {
         return subs == null ? Collections.emptyList() : subs;
     }
 
-    public int getPageCount() {
-        return pagecount;
+    public Integer getPageCount() {
+        return pagecount == null ? 0 : pagecount;
     }
 
     public String getMsg() {
@@ -264,4 +267,59 @@ public class Result {
     public String toString() {
         return new Gson().toJson(this);
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeList(this.types);
+        dest.writeTypedList(this.list);
+        dest.writeString(App.gson().toJson(this.filters));
+        dest.writeString(this.playUrl);
+        dest.writeString(this.jxFrom);
+        dest.writeValue(this.parse);
+        dest.writeValue(this.jx);
+        dest.writeString(this.flag);
+        dest.writeString(this.format);
+        dest.writeString(this.url);
+        dest.writeString(this.key);
+        dest.writeList(this.subs);
+        dest.writeValue(this.pagecount);
+        dest.writeString(this.msg);
+    }
+
+    protected Result(Parcel in) {
+        this.types = new ArrayList<>();
+        in.readList(this.types, Class.class.getClassLoader());
+        this.list = in.createTypedArrayList(Vod.CREATOR);
+        Type type = new TypeToken<LinkedHashMap<String, List<Filter>>>() {}.getType();
+        this.filters = App.gson().fromJson(in.readString(), type);
+        this.playUrl = in.readString();
+        this.jxFrom = in.readString();
+        this.parse = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.jx = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.flag = in.readString();
+        this.format = in.readString();
+        this.url = in.readString();
+        this.key = in.readString();
+        this.subs = new ArrayList<>();
+        in.readList(this.subs, Sub.class.getClassLoader());
+        this.pagecount = in.readInt();
+        this.msg = in.readString();
+    }
+
+    public static final Creator<Result> CREATOR = new Creator<>() {
+        @Override
+        public Result createFromParcel(Parcel source) {
+            return new Result(source);
+        }
+
+        @Override
+        public Result[] newArray(int size) {
+            return new Result[size];
+        }
+    };
 }

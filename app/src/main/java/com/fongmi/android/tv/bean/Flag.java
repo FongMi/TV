@@ -53,15 +53,6 @@ public class Flag implements Parcelable {
         this.position = -1;
     }
 
-    private Flag(Parcel in) {
-        this.flag = in.readString();
-        this.show = in.readString();
-        this.urls = in.readString();
-        this.episodes = in.createTypedArrayList(Episode.CREATOR);
-        this.activated = in.readByte() != 0;
-        this.position = in.readInt();
-    }
-
     public String getShow() {
         return TextUtils.isEmpty(show) ? getFlag() : show;
     }
@@ -172,6 +163,15 @@ public class Flag implements Parcelable {
         dest.writeTypedList(this.episodes);
         dest.writeByte(this.activated ? (byte) 1 : (byte) 0);
         dest.writeInt(this.position);
+    }
+
+    protected Flag(Parcel in) {
+        this.flag = in.readString();
+        this.show = in.readString();
+        this.urls = in.readString();
+        this.episodes = in.createTypedArrayList(Episode.CREATOR);
+        this.activated = in.readByte() != 0;
+        this.position = in.readInt();
     }
 
     public static final Creator<Flag> CREATOR = new Creator<>() {

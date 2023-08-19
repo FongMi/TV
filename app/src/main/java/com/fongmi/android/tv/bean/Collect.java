@@ -11,9 +11,9 @@ import java.util.List;
 
 public class Collect implements Parcelable {
 
-    private final Site site;
-    private final List<Vod> list;
     private boolean activated;
+    private List<Vod> list;
+    private Site site;
     private int page;
 
     public static Collect all() {
@@ -26,16 +26,12 @@ public class Collect implements Parcelable {
         return new Collect(list.get(0).getSite(), list);
     }
 
+    public Collect() {
+    }
+
     public Collect(Site site, List<Vod> list) {
         this.site = site;
         this.list = list;
-    }
-
-    private Collect(Parcel in) {
-        site = in.readParcelable(Site.class.getClassLoader());
-        in.readList(list = new ArrayList<>(), Vod.class.getClassLoader());
-        activated = in.readByte() != 0;
-        page = in.readInt();
     }
 
     public Site getSite() {
@@ -69,10 +65,17 @@ public class Collect implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeParcelable(site, flags);
-        dest.writeList(list);
-        dest.writeByte(activated ? (byte) 1 : (byte) 0);
-        dest.writeInt(page);
+        dest.writeParcelable(this.site, flags);
+        dest.writeTypedList(this.list);
+        dest.writeByte(this.activated ? (byte) 1 : (byte) 0);
+        dest.writeInt(this.page);
+    }
+
+    protected Collect(Parcel in) {
+        this.site = in.readParcelable(Site.class.getClassLoader());
+        this.list = in.createTypedArrayList(Vod.CREATOR);
+        this.activated = in.readByte() != 0;
+        this.page = in.readInt();
     }
 
     public static final Creator<Collect> CREATOR = new Creator<>() {

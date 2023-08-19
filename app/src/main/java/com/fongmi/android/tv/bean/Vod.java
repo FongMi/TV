@@ -90,26 +90,6 @@ public class Vod implements Parcelable {
     public Vod() {
     }
 
-    private Vod(Parcel in) {
-        this.vodId = in.readString();
-        this.vodName = in.readString();
-        this.typeName = in.readString();
-        this.vodPic = in.readString();
-        this.vodRemarks = in.readString();
-        this.vodYear = in.readString();
-        this.vodArea = in.readString();
-        this.vodDirector = in.readString();
-        this.vodActor = in.readString();
-        this.vodContent = in.readString();
-        this.vodPlayFrom = in.readString();
-        this.vodPlayUrl = in.readString();
-        this.vodTag = in.readString();
-        this.style = in.readParcelable(Style.class.getClassLoader());
-        this.vodFlags = new ArrayList<>();
-        in.readList(this.vodFlags, Flag.class.getClassLoader());
-        this.site = in.readParcelable(Site.class.getClassLoader());
-    }
-
     public String getVodId() {
         return TextUtils.isEmpty(vodId) ? "" : vodId.trim();
     }
@@ -289,9 +269,28 @@ public class Vod implements Parcelable {
         dest.writeString(this.vodPlayFrom);
         dest.writeString(this.vodPlayUrl);
         dest.writeString(this.vodTag);
-        dest.writeList(this.vodFlags);
-        dest.writeParcelable(this.site, flags);
         dest.writeParcelable(this.style, flags);
+        dest.writeTypedList(this.vodFlags);
+        dest.writeParcelable(this.site, flags);
+    }
+
+    protected Vod(Parcel in) {
+        this.vodId = in.readString();
+        this.vodName = in.readString();
+        this.typeName = in.readString();
+        this.vodPic = in.readString();
+        this.vodRemarks = in.readString();
+        this.vodYear = in.readString();
+        this.vodArea = in.readString();
+        this.vodDirector = in.readString();
+        this.vodActor = in.readString();
+        this.vodContent = in.readString();
+        this.vodPlayFrom = in.readString();
+        this.vodPlayUrl = in.readString();
+        this.vodTag = in.readString();
+        this.style = in.readParcelable(Style.class.getClassLoader());
+        this.vodFlags = in.createTypedArrayList(Flag.CREATOR);
+        this.site = in.readParcelable(Site.class.getClassLoader());
     }
 
     public static final Creator<Vod> CREATOR = new Creator<>() {

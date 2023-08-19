@@ -25,6 +25,7 @@ import com.fongmi.android.tv.bean.Page;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Style;
+import com.fongmi.android.tv.bean.Value;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.FragmentVodBinding;
 import com.fongmi.android.tv.model.SiteViewModel;
@@ -139,8 +140,8 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         });
     }
 
-    private void setClick(ArrayObjectAdapter adapter, String key, Filter.Value item) {
-        for (int i = 0; i < adapter.size(); i++) ((Filter.Value) adapter.get(i)).setActivated(item);
+    private void setClick(ArrayObjectAdapter adapter, String key, Value item) {
+        for (int i = 0; i < adapter.size(); i++) ((Value) adapter.get(i)).setActivated(item);
         adapter.notifyArrayItemRangeChanged(0, adapter.size());
         mExtends.put(key, item.getV());
         onRefresh();

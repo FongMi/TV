@@ -21,7 +21,7 @@ public class Episode implements Parcelable {
     @SerializedName("url")
     private String url;
 
-    private final int number;
+    private int number;
     private boolean activated;
 
     public static Episode create(String name, String url) {
@@ -43,12 +43,7 @@ public class Episode implements Parcelable {
         this.url = url;
     }
 
-    private Episode(Parcel in) {
-        this.name = in.readString();
-        this.desc = in.readString();
-        this.url = in.readString();
-        this.number = in.readInt();
-        this.activated = in.readByte() != 0;
+    public Episode() {
     }
 
     public String getName() {
@@ -123,6 +118,14 @@ public class Episode implements Parcelable {
         dest.writeString(this.url);
         dest.writeInt(this.number);
         dest.writeByte(this.activated ? (byte) 1 : (byte) 0);
+    }
+
+    protected Episode(Parcel in) {
+        this.name = in.readString();
+        this.desc = in.readString();
+        this.url = in.readString();
+        this.number = in.readInt();
+        this.activated = in.readByte() != 0;
     }
 
     public static final Creator<Episode> CREATOR = new Creator<>() {

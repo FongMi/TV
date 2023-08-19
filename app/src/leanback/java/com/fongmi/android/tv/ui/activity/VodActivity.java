@@ -49,7 +49,7 @@ public class VodActivity extends BaseActivity implements TypePresenter.OnClickLi
         if (result == null || result.getTypes().isEmpty()) return;
         Intent intent = new Intent(activity, VodActivity.class);
         intent.putExtra("key", key);
-        intent.putExtra("result", result.toString());
+        intent.putExtra("result", result);
         activity.startActivity(intent);
     }
 
@@ -57,8 +57,8 @@ public class VodActivity extends BaseActivity implements TypePresenter.OnClickLi
         return getIntent().getStringExtra("key");
     }
 
-    private String getResult() {
-        return getIntent().getStringExtra("result");
+    private Result getResult() {
+        return getIntent().getParcelableExtra("result");
     }
 
     private Site getSite() {
@@ -106,7 +106,7 @@ public class VodActivity extends BaseActivity implements TypePresenter.OnClickLi
     }
 
     private void setTypes() {
-        Result result = Result.fromJson(getResult());
+        Result result = getResult();
         result.setTypes(getTypes(result));
         for (Class item : result.getTypes()) if (result.getFilters().containsKey(item.getTypeId())) item.setFilter(false);
         for (Class item : result.getTypes()) if (result.getFilters().containsKey(item.getTypeId())) item.setFilters(result.getFilters().get(item.getTypeId()));

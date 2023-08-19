@@ -24,6 +24,9 @@ public class Style implements Parcelable {
         return new Style("list");
     }
 
+    public Style() {
+    }
+
     public Style(String type) {
         this.type = type;
     }
@@ -31,11 +34,6 @@ public class Style implements Parcelable {
     public Style(String type, Float ratio) {
         this.type = type;
         this.ratio = ratio;
-    }
-
-    private Style(Parcel in) {
-        this.type = in.readString();
-        this.ratio = (Float) in.readValue(Float.class.getClassLoader());
     }
 
     public String getType() {
@@ -90,6 +88,11 @@ public class Style implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.type);
         dest.writeValue(this.ratio);
+    }
+
+    protected Style(Parcel in) {
+        this.type = in.readString();
+        this.ratio = (Float) in.readValue(Float.class.getClassLoader());
     }
 
     public static final Creator<Style> CREATOR = new Creator<>() {

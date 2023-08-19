@@ -1,5 +1,7 @@
 package com.fongmi.android.tv.bean;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.TextUtils;
 
 import com.github.catvod.utils.Trans;
@@ -9,10 +11,11 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Filter {
+public class Filter implements Parcelable {
 
     @SerializedName("key")
     private String key;
@@ -29,6 +32,9 @@ public class Filter {
         Type listType = new TypeToken<List<Filter>>() {}.getType();
         List<Filter> items = new Gson().fromJson(str, listType);
         return items == null ? Collections.emptyList() : items;
+    }
+
+    public Filter() {
     }
 
     public String getKey() {
@@ -49,41 +55,34 @@ public class Filter {
         return this;
     }
 
-    public static class Value {
+    @Override
+    public int describeContents() {
+        return 0;
+    }
 
-        @SerializedName("n")
-        private String n;
-        @SerializedName("v")
-        private String v;
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.key);
+        dest.writeString(this.name);
+        dest.writeList(this.value);
+    }
 
-        private boolean activated;
+    protected Filter(Parcel in) {
+        this.key = in.readString();
+        this.name = in.readString();
+        this.value = new ArrayList<>();
+        in.readList(this.value, Value.class.getClassLoader());
+    }
 
-        public String getN() {
-            return TextUtils.isEmpty(n) ? "" : n;
-        }
-
-        public String getV() {
-            return TextUtils.isEmpty(v) ? "" : v;
-        }
-
-        public boolean isActivated() {
-            return activated;
-        }
-
-        public void setActivated(Value item) {
-            this.activated = item.equals(this);
-        }
-
-        public void trans() {
-            this.n = Trans.s2t(n);
+    public static final Creator<Filter> CREATOR = new Creator<>() {
+        @Override
+        public Filter createFromParcel(Parcel source) {
+            return new Filter(source);
         }
 
         @Override
-        public boolean equals(Object obj) {
-            if (this == obj) return true;
-            if (!(obj instanceof Value)) return false;
-            Value it = (Value) obj;
-            return getV().equals(it.getV());
+        public Filter[] newArray(int size) {
+            return new Filter[size];
         }
-    }
+    };
 }
