@@ -215,11 +215,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
 
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(LiveViewModel.class);
-        mViewModel.channel.observe(this, result -> {
-            mPlayers.setPlayer(getPlayerType(result.getPlayerType()));
-            mPlayers.start(result, getHome().getTimeout());
-            setPlayerView();
-        });
+        mViewModel.channel.observe(this, result -> mPlayers.start(result, getHome().getTimeout()));
         mViewModel.live.observe(this, live -> {
             hideProgress();
             setGroup(live);
@@ -462,7 +458,9 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     @Override
     public void onItemClick(Channel item) {
         mGroup.setPosition(mChannelAdapter.setSelected(item.group(mGroup)));
+        mPlayers.setPlayer(getPlayerType(item.getPlayerType()));
         mChannel = item;
+        setPlayerView();
         showInfo();
         hideUI();
         fetch();
