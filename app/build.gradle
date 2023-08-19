@@ -21,12 +21,12 @@ android {
         leanback {
             dimension "mode"
             versionCode 204
-            versionName "20230819#1"
+            versionName "20230819#2"
         }
         mobile {
             dimension "mode"
             versionCode 204
-            versionName "20230819#1"
+            versionName "20230819#2"
         }
         java {
             dimension "api"
@@ -112,7 +112,7 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.15.1'
     implementation 'com.github.bumptech.glide:annotations:4.15.1'
     implementation 'com.github.bumptech.glide:okhttp3-integration:4.15.1'
-    implementation 'com.github.TeamNewPipe:NewPipeExtractor:8495ad619e'
+    implementation 'com.github.TeamNewPipe:NewPipeExtractor:340095515d45ecbee576872c7198992ebd8e4f08'
     implementation 'com.google.android.material:material:1.9.0'
     implementation 'com.google.net.cronet:cronet-okhttp:0.1.0'
     implementation 'com.google.zxing:core:3.3.0'
