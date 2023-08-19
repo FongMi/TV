@@ -8,7 +8,9 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.fongmi.android.tv.player.extractor.Magnet;
 import com.fongmi.android.tv.ui.base.ViewType;
+import com.fongmi.android.tv.utils.Sniffer;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.utils.Trans;
 import com.google.gson.Gson;
@@ -26,6 +28,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -350,6 +353,18 @@ public class Vod {
             for (Episode item : getEpisodes()) if (item.rule4(remarks)) return item;
             if (getPosition() != -1) return getEpisodes().get(getPosition());
             return strict ? null : getEpisodes().get(0);
+        }
+
+        public List<Magnet> getMagnet() {
+            Iterator<Episode> iterator = getEpisodes().iterator();
+            List<Magnet> items = new ArrayList<>();
+            while (iterator.hasNext()) {
+                String url = iterator.next().getUrl();
+                if (!Sniffer.isThunder(url)) continue;
+                items.add(Magnet.get(url));
+                iterator.remove();
+            }
+            return items;
         }
 
         public static List<Flag> create(String flag, String name, String url) {
