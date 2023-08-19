@@ -10,7 +10,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-import com.fongmi.android.tv.bean.Vod;
+import com.fongmi.android.tv.bean.Episode;
 import com.fongmi.android.tv.databinding.DialogEpisodeGridBinding;
 import com.fongmi.android.tv.ui.fragment.EpisodeFragment;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -22,7 +22,7 @@ import java.util.List;
 public class EpisodeGridDialog extends BaseDialog {
 
     private DialogEpisodeGridBinding binding;
-    private List<Vod.Flag.Episode> episodes;
+    private List<Episode> episodes;
     private final List<String> titles;
     private boolean reverse;
     private int spanCount;
@@ -42,7 +42,7 @@ public class EpisodeGridDialog extends BaseDialog {
         return this;
     }
 
-    public EpisodeGridDialog episodes(List<Vod.Flag.Episode> episodes) {
+    public EpisodeGridDialog episodes(List<Episode> episodes) {
         this.episodes = episodes;
         return this;
     }
@@ -66,7 +66,7 @@ public class EpisodeGridDialog extends BaseDialog {
 
     private void setSpanCount() {
         int total = 0;
-        for (Vod.Flag.Episode item : episodes) total += item.getName().length();
+        for (Episode item : episodes) total += item.getName().length();
         int offset = (int) Math.ceil((double) total / episodes.size());
         if (offset >= 12) spanCount = 1;
         else if (offset >= 8) spanCount = 2;

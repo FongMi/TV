@@ -38,6 +38,8 @@ import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.bean.Episode;
+import com.fongmi.android.tv.bean.Flag;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.bean.Parse;
@@ -189,11 +191,11 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         return ApiConfig.get().getSite(getKey());
     }
 
-    private Vod.Flag getFlag() {
+    private Flag getFlag() {
         return mFlagAdapter.getActivated();
     }
 
-    private Vod.Flag.Episode getEpisode() {
+    private Episode getEpisode() {
         return mEpisodeAdapter.getActivated();
     }
 
@@ -444,7 +446,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         view.setText(Util.substring(sb.toString(), 2));
     }
 
-    private void getPlayer(Vod.Flag flag, Vod.Flag.Episode episode, boolean replay) {
+    private void getPlayer(Flag flag, Episode episode, boolean replay) {
         mBinding.control.title.setText(getString(R.string.detail_title, mBinding.name.getText(), episode.getName()));
         mViewModel.playerContent(getKey(), flag.getFlag(), episode.getUrl());
         updateHistory(episode, replay);
@@ -463,7 +465,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     @Override
-    public void onItemClick(Vod.Flag item, boolean force) {
+    public void onItemClick(Flag item, boolean force) {
         if (item.isActivated()) return;
         mFlagAdapter.setActivated(item);
         mBinding.flag.scrollToPosition(mFlagAdapter.getPosition());
@@ -472,7 +474,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     @Override
-    public void onItemClick(Vod.Flag.Episode item) {
+    public void onItemClick(Episode item) {
         if (item.isActivated()) return;
         mFlagAdapter.toggle(item);
         notifyItemChanged(mEpisodeAdapter);
@@ -492,7 +494,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         if (mControlDialog != null && mControlDialog.isVisible()) mControlDialog.updateParse();
     }
 
-    private void setEpisodeAdapter(List<Vod.Flag.Episode> items) {
+    private void setEpisodeAdapter(List<Episode> items) {
         mBinding.control.action.episodes.setVisibility(items.size() < 2 ? View.GONE : View.VISIBLE);
         mBinding.control.nextRoot.setVisibility(items.size() < 2 ? View.GONE : View.VISIBLE);
         mBinding.control.prevRoot.setVisibility(items.size() < 2 ? View.GONE : View.VISIBLE);
@@ -502,9 +504,9 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mEpisodeAdapter.addAll(items);
     }
 
-    private void seamless(Vod.Flag flag, boolean force) {
+    private void seamless(Flag flag, boolean force) {
         if (Setting.getFlag() == 1 && (mHistory.isNew() || !force)) return;
-        Vod.Flag.Episode episode = flag.find(mHistory.getVodRemarks(), getMark() == null);
+        Episode episode = flag.find(mHistory.getVodRemarks(), getMark() == null);
         if (episode == null || episode.isActivated()) return;
         mHistory.setVodRemarks(episode.getName());
         onItemClick(episode);
@@ -598,13 +600,13 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void onNext() {
-        Vod.Flag.Episode item = mEpisodeAdapter.getNext();
+        Episode item = mEpisodeAdapter.getNext();
         if (item.isActivated()) Notify.show(mHistory.isRevPlay() ? R.string.error_play_prev : R.string.error_play_next);
         else onItemClick(item);
     }
 
     private void onPrev() {
-        Vod.Flag.Episode item = mEpisodeAdapter.getPrev();
+        Episode item = mEpisodeAdapter.getPrev();
         if (item.isActivated()) Notify.show(mHistory.isRevPlay() ? R.string.error_play_next : R.string.error_play_prev);
         else onItemClick(item);
     }
@@ -902,7 +904,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         return history;
     }
 
-    private void updateHistory(Vod.Flag.Episode item, boolean replay) {
+    private void updateHistory(Episode item, boolean replay) {
         replay = replay || !item.equals(mHistory.getEpisode());
         long position = replay ? 0 : mHistory.getPosition();
         mHistory.setPosition(position);
@@ -1144,7 +1146,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void nextFlag(int position) {
-        Vod.Flag flag = mFlagAdapter.get(position + 1);
+        Flag flag = mFlagAdapter.get(position + 1);
         Notify.show(getString(R.string.play_switch_flag, flag.getFlag()));
         onItemClick(flag, true);
     }

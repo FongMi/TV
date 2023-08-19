@@ -17,6 +17,7 @@ import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Page;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
+import com.fongmi.android.tv.bean.Style;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.FragmentTypeBinding;
 import com.fongmi.android.tv.model.SiteViewModel;
@@ -78,8 +79,8 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         return mPages.get(mPages.size() - 1);
     }
 
-    private Vod.Style getStyle() {
-        return isFolder() ? Vod.Style.list() : getSite().getStyle();
+    private Style getStyle() {
+        return isFolder() ? Style.list() : getSite().getStyle();
     }
 
     @Override
@@ -114,7 +115,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         setStyle(getStyle());
     }
 
-    private void setStyle(Vod.Style style) {
+    private void setStyle(Style style) {
         mBinding.recycler.setAdapter(mAdapter = new VodAdapter(this, style, Product.getSpec(getActivity(), style)));
         mBinding.recycler.setLayoutManager(style.isList() ? new LinearLayoutManager(getActivity()) : new GridLayoutManager(getContext(), Product.getColumn(style)));
     }
@@ -148,7 +149,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     }
 
     private void addVideo(Result result) {
-        Vod.Style style = result.getList().get(0).getStyle(getStyle());
+        Style style = result.getList().get(0).getStyle(getStyle());
         if (!style.equals(mAdapter.getStyle())) setStyle(style);
         mAdapter.addAll(result.getList());
     }

@@ -31,6 +31,13 @@ public class Collect implements Parcelable {
         this.list = list;
     }
 
+    private Collect(Parcel in) {
+        site = in.readParcelable(Site.class.getClassLoader());
+        in.readList(list = new ArrayList<>(), Vod.class.getClassLoader());
+        activated = in.readByte() != 0;
+        page = in.readInt();
+    }
+
     public Site getSite() {
         return site;
     }
@@ -66,13 +73,6 @@ public class Collect implements Parcelable {
         dest.writeList(list);
         dest.writeByte(activated ? (byte) 1 : (byte) 0);
         dest.writeInt(page);
-    }
-
-    private Collect(Parcel in) {
-        site = in.readParcelable(Site.class.getClassLoader());
-        in.readList(list = new ArrayList<>(), Vod.class.getClassLoader());
-        activated = in.readByte() != 0;
-        page = in.readInt();
     }
 
     public static final Creator<Collect> CREATOR = new Creator<>() {

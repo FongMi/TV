@@ -7,7 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.leanback.widget.Presenter;
 
 import com.fongmi.android.tv.Product;
-import com.fongmi.android.tv.bean.Vod;
+import com.fongmi.android.tv.bean.Episode;
 import com.fongmi.android.tv.databinding.AdapterEpisodeBinding;
 
 public class EpisodePresenter extends Presenter {
@@ -20,7 +20,7 @@ public class EpisodePresenter extends Presenter {
     }
 
     public interface OnClickListener {
-        void onItemClick(Vod.Flag.Episode item);
+        void onItemClick(Episode item);
     }
 
     public void setNextFocusDown(int nextFocus) {
@@ -34,7 +34,7 @@ public class EpisodePresenter extends Presenter {
 
     @Override
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object object) {
-        Vod.Flag.Episode item = (Vod.Flag.Episode) object;
+        Episode item = (Episode) object;
         ViewHolder holder = (ViewHolder) viewHolder;
         holder.binding.text.setMaxEms(Product.getEms());
         holder.binding.text.setNextFocusDownId(nextFocus);

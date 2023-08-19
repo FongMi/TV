@@ -6,7 +6,7 @@ import android.view.WindowManager;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.fongmi.android.tv.bean.Vod;
+import com.fongmi.android.tv.bean.Episode;
 import com.fongmi.android.tv.databinding.DialogEpisodeListBinding;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.ui.adapter.EpisodeAdapter;
@@ -19,7 +19,7 @@ public class EpisodeListDialog implements EpisodeAdapter.OnClickListener {
 
     private final FragmentActivity activity;
     private DialogEpisodeListBinding binding;
-    private List<Vod.Flag.Episode> episodes;
+    private List<Episode> episodes;
     private SiteViewModel viewModel;
     private EpisodeAdapter adapter;
     private SideSheetDialog dialog;
@@ -32,7 +32,7 @@ public class EpisodeListDialog implements EpisodeAdapter.OnClickListener {
         this.activity = activity;
     }
 
-    public EpisodeListDialog episodes(List<Vod.Flag.Episode> episodes) {
+    public EpisodeListDialog episodes(List<Episode> episodes) {
         this.episodes = episodes;
         return this;
     }
@@ -73,7 +73,7 @@ public class EpisodeListDialog implements EpisodeAdapter.OnClickListener {
     }
 
     @Override
-    public void onItemClick(Vod.Flag.Episode item) {
+    public void onItemClick(Episode item) {
         viewModel.setEpisode(item);
     }
 }

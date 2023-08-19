@@ -225,12 +225,12 @@ public class History {
         return getKey().split(AppDatabase.SYMBOL)[1];
     }
 
-    public Vod.Flag getFlag() {
-        return Vod.Flag.create(getVodFlag());
+    public Flag getFlag() {
+        return Flag.create(getVodFlag());
     }
 
-    public Vod.Flag.Episode getEpisode() {
-        return Vod.Flag.Episode.create(getVodRemarks(), getEpisodeUrl());
+    public Episode getEpisode() {
+        return Episode.create(getVodRemarks(), getEpisodeUrl());
     }
 
     public int getSiteVisible() {
@@ -309,7 +309,7 @@ public class History {
         return AppDatabase.get().getHistoryDao().findByName(ApiConfig.getCid(), getVodName());
     }
 
-    public void findEpisode(List<Vod.Flag> flags) {
+    public void findEpisode(List<Flag> flags) {
         if (flags.size() > 0) {
             setVodFlag(flags.get(0).getFlag());
             if (flags.get(0).getEpisodes().size() > 0) {
@@ -318,8 +318,8 @@ public class History {
         }
         for (History item : find()) {
             if (getPosition() > 0) break;
-            for (Vod.Flag flag : flags) {
-                Vod.Flag.Episode episode = flag.find(item.getVodRemarks(), true);
+            for (Flag flag : flags) {
+                Episode episode = flag.find(item.getVodRemarks(), true);
                 if (episode == null) continue;
                 setVodFlag(flag.getFlag());
                 setPosition(item.getPosition());

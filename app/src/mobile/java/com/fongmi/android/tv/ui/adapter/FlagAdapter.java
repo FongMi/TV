@@ -6,7 +6,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.fongmi.android.tv.bean.Vod;
+import com.fongmi.android.tv.bean.Episode;
+import com.fongmi.android.tv.bean.Flag;
 import com.fongmi.android.tv.databinding.AdapterFlagBinding;
 
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ import java.util.List;
 public class FlagAdapter extends RecyclerView.Adapter<FlagAdapter.ViewHolder> {
 
     private final OnClickListener mListener;
-    private final List<Vod.Flag> mItems;
+    private final List<Flag> mItems;
 
     public FlagAdapter(OnClickListener listener) {
         this.mListener = listener;
@@ -25,10 +26,10 @@ public class FlagAdapter extends RecyclerView.Adapter<FlagAdapter.ViewHolder> {
 
     public interface OnClickListener {
 
-        void onItemClick(Vod.Flag item, boolean force);
+        void onItemClick(Flag item, boolean force);
     }
 
-    public void addAll(List<Vod.Flag> items) {
+    public void addAll(List<Flag> items) {
         mItems.clear();
         mItems.addAll(items);
         notifyDataSetChanged();
@@ -39,25 +40,25 @@ public class FlagAdapter extends RecyclerView.Adapter<FlagAdapter.ViewHolder> {
         return 0;
     }
 
-    public Vod.Flag get(int position) {
+    public Flag get(int position) {
         return mItems.get(position);
     }
 
-    public Vod.Flag getActivated() {
+    public Flag getActivated() {
         return mItems.get(getPosition());
     }
 
-    public void setActivated(Vod.Flag flag) {
-        for (Vod.Flag item : mItems) item.setActivated(flag);
+    public void setActivated(Flag flag) {
+        for (Flag item : mItems) item.setActivated(flag);
         notifyItemRangeChanged(0, getItemCount());
     }
 
-    public void toggle(Vod.Flag.Episode episode) {
-        for (Vod.Flag item : mItems) item.toggle(item.isActivated(), episode);
+    public void toggle(Episode episode) {
+        for (Flag item : mItems) item.toggle(item.isActivated(), episode);
     }
 
     public void reverse() {
-        for (Vod.Flag item : mItems) Collections.reverse(item.getEpisodes());
+        for (Flag item : mItems) Collections.reverse(item.getEpisodes());
     }
 
     @Override
@@ -73,7 +74,7 @@ public class FlagAdapter extends RecyclerView.Adapter<FlagAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Vod.Flag item = mItems.get(position);
+        Flag item = mItems.get(position);
         holder.binding.text.setText(item.getShow());
         holder.binding.text.setActivated(item.isActivated());
         holder.binding.text.setOnClickListener(v -> mListener.onItemClick(item, false));

@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.viewbinding.ViewBinding;
 
-import com.fongmi.android.tv.bean.Vod;
+import com.fongmi.android.tv.bean.Episode;
 import com.fongmi.android.tv.databinding.FragmentEpisodeBinding;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.ui.adapter.EpisodeAdapter;
@@ -29,11 +29,11 @@ public class EpisodeFragment extends BaseFragment implements EpisodeAdapter.OnCl
         return getArguments().getInt("spanCount");
     }
 
-    private ArrayList<Vod.Flag.Episode> getItems() {
+    private ArrayList<Episode> getItems() {
         return getArguments().getParcelableArrayList("items");
     }
 
-    public static EpisodeFragment newInstance(int spanCount, List<Vod.Flag.Episode> items) {
+    public static EpisodeFragment newInstance(int spanCount, List<Episode> items) {
         Bundle args = new Bundle();
         args.putInt("spanCount", spanCount);
         args.putParcelableArrayList("items", new ArrayList<>(items));
@@ -67,7 +67,7 @@ public class EpisodeFragment extends BaseFragment implements EpisodeAdapter.OnCl
     }
 
     @Override
-    public void onItemClick(Vod.Flag.Episode item) {
+    public void onItemClick(Episode item) {
         mViewModel.setEpisode(item);
     }
 }

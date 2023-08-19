@@ -52,7 +52,7 @@ public class Site implements Parcelable {
     @SerializedName("jar")
     private String jar;
     @SerializedName("style")
-    private Vod.Style style;
+    private Style style;
     @SerializedName("categories")
     private List<String> categories;
 
@@ -80,6 +80,25 @@ public class Site implements Parcelable {
     }
 
     public Site() {
+    }
+
+    private Site(Parcel in) {
+        this.key = in.readString();
+        this.api = in.readString();
+        this.ext = in.readString();
+        this.jar = in.readString();
+        this.name = in.readString();
+        this.playUrl = in.readString();
+        this.activated = in.readByte() != 0;
+        this.categories = in.createStringArrayList();
+        this.style = in.readParcelable(Style.class.getClassLoader());
+        this.type = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.timeout = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.playerType = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.searchable = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.filterable = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.changeable = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.recordable = (Integer) in.readValue(Integer.class.getClassLoader());
     }
 
     public String getKey() {
@@ -170,8 +189,8 @@ public class Site implements Parcelable {
         return TextUtils.isEmpty(jar) ? "" : jar;
     }
 
-    public Vod.Style getStyle() {
-        return style == null ? Vod.Style.rect() : style;
+    public Style getStyle() {
+        return style == null ? Style.rect() : style;
     }
 
     public List<String> getCategories() {
@@ -254,40 +273,21 @@ public class Site implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.key);
-        dest.writeString(this.name);
-        dest.writeValue(this.type);
         dest.writeString(this.api);
-        dest.writeString(this.playUrl);
+        dest.writeString(this.ext);
+        dest.writeString(this.jar);
+        dest.writeValue(this.type);
+        dest.writeString(this.name);
         dest.writeValue(this.timeout);
+        dest.writeString(this.playUrl);
         dest.writeValue(this.playerType);
         dest.writeValue(this.searchable);
         dest.writeValue(this.filterable);
         dest.writeValue(this.changeable);
         dest.writeValue(this.recordable);
-        dest.writeString(this.ext);
-        dest.writeString(this.jar);
-        dest.writeParcelable(this.style, flags);
         dest.writeStringList(this.categories);
+        dest.writeParcelable(this.style, flags);
         dest.writeByte(this.activated ? (byte) 1 : (byte) 0);
-    }
-
-    private Site(Parcel in) {
-        this.key = in.readString();
-        this.api = in.readString();
-        this.ext = in.readString();
-        this.jar = in.readString();
-        this.name = in.readString();
-        this.playUrl = in.readString();
-        this.activated = in.readByte() != 0;
-        this.categories = in.createStringArrayList();
-        this.style = in.readParcelable(Vod.Style.class.getClassLoader());
-        this.type = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.timeout = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.playerType = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.searchable = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.filterable = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.changeable = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.recordable = (Integer) in.readValue(Integer.class.getClassLoader());
     }
 
     public static final Creator<Site> CREATOR = new Creator<>() {

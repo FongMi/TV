@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.fongmi.android.tv.bean.Style;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.AdapterVodListBinding;
 import com.fongmi.android.tv.databinding.AdapterVodOvalBinding;
@@ -23,10 +24,10 @@ public class VodAdapter extends RecyclerView.Adapter<BaseVodHolder> {
 
     private final OnClickListener mListener;
     private final List<Vod> mItems;
-    private final Vod.Style style;
+    private final Style style;
     private final int[] size;
 
-    public VodAdapter(OnClickListener listener, Vod.Style style, int[] size) {
+    public VodAdapter(OnClickListener listener, Style style, int[] size) {
         this.mListener = listener;
         this.mItems = new ArrayList<>();
         this.style = style;
@@ -40,7 +41,7 @@ public class VodAdapter extends RecyclerView.Adapter<BaseVodHolder> {
         boolean onLongClick(Vod item);
     }
 
-    public Vod.Style getStyle() {
+    public Style getStyle() {
         return style;
     }
 

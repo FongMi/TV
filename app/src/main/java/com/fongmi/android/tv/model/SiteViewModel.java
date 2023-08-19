@@ -11,6 +11,8 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.bean.Episode;
+import com.fongmi.android.tv.bean.Flag;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Vod;
@@ -39,7 +41,7 @@ import okhttp3.Response;
 
 public class SiteViewModel extends ViewModel {
 
-    public MutableLiveData<Vod.Flag.Episode> episode;
+    public MutableLiveData<Episode> episode;
     public MutableLiveData<Result> result;
     public MutableLiveData<Result> player;
     public MutableLiveData<Result> search;
@@ -52,7 +54,7 @@ public class SiteViewModel extends ViewModel {
         this.search = new MutableLiveData<>();
     }
 
-    public void setEpisode(Vod.Flag.Episode value) {
+    public void setEpisode(Episode value) {
         episode.setValue(value);
     }
 
@@ -126,7 +128,7 @@ public class SiteViewModel extends ViewModel {
                 vod.setVodId(id);
                 vod.setVodName(id);
                 vod.setVodPic("https://pic.rmb.bdstatic.com/bjh/1d0b02d0f57f0a42201f92caba5107ed.jpeg");
-                vod.setVodFlags(Vod.Flag.create(ResUtil.getString(R.string.push), ResUtil.getString(R.string.play), id));
+                vod.setVodFlags(Flag.create(ResUtil.getString(R.string.push), ResUtil.getString(R.string.play), id));
                 checkThunder(vod.getVodFlags());
                 return Result.vod(vod);
             } else {
@@ -246,10 +248,10 @@ public class SiteViewModel extends ViewModel {
         return result;
     }
 
-    private void checkThunder(List<Vod.Flag> flags) throws Exception {
-        for (Vod.Flag flag : flags) {
+    private void checkThunder(List<Flag> flags) throws Exception {
+        for (Flag flag : flags) {
             ExecutorService executor = Executors.newFixedThreadPool(Constant.THREAD_POOL * 2);
-            for (Future<List<Vod.Flag.Episode>> future : executor.invokeAll(flag.getMagnet(), 30, TimeUnit.SECONDS)) flag.getEpisodes().addAll(Vod.Flag.Episode.Sorter.sort(future.get()));
+            for (Future<List<Episode>> future : executor.invokeAll(flag.getMagnet(), 30, TimeUnit.SECONDS)) flag.getEpisodes().addAll(Episode.Sorter.sort(future.get()));
             executor.shutdownNow();
         }
     }

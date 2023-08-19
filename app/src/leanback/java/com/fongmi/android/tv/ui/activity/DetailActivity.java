@@ -34,6 +34,8 @@ import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.bean.Episode;
+import com.fongmi.android.tv.bean.Flag;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.bean.Parse;
@@ -198,16 +200,16 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         return ApiConfig.get().getSite(getKey());
     }
 
-    private Vod.Flag getFlag() {
-        return (Vod.Flag) mFlagAdapter.get(mBinding.flag.getSelectedPosition());
+    private Flag getFlag() {
+        return (Flag) mFlagAdapter.get(mBinding.flag.getSelectedPosition());
     }
 
-    private Vod.Flag.Episode getEpisode() {
-        return (Vod.Flag.Episode) mEpisodeAdapter.get(getEpisodePosition());
+    private Episode getEpisode() {
+        return (Episode) mEpisodeAdapter.get(getEpisodePosition());
     }
 
     private int getEpisodePosition() {
-        for (int i = 0; i < mEpisodeAdapter.size(); i++) if (((Vod.Flag.Episode) mEpisodeAdapter.get(i)).isActivated()) return i;
+        for (int i = 0; i < mEpisodeAdapter.size(); i++) if (((Episode) mEpisodeAdapter.get(i)).isActivated()) return i;
         return 0;
     }
 
@@ -297,7 +299,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.flag.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
-                if (mFlagAdapter.size() > 0) setFlagActivated((Vod.Flag) mFlagAdapter.get(position), false);
+                if (mFlagAdapter.size() > 0) setFlagActivated((Flag) mFlagAdapter.get(position), false);
             }
         });
         mBinding.array.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
@@ -394,7 +396,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         getDetail();
     }
 
-    private void getPlayer(Vod.Flag flag, Vod.Flag.Episode episode, boolean replay) {
+    private void getPlayer(Flag flag, Episode episode, boolean replay) {
         mBinding.widget.title.setText(getString(R.string.detail_title, mBinding.name.getText(), episode.getName()));
         mViewModel.playerContent(getKey(), flag.getFlag(), episode.getUrl());
         updateHistory(episode, replay);
@@ -457,34 +459,34 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         view.setTag(text);
     }
 
-    private void setFlagActivated(Vod.Flag item, boolean force) {
+    private void setFlagActivated(Flag item, boolean force) {
         if (mFlagAdapter.size() == 0 || item.isActivated()) return;
-        for (int i = 0; i < mFlagAdapter.size(); i++) ((Vod.Flag) mFlagAdapter.get(i)).setActivated(item);
+        for (int i = 0; i < mFlagAdapter.size(); i++) ((Flag) mFlagAdapter.get(i)).setActivated(item);
         mBinding.flag.setSelectedPosition(mFlagAdapter.indexOf(item));
         notifyItemChanged(mBinding.flag, mFlagAdapter);
         setEpisodeAdapter(item.getEpisodes());
         seamless(item, force);
     }
 
-    private void setEpisodeAdapter(List<Vod.Flag.Episode> items) {
+    private void setEpisodeAdapter(List<Episode> items) {
         mBinding.episode.setVisibility(items.isEmpty() ? View.GONE : View.VISIBLE);
         mEpisodeAdapter.setItems(items, null);
         setArray(items.size());
     }
 
-    private void seamless(Vod.Flag flag, boolean force) {
+    private void seamless(Flag flag, boolean force) {
         if (Setting.getFlag() == 1 && (mHistory.isNew() || !force)) return;
-        Vod.Flag.Episode episode = flag.find(mHistory.getVodRemarks(), getMark() == null);
+        Episode episode = flag.find(mHistory.getVodRemarks(), getMark() == null);
         if (episode == null || episode.isActivated()) return;
         mHistory.setVodRemarks(episode.getName());
         setEpisodeActivated(episode);
         hidePreview();
     }
 
-    private void setEpisodeActivated(Vod.Flag.Episode item) {
+    private void setEpisodeActivated(Episode item) {
         if (shouldEnterFullscreen(item)) return;
         setCurrentFlag(mBinding.flag.getSelectedPosition());
-        for (int i = 0; i < mFlagAdapter.size(); i++) ((Vod.Flag) mFlagAdapter.get(i)).toggle(getCurrentFlag() == i, item);
+        for (int i = 0; i < mFlagAdapter.size(); i++) ((Flag) mFlagAdapter.get(i)).toggle(getCurrentFlag() == i, item);
         mBinding.episode.setSelectedPosition(getEpisodePosition());
         notifyItemChanged(mBinding.episode, mEpisodeAdapter);
         if (mEpisodeAdapter.size() == 0) return;
@@ -493,7 +495,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void reverseEpisode(boolean scroll) {
-        for (int i = 0; i < mFlagAdapter.size(); i++) Collections.reverse(((Vod.Flag) mFlagAdapter.get(i)).getEpisodes());
+        for (int i = 0; i < mFlagAdapter.size(); i++) Collections.reverse(((Flag) mFlagAdapter.get(i)).getEpisodes());
         setEpisodeAdapter(getFlag().getEpisodes());
         if (scroll) mBinding.episode.setSelectedPosition(getEpisodePosition());
     }
@@ -529,7 +531,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         Notify.show(mHistory.getRevPlayHint());
     }
 
-    private boolean shouldEnterFullscreen(Vod.Flag.Episode item) {
+    private boolean shouldEnterFullscreen(Episode item) {
         boolean enter = !isFullscreen() && item.isActivated();
         if (enter) enterFullscreen();
         return enter;
@@ -594,7 +596,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         int current = getEpisodePosition();
         int max = mEpisodeAdapter.size() - 1;
         current = ++current > max ? max : current;
-        Vod.Flag.Episode item = (Vod.Flag.Episode) mEpisodeAdapter.get(current);
+        Episode item = (Episode) mEpisodeAdapter.get(current);
         if (item.isActivated()) Notify.show(mHistory.isRevPlay() ? R.string.error_play_prev : R.string.error_play_next);
         else setEpisodeActivated(item);
     }
@@ -602,7 +604,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void onPrev() {
         int current = getEpisodePosition();
         current = --current < 0 ? 0 : current;
-        Vod.Flag.Episode item = (Vod.Flag.Episode) mEpisodeAdapter.get(current);
+        Episode item = (Episode) mEpisodeAdapter.get(current);
         if (item.isActivated()) Notify.show(mHistory.isRevPlay() ? R.string.error_play_next : R.string.error_play_prev);
         else setEpisodeActivated(item);
     }
@@ -869,7 +871,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         return history;
     }
 
-    private void updateHistory(Vod.Flag.Episode item, boolean replay) {
+    private void updateHistory(Episode item, boolean replay) {
         replay = replay || !item.equals(mHistory.getEpisode());
         long position = replay ? 0 : mHistory.getPosition();
         mHistory.setPosition(position);
@@ -1090,7 +1092,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void nextFlag(int position) {
-        Vod.Flag flag = (Vod.Flag) mFlagAdapter.get(position + 1);
+        Flag flag = (Flag) mFlagAdapter.get(position + 1);
         Notify.show(getString(R.string.play_switch_flag, flag.getFlag()));
         setFlagActivated(flag, true);
     }
