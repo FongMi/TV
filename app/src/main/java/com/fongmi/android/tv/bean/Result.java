@@ -71,6 +71,8 @@ public class Result implements Parcelable {
     private List<Sub> subs;
     @SerializedName("pagecount")
     private Integer pagecount;
+    @SerializedName("code")
+    private Integer code;
     @JsonAdapter(MsgAdapter.class)
     @SerializedName("msg")
     private String msg;
@@ -229,8 +231,12 @@ public class Result implements Parcelable {
         return pagecount == null ? 0 : pagecount;
     }
 
+    public Integer getCode() {
+        return code == null ? 0 : code;
+    }
+
     public String getMsg() {
-        return TextUtils.isEmpty(msg) ? "" : msg;
+        return TextUtils.isEmpty(msg) || getCode() != 0 ? "" : msg;
     }
 
     public void setMsg(String msg) {
@@ -238,7 +244,7 @@ public class Result implements Parcelable {
     }
 
     public boolean hasMsg() {
-        return !TextUtils.isEmpty(getMsg());
+        return getMsg().length() > 0;
     }
 
     public String getRealUrl() {
@@ -278,17 +284,6 @@ public class Result implements Parcelable {
         dest.writeList(this.types);
         dest.writeTypedList(this.list);
         dest.writeString(App.gson().toJson(this.filters));
-        dest.writeString(this.playUrl);
-        dest.writeString(this.jxFrom);
-        dest.writeValue(this.parse);
-        dest.writeValue(this.jx);
-        dest.writeString(this.flag);
-        dest.writeString(this.format);
-        dest.writeString(this.url);
-        dest.writeString(this.key);
-        dest.writeList(this.subs);
-        dest.writeValue(this.pagecount);
-        dest.writeString(this.msg);
     }
 
     protected Result(Parcel in) {
@@ -297,18 +292,6 @@ public class Result implements Parcelable {
         this.list = in.createTypedArrayList(Vod.CREATOR);
         Type type = new TypeToken<LinkedHashMap<String, List<Filter>>>() {}.getType();
         this.filters = App.gson().fromJson(in.readString(), type);
-        this.playUrl = in.readString();
-        this.jxFrom = in.readString();
-        this.parse = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.jx = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.flag = in.readString();
-        this.format = in.readString();
-        this.url = in.readString();
-        this.key = in.readString();
-        this.subs = new ArrayList<>();
-        in.readList(this.subs, Sub.class.getClassLoader());
-        this.pagecount = in.readInt();
-        this.msg = in.readString();
     }
 
     public static final Creator<Result> CREATOR = new Creator<>() {
