@@ -22,16 +22,22 @@ public class Url {
         return v(getPosition());
     }
 
-    public String n() {
-        return n(getPosition());
-    }
-
     public String v(int position) {
         return position >= getValues().size() ? "" : getValues().get(position).getV();
     }
 
     public String n(int position) {
         return position >= getValues().size() ? "" : getValues().get(position).getN();
+    }
+
+    public Url add(String v) {
+        getValues().add(new Value("", v));
+        return this;
+    }
+
+    public Url add(String n, String v) {
+        getValues().add(new Value(n, v));
+        return this;
     }
 
     public Url set(int position) {
