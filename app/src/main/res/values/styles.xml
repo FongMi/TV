@@ -8,11 +8,6 @@
         <item name="cornerSize">8dp</item>
     </style>
 
-    <style name="Vod.Rect">
-        <item name="cornerSizeTopLeft">8dp</item>
-        <item name="cornerSizeTopRight">8dp</item>
-    </style>
-
     <style name="Vod.Circle">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>

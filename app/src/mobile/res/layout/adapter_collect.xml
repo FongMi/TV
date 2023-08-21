@@ -7,6 +7,7 @@
     android:layout_margin="8dp"
     android:background="@drawable/shape_item"
     android:gravity="center"
+    android:padding="8dp"
     android:singleLine="true"
     android:textColor="@color/text"
     android:textSize="14sp"
