@@ -78,8 +78,8 @@ public class KeepAdapter extends RecyclerView.Adapter<KeepAdapter.ViewHolder> {
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         ViewHolder holder = new ViewHolder(AdapterVodBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
-        holder.binding.getRoot().getLayoutParams().width = width;
-        holder.binding.getRoot().getLayoutParams().height = height;
+        holder.binding.image.getLayoutParams().width = width;
+        holder.binding.image.getLayoutParams().height = height;
         return holder;
     }
 
