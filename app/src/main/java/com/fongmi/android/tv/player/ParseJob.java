@@ -70,7 +70,7 @@ public class ParseJob implements ParseCallback {
     private Runnable getTask(Result result) {
         return () -> {
             try {
-                doInBackground(result.getKey(), result.getUrl(), result.getFlag());
+                doInBackground(result.getKey(), result.getUrl().v(), result.getFlag());
             } catch (Throwable e) {
                 onParseError();
             }
@@ -148,8 +148,8 @@ public class ParseJob implements ParseCallback {
 
     private void checkResult(Result result) {
         if (result.getUrl().isEmpty()) onParseError();
-        else if (result.getParse() == 1) startWeb(result.getHeaders(), Utils.convert(result.getUrl()));
-        else onParseSuccess(result.getHeaders(), result.getUrl(), result.getJxFrom());
+        else if (result.getParse() == 1) startWeb(result.getHeaders(), Utils.convert(result.getUrl().v()));
+        else onParseSuccess(result.getHeaders(), result.getUrl().v(), result.getJxFrom());
     }
 
     private boolean isPass(Map<String, String> headers, String url) {

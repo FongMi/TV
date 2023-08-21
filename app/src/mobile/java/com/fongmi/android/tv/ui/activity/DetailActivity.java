@@ -64,6 +64,7 @@ import com.fongmi.android.tv.ui.adapter.EpisodeAdapter;
 import com.fongmi.android.tv.ui.adapter.FlagAdapter;
 import com.fongmi.android.tv.ui.adapter.ParseAdapter;
 import com.fongmi.android.tv.ui.adapter.QuickAdapter;
+import com.fongmi.android.tv.ui.adapter.UrlAdapter;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.base.ViewType;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
@@ -98,7 +99,7 @@ import java.util.concurrent.Executors;
 
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class DetailActivity extends BaseActivity implements Clock.Callback, CustomKeyDownVod.Listener, CastDialog.Listener, PiPReceiver.Listener, TrackDialog.Listener, ControlDialog.Listener, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, ParseAdapter.OnClickListener {
+public class DetailActivity extends BaseActivity implements Clock.Callback, CustomKeyDownVod.Listener, CastDialog.Listener, PiPReceiver.Listener, TrackDialog.Listener, ControlDialog.Listener, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, UrlAdapter.OnClickListener, QuickAdapter.OnClickListener, ParseAdapter.OnClickListener {
 
     private ViewGroup.LayoutParams mFrameParams;
     private Observer<Result> mObserveDetail;
@@ -113,6 +114,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     private ExecutorService mExecutor;
     private SiteViewModel mViewModel;
     private FlagAdapter mFlagAdapter;
+    private UrlAdapter mUrlAdapter;
     private PiPReceiver mReceiver;
     private List<Dialog> mDialogs;
     private List<String> mBroken;
@@ -313,15 +315,19 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void setRecyclerView() {
+        mBinding.url.setHasFixedSize(true);
+        mBinding.url.setItemAnimator(null);
+        mBinding.url.addItemDecoration(new SpaceItemDecoration(8));
+        mBinding.url.setAdapter(mUrlAdapter = new UrlAdapter(this));
         mBinding.flag.setHasFixedSize(true);
         mBinding.flag.setItemAnimator(null);
         mBinding.flag.addItemDecoration(new SpaceItemDecoration(8));
         mBinding.flag.setAdapter(mFlagAdapter = new FlagAdapter(this));
+        mBinding.quick.setAdapter(mQuickAdapter = new QuickAdapter(this));
         mBinding.episode.setHasFixedSize(true);
         mBinding.episode.setItemAnimator(null);
         mBinding.episode.addItemDecoration(new SpaceItemDecoration(8));
         mBinding.episode.setAdapter(mEpisodeAdapter = new EpisodeAdapter(this, ViewType.LIST));
-        mBinding.quick.setAdapter(mQuickAdapter = new QuickAdapter(this::setSearch));
         mBinding.control.parse.setHasFixedSize(true);
         mBinding.control.parse.setItemAnimator(null);
         mBinding.control.parse.addItemDecoration(new SpaceItemDecoration(8));
@@ -458,12 +464,14 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void setPlayer(Result result) {
+        result.getUrl().set(mUrlAdapter.getPosition());
         setUseParse(ApiConfig.hasParse() && ((result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx() == 1));
         if (mControlDialog != null && mControlDialog.isVisible()) mControlDialog.setParseVisible(isUseParse());
         mBinding.control.parse.setVisibility(isFullscreen() && isUseParse() ? View.VISIBLE : View.GONE);
-        int timeout = getSite().isChangeable() ? getSite().getTimeout() : -1;
-        mPlayers.start(result, isUseParse(), timeout);
+        mPlayers.start(result, isUseParse(), getSite().isChangeable() ? getSite().getTimeout() : -1);
+        mBinding.url.setVisibility(result.getUrl().isOnly() ? View.GONE : View.VISIBLE);
         mBinding.swipeLayout.setRefreshing(false);
+        mUrlAdapter.addAll(result);
     }
 
     @Override
@@ -482,6 +490,17 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         notifyItemChanged(mEpisodeAdapter);
         mBinding.episode.scrollToPosition(mEpisodeAdapter.getPosition());
         onRefresh();
+    }
+
+    @Override
+    public void onItemClick(Result result) {
+        mPlayers.start(result, isUseParse(), getSite().isChangeable() ? getSite().getTimeout() : -1);
+    }
+
+    @Override
+    public void onItemClick(Vod item) {
+        setAutoMode(false);
+        getDetail(item);
     }
 
     @Override
@@ -1129,11 +1148,6 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         if (isInitAuto()) nextSite();
         if (items.isEmpty()) return;
         App.removeCallbacks(mR4);
-    }
-
-    private void setSearch(Vod item) {
-        setAutoMode(false);
-        getDetail(item);
     }
 
     private boolean mismatch(Vod item) {

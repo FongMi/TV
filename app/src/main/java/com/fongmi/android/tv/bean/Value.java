@@ -19,6 +19,11 @@ public class Value implements Parcelable {
     public Value() {
     }
 
+    public Value(String n, String v) {
+        this.n = Trans.s2t(n);
+        this.v = v;
+    }
+
     public String getN() {
         return TextUtils.isEmpty(n) ? "" : n;
     }

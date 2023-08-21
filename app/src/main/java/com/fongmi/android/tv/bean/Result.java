@@ -64,7 +64,7 @@ public class Result implements Parcelable {
     private String format;
     @SerializedName("url")
     @JsonAdapter(UrlAdapter.class)
-    private String url;
+    private Url url;
     @SerializedName("key")
     private String key;
     @SerializedName("subs")
@@ -207,11 +207,11 @@ public class Result implements Parcelable {
         this.flag = flag;
     }
 
-    public String getUrl() {
-        return TextUtils.isEmpty(url) ? "" : url;
+    public Url getUrl() {
+        return url == null ? new Url() : url;
     }
 
-    public void setUrl(String url) {
+    public void setUrl(Url url) {
         this.url = url;
     }
 
@@ -248,7 +248,7 @@ public class Result implements Parcelable {
     }
 
     public String getRealUrl() {
-        return getPlayUrl() + getUrl();
+        return getPlayUrl() + getUrl().v();
     }
 
     public Map<String, String> getHeaders() {
@@ -290,8 +290,8 @@ public class Result implements Parcelable {
         this.types = new ArrayList<>();
         in.readList(this.types, Class.class.getClassLoader());
         this.list = in.createTypedArrayList(Vod.CREATOR);
-        Type type = new TypeToken<LinkedHashMap<String, List<Filter>>>() {}.getType();
-        this.filters = App.gson().fromJson(in.readString(), type);
+        Type listType = new TypeToken<LinkedHashMap<String, List<Filter>>>() {}.getType();
+        this.filters = App.gson().fromJson(in.readString(), listType);
     }
 
     public static final Creator<Result> CREATOR = new Creator<>() {
