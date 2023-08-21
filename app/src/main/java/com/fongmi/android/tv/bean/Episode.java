@@ -8,10 +8,6 @@ import com.github.catvod.utils.Trans;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
 public class Episode implements Parcelable {
 
     @SerializedName("name")
@@ -139,17 +135,4 @@ public class Episode implements Parcelable {
             return new Episode[size];
         }
     };
-
-    public static class Sorter implements Comparator<Episode> {
-
-        public static List<Episode> sort(List<Episode> items) {
-            if (items.size() > 1) Collections.sort(items, new Sorter());
-            return items;
-        }
-
-        @Override
-        public int compare(Episode o1, Episode o2) {
-            return Integer.compare(o1.getNumber(), o2.getNumber());
-        }
-    }
 }

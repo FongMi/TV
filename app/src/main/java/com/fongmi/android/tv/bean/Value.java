@@ -32,6 +32,10 @@ public class Value implements Parcelable {
         return TextUtils.isEmpty(v) ? "" : v;
     }
 
+    public void setV(String v) {
+        this.v = v;
+    }
+
     public boolean isActivated() {
         return activated;
     }

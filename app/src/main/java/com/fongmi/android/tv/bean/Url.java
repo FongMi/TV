@@ -10,6 +10,10 @@ public class Url {
     private List<Value> values;
     private int position;
 
+    public static Url create() {
+        return new Url();
+    }
+
     public List<Value> getValues() {
         return values = values == null ? new ArrayList<>() : values;
     }
@@ -37,6 +41,11 @@ public class Url {
 
     public Url add(String n, String v) {
         getValues().add(new Value(n, v));
+        return this;
+    }
+
+    public Url replace(String url) {
+        getValues().get(getPosition()).setV(url);
         return this;
     }
 

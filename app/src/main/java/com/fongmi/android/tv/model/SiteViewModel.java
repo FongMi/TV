@@ -15,6 +15,7 @@ import com.fongmi.android.tv.bean.Episode;
 import com.fongmi.android.tv.bean.Flag;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
+import com.fongmi.android.tv.bean.Url;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.exception.ExtractException;
 import com.fongmi.android.tv.player.Source;
@@ -154,7 +155,7 @@ public class SiteViewModel extends ViewModel {
                 ApiConfig.get().setRecent(site);
                 Result result = Result.fromJson(playerContent);
                 if (result.getFlag().isEmpty()) result.setFlag(flag);
-                result.setUrl(Source.get().fetch(result.getUrl()));
+                result.setUrl(Source.get().fetch(result.getUrl().v()));
                 result.setKey(key);
                 return result;
             } else if (site.getType() == 4) {
@@ -167,23 +168,23 @@ public class SiteViewModel extends ViewModel {
                 SpiderDebug.log(body);
                 Result result = Result.fromJson(body);
                 if (result.getFlag().isEmpty()) result.setFlag(flag);
-                result.setUrl(Source.get().fetch(result.getUrl()));
+                result.setUrl(Source.get().fetch(result.getUrl().v()));
                 return result;
             } else if (site.isEmpty() && key.equals("push_agent")) {
                 Result result = new Result();
                 result.setParse(0);
                 result.setFlag(flag);
-                result.setUrl(Source.get().fetch(id));
+                result.setUrl(Source.get().fetch(result.getUrl().v()));
                 return result;
             } else {
-                String url = id;
-                String type = Uri.parse(url).getQueryParameter("type");
+                Url url = Url.create().add(id);
+                String type = Uri.parse(id).getQueryParameter("type");
                 if (type != null && type.equals("json")) url = Result.fromJson(OkHttp.newCall(id).execute().body().string()).getUrl();
                 Result result = new Result();
                 result.setUrl(url);
                 result.setFlag(flag);
                 result.setPlayUrl(site.getPlayUrl());
-                result.setParse(Sniffer.isVideoFormat(url) && result.getPlayUrl().isEmpty() ? 0 : 1);
+                result.setParse(Sniffer.isVideoFormat(url.v()) && result.getPlayUrl().isEmpty() ? 0 : 1);
                 return result;
             }
         });
@@ -246,7 +247,7 @@ public class SiteViewModel extends ViewModel {
     private void checkThunder(List<Flag> flags) throws Exception {
         for (Flag flag : flags) {
             ExecutorService executor = Executors.newFixedThreadPool(Constant.THREAD_POOL * 2);
-            for (Future<List<Episode>> future : executor.invokeAll(flag.getMagnet(), 30, TimeUnit.SECONDS)) flag.getEpisodes().addAll(Episode.Sorter.sort(future.get()));
+            for (Future<List<Episode>> future : executor.invokeAll(flag.getMagnet(), 30, TimeUnit.SECONDS)) flag.getEpisodes().addAll(future.get());
             executor.shutdownNow();
         }
     }

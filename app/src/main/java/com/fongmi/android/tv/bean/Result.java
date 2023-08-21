@@ -208,11 +208,15 @@ public class Result implements Parcelable {
     }
 
     public Url getUrl() {
-        return url == null ? new Url() : url;
+        return url == null ? Url.create() : url;
     }
 
     public void setUrl(Url url) {
         this.url = url;
+    }
+
+    public void setUrl(String url) {
+        this.url = getUrl().replace(url);
     }
 
     public String getKey() {
