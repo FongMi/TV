@@ -185,9 +185,11 @@ public class LiveParser {
         }
 
         private void clear() {
+            ua = null;
+            key = null;
+            type = null;
             player = null;
             referer = null;
-            ua = null;
         }
     }
 }
