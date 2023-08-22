@@ -216,6 +216,13 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         mHistoryAdapter.notifyArrayItemRangeChanged(0, mHistoryAdapter.size());
     }
 
+    private void clearHistory() {
+        mAdapter.removeItems(getHistoryIndex(), 1);
+        History.delete(ApiConfig.getCid());
+        mPresenter.setDelete(false);
+        mHistoryAdapter.clear();
+    }
+
     private int getHistoryIndex() {
         for (int i = 0; i < mAdapter.size(); i++) if (mAdapter.get(i).equals(R.string.home_history)) return i + 1;
         return -1;
@@ -282,7 +289,8 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     public boolean onLongClick() {
-        setHistoryDelete(true);
+        if (mPresenter.isDelete()) clearHistory();
+        else setHistoryDelete(true);
         return true;
     }
 
