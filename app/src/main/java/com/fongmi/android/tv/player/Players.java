@@ -8,6 +8,7 @@ import androidx.media3.common.Player;
 import androidx.media3.common.util.Util;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.analytics.AnalyticsListener;
+import androidx.media3.exoplayer.util.EventLogger;
 import androidx.media3.ui.PlayerView;
 
 import com.fongmi.android.tv.App;
@@ -86,6 +87,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     private void setupExo(PlayerView view) {
         exoPlayer = new ExoPlayer.Builder(App.get()).setLoadControl(ExoUtil.buildLoadControl()).setRenderersFactory(ExoUtil.buildRenderersFactory()).setTrackSelector(ExoUtil.buildTrackSelector()).build();
+        exoPlayer.addAnalyticsListener(new EventLogger());
         exoPlayer.addAnalyticsListener(this);
         exoPlayer.setPlayWhenReady(true);
         exoPlayer.addListener(this);
