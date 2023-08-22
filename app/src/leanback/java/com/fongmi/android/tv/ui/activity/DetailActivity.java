@@ -40,6 +40,7 @@ import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Part;
+import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Track;
 import com.fongmi.android.tv.bean.Vod;
@@ -54,6 +55,7 @@ import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.player.Source;
+import com.fongmi.android.tv.ui.adapter.QualityAdapter;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
 import com.fongmi.android.tv.ui.custom.dialog.DescDialog;
@@ -103,6 +105,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private ArrayObjectAdapter mFlagAdapter;
     private ArrayObjectAdapter mPartAdapter;
     private ActivityDetailBinding mBinding;
+    private QualityAdapter mQualityAdapter;
     private PartPresenter mPartPresenter;
     private CustomKeyDownVod mKeyDown;
     private ExecutorService mExecutor;
@@ -317,6 +320,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.episode.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.episode.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         mBinding.episode.setAdapter(new ItemBridgeAdapter(mEpisodeAdapter = new ArrayObjectAdapter(mEpisodePresenter = new EpisodePresenter(this::setEpisodeActivated))));
+        mBinding.quality.setHorizontalSpacing(ResUtil.dp2px(8));
+        mBinding.quality.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+        mBinding.quality.setAdapter(mQualityAdapter = new QualityAdapter(this::setQualityActivated));
         mBinding.array.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.array.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         mBinding.array.setAdapter(new ItemBridgeAdapter(mArrayAdapter = new ArrayObjectAdapter(new ArrayPresenter(this))));
@@ -359,18 +365,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
+        mViewModel.result.observe(this, this::setDetail);
+        mViewModel.player.observe(this, this::setPlayer);
         mViewModel.search.observe(this, result -> setSearch(result.getList()));
-        mViewModel.player.observe(this, result -> {
-            setUseParse(ApiConfig.hasParse() && ((result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx() == 1));
-            mBinding.control.parse.setVisibility(isUseParse() ? View.VISIBLE : View.GONE);
-            int timeout = getSite().isChangeable() ? getSite().getTimeout() : -1;
-            mPlayers.start(result, isUseParse(), timeout);
-        });
-        mViewModel.result.observe(this, result -> {
-            if (result.getList().isEmpty()) setEmpty();
-            else setDetail(result.getList().get(0));
-            Notify.show(result.getMsg());
-        });
     }
 
     private void checkCast() {
@@ -397,6 +394,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         getDetail();
     }
 
+    private void setDetail(Result result) {
+        if (result.getList().isEmpty()) setEmpty();
+        else setDetail(result.getList().get(0));
+        Notify.show(result.getMsg());
+    }
+
     private void getPlayer(Flag flag, Episode episode, boolean replay) {
         mBinding.widget.title.setText(getString(R.string.detail_title, mBinding.name.getText(), episode.getName()));
         mViewModel.playerContent(getKey(), flag.getFlag(), episode.getUrl());
@@ -404,6 +407,16 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         showProgress();
         hidePreview();
         hideCenter();
+    }
+
+    private void setPlayer(Result result) {
+        result.getUrl().set(mQualityAdapter.getPosition());
+        setUseParse(ApiConfig.hasParse() && ((result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx() == 1));
+        mPlayers.start(result, isUseParse(), getSite().isChangeable() ? getSite().getTimeout() : -1);
+        mBinding.quality.setVisibility(result.getUrl().isOnly() ? View.GONE : View.VISIBLE);
+        mBinding.control.parse.setVisibility(isUseParse() ? View.VISIBLE : View.GONE);
+        mQualityAdapter.addAll(result);
+        updateFocus();
     }
 
     private void setEmpty() {
@@ -473,6 +486,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.episode.setVisibility(items.isEmpty() ? View.GONE : View.VISIBLE);
         mEpisodeAdapter.setItems(items, null);
         setArray(items.size());
+        updateFocus();
     }
 
     private void seamless(Flag flag, boolean force) {
@@ -495,6 +509,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         onRefresh();
     }
 
+    private void setQualityActivated(Result result) {
+        mPlayers.start(result, isUseParse(), getSite().isChangeable() ? getSite().getTimeout() : -1);
+    }
+
     private void reverseEpisode(boolean scroll) {
         for (int i = 0; i < mFlagAdapter.size(); i++) Collections.reverse(((Flag) mFlagAdapter.get(i)).getEpisodes());
         setEpisodeAdapter(getFlag().getEpisodes());
@@ -511,12 +529,15 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         List<String> items = new ArrayList<>();
         items.add(getString(R.string.play_reverse));
         items.add(getString(mHistory.getRevPlayText()));
-        mEpisodePresenter.setNextFocusDown(size > 1 ? R.id.array : R.id.part);
-        mPartPresenter.setNextFocusUp(size > 1 ? R.id.array : R.id.episode);
         mBinding.array.setVisibility(size > 1 ? View.VISIBLE : View.GONE);
         if (mHistory.isRevSort()) for (int i = size; i > 0; i -= 20) items.add(i + "-" + Math.max(i - 19, 1));
         else for (int i = 0; i < size; i += 20) items.add((i + 1) + "-" + Math.min(i + 20, size));
         mArrayAdapter.setItems(items, null);
+    }
+
+    private void updateFocus() {
+        mEpisodePresenter.setNextFocusDown(isVisible(mBinding.quality) ? R.id.quality : isVisible(mBinding.array) ? R.id.array : R.id.part);
+        mPartPresenter.setNextFocusUp(isVisible(mBinding.quality) ? R.id.quality : isVisible(mBinding.array) ? R.id.array : R.id.episode);
     }
 
     @Override
@@ -827,12 +848,14 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
                 List<String> items = Part.get(response.body().string());
                 if (!items.contains(source)) items.add(0, source);
                 App.post(() -> mPartAdapter.setItems(items, null));
+                App.post(() -> mBinding.part.setVisibility(View.VISIBLE));
             }
 
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 List<String> items = List.of(source);
                 App.post(() -> mPartAdapter.setItems(items, null));
+                App.post(() -> mBinding.part.setVisibility(View.VISIBLE));
             }
         });
     }

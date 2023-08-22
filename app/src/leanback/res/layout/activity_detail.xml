@@ -272,6 +272,18 @@
                 android:visibility="gone" />
 
             <com.fongmi.android.tv.ui.custom.CustomHorizontalGridView
+                android:id="@+id/quality"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:paddingStart="24dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="24dp"
+                android:paddingBottom="8dp"
+                android:visibility="gone" />
+
+            <com.fongmi.android.tv.ui.custom.CustomHorizontalGridView
                 android:id="@+id/array"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -292,7 +304,8 @@
                 android:paddingStart="24dp"
                 android:paddingTop="8dp"
                 android:paddingEnd="24dp"
-                android:paddingBottom="8dp" />
+                android:paddingBottom="8dp"
+                android:visibility="gone" />
 
             <androidx.leanback.widget.HorizontalGridView
                 android:id="@+id/quick"
