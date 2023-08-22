@@ -4,6 +4,7 @@ import android.util.Base64;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Channel;
+import com.fongmi.android.tv.bean.Drm;
 import com.fongmi.android.tv.bean.Group;
 import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.utils.Utils;
@@ -55,13 +56,16 @@ public class LiveParser {
     }
 
     private static void m3u(Live live, String text) {
+        Setting setting = Setting.create();
         Channel channel = Channel.create("");
         for (String line : text.split("\n")) {
+            setting.check(line);
             if (Thread.interrupted()) break;
             if (line.startsWith("#EXTINF:")) {
                 Group group = live.find(Group.create(extract(line, GROUP)));
                 channel = group.find(Channel.create(extract(line, NAME)));
                 channel.setLogo(extract(line, LOGO));
+                setting.copy(channel).clear();
             } else if (line.contains("://")) {
                 channel.getUrls().add(line);
             }
@@ -113,9 +117,11 @@ public class LiveParser {
 
     private static class Setting {
 
-        public String ua;
-        public String referer;
-        public Integer player;
+        private String ua;
+        private String key;
+        private String type;
+        private String referer;
+        private Integer player;
 
         public static Setting create() {
             return new Setting();
@@ -125,13 +131,17 @@ public class LiveParser {
             if (line.startsWith("ua")) ua(line);
             if (line.startsWith("player")) player(line);
             if (line.startsWith("referer")) referer(line);
+            if (line.startsWith("#KODIPROP:inputstream.adaptive.license_key")) key(line);
+            if (line.startsWith("#KODIPROP:inputstream.adaptive.license_type")) type(line);
             if (line.contains("#genre#")) clear();
         }
 
-        public void copy(Channel channel) {
+        public Setting copy(Channel channel) {
             if (ua != null) channel.setUa(ua);
             if (referer != null) channel.setReferer(referer);
             if (player != null) channel.setPlayerType(player);
+            if (key != null && type != null) channel.setDrm(Drm.create(key, type));
+            return this;
         }
 
         private void ua(String line) {
@@ -155,6 +165,22 @@ public class LiveParser {
                 player = Integer.parseInt(line.split("=")[1].trim());
             } catch (Exception e) {
                 player = null;
+            }
+        }
+
+        private void key(String line) {
+            try {
+                key = line.split("=")[1].trim();
+            } catch (Exception e) {
+                key = null;
+            }
+        }
+
+        private void type(String line) {
+            try {
+                type = line.split("=")[1].trim();
+            } catch (Exception e) {
+                type = null;
             }
         }
 

@@ -39,6 +39,8 @@ public class Channel {
     private JsonElement header;
     @SerializedName("playerType")
     private Integer playerType;
+    @SerializedName("drm")
+    private Drm drm;
 
     private boolean selected;
     private Group group;
@@ -139,6 +141,14 @@ public class Channel {
 
     public void setPlayerType(Integer playerType) {
         this.playerType = playerType;
+    }
+
+    public Drm getDrm() {
+        return drm;
+    }
+
+    public void setDrm(Drm drm) {
+        this.drm = drm;
     }
 
     public Group getGroup() {

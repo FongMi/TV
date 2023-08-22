@@ -1,6 +1,7 @@
 package com.fongmi.android.tv.server;
 
 import android.net.Uri;
+import android.util.Base64;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
@@ -94,6 +95,7 @@ public class Nano extends NanoHTTPD {
                 else if (url.startsWith("/newFolder")) return doNewFolder(session.getParms());
                 else if (url.startsWith("/delFolder") || url.startsWith("/delFile")) return doDelFolder(session.getParms());
                 else if (url.startsWith("/tvbus")) return createSuccessResponse(LiveConfig.get().getHome().getCore().getResp());
+                else if (url.startsWith("/license/")) return createSuccessResponse(new String(Base64.decode(url.substring(9), Base64.DEFAULT)));
                 break;
         }
         return createErrorResponse(NanoHTTPD.Response.Status.NOT_FOUND, "Not Found");
