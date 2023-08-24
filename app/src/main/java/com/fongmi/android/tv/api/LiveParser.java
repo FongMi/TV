@@ -131,6 +131,8 @@ public class LiveParser {
             if (line.startsWith("ua")) ua(line);
             if (line.startsWith("player")) player(line);
             if (line.startsWith("referer")) referer(line);
+            if (line.startsWith("#EXTVLCOPT:http-user-agent")) ua(line);
+            if (line.startsWith("#EXTVLCOPT:http-referer")) referer(line);
             if (line.startsWith("#KODIPROP:inputstream.adaptive.license_key")) key(line);
             if (line.startsWith("#KODIPROP:inputstream.adaptive.license_type")) type(line);
             if (line.contains("#genre#")) clear();

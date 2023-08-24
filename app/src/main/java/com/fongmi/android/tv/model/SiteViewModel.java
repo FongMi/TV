@@ -39,6 +39,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.FormBody;
+import okhttp3.Response;
 
 public class SiteViewModel extends ViewModel {
 
@@ -239,8 +240,11 @@ public class SiteViewModel extends ViewModel {
     }
 
     private String fetchExt(Site site) throws IOException {
-        if (!site.getExt().contains("127.0.0.1")) return site.getExt();
-        return OkHttp.newCall(site.getExt()).execute().body().string();
+        if (!site.getExt().startsWith("http")) return site.getExt();
+        Response res = OkHttp.newCall(site.getExt()).execute();
+        if (res.code() != 200) return "";
+        site.setExt(res.body().string());
+        return site.getExt();
     }
 
     private Result fetchPic(Site site, Result result) throws Exception {
