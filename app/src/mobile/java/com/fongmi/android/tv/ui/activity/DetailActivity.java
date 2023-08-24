@@ -457,6 +457,8 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     private void getPlayer(Flag flag, Episode episode, boolean replay) {
         mBinding.control.title.setText(getString(R.string.detail_title, mBinding.name.getText(), episode.getName()));
         mViewModel.playerContent(getKey(), flag.getFlag(), episode.getUrl());
+        mBinding.qualityText.setVisibility(View.GONE);
+        mBinding.quality.setVisibility(View.GONE);
         updateHistory(episode, replay);
         showProgress();
         hidePreview();

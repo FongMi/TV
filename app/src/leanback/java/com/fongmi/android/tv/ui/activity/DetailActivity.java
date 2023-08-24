@@ -403,6 +403,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void getPlayer(Flag flag, Episode episode, boolean replay) {
         mBinding.widget.title.setText(getString(R.string.detail_title, mBinding.name.getText(), episode.getName()));
         mViewModel.playerContent(getKey(), flag.getFlag(), episode.getUrl());
+        mBinding.quality.setVisibility(View.GONE);
         updateHistory(episode, replay);
         showProgress();
         hidePreview();
