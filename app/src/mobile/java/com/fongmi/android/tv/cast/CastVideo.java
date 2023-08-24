@@ -17,7 +17,7 @@ public class CastVideo implements ICast {
     }
 
     private CastVideo(String name, String url) {
-        if (url.startsWith("file")) url = Server.get().getAddress() + "/" + url;
+        if (url.startsWith("file")) url = Server.get().getAddress() + "/" + url.replace(Path.rootPath(), "");
         if (url.contains("127.0.0.1")) url = url.replace("127.0.0.1", Server.get().getIP());
         this.name = name;
         this.url = url;
