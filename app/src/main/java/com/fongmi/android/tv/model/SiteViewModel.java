@@ -26,6 +26,7 @@ import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Trans;
 import com.github.catvod.utils.Util;
+import com.google.common.net.HttpHeaders;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.FormBody;
+import okhttp3.Headers;
 import okhttp3.Response;
 
 public class SiteViewModel extends ViewModel {
@@ -92,7 +94,7 @@ public class SiteViewModel extends ViewModel {
                     return Result.fromJson(homeContent);
                 }
             } else {
-                String homeContent = OkHttp.newCall(site.getApi()).execute().body().string();
+                String homeContent = OkHttp.newCall(site.getApi(), Headers.of(HttpHeaders.ACCEPT, OkHttp.ACCEPT)).execute().body().string();
                 SpiderDebug.log(homeContent);
                 return fetchPic(site, Result.fromType(site.getType(), homeContent));
             }

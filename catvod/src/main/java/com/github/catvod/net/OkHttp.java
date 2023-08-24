@@ -24,6 +24,7 @@ import okhttp3.dnsoverhttps.DnsOverHttps;
 
 public class OkHttp {
 
+    public static final String ACCEPT = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7";
     private static final int TIMEOUT = 30 * 1000;
     private static final int CACHE = 100 * 1024 * 1024;
 
@@ -67,7 +68,7 @@ public class OkHttp {
     public static Call newCall(String url) {
         Uri uri = Uri.parse(url);
         if (uri.getUserInfo() != null) return newCall(url, Headers.of(HttpHeaders.AUTHORIZATION, Util.basic(uri)));
-        return client().newCall(new Request.Builder().url(url).headers(Headers.of()).build());
+        return client().newCall(new Request.Builder().url(url).build());
     }
 
     public static Call newCall(OkHttpClient client, String url) {
@@ -79,7 +80,7 @@ public class OkHttp {
     }
 
     public static Call newCall(String url, ArrayMap<String, String> params) {
-        return client().newCall(new Request.Builder().url(buildUrl(url, params)).build());
+        return client().newCall(new Request.Builder().url(buildUrl(url, params)).headers(Headers.of(HttpHeaders.ACCEPT, ACCEPT)).build());
     }
 
     public static Call newCall(String url, ArrayMap<String, String> params, Headers headers) {
