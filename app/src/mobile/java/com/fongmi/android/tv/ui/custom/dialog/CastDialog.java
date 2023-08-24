@@ -30,6 +30,7 @@ import com.fongmi.android.tv.ui.activity.ScanActivity;
 import com.fongmi.android.tv.ui.adapter.DeviceAdapter;
 import com.fongmi.android.tv.utils.Notify;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.Path;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import org.greenrobot.eventbus.EventBus;
