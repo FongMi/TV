@@ -181,6 +181,34 @@
                         android:paddingEnd="16dp"
                         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
+                    <TextView
+                        android:id="@+id/quality_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:text="@string/detail_quality"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:visibility="gone"
+                        tools:visibility="visible" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/quality"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:clipChildren="false"
+                        android:clipToPadding="false"
+                        android:orientation="horizontal"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:visibility="gone"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        tools:visibility="visible" />
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -238,35 +266,6 @@
                         android:paddingStart="16dp"
                         android:paddingEnd="16dp"
                         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
-
-                    <TextView
-                        android:id="@+id/quality_text"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginEnd="16dp"
-                        android:text="@string/detail_quality"
-                        android:textColor="@color/white"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:visibility="gone"
-                        tools:visibility="visible" />
-
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/quality"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginBottom="8dp"
-                        android:clipChildren="false"
-                        android:clipToPadding="false"
-                        android:orientation="horizontal"
-                        android:paddingStart="16dp"
-                        android:paddingEnd="16dp"
-                        android:visibility="gone"
-                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                        tools:visibility="visible" />
 
                     <LinearLayout
                         android:id="@+id/content_layout"
