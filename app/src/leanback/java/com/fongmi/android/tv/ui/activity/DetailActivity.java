@@ -106,7 +106,6 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private ArrayObjectAdapter mPartAdapter;
     private ActivityDetailBinding mBinding;
     private QualityAdapter mQualityAdapter;
-    private ArrayPresenter mArrayPresenter;
     private PartPresenter mPartPresenter;
     private CustomKeyDownVod mKeyDown;
     private ExecutorService mExecutor;
@@ -326,7 +325,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.quality.setAdapter(mQualityAdapter = new QualityAdapter(this::setQualityActivated));
         mBinding.array.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.array.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-        mBinding.array.setAdapter(new ItemBridgeAdapter(mArrayAdapter = new ArrayObjectAdapter(mArrayPresenter = new ArrayPresenter(this))));
+        mBinding.array.setAdapter(new ItemBridgeAdapter(mArrayAdapter = new ArrayObjectAdapter(new ArrayPresenter(this))));
         mBinding.part.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.part.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         mBinding.part.setAdapter(new ItemBridgeAdapter(mPartAdapter = new ArrayObjectAdapter(mPartPresenter = new PartPresenter(item -> initSearch(item, false)))));
@@ -414,10 +413,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         result.getUrl().set(mQualityAdapter.getPosition());
         setUseParse(ApiConfig.hasParse() && ((result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx() == 1));
         mPlayers.start(result, isUseParse(), getSite().isChangeable() ? getSite().getTimeout() : -1);
+        mEpisodePresenter.setNextFocusUp(result.getUrl().isOnly() ? R.id.flag : R.id.quality);
         mBinding.quality.setVisibility(result.getUrl().isOnly() ? View.GONE : View.VISIBLE);
         mBinding.control.parse.setVisibility(isUseParse() ? View.VISIBLE : View.GONE);
+        notifyItemChanged(mBinding.episode, mEpisodeAdapter);
         mQualityAdapter.addAll(result);
-        updateFocus();
     }
 
     private void setEmpty() {
@@ -487,6 +487,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mBinding.episode.setVisibility(items.isEmpty() ? View.GONE : View.VISIBLE);
         mEpisodeAdapter.setItems(items, null);
         setArray(items.size());
+        updateFocus();
     }
 
     private void seamless(Flag flag, boolean force) {
@@ -536,11 +537,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void updateFocus() {
-        mArrayPresenter.setNextFocusUp(isVisible(mBinding.quality) ? R.id.quality : R.id.episode);
-        mPartPresenter.setNextFocusUp(isVisible(mBinding.array) ? R.id.array : isVisible(mBinding.quality) ? R.id.quality : R.id.episode);
-        mEpisodePresenter.setNextFocusDown(isVisible(mBinding.quality) ? R.id.quality : isVisible(mBinding.array) ? R.id.array : R.id.part);
+        mEpisodePresenter.setNextFocusDown(isVisible(mBinding.array) ? R.id.array : R.id.part);
+        mPartPresenter.setNextFocusUp(isVisible(mBinding.array) ? R.id.array : R.id.episode);
         notifyItemChanged(mBinding.episode, mEpisodeAdapter);
-        notifyItemChanged(mBinding.array, mArrayAdapter);
         notifyItemChanged(mBinding.part, mPartAdapter);
     }
 

@@ -13,7 +13,8 @@ import com.fongmi.android.tv.databinding.AdapterEpisodeBinding;
 public class EpisodePresenter extends Presenter {
 
     private final OnClickListener mListener;
-    private int nextFocus;
+    private int nextFocusDown;
+    private int nextFocusUp;
 
     public EpisodePresenter(OnClickListener listener) {
         this.mListener = listener;
@@ -23,8 +24,12 @@ public class EpisodePresenter extends Presenter {
         void onItemClick(Episode item);
     }
 
+    public void setNextFocusUp(int nextFocus) {
+        this.nextFocusUp = nextFocus;
+    }
+
     public void setNextFocusDown(int nextFocus) {
-        this.nextFocus = nextFocus;
+        this.nextFocusDown = nextFocus;
     }
 
     @Override
@@ -37,7 +42,8 @@ public class EpisodePresenter extends Presenter {
         Episode item = (Episode) object;
         ViewHolder holder = (ViewHolder) viewHolder;
         holder.binding.text.setMaxEms(Product.getEms());
-        holder.binding.text.setNextFocusDownId(nextFocus);
+        holder.binding.text.setNextFocusUpId(nextFocusUp);
+        holder.binding.text.setNextFocusDownId(nextFocusDown);
         holder.binding.text.setActivated(item.isActivated());
         holder.binding.text.setText(item.getDesc().concat(item.getName()));
         setOnClickListener(holder, view -> mListener.onItemClick(item));

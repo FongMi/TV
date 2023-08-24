@@ -17,6 +17,8 @@
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:foreground="@drawable/selector_video"
+        android:nextFocusLeft="@id/video"
+        android:nextFocusUp="@id/video"
         android:nextFocusDown="@id/flag">
 
         <androidx.media3.ui.PlayerView
@@ -195,6 +197,7 @@
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:gravity="center"
+            android:nextFocusDown="@id/flag"
             android:singleLine="true"
             android:text="@string/detail_desc"
             android:textColor="@color/white"
@@ -211,6 +214,7 @@
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:gravity="center"
+            android:nextFocusDown="@id/flag"
             android:singleLine="true"
             android:text="@string/keep"
             android:textColor="@color/white"
@@ -226,6 +230,8 @@
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:gravity="center"
+            android:nextFocusRight="@id/change1"
+            android:nextFocusDown="@id/flag"
             android:singleLine="true"
             android:text="@string/play_change"
             android:textColor="@color/white"
@@ -260,7 +266,7 @@
                 android:visibility="gone" />
 
             <com.fongmi.android.tv.ui.custom.CustomHorizontalGridView
-                android:id="@+id/episode"
+                android:id="@+id/quality"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clipChildren="false"
@@ -272,7 +278,7 @@
                 android:visibility="gone" />
 
             <com.fongmi.android.tv.ui.custom.CustomHorizontalGridView
-                android:id="@+id/quality"
+                android:id="@+id/episode"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clipChildren="false"
