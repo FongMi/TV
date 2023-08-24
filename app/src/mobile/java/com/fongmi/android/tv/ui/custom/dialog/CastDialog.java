@@ -68,7 +68,9 @@ public class CastDialog extends BaseDialog implements DeviceAdapter.OnClickListe
 
     public CastDialog history(History history) {
         String id = history.getVodId();
-        String fd = id.startsWith("file") ? Server.get().getAddress() + "/" + id.replace(Path.rootPath(), "") : id;
+        String fd = history.getVodId();
+        if (id.startsWith("/")) fd = Server.get().getAddress() + "/file://" + fd.replace(Path.rootPath(), "");
+        if (id.startsWith("file")) fd = Server.get().getAddress() + "/" + fd.replace(Path.rootPath(), "");
         if (fd.contains("127.0.0.1")) fd = fd.replace("127.0.0.1", Server.get().getIP());
         body.add("history", history.toString().replace(id, fd));
         return this;
