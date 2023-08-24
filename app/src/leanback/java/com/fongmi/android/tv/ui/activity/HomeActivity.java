@@ -22,6 +22,7 @@ import com.fongmi.android.tv.Updater;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.api.LiveConfig;
 import com.fongmi.android.tv.api.WallConfig;
+import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Func;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Result;
@@ -46,6 +47,7 @@ import com.fongmi.android.tv.ui.presenter.HistoryPresenter;
 import com.fongmi.android.tv.ui.presenter.ProgressPresenter;
 import com.fongmi.android.tv.ui.presenter.VodPresenter;
 import com.fongmi.android.tv.utils.Clock;
+import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Utils;
@@ -104,7 +106,11 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         if (Intent.ACTION_SEND.equals(intent.getAction())) {
             DetailActivity.push(this, Uri.parse(intent.getStringExtra(Intent.EXTRA_TEXT)));
         } else if (Intent.ACTION_VIEW.equals(intent.getAction()) && intent.getData() != null) {
-            DetailActivity.push(this, intent.getData());
+            if ("text/plain".equals(intent.getType()) || intent.getData().getPath().endsWith(".m3u")) {
+                loadLive("file:/" + FileChooser.getPathFromUri(this, intent.getData()));
+            } else {
+                DetailActivity.push(this, intent.getData());
+            }
         }
     }
 
@@ -159,6 +165,15 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
                 setFocus();
             }
         };
+    }
+
+    private void loadLive(String url) {
+        LiveConfig.load(Config.find(url, 1), new Callback() {
+            @Override
+            public void success() {
+                LiveActivity.start(getActivity());
+            }
+        });
     }
 
     private void setFocus() {

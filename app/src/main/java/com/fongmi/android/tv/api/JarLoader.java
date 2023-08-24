@@ -3,6 +3,7 @@ package com.fongmi.android.tv.api;
 import android.content.Context;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderNull;
 import com.github.catvod.net.OkHttp;
@@ -91,7 +92,7 @@ public class JarLoader {
         } else if (jar.startsWith("file")) {
             load(key, Path.local(jar));
         } else if (!jar.isEmpty()) {
-            parseJar(key, com.fongmi.android.tv.utils.Utils.convert(ApiConfig.getUrl(), jar));
+            parseJar(key, Utils.convert(ApiConfig.getUrl(), jar));
         }
     }
 

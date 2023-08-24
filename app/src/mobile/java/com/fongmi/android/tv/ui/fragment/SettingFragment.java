@@ -40,7 +40,6 @@ import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.bean.Doh;
 import com.github.catvod.net.OkHttp;
-import com.github.catvod.utils.Path;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.permissionx.guolindev.PermissionX;
 
@@ -343,6 +342,6 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode != Activity.RESULT_OK || requestCode != FileChooser.REQUEST_PICK_FILE) return;
-        setConfig(Config.find("file:/" + FileChooser.getPathFromUri(getContext(), data.getData()).replace(Path.rootPath(), ""), type));
+        setConfig(Config.find("file:/" + FileChooser.getPathFromUri(getContext(), data.getData()), type));
     }
 }

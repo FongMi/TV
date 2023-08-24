@@ -30,7 +30,6 @@ import com.fongmi.android.tv.ui.activity.ScanActivity;
 import com.fongmi.android.tv.ui.adapter.DeviceAdapter;
 import com.fongmi.android.tv.utils.Notify;
 import com.github.catvod.net.OkHttp;
-import com.github.catvod.utils.Path;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import org.greenrobot.eventbus.EventBus;
@@ -68,7 +67,7 @@ public class CastDialog extends BaseDialog implements DeviceAdapter.OnClickListe
 
     public CastDialog history(History history) {
         String id = history.getVodId();
-        String fd = id.startsWith("file") ? Server.get().getAddress() + "/" + id.replace(Path.rootPath(), "") : id;
+        String fd = id.startsWith("file") ? Server.get().getAddress() + "/" + id : id;
         if (fd.contains("127.0.0.1")) fd = fd.replace("127.0.0.1", Server.get().getIP());
         body.add("history", history.toString().replace(id, fd));
         return this;
