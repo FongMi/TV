@@ -1,9 +1,12 @@
 package com.github.catvod.net;
 
+import android.net.Uri;
 import android.util.ArrayMap;
 
 import com.github.catvod.bean.Doh;
 import com.github.catvod.utils.Path;
+import com.github.catvod.utils.Util;
+import com.google.common.net.HttpHeaders;
 
 import java.util.Map;
 import java.util.Objects;
@@ -62,7 +65,9 @@ public class OkHttp {
     }
 
     public static Call newCall(String url) {
-        return client().newCall(new Request.Builder().url(url).build());
+        Uri uri = Uri.parse(url);
+        if (uri.getUserInfo() != null) return newCall(url, Headers.of(HttpHeaders.AUTHORIZATION, Util.basic(uri)));
+        return client().newCall(new Request.Builder().url(url).headers(Headers.of()).build());
     }
 
     public static Call newCall(OkHttpClient client, String url) {
