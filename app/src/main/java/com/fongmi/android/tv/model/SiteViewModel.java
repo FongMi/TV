@@ -39,7 +39,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import okhttp3.FormBody;
+import okhttp3.Call;
 import okhttp3.Headers;
 import okhttp3.Response;
 
@@ -77,22 +77,13 @@ public class SiteViewModel extends ViewModel {
                 result.setList(Result.fromJson(homeVideoContent).getList());
                 return result;
             } else if (site.getType() == 4) {
-                String extend = fetchExt(site);
-                if (extend.length() < 1000) {
-                    ArrayMap<String, String> params = new ArrayMap<>();
-                    params.put("extend", extend);
-                    params.put("filter", "true");
-                    String homeContent = OkHttp.newCall(site.getApi(), params).execute().body().string();
-                    SpiderDebug.log(homeContent);
-                    return Result.fromJson(homeContent);
-                } else {
-                    FormBody.Builder body = new FormBody.Builder();
-                    body.add("extend", extend);
-                    body.add("filter", "true");
-                    String homeContent = OkHttp.newCall(site.getApi(), body.build()).execute().body().string();
-                    SpiderDebug.log(homeContent);
-                    return Result.fromJson(homeContent);
-                }
+                ArrayMap<String, String> params = new ArrayMap<>();
+                String extend = fetchExt(site, params);
+                params.put("filter", "true");
+                Call call = extend.length() < 1000 ? OkHttp.newCall(site.getApi(), params) : OkHttp.newCall(site.getApi(), OkHttp.toBody(params));
+                String homeContent = call.execute().body().string();
+                SpiderDebug.log(homeContent);
+                return Result.fromJson(homeContent);
             } else {
                 String homeContent = OkHttp.newCall(site.getApi(), Headers.of(HttpHeaders.ACCEPT, OkHttp.ACCEPT)).execute().body().string();
                 SpiderDebug.log(homeContent);
@@ -174,10 +165,9 @@ public class SiteViewModel extends ViewModel {
                 return result;
             } else if (site.getType() == 4) {
                 ArrayMap<String, String> params = new ArrayMap<>();
-                String extend = fetchExt(site);
                 params.put("play", id);
                 params.put("flag", flag);
-                if (extend.length() > 0) params.put("extend", extend);
+                fetchExt(site, params);
                 String playerContent = OkHttp.newCall(site.getApi(), params).execute().body().string();
                 SpiderDebug.log(playerContent);
                 Result result = Result.fromJson(playerContent);
@@ -213,6 +203,7 @@ public class SiteViewModel extends ViewModel {
         } else {
             ArrayMap<String, String> params = new ArrayMap<>();
             params.put("wd", Trans.t2s(keyword));
+            fetchExt(site, params);
             String searchContent = OkHttp.newCall(site.getApi(), params).execute().body().string();
             SpiderDebug.log(site.getName() + "," + searchContent);
             post(site, fetchPic(site, Result.fromType(site.getType(), searchContent)));
@@ -232,6 +223,7 @@ public class SiteViewModel extends ViewModel {
                 ArrayMap<String, String> params = new ArrayMap<>();
                 params.put("wd", Trans.t2s(keyword));
                 params.put("pg", page);
+                fetchExt(site, params);
                 String searchContent = OkHttp.newCall(site.getApi(), params).execute().body().string();
                 SpiderDebug.log(site.getName() + "," + searchContent);
                 Result result = fetchPic(site, Result.fromType(site.getType(), searchContent));
@@ -241,8 +233,14 @@ public class SiteViewModel extends ViewModel {
         });
     }
 
+    private String fetchExt(Site site, ArrayMap<String, String> params) throws IOException {
+        String extend = site.getExt();
+        if (extend.startsWith("http")) extend = fetchExt(site);
+        if (!extend.isEmpty()) params.put("extend", extend);
+        return extend;
+    }
+
     private String fetchExt(Site site) throws IOException {
-        if (!site.getExt().startsWith("http")) return site.getExt();
         Response res = OkHttp.newCall(site.getExt()).execute();
         if (res.code() != 200) return "";
         site.setExt(res.body().string());
