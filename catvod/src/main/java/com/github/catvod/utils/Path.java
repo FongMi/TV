@@ -111,8 +111,9 @@ public class Path {
     }
 
     public static File local(String path) {
-        File file = new File(path.replace("file:/", root().getAbsolutePath()));
-        return file.exists() ? file : new File(path.replace("file:/", ""));
+        File file1 = new File(path.replace("file:/", ""));
+        File file2 = new File(path.replace("file:/", rootPath()));
+        return file1.exists() ? file1 : file2.exists() ? file2 : new File(path);
     }
 
     public static String asset(String fileName) {
