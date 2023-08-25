@@ -78,10 +78,8 @@ public class SiteViewModel extends ViewModel {
                 return result;
             } else if (site.getType() == 4) {
                 ArrayMap<String, String> params = new ArrayMap<>();
-                String extend = fetchExt(site, params);
                 params.put("filter", "true");
-                Call call = extend.length() < 1000 ? OkHttp.newCall(site.getApi(), params) : OkHttp.newCall(site.getApi(), OkHttp.toBody(params));
-                String homeContent = call.execute().body().string();
+                String homeContent = call(site, params, false).execute().body().string();
                 SpiderDebug.log(homeContent);
                 return Result.fromJson(homeContent);
             } else {
@@ -108,7 +106,7 @@ public class SiteViewModel extends ViewModel {
                 params.put("ac", site.getType() == 0 ? "videolist" : "detail");
                 params.put("t", tid);
                 params.put("pg", page);
-                String categoryContent = OkHttp.newCall(site.getApi(), params).execute().body().string();
+                String categoryContent = call(site, params, true).execute().body().string();
                 SpiderDebug.log(categoryContent);
                 return Result.fromType(site.getType(), categoryContent);
             }
@@ -139,7 +137,7 @@ public class SiteViewModel extends ViewModel {
                 ArrayMap<String, String> params = new ArrayMap<>();
                 params.put("ac", site.getType() == 0 ? "videolist" : "detail");
                 params.put("ids", id);
-                String detailContent = OkHttp.newCall(site.getApi(), params).execute().body().string();
+                String detailContent = call(site, params, true).execute().body().string();
                 SpiderDebug.log(detailContent);
                 Result result = Result.fromType(site.getType(), detailContent);
                 if (!result.getList().isEmpty()) result.getList().get(0).setVodFlags();
@@ -167,8 +165,7 @@ public class SiteViewModel extends ViewModel {
                 ArrayMap<String, String> params = new ArrayMap<>();
                 params.put("play", id);
                 params.put("flag", flag);
-                fetchExt(site, params);
-                String playerContent = OkHttp.newCall(site.getApi(), params).execute().body().string();
+                String playerContent = call(site, params, true).execute().body().string();
                 SpiderDebug.log(playerContent);
                 Result result = Result.fromJson(playerContent);
                 if (result.getFlag().isEmpty()) result.setFlag(flag);
@@ -203,8 +200,7 @@ public class SiteViewModel extends ViewModel {
         } else {
             ArrayMap<String, String> params = new ArrayMap<>();
             params.put("wd", Trans.t2s(keyword));
-            fetchExt(site, params);
-            String searchContent = OkHttp.newCall(site.getApi(), params).execute().body().string();
+            String searchContent = call(site, params, true).execute().body().string();
             SpiderDebug.log(site.getName() + "," + searchContent);
             post(site, fetchPic(site, Result.fromType(site.getType(), searchContent)));
         }
@@ -223,8 +219,7 @@ public class SiteViewModel extends ViewModel {
                 ArrayMap<String, String> params = new ArrayMap<>();
                 params.put("wd", Trans.t2s(keyword));
                 params.put("pg", page);
-                fetchExt(site, params);
-                String searchContent = OkHttp.newCall(site.getApi(), params).execute().body().string();
+                String searchContent = call(site, params, true).execute().body().string();
                 SpiderDebug.log(site.getName() + "," + searchContent);
                 Result result = fetchPic(site, Result.fromType(site.getType(), searchContent));
                 for (Vod vod : result.getList()) vod.setSite(site);
@@ -233,9 +228,14 @@ public class SiteViewModel extends ViewModel {
         });
     }
 
-    private String fetchExt(Site site, ArrayMap<String, String> params) throws IOException {
+    private Call call(Site site, ArrayMap<String, String> params, boolean limit) throws IOException {
+        return fetchExt(site, params, limit).length() <= 1000 ? OkHttp.newCall(site.getApi(), params) : OkHttp.newCall(site.getApi(), OkHttp.toBody(params));
+    }
+
+    private String fetchExt(Site site, ArrayMap<String, String> params, boolean limit) throws IOException {
         String extend = site.getExt();
         if (extend.startsWith("http")) extend = fetchExt(site);
+        if (limit && extend.length() > 1000) extend = extend.substring(0, 1000);
         if (!extend.isEmpty()) params.put("extend", extend);
         return extend;
     }
