@@ -79,7 +79,7 @@ public class SiteViewModel extends ViewModel {
             } else if (site.getType() == 4) {
                 ArrayMap<String, String> params = new ArrayMap<>();
                 params.put("filter", "true");
-                String homeContent = call(site, params, false).execute().body().string();
+                String homeContent = call(site, params, false);
                 SpiderDebug.log(homeContent);
                 return Result.fromJson(homeContent);
             } else {
@@ -106,7 +106,7 @@ public class SiteViewModel extends ViewModel {
                 params.put("ac", site.getType() == 0 ? "videolist" : "detail");
                 params.put("t", tid);
                 params.put("pg", page);
-                String categoryContent = call(site, params, true).execute().body().string();
+                String categoryContent = call(site, params, true);
                 SpiderDebug.log(categoryContent);
                 return Result.fromType(site.getType(), categoryContent);
             }
@@ -137,7 +137,7 @@ public class SiteViewModel extends ViewModel {
                 ArrayMap<String, String> params = new ArrayMap<>();
                 params.put("ac", site.getType() == 0 ? "videolist" : "detail");
                 params.put("ids", id);
-                String detailContent = call(site, params, true).execute().body().string();
+                String detailContent = call(site, params, true);
                 SpiderDebug.log(detailContent);
                 Result result = Result.fromType(site.getType(), detailContent);
                 if (!result.getList().isEmpty()) result.getList().get(0).setVodFlags();
@@ -165,7 +165,7 @@ public class SiteViewModel extends ViewModel {
                 ArrayMap<String, String> params = new ArrayMap<>();
                 params.put("play", id);
                 params.put("flag", flag);
-                String playerContent = call(site, params, true).execute().body().string();
+                String playerContent = call(site, params, true);
                 SpiderDebug.log(playerContent);
                 Result result = Result.fromJson(playerContent);
                 if (result.getFlag().isEmpty()) result.setFlag(flag);
@@ -200,7 +200,7 @@ public class SiteViewModel extends ViewModel {
         } else {
             ArrayMap<String, String> params = new ArrayMap<>();
             params.put("wd", Trans.t2s(keyword));
-            String searchContent = call(site, params, true).execute().body().string();
+            String searchContent = call(site, params, true);
             SpiderDebug.log(site.getName() + "," + searchContent);
             post(site, fetchPic(site, Result.fromType(site.getType(), searchContent)));
         }
@@ -219,7 +219,7 @@ public class SiteViewModel extends ViewModel {
                 ArrayMap<String, String> params = new ArrayMap<>();
                 params.put("wd", Trans.t2s(keyword));
                 params.put("pg", page);
-                String searchContent = call(site, params, true).execute().body().string();
+                String searchContent = call(site, params, true);
                 SpiderDebug.log(site.getName() + "," + searchContent);
                 Result result = fetchPic(site, Result.fromType(site.getType(), searchContent));
                 for (Vod vod : result.getList()) vod.setSite(site);
@@ -228,8 +228,9 @@ public class SiteViewModel extends ViewModel {
         });
     }
 
-    private Call call(Site site, ArrayMap<String, String> params, boolean limit) throws IOException {
-        return fetchExt(site, params, limit).length() <= 1000 ? OkHttp.newCall(site.getApi(), params) : OkHttp.newCall(site.getApi(), OkHttp.toBody(params));
+    private String call(Site site, ArrayMap<String, String> params, boolean limit) throws IOException {
+        Call call = fetchExt(site, params, limit).length() <= 1000 ? OkHttp.newCall(site.getApi(), params) : OkHttp.newCall(site.getApi(), OkHttp.toBody(params));
+        return call.execute().body().string();
     }
 
     private String fetchExt(Site site, ArrayMap<String, String> params, boolean limit) throws IOException {
