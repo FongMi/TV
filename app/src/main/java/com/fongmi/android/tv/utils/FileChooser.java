@@ -58,7 +58,7 @@ public class FileChooser {
         if (DocumentsContract.isDocumentUri(context, uri)) path = getPathFromDocumentUri(context, uri);
         else if (ContentResolver.SCHEME_CONTENT.equals(uri.getScheme())) path = getDataColumn(context, uri);
         else if (ContentResolver.SCHEME_FILE.equalsIgnoreCase(uri.getScheme())) path = uri.getPath();
-        return path != null ? path : createFileFromUri(context, uri);
+        return path != null ? path.replace(Path.rootPath(), "") : createFileFromUri(context, uri);
     }
 
     private static String getPathFromDocumentUri(Context context, Uri uri) {
