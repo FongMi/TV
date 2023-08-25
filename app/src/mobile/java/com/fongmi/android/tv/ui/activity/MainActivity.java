@@ -30,6 +30,7 @@ import com.fongmi.android.tv.ui.fragment.SettingPlayerFragment;
 import com.fongmi.android.tv.ui.fragment.VodFragment;
 import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.Notify;
+import com.github.catvod.utils.Util;
 import com.google.android.material.navigation.NavigationBarView;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -69,7 +70,7 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
         if (Intent.ACTION_SEND.equals(intent.getAction())) {
             DetailActivity.push(this, Uri.parse(intent.getStringExtra(Intent.EXTRA_TEXT)));
         } else if (Intent.ACTION_VIEW.equals(intent.getAction()) && intent.getData() != null) {
-            if ("text/plain".equals(intent.getType()) || intent.getData().getPath().endsWith(".m3u")) {
+            if ("text/plain".equals(intent.getType()) || Util.path(intent.getData()).endsWith(".m3u")) {
                 loadLive("file:/" + FileChooser.getPathFromUri(this, intent.getData()));
             } else {
                 DetailActivity.push(this, intent.getData());
