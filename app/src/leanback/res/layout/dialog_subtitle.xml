@@ -3,9 +3,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center"
     android:orientation="vertical"
     android:padding="16dp">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/shape_subtitle">
+
+        <androidx.media3.ui.SubtitleView
+            android:id="@+id/preview"
+            android:layout_width="match_parent"
+            android:layout_height="76dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp" />
+
+    </FrameLayout>
 
     <com.google.android.material.slider.Slider
         android:id="@+id/slider"
@@ -14,8 +27,8 @@
         android:layout_marginTop="16dp"
         android:nextFocusDown="@id/positive"
         android:stepSize="1"
-        android:valueFrom="16"
-        android:valueTo="60"
+        android:valueFrom="14"
+        android:valueTo="48"
         app:thumbColor="@color/blue_500"
         app:trackColorActive="@color/blue_500"
         app:trackColorInactive="@color/blue_50" />

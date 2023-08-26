@@ -140,7 +140,7 @@
                 android:textSize="14sp"
                 tools:text="預設" />
 
-            <TextView
+            <com.fongmi.android.tv.ui.custom.CustomUpDownView
                 android:id="@+id/text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
