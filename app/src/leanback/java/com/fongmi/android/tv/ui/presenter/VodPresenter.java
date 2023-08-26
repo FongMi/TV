@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import androidx.leanback.widget.Presenter;
 
 import com.fongmi.android.tv.Product;
+import com.fongmi.android.tv.bean.Style;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.AdapterVodListBinding;
 import com.fongmi.android.tv.databinding.AdapterVodOvalBinding;
@@ -19,14 +20,14 @@ import com.fongmi.android.tv.ui.holder.VodRectHolder;
 public class VodPresenter extends Presenter {
 
     private final OnClickListener mListener;
-    private final Vod.Style style;
+    private final Style style;
     private final int[] size;
 
     public VodPresenter(OnClickListener listener) {
-        this(listener, Vod.Style.rect());
+        this(listener, Style.rect());
     }
 
-    public VodPresenter(OnClickListener listener, Vod.Style style) {
+    public VodPresenter(OnClickListener listener, Style style) {
         this.mListener = listener;
         this.style = style;
         this.size = Product.getSpec(style);

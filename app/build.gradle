@@ -23,7 +23,7 @@ android {
         leanback {
             dimension "default"
             versionCode 204
-            versionName "20230815#2"
+            versionName "20230826"
         }
     }
 
@@ -87,6 +87,7 @@ dependencies {
     implementation project(':media-lib-ui')
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.biometric:biometric:1.1.0'
     implementation 'androidx.leanback:leanback:1.2.0-alpha02'
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.5.1'
     implementation 'androidx.room:room-runtime:2.5.2'
@@ -95,7 +96,7 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.15.1'
     implementation 'com.github.bumptech.glide:annotations:4.15.1'
     implementation 'com.github.bumptech.glide:okhttp3-integration:4.15.1'
-    implementation 'com.github.TeamNewPipe:NewPipeExtractor:8495ad619e'
+    implementation 'com.github.TeamNewPipe:NewPipeExtractor:340095515d45ecbee576872c7198992ebd8e4f08'
     implementation 'com.google.android.material:material:1.9.0'
     implementation 'com.google.net.cronet:cronet-okhttp:0.1.0'
     implementation 'com.google.zxing:core:3.3.0'

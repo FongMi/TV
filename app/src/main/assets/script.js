@@ -69,12 +69,12 @@ function selectFile(path, canDel) {
     current_file = path;
     if (canDel) $("#delFileBtn").show();
     else $("#delFileBtn").hide();
-    $("#fileUrl")[0].value = "file://" + current_file;
+    $("#fileUrl")[0].value = "file:/" + current_file;
     $("#fileInfoDialog").show();
 }
 
 function fileToApi() {
-    doAction('api', { url: "file://" + current_file });
+    doAction('api', { url: "file:/" + current_file });
     hideFileInfo();
 }
 

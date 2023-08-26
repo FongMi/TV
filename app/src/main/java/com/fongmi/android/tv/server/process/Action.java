@@ -14,17 +14,19 @@ import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.event.ServerEvent;
 import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.server.Nano;
+import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Notify;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.Path;
 
-import java.util.Objects;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import fi.iki.elonen.NanoHTTPD;
 import okhttp3.FormBody;
 
-public class ActionRequestProcess implements RequestProcess {
+public class Action implements Process {
 
     @Override
     public boolean isRequest(NanoHTTPD.IHTTPSession session, String path) {
@@ -32,9 +34,9 @@ public class ActionRequestProcess implements RequestProcess {
     }
 
     @Override
-    public NanoHTTPD.Response doResponse(NanoHTTPD.IHTTPSession session, String path) {
+    public NanoHTTPD.Response doResponse(NanoHTTPD.IHTTPSession session, String path, Map<String, String> files) {
         Map<String, String> params = session.getParms();
-        switch (params.get("do")) {
+        switch (Objects.requireNonNullElse(params.get("do"), "")) {
             case "search":
                 onSearch(params);
                 break;
@@ -51,22 +53,23 @@ public class ActionRequestProcess implements RequestProcess {
                 onSync(params);
                 break;
         }
-        return Nano.createSuccessResponse();
+        return Nano.success();
     }
 
     private void onSearch(Map<String, String> params) {
-        String word = Objects.requireNonNull(params.get("word"));
+        String word = Objects.requireNonNullElse(params.get("word"), "");
         if (word.length() > 0) ServerEvent.search(word);
     }
 
     private void onPush(Map<String, String> params) {
-        String url = Objects.requireNonNull(params.get("url"));
+        String url = Objects.requireNonNullElse(params.get("url"), "");
         if (url.length() > 0) ServerEvent.push(url);
     }
 
     private void onApi(Map<String, String> params) {
-        String url = Objects.requireNonNull(params.get("url"));
-        if (url.length() > 0) ServerEvent.api(url);
+        String url = Objects.requireNonNullElse(params.get("url"), "");
+        if (url.endsWith(".apk")) FileUtil.openFile(Path.local(url));
+        else if (url.length() > 0) ServerEvent.api(url);
     }
 
     private void onCast(Map<String, String> params) {
@@ -94,9 +97,9 @@ public class ActionRequestProcess implements RequestProcess {
 
     private void sendHistory(Device device, Map<String, String> params) {
         try {
-            String url = params.get("url");
+            String url = Objects.requireNonNullElse(params.get("url"), ApiConfig.getUrl());
             FormBody.Builder body = new FormBody.Builder();
-            body.add("url", TextUtils.isEmpty(url) ? ApiConfig.getUrl() : url);
+            body.add("url", url);
             body.add("targets", App.gson().toJson(History.get(Config.find(url, 0).getId())));
             OkHttp.newCall(OkHttp.client(Constant.TIMEOUT_SYNC), device.getIp().concat("/action?do=sync&mode=0&type=history"), body.build()).execute();
         } catch (Exception e) {

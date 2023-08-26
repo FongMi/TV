@@ -48,6 +48,7 @@ import com.fongmi.android.tv.ui.custom.dialog.PassDialog;
 import com.fongmi.android.tv.ui.custom.dialog.TrackDialog;
 import com.fongmi.android.tv.ui.presenter.ChannelPresenter;
 import com.fongmi.android.tv.ui.presenter.GroupPresenter;
+import com.fongmi.android.tv.utils.Biometric;
 import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
@@ -69,7 +70,7 @@ import okhttp3.Call;
 import okhttp3.Response;
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class LiveActivity extends BaseActivity implements GroupPresenter.OnClickListener, ChannelPresenter.OnClickListener, CustomKeyDownLive.Listener, CustomLiveListView.Callback, TrackDialog.Listener, PassCallback, LiveCallback {
+public class LiveActivity extends BaseActivity implements GroupPresenter.OnClickListener, ChannelPresenter.OnClickListener, CustomKeyDownLive.Listener, CustomLiveListView.Callback, TrackDialog.Listener, Biometric.Callback, PassCallback, LiveCallback {
 
     private ActivityLiveBinding mBinding;
     private ArrayObjectAdapter mChannelAdapter;
@@ -88,6 +89,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private Runnable mR2;
     private Runnable mR3;
     private Runnable mR4;
+    private Clock mClock;
     private boolean confirm;
     private int count;
 
@@ -111,8 +113,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         return LiveConfig.get().getHome();
     }
 
-    private int getPlayerType() {
-        return getHome().getPlayerType() != -1 ? getHome().getPlayerType() : Setting.getLivePlayer();
+    private int getPlayerType(int playerType) {
+        return playerType != -1 ? playerType : getHome().getPlayerType() != -1 ? getHome().getPlayerType() : Setting.getLivePlayer();
     }
 
     @Override
@@ -135,6 +137,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mHides = new ArrayList<>();
         mPlayers = new Players().init();
         mKeyDown = CustomKeyDownLive.create(this);
+        mClock = Clock.create(mBinding.widget.time);
         mFormatDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         mFormatTime = new SimpleDateFormat("yyyy-MM-ddHH:mm", Locale.getDefault());
         setRecyclerView();
@@ -211,7 +214,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(LiveViewModel.class);
-        mViewModel.channel.observe(this, result -> mPlayers.start(result));
+        mViewModel.channel.observe(this, result -> mPlayers.start(result, getHome().getTimeout()));
         mViewModel.live.observe(this, live -> {
             hideProgress();
             setGroup(live);
@@ -219,7 +222,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void getLive() {
-        mPlayers.setPlayer(getPlayerType());
+        mPlayers.setPlayer(getPlayerType(-1));
         mViewModel.getLive(getHome());
         setPlayerView();
         setDecodeView();
@@ -428,7 +431,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mChannelAdapter.setItems(item.getChannel(), null);
         mBinding.channel.setSelectedPosition(Math.max(item.getPosition(), 0));
         if (!item.isKeep() || ++count < 5 || mHides.isEmpty()) return;
-        PassDialog.create().show(this);
+        if (Biometric.enable()) Biometric.show(this);
+        else PassDialog.create().show(this);
         App.removeCallbacks(mR0);
         resetPass();
     }
@@ -466,8 +470,10 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void setChannel(Channel item) {
+        mPlayers.setPlayer(getPlayerType(item.getPlayerType()));
         App.post(mR3, 100);
         mChannel = item;
+        setPlayerView();
         showInfo();
     }
 
@@ -532,12 +538,21 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public void setPass(String pass) {
+        unlock(pass);
+    }
+
+    @Override
+    public void onBiometricSuccess() {
+        unlock(null);
+    }
+
+    private void unlock(String pass) {
         boolean first = true;
         int position = mGroupAdapter.size();
         Iterator<Group> iterator = mHides.iterator();
         while (iterator.hasNext()) {
             Group item = iterator.next();
-            if (!item.getPass().equals(pass)) continue;
+            if (pass != null && !pass.equals(item.getPass())) continue;
             mGroupAdapter.add(mGroupAdapter.size(), item);
             if (first) mBinding.group.setSelectedPosition(position);
             if (first) onItemClick(mGroup = item);
@@ -761,15 +776,15 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     @Override
     protected void onResume() {
         super.onResume();
-        Clock.start(mBinding.widget.time);
         mPlayers.play();
+        mClock.start();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         mPlayers.pause();
-        Clock.stop();
+        mClock.stop();
     }
 
     @Override

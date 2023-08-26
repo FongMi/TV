@@ -5,6 +5,9 @@ import android.text.TextUtils;
 import com.github.catvod.utils.Util;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 public class TorrentFileInfo {
 
@@ -47,5 +50,18 @@ public class TorrentFileInfo {
 
     public String getExt() {
         return getFileName().contains(".") ? getFileName().substring(getFileName().lastIndexOf(".") + 1).toLowerCase() : "";
+    }
+
+    public static class Sorter implements Comparator<TorrentFileInfo> {
+
+        public static List<TorrentFileInfo> sort(List<TorrentFileInfo> items) {
+            if (items.size() > 1) Collections.sort(items, new Sorter());
+            return items;
+        }
+
+        @Override
+        public int compare(TorrentFileInfo o1, TorrentFileInfo o2) {
+            return o1.getFileName().compareTo(o2.getFileName());
+        }
     }
 }

@@ -6,7 +6,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.leanback.widget.Presenter;
 
-import com.fongmi.android.tv.bean.Filter;
+import com.fongmi.android.tv.bean.Value;
 import com.fongmi.android.tv.databinding.AdapterFilterBinding;
 
 public class FilterPresenter extends Presenter {
@@ -19,7 +19,7 @@ public class FilterPresenter extends Presenter {
     }
 
     public interface OnClickListener {
-        void onItemClick(String key, Filter.Value item);
+        void onItemClick(String key, Value item);
     }
 
     public void setOnClickListener(OnClickListener listener) {
@@ -33,7 +33,7 @@ public class FilterPresenter extends Presenter {
 
     @Override
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object object) {
-        Filter.Value item = (Filter.Value) object;
+        Value item = (Value) object;
         ViewHolder holder = (ViewHolder) viewHolder;
         holder.binding.text.setText(item.getN());
         holder.binding.text.setActivated(item.isActivated());

@@ -1,19 +1,22 @@
 package com.fongmi.android.tv.bean;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.TextUtils;
 
-import com.fongmi.android.tv.utils.Trans;
+import com.github.catvod.utils.Trans;
 import com.google.gson.annotations.SerializedName;
 
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Root;
 import org.simpleframework.xml.Text;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 @Root(strict = false)
-public class Class {
+public class Class implements Parcelable {
 
     @Attribute(name = "id", required = false)
     @SerializedName("type_id")
@@ -31,6 +34,9 @@ public class Class {
 
     private Boolean filter;
     private boolean activated;
+
+    public Class() {
+    }
 
     public String getTypeId() {
         return TextUtils.isEmpty(typeId) ? "" : typeId;
@@ -101,4 +107,41 @@ public class Class {
         Class it = (Class) obj;
         return getTypeId().equals(it.getTypeId());
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.typeId);
+        dest.writeString(this.typeName);
+        dest.writeString(this.typeFlag);
+        dest.writeList(this.filters);
+        dest.writeValue(this.filter);
+        dest.writeByte(this.activated ? (byte) 1 : (byte) 0);
+    }
+
+    protected Class(Parcel in) {
+        this.typeId = in.readString();
+        this.typeName = in.readString();
+        this.typeFlag = in.readString();
+        this.filters = new ArrayList<>();
+        in.readList(this.filters, Filter.class.getClassLoader());
+        this.filter = (Boolean) in.readValue(Boolean.class.getClassLoader());
+        this.activated = in.readByte() != 0;
+    }
+
+    public static final Creator<Class> CREATOR = new Creator<>() {
+        @Override
+        public Class createFromParcel(Parcel source) {
+            return new Class(source);
+        }
+
+        @Override
+        public Class[] newArray(int size) {
+            return new Class[size];
+        }
+    };
 }

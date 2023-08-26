@@ -3,6 +3,7 @@ package com.fongmi.android.tv.player;
 import com.fongmi.android.tv.player.extractor.BiliBili;
 import com.fongmi.android.tv.player.extractor.Force;
 import com.fongmi.android.tv.player.extractor.JianPian;
+import com.fongmi.android.tv.player.extractor.Push;
 import com.fongmi.android.tv.player.extractor.TVBus;
 import com.fongmi.android.tv.player.extractor.Thunder;
 import com.fongmi.android.tv.player.extractor.Youtube;
@@ -29,6 +30,7 @@ public class Source {
         extractors.add(new BiliBili());
         extractors.add(new Force());
         extractors.add(new JianPian());
+        extractors.add(new Push());
         extractors.add(new Thunder());
         extractors.add(new TVBus());
         extractors.add(new Youtube());

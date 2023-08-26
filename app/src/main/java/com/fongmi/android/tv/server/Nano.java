@@ -1,32 +1,25 @@
 package com.fongmi.android.tv.server;
 
 import android.net.Uri;
+import android.util.Base64;
 
-import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.api.LiveConfig;
 import com.fongmi.android.tv.bean.Device;
-import com.fongmi.android.tv.server.process.ActionRequestProcess;
-import com.fongmi.android.tv.server.process.RawRequestProcess;
-import com.fongmi.android.tv.server.process.RequestProcess;
+import com.fongmi.android.tv.server.process.Action;
+import com.fongmi.android.tv.server.process.Local;
+import com.fongmi.android.tv.server.process.Process;
 import com.fongmi.android.tv.utils.M3U8;
 import com.fongmi.android.tv.utils.Sniffer;
-import com.github.catvod.utils.Path;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import com.github.catvod.Init;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,39 +28,32 @@ import fi.iki.elonen.NanoHTTPD;
 
 public class Nano extends NanoHTTPD {
 
-    private List<RequestProcess> processes;
-    private final SimpleDateFormat format;
+    private List<Process> process;
 
     public Nano(int port) {
         super(port);
-        addRequestProcess();
-        format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault());
+        addProcess();
     }
 
-    private void addRequestProcess() {
-        processes = new ArrayList<>();
-        processes.add(new ActionRequestProcess());
-        processes.add(new RawRequestProcess("/", R.raw.index, MIME_HTML));
-        processes.add(new RawRequestProcess("/index.html", R.raw.index, MIME_HTML));
-        processes.add(new RawRequestProcess("/ui.css", R.raw.ui, "text/css"));
-        processes.add(new RawRequestProcess("/style.css", R.raw.style, "text/css"));
-        processes.add(new RawRequestProcess("/script.js", R.raw.script, "application/x-javascript"));
-        processes.add(new RawRequestProcess("/favicon.ico", R.mipmap.ic_launcher, "image/x-icon"));
+    private void addProcess() {
+        process = new ArrayList<>();
+        process.add(new Action());
+        process.add(new Local());
     }
 
-    public static Response createSuccessResponse() {
-        return createSuccessResponse("OK");
+    public static Response success() {
+        return success("OK");
     }
 
-    public static Response createSuccessResponse(String text) {
+    public static Response success(String text) {
         return newFixedLengthResponse(Response.Status.OK, MIME_PLAINTEXT, text);
     }
 
-    public static Response createErrorResponse(String text) {
-        return createErrorResponse(Response.Status.INTERNAL_ERROR, text);
+    public static Response error(String text) {
+        return error(Response.Status.INTERNAL_ERROR, text);
     }
 
-    public static Response createErrorResponse(Response.IStatus status, String text) {
+    public static Response error(Response.IStatus status, String text) {
         return newFixedLengthResponse(status, MIME_PLAINTEXT, text);
     }
 
@@ -75,31 +61,18 @@ public class Nano extends NanoHTTPD {
     public Response serve(IHTTPSession session) {
         String url = session.getUri().trim();
         Map<String, String> files = new HashMap<>();
+        if (session.getMethod() == Method.POST) parse(session, files);
         if (url.contains("?")) url = url.substring(0, url.indexOf('?'));
-        if (session.getMethod() == Method.POST) parseBody(session, files);
-        for (RequestProcess process : processes) {
-            if (process.isRequest(session, url)) {
-                return process.doResponse(session, url);
-            }
-        }
-        switch (session.getMethod()) {
-            case GET:
-                if (url.startsWith("/file")) return doFile(url);
-                else if (url.startsWith("/m3u8")) return doM3u8(session);
-                else if (url.startsWith("/proxy")) return doProxy(session.getParms());
-                else if (url.startsWith("/device")) return createSuccessResponse(Device.get().toString());
-                break;
-            case POST:
-                if (url.startsWith("/upload")) return doUpload(session.getParms(), files);
-                else if (url.startsWith("/newFolder")) return doNewFolder(session.getParms());
-                else if (url.startsWith("/delFolder") || url.startsWith("/delFile")) return doDelFolder(session.getParms());
-                else if (url.startsWith("/tvbus")) return createSuccessResponse(LiveConfig.get().getHome().getCore().getResp());
-                break;
-        }
-        return createErrorResponse(NanoHTTPD.Response.Status.NOT_FOUND, "Not Found");
+        if (url.startsWith("/m3u8")) return m3u8(session);
+        if (url.startsWith("/proxy")) return proxy(session.getParms());
+        if (url.startsWith("/tvbus")) return success(LiveConfig.getResp());
+        if (url.startsWith("/device")) return success(Device.get().toString());
+        if (url.startsWith("/license")) return success(new String(Base64.decode(url.substring(9), Base64.DEFAULT)));
+        for (Process process : process) if (process.isRequest(session, url)) return process.doResponse(session, url, files);
+        return getAssets(url.substring(1));
     }
 
-    private void parseBody(IHTTPSession session, Map<String, String> files) {
+    private void parse(NanoHTTPD.IHTTPSession session, Map<String, String> files) {
         String ct = session.getHeaders().get("content-type");
         if (ct != null && ct.toLowerCase().contains("multipart/form-data") && !ct.toLowerCase().contains("charset=")) {
             Matcher matcher = Pattern.compile("[ |\t]*(boundary[ |\t]*=[ |\t]*['|\"]?[^\"^'^;^,]*['|\"]?)", Pattern.CASE_INSENSITIVE).matcher(ct);
@@ -112,87 +85,33 @@ public class Nano extends NanoHTTPD {
         }
     }
 
-    private Response doFile(String url) {
-        try {
-            File file = Path.root(url.substring(6));
-            if (file.isFile()) return newChunkedResponse(Response.Status.OK, "application/octet-stream", new FileInputStream(file));
-            else return createSuccessResponse(listFiles(file));
-        } catch (Exception e) {
-            return createErrorResponse(e.getMessage());
-        }
-    }
-
-    private Response doM3u8(IHTTPSession session) {
+    private Response m3u8(IHTTPSession session) {
         try {
             String url = session.getParms().get("url");
             String result = M3U8.get(url, session.getHeaders());
             for (String ad : Sniffer.getRegex(Uri.parse(url))) result = result.replaceAll(ad, "");
-            return newChunkedResponse(Response.Status.OK, NanoHTTPD.MIME_PLAINTEXT, new ByteArrayInputStream(result.getBytes("UTF-8")));
+            return newChunkedResponse(Response.Status.OK, MIME_PLAINTEXT, new ByteArrayInputStream(result.getBytes(StandardCharsets.UTF_8)));
         } catch (Exception e) {
-            return createErrorResponse(e.getMessage());
+            return error(e.getMessage());
         }
     }
 
-    private Response doProxy(Map<String, String> params) {
+    private Response proxy(Map<String, String> params) {
         try {
             Object[] rs = ApiConfig.get().proxyLocal(params);
             return newChunkedResponse(Response.Status.lookup((Integer) rs[0]), (String) rs[1], (InputStream) rs[2]);
         } catch (Exception e) {
-            return createErrorResponse(e.getMessage());
+            return error(e.getMessage());
         }
     }
 
-    private Response doUpload(Map<String, String> params, Map<String, String> files) {
-        String path = params.get("path");
-        for (String k : files.keySet()) {
-            String fn = params.get(k);
-            File temp = new File(files.get(k));
-            if (fn.toLowerCase().endsWith(".zip")) Path.unzip(temp, Path.root(path));
-            else Path.copy(temp, Path.root(path, fn));
+    private Response getAssets(String path) {
+        try {
+            if (path.isEmpty()) path = "index.html";
+            InputStream is = Init.context().getAssets().open(path);
+            return newFixedLengthResponse(Response.Status.OK, getMimeTypeForFile(path), is, is.available());
+        } catch (IOException e) {
+            return newFixedLengthResponse(Response.Status.NOT_FOUND, MIME_HTML, null);
         }
-        return createSuccessResponse();
-    }
-
-    private Response doNewFolder(Map<String, String> params) {
-        String path = params.get("path");
-        String name = params.get("name");
-        Path.root(path, name).mkdirs();
-        return createSuccessResponse();
-    }
-
-    private Response doDelFolder(Map<String, String> params) {
-        String path = params.get("path");
-        Path.clear(Path.root(path));
-        return createSuccessResponse();
-    }
-
-    private String getParent(File root) {
-        return root.equals(Path.root()) ? "." : root.getParent().replace(Path.rootPath(), "");
-    }
-
-    private String listFiles(File root) {
-        File[] list = root.listFiles();
-        String parent = getParent(root);
-        JsonObject info = new JsonObject();
-        info.addProperty("parent", parent);
-        if (list == null || list.length == 0) {
-            info.add("files", new JsonArray());
-            return info.toString();
-        }
-        Arrays.sort(list, (o1, o2) -> {
-            if (o1.isDirectory() && o2.isFile()) return -1;
-            return o1.isFile() && o2.isDirectory() ? 1 : o1.getName().compareTo(o2.getName());
-        });
-        JsonArray files = new JsonArray();
-        info.add("files", files);
-        for (File file : list) {
-            JsonObject obj = new JsonObject();
-            obj.addProperty("name", file.getName());
-            obj.addProperty("path", file.getAbsolutePath().replace(Path.rootPath(), ""));
-            obj.addProperty("time", format.format(new Date(file.lastModified())));
-            obj.addProperty("dir", file.isDirectory() ? 1 : 0);
-            files.add(obj);
-        }
-        return info.toString();
     }
 }

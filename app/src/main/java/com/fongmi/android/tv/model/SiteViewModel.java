@@ -2,6 +2,7 @@ package com.fongmi.android.tv.model;
 
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.ArrayMap;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -10,25 +11,27 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.bean.Episode;
+import com.fongmi.android.tv.bean.Flag;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
+import com.fongmi.android.tv.bean.Url;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.exception.ExtractException;
 import com.fongmi.android.tv.player.Source;
-import com.fongmi.android.tv.player.extractor.Magnet;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Sniffer;
-import com.fongmi.android.tv.utils.Trans;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.Trans;
 import com.github.catvod.utils.Util;
+import com.google.common.net.HttpHeaders;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -36,11 +39,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.Call;
+import okhttp3.Headers;
 import okhttp3.Response;
 
 public class SiteViewModel extends ViewModel {
 
-    public MutableLiveData<Vod.Flag.Episode> episode;
+    public MutableLiveData<Episode> episode;
     public MutableLiveData<Result> result;
     public MutableLiveData<Result> player;
     public MutableLiveData<Result> search;
@@ -53,7 +58,7 @@ public class SiteViewModel extends ViewModel {
         this.search = new MutableLiveData<>();
     }
 
-    public void setEpisode(Vod.Flag.Episode value) {
+    public void setEpisode(Episode value) {
         episode.setValue(value);
     }
 
@@ -72,17 +77,15 @@ public class SiteViewModel extends ViewModel {
                 result.setList(Result.fromJson(homeVideoContent).getList());
                 return result;
             } else if (site.getType() == 4) {
-                LinkedHashMap<String, String> params = new LinkedHashMap<>();
-                String extend = fetchExt(site);
+                ArrayMap<String, String> params = new ArrayMap<>();
                 params.put("filter", "true");
-                if (extend.length() > 0) params.put("extend", extend);
-                String body = OkHttp.newCall(site.getApi(), params).execute().body().string();
-                SpiderDebug.log(body);
-                return Result.fromJson(body);
+                String homeContent = call(site, params, false);
+                SpiderDebug.log(homeContent);
+                return Result.fromJson(homeContent);
             } else {
-                String body = OkHttp.newCall(site.getApi()).execute().body().string();
-                SpiderDebug.log(body);
-                return fetchPic(site, Result.fromType(site.getType(), body));
+                String homeContent = OkHttp.newCall(site.getApi(), Headers.of(HttpHeaders.ACCEPT, OkHttp.ACCEPT)).execute().body().string();
+                SpiderDebug.log(homeContent);
+                return fetchPic(site, Result.fromType(site.getType(), homeContent));
             }
         });
     }
@@ -97,15 +100,15 @@ public class SiteViewModel extends ViewModel {
                 ApiConfig.get().setRecent(site);
                 return Result.fromJson(categoryContent);
             } else {
-                LinkedHashMap<String, String> params = new LinkedHashMap<>();
+                ArrayMap<String, String> params = new ArrayMap<>();
                 if (site.getType() == 1 && !extend.isEmpty()) params.put("f", App.gson().toJson(extend));
                 else if (site.getType() == 4) params.put("ext", Util.base64(App.gson().toJson(extend)));
                 params.put("ac", site.getType() == 0 ? "videolist" : "detail");
                 params.put("t", tid);
                 params.put("pg", page);
-                String body = OkHttp.newCall(site.getApi(), params).execute().body().string();
-                SpiderDebug.log(body);
-                return Result.fromType(site.getType(), body);
+                String categoryContent = call(site, params, true);
+                SpiderDebug.log(categoryContent);
+                return Result.fromType(site.getType(), categoryContent);
             }
         });
     }
@@ -127,16 +130,16 @@ public class SiteViewModel extends ViewModel {
                 vod.setVodId(id);
                 vod.setVodName(id);
                 vod.setVodPic("https://pic.rmb.bdstatic.com/bjh/1d0b02d0f57f0a42201f92caba5107ed.jpeg");
-                vod.setVodFlags(Vod.Flag.create(ResUtil.getString(R.string.push), ResUtil.getString(R.string.play), id));
+                vod.setVodFlags(Flag.create(ResUtil.getString(R.string.push), ResUtil.getString(R.string.play), id));
                 checkThunder(vod.getVodFlags());
                 return Result.vod(vod);
             } else {
-                LinkedHashMap<String, String> params = new LinkedHashMap<>();
+                ArrayMap<String, String> params = new ArrayMap<>();
                 params.put("ac", site.getType() == 0 ? "videolist" : "detail");
                 params.put("ids", id);
-                String body = OkHttp.newCall(site.getApi(), params).execute().body().string();
-                SpiderDebug.log(body);
-                Result result = Result.fromType(site.getType(), body);
+                String detailContent = call(site, params, true);
+                SpiderDebug.log(detailContent);
+                Result result = Result.fromType(site.getType(), detailContent);
                 if (!result.getList().isEmpty()) result.getList().get(0).setVodFlags();
                 if (!result.getList().isEmpty()) checkThunder(result.getList().get(0).getVodFlags());
                 return result;
@@ -153,38 +156,36 @@ public class SiteViewModel extends ViewModel {
                 String playerContent = spider.playerContent(flag, id, ApiConfig.get().getFlags());
                 SpiderDebug.log(playerContent);
                 ApiConfig.get().setRecent(site);
-                Result result = Result.objectFrom(playerContent);
+                Result result = Result.fromJson(playerContent);
                 if (result.getFlag().isEmpty()) result.setFlag(flag);
-                result.setUrl(Source.get().fetch(result.getUrl()));
+                result.setUrl(Source.get().fetch(result.getUrl().v()));
                 result.setKey(key);
                 return result;
             } else if (site.getType() == 4) {
-                LinkedHashMap<String, String> params = new LinkedHashMap<>();
-                String extend = fetchExt(site);
+                ArrayMap<String, String> params = new ArrayMap<>();
                 params.put("play", id);
                 params.put("flag", flag);
-                if (extend.length() > 0) params.put("extend", extend);
-                String body = OkHttp.newCall(site.getApi(), params).execute().body().string();
-                SpiderDebug.log(body);
-                Result result = Result.fromJson(body);
+                String playerContent = call(site, params, true);
+                SpiderDebug.log(playerContent);
+                Result result = Result.fromJson(playerContent);
                 if (result.getFlag().isEmpty()) result.setFlag(flag);
-                result.setUrl(Source.get().fetch(result.getUrl()));
+                result.setUrl(Source.get().fetch(result.getUrl().v()));
                 return result;
             } else if (site.isEmpty() && key.equals("push_agent")) {
                 Result result = new Result();
                 result.setParse(0);
                 result.setFlag(flag);
-                result.setUrl(Source.get().fetch(id));
+                result.setUrl(Source.get().fetch(result.getUrl().v()));
                 return result;
             } else {
-                String url = id;
-                String type = Uri.parse(url).getQueryParameter("type");
+                Url url = Url.create().add(id);
+                String type = Uri.parse(id).getQueryParameter("type");
                 if (type != null && type.equals("json")) url = Result.fromJson(OkHttp.newCall(id).execute().body().string()).getUrl();
                 Result result = new Result();
                 result.setUrl(url);
                 result.setFlag(flag);
                 result.setPlayUrl(site.getPlayUrl());
-                result.setParse(Sniffer.isVideoFormat(url) && result.getPlayUrl().isEmpty() ? 0 : 1);
+                result.setParse(Sniffer.isVideoFormat(url.v()) && result.getPlayUrl().isEmpty() ? 0 : 1);
                 return result;
             }
         });
@@ -197,11 +198,11 @@ public class SiteViewModel extends ViewModel {
             SpiderDebug.log(site.getName() + "," + searchContent);
             post(site, Result.fromJson(searchContent));
         } else {
-            LinkedHashMap<String, String> params = new LinkedHashMap<>();
+            ArrayMap<String, String> params = new ArrayMap<>();
             params.put("wd", Trans.t2s(keyword));
-            String body = OkHttp.newCall(site.getApi(), params).execute().body().string();
-            SpiderDebug.log(site.getName() + "," + body);
-            post(site, fetchPic(site, Result.fromType(site.getType(), body)));
+            String searchContent = call(site, params, true);
+            SpiderDebug.log(site.getName() + "," + searchContent);
+            post(site, fetchPic(site, Result.fromType(site.getType(), searchContent)));
         }
     }
 
@@ -215,20 +216,32 @@ public class SiteViewModel extends ViewModel {
                 for (Vod vod : result.getList()) vod.setSite(site);
                 return result;
             } else {
-                LinkedHashMap<String, String> params = new LinkedHashMap<>();
+                ArrayMap<String, String> params = new ArrayMap<>();
                 params.put("wd", Trans.t2s(keyword));
                 params.put("pg", page);
-                String body = OkHttp.newCall(site.getApi(), params).execute().body().string();
-                SpiderDebug.log(site.getName() + "," + body);
-                Result result = fetchPic(site, Result.fromType(site.getType(), body));
+                String searchContent = call(site, params, true);
+                SpiderDebug.log(site.getName() + "," + searchContent);
+                Result result = fetchPic(site, Result.fromType(site.getType(), searchContent));
                 for (Vod vod : result.getList()) vod.setSite(site);
                 return result;
             }
         });
     }
 
+    private String call(Site site, ArrayMap<String, String> params, boolean limit) throws IOException {
+        Call call = fetchExt(site, params, limit).length() <= 1000 ? OkHttp.newCall(site.getApi(), params) : OkHttp.newCall(site.getApi(), OkHttp.toBody(params));
+        return call.execute().body().string();
+    }
+
+    private String fetchExt(Site site, ArrayMap<String, String> params, boolean limit) throws IOException {
+        String extend = site.getExt();
+        if (extend.startsWith("http")) extend = fetchExt(site);
+        if (limit && extend.length() > 1000) extend = extend.substring(0, 1000);
+        if (!extend.isEmpty()) params.put("extend", extend);
+        return extend;
+    }
+
     private String fetchExt(Site site) throws IOException {
-        if (!site.getExt().startsWith("http")) return site.getExt();
         Response res = OkHttp.newCall(site.getExt()).execute();
         if (res.code() != 200) return "";
         site.setExt(res.body().string());
@@ -239,22 +252,18 @@ public class SiteViewModel extends ViewModel {
         if (result.getList().isEmpty() || result.getList().get(0).getVodPic().length() > 0) return result;
         ArrayList<String> ids = new ArrayList<>();
         for (Vod item : result.getList()) ids.add(item.getVodId());
-        LinkedHashMap<String, String> params = new LinkedHashMap<>();
+        ArrayMap<String, String> params = new ArrayMap<>();
         params.put("ac", site.getType() == 0 ? "videolist" : "detail");
         params.put("ids", TextUtils.join(",", ids));
-        String body = OkHttp.newCall(site.getApi(), params).execute().body().string();
-        result.setList(Result.fromType(site.getType(), body).getList());
+        String response = OkHttp.newCall(site.getApi(), params).execute().body().string();
+        result.setList(Result.fromType(site.getType(), response).getList());
         return result;
     }
 
-    private void checkThunder(List<Vod.Flag> flags) throws Exception {
-        for (Vod.Flag flag : flags) {
-            List<Magnet> magnets = new ArrayList<>();
-            List<Vod.Flag.Episode> items = new ArrayList<>();
-            for (Vod.Flag.Episode episode : flag.getEpisodes()) if (Sniffer.isThunder(episode.getUrl())) magnets.add(Magnet.get(episode.getUrl()));
+    private void checkThunder(List<Flag> flags) throws Exception {
+        for (Flag flag : flags) {
             ExecutorService executor = Executors.newFixedThreadPool(Constant.THREAD_POOL * 2);
-            for (Future<List<Vod.Flag.Episode>> future : executor.invokeAll(magnets, 30, TimeUnit.SECONDS)) Magnet.addAll(items, future);
-            if (items.size() > 0) flag.createEpisode(items);
+            for (Future<List<Episode>> future : executor.invokeAll(flag.getMagnet(), 30, TimeUnit.SECONDS)) flag.getEpisodes().addAll(future.get());
             executor.shutdownNow();
         }
     }

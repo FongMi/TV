@@ -135,6 +135,12 @@ public class CollectActivity extends BaseActivity {
         }
     }
 
+    private void stop() {
+        if (mExecutor == null) return;
+        mExecutor.shutdownNow();
+        mExecutor = null;
+    }
+
     private void onChildSelected(@Nullable RecyclerView.ViewHolder child) {
         if (mOldView != null) mOldView.setActivated(false);
         if (child == null) return;
@@ -177,7 +183,13 @@ public class CollectActivity extends BaseActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        if (mExecutor != null) mExecutor.shutdownNow();
+        stop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stop();
     }
 
     class PageAdapter extends FragmentStatePagerAdapter {

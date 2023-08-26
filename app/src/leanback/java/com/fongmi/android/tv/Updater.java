@@ -119,7 +119,7 @@ public class Updater implements Download.Callback {
 
     @Override
     public void success(File file) {
-        FileUtil.openFile(getFile());
+        FileUtil.openFile(file);
         dismiss();
     }
 }

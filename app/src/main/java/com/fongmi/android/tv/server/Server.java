@@ -65,7 +65,7 @@ public class Server {
         }
     }
 
-    private String getIP() {
+    public String getIP() {
         try {
             WifiManager manager = (WifiManager) App.get().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
             int address = manager.getConnectionInfo().getIpAddress();

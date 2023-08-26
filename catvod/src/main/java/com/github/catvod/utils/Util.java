@@ -65,6 +65,15 @@ public class Util {
         return host == null ? "" : host.toLowerCase().trim();
     }
 
+    public static String path(Uri uri) {
+        String path = uri.getPath();
+        return path == null ? "" : path.trim();
+    }
+
+    public static String basic(Uri uri) {
+        return "Basic " + base64(uri.getUserInfo());
+    }
+
     public static String md5(String src) {
         try {
             if (TextUtils.isEmpty(src)) return "";

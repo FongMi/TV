@@ -30,6 +30,7 @@ public class TorrentInfo {
     public List<TorrentFileInfo> getMedias(List<String> ads) {
         List<TorrentFileInfo> items = new ArrayList<>();
         for (TorrentFileInfo item : getSubFileInfo()) if (Util.isMedia(item.getExt()) && Util.notAd(ads, item.getFileName())) items.add(item.file(getFile()));
+        TorrentFileInfo.Sorter.sort(items);
         return items;
     }
 }

@@ -12,68 +12,64 @@ import java.util.TimerTask;
 
 public class Clock {
 
-    private SimpleDateFormat formatter;
+    private SimpleDateFormat format;
     private Callback callback;
+    private final Date date;
+    private TextView view;
     private Timer timer;
-    private Date date;
 
-    private static class Loader {
-        static volatile Clock INSTANCE = new Clock();
+    public static Clock create() {
+        return new Clock();
     }
 
-    public static Clock get() {
-        return Loader.INSTANCE;
+    public static Clock create(TextView view) {
+        return new Clock().view(view).format("HH:mm:ss");
     }
 
-    public void init(String format) {
-        this.formatter = new SimpleDateFormat(format, Locale.getDefault());
+    public Clock() {
         this.date = new Date();
-        this.callback = null;
     }
 
-    public static void stop() {
-        if (get().timer != null) get().timer.cancel();
+    public Clock view(TextView view) {
+        this.view = view;
+        return this;
     }
 
-    public static void start() {
-        start(null);
-    }
-
-    public static void start(TextView view) {
-        start(view, "HH:mm:ss");
-    }
-
-    public static void start(TextView view, String format) {
-        get().init(format);
-        get().run(view);
+    public Clock format(String format) {
+        this.format = new SimpleDateFormat(format, Locale.getDefault());
+        return this;
     }
 
     public void setCallback(Callback callback) {
         this.callback = callback;
     }
 
-    public void release() {
-        if (timer != null) timer.cancel();
-        if (callback != null) callback = null;
-    }
-
-    private void run(TextView view) {
+    public void start() {
         timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                App.post(() -> doJob(view));
+                App.post(() -> doJob());
             }
         }, 0, 1000);
     }
 
-    private void doJob(TextView view) {
+    private void doJob() {
         try {
             date.setTime(System.currentTimeMillis());
             if (callback != null) callback.onTimeChanged();
-            if (view != null) view.setText(formatter.format(date));
+            if (view != null) view.setText(format.format(date));
         } catch (Exception ignored) {
         }
+    }
+
+    public void stop() {
+        if (timer != null) timer.cancel();
+    }
+
+    public void release() {
+        if (timer != null) timer.cancel();
+        if (callback != null) callback = null;
     }
 
     public interface Callback {
