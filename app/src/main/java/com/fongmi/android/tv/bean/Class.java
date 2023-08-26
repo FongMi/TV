@@ -178,7 +178,7 @@ public class Class implements Parcelable {
         this.activated = in.readByte() != 0;
     }
 
-    public static final Creator<Class> CREATOR = new Creator<>() {
+    public static final Creator<Class> CREATOR = new Creator<Class>() {
         @Override
         public Class createFromParcel(Parcel source) {
             return new Class(source);

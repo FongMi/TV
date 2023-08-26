@@ -101,7 +101,7 @@ public class Style implements Parcelable {
         this.ratio = in.readFloat();
     }
 
-    public static final Creator<Style> CREATOR = new Creator<>() {
+    public static final Creator<Style> CREATOR = new Creator<Style>() {
         @Override
         public Style createFromParcel(Parcel source) {
             return new Style(source);

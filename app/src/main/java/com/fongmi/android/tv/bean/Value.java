@@ -84,7 +84,7 @@ public class Value implements Parcelable {
         this.activated = in.readByte() != 0;
     }
 
-    public static final Creator<Value> CREATOR = new Creator<>() {
+    public static final Creator<Value> CREATOR = new Creator<Value>() {
         @Override
         public Value createFromParcel(Parcel source) {
             return new Value(source);

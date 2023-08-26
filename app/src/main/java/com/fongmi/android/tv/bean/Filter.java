@@ -95,7 +95,7 @@ public class Filter implements Parcelable {
         in.readList(this.value, Value.class.getClassLoader());
     }
 
-    public static final Creator<Filter> CREATOR = new Creator<>() {
+    public static final Creator<Filter> CREATOR = new Creator<Filter>() {
         @Override
         public Filter createFromParcel(Parcel source) {
             return new Filter(source);

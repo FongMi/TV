@@ -136,7 +136,7 @@ public class Episode implements Parcelable {
         this.selected = in.readByte() != 0;
     }
 
-    public static final Creator<Episode> CREATOR = new Creator<>() {
+    public static final Creator<Episode> CREATOR = new Creator<Episode>() {
         @Override
         public Episode createFromParcel(Parcel source) {
             return new Episode(source);

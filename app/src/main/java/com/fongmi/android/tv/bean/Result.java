@@ -324,7 +324,7 @@ public class Result implements Parcelable {
         this.list = in.createTypedArrayList(Vod.CREATOR);
     }
 
-    public static final Creator<Result> CREATOR = new Creator<>() {
+    public static final Creator<Result> CREATOR = new Creator<Result>() {
         @Override
         public Result createFromParcel(Parcel source) {
             return new Result(source);
