@@ -78,7 +78,7 @@ public class Collect implements Parcelable {
         this.page = in.readInt();
     }
 
-    public static final Creator<Collect> CREATOR = new Creator<>() {
+    public static final Creator<Collect> CREATOR = new Creator<Collect>() {
         @Override
         public Collect createFromParcel(Parcel source) {
             return new Collect(source);

@@ -298,7 +298,7 @@ public class Result implements Parcelable {
         this.filters = App.gson().fromJson(in.readString(), listType);
     }
 
-    public static final Creator<Result> CREATOR = new Creator<>() {
+    public static final Creator<Result> CREATOR = new Creator<Result>() {
         @Override
         public Result createFromParcel(Parcel source) {
             return new Result(source);

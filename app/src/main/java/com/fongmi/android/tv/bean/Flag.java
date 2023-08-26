@@ -174,7 +174,7 @@ public class Flag implements Parcelable {
         this.position = in.readInt();
     }
 
-    public static final Creator<Flag> CREATOR = new Creator<>() {
+    public static final Creator<Flag> CREATOR = new Creator<Flag>() {
         @Override
         public Flag createFromParcel(Parcel source) {
             return new Flag(source);

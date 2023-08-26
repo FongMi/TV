@@ -290,7 +290,7 @@ public class Site implements Parcelable {
         this.activated = in.readByte() != 0;
     }
 
-    public static final Creator<Site> CREATOR = new Creator<>() {
+    public static final Creator<Site> CREATOR = new Creator<Site>() {
         @Override
         public Site createFromParcel(Parcel source) {
             return new Site(source);

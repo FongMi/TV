@@ -36,7 +36,7 @@ public class Action implements Process {
     @Override
     public NanoHTTPD.Response doResponse(NanoHTTPD.IHTTPSession session, String path, Map<String, String> files) {
         Map<String, String> params = session.getParms();
-        switch (Objects.requireNonNullElse(params.get("do"), "")) {
+        switch (Objects.requireNonNull(params.get("do"))) {
             case "search":
                 onSearch(params);
                 break;
@@ -57,17 +57,18 @@ public class Action implements Process {
     }
 
     private void onSearch(Map<String, String> params) {
-        String word = Objects.requireNonNullElse(params.get("word"), "");
-        if (word.length() > 0) ServerEvent.search(word);
+        String word = params.get("word");
+        if (!TextUtils.isEmpty(word)) ServerEvent.search(word);
     }
 
     private void onPush(Map<String, String> params) {
-        String url = Objects.requireNonNullElse(params.get("url"), "");
-        if (url.length() > 0) ServerEvent.push(url);
+        String url = params.get("url");
+        if (!TextUtils.isEmpty(url)) ServerEvent.push(url);
     }
 
     private void onApi(Map<String, String> params) {
-        String url = Objects.requireNonNullElse(params.get("url"), "");
+        String url = params.get("url");
+        if (TextUtils.isEmpty(url)) return;
         if (url.endsWith(".apk")) FileUtil.openFile(Path.local(url));
         else if (url.length() > 0) ServerEvent.api(url);
     }
@@ -97,9 +98,9 @@ public class Action implements Process {
 
     private void sendHistory(Device device, Map<String, String> params) {
         try {
-            String url = Objects.requireNonNullElse(params.get("url"), ApiConfig.getUrl());
+            String url = params.get("url");
             FormBody.Builder body = new FormBody.Builder();
-            body.add("url", url);
+            body.add("url", TextUtils.isEmpty(url) ? ApiConfig.getUrl() : url);
             body.add("targets", App.gson().toJson(History.get(Config.find(url, 0).getId())));
             OkHttp.newCall(OkHttp.client(Constant.TIMEOUT_SYNC), device.getIp().concat("/action?do=sync&mode=0&type=history"), body.build()).execute();
         } catch (Exception e) {

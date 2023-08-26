@@ -16,7 +16,6 @@ import com.github.catvod.Init;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -90,7 +89,7 @@ public class Nano extends NanoHTTPD {
             String url = session.getParms().get("url");
             String result = M3U8.get(url, session.getHeaders());
             for (String ad : Sniffer.getRegex(Uri.parse(url))) result = result.replaceAll(ad, "");
-            return newChunkedResponse(Response.Status.OK, MIME_PLAINTEXT, new ByteArrayInputStream(result.getBytes(StandardCharsets.UTF_8)));
+            return newChunkedResponse(Response.Status.OK, MIME_PLAINTEXT, new ByteArrayInputStream(result.getBytes("UTF-8")));
         } catch (Exception e) {
             return error(e.getMessage());
         }

@@ -293,7 +293,7 @@ public class Vod implements Parcelable {
         this.site = in.readParcelable(Site.class.getClassLoader());
     }
 
-    public static final Creator<Vod> CREATOR = new Creator<>() {
+    public static final Creator<Vod> CREATOR = new Creator<Vod>() {
         @Override
         public Vod createFromParcel(Parcel source) {
             return new Vod(source);
