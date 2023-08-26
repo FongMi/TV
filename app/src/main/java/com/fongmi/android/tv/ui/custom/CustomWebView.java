@@ -2,18 +2,10 @@ package com.fongmi.android.tv.ui.custom;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.net.http.SslError;
 import android.text.TextUtils;
-import android.webkit.CookieManager;
-import android.webkit.SslErrorHandler;
-import android.webkit.WebResourceRequest;
-import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
@@ -22,6 +14,13 @@ import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.impl.ParseCallback;
 import com.fongmi.android.tv.utils.Sniffer;
 import com.github.catvod.crawler.Spider;
+import com.tencent.smtt.export.external.interfaces.SslError;
+import com.tencent.smtt.export.external.interfaces.SslErrorHandler;
+import com.tencent.smtt.export.external.interfaces.WebResourceRequest;
+import com.tencent.smtt.export.external.interfaces.WebResourceResponse;
+import com.tencent.smtt.sdk.CookieManager;
+import com.tencent.smtt.sdk.WebView;
+import com.tencent.smtt.sdk.WebViewClient;
 
 import java.io.ByteArrayInputStream;
 import java.util.Map;
@@ -78,7 +77,6 @@ public class CustomWebView extends WebView {
 
     private WebViewClient webViewClient() {
         return new WebViewClient() {
-            @Nullable
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
                 String url = request.getUrl().toString();
@@ -91,7 +89,6 @@ public class CustomWebView extends WebView {
             }
 
             @Override
-            @SuppressLint("WebViewClientOnReceivedSslError")
             public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
                 handler.proceed();
             }
