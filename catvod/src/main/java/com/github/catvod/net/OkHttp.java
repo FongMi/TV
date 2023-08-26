@@ -1,7 +1,8 @@
 package com.github.catvod.net;
 
 import android.net.Uri;
-import android.util.ArrayMap;
+
+import androidx.collection.ArrayMap;
 
 import com.github.catvod.bean.Doh;
 import com.github.catvod.utils.Path;
