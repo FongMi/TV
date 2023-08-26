@@ -16,6 +16,7 @@ import android.widget.MediaController;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.media3.ui.SubtitleView;
 
 import java.util.List;
 import java.util.Map;
@@ -228,7 +229,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     private void reset() {
         removeRenderView();
-        mSubtitleView.setText("");
+        mSubtitleView.setCues(null);
         mTargetState = STATE_IDLE;
         mCurrentState = STATE_IDLE;
         mCurrentBufferPosition = 0;
@@ -365,7 +366,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
             ITrackInfo trackInfo = trackInfos.get(index);
             if (trackInfo.getTrackType() != type) continue;
             if (index == track && selected != track) {
-                mSubtitleView.setText("");
+                mSubtitleView.setCues(null);
                 mPlayer.selectTrack(index);
                 updateForCurrentTrackSelections();
                 if (text && position > 0) seekTo(position);
@@ -380,7 +381,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
             ITrackInfo trackInfo = trackInfos.get(index);
             if (trackInfo.getTrackType() != type) continue;
             if (index == track && selected == track) {
-                mSubtitleView.setText("");
+                mSubtitleView.setCues(null);
                 mPlayer.deselectTrack(track);
                 updateForCurrentTrackSelections();
             }
@@ -511,7 +512,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     @Override
     public void onTimedText(IMediaPlayer mp, IjkTimedText text) {
-        mSubtitleView.onSubtitleChanged(text.getText());
+        mSubtitleView.setCues(SubtitleParser.parse(text.getText()));
     }
 
     @Override

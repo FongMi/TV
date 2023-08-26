@@ -9,14 +9,16 @@ import androidx.viewbinding.ViewBinding;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.databinding.ActivitySettingPlayerBinding;
+import com.fongmi.android.tv.impl.SubtitleCallback;
 import com.fongmi.android.tv.impl.UaCallback;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.base.BaseActivity;
+import com.fongmi.android.tv.ui.custom.dialog.SubtitleDialog;
 import com.fongmi.android.tv.ui.custom.dialog.UaDialog;
 import com.fongmi.android.tv.utils.ResUtil;
 
-public class SettingPlayerActivity extends BaseActivity implements UaCallback {
+public class SettingPlayerActivity extends BaseActivity implements UaCallback, SubtitleCallback {
 
     private ActivitySettingPlayerBinding mBinding;
     private String[] http;
@@ -39,6 +41,7 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback {
     protected void initView() {
         mBinding.uaText.setText(Setting.getUa());
         mBinding.tunnelText.setText(getSwitch(Setting.isTunnel()));
+        mBinding.subtitleText.setText(String.valueOf(Setting.getSubtitle()));
         mBinding.http.setVisibility(Players.isExo(Setting.getPlayer()) ? View.VISIBLE : View.GONE);
         mBinding.tunnel.setVisibility(Players.isExo(Setting.getPlayer()) ? View.VISIBLE : View.GONE);
         mBinding.flagText.setText((flag = ResUtil.getStringArray(R.array.select_flag))[Setting.getFlag()]);
@@ -51,6 +54,7 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback {
         mBinding.http.setOnClickListener(this::setHttp);
         mBinding.flag.setOnClickListener(this::setFlag);
         mBinding.tunnel.setOnClickListener(this::setTunnel);
+        mBinding.subtitle.setOnClickListener(this::onSubtitle);
     }
 
     private void onUa(View view) {
@@ -75,9 +79,18 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback {
         mBinding.tunnelText.setText(getSwitch(Setting.isTunnel()));
     }
 
+    private void onSubtitle(View view) {
+        SubtitleDialog.create(this).show();
+    }
+
     @Override
     public void setUa(String ua) {
         mBinding.uaText.setText(ua);
         Setting.putUa(ua);
+    }
+
+    @Override
+    public void setSubtitle(int size) {
+        mBinding.subtitleText.setText(String.valueOf(size));
     }
 }
