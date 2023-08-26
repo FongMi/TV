@@ -6,7 +6,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.leanback.widget.Presenter;
 
-import com.fongmi.android.tv.bean.Vod;
+import com.fongmi.android.tv.bean.Flag;
 import com.fongmi.android.tv.databinding.AdapterFlagBinding;
 
 public class FlagPresenter extends Presenter {
@@ -18,7 +18,7 @@ public class FlagPresenter extends Presenter {
     }
 
     public interface OnClickListener {
-        void onItemClick(Vod.Flag item);
+        void onItemClick(Flag item);
     }
 
     @Override
@@ -28,7 +28,7 @@ public class FlagPresenter extends Presenter {
 
     @Override
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object object) {
-        Vod.Flag item = (Vod.Flag) object;
+        Flag item = (Flag) object;
         ViewHolder holder = (ViewHolder) viewHolder;
         holder.binding.text.setText(item.getShow());
         holder.binding.text.setActivated(item.isActivated());

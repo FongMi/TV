@@ -44,9 +44,6 @@ public class Device {
         return new Gson().fromJson(str, Device.class);
     }
 
-    public Device() {
-    }
-
     public Integer getId() {
         return id;
     }

@@ -14,8 +14,10 @@ import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.event.ServerEvent;
 import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.server.Nano;
+import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Notify;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.Path;
 
 import java.util.List;
 import java.util.Map;
@@ -24,7 +26,7 @@ import java.util.Objects;
 import fi.iki.elonen.NanoHTTPD;
 import okhttp3.FormBody;
 
-public class ActionRequestProcess implements RequestProcess {
+public class Action implements Process {
 
     @Override
     public boolean isRequest(NanoHTTPD.IHTTPSession session, String path) {
@@ -32,7 +34,7 @@ public class ActionRequestProcess implements RequestProcess {
     }
 
     @Override
-    public NanoHTTPD.Response doResponse(NanoHTTPD.IHTTPSession session, String path) {
+    public NanoHTTPD.Response doResponse(NanoHTTPD.IHTTPSession session, String path, Map<String, String> files) {
         Map<String, String> params = session.getParms();
         switch (Objects.requireNonNullElse(params.get("do"), "")) {
             case "search":
@@ -51,7 +53,7 @@ public class ActionRequestProcess implements RequestProcess {
                 onSync(params);
                 break;
         }
-        return Nano.createSuccessResponse();
+        return Nano.success();
     }
 
     private void onSearch(Map<String, String> params) {
@@ -66,7 +68,8 @@ public class ActionRequestProcess implements RequestProcess {
 
     private void onApi(Map<String, String> params) {
         String url = Objects.requireNonNullElse(params.get("url"), "");
-        if (url.length() > 0) ServerEvent.api(url);
+        if (url.endsWith(".apk")) FileUtil.openFile(Path.local(url));
+        else if (url.length() > 0) ServerEvent.api(url);
     }
 
     private void onCast(Map<String, String> params) {

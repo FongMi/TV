@@ -20,8 +20,8 @@ public class VodRectHolder extends BaseVodHolder {
     }
 
     public VodRectHolder size(int[] size) {
-        itemView.getLayoutParams().width = size[0];
-        itemView.getLayoutParams().height = size[1];
+        binding.getRoot().getLayoutParams().width = size[0];
+        binding.getRoot().getLayoutParams().height = size[1];
         return this;
     }
 
@@ -32,6 +32,7 @@ public class VodRectHolder extends BaseVodHolder {
         binding.site.setText(item.getSiteName());
         binding.remark.setText(item.getVodRemarks());
         binding.site.setVisibility(item.getSiteVisible());
+        binding.name.setVisibility(item.getNameVisible());
         binding.year.setVisibility(item.getYearVisible());
         binding.remark.setVisibility(item.getRemarkVisible());
         binding.getRoot().setOnClickListener(v -> listener.onItemClick(item));

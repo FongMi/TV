@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.fongmi.android.tv.Product;
-import com.fongmi.android.tv.bean.Vod;
+import com.fongmi.android.tv.bean.Episode;
 import com.fongmi.android.tv.databinding.AdapterEpisodeGridBinding;
 import com.fongmi.android.tv.databinding.AdapterEpisodeListBinding;
 import com.fongmi.android.tv.ui.base.ViewType;
@@ -18,22 +18,26 @@ import java.util.List;
 
 public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHolder> {
 
-    private final List<Vod.Flag.Episode> mItems;
+    private final List<Episode> mItems;
     private final OnClickListener mListener;
     private final int viewType;
 
     public EpisodeAdapter(OnClickListener listener, int viewType) {
-        this.mItems = new ArrayList<>();
+        this(listener, viewType, new ArrayList<>());
+    }
+
+    public EpisodeAdapter(OnClickListener listener, int viewType, ArrayList<Episode> items) {
         this.mListener = listener;
         this.viewType = viewType;
+        this.mItems = items;
     }
 
     public interface OnClickListener {
 
-        void onItemClick(Vod.Flag.Episode item);
+        void onItemClick(Episode item);
     }
 
-    public void addAll(List<Vod.Flag.Episode> items) {
+    public void addAll(List<Episode> items) {
         mItems.clear();
         mItems.addAll(items);
         notifyDataSetChanged();
@@ -44,24 +48,24 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
         return 0;
     }
 
-    public Vod.Flag.Episode getActivated() {
+    public Episode getActivated() {
         return mItems.get(getPosition());
     }
 
-    public Vod.Flag.Episode getNext() {
+    public Episode getNext() {
         int current = getPosition();
         int max = getItemCount() - 1;
         current = ++current > max ? max : current;
         return mItems.get(current);
     }
 
-    public Vod.Flag.Episode getPrev() {
+    public Episode getPrev() {
         int current = getPosition();
         current = --current < 0 ? 0 : current;
         return mItems.get(current);
     }
 
-    public List<Vod.Flag.Episode> getItems() {
+    public List<Episode> getItems() {
         return mItems;
     }
 
@@ -84,7 +88,7 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Vod.Flag.Episode item = mItems.get(position);
+        Episode item = mItems.get(position);
         if (holder.gridBinding != null) holder.initView(holder.gridBinding.text, item, false);
         if (holder.listBinding != null) holder.initView(holder.listBinding.text, item, true);
     }
@@ -104,11 +108,11 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
             this.gridBinding = binding;
         }
 
-        void initView(TextView view, Vod.Flag.Episode item, boolean ems) {
-            view.setText(item.getName());
+        void initView(TextView view, Episode item, boolean ems) {
             view.setSelected(item.isActivated());
             view.setActivated(item.isActivated());
             if (ems) view.setMaxEms(Product.getEms());
+            view.setText(item.getDesc().concat(item.getName()));
             view.setOnClickListener(v -> mListener.onItemClick(item));
         }
     }

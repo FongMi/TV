@@ -2,7 +2,7 @@ package com.fongmi.android.tv.player.extractor;
 
 import android.os.SystemClock;
 
-import com.fongmi.android.tv.bean.Vod;
+import com.fongmi.android.tv.bean.Episode;
 import com.fongmi.android.tv.utils.Download;
 import com.fongmi.android.tv.utils.Sniffer;
 import com.github.catvod.utils.Path;
@@ -14,10 +14,10 @@ import com.xunlei.downloadlib.parameter.TorrentFileInfo;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
 
-public class Magnet implements Callable<List<Vod.Flag.Episode>> {
+public class Magnet implements Callable<List<Episode>> {
 
+    private final List<String> ads;
     private final String url;
     private int time;
 
@@ -27,6 +27,7 @@ public class Magnet implements Callable<List<Vod.Flag.Episode>> {
 
     public Magnet(String url) {
         this.url = url;
+        this.ads = Sniffer.getRegex("magnet");
     }
 
     private void sleep() {
@@ -35,24 +36,16 @@ public class Magnet implements Callable<List<Vod.Flag.Episode>> {
     }
 
     @Override
-    public List<Vod.Flag.Episode> call() {
+    public List<Episode> call() {
         boolean torrent = Sniffer.isTorrent(url);
-        List<Vod.Flag.Episode> episodes = new ArrayList<>();
+        List<Episode> episodes = new ArrayList<>();
         GetTaskId taskId = XLTaskHelper.get().parse(url, Path.thunder(Util.md5(url)));
-        if (!torrent && !taskId.getRealUrl().startsWith("magnet")) return List.of(Vod.Flag.Episode.create(taskId.getFileName(), taskId.getRealUrl()));
+        if (!torrent && !taskId.getRealUrl().startsWith("magnet")) return List.of(Episode.create(taskId.getFileName(), taskId.getRealUrl()));
         if (torrent) Download.create(url, taskId.getSaveFile()).start();
         else while (XLTaskHelper.get().getTaskInfo(taskId).getTaskStatus() != 2 && time < 5000) sleep();
-        List<TorrentFileInfo> medias = XLTaskHelper.get().getTorrentInfo(taskId.getSaveFile()).getMedias();
-        for (TorrentFileInfo media : medias) episodes.add(Vod.Flag.Episode.create(media.getFileName(), media.getPlayUrl()));
+        List<TorrentFileInfo> medias = XLTaskHelper.get().getTorrentInfo(taskId.getSaveFile()).getMedias(ads);
+        for (TorrentFileInfo media : medias) episodes.add(Episode.create(media.getFileName(), media.getSize(), media.getPlayUrl()));
         XLTaskHelper.get().stopTask(taskId);
         return episodes;
-    }
-
-    public static void addAll(List<Vod.Flag.Episode> items, Future<List<Vod.Flag.Episode>> future) {
-        try {
-            items.addAll(Vod.Flag.Episode.Sorter.sort(future.get()));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }

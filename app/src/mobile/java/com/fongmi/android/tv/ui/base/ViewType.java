@@ -4,9 +4,8 @@ public class ViewType {
 
     public static final int RECT = 0;
     public static final int OVAL = 1;
-    public static final int FULL = 2;
-    public static final int LIST = 3;
-    public static final int GRID = 4;
+    public static final int LIST = 2;
+    public static final int GRID = 3;
 
     public static final int DARK = 0;
     public static final int LIGHT = 1;

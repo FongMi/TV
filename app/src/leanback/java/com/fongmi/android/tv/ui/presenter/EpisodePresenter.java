@@ -7,24 +7,29 @@ import androidx.annotation.NonNull;
 import androidx.leanback.widget.Presenter;
 
 import com.fongmi.android.tv.Product;
-import com.fongmi.android.tv.bean.Vod;
+import com.fongmi.android.tv.bean.Episode;
 import com.fongmi.android.tv.databinding.AdapterEpisodeBinding;
 
 public class EpisodePresenter extends Presenter {
 
     private final OnClickListener mListener;
-    private int nextFocus;
+    private int nextFocusDown;
+    private int nextFocusUp;
 
     public EpisodePresenter(OnClickListener listener) {
         this.mListener = listener;
     }
 
     public interface OnClickListener {
-        void onItemClick(Vod.Flag.Episode item);
+        void onItemClick(Episode item);
+    }
+
+    public void setNextFocusUp(int nextFocus) {
+        this.nextFocusUp = nextFocus;
     }
 
     public void setNextFocusDown(int nextFocus) {
-        this.nextFocus = nextFocus;
+        this.nextFocusDown = nextFocus;
     }
 
     @Override
@@ -34,12 +39,13 @@ public class EpisodePresenter extends Presenter {
 
     @Override
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object object) {
-        Vod.Flag.Episode item = (Vod.Flag.Episode) object;
+        Episode item = (Episode) object;
         ViewHolder holder = (ViewHolder) viewHolder;
-        holder.binding.text.setText(item.getName());
         holder.binding.text.setMaxEms(Product.getEms());
-        holder.binding.text.setNextFocusDownId(nextFocus);
+        holder.binding.text.setNextFocusUpId(nextFocusUp);
+        holder.binding.text.setNextFocusDownId(nextFocusDown);
         holder.binding.text.setActivated(item.isActivated());
+        holder.binding.text.setText(item.getDesc().concat(item.getName()));
         setOnClickListener(holder, view -> mListener.onItemClick(item));
     }
 

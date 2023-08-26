@@ -37,7 +37,7 @@ public class Thunder implements Source.Extractor {
             XLTaskInfo taskInfo = XLTaskHelper.get().getBtSubTaskInfo(taskId, index).mTaskInfo;
             if (taskInfo.mTaskStatus == 3) throw new ExtractException(taskInfo.getErrorMsg());
             if (taskInfo.mTaskStatus != 0) return XLTaskHelper.get().getLocalUrl(new File(torrent.getParent(), name));
-            else SystemClock.sleep(50);
+            else SystemClock.sleep(300);
         }
     }
 

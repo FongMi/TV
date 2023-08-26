@@ -22,7 +22,10 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Filter;
 import com.fongmi.android.tv.bean.Page;
+import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
+import com.fongmi.android.tv.bean.Style;
+import com.fongmi.android.tv.bean.Value;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.FragmentVodBinding;
 import com.fongmi.android.tv.model.SiteViewModel;
@@ -89,8 +92,8 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         return mPages.get(mPages.size() - 1);
     }
 
-    private Vod.Style getStyle() {
-        return isFolder() ? Vod.Style.list() : getSite().getStyle();
+    private Style getStyle() {
+        return isFolder() ? Style.list() : getSite().getStyle();
     }
 
     @Override
@@ -115,7 +118,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     @SuppressLint("RestrictedApi")
     private void setRecyclerView() {
         CustomSelector selector = new CustomSelector();
-        selector.addPresenter(Vod.class, new VodPresenter(this, Vod.Style.list()));
+        selector.addPresenter(Vod.class, new VodPresenter(this, Style.list()));
         selector.addPresenter(ListRow.class, new CustomRowPresenter(16), VodPresenter.class);
         selector.addPresenter(ListRow.class, new CustomRowPresenter(8, FocusHighlight.ZOOM_FACTOR_NONE, HorizontalGridView.FOCUS_SCROLL_ALIGNED), FilterPresenter.class);
         mBinding.recycler.addOnScrollListener(mScroller = new CustomScroller(this));
@@ -127,17 +130,18 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mViewModel.result.observe(getViewLifecycleOwner(), result -> {
+            boolean first = mScroller.first();
             int size = result.getList().size();
+            if (size > 0) addVideo(result);
             mScroller.endLoading(result);
-            addVideo(result.getList());
-            checkPosition();
-            checkPage(size);
+            checkPosition(first);
+            checkMore(size);
             hideProgress();
         });
     }
 
-    private void setClick(ArrayObjectAdapter adapter, String key, Filter.Value item) {
-        for (int i = 0; i < adapter.size(); i++) ((Filter.Value) adapter.get(i)).setActivated(item);
+    private void setClick(ArrayObjectAdapter adapter, String key, Value item) {
+        for (int i = 0; i < adapter.size(); i++) ((Value) adapter.get(i)).setActivated(item);
         adapter.notifyArrayItemRangeChanged(0, adapter.size());
         mExtends.put(key, item.getV());
         onRefresh();
@@ -158,27 +162,26 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         mViewModel.categoryContent(getKey(), typeId, page, true, mExtends);
     }
 
-    private void addVideo(List<Vod> items) {
-        if (items.isEmpty()) return;
-        Vod.Style style = items.get(0).getStyle(getStyle());
-        if (style.isList()) mAdapter.addAll(mAdapter.size(), items);
-        else addGrid(items, style);
+    private void addVideo(Result result) {
+        Style style = result.getList().get(0).getStyle(getStyle());
+        if (style.isList()) mAdapter.addAll(mAdapter.size(), result.getList());
+        else addGrid(result.getList(), style);
     }
 
-    private void checkPosition() {
+    private void checkPosition(boolean first) {
         if (mPage != null && mPage.getPosition() > 0) mBinding.recycler.hideHeader();
         if (mPage != null && mPage.getPosition() < 1) mBinding.recycler.showHeader();
         if (mPage != null) mBinding.recycler.setSelectedPosition(mPage.getPosition());
-        else if (isFolder() && !mOpen) mBinding.recycler.moveToTop();
+        else if (first && !mOpen) mBinding.recycler.moveToTop();
         mPage = null;
     }
 
-    private void checkPage(int count) {
-        if (mScroller.isDisable() || count == 0 || mAdapter.size() >= 5 || isFolder()) return;
+    private void checkMore(int count) {
+        if (mScroller.isDisable() || count == 0 || mAdapter.size() >= 5) return;
         getVideo(getTypeId(), String.valueOf(mScroller.addPage()));
     }
 
-    private boolean checkLastSize(List<Vod> items, Vod.Style style) {
+    private boolean checkLastSize(List<Vod> items, Style style) {
         if (mLast == null || items.size() == 0) return false;
         int size = Product.getColumn(style) - mLast.size();
         if (size == 0) return false;
@@ -188,7 +191,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         return true;
     }
 
-    private void addGrid(List<Vod> items, Vod.Style style) {
+    private void addGrid(List<Vod> items, Style style) {
         if (checkLastSize(items, style)) return;
         List<ListRow> rows = new ArrayList<>();
         for (List<Vod> part : Lists.partition(items, Product.getColumn(style))) {
@@ -267,7 +270,6 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
 
     @Override
     public void onLoadMore(String page) {
-        if (isFolder()) return;
         mScroller.setLoading(true);
         getVideo(getTypeId(), page);
     }

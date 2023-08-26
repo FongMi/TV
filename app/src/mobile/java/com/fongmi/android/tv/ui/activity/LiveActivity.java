@@ -48,6 +48,7 @@ import com.fongmi.android.tv.ui.custom.dialog.CastDialog;
 import com.fongmi.android.tv.ui.custom.dialog.LiveDialog;
 import com.fongmi.android.tv.ui.custom.dialog.PassDialog;
 import com.fongmi.android.tv.ui.custom.dialog.TrackDialog;
+import com.fongmi.android.tv.utils.Biometric;
 import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.PiP;
@@ -71,7 +72,7 @@ import okhttp3.Call;
 import okhttp3.Response;
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class LiveActivity extends BaseActivity implements CustomKeyDownLive.Listener, CastDialog.Listener, PiPReceiver.Listener, TrackDialog.Listener, PassCallback, LiveCallback, GroupAdapter.OnClickListener, ChannelAdapter.OnClickListener {
+public class LiveActivity extends BaseActivity implements CustomKeyDownLive.Listener, CastDialog.Listener, PiPReceiver.Listener, TrackDialog.Listener, Biometric.Callback, PassCallback, LiveCallback, GroupAdapter.OnClickListener, ChannelAdapter.OnClickListener {
 
     private ChannelAdapter mChannelAdapter;
     private ActivityLiveBinding mBinding;
@@ -88,12 +89,13 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     private Runnable mR1;
     private Runnable mR2;
     private Runnable mR3;
-    private int toggleCount;
+    private Clock mClock;
     private boolean rotate;
     private boolean stop;
     private boolean lock;
+    private int toggleCount;
+    private int passCount;
     private String url;
-    private int count;
     private PiP mPiP;
 
     public static void start(Activity activity) {
@@ -116,8 +118,8 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         return LiveConfig.get().getHome();
     }
 
-    private int getPlayerType() {
-        return getHome().getPlayerType() != -1 ? getHome().getPlayerType() : Setting.getLivePlayer();
+    private int getPlayerType(int playerType) {
+        return playerType != -1 ? playerType : getHome().getPlayerType() != -1 ? getHome().getPlayerType() : Setting.getLivePlayer();
     }
 
     @Override
@@ -141,6 +143,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mFormatTime = new SimpleDateFormat("yyyy-MM-ddHH:mm", Locale.getDefault());
         mFormatDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         mKeyDown = CustomKeyDownLive.create(this, mBinding.video);
+        mClock = Clock.create(mBinding.widget.time);
         mReceiver = new PiPReceiver(this);
         mPlayers = new Players().init();
         mHides = new ArrayList<>();
@@ -214,7 +217,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
 
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(LiveViewModel.class);
-        mViewModel.channel.observe(this, result -> mPlayers.start(result));
+        mViewModel.channel.observe(this, result -> mPlayers.start(result, getHome().getTimeout()));
         mViewModel.live.observe(this, live -> {
             hideProgress();
             setGroup(live);
@@ -222,7 +225,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private void getLive() {
-        mPlayers.setPlayer(getPlayerType());
+        mPlayers.setPlayer(getPlayerType(-1));
         mViewModel.getLive(getHome());
         setPlayerView();
         setDecodeView();
@@ -441,7 +444,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private void resetPass() {
-        this.count = 0;
+        this.passCount = 0;
     }
 
     @Override
@@ -450,15 +453,18 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mChannelAdapter.addAll(item.getChannel());
         mChannelAdapter.setSelected(item.getPosition());
         mBinding.channel.scrollToPosition(Math.max(item.getPosition(), 0));
-        if (!item.isKeep() || ++count < 5 || mHides.isEmpty()) return;
-        PassDialog.create().show(this);
+        if (!item.isKeep() || ++passCount < 5 || mHides.isEmpty()) return;
+        if (Biometric.enable()) Biometric.show(this);
+        else PassDialog.create().show(this);
         resetPass();
     }
 
     @Override
     public void onItemClick(Channel item) {
         mGroup.setPosition(mChannelAdapter.setSelected(item.group(mGroup)));
+        mPlayers.setPlayer(getPlayerType(item.getPlayerType()));
         mChannel = item;
+        setPlayerView();
         showInfo();
         hideUI();
         fetch();
@@ -555,11 +561,20 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
 
     @Override
     public void setPass(String pass) {
+        unlock(pass);
+    }
+
+    @Override
+    public void onBiometricSuccess() {
+        unlock(null);
+    }
+
+    private void unlock(String pass) {
         boolean first = true;
         Iterator<Group> iterator = mHides.iterator();
         while (iterator.hasNext()) {
             Group item = iterator.next();
-            if (!item.getPass().equals(pass)) continue;
+            if (pass != null && !pass.equals(item.getPass())) continue;
             mGroupAdapter.add(item);
             if (first) onItemClick(item);
             iterator.remove();
@@ -895,13 +910,13 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     @Override
     protected void onResume() {
         super.onResume();
-        Clock.start(mBinding.widget.time);
+        mClock.start();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        Clock.stop();
+        mClock.stop();
     }
 
     @Override

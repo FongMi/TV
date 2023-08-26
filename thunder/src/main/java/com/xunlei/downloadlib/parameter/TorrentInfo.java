@@ -27,9 +27,10 @@ public class TorrentInfo {
         return mSubFileInfo == null ? new TorrentFileInfo[0] : mSubFileInfo;
     }
 
-    public List<TorrentFileInfo> getMedias() {
+    public List<TorrentFileInfo> getMedias(List<String> ads) {
         List<TorrentFileInfo> items = new ArrayList<>();
-        for (TorrentFileInfo item : getSubFileInfo()) if (Util.isMedia(item.getExt())) items.add(item.file(getFile()));
+        for (TorrentFileInfo item : getSubFileInfo()) if (Util.isMedia(item.getExt()) && Util.notAd(ads, item.getFileName())) items.add(item.file(getFile()));
+        TorrentFileInfo.Sorter.sort(items);
         return items;
     }
 }

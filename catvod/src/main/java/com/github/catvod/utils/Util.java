@@ -13,9 +13,12 @@ import java.io.FileInputStream;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 
 public class Util {
+
+    public static final String[] UNITS = new String[]{"bytes", "KB", "MB", "GB", "TB"};
 
     public static String getDeviceId() {
         return Settings.Secure.getString(Init.context().getContentResolver(), Settings.Secure.ANDROID_ID);
@@ -45,13 +48,30 @@ public class Util {
     }
 
     public static String scheme(String url) {
-        String scheme = Uri.parse(url).getScheme();
+        return url == null ? "" : scheme(Uri.parse(url));
+    }
+
+    public static String scheme(Uri uri) {
+        String scheme = uri.getScheme();
         return scheme == null ? "" : scheme.toLowerCase().trim();
     }
 
     public static String host(String url) {
-        String host = Uri.parse(url).getHost();
+        return url == null ? "" : host(Uri.parse(url));
+    }
+
+    public static String host(Uri uri) {
+        String host = uri.getHost();
         return host == null ? "" : host.toLowerCase().trim();
+    }
+
+    public static String path(Uri uri) {
+        String path = uri.getPath();
+        return path == null ? "" : path.trim();
+    }
+
+    public static String basic(Uri uri) {
+        return "Basic " + base64(uri.getUserInfo());
     }
 
     public static String md5(String src) {
@@ -94,5 +114,11 @@ public class Util {
         } catch (Exception e) {
             return 0;
         }
+    }
+
+    public static String size(long size) {
+        if (size <= 0) return "";
+        int group = (int) (Math.log10(size) / Math.log10(1024));
+        return "[" + new DecimalFormat("###0.#").format(size / Math.pow(1024, group)) + " " + UNITS[group] + "] ";
     }
 }

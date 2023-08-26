@@ -192,7 +192,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
             if (!mIsNativeInitialized) {
                 native_init();
                 native_setDot(0);
-                native_setLogLevel(IjkMediaPlayer.IJK_LOG_SILENT);
+                native_setLogLevel(IjkMediaPlayer.IJK_LOG_DEBUG);
                 mIsNativeInitialized = true;
             }
         }
@@ -818,7 +818,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
                     player.notifyOnInfo(msg.arg1, msg.arg2);
                     return;
                 case MEDIA_TIMED_TEXT:
-                    player.notifyOnTimedText(msg.obj == null ? null : IjkTimedText.create(msg.obj.toString()));
+                    player.notifyOnTimedText(IjkTimedText.create((msg.arg1 >= 2 || msg.obj == null) ? "" : msg.obj.toString()));
                     return;
                 case MEDIA_NOP: // interface test message - ignore
                     break;

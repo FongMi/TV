@@ -16,6 +16,7 @@
     <string name="detail_flag">线路</string>
     <string name="detail_more">更多</string>
     <string name="detail_episode">选集</string>
+    <string name="detail_quality">画质</string>
     <string name="detail_content">简介</string>
     <string name="detail_search">快搜“<xliff:g name="name">%s</xliff:g>”</string>
 

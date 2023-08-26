@@ -21,12 +21,12 @@ android {
         leanback {
             dimension "mode"
             versionCode 204
-            versionName "20230812"
+            versionName "20230826"
         }
         mobile {
             dimension "mode"
             versionCode 204
-            versionName "20230812"
+            versionName "20230826"
         }
         java {
             dimension "api"
@@ -69,8 +69,7 @@ android {
     }
 
     android.applicationVariants.all { variant ->
-        variant.outputs.all { output ->
-            outputFileName = "${variant.productFlavors[0].name}-${variant.productFlavors[1].name}-${variant.productFlavors[2].name}.apk"
+        variant.outputs.all { output -> outputFileName = "${variant.productFlavors[0].name}-${variant.productFlavors[1].name}-${variant.productFlavors[2].name}.apk"
         }
     }
 
@@ -103,6 +102,7 @@ dependencies {
     implementation 'androidx.media3:media3-session:1.1.0'
     implementation 'androidx.media3:media3-ui:1.1.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.biometric:biometric:1.1.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.5.1'
     implementation 'androidx.room:room-runtime:2.5.2'
     implementation 'cat.ereza:customactivityoncrash:2.4.0'
@@ -110,7 +110,7 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.15.1'
     implementation 'com.github.bumptech.glide:annotations:4.15.1'
     implementation 'com.github.bumptech.glide:okhttp3-integration:4.15.1'
-    implementation 'com.github.TeamNewPipe:NewPipeExtractor:8495ad619e'
+    implementation 'com.github.TeamNewPipe:NewPipeExtractor:340095515d45ecbee576872c7198992ebd8e4f08'
     implementation 'com.google.android.material:material:1.9.0'
     implementation 'com.google.net.cronet:cronet-okhttp:0.1.0'
     implementation 'com.google.zxing:core:3.3.0'

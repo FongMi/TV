@@ -3,6 +3,7 @@ package com.fongmi.android.tv.bean;
 import android.net.Uri;
 import android.text.TextUtils;
 
+import com.fongmi.android.tv.Constant;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
@@ -36,6 +37,8 @@ public class Live {
     private String ua;
     @SerializedName("referer")
     private String referer;
+    @SerializedName("timeout")
+    private Integer timeout;
     @SerializedName("header")
     private JsonElement header;
     @SerializedName("playerType")
@@ -112,6 +115,10 @@ public class Live {
         return TextUtils.isEmpty(referer) ? "" : referer;
     }
 
+    public Integer getTimeout() {
+        return timeout == null ? Constant.TIMEOUT_PLAY : Math.max(timeout, 1) * 1000;
+    }
+
     public JsonElement getHeader() {
         return header;
     }
@@ -167,6 +174,6 @@ public class Live {
         if (this == obj) return true;
         if (!(obj instanceof Live)) return false;
         Live it = (Live) obj;
-        return getName().equals(it.getName()) && getUrl().equals(it.getUrl());
+        return getName().equals(it.getName());
     }
 }

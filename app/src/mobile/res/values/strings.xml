@@ -16,6 +16,7 @@
     <string name="detail_flag">Flag</string>
     <string name="detail_more">More</string>
     <string name="detail_episode">Episode</string>
+    <string name="detail_quality">Quality</string>
     <string name="detail_content">Summary</string>
     <string name="detail_search">Searching <xliff:g name="name">%s</xliff:g></string>
 

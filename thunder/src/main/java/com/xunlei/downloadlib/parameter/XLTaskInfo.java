@@ -5,18 +5,6 @@ import android.os.Parcelable;
 
 public class XLTaskInfo implements Parcelable {
 
-    public static final Creator<XLTaskInfo> CREATOR = new Creator<XLTaskInfo>() {
-        @Override
-        public XLTaskInfo createFromParcel(Parcel parcel) {
-            return new XLTaskInfo(parcel);
-        }
-
-        @Override
-        public XLTaskInfo[] newArray(int i) {
-            return new XLTaskInfo[i];
-        }
-    };
-
     public int mAdditionalResCount;
     public long mAdditionalResPeerBytes;
     public long mAdditionalResPeerSpeed;
@@ -46,34 +34,6 @@ public class XLTaskInfo implements Parcelable {
     public XLTaskInfo() {
     }
 
-    public XLTaskInfo(Parcel parcel) {
-        this.mTaskId = parcel.readLong();
-        this.mFileName = parcel.readString();
-        this.mInfoLen = parcel.readInt();
-        this.mTaskStatus = parcel.readInt();
-        this.mErrorCode = parcel.readInt();
-        this.mFileSize = parcel.readLong();
-        this.mDownloadSize = parcel.readLong();
-        this.mDownloadSpeed = parcel.readLong();
-        this.mQueryIndexStatus = parcel.readInt();
-        this.mCid = parcel.readString();
-        this.mGcid = parcel.readString();
-        this.mOriginSpeed = parcel.readLong();
-        this.mOriginRecvBytes = parcel.readLong();
-        this.mP2SSpeed = parcel.readLong();
-        this.mP2SRecvBytes = parcel.readLong();
-        this.mP2PSpeed = parcel.readLong();
-        this.mP2PRecvBytes = parcel.readLong();
-        this.mAdditionalResCount = parcel.readInt();
-        this.mAdditionalResType = parcel.readInt();
-        this.mAdditionalResVipSpeed = parcel.readLong();
-        this.mAdditionalResVipRecvBytes = parcel.readLong();
-        this.mAdditionalResPeerSpeed = parcel.readLong();
-        this.mAdditionalResPeerBytes = parcel.readLong();
-        this.mScdnSpeed = parcel.readLong();
-        this.mScdnRecvBytes = parcel.readLong();
-    }
-
     public int getTaskStatus() {
         return mTaskStatus;
     }
@@ -87,36 +47,76 @@ public class XLTaskInfo implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeLong(this.mTaskId);
-        parcel.writeString(this.mFileName);
-        parcel.writeInt(this.mInfoLen);
-        parcel.writeInt(this.mTaskStatus);
-        parcel.writeInt(this.mErrorCode);
-        parcel.writeLong(this.mFileSize);
-        parcel.writeLong(this.mDownloadSize);
-        parcel.writeLong(this.mDownloadSpeed);
-        parcel.writeInt(this.mQueryIndexStatus);
-        parcel.writeString(this.mCid);
-        parcel.writeString(this.mGcid);
-        parcel.writeLong(this.mOriginSpeed);
-        parcel.writeLong(this.mOriginRecvBytes);
-        parcel.writeLong(this.mP2SSpeed);
-        parcel.writeLong(this.mP2SRecvBytes);
-        parcel.writeLong(this.mP2PSpeed);
-        parcel.writeLong(this.mP2PRecvBytes);
-        parcel.writeInt(this.mAdditionalResCount);
-        parcel.writeInt(this.mAdditionalResType);
-        parcel.writeLong(this.mAdditionalResVipSpeed);
-        parcel.writeLong(this.mAdditionalResVipRecvBytes);
-        parcel.writeLong(this.mAdditionalResPeerSpeed);
-        parcel.writeLong(this.mAdditionalResPeerBytes);
-        parcel.writeLong(this.mScdnSpeed);
-        parcel.writeLong(this.mScdnRecvBytes);
-    }
-
-    @Override
     public int describeContents() {
         return 0;
     }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.mAdditionalResCount);
+        dest.writeLong(this.mAdditionalResPeerBytes);
+        dest.writeLong(this.mAdditionalResPeerSpeed);
+        dest.writeInt(this.mAdditionalResType);
+        dest.writeLong(this.mAdditionalResVipRecvBytes);
+        dest.writeLong(this.mAdditionalResVipSpeed);
+        dest.writeString(this.mCid);
+        dest.writeLong(this.mDownloadSize);
+        dest.writeLong(this.mDownloadSpeed);
+        dest.writeInt(this.mErrorCode);
+        dest.writeString(this.mFileName);
+        dest.writeLong(this.mFileSize);
+        dest.writeString(this.mGcid);
+        dest.writeInt(this.mInfoLen);
+        dest.writeLong(this.mOriginRecvBytes);
+        dest.writeLong(this.mOriginSpeed);
+        dest.writeLong(this.mP2PRecvBytes);
+        dest.writeLong(this.mP2PSpeed);
+        dest.writeLong(this.mP2SRecvBytes);
+        dest.writeLong(this.mP2SSpeed);
+        dest.writeInt(this.mQueryIndexStatus);
+        dest.writeLong(this.mScdnRecvBytes);
+        dest.writeLong(this.mScdnSpeed);
+        dest.writeLong(this.mTaskId);
+        dest.writeInt(this.mTaskStatus);
+    }
+
+    protected XLTaskInfo(Parcel in) {
+        this.mAdditionalResCount = in.readInt();
+        this.mAdditionalResPeerBytes = in.readLong();
+        this.mAdditionalResPeerSpeed = in.readLong();
+        this.mAdditionalResType = in.readInt();
+        this.mAdditionalResVipRecvBytes = in.readLong();
+        this.mAdditionalResVipSpeed = in.readLong();
+        this.mCid = in.readString();
+        this.mDownloadSize = in.readLong();
+        this.mDownloadSpeed = in.readLong();
+        this.mErrorCode = in.readInt();
+        this.mFileName = in.readString();
+        this.mFileSize = in.readLong();
+        this.mGcid = in.readString();
+        this.mInfoLen = in.readInt();
+        this.mOriginRecvBytes = in.readLong();
+        this.mOriginSpeed = in.readLong();
+        this.mP2PRecvBytes = in.readLong();
+        this.mP2PSpeed = in.readLong();
+        this.mP2SRecvBytes = in.readLong();
+        this.mP2SSpeed = in.readLong();
+        this.mQueryIndexStatus = in.readInt();
+        this.mScdnRecvBytes = in.readLong();
+        this.mScdnSpeed = in.readLong();
+        this.mTaskId = in.readLong();
+        this.mTaskStatus = in.readInt();
+    }
+
+    public static final Creator<XLTaskInfo> CREATOR = new Creator<XLTaskInfo>() {
+        @Override
+        public XLTaskInfo createFromParcel(Parcel source) {
+            return new XLTaskInfo(source);
+        }
+
+        @Override
+        public XLTaskInfo[] newArray(int size) {
+            return new XLTaskInfo[size];
+        }
+    };
 }

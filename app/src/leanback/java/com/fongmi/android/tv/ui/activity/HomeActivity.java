@@ -22,6 +22,7 @@ import com.fongmi.android.tv.Updater;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.api.LiveConfig;
 import com.fongmi.android.tv.api.WallConfig;
+import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Func;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Result;
@@ -46,9 +47,11 @@ import com.fongmi.android.tv.ui.presenter.HistoryPresenter;
 import com.fongmi.android.tv.ui.presenter.ProgressPresenter;
 import com.fongmi.android.tv.ui.presenter.VodPresenter;
 import com.fongmi.android.tv.utils.Clock;
+import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Utils;
+import com.github.catvod.utils.Util;
 import com.google.common.collect.Lists;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -64,7 +67,8 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     private ArrayObjectAdapter mAdapter;
     private SiteViewModel mViewModel;
     private boolean confirm;
-    private Result result;
+    private Result mResult;
+    private Clock mClock;
 
     @Override
     protected ViewBinding getBinding() {
@@ -79,6 +83,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     protected void initView() {
+        mClock = Clock.create(mBinding.time).format("MM/dd HH:mm:ss");
         mBinding.progressLayout.showProgress();
         Updater.get().release().start();
         Server.get().start();
@@ -104,7 +109,11 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         if (Intent.ACTION_SEND.equals(intent.getAction())) {
             DetailActivity.push(this, Uri.parse(intent.getStringExtra(Intent.EXTRA_TEXT)));
         } else if (Intent.ACTION_VIEW.equals(intent.getAction()) && intent.getData() != null) {
-            DetailActivity.push(this, intent.getData());
+            if ("text/plain".equals(intent.getType()) || Util.path(intent.getData()).endsWith(".m3u")) {
+                loadLive("file:/" + FileChooser.getPathFromUri(this, intent.getData()));
+            } else {
+                DetailActivity.push(this, intent.getData());
+            }
         }
     }
 
@@ -123,7 +132,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mViewModel.result.observe(this, result -> {
             mAdapter.remove("progress");
-            addVideo(this.result = result);
+            addVideo(mResult = result);
         });
     }
 
@@ -154,11 +163,20 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
             @Override
             public void error(String msg) {
                 mBinding.progressLayout.showContent();
-                result = Result.empty();
+                mResult = Result.empty();
                 Notify.show(msg);
                 setFocus();
             }
         };
+    }
+
+    private void loadLive(String url) {
+        LiveConfig.load(Config.find(url, 1), new Callback() {
+            @Override
+            public void success() {
+                LiveActivity.start(getActivity());
+            }
+        });
     }
 
     private void setFocus() {
@@ -167,7 +185,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     }
 
     private void getVideo() {
-        this.result = Result.empty();
+        mResult = Result.empty();
         int index = getRecommendIndex();
         String home = ApiConfig.get().getHome().getName();
         mBinding.title.setText(home.isEmpty() ? ResUtil.getString(R.string.app_name) : home);
@@ -216,6 +234,13 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         mHistoryAdapter.notifyArrayItemRangeChanged(0, mHistoryAdapter.size());
     }
 
+    private void clearHistory() {
+        mAdapter.removeItems(getHistoryIndex(), 1);
+        History.delete(ApiConfig.getCid());
+        mPresenter.setDelete(false);
+        mHistoryAdapter.clear();
+    }
+
     private int getHistoryIndex() {
         for (int i = 0; i < mAdapter.size(); i++) if (mAdapter.get(i).equals(R.string.home_history)) return i + 1;
         return -1;
@@ -236,7 +261,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     public void onItemClick(Func item) {
         switch (item.getResId()) {
             case R.string.home_vod:
-                VodActivity.start(this, result.clear());
+                VodActivity.start(this, mResult.clear());
                 break;
             case R.string.home_live:
                 LiveActivity.start(this);
@@ -282,7 +307,8 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     public boolean onLongClick() {
-        setHistoryDelete(true);
+        if (mPresenter.isDelete()) clearHistory();
+        else setHistoryDelete(true);
         return true;
     }
 
@@ -368,13 +394,13 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     @Override
     protected void onResume() {
         super.onResume();
-        Clock.start(mBinding.time, "MM/dd HH:mm:ss");
+        mClock.start();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        Clock.stop();
+        mClock.stop();
     }
 
     @Override

@@ -10,34 +10,33 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.viewbinding.ViewBinding;
 
-import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.bean.Vod;
+import com.fongmi.android.tv.bean.Episode;
 import com.fongmi.android.tv.databinding.FragmentEpisodeBinding;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.ui.adapter.EpisodeAdapter;
 import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.base.ViewType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class EpisodeFragment extends BaseFragment implements EpisodeAdapter.OnClickListener {
 
     private FragmentEpisodeBinding mBinding;
     private SiteViewModel mViewModel;
-    private EpisodeAdapter mAdapter;
 
     private int getSpanCount() {
         return getArguments().getInt("spanCount");
     }
 
-    private String getJson() {
-        return getArguments().getString("json");
+    private ArrayList<Episode> getItems() {
+        return getArguments().getParcelableArrayList("items");
     }
 
-    public static EpisodeFragment newInstance(int spanCount, List<Vod.Flag.Episode> items) {
+    public static EpisodeFragment newInstance(int spanCount, List<Episode> items) {
         Bundle args = new Bundle();
         args.putInt("spanCount", spanCount);
-        args.putString("json", App.gson().toJson(items));
+        args.putParcelableArrayList("items", new ArrayList<>(items));
         EpisodeFragment fragment = new EpisodeFragment();
         fragment.setArguments(args);
         return fragment;
@@ -52,27 +51,23 @@ public class EpisodeFragment extends BaseFragment implements EpisodeAdapter.OnCl
     protected void initView() {
         setRecyclerView();
         setViewModel();
-        setEpisode();
     }
 
     private void setRecyclerView() {
+        EpisodeAdapter adapter;
         mBinding.recycler.setHasFixedSize(true);
         mBinding.recycler.setItemAnimator(null);
-        mBinding.recycler.setAdapter(mAdapter = new EpisodeAdapter(this, ViewType.GRID));
+        mBinding.recycler.setLayoutManager(new GridLayoutManager(getContext(), getSpanCount()));
+        mBinding.recycler.setAdapter(adapter = new EpisodeAdapter(this, ViewType.GRID, getItems()));
+        mBinding.recycler.scrollToPosition(adapter.getPosition());
     }
 
     private void setViewModel() {
         mViewModel = new ViewModelProvider(requireActivity()).get(SiteViewModel.class);
     }
 
-    private void setEpisode() {
-        mAdapter.addAll(Vod.Flag.Episode.arrayFrom(getJson()));
-        mBinding.recycler.setLayoutManager(new GridLayoutManager(getContext(), getSpanCount()));
-        mBinding.recycler.scrollToPosition(mAdapter.getPosition());
-    }
-
     @Override
-    public void onItemClick(Vod.Flag.Episode item) {
+    public void onItemClick(Episode item) {
         mViewModel.setEpisode(item);
     }
 }

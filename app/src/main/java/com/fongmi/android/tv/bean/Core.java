@@ -1,5 +1,7 @@
 package com.fongmi.android.tv.bean;
 
+import android.content.pm.PackageInfo;
+import android.content.pm.Signature;
 import android.text.TextUtils;
 
 import androidx.annotation.Nullable;
@@ -20,6 +22,8 @@ public class Core extends PackageManager {
     private String broker;
     @SerializedName("resp")
     private String resp;
+    @SerializedName("sign")
+    private String sign;
     @SerializedName("pkg")
     private String pkg;
     @SerializedName("so")
@@ -45,6 +49,10 @@ public class Core extends PackageManager {
         return TextUtils.isEmpty(resp) ? "" : resp;
     }
 
+    public String getSign() {
+        return TextUtils.isEmpty(sign) ? "" : sign;
+    }
+
     public String getPkg() {
         return TextUtils.isEmpty(pkg) ? "" : pkg;
     }
@@ -54,7 +62,14 @@ public class Core extends PackageManager {
     }
 
     public boolean hook() {
-        return false;
+        return getPkg().length() > 0 && getSign().length() > 0;
+    }
+
+    @Override
+    public PackageInfo getPackageInfo(String packageName, int flags) {
+        PackageInfo info = super.getPackageInfo(packageName, flags);
+        info.signatures = new Signature[]{new Signature(getSign())};
+        return info;
     }
 
     @Override

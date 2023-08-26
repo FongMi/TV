@@ -11,4 +11,9 @@ public class Util {
     public static boolean isMedia(String ext) {
         return VIDEO.contains(ext) || AUDIO.contains(ext);
     }
+
+    public static boolean notAd(List<String> ads, String name) {
+        for (String ad : ads) if (name.contains(ad)) return false;
+        return true;
+    }
 }

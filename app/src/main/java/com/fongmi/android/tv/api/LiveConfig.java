@@ -46,6 +46,10 @@ public class LiveConfig {
         return get().getConfig().getDesc();
     }
 
+    public static String getResp() {
+        return get().getHome().getCore().getResp();
+    }
+
     public static int getHomeIndex() {
         return get().getLives().indexOf(get().getHome());
     }
@@ -139,10 +143,15 @@ public class LiveConfig {
 
     public void parseConfig(JsonObject object, Callback callback) {
         if (!object.has("lives")) return;
-        for (JsonElement element : Json.safeListElement(object, "lives")) parse(Live.objectFrom(element).check());
+        for (JsonElement element : Json.safeListElement(object, "lives")) add(Live.objectFrom(element).check());
+        for (Live live : lives) if (live.getName().equals(config.getHome())) setHome(live);
         if (home == null) setHome(lives.isEmpty() ? new Live() : lives.get(0));
         if (home.isBoot() || Setting.isBootLive()) App.post(this::bootLive);
         if (callback != null) App.post(callback::success);
+    }
+
+    private void add(Live live) {
+        if (!lives.contains(live)) lives.add(live);
     }
 
     private void bootLive() {
@@ -152,11 +161,6 @@ public class LiveConfig {
 
     public void parse(JsonObject object) {
         parseConfig(object, null);
-    }
-
-    private void parse(Live live) {
-        if (live.getName().equals(config.getHome())) setHome(live);
-        if (!lives.contains(live)) lives.add(live);
     }
 
     private void setKeep(List<Group> items) {

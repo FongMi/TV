@@ -5,7 +5,7 @@ import android.text.TextUtils;
 
 import androidx.media3.common.MediaItem;
 
-import com.fongmi.android.tv.utils.Trans;
+import com.github.catvod.utils.Trans;
 import com.google.gson.annotations.SerializedName;
 
 public class Sub {

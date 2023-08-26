@@ -1,9 +1,12 @@
 package com.github.catvod.net;
 
+import android.net.Uri;
 import android.util.ArrayMap;
 
 import com.github.catvod.bean.Doh;
 import com.github.catvod.utils.Path;
+import com.github.catvod.utils.Util;
+import com.google.common.net.HttpHeaders;
 
 import java.util.Map;
 import java.util.Objects;
@@ -12,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 import okhttp3.Cache;
 import okhttp3.Call;
 import okhttp3.Dns;
+import okhttp3.FormBody;
 import okhttp3.Headers;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
@@ -21,8 +25,9 @@ import okhttp3.dnsoverhttps.DnsOverHttps;
 
 public class OkHttp {
 
+    public static final String ACCEPT = "*/*";
     private static final int TIMEOUT = 30 * 1000;
-    private static final int CACHE = 50 * 1024 * 1024;
+    private static final int CACHE = 100 * 1024 * 1024;
 
     private DnsOverHttps dns;
     private OkHttpClient client;
@@ -62,6 +67,8 @@ public class OkHttp {
     }
 
     public static Call newCall(String url) {
+        Uri uri = Uri.parse(url);
+        if (uri.getUserInfo() != null) return newCall(url, Headers.of(HttpHeaders.AUTHORIZATION, Util.basic(uri)));
         return client().newCall(new Request.Builder().url(url).build());
     }
 
@@ -74,11 +81,15 @@ public class OkHttp {
     }
 
     public static Call newCall(String url, ArrayMap<String, String> params) {
-        return client().newCall(new Request.Builder().url(buildUrl(url, params)).build());
+        return client().newCall(new Request.Builder().url(buildUrl(url, params)).headers(Headers.of(HttpHeaders.ACCEPT, ACCEPT)).build());
     }
 
     public static Call newCall(String url, ArrayMap<String, String> params, Headers headers) {
         return client().newCall(new Request.Builder().url(buildUrl(url, params)).headers(headers).build());
+    }
+
+    public static Call newCall(String url, RequestBody body) {
+        return client().newCall(new Request.Builder().url(url).post(body).build());
     }
 
     public static Call newCall(OkHttpClient client, String url, RequestBody body) {
@@ -89,5 +100,11 @@ public class OkHttp {
         HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(url)).newBuilder();
         for (Map.Entry<String, String> entry : params.entrySet()) builder.addQueryParameter(entry.getKey(), entry.getValue());
         return builder.build();
+    }
+
+    public static FormBody toBody(ArrayMap<String, String> params) {
+        FormBody.Builder body = new FormBody.Builder();
+        for (Map.Entry<String, String> entry : params.entrySet()) body.add(entry.getKey(), entry.getValue());
+        return body.build();
     }
 }
