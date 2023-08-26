@@ -42,7 +42,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
     private final String key;
     private final String api;
 
-    public Spider(String api, DexClassLoader dex) throws Exception {
+    public Spider(String key, String api, DexClassLoader dex) throws Exception {
         this.key = "__" + UUID.randomUUID().toString().replace("-", "") + "__";
         this.executor = Executors.newSingleThreadExecutor();
         this.api = api;
