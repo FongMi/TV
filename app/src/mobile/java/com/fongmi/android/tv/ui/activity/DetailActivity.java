@@ -1406,6 +1406,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         if (isInPictureInPictureMode) {
             mReceiver.register(this);
             enterFullscreen();
+            setSubtitle(12);
             hideControl();
             hideSheet();
         } else {
