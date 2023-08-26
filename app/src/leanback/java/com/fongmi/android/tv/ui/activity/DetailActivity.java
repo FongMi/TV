@@ -123,6 +123,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private Runnable mR1;
     private Runnable mR2;
     private Runnable mR3;
+    private Clock mClock;
 
     public static void push(FragmentActivity activity, Uri uri) {
         if (Sniffer.isPush(uri)) push(activity, uri.toString(), true);
@@ -254,6 +255,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     protected void initView() {
         mKeyDown = CustomKeyDownVod.create(this, mBinding.video);
         mFrameParams = mBinding.video.getLayoutParams();
+        mClock = Clock.create(mBinding.widget.time);
         mPlayers = new Players().init();
         mBroken = new ArrayList<>();
         mR1 = this::hideControl;
@@ -389,7 +391,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         getIntent().putExtra("key", item.getSiteKey());
         getIntent().putExtra("id", item.getVodId());
         mBinding.scroll.scrollTo(0, 0);
-        Clock.get().setCallback(null);
+        mClock.setCallback(null);
         mPlayers.stop();
         getDetail();
     }
@@ -672,7 +674,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onReset(boolean replay) {
-        Clock.get().setCallback(null);
+        mClock.setCallback(null);
         if (mFlagAdapter.size() == 0) return;
         if (mEpisodeAdapter.size() == 0) return;
         getPlayer(getFlag(), getEpisode(), replay);
@@ -937,7 +939,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mHistory.setDuration(duration = mPlayers.getDuration());
         if (position >= 0 && duration > 0 && getSite().isRecordable()) App.execute(() -> mHistory.update());
         if (mHistory.getEnding() > 0 && duration > 0 && mHistory.getEnding() + position >= duration) {
-            Clock.get().setCallback(null);
+            mClock.setCallback(null);
             checkNext();
         }
     }
@@ -949,7 +951,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
                 setPosition();
                 setInitTrack(true);
                 setTrackVisible(false);
-                Clock.get().setCallback(this);
+                mClock.setCallback(this);
                 break;
             case Player.STATE_IDLE:
                 break;
@@ -1020,8 +1022,8 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     private void onError(ErrorEvent event) {
-        Clock.get().setCallback(null);
         showError(event.getMsg());
+        mClock.setCallback(null);
         mPlayers.stop();
         startFlow();
     }
@@ -1314,7 +1316,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     @Override
     protected void onResume() {
         super.onResume();
-        Clock.start(mBinding.widget.time);
+        mClock.start();
         onPlay();
     }
 
@@ -1322,7 +1324,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     protected void onPause() {
         super.onPause();
         onPause(false);
-        Clock.stop();
+        mClock.stop();
     }
 
     @Override
@@ -1343,9 +1345,9 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     protected void onDestroy() {
         super.onDestroy();
         stopSearch();
+        mClock.release();
         mPlayers.release();
         Source.get().stop();
-        Clock.get().release();
         RefreshEvent.history();
         App.removeCallbacks(mR1, mR2, mR3);
     }

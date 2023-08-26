@@ -89,12 +89,13 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     private Runnable mR1;
     private Runnable mR2;
     private Runnable mR3;
-    private int toggleCount;
+    private Clock mClock;
     private boolean rotate;
     private boolean stop;
     private boolean lock;
+    private int toggleCount;
+    private int passCount;
     private String url;
-    private int count;
     private PiP mPiP;
 
     public static void start(Activity activity) {
@@ -142,6 +143,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mFormatTime = new SimpleDateFormat("yyyy-MM-ddHH:mm", Locale.getDefault());
         mFormatDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         mKeyDown = CustomKeyDownLive.create(this, mBinding.video);
+        mClock = Clock.create(mBinding.widget.time);
         mReceiver = new PiPReceiver(this);
         mPlayers = new Players().init();
         mHides = new ArrayList<>();
@@ -442,7 +444,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private void resetPass() {
-        this.count = 0;
+        this.passCount = 0;
     }
 
     @Override
@@ -451,7 +453,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mChannelAdapter.addAll(item.getChannel());
         mChannelAdapter.setSelected(item.getPosition());
         mBinding.channel.scrollToPosition(Math.max(item.getPosition(), 0));
-        if (!item.isKeep() || ++count < 5 || mHides.isEmpty()) return;
+        if (!item.isKeep() || ++passCount < 5 || mHides.isEmpty()) return;
         if (Biometric.enable()) Biometric.show(this);
         else PassDialog.create().show(this);
         resetPass();
@@ -908,13 +910,13 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     @Override
     protected void onResume() {
         super.onResume();
-        Clock.start(mBinding.widget.time);
+        mClock.start();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        Clock.stop();
+        mClock.stop();
     }
 
     @Override

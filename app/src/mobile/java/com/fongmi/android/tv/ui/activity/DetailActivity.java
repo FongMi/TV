@@ -133,6 +133,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     private Runnable mR2;
     private Runnable mR3;
     private Runnable mR4;
+    private Clock mClock;
     private String url;
     private PiP mPiP;
 
@@ -259,6 +260,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mPlayers = new Players().init();
         mDialogs = new ArrayList<>();
         mBroken = new ArrayList<>();
+        mClock = Clock.create();
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
         mR3 = this::setOrient;
@@ -389,7 +391,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mBinding.swipeLayout.setRefreshing(true);
         mBinding.swipeLayout.setEnabled(false);
         mBinding.scroll.scrollTo(0, 0);
-        Clock.get().setCallback(null);
+        mClock.setCallback(null);
         mPlayers.stop();
         getDetail();
     }
@@ -684,7 +686,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void onReset(boolean replay) {
-        Clock.get().setCallback(null);
+        mClock.setCallback(null);
         if (mFlagAdapter.getItemCount() == 0) return;
         if (mEpisodeAdapter.getItemCount() == 0) return;
         getPlayer(getFlag(), getEpisode(), replay);
@@ -975,7 +977,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mHistory.setDuration(duration = mPlayers.getDuration());
         if (position >= 0 && duration > 0) App.execute(() -> mHistory.update());
         if (mHistory.getEnding() > 0 && duration > 0 && mHistory.getEnding() + position >= duration) {
-            Clock.get().setCallback(null);
+            mClock.setCallback(null);
             checkNext();
         }
     }
@@ -988,7 +990,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
                 setInitTrack(true);
                 setTrackVisible(false);
                 setUrl(event.getUrl());
-                Clock.get().setCallback(this);
+                mClock.setCallback(this);
                 break;
             case Player.STATE_IDLE:
                 break;
@@ -1071,8 +1073,8 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     private void onError(ErrorEvent event) {
         mBinding.swipeLayout.setEnabled(true);
-        Clock.get().setCallback(null);
         showError(event.getMsg());
+        mClock.setCallback(null);
         mPlayers.stop();
         startFlow();
     }
@@ -1420,7 +1422,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
             PlaybackService.stop();
         } else {
             mPlayers.play();
-            Clock.start();
+            mClock.start();
         }
     }
 
@@ -1432,7 +1434,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
             PlaybackService.start();
         } else {
             mPlayers.pause();
-            Clock.stop();
+            mClock.stop();
         }
     }
 
@@ -1452,9 +1454,9 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     protected void onDestroy() {
         super.onDestroy();
         stopSearch();
+        mClock.release();
         mPlayers.release();
         Source.get().stop();
-        Clock.get().release();
         RefreshEvent.history();
         PlaybackService.stop();
         App.removeCallbacks(mR1, mR2, mR3, mR4);

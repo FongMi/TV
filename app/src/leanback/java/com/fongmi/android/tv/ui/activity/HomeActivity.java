@@ -67,7 +67,8 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     private ArrayObjectAdapter mAdapter;
     private SiteViewModel mViewModel;
     private boolean confirm;
-    private Result result;
+    private Result mResult;
+    private Clock mClock;
 
     @Override
     protected ViewBinding getBinding() {
@@ -82,6 +83,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     protected void initView() {
+        mClock = Clock.create(mBinding.time).format("MM/dd HH:mm:ss");
         mBinding.progressLayout.showProgress();
         Updater.get().release().start();
         Server.get().start();
@@ -130,7 +132,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mViewModel.result.observe(this, result -> {
             mAdapter.remove("progress");
-            addVideo(this.result = result);
+            addVideo(mResult = result);
         });
     }
 
@@ -161,7 +163,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
             @Override
             public void error(String msg) {
                 mBinding.progressLayout.showContent();
-                result = Result.empty();
+                mResult = Result.empty();
                 Notify.show(msg);
                 setFocus();
             }
@@ -183,7 +185,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     }
 
     private void getVideo() {
-        this.result = Result.empty();
+        mResult = Result.empty();
         int index = getRecommendIndex();
         String home = ApiConfig.get().getHome().getName();
         mBinding.title.setText(home.isEmpty() ? ResUtil.getString(R.string.app_name) : home);
@@ -259,7 +261,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     public void onItemClick(Func item) {
         switch (item.getResId()) {
             case R.string.home_vod:
-                VodActivity.start(this, result.clear());
+                VodActivity.start(this, mResult.clear());
                 break;
             case R.string.home_live:
                 LiveActivity.start(this);
@@ -392,13 +394,13 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     @Override
     protected void onResume() {
         super.onResume();
-        Clock.start(mBinding.time, "MM/dd HH:mm:ss");
+        mClock.start();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        Clock.stop();
+        mClock.stop();
     }
 
     @Override

@@ -89,6 +89,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private Runnable mR2;
     private Runnable mR3;
     private Runnable mR4;
+    private Clock mClock;
     private boolean confirm;
     private int toggleCount;
     private int count;
@@ -137,6 +138,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mHides = new ArrayList<>();
         mPlayers = new Players().init();
         mKeyDown = CustomKeyDownLive.create(this);
+        mClock = Clock.create(mBinding.widget.time);
         mFormatDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         mFormatTime = new SimpleDateFormat("yyyy-MM-ddHH:mm", Locale.getDefault());
         setRecyclerView();
@@ -800,15 +802,15 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     @Override
     protected void onResume() {
         super.onResume();
-        Clock.start(mBinding.widget.time);
         mPlayers.play();
+        mClock.start();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         mPlayers.pause();
-        Clock.stop();
+        mClock.stop();
     }
 
     @Override
