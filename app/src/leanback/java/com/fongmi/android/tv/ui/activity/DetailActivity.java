@@ -402,6 +402,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void getDetail(Vod item) {
         getIntent().putExtra("key", item.getSiteKey());
+        getIntent().putExtra("pic", item.getVodPic());
         getIntent().putExtra("id", item.getVodId());
         mBinding.scroll.scrollTo(0, 0);
         mClock.setCallback(null);

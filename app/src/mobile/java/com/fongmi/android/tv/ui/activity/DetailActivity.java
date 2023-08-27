@@ -405,6 +405,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     private void getDetail(Vod item) {
         getIntent().putExtra("key", item.getSiteKey());
+        getIntent().putExtra("pic", item.getVodPic());
         getIntent().putExtra("id", item.getVodId());
         mBinding.swipeLayout.setRefreshing(true);
         mBinding.swipeLayout.setEnabled(false);
@@ -477,7 +478,6 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     private void getPlayer(Flag flag, Episode episode, boolean replay) {
         mBinding.control.title.setText(getString(R.string.detail_title, mBinding.name.getText(), episode.getName()));
         mViewModel.playerContent(getKey(), flag.getFlag(), episode.getUrl());
-        mBinding.qualityText.setVisibility(View.GONE);
         updateHistory(episode, replay);
         showProgress();
         hidePreview();
@@ -501,6 +501,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         if (item.isActivated()) return;
         mFlagAdapter.setActivated(item);
         mBinding.flag.scrollToPosition(mFlagAdapter.getPosition());
+        mBinding.qualityText.setVisibility(View.GONE);
         mBinding.quality.setVisibility(View.GONE);
         setEpisodeAdapter(item.getEpisodes());
         seamless(item, force);
