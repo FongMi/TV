@@ -34,6 +34,10 @@
 # Cling
 -keep class org.fourthline.cling.** { *; }
 
+# Cronet
+-keep class org.chromium.net.** { *; }
+-keep class com.google.net.cronet.** { *; }
+
 # EXO
 -keep class org.xmlpull.v1.** { *; }
 
