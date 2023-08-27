@@ -478,7 +478,6 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mBinding.control.title.setText(getString(R.string.detail_title, mBinding.name.getText(), episode.getName()));
         mViewModel.playerContent(getKey(), flag.getFlag(), episode.getUrl());
         mBinding.qualityText.setVisibility(View.GONE);
-        mBinding.quality.setVisibility(View.GONE);
         updateHistory(episode, replay);
         showProgress();
         hidePreview();
@@ -502,6 +501,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         if (item.isActivated()) return;
         mFlagAdapter.setActivated(item);
         mBinding.flag.scrollToPosition(mFlagAdapter.getPosition());
+        mBinding.quality.setVisibility(View.GONE);
         setEpisodeAdapter(item.getEpisodes());
         seamless(item, force);
     }
