@@ -106,6 +106,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private ArrayObjectAdapter mPartAdapter;
     private ActivityDetailBinding mBinding;
     private QualityAdapter mQualityAdapter;
+    private FlagPresenter mFlagPresenter;
     private PartPresenter mPartPresenter;
     private CustomKeyDownVod mKeyDown;
     private ExecutorService mExecutor;
@@ -320,7 +321,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     private void setRecyclerView() {
         mBinding.flag.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.flag.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-        mBinding.flag.setAdapter(new ItemBridgeAdapter(mFlagAdapter = new ArrayObjectAdapter(new FlagPresenter(item -> setFlagActivated(item, false)))));
+        mBinding.flag.setAdapter(new ItemBridgeAdapter(mFlagAdapter = new ArrayObjectAdapter(mFlagPresenter = new FlagPresenter(item -> setFlagActivated(item, false)))));
         mBinding.episode.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.episode.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         mBinding.episode.setAdapter(new ItemBridgeAdapter(mEpisodeAdapter = new ArrayObjectAdapter(mEpisodePresenter = new EpisodePresenter(this::setEpisodeActivated))));
@@ -342,34 +343,11 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         mParseAdapter.setItems(ApiConfig.get().getParses(), null);
     }
 
-    private void setPlayerView() {
-        getIjk().setPlayer(mPlayers.getPlayer());
-        mBinding.control.player.setText(mPlayers.getPlayerText());
-        getExo().setVisibility(mPlayers.isExo() ? View.VISIBLE : View.GONE);
-        getIjk().setVisibility(mPlayers.isIjk() ? View.VISIBLE : View.GONE);
-        mBinding.control.reset.setText(ResUtil.getStringArray(R.array.select_reset)[Setting.getReset()]);
-    }
-
-    private void setDecodeView() {
-        mBinding.control.decode.setText(mPlayers.getDecodeText());
-    }
-
     private void setVideoView() {
         mPlayers.set(getExo(), getIjk());
         getExo().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
         getIjk().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
         setSubtitle(16);
-    }
-
-    private void setSubtitle(int size) {
-        getExo().getSubtitleView().setFixedTextSize(Dimension.SP, size);
-        getIjk().getSubtitleView().setFixedTextSize(Dimension.SP, size);
-    }
-
-    private void setScale(int scale) {
-        getExo().setResizeMode(scale);
-        getIjk().setResizeMode(scale);
-        mBinding.control.scale.setText(ResUtil.getStringArray(R.array.select_scale)[scale]);
     }
 
     private void setViewModel() {
@@ -388,6 +366,29 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         if (getId().startsWith("push://")) getIntent().putExtra("key", "push_agent").putExtra("id", getId().substring(7));
         if (TextUtils.isEmpty(getId()) || getId().startsWith("msearch:")) setEmpty();
         else getDetail();
+    }
+
+    private void setPlayerView() {
+        getIjk().setPlayer(mPlayers.getPlayer());
+        mBinding.control.player.setText(mPlayers.getPlayerText());
+        getExo().setVisibility(mPlayers.isExo() ? View.VISIBLE : View.GONE);
+        getIjk().setVisibility(mPlayers.isIjk() ? View.VISIBLE : View.GONE);
+        mBinding.control.reset.setText(ResUtil.getStringArray(R.array.select_reset)[Setting.getReset()]);
+    }
+
+    private void setDecodeView() {
+        mBinding.control.decode.setText(mPlayers.getDecodeText());
+    }
+
+    private void setSubtitle(int size) {
+        getExo().getSubtitleView().setFixedTextSize(Dimension.SP, size);
+        getIjk().getSubtitleView().setFixedTextSize(Dimension.SP, size);
+    }
+
+    private void setScale(int scale) {
+        getExo().setResizeMode(scale);
+        getIjk().setResizeMode(scale);
+        mBinding.control.scale.setText(ResUtil.getStringArray(R.array.select_scale)[scale]);
     }
 
     private void getDetail() {
@@ -423,10 +424,12 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         result.getUrl().set(mQualityAdapter.getPosition());
         setUseParse(ApiConfig.hasParse() && ((result.getPlayUrl().isEmpty() && ApiConfig.get().getFlags().contains(result.getFlag())) || result.getJx() == 1));
         mPlayers.start(result, isUseParse(), getSite().isChangeable() ? getSite().getTimeout() : -1);
+        mFlagPresenter.setNextFocusDown(result.getUrl().isOnly() ? R.id.episode : R.id.quality);
         mEpisodePresenter.setNextFocusUp(result.getUrl().isOnly() ? R.id.flag : R.id.quality);
         mBinding.quality.setVisibility(result.getUrl().isOnly() ? View.GONE : View.VISIBLE);
         mBinding.control.parse.setVisibility(isUseParse() ? View.VISIBLE : View.GONE);
         notifyItemChanged(mBinding.episode, mEpisodeAdapter);
+        notifyItemChanged(mBinding.flag, mFlagAdapter);
         mQualityAdapter.addAll(result);
     }
 
