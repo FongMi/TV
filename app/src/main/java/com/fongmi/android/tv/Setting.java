@@ -175,7 +175,7 @@ public class Setting {
     }
 
     public static int getSubtitle() {
-        return Prefers.getInt("subtitle", 16);
+        return Math.max(Prefers.getInt("subtitle", 16), 14);
     }
 
     public static void putSubtitle(int subtitle) {
