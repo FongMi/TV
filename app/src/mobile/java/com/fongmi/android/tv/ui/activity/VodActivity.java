@@ -13,6 +13,8 @@ import com.fongmi.android.tv.databinding.ActivityVodBinding;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.fragment.TypeFragment;
 
+import java.util.HashMap;
+
 public class VodActivity extends BaseActivity {
 
     private ActivityVodBinding mBinding;
@@ -43,7 +45,7 @@ public class VodActivity extends BaseActivity {
         Result result = getResult();
         Class type = result.getTypes().get(0);
         mBinding.text.setText(type.getTypeName());
-        getSupportFragmentManager().beginTransaction().replace(R.id.container, TypeFragment.newInstance(getKey(), type.getTypeId(), type.getTypeFlag().equals("1")), "0").commitAllowingStateLoss();
+        getSupportFragmentManager().beginTransaction().replace(R.id.container, TypeFragment.newInstance(getKey(), type.getTypeId(), new HashMap<>(), type.getTypeFlag().equals("1")), "0").commitAllowingStateLoss();
     }
 
     private TypeFragment getFragment() {

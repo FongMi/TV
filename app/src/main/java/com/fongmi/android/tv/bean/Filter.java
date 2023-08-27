@@ -55,6 +55,12 @@ public class Filter implements Parcelable {
         return value == null ? Collections.emptyList() : value;
     }
 
+    public String setActivated(String v) {
+        int index = getValue().indexOf(new Value(v));
+        if (index != -1) getValue().get(index).setActivated(true);
+        return v;
+    }
+
     public Filter trans() {
         if (Trans.pass()) return this;
         for (Value value : getValue()) value.trans();
@@ -70,12 +76,14 @@ public class Filter implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.key);
         dest.writeString(this.name);
+        dest.writeString(this.init);
         dest.writeList(this.value);
     }
 
     protected Filter(Parcel in) {
         this.key = in.readString();
         this.name = in.readString();
+        this.init = in.readString();
         this.value = new ArrayList<>();
         in.readList(this.value, Value.class.getClassLoader());
     }

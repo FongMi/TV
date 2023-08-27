@@ -13,6 +13,7 @@ import org.simpleframework.xml.Text;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 @Root(strict = false)
@@ -98,6 +99,12 @@ public class Class implements Parcelable {
     public void trans() {
         if (Trans.pass()) return;
         this.typeName = Trans.s2t(typeName);
+    }
+
+    public HashMap<String, String> getExtend() {
+        HashMap<String, String> extend = new HashMap<>();
+        for (Filter filter : getFilters()) if (filter.getInit() != null) extend.put(filter.getKey(), filter.setActivated(filter.getInit()));
+        return extend;
     }
 
     @Override

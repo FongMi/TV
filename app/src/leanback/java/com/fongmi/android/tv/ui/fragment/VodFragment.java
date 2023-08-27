@@ -146,7 +146,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
             if (filter.getInit() == null) continue;
             Value value = new Value(filter.getInit());
             int index = filter.getValue().indexOf(value);
-            filter.getValue().get(index).setActivated(value);
+            filter.getValue().get(index).setActivated(true);
             mExtends.put(filter.getKey(), filter.getInit());
         }
     }

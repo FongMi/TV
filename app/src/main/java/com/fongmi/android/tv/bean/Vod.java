@@ -73,7 +73,7 @@ public class Vod implements Parcelable {
     private String vodTag;
 
     @SerializedName("cate")
-    private Object cate;
+    private Cate cate;
 
     @SerializedName("style")
     private Style style;
@@ -157,7 +157,7 @@ public class Vod implements Parcelable {
         return TextUtils.isEmpty(vodTag) ? "" : vodTag;
     }
 
-    public Object getCate() {
+    public Cate getCate() {
         return cate;
     }
 
@@ -276,6 +276,7 @@ public class Vod implements Parcelable {
         dest.writeString(this.vodPlayFrom);
         dest.writeString(this.vodPlayUrl);
         dest.writeString(this.vodTag);
+        dest.writeParcelable(this.cate, flags);
         dest.writeParcelable(this.style, flags);
         dest.writeTypedList(this.vodFlags);
         dest.writeParcelable(this.site, flags);
@@ -295,6 +296,7 @@ public class Vod implements Parcelable {
         this.vodPlayFrom = in.readString();
         this.vodPlayUrl = in.readString();
         this.vodTag = in.readString();
+        this.cate = in.readParcelable(Cate.class.getClassLoader());
         this.style = in.readParcelable(Style.class.getClassLoader());
         this.vodFlags = in.createTypedArrayList(Flag.CREATOR);
         this.site = in.readParcelable(Site.class.getClassLoader());

@@ -27,6 +27,7 @@ import com.fongmi.android.tv.ui.adapter.VodAdapter;
 import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.custom.CustomScroller;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,11 +42,12 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     private List<Page> mPages;
     private Page mPage;
 
-    public static TypeFragment newInstance(String key, String typeId, boolean folder) {
+    public static TypeFragment newInstance(String key, String typeId, HashMap<String, String> extend, boolean folder) {
         Bundle args = new Bundle();
         args.putString("key", key);
         args.putString("typeId", typeId);
         args.putBoolean("folder", folder);
+        args.putSerializable("extend", extend);
         TypeFragment fragment = new TypeFragment();
         fragment.setArguments(args);
         return fragment;
@@ -57,6 +59,11 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     private String getTypeId() {
         return mPages.isEmpty() ? getArguments().getString("typeId") : getLastPage().getVodId();
+    }
+
+    private HashMap<String, String> getExtend() {
+        Serializable extend = getArguments().getSerializable("extend");
+        return extend == null ? new HashMap<>() : (HashMap<String, String>) extend;
     }
 
     private boolean isFolder() {
@@ -91,8 +98,8 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     @Override
     protected void initView() {
         mScroller = new CustomScroller(this);
-        mExtends = new HashMap<>();
         mPages = new ArrayList<>();
+        mExtends = getExtend();
         setRecyclerView();
         setViewModel();
     }
