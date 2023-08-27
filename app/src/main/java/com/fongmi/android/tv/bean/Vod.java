@@ -217,6 +217,11 @@ public class Vod implements Parcelable {
         return getStyle() == null ? style : getStyle();
     }
 
+    public String getVodPic(String pic) {
+        if (getVodPic().isEmpty()) setVodPic(pic);
+        return getVodPic();
+    }
+
     public String getVodName(String name) {
         if (getVodName().isEmpty()) setVodName(name);
         return getVodName();

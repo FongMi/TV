@@ -213,8 +213,8 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
             mPages.add(Page.get(item.getVodId(), findPosition()));
             getVideo(item.getVodId(), "1");
         } else {
-            if (!isFolder()) DetailActivity.start(getActivity(), getKey(), item.getVodId(), item.getVodName());
-            else DetailActivity.start(getActivity(), getKey(), item.getVodId(), item.getVodName(), item.getVodName());
+            if (!isFolder()) DetailActivity.start(getActivity(), getKey(), item.getVodId(), item.getVodName(), item.getVodPic());
+            else DetailActivity.start(getActivity(), getKey(), item.getVodId(), item.getVodName(), item.getVodPic(), item.getVodName());
         }
     }
 

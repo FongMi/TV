@@ -152,21 +152,26 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     public static void cast(Activity activity, History history) {
-        start(activity, history.getSiteKey(), history.getVodId(), history.getVodName());
+        start(activity, history.getSiteKey(), history.getVodId(), history.getVodName(), history.getVodPic());
     }
 
     public static void push(Activity activity, String url) {
-        start(activity, "push_agent", url, url);
+        start(activity, "push_agent", url, url, null);
     }
 
     public static void start(Activity activity, String key, String id, String name) {
-        start(activity, key, id, name, null);
+        start(activity, key, id, name, null, null);
     }
 
-    public static void start(Activity activity, String key, String id, String name, String mark) {
+    public static void start(Activity activity, String key, String id, String name, String pic) {
+        start(activity, key, id, name, pic, null);
+    }
+
+    public static void start(Activity activity, String key, String id, String name, String pic, String mark) {
         Intent intent = new Intent(activity, DetailActivity.class);
-        intent.putExtra("name", name);
         intent.putExtra("mark", mark);
+        intent.putExtra("name", name);
+        intent.putExtra("pic", pic);
         intent.putExtra("key", key);
         intent.putExtra("id", id);
         activity.startActivity(intent);
@@ -174,6 +179,10 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     private String getName() {
         return getIntent().getStringExtra("name");
+    }
+
+    private String getPic() {
+        return getIntent().getStringExtra("pic");
     }
 
     private String getMark() {
@@ -433,7 +442,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     private void setDetail(Vod item) {
         mBinding.progressLayout.showContent();
-        mBinding.video.setTag(item.getVodPic());
+        mBinding.video.setTag(item.getVodPic(getPic()));
         mBinding.name.setText(item.getVodName(getName()));
         setText(mBinding.remark, 0, item.getVodRemarks());
         setText(mBinding.site, R.string.detail_site, getSite().getName());
@@ -1406,7 +1415,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         if (isInPictureInPictureMode) {
             mReceiver.register(this);
             enterFullscreen();
-            setSubtitle(12);
+            setSubtitle(10);
             hideControl();
             hideSheet();
         } else {

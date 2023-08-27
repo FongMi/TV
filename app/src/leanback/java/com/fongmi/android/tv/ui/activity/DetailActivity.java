@@ -139,39 +139,40 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
     }
 
     public static void cast(Activity activity, History history) {
-        start(activity, history.getSiteKey(), history.getVodId(), history.getVodName(), null, true, true);
+        start(activity, history.getSiteKey(), history.getVodId(), history.getVodName(), history.getVodPic(), null, true, true);
     }
 
     public static void push(Activity activity, String url, boolean clear) {
         start(activity, "push_agent", url, url, clear);
     }
 
-    public static void start(Activity activity, String id, String name) {
-        start(activity, ApiConfig.get().getHome().getKey(), id, name);
+    public static void start(Activity activity, String id, String name, String pic) {
+        start(activity, ApiConfig.get().getHome().getKey(), id, name, pic);
     }
 
-    public static void start(Activity activity, String key, String id, String name) {
-        start(activity, key, id, name, false);
+    public static void start(Activity activity, String key, String id, String name, String pic) {
+        start(activity, key, id, name, pic, null, false);
     }
 
-    public static void start(Activity activity, String key, String id, String name, String mark) {
-        start(activity, key, id, name, mark, false);
+    public static void start(Activity activity, String key, String id, String name, String pic, String mark) {
+        start(activity, key, id, name, pic, mark, false);
     }
 
     public static void start(Activity activity, String key, String id, String name, boolean clear) {
-        start(activity, key, id, name, null, clear, false);
+        start(activity, key, id, name, null, null, clear, false);
     }
 
-    public static void start(Activity activity, String key, String id, String name, String mark, boolean clear) {
-        start(activity, key, id, name, mark, clear, false);
+    public static void start(Activity activity, String key, String id, String name, String pic, String mark, boolean clear) {
+        start(activity, key, id, name, pic, mark, clear, false);
     }
 
-    public static void start(Activity activity, String key, String id, String name, String mark, boolean clear, boolean cast) {
+    public static void start(Activity activity, String key, String id, String name, String pic, String mark, boolean clear, boolean cast) {
         Intent intent = new Intent(activity, DetailActivity.class);
         if (clear) intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra("cast", cast);
-        intent.putExtra("name", name);
         intent.putExtra("mark", mark);
+        intent.putExtra("name", name);
+        intent.putExtra("pic", pic);
         intent.putExtra("key", key);
         intent.putExtra("id", id);
         activity.startActivityForResult(intent, 1000);
@@ -183,6 +184,10 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private String getName() {
         return getIntent().getStringExtra("name");
+    }
+
+    private String getPic() {
+        return getIntent().getStringExtra("pic");
     }
 
     private String getMark() {
@@ -452,7 +457,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
 
     private void setDetail(Vod item) {
         mBinding.progressLayout.showContent();
-        mBinding.video.setTag(item.getVodPic());
+        mBinding.video.setTag(item.getVodPic(getPic()));
         mBinding.name.setText(item.getVodName(getName()));
         setText(mBinding.remark, 0, item.getVodRemarks());
         setText(mBinding.year, R.string.detail_year, item.getVodYear());

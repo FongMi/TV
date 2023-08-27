@@ -883,12 +883,14 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         super.onPictureInPictureModeChanged(isInPictureInPictureMode);
         if (isInPictureInPictureMode) {
             mReceiver.register(this);
+            setSubtitle(10);
             hideControl();
             hideInfo();
             hideUI();
         } else {
             hideInfo();
             mReceiver.unregister(this);
+            setSubtitle(Setting.getSubtitle());
             if (isStop()) finish();
         }
     }
