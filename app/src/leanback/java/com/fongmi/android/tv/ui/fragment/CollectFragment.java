@@ -46,8 +46,7 @@ public class CollectFragment extends BaseFragment implements CustomScroller.Call
     public static CollectFragment newInstance(String keyword, Collect collect) {
         Bundle args = new Bundle();
         args.putString("keyword", keyword);
-        args.putParcelable("collect", collect);
-        CollectFragment fragment = new CollectFragment();
+        CollectFragment fragment = new CollectFragment().setCollect(collect);
         fragment.setArguments(args);
         return fragment;
     }
@@ -56,8 +55,9 @@ public class CollectFragment extends BaseFragment implements CustomScroller.Call
         return mKeyword = mKeyword == null ? getArguments().getString("keyword") : mKeyword;
     }
 
-    private Collect getCollect() {
-        return mCollect = mCollect == null ? getArguments().getParcelable("collect") : mCollect;
+    private CollectFragment setCollect(Collect collect) {
+        this.mCollect = collect;
+        return this;
     }
 
     @Override
@@ -90,7 +90,7 @@ public class CollectFragment extends BaseFragment implements CustomScroller.Call
 
     @Override
     protected void initData() {
-        addVideo(getCollect().getList());
+        addVideo(mCollect.getList());
     }
 
     private boolean checkLastSize(List<Vod> items) {
@@ -128,8 +128,8 @@ public class CollectFragment extends BaseFragment implements CustomScroller.Call
 
     @Override
     public void onLoadMore(String page) {
-        if (getCollect().getSite().getKey().equals("all")) return;
-        mViewModel.searchContent(getCollect().getSite(), getKeyword(), page);
+        if (mCollect.getSite().getKey().equals("all")) return;
+        mViewModel.searchContent(mCollect.getSite(), getKeyword(), page);
         mScroller.setLoading(true);
     }
 
