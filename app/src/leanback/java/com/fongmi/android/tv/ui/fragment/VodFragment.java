@@ -105,9 +105,9 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     protected void initView() {
         mPages = new ArrayList<>();
         mExtends = new HashMap<>();
-        mFilters = Filter.arrayFrom(getFilter());
         setRecyclerView();
         setViewModel();
+        setFilters();
     }
 
     @Override
@@ -138,6 +138,17 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
             checkMore(size);
             hideProgress();
         });
+    }
+
+    private void setFilters() {
+        mFilters = Filter.arrayFrom(getFilter());
+        for (Filter filter : mFilters) {
+            if (filter.getInit() == null) continue;
+            Value value = new Value(filter.getInit());
+            int index = filter.getValue().indexOf(value);
+            filter.getValue().get(index).setActivated(value);
+            mExtends.put(filter.getKey(), filter.getInit());
+        }
     }
 
     private void setClick(ArrayObjectAdapter adapter, String key, Value item) {

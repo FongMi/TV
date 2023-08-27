@@ -72,6 +72,9 @@ public class Vod implements Parcelable {
     @SerializedName("vod_tag")
     private String vodTag;
 
+    @SerializedName("cate")
+    private Object cate;
+
     @SerializedName("style")
     private Style style;
 
@@ -154,6 +157,10 @@ public class Vod implements Parcelable {
         return TextUtils.isEmpty(vodTag) ? "" : vodTag;
     }
 
+    public Object getCate() {
+        return cate;
+    }
+
     public Style getStyle() {
         return style;
     }
@@ -199,7 +206,7 @@ public class Vod implements Parcelable {
     }
 
     public boolean isFolder() {
-        return getVodTag().equals("folder");
+        return getVodTag().equals("folder") || getCate() != null;
     }
 
     public boolean isManga() {

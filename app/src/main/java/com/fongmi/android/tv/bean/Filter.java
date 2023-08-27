@@ -21,6 +21,8 @@ public class Filter implements Parcelable {
     private String key;
     @SerializedName("name")
     private String name;
+    @SerializedName("init")
+    private String init;
     @SerializedName("value")
     private List<Value> value;
 
@@ -43,6 +45,10 @@ public class Filter implements Parcelable {
 
     public String getName() {
         return TextUtils.isEmpty(name) ? "" : name;
+    }
+
+    public String getInit() {
+        return init;
     }
 
     public List<Value> getValue() {
