@@ -496,6 +496,7 @@ public class DetailActivity extends BaseActivity implements CustomKeyDownVod.Lis
         if (mFlagAdapter.size() == 0 || item.isActivated()) return;
         for (int i = 0; i < mFlagAdapter.size(); i++) ((Flag) mFlagAdapter.get(i)).setActivated(item);
         mBinding.flag.setSelectedPosition(mFlagAdapter.indexOf(item));
+        mFlagPresenter.setNextFocusDown(R.id.episode);
         notifyItemChanged(mBinding.flag, mFlagAdapter);
         mBinding.quality.setVisibility(View.GONE);
         setEpisodeAdapter(item.getEpisodes());
