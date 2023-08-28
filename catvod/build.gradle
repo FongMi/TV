@@ -22,5 +22,6 @@ dependencies {
     api('com.github.thegrizzlylabs:sardine-android:0.8') { exclude group: 'com.squareup.okhttp3', module: 'okhttp' }
     api 'com.hierynomus:smbj:0.11.5'
     api 'com.orhanobut:logger:2.2.0'
+    api 'org.chromium.net:cronet-embedded:101.4951.41'
     api 'org.jsoup:jsoup:' + jsoupVersion
 }
