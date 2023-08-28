@@ -53,7 +53,7 @@ public class Cate implements Parcelable {
         this.ratio = in.readFloat();
     }
 
-    public static final Creator<Cate> CREATOR = new Creator<>() {
+    public static final Creator<Cate> CREATOR = new Creator<Cate>() {
         @Override
         public Cate createFromParcel(Parcel source) {
             return new Cate(source);
