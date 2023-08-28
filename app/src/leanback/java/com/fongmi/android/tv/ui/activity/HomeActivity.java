@@ -283,7 +283,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     public void onItemClick(Vod item) {
-        DetailActivity.start(this, item.getVodId(), item.getVodName());
+        DetailActivity.start(this, item.getVodId(), item.getVodName(), item.getVodPic());
     }
 
     @Override
@@ -294,7 +294,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     public void onItemClick(History item) {
-        DetailActivity.start(this, item.getSiteKey(), item.getVodId(), item.getVodName());
+        DetailActivity.start(this, item.getSiteKey(), item.getVodId(), item.getVodName(), item.getVodPic());
     }
 
     @Override

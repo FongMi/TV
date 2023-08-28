@@ -1,5 +1,7 @@
 package com.fongmi.android.tv.impl;
 
+import androidx.annotation.NonNull;
+
 import com.fongmi.android.tv.utils.Sniffer;
 import com.github.catvod.net.OkHttp;
 import com.google.common.net.HttpHeaders;
@@ -13,7 +15,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Nonnull;
 
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -21,7 +22,7 @@ import okhttp3.ResponseBody;
 public class NewPipeImpl extends Downloader {
 
     @Override
-    public Response execute(@Nonnull Request request) throws IOException, ReCaptchaException {
+    public Response execute(@NonNull Request request) throws IOException, ReCaptchaException {
         String url = request.url();
         RequestBody reqBody = null;
         byte[] dataToSend = request.dataToSend();

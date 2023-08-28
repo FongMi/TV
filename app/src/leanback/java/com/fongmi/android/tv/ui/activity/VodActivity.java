@@ -100,9 +100,9 @@ public class VodActivity extends BaseActivity implements TypePresenter.OnClickLi
     }
 
     private List<Class> getTypes(Result result) {
-        List<Class> types = new ArrayList<>();
-        for (String cate : getSite().getCategories()) for (Class type : result.getTypes()) if (Trans.s2t(cate).equals(type.getTypeName())) types.add(type);
-        return types;
+        List<Class> items = new ArrayList<>();
+        for (String cate : getSite().getCategories()) for (Class item : result.getTypes()) if (Trans.s2t(cate).equals(item.getTypeName())) items.add(item);
+        return items;
     }
 
     private void setTypes() {
@@ -176,8 +176,7 @@ public class VodActivity extends BaseActivity implements TypePresenter.OnClickLi
         @Override
         public Fragment getItem(int position) {
             Class type = (Class) mAdapter.get(position);
-            String filter = App.gson().toJson(type.getFilters());
-            return VodFragment.newInstance(getKey(), type.getTypeId(), filter, type.getTypeFlag().equals("1"));
+            return VodFragment.newInstance(getKey(), type.getTypeId(), type.getFilters(), type.getExtend(), type.getTypeFlag().equals("1"));
         }
 
         @Override
