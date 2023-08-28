@@ -12,13 +12,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.TextUtils;
-import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.Dimension;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ShareCompat;
@@ -54,6 +54,7 @@ import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.impl.CustomTarget;
+import com.fongmi.android.tv.impl.SubtitleCallback;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
@@ -73,6 +74,7 @@ import com.fongmi.android.tv.ui.custom.dialog.CastDialog;
 import com.fongmi.android.tv.ui.custom.dialog.ControlDialog;
 import com.fongmi.android.tv.ui.custom.dialog.EpisodeGridDialog;
 import com.fongmi.android.tv.ui.custom.dialog.EpisodeListDialog;
+import com.fongmi.android.tv.ui.custom.dialog.SubtitleDialog;
 import com.fongmi.android.tv.ui.custom.dialog.TrackDialog;
 import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.FileChooser;
@@ -99,7 +101,7 @@ import java.util.concurrent.Executors;
 
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class DetailActivity extends BaseActivity implements Clock.Callback, CustomKeyDownVod.Listener, CastDialog.Listener, PiPReceiver.Listener, TrackDialog.Listener, ControlDialog.Listener, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, QualityAdapter.OnClickListener, QuickAdapter.OnClickListener, ParseAdapter.OnClickListener {
+public class DetailActivity extends BaseActivity implements Clock.Callback, CustomKeyDownVod.Listener, CastDialog.Listener, PiPReceiver.Listener, TrackDialog.Listener, ControlDialog.Listener, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, QualityAdapter.OnClickListener, QuickAdapter.OnClickListener, ParseAdapter.OnClickListener, SubtitleCallback {
 
     private ViewGroup.LayoutParams mFrameParams;
     private Observer<Result> mObserveDetail;
@@ -150,21 +152,26 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     public static void cast(Activity activity, History history) {
-        start(activity, history.getSiteKey(), history.getVodId(), history.getVodName());
+        start(activity, history.getSiteKey(), history.getVodId(), history.getVodName(), history.getVodPic());
     }
 
     public static void push(Activity activity, String url) {
-        start(activity, "push_agent", url, url);
+        start(activity, "push_agent", url, url, null);
     }
 
     public static void start(Activity activity, String key, String id, String name) {
-        start(activity, key, id, name, null);
+        start(activity, key, id, name, null, null);
     }
 
-    public static void start(Activity activity, String key, String id, String name, String mark) {
+    public static void start(Activity activity, String key, String id, String name, String pic) {
+        start(activity, key, id, name, pic, null);
+    }
+
+    public static void start(Activity activity, String key, String id, String name, String pic, String mark) {
         Intent intent = new Intent(activity, DetailActivity.class);
-        intent.putExtra("name", name);
         intent.putExtra("mark", mark);
+        intent.putExtra("name", name);
+        intent.putExtra("pic", pic);
         intent.putExtra("key", key);
         intent.putExtra("id", id);
         activity.startActivity(intent);
@@ -172,6 +179,10 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     private String getName() {
         return getIntent().getStringExtra("name");
+    }
+
+    private String getPic() {
+        return getIntent().getStringExtra("pic");
     }
 
     private String getMark() {
@@ -306,6 +317,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         mBinding.control.action.ending.setOnClickListener(view -> onEnding());
         mBinding.control.action.opening.setOnClickListener(view -> onOpening());
         mBinding.control.action.episodes.setOnClickListener(view -> onEpisodes());
+        mBinding.control.action.text.setOnLongClickListener(view -> onTextLong());
         mBinding.control.action.speed.setOnLongClickListener(view -> onSpeedLong());
         mBinding.control.action.reset.setOnLongClickListener(view -> onResetToggle());
         mBinding.control.action.ending.setOnLongClickListener(view -> onEndingReset());
@@ -353,9 +365,15 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     private void setVideoView() {
         mPlayers.set(getExo(), getIjk());
         if (ResUtil.isLand(this)) enterFullscreen();
-        getExo().getSubtitleView().setUserDefaultTextSize();
         getExo().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
-        getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        getIjk().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
+        setSubtitle(14);
+    }
+
+    @Override
+    public void setSubtitle(int size) {
+        getExo().getSubtitleView().setFixedTextSize(Dimension.SP, size);
+        getIjk().getSubtitleView().setFixedTextSize(Dimension.SP, size);
     }
 
     private void setScale(int scale) {
@@ -387,6 +405,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     private void getDetail(Vod item) {
         getIntent().putExtra("key", item.getSiteKey());
+        getIntent().putExtra("pic", item.getVodPic());
         getIntent().putExtra("id", item.getVodId());
         mBinding.swipeLayout.setRefreshing(true);
         mBinding.swipeLayout.setEnabled(false);
@@ -424,7 +443,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     private void setDetail(Vod item) {
         mBinding.progressLayout.showContent();
-        mBinding.video.setTag(item.getVodPic());
+        mBinding.video.setTag(item.getVodPic(getPic()));
         mBinding.name.setText(item.getVodName(getName()));
         setText(mBinding.remark, 0, item.getVodRemarks());
         setText(mBinding.site, R.string.detail_site, getSite().getName());
@@ -459,8 +478,6 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     private void getPlayer(Flag flag, Episode episode, boolean replay) {
         mBinding.control.title.setText(getString(R.string.detail_title, mBinding.name.getText(), episode.getName()));
         mViewModel.playerContent(getKey(), flag.getFlag(), episode.getUrl());
-        mBinding.qualityText.setVisibility(View.GONE);
-        mBinding.quality.setVisibility(View.GONE);
         updateHistory(episode, replay);
         showProgress();
         hidePreview();
@@ -484,6 +501,8 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         if (item.isActivated()) return;
         mFlagAdapter.setActivated(item);
         mBinding.flag.scrollToPosition(mFlagAdapter.getPosition());
+        mBinding.qualityText.setVisibility(View.GONE);
+        mBinding.quality.setVisibility(View.GONE);
         setEpisodeAdapter(item.getEpisodes());
         seamless(item, force);
     }
@@ -652,6 +671,12 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         hideControl();
     }
 
+    private boolean onTextLong() {
+        SubtitleDialog.create(this).show();
+        hideControl();
+        return true;
+    }
+
     private void onLoop() {
         mBinding.control.action.loop.setActivated(!mBinding.control.action.loop.isActivated());
     }
@@ -768,8 +793,8 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         if (isFullscreen()) return;
         mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
         setRequestedOrientation(mPlayers.isPortrait() ? ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
-        getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
         mBinding.control.full.setVisibility(View.GONE);
+        setSubtitle(Setting.getSubtitle());
         setRotate(mPlayers.isPortrait());
         App.post(mR3, 2000);
         setFullscreen(true);
@@ -778,7 +803,6 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     private void exitFullscreen() {
         if (!isFullscreen()) return;
-        getIjk().getSubtitleView().setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
         mBinding.episode.scrollToPosition(mEpisodeAdapter.getPosition());
         mBinding.control.full.setVisibility(View.VISIBLE);
@@ -786,6 +810,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         App.post(mR3, 2000);
         setFullscreen(false);
         setRotate(false);
+        setSubtitle(14);
         hideControl();
     }
 
@@ -1391,6 +1416,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
         if (isInPictureInPictureMode) {
             mReceiver.register(this);
             enterFullscreen();
+            setSubtitle(10);
             hideControl();
             hideSheet();
         } else {

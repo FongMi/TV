@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 
+import androidx.annotation.Dimension;
 import androidx.annotation.NonNull;
 import androidx.core.app.ShareCompat;
 import androidx.lifecycle.ViewModelProvider;
@@ -35,7 +36,9 @@ import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.impl.LiveCallback;
 import com.fongmi.android.tv.impl.PassCallback;
+import com.fongmi.android.tv.impl.SubtitleCallback;
 import com.fongmi.android.tv.model.LiveViewModel;
+import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.player.Source;
 import com.fongmi.android.tv.receiver.PiPReceiver;
@@ -47,6 +50,7 @@ import com.fongmi.android.tv.ui.custom.CustomKeyDownLive;
 import com.fongmi.android.tv.ui.custom.dialog.CastDialog;
 import com.fongmi.android.tv.ui.custom.dialog.LiveDialog;
 import com.fongmi.android.tv.ui.custom.dialog.PassDialog;
+import com.fongmi.android.tv.ui.custom.dialog.SubtitleDialog;
 import com.fongmi.android.tv.ui.custom.dialog.TrackDialog;
 import com.fongmi.android.tv.utils.Biometric;
 import com.fongmi.android.tv.utils.Clock;
@@ -72,7 +76,7 @@ import okhttp3.Call;
 import okhttp3.Response;
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class LiveActivity extends BaseActivity implements CustomKeyDownLive.Listener, CastDialog.Listener, PiPReceiver.Listener, TrackDialog.Listener, Biometric.Callback, PassCallback, LiveCallback, GroupAdapter.OnClickListener, ChannelAdapter.OnClickListener {
+public class LiveActivity extends BaseActivity implements CustomKeyDownLive.Listener, CastDialog.Listener, PiPReceiver.Listener, TrackDialog.Listener, Biometric.Callback, PassCallback, LiveCallback, GroupAdapter.OnClickListener, ChannelAdapter.OnClickListener, SubtitleCallback {
 
     private ChannelAdapter mChannelAdapter;
     private ActivityLiveBinding mBinding;
@@ -177,6 +181,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mBinding.control.action.change.setOnClickListener(view -> onChange());
         mBinding.control.action.player.setOnClickListener(view -> onPlayer());
         mBinding.control.action.decode.setOnClickListener(view -> onDecode());
+        mBinding.control.action.text.setOnLongClickListener(view -> onTextLong());
         mBinding.control.action.speed.setOnLongClickListener(view -> onSpeedLong());
         mBinding.video.setOnTouchListener((view, event) -> mKeyDown.onTouchEvent(event));
     }
@@ -203,10 +208,19 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     private void setVideoView() {
         mPlayers.set(getExo(), getIjk());
         setScale(Setting.getLiveScale());
+        setSubtitle(Setting.getSubtitle());
+        getExo().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
+        getIjk().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
         mBinding.control.action.speed.setText(mPlayers.getSpeedText());
         mBinding.control.action.across.setActivated(Setting.isAcross());
         mBinding.control.action.change.setActivated(Setting.isChange());
         mBinding.control.action.home.setVisibility(LiveConfig.isOnly() ? View.GONE : View.VISIBLE);
+    }
+
+    @Override
+    public void setSubtitle(int size) {
+        getExo().getSubtitleView().setFixedTextSize(Dimension.SP, size);
+        getIjk().getSubtitleView().setFixedTextSize(Dimension.SP, size);
     }
 
     private void setScale(int scale) {
@@ -293,6 +307,12 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     private void onTrack(View view) {
         TrackDialog.create().player(mPlayers).type(Integer.parseInt(view.getTag().toString())).show(this);
         hideControl();
+    }
+
+    private boolean onTextLong() {
+        SubtitleDialog.create(this).show();
+        hideControl();
+        return true;
     }
 
     private void onHome() {
@@ -863,12 +883,14 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         super.onPictureInPictureModeChanged(isInPictureInPictureMode);
         if (isInPictureInPictureMode) {
             mReceiver.register(this);
+            setSubtitle(10);
             hideControl();
             hideInfo();
             hideUI();
         } else {
             hideInfo();
             mReceiver.unregister(this);
+            setSubtitle(Setting.getSubtitle());
             if (isStop()) finish();
         }
     }

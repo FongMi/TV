@@ -13,7 +13,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
@@ -78,7 +77,6 @@ public class CustomWebView extends WebView {
 
     private WebViewClient webViewClient() {
         return new WebViewClient() {
-            @Nullable
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
                 String url = request.getUrl().toString();

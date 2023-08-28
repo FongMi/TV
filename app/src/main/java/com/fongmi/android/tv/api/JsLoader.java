@@ -1,6 +1,7 @@
 package com.fongmi.android.tv.api;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.bean.Site;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderNull;
 
@@ -51,11 +52,15 @@ public class JsLoader {
         }
     }
 
+    private Spider find(Map<String, String> params) {
+        if (!params.containsKey("siteKey")) return spiders.get(recent);
+        Site site = ApiConfig.get().getSite(params.get("siteKey"));
+        return site.isEmpty() ? null : ApiConfig.get().getCSP(site);
+    }
+
     public Object[] proxyInvoke(Map<String, String> params) {
         try {
-            Spider spider = spiders.get(recent);
-            if (spider == null) return null;
-            return spider.proxyLocal(params);
+            return find(params).proxyLocal(params);
         } catch (Throwable e) {
             e.printStackTrace();
             return null;

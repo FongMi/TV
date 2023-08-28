@@ -12,6 +12,7 @@ import com.fongmi.android.tv.databinding.AdapterFlagBinding;
 public class FlagPresenter extends Presenter {
 
     private final OnClickListener mListener;
+    private int nextFocusDown;
 
     public FlagPresenter(OnClickListener listener) {
         this.mListener = listener;
@@ -19,6 +20,10 @@ public class FlagPresenter extends Presenter {
 
     public interface OnClickListener {
         void onItemClick(Flag item);
+    }
+
+    public void setNextFocusDown(int nextFocusDown) {
+        this.nextFocusDown = nextFocusDown;
     }
 
     @Override
@@ -32,6 +37,7 @@ public class FlagPresenter extends Presenter {
         ViewHolder holder = (ViewHolder) viewHolder;
         holder.binding.text.setText(item.getShow());
         holder.binding.text.setActivated(item.isActivated());
+        holder.binding.text.setNextFocusDownId(nextFocusDown);
         setOnClickListener(holder, view -> mListener.onItemClick(item));
     }
 

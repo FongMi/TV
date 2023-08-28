@@ -20,13 +20,13 @@ android {
     productFlavors {
         leanback {
             dimension "mode"
-            versionCode 204
-            versionName "20230826"
+            versionCode 205
+            versionName "2.0.5"
         }
         mobile {
             dimension "mode"
-            versionCode 204
-            versionName "20230826"
+            versionCode 205
+            versionName "2.0.5"
         }
         java {
             dimension "api"
@@ -68,8 +68,9 @@ android {
         targetCompatibility JavaVersion.VERSION_11
     }
 
-    android.applicationVariants.all { variant ->
-        variant.outputs.all { output -> outputFileName = "${variant.productFlavors[0].name}-${variant.productFlavors[1].name}-${variant.productFlavors[2].name}.apk"
+    android.applicationVariants.all {
+        variant -> variant.outputs.all {
+            output -> outputFileName = "${variant.productFlavors[0].name}-${variant.productFlavors[1].name}-${variant.productFlavors[2].name}.apk"
         }
     }
 
@@ -112,10 +113,8 @@ dependencies {
     implementation 'com.github.bumptech.glide:okhttp3-integration:4.15.1'
     implementation 'com.github.TeamNewPipe:NewPipeExtractor:340095515d45ecbee576872c7198992ebd8e4f08'
     implementation 'com.google.android.material:material:1.9.0'
-    implementation 'com.google.net.cronet:cronet-okhttp:0.1.0'
     implementation 'com.google.zxing:core:3.3.0'
     implementation 'com.guolindev.permissionx:permissionx:1.7.1'
-    implementation 'org.chromium.net:cronet-embedded:101.4951.41'
     implementation 'org.greenrobot:eventbus:3.3.1'
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
     implementation('org.simpleframework:simple-xml:2.7.1') { exclude group: 'stax', module: 'stax-api' exclude group: 'xpp3', module: 'xpp3' }

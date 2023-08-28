@@ -72,6 +72,9 @@ public class Vod implements Parcelable {
     @SerializedName("vod_tag")
     private String vodTag;
 
+    @SerializedName("cate")
+    private Cate cate;
+
     @SerializedName("style")
     private Style style;
 
@@ -154,6 +157,10 @@ public class Vod implements Parcelable {
         return TextUtils.isEmpty(vodTag) ? "" : vodTag;
     }
 
+    public Cate getCate() {
+        return cate;
+    }
+
     public Style getStyle() {
         return style;
     }
@@ -199,7 +206,7 @@ public class Vod implements Parcelable {
     }
 
     public boolean isFolder() {
-        return getVodTag().equals("folder");
+        return getVodTag().equals("folder") || getCate() != null;
     }
 
     public boolean isManga() {
@@ -208,6 +215,11 @@ public class Vod implements Parcelable {
 
     public Style getStyle(Style style) {
         return getStyle() == null ? style : getStyle();
+    }
+
+    public String getVodPic(String pic) {
+        if (getVodPic().isEmpty()) setVodPic(pic);
+        return getVodPic();
     }
 
     public String getVodName(String name) {
@@ -269,6 +281,7 @@ public class Vod implements Parcelable {
         dest.writeString(this.vodPlayFrom);
         dest.writeString(this.vodPlayUrl);
         dest.writeString(this.vodTag);
+        dest.writeParcelable(this.cate, flags);
         dest.writeParcelable(this.style, flags);
         dest.writeTypedList(this.vodFlags);
         dest.writeParcelable(this.site, flags);
@@ -288,6 +301,7 @@ public class Vod implements Parcelable {
         this.vodPlayFrom = in.readString();
         this.vodPlayUrl = in.readString();
         this.vodTag = in.readString();
+        this.cate = in.readParcelable(Cate.class.getClassLoader());
         this.style = in.readParcelable(Style.class.getClassLoader());
         this.vodFlags = in.createTypedArrayList(Flag.CREATOR);
         this.site = in.readParcelable(Site.class.getClassLoader());

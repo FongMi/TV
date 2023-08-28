@@ -174,6 +174,14 @@ public class Setting {
         Prefers.put("ua", ua);
     }
 
+    public static int getSubtitle() {
+        return Math.max(Prefers.getInt("subtitle", 16), 14);
+    }
+
+    public static void putSubtitle(int subtitle) {
+        Prefers.put("subtitle", subtitle);
+    }
+
     public static boolean isTunnel() {
         return Prefers.getBoolean("exo_tunnel");
     }

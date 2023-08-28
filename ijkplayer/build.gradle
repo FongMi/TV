@@ -12,5 +12,6 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.annotation:annotation:' + annotationVersion
+    implementation project(':catvod')
+    implementation project(':media-lib-ui')
 }
