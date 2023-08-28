@@ -511,7 +511,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     @Override
     public void onTimedText(IMediaPlayer mp, IjkTimedText text) {
-        mSubtitleView.setCues(SubtitleParser.parse(text.getText()));
     }
 
     @Override
