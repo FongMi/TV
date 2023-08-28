@@ -25,7 +25,6 @@ public class Updater implements Download.Callback {
 
     private DialogUpdateBinding binding;
     private AlertDialog dialog;
-    private boolean dev;
 
     private static class Loader {
         static volatile Updater INSTANCE = new Updater();
@@ -53,36 +52,26 @@ public class Updater implements Download.Callback {
         return this;
     }
 
-    public Updater release() {
-        this.dev = false;
-        return this;
-    }
-
-    public Updater dev() {
-        this.dev = true;
-        return this;
-    }
-
     private Updater check() {
         dismiss();
         return this;
     }
 
-    public void start(Activity activity) {
-        App.execute(() -> doInBackground(activity));
+    public void start() {
+        App.execute(this::doInBackground);
     }
 
     private boolean need(int code, String name) {
-        return Setting.getUpdate() && (dev ? !name.equals(BuildConfig.VERSION_NAME) && code >= BuildConfig.VERSION_CODE : code > BuildConfig.VERSION_CODE);
+        return Setting.getUpdate() && !name.equals(BuildConfig.VERSION_NAME) && code >= BuildConfig.VERSION_CODE;
     }
 
-    private void doInBackground(Activity activity) {
+    private void doInBackground() {
         try {
-            JSONObject object = new JSONObject(OkHttp.string(getJson()));
+            JSONObject object = new JSONObject(OkHttp.newCall(getJson()).execute().body().string());
             String name = object.optString("name");
             String desc = object.optString("desc");
             int code = object.optInt("code");
-            if (need(code, name)) App.post(() -> show(activity, name, desc));
+            if (need(code, name)) App.post(() -> show(App.activity(), name, desc));
         } catch (Exception e) {
             e.printStackTrace();
         }
