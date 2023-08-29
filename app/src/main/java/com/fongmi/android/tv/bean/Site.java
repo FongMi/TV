@@ -11,6 +11,7 @@ import androidx.room.PrimaryKey;
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.gson.ExtAdapter;
+import com.github.catvod.utils.Json;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.JsonAdapter;
@@ -19,7 +20,9 @@ import com.google.gson.annotations.SerializedName;
 import java.util.Collections;
 import java.util.List;
 
-@Entity(ignoredColumns = {"type", "api", "playUrl", "timeout", "playerType", "ext", "jar", "style", "categories"})
+import okhttp3.Headers;
+
+@Entity(ignoredColumns = {"type", "api", "playUrl", "timeout", "playerType", "ext", "jar", "style", "categories", "header"})
 public class Site implements Parcelable {
 
     @NonNull
@@ -55,6 +58,8 @@ public class Site implements Parcelable {
     private Style style;
     @SerializedName("categories")
     private List<String> categories;
+    @SerializedName("header")
+    private JsonElement header;
 
     private boolean activated;
 
@@ -178,6 +183,10 @@ public class Site implements Parcelable {
         return categories == null ? Collections.emptyList() : categories;
     }
 
+    public JsonElement getHeader() {
+        return header;
+    }
+
     public boolean isActivated() {
         return activated;
     }
@@ -227,6 +236,10 @@ public class Site implements Parcelable {
 
     public boolean isEmpty() {
         return getKey().isEmpty() && getName().isEmpty();
+    }
+
+    public Headers getHeaders() {
+        return Headers.of(Json.toMap(getHeader()));
     }
 
     public Site sync() {
