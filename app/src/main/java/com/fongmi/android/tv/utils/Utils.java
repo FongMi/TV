@@ -125,13 +125,7 @@ public class Utils {
     public static int getDigit(String text) {
         try {
             if (text.startsWith("上") || text.startsWith("下")) return -1;
-            if (text.contains("4k")) text = text.replace("4k", "");
-            if (text.contains("mp4")) text = text.replace("mp4", "");
-            if (text.contains("H264")) text = text.replace("H264", "");
-            if (text.contains("H265")) text = text.replace("H265", "");
-            if (text.contains("1080p")) text = text.replace("1080p", "");
-            if (text.contains("2160p")) text = text.replace("2160p", "");
-            return Integer.parseInt(text.replaceAll("\\D+", ""));
+            return Integer.parseInt(text.replaceAll("(mp4|H264|H265|720p|1080p|2160p|4k|4K)", "").replaceAll("\\D+", ""));
         } catch (Exception e) {
             return -1;
         }
