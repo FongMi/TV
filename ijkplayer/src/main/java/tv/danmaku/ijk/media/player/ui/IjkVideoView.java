@@ -100,6 +100,14 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         mCurrentState = STATE_IDLE;
         mTargetState = STATE_IDLE;
         mCurrentSpeed = 1.0f;
+        setSubtitleView();
+    }
+
+    private void setSubtitleView() {
+        if (mSubtitleView == null) return;
+        mSubtitleView.setUserDefaultStyle();
+        mSubtitleView.setUserDefaultTextSize();
+        mSubtitleView.setApplyEmbeddedFontSizes(false);
     }
 
     private void initAttr(Context context, AttributeSet attrs, int defStyleAttr) {
