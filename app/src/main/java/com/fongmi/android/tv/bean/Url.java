@@ -59,6 +59,6 @@ public class Url {
     }
 
     public boolean isOnly() {
-        return getValues().size() == 1;
+        return getValues().size() <= 1;
     }
 }
