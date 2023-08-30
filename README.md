@@ -5,26 +5,38 @@
 https://github.com/CatVodTVOfficial/CatVodTVJarLoader
 
 ### 點播欄位
-<pre><code>searchable：搜索    (0：關閉、1：啟用)  
-changeable：換源    (0：關閉、1：啟用)
-playerType：播放器  (1：IJK、2：EXO)</code></pre>
+
+| 欄位名稱       | 預設值  | 說明                      |
+|------------|------|-------------------------|
+| searchable | 1    | 是否搜索　　　0：關閉；1：啟用        |
+| changeable | 1    | 是否換源　　　0：關閉；1：啟用        |
+| recordable | 1    | 是否紀錄　　　0：關閉；1：啟用        |
+| playerType | none | 播放器　　　　0：系統；1：IJK；2：EXO |
+| timeout    | 15   | 播放超時　　　單位：秒             |
+| header     | none | 標頭　　　　　格式：json          |
 
 ### 直播欄位
-<pre><code>ua：用戶代理
-referer：參照位址
-epg：節目網址
-logo：台標網址
-pass：是否免密碼
-boot：是否自動開啟
-playerType：播放器</code></pre>
+
+| 欄位名稱       | 預設值   | 說明                      |
+|------------|-------|-------------------------|
+| ua         | none  | 用戶代理                    |
+| referer    | none  | 參照地址                    |
+| epg        | none  | 節目地址                    |
+| logo       | none  | 台標地址                    |
+| pass       | false | 是否免密碼　　單位：秒             |
+| boot       | false | 是否自啟動　　格式：json          |
+| playerType | none  | 播放器　　　　0：系統；1：IJK；2：EXO |
+| timeout    | 15    | 播放超時　　　單位：秒             |
+| header     | none  | 標頭　　　　　格式：json          |
 
 ### 配置範例
+
 [點播-線上](other/sample/vod/online.json)  
 [點播-本地](other/sample/vod/offline.json)  
 [直播-線上](other/sample/live/online.json)  
 [直播-本地](other/sample/live/offline.json)
 
 ### 飛機群
+
 [討論群組](https://t.me/fongmi_offical)  
 [發布頻道](https://t.me/fongmi_release)
-
