@@ -110,7 +110,7 @@
             android:supportsPictureInPicture="true" />
 
         <activity
-            android:name=".ui.activity.VodActivity"
+            android:name=".ui.activity.FolderActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout"
             android:screenOrientation="fullUser" />
 

@@ -9,19 +9,19 @@ import androidx.viewbinding.ViewBinding;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Class;
 import com.fongmi.android.tv.bean.Result;
-import com.fongmi.android.tv.databinding.ActivityVodBinding;
+import com.fongmi.android.tv.databinding.ActivityFolderBinding;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.fragment.TypeFragment;
 
 import java.util.HashMap;
 
-public class VodActivity extends BaseActivity {
+public class FolderActivity extends BaseActivity {
 
-    private ActivityVodBinding mBinding;
+    private ActivityFolderBinding mBinding;
 
     public static void start(Activity activity, String key, Result result) {
         if (result == null || result.getTypes().isEmpty()) return;
-        Intent intent = new Intent(activity, VodActivity.class);
+        Intent intent = new Intent(activity, FolderActivity.class);
         intent.putExtra("key", key);
         intent.putExtra("result", result);
         activity.startActivity(intent);
@@ -37,7 +37,7 @@ public class VodActivity extends BaseActivity {
 
     @Override
     protected ViewBinding getBinding() {
-        return mBinding = ActivityVodBinding.inflate(getLayoutInflater());
+        return mBinding = ActivityFolderBinding.inflate(getLayoutInflater());
     }
 
     @Override
