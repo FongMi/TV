@@ -78,8 +78,8 @@ import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
 public class LiveActivity extends BaseActivity implements CustomKeyDownLive.Listener, CastDialog.Listener, PiPReceiver.Listener, TrackDialog.Listener, Biometric.Callback, PassCallback, LiveCallback, GroupAdapter.OnClickListener, ChannelAdapter.OnClickListener, SubtitleCallback {
 
-    private ChannelAdapter mChannelAdapter;
     private ActivityLiveBinding mBinding;
+    private ChannelAdapter mChannelAdapter;
     private SimpleDateFormat mFormatDate;
     private SimpleDateFormat mFormatTime;
     private CustomKeyDownLive mKeyDown;

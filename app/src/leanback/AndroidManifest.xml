@@ -101,7 +101,7 @@
             android:screenOrientation="sensorLandscape" />
 
         <activity
-            android:name=".ui.activity.DetailActivity"
+            android:name=".ui.activity.VideoActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
             android:screenOrientation="sensorLandscape" />
 

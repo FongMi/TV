@@ -38,6 +38,6 @@ public class PushActivity extends BaseActivity {
 
     private void onClip(View view) {
         CharSequence text = Utils.getClipText();
-        if (!TextUtils.isEmpty(text)) DetailActivity.push(this, text.toString(), false);
+        if (!TextUtils.isEmpty(text)) VideoActivity.push(this, text.toString(), false);
     }
 }

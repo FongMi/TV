@@ -38,8 +38,8 @@ import org.greenrobot.eventbus.ThreadMode;
 
 public class MainActivity extends BaseActivity implements NavigationBarView.OnItemSelectedListener {
 
-    private FragmentStateManager mManager;
     private ActivityMainBinding mBinding;
+    private FragmentStateManager mManager;
     private boolean confirm;
 
     @Override
