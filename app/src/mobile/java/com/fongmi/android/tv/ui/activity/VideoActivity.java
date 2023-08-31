@@ -48,7 +48,7 @@ import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Track;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.cast.CastVideo;
-import com.fongmi.android.tv.databinding.ActivityDetailBinding;
+import com.fongmi.android.tv.databinding.ActivityVideoBinding;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.event.PlayerEvent;
@@ -101,13 +101,13 @@ import java.util.concurrent.Executors;
 
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class DetailActivity extends BaseActivity implements Clock.Callback, CustomKeyDownVod.Listener, CastDialog.Listener, PiPReceiver.Listener, TrackDialog.Listener, ControlDialog.Listener, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, QualityAdapter.OnClickListener, QuickAdapter.OnClickListener, ParseAdapter.OnClickListener, SubtitleCallback {
+public class VideoActivity extends BaseActivity implements Clock.Callback, CustomKeyDownVod.Listener, CastDialog.Listener, PiPReceiver.Listener, TrackDialog.Listener, ControlDialog.Listener, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, QualityAdapter.OnClickListener, QuickAdapter.OnClickListener, ParseAdapter.OnClickListener, SubtitleCallback {
 
+    private ActivityVideoBinding mBinding;
     private ViewGroup.LayoutParams mFrameParams;
     private Observer<Result> mObserveDetail;
     private Observer<Result> mObservePlayer;
     private Observer<Result> mObserveSearch;
-    private ActivityDetailBinding mBinding;
     private EpisodeAdapter mEpisodeAdapter;
     private QualityAdapter mQualityAdapter;
     private ControlDialog mControlDialog;
@@ -168,7 +168,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     public static void start(Activity activity, String key, String id, String name, String pic, String mark) {
-        Intent intent = new Intent(activity, DetailActivity.class);
+        Intent intent = new Intent(activity, VideoActivity.class);
         intent.putExtra("mark", mark);
         intent.putExtra("name", name);
         intent.putExtra("pic", pic);
@@ -244,7 +244,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
 
     @Override
     protected ViewBinding getBinding() {
-        return mBinding = ActivityDetailBinding.inflate(getLayoutInflater());
+        return mBinding = ActivityVideoBinding.inflate(getLayoutInflater());
     }
 
     @Override
@@ -663,7 +663,7 @@ public class DetailActivity extends BaseActivity implements Clock.Callback, Cust
     }
 
     private void onSetting() {
-        mControlDialog = ControlDialog.create().detail(mBinding).history(mHistory).players(mPlayers).parse(isUseParse()).show(this);
+        mControlDialog = ControlDialog.create().parent(mBinding).history(mHistory).players(mPlayers).parse(isUseParse()).show(this);
     }
 
     private void onTrack(View view) {

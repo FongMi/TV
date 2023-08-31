@@ -68,12 +68,12 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
 
     private void checkAction(Intent intent) {
         if (Intent.ACTION_SEND.equals(intent.getAction())) {
-            DetailActivity.push(this, Uri.parse(intent.getStringExtra(Intent.EXTRA_TEXT)));
+            VideoActivity.push(this, Uri.parse(intent.getStringExtra(Intent.EXTRA_TEXT)));
         } else if (Intent.ACTION_VIEW.equals(intent.getAction()) && intent.getData() != null) {
             if ("text/plain".equals(intent.getType()) || Util.path(intent.getData()).endsWith(".m3u")) {
                 loadLive("file:/" + FileChooser.getPathFromUri(this, intent.getData()));
             } else {
-                DetailActivity.push(this, intent.getData());
+                VideoActivity.push(this, intent.getData());
             }
         }
     }
@@ -154,7 +154,7 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onServerEvent(ServerEvent event) {
         if (event.getType() != ServerEvent.Type.PUSH) return;
-        DetailActivity.push(this, event.getText());
+        VideoActivity.push(this, event.getText());
     }
 
     @Override

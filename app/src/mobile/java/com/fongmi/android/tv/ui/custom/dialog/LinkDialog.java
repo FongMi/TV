@@ -13,7 +13,7 @@ import androidx.fragment.app.Fragment;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.DialogLinkBinding;
-import com.fongmi.android.tv.ui.activity.DetailActivity;
+import com.fongmi.android.tv.ui.activity.VideoActivity;
 import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.Sniffer;
 import com.fongmi.android.tv.utils.Utils;
@@ -66,7 +66,7 @@ public class LinkDialog {
 
     private void onPositive(DialogInterface dialog, int which) {
         String text = binding.text.getText().toString().trim();
-        if (!text.isEmpty()) DetailActivity.push(App.activity(), text);
+        if (!text.isEmpty()) VideoActivity.push(App.activity(), text);
         dialog.dismiss();
     }
 

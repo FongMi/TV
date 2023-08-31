@@ -15,7 +15,7 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Parse;
-import com.fongmi.android.tv.databinding.ActivityDetailBinding;
+import com.fongmi.android.tv.databinding.ActivityVideoBinding;
 import com.fongmi.android.tv.databinding.DialogControlBinding;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.adapter.ParseAdapter;
@@ -31,7 +31,7 @@ import java.util.List;
 public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickListener {
 
     private DialogControlBinding binding;
-    private ActivityDetailBinding detail;
+    private ActivityVideoBinding parent;
     private List<TextView> scales;
     private final String[] scale;
     private Listener listener;
@@ -47,8 +47,8 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
         this.scale = ResUtil.getStringArray(R.array.select_scale);
     }
 
-    public ControlDialog detail(ActivityDetailBinding detail) {
-        this.detail = detail;
+    public ControlDialog parent(ActivityVideoBinding parent) {
+        this.parent = parent;
         return this;
     }
 
@@ -86,11 +86,11 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
         if (players == null) dismiss();
         if (players == null) return;
         binding.speed.setValue(Math.max(players.getSpeed(), 1.0f));
-        binding.player.setText(detail.control.action.player.getText());
-        binding.decode.setText(detail.control.action.decode.getText());
-        binding.ending.setText(detail.control.action.ending.getText());
-        binding.opening.setText(detail.control.action.opening.getText());
-        binding.loop.setActivated(detail.control.action.loop.isActivated());
+        binding.player.setText(parent.control.action.player.getText());
+        binding.decode.setText(parent.control.action.decode.getText());
+        binding.ending.setText(parent.control.action.ending.getText());
+        binding.opening.setText(parent.control.action.opening.getText());
+        binding.loop.setActivated(parent.control.action.loop.isActivated());
         setTrackVisible();
         setScaleText();
         setParse();
@@ -100,27 +100,27 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
     protected void initEvent() {
         binding.speed.addOnChangeListener(this::setSpeed);
         for (TextView view : scales) view.setOnClickListener(this::setScale);
-        binding.text.setOnClickListener(v -> dismiss(detail.control.action.text));
-        binding.audio.setOnClickListener(v -> dismiss(detail.control.action.audio));
-        binding.video.setOnClickListener(v -> dismiss(detail.control.action.video));
-        binding.loop.setOnClickListener(v -> active(binding.loop, detail.control.action.loop));
-        binding.player.setOnClickListener(v -> click(binding.player, detail.control.action.player));
-        binding.decode.setOnClickListener(v -> click(binding.decode, detail.control.action.decode));
-        binding.ending.setOnClickListener(v -> click(binding.ending, detail.control.action.ending));
-        binding.opening.setOnClickListener(v -> click(binding.opening, detail.control.action.opening));
-        binding.ending.setOnLongClickListener(v -> longClick(binding.ending, detail.control.action.ending));
-        binding.opening.setOnLongClickListener(v -> longClick(binding.opening, detail.control.action.opening));
+        binding.text.setOnClickListener(v -> dismiss(parent.control.action.text));
+        binding.audio.setOnClickListener(v -> dismiss(parent.control.action.audio));
+        binding.video.setOnClickListener(v -> dismiss(parent.control.action.video));
+        binding.loop.setOnClickListener(v -> active(binding.loop, parent.control.action.loop));
+        binding.player.setOnClickListener(v -> click(binding.player, parent.control.action.player));
+        binding.decode.setOnClickListener(v -> click(binding.decode, parent.control.action.decode));
+        binding.ending.setOnClickListener(v -> click(binding.ending, parent.control.action.ending));
+        binding.opening.setOnClickListener(v -> click(binding.opening, parent.control.action.opening));
+        binding.ending.setOnLongClickListener(v -> longClick(binding.ending, parent.control.action.ending));
+        binding.opening.setOnLongClickListener(v -> longClick(binding.opening, parent.control.action.opening));
     }
 
     private void setSpeed(@NonNull Slider slider, float value, boolean fromUser) {
-        detail.control.action.speed.setText(players.setSpeed(value));
+        parent.control.action.speed.setText(players.setSpeed(value));
         if (history != null) history.setSpeed(players.getSpeed());
     }
 
     private void setScaleText() {
         for (int i = 0; i < scales.size(); i++) {
             scales.get(i).setText(scale[i]);
-            scales.get(i).setActivated(scales.get(i).getText().equals(detail.control.action.scale.getText()));
+            scales.get(i).setActivated(scales.get(i).getText().equals(parent.control.action.scale.getText()));
         }
     }
 
@@ -164,7 +164,7 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
     }
 
     public void updatePlayer() {
-        binding.player.setText(detail.control.action.player.getText());
+        binding.player.setText(parent.control.action.player.getText());
     }
 
     public void setParseVisible(boolean visible) {
@@ -173,9 +173,9 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
     }
 
     public void setTrackVisible() {
-        binding.text.setVisibility(detail.control.action.text.getVisibility());
-        binding.audio.setVisibility(detail.control.action.audio.getVisibility());
-        binding.video.setVisibility(detail.control.action.video.getVisibility());
+        binding.text.setVisibility(parent.control.action.text.getVisibility());
+        binding.audio.setVisibility(parent.control.action.audio.getVisibility());
+        binding.video.setVisibility(parent.control.action.video.getVisibility());
         binding.track.setVisibility(binding.text.getVisibility() == View.GONE && binding.audio.getVisibility() == View.GONE && binding.video.getVisibility() == View.GONE ? View.GONE : View.VISIBLE);
     }
 

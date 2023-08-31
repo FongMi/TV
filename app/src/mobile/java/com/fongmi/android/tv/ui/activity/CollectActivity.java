@@ -271,7 +271,7 @@ public class CollectActivity extends BaseActivity implements CustomScroller.Call
     @Override
     public void onItemClick(Vod item) {
         if (item.isFolder()) VodActivity.start(this, item.getSiteKey(), Result.folder(item));
-        else DetailActivity.start(this, item.getSiteKey(), item.getVodId(), item.getVodName(), item.getVodPic());
+        else VideoActivity.start(this, item.getSiteKey(), item.getVodId(), item.getVodName(), item.getVodPic());
     }
 
     @Override
