@@ -1,0 +1,185 @@
+package com.fongmi.android.tv.ui.activity;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.text.Html;
+import android.view.View;
+import android.widget.TextView;
+
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.media3.common.util.Log;
+import androidx.viewbinding.ViewBinding;
+
+import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.bean.Episode;
+import com.fongmi.android.tv.bean.Flag;
+import com.fongmi.android.tv.bean.Result;
+import com.fongmi.android.tv.bean.Site;
+import com.fongmi.android.tv.bean.Vod;
+import com.fongmi.android.tv.databinding.ActivityDetailBinding;
+import com.fongmi.android.tv.db.AppDatabase;
+import com.fongmi.android.tv.model.SiteViewModel;
+import com.fongmi.android.tv.ui.adapter.EpisodeAdapter;
+import com.fongmi.android.tv.ui.adapter.FlagAdapter;
+import com.fongmi.android.tv.ui.base.BaseActivity;
+import com.fongmi.android.tv.ui.base.ViewType;
+import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
+import com.fongmi.android.tv.utils.ImgUtil;
+import com.fongmi.android.tv.utils.Notify;
+import com.google.gson.Gson;
+
+public class DetailActivity extends BaseActivity implements EpisodeAdapter.OnClickListener {
+
+    private ActivityDetailBinding mBinding;
+    private EpisodeAdapter mEpisodeAdapter;
+    private SiteViewModel mViewModel;
+    private FlagAdapter mFlagAdapter;
+
+    public static void start(Activity activity, String key, String id, String name) {
+        start(activity, key, id, name, null, null);
+    }
+
+    public static void start(Activity activity, String key, String id, String name, String pic) {
+        start(activity, key, id, name, pic, null);
+    }
+
+    public static void start(Activity activity, String key, String id, String name, String pic, String mark) {
+        Intent intent = new Intent(activity, DetailActivity.class);
+        intent.putExtra("mark", mark);
+        intent.putExtra("name", name);
+        intent.putExtra("pic", pic);
+        intent.putExtra("key", key);
+        intent.putExtra("id", id);
+        activity.startActivity(intent);
+    }
+
+    private String getName() {
+        return getIntent().getStringExtra("name");
+    }
+
+    private String getPic() {
+        return getIntent().getStringExtra("pic");
+    }
+
+    private String getMark() {
+        return getIntent().getStringExtra("mark");
+    }
+
+    private String getKey() {
+        return getIntent().getStringExtra("key");
+    }
+
+    private String getId() {
+        return getIntent().getStringExtra("id");
+    }
+
+    private String getHistoryKey() {
+        return getKey().concat(AppDatabase.SYMBOL).concat(getId()).concat(AppDatabase.SYMBOL) + ApiConfig.getCid();
+    }
+
+    private Site getSite() {
+        return ApiConfig.get().getSite(getKey());
+    }
+
+    private Flag getFlag() {
+        return mFlagAdapter.getActivated();
+    }
+
+    private Episode getEpisode() {
+        return mEpisodeAdapter.getActivated();
+    }
+
+    private boolean isFromCollect() {
+        return getCallingActivity() != null && getCallingActivity().getShortClassName().contains(CollectActivity.class.getSimpleName());
+    }
+
+    @Override
+    protected ViewBinding getBinding() {
+        return mBinding = ActivityDetailBinding.inflate(getLayoutInflater());
+    }
+
+    @Override
+    protected void initView(Bundle savedInstanceState) {
+        mBinding.progressLayout.showProgress();
+        setViewModel();
+        getDetail();
+    }
+
+    @Override
+    protected void initEvent() {
+    }
+
+    private void setRecyclerView() {
+        //mBinding.flag.setHasFixedSize(true);
+        //mBinding.flag.setItemAnimator(null);
+        //mBinding.flag.addItemDecoration(new SpaceItemDecoration(8));
+        //mBinding.flag.setAdapter(mFlagAdapter = new FlagAdapter(this));
+        mBinding.episode.setHasFixedSize(true);
+        mBinding.episode.setItemAnimator(null);
+        mBinding.episode.addItemDecoration(new SpaceItemDecoration(8));
+        mBinding.episode.setAdapter(mEpisodeAdapter = new EpisodeAdapter(this, ViewType.LIST));
+    }
+
+    private void setViewModel() {
+        mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
+        mViewModel.result.observe(this, this::setDetail);
+        mViewModel.player.observe(this, new Observer<Result>() {
+            @Override
+            public void onChanged(Result result) {
+
+            }
+        });
+    }
+
+    private void getDetail() {
+        mViewModel.detailContent(getKey(), getId());
+    }
+
+    private void setDetail(Result result) {
+        mBinding.swipeLayout.setRefreshing(false);
+        Log.e("DDD", new Gson().toJson(result));
+        if (result.getList().isEmpty()) setEmpty();
+        else setDetail(result.getList().get(0));
+        Notify.show(result.getMsg());
+    }
+
+    private void setEmpty() {
+        if (isFromCollect()) {
+            finish();
+        } else {
+            showEmpty();
+        }
+    }
+
+    private void showEmpty() {
+        mBinding.swipeLayout.setEnabled(true);
+        mBinding.progressLayout.showEmpty();
+    }
+
+    private void setDetail(Vod item) {
+        mBinding.progressLayout.showContent();
+        mBinding.name.setText(item.getVodName(getName()));
+        setText(mBinding.site, R.string.detail_site, getSite().getName());
+        setText(mBinding.content, 0, Html.fromHtml(item.getVodContent()).toString());
+        setText(mBinding.director, R.string.detail_director, Html.fromHtml(item.getVodDirector()).toString());
+        ImgUtil.load(item.getVodPic(getPic()), mBinding.pic);
+        //mFlagAdapter.addAll(item.getVodFlags());
+        //checkHistory(item);
+        //checkFlag(item);
+        //checkKeepImg();
+    }
+
+    private void setText(TextView view, int resId, String text) {
+        view.setVisibility(text.isEmpty() ? View.GONE : View.VISIBLE);
+        view.setText(resId > 0 ? getString(resId, text) : text);
+        view.setTag(text);
+    }
+
+    @Override
+    public void onItemClick(Episode item) {
+
+    }
+}

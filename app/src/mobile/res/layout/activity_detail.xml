@@ -2,19 +2,27 @@
 <androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swipeLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
-    <RelativeLayout
+    <com.fongmi.android.tv.ui.custom.ProgressLayout
+        android:id="@+id/progressLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:keepScreenOn="true">
+        android:layout_height="match_parent">
 
-        <ImageView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/pic"
             android:layout_width="120dp"
             android:layout_height="168dp"
-            android:layout_margin="16dp" />
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:elevation="4dp"
+            android:scaleType="centerCrop"
+            app:shapeAppearance="@style/Vod.Grid" />
 
         <LinearLayout
             android:id="@+id/info"
@@ -38,7 +46,7 @@
                 tools:text="海賊王" />
 
             <TextView
-                android:id="@+id/author"
+                android:id="@+id/director"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -111,5 +119,5 @@
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:stackFromEnd="true" />
 
-    </RelativeLayout>
+    </com.fongmi.android.tv.ui.custom.ProgressLayout>
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

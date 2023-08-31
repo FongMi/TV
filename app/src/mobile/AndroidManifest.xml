@@ -81,14 +81,14 @@
             android:screenOrientation="fullUser" />
 
         <activity
-            android:name=".ui.activity.VideoActivity"
-            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
-            android:excludeFromRecents="true"
-            android:launchMode="singleTask"
-            android:resizeableActivity="true"
-            android:screenOrientation="fullUser"
-            android:supportsPictureInPicture="true"
-            android:theme="@style/AppTheme.Detail" />
+            android:name=".ui.activity.DetailActivity"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout"
+            android:screenOrientation="fullUser" />
+
+        <activity
+            android:name=".ui.activity.FolderActivity"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout"
+            android:screenOrientation="fullUser" />
 
         <activity
             android:name=".ui.activity.HistoryActivity"
@@ -110,14 +110,19 @@
             android:supportsPictureInPicture="true" />
 
         <activity
-            android:name=".ui.activity.FolderActivity"
+            android:name=".ui.activity.ScanActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout"
             android:screenOrientation="fullUser" />
 
         <activity
-            android:name=".ui.activity.ScanActivity"
-            android:configChanges="screenSize|smallestScreenSize|screenLayout"
-            android:screenOrientation="fullUser" />
+            android:name=".ui.activity.VideoActivity"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTask"
+            android:resizeableActivity="true"
+            android:screenOrientation="fullUser"
+            android:supportsPictureInPicture="true"
+            android:theme="@style/AppTheme.Detail" />
 
         <service
             android:name="com.android.cast.dlna.dmc.DLNACastService"
