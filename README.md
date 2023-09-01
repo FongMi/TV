@@ -40,3 +40,5 @@ https://github.com/CatVodTVOfficial/CatVodTVJarLoader
 
 [討論群組](https://t.me/fongmi_offical)  
 [發布頻道](https://t.me/fongmi_release)
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/E1E5OT2RJ)
