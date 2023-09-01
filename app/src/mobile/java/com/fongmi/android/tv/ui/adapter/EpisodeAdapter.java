@@ -2,24 +2,27 @@ package com.fongmi.android.tv.ui.adapter;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.bean.Episode;
 import com.fongmi.android.tv.databinding.AdapterEpisodeGridBinding;
-import com.fongmi.android.tv.databinding.AdapterEpisodeListBinding;
+import com.fongmi.android.tv.databinding.AdapterEpisodeHoriBinding;
+import com.fongmi.android.tv.databinding.AdapterEpisodeVertBinding;
+import com.fongmi.android.tv.ui.base.BaseEpisodeHolder;
 import com.fongmi.android.tv.ui.base.ViewType;
+import com.fongmi.android.tv.ui.holder.EpisodeGridHolder;
+import com.fongmi.android.tv.ui.holder.EpisodeHoriHolder;
+import com.fongmi.android.tv.ui.holder.EpisodeVertHolder;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHolder> {
+public class EpisodeAdapter extends RecyclerView.Adapter<BaseEpisodeHolder> {
 
-    private final List<Episode> mItems;
     private final OnClickListener mListener;
+    private final List<Episode> mItems;
     private final int viewType;
 
     public EpisodeAdapter(OnClickListener listener, int viewType) {
@@ -79,41 +82,21 @@ public class EpisodeAdapter extends RecyclerView.Adapter<EpisodeAdapter.ViewHold
         return viewType;
     }
 
+    @Override
+    public void onBindViewHolder(@NonNull BaseEpisodeHolder holder, int position) {
+        holder.initView(mItems.get(position));
+    }
+
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        if (viewType == ViewType.LIST) return new ViewHolder(AdapterEpisodeListBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
-        return new ViewHolder(AdapterEpisodeGridBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Episode item = mItems.get(position);
-        if (holder.gridBinding != null) holder.initView(holder.gridBinding.text, item, false);
-        if (holder.listBinding != null) holder.initView(holder.listBinding.text, item, true);
-    }
-
-    class ViewHolder extends RecyclerView.ViewHolder {
-
-        private AdapterEpisodeListBinding listBinding;
-        private AdapterEpisodeGridBinding gridBinding;
-
-        ViewHolder(@NonNull AdapterEpisodeListBinding binding) {
-            super(binding.getRoot());
-            this.listBinding = binding;
-        }
-
-        ViewHolder(@NonNull AdapterEpisodeGridBinding binding) {
-            super(binding.getRoot());
-            this.gridBinding = binding;
-        }
-
-        void initView(TextView view, Episode item, boolean ems) {
-            view.setSelected(item.isActivated());
-            view.setActivated(item.isActivated());
-            if (ems) view.setMaxEms(Product.getEms());
-            view.setText(item.getDesc().concat(item.getName()));
-            view.setOnClickListener(v -> mListener.onItemClick(item));
+    public BaseEpisodeHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        switch (viewType) {
+            case ViewType.HORI:
+                return new EpisodeHoriHolder(AdapterEpisodeHoriBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), mListener);
+            case ViewType.VERT:
+                return new EpisodeVertHolder(AdapterEpisodeVertBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), mListener);
+            default:
+                return new EpisodeGridHolder(AdapterEpisodeGridBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), mListener);
         }
     }
 }

@@ -4,23 +4,25 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.media3.common.util.Log;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Episode;
 import com.fongmi.android.tv.bean.Flag;
+import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.ActivityDetailBinding;
 import com.fongmi.android.tv.db.AppDatabase;
+import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.ui.adapter.EpisodeAdapter;
 import com.fongmi.android.tv.ui.adapter.FlagAdapter;
@@ -29,14 +31,16 @@ import com.fongmi.android.tv.ui.base.ViewType;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.Notify;
-import com.google.gson.Gson;
 
-public class DetailActivity extends BaseActivity implements EpisodeAdapter.OnClickListener {
+import java.util.List;
+
+public class DetailActivity extends BaseActivity implements FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener {
 
     private ActivityDetailBinding mBinding;
     private EpisodeAdapter mEpisodeAdapter;
     private SiteViewModel mViewModel;
     private FlagAdapter mFlagAdapter;
+    private History mHistory;
 
     public static void start(Activity activity, String key, String id, String name) {
         start(activity, key, id, name, null, null);
@@ -104,6 +108,7 @@ public class DetailActivity extends BaseActivity implements EpisodeAdapter.OnCli
     @Override
     protected void initView(Bundle savedInstanceState) {
         mBinding.progressLayout.showProgress();
+        setRecyclerView();
         setViewModel();
         getDetail();
     }
@@ -113,14 +118,14 @@ public class DetailActivity extends BaseActivity implements EpisodeAdapter.OnCli
     }
 
     private void setRecyclerView() {
-        //mBinding.flag.setHasFixedSize(true);
-        //mBinding.flag.setItemAnimator(null);
-        //mBinding.flag.addItemDecoration(new SpaceItemDecoration(8));
-        //mBinding.flag.setAdapter(mFlagAdapter = new FlagAdapter(this));
+        mBinding.flag.setHasFixedSize(true);
+        mBinding.flag.setItemAnimator(null);
+        mBinding.flag.addItemDecoration(new SpaceItemDecoration(8));
+        mBinding.flag.setAdapter(mFlagAdapter = new FlagAdapter(this));
         mBinding.episode.setHasFixedSize(true);
         mBinding.episode.setItemAnimator(null);
-        mBinding.episode.addItemDecoration(new SpaceItemDecoration(8));
-        mBinding.episode.setAdapter(mEpisodeAdapter = new EpisodeAdapter(this, ViewType.LIST));
+        mBinding.episode.addItemDecoration(new SpaceItemDecoration(1,8));
+        mBinding.episode.setAdapter(mEpisodeAdapter = new EpisodeAdapter(this, ViewType.VERT));
     }
 
     private void setViewModel() {
@@ -139,8 +144,6 @@ public class DetailActivity extends BaseActivity implements EpisodeAdapter.OnCli
     }
 
     private void setDetail(Result result) {
-        mBinding.swipeLayout.setRefreshing(false);
-        Log.e("DDD", new Gson().toJson(result));
         if (result.getList().isEmpty()) setEmpty();
         else setDetail(result.getList().get(0));
         Notify.show(result.getMsg());
@@ -155,7 +158,6 @@ public class DetailActivity extends BaseActivity implements EpisodeAdapter.OnCli
     }
 
     private void showEmpty() {
-        mBinding.swipeLayout.setEnabled(true);
         mBinding.progressLayout.showEmpty();
     }
 
@@ -166,16 +168,66 @@ public class DetailActivity extends BaseActivity implements EpisodeAdapter.OnCli
         setText(mBinding.content, 0, Html.fromHtml(item.getVodContent()).toString());
         setText(mBinding.director, R.string.detail_director, Html.fromHtml(item.getVodDirector()).toString());
         ImgUtil.load(item.getVodPic(getPic()), mBinding.pic);
-        //mFlagAdapter.addAll(item.getVodFlags());
-        //checkHistory(item);
-        //checkFlag(item);
-        //checkKeepImg();
+        mFlagAdapter.addAll(item.getVodFlags());
+        checkHistory(item);
+        checkFlag(item);
+        checkKeepImg();
     }
 
     private void setText(TextView view, int resId, String text) {
         view.setVisibility(text.isEmpty() ? View.GONE : View.VISIBLE);
         view.setText(resId > 0 ? getString(resId, text) : text);
         view.setTag(text);
+    }
+
+    private void checkHistory(Vod item) {
+        mHistory = History.find(getHistoryKey());
+        mHistory = mHistory == null ? createHistory(item) : mHistory;
+        if (!TextUtils.isEmpty(getMark())) mHistory.setVodRemarks(getMark());
+    }
+
+    private History createHistory(Vod item) {
+        History history = new History();
+        history.setKey(getHistoryKey());
+        history.setCid(ApiConfig.getCid());
+        history.setVodPic(item.getVodPic());
+        history.setVodName(item.getVodName());
+        history.findEpisode(item.getVodFlags());
+        return history;
+    }
+
+    private void checkFlag(Vod item) {
+        boolean empty = item.getVodFlags().isEmpty();
+        mBinding.flag.setVisibility(empty ? View.GONE : View.VISIBLE);
+        if (empty) {
+            ErrorEvent.episode();
+        } else {
+            onItemClick(mHistory.getFlag(), true);
+            if (mHistory.isRevSort()) reverseEpisode(true);
+        }
+    }
+
+    private void reverseEpisode(boolean scroll) {
+        mFlagAdapter.reverse();
+        setEpisodeAdapter(getFlag().getEpisodes());
+        if (scroll) mBinding.episode.scrollToPosition(mEpisodeAdapter.getPosition());
+    }
+
+    private void setEpisodeAdapter(List<Episode> items) {
+        mBinding.episode.setVisibility(items.isEmpty() ? View.GONE : View.VISIBLE);
+        mEpisodeAdapter.addAll(items);
+    }
+
+    private void checkKeepImg() {
+        //mBinding.keep.setImageResource(Keep.find(getHistoryKey()) == null ? R.drawable.ic_control_keep_off : R.drawable.ic_control_keep_on);
+    }
+
+    @Override
+    public void onItemClick(Flag item, boolean force) {
+        if (item.isActivated()) return;
+        mFlagAdapter.setActivated(item);
+        mBinding.flag.scrollToPosition(mFlagAdapter.getPosition());
+        setEpisodeAdapter(item.getEpisodes());
     }
 
     @Override
