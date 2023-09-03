@@ -67,13 +67,14 @@ public class EpisodeGridDialog extends BaseDialog {
 
     private void setSpanCount() {
         int total = 0;
+        int row = Product.isPad() ? 5 : 10;
         for (Episode item : episodes) total += item.getName().length();
         int offset = (int) Math.ceil((double) total / episodes.size());
         if (offset >= 12) spanCount = 1;
         else if (offset >= 8) spanCount = 2;
         else if (offset >= 4) spanCount = 3;
         else if (offset >= 2) spanCount = 4;
-        itemCount = spanCount * (Product.isPad() ? 5 : 10);
+        itemCount = spanCount * row;
     }
 
     private void setTitles() {
