@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import android.util.Base64;
 
 import com.github.catvod.Init;
+import com.google.common.net.HttpHeaders;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -114,6 +115,13 @@ public class Util {
         } catch (Exception e) {
             return 0;
         }
+    }
+
+    public static String fix(String key) {
+        if (key.equalsIgnoreCase(HttpHeaders.USER_AGENT)) return HttpHeaders.USER_AGENT;
+        if (key.equalsIgnoreCase(HttpHeaders.REFERER)) return HttpHeaders.REFERER;
+        if (key.equalsIgnoreCase(HttpHeaders.COOKIE)) return HttpHeaders.COOKIE;
+        return key;
     }
 
     public static String size(long size) {

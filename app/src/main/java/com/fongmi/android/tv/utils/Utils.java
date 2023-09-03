@@ -96,7 +96,8 @@ public class Utils {
     }
 
     public static Map<String, String> checkUa(Map<String, String> headers) {
-        if (Setting.getUa().isEmpty() || headers.containsKey(HttpHeaders.USER_AGENT) || headers.containsKey(HttpHeaders.USER_AGENT.toLowerCase())) return headers;
+        if (Setting.getUa().isEmpty()) return headers;
+        for (Map.Entry<String, String> header : headers.entrySet()) if (header.getKey().equalsIgnoreCase(HttpHeaders.USER_AGENT)) return headers;
         headers.put(HttpHeaders.USER_AGENT, Setting.getUa());
         return headers;
     }
