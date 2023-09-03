@@ -516,7 +516,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     @Override
     public void onItemClick(Episode item) {
-        if (item.isActivated()) return;
+        if (shouldEnterFullscreen(item)) return;
         mFlagAdapter.toggle(item);
         notifyItemChanged(mEpisodeAdapter);
         mBinding.episode.scrollToPosition(mEpisodeAdapter.getPosition());
@@ -796,13 +796,20 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         else enterFullscreen();
     }
 
+    private boolean shouldEnterFullscreen(Episode item) {
+        boolean enter = !isFullscreen() && item.isActivated();
+        if (enter) enterFullscreen();
+        return enter;
+    }
+
     private void enterFullscreen() {
         if (isFullscreen()) return;
-        mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
+        App.post(() -> mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT)), 50);
         setRequestedOrientation(mPlayers.isPortrait() ? ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
         mBinding.control.full.setVisibility(View.GONE);
         setSubtitle(Setting.getSubtitle());
         setRotate(mPlayers.isPortrait());
+        Utils.hideSystemUI(this);
         App.post(mR3, 2000);
         setFullscreen(true);
         hideControl();

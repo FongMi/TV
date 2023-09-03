@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
+import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.bean.Episode;
 import com.fongmi.android.tv.databinding.DialogEpisodeGridBinding;
 import com.fongmi.android.tv.ui.fragment.EpisodeFragment;
@@ -72,7 +73,7 @@ public class EpisodeGridDialog extends BaseDialog {
         else if (offset >= 8) spanCount = 2;
         else if (offset >= 4) spanCount = 3;
         else if (offset >= 2) spanCount = 4;
-        itemCount = spanCount * 10;
+        itemCount = spanCount * (Product.isPad() ? 5 : 10);
     }
 
     private void setTitles() {
