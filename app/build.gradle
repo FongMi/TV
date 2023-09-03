@@ -125,6 +125,7 @@ dependencies {
     mobileImplementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     mobileImplementation 'com.github.chrisbanes:PhotoView:2.3.0'
     mobileImplementation 'com.github.devin1014.DLNA-Cast:dlna-dmc:V1.0.0'
+    mobileImplementation 'com.google.android.flexbox:flexbox:3.0.0'
     mobileImplementation('com.journeyapps:zxing-android-embedded:4.3.0') { transitive = false }
     annotationProcessor 'androidx.room:room-compiler:2.5.2'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.15.1'
