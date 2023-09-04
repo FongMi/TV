@@ -7,16 +7,14 @@ import com.fongmi.android.tv.utils.ResUtil;
 
 public class Product {
 
-    public static boolean isPad() {
-        return App.get().getResources().getConfiguration().smallestScreenWidthDp >= 600;
-    }
-
     public static int getDeviceType() {
         return 1;
     }
 
     public static int getColumn() {
-        return Math.abs(Setting.getSize() - (isPad() ? 8 : 5));
+        int count = ResUtil.isPad() ? 6 : 5;
+        count = count + ResUtil.getOrient() - 1;
+        return Math.abs(Setting.getSize() - count);
     }
 
     public static int getColumn(Style style) {
