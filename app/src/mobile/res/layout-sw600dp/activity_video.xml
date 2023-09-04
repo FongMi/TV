@@ -14,8 +14,8 @@
 
         <FrameLayout
             android:id="@+id/video"
-            android:layout_width="432dp"
-            android:layout_height="243dp"
+            android:layout_width="400dp"
+            android:layout_height="225dp"
             android:layout_margin="16dp"
             android:background="@color/black"
             android:clickable="true"
