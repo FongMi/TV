@@ -121,6 +121,11 @@
             android:supportsPictureInPicture="true"
             android:theme="@style/AppTheme.Detail" />
 
+        <activity
+            android:name=".ui.activity.MangaActivity"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout"
+            android:screenOrientation="fullUser" />
+
         <service
             android:name="com.android.cast.dlna.dmc.DLNACastService"
             android:exported="false" />

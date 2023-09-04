@@ -24,7 +24,6 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
-                android:elevation="4dp"
                 android:scaleType="centerCrop"
                 app:shapeAppearance="@style/Vod.Grid" />
 
@@ -105,14 +104,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/flag"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="16dp"
                 android:clipChildren="false"
                 android:clipToPadding="false"
                 android:nestedScrollingEnabled="false"
                 android:orientation="vertical"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
+                android:padding="8dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listitem="@layout/adapter_episode_vert" />
 
