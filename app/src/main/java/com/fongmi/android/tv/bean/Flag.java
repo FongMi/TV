@@ -118,22 +118,24 @@ public class Flag implements Parcelable {
         return strict ? null : getEpisodes().get(0);
     }
 
-    public List<Magnet> getMagnet() {
-        Iterator<Episode> iterator = getEpisodes().iterator();
-        List<Magnet> items = new ArrayList<>();
-        while (iterator.hasNext()) {
-            String url = iterator.next().getUrl();
-            if (!Sniffer.isThunder(url)) continue;
-            items.add(Magnet.get(url));
-            iterator.remove();
-        }
-        return items;
-    }
-
     public static List<Flag> create(String flag, String name, String url) {
         Flag item = Flag.create(flag);
         item.getEpisodes().add(Episode.create(name, url));
         return List.of(item);
+    }
+
+    public List<Magnet> getMagnet() {
+        Iterator<Episode> iterator = getEpisodes().iterator();
+        List<Magnet> items = new ArrayList<>();
+        while (iterator.hasNext()) addMagnet(iterator, items);
+        return items;
+    }
+
+    private void addMagnet(Iterator<Episode> iterator, List<Magnet> items) {
+        String url = iterator.next().getUrl();
+        if (!Sniffer.isThunder(url)) return;
+        items.add(Magnet.get(url));
+        iterator.remove();
     }
 
     @Override

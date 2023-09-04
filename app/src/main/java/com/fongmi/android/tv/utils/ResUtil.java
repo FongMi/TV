@@ -1,6 +1,5 @@
 package com.fongmi.android.tv.utils;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -86,12 +85,8 @@ public class ResUtil {
         return e.getRawX() < edge || e.getRawX() > getScreenWidthNav() - edge || e.getRawY() < edge || e.getRawY() > getScreenHeightNav() - edge;
     }
 
-    public static boolean isLand(Activity activity) {
-        return activity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
-    }
-
-    public static boolean isPort(Activity activity) {
-        return activity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
+    public static boolean isLand() {
+        return App.get().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
     }
 
     public static int sp2px(int sp) {

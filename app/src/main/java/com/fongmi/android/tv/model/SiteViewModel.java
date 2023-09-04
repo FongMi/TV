@@ -156,7 +156,7 @@ public class SiteViewModel extends ViewModel {
                 ApiConfig.get().setRecent(site);
                 Result result = Result.fromJson(playerContent);
                 if (result.getFlag().isEmpty()) result.setFlag(flag);
-                result.setUrl(Source.get().fetch(result.getUrl().v()));
+                result.setUrl(Source.get().fetch(result));
                 result.setKey(key);
                 return result;
             } else if (site.getType() == 4) {
@@ -167,13 +167,13 @@ public class SiteViewModel extends ViewModel {
                 SpiderDebug.log(playerContent);
                 Result result = Result.fromJson(playerContent);
                 if (result.getFlag().isEmpty()) result.setFlag(flag);
-                result.setUrl(Source.get().fetch(result.getUrl().v()));
+                result.setUrl(Source.get().fetch(result));
                 return result;
             } else if (site.isEmpty() && key.equals("push_agent")) {
                 Result result = new Result();
                 result.setParse(0);
                 result.setFlag(flag);
-                result.setUrl(Source.get().fetch(result.getUrl().v()));
+                result.setUrl(Source.get().fetch(result));
                 return result;
             } else {
                 Url url = Url.create().add(id);

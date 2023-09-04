@@ -371,7 +371,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     private void setVideoView() {
         mPlayers.set(getExo(), getIjk());
-        if (isPort() && ResUtil.isLand(this)) enterFullscreen();
+        if (isPort() && ResUtil.isLand()) enterFullscreen();
         getExo().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
         getIjk().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
         setSubtitle(14);
@@ -666,7 +666,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private void onRotate() {
         setR1Callback();
         setRotate(!isRotate());
-        setRequestedOrientation(ResUtil.isLand(this) ? ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+        setRequestedOrientation(ResUtil.isLand() ? ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
     }
 
     private void onSetting() {
@@ -830,13 +830,13 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     private int getLockOrient() {
         if (isLock()) {
-            return ResUtil.isLand(this) ? ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
+            return ResUtil.isLand() ? ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
         } else if (isRotate()) {
             return ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT;
         } else if (isPort() && Utils.isAutoRotate()) {
             return ActivityInfo.SCREEN_ORIENTATION_FULL_USER;
         } else {
-            return ResUtil.isLand(this) ? ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT;
+            return ResUtil.isLand() ? ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT;
         }
     }
 
