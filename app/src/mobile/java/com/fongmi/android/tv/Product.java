@@ -12,8 +12,8 @@ public class Product {
     }
 
     public static int getColumn() {
-        int count = ResUtil.isPad() ? 6 : 5;
-        count = count + ResUtil.getOrient() - 1;
+        int count = ResUtil.isLand() ? 7 : 5;
+        count = count + (ResUtil.isPad() ? 1 : 0);
         return Math.abs(Setting.getSize() - count);
     }
 
