@@ -4,7 +4,7 @@ plugins {
 
 android {
     compileSdk 33
-    flavorDimensions "mode", "api", "abi"
+    flavorDimensions = ["mode", "api", "abi"]
 
     defaultConfig {
         applicationId "com.fongmi.android.tv"
@@ -53,7 +53,6 @@ android {
     buildTypes {
         release {
             minifyEnabled true
-            zipAlignEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -68,14 +67,13 @@ android {
         targetCompatibility JavaVersion.VERSION_11
     }
 
-    android.applicationVariants.all {
-        variant -> variant.outputs.all {
-            output -> outputFileName = "${variant.productFlavors[0].name}-${variant.productFlavors[1].name}-${variant.productFlavors[2].name}.apk"
+    android.applicationVariants.configureEach { variant ->
+        variant.outputs.configureEach { output ->
+            outputFileName = "${variant.productFlavors[0].name}-${variant.productFlavors[1].name}-${variant.productFlavors[2].name}.apk"
         }
     }
 
     lint {
-        abortOnError false
         disable 'UnsafeOptInUsageError'
     }
 }
@@ -106,7 +104,7 @@ dependencies {
     implementation project(':media-lib-ui')
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.biometric:biometric:1.1.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel:2.5.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel:2.6.1'
     implementation 'androidx.room:room-runtime:2.5.2'
     implementation 'cat.ereza:customactivityoncrash:2.4.0'
     implementation 'com.github.bassaer:materialdesigncolors:1.0.0'

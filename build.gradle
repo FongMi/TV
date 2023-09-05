@@ -4,7 +4,7 @@ plugins {
     id 'com.chaquo.python' version '14.0.2' apply false
 }
 
-task clean(type: Delete) {
+tasks.register('clean', Delete) {
     delete rootProject.buildDir
 }
 
