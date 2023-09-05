@@ -140,7 +140,7 @@ public class CollectActivity extends BaseActivity implements CustomScroller.Call
     }
 
     private void setViewType(int viewType) {
-        int count = Product.getColumn() - 1;
+        int count = Product.getColumn(this) - 1;
         mSearchAdapter.setViewType(viewType, count);
         mSearchAdapter.setSize(Product.getSpec(this, ResUtil.dp2px((count + 2) * 16), count + 1));
         ((GridLayoutManager) mBinding.recycler.getLayoutManager()).setSpanCount(mSearchAdapter.isGrid() ? count : 1);

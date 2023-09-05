@@ -85,12 +85,8 @@ public class ResUtil {
         return e.getRawX() < edge || e.getRawX() > getScreenWidthNav() - edge || e.getRawY() < edge || e.getRawY() > getScreenHeightNav() - edge;
     }
 
-    public static int getOrient() {
-        return App.get().getResources().getConfiguration().orientation;
-    }
-
-    public static boolean isLand() {
-        return getOrient() == Configuration.ORIENTATION_LANDSCAPE;
+    public static boolean isLand(Context context) {
+        return context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
     }
 
     public static boolean isPad() {

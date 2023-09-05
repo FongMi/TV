@@ -11,14 +11,14 @@ public class Product {
         return 1;
     }
 
-    public static int getColumn() {
-        int count = ResUtil.isLand() ? 7 : 5;
+    public static int getColumn(Context context) {
+        int count = ResUtil.isLand(context) ? 7 : 5;
         count = count + (ResUtil.isPad() ? 1 : 0);
         return Math.abs(Setting.getSize() - count);
     }
 
-    public static int getColumn(Style style) {
-        return style.isLand() ? getColumn() - 1 : getColumn();
+    public static int getColumn(Context context, Style style) {
+        return style.isLand() ? getColumn(context) - 1 : getColumn(context);
     }
 
     public static int[] getSpec(Context context) {
@@ -26,7 +26,7 @@ public class Product {
     }
 
     public static int[] getSpec(Context context, Style style) {
-        int column = getColumn(style);
+        int column = getColumn(context, style);
         int space = ResUtil.dp2px(32) + ResUtil.dp2px(16 * (column - 1));
         if (style.isOval()) space += ResUtil.dp2px(column * 16);
         return getSpec(context, space, column, style);

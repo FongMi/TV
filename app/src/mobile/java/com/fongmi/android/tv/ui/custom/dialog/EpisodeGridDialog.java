@@ -67,7 +67,7 @@ public class EpisodeGridDialog extends BaseDialog {
 
     private void setSpanCount() {
         int total = 0;
-        int row = ResUtil.isLand() ? 5 : 10;
+        int row = ResUtil.isLand(getActivity()) ? 5 : 10;
         for (Episode item : episodes) total += item.getName().length();
         int offset = (int) Math.ceil((double) total / episodes.size());
         if (offset >= 12) spanCount = 1;

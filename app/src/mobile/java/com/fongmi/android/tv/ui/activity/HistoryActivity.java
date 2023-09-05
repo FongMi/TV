@@ -50,7 +50,7 @@ public class HistoryActivity extends BaseActivity implements HistoryAdapter.OnCl
     private void setRecyclerView() {
         mBinding.recycler.setHasFixedSize(true);
         mBinding.recycler.getItemAnimator().setChangeDuration(0);
-        mBinding.recycler.setLayoutManager(new GridLayoutManager(this, Product.getColumn()));
+        mBinding.recycler.setLayoutManager(new GridLayoutManager(this, Product.getColumn(this)));
         mBinding.recycler.setAdapter(mAdapter = new HistoryAdapter(this));
         mAdapter.setSize(Product.getSpec(getActivity()));
     }
