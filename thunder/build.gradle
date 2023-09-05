@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdk 33
-    flavorDimensions "abi"
+    flavorDimensions = ["abi"]
 
     defaultConfig {
         minSdkVersion 21

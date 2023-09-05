@@ -5,7 +5,7 @@ plugins {
 
 android {
     compileSdk 33
-    flavorDimensions "abi"
+    flavorDimensions = ["abi"]
 
     defaultConfig {
         minSdk 21
