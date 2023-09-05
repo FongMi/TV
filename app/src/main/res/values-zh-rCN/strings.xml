@@ -66,10 +66,11 @@
     <string name="setting_wall">壁纸</string>
     <string name="setting_player">播放器</string>
     <string name="setting_player_ua">User-Agent</string>
+    <string name="setting_player_flag">线路播放</string>
     <string name="setting_player_http">连线方式</string>
     <string name="setting_player_tunnel">隧道模式</string>
     <string name="setting_player_subtitle">字幕大小</string>
-    <string name="setting_player_flag">线路播放</string>
+    <string name="setting_player_background">后台播放</string>
     <string name="setting_decode">解码方式</string>
     <string name="setting_render">渲染方式</string>
     <string name="setting_scale">缩放比例</string>
@@ -132,16 +133,6 @@
         <item>EXO</item>
     </string-array>
 
-    <string-array name="select_exo_http">
-        <item>预设</item>
-        <item>OkHttp</item>
-    </string-array>
-
-    <string-array name="select_flag">
-        <item>自动</item>
-        <item>手动</item>
-    </string-array>
-
     <string-array name="select_quality">
         <item>低</item>
         <item>中</item>
@@ -166,6 +157,22 @@
     <string-array name="select_reset">
         <item>刷新</item>
         <item>重播</item>
+    </string-array>
+
+    <string-array name="select_exo_http">
+        <item>预设</item>
+        <item>OkHttp</item>
+    </string-array>
+
+    <string-array name="select_flag">
+        <item>自动</item>
+        <item>手动</item>
+    </string-array>
+
+    <string-array name="select_background">
+        <item>关闭</item>
+        <item>开启</item>
+        <item>画中画</item>
     </string-array>
 
 </resources>

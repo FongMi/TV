@@ -66,10 +66,11 @@
     <string name="setting_wall">Wallpaper</string>
     <string name="setting_player">Player</string>
     <string name="setting_player_ua">User-Agent</string>
+    <string name="setting_player_flag">Flag play</string>
     <string name="setting_player_http">HTTP method</string>
     <string name="setting_player_tunnel">Tunnel mode</string>
     <string name="setting_player_subtitle">Subtitle size</string>
-    <string name="setting_player_flag">Flag play</string>
+    <string name="setting_player_background">Background play</string>
     <string name="setting_decode">Decode</string>
     <string name="setting_render">Render</string>
     <string name="setting_scale">Scale</string>
@@ -132,16 +133,6 @@
         <item>EXO</item>
     </string-array>
 
-    <string-array name="select_exo_http">
-        <item>Default</item>
-        <item>OkHttp</item>
-    </string-array>
-
-    <string-array name="select_flag">
-        <item>Auto</item>
-        <item>Manual</item>
-    </string-array>
-
     <string-array name="select_render">
         <item>Surface</item>
         <item>Texture</item>
@@ -171,6 +162,22 @@
     <string-array name="select_reset">
         <item>Reset</item>
         <item>Replay</item>
+    </string-array>
+
+    <string-array name="select_exo_http">
+        <item>Default</item>
+        <item>OkHttp</item>
+    </string-array>
+
+    <string-array name="select_flag">
+        <item>Auto</item>
+        <item>Manual</item>
+    </string-array>
+
+    <string-array name="select_background">
+        <item>Off</item>
+        <item>On</item>
+        <item>PiP</item>
     </string-array>
 
 </resources>
