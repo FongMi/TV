@@ -1,9 +1,7 @@
 package com.fongmi.android.tv.service;
 
-import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -29,7 +27,6 @@ import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.receiver.ActionReceiver;
 import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.Notify;
-import com.fongmi.android.tv.utils.Utils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -37,14 +34,12 @@ import org.greenrobot.eventbus.ThreadMode;
 
 public class PlaybackService extends Service {
 
-    private static Class<?> classes;
     private static Players players;
     private final int ID = 9527;
     private Bitmap bitmap;
 
-    public static void start(Activity activity, Players players) {
-        ContextCompat.startForegroundService(activity, new Intent(activity, PlaybackService.class));
-        PlaybackService.classes = activity.getClass();
+    public static void start(Players players) {
+        ContextCompat.startForegroundService(App.get(), new Intent(App.get(), PlaybackService.class));
         PlaybackService.players = players;
     }
 
@@ -82,13 +77,11 @@ public class PlaybackService extends Service {
     }
 
     private Notification buildNotification() {
-        Intent intent = new Intent(this, classes);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, Utils.getPendingFlag());
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, Notify.DEFAULT);
         builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
         builder.setPriority(NotificationCompat.PRIORITY_LOW);
         builder.setSmallIcon(R.drawable.ic_logo);
-        builder.setContentIntent(pendingIntent);
+        builder.setContentIntent(players.getSession().getController().getSessionActivity());
         builder.setContentTitle(getTitle());
         builder.setContentText(getText());
         builder.setOngoing(false);
@@ -100,7 +93,7 @@ public class PlaybackService extends Service {
         MediaStyle mediaStyle = new MediaStyle();
         mediaStyle.setShowActionsInCompactView(0, 2);
         mediaStyle.setShowCancelButton(true);
-        //mediaStyle.setMediaSession(players.getSession().getSessionToken());
+        mediaStyle.setMediaSession(players.getSession().getSessionToken());
         mediaStyle.setCancelButtonIntent(ActionReceiver.getPendingIntent(this, ActionEvent.CANCEL));
         builder.setDeleteIntent(ActionReceiver.getPendingIntent(this, ActionEvent.CANCEL));
         if (bitmap != null) setLargeIcon(builder);

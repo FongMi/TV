@@ -231,7 +231,7 @@ public class Setting {
     }
 
     public static boolean isBackgroundOn() {
-        return getBackground() == 1 || getBackground() == 2;
+        return getBackground() == 1;
     }
 
     public static boolean isBackgroundPiP() {

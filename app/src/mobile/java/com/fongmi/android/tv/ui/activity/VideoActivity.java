@@ -272,10 +272,10 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mFrameParams = mBinding.video.getLayoutParams();
         mBinding.progressLayout.showProgress();
         mBinding.swipeLayout.setEnabled(false);
+        mPlayers = new Players().init(this);
         mObserveDetail = this::setDetail;
         mObservePlayer = this::setPlayer;
         mObserveSearch = this::setSearch;
-        mPlayers = new Players().init();
         mDialogs = new ArrayList<>();
         mBroken = new ArrayList<>();
         mClock = Clock.create();
@@ -1430,12 +1430,14 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode);
         if (isInPictureInPictureMode) {
+            PlaybackService.start(mPlayers);
             enterFullscreen();
             setSubtitle(10);
             hideControl();
             hideSheet();
         } else {
             exitFullscreen();
+            PlaybackService.stop();
             if (isStop()) finish();
         }
     }
@@ -1471,7 +1473,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     @Override
     protected void onPause() {
         super.onPause();
-        if (Setting.isBackgroundOn()) PlaybackService.start(this, mPlayers);
+        if (Setting.isBackgroundOn()) PlaybackService.start(mPlayers);
     }
 
     @Override

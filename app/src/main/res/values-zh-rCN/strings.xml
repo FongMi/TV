@@ -80,8 +80,8 @@
     <string name="setting_cache">缓存</string>
     <string name="setting_version">版本</string>
     <string name="setting_storage">权限</string>
-    <string name="setting_off">关</string>
-    <string name="setting_on">开</string>
+    <string name="setting_off">关闭</string>
+    <string name="setting_on">开启</string>
 
     <!-- Search -->
     <string name="search_keyword">关键字…</string>

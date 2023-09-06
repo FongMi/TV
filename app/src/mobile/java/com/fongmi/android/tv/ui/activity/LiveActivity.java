@@ -149,7 +149,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mFormatDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         mKeyDown = CustomKeyDownLive.create(this, mBinding.video);
         mClock = Clock.create(mBinding.widget.time);
-        mPlayers = new Players().init();
+        mPlayers = new Players().init(this);
         mHides = new ArrayList<>();
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
@@ -891,12 +891,14 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode);
         if (isInPictureInPictureMode) {
+            PlaybackService.start(mPlayers);
             setSubtitle(10);
             hideControl();
             hideInfo();
             hideUI();
         } else {
             hideInfo();
+            PlaybackService.stop();
             setSubtitle(Setting.getSubtitle());
             if (isStop()) finish();
         }
@@ -931,7 +933,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     @Override
     protected void onPause() {
         super.onPause();
-        if (Setting.isBackgroundOn()) PlaybackService.start(this, mPlayers);
+        if (Setting.isBackgroundOn()) PlaybackService.start(mPlayers);
         mClock.stop();
     }
 

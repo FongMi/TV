@@ -1,5 +1,8 @@
 package com.fongmi.android.tv.player;
 
+import android.app.Activity;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.text.TextUtils;
 
@@ -24,6 +27,7 @@ import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.impl.ParseCallback;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.crawler.SpiderDebug;
 
 import java.util.Formatter;
@@ -73,14 +77,20 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         return player == SYS || player == IJK;
     }
 
-    public Players init() {
+    public Players init(Activity activity) {
         player = Setting.getPlayer();
         decode = Setting.getDecode();
         builder = new StringBuilder();
         runnable = ErrorEvent::timeout;
-        session = new MediaSessionCompat(App.get(), "TV");
         formatter = new Formatter(builder, Locale.getDefault());
+        createSession(activity);
         return this;
+    }
+
+    private void createSession(Activity activity) {
+        session = new MediaSessionCompat(activity, "TV");
+        session.setSessionActivity(PendingIntent.getActivity(activity, 0, new Intent(activity, activity.getClass()), Utils.getPendingFlag()));
+        session.setActive(true);
     }
 
     public void set(PlayerView exo, IjkVideoView ijk) {

@@ -80,8 +80,8 @@
     <string name="setting_cache">Cache</string>
     <string name="setting_version">Version</string>
     <string name="setting_storage">Permission</string>
-    <string name="setting_off">OFF</string>
-    <string name="setting_on">ON</string>
+    <string name="setting_off">Off</string>
+    <string name="setting_on">On</string>
 
     <!-- Search -->
     <string name="search_keyword">Keywords…</string>
