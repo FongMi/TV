@@ -206,6 +206,14 @@ public class Setting {
         Prefers.put("flag", mode);
     }
 
+    public static int getBackground() {
+        return Prefers.getInt("background");
+    }
+
+    public static void putBackground(int background) {
+        Prefers.put("background", background);
+    }
+
     public static int getSiteMode() {
         return Prefers.getInt("site_mode");
     }

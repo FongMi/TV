@@ -19,10 +19,12 @@ import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.custom.dialog.SubtitleDialog;
 import com.fongmi.android.tv.ui.custom.dialog.UaDialog;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class SettingPlayerFragment extends BaseFragment implements UaCallback, SubtitleCallback {
 
     private FragmentSettingPlayerBinding mBinding;
+    private String[] background;
     private String[] http;
     private String[] flag;
 
@@ -46,6 +48,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, S
         mBinding.subtitleText.setText(String.valueOf(Setting.getSubtitle()));
         mBinding.flagText.setText((flag = ResUtil.getStringArray(R.array.select_flag))[Setting.getFlag()]);
         mBinding.httpText.setText((http = ResUtil.getStringArray(R.array.select_exo_http))[Setting.getHttp()]);
+        mBinding.backgroundText.setText((background = ResUtil.getStringArray(R.array.select_background))[Setting.getBackground()]);
         setVisible();
     }
 
@@ -56,6 +59,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, S
         mBinding.flag.setOnClickListener(this::setFlag);
         mBinding.tunnel.setOnClickListener(this::setTunnel);
         mBinding.subtitle.setOnClickListener(this::onSubtitle);
+        mBinding.background.setOnClickListener(this::setBackground);
     }
 
     private void setVisible() {
@@ -87,6 +91,14 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, S
 
     private void onSubtitle(View view) {
         SubtitleDialog.create(this).show();
+    }
+
+    private void setBackground(View view) {
+        new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.setting_player_background).setNegativeButton(R.string.dialog_negative, null).setSingleChoiceItems(background, Setting.getBackground(), (dialog, which) -> {
+            mBinding.backgroundText.setText(background[which]);
+            Setting.putBackground(which);
+            dialog.dismiss();
+        }).show();
     }
 
     @Override
