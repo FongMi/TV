@@ -132,12 +132,24 @@
 
         <service
             android:name=".service.PlaybackService"
-            android:exported="true"
+            android:exported="false"
             android:foregroundServiceType="mediaPlayback">
             <intent-filter>
                 <action android:name="androidx.media3.session.MediaSessionService" />
             </intent-filter>
         </service>
+
+        <receiver
+            android:name=".receiver.ActionReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="${applicationId}.PREV" />
+                <action android:name="${applicationId}.NEXT" />
+                <action android:name="${applicationId}.PLAY" />
+                <action android:name="${applicationId}.PAUSE" />
+                <action android:name="${applicationId}.CANCEL" />
+            </intent-filter>
+        </receiver>
 
     </application>
 </manifest>

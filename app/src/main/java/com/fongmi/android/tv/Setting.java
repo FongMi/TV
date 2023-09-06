@@ -225,4 +225,16 @@ public class Setting {
     public static float getThumbnail() {
         return 0.3f * getQuality() + 0.4f;
     }
+
+    public static boolean isBackgroundOff() {
+        return getBackground() == 0;
+    }
+
+    public static boolean isBackgroundOn() {
+        return getBackground() == 1 || getBackground() == 2;
+    }
+
+    public static boolean isBackgroundPiP() {
+        return getBackground() == 2;
+    }
 }

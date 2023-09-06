@@ -2,14 +2,17 @@ package com.fongmi.android.tv.utils;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.os.Build;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
 import androidx.fragment.app.FragmentActivity;
@@ -123,12 +126,26 @@ public class Utils {
         return url;
     }
 
+    public static int getPendingFlag() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE : PendingIntent.FLAG_UPDATE_CURRENT;
+    }
+
     public static int getDigit(String text) {
         try {
             if (text.startsWith("上") || text.startsWith("下")) return -1;
             return Integer.parseInt(text.replaceAll("(mp4|H264|H265|720p|1080p|2160p|4k|4K)", "").replaceAll("\\D+", ""));
         } catch (Exception e) {
             return -1;
+        }
+    }
+
+    public static float getBrightness(Activity activity) {
+        try {
+            float value = activity.getWindow().getAttributes().screenBrightness;
+            if (WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL >= value && value >= WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_OFF) return value;
+            return Settings.System.getFloat(activity.getContentResolver(), Settings.System.SCREEN_BRIGHTNESS) / 128;
+        } catch (Exception e) {
+            return 0.5f;
         }
     }
 }

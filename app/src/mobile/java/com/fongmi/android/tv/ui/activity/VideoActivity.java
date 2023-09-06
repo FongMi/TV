@@ -27,6 +27,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.media3.common.C;
+import androidx.media3.common.MediaMetadata;
 import androidx.media3.common.Player;
 import androidx.media3.ui.PlayerView;
 import androidx.recyclerview.widget.RecyclerView;
@@ -50,6 +51,7 @@ import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.cast.CastVideo;
 import com.fongmi.android.tv.databinding.ActivityVideoBinding;
 import com.fongmi.android.tv.db.AppDatabase;
+import com.fongmi.android.tv.event.ActionEvent;
 import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
@@ -59,7 +61,6 @@ import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.player.Source;
-import com.fongmi.android.tv.receiver.PiPReceiver;
 import com.fongmi.android.tv.service.PlaybackService;
 import com.fongmi.android.tv.ui.adapter.EpisodeAdapter;
 import com.fongmi.android.tv.ui.adapter.FlagAdapter;
@@ -101,7 +102,7 @@ import java.util.concurrent.Executors;
 
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class VideoActivity extends BaseActivity implements Clock.Callback, CustomKeyDownVod.Listener, CastDialog.Listener, PiPReceiver.Listener, TrackDialog.Listener, ControlDialog.Listener, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, QualityAdapter.OnClickListener, QuickAdapter.OnClickListener, ParseAdapter.OnClickListener, SubtitleCallback {
+public class VideoActivity extends BaseActivity implements Clock.Callback, CustomKeyDownVod.Listener, CastDialog.Listener, TrackDialog.Listener, ControlDialog.Listener, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, QualityAdapter.OnClickListener, QuickAdapter.OnClickListener, ParseAdapter.OnClickListener, SubtitleCallback {
 
     private ActivityVideoBinding mBinding;
     private ViewGroup.LayoutParams mFrameParams;
@@ -117,7 +118,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private ExecutorService mExecutor;
     private SiteViewModel mViewModel;
     private FlagAdapter mFlagAdapter;
-    private PiPReceiver mReceiver;
     private List<Dialog> mDialogs;
     private List<String> mBroken;
     private History mHistory;
@@ -258,6 +258,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+        if (intent.getStringExtra("key") == null) return;
         mBinding.swipeLayout.setRefreshing(true);
         getIntent().putExtras(intent);
         stopSearch();
@@ -271,7 +272,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mFrameParams = mBinding.video.getLayoutParams();
         mBinding.progressLayout.showProgress();
         mBinding.swipeLayout.setEnabled(false);
-        mReceiver = new PiPReceiver(this);
         mObserveDetail = this::setDetail;
         mObservePlayer = this::setPlayer;
         mObserveSearch = this::setSearch;
@@ -484,8 +484,10 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     private void getPlayer(Flag flag, Episode episode, boolean replay) {
         mBinding.control.title.setText(getString(R.string.detail_title, mBinding.name.getText(), episode.getName()));
+        mPlayers.setMetadata(new MediaMetadata.Builder().setTitle(mHistory.getVodName()).setArtist(episode.getName()).setArtworkUri(Uri.parse(mHistory.getVodPic())).build());
         mViewModel.playerContent(getKey(), flag.getFlag(), episode.getUrl());
         updateHistory(episode, replay);
+        ActionEvent.update();
         showProgress();
         hidePreview();
         setUrl(null);
@@ -918,7 +920,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private void setArtwork(String url) {
-        ImgUtil.load(url, R.drawable.radio, new CustomTarget() {
+        ImgUtil.load(url, R.drawable.radio, new CustomTarget<>() {
             @Override
             public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
                 getExo().setDefaultArtwork(resource);
@@ -987,6 +989,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private void checkPlayImg(boolean playing) {
         mBinding.control.play.setImageResource(playing ? androidx.media3.ui.R.drawable.exo_icon_pause : androidx.media3.ui.R.drawable.exo_icon_play);
         mPiP.update(this, playing);
+        ActionEvent.update();
     }
 
     private void checkLockImg() {
@@ -1019,6 +1022,19 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         if (mHistory.getEnding() > 0 && duration > 0 && mHistory.getEnding() + position >= duration) {
             mClock.setCallback(null);
             checkNext();
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onActionEvent(ActionEvent event) {
+        if (event.getType().equals(ActionEvent.PLAY) || event.getType().equals(ActionEvent.PAUSE)) {
+            mBinding.control.play.performClick();
+        } else if (event.getType().equals(ActionEvent.NEXT)) {
+            mBinding.control.next.performClick();
+        } else if (event.getType().equals(ActionEvent.PREV)) {
+            mBinding.control.prev.performClick();
+        } else if (event.getType().equals(ActionEvent.CANCEL)) {
+            finish();
         }
     }
 
@@ -1404,21 +1420,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     @Override
-    public void onControlPlay() {
-        mBinding.control.play.performClick();
-    }
-
-    @Override
-    public void onControlNext() {
-        mBinding.control.next.performClick();
-    }
-
-    @Override
-    public void onControlPrev() {
-        mBinding.control.prev.performClick();
-    }
-
-    @Override
     protected void onUserLeaveHint() {
         super.onUserLeaveHint();
         mPiP.enter(this, getScale() == 2);
@@ -1429,14 +1430,12 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode);
         if (isInPictureInPictureMode) {
-            mReceiver.register(this);
             enterFullscreen();
             setSubtitle(10);
             hideControl();
             hideSheet();
         } else {
             exitFullscreen();
-            mReceiver.unregister(this);
             if (isStop()) finish();
         }
     }
@@ -1458,25 +1457,29 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     @Override
     protected void onStart() {
         super.onStart();
+        if (Setting.isBackgroundOff()) mPlayers.play();
+        if (Setting.isBackgroundOff()) mClock.start();
         setStop(false);
-        if (PiP.isIn(this)) {
-            PlaybackService.stop();
-        } else {
-            mPlayers.play();
-            mClock.start();
-        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (Setting.isBackgroundOn()) PlaybackService.stop();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (Setting.isBackgroundOn()) PlaybackService.start(this, mPlayers);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        if (Setting.isBackgroundOff()) mPlayers.pause();
+        if (Setting.isBackgroundOff()) mClock.stop();
         setStop(true);
-        if (PiP.isIn(this)) {
-            PlaybackService.start();
-        } else {
-            mPlayers.pause();
-            mClock.stop();
-        }
     }
 
     @Override

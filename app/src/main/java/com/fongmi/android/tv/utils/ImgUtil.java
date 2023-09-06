@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
@@ -42,9 +43,9 @@ public class ImgUtil {
         else Glide.with(App.get()).load(getUrl(url)).error(error).dontAnimate().into(target);
     }
 
-    public static void load(String url, ImageView view, CustomTarget<Bitmap> target) {
-        if (TextUtils.isEmpty(url)) view.setImageResource(R.drawable.ic_img_error);
-        else Glide.with(App.get()).asBitmap().load(getUrl(url)).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).skipMemoryCache(true).dontAnimate().signature(new ObjectKey(url + "_" + Setting.getQuality())).into(target);
+    public static void load(Uri uri, int error, CustomTarget<Bitmap> target) {
+        if (uri == null || uri.toString().isEmpty()) target.onLoadFailed(ResUtil.getDrawable(error));
+        else Glide.with(App.get()).asBitmap().load(getUrl(uri.toString())).error(error).dontAnimate().into(target);
     }
 
     public static void load(String url, ImageView view, ImageView.ScaleType scaleType) {

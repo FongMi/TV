@@ -1,8 +1,10 @@
 package com.fongmi.android.tv.player;
 
+import android.support.v4.media.session.MediaSessionCompat;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
+import androidx.media3.common.MediaMetadata;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
 import androidx.media3.common.util.Util;
@@ -41,7 +43,9 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     public static final int SOFT = 0;
     public static final int HARD = 1;
 
+    private MediaSessionCompat session;
     private IjkVideoView ijkPlayer;
+    private MediaMetadata metadata;
     private StringBuilder builder;
     private Formatter formatter;
     private ExoPlayer exoPlayer;
@@ -74,6 +78,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         decode = Setting.getDecode();
         builder = new StringBuilder();
         runnable = ErrorEvent::timeout;
+        session = new MediaSessionCompat(App.get(), "TV");
         formatter = new Formatter(builder, Locale.getDefault());
         return this;
     }
@@ -106,6 +111,18 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     public IjkVideoView ijk() {
         return ijkPlayer;
+    }
+
+    public MediaSessionCompat getSession() {
+        return session;
+    }
+
+    public MediaMetadata getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(MediaMetadata metadata) {
+        this.metadata = metadata;
     }
 
     public int getPlayer() {
