@@ -1474,7 +1474,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     protected void onStart() {
         super.onStart();
         if (Setting.isBackgroundOff()) mPlayers.play();
-        if (Setting.isBackgroundOff()) mClock.start();
+        mClock.stop().start();
         setStop(false);
     }
 
