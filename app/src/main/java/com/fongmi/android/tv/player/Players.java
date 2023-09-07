@@ -128,7 +128,6 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     public void setMetadata(MediaMetadataCompat metadata) {
-        session.setMetadata(metadata);
         ActionEvent.update();
     }
 
