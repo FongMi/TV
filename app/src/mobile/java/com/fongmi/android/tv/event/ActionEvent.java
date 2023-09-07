@@ -30,4 +30,8 @@ public class ActionEvent {
     public String getAction() {
         return action;
     }
+
+    public boolean isUpdate() {
+        return UPDATE.equals(getAction());
+    }
 }

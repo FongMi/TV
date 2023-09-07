@@ -32,8 +32,8 @@ public class PiP {
     }
 
     @TargetApi(Build.VERSION_CODES.O)
-    private RemoteAction buildRemoteAction(Activity activity, @DrawableRes int icon, @StringRes int title, String type) {
-        return new RemoteAction(Icon.createWithResource(activity, icon), activity.getString(title), "", ActionReceiver.getPendingIntent(activity, type));
+    private RemoteAction buildRemoteAction(Activity activity, @DrawableRes int icon, @StringRes int title, String action) {
+        return new RemoteAction(Icon.createWithResource(activity, icon), activity.getString(title), "", ActionReceiver.getPendingIntent(activity, action));
     }
 
     private RemoteAction getPlayPauseAction(Activity activity, boolean play) {
