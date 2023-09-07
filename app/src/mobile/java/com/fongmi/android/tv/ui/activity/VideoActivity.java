@@ -934,6 +934,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
                 getIjk().setDefaultArtwork(error);
                 hideProgress();
                 hidePreview();
+                setMetadata();
             }
         });
     }

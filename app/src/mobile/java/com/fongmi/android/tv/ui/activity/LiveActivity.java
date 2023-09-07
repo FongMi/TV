@@ -491,6 +491,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
             public void onLoadFailed(@Nullable Drawable error) {
                 getExo().setDefaultArtwork(error);
                 getIjk().setDefaultArtwork(error);
+                setMetadata();
             }
         });
     }
@@ -698,8 +699,8 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
 
     private void setMetadata() {
         MediaMetadataCompat.Builder builder = new MediaMetadataCompat.Builder();
-        builder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, mChannel.getName());
-        builder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, mChannel.getData().getEpg());
+        builder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, mChannel == null ? "" : mChannel.getName());
+        builder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, mChannel == null ? "" : mChannel.getData().getEpg());
         builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, getIjk().getDefaultArtwork());
         builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, mPlayers.getDuration());
         mPlayers.setMetadata(builder.build());

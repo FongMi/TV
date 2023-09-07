@@ -49,7 +49,6 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     public static final int SOFT = 0;
     public static final int HARD = 1;
 
-    private MediaMetadataCompat metadata;
     private MediaSessionCompat session;
     private IjkVideoView ijkPlayer;
     private StringBuilder builder;
@@ -129,7 +128,6 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     public void setMetadata(MediaMetadataCompat metadata) {
-        this.metadata = metadata;
         session.setMetadata(metadata);
         ActionEvent.update();
     }

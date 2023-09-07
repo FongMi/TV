@@ -27,10 +27,6 @@ public class PiP {
 
     private PictureInPictureParams.Builder builder;
 
-    public static boolean isIn(Activity activity) {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && activity.isInPictureInPictureMode();
-    }
-
     private boolean noPiP() {
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.O || !App.get().getPackageManager().hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE) || !Setting.isBackgroundPiP();
     }
