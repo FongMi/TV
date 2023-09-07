@@ -136,6 +136,7 @@
             android:foregroundServiceType="mediaPlayback">
             <intent-filter>
                 <action android:name="androidx.media3.session.MediaSessionService" />
+                <action android:name="android.media.browse.MediaBrowserService" />
             </intent-filter>
         </service>
 
@@ -143,11 +144,11 @@
             android:name=".receiver.ActionReceiver"
             android:exported="false">
             <intent-filter>
-                <action android:name="${applicationId}.PREV" />
-                <action android:name="${applicationId}.NEXT" />
-                <action android:name="${applicationId}.PLAY" />
-                <action android:name="${applicationId}.PAUSE" />
-                <action android:name="${applicationId}.CANCEL" />
+                <action android:name="${applicationId}.stop" />
+                <action android:name="${applicationId}.prev" />
+                <action android:name="${applicationId}.next" />
+                <action android:name="${applicationId}.play" />
+                <action android:name="${applicationId}.pause" />
             </intent-filter>
         </receiver>
 

@@ -1,17 +1,19 @@
 package com.fongmi.android.tv.event;
 
+import com.fongmi.android.tv.BuildConfig;
+
 import org.greenrobot.eventbus.EventBus;
 
 public class ActionEvent {
 
-    public static String PREV = "PREV";
-    public static String NEXT = "NEXT";
-    public static String PLAY = "PLAY";
-    public static String PAUSE = "PAUSE";
-    public static String UPDATE = "UPDATE";
-    public static String CANCEL = "CANCEL";
+    public static String STOP = BuildConfig.APPLICATION_ID.concat(".stop");
+    public static String PREV = BuildConfig.APPLICATION_ID.concat(".prev");
+    public static String NEXT = BuildConfig.APPLICATION_ID.concat(".next");
+    public static String PLAY = BuildConfig.APPLICATION_ID.concat(".play");
+    public static String PAUSE = BuildConfig.APPLICATION_ID.concat(".pause");
+    public static String UPDATE = BuildConfig.APPLICATION_ID.concat(".update");
 
-    private String type;
+    private final String action;
 
     public static void send(String action) {
         EventBus.getDefault().post(new ActionEvent(action));
@@ -21,11 +23,11 @@ public class ActionEvent {
         EventBus.getDefault().post(new ActionEvent(UPDATE));
     }
 
-    public ActionEvent(String type) {
-        this.type = type;
+    public ActionEvent(String action) {
+        this.action = action;
     }
 
-    public String getType() {
-        return type;
+    public String getAction() {
+        return action;
     }
 }

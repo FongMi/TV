@@ -1028,13 +1028,13 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onActionEvent(ActionEvent event) {
-        if (event.getType().equals(ActionEvent.PLAY) || event.getType().equals(ActionEvent.PAUSE)) {
+        if (ActionEvent.PLAY.equals(event.getAction()) || ActionEvent.PAUSE.equals(event.getAction())) {
             mBinding.control.play.performClick();
-        } else if (event.getType().equals(ActionEvent.NEXT)) {
+        } else if (ActionEvent.NEXT.equals(event.getAction())) {
             mBinding.control.next.performClick();
-        } else if (event.getType().equals(ActionEvent.PREV)) {
+        } else if (ActionEvent.PREV.equals(event.getAction())) {
             mBinding.control.prev.performClick();
-        } else if (event.getType().equals(ActionEvent.CANCEL)) {
+        } else if (ActionEvent.STOP.equals(event.getAction())) {
             finish();
         }
     }
