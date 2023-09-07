@@ -698,9 +698,11 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private void setMetadata() {
+        String title = mChannel == null ? "" : mChannel.getName();
+        String artist = mChannel == null ? "" : mChannel.getData().getEpg();
         MediaMetadataCompat.Builder builder = new MediaMetadataCompat.Builder();
-        builder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, mChannel == null ? "" : mChannel.getName());
-        builder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, mChannel == null ? "" : mChannel.getData().getEpg());
+        builder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, title);
+        builder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, artist);
         builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, getIjk().getDefaultArtwork());
         builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, mPlayers.getDuration());
         mPlayers.setMetadata(builder.build());

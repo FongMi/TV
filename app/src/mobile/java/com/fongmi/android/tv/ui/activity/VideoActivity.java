@@ -720,8 +720,8 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     private void onReset(boolean replay) {
         mClock.setCallback(null);
-        if (mFlagAdapter.getItemCount() == 0) return;
-        if (mEpisodeAdapter.getItemCount() == 0) return;
+        if (mFlagAdapter.isEmpty()) return;
+        if (mEpisodeAdapter.isEmpty()) return;
         getPlayer(getFlag(), getEpisode(), replay);
     }
 
@@ -1108,9 +1108,12 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private void setMetadata() {
+        String title = mHistory == null ? getName() : mHistory.getVodName();
+        String artist = mEpisodeAdapter.isEmpty() ? "" : getEpisode().getName();
+        artist = title.equals(artist) ? "" : getString(R.string.play_now, artist);
         MediaMetadataCompat.Builder builder = new MediaMetadataCompat.Builder();
-        builder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, mHistory == null ? getName() : mHistory.getVodName());
-        builder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, mEpisodeAdapter.getItemCount() == 0 ? "" : getString(R.string.play_now, getEpisode().getName()));
+        builder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, title);
+        builder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, artist);
         builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, getIjk().getDefaultArtwork());
         builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, mPlayers.getDuration());
         mPlayers.setMetadata(builder.build());
@@ -1162,7 +1165,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private void initParse() {
-        if (mParseAdapter.getItemCount() == 0) return;
+        if (mParseAdapter.isEmpty()) return;
         setParse(mParseAdapter.first());
     }
 
@@ -1173,7 +1176,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private void checkSearch(boolean force) {
-        if (mQuickAdapter.getItemCount() == 0) initSearch(mBinding.name.getText().toString(), true);
+        if (mQuickAdapter.isEmpty()) initSearch(mBinding.name.getText().toString(), true);
         else if (isAutoMode() || force) nextSite();
     }
 
@@ -1242,7 +1245,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private void nextSite() {
-        if (mQuickAdapter.getItemCount() == 0) return;
+        if (mQuickAdapter.isEmpty()) return;
         Vod item = mQuickAdapter.get(0);
         Notify.show(getString(R.string.play_switch_site, item.getSiteName()));
         mQuickAdapter.remove(0);
