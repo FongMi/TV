@@ -579,7 +579,6 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         if (mChannel == null) return;
         LiveConfig.get().setKeep(mChannel);
         mViewModel.fetch(mChannel);
-        ActionEvent.update();
         showProgress();
         setUrl(null);
     }
