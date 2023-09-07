@@ -262,7 +262,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mKeyDown = CustomKeyDownVod.create(this, mBinding.video);
         mFrameParams = mBinding.video.getLayoutParams();
         mClock = Clock.create(mBinding.widget.time);
-        mPlayers = new Players().init();
+        mPlayers = new Players().init(this);
         mBroken = new ArrayList<>();
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
@@ -861,7 +861,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void setArtwork(String url) {
-        ImgUtil.load(url, R.drawable.radio, new CustomTarget() {
+        ImgUtil.load(url, R.drawable.radio, new CustomTarget<>() {
             @Override
             public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
                 getExo().setDefaultArtwork(resource);

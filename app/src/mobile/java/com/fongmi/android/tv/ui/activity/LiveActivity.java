@@ -706,6 +706,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, getIjk().getDefaultArtwork());
         builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, mPlayers.getDuration());
         mPlayers.setMetadata(builder.build());
+        ActionEvent.update();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

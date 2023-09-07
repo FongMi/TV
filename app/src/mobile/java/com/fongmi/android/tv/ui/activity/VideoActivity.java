@@ -1117,6 +1117,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, getIjk().getDefaultArtwork());
         builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, mPlayers.getDuration());
         mPlayers.setMetadata(builder.build());
+        ActionEvent.update();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
