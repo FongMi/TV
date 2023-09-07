@@ -5,21 +5,23 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
-import android.net.Uri;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.media.MediaMetadataCompat;
 import android.view.View;
 
 import androidx.annotation.Dimension;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ShareCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.media3.common.C;
-import androidx.media3.common.MediaMetadata;
 import androidx.media3.common.Player;
 import androidx.media3.ui.PlayerView;
 import androidx.viewbinding.ViewBinding;
 
+import com.bumptech.glide.request.transition.Transition;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
@@ -37,6 +39,7 @@ import com.fongmi.android.tv.event.ActionEvent;
 import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.impl.Callback;
+import com.fongmi.android.tv.impl.CustomTarget;
 import com.fongmi.android.tv.impl.LiveCallback;
 import com.fongmi.android.tv.impl.PassCallback;
 import com.fongmi.android.tv.impl.SubtitleCallback;
@@ -56,6 +59,7 @@ import com.fongmi.android.tv.ui.custom.dialog.SubtitleDialog;
 import com.fongmi.android.tv.ui.custom.dialog.TrackDialog;
 import com.fongmi.android.tv.utils.Biometric;
 import com.fongmi.android.tv.utils.Clock;
+import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.PiP;
 import com.fongmi.android.tv.utils.ResUtil;
@@ -447,7 +451,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
 
     private void showEpg() {
         mBinding.widget.play.setText(mChannel.getData().getEpg());
-        mPlayers.setMetadata(new MediaMetadata.Builder().setTitle(mChannel.getName()).setArtist(mChannel.getData().getEpg()).setArtworkUri(Uri.parse(mChannel.getLogo())).build());
+        setMetadata();
     }
 
     private void setTraffic() {
@@ -474,6 +478,23 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         this.passCount = 0;
     }
 
+    private void setArtwork(String url) {
+        ImgUtil.load(url, R.drawable.radio, new CustomTarget<>() {
+            @Override
+            public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                getExo().setDefaultArtwork(resource);
+                getIjk().setDefaultArtwork(resource);
+                setMetadata();
+            }
+
+            @Override
+            public void onLoadFailed(@Nullable Drawable error) {
+                getExo().setDefaultArtwork(error);
+                getIjk().setDefaultArtwork(error);
+            }
+        });
+    }
+
     @Override
     public void onItemClick(Group item) {
         mGroupAdapter.setSelected(mGroup = item);
@@ -490,6 +511,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     public void onItemClick(Channel item) {
         mGroup.setPosition(mChannelAdapter.setSelected(item.group(mGroup)));
         mPlayers.setPlayer(getPlayerType(item.getPlayerType()));
+        setArtwork(item.getLogo());
         mChannel = item;
         setPlayerView();
         showInfo();
@@ -642,6 +664,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
                 break;
             case Player.STATE_READY:
                 checkRotate();
+                setMetadata();
                 resetToggle();
                 hideProgress();
                 mPlayers.reset();
@@ -672,6 +695,15 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mBinding.control.action.text.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_TEXT) ? View.VISIBLE : View.GONE);
         mBinding.control.action.audio.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_AUDIO) ? View.VISIBLE : View.GONE);
         mBinding.control.action.video.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_VIDEO) ? View.VISIBLE : View.GONE);
+    }
+
+    private void setMetadata() {
+        MediaMetadataCompat.Builder builder = new MediaMetadataCompat.Builder();
+        builder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, mChannel.getName());
+        builder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, mChannel.getData().getEpg());
+        builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, getIjk().getDefaultArtwork());
+        builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, mPlayers.getDuration());
+        mPlayers.setMetadata(builder.build());
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

@@ -10,6 +10,7 @@ import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.media.MediaMetadataCompat;
 import android.text.Html;
 import android.text.TextUtils;
 import android.view.MotionEvent;
@@ -27,7 +28,6 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.media3.common.C;
-import androidx.media3.common.MediaMetadata;
 import androidx.media3.common.Player;
 import androidx.media3.ui.PlayerView;
 import androidx.recyclerview.widget.RecyclerView;
@@ -484,11 +484,10 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     private void getPlayer(Flag flag, Episode episode, boolean replay) {
         mBinding.control.title.setText(getString(R.string.detail_title, mBinding.name.getText(), episode.getName()));
-        mPlayers.setMetadata(new MediaMetadata.Builder().setTitle(mHistory.getVodName()).setArtist(episode.getName()).setArtworkUri(Uri.parse(mHistory.getVodPic())).build());
         mViewModel.playerContent(getKey(), flag.getFlag(), episode.getUrl());
         updateHistory(episode, replay);
-        ActionEvent.update();
         showProgress();
+        setMetadata();
         hidePreview();
         setUrl(null);
     }
@@ -926,6 +925,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
                 getExo().setDefaultArtwork(resource);
                 getIjk().setDefaultArtwork(resource);
                 showPreview(resource);
+                setMetadata();
             }
 
             @Override
@@ -1056,6 +1056,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
             case Player.STATE_READY:
                 stopSearch();
                 checkRotate();
+                setMetadata();
                 resetToggle();
                 hideProgress();
                 mPlayers.reset();
@@ -1103,6 +1104,15 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
             setInitTrack(false);
             mPlayers.setTrack(Track.find(getHistoryKey()));
         }
+    }
+
+    private void setMetadata() {
+        MediaMetadataCompat.Builder builder = new MediaMetadataCompat.Builder();
+        builder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, mHistory == null ? getName() : mHistory.getVodName());
+        builder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, mEpisodeAdapter.getItemCount() == 0 ? "" : getString(R.string.play_now, getEpisode().getName()));
+        builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, getIjk().getDefaultArtwork());
+        builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, mPlayers.getDuration());
+        mPlayers.setMetadata(builder.build());
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

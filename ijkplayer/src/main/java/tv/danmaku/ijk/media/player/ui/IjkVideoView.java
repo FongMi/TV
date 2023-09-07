@@ -2,6 +2,8 @@ package tv.danmaku.ijk.media.player.ui;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -415,6 +417,10 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         }
     }
 
+    public Bitmap getDefaultArtwork() {
+        return ((BitmapDrawable) mDefaultArtwork).getBitmap();
+    }
+
     private void updateForCurrentTrackSelections() {
         if (mPlayer == null || mPlayer.getTrackInfo().isEmpty()) return;
         int select = getSelectedTrack(ITrackInfo.MEDIA_TRACK_TYPE_VIDEO);
@@ -524,11 +530,13 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     @Override
     public void onBufferingUpdate(IMediaPlayer mp, int percent) {
+        mListener.onBufferingUpdate(mp, percent);
         mCurrentBufferPercentage = percent;
     }
 
     @Override
     public void onBufferingUpdate(IMediaPlayer mp, long position) {
+        mListener.onBufferingUpdate(mp, position);
         mCurrentBufferPosition = position;
     }
 

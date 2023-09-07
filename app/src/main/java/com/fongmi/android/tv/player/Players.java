@@ -3,11 +3,12 @@ package com.fongmi.android.tv.player;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
-import androidx.media3.common.MediaMetadata;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
 import androidx.media3.common.util.Util;
@@ -22,6 +23,7 @@ import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Track;
+import com.fongmi.android.tv.event.ActionEvent;
 import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.impl.ParseCallback;
@@ -47,9 +49,9 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     public static final int SOFT = 0;
     public static final int HARD = 1;
 
+    private MediaMetadataCompat metadata;
     private MediaSessionCompat session;
     private IjkVideoView ijkPlayer;
-    private MediaMetadata metadata;
     private StringBuilder builder;
     private Formatter formatter;
     private ExoPlayer exoPlayer;
@@ -90,7 +92,6 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     private void createSession(Activity activity) {
         session = new MediaSessionCompat(activity, "TV");
         session.setSessionActivity(PendingIntent.getActivity(activity, 0, new Intent(activity, activity.getClass()), Utils.getPendingFlag()));
-        session.setActive(true);
     }
 
     public void set(PlayerView exo, IjkVideoView ijk) {
@@ -127,12 +128,10 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         return session;
     }
 
-    public MediaMetadata getMetadata() {
-        return metadata;
-    }
-
-    public void setMetadata(MediaMetadata metadata) {
+    public void setMetadata(MediaMetadataCompat metadata) {
         this.metadata = metadata;
+        session.setMetadata(metadata);
+        ActionEvent.update();
     }
 
     public int getPlayer() {
@@ -279,21 +278,25 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     public void play() {
         if (isExo()) exoPlayer.play();
         else if (isIjk()) ijkPlayer.start();
+        session.setActive(true);
     }
 
     public void pause() {
         if (isExo()) pauseExo();
         else if (isIjk()) pauseIjk();
+        session.setActive(false);
     }
 
     public void stop() {
         reset();
         if (isExo()) stopExo();
         else if (isIjk()) stopIjk();
+        session.setActive(false);
     }
 
     public void release() {
         stopParse();
+        session.release();
         if (isExo()) releaseExo();
         else if (isIjk()) releaseIjk();
     }
@@ -448,6 +451,16 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     @Override
     public void onParseError() {
         ErrorEvent.parse();
+    }
+
+    @Override
+    public void onEvents(@NonNull Player player, @NonNull Player.Events events) {
+        session.setPlaybackState(new PlaybackStateCompat.Builder().setState(isPlaying() ? PlaybackStateCompat.STATE_PLAYING : PlaybackStateCompat.STATE_PAUSED, getPosition(), getSpeed()).build());
+    }
+
+    @Override
+    public void onBufferingUpdate(IMediaPlayer mp, int percent) {
+        session.setPlaybackState(new PlaybackStateCompat.Builder().setState(isPlaying() ? PlaybackStateCompat.STATE_PLAYING : PlaybackStateCompat.STATE_PAUSED, getPosition(), getSpeed()).build());
     }
 
     @Override

@@ -10,7 +10,6 @@
     <!-- Live -->
     <string name="live_pass">密碼</string>
     <string name="live_group">未分類</string>
-    <string name="live_epg_now">正在播放：<xliff:g name="name">%s</xliff:g></string>
     <string name="live_line">來源 <xliff:g name="name">%s</xliff:g></string>
 
     <!-- Detail -->
@@ -47,6 +46,7 @@
     <string name="play_track_video">視軌</string>
     <string name="play_forward_hint">已切換正序播放</string>
     <string name="play_backward_hint">已切換倒序播放</string>
+    <string name="play_now">正在播放：<xliff:g name="name">%s</xliff:g></string>
     <string name="play_ready">準備播放：<xliff:g name="name">%s</xliff:g></string>
     <string name="play_switch_parse">正在切换解析至「<xliff:g name="name">%s</xliff:g>」</string>
     <string name="play_switch_flag">正在切換線路至「<xliff:g name="name">%s</xliff:g>」</string>
