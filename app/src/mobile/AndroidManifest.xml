@@ -127,17 +127,5 @@
             android:exported="false"
             android:foregroundServiceType="mediaPlayback" />
 
-        <receiver
-            android:name=".receiver.ActionReceiver"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="${applicationId}.stop" />
-                <action android:name="${applicationId}.prev" />
-                <action android:name="${applicationId}.next" />
-                <action android:name="${applicationId}.play" />
-                <action android:name="${applicationId}.pause" />
-            </intent-filter>
-        </receiver>
-
     </application>
 </manifest>
