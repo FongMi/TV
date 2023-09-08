@@ -3,12 +3,14 @@ package com.fongmi.android.tv.player;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.os.PowerManager;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
+import androidx.media3.common.C;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
 import androidx.media3.common.util.Util;
@@ -90,7 +92,13 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     private void createSession(Activity activity) {
         session = new MediaSessionCompat(activity, "TV");
-        session.setSessionActivity(PendingIntent.getActivity(activity, 0, new Intent(activity, activity.getClass()), Utils.getPendingFlag()));
+        session.setSessionActivity(PendingIntent.getActivity(App.get(), 99, new Intent(App.get(), activity.getClass()), Utils.getPendingFlag()));
+        session.setCallback(new MediaSessionCompat.Callback() {
+            @Override
+            public void onSeekTo(long pos) {
+                seekTo(pos, true);
+            }
+        });
     }
 
     public void set(PlayerView exo, IjkVideoView ijk) {
@@ -165,19 +173,27 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     public float getSpeed() {
-        return isExo() ? exoPlayer.getPlaybackParameters().speed : ijkPlayer.getSpeed();
+        if (isExo() && exoPlayer != null) return exoPlayer.getPlaybackParameters().speed;
+        if (isIjk() && ijkPlayer != null) return ijkPlayer.getSpeed();
+        return 1.0f;
     }
 
     public long getPosition() {
-        return isExo() ? exoPlayer.getCurrentPosition() : ijkPlayer.getCurrentPosition();
+        if (isExo() && exoPlayer != null) return exoPlayer.getCurrentPosition();
+        if (isIjk() && ijkPlayer != null) return ijkPlayer.getCurrentPosition();
+        return 0;
     }
 
     public long getDuration() {
-        return isExo() ? exoPlayer.getDuration() : ijkPlayer.getDuration();
+        if (isExo() && exoPlayer != null) return exoPlayer.getDuration();
+        if (isIjk() && ijkPlayer != null) return ijkPlayer.getDuration();
+        return -1;
     }
 
     public long getBuffered() {
-        return isExo() ? exoPlayer.getBufferedPosition() : ijkPlayer.getBufferedPosition();
+        if (isExo() && exoPlayer != null) return exoPlayer.getBufferedPosition();
+        if (isIjk() && ijkPlayer != null) return ijkPlayer.getBufferedPosition();
+        return 0;
     }
 
     public boolean isPlaying() {
@@ -262,26 +278,32 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     public void seekTo(int time) {
-        if (isExo()) exoPlayer.seekTo(getPosition() + time);
-        else if (isIjk()) ijkPlayer.seekTo(getPosition() + time);
+        if (isExo() && exoPlayer != null) exoPlayer.seekTo(getPosition() + time);
+        if (isIjk() && ijkPlayer != null) ijkPlayer.seekTo(getPosition() + time);
     }
 
     public void seekTo(long time, boolean force) {
         if (time == 0 && !force) return;
-        if (isExo()) exoPlayer.seekTo(time);
-        else if (isIjk()) ijkPlayer.seekTo(time);
+        if (isExo() && exoPlayer != null) exoPlayer.seekTo(time);
+        if (isIjk() && ijkPlayer != null) ijkPlayer.seekTo(time);
+    }
+
+    public void setWake(boolean wake) {
+        if (isExo() && exoPlayer != null) exoPlayer.setWakeMode(wake ? C.WAKE_MODE_NETWORK : C.WAKE_MODE_NONE);
+        if (isIjk() && ijkPlayer != null) ijkPlayer.setWakeMode(wake ? PowerManager.PARTIAL_WAKE_LOCK : PowerManager.ON_AFTER_RELEASE);
     }
 
     public void play() {
+        session.setActive(true);
         if (isExo()) exoPlayer.play();
         else if (isIjk()) ijkPlayer.start();
-        session.setActive(true);
+        setPlaybackState(PlaybackStateCompat.STATE_PLAYING);
     }
 
     public void pause() {
         if (isExo()) pauseExo();
         else if (isIjk()) pauseIjk();
-        session.setActive(false);
+        setPlaybackState(PlaybackStateCompat.STATE_PAUSED);
     }
 
     public void stop() {
@@ -289,6 +311,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         if (isExo()) stopExo();
         else if (isIjk()) stopIjk();
         session.setActive(false);
+        setPlaybackState(PlaybackStateCompat.STATE_STOPPED);
     }
 
     public void release() {
@@ -438,6 +461,10 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         }
     }
 
+    private void setPlaybackState(int state) {
+        session.setPlaybackState(new PlaybackStateCompat.Builder().setState(state, getPosition(), getSpeed()).build());
+    }
+
     @Override
     public void onParseSuccess(Map<String, String> headers, String url, String from) {
         setMediaSource(headers, url);
@@ -452,16 +479,17 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     @Override
     public void onEvents(@NonNull Player player, @NonNull Player.Events events) {
-        session.setPlaybackState(new PlaybackStateCompat.Builder().setState(isPlaying() ? PlaybackStateCompat.STATE_PLAYING : PlaybackStateCompat.STATE_PAUSED, getPosition(), getSpeed()).build());
+        setPlaybackState(isPlaying() ? PlaybackStateCompat.STATE_PLAYING : PlaybackStateCompat.STATE_PAUSED);
     }
 
     @Override
     public void onBufferingUpdate(IMediaPlayer mp, int percent) {
-        session.setPlaybackState(new PlaybackStateCompat.Builder().setState(isPlaying() ? PlaybackStateCompat.STATE_PLAYING : PlaybackStateCompat.STATE_PAUSED, getPosition(), getSpeed()).build());
+        setPlaybackState(isPlaying() ? PlaybackStateCompat.STATE_PLAYING : PlaybackStateCompat.STATE_PAUSED);
     }
 
     @Override
     public void onPlayerError(@NonNull PlaybackException error) {
+        setPlaybackState(PlaybackStateCompat.STATE_ERROR);
         this.errorCode = error.errorCode;
         ErrorEvent.format(2);
     }
@@ -496,6 +524,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     @Override
     public boolean onError(IMediaPlayer mp, int what, int extra) {
+        setPlaybackState(PlaybackStateCompat.STATE_ERROR);
         ErrorEvent.format(1);
         return true;
     }
