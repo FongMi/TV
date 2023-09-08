@@ -207,7 +207,7 @@ public class Setting {
     }
 
     public static int getBackground() {
-        return Prefers.getInt("background");
+        return Prefers.getInt("background", 2);
     }
 
     public static void putBackground(int background) {

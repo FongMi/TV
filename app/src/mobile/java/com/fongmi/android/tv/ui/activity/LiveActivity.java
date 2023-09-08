@@ -15,12 +15,14 @@ import androidx.annotation.Dimension;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ShareCompat;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.media3.common.C;
 import androidx.media3.common.Player;
 import androidx.media3.ui.PlayerView;
 import androidx.viewbinding.ViewBinding;
 
+import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
@@ -39,7 +41,6 @@ import com.fongmi.android.tv.event.ActionEvent;
 import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.impl.Callback;
-import com.fongmi.android.tv.impl.CustomTarget;
 import com.fongmi.android.tv.impl.LiveCallback;
 import com.fongmi.android.tv.impl.PassCallback;
 import com.fongmi.android.tv.impl.SubtitleCallback;
@@ -85,6 +86,7 @@ import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 public class LiveActivity extends BaseActivity implements CustomKeyDownLive.Listener, CastDialog.Listener, TrackDialog.Listener, Biometric.Callback, PassCallback, LiveCallback, GroupAdapter.OnClickListener, ChannelAdapter.OnClickListener, SubtitleCallback {
 
     private ActivityLiveBinding mBinding;
+    private Observer<Channel> mObserveChannel;
     private ChannelAdapter mChannelAdapter;
     private SimpleDateFormat mFormatDate;
     private SimpleDateFormat mFormatTime;
@@ -154,6 +156,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mKeyDown = CustomKeyDownLive.create(this, mBinding.video);
         mClock = Clock.create(mBinding.widget.time);
         mPlayers = new Players().init(this);
+        mObserveChannel = this::start;
         mHides = new ArrayList<>();
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
@@ -235,7 +238,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
 
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(LiveViewModel.class);
-        mViewModel.channel.observe(this, result -> mPlayers.start(result, getHome().getTimeout()));
+        mViewModel.channel.observeForever(mObserveChannel);
         mViewModel.live.observe(this, live -> {
             hideProgress();
             setGroup(live);
@@ -493,6 +496,10 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
                 getIjk().setDefaultArtwork(error);
                 setMetadata();
             }
+
+            @Override
+            public void onLoadCleared(@Nullable Drawable placeholder) {
+            }
         });
     }
 
@@ -582,6 +589,10 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mViewModel.fetch(mChannel);
         showProgress();
         setUrl(null);
+    }
+
+    private void start(Channel result) {
+        mPlayers.start(result, getHome().getTimeout());
     }
 
     private void checkPlayImg(boolean playing) {
@@ -999,5 +1010,6 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         Source.get().stop();
         PlaybackService.stop();
         App.removeCallbacks(mR1, mR2, mR3);
+        mViewModel.channel.removeObserver(mObserveChannel);
     }
 }

@@ -28,6 +28,7 @@ import androidx.media3.ui.PlayerView;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
+import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
@@ -50,7 +51,6 @@ import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.impl.Callback;
-import com.fongmi.android.tv.impl.CustomTarget;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
@@ -876,6 +876,10 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
                 hideProgress();
                 hidePreview();
             }
+
+            @Override
+            public void onLoadCleared(@Nullable Drawable placeholder) {
+            }
         });
     }
 
@@ -1102,7 +1106,6 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     private boolean isPass(Site item) {
         if (isAutoMode() && !item.isChangeable()) return false;
-        if (isAutoMode() && item.getKey().equals(getKey())) return false;
         return item.isSearchable();
     }
 
