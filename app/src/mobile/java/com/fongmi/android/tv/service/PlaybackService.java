@@ -6,26 +6,21 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.os.IBinder;
-import android.text.TextUtils;
+import android.support.v4.media.MediaMetadataCompat;
 
 import androidx.annotation.DrawableRes;
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.media.app.NotificationCompat.MediaStyle;
 
-import com.bumptech.glide.request.transition.Transition;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.event.ActionEvent;
-import com.fongmi.android.tv.impl.CustomTarget;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.receiver.ActionReceiver;
-import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.Notify;
 
 import org.greenrobot.eventbus.EventBus;
@@ -36,7 +31,6 @@ public class PlaybackService extends Service {
 
     private static Players players;
     private final int ID = 9527;
-    private Bitmap bitmap;
 
     public static void start(Players players) {
         ContextCompat.startForegroundService(App.get(), new Intent(App.get(), PlaybackService.class));
@@ -47,8 +41,12 @@ public class PlaybackService extends Service {
         App.get().stopService(new Intent(App.get(), PlaybackService.class));
     }
 
-    private NotificationCompat.Action buildNotificationAction(@DrawableRes int icon, @StringRes int title, String type) {
-        return new NotificationCompat.Action.Builder(icon, getString(title), ActionReceiver.getPendingIntent(this, type)).setContextual(false).setShowsUserInterface(false).build();
+    private NotificationManager getManager() {
+        return (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+    }
+
+    private NotificationCompat.Action buildNotificationAction(@DrawableRes int icon, @StringRes int title, String action) {
+        return new NotificationCompat.Action(icon, getString(title), ActionReceiver.getPendingIntent(this, action));
     }
 
     private NotificationCompat.Action getPlayPauseAction() {
@@ -56,80 +54,65 @@ public class PlaybackService extends Service {
         return buildNotificationAction(androidx.media3.ui.R.drawable.exo_icon_play, androidx.media3.ui.R.string.exo_controls_play_description, ActionEvent.PLAY);
     }
 
-    private void setLargeIcon(NotificationCompat.Builder builder) {
-        Bitmap b1 = Bitmap.createScaledBitmap(bitmap, 16, 16, true);
+    private MediaMetadataCompat getMetadata() {
+        return players.getSession().getController().getMetadata();
+    }
+
+    private String getTitle() {
+        return getMetadata() == null || getMetadata().getString(MediaMetadataCompat.METADATA_KEY_TITLE).isEmpty() ? null : getMetadata().getString(MediaMetadataCompat.METADATA_KEY_TITLE);
+    }
+
+    private String getArtist() {
+        return getMetadata() == null || getMetadata().getString(MediaMetadataCompat.METADATA_KEY_ARTIST).isEmpty() ? null : getMetadata().getString(MediaMetadataCompat.METADATA_KEY_ARTIST);
+    }
+
+    private Bitmap getArt() {
+        return getMetadata() == null ? null : getMetadata().getBitmap(MediaMetadataCompat.METADATA_KEY_ART);
+    }
+
+    private void setLargeIcon(NotificationCompat.Builder builder, Bitmap art) {
+        Bitmap b1 = Bitmap.createScaledBitmap(art, 16, 16, true);
         Bitmap b2 = Bitmap.createScaledBitmap(b1, 1, 1, true);
         builder.setColor(b2.getPixel(0, 0));
-        builder.setLargeIcon(bitmap);
+        builder.setLargeIcon(art);
         b2.recycle();
         b1.recycle();
     }
 
-    private CharSequence getTitle() {
-        if (players.getMetadata() == null || TextUtils.isEmpty(players.getMetadata().title)) return null;
-        return players.getMetadata().title;
+    private void setAction(NotificationCompat.Builder builder) {
+        builder.addAction(buildNotificationAction(androidx.media3.ui.R.drawable.exo_icon_previous, androidx.media3.ui.R.string.exo_controls_previous_description, ActionEvent.PREV));
+        builder.addAction(getPlayPauseAction());
+        builder.addAction(buildNotificationAction(androidx.media3.ui.R.drawable.exo_icon_next, androidx.media3.ui.R.string.exo_controls_next_description, ActionEvent.NEXT));
     }
 
-    private String getText() {
-        if (players.getMetadata() == null || TextUtils.isEmpty(players.getMetadata().artist)) return null;
-        if (players.getMetadata().artist.equals(players.getMetadata().title)) return null;
-        return getString(R.string.live_epg_now, players.getMetadata().artist);
+    private void setStyle(NotificationCompat.Builder builder) {
+        MediaStyle style = new MediaStyle();
+        style.setShowCancelButton(true);
+        style.setCancelButtonIntent(ActionReceiver.getPendingIntent(this, ActionEvent.STOP));
+        builder.setStyle(style);
     }
 
     private Notification buildNotification() {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, Notify.DEFAULT);
-        builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
-        builder.setPriority(NotificationCompat.PRIORITY_LOW);
-        builder.setSmallIcon(R.drawable.ic_logo);
-        builder.setContentIntent(players.getSession().getController().getSessionActivity());
-        builder.setContentTitle(getTitle());
-        builder.setContentText(getText());
+        setStyle(builder);
+        setAction(builder);
+        Bitmap art = getArt();
         builder.setOngoing(false);
         builder.setColorized(true);
         builder.setOnlyAlertOnce(true);
-        builder.addAction(buildNotificationAction(androidx.media3.ui.R.drawable.exo_icon_previous, androidx.media3.ui.R.string.exo_controls_previous_description, ActionEvent.PREV));
-        builder.addAction(getPlayPauseAction());
-        builder.addAction(buildNotificationAction(androidx.media3.ui.R.drawable.exo_icon_next, androidx.media3.ui.R.string.exo_controls_next_description, ActionEvent.NEXT));
-        MediaStyle mediaStyle = new MediaStyle();
-        mediaStyle.setShowActionsInCompactView(0, 2);
-        mediaStyle.setShowCancelButton(true);
-        mediaStyle.setMediaSession(players.getSession().getSessionToken());
-        mediaStyle.setCancelButtonIntent(ActionReceiver.getPendingIntent(this, ActionEvent.CANCEL));
-        builder.setDeleteIntent(ActionReceiver.getPendingIntent(this, ActionEvent.CANCEL));
-        if (bitmap != null) setLargeIcon(builder);
-        builder.setStyle(mediaStyle);
+        builder.setContentText(getArtist());
+        builder.setContentTitle(getTitle());
+        builder.setSmallIcon(R.drawable.ic_logo);
+        if (art != null) setLargeIcon(builder, art);
+        builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+        builder.setDeleteIntent(ActionReceiver.getPendingIntent(this, ActionEvent.STOP));
+        builder.setContentIntent(players.getSession().getController().getSessionActivity());
         return builder.build();
-    }
-
-    private void setNotification() {
-        NotificationManager notifyMgr = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
-        notifyMgr.notify(ID, buildNotification());
-    }
-
-    private void setArtwork() {
-        ImgUtil.load(players.getMetadata().artworkUri, R.drawable.ic_img_error, new CustomTarget<>() {
-            @Override
-            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                bitmap = resource;
-                setNotification();
-            }
-
-            @Override
-            public void onLoadFailed(@Nullable Drawable errorDrawable) {
-                bitmap = null;
-                setNotification();
-            }
-        });
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onActionEvent(ActionEvent event) {
-        if (!event.getType().equals(ActionEvent.UPDATE)) return;
-        if (players != null && players.getMetadata() != null) {
-            setArtwork();
-        } else {
-            setNotification();
-        }
+        if (event.isUpdate()) getManager().notify(ID, buildNotification());
     }
 
     @Override
@@ -140,14 +123,15 @@ public class PlaybackService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (players != null && players.getMetadata() != null) setArtwork();
         startForeground(ID, buildNotification());
-        return START_NOT_STICKY;
+        return START_STICKY;
     }
 
     @Override
     public void onDestroy() {
         EventBus.getDefault().unregister(this);
+        getManager().cancel(ID);
+        stopForeground(true);
     }
 
     @Nullable

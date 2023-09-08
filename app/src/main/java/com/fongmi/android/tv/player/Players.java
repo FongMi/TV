@@ -3,14 +3,12 @@ package com.fongmi.android.tv.player;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Intent;
-import android.os.PowerManager;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
-import androidx.media3.common.C;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
 import androidx.media3.common.util.Util;
@@ -286,11 +284,6 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         if (time == 0 && !force) return;
         if (isExo() && exoPlayer != null) exoPlayer.seekTo(time);
         if (isIjk() && ijkPlayer != null) ijkPlayer.seekTo(time);
-    }
-
-    public void setWake(boolean wake) {
-        if (isExo() && exoPlayer != null) exoPlayer.setWakeMode(wake ? C.WAKE_MODE_NETWORK : C.WAKE_MODE_NONE);
-        if (isIjk() && ijkPlayer != null) ijkPlayer.setWakeMode(wake ? PowerManager.PARTIAL_WAKE_LOCK : PowerManager.ON_AFTER_RELEASE);
     }
 
     public void play() {

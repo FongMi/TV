@@ -122,6 +122,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private List<String> mBroken;
     private History mHistory;
     private Players mPlayers;
+    private boolean foreground;
     private boolean fullscreen;
     private boolean initTrack;
     private boolean initAuto;
@@ -131,11 +132,11 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private boolean stop;
     private boolean lock;
     private int toggleCount;
+    private Runnable mR0;
     private Runnable mR1;
     private Runnable mR2;
     private Runnable mR3;
     private Runnable mR4;
-    private Runnable mR5;
     private Clock mClock;
     private String url;
     private PiP mPiP;
@@ -280,12 +281,13 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mDialogs = new ArrayList<>();
         mBroken = new ArrayList<>();
         mClock = Clock.create();
+        mR0 = this::stopService;
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
         mR3 = this::setOrient;
         mR4 = this::showEmpty;
-        mR5 = this::stopBack;
         mPiP = new PiP();
+        setForeground(true);
         setRecyclerView();
         setVideoView();
         setViewModel();
@@ -1260,6 +1262,14 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         getDetail(item);
     }
 
+    public boolean isForeground() {
+        return foreground;
+    }
+
+    public void setForeground(boolean foreground) {
+        this.foreground = foreground;
+    }
+
     private boolean isFullscreen() {
         return fullscreen;
     }
@@ -1344,12 +1354,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         adapter.notifyItemRangeChanged(0, adapter.getItemCount());
     }
 
-    private void startBack() {
-        App.removeCallbacks(mR5);
-        PlaybackService.start(mPlayers);
-    }
-
-    private void stopBack() {
+    private void stopService() {
         PlaybackService.stop();
     }
 
@@ -1459,14 +1464,15 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode);
         if (isInPictureInPictureMode) {
+            PlaybackService.start(mPlayers);
             enterFullscreen();
             setSubtitle(10);
             hideControl();
             hideSheet();
-            startBack();
         } else {
-            stopBack();
             exitFullscreen();
+            setForeground(true);
+            PlaybackService.stop();
             if (isStop()) finish();
         }
     }
@@ -1496,14 +1502,18 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     @Override
     protected void onResume() {
         super.onResume();
-        App.removeCallbacks(mR5);
-        if (Setting.isBackgroundOn()) App.post(mR5, 1000);
+        if (isForeground()) return;
+        App.removeCallbacks(mR0);
+        App.post(mR0, 1000);
+        setForeground(true);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (Setting.isBackgroundOn() && !isFinishing()) startBack();
+        setForeground(false);
+        App.removeCallbacks(mR0);
+        if (Setting.isBackgroundOn() && !isFinishing()) PlaybackService.start(mPlayers);
     }
 
     @Override
@@ -1534,7 +1544,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mPlayers.release();
         Source.get().stop();
         RefreshEvent.history();
-        PlaybackService.stop();
         App.removeCallbacks(mR1, mR2, mR3, mR4);
         mViewModel.result.removeObserver(mObserveDetail);
         mViewModel.player.removeObserver(mObservePlayer);

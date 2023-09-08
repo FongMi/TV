@@ -97,11 +97,12 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     private Players mPlayers;
     private Channel mChannel;
     private Group mGroup;
+    private Runnable mR0;
     private Runnable mR1;
     private Runnable mR2;
     private Runnable mR3;
-    private Runnable mR4;
     private Clock mClock;
+    private boolean foreground;
     private boolean rotate;
     private boolean stop;
     private boolean lock;
@@ -159,11 +160,12 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mPlayers = new Players().init(this);
         mObserveChannel = this::start;
         mHides = new ArrayList<>();
+        mR0 = this::stopService;
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
         mR3 = this::hideInfo;
-        mR4 = this::stopBack;
         mPiP = new PiP();
+        setForeground(true);
         setRecyclerView();
         setVideoView();
         setViewModel();
@@ -820,6 +822,14 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         showProgress();
     }
 
+    public boolean isForeground() {
+        return foreground;
+    }
+
+    public void setForeground(boolean foreground) {
+        this.foreground = foreground;
+    }
+
     public boolean isRotate() {
         return rotate;
     }
@@ -860,12 +870,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         this.toggleCount = 0;
     }
 
-    private void startBack() {
-        App.removeCallbacks(mR4);
-        PlaybackService.start(mPlayers);
-    }
-
-    private void stopBack() {
+    private void stopService() {
         PlaybackService.stop();
     }
 
@@ -948,14 +953,15 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode);
         if (isInPictureInPictureMode) {
+            PlaybackService.start(mPlayers);
             setSubtitle(10);
             hideControl();
-            startBack();
             hideInfo();
             hideUI();
         } else {
             hideInfo();
-            stopBack();
+            setForeground(true);
+            PlaybackService.stop();
             setSubtitle(Setting.getSubtitle());
             if (isStop()) finish();
         }
@@ -977,28 +983,32 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     protected void onStart() {
         super.onStart();
         if (Setting.isBackgroundOff()) mPlayers.play();
+        mClock.stop().start();
         setStop(false);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        App.removeCallbacks(mR4);
-        if (Setting.isBackgroundOn()) App.post(mR4, 1000);
-        mClock.start();
+        if (isForeground()) return;
+        App.removeCallbacks(mR0);
+        App.post(mR0, 1000);
+        setForeground(true);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (Setting.isBackgroundOn() && !isFinishing()) startBack();
-        mClock.stop();
+        setForeground(false);
+        App.removeCallbacks(mR0);
+        if (Setting.isBackgroundOn() && !isFinishing()) PlaybackService.start(mPlayers);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         if (Setting.isBackgroundOff()) mPlayers.pause();
+        if (Setting.isBackgroundOff()) mClock.stop();
         setStop(true);
     }
 
