@@ -39,7 +39,7 @@ public class ImgUtil {
 
     public static void load(String url, int error, CustomTarget<Drawable> target) {
         if (TextUtils.isEmpty(url)) target.onLoadFailed(ResUtil.getDrawable(error));
-        else Glide.with(App.get()).load(getUrl(url)).error(error).dontAnimate().into(target);
+        else Glide.with(App.get()).load(getUrl(url)).error(error).skipMemoryCache(true).dontAnimate().signature(new ObjectKey(url + "_" + Setting.getQuality())).into(target);
     }
 
     public static void load(String url, ImageView view, ImageView.ScaleType scaleType) {

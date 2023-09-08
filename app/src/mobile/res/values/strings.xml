@@ -35,4 +35,10 @@
     <string name="dialog_delete_keep">All keep records will be removed.</string>
     <string name="dialog_delete_history">All history records will be removed.</string>
 
+    <string-array name="select_background">
+        <item>Off</item>
+        <item>On</item>
+        <item>PiP</item>
+    </string-array>
+
 </resources>

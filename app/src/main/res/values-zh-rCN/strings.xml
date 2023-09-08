@@ -169,10 +169,4 @@
         <item>手动</item>
     </string-array>
 
-    <string-array name="select_background">
-        <item>关闭</item>
-        <item>开启</item>
-        <item>画中画</item>
-    </string-array>
-
 </resources>

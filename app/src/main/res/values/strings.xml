@@ -174,10 +174,4 @@
         <item>Manual</item>
     </string-array>
 
-    <string-array name="select_background">
-        <item>Off</item>
-        <item>On</item>
-        <item>PiP</item>
-    </string-array>
-
 </resources>

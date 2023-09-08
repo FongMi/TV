@@ -27,8 +27,8 @@ public class PiP {
 
     private PictureInPictureParams.Builder builder;
 
-    private boolean noPiP() {
-        return Build.VERSION.SDK_INT < Build.VERSION_CODES.O || !App.get().getPackageManager().hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE) || !Setting.isBackgroundPiP();
+    public static boolean noPiP() {
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.O || !App.get().getPackageManager().hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE);
     }
 
     @TargetApi(Build.VERSION_CODES.O)
@@ -73,7 +73,7 @@ public class PiP {
 
     public void enter(Activity activity, boolean four) {
         try {
-            if (noPiP() || activity.isInPictureInPictureMode()) return;
+            if (noPiP() || activity.isInPictureInPictureMode() || !Setting.isBackgroundPiP()) return;
             builder.setAspectRatio(new Rational(four ? 4 : 16, four ? 3 : 9));
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) builder.setAutoEnterEnabled(true);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) builder.setSeamlessResizeEnabled(true);

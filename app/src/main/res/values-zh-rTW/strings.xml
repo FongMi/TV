@@ -169,10 +169,4 @@
         <item>手動</item>
     </string-array>
 
-    <string-array name="select_background">
-        <item>關閉</item>
-        <item>開啟</item>
-        <item>子母畫面</item>
-    </string-array>
-
 </resources>
