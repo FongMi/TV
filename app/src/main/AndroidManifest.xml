@@ -60,5 +60,6 @@
                 <action android:name="${applicationId}.pause" />
             </intent-filter>
         </receiver>
+
     </application>
 </manifest>
