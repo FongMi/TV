@@ -100,6 +100,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     private Runnable mR1;
     private Runnable mR2;
     private Runnable mR3;
+    private Runnable mR4;
     private Clock mClock;
     private boolean rotate;
     private boolean stop;
@@ -161,6 +162,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
         mR3 = this::hideInfo;
+        mR4 = this::stopBack;
         mPiP = new PiP();
         setRecyclerView();
         setVideoView();
@@ -858,6 +860,15 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         this.toggleCount = 0;
     }
 
+    private void startBack() {
+        App.removeCallbacks(mR4);
+        PlaybackService.start(mPlayers);
+    }
+
+    private void stopBack() {
+        PlaybackService.stop();
+    }
+
     @Override
     public void onCastTo() {
     }
@@ -937,14 +948,14 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode);
         if (isInPictureInPictureMode) {
-            PlaybackService.start(mPlayers);
             setSubtitle(10);
             hideControl();
+            startBack();
             hideInfo();
             hideUI();
         } else {
             hideInfo();
-            PlaybackService.stop();
+            stopBack();
             setSubtitle(Setting.getSubtitle());
             if (isStop()) finish();
         }
@@ -972,14 +983,15 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     @Override
     protected void onResume() {
         super.onResume();
-        if (Setting.isBackgroundOn()) PlaybackService.stop();
+        App.removeCallbacks(mR4);
+        if (Setting.isBackgroundOn()) App.post(mR4, 1000);
         mClock.start();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (Setting.isBackgroundOn()) PlaybackService.start(mPlayers);
+        if (Setting.isBackgroundOn() && !isFinishing()) startBack();
         mClock.stop();
     }
 

@@ -135,6 +135,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private Runnable mR2;
     private Runnable mR3;
     private Runnable mR4;
+    private Runnable mR5;
     private Clock mClock;
     private String url;
     private PiP mPiP;
@@ -283,6 +284,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mR2 = this::setTraffic;
         mR3 = this::setOrient;
         mR4 = this::showEmpty;
+        mR5 = this::stopBack;
         mPiP = new PiP();
         setRecyclerView();
         setVideoView();
@@ -1342,6 +1344,15 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         adapter.notifyItemRangeChanged(0, adapter.getItemCount());
     }
 
+    private void startBack() {
+        App.removeCallbacks(mR5);
+        PlaybackService.start(mPlayers);
+    }
+
+    private void stopBack() {
+        PlaybackService.stop();
+    }
+
     @Override
     public void onCastTo() {
         checkPlayImg(false);
@@ -1448,14 +1459,14 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode);
         if (isInPictureInPictureMode) {
-            PlaybackService.start(mPlayers);
             enterFullscreen();
             setSubtitle(10);
             hideControl();
             hideSheet();
+            startBack();
         } else {
+            stopBack();
             exitFullscreen();
-            PlaybackService.stop();
             if (isStop()) finish();
         }
     }
@@ -1485,13 +1496,14 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     @Override
     protected void onResume() {
         super.onResume();
-        if (Setting.isBackgroundOn()) PlaybackService.stop();
+        App.removeCallbacks(mR5);
+        if (Setting.isBackgroundOn()) App.post(mR5, 1000);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (Setting.isBackgroundOn()) PlaybackService.start(mPlayers);
+        if (Setting.isBackgroundOn() && !isFinishing()) startBack();
     }
 
     @Override
@@ -1521,8 +1533,8 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mClock.release();
         mPlayers.release();
         Source.get().stop();
-        RefreshEvent.history();
         PlaybackService.stop();
+        RefreshEvent.history();
         App.removeCallbacks(mR1, mR2, mR3, mR4);
         mViewModel.result.removeObserver(mObserveDetail);
         mViewModel.player.removeObserver(mObservePlayer);
