@@ -31,7 +31,7 @@ public class Provider extends ContentProvider {
 
             @Override
             public String getModuleScript(String moduleName) {
-                return Module.get().load(moduleName);
+                return Module.get().fetch(moduleName);
             }
         });
     }

@@ -110,7 +110,7 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/collect"
-            android:layout_width="wrap_content"
+            android:layout_width="120dp"
             android:layout_height="match_parent"
             android:layout_marginTop="-8dp"
             android:clipChildren="false"
@@ -135,7 +135,8 @@
             android:paddingEnd="8dp"
             android:paddingBottom="8dp"
             app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-            app:spanCount="2" />
+            app:spanCount="2"
+            tools:listitem="@layout/adapter_vod_rect" />
 
     </RelativeLayout>
 </LinearLayout>

@@ -29,14 +29,14 @@ public class Module {
         this.cache = new ConcurrentHashMap<>();
     }
 
-    public String load(String name) {
+    public String fetch(String name) {
         if (cache.contains(name)) return cache.get(name);
-        if (name.startsWith("http")) cache.put(name, getModule(name));
-        if (name.startsWith("assets://")) cache.put(name, Path.asset(name.substring(9)));
+        if (name.startsWith("http")) cache.put(name, request(name));
+        if (name.startsWith("assets")) cache.put(name, Path.asset(name.substring(9)));
         return cache.get(name);
     }
 
-    private String getModule(String url) {
+    private String request(String url) {
         try {
             Uri uri = Uri.parse(url);
             File file = Path.js(uri.getLastPathSegment());

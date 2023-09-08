@@ -7,7 +7,6 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModelProvider;
@@ -142,12 +141,9 @@ public class CollectActivity extends BaseActivity implements CustomScroller.Call
     private void setViewType(int viewType) {
         int count = Product.getColumn(this) - 1;
         mSearchAdapter.setViewType(viewType, count);
-        mSearchAdapter.setSize(Product.getSpec(this, ResUtil.dp2px((count + 2) * 16), count + 1));
+        mSearchAdapter.setSize(Product.getSpec(this, ResUtil.dp2px(128 + (count) * 16), count));
         ((GridLayoutManager) mBinding.recycler.getLayoutManager()).setSpanCount(mSearchAdapter.isGrid() ? count : 1);
         mBinding.view.setImageResource(mSearchAdapter.isGrid() ? R.drawable.ic_action_list : R.drawable.ic_action_grid);
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mBinding.collect.getLayoutParams();
-        params.width = mSearchAdapter.getWidth() + ResUtil.dp2px(24);
-        mBinding.collect.setLayoutParams(params);
     }
 
     private void setViewModel() {
