@@ -198,6 +198,7 @@ public class SiteViewModel extends ViewModel {
         } else {
             ArrayMap<String, String> params = new ArrayMap<>();
             params.put("wd", Trans.t2s(keyword));
+            params.put("quick", String.valueOf(quick));
             String searchContent = call(site, params, true);
             SpiderDebug.log(site.getName() + "," + searchContent);
             post(site, fetchPic(site, Result.fromType(site.getType(), searchContent)));
