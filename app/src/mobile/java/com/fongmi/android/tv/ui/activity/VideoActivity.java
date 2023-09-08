@@ -1533,8 +1533,8 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mClock.release();
         mPlayers.release();
         Source.get().stop();
-        PlaybackService.stop();
         RefreshEvent.history();
+        PlaybackService.stop();
         App.removeCallbacks(mR1, mR2, mR3, mR4);
         mViewModel.result.removeObserver(mObserveDetail);
         mViewModel.player.removeObserver(mObservePlayer);
