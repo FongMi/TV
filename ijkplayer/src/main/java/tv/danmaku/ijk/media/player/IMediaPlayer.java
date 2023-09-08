@@ -154,7 +154,6 @@ public interface IMediaPlayer {
 
     int getVideoSarDen();
 
-    @Deprecated
     void setWakeMode(Context context, int mode);
 
     void setLooping(boolean looping);

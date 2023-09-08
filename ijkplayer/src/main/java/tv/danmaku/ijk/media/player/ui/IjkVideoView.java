@@ -188,6 +188,10 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         if (mRenderView != null) mRenderView.setAspectRatio(resizeMode);
     }
 
+    public void setWakeMode(int mode) {
+        mPlayer.setWakeMode(getContext(), mode);
+    }
+
     public void setMediaSource(MediaSource source) {
         setVideoURI(source.getUri(), source.getHeaders());
     }
