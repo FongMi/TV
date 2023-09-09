@@ -368,8 +368,9 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void checkId() {
-        if (getId().startsWith("push://")) getIntent().putExtra("key", "push_agent").putExtra("id", getId().substring(7));
-        if (TextUtils.isEmpty(getId()) || getId().startsWith("msearch:")) setEmpty();
+        String id = Objects.toString(getId(), "");
+        if (id.startsWith("push://")) getIntent().putExtra("key", "push_agent").putExtra("id", id.substring(7));
+        if (id.isEmpty() || id.startsWith("msearch:")) setEmpty();
         else getDetail();
     }
 

@@ -97,6 +97,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -260,7 +261,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        if (intent.getStringExtra("key") == null) return;
+        if (TextUtils.isEmpty(intent.getStringExtra("id"))) return;
         mBinding.swipeLayout.setRefreshing(true);
         getIntent().putExtras(intent);
         stopSearch();
@@ -405,8 +406,9 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private void checkId() {
-        if (getId().startsWith("push://")) getIntent().putExtra("key", "push_agent").putExtra("id", getId().substring(7));
-        if (TextUtils.isEmpty(getId()) || getId().startsWith("msearch:")) setEmpty();
+        String id = Objects.toString(getId(), "");
+        if (id.startsWith("push://")) getIntent().putExtra("key", "push_agent").putExtra("id", id.substring(7));
+        if (id.isEmpty() || id.startsWith("msearch:")) setEmpty();
         else getDetail();
     }
 
