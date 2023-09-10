@@ -22,12 +22,8 @@ import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.DanmakuContext;
 
-/**
- *
- */
 public abstract class BaseDanmakuParser {
 
-    protected IDataSource<?> mDataSource;
     protected DanmakuTimer mTimer;
     protected int mDispWidth;
     protected int mDispHeight;
@@ -67,11 +63,6 @@ public abstract class BaseDanmakuParser {
         return 1 / (mDispDensity - 0.6f);
     }
 
-    public BaseDanmakuParser load(IDataSource<?> source) {
-        mDataSource = source;
-        return this;
-    }
-
     public DanmakuTimer getTimer() {
         return mTimer;
     }
@@ -82,25 +73,16 @@ public abstract class BaseDanmakuParser {
     }
 
     public IDanmakus getDanmakus() {
-        if (mDanmakus != null)
-            return mDanmakus;
+        if (mDanmakus != null) return mDanmakus;
         mContext.mDanmakuFactory.resetDurationsData();
         mDanmakus = parse();
-        releaseDataSource();
         mContext.mDanmakuFactory.updateMaxDanmakuDuration();
         return mDanmakus;
-    }
-
-    protected void releaseDataSource() {
-        if (mDataSource != null)
-            mDataSource.release();
-        mDataSource = null;
     }
 
     protected abstract IDanmakus parse();
 
     public void release() {
-        releaseDataSource();
     }
 
     public BaseDanmakuParser setConfig(DanmakuContext config) {

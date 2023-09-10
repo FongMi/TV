@@ -323,5 +323,4 @@ public class Danmakus implements IDanmakus {
     public Object obtainSynchronizer() {
         return mLockObject;
     }
-
 }

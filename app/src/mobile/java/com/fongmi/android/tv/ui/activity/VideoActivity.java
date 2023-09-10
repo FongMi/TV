@@ -40,6 +40,7 @@ import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.bean.Danmu;
 import com.fongmi.android.tv.bean.Episode;
 import com.fongmi.android.tv.bean.Flag;
 import com.fongmi.android.tv.bean.History;
@@ -508,6 +509,12 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mBinding.quality.setVisibility(result.getUrl().isOnly() ? View.GONE : View.VISIBLE);
         mBinding.swipeLayout.setRefreshing(false);
         mQualityAdapter.addAll(result);
+        loadDanmu(result.getDanmu());
+    }
+
+    private void loadDanmu(Danmu danmu) {
+        if (danmu.getD().isEmpty()) return;
+
     }
 
     @Override

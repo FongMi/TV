@@ -32,8 +32,6 @@ public abstract class BaseDanmaku {
 
     public final static int TYPE_SPECIAL = 7;
 
-    public final static int TYPE_MOVEABLE_XXX = 0; // TODO: add more type
-
     public final static int INVISIBLE = 0;
 
     public final static int VISIBLE = 1;
@@ -193,8 +191,7 @@ public abstract class BaseDanmaku {
     }
 
     public boolean isMeasured() {
-        return paintWidth > -1 && paintHeight > -1
-                && measureResetFlag == flags.MEASURE_RESET_FLAG;
+        return paintWidth > -1 && paintHeight > -1 && measureResetFlag == flags.MEASURE_RESET_FLAG;
     }
 
     public void measure(IDisplayer displayer, boolean fromWorkerThread) {
@@ -216,8 +213,7 @@ public abstract class BaseDanmaku {
     }
 
     public boolean isShown() {
-        return this.visibility == VISIBLE
-                && visibleResetFlag == flags.VISIBLE_RESET_FLAG;
+        return this.visibility == VISIBLE && visibleResetFlag == flags.VISIBLE_RESET_FLAG;
     }
 
     public boolean isTimeOut() {
@@ -261,8 +257,9 @@ public abstract class BaseDanmaku {
         if (b) {
             this.visibleResetFlag = flags.VISIBLE_RESET_FLAG;
             this.visibility = VISIBLE;
-        } else
+        } else {
             this.visibility = INVISIBLE;
+        }
     }
 
     public abstract void layout(IDisplayer displayer, float x, float y);
@@ -306,9 +303,7 @@ public abstract class BaseDanmaku {
     }
 
     public Object getTag(int key) {
-        if (mTags == null) {
-            return null;
-        }
+        if (mTags == null) return null;
         return mTags.get(key);
     }
 
@@ -324,6 +319,30 @@ public abstract class BaseDanmaku {
     public void setTime(long time) {
         this.time = time;
         this.timeOffset = 0;
+    }
+
+    public void setText(CharSequence text) {
+        this.text = text;
+    }
+
+    public void setTextColor(int textColor) {
+        this.textColor = textColor;
+    }
+
+    public void setTextShadowColor(int textShadowColor) {
+        this.textShadowColor = textShadowColor;
+    }
+
+    public void setTextSize(float textSize) {
+        this.textSize = textSize;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
+    public void setFlags(GlobalFlagValues flags) {
+        this.flags = flags;
     }
 
     public long getActualTime() {

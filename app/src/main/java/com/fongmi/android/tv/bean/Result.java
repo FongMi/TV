@@ -60,6 +60,8 @@ public class Result implements Parcelable {
     private Integer jx;
     @SerializedName("flag")
     private String flag;
+    @SerializedName("danmaku")
+    private String danmaku;
     @SerializedName("format")
     private String format;
     @SerializedName("url")
@@ -76,6 +78,8 @@ public class Result implements Parcelable {
     @JsonAdapter(MsgAdapter.class)
     @SerializedName("msg")
     private String msg;
+
+    private Danmu danmu;
 
     public static Result objectFrom(String str) {
         try {
@@ -191,8 +195,8 @@ public class Result implements Parcelable {
         return jx == null ? 0 : jx;
     }
 
-    public void setJx(Integer jx) {
-        this.jx = jx;
+    public String getDanmaku() {
+        return TextUtils.isEmpty(danmaku) ? "" : danmaku;
     }
 
     public String getFormat() {
@@ -245,6 +249,14 @@ public class Result implements Parcelable {
 
     public void setMsg(String msg) {
         this.msg = msg;
+    }
+
+    public Danmu getDanmu() {
+        return danmu == null ? new Danmu() : danmu;
+    }
+
+    public void setDanmu(Danmu danmu) {
+        this.danmu = danmu;
     }
 
     public boolean hasMsg() {

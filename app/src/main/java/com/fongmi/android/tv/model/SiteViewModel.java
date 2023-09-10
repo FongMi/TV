@@ -11,6 +11,7 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.bean.Danmu;
 import com.fongmi.android.tv.bean.Episode;
 import com.fongmi.android.tv.bean.Flag;
 import com.fongmi.android.tv.bean.Result;
@@ -47,6 +48,7 @@ public class SiteViewModel extends ViewModel {
     public MutableLiveData<Result> result;
     public MutableLiveData<Result> player;
     public MutableLiveData<Result> search;
+    public MutableLiveData<Danmu> danmaku;
     public ExecutorService executor;
 
     public SiteViewModel() {
@@ -157,6 +159,7 @@ public class SiteViewModel extends ViewModel {
                 Result result = Result.fromJson(playerContent);
                 if (result.getFlag().isEmpty()) result.setFlag(flag);
                 result.setUrl(Source.get().fetch(result));
+                checkDanmaku(result);
                 result.setKey(key);
                 return result;
             } else if (site.getType() == 4) {
@@ -168,6 +171,7 @@ public class SiteViewModel extends ViewModel {
                 Result result = Result.fromJson(playerContent);
                 if (result.getFlag().isEmpty()) result.setFlag(flag);
                 result.setUrl(Source.get().fetch(result));
+                checkDanmaku(result);
                 return result;
             } else if (site.isEmpty() && key.equals("push_agent")) {
                 Result result = new Result();
@@ -265,6 +269,13 @@ public class SiteViewModel extends ViewModel {
             for (Future<List<Episode>> future : executor.invokeAll(flag.getMagnet(), 30, TimeUnit.SECONDS)) flag.getEpisodes().addAll(future.get());
             executor.shutdownNow();
         }
+    }
+
+    private void checkDanmaku(Result result) throws Exception {
+        if (result.getDanmaku().isEmpty()) return;
+        String body = OkHttp.newCall(result.getDanmaku()).execute().body().string();
+        result.setDanmu(Danmu.fromXml(body));
+        SpiderDebug.log(body);
     }
 
     private void post(Site site, Result result) {
