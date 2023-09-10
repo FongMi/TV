@@ -159,5 +159,4 @@ public interface IDanmakus {
             return Float.compare(obj2.getTop(), obj1.getTop());
         }
     }
-
 }

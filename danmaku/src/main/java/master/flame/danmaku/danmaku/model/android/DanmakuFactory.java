@@ -55,7 +55,6 @@ public class DanmakuFactory {
     private DanmakuContext sLastConfig;
 
     protected DanmakuFactory() {
-
     }
 
     public static DanmakuFactory create() {

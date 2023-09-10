@@ -274,7 +274,7 @@ public class SiteViewModel extends ViewModel {
     private void checkDanmaku(Result result) throws Exception {
         if (result.getDanmaku().isEmpty()) return;
         String body = OkHttp.newCall(result.getDanmaku()).execute().body().string();
-        result.setDanmu(Danmu.fromXml(body));
+        //result.setDanmakus(new Parser(body).getDanmakus());
         SpiderDebug.log(body);
     }
 

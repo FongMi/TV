@@ -160,10 +160,7 @@ public class DanmakuUtils {
 
     public static void fillText(BaseDanmaku danmaku, CharSequence text) {
         danmaku.text = text;
-        if (TextUtils.isEmpty(text) || !text.toString().contains(BaseDanmaku.DANMAKU_BR_CHAR)) {
-            return;
-        }
-
+        if (TextUtils.isEmpty(text) || !text.toString().contains(BaseDanmaku.DANMAKU_BR_CHAR)) return;
         String[] lines = String.valueOf(danmaku.text).split(BaseDanmaku.DANMAKU_BR_CHAR, -1);
         if (lines.length > 1) {
             danmaku.lines = lines;

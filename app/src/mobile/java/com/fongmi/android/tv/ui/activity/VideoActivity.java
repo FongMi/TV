@@ -40,7 +40,6 @@ import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.api.ApiConfig;
-import com.fongmi.android.tv.bean.Danmu;
 import com.fongmi.android.tv.bean.Episode;
 import com.fongmi.android.tv.bean.Flag;
 import com.fongmi.android.tv.bean.History;
@@ -102,6 +101,7 @@ import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import master.flame.danmaku.danmaku.model.IDanmakus;
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
 public class VideoActivity extends BaseActivity implements Clock.Callback, CustomKeyDownVod.Listener, CastDialog.Listener, TrackDialog.Listener, ControlDialog.Listener, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, QualityAdapter.OnClickListener, QuickAdapter.OnClickListener, ParseAdapter.OnClickListener, SubtitleCallback {
@@ -509,11 +509,10 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mBinding.quality.setVisibility(result.getUrl().isOnly() ? View.GONE : View.VISIBLE);
         mBinding.swipeLayout.setRefreshing(false);
         mQualityAdapter.addAll(result);
-        loadDanmu(result.getDanmu());
+        loadDanmu(result.getDanmakus());
     }
 
-    private void loadDanmu(Danmu danmu) {
-        if (danmu.getD().isEmpty()) return;
+    private void loadDanmu(IDanmakus danmakus) {
 
     }
 

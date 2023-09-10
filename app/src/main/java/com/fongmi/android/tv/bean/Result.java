@@ -32,6 +32,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import master.flame.danmaku.danmaku.model.IDanmakus;
+
 @Root(name = "rss", strict = false)
 public class Result implements Parcelable {
 
@@ -79,7 +81,7 @@ public class Result implements Parcelable {
     @SerializedName("msg")
     private String msg;
 
-    private Danmu danmu;
+    private IDanmakus danmakus;
 
     public static Result objectFrom(String str) {
         try {
@@ -251,12 +253,12 @@ public class Result implements Parcelable {
         this.msg = msg;
     }
 
-    public Danmu getDanmu() {
-        return danmu == null ? new Danmu() : danmu;
+    public IDanmakus getDanmakus() {
+        return danmakus;
     }
 
-    public void setDanmu(Danmu danmu) {
-        this.danmu = danmu;
+    public void setDanmakus(IDanmakus danmakus) {
+        this.danmakus = danmakus;
     }
 
     public boolean hasMsg() {

@@ -309,7 +309,7 @@ public class DrawTask implements IDrawTask {
     }
 
     protected void loadDanmakus(BaseDanmakuParser parser) {
-        danmakuList = parser.setConfig(mContext).setDisplayer(mDisp).setTimer(mTimer).setListener(new BaseDanmakuParser.Listener() {
+        danmakuList = parser.setConfig(mContext).setDisplay(mDisp).setTimer(mTimer).setListener(new BaseDanmakuParser.Listener() {
             @Override
             public void onDanmakuAdd(BaseDanmaku danmaku) {
                 if (mTaskListener != null) {

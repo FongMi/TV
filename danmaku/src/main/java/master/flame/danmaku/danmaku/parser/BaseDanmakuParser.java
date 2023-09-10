@@ -34,11 +34,11 @@ public abstract class BaseDanmakuParser {
     protected Listener mListener;
     private IDanmakus mDanmakus;
 
-    public IDisplayer getDisplayer() {
+    public IDisplayer getDisplay() {
         return mDisp;
     }
 
-    public BaseDanmakuParser setDisplayer(IDisplayer disp) {
+    public BaseDanmakuParser setDisplay(IDisplayer disp) {
         mDisp = disp;
         mDispWidth = disp.getWidth();
         mDispHeight = disp.getHeight();
