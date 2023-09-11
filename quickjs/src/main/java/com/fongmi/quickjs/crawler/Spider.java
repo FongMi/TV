@@ -1,7 +1,6 @@
 package com.fongmi.quickjs.crawler;
 
 import android.content.Context;
-import android.util.Base64;
 
 import com.fongmi.quickjs.bean.Res;
 import com.fongmi.quickjs.method.Function;
@@ -39,12 +38,15 @@ public class Spider extends com.github.catvod.crawler.Spider {
     private final DexClassLoader dex;
     private QuickJSContext ctx;
     private JSObject jsObject;
+    private final String name;
     private final String key;
     private final String api;
+    private boolean cat;
 
-    public Spider(String api, DexClassLoader dex) throws Exception {
-        this.key = "__" + UUID.randomUUID().toString().replace("-", "") + "__";
+    public Spider(String key, String api, DexClassLoader dex) throws Exception {
+        this.name = "__" + UUID.randomUUID().toString().replace("-", "") + "__";
         this.executor = Executors.newSingleThreadExecutor();
+        this.key = key;
         this.api = api;
         this.dex = dex;
         initializeJS();
@@ -132,8 +134,9 @@ public class Spider extends com.github.catvod.crawler.Spider {
         submit(() -> {
             if (ctx == null) createCtx();
             if (dex != null) createDex();
-            ctx.evaluateModule(getContent(), api);
-            jsObject = (JSObject) ctx.getProperty(ctx.getGlobalObject(), key);
+            String context = getContent();
+            ctx.evaluateModule(context, api);
+            jsObject = (JSObject) ctx.getProperty(ctx.getGlobalObject(), name);
             return null;
         }).get();
     }
@@ -144,6 +147,12 @@ public class Spider extends com.github.catvod.crawler.Spider {
         Global.create(ctx, executor).setProperty();
         ctx.getGlobalObject().setProperty("local", Local.class);
         ctx.getGlobalObject().getContext().evaluate(Path.asset("js/lib/http.js"));
+        ctx.setModuleLoader(new QuickJSContext.DefaultModuleLoader() {
+            @Override
+            public String getModuleStringCode(String moduleName) {
+                return Module.get().fetch(moduleName);
+            }
+        });
     }
 
     private void createDex() {
@@ -190,11 +199,11 @@ public class Spider extends com.github.catvod.crawler.Spider {
     }
 
     private String getContent() {
-        String global = "globalThis." + key;
-        String content = Module.get().load(api);
+        String global = "globalThis." + name;
+        String content = Module.get().fetch(api);
         if (content.contains("__jsEvalReturn")) {
-            ctx.evaluate("req = http");
-            return content.concat(global).concat(" = __jsEvalReturn()");
+            cat = true;
+            return content.concat(global + " = __jsEvalReturn()");
         } else if (content.contains("__JS_SPIDER__")) {
             return content.replace("__JS_SPIDER__", global);
         } else {
@@ -220,9 +229,9 @@ public class Spider extends com.github.catvod.crawler.Spider {
         String json = (String) call("proxy", array, object);
         Res res = Res.objectFrom(json);
         Object[] result = new Object[3];
-        result[0] = 200;
-        result[1] = "application/octet-stream";
-        result[2] = new ByteArrayInputStream(Base64.decode(res.getContent(), Base64.DEFAULT));
+        result[0] = res.getCode();
+        result[1] = res.getContentType();
+        result[2] = res.getStream();
         return result;
     }
 

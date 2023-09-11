@@ -13,5 +13,5 @@ android {
 
 dependencies {
     implementation project(':catvod')
-    implementation 'wang.harlon.quickjs:wrapper-android:0.21.1'
+    implementation 'wang.harlon.quickjs:wrapper-android:0.22.1-beta'
 }

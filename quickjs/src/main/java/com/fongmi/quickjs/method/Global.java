@@ -9,6 +9,7 @@ import com.fongmi.quickjs.bean.Req;
 import com.fongmi.quickjs.utils.Connect;
 import com.fongmi.quickjs.utils.Parser;
 import com.fongmi.quickjs.utils.Proxy;
+import com.github.catvod.utils.Trans;
 import com.google.gson.Gson;
 import com.whl.quickjs.wrapper.JSFunction;
 import com.whl.quickjs.wrapper.JSMethod;
@@ -18,7 +19,6 @@ import com.whl.quickjs.wrapper.QuickJSContext;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -65,6 +65,30 @@ public class Global {
         }
     }
 
+    private void submit(Runnable runnable) {
+        if (!executor.isShutdown()) executor.submit(runnable);
+    }
+
+    @Keep
+    @JSMethod
+    public String s2t(String text) {
+        try {
+            return Trans.s2t(false, text);
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    @Keep
+    @JSMethod
+    public String t2s(String text) {
+        try {
+            return Trans.t2s(false, text);
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
     @Keep
     @JSMethod
     public String getProxy(Boolean local) {
@@ -74,7 +98,7 @@ public class Global {
     @Keep
     @JSMethod
     public String js2Proxy(Boolean dynamic, Integer siteType, String siteKey, String url, JSObject headers) {
-        return getProxy(true) + "&from=catvod" + "&header=" + URLEncoder.encode(headers.stringify()) + "&url=" + URLEncoder.encode(url);
+        return getProxy(true) + "&from=catvod" + "&siteType=" + siteType + "&siteKey=" + siteKey + "&header=" + URLEncoder.encode(headers.stringify()) + "&url=" + URLEncoder.encode(url);
     }
 
     @Keep
@@ -169,8 +193,8 @@ public class Global {
             SecretKeySpec keySpec = new SecretKeySpec(keyBuf, "AES");
             if (iv == null) cipher.init(encrypt ? Cipher.ENCRYPT_MODE : Cipher.DECRYPT_MODE, keySpec);
             else cipher.init(encrypt ? Cipher.ENCRYPT_MODE : Cipher.DECRYPT_MODE, keySpec, new IvParameterSpec(ivBuf));
-            byte[] inBuf = inBase64 ? Base64.decode(input, Base64.DEFAULT) : input.getBytes(StandardCharsets.UTF_8);
-            return outBase64 ? Base64.encodeToString(cipher.doFinal(inBuf), Base64.DEFAULT) : new String(cipher.doFinal(inBuf), StandardCharsets.UTF_8);
+            byte[] inBuf = inBase64 ? Base64.decode(input, Base64.DEFAULT) : input.getBytes("UTF-8");
+            return outBase64 ? Base64.encodeToString(cipher.doFinal(inBuf), Base64.DEFAULT) : new String(cipher.doFinal(inBuf), "UTF-8");
         } catch (Exception e) {
             e.printStackTrace();
             return "";
@@ -181,12 +205,12 @@ public class Global {
         return new Callback() {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response res) {
-                if (!executor.isShutdown()) executor.submit(() -> {complete.call(Connect.success(ctx, req, res));});
+                submit(() -> complete.call(Connect.success(ctx, req, res)));
             }
 
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                if (!executor.isShutdown()) executor.submit(() -> {complete.call(Connect.error(ctx));});
+                submit(() -> complete.call(Connect.error(ctx)));
             }
         };
     }
@@ -195,7 +219,7 @@ public class Global {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                if (!executor.isShutdown()) executor.submit(() -> {func.call();});
+                submit(func::call);
             }
         }, delay);
     }
