@@ -325,6 +325,14 @@ public abstract class BaseDanmaku {
         this.text = text;
     }
 
+    public CharSequence getText() {
+        return text;
+    }
+
+    public void setLines(String[] lines) {
+        this.lines = lines;
+    }
+
     public void setTextColor(int textColor) {
         this.textColor = textColor;
     }

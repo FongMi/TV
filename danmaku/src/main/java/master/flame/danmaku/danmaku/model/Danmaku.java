@@ -20,7 +20,7 @@ import master.flame.danmaku.danmaku.util.DanmakuUtils;
 
 public class Danmaku extends BaseDanmaku {
 
-    public Danmaku(CharSequence text) {
+    public Danmaku(String text) {
         DanmakuUtils.fillText(this, text);
     }
 

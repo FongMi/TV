@@ -15,7 +15,7 @@ import java.util.List;
 public class Danmu {
 
     @ElementList(entry = "d", required = false, inline = true)
-    private List<D> d;
+    private List<Data> data;
 
     public static Danmu fromXml(String str) {
         try {
@@ -25,24 +25,24 @@ public class Danmu {
         }
     }
 
-    public List<D> getD() {
-        return d == null ? Collections.emptyList() : d;
+    public List<Data> getData() {
+        return data == null ? Collections.emptyList() : data;
     }
 
-    public static class D {
+    public static class Data {
 
         @Attribute(name = "p", required = false)
-        public String p;
+        public String param;
 
         @Text
-        public String t;
+        public String text;
 
-        public String getP() {
-            return TextUtils.isEmpty(p) ? "" : p;
+        public String getParam() {
+            return TextUtils.isEmpty(param) ? "" : param;
         }
 
-        public String getT() {
-            return TextUtils.isEmpty(t) ? "" : t;
+        public String getText() {
+            return TextUtils.isEmpty(text) ? "" : text;
         }
     }
 }

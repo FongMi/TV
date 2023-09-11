@@ -34,10 +34,11 @@ public class Parser extends BaseDanmakuParser {
     @Override
     protected Danmakus parse() {
         Danmakus result = new Danmakus(IDanmakus.ST_BY_TIME);
-        for (Danmu.D d : danmu.getD()) {
-            String[] values = d.getP().split(",");
+        for (Danmu.Data data : danmu.getData()) {
+            String[] values = data.getParam().split(",");
             if (values.length < 4) continue;
-            setBase(values).setText(d);
+            setParam(values);
+            setText(data.getText());
             synchronized (result.obtainSynchronizer()) {
                 result.addItem(item);
             }
@@ -53,7 +54,7 @@ public class Parser extends BaseDanmakuParser {
         return this;
     }
 
-    private Parser setBase(String[] values) {
+    private void setParam(String[] values) {
         int type = Integer.parseInt(values[1]);
         long time = (long) (Float.parseFloat(values[0]) * 1000);
         float size = Float.parseFloat(values[2]) * (mDispDensity - 0.6f);
@@ -65,20 +66,18 @@ public class Parser extends BaseDanmakuParser {
         item.setTextColor(color);
         item.setTextShadowColor(color <= Color.BLACK ? Color.WHITE : Color.BLACK);
         item.setFlags(mContext.mGlobalFlagValues);
-        return this;
     }
 
-    private void setText(Danmu.D d) {
+    private void setText(String text) {
         item.index = index++;
-        DanmakuUtils.fillText(item, decodeXmlString(d.getT()));
-        String text = item.text.toString().trim();
-        if (item.getType() == BaseDanmaku.TYPE_SPECIAL && text.startsWith("[") && text.endsWith("]")) setSpecial(text);
+        DanmakuUtils.fillText(item, decodeXmlString(text));
+        if (item.getType() == BaseDanmaku.TYPE_SPECIAL && text.startsWith("[") && text.endsWith("]")) setSpecial();
     }
 
-    private void setSpecial(String text) {
+    private void setSpecial() {
         String[] textArr = null;
         try {
-            JSONArray jsonArray = new JSONArray(text);
+            JSONArray jsonArray = new JSONArray(item.getText());
             textArr = new String[jsonArray.length()];
             for (int i = 0; i < textArr.length; i++) {
                 textArr[i] = jsonArray.getString(i);
@@ -136,7 +135,6 @@ public class Parser extends BaseDanmakuParser {
         item.rotationY = rotateY;
         mContext.mDanmakuFactory.fillTranslationData(item, beginX, beginY, endX, endY, translationDuration, translationStartDelay, scaleX, scaleY);
         mContext.mDanmakuFactory.fillAlphaData(item, beginAlpha, endAlpha, alphaDuraion);
-
         if (textArr.length >= 12) {
             if (!TextUtils.isEmpty(textArr[11]) && "true".equalsIgnoreCase(textArr[11])) {
                 item.textShadowColor = Color.TRANSPARENT;

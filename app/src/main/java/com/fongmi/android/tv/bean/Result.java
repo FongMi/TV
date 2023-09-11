@@ -32,8 +32,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import master.flame.danmaku.danmaku.model.IDanmakus;
-
 @Root(name = "rss", strict = false)
 public class Result implements Parcelable {
 
@@ -80,8 +78,6 @@ public class Result implements Parcelable {
     @JsonAdapter(MsgAdapter.class)
     @SerializedName("msg")
     private String msg;
-
-    private IDanmakus danmakus;
 
     public static Result objectFrom(String str) {
         try {
@@ -201,6 +197,10 @@ public class Result implements Parcelable {
         return TextUtils.isEmpty(danmaku) ? "" : danmaku;
     }
 
+    public void setDanmaku(String danmaku) {
+        this.danmaku = danmaku;
+    }
+
     public String getFormat() {
         return format;
     }
@@ -251,14 +251,6 @@ public class Result implements Parcelable {
 
     public void setMsg(String msg) {
         this.msg = msg;
-    }
-
-    public IDanmakus getDanmakus() {
-        return danmakus;
-    }
-
-    public void setDanmakus(IDanmakus danmakus) {
-        this.danmakus = danmakus;
     }
 
     public boolean hasMsg() {

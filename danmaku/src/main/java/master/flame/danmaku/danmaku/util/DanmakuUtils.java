@@ -158,12 +158,10 @@ public class DanmakuUtils {
         return disp.isHardwareAccelerated() && (item.paintWidth > disp.getMaximumCacheWidth() || item.paintHeight > disp.getMaximumCacheHeight());
     }
 
-    public static void fillText(BaseDanmaku danmaku, CharSequence text) {
-        danmaku.text = text;
-        if (TextUtils.isEmpty(text) || !text.toString().contains(BaseDanmaku.DANMAKU_BR_CHAR)) return;
-        String[] lines = String.valueOf(danmaku.text).split(BaseDanmaku.DANMAKU_BR_CHAR, -1);
-        if (lines.length > 1) {
-            danmaku.lines = lines;
-        }
+    public static void fillText(BaseDanmaku danmaku, String text) {
+        danmaku.setText(text.trim());
+        if (TextUtils.isEmpty(text) || !text.contains(BaseDanmaku.DANMAKU_BR_CHAR)) return;
+        String[] lines = danmaku.getText().toString().split(BaseDanmaku.DANMAKU_BR_CHAR, -1);
+        if (lines.length > 1) danmaku.setLines(lines);
     }
 }

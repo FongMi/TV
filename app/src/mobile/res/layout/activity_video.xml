@@ -38,6 +38,12 @@
             android:layout_height="match_parent"
             android:visibility="gone" />
 
+        <master.flame.danmaku.ui.widget.DanmakuView
+            android:id="@+id/danmu"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+
         <include
             android:id="@+id/widget"
             layout="@layout/view_widget_vod"
