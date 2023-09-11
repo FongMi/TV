@@ -26,7 +26,6 @@ import master.flame.danmaku.danmaku.model.android.DanmakuContext;
 import master.flame.danmaku.danmaku.renderer.IRenderer;
 import master.flame.danmaku.danmaku.renderer.Renderer;
 
-
 public class DanmakuRenderer extends Renderer {
 
     private final DanmakuContext mContext;
@@ -46,6 +45,7 @@ public class DanmakuRenderer extends Renderer {
     private ICacheManager mCacheManager;
     private OnDanmakuShownListener mOnDanmakuShownListener;
     private Consumer mConsumer = new Consumer();
+
     public DanmakuRenderer(DanmakuContext config) {
         mContext = config;
         mDanmakusRetainer = new DanmakusRetainer(config.isAlignBottom());
@@ -157,7 +157,7 @@ public class DanmakuRenderer extends Renderer {
             // draw
             if (drawItem.isShown()) {
                 if (drawItem.lines == null && drawItem.getBottom() > disp.getHeight()) {
-                    return ACTION_CONTINUE;    // skip bottom outside danmaku
+                    return ACTION_CONTINUE;
                 }
                 int renderingType = drawItem.draw(disp);
                 if (renderingType == IRenderer.CACHE_RENDERING) {
@@ -171,9 +171,7 @@ public class DanmakuRenderer extends Renderer {
                 renderingState.addCount(drawItem.getType(), 1);
                 renderingState.addTotalCount(1);
                 renderingState.appendToRunningDanmakus(drawItem);
-
-                if (mOnDanmakuShownListener != null
-                        && drawItem.firstShownFlag != mContext.mGlobalFlagValues.FIRST_SHOWN_RESET_FLAG) {
+                if (mOnDanmakuShownListener != null && drawItem.firstShownFlag != mContext.mGlobalFlagValues.FIRST_SHOWN_RESET_FLAG) {
                     drawItem.firstShownFlag = mContext.mGlobalFlagValues.FIRST_SHOWN_RESET_FLAG;
                     mOnDanmakuShownListener.onDanmakuShown(drawItem);
                 }

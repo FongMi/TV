@@ -77,10 +77,10 @@ public interface IRenderer {
             mRefreshRect[2] = right;
             mRefreshRect[3] = bottom;
         }
-
     }
 
-    public class RenderingState {
+    class RenderingState {
+
         public final static int UNKNOWN_TIME = -1;
 
         public boolean isRunningDanmakus;
@@ -178,7 +178,5 @@ public interface IRenderer {
             mIsObtaining = false;
             return danmakus;
         }
-
     }
-
 }

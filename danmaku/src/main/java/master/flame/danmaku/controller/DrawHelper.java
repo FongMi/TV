@@ -52,7 +52,6 @@ public class DrawHelper {
             PAINT_FPS.setTextSize(30);
         }
         int top = canvas.getHeight() - 50;
-
         clearCanvas(canvas, 10, top - 50, (int) (PAINT_FPS.measureText(text) + 20), canvas.getHeight());
         canvas.drawText(text, 10, top, PAINT_FPS);
     }
@@ -80,9 +79,7 @@ public class DrawHelper {
     }
 
     private static void clearCanvas(Canvas canvas, RectF rect) {
-        if (rect.width() <= 0 || rect.height() <= 0) {
-            return;
-        }
+        if (rect.width() <= 0 || rect.height() <= 0) return;
         canvas.drawRect(rect, PAINT);
     }
 }

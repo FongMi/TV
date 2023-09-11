@@ -45,7 +45,6 @@ import master.flame.danmaku.danmaku.util.SystemClock;
 
 public class DanmakuView extends View implements IDanmakuView, IDanmakuViewController {
 
-    public static final String TAG = "DanmakuView";
     private static final int MAX_RECORD_SIZE = 50;
     private static final int ONE_SECOND = 1000;
     protected volatile DrawHandler handler;
@@ -139,7 +138,6 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
         if (handler != null) {
             return handler.getCurrentVisibleDanmakus();
         }
-
         return null;
     }
 
@@ -211,8 +209,7 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
     }
 
     private void prepare() {
-        if (handler == null)
-            handler = new DrawHandler(getLooper(mDrawingThreadType), this, mDanmakuVisible);
+        if (handler == null) handler = new DrawHandler(getLooper(mDrawingThreadType), this, mDanmakuVisible);
     }
 
     @Override

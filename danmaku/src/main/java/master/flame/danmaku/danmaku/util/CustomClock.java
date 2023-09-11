@@ -3,6 +3,7 @@ package master.flame.danmaku.danmaku.util;
 import android.os.SystemClock;
 
 public class CustomClock {
+
     private static final float DEFAULT_SPEED = 1.0F;
     private final long baseTime;
     private float speed;
@@ -24,7 +25,6 @@ public class CustomClock {
         if (speed <= 0.0F) {
             speed = 1.0F;
         }
-
         this.elapsedRealtime();
         this.speed = speed;
         this.speedBaseTime = SystemClock.elapsedRealtime();
@@ -45,6 +45,7 @@ public class CustomClock {
     }
 
     private static class Holder {
+
         static CustomClock instance = new CustomClock();
 
         private Holder() {

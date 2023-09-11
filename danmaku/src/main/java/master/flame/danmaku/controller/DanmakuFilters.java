@@ -41,10 +41,8 @@ public class DanmakuFilters {
     public final static String TAG_OVERLAPPING_FILTER = "1019_Filter";
     public final static String TAG_PRIMARY_CUSTOM_FILTER = "2000_Primary_Custom_Filter";
     public final Exception filterException = new Exception("not suuport this filter tag");
-    private final Map<String, IDanmakuFilter<?>> filters = Collections
-            .synchronizedSortedMap(new TreeMap<String, IDanmakuFilter<?>>());
-    private final Map<String, IDanmakuFilter<?>> filtersSecondary = Collections
-            .synchronizedSortedMap(new TreeMap<String, IDanmakuFilter<?>>());
+    private final Map<String, IDanmakuFilter<?>> filters = Collections.synchronizedSortedMap(new TreeMap<>());
+    private final Map<String, IDanmakuFilter<?>> filtersSecondary = Collections.synchronizedSortedMap(new TreeMap<>());
     IDanmakuFilter<?>[] mFilterArray = new IDanmakuFilter[0];
     IDanmakuFilter<?>[] mFilterArraySecondary = new IDanmakuFilter[0];
 

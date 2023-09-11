@@ -16,7 +16,6 @@
 
 package master.flame.danmaku.controller;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.os.Build;
@@ -60,6 +59,7 @@ public class DrawHandler extends Handler {
     private static final long INDEFINITE_TIME = 10000000;
     private static final int MAX_RECORD_SIZE = 500;
     private final RenderingState mRenderingState = new RenderingState();
+    private final LinkedList<Long> mDrawTimes = new LinkedList<>();
     public IDrawTask drawTask;
     private DanmakuContext mContext;
     private FrameCallback mFrameCallback;
@@ -71,9 +71,8 @@ public class DrawHandler extends Handler {
     private DanmakuTimer timer = new DanmakuTimer();
     private BaseDanmakuParser mParser;
     private IDanmakuViewController mDanmakuView;
-    private boolean mDanmakusVisible = true;
+    private boolean mDanmakusVisible;
     private AbsDisplayer mDisp;
-    private LinkedList<Long> mDrawTimes = new LinkedList<>();
     private UpdateThread mThread;
     private boolean mUpdateInSeparateThread;
     private long mCordonTime = 30;
@@ -549,12 +548,7 @@ public class DrawHandler extends Handler {
 
     public void prepare() {
         mReady = false;
-        if (Build.VERSION.SDK_INT < 16 && mContext.updateMethod == 0) {
-            mContext.updateMethod = 2;
-        }
-        if (mContext.updateMethod == 0) {
-            mFrameCallback = new FrameCallback();
-        }
+        if (mContext.updateMethod == 0) mFrameCallback = new FrameCallback();
         mUpdateInSeparateThread = (mContext.updateMethod == 1);
         sendEmptyMessage(DrawHandler.PREPARE);
     }
@@ -592,9 +586,7 @@ public class DrawHandler extends Handler {
     }
 
     public RenderingState draw(Canvas canvas) {
-        if (drawTask == null)
-            return mRenderingState;
-
+        if (drawTask == null) return mRenderingState;
         if (!mInWaitingState) {
             AbsDanmakuSync danmakuSync = mContext.danmakuSync;
             if (danmakuSync != null) {
@@ -699,9 +691,7 @@ public class DrawHandler extends Handler {
         if (frames == 0) return 0;
         Long first = mDrawTimes.peekFirst();
         Long last = mDrawTimes.peekLast();
-        if (first == null || last == null) {
-            return 0;
-        }
+        if (first == null || last == null) return 0;
         long dtime = last - first;
         return dtime / frames;
     }
@@ -720,9 +710,7 @@ public class DrawHandler extends Handler {
     }
 
     public void notifyDispSizeChanged(int width, int height) {
-        if (mDisp == null) {
-            return;
-        }
+        if (mDisp == null) return;
         if (mDisp.getWidth() != width || mDisp.getHeight() != height) {
             mDisp.setSize(width, height);
             obtainMessage(NOTIFY_DISP_SIZE_CHANGED, true).sendToTarget();
@@ -730,15 +718,11 @@ public class DrawHandler extends Handler {
     }
 
     public void removeAllDanmakus(boolean isClearDanmakusOnScreen) {
-        if (drawTask != null) {
-            drawTask.removeAllDanmakus(isClearDanmakusOnScreen);
-        }
+        if (drawTask != null) drawTask.removeAllDanmakus(isClearDanmakusOnScreen);
     }
 
     public void removeAllLiveDanmakus() {
-        if (drawTask != null) {
-            drawTask.removeAllLiveDanmakus();
-        }
+        if (drawTask != null) drawTask.removeAllLiveDanmakus();
     }
 
     public IDanmakus getCurrentVisibleDanmakus() {
@@ -747,15 +731,9 @@ public class DrawHandler extends Handler {
     }
 
     public long getCurrentTime() {
-        if (!mReady) {
-            return 0;
-        }
-        if (mInSeekingAction) {
-            return mDesireSeekingTime;
-        }
-        if (quitFlag || !mInWaitingState) {
-            return timer.currMillisecond - mRemainingTime;
-        }
+        if (!mReady) return 0;
+        if (mInSeekingAction) return mDesireSeekingTime;
+        if (quitFlag || !mInWaitingState) return timer.currMillisecond - mRemainingTime;
         return SystemClock.uptimeMillis() - mTimeBase;
     }
 
@@ -782,7 +760,6 @@ public class DrawHandler extends Handler {
         void drawingFinished();
     }
 
-    @TargetApi(16)
     private class FrameCallback implements Choreographer.FrameCallback {
         @Override
         public void doFrame(long frameTimeNanos) {
