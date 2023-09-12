@@ -16,7 +16,6 @@
 
 package master.flame.danmaku.danmaku.parser;
 
-import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.model.IDisplay;
@@ -31,7 +30,6 @@ public abstract class BaseDanmakuParser {
     protected float mScaledDensity;
     protected IDisplay mDisp;
     protected DanmakuContext mContext;
-    protected Listener mListener;
     private IDanmakus mDanmakus;
 
     public IDisplay getDisplay() {
@@ -49,15 +47,9 @@ public abstract class BaseDanmakuParser {
         return this;
     }
 
-    public BaseDanmakuParser setListener(Listener listener) {
-        mListener = listener;
-        return this;
-    }
-
     /**
      * decide the speed of scroll-danmakus
      *
-     * @return
      */
     protected float getViewportSizeFactor() {
         return 1 / (mDispDensity - 0.6f);
@@ -88,9 +80,5 @@ public abstract class BaseDanmakuParser {
     public BaseDanmakuParser setConfig(DanmakuContext config) {
         mContext = config;
         return this;
-    }
-
-    public interface Listener {
-        void onDanmakuAdd(BaseDanmaku danmaku);
     }
 }

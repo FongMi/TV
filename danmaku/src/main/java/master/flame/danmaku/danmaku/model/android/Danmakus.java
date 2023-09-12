@@ -30,22 +30,14 @@ import master.flame.danmaku.danmaku.model.IDanmakus;
 
 public class Danmakus implements IDanmakus {
 
-    public Collection<BaseDanmaku> items;
-
+    private final AtomicInteger mSize = new AtomicInteger(0);
+    private Collection<BaseDanmaku> items;
     private Danmakus subItems;
-
     private BaseDanmaku startItem, endItem;
-
     private BaseDanmaku endSubItem;
-
     private BaseDanmaku startSubItem;
-
-    private volatile AtomicInteger mSize = new AtomicInteger(0);
-
     private int mSortType = ST_BY_TIME;
-
     private BaseComparator mComparator;
-
     private boolean mDuplicateMergingEnabled;
     private Object mLockObject = new Object();
 
@@ -154,7 +146,6 @@ public class Danmakus implements IDanmakus {
         if (endSubItem == null) {
             endSubItem = createItem("end");
         }
-
         startSubItem.setTime(startTime);
         endSubItem.setTime(endTime);
         return ((SortedSet<BaseDanmaku>) items).subSet(startSubItem, endSubItem);
@@ -163,10 +154,8 @@ public class Danmakus implements IDanmakus {
     @Override
     public IDanmakus subnew(long startTime, long endTime) {
         Collection<BaseDanmaku> subset = subset(startTime, endTime);
-        if (subset == null || subset.isEmpty()) {
-            return null;
-        }
-        LinkedList<BaseDanmaku> newSet = new LinkedList<BaseDanmaku>(subset);
+        if (subset == null || subset.isEmpty()) return null;
+        LinkedList<BaseDanmaku> newSet = new LinkedList<>(subset);
         return new Danmakus(newSet);
     }
 
