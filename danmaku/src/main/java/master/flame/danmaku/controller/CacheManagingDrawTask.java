@@ -51,7 +51,6 @@ public class CacheManagingDrawTask extends DrawTask {
 
     public CacheManagingDrawTask(DanmakuTimer timer, DanmakuContext config, TaskListener taskListener) {
         super(timer, config, taskListener);
-        NativeBitmapFactory.loadLibs();
         mMaxCacheSize = (int) Math.max(1024 * 1024 * 4, Runtime.getRuntime().maxMemory() * config.cachingPolicy.maxCachePoolSizeFactorPercentage);
         mCacheManager = new CacheManager(mMaxCacheSize, MAX_CACHE_SCREEN_SIZE);
         mRenderer.setCacheManager(mCacheManager);
@@ -150,7 +149,6 @@ public class CacheManagingDrawTask extends DrawTask {
             mCacheManager.end();
             mCacheManager = null;
         }
-        NativeBitmapFactory.releaseLibs();
     }
 
     @Override

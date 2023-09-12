@@ -45,7 +45,7 @@ public class DanmakuContext implements Cloneable {
     List<String> mUserHashBlackList = new ArrayList<>();
     private List<WeakReference<ConfigChangedCallback>> mCallbackList;
     private boolean mBlockGuestDanmaku = false;
-    private boolean mDuplicateMergingEnable = false;
+    private boolean mDuplicateMergingEnable = true;
     private boolean mIsAlignBottom = false;
     private BaseCacheStuffer mCacheStuffer;
     private boolean mIsMaxLinesLimited;

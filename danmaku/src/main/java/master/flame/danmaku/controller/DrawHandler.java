@@ -409,14 +409,14 @@ public class DrawHandler extends Handler {
         long time = startMS - mTimeBase;
         if (mNonBlockModeEnable) {
             if (mCallback != null) {
-                mCallback.updateTimer(timer);
+                //mCallback.updateTimer(timer);
                 d = timer.lastInterval();
             }
         } else if (!mDanmakusVisible || mRenderingState.nothingRendered || mInWaitingState) {
             timer.update(time);
             mRemainingTime = 0;
             if (mCallback != null) {
-                mCallback.updateTimer(timer);
+                //mCallback.updateTimer(timer);
             }
         } else {
             long gapTime = time - timer.currMillisecond;
@@ -438,7 +438,7 @@ public class DrawHandler extends Handler {
             mRemainingTime = gapTime;
             timer.add(d);
             if (mCallback != null) {
-                mCallback.updateTimer(timer);
+                //mCallback.updateTimer(timer);
             }
         }
         mInSyncAction = false;
@@ -483,12 +483,12 @@ public class DrawHandler extends Handler {
 
             @Override
             public void onDanmakuShown(BaseDanmaku danmaku) {
-                if (mCallback != null) mCallback.danmakuShown(danmaku);
+                //if (mCallback != null) mCallback.danmakuShown(danmaku);
             }
 
             @Override
             public void onDanmakusDrawingFinished() {
-                if (mCallback != null) mCallback.drawingFinished();
+                //if (mCallback != null) mCallback.drawingFinished();
             }
 
             @Override
@@ -752,12 +752,6 @@ public class DrawHandler extends Handler {
     public interface Callback {
 
         void prepared();
-
-        void updateTimer(DanmakuTimer timer);
-
-        void danmakuShown(BaseDanmaku danmaku);
-
-        void drawingFinished();
     }
 
     private class FrameCallback implements Choreographer.FrameCallback {

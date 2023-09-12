@@ -61,6 +61,7 @@ import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.player.Source;
+import com.fongmi.android.tv.player.danmu.Parser;
 import com.fongmi.android.tv.service.PlaybackService;
 import com.fongmi.android.tv.ui.adapter.EpisodeAdapter;
 import com.fongmi.android.tv.ui.adapter.FlagAdapter;
@@ -101,7 +102,8 @@ import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import master.flame.danmaku.danmaku.model.IDanmakus;
+import master.flame.danmaku.danmaku.model.IDisplay;
+import master.flame.danmaku.danmaku.model.android.DanmakuContext;
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
 public class VideoActivity extends BaseActivity implements Clock.Callback, CustomKeyDownVod.Listener, CastDialog.Listener, TrackDialog.Listener, ControlDialog.Listener, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, QualityAdapter.OnClickListener, QuickAdapter.OnClickListener, ParseAdapter.OnClickListener, SubtitleCallback {
@@ -111,6 +113,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private Observer<Result> mObserveDetail;
     private Observer<Result> mObservePlayer;
     private Observer<Result> mObserveSearch;
+    private DanmakuContext mDanmakuContext;
     private EpisodeAdapter mEpisodeAdapter;
     private QualityAdapter mQualityAdapter;
     private ControlDialog mControlDialog;
@@ -262,7 +265,8 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        if (TextUtils.isEmpty(intent.getStringExtra("id"))) return;
+        String id = intent.getStringExtra("id");
+        if (TextUtils.isEmpty(id) || id.equals(getId())) return;
         mBinding.swipeLayout.setRefreshing(true);
         getIntent().putExtras(intent);
         stopSearch();
@@ -274,6 +278,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     protected void initView(Bundle savedInstanceState) {
         mKeyDown = CustomKeyDownVod.create(this, mBinding.video);
         mFrameParams = mBinding.video.getLayoutParams();
+        mDanmakuContext = DanmakuContext.create();
         mBinding.progressLayout.showProgress();
         mBinding.swipeLayout.setEnabled(false);
         mPlayers = new Players().init(this);
@@ -292,6 +297,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         setForeground(true);
         setRecyclerView();
         setVideoView();
+        setDanmuView();
         setViewModel();
         showProgress();
         checkId();
@@ -381,6 +387,11 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         getExo().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
         getIjk().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
         setSubtitle(14);
+    }
+
+    private void setDanmuView() {
+        mPlayers.setDanmuView(mBinding.danmu);
+        mDanmakuContext.setDanmakuStyle(IDisplay.DANMAKU_STYLE_STROKEN, 3).setDanmakuMargin(ResUtil.dp2px(24));
     }
 
     @Override
@@ -509,11 +520,13 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mBinding.quality.setVisibility(result.getUrl().isOnly() ? View.GONE : View.VISIBLE);
         mBinding.swipeLayout.setRefreshing(false);
         mQualityAdapter.addAll(result);
-        loadDanmu(result.getDanmakus());
+        checkDanmu(result.getDanmaku());
     }
 
-    private void loadDanmu(IDanmakus danmakus) {
-
+    private void checkDanmu(String danmu) {
+        mBinding.danmu.release();
+        mBinding.danmu.setVisibility(danmu.isEmpty() ? View.GONE : View.VISIBLE);
+        if (danmu.length() > 0) mBinding.danmu.prepare(new Parser(danmu), mDanmakuContext);
     }
 
     @Override

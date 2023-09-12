@@ -47,13 +47,14 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
     private static final int MAX_RECORD_SIZE = 50;
     private static final int ONE_SECOND = 1000;
 
-    private Callback mCallback;
-    private Object mDrawMonitor;
     private OnDanmakuClickListener mOnDanmakuClickListener;
     private DanmakuTouchHelper mTouchHelper;
     private HandlerThread mHandlerThread;
-    private LinkedList<Long> mDrawTimes;
     private volatile DrawHandler handler;
+    private LinkedList<Long> mDrawTimes;
+    private Object mDrawMonitor;
+    private Callback mCallback;
+
     private boolean mEnableDrawingCache;
     private boolean isSurfaceCreated;
     private boolean mDanmakuVisible;
@@ -135,6 +136,11 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
     public void setCallback(Callback callback) {
         if (handler != null) handler.setCallback(callback);
         mCallback = callback;
+    }
+
+    public void setSpeed(float speed) {
+        if (getConfig() == null) return;
+        getConfig().setSpeed(speed);
     }
 
     @Override

@@ -23,14 +23,15 @@ import master.flame.danmaku.danmaku.model.android.DanmakuContext;
 
 public abstract class BaseDanmakuParser {
 
-    protected DanmakuTimer mTimer;
-    protected int mDispWidth;
-    protected int mDispHeight;
-    protected float mDispDensity;
-    protected float mScaledDensity;
-    protected IDisplay mDisp;
     protected DanmakuContext mContext;
+    protected DanmakuTimer mTimer;
     private IDanmakus mDanmakus;
+    private IDisplay mDisp;
+
+    protected float mDisplayDensity;
+    protected float mScaledDensity;
+    protected int mDisplayHeight;
+    protected int mDisplayWidth;
 
     public IDisplay getDisplay() {
         return mDisp;
@@ -38,21 +39,20 @@ public abstract class BaseDanmakuParser {
 
     public BaseDanmakuParser setDisplay(IDisplay disp) {
         mDisp = disp;
-        mDispWidth = disp.getWidth();
-        mDispHeight = disp.getHeight();
-        mDispDensity = disp.getDensity();
+        mDisplayWidth = disp.getWidth();
+        mDisplayHeight = disp.getHeight();
+        mDisplayDensity = disp.getDensity();
         mScaledDensity = disp.getScaledDensity();
-        mContext.mDanmakuFactory.updateViewportState(mDispWidth, mDispHeight, getViewportSizeFactor());
+        mContext.mDanmakuFactory.updateViewportState(mDisplayWidth, mDisplayHeight, getViewportSizeFactor());
         mContext.mDanmakuFactory.updateMaxDanmakuDuration();
         return this;
     }
 
     /**
      * decide the speed of scroll-danmakus
-     *
      */
     protected float getViewportSizeFactor() {
-        return 1 / (mDispDensity - 0.6f);
+        return 1 / (mDisplayDensity - 0.6f);
     }
 
     public DanmakuTimer getTimer() {

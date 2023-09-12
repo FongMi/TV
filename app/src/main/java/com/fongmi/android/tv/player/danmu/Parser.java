@@ -49,15 +49,15 @@ public class Parser extends BaseDanmakuParser {
     @Override
     public BaseDanmakuParser setDisplay(IDisplay display) {
         super.setDisplay(display);
-        scaleX = mDispWidth / DanmakuFactory.BILI_PLAYER_WIDTH;
-        scaleY = mDispHeight / DanmakuFactory.BILI_PLAYER_HEIGHT;
+        scaleX = mDisplayWidth / DanmakuFactory.BILI_PLAYER_WIDTH;
+        scaleY = mDisplayHeight / DanmakuFactory.BILI_PLAYER_HEIGHT;
         return this;
     }
 
     private void setParam(String[] values) {
         int type = Integer.parseInt(values[1]);
         long time = (long) (Float.parseFloat(values[0]) * 1000);
-        float size = Float.parseFloat(values[2]) * (mDispDensity - 0.6f);
+        float size = Float.parseFloat(values[2]) * (mDisplayDensity - 0.6f);
         int color = (int) ((0x00000000ff000000L | Long.parseLong(values[3])) & 0x00000000ffffffffL);
         item = mContext.mDanmakuFactory.createDanmaku(type, mContext);
         item.setTime(time);
