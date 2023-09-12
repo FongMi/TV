@@ -132,7 +132,6 @@ public class CacheManagingDrawTask extends DrawTask {
     @Override
     public void start() {
         super.start();
-        NativeBitmapFactory.loadLibs();
         if (mCacheManager == null) {
             mCacheManager = new CacheManager(mMaxCacheSize, MAX_CACHE_SCREEN_SIZE);
             mCacheManager.begin();

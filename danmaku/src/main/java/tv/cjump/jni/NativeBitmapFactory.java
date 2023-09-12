@@ -14,30 +14,23 @@ public class NativeBitmapFactory {
 
     static Field nativeIntField = null;
 
-    static boolean nativeLibLoaded = false;
+    static {
+        System.loadLibrary("ndkbitmap");
+    }
 
     public static void loadLibs() {
-        System.loadLibrary("ndkbitmap");
-        nativeLibLoaded = true;
         boolean libInit = init();
         if (!libInit) {
             release();
-            nativeLibLoaded = false;
         } else {
             initField();
-            boolean confirm = testLib();
-            if (!confirm) {
-                release();
-                nativeLibLoaded = false;
-            }
+            if (!testLib()) release();
         }
     }
 
     public static synchronized void releaseLibs() {
-        boolean loaded = nativeLibLoaded;
         nativeIntField = null;
-        nativeLibLoaded = false;
-        if (loaded) release();
+        release();
     }
 
     static void initField() {
@@ -103,7 +96,7 @@ public class NativeBitmapFactory {
     }
 
     public static synchronized Bitmap createBitmap(int width, int height, Bitmap.Config config, boolean hasAlpha) {
-        if (!nativeLibLoaded || nativeIntField == null) return Bitmap.createBitmap(width, height, config);
+        if (nativeIntField == null) return Bitmap.createBitmap(width, height, config);
         return createNativeBitmap(width, height, config, hasAlpha);
     }
 
