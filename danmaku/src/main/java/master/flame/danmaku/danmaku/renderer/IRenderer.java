@@ -21,7 +21,7 @@ import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.ICacheManager;
 import master.flame.danmaku.danmaku.model.IDanmakus;
-import master.flame.danmaku.danmaku.model.IDisplayer;
+import master.flame.danmaku.danmaku.model.IDisplay;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 
 public interface IRenderer {
@@ -30,7 +30,7 @@ public interface IRenderer {
     int CACHE_RENDERING = 1;
     int TEXT_RENDERING = 2;
 
-    void draw(IDisplayer disp, IDanmakus danmakus, long startRenderTime, RenderingState renderingState);
+    void draw(IDisplay disp, IDanmakus danmakus, long startRenderTime, RenderingState renderingState);
 
     void clear();
 

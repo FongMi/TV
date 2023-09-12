@@ -33,7 +33,7 @@ public abstract class BaseCacheStuffer {
      */
     public abstract void clearCaches();
 
-    public abstract void drawDanmaku(BaseDanmaku danmaku, Canvas canvas, float left, float top, boolean fromWorkerThread, AndroidDisplayer.DisplayerConfig displayerConfig);
+    public abstract void drawDanmaku(BaseDanmaku danmaku, Canvas canvas, float left, float top, boolean fromWorkerThread, AndroidDisplay.DisplayerConfig displayerConfig);
 
     public boolean drawCache(BaseDanmaku danmaku, Canvas canvas, float left, float top, Paint alphaPaint, TextPaint paint) {
         IDrawingCache<?> cache = danmaku.getDrawingCache();
@@ -73,5 +73,4 @@ public abstract class BaseCacheStuffer {
         public abstract void releaseResource(BaseDanmaku danmaku);
 
     }
-
 }

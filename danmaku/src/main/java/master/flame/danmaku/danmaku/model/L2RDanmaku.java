@@ -24,12 +24,12 @@ public class L2RDanmaku extends R2LDanmaku {
     }
 
     @Override
-    public void layout(IDisplayer displayer, float x, float y) {
+    public void layout(IDisplay display, float x, float y) {
         if (mTimer != null) {
             long currMS = mTimer.currMillisecond;
             long deltaDuration = currMS - getActualTime();
             if (deltaDuration > 0 && deltaDuration < duration.value) {
-                this.x = getAccurateLeft(displayer, currMS);
+                this.x = getAccurateLeft(display, currMS);
                 if (!this.isShown()) {
                     this.y = y;
                     this.setVisibility(true);
@@ -43,13 +43,10 @@ public class L2RDanmaku extends R2LDanmaku {
     }
 
     @Override
-    public float[] getRectAtTime(IDisplayer displayer, long time) {
-        if (!isMeasured())
-            return null;
-        float left = getAccurateLeft(displayer, time);
-        if (RECT == null) {
-            RECT = new float[4];
-        }
+    public float[] getRectAtTime(IDisplay display, long time) {
+        if (!isMeasured()) return null;
+        float left = getAccurateLeft(display, time);
+        if (RECT == null) RECT = new float[4];
         RECT[0] = left;
         RECT[1] = y;
         RECT[2] = left + paintWidth;
@@ -57,11 +54,9 @@ public class L2RDanmaku extends R2LDanmaku {
         return RECT;
     }
 
-    protected float getAccurateLeft(IDisplayer displayer, long currTime) {
+    protected float getAccurateLeft(IDisplay display, long currTime) {
         long elapsedTime = currTime - getActualTime();
-        if (elapsedTime >= duration.value) {
-            return displayer.getWidth();
-        }
+        if (elapsedTime >= duration.value) return display.getWidth();
         return mStepX * elapsedTime - paintWidth;
     }
 
@@ -89,5 +84,4 @@ public class L2RDanmaku extends R2LDanmaku {
     public int getType() {
         return TYPE_SCROLL_LR;
     }
-
 }

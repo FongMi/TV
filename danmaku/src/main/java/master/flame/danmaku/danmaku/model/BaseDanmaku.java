@@ -16,8 +16,6 @@
 
 package master.flame.danmaku.danmaku.model;
 
-import android.util.SparseArray;
-
 public abstract class BaseDanmaku {
 
     public final static String DANMAKU_BR_CHAR = "/n";
@@ -38,6 +36,7 @@ public abstract class BaseDanmaku {
 
     public final static int FLAG_REQUEST_REMEASURE = 0x1;
     public final static int FLAG_REQUEST_INVALIDATE = 0x2;
+
     /**
      * 偏移时间
      */
@@ -176,7 +175,6 @@ public abstract class BaseDanmaku {
      * 重置位 visible
      */
     private int visibleResetFlag = 0;
-    private SparseArray<Object> mTags = new SparseArray<>();
 
     public long getDuration() {
         return duration.value;
@@ -186,7 +184,7 @@ public abstract class BaseDanmaku {
         this.duration = duration;
     }
 
-    public int draw(IDisplayer displayer) {
+    public int draw(IDisplay displayer) {
         return displayer.draw(this);
     }
 
@@ -194,8 +192,8 @@ public abstract class BaseDanmaku {
         return paintWidth > -1 && paintHeight > -1 && measureResetFlag == flags.MEASURE_RESET_FLAG;
     }
 
-    public void measure(IDisplayer displayer, boolean fromWorkerThread) {
-        displayer.measure(this, fromWorkerThread);
+    public void measure(IDisplay display, boolean fromWorkerThread) {
+        display.measure(this, fromWorkerThread);
         this.measureResetFlag = flags.MEASURE_RESET_FLAG;
     }
 
@@ -203,8 +201,8 @@ public abstract class BaseDanmaku {
         return this.prepareResetFlag == flags.PREPARE_RESET_FLAG;
     }
 
-    public void prepare(IDisplayer displayer, boolean fromWorkerThread) {
-        displayer.prepare(this, fromWorkerThread);
+    public void prepare(IDisplay display, boolean fromWorkerThread) {
+        display.prepare(this, fromWorkerThread);
         this.prepareResetFlag = flags.PREPARE_RESET_FLAG;
     }
 
@@ -262,9 +260,9 @@ public abstract class BaseDanmaku {
         }
     }
 
-    public abstract void layout(IDisplayer displayer, float x, float y);
+    public abstract void layout(IDisplay display, float x, float y);
 
-    public abstract float[] getRectAtTime(IDisplayer displayer, long currTime);
+    public abstract float[] getRectAtTime(IDisplay display, long currTime);
 
     public abstract float getLeft();
 
@@ -296,15 +294,6 @@ public abstract class BaseDanmaku {
 
     public void setTag(Object tag) {
         this.tag = tag;
-    }
-
-    public void setTag(int key, Object tag) {
-        this.mTags.put(key, tag);
-    }
-
-    public Object getTag(int key) {
-        if (mTags == null) return null;
-        return mTags.get(key);
     }
 
     public void setTimeOffset(long timeOffset) {

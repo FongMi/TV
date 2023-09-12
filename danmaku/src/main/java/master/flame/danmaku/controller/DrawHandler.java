@@ -28,11 +28,11 @@ import android.view.Choreographer;
 import java.util.LinkedList;
 
 import master.flame.danmaku.danmaku.model.AbsDanmakuSync;
-import master.flame.danmaku.danmaku.model.AbsDisplayer;
+import master.flame.danmaku.danmaku.model.AbsDisplay;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.IDanmakus;
-import master.flame.danmaku.danmaku.model.IDisplayer;
+import master.flame.danmaku.danmaku.model.IDisplay;
 import master.flame.danmaku.danmaku.model.android.DanmakuContext;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
@@ -72,7 +72,7 @@ public class DrawHandler extends Handler {
     private BaseDanmakuParser mParser;
     private IDanmakuViewController mDanmakuView;
     private boolean mDanmakusVisible;
-    private AbsDisplayer mDisp;
+    private AbsDisplay mDisp;
     private UpdateThread mThread;
     private boolean mUpdateInSeparateThread;
     private long mCordonTime = 30;
@@ -503,7 +503,7 @@ public class DrawHandler extends Handler {
     }
 
     private IDrawTask createDrawTask(boolean useDrwaingCache, DanmakuTimer timer, Context context, int width, int height, boolean isHardwareAccelerated, IDrawTask.TaskListener taskListener) {
-        mDisp = mContext.getDisplayer();
+        mDisp = mContext.getDisplay();
         mDisp.setSize(width, height);
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         mDisp.setDensities(displayMetrics.density, displayMetrics.densityDpi, displayMetrics.scaledDensity);
@@ -705,7 +705,7 @@ public class DrawHandler extends Handler {
         }
     }
 
-    public IDisplayer getDisplayer() {
+    public IDisplay getDisplay() {
         return mDisp;
     }
 

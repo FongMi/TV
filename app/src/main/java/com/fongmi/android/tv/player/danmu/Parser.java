@@ -12,7 +12,7 @@ import master.flame.danmaku.danmaku.model.AlphaValue;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.Duration;
 import master.flame.danmaku.danmaku.model.IDanmakus;
-import master.flame.danmaku.danmaku.model.IDisplayer;
+import master.flame.danmaku.danmaku.model.IDisplay;
 import master.flame.danmaku.danmaku.model.SpecialDanmaku;
 import master.flame.danmaku.danmaku.model.android.DanmakuFactory;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
@@ -47,7 +47,7 @@ public class Parser extends BaseDanmakuParser {
     }
 
     @Override
-    public BaseDanmakuParser setDisplay(IDisplayer display) {
+    public BaseDanmakuParser setDisplay(IDisplay display) {
         super.setDisplay(display);
         scaleX = mDispWidth / DanmakuFactory.BILI_PLAYER_WIDTH;
         scaleY = mDispHeight / DanmakuFactory.BILI_PLAYER_HEIGHT;

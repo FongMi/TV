@@ -23,16 +23,11 @@ public class SpecialDanmaku extends BaseDanmaku {
     public float deltaX, deltaY;
     public long translationDuration;
     public long translationStartDelay;
-    /**
-     * Linear.easeIn or Quadratic.easeOut
-     */
     public boolean isQuadraticEaseOut = false;
     public int beginAlpha;
     public int endAlpha;
     public int deltaAlpha;
     public long alphaDuration;
-    public float rotateX, rotateZ;
-    public float pivotX, pivotY;
     public LinePath[] linePaths;
     private ScaleFactor mScaleFactor;
     private int mScaleFactorChangedFlag;
@@ -40,38 +35,30 @@ public class SpecialDanmaku extends BaseDanmaku {
     private int mCurrentHeight = 0;
     private float[] currStateValues = new float[4];
 
-    private final static float getQuadEaseOutProgress(long ctime, long duration) {
-//            Math.easeOutQuad = function (t, b, c, d) {
-//                t /= d;
-//                return -c * t*(t-2) + b;
-//            };
+    private static float getQuadEaseOutProgress(long ctime, long duration) {
         float t = ctime;
-//        float b = 0f;
         float c = 1.0f;
         float d = duration;
-        return -c * (t /= d) * (t - 2); // + b;
+        return -c * (t /= d) * (t - 2);
     }
 
     @Override
-    public void measure(IDisplayer displayer, boolean fromWorkerThread) {
-        super.measure(displayer, fromWorkerThread);
+    public void measure(IDisplay display, boolean fromWorkerThread) {
+        super.measure(display, fromWorkerThread);
         if (mCurrentWidth == 0 || mCurrentHeight == 0) {
-            mCurrentWidth = displayer.getWidth();
-            mCurrentHeight = displayer.getHeight();
+            mCurrentWidth = display.getWidth();
+            mCurrentHeight = display.getHeight();
         }
     }
 
     @Override
-    public void layout(IDisplayer displayer, float x, float y) {
-        getRectAtTime(displayer, mTimer.currMillisecond);
+    public void layout(IDisplay display, float x, float y) {
+        getRectAtTime(display, mTimer.currMillisecond);
     }
 
     @Override
-    public float[] getRectAtTime(IDisplayer displayer, long currTime) {
-
-        if (!isMeasured())
-            return null;
-
+    public float[] getRectAtTime(IDisplay display, long currTime) {
+        if (!isMeasured()) return null;
         if (mScaleFactor.isUpdated(this.mScaleFactorChangedFlag, mCurrentWidth, mCurrentHeight)) {
             float scaleX = mScaleFactor.scaleX;
             float scaleY = mScaleFactor.scaleY;
@@ -93,10 +80,7 @@ public class SpecialDanmaku extends BaseDanmaku {
             this.mCurrentWidth = mScaleFactor.width;
             this.mCurrentHeight = mScaleFactor.height;
         }
-
         long deltaTime = currTime - getActualTime();
-
-        // caculate alpha
         if (alphaDuration > 0 && deltaAlpha != 0) {
             if (deltaTime >= alphaDuration) {
                 alpha = endAlpha;
@@ -106,8 +90,6 @@ public class SpecialDanmaku extends BaseDanmaku {
                 alpha = beginAlpha + vectorAlpha;
             }
         }
-
-        // caculate x y
         float currX = beginX;
         float currY = beginY;
         long dtime = deltaTime - translationStartDelay;
@@ -154,14 +136,11 @@ public class SpecialDanmaku extends BaseDanmaku {
             currX = endX;
             currY = endY;
         }
-
         currStateValues[0] = currX;
         currStateValues[1] = currY;
         currStateValues[2] = currX + paintWidth;
         currStateValues[3] = currY + paintHeight;
-
         this.setVisibility(!isOutside());
-
         return currStateValues;
     }
 
@@ -190,8 +169,7 @@ public class SpecialDanmaku extends BaseDanmaku {
         return TYPE_SPECIAL;
     }
 
-    public void setTranslationData(float beginX, float beginY, float endX, float endY,
-                                   long translationDuration, long translationStartDelay) {
+    public void setTranslationData(float beginX, float beginY, float endX, float endY, long translationDuration, long translationStartDelay) {
         this.beginX = beginX;
         this.beginY = beginY;
         this.endX = endX;
@@ -237,7 +215,6 @@ public class SpecialDanmaku extends BaseDanmaku {
                     line.endTime = line.beginTime + line.duration;
                     lastLine = line;
                 }
-
             }
         }
     }
@@ -259,9 +236,7 @@ public class SpecialDanmaku extends BaseDanmaku {
         }
 
         public void update(int width, int height, float scaleX, float scaleY) {
-            if (Float.compare(this.scaleX, scaleX) != 0 || Float.compare(this.scaleY, scaleY) != 0) {
-                flag++;
-            }
+            if (Float.compare(this.scaleX, scaleX) != 0 || Float.compare(this.scaleY, scaleY) != 0) flag++;
             this.width = width;
             this.height = height;
             this.scaleX = scaleX;
@@ -273,8 +248,8 @@ public class SpecialDanmaku extends BaseDanmaku {
         }
     }
 
-    private class Point {
-        float x, y;
+    private static class Point {
+        public float x, y;
 
         public Point(float x, float y) {
             this.x = x;
@@ -288,10 +263,10 @@ public class SpecialDanmaku extends BaseDanmaku {
         }
     }
 
-    public class LinePath {
+    public static class LinePath {
         public long duration, beginTime, endTime;
-        Point pBegin, pEnd;
-        float delatX, deltaY;
+        public Point pBegin, pEnd;
+        public float delatX, deltaY;
 
         public void setPoints(Point pBegin, Point pEnd) {
             this.pBegin = pBegin;
@@ -305,17 +280,11 @@ public class SpecialDanmaku extends BaseDanmaku {
         }
 
         public float[] getBeginPoint() {
-            return new float[]{
-                    pBegin.x, pBegin.y
-            };
+            return new float[]{pBegin.x, pBegin.y};
         }
 
         public float[] getEndPoint() {
-            return new float[]{
-                    pEnd.x, pEnd.y
-            };
+            return new float[]{pEnd.x, pEnd.y};
         }
-
     }
-
 }

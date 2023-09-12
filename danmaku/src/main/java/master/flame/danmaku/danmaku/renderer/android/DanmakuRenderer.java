@@ -20,7 +20,7 @@ import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.ICacheManager;
 import master.flame.danmaku.danmaku.model.IDanmakus;
-import master.flame.danmaku.danmaku.model.IDisplayer;
+import master.flame.danmaku.danmaku.model.IDisplay;
 import master.flame.danmaku.danmaku.model.IDrawingCache;
 import master.flame.danmaku.danmaku.model.android.DanmakuContext;
 import master.flame.danmaku.danmaku.renderer.IRenderer;
@@ -74,7 +74,7 @@ public class DanmakuRenderer extends Renderer {
     }
 
     @Override
-    public void draw(final IDisplayer disp, IDanmakus danmakus, long startRenderTime, final RenderingState renderingState) {
+    public void draw(final IDisplay disp, IDanmakus danmakus, long startRenderTime, final RenderingState renderingState) {
         mStartTimer = renderingState.timer;
         mConsumer.disp = disp;
         mConsumer.renderingState = renderingState;
@@ -103,7 +103,7 @@ public class DanmakuRenderer extends Renderer {
     }
 
     private class Consumer extends IDanmakus.DefaultConsumer<BaseDanmaku> {
-        public IDisplayer disp;
+        public IDisplay disp;
         public RenderingState renderingState;
         public long startRenderTime;
         private BaseDanmaku lastItem;

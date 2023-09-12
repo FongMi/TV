@@ -11,7 +11,7 @@ import java.util.Map;
 import master.flame.danmaku.controller.DanmakuFilters;
 import master.flame.danmaku.controller.DanmakuFilters.IDanmakuFilter;
 import master.flame.danmaku.danmaku.model.AbsDanmakuSync;
-import master.flame.danmaku.danmaku.model.AbsDisplayer;
+import master.flame.danmaku.danmaku.model.AbsDisplay;
 import master.flame.danmaku.danmaku.model.AlphaValue;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.GlobalFlagValues;
@@ -48,7 +48,7 @@ public class DanmakuContext implements Cloneable {
     public float scrollSpeedFactor = 1.0f;
     public AbsDanmakuSync danmakuSync;
     public CustomClock mCustomClock = CustomClock.getInstance().init();
-    public AbsDisplayer mDisplayer = new AndroidDisplayer();
+    public AbsDisplay mDisplayer = new AndroidDisplay();
     public GlobalFlagValues mGlobalFlagValues = new GlobalFlagValues();
     public DanmakuFilters mDanmakuFilters = new DanmakuFilters();
     public DanmakuFactory mDanmakuFactory = DanmakuFactory.create();
@@ -61,10 +61,10 @@ public class DanmakuContext implements Cloneable {
      * Note: 在系统{@link android.os.Build.VERSION_CODES#JELLY_BEAN}以下, 0方式会被2方式代替
      */
     public byte updateMethod = 0;
-    List<Integer> mFilterTypes = new ArrayList<Integer>();
-    List<Integer> mColorValueWhiteList = new ArrayList<Integer>();
-    List<Integer> mUserIdBlackList = new ArrayList<Integer>();
-    List<String> mUserHashBlackList = new ArrayList<String>();
+    List<Integer> mFilterTypes = new ArrayList<>();
+    List<Integer> mColorValueWhiteList = new ArrayList<>();
+    List<Integer> mUserIdBlackList = new ArrayList<>();
+    List<String> mUserHashBlackList = new ArrayList<>();
     private List<WeakReference<ConfigChangedCallback>> mCallbackList;
     private boolean mBlockGuestDanmaku = false;
     private boolean mDuplicateMergingEnable = false;
@@ -86,7 +86,7 @@ public class DanmakuContext implements Cloneable {
         this.mBaseComparator = baseComparator;
     }
 
-    public AbsDisplayer getDisplayer() {
+    public AbsDisplay getDisplay() {
         return mDisplayer;
     }
 
@@ -666,7 +666,7 @@ public class DanmakuContext implements Cloneable {
     }
 
     public DanmakuContext resetContext() {
-        mDisplayer = new AndroidDisplayer();
+        mDisplayer = new AndroidDisplay();
         mGlobalFlagValues = new GlobalFlagValues();
 //        mDanmakuFilters = new DanmakuFilters();
         mDanmakuFilters.clear();

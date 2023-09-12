@@ -18,15 +18,15 @@ package master.flame.danmaku.danmaku.util;
 
 import android.text.TextUtils;
 
-import master.flame.danmaku.danmaku.model.AbsDisplayer;
+import master.flame.danmaku.danmaku.model.AbsDisplay;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
-import master.flame.danmaku.danmaku.model.IDisplayer;
+import master.flame.danmaku.danmaku.model.IDisplay;
 import master.flame.danmaku.danmaku.model.android.DrawingCache;
 import master.flame.danmaku.danmaku.model.android.DrawingCacheHolder;
 
 public class DanmakuUtils {
 
-    public static boolean willHitInDuration(IDisplayer disp, BaseDanmaku d1, BaseDanmaku d2, long duration, long currTime) {
+    public static boolean willHitInDuration(IDisplay disp, BaseDanmaku d1, BaseDanmaku d2, long duration, long currTime) {
         final int type1 = d1.getType();
         final int type2 = d2.getType();
         if (type1 != type2) return false;
@@ -38,7 +38,7 @@ public class DanmakuUtils {
         return checkHitAtTime(disp, d1, d2, currTime) || checkHitAtTime(disp, d1, d2, d1.getActualTime() + d1.getDuration());
     }
 
-    private static boolean checkHitAtTime(IDisplayer disp, BaseDanmaku d1, BaseDanmaku d2, long time) {
+    private static boolean checkHitAtTime(IDisplay disp, BaseDanmaku d1, BaseDanmaku d2, long time) {
         final float[] rectArr1 = d1.getRectAtTime(disp, time);
         final float[] rectArr2 = d2.getRectAtTime(disp, time);
         if (rectArr1 == null || rectArr2 == null) return false;
@@ -52,12 +52,12 @@ public class DanmakuUtils {
         return false;
     }
 
-    public static DrawingCache buildDanmakuDrawingCache(BaseDanmaku danmaku, IDisplayer disp, DrawingCache cache, int bitsPerPixel) {
+    public static DrawingCache buildDanmakuDrawingCache(BaseDanmaku danmaku, IDisplay disp, DrawingCache cache, int bitsPerPixel) {
         if (cache == null) cache = new DrawingCache();
         cache.build((int) Math.ceil(danmaku.paintWidth), (int) Math.ceil(danmaku.paintHeight), disp.getDensityDpi(), false, bitsPerPixel);
         DrawingCacheHolder holder = cache.get();
         if (holder != null) {
-            ((AbsDisplayer) disp).drawDanmaku(danmaku, holder.canvas, 0, 0, true);
+            ((AbsDisplay) disp).drawDanmaku(danmaku, holder.canvas, 0, 0, true);
             if (disp.isHardwareAccelerated()) {
                 holder.splitWith(disp.getWidth(), disp.getHeight(), disp.getMaximumCacheWidth(), disp.getMaximumCacheHeight());
             }
@@ -88,7 +88,7 @@ public class DanmakuUtils {
         return r;
     }
 
-    public static boolean isOverSize(IDisplayer disp, BaseDanmaku item) {
+    public static boolean isOverSize(IDisplay disp, BaseDanmaku item) {
         return disp.isHardwareAccelerated() && (item.paintWidth > disp.getMaximumCacheWidth() || item.paintHeight > disp.getMaximumCacheHeight());
     }
 

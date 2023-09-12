@@ -22,5 +22,4 @@ public class Duration implements Cloneable {
             value = (long) (mInitialDuration * f);
         }
     }
-
 }

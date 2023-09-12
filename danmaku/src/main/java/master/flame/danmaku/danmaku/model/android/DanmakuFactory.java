@@ -20,7 +20,7 @@ import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.Duration;
 import master.flame.danmaku.danmaku.model.FBDanmaku;
 import master.flame.danmaku.danmaku.model.FTDanmaku;
-import master.flame.danmaku.danmaku.model.IDisplayer;
+import master.flame.danmaku.danmaku.model.IDisplay;
 import master.flame.danmaku.danmaku.model.L2RDanmaku;
 import master.flame.danmaku.danmaku.model.R2LDanmaku;
 import master.flame.danmaku.danmaku.model.SpecialDanmaku;
@@ -49,7 +49,7 @@ public class DanmakuFactory {
     public Duration MAX_Duration_Scroll_Danmaku;
     public Duration MAX_Duration_Fix_Danmaku;
     public Duration MAX_Duration_Special_Danmaku;
-    public IDisplayer sLastDisp;
+    public IDisplay sLastDisp;
     private SpecialDanmaku.ScaleFactor mScaleFactor = null;
     private float CURRENT_DISP_SIZE_FACTOR = 1.0f;
     private DanmakuContext sLastConfig;
@@ -81,7 +81,7 @@ public class DanmakuFactory {
 
     public void notifyDispSizeChanged(DanmakuContext context) {
         sLastConfig = context;
-        sLastDisp = context.getDisplayer();
+        sLastDisp = context.getDisplay();
         createDanmaku(BaseDanmaku.TYPE_SCROLL_RL, context);
     }
 
@@ -92,11 +92,11 @@ public class DanmakuFactory {
     public BaseDanmaku createDanmaku(int type, DanmakuContext context) {
         if (context == null) return null;
         sLastConfig = context;
-        sLastDisp = context.getDisplayer();
+        sLastDisp = context.getDisplay();
         return createDanmaku(type, sLastDisp.getWidth(), sLastDisp.getHeight(), CURRENT_DISP_SIZE_FACTOR, context.scrollSpeedFactor);
     }
 
-    public BaseDanmaku createDanmaku(int type, IDisplayer disp, float viewportScale, float scrollSpeedFactor) {
+    public BaseDanmaku createDanmaku(int type, IDisplay disp, float viewportScale, float scrollSpeedFactor) {
         if (disp == null) return null;
         sLastDisp = disp;
         return createDanmaku(type, disp.getWidth(), disp.getHeight(), viewportScale, scrollSpeedFactor);

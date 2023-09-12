@@ -18,7 +18,7 @@ package master.flame.danmaku.danmaku.renderer.android;
 
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDanmakus;
-import master.flame.danmaku.danmaku.model.IDisplayer;
+import master.flame.danmaku.danmaku.model.IDisplay;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.util.DanmakuUtils;
 
@@ -47,7 +47,7 @@ public class DanmakusRetainer {
         }
     }
 
-    public void fix(BaseDanmaku danmaku, IDisplayer disp, Verifier verifier) {
+    public void fix(BaseDanmaku danmaku, IDisplay disp, Verifier verifier) {
         int type = danmaku.getType();
         switch (type) {
             case BaseDanmaku.TYPE_SCROLL_RL:
@@ -94,7 +94,7 @@ public class DanmakusRetainer {
 
     public interface IDanmakusRetainer {
 
-        void fix(BaseDanmaku drawItem, IDisplayer disp, Verifier verifier);
+        void fix(BaseDanmaku drawItem, IDisplay disp, Verifier verifier);
 
         void clear();
     }
@@ -114,7 +114,7 @@ public class DanmakusRetainer {
         protected RetainerConsumer mConsumer = new RetainerConsumer();
 
         @Override
-        public void fix(BaseDanmaku drawItem, IDisplayer disp, Verifier verifier) {
+        public void fix(BaseDanmaku drawItem, IDisplay disp, Verifier verifier) {
             if (drawItem.isOutside()) return;
             float topPos = disp.getAllMarginTop();
             int lines = 0;
@@ -194,7 +194,7 @@ public class DanmakusRetainer {
             }
         }
 
-        protected boolean isOutVerticalEdge(boolean overwriteInsert, BaseDanmaku drawItem, IDisplayer disp, float topPos, BaseDanmaku firstItem, BaseDanmaku lastItem) {
+        protected boolean isOutVerticalEdge(boolean overwriteInsert, BaseDanmaku drawItem, IDisplay disp, float topPos, BaseDanmaku firstItem, BaseDanmaku lastItem) {
             return topPos < disp.getAllMarginTop() || (firstItem != null && firstItem.getTop() > 0) || topPos + drawItem.paintHeight > disp.getHeight();
         }
 
@@ -206,7 +206,7 @@ public class DanmakusRetainer {
 
         protected class RetainerConsumer extends IDanmakus.Consumer<BaseDanmaku, RetainerState> {
 
-            public IDisplayer disp;
+            public IDisplay disp;
             public BaseDanmaku insertItem = null, firstItem = null, lastItem = null, minRightRow = null, drawItem = null;
             int lines = 0;
             boolean overwriteInsert = false;
@@ -281,7 +281,7 @@ public class DanmakusRetainer {
     private static class FTDanmakusRetainer extends AlignTopRetainer {
 
         @Override
-        protected boolean isOutVerticalEdge(boolean overwriteInsert, BaseDanmaku drawItem, IDisplayer disp, float topPos, BaseDanmaku firstItem, BaseDanmaku lastItem) {
+        protected boolean isOutVerticalEdge(boolean overwriteInsert, BaseDanmaku drawItem, IDisplay disp, float topPos, BaseDanmaku firstItem, BaseDanmaku lastItem) {
             return topPos + drawItem.paintHeight > disp.getHeight();
         }
     }
@@ -292,7 +292,7 @@ public class DanmakusRetainer {
         protected Danmakus mVisibleDanmakus = new Danmakus(Danmakus.ST_BY_YPOS_DESC);
 
         @Override
-        public void fix(BaseDanmaku drawItem, IDisplayer disp, Verifier verifier) {
+        public void fix(BaseDanmaku drawItem, IDisplay disp, Verifier verifier) {
             if (drawItem.isOutside()) return;
             boolean shown = drawItem.isShown();
             float topPos = shown ? drawItem.getTop() : -1;
@@ -350,7 +350,7 @@ public class DanmakusRetainer {
             }
         }
 
-        protected boolean isOutVerticalEdge(boolean overwriteInsert, BaseDanmaku drawItem, IDisplayer disp, float topPos, BaseDanmaku firstItem, BaseDanmaku lastItem) {
+        protected boolean isOutVerticalEdge(boolean overwriteInsert, BaseDanmaku drawItem, IDisplay disp, float topPos, BaseDanmaku firstItem, BaseDanmaku lastItem) {
             return topPos < disp.getAllMarginTop() || (firstItem != null && firstItem.getBottom() != disp.getHeight());
         }
 
@@ -362,7 +362,7 @@ public class DanmakusRetainer {
 
         protected class RetainerConsumer extends IDanmakus.Consumer<BaseDanmaku, RetainerState> {
 
-            public IDisplayer disp;
+            public IDisplay disp;
             public BaseDanmaku removeItem = null, firstItem = null, drawItem = null;
             int lines = 0;
             boolean willHit = false;

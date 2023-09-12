@@ -83,7 +83,7 @@ public class SimpleTextCacheStuffer extends BaseCacheStuffer {
     }
 
     @Override
-    public void drawDanmaku(BaseDanmaku danmaku, Canvas canvas, float left, float top, boolean fromWorkerThread, AndroidDisplayer.DisplayerConfig displayerConfig) {
+    public void drawDanmaku(BaseDanmaku danmaku, Canvas canvas, float left, float top, boolean fromWorkerThread, AndroidDisplay.DisplayerConfig displayerConfig) {
         float _left = left;
         float _top = top;
         left += danmaku.padding;
@@ -93,7 +93,7 @@ public class SimpleTextCacheStuffer extends BaseCacheStuffer {
             top += displayerConfig.BORDER_WIDTH;
         }
 
-        displayerConfig.definePaintParams(fromWorkerThread);
+        displayerConfig.definePaintParams();
         TextPaint paint = displayerConfig.getPaint(danmaku, fromWorkerThread);
         drawBackground(danmaku, canvas, _left, _top);
         if (danmaku.lines != null) {

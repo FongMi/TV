@@ -16,7 +16,7 @@
 
 package master.flame.danmaku.controller;
 
-import master.flame.danmaku.danmaku.model.AbsDisplayer;
+import master.flame.danmaku.danmaku.model.AbsDisplay;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
@@ -37,7 +37,7 @@ public interface IDrawTask {
 
     IDanmakus getVisibleDanmakusOnTime(long time);
 
-    RenderingState draw(AbsDisplayer displayer);
+    RenderingState draw(AbsDisplay display);
 
     void reset();
 

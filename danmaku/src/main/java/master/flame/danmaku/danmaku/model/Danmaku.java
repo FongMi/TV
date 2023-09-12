@@ -30,12 +30,12 @@ public class Danmaku extends BaseDanmaku {
     }
 
     @Override
-    public void layout(IDisplayer displayer, float x, float y) {
+    public void layout(IDisplay display, float x, float y) {
 
     }
 
     @Override
-    public float[] getRectAtTime(IDisplayer displayer, long time) {
+    public float[] getRectAtTime(IDisplay display, long time) {
         return null;
     }
 

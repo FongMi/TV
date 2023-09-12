@@ -49,10 +49,7 @@ class FinitePool<T extends Poolable<T>> implements Pool<T> {
     }
 
     FinitePool(PoolableManager<T> manager, int limit) {
-        if (limit <= 0) {
-            throw new IllegalArgumentException("The pool limit must be > 0");
-        }
-
+        if (limit <= 0) throw new IllegalArgumentException("The pool limit must be > 0");
         mManager = manager;
         mLimit = limit;
         mInfinite = false;
@@ -60,7 +57,6 @@ class FinitePool<T extends Poolable<T>> implements Pool<T> {
 
     public T acquire() {
         T element;
-
         if (mRoot != null) {
             element = mRoot;
             mRoot = element.getNextPoolable();
@@ -68,13 +64,11 @@ class FinitePool<T extends Poolable<T>> implements Pool<T> {
         } else {
             element = mManager.newInstance();
         }
-
         if (element != null) {
             element.setNextPoolable(null);
             element.setPooled(false);
             mManager.onAcquired(element);
         }
-
         return element;
     }
 

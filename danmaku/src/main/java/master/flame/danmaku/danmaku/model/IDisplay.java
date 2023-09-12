@@ -17,7 +17,7 @@
 package master.flame.danmaku.danmaku.model;
 
 
-public interface IDisplayer {
+public interface IDisplay {
 
     int DANMAKU_STYLE_DEFAULT = -1; // 自动
     int DANMAKU_STYLE_NONE = 0; // 无
@@ -54,7 +54,6 @@ public interface IDisplayer {
     int getMaximumCacheWidth();
 
     int getMaximumCacheHeight();
-
 
     ////////////////// setter ///////////////////////////
 

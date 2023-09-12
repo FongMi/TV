@@ -18,7 +18,7 @@ package master.flame.danmaku.controller;
 
 import android.graphics.Canvas;
 
-import master.flame.danmaku.danmaku.model.AbsDisplayer;
+import master.flame.danmaku.danmaku.model.AbsDisplay;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.IDanmakus;
@@ -36,7 +36,7 @@ public class DrawTask implements IDrawTask {
 
     protected final DanmakuContext mContext;
 
-    protected final AbsDisplayer mDisp;
+    protected final AbsDisplay mDisp;
     final IRenderer mRenderer;
     private final RenderingState mRenderingState = new RenderingState();
     protected IDanmakus danmakuList;
@@ -65,7 +65,7 @@ public class DrawTask implements IDrawTask {
     public DrawTask(DanmakuTimer timer, DanmakuContext context, TaskListener taskListener) {
         if (context == null) throw new IllegalArgumentException("context is null");
         mContext = context;
-        mDisp = context.getDisplayer();
+        mDisp = context.getDisplay();
         mTaskListener = taskListener;
         mRenderer = new DanmakuRenderer(context);
         mRenderer.setOnDanmakuShownListener(danmaku -> {
@@ -120,7 +120,7 @@ public class DrawTask implements IDrawTask {
 
     @Override
     public void invalidateDanmaku(BaseDanmaku item, boolean remeasure) {
-        mContext.getDisplayer().getCacheStuffer().clearCache(item);
+        mContext.getDisplay().getCacheStuffer().clearCache(item);
         item.requestFlags |= BaseDanmaku.FLAG_REQUEST_INVALIDATE;
         if (remeasure) {
             item.paintWidth = -1;
@@ -216,8 +216,8 @@ public class DrawTask implements IDrawTask {
     }
 
     @Override
-    public synchronized RenderingState draw(AbsDisplayer displayer) {
-        return drawDanmakus(displayer, mTimer);
+    public synchronized RenderingState draw(AbsDisplay display) {
+        return drawDanmakus(display, mTimer);
     }
 
     @Override
@@ -297,7 +297,7 @@ public class DrawTask implements IDrawTask {
         mReadyState = false;
     }
 
-    protected RenderingState drawDanmakus(AbsDisplayer disp, DanmakuTimer timer) {
+    protected RenderingState drawDanmakus(AbsDisplay disp, DanmakuTimer timer) {
         if (clearRetainerFlag) {
             mRenderer.clearRetainer();
             clearRetainerFlag = false;

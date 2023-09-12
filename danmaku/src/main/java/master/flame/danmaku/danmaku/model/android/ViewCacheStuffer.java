@@ -27,7 +27,7 @@ public abstract class ViewCacheStuffer<VH extends ViewCacheStuffer.ViewHolder> e
 
     public abstract VH onCreateViewHolder(int viewType);
 
-    public abstract void onBindViewHolder(int viewType, VH viewHolder, BaseDanmaku danmaku, AndroidDisplayer.DisplayerConfig displayerConfig, TextPaint paint);
+    public abstract void onBindViewHolder(int viewType, VH viewHolder, BaseDanmaku danmaku, AndroidDisplay.DisplayerConfig displayerConfig, TextPaint paint);
 
     public int getItemViewType(int position, BaseDanmaku danmaku) {
         return 0;
@@ -65,7 +65,7 @@ public abstract class ViewCacheStuffer<VH extends ViewCacheStuffer.ViewHolder> e
     }
 
     @Override
-    public void drawDanmaku(BaseDanmaku danmaku, Canvas canvas, float left, float top, boolean fromWorkerThread, AndroidDisplayer.DisplayerConfig displayerConfig) {
+    public void drawDanmaku(BaseDanmaku danmaku, Canvas canvas, float left, float top, boolean fromWorkerThread, AndroidDisplay.DisplayerConfig displayerConfig) {
         int viewType = getItemViewType(danmaku.index, danmaku);
         List<VH> viewHolders = mViewHolderArray.get(viewType);
         VH viewHolder = null;
@@ -76,7 +76,7 @@ public abstract class ViewCacheStuffer<VH extends ViewCacheStuffer.ViewHolder> e
             return;
         }
         //ignore danmaku.padding, apply it onBindViewHolder
-        displayerConfig.definePaintParams(fromWorkerThread);
+        displayerConfig.definePaintParams();
         TextPaint paint = displayerConfig.getPaint(danmaku, fromWorkerThread);
         displayerConfig.applyPaintConfig(danmaku, paint, false);
 
@@ -136,7 +136,7 @@ public abstract class ViewCacheStuffer<VH extends ViewCacheStuffer.ViewHolder> e
             this.itemView.layout(l, t, r, b);
         }
 
-        public void draw(Canvas canvas, AndroidDisplayer.DisplayerConfig displayerConfig) {
+        public void draw(Canvas canvas, AndroidDisplay.DisplayerConfig displayerConfig) {
             this.itemView.draw(canvas);
             //TODO: apply displayerConfig
         }

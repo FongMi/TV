@@ -16,30 +16,28 @@
 
 package master.flame.danmaku.danmaku.model.android;
 
-import android.annotation.SuppressLint;
 import android.graphics.Camera;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Typeface;
-import android.os.Build;
 import android.text.TextPaint;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import master.flame.danmaku.danmaku.model.AbsDisplayer;
+import master.flame.danmaku.danmaku.model.AbsDisplay;
 import master.flame.danmaku.danmaku.model.AlphaValue;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.renderer.IRenderer;
 
-public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
+public class AndroidDisplay extends AbsDisplay {
 
     private final DisplayerConfig mDisplayConfig = new DisplayerConfig();
+    private final Camera camera = new Camera();
+    private final Matrix matrix = new Matrix();
     public Canvas canvas;
-    private Camera camera = new Camera();
-    private Matrix matrix = new Matrix();
     private BaseCacheStuffer sStuffer = new SimpleTextCacheStuffer();
     private int width;
     private int height;
@@ -52,26 +50,16 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
     private int mMaximumBitmapWidth = 2048;
     private int mMaximumBitmapHeight = 2048;
 
-    public AndroidDisplayer() {
+    public AndroidDisplay() {
 
     }
 
-    @SuppressLint("NewApi")
-    private static final int getMaximumBitmapWidth(Canvas c) {
-        if (Build.VERSION.SDK_INT >= 14) {
-            return c.getMaximumBitmapWidth();
-        } else {
-            return c.getWidth();
-        }
+    private static int getMaximumBitmapWidth(Canvas c) {
+        return c.getMaximumBitmapWidth();
     }
 
-    @SuppressLint("NewApi")
-    private static final int getMaximumBitmapHeight(Canvas c) {
-        if (Build.VERSION.SDK_INT >= 14) {
-            return c.getMaximumBitmapHeight();
-        } else {
-            return c.getHeight();
-        }
+    private static int getMaximumBitmapHeight(Canvas c) {
+        return c.getMaximumBitmapHeight();
     }
 
     public void setTypeFace(Typeface font) {
@@ -173,7 +161,6 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
         float top = danmaku.getTop();
         float left = danmaku.getLeft();
         if (canvas != null) {
-
             Paint alphaPaint = null;
             boolean needRestore = false;
             if (danmaku.getType() == BaseDanmaku.TYPE_SPECIAL) {
@@ -184,19 +171,16 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
                     saveCanvas(danmaku, canvas, left, top);
                     needRestore = true;
                 }
-
                 int alpha = danmaku.getAlpha();
                 if (alpha != AlphaValue.MAX) {
                     alphaPaint = mDisplayConfig.ALPHA_PAINT;
                     alphaPaint.setAlpha(danmaku.getAlpha());
                 }
             }
-
             // skip drawing when danmaku is transparent
             if (alphaPaint != null && alphaPaint.getAlpha() == AlphaValue.TRANSPARENT) {
                 return IRenderer.NOTHING_RENDERING;
             }
-
             // drawing cache
             boolean cacheDrawn = sStuffer.drawCache(danmaku, canvas, left, top, alphaPaint, mDisplayConfig.PAINT);
             int result = IRenderer.CACHE_RENDERING;
@@ -210,14 +194,11 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
                 drawDanmaku(danmaku, canvas, left, top, false);
                 result = IRenderer.TEXT_RENDERING;
             }
-
             if (needRestore) {
                 restoreCanvas(canvas);
             }
-
             return result;
         }
-
         return IRenderer.NOTHING_RENDERING;
     }
 
@@ -238,28 +219,21 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
         canvas.restore();
     }
 
-    private int saveCanvas(BaseDanmaku danmaku, Canvas canvas, float left, float top) {
+    private void saveCanvas(BaseDanmaku danmaku, Canvas canvas, float left, float top) {
         camera.save();
-        if (locationZ != 0 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1) {
-            camera.setLocation(0, 0, locationZ);
-        }
+        if (locationZ != 0) camera.setLocation(0, 0, locationZ);
         camera.rotateY(-danmaku.rotationY);
         camera.rotateZ(-danmaku.rotationZ);
         camera.getMatrix(matrix);
         matrix.preTranslate(-left, -top);
         matrix.postTranslate(left, top);
         camera.restore();
-        int count = canvas.save();
         canvas.concat(matrix);
-        return count;
     }
 
     @Override
-    public synchronized void drawDanmaku(BaseDanmaku danmaku, Canvas canvas, float left, float top,
-                                         boolean fromWorkerThread) {
-        if (sStuffer != null) {
-            sStuffer.drawDanmaku(danmaku, canvas, left, top, fromWorkerThread, mDisplayConfig);
-        }
+    public synchronized void drawDanmaku(BaseDanmaku danmaku, Canvas canvas, float left, float top, boolean fromWorkerThread) {
+        if (sStuffer != null) sStuffer.drawDanmaku(danmaku, canvas, left, top, fromWorkerThread, mDisplayConfig);
     }
 
     private synchronized TextPaint getPaint(BaseDanmaku danmaku, boolean fromWorkerThread) {
@@ -268,9 +242,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
 
     @Override
     public void prepare(BaseDanmaku danmaku, boolean fromWorkerThread) {
-        if (sStuffer != null) {
-            sStuffer.prepare(danmaku, fromWorkerThread);
-        }
+        if (sStuffer != null) sStuffer.prepare(danmaku, fromWorkerThread);
     }
 
     @Override
@@ -294,8 +266,8 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
         float pw = w + 2 * danmaku.padding;
         float ph = h + 2 * danmaku.padding;
         if (danmaku.borderColor != 0) {
-            pw += 2 * mDisplayConfig.BORDER_WIDTH;
-            ph += 2 * mDisplayConfig.BORDER_WIDTH;
+            pw += 2 * DisplayerConfig.BORDER_WIDTH;
+            ph += 2 * DisplayerConfig.BORDER_WIDTH;
         }
         danmaku.paintWidth = pw + getStrokeWidth();
         danmaku.paintHeight = ph;
@@ -317,8 +289,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
         float d = Math.max(factor, getWidth() / DanmakuFactory.BILI_PLAYER_WIDTH); //correct for low density and high resolution
         float slop = d * DanmakuFactory.DANMAKU_MEDIUM_TEXTSIZE;
         mSlopPixel = (int) slop;
-        if (factor > 1f)
-            mSlopPixel = (int) (slop * factor);
+        if (factor > 1f) mSlopPixel = (int) (slop * factor);
     }
 
     @Override
@@ -439,9 +410,9 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
          */
         public boolean CONFIG_ANTI_ALIAS = true;
         private float sLastScaleTextSize;
-        private Paint ALPHA_PAINT;
-        private Paint UNDERLINE_PAINT;
-        private Paint BORDER_PAINT;
+        private final Paint ALPHA_PAINT;
+        private final Paint UNDERLINE_PAINT;
+        private final Paint BORDER_PAINT;
         /**
          * 阴影半径
          */
@@ -484,9 +455,9 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
 
         public void setProjectionConfig(float offsetX, float offsetY, int alpha) {
             if (sProjectionOffsetX != offsetX || sProjectionOffsetY != offsetY || sProjectionAlpha != alpha) {
-                sProjectionOffsetX = (offsetX > 1.0f) ? offsetX : 1.0f;
-                sProjectionOffsetY = (offsetY > 1.0f) ? offsetY : 1.0f;
-                sProjectionAlpha = (alpha < 0) ? 0 : ((alpha > 255) ? 255 : alpha);
+                sProjectionOffsetX = Math.max(offsetX, 1.0f);
+                sProjectionOffsetY = Math.max(offsetY, 1.0f);
+                sProjectionAlpha = (alpha < 0) ? 0 : (Math.min(alpha, 255));
             }
         }
 
@@ -505,9 +476,7 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
         }
 
         private void applyTextScaleConfig(BaseDanmaku danmaku, Paint paint) {
-            if (!isTextScaled) {
-                return;
-            }
+            if (!isTextScaled) return;
             Float size = sCachedScaleSize.get(danmaku.textSize);
             if (size == null || sLastScaleTextSize != scaleTextSize) {
                 sLastScaleTextSize = scaleTextSize;
@@ -541,7 +510,6 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
             }
             paint.setTextSize(danmaku.textSize);
             applyTextScaleConfig(danmaku, paint);
-
             //ignore the transparent textShadowColor
             if (!HAS_SHADOW || SHADOW_RADIUS <= 0 || danmaku.textShadowColor == 0) {
                 paint.clearShadowLayer();
@@ -553,7 +521,6 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
         }
 
         public void applyPaintConfig(BaseDanmaku danmaku, Paint paint, boolean stroke) {
-
             if (isTranslucent) {
                 if (stroke) {
                     paint.setStyle(HAS_PROJECTION ? Style.FILL : Style.FILL_AND_STROKE);
@@ -578,11 +545,9 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
                     paint.setAlpha(AlphaValue.MAX);
                 }
             }
-
             if (danmaku.getType() == BaseDanmaku.TYPE_SPECIAL) {
                 paint.setAlpha(danmaku.getAlpha());
             }
-
         }
 
         public void clearTextHeightCache() {
@@ -607,13 +572,11 @@ public class AndroidDisplayer extends AbsDisplayer<Canvas, Typeface> {
             STROKE_WIDTH = s;
         }
 
-        public void definePaintParams(boolean fromWorkerThread) {
+        public void definePaintParams() {
             HAS_STROKE = CONFIG_HAS_STROKE;
             HAS_SHADOW = CONFIG_HAS_SHADOW;
             HAS_PROJECTION = CONFIG_HAS_PROJECTION;
             ANTI_ALIAS = CONFIG_ANTI_ALIAS;
         }
     }
-
-
 }

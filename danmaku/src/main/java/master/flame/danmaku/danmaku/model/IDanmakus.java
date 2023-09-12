@@ -110,12 +110,9 @@ public interface IDanmakus {
 
         @Override
         public int compare(BaseDanmaku obj1, BaseDanmaku obj2) {
-            if (mDuplicateMergingEnable && DanmakuUtils.isDuplicate(obj1, obj2)) {
-                return 0;
-            }
+            if (mDuplicateMergingEnable && DanmakuUtils.isDuplicate(obj1, obj2)) return 0;
             return DanmakuUtils.compare(obj1, obj2);
         }
-
     }
 
     class TimeComparator extends BaseComparator {
@@ -138,9 +135,7 @@ public interface IDanmakus {
 
         @Override
         public int compare(BaseDanmaku obj1, BaseDanmaku obj2) {
-            if (mDuplicateMergingEnable && DanmakuUtils.isDuplicate(obj1, obj2)) {
-                return 0;
-            }
+            if (mDuplicateMergingEnable && DanmakuUtils.isDuplicate(obj1, obj2)) return 0;
             return Float.compare(obj1.getTop(), obj2.getTop());
         }
     }
@@ -153,9 +148,7 @@ public interface IDanmakus {
 
         @Override
         public int compare(BaseDanmaku obj1, BaseDanmaku obj2) {
-            if (mDuplicateMergingEnable && DanmakuUtils.isDuplicate(obj1, obj2)) {
-                return 0;
-            }
+            if (mDuplicateMergingEnable && DanmakuUtils.isDuplicate(obj1, obj2)) return 0;
             return Float.compare(obj2.getTop(), obj1.getTop());
         }
     }
