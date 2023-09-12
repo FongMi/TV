@@ -4,7 +4,6 @@ import android.os.SystemClock;
 
 public class CustomClock {
 
-    private static final float DEFAULT_SPEED = 1.0F;
     private final long baseTime;
     private float speed;
     private long speedBaseTime;
@@ -22,9 +21,7 @@ public class CustomClock {
     }
 
     public void setSpeed(float speed) {
-        if (speed <= 0.0F) {
-            speed = 1.0F;
-        }
+        if (speed <= 0.0F) speed = 1.0F;
         this.elapsedRealtime();
         this.speed = speed;
         this.speedBaseTime = SystemClock.elapsedRealtime();

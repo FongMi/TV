@@ -30,7 +30,13 @@ public class DanmakuRenderer extends Renderer {
 
     private final DanmakuContext mContext;
     private final DanmakusRetainer mDanmakusRetainer;
+    private final Consumer mConsumer = new Consumer();
+
     private DanmakuTimer mStartTimer;
+    private DanmakusRetainer.Verifier mVerifier;
+    private ICacheManager mCacheManager;
+    private OnDanmakuShownListener mOnDanmakuShownListener;
+
     private final DanmakusRetainer.Verifier verifier = new DanmakusRetainer.Verifier() {
         @Override
         public boolean skipLayout(BaseDanmaku danmaku, float fixedTop, int lines, boolean willHit) {
@@ -41,10 +47,6 @@ public class DanmakuRenderer extends Renderer {
             return false;
         }
     };
-    private DanmakusRetainer.Verifier mVerifier;
-    private ICacheManager mCacheManager;
-    private OnDanmakuShownListener mOnDanmakuShownListener;
-    private Consumer mConsumer = new Consumer();
 
     public DanmakuRenderer(DanmakuContext config) {
         mContext = config;

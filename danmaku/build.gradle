@@ -10,3 +10,7 @@ android {
         targetSdk 28
     }
 }
+
+dependencies {
+    implementation project(':catvod')
+}

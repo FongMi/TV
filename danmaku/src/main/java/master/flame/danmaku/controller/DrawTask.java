@@ -60,7 +60,7 @@ public class DrawTask implements IDrawTask {
 
     private boolean mRequestRender;
 
-    private ConfigChangedCallback mConfigChangedCallback = DrawTask.this::onDanmakuConfigChanged;
+    private ConfigChangedCallback mConfigChangedCallback = (config, tag, values) -> DrawTask.this.onDanmakuConfigChanged(config, tag, values);
 
     public DrawTask(DanmakuTimer timer, DanmakuContext context, TaskListener taskListener) {
         if (context == null) throw new IllegalArgumentException("context is null");

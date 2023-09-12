@@ -89,10 +89,9 @@ public class SimpleTextCacheStuffer extends BaseCacheStuffer {
         left += danmaku.padding;
         top += danmaku.padding;
         if (danmaku.borderColor != 0) {
-            left += displayerConfig.BORDER_WIDTH;
-            top += displayerConfig.BORDER_WIDTH;
+            left += AndroidDisplay.DisplayerConfig.BORDER_WIDTH;
+            top += AndroidDisplay.DisplayerConfig.BORDER_WIDTH;
         }
-
         displayerConfig.definePaintParams();
         TextPaint paint = displayerConfig.getPaint(danmaku, fromWorkerThread);
         drawBackground(danmaku, canvas, _left, _top);
@@ -136,14 +135,12 @@ public class SimpleTextCacheStuffer extends BaseCacheStuffer {
                 displayerConfig.applyPaintConfig(danmaku, paint, true);
                 float strokeLeft = left;
                 float strokeTop = top - paint.ascent();
-
                 if (displayerConfig.HAS_PROJECTION) {
                     strokeLeft += displayerConfig.sProjectionOffsetX;
                     strokeTop += displayerConfig.sProjectionOffsetY;
                 }
                 drawStroke(danmaku, null, canvas, strokeLeft, strokeTop, paint);
             }
-
             displayerConfig.applyPaintConfig(danmaku, paint, false);
             drawText(danmaku, null, canvas, left, top - paint.ascent(), paint, fromWorkerThread);
         }
@@ -158,10 +155,7 @@ public class SimpleTextCacheStuffer extends BaseCacheStuffer {
         //draw border
         if (danmaku.borderColor != 0) {
             Paint borderPaint = displayerConfig.getBorderPaint(danmaku);
-            canvas.drawRect(_left, _top, _left + danmaku.paintWidth, _top + danmaku.paintHeight,
-                    borderPaint);
+            canvas.drawRect(_left, _top, _left + danmaku.paintWidth, _top + danmaku.paintHeight, borderPaint);
         }
-
     }
-
 }

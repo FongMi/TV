@@ -16,7 +16,6 @@
 
 package master.flame.danmaku.danmaku.renderer;
 
-
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.ICacheManager;
@@ -52,33 +51,6 @@ public interface IRenderer {
         void onDanmakuShown(BaseDanmaku danmaku);
     }
 
-    class Area {
-
-        public final float[] mRefreshRect = new float[4];
-        private int mMaxHeight;
-        private int mMaxWidth;
-
-        public void setEdge(int maxWidth, int maxHeight) {
-            mMaxWidth = maxWidth;
-            mMaxHeight = maxHeight;
-        }
-
-        public void reset() {
-            set(mMaxWidth, mMaxHeight, 0, 0);
-        }
-
-        public void resizeToMax() {
-            set(0, 0, mMaxWidth, mMaxHeight);
-        }
-
-        public void set(float left, float top, float right, float bottom) {
-            mRefreshRect[0] = left;
-            mRefreshRect[1] = top;
-            mRefreshRect[2] = right;
-            mRefreshRect[3] = bottom;
-        }
-    }
-
     class RenderingState {
 
         public final static int UNKNOWN_TIME = -1;
@@ -107,30 +79,27 @@ public interface IRenderer {
         private IDanmakus runningDanmakus = new Danmakus(Danmakus.ST_BY_LIST);
         private boolean mIsObtaining;
 
-        public int addTotalCount(int count) {
+        public void addTotalCount(int count) {
             totalDanmakuCount += count;
-            return totalDanmakuCount;
         }
 
-        public int addCount(int type, int count) {
+        public void addCount(int type, int count) {
             switch (type) {
                 case BaseDanmaku.TYPE_SCROLL_RL:
                     r2lDanmakuCount += count;
-                    return r2lDanmakuCount;
+                    return;
                 case BaseDanmaku.TYPE_SCROLL_LR:
                     l2rDanmakuCount += count;
-                    return l2rDanmakuCount;
+                    return;
                 case BaseDanmaku.TYPE_FIX_TOP:
                     ftDanmakuCount += count;
-                    return ftDanmakuCount;
+                    return;
                 case BaseDanmaku.TYPE_FIX_BOTTOM:
                     fbDanmakuCount += count;
-                    return fbDanmakuCount;
+                    return;
                 case BaseDanmaku.TYPE_SPECIAL:
                     specialDanmakuCount += count;
-                    return specialDanmakuCount;
             }
-            return 0;
         }
 
         public void reset() {
@@ -144,8 +113,7 @@ public interface IRenderer {
         }
 
         public void set(RenderingState other) {
-            if (other == null)
-                return;
+            if (other == null) return;
             lastTotalDanmakuCount = other.lastTotalDanmakuCount;
             r2lDanmakuCount = other.r2lDanmakuCount;
             l2rDanmakuCount = other.l2rDanmakuCount;

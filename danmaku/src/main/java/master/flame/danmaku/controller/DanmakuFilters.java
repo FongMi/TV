@@ -216,7 +216,6 @@ public class DanmakuFilters {
 
         @Override
         public void clear() {
-
         }
     }
 

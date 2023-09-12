@@ -20,31 +20,16 @@ import master.flame.danmaku.danmaku.util.CustomClock;
 
 public class DanmakuContext implements Cloneable {
 
-    /**
-     * 默认字体
-     */
     public Typeface mFont = null;
-    /**
-     * paint alpha:0-255
-     */
     public int transparency = AlphaValue.MAX;
     public float scaleTextSize = 1.0f;
     public int margin = 0;
-    /**
-     * 弹幕显示隐藏设置
-     */
     public boolean FTDanmakuVisibility = true;
     public boolean FBDanmakuVisibility = true;
     public boolean L2RDanmakuVisibility = true;
     public boolean R2LDanmakuVisibility = true;
     public boolean SpecialDanmakuVisibility = true;
-    /**
-     * 同屏弹幕数量 -1 按绘制效率自动调整 0 无限制 n 同屏最大显示n个弹幕
-     */
     public int maximumNumsInScreen = -1;
-    /**
-     * 默认滚动速度系数
-     */
     public float scrollSpeedFactor = 1.0f;
     public AbsDanmakuSync danmakuSync;
     public CustomClock mCustomClock = CustomClock.getInstance().init();
@@ -53,13 +38,6 @@ public class DanmakuContext implements Cloneable {
     public DanmakuFilters mDanmakuFilters = new DanmakuFilters();
     public DanmakuFactory mDanmakuFactory = DanmakuFactory.create();
     public CachingPolicy cachingPolicy = CachingPolicy.POLICY_DEFAULT;
-    /**
-     * 0 默认 Choreographer驱动DrawHandler线程刷新 <br />
-     * 1 "DFM Update"单独线程刷新 <br />
-     * 2 DrawHandler线程自驱动刷新
-     * <p>
-     * Note: 在系统{@link android.os.Build.VERSION_CODES#JELLY_BEAN}以下, 0方式会被2方式代替
-     */
     public byte updateMethod = 0;
     List<Integer> mFilterTypes = new ArrayList<>();
     List<Integer> mColorValueWhiteList = new ArrayList<>();
@@ -90,51 +68,42 @@ public class DanmakuContext implements Cloneable {
         return mDisplayer;
     }
 
-    /**
-     * set typeface
-     *
-     * @param font
-     */
     public DanmakuContext setTypeface(Typeface font) {
-        if (mFont != font) {
-            mFont = font;
-            mDisplayer.clearTextHeightCache();
-            mDisplayer.setTypeFace(font);
-            notifyConfigureChanged(DanmakuConfigTag.TYPEFACE);
-        }
+        if (mFont == font) return this;
+        mFont = font;
+        mDisplayer.clearTextHeightCache();
+        mDisplayer.setTypeFace(font);
+        notifyConfigureChanged(DanmakuConfigTag.TYPEFACE);
         return this;
     }
 
     public DanmakuContext setDanmakuTransparency(float p) {
         int newTransparency = (int) (p * AlphaValue.MAX);
-        if (newTransparency != transparency) {
-            transparency = newTransparency;
-            mDisplayer.setTransparency(newTransparency);
-            notifyConfigureChanged(DanmakuConfigTag.TRANSPARENCY, p);
-        }
+        if (newTransparency == transparency) return this;
+        transparency = newTransparency;
+        mDisplayer.setTransparency(newTransparency);
+        notifyConfigureChanged(DanmakuConfigTag.TRANSPARENCY, p);
         return this;
     }
 
     public DanmakuContext setScaleTextSize(float p) {
-        if (scaleTextSize != p) {
-            scaleTextSize = p;
-            mDisplayer.clearTextHeightCache();
-            mDisplayer.setScaleTextSizeFactor(p);
-            mGlobalFlagValues.updateMeasureFlag();
-            mGlobalFlagValues.updateVisibleFlag();
-            notifyConfigureChanged(DanmakuConfigTag.SCALE_TEXTSIZE, p);
-        }
+        if (scaleTextSize == p) return this;
+        scaleTextSize = p;
+        mDisplayer.clearTextHeightCache();
+        mDisplayer.setScaleTextSizeFactor(p);
+        mGlobalFlagValues.updateMeasureFlag();
+        mGlobalFlagValues.updateVisibleFlag();
+        notifyConfigureChanged(DanmakuConfigTag.SCALE_TEXTSIZE, p);
         return this;
     }
 
     public DanmakuContext setDanmakuMargin(int m) {
-        if (margin != m) {
-            margin = m;
-            mDisplayer.setMargin(m);
-            mGlobalFlagValues.updateFilterFlag();
-            mGlobalFlagValues.updateVisibleFlag();
-            notifyConfigureChanged(DanmakuConfigTag.DANMAKU_MARGIN, m);
-        }
+        if (margin == m) return this;
+        margin = m;
+        mDisplayer.setMargin(m);
+        mGlobalFlagValues.updateFilterFlag();
+        mGlobalFlagValues.updateVisibleFlag();
+        notifyConfigureChanged(DanmakuConfigTag.DANMAKU_MARGIN, m);
         return this;
     }
 
@@ -171,7 +140,6 @@ public class DanmakuContext implements Cloneable {
     }
 
     private <T> void setFilterData(String tag, T data, boolean primary) {
-        @SuppressWarnings("unchecked")
         IDanmakuFilter<T> filter = (IDanmakuFilter<T>) mDanmakuFilters.get(tag, primary);
         filter.setData(data);
     }
@@ -179,7 +147,7 @@ public class DanmakuContext implements Cloneable {
     private void setDanmakuVisible(boolean visible, int type) {
         if (visible) {
             mFilterTypes.remove(Integer.valueOf(type));
-        } else if (!mFilterTypes.contains(Integer.valueOf(type))) {
+        } else if (!mFilterTypes.contains(type)) {
             mFilterTypes.add(type);
         }
     }
@@ -359,12 +327,8 @@ public class DanmakuContext implements Cloneable {
     }
 
     public DanmakuContext removeUserHashBlackList(String... hashes) {
-        if (hashes == null || hashes.length == 0) {
-            return this;
-        }
-        for (String hash : hashes) {
-            mUserHashBlackList.remove(hash);
-        }
+        if (hashes == null || hashes.length == 0) return this;
+        for (String hash : hashes) mUserHashBlackList.remove(hash);
         setFilterData(DanmakuFilters.TAG_USER_HASH_FILTER, mUserHashBlackList);
         mGlobalFlagValues.updateFilterFlag();
         notifyConfigureChanged(DanmakuConfigTag.USER_HASH_BLACK_LIST, mUserHashBlackList);
@@ -378,9 +342,7 @@ public class DanmakuContext implements Cloneable {
      * @return
      */
     public DanmakuContext addUserHashBlackList(String... hashes) {
-        if (hashes == null || hashes.length == 0) {
-            return this;
-        }
+        if (hashes == null || hashes.length == 0) return this;
         Collections.addAll(mUserHashBlackList, hashes);
         setFilterData(DanmakuFilters.TAG_USER_HASH_FILTER, mUserHashBlackList);
         mGlobalFlagValues.updateFilterFlag();
@@ -412,12 +374,8 @@ public class DanmakuContext implements Cloneable {
     }
 
     public DanmakuContext removeUserIdBlackList(Integer... ids) {
-        if (ids == null || ids.length == 0) {
-            return this;
-        }
-        for (Integer id : ids) {
-            mUserIdBlackList.remove(id);
-        }
+        if (ids == null || ids.length == 0) return this;
+        for (Integer id : ids) mUserIdBlackList.remove(id);
         setFilterData(DanmakuFilters.TAG_USER_ID_FILTER, mUserIdBlackList);
         mGlobalFlagValues.updateFilterFlag();
         notifyConfigureChanged(DanmakuConfigTag.USER_ID_BLACK_LIST, mUserIdBlackList);
@@ -431,9 +389,7 @@ public class DanmakuContext implements Cloneable {
      * @return
      */
     public DanmakuContext addUserIdBlackList(Integer... ids) {
-        if (ids == null || ids.length == 0) {
-            return this;
-        }
+        if (ids == null || ids.length == 0) return this;
         Collections.addAll(mUserIdBlackList, ids);
         setFilterData(DanmakuFilters.TAG_USER_ID_FILTER, mUserIdBlackList);
         mGlobalFlagValues.updateFilterFlag();
@@ -471,16 +427,12 @@ public class DanmakuContext implements Cloneable {
      * @return
      */
     public DanmakuContext blockGuestDanmaku(boolean block) {
-        if (mBlockGuestDanmaku != block) {
-            mBlockGuestDanmaku = block;
-            if (block) {
-                setFilterData(DanmakuFilters.TAG_GUEST_FILTER, block);
-            } else {
-                mDanmakuFilters.unregisterFilter(DanmakuFilters.TAG_GUEST_FILTER);
-            }
-            mGlobalFlagValues.updateFilterFlag();
-            notifyConfigureChanged(DanmakuConfigTag.BLOCK_GUEST_DANMAKU, block);
-        }
+        if (mBlockGuestDanmaku == block) return this;
+        mBlockGuestDanmaku = block;
+        if (block) setFilterData(DanmakuFilters.TAG_GUEST_FILTER, block);
+        else mDanmakuFilters.unregisterFilter(DanmakuFilters.TAG_GUEST_FILTER);
+        mGlobalFlagValues.updateFilterFlag();
+        notifyConfigureChanged(DanmakuConfigTag.BLOCK_GUEST_DANMAKU, block);
         return this;
     }
 
@@ -491,13 +443,12 @@ public class DanmakuContext implements Cloneable {
      * @return
      */
     public DanmakuContext setScrollSpeedFactor(float p) {
-        if (scrollSpeedFactor != p) {
-            scrollSpeedFactor = p;
-            mDanmakuFactory.updateDurationFactor(p);
-            mGlobalFlagValues.updateMeasureFlag();
-            mGlobalFlagValues.updateVisibleFlag();
-            notifyConfigureChanged(DanmakuConfigTag.SCROLL_SPEED_FACTOR, p);
-        }
+        if (scrollSpeedFactor == p) return this;
+        scrollSpeedFactor = p;
+        mDanmakuFactory.updateDurationFactor(p);
+        mGlobalFlagValues.updateMeasureFlag();
+        mGlobalFlagValues.updateVisibleFlag();
+        notifyConfigureChanged(DanmakuConfigTag.SCROLL_SPEED_FACTOR, p);
         return this;
     }
 
@@ -512,20 +463,18 @@ public class DanmakuContext implements Cloneable {
      * @return
      */
     public DanmakuContext setDuplicateMergingEnabled(boolean enable) {
-        if (mDuplicateMergingEnable != enable) {
-            mDuplicateMergingEnable = enable;
-            mGlobalFlagValues.updateFilterFlag();
-            notifyConfigureChanged(DanmakuConfigTag.DUPLICATE_MERGING_ENABLED, enable);
-        }
+        if (mDuplicateMergingEnable == enable) return this;
+        mDuplicateMergingEnable = enable;
+        mGlobalFlagValues.updateFilterFlag();
+        notifyConfigureChanged(DanmakuConfigTag.DUPLICATE_MERGING_ENABLED, enable);
         return this;
     }
 
     public DanmakuContext alignBottom(boolean enable) {
-        if (mIsAlignBottom != enable) {
-            mIsAlignBottom = enable;
-            notifyConfigureChanged(DanmakuConfigTag.ALIGN_BOTTOM, enable);
-            mGlobalFlagValues.updateVisibleFlag();
-        }
+        if (mIsAlignBottom == enable) return this;
+        mIsAlignBottom = enable;
+        notifyConfigureChanged(DanmakuConfigTag.ALIGN_BOTTOM, enable);
+        mGlobalFlagValues.updateVisibleFlag();
         return this;
     }
 
@@ -543,11 +492,8 @@ public class DanmakuContext implements Cloneable {
      */
     public DanmakuContext setMaximumLines(Map<Integer, Integer> pairs) {
         mIsMaxLinesLimited = (pairs != null);
-        if (pairs == null) {
-            mDanmakuFilters.unregisterFilter(DanmakuFilters.TAG_MAXIMUN_LINES_FILTER, false);
-        } else {
-            setFilterData(DanmakuFilters.TAG_MAXIMUN_LINES_FILTER, pairs, false);
-        }
+        if (pairs == null) mDanmakuFilters.unregisterFilter(DanmakuFilters.TAG_MAXIMUN_LINES_FILTER, false);
+        else setFilterData(DanmakuFilters.TAG_MAXIMUN_LINES_FILTER, pairs, false);
         mGlobalFlagValues.updateFilterFlag();
         notifyConfigureChanged(DanmakuConfigTag.MAXIMUN_LINES, pairs);
         return this;
@@ -568,11 +514,8 @@ public class DanmakuContext implements Cloneable {
      */
     public DanmakuContext preventOverlapping(Map<Integer, Boolean> pairs) {
         mIsPreventOverlappingEnabled = (pairs != null);
-        if (pairs == null) {
-            mDanmakuFilters.unregisterFilter(DanmakuFilters.TAG_OVERLAPPING_FILTER, false);
-        } else {
-            setFilterData(DanmakuFilters.TAG_OVERLAPPING_FILTER, pairs, false);
-        }
+        if (pairs == null) mDanmakuFilters.unregisterFilter(DanmakuFilters.TAG_OVERLAPPING_FILTER, false);
+        else setFilterData(DanmakuFilters.TAG_OVERLAPPING_FILTER, pairs, false);
         mGlobalFlagValues.updateFilterFlag();
         notifyConfigureChanged(DanmakuConfigTag.OVERLAPPING_ENABLE, pairs);
         return this;
@@ -595,10 +538,9 @@ public class DanmakuContext implements Cloneable {
      */
     public DanmakuContext setCacheStuffer(BaseCacheStuffer cacheStuffer, BaseCacheStuffer.Proxy cacheStufferAdapter) {
         this.mCacheStuffer = cacheStuffer;
-        if (this.mCacheStuffer != null) {
-            this.mCacheStuffer.setProxy(cacheStufferAdapter);
-            mDisplayer.setCacheStuffer(this.mCacheStuffer);
-        }
+        if (mCacheStuffer == null) return this;
+        mCacheStuffer.setProxy(cacheStufferAdapter);
+        mDisplayer.setCacheStuffer(this.mCacheStuffer);
         return this;
     }
 
@@ -614,19 +556,18 @@ public class DanmakuContext implements Cloneable {
 
     public void registerConfigChangedCallback(ConfigChangedCallback listener) {
         if (listener == null || mCallbackList == null) {
-            mCallbackList = Collections.synchronizedList(new ArrayList<WeakReference<ConfigChangedCallback>>());
+            mCallbackList = Collections.synchronizedList(new ArrayList<>());
         }
         for (WeakReference<ConfigChangedCallback> configReferer : mCallbackList) {
-            if (listener.equals(configReferer.get())) {
+            if (listener != null && listener.equals(configReferer.get())) {
                 return;
             }
         }
-        mCallbackList.add(new WeakReference<ConfigChangedCallback>(listener));
+        mCallbackList.add(new WeakReference<>(listener));
     }
 
     public void unregisterConfigChangedCallback(ConfigChangedCallback listener) {
-        if (listener == null || mCallbackList == null)
-            return;
+        if (listener == null || mCallbackList == null) return;
         for (WeakReference<ConfigChangedCallback> configReferer : mCallbackList) {
             if (listener.equals(configReferer.get())) {
                 mCallbackList.remove(listener);
@@ -653,13 +594,13 @@ public class DanmakuContext implements Cloneable {
         }
     }
 
-    public DanmakuContext registerFilter(DanmakuFilters.BaseDanmakuFilter filter) {
+    public DanmakuContext registerFilter(DanmakuFilters.BaseDanmakuFilter<?> filter) {
         mDanmakuFilters.registerFilter(filter);
         mGlobalFlagValues.updateFilterFlag();
         return this;
     }
 
-    public DanmakuContext unregisterFilter(DanmakuFilters.BaseDanmakuFilter filter) {
+    public DanmakuContext unregisterFilter(DanmakuFilters.BaseDanmakuFilter<?> filter) {
         mDanmakuFilters.unregisterFilter(filter);
         mGlobalFlagValues.updateFilterFlag();
         return this;
@@ -668,7 +609,6 @@ public class DanmakuContext implements Cloneable {
     public DanmakuContext resetContext() {
         mDisplayer = new AndroidDisplay();
         mGlobalFlagValues = new GlobalFlagValues();
-//        mDanmakuFilters = new DanmakuFilters();
         mDanmakuFilters.clear();
         mDanmakuFactory = DanmakuFactory.create();
         return this;
@@ -688,15 +628,11 @@ public class DanmakuContext implements Cloneable {
         FT_DANMAKU_VISIBILITY, FB_DANMAKU_VISIBILITY, L2R_DANMAKU_VISIBILITY, R2L_DANMAKU_VISIBILIY, SPECIAL_DANMAKU_VISIBILITY, TYPEFACE, TRANSPARENCY, SCALE_TEXTSIZE, MAXIMUM_NUMS_IN_SCREEN, DANMAKU_STYLE, DANMAKU_BOLD, COLOR_VALUE_WHITE_LIST, USER_ID_BLACK_LIST, USER_HASH_BLACK_LIST, SCROLL_SPEED_FACTOR, BLOCK_GUEST_DANMAKU, DUPLICATE_MERGING_ENABLED, MAXIMUN_LINES, OVERLAPPING_ENABLE, ALIGN_BOTTOM, DANMAKU_MARGIN, DANMAKU_SYNC;
 
         public boolean isVisibilityRelatedTag() {
-            return this.equals(FT_DANMAKU_VISIBILITY) || this.equals(FB_DANMAKU_VISIBILITY)
-                    || this.equals(L2R_DANMAKU_VISIBILITY) || this.equals(R2L_DANMAKU_VISIBILIY)
-                    || this.equals(SPECIAL_DANMAKU_VISIBILITY) || this.equals(COLOR_VALUE_WHITE_LIST)
-                    || this.equals(USER_ID_BLACK_LIST);
+            return this.equals(FT_DANMAKU_VISIBILITY) || this.equals(FB_DANMAKU_VISIBILITY) || this.equals(L2R_DANMAKU_VISIBILITY) || this.equals(R2L_DANMAKU_VISIBILIY) || this.equals(SPECIAL_DANMAKU_VISIBILITY) || this.equals(COLOR_VALUE_WHITE_LIST) || this.equals(USER_ID_BLACK_LIST);
         }
     }
 
     public interface ConfigChangedCallback {
-        public boolean onDanmakuConfigChanged(DanmakuContext config, DanmakuConfigTag tag,
-                                              Object... value);
+        void onDanmakuConfigChanged(DanmakuContext config, DanmakuConfigTag tag, Object... value);
     }
 }

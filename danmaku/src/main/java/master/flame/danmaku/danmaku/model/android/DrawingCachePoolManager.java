@@ -11,12 +11,9 @@ public class DrawingCachePoolManager implements PoolableManager<DrawingCache> {
 
     @Override
     public void onAcquired(DrawingCache element) {
-
     }
 
     @Override
     public void onReleased(DrawingCache element) {
-
     }
-
 }
