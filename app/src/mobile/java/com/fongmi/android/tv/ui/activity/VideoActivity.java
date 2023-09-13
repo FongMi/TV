@@ -9,7 +9,6 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.media.MediaMetadataCompat;
 import android.text.Html;
@@ -853,8 +852,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         if (isFullscreen()) return;
         App.post(() -> mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT)), 50);
         setRequestedOrientation(mPlayers.isPortrait() ? ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
-        int padding = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ? getWindowManager().getDefaultDisplay().getCutout().getSafeInsetTop() : 0;
-        mBinding.control.getRoot().setPadding(padding, 0, padding, 0);
+        ResUtil.setPadding(this, mBinding.control.getRoot());
         mBinding.control.full.setVisibility(View.GONE);
         mDanmakuContext.setScaleTextSize(1.0f);
         setSubtitle(Setting.getSubtitle());

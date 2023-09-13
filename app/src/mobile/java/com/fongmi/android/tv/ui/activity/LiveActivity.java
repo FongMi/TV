@@ -156,6 +156,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mFormatTime = new SimpleDateFormat("yyyy-MM-ddHH:mm", Locale.getDefault());
         mFormatDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         mKeyDown = CustomKeyDownLive.create(this, mBinding.video);
+        ResUtil.setPadding(this, mBinding.control.getRoot());
         mClock = Clock.create(mBinding.widget.time);
         mPlayers = new Players().init(this);
         mObserveChannel = this::start;
