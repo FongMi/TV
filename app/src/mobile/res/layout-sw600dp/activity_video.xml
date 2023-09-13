@@ -46,7 +46,7 @@
                 android:visibility="gone" />
 
             <master.flame.danmaku.ui.widget.DanmakuView
-                android:id="@+id/danmu"
+                android:id="@+id/danmaku"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:visibility="gone" />

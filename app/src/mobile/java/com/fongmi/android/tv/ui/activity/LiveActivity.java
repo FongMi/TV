@@ -176,11 +176,11 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     @SuppressLint("ClickableViewAccessibility")
     protected void initEvent() {
         mBinding.control.seek.setListener(mPlayers);
-        mBinding.control.back.setOnClickListener(view -> onBack());
-        mBinding.control.lock.setOnClickListener(view -> onLock());
         mBinding.control.cast.setOnClickListener(view -> onCast());
         mBinding.control.share.setOnClickListener(view -> onShare());
-        mBinding.control.rotate.setOnClickListener(view -> onRotate());
+        mBinding.control.right.back.setOnClickListener(view -> onBack());
+        mBinding.control.right.lock.setOnClickListener(view -> onLock());
+        mBinding.control.right.rotate.setOnClickListener(view -> onRotate());
         mBinding.control.action.text.setOnClickListener(this::onTrack);
         mBinding.control.action.audio.setOnClickListener(this::onTrack);
         mBinding.control.action.video.setOnClickListener(this::onTrack);
@@ -287,17 +287,6 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mBinding.channel.scrollToPosition(mGroup.getPosition());
     }
 
-    private void onBack() {
-        finish();
-    }
-
-    private void onLock() {
-        setLock(!isLock());
-        mKeyDown.setLock(isLock());
-        checkLockImg();
-        showControl();
-    }
-
     private void onCast() {
         CastDialog.create().video(CastVideo.get(mBinding.control.title.getText().toString(), getUrl())).fm(false).show(this);
     }
@@ -309,16 +298,27 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         builder.startChooser();
     }
 
-    private void checkPlay() {
-        checkPlayImg(!mPlayers.isPlaying());
-        if (mPlayers.isPlaying()) mPlayers.pause();
-        else mPlayers.play();
+    private void onBack() {
+        finish();
+    }
+
+    private void onLock() {
+        setLock(!isLock());
+        mKeyDown.setLock(isLock());
+        checkLockImg();
+        showControl();
     }
 
     private void onRotate() {
         setR1Callback();
         setRotate(!isRotate());
         setRequestedOrientation(ResUtil.isLand(this) ? ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+    }
+
+    private void checkPlay() {
+        checkPlayImg(!mPlayers.isPlaying());
+        if (mPlayers.isPlaying()) mPlayers.pause();
+        else mPlayers.play();
     }
 
     private void onTrack(View view) {
@@ -427,9 +427,9 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     private void showControl() {
         mBinding.control.share.setVisibility(getUrl() == null ? View.GONE : View.VISIBLE);
         mBinding.control.cast.setVisibility(getUrl() == null ? View.GONE : View.VISIBLE);
-        mBinding.control.rotate.setVisibility(isLock() ? View.GONE : View.VISIBLE);
+        mBinding.control.right.rotate.setVisibility(isLock() ? View.GONE : View.VISIBLE);
+        mBinding.control.right.back.setVisibility(isLock() ? View.GONE : View.VISIBLE);
         mBinding.control.bottom.setVisibility(isLock() ? View.GONE : View.VISIBLE);
-        mBinding.control.back.setVisibility(isLock() ? View.GONE : View.VISIBLE);
         mBinding.control.top.setVisibility(isLock() ? View.GONE : View.VISIBLE);
         mBinding.control.getRoot().setVisibility(View.VISIBLE);
         setR1Callback();
@@ -605,7 +605,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private void checkLockImg() {
-        mBinding.control.lock.setImageResource(isLock() ? R.drawable.ic_control_lock_on : R.drawable.ic_control_lock_off);
+        mBinding.control.right.lock.setImageResource(isLock() ? R.drawable.ic_control_lock_on : R.drawable.ic_control_lock_off);
     }
 
     private void release() {

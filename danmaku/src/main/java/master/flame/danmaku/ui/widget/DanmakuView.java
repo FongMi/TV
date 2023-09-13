@@ -16,7 +16,6 @@
 
 package master.flame.danmaku.ui.widget;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -247,7 +246,6 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
         return SystemClock.uptimeMillis() - stime;
     }
 
-    @SuppressLint("NewApi")
     private void postInvalidateCompat() {
         mRequestRender = true;
         this.postInvalidateOnAnimation();

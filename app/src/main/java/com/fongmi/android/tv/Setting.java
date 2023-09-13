@@ -166,6 +166,14 @@ public class Setting {
         Prefers.put("update", update);
     }
 
+    public static boolean isDanmu() {
+        return Prefers.getBoolean("danmu");
+    }
+
+    public static void putDanmu(boolean danmu) {
+        Prefers.put("danmu", danmu);
+    }
+
     public static String getUa() {
         return Prefers.getString("ua");
     }
