@@ -534,7 +534,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private void checkDanmu(String danmu) {
         mBinding.danmaku.release();
         mBinding.danmaku.setVisibility(danmu.isEmpty() ? View.GONE : View.VISIBLE);
-        mBinding.control.danmu.setVisibility(danmu.isEmpty() ? View.GONE : View.VISIBLE);
         if (danmu.length() > 0) mBinding.danmaku.prepare(new Parser(danmu), mDanmakuContext);
     }
 
@@ -914,6 +913,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private void showControl() {
+        mBinding.control.danmu.setVisibility(isLock() || !mBinding.danmaku.isPrepared() ? View.GONE : View.VISIBLE);
         mBinding.control.setting.setVisibility(mHistory == null || isFullscreen() ? View.GONE : View.VISIBLE);
         mBinding.control.right.rotate.setVisibility(isFullscreen() && !isLock() ? View.VISIBLE : View.GONE);
         mBinding.control.keep.setVisibility(mHistory == null || isFullscreen() ? View.GONE : View.VISIBLE);
@@ -925,7 +925,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mBinding.control.cast.setVisibility(getUrl() == null ? View.GONE : View.VISIBLE);
         mBinding.control.center.setVisibility(isLock() ? View.GONE : View.VISIBLE);
         mBinding.control.bottom.setVisibility(isLock() ? View.GONE : View.VISIBLE);
-        mBinding.control.danmu.setVisibility(isLock() ? View.GONE : View.VISIBLE);
         mBinding.control.top.setVisibility(isLock() ? View.GONE : View.VISIBLE);
         mBinding.control.getRoot().setVisibility(View.VISIBLE);
         checkPlayImg(mPlayers.isPlaying());
