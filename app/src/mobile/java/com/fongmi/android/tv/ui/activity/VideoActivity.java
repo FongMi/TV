@@ -9,6 +9,7 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.media.MediaMetadataCompat;
 import android.text.Html;
@@ -661,9 +662,13 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     private void onDanmu() {
         Setting.putDanmu(!Setting.isDanmu());
+        checkDanmuImg();
+        showDanmu();
+    }
+
+    private void showDanmu() {
         if (Setting.isDanmu()) mBinding.danmaku.show();
         else mBinding.danmaku.hide();
-        checkDanmuImg();
     }
 
     private void checkPlay() {
@@ -848,6 +853,8 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         if (isFullscreen()) return;
         App.post(() -> mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT)), 50);
         setRequestedOrientation(mPlayers.isPortrait() ? ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+        int padding = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ? getWindowManager().getDefaultDisplay().getCutout().getSafeInsetTop() : 0;
+        mBinding.control.getRoot().setPadding(padding, 0, padding, 0);
         mBinding.control.full.setVisibility(View.GONE);
         mDanmakuContext.setScaleTextSize(1.0f);
         setSubtitle(Setting.getSubtitle());
@@ -863,6 +870,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         setRequestedOrientation(isPort() ? ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_FULL_USER);
         mBinding.episode.scrollToPosition(mEpisodeAdapter.getPosition());
         mBinding.control.full.setVisibility(View.VISIBLE);
+        mBinding.control.getRoot().setPadding(0, 0, 0, 0);
         mBinding.video.setLayoutParams(mFrameParams);
         mDanmakuContext.setScaleTextSize(0.8f);
         App.post(mR3, 2000);
@@ -919,6 +927,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mBinding.control.cast.setVisibility(getUrl() == null ? View.GONE : View.VISIBLE);
         mBinding.control.center.setVisibility(isLock() ? View.GONE : View.VISIBLE);
         mBinding.control.bottom.setVisibility(isLock() ? View.GONE : View.VISIBLE);
+        mBinding.control.danmu.setVisibility(isLock() ? View.GONE : View.VISIBLE);
         mBinding.control.top.setVisibility(isLock() ? View.GONE : View.VISIBLE);
         mBinding.control.getRoot().setVisibility(View.VISIBLE);
         checkPlayImg(mPlayers.isPlaying());
@@ -1154,8 +1163,8 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private void setDefaultTrack() {
         if (isInitTrack()) {
             setInitTrack(false);
+            mPlayers.prepared();
             mPlayers.setTrack(Track.find(getHistoryKey()));
-            if (isVisible(mBinding.danmaku)) mPlayers.prepared();
         }
     }
 
@@ -1515,10 +1524,10 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
             hideControl();
             hideSheet();
         } else {
+            showDanmu();
             exitFullscreen();
             setForeground(true);
             PlaybackService.stop();
-            mBinding.danmaku.show();
             if (isStop()) finish();
         }
     }

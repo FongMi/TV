@@ -47,7 +47,7 @@ public interface IDanmakuView {
 
     IDanmakus getCurrentVisibleDanmakus();
 
-    void setCallback(Callback callback);
+    IDanmakuView setCallback(Callback callback);
 
     /**
      * for getting the accurate play-time. use this method intead of parser.getTimer().currMillisecond

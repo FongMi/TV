@@ -38,7 +38,6 @@ import master.flame.danmaku.danmaku.model.objectpool.Pools;
 import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
 import master.flame.danmaku.danmaku.util.DanmakuUtils;
 import master.flame.danmaku.danmaku.util.SystemClock;
-import tv.cjump.jni.NativeBitmapFactory;
 
 public class CacheManagingDrawTask extends DrawTask {
 
@@ -122,9 +121,7 @@ public class CacheManagingDrawTask extends DrawTask {
     @Override
     public void seek(long mills) {
         super.seek(mills);
-        if (mCacheManager == null) {
-            start();
-        }
+        if (mCacheManager == null) start();
         mCacheManager.seek(mills);
     }
 

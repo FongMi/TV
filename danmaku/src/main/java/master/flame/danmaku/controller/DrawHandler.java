@@ -38,7 +38,6 @@ import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
 import master.flame.danmaku.danmaku.util.FrameHelper;
 import master.flame.danmaku.danmaku.util.SystemClock;
-import tv.cjump.jni.DeviceUtils;
 
 public class DrawHandler extends Handler {
 
@@ -47,6 +46,7 @@ public class DrawHandler extends Handler {
     public static final int RESUME = 3;
     public static final int SEEK_POS = 4;
     public static final int PREPARE = 5;
+
     private static final int QUIT = 6;
     private static final int PAUSE = 7;
     private static final int SHOW_DANMAKUS = 8;
@@ -56,47 +56,51 @@ public class DrawHandler extends Handler {
     private static final int UPDATE_WHEN_PAUSED = 12;
     private static final int CLEAR_DANMAKUS_ON_SCREEN = 13;
     private static final int FORCE_RENDER = 14;
-    private static final long INDEFINITE_TIME = 10000000;
     private static final int MAX_RECORD_SIZE = 500;
+    private static final long INDEFINITE_TIME = 10000000;
+
     private final RenderingState mRenderingState = new RenderingState();
     private final LinkedList<Long> mDrawTimes = new LinkedList<>();
-    public IDrawTask drawTask;
-    private DanmakuContext mContext;
-    private FrameCallback mFrameCallback;
-    private long pausedPosition = 0;
-    private boolean quitFlag = true;
-    private long mTimeBase;
-    private boolean mReady;
-    private Callback mCallback;
     private DanmakuTimer timer = new DanmakuTimer();
-    private BaseDanmakuParser mParser;
     private IDanmakuViewController mDanmakuView;
-    private boolean mDanmakusVisible;
-    private AbsDisplay mDisp;
+    private FrameCallback mFrameCallback;
+    private BaseDanmakuParser mParser;
+    private DanmakuContext mContext;
     private UpdateThread mThread;
+    private IDrawTask drawTask;
+    private Callback mCallback;
+    private AbsDisplay mDisp;
+
     private boolean mUpdateInSeparateThread;
-    private long mCordonTime = 30;
-    private long mCordonTime2 = 60;
-    private long mFrameUpdateRate = 16;
-    private long mLastDeltaTime;
-    private boolean mInSeekingAction;
-    private long mDesireSeekingTime;
-    private long mRemainingTime;
-    private boolean mInSyncAction;
-    private boolean mInWaitingState;
-    private boolean mIdleSleep;
     private boolean mNonBlockModeEnable;
+    private boolean mDanmakusVisible;
+    private boolean mInSeekingAction;
+    private boolean mInWaitingState;
+    private boolean mInSyncAction;
+    private boolean mIdleSleep;
+    private boolean quitFlag;
+    private boolean mReady;
+
+    private long mDesireSeekingTime;
+    private long mFrameUpdateRate;
+    private long mLastDeltaTime;
+    private long mRemainingTime;
+    private long pausedPosition;
+    private long mCordonTime2;
+    private long mCordonTime;
+    private long mTimeBase;
 
     public DrawHandler(Looper looper, IDanmakuViewController view, boolean danmakuVisibile) {
         super(looper);
-        mIdleSleep = !DeviceUtils.isProblemBoxDevice();
         bindView(view);
-        if (danmakuVisibile) {
-            showDanmakus(null);
-        } else {
-            hideDanmakus(false);
-        }
+        quitFlag = true;
+        mIdleSleep = true;
+        mCordonTime = 30;
+        mCordonTime2 = 60;
+        mFrameUpdateRate = 16;
         mDanmakusVisible = danmakuVisibile;
+        if (danmakuVisibile) showDanmakus(null);
+        else hideDanmakus(false);
     }
 
     private void bindView(IDanmakuViewController view) {
@@ -187,7 +191,7 @@ public class DrawHandler extends Handler {
                     timer.update(position);
                     mContext.mGlobalFlagValues.updateMeasureFlag();
                     pausedPosition = position;
-                    drawTask.seek(position);
+                    if (drawTask != null) drawTask.seek(position);
                 }
             case RESUME:
                 removeMessages(DrawHandler.PAUSE);
@@ -409,15 +413,11 @@ public class DrawHandler extends Handler {
         long time = startMS - mTimeBase;
         if (mNonBlockModeEnable) {
             if (mCallback != null) {
-                //mCallback.updateTimer(timer);
                 d = timer.lastInterval();
             }
         } else if (!mDanmakusVisible || mRenderingState.nothingRendered || mInWaitingState) {
             timer.update(time);
             mRemainingTime = 0;
-            if (mCallback != null) {
-                //mCallback.updateTimer(timer);
-            }
         } else {
             long gapTime = time - timer.currMillisecond;
             long averageTime = Math.max(mFrameUpdateRate, getAverageRenderingTime());
@@ -437,9 +437,6 @@ public class DrawHandler extends Handler {
             }
             mRemainingTime = gapTime;
             timer.add(d);
-            if (mCallback != null) {
-                //mCallback.updateTimer(timer);
-            }
         }
         mInSyncAction = false;
         return d;
@@ -483,12 +480,10 @@ public class DrawHandler extends Handler {
 
             @Override
             public void onDanmakuShown(BaseDanmaku danmaku) {
-                //if (mCallback != null) mCallback.danmakuShown(danmaku);
             }
 
             @Override
             public void onDanmakusDrawingFinished() {
-                //if (mCallback != null) mCallback.drawingFinished();
             }
 
             @Override
@@ -535,9 +530,7 @@ public class DrawHandler extends Handler {
     }
 
     public void invalidateDanmaku(BaseDanmaku item, boolean remeasure) {
-        if (drawTask != null && item != null) {
-            drawTask.invalidateDanmaku(item, remeasure);
-        }
+        if (drawTask != null && item != null) drawTask.invalidateDanmaku(item, remeasure);
         redrawIfNeeded();
     }
 

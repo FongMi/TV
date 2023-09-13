@@ -132,9 +132,10 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
         return null;
     }
 
-    public void setCallback(Callback callback) {
+    public DanmakuView setCallback(Callback callback) {
         if (handler != null) handler.setCallback(callback);
         mCallback = callback;
+        return this;
     }
 
     public void setSpeed(float speed) {
