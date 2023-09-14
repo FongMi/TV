@@ -371,7 +371,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         maxLines.put(BaseDanmaku.TYPE_FIX_TOP, 3);
         maxLines.put(BaseDanmaku.TYPE_SCROLL_RL, 3);
         maxLines.put(BaseDanmaku.TYPE_FIX_BOTTOM, 1);
-        mDanmakuContext.setDanmakuStyle(IDisplay.DANMAKU_STYLE_STROKEN, 3).setMaximumLines(maxLines).setDanmakuMargin(12).setScaleTextSize(1.0f);
+        mDanmakuContext.setDanmakuStyle(IDisplay.DANMAKU_STYLE_STROKEN, 3).setMaximumLines(maxLines).setDanmakuMargin(12).setScaleTextSize(0.8f);
         mBinding.control.danmu.setActivated(Setting.isDanmu());
     }
 
@@ -614,7 +614,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mBinding.video.setForeground(null);
         mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
         mBinding.flag.setSelectedPosition(getCurrentFlag());
-        mDanmakuContext.setScaleTextSize(1.4f);
+        mDanmakuContext.setScaleTextSize(1.2f);
         setSubtitle(Setting.getSubtitle());
         mKeyDown.setFull(true);
         setFullscreen(true);
@@ -624,7 +624,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private void exitFullscreen() {
         mBinding.video.setForeground(ResUtil.getDrawable(R.drawable.selector_video));
         mBinding.video.setLayoutParams(mFrameParams);
-        mDanmakuContext.setScaleTextSize(1.0f);
+        mDanmakuContext.setScaleTextSize(0.8f);
         mKeyDown.setFull(false);
         setFullscreen(false);
         setSubtitle(16);
