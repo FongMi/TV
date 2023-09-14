@@ -156,8 +156,8 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mFormatTime = new SimpleDateFormat("yyyy-MM-ddHH:mm", Locale.getDefault());
         mFormatDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         mKeyDown = CustomKeyDownLive.create(this, mBinding.video);
-        ResUtil.setPadding(this, mBinding.control.getRoot());
         mClock = Clock.create(mBinding.widget.time);
+        setPadding(mBinding.control.getRoot());
         mPlayers = new Players().init(this);
         mObserveChannel = this::start;
         mHides = new ArrayList<>();
@@ -837,6 +837,8 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
 
     public void setRotate(boolean rotate) {
         this.rotate = rotate;
+        if (rotate) resetPadding(mBinding.control.getRoot());
+        else setPadding(mBinding.control.getRoot());
     }
 
     public boolean isStop() {

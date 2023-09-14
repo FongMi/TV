@@ -128,19 +128,7 @@ public class ResUtil {
         return AnimationUtils.loadAnimation(App.get(), resId);
     }
 
-    private static Display getDisplay(Activity activity) {
+    public static Display getDisplay(Activity activity) {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.R ? activity.getDisplay() : activity.getWindowManager().getDefaultDisplay();
-    }
-
-    public static void setPadding(Activity activity, ViewGroup layout) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return;
-        DisplayCutout cutout = getDisplay(activity).getCutout();
-        if (cutout == null) return;
-        int top = cutout.getSafeInsetTop();
-        int left = cutout.getSafeInsetLeft();
-        int right = cutout.getSafeInsetRight();
-        int bottom = cutout.getSafeInsetBottom();
-        int padding = left | right | top | bottom;
-        layout.setPadding(padding, 0, padding, 0);
     }
 }

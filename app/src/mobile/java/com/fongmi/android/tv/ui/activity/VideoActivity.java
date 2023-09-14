@@ -851,7 +851,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         if (isFullscreen()) return;
         App.post(() -> mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT)), 50);
         setRequestedOrientation(mPlayers.isPortrait() ? ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
-        ResUtil.setPadding(this, mBinding.control.getRoot());
         mBinding.control.full.setVisibility(View.GONE);
         mDanmakuContext.setScaleTextSize(1.0f);
         setSubtitle(Setting.getSubtitle());
@@ -867,7 +866,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         setRequestedOrientation(isPort() ? ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_FULL_USER);
         mBinding.episode.scrollToPosition(mEpisodeAdapter.getPosition());
         mBinding.control.full.setVisibility(View.VISIBLE);
-        mBinding.control.getRoot().setPadding(0, 0, 0, 0);
         mBinding.video.setLayoutParams(mFrameParams);
         mDanmakuContext.setScaleTextSize(0.8f);
         App.post(mR3, 2000);
@@ -1051,7 +1049,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private void checkDanmuImg() {
-        mBinding.control.danmu.setImageResource(Setting.isDanmu() ? R.drawable.ic_control_danmu_off : R.drawable.ic_control_danmu_on);
+        mBinding.control.danmu.setImageResource(Setting.isDanmu() ? R.drawable.ic_control_danmu_on : R.drawable.ic_control_danmu_off);
     }
 
     private void createKeep() {
@@ -1366,6 +1364,8 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     public void setRotate(boolean rotate) {
         this.rotate = rotate;
+        if (rotate) resetPadding(mBinding.control.getRoot());
+        else setPadding(mBinding.control.getRoot());
     }
 
     public boolean isStop() {
