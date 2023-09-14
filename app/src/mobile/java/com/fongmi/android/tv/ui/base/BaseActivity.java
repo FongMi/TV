@@ -79,7 +79,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         layout.setPadding(padding, 0, padding, 0);
     }
 
-    protected void resetPadding(ViewGroup layout) {
+    protected void noPadding(ViewGroup layout) {
         layout.setPadding(0, 0, 0, 0);
     }
 

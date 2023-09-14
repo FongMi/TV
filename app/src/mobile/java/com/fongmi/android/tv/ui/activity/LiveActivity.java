@@ -837,8 +837,8 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
 
     public void setRotate(boolean rotate) {
         this.rotate = rotate;
-        if (rotate) resetPadding(mBinding.control.getRoot());
-        else setPadding(mBinding.control.getRoot());
+        if (rotate) noPadding(mBinding.control.getRoot());
+        if (!rotate) setPadding(mBinding.control.getRoot());
     }
 
     public boolean isStop() {

@@ -853,11 +853,10 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         setRequestedOrientation(mPlayers.isPortrait() ? ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
         mBinding.control.full.setVisibility(View.GONE);
         mDanmakuContext.setScaleTextSize(1.0f);
+        setRotate(mPlayers.isPortrait(), true);
         setSubtitle(Setting.getSubtitle());
-        setRotate(mPlayers.isPortrait());
         Utils.hideSystemUI(this);
         App.post(mR3, 2000);
-        setFullscreen(true);
         hideControl();
     }
 
@@ -868,9 +867,8 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mBinding.control.full.setVisibility(View.VISIBLE);
         mBinding.video.setLayoutParams(mFrameParams);
         mDanmakuContext.setScaleTextSize(0.8f);
+        setRotate(false, false);
         App.post(mR3, 2000);
-        setFullscreen(false);
-        setRotate(false);
         setSubtitle(14);
         hideControl();
     }
@@ -1362,10 +1360,17 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         return rotate;
     }
 
+    public void setRotate(boolean rotate, boolean fullscreen) {
+        this.rotate = rotate;
+        setFullscreen(fullscreen);
+        if (!fullscreen || rotate) noPadding(mBinding.control.getRoot());
+        if (fullscreen && !rotate) setPadding(mBinding.control.getRoot());
+    }
+
     public void setRotate(boolean rotate) {
         this.rotate = rotate;
-        if (rotate) resetPadding(mBinding.control.getRoot());
-        else setPadding(mBinding.control.getRoot());
+        if (fullscreen && rotate) noPadding(mBinding.control.getRoot());
+        if (fullscreen && !rotate) setPadding(mBinding.control.getRoot());
     }
 
     public boolean isStop() {
