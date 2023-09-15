@@ -1,8 +1,6 @@
 package com.fongmi.android.tv.player;
 
 import android.app.Activity;
-import android.app.PendingIntent;
-import android.content.Intent;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -23,13 +21,11 @@ import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Track;
-import com.fongmi.android.tv.event.ActionEvent;
 import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.impl.ParseCallback;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
-import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.crawler.SpiderDebug;
 
 import java.util.Formatter;
@@ -37,10 +33,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import master.flame.danmaku.controller.DrawHandler;
+import master.flame.danmaku.ui.widget.DanmakuView;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class Players implements Player.Listener, IMediaPlayer.Listener, AnalyticsListener, ParseCallback {
+public class Players implements Player.Listener, IMediaPlayer.Listener, AnalyticsListener, ParseCallback, DrawHandler.Callback {
 
     public static final int SYS = 0;
     public static final int IJK = 1;
@@ -51,6 +49,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     private MediaSessionCompat session;
     private IjkVideoView ijkPlayer;
+    private DanmakuView danmuView;
     private StringBuilder builder;
     private Formatter formatter;
     private ExoPlayer exoPlayer;
@@ -90,13 +89,6 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     private void createSession(Activity activity) {
         session = new MediaSessionCompat(activity, "TV");
-        session.setSessionActivity(PendingIntent.getActivity(App.get(), 99, new Intent(App.get(), activity.getClass()), Utils.getPendingFlag()));
-        session.setCallback(new MediaSessionCompat.Callback() {
-            @Override
-            public void onSeekTo(long pos) {
-                seekTo(pos, true);
-            }
-        });
     }
 
     public void set(PlayerView exo, IjkVideoView ijk) {
@@ -121,6 +113,10 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         ijkPlayer.setPlayer(player);
     }
 
+    public void setDanmuView(DanmakuView view) {
+        danmuView = view.setCallback(this);
+    }
+
     public ExoPlayer exo() {
         return exoPlayer;
     }
@@ -134,7 +130,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     public void setMetadata(MediaMetadataCompat metadata) {
-        ActionEvent.update();
+        session.setMetadata(metadata);
     }
 
     public int getPlayer() {
@@ -198,6 +194,12 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         return isExo() ? exoPlayer != null && exoPlayer.isPlaying() : ijkPlayer != null && ijkPlayer.isPlaying();
     }
 
+    public boolean isEnd() {
+        if (isExo() && exoPlayer != null) return exoPlayer.getPlaybackState() == Player.STATE_ENDED;
+        if (isIjk() && ijkPlayer != null) return ijkPlayer.getPlaybackState() == IjkVideoView.STATE_ENDED;
+        return false;
+    }
+
     public boolean isPortrait() {
         return getVideoHeight() > getVideoWidth();
     }
@@ -219,8 +221,9 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     public String setSpeed(float speed) {
-        exoPlayer.setPlaybackSpeed(speed);
-        ijkPlayer.setSpeed(speed);
+        if (exoPlayer != null) exoPlayer.setPlaybackSpeed(speed);
+        if (ijkPlayer != null) ijkPlayer.setSpeed(speed);
+        if (hasDanmu()) danmuView.setSpeed(speed);
         return getSpeedText();
     }
 
@@ -276,34 +279,38 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     public void seekTo(int time) {
-        if (isExo() && exoPlayer != null) exoPlayer.seekTo(getPosition() + time);
-        if (isIjk() && ijkPlayer != null) ijkPlayer.seekTo(getPosition() + time);
+        seekTo(getPosition() + time, true);
     }
 
     public void seekTo(long time, boolean force) {
         if (time == 0 && !force) return;
+        if (hasDanmu()) danmuView.seekTo(time);
         if (isExo() && exoPlayer != null) exoPlayer.seekTo(time);
         if (isIjk() && ijkPlayer != null) ijkPlayer.seekTo(time);
     }
 
     public void play() {
+        if (isEnd()) return;
         session.setActive(true);
         if (isExo()) exoPlayer.play();
-        else if (isIjk()) ijkPlayer.start();
+        if (isIjk()) ijkPlayer.start();
+        if (hasDanmu()) danmuView.resume();
         setPlaybackState(PlaybackStateCompat.STATE_PLAYING);
     }
 
     public void pause() {
         if (isExo()) pauseExo();
-        else if (isIjk()) pauseIjk();
+        if (isIjk()) pauseIjk();
+        if (hasDanmu()) danmuView.pause();
         setPlaybackState(PlaybackStateCompat.STATE_PAUSED);
     }
 
     public void stop() {
         reset();
         if (isExo()) stopExo();
-        else if (isIjk()) stopIjk();
+        if (isIjk()) stopIjk();
         session.setActive(false);
+        if (hasDanmu()) danmuView.stop();
         setPlaybackState(PlaybackStateCompat.STATE_STOPPED);
     }
 
@@ -311,7 +318,8 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         stopParse();
         session.release();
         if (isExo()) releaseExo();
-        else if (isIjk()) releaseIjk();
+        if (isIjk()) releaseIjk();
+        if (hasDanmu()) danmuView.release();
     }
 
     public boolean isRelease() {
@@ -458,6 +466,10 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         session.setPlaybackState(new PlaybackStateCompat.Builder().setState(state, getPosition(), getSpeed()).build());
     }
 
+    private boolean hasDanmu() {
+        return danmuView != null && danmuView.isPrepared();
+    }
+
     @Override
     public void onParseSuccess(Map<String, String> headers, String url, String from) {
         setMediaSource(headers, url);
@@ -472,6 +484,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     @Override
     public void onEvents(@NonNull Player player, @NonNull Player.Events events) {
+        if (!events.containsAny(EVENT_PLAYBACK_STATE_CHANGED, EVENT_PLAY_WHEN_READY_CHANGED, EVENT_IS_PLAYING_CHANGED, EVENT_TIMELINE_CHANGED, EVENT_PLAYBACK_PARAMETERS_CHANGED, EVENT_POSITION_DISCONTINUITY, EVENT_REPEAT_MODE_CHANGED, EVENT_SHUFFLE_MODE_ENABLED_CHANGED, EVENT_MEDIA_METADATA_CHANGED)) return;
         setPlaybackState(isPlaying() ? PlaybackStateCompat.STATE_PLAYING : PlaybackStateCompat.STATE_PAUSED);
     }
 
@@ -530,5 +543,14 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     @Override
     public void onCompletion(IMediaPlayer mp) {
         PlayerEvent.state(Player.STATE_ENDED);
+    }
+
+    @Override
+    public void prepared() {
+        App.post(() -> {
+            if (danmuView == null) return;
+            if (!Setting.isDanmu()) danmuView.hide();
+            if (isPlaying() && danmuView.isPrepared()) danmuView.start(getPosition());
+        });
     }
 }

@@ -523,11 +523,10 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         if (mControlDialog != null && mControlDialog.isVisible()) mControlDialog.setParseVisible(isUseParse());
         mBinding.control.parse.setVisibility(isFullscreen() && isUseParse() ? View.VISIBLE : View.GONE);
         mPlayers.start(result, isUseParse(), getSite().isChangeable() ? getSite().getTimeout() : -1);
-        mBinding.qualityText.setVisibility(result.getUrl().isOnly() ? View.GONE : View.VISIBLE);
-        mBinding.quality.setVisibility(result.getUrl().isOnly() ? View.GONE : View.VISIBLE);
+        setQualityVisible(result.getUrl().isMulti());
         mBinding.swipeLayout.setRefreshing(false);
-        mQualityAdapter.addAll(result);
         checkDanmu(result.getDanmaku());
+        mQualityAdapter.addAll(result);
     }
 
     private void checkDanmu(String danmu) {
@@ -541,9 +540,8 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         if (item.isActivated()) return;
         mFlagAdapter.setActivated(item);
         mBinding.flag.scrollToPosition(mFlagAdapter.getPosition());
-        mBinding.qualityText.setVisibility(View.GONE);
-        mBinding.quality.setVisibility(View.GONE);
         setEpisodeAdapter(item.getEpisodes());
+        setQualityVisible(false);
         seamless(item, force);
     }
 
@@ -592,10 +590,16 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private void seamless(Flag flag, boolean force) {
         if (Setting.getFlag() == 1 && (mHistory.isNew() || !force)) return;
         Episode episode = flag.find(mHistory.getVodRemarks(), getMark().isEmpty());
+        setQualityVisible(episode != null && episode.isActivated() && mQualityAdapter.getItemCount() > 0);
         if (episode == null || episode.isActivated()) return;
         mHistory.setVodRemarks(episode.getName());
         onItemClick(episode);
         hidePreview();
+    }
+
+    private void setQualityVisible(boolean visible) {
+        mBinding.qualityText.setVisibility(visible ? View.VISIBLE : View.GONE);
+        mBinding.quality.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     private void reverseEpisode(boolean scroll) {
