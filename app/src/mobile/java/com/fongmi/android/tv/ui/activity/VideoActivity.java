@@ -187,23 +187,23 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private String getName() {
-        return getIntent().getStringExtra("name");
+        return Objects.toString(getIntent().getStringExtra("name"), "");
     }
 
     private String getPic() {
-        return getIntent().getStringExtra("pic");
+        return Objects.toString(getIntent().getStringExtra("pic"), "");
     }
 
     private String getMark() {
-        return getIntent().getStringExtra("mark");
+        return Objects.toString(getIntent().getStringExtra("mark"), "");
     }
 
     private String getKey() {
-        return getIntent().getStringExtra("key");
+        return Objects.toString(getIntent().getStringExtra("key"), "");
     }
 
     private String getId() {
-        return getIntent().getStringExtra("id");
+        return Objects.toString(getIntent().getStringExtra("id"), "");
     }
 
     private String getHistoryKey() {
@@ -267,7 +267,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        String id = intent.getStringExtra("id");
+        String id = Objects.toString(intent.getStringExtra("id"), "");
         if (TextUtils.isEmpty(id) || id.equals(getId())) return;
         mBinding.swipeLayout.setRefreshing(true);
         getIntent().putExtras(intent);
@@ -426,9 +426,8 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private void checkId() {
-        String id = Objects.toString(getId(), "");
-        if (id.startsWith("push://")) getIntent().putExtra("key", "push_agent").putExtra("id", id.substring(7));
-        if (id.isEmpty() || id.startsWith("msearch:")) setEmpty();
+        if (getId().startsWith("push://")) getIntent().putExtra("key", "push_agent").putExtra("id", getId().substring(7));
+        if (getId().isEmpty() || getId().startsWith("msearch:")) setEmpty();
         else getDetail();
     }
 
@@ -592,7 +591,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     private void seamless(Flag flag, boolean force) {
         if (Setting.getFlag() == 1 && (mHistory.isNew() || !force)) return;
-        Episode episode = flag.find(mHistory.getVodRemarks(), getMark() == null);
+        Episode episode = flag.find(mHistory.getVodRemarks(), getMark().isEmpty());
         if (episode == null || episode.isActivated()) return;
         mHistory.setVodRemarks(episode.getName());
         onItemClick(episode);
