@@ -1,6 +1,7 @@
 package tv.cjump.jni;
 
 import android.graphics.Bitmap;
+import android.os.Build;
 
 public class NativeBitmapFactory {
 
@@ -9,6 +10,10 @@ public class NativeBitmapFactory {
     }
 
     public static synchronized Bitmap createBitmap(int width, int height, Bitmap.Config config, boolean hasAlpha) {
-        return Bitmap.createBitmap(width, height, config, hasAlpha);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            return Bitmap.createBitmap(width, height, config, hasAlpha);
+        } else {
+            return Bitmap.createBitmap(width, height, config);
+        }
     }
 }
