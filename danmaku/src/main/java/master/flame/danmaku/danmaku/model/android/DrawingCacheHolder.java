@@ -7,7 +7,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
-import tv.cjump.jni.NativeBitmapFactory;
+import tv.cjump.jni.BitmapFactory;
 
 public class DrawingCacheHolder {
 
@@ -37,7 +37,7 @@ public class DrawingCacheHolder {
         height = h;
         Bitmap.Config config = Bitmap.Config.ARGB_4444;
         if (bitsPerPixel == 32) config = Bitmap.Config.ARGB_8888;
-        bitmap = NativeBitmapFactory.createBitmap(w, h, config);
+        bitmap = BitmapFactory.createBitmap(w, h, config);
         if (density > 0) {
             mDensity = density;
             bitmap.setDensity(density);
@@ -86,7 +86,7 @@ public class DrawingCacheHolder {
         Rect rectDst = new Rect();
         for (int yIndex = 0; yIndex < yCount; yIndex++) {
             for (int xIndex = 0; xIndex < xCount; xIndex++) {
-                Bitmap bmp = bmpArray[yIndex][xIndex] = NativeBitmapFactory.createBitmap(averageWidth, averageHeight, Bitmap.Config.ARGB_8888);
+                Bitmap bmp = bmpArray[yIndex][xIndex] = BitmapFactory.createBitmap(averageWidth, averageHeight, Bitmap.Config.ARGB_8888);
                 if (mDensity > 0) {
                     bmp.setDensity(mDensity);
                 }

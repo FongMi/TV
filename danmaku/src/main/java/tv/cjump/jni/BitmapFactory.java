@@ -3,7 +3,7 @@ package tv.cjump.jni;
 import android.graphics.Bitmap;
 import android.os.Build;
 
-public class NativeBitmapFactory {
+public class BitmapFactory {
 
     public static Bitmap createBitmap(int width, int height, Bitmap.Config config) {
         return createBitmap(width, height, config, config.equals(Bitmap.Config.ARGB_4444) || config.equals(Bitmap.Config.ARGB_8888));
