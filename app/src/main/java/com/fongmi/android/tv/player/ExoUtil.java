@@ -3,7 +3,6 @@ package com.fongmi.android.tv.player;
 import android.graphics.Color;
 import android.net.Uri;
 
-import androidx.media3.common.C;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.MimeTypes;
 import androidx.media3.common.PlaybackException;
@@ -69,7 +68,7 @@ public class ExoUtil {
 
     public static TrackSelector buildTrackSelector() {
         DefaultTrackSelector trackSelector = new DefaultTrackSelector(App.get());
-        trackSelector.setParameters(trackSelector.buildUponParameters().setIgnoredTextSelectionFlags(C.SELECTION_FLAG_DEFAULT).setPreferredTextLanguage("zh").setTunnelingEnabled(Setting.isTunnel()));
+        trackSelector.setParameters(trackSelector.buildUponParameters().setPreferredTextLanguage("zh").setTunnelingEnabled(Setting.isTunnel()));
         return trackSelector;
     }
 
@@ -79,6 +78,12 @@ public class ExoUtil {
 
     public static CaptionStyleCompat getCaptionStyle() {
         return new CaptionStyleCompat(Color.WHITE, Color.TRANSPARENT, Color.TRANSPARENT, CaptionStyleCompat.EDGE_TYPE_OUTLINE, Color.BLACK, null);
+    }
+
+    public static int getRetry(int errorCode) {
+        if (errorCode == PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED) return 0;
+        if (errorCode == PlaybackException.ERROR_CODE_PARSING_MANIFEST_MALFORMED || errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED || errorCode == PlaybackException.ERROR_CODE_IO_UNSPECIFIED) return 2;
+        return 1;
     }
 
     public static boolean haveTrack(Tracks tracks, int type) {

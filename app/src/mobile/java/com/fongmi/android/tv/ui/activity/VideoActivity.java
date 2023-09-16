@@ -1184,7 +1184,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private void checkError(ErrorEvent event) {
-        if (getSite().getPlayerType() == -1 && event.isFormat() && getToggleCount() < 2 && mPlayers.getPlayer() != Players.SYS) {
+        if (getSite().getPlayerType() == -1 && event.isFormat() && event.getRetry() > 0 && getToggleCount() < 2 && mPlayers.getPlayer() != Players.SYS) {
             toggleCount++;
             nextPlayer();
         } else {

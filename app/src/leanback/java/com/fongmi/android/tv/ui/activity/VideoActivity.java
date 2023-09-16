@@ -556,7 +556,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private void setQualityVisible(boolean visible) {
         mFlagPresenter.setNextFocusDown(visible ? R.id.quality : R.id.episode);
         mEpisodePresenter.setNextFocusUp(visible ? R.id.quality : R.id.flag);
-        mBinding.quality.setVisibility(visible?View.VISIBLE:View.GONE);
+        mBinding.quality.setVisibility(visible ? View.VISIBLE : View.GONE);
         notifyItemChanged(mBinding.episode, mEpisodeAdapter);
         notifyItemChanged(mBinding.flag, mFlagAdapter);
     }
@@ -1088,7 +1088,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void checkError(ErrorEvent event) {
-        if (getSite().getPlayerType() == -1 && event.isFormat() && getToggleCount() < 2 && mPlayers.getPlayer() != Players.SYS) {
+        if (getSite().getPlayerType() == -1 && event.isFormat() && event.getRetry() > 0 && getToggleCount() < 2 && mPlayers.getPlayer() != Players.SYS) {
             toggleCount++;
             nextPlayer();
         } else {
