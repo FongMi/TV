@@ -15,11 +15,6 @@ import tv.danmaku.ijk.media.player.MediaSource;
 
 public class IjkUtil {
 
-    public static int getRetry(int errorCode) {
-        if (errorCode == -10000) return 0;
-        return 1;
-    }
-
     public static MediaSource getSource(Result result) {
         return getSource(result.getHeaders(), result.getRealUrl());
     }
