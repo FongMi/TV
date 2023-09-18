@@ -35,11 +35,6 @@ public class Sniffer {
         return url.split(";")[0].endsWith(".torrent");
     }
 
-    public static boolean isAds(Uri uri) {
-        for (String regex : getRegex(uri)) if (regex.contains("#EXTINF")) return true;
-        return false;
-    }
-
     public static boolean isVideoFormat(String url) {
         return isVideoFormat(url, new HashMap<>());
     }

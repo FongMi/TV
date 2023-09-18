@@ -590,7 +590,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private void seamless(Flag flag, boolean force) {
         if (Setting.getFlag() == 1 && (mHistory.isNew() || !force)) return;
         Episode episode = flag.find(mHistory.getVodRemarks(), getMark().isEmpty());
-        setQualityVisible(episode != null && episode.isActivated() && mQualityAdapter.getItemCount() > 0);
+        setQualityVisible(episode != null && episode.isActivated() && mQualityAdapter.getItemCount() > 1);
         if (episode == null || episode.isActivated()) return;
         mHistory.setVodRemarks(episode.getName());
         onItemClick(episode);
