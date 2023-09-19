@@ -1,6 +1,7 @@
 package com.github.catvod.crawler;
 
 import android.content.Context;
+import android.net.Uri;
 
 import com.github.catvod.net.OkHttp;
 
@@ -66,7 +67,7 @@ public abstract class Spider {
         return OkHttp.dns();
     }
 
-    public static String proxy() {
+    public static Uri proxy() {
         return OkHttp.proxy();
     }
 }
