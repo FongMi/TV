@@ -1,6 +1,5 @@
 package com.fongmi.android.tv.ui.custom.dialog;
 
-import android.Manifest;
 import android.content.DialogInterface;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -12,48 +11,34 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
 
 import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.api.ApiConfig;
-import com.fongmi.android.tv.api.LiveConfig;
-import com.fongmi.android.tv.api.WallConfig;
-import com.fongmi.android.tv.bean.Config;
-import com.fongmi.android.tv.databinding.DialogConfigBinding;
+import com.fongmi.android.tv.Setting;
+import com.fongmi.android.tv.databinding.DialogProxyBinding;
 import com.fongmi.android.tv.event.ServerEvent;
-import com.fongmi.android.tv.impl.ConfigCallback;
+import com.fongmi.android.tv.impl.ProxyCallback;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.ui.custom.CustomTextListener;
 import com.fongmi.android.tv.utils.QRCode;
 import com.fongmi.android.tv.utils.ResUtil;
-import com.fongmi.android.tv.utils.Utils;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.permissionx.guolindev.PermissionX;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-public class ConfigDialog implements DialogInterface.OnDismissListener {
+public class ProxyDialog implements DialogInterface.OnDismissListener {
 
-    private final DialogConfigBinding binding;
-    private final FragmentActivity activity;
-    private final ConfigCallback callback;
+    private final DialogProxyBinding binding;
+    private final ProxyCallback callback;
     private final AlertDialog dialog;
     private boolean append;
-    private String url;
-    private int type;
 
-    public static ConfigDialog create(FragmentActivity activity) {
-        return new ConfigDialog(activity);
+    public static ProxyDialog create(FragmentActivity activity) {
+        return new ProxyDialog(activity);
     }
 
-    public ConfigDialog type(int type) {
-        this.type = type;
-        return this;
-    }
-
-    public ConfigDialog(FragmentActivity activity) {
-        this.activity = activity;
-        this.callback = (ConfigCallback) activity;
-        this.binding = DialogConfigBinding.inflate(LayoutInflater.from(activity));
+    public ProxyDialog(FragmentActivity activity) {
+        this.callback = (ProxyCallback) activity;
+        this.binding = DialogProxyBinding.inflate(LayoutInflater.from(activity));
         this.dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).create();
         this.append = true;
     }
@@ -74,17 +59,16 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
     }
 
     private void initView() {
+        String text = Setting.getProxy();
         String address = Server.get().getAddress();
-        binding.text.setText(url = getUrl());
+        binding.text.setText(text);
         binding.code.setImageBitmap(QRCode.getBitmap(address, 200, 0));
-        binding.text.setSelection(TextUtils.isEmpty(url) ? 0 : url.length());
-        binding.storage.setVisibility(Utils.hasPermission(activity) ? View.GONE : View.VISIBLE);
+        binding.text.setSelection(TextUtils.isEmpty(text) ? 0 : text.length());
         binding.info.setText(ResUtil.getString(R.string.push_info, address).replace("，", "\n"));
     }
 
     private void initEvent() {
         EventBus.getDefault().register(this);
-        binding.storage.setOnClickListener(this::onStorage);
         binding.positive.setOnClickListener(this::onPositive);
         binding.negative.setOnClickListener(this::onNegative);
         binding.text.addTextChangedListener(new CustomTextListener() {
@@ -99,30 +83,16 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
         });
     }
 
-    private String getUrl() {
-        switch (type) {
-            case 0:
-                return ApiConfig.getUrl();
-            case 1:
-                return LiveConfig.getUrl();
-            case 2:
-                return WallConfig.getUrl();
-            default:
-                return "";
-        }
-    }
-
-    private void onStorage(View view) {
-        PermissionX.init(activity).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> binding.storage.setVisibility(allGranted ? View.GONE : View.VISIBLE));
-    }
-
     private void detect(String s) {
         if (append && s.equalsIgnoreCase("h")) {
             append = false;
             binding.text.append("ttp://");
-        } else if (append && s.equalsIgnoreCase("f")) {
+        } else if (append && s.equalsIgnoreCase("s")) {
             append = false;
-            binding.text.append("ile://");
+            binding.text.append("ocks5://");
+        } else if (append && s.length() == 1) {
+            append = false;
+            binding.text.getText().insert(0, "socks5://");
         } else if (s.length() > 1) {
             append = false;
         } else if (s.length() == 0) {
@@ -131,9 +101,7 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
     }
 
     private void onPositive(View view) {
-        String text = Utils.checkClan(binding.text.getText().toString().trim());
-        if (text.isEmpty()) Config.delete(url, type);
-        callback.setConfig(Config.find(text, type));
+        callback.setProxy(binding.text.getText().toString().trim());
         dialog.dismiss();
     }
 
@@ -145,7 +113,7 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
     public void onServerEvent(ServerEvent event) {
         if (event.getType() != ServerEvent.Type.API) return;
         binding.text.setText(event.getText());
-        binding.text.setSelection(binding.text.getText().length());
+        binding.positive.performClick();
     }
 
     @Override
