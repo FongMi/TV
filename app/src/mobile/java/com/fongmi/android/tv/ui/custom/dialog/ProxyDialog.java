@@ -64,10 +64,10 @@ public class ProxyDialog {
     }
 
     private void detect(String s) {
-        if (append && s.equals("h")) {
+        if (append && s.equalsIgnoreCase("h")) {
             append = false;
             binding.text.append("ttp://");
-        } else if (append && s.equals("s")) {
+        } else if (append && s.equalsIgnoreCase("s")) {
             append = false;
             binding.text.append("ocks5://");
         } else if (append && s.length() == 1) {
