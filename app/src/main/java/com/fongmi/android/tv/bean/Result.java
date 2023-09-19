@@ -304,8 +304,7 @@ public class Result implements Parcelable {
         this.types = new ArrayList<>();
         in.readList(this.types, Class.class.getClassLoader());
         this.list = in.createTypedArrayList(Vod.CREATOR);
-        Type listType = new TypeToken<LinkedHashMap<String, List<Filter>>>() {
-        }.getType();
+        Type listType = new TypeToken<LinkedHashMap<String, List<Filter>>>() {}.getType();
         this.filters = App.gson().fromJson(in.readString(), listType);
     }
 
