@@ -65,4 +65,8 @@ public abstract class Spider {
     public static Dns safeDns() {
         return OkHttp.dns();
     }
+
+    public static String proxy() {
+        return OkHttp.proxy();
+    }
 }

@@ -78,6 +78,7 @@
     <string name="setting_quality">圖片品質</string>
     <string name="setting_size">圖片尺寸</string>
     <string name="setting_doh">DoH</string>
+    <string name="setting_proxy">Proxy</string>
     <string name="setting_cache">暫存</string>
     <string name="setting_version">版本</string>
     <string name="setting_storage">權限</string>

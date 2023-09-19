@@ -14,6 +14,14 @@ public class Setting {
         Prefers.put("doh", doh);
     }
 
+    public static String getProxy() {
+        return Prefers.getString("proxy");
+    }
+
+    public static void putProxy(String proxy) {
+        Prefers.put("proxy", proxy);
+    }
+
     public static String getKeep() {
         return Prefers.getString("keep");
     }

@@ -42,9 +42,9 @@ public class UaDialog {
     }
 
     private void initView() {
-        String ua = Setting.getUa();
-        binding.text.setText(ua);
-        binding.text.setSelection(TextUtils.isEmpty(ua) ? 0 : ua.length());
+        String text = Setting.getUa();
+        binding.text.setText(text);
+        binding.text.setSelection(TextUtils.isEmpty(text) ? 0 : text.length());
     }
 
     private void initEvent() {

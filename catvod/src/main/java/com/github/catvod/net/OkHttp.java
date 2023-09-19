@@ -1,6 +1,7 @@
 package com.github.catvod.net;
 
 import android.net.Uri;
+import android.text.TextUtils;
 
 import androidx.collection.ArrayMap;
 
@@ -9,12 +10,17 @@ import com.github.catvod.utils.Path;
 import com.github.catvod.utils.Util;
 import com.google.common.net.HttpHeaders;
 
+import java.net.Authenticator;
+import java.net.InetSocketAddress;
+import java.net.PasswordAuthentication;
+import java.net.Proxy;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Cache;
 import okhttp3.Call;
+import okhttp3.Credentials;
 import okhttp3.Dns;
 import okhttp3.FormBody;
 import okhttp3.Headers;
@@ -29,6 +35,7 @@ public class OkHttp {
     private static final int TIMEOUT = 30 * 1000;
     private static final int CACHE = 100 * 1024 * 1024;
 
+    private String proxy;
     private DnsOverHttps dns;
     private OkHttpClient client;
     private OkHttpClient noRedirect;
@@ -44,8 +51,15 @@ public class OkHttp {
     public void setDoh(Doh doh) {
         OkHttpClient dohClient = new OkHttpClient.Builder().cache(new Cache(Path.doh(), CACHE)).hostnameVerifier(SSLCompat.VERIFIER).sslSocketFactory(new SSLCompat(), SSLCompat.TM).build();
         dns = doh.getUrl().isEmpty() ? null : new DnsOverHttps.Builder().client(dohClient).url(HttpUrl.get(doh.getUrl())).bootstrapDnsHosts(doh.getHosts()).build();
-        client = null;
         noRedirect = null;
+        client = null;
+    }
+
+    public void setProxy(String proxy) {
+        Authenticator.setDefault(null);
+        this.proxy = proxy;
+        noRedirect = null;
+        client = null;
     }
 
     public static OkHttpClient client() {
@@ -62,8 +76,14 @@ public class OkHttp {
         return get().dns != null ? get().dns : Dns.SYSTEM;
     }
 
+    public static String proxy() {
+        return get().proxy;
+    }
+
     public static OkHttpClient client(int timeout) {
-        return new OkHttpClient.Builder().addInterceptor(new DeflateInterceptor()).connectTimeout(timeout, TimeUnit.MILLISECONDS).readTimeout(timeout, TimeUnit.MILLISECONDS).writeTimeout(timeout, TimeUnit.MILLISECONDS).dns(dns()).hostnameVerifier(SSLCompat.VERIFIER).sslSocketFactory(new SSLCompat(), SSLCompat.TM).build();
+        OkHttpClient.Builder builder = new OkHttpClient.Builder().addInterceptor(new DeflateInterceptor()).connectTimeout(timeout, TimeUnit.MILLISECONDS).readTimeout(timeout, TimeUnit.MILLISECONDS).writeTimeout(timeout, TimeUnit.MILLISECONDS).dns(dns()).hostnameVerifier(SSLCompat.VERIFIER).sslSocketFactory(new SSLCompat(), SSLCompat.TM);
+        if (!TextUtils.isEmpty(proxy())) setProxy(builder);
+        return builder.build();
     }
 
     public static Call newCall(String url) {
@@ -96,15 +116,37 @@ public class OkHttp {
         return client.newCall(new Request.Builder().url(url).post(body).build());
     }
 
+    public static FormBody toBody(ArrayMap<String, String> params) {
+        FormBody.Builder body = new FormBody.Builder();
+        for (Map.Entry<String, String> entry : params.entrySet()) body.add(entry.getKey(), entry.getValue());
+        return body.build();
+    }
+
     private static HttpUrl buildUrl(String url, ArrayMap<String, String> params) {
         HttpUrl.Builder builder = Objects.requireNonNull(HttpUrl.parse(url)).newBuilder();
         for (Map.Entry<String, String> entry : params.entrySet()) builder.addQueryParameter(entry.getKey(), entry.getValue());
         return builder.build();
     }
 
-    public static FormBody toBody(ArrayMap<String, String> params) {
-        FormBody.Builder body = new FormBody.Builder();
-        for (Map.Entry<String, String> entry : params.entrySet()) body.add(entry.getKey(), entry.getValue());
-        return body.build();
+    private static void setProxy(OkHttpClient.Builder builder) {
+        Uri uri = Uri.parse(proxy());
+        if (uri.getHost() == null) return;
+        String userInfo = uri.getUserInfo();
+        if (Util.scheme(uri).startsWith("socks")) {
+            builder.proxy(new Proxy(Proxy.Type.SOCKS, InetSocketAddress.createUnresolved(uri.getHost(), uri.getPort())));
+        }
+        if (Util.scheme(uri).startsWith("http")) {
+            builder.proxy(new Proxy(Proxy.Type.HTTP, InetSocketAddress.createUnresolved(uri.getHost(), uri.getPort())));
+            if (userInfo != null && userInfo.contains(":")) builder.proxyAuthenticator((route, response) -> {
+                String credential = Credentials.basic(userInfo.split(":")[0], userInfo.split(":")[1]);
+                return response.request().newBuilder().header("Proxy-Authorization", credential).build();
+            });
+        }
+        if (userInfo != null && userInfo.contains(":")) Authenticator.setDefault(new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(userInfo.split(":")[0], userInfo.split(":")[1].toCharArray());
+            }
+        });
     }
 }
