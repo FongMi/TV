@@ -48,14 +48,6 @@ public class Parse {
         return parse;
     }
 
-    public static Parse get(Integer type, String url, JsonElement header) {
-        Parse parse = new Parse();
-        parse.setHeader(header);
-        parse.setType(type);
-        parse.setUrl(url);
-        return parse;
-    }
-
     public static Parse god() {
         Parse parse = new Parse();
         parse.setName(ResUtil.getString(R.string.parse_god));
@@ -107,8 +99,8 @@ public class Parse {
         return Json.toMap(getExt().getHeader());
     }
 
-    private void setHeader(JsonElement header) {
-        getExt().setHeader(header);
+    public void setHeader(JsonElement header) {
+        if (getExt().getHeader() == null) getExt().setHeader(header);
     }
 
     @Override

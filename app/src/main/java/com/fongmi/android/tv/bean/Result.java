@@ -165,6 +165,10 @@ public class Result implements Parcelable {
         return header;
     }
 
+    public void setHeader(JsonElement header) {
+        if (getHeader() == null) this.header = header;
+    }
+
     public String getPlayUrl() {
         return TextUtils.isEmpty(playUrl) ? "" : playUrl;
     }
@@ -300,7 +304,8 @@ public class Result implements Parcelable {
         this.types = new ArrayList<>();
         in.readList(this.types, Class.class.getClassLoader());
         this.list = in.createTypedArrayList(Vod.CREATOR);
-        Type listType = new TypeToken<LinkedHashMap<String, List<Filter>>>() {}.getType();
+        Type listType = new TypeToken<LinkedHashMap<String, List<Filter>>>() {
+        }.getType();
         this.filters = App.gson().fromJson(in.readString(), listType);
     }
 
