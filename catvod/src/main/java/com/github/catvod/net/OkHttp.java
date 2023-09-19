@@ -81,7 +81,7 @@ public class OkHttp {
 
     public static OkHttpClient client(int timeout) {
         OkHttpClient.Builder builder = new OkHttpClient.Builder().addInterceptor(new DeflateInterceptor()).connectTimeout(timeout, TimeUnit.MILLISECONDS).readTimeout(timeout, TimeUnit.MILLISECONDS).writeTimeout(timeout, TimeUnit.MILLISECONDS).dns(dns()).hostnameVerifier(SSLCompat.VERIFIER).sslSocketFactory(new SSLCompat(), SSLCompat.TM);
-        if (proxy() != null && proxy().getHost() != null && proxy().getPort() > 0) setProxy(builder);
+        if (proxy() != null && proxy().getScheme() != null && proxy().getHost() != null && proxy().getPort() > 0) setProxy(builder);
         return builder.build();
     }
 
@@ -129,17 +129,17 @@ public class OkHttp {
 
     private static void setProxy(OkHttpClient.Builder builder) {
         String userInfo = proxy().getUserInfo();
-        if (Util.scheme(proxy()).startsWith("socks")) {
-            builder.proxy(new Proxy(Proxy.Type.SOCKS, InetSocketAddress.createUnresolved(proxy().getHost(), proxy().getPort())));
-        }
-        if (Util.scheme(proxy()).startsWith("http")) {
-            builder.proxy(new Proxy(Proxy.Type.HTTP, InetSocketAddress.createUnresolved(proxy().getHost(), proxy().getPort())));
-            if (userInfo != null && userInfo.contains(":")) builder.proxyAuthenticator((route, response) -> {
-                String credential = Credentials.basic(userInfo.split(":")[0], userInfo.split(":")[1]);
-                return response.request().newBuilder().header("Proxy-Authorization", credential).build();
-            });
-        }
-        if (userInfo != null && userInfo.contains(":")) Authenticator.setDefault(new Authenticator() {
+        if (userInfo != null && userInfo.contains(":")) setAuthenticator(builder, userInfo);
+        if (Util.scheme(proxy()).startsWith("http")) builder.proxy(new Proxy(Proxy.Type.HTTP, InetSocketAddress.createUnresolved(proxy().getHost(), proxy().getPort())));
+        if (Util.scheme(proxy()).startsWith("socks")) builder.proxy(new Proxy(Proxy.Type.SOCKS, InetSocketAddress.createUnresolved(proxy().getHost(), proxy().getPort())));
+    }
+
+    private static void setAuthenticator(OkHttpClient.Builder builder, String userInfo) {
+        builder.proxyAuthenticator((route, response) -> {
+            String credential = Credentials.basic(userInfo.split(":")[0], userInfo.split(":")[1]);
+            return response.request().newBuilder().header("Proxy-Authorization", credential).build();
+        });
+        Authenticator.setDefault(new Authenticator() {
             @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(userInfo.split(":")[0], userInfo.split(":")[1].toCharArray());
