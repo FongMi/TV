@@ -22,7 +22,7 @@ import java.util.List;
 
 import okhttp3.Headers;
 
-@Entity(ignoredColumns = {"type", "api", "playUrl", "timeout", "playerType", "ext", "jar", "style", "categories", "header"})
+@Entity(ignoredColumns = {"type", "api", "playUrl", "timeout", "playerType", "ext", "jar", "style", "categories", "header", "proxy"})
 public class Site implements Parcelable {
 
     @NonNull
@@ -60,6 +60,8 @@ public class Site implements Parcelable {
     private List<String> categories;
     @SerializedName("header")
     private JsonElement header;
+    @SerializedName("proxy")
+    private boolean proxy;
 
     private boolean activated;
 
@@ -185,6 +187,10 @@ public class Site implements Parcelable {
 
     public JsonElement getHeader() {
         return header;
+    }
+
+    public boolean isProxy() {
+        return proxy;
     }
 
     public boolean isActivated() {
