@@ -263,6 +263,10 @@ public class Result implements Parcelable {
         return proxy;
     }
 
+    public void setProxy(boolean proxy) {
+        this.proxy = proxy;
+    }
+
     public boolean hasMsg() {
         return getMsg().length() > 0;
     }
