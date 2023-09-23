@@ -2,8 +2,6 @@ package com.fongmi.android.tv.utils;
 
 import android.widget.TextView;
 
-import androidx.media3.common.util.Log;
-
 import com.fongmi.android.tv.App;
 
 import java.text.SimpleDateFormat;
