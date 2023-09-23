@@ -144,7 +144,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
     private void createCtx() {
         ctx = QuickJSContext.create();
         QuickJSLoader.initConsoleLog(ctx);
-        Global.create(ctx, executor, proxy()).setProperty();
+        Global.create(ctx, executor).setProperty();
         ctx.getGlobalObject().setProperty("local", Local.class);
         ctx.getGlobalObject().getContext().evaluate(Path.asset("js/lib/http.js"));
         ctx.setModuleLoader(new QuickJSContext.DefaultModuleLoader() {
