@@ -37,9 +37,7 @@ public class OkHttp {
 
     private DnsOverHttps dns;
     private OkHttpClient client;
-    private OkHttpClient noRedirect;
     private OkHttpClient clientProxy;
-    private OkHttpClient noRedirectProxy;
 
     private static class Loader {
         static volatile OkHttp INSTANCE = new OkHttp();
@@ -47,46 +45,6 @@ public class OkHttp {
 
     public static OkHttp get() {
         return Loader.INSTANCE;
-    }
-
-    public void setDoh(Doh doh) {
-        OkHttpClient dohClient = new OkHttpClient.Builder().cache(new Cache(Path.doh(), CACHE)).hostnameVerifier(SSLCompat.VERIFIER).sslSocketFactory(new SSLCompat(), SSLCompat.TM).build();
-        dns = doh.getUrl().isEmpty() ? null : new DnsOverHttps.Builder().client(dohClient).url(HttpUrl.get(doh.getUrl())).bootstrapDnsHosts(doh.getHosts()).build();
-        noRedirectProxy = null;
-        clientProxy = null;
-        noRedirect = null;
-        client = null;
-    }
-
-    public void setProxy() {
-        Authenticator.setDefault(null);
-        noRedirectProxy = null;
-        clientProxy = null;
-    }
-
-    public static OkHttpClient client(boolean proxy, boolean redirect) {
-        if (proxy) return redirect ? clientProxy() : noRedirectProxy();
-        else return redirect ? client() : noRedirect();
-    }
-
-    public static OkHttpClient client() {
-        if (get().client != null) return get().client;
-        return get().client = client(TIMEOUT);
-    }
-
-    public static OkHttpClient noRedirect() {
-        if (get().noRedirect != null) return get().noRedirect;
-        return get().noRedirect = client().newBuilder().followRedirects(false).followSslRedirects(false).build();
-    }
-
-    public static OkHttpClient clientProxy() {
-        if (get().clientProxy != null) return get().clientProxy;
-        return get().clientProxy = clientProxy(TIMEOUT);
-    }
-
-    public static OkHttpClient noRedirectProxy() {
-        if (get().noRedirectProxy != null) return get().noRedirectProxy;
-        return get().noRedirectProxy = clientProxy().newBuilder().followRedirects(false).followSslRedirects(false).build();
     }
 
     public static Dns dns() {
@@ -97,12 +55,47 @@ public class OkHttp {
         return Uri.parse(Prefers.getString("proxy"));
     }
 
+    public void setDoh(Doh doh) {
+        OkHttpClient dohClient = new OkHttpClient.Builder().cache(new Cache(Path.doh(), CACHE)).hostnameVerifier(SSLCompat.VERIFIER).sslSocketFactory(new SSLCompat(), SSLCompat.TM).build();
+        dns = doh.getUrl().isEmpty() ? null : new DnsOverHttps.Builder().client(dohClient).url(HttpUrl.get(doh.getUrl())).bootstrapDnsHosts(doh.getHosts()).build();
+        clientProxy = null;
+        client = null;
+    }
+
+    public void setProxy() {
+        Authenticator.setDefault(null);
+        clientProxy = null;
+    }
+
+    public static OkHttpClient client() {
+        if (get().client != null) return get().client;
+        return get().client = getBuilder().build();
+    }
+
+    public static OkHttpClient clientProxy() {
+        if (get().clientProxy != null) return get().clientProxy;
+        return get().clientProxy = getBuilder(proxy()).build();
+    }
+
     public static OkHttpClient client(int timeout) {
-        return new OkHttpClient.Builder().addInterceptor(new DeflateInterceptor()).connectTimeout(timeout, TimeUnit.MILLISECONDS).readTimeout(timeout, TimeUnit.MILLISECONDS).writeTimeout(timeout, TimeUnit.MILLISECONDS).dns(dns()).hostnameVerifier(SSLCompat.VERIFIER).sslSocketFactory(new SSLCompat(), SSLCompat.TM).build();
+        return client().newBuilder().connectTimeout(timeout, TimeUnit.MILLISECONDS).readTimeout(timeout, TimeUnit.MILLISECONDS).writeTimeout(timeout, TimeUnit.MILLISECONDS).build();
     }
 
     public static OkHttpClient clientProxy(int timeout) {
-        return getProxyBuilder(proxy(), timeout).build();
+        return clientProxy().newBuilder().connectTimeout(timeout, TimeUnit.MILLISECONDS).readTimeout(timeout, TimeUnit.MILLISECONDS).writeTimeout(timeout, TimeUnit.MILLISECONDS).build();
+    }
+
+    public static OkHttpClient noRedirect(int timeout) {
+        return client().newBuilder().connectTimeout(timeout, TimeUnit.MILLISECONDS).readTimeout(timeout, TimeUnit.MILLISECONDS).writeTimeout(timeout, TimeUnit.MILLISECONDS).followRedirects(false).followSslRedirects(false).build();
+    }
+
+    public static OkHttpClient noRedirectProxy(int timeout) {
+        return clientProxy().newBuilder().connectTimeout(timeout, TimeUnit.MILLISECONDS).readTimeout(timeout, TimeUnit.MILLISECONDS).writeTimeout(timeout, TimeUnit.MILLISECONDS).followRedirects(false).followSslRedirects(false).build();
+    }
+
+    public static OkHttpClient client(boolean proxy, boolean redirect, int timeout) {
+        if (proxy) return redirect ? clientProxy(timeout) : noRedirectProxy(timeout);
+        else return redirect ? client(timeout) : noRedirect(timeout);
     }
 
     public static Call newCall(String url) {
@@ -147,13 +140,17 @@ public class OkHttp {
         return builder.build();
     }
 
-    private static OkHttpClient.Builder getProxyBuilder(Uri uri, int timeout) {
+    private static OkHttpClient.Builder getBuilder() {
+        return new OkHttpClient.Builder().addInterceptor(new DeflateInterceptor()).connectTimeout(TIMEOUT, TimeUnit.MILLISECONDS).readTimeout(TIMEOUT, TimeUnit.MILLISECONDS).writeTimeout(TIMEOUT, TimeUnit.MILLISECONDS).dns(dns()).hostnameVerifier(SSLCompat.VERIFIER).sslSocketFactory(new SSLCompat(), SSLCompat.TM);
+    }
+
+    private static OkHttpClient.Builder getBuilder(Uri uri) {
         String userInfo = uri.getUserInfo();
-        OkHttpClient.Builder builder = client(timeout).newBuilder();
+        OkHttpClient.Builder builder = client().newBuilder();
         if (userInfo != null && userInfo.contains(":")) setAuthenticator(builder, userInfo);
-        if (uri.getScheme() != null && uri.getHost() != null && uri.getPort() > 0) return builder;
-        if (Util.scheme(uri).startsWith("http")) builder.proxy(new Proxy(Proxy.Type.HTTP, InetSocketAddress.createUnresolved(uri.getHost(), uri.getPort())));
-        if (Util.scheme(uri).startsWith("socks")) builder.proxy(new Proxy(Proxy.Type.SOCKS, InetSocketAddress.createUnresolved(uri.getHost(), uri.getPort())));
+        if (uri.getScheme() == null || uri.getHost() == null || uri.getPort() <= 0) return builder;
+        if (uri.getScheme().startsWith("http")) builder.proxy(new Proxy(Proxy.Type.HTTP, InetSocketAddress.createUnresolved(uri.getHost(), uri.getPort())));
+        if (uri.getScheme().startsWith("socks")) builder.proxy(new Proxy(Proxy.Type.SOCKS, InetSocketAddress.createUnresolved(uri.getHost(), uri.getPort())));
         return builder;
     }
 

@@ -10,7 +10,6 @@ import com.whl.quickjs.wrapper.QuickJSContext;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
 import okhttp3.FormBody;
@@ -24,8 +23,7 @@ import okhttp3.Response;
 public class Connect {
 
     public static Call to(String url, Req req, boolean proxy) {
-        OkHttpClient client = OkHttp.client(proxy, req.isRedirect());
-        client = client.newBuilder().connectTimeout(req.getTimeout(), TimeUnit.MILLISECONDS).readTimeout(req.getTimeout(), TimeUnit.MILLISECONDS).writeTimeout(req.getTimeout(), TimeUnit.MILLISECONDS).build();
+        OkHttpClient client = OkHttp.client(proxy, req.isRedirect(), req.getTimeout());
         return client.newCall(getRequest(url, req, Headers.of(req.getHeader())));
     }
 
