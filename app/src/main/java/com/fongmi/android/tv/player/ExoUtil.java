@@ -172,7 +172,7 @@ public class ExoUtil {
     }
 
     private static synchronized HttpDataSource.Factory getHttpDataSourceFactory(boolean proxy) {
-        if (httpDataSourceFactory == null) httpDataSourceFactory = Setting.getHttp() == 0 ? new DefaultHttpDataSource.Factory().setAllowCrossProtocolRedirects(true).setProxy(proxy ? OkHttp.proxy() : null) : new OkHttpDataSource.Factory((Call.Factory) (proxy ? OkHttp.clientProxy() : OkHttp.client()));
+        if (httpDataSourceFactory == null) httpDataSourceFactory = Setting.getHttp() == 0 ? new DefaultHttpDataSource.Factory().setAllowCrossProtocolRedirects(true).setProxy(proxy ? Setting.getProxy() : null) : new OkHttpDataSource.Factory((Call.Factory) (proxy ? OkHttp.clientProxy() : OkHttp.client()));
         return httpDataSourceFactory;
     }
 

@@ -51,10 +51,6 @@ public class OkHttp {
         return get().dns != null ? get().dns : Dns.SYSTEM;
     }
 
-    public static Uri proxy() {
-        return Uri.parse(Prefers.getString("proxy"));
-    }
-
     public void setDoh(Doh doh) {
         OkHttpClient dohClient = new OkHttpClient.Builder().cache(new Cache(Path.doh(), CACHE)).hostnameVerifier(SSLCompat.VERIFIER).sslSocketFactory(new SSLCompat(), SSLCompat.TM).build();
         dns = doh.getUrl().isEmpty() ? null : new DnsOverHttps.Builder().client(dohClient).url(HttpUrl.get(doh.getUrl())).bootstrapDnsHosts(doh.getHosts()).build();
@@ -72,17 +68,17 @@ public class OkHttp {
         return get().client = getBuilder().build();
     }
 
-    public static OkHttpClient clientProxy() {
+    public static OkHttpClient proxy() {
         if (get().clientProxy != null) return get().clientProxy;
-        return get().clientProxy = getBuilder(proxy()).build();
+        return get().clientProxy = getBuilder(Uri.parse(Prefers.getString("proxy"))).build();
     }
 
     public static OkHttpClient client(int timeout) {
         return client().newBuilder().connectTimeout(timeout, TimeUnit.MILLISECONDS).readTimeout(timeout, TimeUnit.MILLISECONDS).writeTimeout(timeout, TimeUnit.MILLISECONDS).build();
     }
 
-    public static OkHttpClient clientProxy(int timeout) {
-        return clientProxy().newBuilder().connectTimeout(timeout, TimeUnit.MILLISECONDS).readTimeout(timeout, TimeUnit.MILLISECONDS).writeTimeout(timeout, TimeUnit.MILLISECONDS).build();
+    public static OkHttpClient proxy(int timeout) {
+        return proxy().newBuilder().connectTimeout(timeout, TimeUnit.MILLISECONDS).readTimeout(timeout, TimeUnit.MILLISECONDS).writeTimeout(timeout, TimeUnit.MILLISECONDS).build();
     }
 
     public static OkHttpClient noRedirect(int timeout) {
@@ -90,11 +86,11 @@ public class OkHttp {
     }
 
     public static OkHttpClient noRedirectProxy(int timeout) {
-        return clientProxy().newBuilder().connectTimeout(timeout, TimeUnit.MILLISECONDS).readTimeout(timeout, TimeUnit.MILLISECONDS).writeTimeout(timeout, TimeUnit.MILLISECONDS).followRedirects(false).followSslRedirects(false).build();
+        return proxy().newBuilder().connectTimeout(timeout, TimeUnit.MILLISECONDS).readTimeout(timeout, TimeUnit.MILLISECONDS).writeTimeout(timeout, TimeUnit.MILLISECONDS).followRedirects(false).followSslRedirects(false).build();
     }
 
     public static OkHttpClient client(boolean proxy, boolean redirect, int timeout) {
-        if (proxy) return redirect ? clientProxy(timeout) : noRedirectProxy(timeout);
+        if (proxy) return redirect ? proxy(timeout) : noRedirectProxy(timeout);
         else return redirect ? client(timeout) : noRedirect(timeout);
     }
 
