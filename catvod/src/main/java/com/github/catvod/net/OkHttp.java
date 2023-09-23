@@ -36,8 +36,8 @@ public class OkHttp {
     private static final int CACHE = 100 * 1024 * 1024;
 
     private DnsOverHttps dns;
+    private OkHttpClient proxy;
     private OkHttpClient client;
-    private OkHttpClient clientProxy;
 
     private static class Loader {
         static volatile OkHttp INSTANCE = new OkHttp();
@@ -54,13 +54,13 @@ public class OkHttp {
     public void setDoh(Doh doh) {
         OkHttpClient dohClient = new OkHttpClient.Builder().cache(new Cache(Path.doh(), CACHE)).hostnameVerifier(SSLCompat.VERIFIER).sslSocketFactory(new SSLCompat(), SSLCompat.TM).build();
         dns = doh.getUrl().isEmpty() ? null : new DnsOverHttps.Builder().client(dohClient).url(HttpUrl.get(doh.getUrl())).bootstrapDnsHosts(doh.getHosts()).build();
-        clientProxy = null;
         client = null;
+        proxy = null;
     }
 
     public void resetProxy() {
         Authenticator.setDefault(null);
-        clientProxy = null;
+        proxy = null;
     }
 
     public static OkHttpClient client() {
@@ -69,8 +69,8 @@ public class OkHttp {
     }
 
     public static OkHttpClient proxy() {
-        if (get().clientProxy != null) return get().clientProxy;
-        return get().clientProxy = getBuilder(Uri.parse(Prefers.getString("proxy"))).build();
+        if (get().proxy != null) return get().proxy;
+        return get().proxy = getBuilder(Prefers.getString("proxy")).build();
     }
 
     public static OkHttpClient client(int timeout) {
@@ -140,7 +140,8 @@ public class OkHttp {
         return new OkHttpClient.Builder().addInterceptor(new DeflateInterceptor()).connectTimeout(TIMEOUT, TimeUnit.MILLISECONDS).readTimeout(TIMEOUT, TimeUnit.MILLISECONDS).writeTimeout(TIMEOUT, TimeUnit.MILLISECONDS).dns(dns()).hostnameVerifier(SSLCompat.VERIFIER).sslSocketFactory(new SSLCompat(), SSLCompat.TM);
     }
 
-    private static OkHttpClient.Builder getBuilder(Uri uri) {
+    private static OkHttpClient.Builder getBuilder(String proxy) {
+        Uri uri = Uri.parse(proxy);
         String userInfo = uri.getUserInfo();
         OkHttpClient.Builder builder = client().newBuilder();
         if (userInfo != null && userInfo.contains(":")) setAuthenticator(builder, userInfo);
