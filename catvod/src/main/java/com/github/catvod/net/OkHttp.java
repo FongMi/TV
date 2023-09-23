@@ -62,7 +62,7 @@ public class OkHttp {
         client = null;
     }
 
-    public void setProxy() {
+    public void resetProxy() {
         Authenticator.setDefault(null);
         clientProxy = null;
     }

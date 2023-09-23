@@ -323,7 +323,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
     @Override
     public void setProxy(String proxy) {
         Setting.putProxy(proxy);
-        OkHttp.get().setProxy();
+        OkHttp.get().resetProxy();
         Notify.progress(getActivity());
         ApiConfig.load(Config.vod(), getCallback());
         mBinding.proxyText.setText(Util.scheme(proxy));
