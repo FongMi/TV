@@ -78,6 +78,8 @@ public class Result implements Parcelable {
     @JsonAdapter(MsgAdapter.class)
     @SerializedName("msg")
     private String msg;
+    @SerializedName("proxy")
+    private boolean proxy;
 
     public static Result objectFrom(String str) {
         try {
@@ -255,6 +257,14 @@ public class Result implements Parcelable {
 
     public void setMsg(String msg) {
         this.msg = msg;
+    }
+
+    public boolean isProxy() {
+        return proxy;
+    }
+
+    public void setProxy(boolean proxy) {
+        this.proxy = proxy;
     }
 
     public boolean hasMsg() {

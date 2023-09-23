@@ -12,6 +12,13 @@ import okhttp3.Dns;
 
 public abstract class Spider {
 
+    private boolean proxy;
+
+    public Spider proxy(boolean proxy) {
+        this.proxy = proxy;
+        return this;
+    }
+
     public void init(Context context) throws Exception {
     }
 
@@ -53,6 +60,10 @@ public abstract class Spider {
 
     public boolean isVideoFormat(String url) throws Exception {
         return false;
+    }
+
+    public boolean proxy() {
+        return proxy;
     }
 
     public Object[] proxyLocal(Map<String, String> params) throws Exception {

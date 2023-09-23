@@ -38,7 +38,7 @@ public class NewPipeImpl extends Downloader {
                 builder.header(headerName, headerValueList.get(0));
             }
         }
-        okhttp3.Response response = OkHttp.client().newCall(builder.build()).execute();
+        okhttp3.Response response = OkHttp.client(true).newCall(builder.build()).execute();
         if (response.code() == 429) {
             response.close();
             throw new ReCaptchaException("reCaptcha Challenge requested", url);

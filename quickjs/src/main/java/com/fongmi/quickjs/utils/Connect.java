@@ -22,8 +22,8 @@ import okhttp3.Response;
 
 public class Connect {
 
-    public static Call to(String url, Req req) {
-        OkHttpClient client = OkHttp.client(req.isRedirect(), req.getTimeout());
+    public static Call to(String url, Req req, boolean proxy) {
+        OkHttpClient client = OkHttp.client(proxy, req.isRedirect(), req.getTimeout());
         return client.newCall(getRequest(url, req, Headers.of(req.getHeader())));
     }
 

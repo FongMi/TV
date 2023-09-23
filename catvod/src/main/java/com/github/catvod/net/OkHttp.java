@@ -36,6 +36,7 @@ public class OkHttp {
     private static final int CACHE = 100 * 1024 * 1024;
 
     private DnsOverHttps dns;
+    private OkHttpClient proxy;
     private OkHttpClient client;
 
     private static class Loader {
@@ -54,34 +55,53 @@ public class OkHttp {
         OkHttpClient dohClient = new OkHttpClient.Builder().cache(new Cache(Path.doh(), CACHE)).hostnameVerifier(SSLCompat.VERIFIER).sslSocketFactory(new SSLCompat(), SSLCompat.TM).build();
         dns = doh.getUrl().isEmpty() ? null : new DnsOverHttps.Builder().client(dohClient).url(HttpUrl.get(doh.getUrl())).bootstrapDnsHosts(doh.getHosts()).build();
         client = null;
+        proxy = null;
     }
 
     public void resetProxy() {
         Authenticator.setDefault(null);
-        client = null;
+        proxy = null;
     }
 
     public static OkHttpClient client() {
         if (get().client != null) return get().client;
-        return get().client = getBuilder(Prefers.getString("proxy")).build();
+        return get().client = getBuilder().build();
+    }
+
+    public static OkHttpClient proxy() {
+        if (get().proxy != null) return get().proxy;
+        return get().proxy = getBuilder(Prefers.getString("proxy")).build();
     }
 
     public static OkHttpClient client(int timeout) {
         return client().newBuilder().connectTimeout(timeout, TimeUnit.MILLISECONDS).readTimeout(timeout, TimeUnit.MILLISECONDS).writeTimeout(timeout, TimeUnit.MILLISECONDS).build();
     }
 
+    public static OkHttpClient proxy(int timeout) {
+        return proxy().newBuilder().connectTimeout(timeout, TimeUnit.MILLISECONDS).readTimeout(timeout, TimeUnit.MILLISECONDS).writeTimeout(timeout, TimeUnit.MILLISECONDS).build();
+    }
+
     public static OkHttpClient noRedirect(int timeout) {
         return client().newBuilder().connectTimeout(timeout, TimeUnit.MILLISECONDS).readTimeout(timeout, TimeUnit.MILLISECONDS).writeTimeout(timeout, TimeUnit.MILLISECONDS).followRedirects(false).followSslRedirects(false).build();
     }
 
-    public static OkHttpClient client(boolean redirect, int timeout) {
-        return redirect ? client(timeout) : noRedirect(timeout);
+    public static OkHttpClient noRedirectProxy(int timeout) {
+        return proxy().newBuilder().connectTimeout(timeout, TimeUnit.MILLISECONDS).readTimeout(timeout, TimeUnit.MILLISECONDS).writeTimeout(timeout, TimeUnit.MILLISECONDS).followRedirects(false).followSslRedirects(false).build();
+    }
+
+    public static OkHttpClient client(boolean proxy) {
+        return proxy ? proxy() : client();
+    }
+
+    public static OkHttpClient client(boolean proxy, boolean redirect, int timeout) {
+        if (proxy) return redirect ? proxy(timeout) : noRedirectProxy(timeout);
+        else return redirect ? client(timeout) : noRedirect(timeout);
     }
 
     public static Call newCall(String url) {
         Uri uri = Uri.parse(url);
         if (uri.getUserInfo() != null) return newCall(url, Headers.of(HttpHeaders.AUTHORIZATION, Util.basic(uri)));
-        return client().newCall(new Request.Builder().url(url).build());
+        return client(true).newCall(new Request.Builder().url(url).build());
     }
 
     public static Call newCall(OkHttpClient client, String url) {
@@ -89,19 +109,19 @@ public class OkHttp {
     }
 
     public static Call newCall(String url, Headers headers) {
-        return client().newCall(new Request.Builder().url(url).headers(headers).build());
+        return client(true).newCall(new Request.Builder().url(url).headers(headers).build());
     }
 
     public static Call newCall(String url, ArrayMap<String, String> params) {
-        return client().newCall(new Request.Builder().url(buildUrl(url, params)).build());
+        return client(true).newCall(new Request.Builder().url(buildUrl(url, params)).build());
     }
 
     public static Call newCall(String url, ArrayMap<String, String> params, Headers headers) {
-        return client().newCall(new Request.Builder().url(buildUrl(url, params)).headers(headers).build());
+        return client(true).newCall(new Request.Builder().url(buildUrl(url, params)).headers(headers).build());
     }
 
     public static Call newCall(String url, RequestBody body, Headers headers) {
-        return client().newCall(new Request.Builder().url(url).post(body).headers(headers).build());
+        return client(true).newCall(new Request.Builder().url(url).post(body).headers(headers).build());
     }
 
     public static Call newCall(OkHttpClient client, String url, RequestBody body) {
@@ -127,7 +147,7 @@ public class OkHttp {
     private static OkHttpClient.Builder getBuilder(String proxy) {
         Uri uri = Uri.parse(proxy);
         String userInfo = uri.getUserInfo();
-        OkHttpClient.Builder builder = getBuilder();
+        OkHttpClient.Builder builder = client().newBuilder();
         if (userInfo != null && userInfo.contains(":")) setAuthenticator(builder, userInfo);
         if (uri.getScheme() == null || uri.getHost() == null || uri.getPort() <= 0) return builder;
         if (uri.getScheme().startsWith("http")) builder.proxy(new Proxy(Proxy.Type.HTTP, InetSocketAddress.createUnresolved(uri.getHost(), uri.getPort())));
