@@ -160,7 +160,6 @@ public class SiteViewModel extends ViewModel {
                 if (result.getFlag().isEmpty()) result.setFlag(flag);
                 result.setUrl(Source.get().fetch(result));
                 result.setHeader(site.getHeader());
-                result.setProxy(site.isProxy());
                 checkDanmaku(result);
                 result.setKey(key);
                 return result;
@@ -174,7 +173,6 @@ public class SiteViewModel extends ViewModel {
                 if (result.getFlag().isEmpty()) result.setFlag(flag);
                 result.setUrl(Source.get().fetch(result));
                 result.setHeader(site.getHeader());
-                result.setProxy(site.isProxy());
                 checkDanmaku(result);
                 return result;
             } else if (site.isEmpty() && key.equals("push_agent")) {
@@ -190,7 +188,6 @@ public class SiteViewModel extends ViewModel {
                 Result result = new Result();
                 result.setUrl(url);
                 result.setFlag(flag);
-                result.setProxy(site.isProxy());
                 result.setHeader(site.getHeader());
                 result.setPlayUrl(site.getPlayUrl());
                 result.setParse(Sniffer.isVideoFormat(url.v()) && result.getPlayUrl().isEmpty() ? 0 : 1);

@@ -37,20 +37,18 @@ public class Global {
     private final ExecutorService executor;
     private final QuickJSContext ctx;
     private final Parser parser;
-    private final boolean proxy;
     private final Timer timer;
     private final Gson gson;
 
-    public static Global create(QuickJSContext ctx, ExecutorService executor, boolean proxy) {
-        return new Global(ctx, executor, proxy);
+    public static Global create(QuickJSContext ctx, ExecutorService executor) {
+        return new Global(ctx, executor);
     }
 
-    private Global(QuickJSContext ctx, ExecutorService executor, boolean proxy) {
+    private Global(QuickJSContext ctx, ExecutorService executor) {
         this.parser = new Parser();
         this.executor = executor;
         this.timer = new Timer();
         this.gson = new Gson();
-        this.proxy = proxy;
         this.ctx = ctx;
     }
 
@@ -117,7 +115,7 @@ public class Global {
         JSFunction complete = options.getJSFunction("complete");
         if (complete == null) return req(url, options);
         Req req = Req.objectFrom(ctx.stringify(options));
-        Connect.to(url, req, proxy).enqueue(getCallback(complete, req));
+        Connect.to(url, req).enqueue(getCallback(complete, req));
         return null;
     }
 
@@ -126,7 +124,7 @@ public class Global {
     public JSObject req(String url, JSObject options) {
         try {
             Req req = Req.objectFrom(ctx.stringify(options));
-            Response res = Connect.to(url, req, proxy).execute();
+            Response res = Connect.to(url, req).execute();
             return Connect.success(ctx, req, res);
         } catch (Exception e) {
             return Connect.error(ctx);

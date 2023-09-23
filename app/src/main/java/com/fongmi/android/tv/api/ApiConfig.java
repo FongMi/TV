@@ -232,9 +232,9 @@ public class ApiConfig {
         boolean js = site.getApi().contains(".js");
         boolean py = site.getApi().startsWith("py_");
         boolean csp = site.getApi().startsWith("csp_");
-        if (py) return pyLoader.getSpider(site.getKey(), site.getApi(), site.getExt(), site.isProxy());
-        else if (js) return jsLoader.getSpider(site.getKey(), site.getApi(), site.getExt(), site.getJar(), site.isProxy());
-        else if (csp) return jarLoader.getSpider(site.getKey(), site.getApi(), site.getExt(), site.getJar(), site.isProxy());
+        if (py) return pyLoader.getSpider(site.getKey(), site.getApi(), site.getExt());
+        else if (js) return jsLoader.getSpider(site.getKey(), site.getApi(), site.getExt(), site.getJar());
+        else if (csp) return jarLoader.getSpider(site.getKey(), site.getApi(), site.getExt(), site.getJar());
         else return new SpiderNull();
     }
 
