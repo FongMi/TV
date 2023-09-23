@@ -30,7 +30,7 @@ public class Github {
     }
 
     private Github() {
-        client = OkHttp.client(TIMEOUT);
+        client = OkHttp.clientProxy(TIMEOUT);
         check(A);
         check(B);
         check(C);

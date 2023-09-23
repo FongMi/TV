@@ -23,8 +23,8 @@ import okhttp3.Response;
 
 public class Connect {
 
-    public static Call to(String url, Req req) {
-        OkHttpClient client = req.getRedirect() == 1 ? OkHttp.client() : OkHttp.noRedirect();
+    public static Call to(String url, Req req, boolean proxy) {
+        OkHttpClient client = OkHttp.client(proxy, req.isRedirect());
         client = client.newBuilder().connectTimeout(req.getTimeout(), TimeUnit.MILLISECONDS).readTimeout(req.getTimeout(), TimeUnit.MILLISECONDS).writeTimeout(req.getTimeout(), TimeUnit.MILLISECONDS).build();
         return client.newCall(getRequest(url, req, Headers.of(req.getHeader())));
     }

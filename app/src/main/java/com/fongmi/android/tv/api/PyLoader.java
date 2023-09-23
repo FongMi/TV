@@ -37,12 +37,12 @@ public class PyLoader {
         }
     }
 
-    public Spider getSpider(String key, String api, String ext) {
+    public Spider getSpider(String key, String api, String ext, boolean proxy) {
         try {
             if (spiders.containsKey(key)) return spiders.get(key);
             Method method = loader.getClass().getMethod("spider", Context.class, String.class, String.class);
             Spider spider = (Spider) method.invoke(loader, App.get(), api.split("py_")[1], ext);
-            spider.init(App.get(), ext);
+            spider.proxy(proxy).init(App.get(), ext);
             spiders.put(key, spider);
             return spider;
         } catch (Throwable e) {
