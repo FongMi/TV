@@ -78,7 +78,7 @@ public abstract class Spider {
         return OkHttp.dns();
     }
 
-    public static OkHttpClient client(boolean proxy, boolean redirect, int timeout) {
-        return OkHttp.client(proxy, redirect, timeout);
+    public OkHttpClient client() {
+        return OkHttp.client(proxy);
     }
 }

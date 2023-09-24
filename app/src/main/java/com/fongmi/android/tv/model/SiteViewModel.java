@@ -238,7 +238,7 @@ public class SiteViewModel extends ViewModel {
     }
 
     private String call(Site site, ArrayMap<String, String> params, boolean limit) throws IOException {
-        Call call = fetchExt(site, params, limit).length() <= 1000 ? OkHttp.newCall(site.isProxy(), site.getApi(), params, site.getHeaders()) : OkHttp.newCall(site.isProxy(), site.getApi(), OkHttp.toBody(params), site.getHeaders());
+        Call call = fetchExt(site, params, limit).length() <= 1000 ? OkHttp.newCall(site.isProxy(), site.getApi(), site.getHeaders(), params) : OkHttp.newCall(site.isProxy(), site.getApi(), site.getHeaders(), OkHttp.toBody(params));
         return call.execute().body().string();
     }
 
@@ -264,7 +264,7 @@ public class SiteViewModel extends ViewModel {
         ArrayMap<String, String> params = new ArrayMap<>();
         params.put("ac", site.getType() == 0 ? "videolist" : "detail");
         params.put("ids", TextUtils.join(",", ids));
-        String response = OkHttp.newCall(site.isProxy(), site.getApi(), params, site.getHeaders()).execute().body().string();
+        String response = OkHttp.newCall(site.isProxy(), site.getApi(), site.getHeaders(), params).execute().body().string();
         result.setList(Result.fromType(site.getType(), response).getList());
         return result;
     }
