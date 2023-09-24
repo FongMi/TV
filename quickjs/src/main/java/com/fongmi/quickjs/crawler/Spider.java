@@ -2,7 +2,10 @@ package com.fongmi.quickjs.crawler;
 
 import android.content.Context;
 
+import androidx.media3.common.util.UriUtil;
+
 import com.fongmi.quickjs.bean.Res;
+import com.fongmi.quickjs.method.Console;
 import com.fongmi.quickjs.method.Function;
 import com.fongmi.quickjs.method.Global;
 import com.fongmi.quickjs.method.Local;
@@ -10,7 +13,6 @@ import com.fongmi.quickjs.utils.JSUtil;
 import com.fongmi.quickjs.utils.Module;
 import com.github.catvod.utils.Json;
 import com.github.catvod.utils.Path;
-import com.whl.quickjs.android.QuickJSLoader;
 import com.whl.quickjs.wrapper.JSArray;
 import com.whl.quickjs.wrapper.JSMethod;
 import com.whl.quickjs.wrapper.JSObject;
@@ -134,8 +136,8 @@ public class Spider extends com.github.catvod.crawler.Spider {
         submit(() -> {
             if (ctx == null) createCtx();
             if (dex != null) createDex();
-            String context = getContent();
-            ctx.evaluateModule(context, api);
+            String content = getContent();
+            ctx.evaluateModule(content, api);
             jsObject = (JSObject) ctx.getProperty(ctx.getGlobalObject(), name);
             return null;
         }).get();
@@ -143,11 +145,16 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
     private void createCtx() {
         ctx = QuickJSContext.create();
-        QuickJSLoader.initConsoleLog(ctx);
+        ctx.setConsole(new Console());
         Global.create(ctx, executor, proxy()).setProperty();
         ctx.getGlobalObject().setProperty("local", Local.class);
         ctx.getGlobalObject().getContext().evaluate(Path.asset("js/lib/http.js"));
         ctx.setModuleLoader(new QuickJSContext.DefaultModuleLoader() {
+            @Override
+            public String moduleNormalizeName(String baseModuleName, String moduleName) {
+                return UriUtil.resolve(baseModuleName, moduleName);
+            }
+
             @Override
             public String getModuleStringCode(String moduleName) {
                 return Module.get().fetch(proxy(), moduleName);

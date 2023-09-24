@@ -1,7 +1,10 @@
 package com.fongmi.android.tv.player;
 
 import android.app.Activity;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.support.v4.media.MediaMetadataCompat;
+import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.text.TextUtils;
@@ -24,9 +27,11 @@ import com.fongmi.android.tv.bean.Track;
 import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.impl.ParseCallback;
+import com.fongmi.android.tv.impl.SessionCallback;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
-import com.github.catvod.crawler.SpiderDebug;
+import com.fongmi.android.tv.utils.Utils;
+import com.orhanobut.logger.Logger;
 
 import java.util.Formatter;
 import java.util.List;
@@ -39,6 +44,8 @@ import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
 public class Players implements Player.Listener, IMediaPlayer.Listener, AnalyticsListener, ParseCallback, DrawHandler.Callback {
+
+    private static final String TAG = Players.class.getSimpleName();
 
     public static final int SYS = 0;
     public static final int IJK = 1;
@@ -89,6 +96,11 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     private void createSession(Activity activity) {
         session = new MediaSessionCompat(activity, "TV");
+        session.setMediaButtonReceiver(null);
+        session.setCallback(SessionCallback.create(this));
+        session.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+        session.setSessionActivity(PendingIntent.getActivity(App.get(), 99, new Intent(App.get(), activity.getClass()), Utils.getPendingFlag()));
+        MediaControllerCompat.setMediaController(activity, session.getController());
     }
 
     public void set(PlayerView exo, IjkVideoView ijk) {
@@ -409,26 +421,26 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     private void setMediaSource(Result result) {
-        SpiderDebug.log(errorCode + "," + result.getRealUrl());
-        if (isIjk()) ijkPlayer.setMediaSource(IjkUtil.getSource(result));
-        if (isExo()) exoPlayer.setMediaSource(ExoUtil.getSource(result, errorCode));
-        if (isExo()) exoPlayer.prepare();
+        Logger.t(TAG).d(errorCode + "," + result.getRealUrl());
+        if (isIjk() && ijkPlayer != null) ijkPlayer.setMediaSource(IjkUtil.getSource(result));
+        if (isExo() && exoPlayer != null) exoPlayer.setMediaSource(ExoUtil.getSource(result, errorCode));
+        if (isExo() && exoPlayer != null) exoPlayer.prepare();
         setTimeoutCheck(result.getRealUrl());
     }
 
     private void setMediaSource(Channel channel) {
-        SpiderDebug.log(errorCode + "," + channel.getUrl());
-        if (isIjk()) ijkPlayer.setMediaSource(IjkUtil.getSource(channel));
-        if (isExo()) exoPlayer.setMediaSource(ExoUtil.getSource(channel, errorCode));
-        if (isExo()) exoPlayer.prepare();
+        Logger.t(TAG).d(errorCode + "," + channel.getUrl());
+        if (isIjk() && ijkPlayer != null) ijkPlayer.setMediaSource(IjkUtil.getSource(channel));
+        if (isExo() && exoPlayer != null) exoPlayer.setMediaSource(ExoUtil.getSource(channel, errorCode));
+        if (isExo() && exoPlayer != null) exoPlayer.prepare();
         setTimeoutCheck(channel.getUrl());
     }
 
     private void setMediaSource(Map<String, String> headers, String url) {
-        SpiderDebug.log(errorCode + "," + url);
-        if (isIjk()) ijkPlayer.setMediaSource(IjkUtil.getSource(headers, url));
-        if (isExo()) exoPlayer.setMediaSource(ExoUtil.getSource(headers, url, errorCode));
-        if (isExo()) exoPlayer.prepare();
+        Logger.t(TAG).d(errorCode + "," + url);
+        if (isIjk() && ijkPlayer != null) ijkPlayer.setMediaSource(IjkUtil.getSource(headers, url));
+        if (isExo() && exoPlayer != null) exoPlayer.setMediaSource(ExoUtil.getSource(headers, url, errorCode));
+        if (isExo() && exoPlayer != null) exoPlayer.prepare();
         setTimeoutCheck(url);
     }
 
@@ -463,7 +475,8 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     private void setPlaybackState(int state) {
-        session.setPlaybackState(new PlaybackStateCompat.Builder().setState(state, getPosition(), getSpeed()).build());
+        long actions = PlaybackStateCompat.ACTION_SEEK_TO | PlaybackStateCompat.ACTION_PLAY_PAUSE | PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS;
+        session.setPlaybackState(new PlaybackStateCompat.Builder().setActions(actions).setState(state, getPosition(), getSpeed()).build());
     }
 
     private boolean hasDanmu() {
@@ -495,9 +508,8 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     @Override
     public void onPlayerError(@NonNull PlaybackException error) {
+        ErrorEvent.format(ExoUtil.getRetry(errorCode = error.errorCode));
         setPlaybackState(PlaybackStateCompat.STATE_ERROR);
-        this.errorCode = error.errorCode;
-        ErrorEvent.format(2);
     }
 
     @Override
