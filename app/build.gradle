@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    compileSdk 33
+    compileSdk 34
     flavorDimensions = ["mode", "api", "abi"]
 
     defaultConfig {
@@ -106,7 +106,7 @@ dependencies {
     implementation platform('org.jetbrains.kotlin:kotlin-bom:1.8.20')
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.biometric:biometric:1.1.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel:2.6.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel:2.6.2'
     implementation 'androidx.room:room-runtime:2.5.2'
     implementation 'androidx.media:media:1.6.0'
     implementation 'cat.ereza:customactivityoncrash:2.4.0'
@@ -121,7 +121,7 @@ dependencies {
     implementation 'org.greenrobot:eventbus:3.3.1'
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
     implementation('org.simpleframework:simple-xml:2.7.1') { exclude group: 'stax', module: 'stax-api' exclude group: 'xpp3', module: 'xpp3' }
-    leanbackImplementation 'androidx.leanback:leanback:1.2.0-alpha02'
+    leanbackImplementation 'androidx.leanback:leanback:1.2.0-alpha03'
     leanbackImplementation 'me.jessyan:autosize:1.2.1'
     mobileImplementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     mobileImplementation 'com.github.chrisbanes:PhotoView:2.3.0'
