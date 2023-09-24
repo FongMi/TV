@@ -26,8 +26,6 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import okhttp3.internal.Util;
-
 public class UaDialog implements DialogInterface.OnDismissListener {
 
     private final DialogUaBinding binding;
@@ -92,7 +90,7 @@ public class UaDialog implements DialogInterface.OnDismissListener {
             binding.text.setText(Sniffer.CHROME);
         } else if (append && s.equalsIgnoreCase("o")) {
             append = false;
-            binding.text.setText(Util.userAgent);
+            binding.text.setText("okhttp/3.12.13");
         } else if (s.length() > 1) {
             append = false;
         } else if (s.length() == 0) {
