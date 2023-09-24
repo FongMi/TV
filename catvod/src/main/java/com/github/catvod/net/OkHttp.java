@@ -109,19 +109,19 @@ public class OkHttp {
     }
 
     public static Call newCall(String url, Headers headers) {
-        return client(true).newCall(new Request.Builder().url(url).headers(headers).build());
+        return newCall(true, url, headers);
     }
 
-    public static Call newCall(String url, ArrayMap<String, String> params) {
-        return client(true).newCall(new Request.Builder().url(buildUrl(url, params)).build());
+    public static Call newCall(boolean proxy, String url, Headers headers) {
+        return client(proxy).newCall(new Request.Builder().url(url).headers(headers).build());
     }
 
-    public static Call newCall(String url, ArrayMap<String, String> params, Headers headers) {
-        return client(true).newCall(new Request.Builder().url(buildUrl(url, params)).headers(headers).build());
+    public static Call newCall(boolean proxy, String url, ArrayMap<String, String> params, Headers headers) {
+        return client(proxy).newCall(new Request.Builder().url(buildUrl(url, params)).headers(headers).build());
     }
 
-    public static Call newCall(String url, RequestBody body, Headers headers) {
-        return client(true).newCall(new Request.Builder().url(url).post(body).headers(headers).build());
+    public static Call newCall(boolean proxy, String url, RequestBody body, Headers headers) {
+        return client(proxy).newCall(new Request.Builder().url(url).post(body).headers(headers).build());
     }
 
     public static Call newCall(OkHttpClient client, String url, RequestBody body) {

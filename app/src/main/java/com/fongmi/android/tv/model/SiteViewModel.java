@@ -83,7 +83,7 @@ public class SiteViewModel extends ViewModel {
                 SpiderDebug.log(homeContent);
                 return Result.fromJson(homeContent);
             } else {
-                String homeContent = OkHttp.newCall(site.getApi(), site.getHeaders()).execute().body().string();
+                String homeContent = OkHttp.newCall(site.isProxy(), site.getApi(), site.getHeaders()).execute().body().string();
                 SpiderDebug.log(homeContent);
                 return fetchPic(site, Result.fromType(site.getType(), homeContent));
             }
@@ -186,7 +186,7 @@ public class SiteViewModel extends ViewModel {
             } else {
                 Url url = Url.create().add(id);
                 String type = Uri.parse(id).getQueryParameter("type");
-                if (type != null && type.equals("json")) url = Result.fromJson(OkHttp.newCall(id, site.getHeaders()).execute().body().string()).getUrl();
+                if (type != null && type.equals("json")) url = Result.fromJson(OkHttp.newCall(site.isProxy(), id, site.getHeaders()).execute().body().string()).getUrl();
                 Result result = new Result();
                 result.setUrl(url);
                 result.setFlag(flag);
@@ -238,7 +238,7 @@ public class SiteViewModel extends ViewModel {
     }
 
     private String call(Site site, ArrayMap<String, String> params, boolean limit) throws IOException {
-        Call call = fetchExt(site, params, limit).length() <= 1000 ? OkHttp.newCall(site.getApi(), params, site.getHeaders()) : OkHttp.newCall(site.getApi(), OkHttp.toBody(params), site.getHeaders());
+        Call call = fetchExt(site, params, limit).length() <= 1000 ? OkHttp.newCall(site.isProxy(), site.getApi(), params, site.getHeaders()) : OkHttp.newCall(site.isProxy(), site.getApi(), OkHttp.toBody(params), site.getHeaders());
         return call.execute().body().string();
     }
 
@@ -251,7 +251,7 @@ public class SiteViewModel extends ViewModel {
     }
 
     private String fetchExt(Site site) throws IOException {
-        Response res = OkHttp.newCall(site.getExt(), site.getHeaders()).execute();
+        Response res = OkHttp.newCall(site.isProxy(), site.getExt(), site.getHeaders()).execute();
         if (res.code() != 200) return "";
         site.setExt(res.body().string());
         return site.getExt();
@@ -264,7 +264,7 @@ public class SiteViewModel extends ViewModel {
         ArrayMap<String, String> params = new ArrayMap<>();
         params.put("ac", site.getType() == 0 ? "videolist" : "detail");
         params.put("ids", TextUtils.join(",", ids));
-        String response = OkHttp.newCall(site.getApi(), params, site.getHeaders()).execute().body().string();
+        String response = OkHttp.newCall(site.isProxy(), site.getApi(), params, site.getHeaders()).execute().body().string();
         result.setList(Result.fromType(site.getType(), response).getList());
         return result;
     }
