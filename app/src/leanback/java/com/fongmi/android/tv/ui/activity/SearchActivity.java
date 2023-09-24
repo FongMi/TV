@@ -115,6 +115,7 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
         OkHttp.newCall("https://suggest.video.iqiyi.com/?if=mobile&key=" + text).enqueue(new Callback() {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                if (mBinding.keyword.getText().toString().trim().isEmpty()) return;
                 List<String> items = Suggest.get(response.body().string());
                 App.post(() -> mWordAdapter.addAll(items));
             }

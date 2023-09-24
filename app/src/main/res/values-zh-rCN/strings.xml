@@ -10,7 +10,6 @@
     <!-- Live -->
     <string name="live_pass">密码</string>
     <string name="live_group">未分类</string>
-    <string name="live_epg_now">正在播放：<xliff:g name="name">%s</xliff:g></string>
     <string name="live_line">线路 <xliff:g name="name">%s</xliff:g></string>
 
     <!-- Detail -->
@@ -36,6 +35,7 @@
     <string name="play_next">下集</string>
     <string name="play_prev">上集</string>
     <string name="play_loop">循环</string>
+    <string name="play_danmu">弹幕</string>
     <string name="play_change">换源</string>
     <string name="play_forward">→</string>
     <string name="play_backward">←</string>
@@ -47,6 +47,7 @@
     <string name="play_track_video">视轨</string>
     <string name="play_forward_hint">已切换正序播放</string>
     <string name="play_backward_hint">已切换倒序播放</string>
+    <string name="play_now">正在播放：<xliff:g name="name">%s</xliff:g></string>
     <string name="play_ready">准备播放：<xliff:g name="name">%s</xliff:g></string>
     <string name="play_switch_parse">正在切换解析至「<xliff:g name="name">%s</xliff:g>」</string>
     <string name="play_switch_flag">正在切换线路至「<xliff:g name="name">%s</xliff:g>」</string>
@@ -66,21 +67,23 @@
     <string name="setting_wall">壁纸</string>
     <string name="setting_player">播放器</string>
     <string name="setting_player_ua">User-Agent</string>
+    <string name="setting_player_flag">线路播放</string>
     <string name="setting_player_http">连线方式</string>
     <string name="setting_player_tunnel">隧道模式</string>
     <string name="setting_player_subtitle">字幕大小</string>
-    <string name="setting_player_flag">线路播放</string>
+    <string name="setting_player_background">后台播放</string>
     <string name="setting_decode">解码方式</string>
     <string name="setting_render">渲染方式</string>
     <string name="setting_scale">缩放比例</string>
     <string name="setting_quality">图片品质</string>
     <string name="setting_size">图片尺寸</string>
     <string name="setting_doh">DoH</string>
+    <string name="setting_proxy">Proxy</string>
     <string name="setting_cache">缓存</string>
     <string name="setting_version">版本</string>
     <string name="setting_storage">权限</string>
-    <string name="setting_off">关</string>
-    <string name="setting_on">开</string>
+    <string name="setting_off">关闭</string>
+    <string name="setting_on">开启</string>
 
     <!-- Search -->
     <string name="search_keyword">关键字…</string>
@@ -132,16 +135,6 @@
         <item>EXO</item>
     </string-array>
 
-    <string-array name="select_exo_http">
-        <item>预设</item>
-        <item>OkHttp</item>
-    </string-array>
-
-    <string-array name="select_flag">
-        <item>自动</item>
-        <item>手动</item>
-    </string-array>
-
     <string-array name="select_quality">
         <item>低</item>
         <item>中</item>
@@ -166,6 +159,16 @@
     <string-array name="select_reset">
         <item>刷新</item>
         <item>重播</item>
+    </string-array>
+
+    <string-array name="select_exo_http">
+        <item>预设</item>
+        <item>OkHttp</item>
+    </string-array>
+
+    <string-array name="select_flag">
+        <item>自动</item>
+        <item>手动</item>
     </string-array>
 
 </resources>

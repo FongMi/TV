@@ -29,11 +29,11 @@ public class Collect {
     }
 
     public Site getSite() {
-        return site;
+        return site == null ? new Site() : site;
     }
 
     public List<Vod> getList() {
-        return list;
+        return list == null ? new ArrayList<>() : list;
     }
 
     public boolean isActivated() {

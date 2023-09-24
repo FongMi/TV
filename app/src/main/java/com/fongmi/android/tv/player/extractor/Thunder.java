@@ -20,7 +20,7 @@ public class Thunder implements Source.Extractor {
 
     @Override
     public boolean match(String scheme, String host) {
-        return scheme.equals("magnet") || scheme.equals("ed2k") || scheme.equals("ftp");
+        return scheme.equals("magnet") || scheme.equals("ed2k");
     }
 
     @Override

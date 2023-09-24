@@ -86,12 +86,12 @@ public class ResUtil {
         return e.getRawX() < edge || e.getRawX() > getScreenWidthNav() - edge || e.getRawY() < edge || e.getRawY() > getScreenHeightNav() - edge;
     }
 
-    public static boolean isLand(Activity activity) {
-        return activity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
+    public static boolean isLand(Context context) {
+        return context.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
     }
 
-    public static boolean isPort(Activity activity) {
-        return activity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
+    public static boolean isPad() {
+        return App.get().getResources().getConfiguration().smallestScreenWidthDp >= 600;
     }
 
     public static int sp2px(int sp) {
@@ -124,5 +124,9 @@ public class ResUtil {
 
     public static Animation getAnim(@AnimRes int resId) {
         return AnimationUtils.loadAnimation(App.get(), resId);
+    }
+
+    public static Display getDisplay(Activity activity) {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.R ? activity.getDisplay() : activity.getWindowManager().getDefaultDisplay();
     }
 }

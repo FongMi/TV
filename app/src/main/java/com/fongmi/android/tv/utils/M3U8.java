@@ -6,7 +6,6 @@ import com.github.catvod.net.OkHttp;
 import com.google.common.net.HttpHeaders;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,8 +27,7 @@ public class M3U8 {
 
     private static Headers getHeader(Map<String, String> headers) {
         Headers.Builder builder = new Headers.Builder();
-        if (headers.containsKey(HttpHeaders.USER_AGENT)) builder.add(HttpHeaders.USER_AGENT, Objects.requireNonNull(headers.get(HttpHeaders.USER_AGENT)));
-        if (headers.containsKey(HttpHeaders.REFERER)) builder.add(HttpHeaders.REFERER, Objects.requireNonNull(headers.get(HttpHeaders.REFERER)));
+        for (Map.Entry<String, String> header : headers.entrySet()) if (header.getKey().equalsIgnoreCase(HttpHeaders.USER_AGENT) || header.getKey().equalsIgnoreCase(HttpHeaders.REFERER)) builder.add(header.getKey(), header.getValue());
         return builder.build();
     }
 

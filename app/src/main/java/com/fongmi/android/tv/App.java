@@ -88,7 +88,7 @@ public class App extends MultiDexApplication {
     }
 
     private LogAdapter getLogAdapter() {
-        return new AndroidLogAdapter(PrettyFormatStrategy.newBuilder().showThreadInfo(false).tag("").build()) {
+        return new AndroidLogAdapter(PrettyFormatStrategy.newBuilder().methodCount(0).showThreadInfo(false).tag("").build()) {
             @Override
             public boolean isLoggable(int priority, String tag) {
                 return true;

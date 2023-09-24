@@ -7,7 +7,7 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.player.Source;
-import com.fongmi.android.tv.ui.activity.DetailActivity;
+import com.fongmi.android.tv.ui.activity.VideoActivity;
 
 public class Push implements Source.Extractor {
 
@@ -18,7 +18,7 @@ public class Push implements Source.Extractor {
 
     @Override
     public String fetch(String url) throws Exception {
-        DetailActivity.push((FragmentActivity) App.activity(), Uri.parse(url.substring(7)));
+        VideoActivity.push((FragmentActivity) App.activity(), Uri.parse(url.substring(7)));
         SystemClock.sleep(500);
         return "";
     }

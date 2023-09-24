@@ -4,7 +4,7 @@ plugins {
 
 android {
     compileSdk 33
-    flavorDimensions "default"
+    flavorDimensions ["default"]
 
     defaultConfig {
         applicationId "com.fongmi.android.tv"
@@ -23,7 +23,7 @@ android {
         leanback {
             dimension "default"
             versionCode 205
-            versionName "2.0.5"
+            versionName "20230924#4"
         }
     }
 
@@ -34,7 +34,6 @@ android {
     buildTypes {
         release {
             minifyEnabled true
-            zipAlignEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -49,14 +48,13 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-    android.applicationVariants.all { variant ->
-        variant.outputs.all { output ->
+    android.applicationVariants.configureEach { variant ->
+        variant.outputs.configureEach { output ->
             outputFileName = "${variant.productFlavors[0].name}.apk"
         }
     }
 
     lint {
-        abortOnError false
         disable 'UnsafeOptInUsageError'
     }
 }
@@ -66,6 +64,7 @@ dependencies {
     implementation project(':tvbus')
     implementation project(':catvod')
     implementation project(':pyramid')
+    implementation project(':danmaku')
     implementation project(':quickjs')
     implementation project(':thunder')
     implementation project(':jianpian')
@@ -90,7 +89,12 @@ dependencies {
     implementation 'androidx.biometric:biometric:1.1.0'
     implementation 'androidx.leanback:leanback:1.2.0-alpha02'
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.5.1'
+    implementation platform('org.jetbrains.kotlin:kotlin-bom:1.8.20')
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.biometric:biometric:1.1.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel:2.6.1'
     implementation 'androidx.room:room-runtime:2.5.2'
+    implementation 'androidx.media:media:1.6.0'
     implementation 'cat.ereza:customactivityoncrash:2.4.0'
     implementation 'com.github.bassaer:materialdesigncolors:1.0.0'
     implementation 'com.github.bumptech.glide:glide:4.15.1'

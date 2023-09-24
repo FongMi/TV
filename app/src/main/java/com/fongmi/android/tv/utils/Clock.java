@@ -63,8 +63,9 @@ public class Clock {
         }
     }
 
-    public void stop() {
+    public Clock stop() {
         if (timer != null) timer.cancel();
+        return this;
     }
 
     public void release() {

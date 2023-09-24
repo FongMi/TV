@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 
@@ -38,7 +37,7 @@ public class NewPipeImpl extends Downloader {
                 builder.header(headerName, headerValueList.get(0));
             }
         }
-        okhttp3.Response response = OkHttp.client().newCall(builder.build()).execute();
+        okhttp3.Response response = OkHttp.client(true).newCall(builder.build()).execute();
         if (response.code() == 429) {
             response.close();
             throw new ReCaptchaException("reCaptcha Challenge requested", url);

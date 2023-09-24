@@ -60,6 +60,7 @@ public class ExoUtil {
     private static DataSource.Factory dataSourceFactory;
     private static ExtractorsFactory extractorsFactory;
     private static DatabaseProvider database;
+    private static boolean proxy;
     private static Cache cache;
 
     public static LoadControl buildLoadControl() {
@@ -68,7 +69,7 @@ public class ExoUtil {
 
     public static TrackSelector buildTrackSelector() {
         DefaultTrackSelector trackSelector = new DefaultTrackSelector(App.get());
-        trackSelector.setParameters(trackSelector.buildUponParameters().setPreferredTextLanguage("zh").setTunnelingEnabled(Setting.isTunnel()));
+        trackSelector.setParameters(trackSelector.buildUponParameters().setPreferredTextLanguage("zh").setForceHighestSupportedBitrate(true).setTunnelingEnabled(Setting.isTunnel()));
         return trackSelector;
     }
 
@@ -78,6 +79,12 @@ public class ExoUtil {
 
     public static CaptionStyleCompat getCaptionStyle() {
         return new CaptionStyleCompat(Color.WHITE, Color.TRANSPARENT, Color.TRANSPARENT, CaptionStyleCompat.EDGE_TYPE_OUTLINE, Color.BLACK, null);
+    }
+
+    public static int getRetry(int errorCode) {
+        if (errorCode == PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED) return 0;
+        if (errorCode == PlaybackException.ERROR_CODE_PARSING_MANIFEST_MALFORMED || errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED || errorCode == PlaybackException.ERROR_CODE_IO_UNSPECIFIED) return 2;
+        return 1;
     }
 
     public static boolean haveTrack(Tracks tracks, int type) {
@@ -99,22 +106,23 @@ public class ExoUtil {
     }
 
     public static MediaSource getSource(Result result, int errorCode) {
-        return getSource(result.getHeaders(), result.getRealUrl(), result.getFormat(), result.getSubs(), null, errorCode);
+        return getSource(result.getHeaders(), result.isProxy(), result.getRealUrl(), result.getFormat(), result.getSubs(), null, errorCode);
     }
 
     public static MediaSource getSource(Channel channel, int errorCode) {
-        return getSource(channel.getHeaders(), channel.getUrl(), null, Collections.emptyList(), channel.getDrm(), errorCode);
+        return getSource(channel.getHeaders(), channel.isProxy(), channel.getUrl(), null, Collections.emptyList(), channel.getDrm(), errorCode);
     }
 
     public static MediaSource getSource(Map<String, String> headers, String url, int errorCode) {
-        return getSource(headers, url, null, Collections.emptyList(), null, errorCode);
+        return getSource(headers, false, url, null, Collections.emptyList(), null, errorCode);
     }
 
-    private static MediaSource getSource(Map<String, String> headers, String url, String format, List<Sub> subs, Drm drm, int errorCode) {
+    private static MediaSource getSource(Map<String, String> headers, boolean proxy, String url, String format, List<Sub> subs, Drm drm, int errorCode) {
+        if (ExoUtil.proxy != proxy) reset();
         Uri uri = Uri.parse(url.trim().replace("\\", ""));
         String mimeType = getMimeType(format, errorCode);
         if (uri.getUserInfo() != null) headers.put(HttpHeaders.AUTHORIZATION, Util.basic(uri));
-        return new DefaultMediaSourceFactory(getDataSourceFactory(headers), getExtractorsFactory()).createMediaSource(getMediaItem(uri, mimeType, subs, drm));
+        return new DefaultMediaSourceFactory(getDataSourceFactory(headers, ExoUtil.proxy = proxy), getExtractorsFactory()).createMediaSource(getMediaItem(uri, mimeType, subs, drm));
     }
 
     private static MediaItem getMediaItem(Uri uri, String mimeType, List<Sub> subs, Drm drm) {
@@ -163,13 +171,13 @@ public class ExoUtil {
         return extractorsFactory;
     }
 
-    private static synchronized HttpDataSource.Factory getHttpDataSourceFactory() {
-        if (httpDataSourceFactory == null) httpDataSourceFactory = Setting.getHttp() == 0 ? new DefaultHttpDataSource.Factory().setAllowCrossProtocolRedirects(true) : new OkHttpDataSource.Factory((Call.Factory) OkHttp.client());
+    private static synchronized HttpDataSource.Factory getHttpDataSourceFactory(boolean proxy) {
+        if (httpDataSourceFactory == null) httpDataSourceFactory = Setting.getHttp() == 0 ? new DefaultHttpDataSource.Factory().setAllowCrossProtocolRedirects(true).setProxy(proxy ? Setting.getProxy() : null) : new OkHttpDataSource.Factory((Call.Factory) OkHttp.client(proxy));
         return httpDataSourceFactory;
     }
 
-    private static synchronized DataSource.Factory getDataSourceFactory(Map<String, String> headers) {
-        if (dataSourceFactory == null) dataSourceFactory = buildReadOnlyCacheDataSource(new DefaultDataSource.Factory(App.get(), getHttpDataSourceFactory()), getCache());
+    private static synchronized DataSource.Factory getDataSourceFactory(Map<String, String> headers, boolean proxy) {
+        if (dataSourceFactory == null) dataSourceFactory = buildReadOnlyCacheDataSource(new DefaultDataSource.Factory(App.get(), getHttpDataSourceFactory(proxy)), getCache());
         httpDataSourceFactory.setDefaultRequestProperties(Utils.checkUa(headers));
         return dataSourceFactory;
     }

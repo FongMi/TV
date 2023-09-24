@@ -33,7 +33,6 @@
             android:name=".ui.activity.HomeActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
             android:exported="true"
-            android:launchMode="singleTask"
             android:screenOrientation="sensorLandscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -77,18 +76,9 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="ftp" />
                 <data android:scheme="ed2k" />
                 <data android:scheme="magnet" />
                 <data android:scheme="thunder" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data android:scheme="mitv" />
                 <data android:scheme="jianpian" />
             </intent-filter>
         </activity>
@@ -104,7 +94,7 @@
             android:screenOrientation="sensorLandscape" />
 
         <activity
-            android:name=".ui.activity.DetailActivity"
+            android:name=".ui.activity.VideoActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
             android:screenOrientation="sensorLandscape" />
 

@@ -11,6 +11,7 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.bean.Danmu;
 import com.fongmi.android.tv.bean.Episode;
 import com.fongmi.android.tv.bean.Flag;
 import com.fongmi.android.tv.bean.Result;
@@ -47,6 +48,7 @@ public class SiteViewModel extends ViewModel {
     public MutableLiveData<Result> result;
     public MutableLiveData<Result> player;
     public MutableLiveData<Result> search;
+    public MutableLiveData<Danmu> danmaku;
     public ExecutorService executor;
 
     public SiteViewModel() {
@@ -81,7 +83,7 @@ public class SiteViewModel extends ViewModel {
                 SpiderDebug.log(homeContent);
                 return Result.fromJson(homeContent);
             } else {
-                String homeContent = OkHttp.newCall(site.getApi(), site.getHeaders()).execute().body().string();
+                String homeContent = OkHttp.newCall(site.isProxy(), site.getApi(), site.getHeaders()).execute().body().string();
                 SpiderDebug.log(homeContent);
                 return fetchPic(site, Result.fromType(site.getType(), homeContent));
             }
@@ -156,7 +158,10 @@ public class SiteViewModel extends ViewModel {
                 ApiConfig.get().setRecent(site);
                 Result result = Result.fromJson(playerContent);
                 if (result.getFlag().isEmpty()) result.setFlag(flag);
-                result.setUrl(Source.get().fetch(result.getUrl().v()));
+                result.setUrl(Source.get().fetch(result));
+                result.setHeader(site.getHeader());
+                result.setProxy(site.isProxy());
+                checkDanmaku(result);
                 result.setKey(key);
                 return result;
             } else if (site.getType() == 4) {
@@ -167,21 +172,26 @@ public class SiteViewModel extends ViewModel {
                 SpiderDebug.log(playerContent);
                 Result result = Result.fromJson(playerContent);
                 if (result.getFlag().isEmpty()) result.setFlag(flag);
-                result.setUrl(Source.get().fetch(result.getUrl().v()));
+                result.setUrl(Source.get().fetch(result));
+                result.setHeader(site.getHeader());
+                result.setProxy(site.isProxy());
+                checkDanmaku(result);
                 return result;
             } else if (site.isEmpty() && key.equals("push_agent")) {
                 Result result = new Result();
                 result.setParse(0);
                 result.setFlag(flag);
-                result.setUrl(Source.get().fetch(result.getUrl().v()));
+                result.setUrl(Source.get().fetch(result));
                 return result;
             } else {
                 Url url = Url.create().add(id);
                 String type = Uri.parse(id).getQueryParameter("type");
-                if (type != null && type.equals("json")) url = Result.fromJson(OkHttp.newCall(id, site.getHeaders()).execute().body().string()).getUrl();
+                if (type != null && type.equals("json")) url = Result.fromJson(OkHttp.newCall(site.isProxy(), id, site.getHeaders()).execute().body().string()).getUrl();
                 Result result = new Result();
                 result.setUrl(url);
                 result.setFlag(flag);
+                result.setProxy(site.isProxy());
+                result.setHeader(site.getHeader());
                 result.setPlayUrl(site.getPlayUrl());
                 result.setParse(Sniffer.isVideoFormat(url.v()) && result.getPlayUrl().isEmpty() ? 0 : 1);
                 return result;
@@ -198,6 +208,7 @@ public class SiteViewModel extends ViewModel {
         } else {
             ArrayMap<String, String> params = new ArrayMap<>();
             params.put("wd", Trans.t2s(keyword));
+            params.put("quick", String.valueOf(quick));
             String searchContent = call(site, params, true);
             SpiderDebug.log(site.getName() + "," + searchContent);
             post(site, fetchPic(site, Result.fromType(site.getType(), searchContent)));
@@ -227,7 +238,7 @@ public class SiteViewModel extends ViewModel {
     }
 
     private String call(Site site, ArrayMap<String, String> params, boolean limit) throws IOException {
-        Call call = fetchExt(site, params, limit).length() <= 1000 ? OkHttp.newCall(site.getApi(), params, site.getHeaders()) : OkHttp.newCall(site.getApi(), OkHttp.toBody(params), site.getHeaders());
+        Call call = fetchExt(site, params, limit).length() <= 1000 ? OkHttp.newCall(site.isProxy(), site.getApi(), site.getHeaders(), params) : OkHttp.newCall(site.isProxy(), site.getApi(), site.getHeaders(), OkHttp.toBody(params));
         return call.execute().body().string();
     }
 
@@ -240,7 +251,7 @@ public class SiteViewModel extends ViewModel {
     }
 
     private String fetchExt(Site site) throws IOException {
-        Response res = OkHttp.newCall(site.getExt(), site.getHeaders()).execute();
+        Response res = OkHttp.newCall(site.isProxy(), site.getExt(), site.getHeaders()).execute();
         if (res.code() != 200) return "";
         site.setExt(res.body().string());
         return site.getExt();
@@ -253,7 +264,7 @@ public class SiteViewModel extends ViewModel {
         ArrayMap<String, String> params = new ArrayMap<>();
         params.put("ac", site.getType() == 0 ? "videolist" : "detail");
         params.put("ids", TextUtils.join(",", ids));
-        String response = OkHttp.newCall(site.getApi(), params, site.getHeaders()).execute().body().string();
+        String response = OkHttp.newCall(site.isProxy(), site.getApi(), site.getHeaders(), params).execute().body().string();
         result.setList(Result.fromType(site.getType(), response).getList());
         return result;
     }
@@ -264,6 +275,11 @@ public class SiteViewModel extends ViewModel {
             for (Future<List<Episode>> future : executor.invokeAll(flag.getMagnet(), 30, TimeUnit.SECONDS)) flag.getEpisodes().addAll(future.get());
             executor.shutdownNow();
         }
+    }
+
+    private void checkDanmaku(Result result) throws Exception {
+        if (result.getDanmaku().isEmpty() || !result.getDanmaku().startsWith("http")) return;
+        result.setDanmaku(OkHttp.newCall(result.getDanmaku()).execute().body().string());
     }
 
     private void post(Site site, Result result) {

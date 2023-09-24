@@ -24,6 +24,7 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
 import com.github.catvod.utils.Json;
+import com.github.catvod.utils.Util;
 import com.google.common.net.HttpHeaders;
 import com.google.gson.JsonParser;
 
@@ -38,12 +39,7 @@ public class ImgUtil {
 
     public static void load(String url, int error, CustomTarget<Drawable> target) {
         if (TextUtils.isEmpty(url)) target.onLoadFailed(ResUtil.getDrawable(error));
-        else Glide.with(App.get()).load(getUrl(url)).error(error).dontAnimate().into(target);
-    }
-
-    public static void load(String url, ImageView view, CustomTarget<Bitmap> target) {
-        if (TextUtils.isEmpty(url)) view.setImageResource(R.drawable.ic_img_error);
-        else Glide.with(App.get()).asBitmap().load(getUrl(url)).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).skipMemoryCache(true).dontAnimate().signature(new ObjectKey(url + "_" + Setting.getQuality())).into(target);
+        else Glide.with(App.get()).load(getUrl(url)).error(error).skipMemoryCache(true).dontAnimate().signature(new ObjectKey(url + "_" + Setting.getQuality())).into(target);
     }
 
     public static void load(String url, ImageView view, ImageView.ScaleType scaleType) {
@@ -85,14 +81,7 @@ public class ImgUtil {
 
     private static void addHeader(LazyHeaders.Builder builder, String header) {
         Map<String, String> map = Json.toMap(JsonParser.parseString(header));
-        for (Map.Entry<String, String> entry : map.entrySet()) builder.addHeader(replace(entry.getKey()), entry.getValue());
-    }
-
-    private static String replace(String key) {
-        if (key.equals("user-agent")) return HttpHeaders.USER_AGENT;
-        if (key.equals("referer")) return HttpHeaders.REFERER;
-        if (key.equals("cookie")) return HttpHeaders.COOKIE;
-        return key;
+        for (Map.Entry<String, String> entry : map.entrySet()) builder.addHeader(Util.fix(entry.getKey()), entry.getValue());
     }
 
     public static byte[] resize(byte[] bytes) {

@@ -89,7 +89,7 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
     public boolean onDown(@NonNull MotionEvent e) {
         if (!full) return false;
         volume = manager.getStreamVolume(AudioManager.STREAM_MUSIC);
-        bright = activity.getWindow().getAttributes().screenBrightness;
+        bright = Utils.getBrightness(activity);
         changeBright = false;
         changeVolume = false;
         touch = true;

@@ -2,6 +2,8 @@ package tv.danmaku.ijk.media.player.ui;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -33,17 +35,17 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     private final String TAG = IjkVideoView.class.getSimpleName();
 
+    public static final int STATE_ERROR = -1;
+    public static final int STATE_IDLE = 0;
+    public static final int STATE_PREPARING = 1;
+    public static final int STATE_PREPARED = 2;
+    public static final int STATE_PLAYING = 3;
+    public static final int STATE_PAUSED = 4;
+    public static final int STATE_ENDED = 5;
+
     private static final int codec = IjkMediaPlayer.OPT_CATEGORY_CODEC;
     private static final int format = IjkMediaPlayer.OPT_CATEGORY_FORMAT;
     private static final int player = IjkMediaPlayer.OPT_CATEGORY_PLAYER;
-
-    private static final int STATE_ERROR = -1;
-    private static final int STATE_IDLE = 0;
-    private static final int STATE_PREPARING = 1;
-    private static final int STATE_PREPARED = 2;
-    private static final int STATE_PLAYING = 3;
-    private static final int STATE_PAUSED = 4;
-    private static final int STATE_PLAYBACK_COMPLETED = 5;
 
     private static final int PLAYER_NONE = -1;
     private static final int PLAYER_SYS = 0;
@@ -186,6 +188,10 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         if (mRenderView != null) mRenderView.setAspectRatio(resizeMode);
     }
 
+    public void setWakeMode(int mode) {
+        mPlayer.setWakeMode(getContext(), mode);
+    }
+
     public void setMediaSource(MediaSource source) {
         setVideoURI(source.getUri(), source.getHeaders());
     }
@@ -306,6 +312,10 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         return mVideoHeight;
     }
 
+    public int getPlaybackState() {
+        return mCurrentState;
+    }
+
     public SubtitleView getSubtitleView() {
         return mSubtitleView;
     }
@@ -415,6 +425,10 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         }
     }
 
+    public Bitmap getDefaultArtwork() {
+        return ((BitmapDrawable) mDefaultArtwork).getBitmap();
+    }
+
     private void updateForCurrentTrackSelections() {
         if (mPlayer == null || mPlayer.getTrackInfo().isEmpty()) return;
         int select = getSelectedTrack(ITrackInfo.MEDIA_TRACK_TYPE_VIDEO);
@@ -499,8 +513,8 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     @Override
     public void onCompletion(IMediaPlayer mp) {
-        mCurrentState = STATE_PLAYBACK_COMPLETED;
-        mTargetState = STATE_PLAYBACK_COMPLETED;
+        mCurrentState = STATE_ENDED;
+        mTargetState = STATE_ENDED;
         mListener.onCompletion(mPlayer);
     }
 
@@ -524,11 +538,13 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     @Override
     public void onBufferingUpdate(IMediaPlayer mp, int percent) {
+        mListener.onBufferingUpdate(mp, percent);
         mCurrentBufferPercentage = percent;
     }
 
     @Override
     public void onBufferingUpdate(IMediaPlayer mp, long position) {
+        mListener.onBufferingUpdate(mp, position);
         mCurrentBufferPosition = position;
     }
 

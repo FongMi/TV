@@ -1,6 +1,5 @@
 package com.fongmi.android.tv.server;
 
-import android.net.Uri;
 import android.util.Base64;
 
 import com.fongmi.android.tv.api.ApiConfig;
@@ -10,7 +9,6 @@ import com.fongmi.android.tv.server.process.Action;
 import com.fongmi.android.tv.server.process.Local;
 import com.fongmi.android.tv.server.process.Process;
 import com.fongmi.android.tv.utils.M3U8;
-import com.fongmi.android.tv.utils.Sniffer;
 import com.github.catvod.Init;
 
 import java.io.ByteArrayInputStream;
@@ -88,7 +86,6 @@ public class Nano extends NanoHTTPD {
         try {
             String url = session.getParms().get("url");
             String result = M3U8.get(url, session.getHeaders());
-            for (String ad : Sniffer.getRegex(Uri.parse(url))) result = result.replaceAll(ad, "");
             return newChunkedResponse(Response.Status.OK, MIME_PLAINTEXT, new ByteArrayInputStream(result.getBytes("UTF-8")));
         } catch (Exception e) {
             return error(e.getMessage());

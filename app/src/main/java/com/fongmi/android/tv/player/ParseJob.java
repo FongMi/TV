@@ -10,6 +10,8 @@ import com.fongmi.android.tv.ui.custom.CustomWebView;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Json;
+import com.github.catvod.utils.Util;
+import com.google.common.net.HttpHeaders;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -54,7 +56,8 @@ public class ParseJob implements ParseCallback {
         if (useParse) parse = ApiConfig.get().getParse();
         if (result.getPlayUrl().startsWith("json:")) parse = Parse.get(1, result.getPlayUrl().substring(5));
         if (result.getPlayUrl().startsWith("parse:")) parse = ApiConfig.get().getParse(result.getPlayUrl().substring(6));
-        if (parse == null) parse = Parse.get(0, result.getPlayUrl(), result.getHeader());
+        if (parse == null) parse = Parse.get(0, result.getPlayUrl());
+        parse.setHeader(result.getHeader());
     }
 
     private void execute(Result result) {
@@ -147,6 +150,7 @@ public class ParseJob implements ParseCallback {
     }
 
     private void checkResult(Result result) {
+        result.setHeader(parse.getExt().getHeader());
         if (result.getUrl().isEmpty()) onParseError();
         else if (result.getParse() == 1) startWeb(result.getHeaders(), Utils.convert(result.getUrl().v()));
         else onParseSuccess(result.getHeaders(), result.getUrl().v(), result.getJxFrom());
@@ -179,7 +183,8 @@ public class ParseJob implements ParseCallback {
 
     private Map<String, String> getHeader(JsonObject object) {
         Map<String, String> headers = new HashMap<>();
-        for (String key : object.keySet()) if (key.equalsIgnoreCase("user-agent") || key.equalsIgnoreCase("referer")) headers.put(key, object.get(key).getAsString());
+        for (String key : object.keySet()) if (key.equalsIgnoreCase(HttpHeaders.USER_AGENT) || key.equalsIgnoreCase(HttpHeaders.REFERER)) headers.put(Util.fix(key), object.get(key).getAsString());
+        if (headers.isEmpty()) return parse.getHeaders();
         return headers;
     }
 
