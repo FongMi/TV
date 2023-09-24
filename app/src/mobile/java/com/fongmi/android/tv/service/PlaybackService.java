@@ -1,10 +1,10 @@
 package com.fongmi.android.tv.service;
 
+import android.Manifest;
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.IBinder;
 import android.support.v4.media.MediaMetadataCompat;
@@ -12,7 +12,9 @@ import android.support.v4.media.MediaMetadataCompat;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.media.app.NotificationCompat.MediaStyle;
 
@@ -26,6 +28,8 @@ import com.fongmi.android.tv.utils.Notify;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
+import java.util.Objects;
 
 public class PlaybackService extends Service {
 
@@ -41,8 +45,16 @@ public class PlaybackService extends Service {
         App.get().stopService(new Intent(App.get(), PlaybackService.class));
     }
 
-    private NotificationManager getManager() {
-        return (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+    private boolean isNull() {
+        return Objects.isNull(players) || Objects.isNull(players.getSession());
+    }
+
+    private boolean nonNull() {
+        return Objects.nonNull(players) && Objects.nonNull(players.getSession());
+    }
+
+    private NotificationManagerCompat getManager() {
+        return NotificationManagerCompat.from(this);
     }
 
     private NotificationCompat.Action buildNotificationAction(@DrawableRes int icon, @StringRes int title, String action) {
@@ -50,12 +62,12 @@ public class PlaybackService extends Service {
     }
 
     private NotificationCompat.Action getPlayPauseAction() {
-        if (players != null && players.isPlaying()) return buildNotificationAction(androidx.media3.ui.R.drawable.exo_icon_pause, androidx.media3.ui.R.string.exo_controls_pause_description, ActionEvent.PAUSE);
-        return buildNotificationAction(androidx.media3.ui.R.drawable.exo_icon_play, androidx.media3.ui.R.string.exo_controls_play_description, ActionEvent.PLAY);
+        if (nonNull() && players.isPlaying()) return buildNotificationAction(R.drawable.ic_notify_pause, androidx.media3.ui.R.string.exo_controls_pause_description, ActionEvent.PAUSE);
+        return buildNotificationAction(R.drawable.ic_notify_play, androidx.media3.ui.R.string.exo_controls_play_description, ActionEvent.PLAY);
     }
 
     private MediaMetadataCompat getMetadata() {
-        return players.getSession().getController().getMetadata();
+        return isNull() ? null : players.getSession().getController().getMetadata();
     }
 
     private String getTitle() {
@@ -80,14 +92,15 @@ public class PlaybackService extends Service {
     }
 
     private void setAction(NotificationCompat.Builder builder) {
-        builder.addAction(buildNotificationAction(androidx.media3.ui.R.drawable.exo_icon_previous, androidx.media3.ui.R.string.exo_controls_previous_description, ActionEvent.PREV));
+        builder.addAction(buildNotificationAction(R.drawable.ic_notify_prev, androidx.media3.ui.R.string.exo_controls_previous_description, ActionEvent.PREV));
         builder.addAction(getPlayPauseAction());
-        builder.addAction(buildNotificationAction(androidx.media3.ui.R.drawable.exo_icon_next, androidx.media3.ui.R.string.exo_controls_next_description, ActionEvent.NEXT));
+        builder.addAction(buildNotificationAction(R.drawable.ic_notify_next, androidx.media3.ui.R.string.exo_controls_next_description, ActionEvent.NEXT));
     }
 
     private void setStyle(NotificationCompat.Builder builder) {
         MediaStyle style = new MediaStyle();
         style.setShowCancelButton(true);
+        if (nonNull()) style.setMediaSession(players.getSession().getSessionToken());
         style.setCancelButtonIntent(ActionReceiver.getPendingIntent(this, ActionEvent.STOP));
         builder.setStyle(style);
     }
@@ -106,12 +119,13 @@ public class PlaybackService extends Service {
         if (art != null) setLargeIcon(builder, art);
         builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
         builder.setDeleteIntent(ActionReceiver.getPendingIntent(this, ActionEvent.STOP));
-        builder.setContentIntent(players.getSession().getController().getSessionActivity());
+        if (nonNull()) builder.setContentIntent(players.getSession().getController().getSessionActivity());
         return builder.build();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onActionEvent(ActionEvent event) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) return;
         if (event.isUpdate()) getManager().notify(ID, buildNotification());
     }
 
@@ -124,7 +138,7 @@ public class PlaybackService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         startForeground(ID, buildNotification());
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 
     @Override
