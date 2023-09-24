@@ -1,4 +1,4 @@
-package com.fongmi.android.tv.ui.dialog;
+package com.fongmi.android.tv.ui.custom.dialog;
 
 import android.content.DialogInterface;
 import android.text.TextUtils;
@@ -19,7 +19,7 @@ import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.ui.custom.CustomTextListener;
 import com.fongmi.android.tv.utils.QRCode;
 import com.fongmi.android.tv.utils.ResUtil;
-import com.github.catvod.utils.Util;
+import com.fongmi.android.tv.utils.Sniffer;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.greenrobot.eventbus.EventBus;
@@ -87,10 +87,10 @@ public class UaDialog implements DialogInterface.OnDismissListener {
     private void detect(String s) {
         if (append && s.equalsIgnoreCase("c")) {
             append = false;
-            binding.text.setText(Util.CHROME);
+            binding.text.setText(Sniffer.CHROME);
         } else if (append && s.equalsIgnoreCase("o")) {
             append = false;
-            binding.text.setText(okhttp3.internal.Util.userAgent);
+            binding.text.setText("okhttp/3.12.13");
         } else if (s.length() > 1) {
             append = false;
         } else if (s.length() == 0) {
@@ -109,7 +109,7 @@ public class UaDialog implements DialogInterface.OnDismissListener {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onServerEvent(ServerEvent event) {
-        if (event.getType() != ServerEvent.Type.SETTING) return;
+        if (event.getType() != ServerEvent.Type.API) return;
         binding.text.setText(event.getText());
         binding.positive.performClick();
     }
