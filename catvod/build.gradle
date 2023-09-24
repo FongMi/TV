@@ -23,7 +23,6 @@ dependencies {
     api 'com.hierynomus:smbj:0.11.5'
     api 'com.orhanobut:logger:2.2.0'
     api 'com.squareup.okhttp3:okhttp:' + okhttpVersion
-    api 'com.squareup.okhttp3:okhttp-dnsoverhttps:' + okhttpVersion
     api 'org.chromium.net:cronet-embedded:101.4951.41'
     api 'org.jsoup:jsoup:' + jsoupVersion
 }
