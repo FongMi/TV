@@ -441,7 +441,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void setArtwork(String url) {
-        ImgUtil.load(url, R.drawable.radio, new CustomTarget<>() {
+        ImgUtil.load(url, R.drawable.radio, new CustomTarget<Drawable>() {
             @Override
             public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
                 getExo().setDefaultArtwork(resource);
@@ -632,7 +632,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onErrorEvent(ErrorEvent event) {
-        if (mPlayers.addRetry() > event.getRetry()) checkError(event);
+        if (mPlayers.addRetry() > event.getRetry()) onError(event);
         else fetch();
     }
 

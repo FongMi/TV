@@ -907,7 +907,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void setArtwork(String url) {
-        ImgUtil.load(url, R.drawable.radio, new CustomTarget<>() {
+        ImgUtil.load(url, R.drawable.radio, new CustomTarget<Drawable>() {
             @Override
             public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
                 getExo().setDefaultArtwork(resource);
@@ -1084,7 +1084,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onErrorEvent(ErrorEvent event) {
-        if (mPlayers.addRetry() > event.getRetry()) checkError(event);
+        if (mPlayers.addRetry() > event.getRetry()) onError(event);
         else onRefresh();
     }
 
