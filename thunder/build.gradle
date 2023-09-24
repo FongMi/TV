@@ -1,12 +1,14 @@
-apply plugin: 'com.android.library'
+plugins {
+    id 'com.android.library'
+}
 
 android {
-    compileSdk 33
+    compileSdk 34
     flavorDimensions = ["abi"]
 
     defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 28
+        minSdk 21
+        targetSdk 28
     }
 
     productFlavors {
