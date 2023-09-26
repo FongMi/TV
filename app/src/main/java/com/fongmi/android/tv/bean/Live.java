@@ -23,8 +23,6 @@ public class Live {
     private boolean boot;
     @SerializedName("pass")
     private boolean pass;
-    @SerializedName("proxy")
-    private boolean proxy;
     @SerializedName("name")
     private String name;
     @SerializedName("group")
@@ -87,10 +85,6 @@ public class Live {
 
     public boolean isPass() {
         return pass;
-    }
-
-    public boolean isProxy() {
-        return proxy;
     }
 
     public String getName() {

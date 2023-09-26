@@ -39,8 +39,6 @@ public class Channel {
     private JsonElement header;
     @SerializedName("playerType")
     private Integer playerType;
-    @SerializedName("proxy")
-    private Boolean proxy;
     @SerializedName("drm")
     private Drm drm;
 
@@ -145,18 +143,6 @@ public class Channel {
         this.playerType = playerType;
     }
 
-    public Boolean getProxy() {
-        return proxy;
-    }
-
-    public boolean isProxy() {
-        return proxy != null && proxy;
-    }
-
-    public void setProxy(boolean proxy) {
-        this.proxy = proxy;
-    }
-
     public Drm getDrm() {
         return drm;
     }
@@ -258,7 +244,6 @@ public class Channel {
     }
 
     public void live(Live live) {
-        if (live.isProxy() && getProxy() == null) setProxy(live.isProxy());
         if (live.getUa().length() > 0 && getUa().isEmpty()) setUa(live.getUa());
         if (live.getHeader() != null && getHeader() == null) setHeader(live.getHeader());
         if (live.getReferer().length() > 0 && getReferer().isEmpty()) setReferer(live.getReferer());

@@ -101,14 +101,14 @@ public class JarLoader {
         return loaders.get(key);
     }
 
-    public Spider getSpider(String key, String api, String ext, String jar, boolean proxy) {
+    public Spider getSpider(String key, String api, String ext, String jar) {
         try {
             String jaKey = Util.md5(jar);
             String spKey = jaKey + key;
             if (spiders.containsKey(spKey)) return spiders.get(spKey);
             if (!loaders.containsKey(jaKey)) parseJar(jaKey, jar);
             Spider spider = (Spider) loaders.get(jaKey).loadClass("com.github.catvod.spider." + api.split("csp_")[1]).newInstance();
-            spider.proxy(proxy).init(App.get(), ext);
+            spider.init(App.get(), ext);
             spiders.put(spKey, spider);
             return spider;
         } catch (Throwable e) {

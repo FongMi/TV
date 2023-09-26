@@ -39,11 +39,11 @@ public class JsLoader {
         }
     }
 
-    public Spider getSpider(String key, String api, String ext, String jar, boolean proxy) {
+    public Spider getSpider(String key, String api, String ext, String jar) {
         try {
             if (spiders.containsKey(key)) return spiders.get(key);
             Spider spider = new com.fongmi.quickjs.crawler.Spider(key, api, dex(key, jar));
-            spider.proxy(proxy).init(App.get(), ext);
+            spider.init(App.get(), ext);
             spiders.put(key, spider);
             return spider;
         } catch (Throwable e) {

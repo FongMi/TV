@@ -22,7 +22,7 @@ import java.util.List;
 
 import okhttp3.Headers;
 
-@Entity(ignoredColumns = {"type", "api", "playUrl", "timeout", "playerType", "ext", "jar", "style", "categories", "header", "proxy"})
+@Entity(ignoredColumns = {"api", "ext", "jar", "type", "playUrl", "timeout", "playerType", "categories", "header", "style"})
 public class Site implements Parcelable {
 
     @NonNull
@@ -31,12 +31,17 @@ public class Site implements Parcelable {
     private String key;
     @SerializedName("name")
     private String name;
-    @SerializedName("type")
-    private Integer type;
     @SerializedName("api")
     private String api;
+    @JsonAdapter(ExtAdapter.class)
+    @SerializedName("ext")
+    private String ext;
+    @SerializedName("jar")
+    private String jar;
     @SerializedName("playUrl")
     private String playUrl;
+    @SerializedName("type")
+    private Integer type;
     @SerializedName("timeout")
     private Integer timeout;
     @SerializedName("playerType")
@@ -49,19 +54,12 @@ public class Site implements Parcelable {
     private Integer changeable;
     @SerializedName("recordable")
     private Integer recordable;
-    @JsonAdapter(ExtAdapter.class)
-    @SerializedName("ext")
-    private String ext;
-    @SerializedName("jar")
-    private String jar;
-    @SerializedName("style")
-    private Style style;
     @SerializedName("categories")
     private List<String> categories;
     @SerializedName("header")
     private JsonElement header;
-    @SerializedName("proxy")
-    private boolean proxy;
+    @SerializedName("style")
+    private Style style;
 
     private boolean activated;
 
@@ -105,14 +103,6 @@ public class Site implements Parcelable {
         this.name = name;
     }
 
-    public Integer getType() {
-        return type == null ? 0 : type;
-    }
-
-    public void setType(int type) {
-        this.type = type;
-    }
-
     public String getApi() {
         return TextUtils.isEmpty(api) ? "" : api;
     }
@@ -121,8 +111,28 @@ public class Site implements Parcelable {
         this.api = api;
     }
 
+    public String getExt() {
+        return TextUtils.isEmpty(ext) ? "" : ext;
+    }
+
+    public void setExt(String ext) {
+        this.ext = ext.trim();
+    }
+
+    public String getJar() {
+        return TextUtils.isEmpty(jar) ? "" : jar;
+    }
+
     public String getPlayUrl() {
         return TextUtils.isEmpty(playUrl) ? "" : playUrl;
+    }
+
+    public Integer getType() {
+        return type == null ? 0 : type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 
     public Integer getTimeout() {
@@ -165,22 +175,6 @@ public class Site implements Parcelable {
         this.recordable = recordable;
     }
 
-    public String getExt() {
-        return TextUtils.isEmpty(ext) ? "" : ext;
-    }
-
-    public void setExt(String ext) {
-        this.ext = ext.trim();
-    }
-
-    public String getJar() {
-        return TextUtils.isEmpty(jar) ? "" : jar;
-    }
-
-    public Style getStyle() {
-        return style == null ? Style.rect() : style;
-    }
-
     public List<String> getCategories() {
         return categories == null ? Collections.emptyList() : categories;
     }
@@ -189,8 +183,8 @@ public class Site implements Parcelable {
         return header;
     }
 
-    public boolean isProxy() {
-        return proxy;
+    public Style getStyle() {
+        return style == null ? Style.rect() : style;
     }
 
     public boolean isActivated() {
@@ -232,14 +226,6 @@ public class Site implements Parcelable {
         return this;
     }
 
-    public static Site find(String key) {
-        return AppDatabase.get().getSiteDao().find(key);
-    }
-
-    public void save() {
-        AppDatabase.get().getSiteDao().insertOrUpdate(this);
-    }
-
     public boolean isEmpty() {
         return getKey().isEmpty() && getName().isEmpty();
     }
@@ -255,6 +241,14 @@ public class Site implements Parcelable {
         setRecordable(item.getRecordable());
         if (getSearchable() != 0) setSearchable(Math.max(1, item.getSearchable()));
         return this;
+    }
+
+    public static Site find(String key) {
+        return AppDatabase.get().getSiteDao().find(key);
+    }
+
+    public void save() {
+        AppDatabase.get().getSiteDao().insertOrUpdate(this);
     }
 
     @Override
@@ -274,40 +268,38 @@ public class Site implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.key);
         dest.writeString(this.name);
-        dest.writeValue(this.type);
         dest.writeString(this.api);
+        dest.writeString(this.ext);
+        dest.writeString(this.jar);
         dest.writeString(this.playUrl);
+        dest.writeValue(this.type);
         dest.writeValue(this.timeout);
         dest.writeValue(this.playerType);
         dest.writeValue(this.searchable);
         dest.writeValue(this.filterable);
         dest.writeValue(this.changeable);
         dest.writeValue(this.recordable);
-        dest.writeString(this.ext);
-        dest.writeString(this.jar);
-        dest.writeParcelable(this.style, flags);
         dest.writeStringList(this.categories);
-        dest.writeByte(this.proxy ? (byte) 1 : (byte) 0);
+        dest.writeParcelable(this.style, flags);
         dest.writeByte(this.activated ? (byte) 1 : (byte) 0);
     }
 
     protected Site(Parcel in) {
         this.key = in.readString();
         this.name = in.readString();
-        this.type = (Integer) in.readValue(Integer.class.getClassLoader());
         this.api = in.readString();
+        this.ext = in.readString();
+        this.jar = in.readString();
         this.playUrl = in.readString();
+        this.type = (Integer) in.readValue(Integer.class.getClassLoader());
         this.timeout = (Integer) in.readValue(Integer.class.getClassLoader());
         this.playerType = (Integer) in.readValue(Integer.class.getClassLoader());
         this.searchable = (Integer) in.readValue(Integer.class.getClassLoader());
         this.filterable = (Integer) in.readValue(Integer.class.getClassLoader());
         this.changeable = (Integer) in.readValue(Integer.class.getClassLoader());
         this.recordable = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.ext = in.readString();
-        this.jar = in.readString();
-        this.style = in.readParcelable(Style.class.getClassLoader());
         this.categories = in.createStringArrayList();
-        this.proxy = in.readByte() != 0;
+        this.style = in.readParcelable(Style.class.getClassLoader());
         this.activated = in.readByte() != 0;
     }
 
