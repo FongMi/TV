@@ -146,7 +146,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
     private void createCtx() {
         ctx = QuickJSContext.create();
         ctx.setConsole(new Console());
-        Global.create(ctx, executor, proxy()).setProperty();
+        Global.create(ctx, executor).setProperty();
         ctx.getGlobalObject().setProperty("local", Local.class);
         ctx.getGlobalObject().getContext().evaluate(Path.asset("js/lib/http.js"));
         ctx.setModuleLoader(new QuickJSContext.DefaultModuleLoader() {
@@ -157,7 +157,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
             @Override
             public String getModuleStringCode(String moduleName) {
-                return Module.get().fetch(proxy(), moduleName);
+                return Module.get().fetch(moduleName);
             }
         });
     }
@@ -207,7 +207,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
     private String getContent() {
         String global = "globalThis." + name;
-        String content = Module.get().fetch(proxy(), api);
+        String content = Module.get().fetch(api);
         if (content.contains("__jsEvalReturn")) {
             cat = true;
             return content.concat(global + " = __jsEvalReturn()");
