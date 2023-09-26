@@ -16,7 +16,7 @@ import okhttp3.ResponseBody;
 import okio.BufferedSource;
 import okio.Okio;
 
-public class DeflateInterceptor implements Interceptor {
+public class OkhttpInterceptor implements Interceptor {
 
     @NonNull
     @Override

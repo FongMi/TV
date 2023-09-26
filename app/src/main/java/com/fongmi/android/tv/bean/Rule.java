@@ -1,5 +1,7 @@
 package com.fongmi.android.tv.bean;
 
+import android.text.TextUtils;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
@@ -11,6 +13,8 @@ import java.util.List;
 
 public class Rule {
 
+    @SerializedName("name")
+    private String name;
     @SerializedName("hosts")
     private List<String> hosts;
     @SerializedName("regex")
@@ -20,6 +24,10 @@ public class Rule {
         Type listType = new TypeToken<List<Rule>>() {}.getType();
         List<Rule> items = new Gson().fromJson(element, listType);
         return items == null ? Collections.emptyList() : items;
+    }
+
+    public String getName() {
+        return TextUtils.isEmpty(name) ? "" : name;
     }
 
     public List<String> getHosts() {

@@ -330,7 +330,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
     @Override
     public void setProxy(String proxy) {
         Setting.putProxy(proxy);
-        OkHttp.get().resetProxy();
+        OkHttp.get().setProxy(proxy);
         Notify.progress(getActivity());
         ApiConfig.load(Config.vod(), getCallback());
         mBinding.proxyText.setText(Util.scheme(proxy));

@@ -17,7 +17,6 @@ import java.util.concurrent.Callable;
 
 public class Magnet implements Callable<List<Episode>> {
 
-    private final List<String> ads;
     private final String url;
     private int time;
 
@@ -27,7 +26,6 @@ public class Magnet implements Callable<List<Episode>> {
 
     public Magnet(String url) {
         this.url = url;
-        this.ads = Sniffer.getRegex("magnet");
     }
 
     private void sleep() {
@@ -43,7 +41,7 @@ public class Magnet implements Callable<List<Episode>> {
         if (!torrent && !taskId.getRealUrl().startsWith("magnet")) return List.of(Episode.create(taskId.getFileName(), taskId.getRealUrl()));
         if (torrent) Download.create(url, taskId.getSaveFile()).start();
         else while (XLTaskHelper.get().getTaskInfo(taskId).getTaskStatus() != 2 && time < 5000) sleep();
-        List<TorrentFileInfo> medias = XLTaskHelper.get().getTorrentInfo(taskId.getSaveFile()).getMedias(ads);
+        List<TorrentFileInfo> medias = XLTaskHelper.get().getTorrentInfo(taskId.getSaveFile()).getMedias();
         for (TorrentFileInfo media : medias) episodes.add(Episode.create(media.getFileName(), media.getSize(), media.getPlayUrl()));
         XLTaskHelper.get().stopTask(taskId);
         return episodes;
