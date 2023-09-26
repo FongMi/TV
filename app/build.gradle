@@ -112,7 +112,7 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.15.1'
     implementation 'com.github.bumptech.glide:annotations:4.15.1'
     implementation 'com.github.bumptech.glide:okhttp3-integration:4.15.1'
-    implementation 'com.github.TeamNewPipe:NewPipeExtractor:340095515d45ecbee576872c7198992ebd8e4f08'
+    implementation 'com.github.TeamNewPipe:NewPipeExtractor:289db1178ab66694c23893e6a487d4708343c47b'
     implementation 'com.google.android.material:material:1.9.0'
     implementation 'com.google.zxing:core:3.3.0'
     implementation 'com.guolindev.permissionx:permissionx:1.7.1'
