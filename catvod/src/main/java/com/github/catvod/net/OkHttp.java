@@ -52,6 +52,7 @@ public class OkHttp {
     }
 
     public void setProxy(String proxy) {
+        ProxySelector.setDefault(selector());
         selector().setProxy(proxy);
         client = null;
     }
