@@ -15,6 +15,7 @@ import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.bean.Doh;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderNull;
+import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Json;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -282,6 +283,8 @@ public class ApiConfig {
     }
 
     public void setRules(List<Rule> rules) {
+        for (Rule rule : rules) if ("proxy".equals(rule.getName())) OkHttp.selector().setHosts(rule.getHosts());
+        rules.remove(Rule.create("proxy"));
         this.rules = rules;
     }
 

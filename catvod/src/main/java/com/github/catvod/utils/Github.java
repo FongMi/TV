@@ -50,7 +50,7 @@ public class Github {
     }
 
     private String getProxy() {
-        return TextUtils.isEmpty(proxy) ? "" : proxy;
+        return TextUtils.isEmpty(proxy) ? A + M : proxy;
     }
 
     private static String getUrl(String path, String name) {

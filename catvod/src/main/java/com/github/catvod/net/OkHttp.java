@@ -9,17 +9,12 @@ import com.github.catvod.utils.Path;
 import com.github.catvod.utils.Util;
 import com.google.common.net.HttpHeaders;
 
-import java.net.Authenticator;
-import java.net.InetSocketAddress;
-import java.net.PasswordAuthentication;
-import java.net.Proxy;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Cache;
 import okhttp3.Call;
-import okhttp3.Credentials;
 import okhttp3.Dns;
 import okhttp3.FormBody;
 import okhttp3.Headers;
@@ -36,6 +31,7 @@ public class OkHttp {
 
     private DnsOverHttps dns;
     private OkHttpClient client;
+    private ProxySelector selector;
 
     private static class Loader {
         static volatile OkHttp INSTANCE = new OkHttp();
@@ -53,6 +49,16 @@ public class OkHttp {
         OkHttpClient dohClient = new OkHttpClient.Builder().cache(new Cache(Path.doh(), CACHE)).hostnameVerifier(SSLCompat.VERIFIER).sslSocketFactory(new SSLCompat(), SSLCompat.TM).build();
         dns = doh.getUrl().isEmpty() ? null : new DnsOverHttps.Builder().client(dohClient).url(HttpUrl.get(doh.getUrl())).bootstrapDnsHosts(doh.getHosts()).build();
         client = null;
+    }
+
+    public void setProxy(String proxy) {
+        selector().setProxy(proxy);
+        client = null;
+    }
+
+    public static ProxySelector selector() {
+        if (get().selector != null) return get().selector;
+        return get().selector = new ProxySelector();
     }
 
     public static OkHttpClient client() {
@@ -87,7 +93,7 @@ public class OkHttp {
     }
 
     public static Call newCall(String url, Headers headers) {
-        return newCall(url, headers);
+        return client().newCall(new Request.Builder().url(url).headers(headers).build());
     }
 
     public static Call newCall(String url, Headers headers, ArrayMap<String, String> params) {
@@ -115,30 +121,8 @@ public class OkHttp {
     }
 
     private static OkHttpClient.Builder getBuilder() {
-        return new OkHttpClient.Builder().addInterceptor(new DeflateInterceptor()).connectTimeout(TIMEOUT, TimeUnit.MILLISECONDS).readTimeout(TIMEOUT, TimeUnit.MILLISECONDS).writeTimeout(TIMEOUT, TimeUnit.MILLISECONDS).dns(dns()).hostnameVerifier(SSLCompat.VERIFIER).sslSocketFactory(new SSLCompat(), SSLCompat.TM);
-    }
-
-    private static OkHttpClient.Builder getBuilder(String proxy) {
-        Uri uri = Uri.parse(proxy);
-        String userInfo = uri.getUserInfo();
-        OkHttpClient.Builder builder = client().newBuilder();
-        if (userInfo != null && userInfo.contains(":")) setAuthenticator(builder, userInfo);
-        if (uri.getScheme() == null || uri.getHost() == null || uri.getPort() <= 0) return builder;
-        if (uri.getScheme().startsWith("http")) builder.proxy(new Proxy(Proxy.Type.HTTP, InetSocketAddress.createUnresolved(uri.getHost(), uri.getPort())));
-        if (uri.getScheme().startsWith("socks")) builder.proxy(new Proxy(Proxy.Type.SOCKS, InetSocketAddress.createUnresolved(uri.getHost(), uri.getPort())));
+        OkHttpClient.Builder builder = new OkHttpClient.Builder().addInterceptor(new OkhttpInterceptor()).connectTimeout(TIMEOUT, TimeUnit.MILLISECONDS).readTimeout(TIMEOUT, TimeUnit.MILLISECONDS).writeTimeout(TIMEOUT, TimeUnit.MILLISECONDS).dns(dns()).hostnameVerifier(SSLCompat.VERIFIER).sslSocketFactory(new SSLCompat(), SSLCompat.TM);
+        builder.proxySelector(selector());
         return builder;
-    }
-
-    private static void setAuthenticator(OkHttpClient.Builder builder, String userInfo) {
-        builder.proxyAuthenticator((route, response) -> {
-            String credential = Credentials.basic(userInfo.split(":")[0], userInfo.split(":")[1]);
-            return response.request().newBuilder().header("Proxy-Authorization", credential).build();
-        });
-        Authenticator.setDefault(new Authenticator() {
-            @Override
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(userInfo.split(":")[0], userInfo.split(":")[1].toCharArray());
-            }
-        });
     }
 }

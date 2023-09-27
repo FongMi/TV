@@ -55,8 +55,8 @@ public class Sniffer {
         return regex;
     }
 
-    public static List<String> getRegex(String key) {
-        for (Rule rule : ApiConfig.get().getRules()) for (String host : rule.getHosts()) if (host.equals(key)) return rule.getRegex();
+    public static List<String> getProxy() {
+        for (Rule rule : ApiConfig.get().getRules()) if ("proxy".equals(rule.getName())) return rule.getHosts();
         return Collections.emptyList();
     }
 

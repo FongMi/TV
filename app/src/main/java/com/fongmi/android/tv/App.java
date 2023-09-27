@@ -108,6 +108,7 @@ public class App extends MultiDexApplication {
         super.onCreate();
         Notify.createChannel();
         Logger.addLogAdapter(getLogAdapter());
+        OkHttp.get().setProxy(Setting.getProxy());
         OkHttp.get().setDoh(Doh.objectFrom(Setting.getDoh()));
         CaocConfig.Builder.create().backgroundMode(CaocConfig.BACKGROUND_MODE_SILENT).errorActivity(CrashActivity.class).apply();
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
