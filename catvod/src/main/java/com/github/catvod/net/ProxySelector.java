@@ -2,6 +2,8 @@ package com.github.catvod.net;
 
 import android.net.Uri;
 
+import com.orhanobut.logger.Logger;
+
 import java.io.IOException;
 import java.net.Authenticator;
 import java.net.InetSocketAddress;
@@ -14,6 +16,7 @@ import java.util.List;
 
 public class ProxySelector extends java.net.ProxySelector {
 
+    private static final String TAG = ProxySelector.class.getSimpleName();
     private List<String> hosts;
     private Proxy proxy;
 
@@ -27,6 +30,7 @@ public class ProxySelector extends java.net.ProxySelector {
 
     @Override
     public List<Proxy> select(URI uri) {
+        Logger.t(TAG).d(uri.getHost());
         if (proxy == null || hosts == null || hosts.isEmpty() || uri.getHost() == null || "127.0.0.1".equals(uri.getHost())) return Collections.singletonList(Proxy.NO_PROXY);
         for (String host : hosts) if (uri.getHost().contains(host) || uri.getHost().matches(host)) return Collections.singletonList(proxy);
         return Collections.singletonList(Proxy.NO_PROXY);
