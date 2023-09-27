@@ -25,6 +25,7 @@ import com.fongmi.android.tv.impl.DohCallback;
 import com.fongmi.android.tv.impl.LiveCallback;
 import com.fongmi.android.tv.impl.ProxyCallback;
 import com.fongmi.android.tv.impl.SiteCallback;
+import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.dialog.ConfigDialog;
 import com.fongmi.android.tv.ui.custom.dialog.DohDialog;
@@ -322,6 +323,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
 
     @Override
     public void setProxy(String proxy) {
+        ExoUtil.reset();
         Setting.putProxy(proxy);
         OkHttp.get().setProxy(proxy);
         Notify.progress(getActivity());

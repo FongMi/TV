@@ -2,6 +2,8 @@ package com.fongmi.android.tv.bean;
 
 import android.text.TextUtils;
 
+import androidx.annotation.Nullable;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
@@ -20,6 +22,14 @@ public class Rule {
     @SerializedName("regex")
     private List<String> regex;
 
+    public static Rule create(String name) {
+        return new Rule(name);
+    }
+
+    public Rule(String name) {
+        this.name = name;
+    }
+
     public static List<Rule> arrayFrom(JsonElement element) {
         Type listType = new TypeToken<List<Rule>>() {}.getType();
         List<Rule> items = new Gson().fromJson(element, listType);
@@ -36,5 +46,13 @@ public class Rule {
 
     public List<String> getRegex() {
         return regex == null ? Collections.emptyList() : regex;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Rule)) return false;
+        Rule it = (Rule) obj;
+        return getName().equals(it.getName());
     }
 }

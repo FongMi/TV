@@ -284,6 +284,7 @@ public class ApiConfig {
 
     public void setRules(List<Rule> rules) {
         for (Rule rule : rules) if ("proxy".equals(rule.getName())) OkHttp.selector().setHosts(rule.getHosts());
+        rules.remove(Rule.create("proxy"));
         this.rules = rules;
     }
 
