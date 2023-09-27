@@ -3,6 +3,7 @@ package com.fongmi.android.tv.ui.activity;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.view.KeyEvent;
 import android.view.View;
 
@@ -19,6 +20,8 @@ import androidx.media3.ui.PlayerView;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
@@ -52,6 +55,7 @@ import com.fongmi.android.tv.ui.presenter.ChannelPresenter;
 import com.fongmi.android.tv.ui.presenter.GroupPresenter;
 import com.fongmi.android.tv.utils.Biometric;
 import com.fongmi.android.tv.utils.Clock;
+import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Traffic;
@@ -138,7 +142,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mR3 = this::setChannelActivated;
         mR4 = this::setTraffic;
         mHides = new ArrayList<>();
-        mPlayers = new Players().init();
+        mPlayers = new Players().init(this);
         mKeyDown = CustomKeyDownLive.create(this);
         mClock = Clock.create(mBinding.widget.time);
         mFormatDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
@@ -436,6 +440,26 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         this.count = 0;
     }
 
+    private void setArtwork(String url) {
+        ImgUtil.load(url, R.drawable.radio, new CustomTarget<>() {
+            @Override
+            public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                getExo().setDefaultArtwork(resource);
+                getIjk().setDefaultArtwork(resource);
+            }
+
+            @Override
+            public void onLoadFailed(@Nullable Drawable error) {
+                getExo().setDefaultArtwork(error);
+                getIjk().setDefaultArtwork(error);
+            }
+
+            @Override
+            public void onLoadCleared(@Nullable Drawable placeholder) {
+            }
+        });
+    }
+
     @Override
     public void onItemClick(Group item) {
         mChannelAdapter.setItems(item.getChannel(), null);
@@ -481,6 +505,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void setChannel(Channel item) {
         mPlayers.setPlayer(getPlayerType(item.getPlayerType()));
+        setArtwork(item.getLogo());
         App.post(mR3, 100);
         mChannel = item;
         setPlayerView();
@@ -612,7 +637,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void checkError(ErrorEvent event) {
-        if (getHome().getPlayerType() == -1 && event.isFormat() && getToggleCount() < 2 && mPlayers.getPlayer() != Players.SYS) {
+        if (getHome().getPlayerType() == -1 && event.isFormat() && event.getRetry() > 0 && getToggleCount() < 2 && mPlayers.getPlayer() != Players.SYS) {
             toggleCount++;
             nextPlayer();
         } else {

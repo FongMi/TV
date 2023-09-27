@@ -21,6 +21,7 @@ import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.impl.ParseCallback;
 import com.fongmi.android.tv.utils.Sniffer;
 import com.github.catvod.crawler.Spider;
+import com.google.common.net.HttpHeaders;
 
 import java.io.ByteArrayInputStream;
 import java.util.Map;
@@ -58,7 +59,7 @@ public class CustomWebView extends WebView {
 
     private void setUserAgent(Map<String, String> headers) {
         for (String key : headers.keySet()) {
-            if (key.equalsIgnoreCase("user-agent")) {
+            if (key.equalsIgnoreCase(HttpHeaders.USER_AGENT)) {
                 getSettings().setUserAgentString(headers.get(key));
                 break;
             }
@@ -114,7 +115,7 @@ public class CustomWebView extends WebView {
 
     private void post(Map<String, String> headers, String url) {
         String cookie = CookieManager.getInstance().getCookie(url);
-        if (cookie != null) headers.put("cookie", cookie);
+        if (cookie != null) headers.put(HttpHeaders.COOKIE, cookie);
         onParseSuccess(headers, url);
     }
 

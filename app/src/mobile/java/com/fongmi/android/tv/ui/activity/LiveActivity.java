@@ -5,19 +5,25 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.media.MediaMetadataCompat;
 import android.view.View;
 
 import androidx.annotation.Dimension;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ShareCompat;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.media3.common.C;
 import androidx.media3.common.Player;
 import androidx.media3.ui.PlayerView;
 import androidx.viewbinding.ViewBinding;
 
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
@@ -31,6 +37,7 @@ import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.bean.Track;
 import com.fongmi.android.tv.cast.CastVideo;
 import com.fongmi.android.tv.databinding.ActivityLiveBinding;
+import com.fongmi.android.tv.event.ActionEvent;
 import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.impl.Callback;
@@ -41,7 +48,6 @@ import com.fongmi.android.tv.model.LiveViewModel;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.player.Source;
-import com.fongmi.android.tv.receiver.PiPReceiver;
 import com.fongmi.android.tv.service.PlaybackService;
 import com.fongmi.android.tv.ui.adapter.ChannelAdapter;
 import com.fongmi.android.tv.ui.adapter.GroupAdapter;
@@ -54,6 +60,7 @@ import com.fongmi.android.tv.ui.custom.dialog.SubtitleDialog;
 import com.fongmi.android.tv.ui.custom.dialog.TrackDialog;
 import com.fongmi.android.tv.utils.Biometric;
 import com.fongmi.android.tv.utils.Clock;
+import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.PiP;
 import com.fongmi.android.tv.utils.ResUtil;
@@ -76,24 +83,26 @@ import okhttp3.Call;
 import okhttp3.Response;
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class LiveActivity extends BaseActivity implements CustomKeyDownLive.Listener, CastDialog.Listener, PiPReceiver.Listener, TrackDialog.Listener, Biometric.Callback, PassCallback, LiveCallback, GroupAdapter.OnClickListener, ChannelAdapter.OnClickListener, SubtitleCallback {
+public class LiveActivity extends BaseActivity implements CustomKeyDownLive.Listener, CastDialog.Listener, TrackDialog.Listener, Biometric.Callback, PassCallback, LiveCallback, GroupAdapter.OnClickListener, ChannelAdapter.OnClickListener, SubtitleCallback {
 
-    private ChannelAdapter mChannelAdapter;
     private ActivityLiveBinding mBinding;
+    private Observer<Channel> mObserveChannel;
+    private ChannelAdapter mChannelAdapter;
     private SimpleDateFormat mFormatDate;
     private SimpleDateFormat mFormatTime;
     private CustomKeyDownLive mKeyDown;
     private GroupAdapter mGroupAdapter;
     private LiveViewModel mViewModel;
-    private PiPReceiver mReceiver;
     private List<Group> mHides;
     private Players mPlayers;
     private Channel mChannel;
     private Group mGroup;
+    private Runnable mR0;
     private Runnable mR1;
     private Runnable mR2;
     private Runnable mR3;
     private Clock mClock;
+    private boolean foreground;
     private boolean rotate;
     private boolean stop;
     private boolean lock;
@@ -148,13 +157,16 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mFormatDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         mKeyDown = CustomKeyDownLive.create(this, mBinding.video);
         mClock = Clock.create(mBinding.widget.time);
-        mReceiver = new PiPReceiver(this);
-        mPlayers = new Players().init();
+        setPadding(mBinding.control.getRoot());
+        mPlayers = new Players().init(this);
+        mObserveChannel = this::start;
         mHides = new ArrayList<>();
+        mR0 = this::stopService;
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
         mR3 = this::hideInfo;
         mPiP = new PiP();
+        setForeground(true);
         setRecyclerView();
         setVideoView();
         setViewModel();
@@ -165,11 +177,11 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     @SuppressLint("ClickableViewAccessibility")
     protected void initEvent() {
         mBinding.control.seek.setListener(mPlayers);
-        mBinding.control.back.setOnClickListener(view -> onBack());
-        mBinding.control.lock.setOnClickListener(view -> onLock());
         mBinding.control.cast.setOnClickListener(view -> onCast());
         mBinding.control.share.setOnClickListener(view -> onShare());
-        mBinding.control.rotate.setOnClickListener(view -> onRotate());
+        mBinding.control.right.back.setOnClickListener(view -> onBack());
+        mBinding.control.right.lock.setOnClickListener(view -> onLock());
+        mBinding.control.right.rotate.setOnClickListener(view -> onRotate());
         mBinding.control.action.text.setOnClickListener(this::onTrack);
         mBinding.control.action.audio.setOnClickListener(this::onTrack);
         mBinding.control.action.video.setOnClickListener(this::onTrack);
@@ -231,7 +243,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
 
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(LiveViewModel.class);
-        mViewModel.channel.observe(this, result -> mPlayers.start(result, getHome().getTimeout()));
+        mViewModel.channel.observeForever(mObserveChannel);
         mViewModel.live.observe(this, live -> {
             hideProgress();
             setGroup(live);
@@ -276,17 +288,6 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mBinding.channel.scrollToPosition(mGroup.getPosition());
     }
 
-    private void onBack() {
-        finish();
-    }
-
-    private void onLock() {
-        setLock(!isLock());
-        mKeyDown.setLock(isLock());
-        checkLockImg();
-        showControl();
-    }
-
     private void onCast() {
         CastDialog.create().video(CastVideo.get(mBinding.control.title.getText().toString(), getUrl())).fm(false).show(this);
     }
@@ -298,10 +299,27 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         builder.startChooser();
     }
 
+    private void onBack() {
+        finish();
+    }
+
+    private void onLock() {
+        setLock(!isLock());
+        mKeyDown.setLock(isLock());
+        checkLockImg();
+        showControl();
+    }
+
     private void onRotate() {
         setR1Callback();
         setRotate(!isRotate());
         setRequestedOrientation(ResUtil.isLand(this) ? ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+    }
+
+    private void checkPlay() {
+        checkPlayImg(!mPlayers.isPlaying());
+        if (mPlayers.isPlaying()) mPlayers.pause();
+        else mPlayers.play();
     }
 
     private void onTrack(View view) {
@@ -410,9 +428,9 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     private void showControl() {
         mBinding.control.share.setVisibility(getUrl() == null ? View.GONE : View.VISIBLE);
         mBinding.control.cast.setVisibility(getUrl() == null ? View.GONE : View.VISIBLE);
-        mBinding.control.rotate.setVisibility(isLock() ? View.GONE : View.VISIBLE);
+        mBinding.control.right.rotate.setVisibility(isLock() ? View.GONE : View.VISIBLE);
+        mBinding.control.right.back.setVisibility(isLock() ? View.GONE : View.VISIBLE);
         mBinding.control.bottom.setVisibility(isLock() ? View.GONE : View.VISIBLE);
-        mBinding.control.back.setVisibility(isLock() ? View.GONE : View.VISIBLE);
         mBinding.control.top.setVisibility(isLock() ? View.GONE : View.VISIBLE);
         mBinding.control.getRoot().setVisibility(View.VISIBLE);
         setR1Callback();
@@ -441,6 +459,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
 
     private void showEpg() {
         mBinding.widget.play.setText(mChannel.getData().getEpg());
+        setMetadata();
     }
 
     private void setTraffic() {
@@ -467,6 +486,28 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         this.passCount = 0;
     }
 
+    private void setArtwork(String url) {
+        ImgUtil.load(url, R.drawable.radio, new CustomTarget<>() {
+            @Override
+            public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                getExo().setDefaultArtwork(resource);
+                getIjk().setDefaultArtwork(resource);
+                setMetadata();
+            }
+
+            @Override
+            public void onLoadFailed(@Nullable Drawable error) {
+                getExo().setDefaultArtwork(error);
+                getIjk().setDefaultArtwork(error);
+                setMetadata();
+            }
+
+            @Override
+            public void onLoadCleared(@Nullable Drawable placeholder) {
+            }
+        });
+    }
+
     @Override
     public void onItemClick(Group item) {
         mGroupAdapter.setSelected(mGroup = item);
@@ -483,6 +524,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     public void onItemClick(Channel item) {
         mGroup.setPosition(mChannelAdapter.setSelected(item.group(mGroup)));
         mPlayers.setPlayer(getPlayerType(item.getPlayerType()));
+        setArtwork(item.getLogo());
         mChannel = item;
         setPlayerView();
         showInfo();
@@ -554,8 +596,17 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         setUrl(null);
     }
 
+    private void start(Channel result) {
+        mPlayers.start(result, getHome().getTimeout());
+    }
+
+    private void checkPlayImg(boolean playing) {
+        mPiP.update(this, playing);
+        ActionEvent.update();
+    }
+
     private void checkLockImg() {
-        mBinding.control.lock.setImageResource(isLock() ? R.drawable.ic_control_lock_on : R.drawable.ic_control_lock_off);
+        mBinding.control.right.lock.setImageResource(isLock() ? R.drawable.ic_control_lock_on : R.drawable.ic_control_lock_off);
     }
 
     private void release() {
@@ -603,6 +654,19 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onActionEvent(ActionEvent event) {
+        if (ActionEvent.PLAY.equals(event.getAction()) || ActionEvent.PAUSE.equals(event.getAction())) {
+            checkPlay();
+        } else if (ActionEvent.NEXT.equals(event.getAction())) {
+            nextChannel();
+        } else if (ActionEvent.PREV.equals(event.getAction())) {
+            prevChannel();
+        } else if (ActionEvent.STOP.equals(event.getAction())) {
+            finish();
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onPlayerEvent(PlayerEvent event) {
         switch (event.getState()) {
             case 0:
@@ -616,12 +680,13 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
                 break;
             case Player.STATE_READY:
                 checkRotate();
+                setMetadata();
                 resetToggle();
                 hideProgress();
                 mPlayers.reset();
                 setSpeedVisible();
                 setTrackVisible(true);
-                mPiP.update(this, mPlayers.isPlaying());
+                checkPlayImg(mPlayers.isPlaying());
                 mBinding.control.size.setText(mPlayers.getSizeText());
                 if (isVisible(mBinding.control.getRoot())) showControl();
                 break;
@@ -648,6 +713,18 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mBinding.control.action.video.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_VIDEO) ? View.VISIBLE : View.GONE);
     }
 
+    private void setMetadata() {
+        String title = mChannel == null ? "" : mChannel.getName();
+        String artist = mChannel == null ? "" : mChannel.getData().getEpg();
+        MediaMetadataCompat.Builder builder = new MediaMetadataCompat.Builder();
+        builder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, title);
+        builder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, artist);
+        builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, getIjk().getDefaultArtwork());
+        builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, mPlayers.getDuration());
+        mPlayers.setMetadata(builder.build());
+        ActionEvent.update();
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onErrorEvent(ErrorEvent event) {
         if (mPlayers.addRetry() > event.getRetry()) checkError(event);
@@ -655,7 +732,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private void checkError(ErrorEvent event) {
-        if (getHome().getPlayerType() == -1 && event.isFormat() && getToggleCount() < 2 && mPlayers.getPlayer() != Players.SYS) {
+        if (getHome().getPlayerType() == -1 && event.isFormat() && event.getRetry() > 0 && getToggleCount() < 2 && mPlayers.getPlayer() != Players.SYS) {
             toggleCount++;
             nextPlayer();
         } else {
@@ -746,12 +823,22 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         showProgress();
     }
 
+    public boolean isForeground() {
+        return foreground;
+    }
+
+    public void setForeground(boolean foreground) {
+        this.foreground = foreground;
+    }
+
     public boolean isRotate() {
         return rotate;
     }
 
     public void setRotate(boolean rotate) {
         this.rotate = rotate;
+        if (rotate) noPadding(mBinding.control.getRoot());
+        if (!rotate) setPadding(mBinding.control.getRoot());
     }
 
     public boolean isStop() {
@@ -784,6 +871,10 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
 
     public void resetToggle() {
         this.toggleCount = 0;
+    }
+
+    private void stopService() {
+        PlaybackService.stop();
     }
 
     @Override
@@ -855,23 +946,6 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     @Override
-    public void onControlPlay() {
-        mPiP.update(this, !mPlayers.isPlaying());
-        if (mPlayers.isPlaying()) mPlayers.pause();
-        else mPlayers.play();
-    }
-
-    @Override
-    public void onControlNext() {
-        nextChannel();
-    }
-
-    @Override
-    public void onControlPrev() {
-        prevChannel();
-    }
-
-    @Override
     protected void onUserLeaveHint() {
         super.onUserLeaveHint();
         mPiP.enter(this, Setting.getLiveScale() == 2);
@@ -882,14 +956,15 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode) {
         super.onPictureInPictureModeChanged(isInPictureInPictureMode);
         if (isInPictureInPictureMode) {
-            mReceiver.register(this);
+            PlaybackService.start(mPlayers);
             setSubtitle(10);
             hideControl();
             hideInfo();
             hideUI();
         } else {
             hideInfo();
-            mReceiver.unregister(this);
+            setForeground(true);
+            PlaybackService.stop();
             setSubtitle(Setting.getSubtitle());
             if (isStop()) finish();
         }
@@ -910,35 +985,34 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     @Override
     protected void onStart() {
         super.onStart();
+        if (Setting.isBackgroundOff()) mPlayers.play();
+        mClock.stop().start();
         setStop(false);
-        if (PiP.isIn(this)) {
-            PlaybackService.stop();
-        } else {
-            mPlayers.play();
-        }
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        setStop(true);
-        if (PiP.isIn(this)) {
-            PlaybackService.start();
-        } else {
-            mPlayers.pause();
-        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        mClock.start();
+        if (isForeground()) return;
+        App.removeCallbacks(mR0);
+        App.post(mR0, 1000);
+        setForeground(true);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mClock.stop();
+        setForeground(false);
+        App.removeCallbacks(mR0);
+        if (Setting.isBackgroundOn() && !isFinishing()) PlaybackService.start(mPlayers);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (Setting.isBackgroundOff()) mPlayers.pause();
+        if (Setting.isBackgroundOff()) mClock.stop();
+        setStop(true);
     }
 
     @Override
@@ -961,5 +1035,6 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         Source.get().stop();
         PlaybackService.stop();
         App.removeCallbacks(mR1, mR2, mR3);
+        mViewModel.channel.removeObserver(mObserveChannel);
     }
 }

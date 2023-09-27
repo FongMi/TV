@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         minSdk 21
@@ -13,5 +13,5 @@ android {
 
 dependencies {
     implementation project(':catvod')
-    implementation 'wang.harlon.quickjs:wrapper-android:0.21.1'
+    implementation 'wang.harlon.quickjs:wrapper-android:1.0.0-beta'
 }

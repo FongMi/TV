@@ -5,12 +5,12 @@ import android.os.Parcelable;
 import android.text.TextUtils;
 
 import com.github.catvod.utils.Trans;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
-import com.google.gson.reflect.TypeToken;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -28,12 +28,6 @@ public class Filter implements Parcelable {
 
     public static Filter objectFrom(JsonElement element) {
         return new Gson().fromJson(element, Filter.class);
-    }
-
-    public static List<Filter> arrayFrom(String str) {
-        Type listType = new TypeToken<List<Filter>>() {}.getType();
-        List<Filter> items = new Gson().fromJson(str, listType);
-        return items == null ? Collections.emptyList() : items;
     }
 
     public Filter() {
@@ -59,6 +53,11 @@ public class Filter implements Parcelable {
         int index = getValue().indexOf(new Value(v));
         if (index != -1) getValue().get(index).setActivated(true);
         return v;
+    }
+
+    public Filter check() {
+        Iterables.removeIf(getValue(), Predicates.isNull());
+        return this;
     }
 
     public Filter trans() {

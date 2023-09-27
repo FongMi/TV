@@ -26,12 +26,15 @@ import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.impl.ConfigCallback;
 import com.fongmi.android.tv.impl.LiveCallback;
+import com.fongmi.android.tv.impl.ProxyCallback;
 import com.fongmi.android.tv.impl.SiteCallback;
+import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.ui.activity.MainActivity;
 import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.custom.dialog.ConfigDialog;
 import com.fongmi.android.tv.ui.custom.dialog.HistoryDialog;
 import com.fongmi.android.tv.ui.custom.dialog.LiveDialog;
+import com.fongmi.android.tv.ui.custom.dialog.ProxyDialog;
 import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
 import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.FileUtil;
@@ -41,13 +44,14 @@ import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.bean.Doh;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Path;
+import com.github.catvod.utils.Util;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.permissionx.guolindev.PermissionX;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SettingFragment extends BaseFragment implements ConfigCallback, SiteCallback, LiveCallback {
+public class SettingFragment extends BaseFragment implements ConfigCallback, SiteCallback, LiveCallback, ProxyCallback {
 
     private FragmentSettingBinding mBinding;
     private String[] render;
@@ -87,6 +91,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.wallUrl.setText(WallConfig.getDesc());
         mBinding.dohText.setText(getDohList()[getDohIndex()]);
         mBinding.versionText.setText(BuildConfig.VERSION_NAME);
+        mBinding.proxyText.setText(Util.scheme(Setting.getProxy()));
         mBinding.sizeText.setText((size = ResUtil.getStringArray(R.array.select_size))[Setting.getSize()]);
         mBinding.scaleText.setText((scale = ResUtil.getStringArray(R.array.select_scale))[Setting.getScale()]);
         mBinding.playerText.setText((player = ResUtil.getStringArray(R.array.select_player))[Setting.getPlayer()]);
@@ -109,6 +114,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.vod.setOnClickListener(this::onVod);
         mBinding.live.setOnClickListener(this::onLive);
         mBinding.wall.setOnClickListener(this::onWall);
+        mBinding.proxy.setOnClickListener(this::onProxy);
         mBinding.cache.setOnClickListener(this::onCache);
         mBinding.version.setOnClickListener(this::onVersion);
         mBinding.vodHome.setOnClickListener(this::onVodHome);
@@ -316,6 +322,20 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         Setting.putDoh(doh.toString());
         mBinding.dohText.setText(doh.getName());
         ApiConfig.load(Config.vod(), getCallback());
+    }
+
+    private void onProxy(View view) {
+        ProxyDialog.create(this).show();
+    }
+
+    @Override
+    public void setProxy(String proxy) {
+        ExoUtil.reset();
+        Setting.putProxy(proxy);
+        OkHttp.get().setProxy(proxy);
+        Notify.progress(getActivity());
+        ApiConfig.load(Config.vod(), getCallback());
+        mBinding.proxyText.setText(Util.scheme(proxy));
     }
 
     private void onCache(View view) {

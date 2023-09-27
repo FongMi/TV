@@ -97,7 +97,7 @@ public class Epg {
 
     private String format() {
         if (getTitle().isEmpty()) return "";
-        if (getStart().isEmpty() || getEnd().isEmpty()) return ResUtil.getString(R.string.live_epg_now, getTitle());
+        if (getStart().isEmpty() || getEnd().isEmpty()) return ResUtil.getString(R.string.play_now, getTitle());
         return getStart() + " ~ " + getEnd() + "  " + getTitle();
     }
 

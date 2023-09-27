@@ -28,7 +28,7 @@ public class WordAdapter extends RecyclerView.Adapter<WordAdapter.ViewHolder> {
 
     public void addAll(List<String> items) {
         mItems.clear();
-        mItems.addAll(items.subList(0, Math.min(items.size(), 10)));
+        mItems.addAll(items.subList(0, Math.min(items.size(), 20)));
         notifyDataSetChanged();
     }
 

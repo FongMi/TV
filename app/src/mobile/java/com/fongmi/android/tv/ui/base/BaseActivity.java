@@ -3,8 +3,11 @@ package com.fongmi.android.tv.ui.base;
 import android.app.Activity;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.view.DisplayCutout;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -62,6 +65,22 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     protected boolean isGone(View view) {
         return view.getVisibility() == View.GONE;
+    }
+
+    protected void setPadding(ViewGroup layout) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return;
+        DisplayCutout cutout = ResUtil.getDisplay(this).getCutout();
+        if (cutout == null) return;
+        int top = cutout.getSafeInsetTop();
+        int left = cutout.getSafeInsetLeft();
+        int right = cutout.getSafeInsetRight();
+        int bottom = cutout.getSafeInsetBottom();
+        int padding = left | right | top | bottom;
+        layout.setPadding(padding, 0, padding, 0);
+    }
+
+    protected void noPadding(ViewGroup layout) {
+        layout.setPadding(0, 0, 0, 0);
     }
 
     private void setWall() {

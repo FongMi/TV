@@ -58,7 +58,7 @@ public class Url {
         return getValues().isEmpty() || TextUtils.isEmpty(v());
     }
 
-    public boolean isOnly() {
-        return getValues().size() <= 1;
+    public boolean isMulti() {
+        return getValues().size() > 1;
     }
 }

@@ -61,6 +61,10 @@ public class FlagAdapter extends RecyclerView.Adapter<FlagAdapter.ViewHolder> {
         for (Flag item : mItems) Collections.reverse(item.getEpisodes());
     }
 
+    public boolean isEmpty() {
+        return getItemCount() == 0;
+    }
+
     @Override
     public int getItemCount() {
         return mItems.size();

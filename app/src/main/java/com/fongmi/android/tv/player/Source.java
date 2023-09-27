@@ -1,5 +1,6 @@
 package com.fongmi.android.tv.player;
 
+import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.player.extractor.BiliBili;
 import com.fongmi.android.tv.player.extractor.Force;
 import com.fongmi.android.tv.player.extractor.JianPian;
@@ -37,11 +38,23 @@ public class Source {
         extractors.add(new ZLive());
     }
 
-    public String fetch(String url) throws Exception {
+    private Extractor getExtractor(String url) {
         String host = Util.host(url);
         String scheme = Util.scheme(url);
-        for (Extractor extractor : extractors) if (extractor.match(scheme, host)) return extractor.fetch(url.trim());
-        return url;
+        for (Extractor extractor : extractors) if (extractor.match(scheme, host)) return extractor;
+        return null;
+    }
+
+    public String fetch(Result result) throws Exception {
+        String url = result.getUrl().v();
+        Extractor extractor = getExtractor(url);
+        if (extractor != null) result.setParse(0);
+        return extractor == null ? url : extractor.fetch(url.trim());
+    }
+
+    public String fetch(String url) throws Exception {
+        Extractor extractor = getExtractor(url);
+        return extractor == null ? url : extractor.fetch(url.trim());
     }
 
     public void stop() {

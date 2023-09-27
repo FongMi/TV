@@ -7,7 +7,6 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModelProvider;
@@ -43,6 +42,8 @@ import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.net.OkHttp;
+import com.google.android.flexbox.FlexDirection;
+import com.google.android.flexbox.FlexboxLayoutManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -127,8 +128,10 @@ public class CollectActivity extends BaseActivity implements CustomScroller.Call
         mBinding.recycler.setAdapter(mSearchAdapter = new SearchAdapter(this));
         mBinding.wordRecycler.setHasFixedSize(true);
         mBinding.wordRecycler.setAdapter(mWordAdapter = new WordAdapter(this));
+        mBinding.wordRecycler.setLayoutManager(new FlexboxLayoutManager(this, FlexDirection.ROW));
         mBinding.recordRecycler.setHasFixedSize(true);
         mBinding.recordRecycler.setAdapter(mRecordAdapter = new RecordAdapter(this));
+        mBinding.recordRecycler.setLayoutManager(new FlexboxLayoutManager(this, FlexDirection.ROW));
     }
 
     private void setViewType() {
@@ -136,13 +139,11 @@ public class CollectActivity extends BaseActivity implements CustomScroller.Call
     }
 
     private void setViewType(int viewType) {
-        mSearchAdapter.setViewType(viewType);
-        mSearchAdapter.setSize(Product.getSpec(this, ResUtil.dp2px(64), 3));
-        ((GridLayoutManager) mBinding.recycler.getLayoutManager()).setSpanCount(mSearchAdapter.isGrid() ? 2 : 1);
+        int count = Product.getColumn(this) - 1;
+        mSearchAdapter.setViewType(viewType, count);
+        mSearchAdapter.setSize(Product.getSpec(this, ResUtil.dp2px(128 + (count) * 16), count));
+        ((GridLayoutManager) mBinding.recycler.getLayoutManager()).setSpanCount(mSearchAdapter.isGrid() ? count : 1);
         mBinding.view.setImageResource(mSearchAdapter.isGrid() ? R.drawable.ic_action_list : R.drawable.ic_action_grid);
-        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) mBinding.collect.getLayoutParams();
-        params.width = mSearchAdapter.getWidth() + ResUtil.dp2px(24);
-        mBinding.collect.setLayoutParams(params);
     }
 
     private void setViewModel() {
@@ -211,6 +212,7 @@ public class CollectActivity extends BaseActivity implements CustomScroller.Call
         OkHttp.newCall("https://suggest.video.iqiyi.com/?if=mobile&key=" + text).enqueue(new Callback() {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                if (mBinding.keyword.getText().toString().trim().isEmpty()) return;
                 List<String> items = Suggest.get(response.body().string());
                 App.post(() -> mWordAdapter.addAll(items));
             }
@@ -270,8 +272,8 @@ public class CollectActivity extends BaseActivity implements CustomScroller.Call
 
     @Override
     public void onItemClick(Vod item) {
-        if (item.isFolder()) VodActivity.start(this, item.getSiteKey(), Result.folder(item));
-        else DetailActivity.start(this, item.getSiteKey(), item.getVodId(), item.getVodName(), item.getVodPic());
+        if (item.isFolder()) FolderActivity.start(this, item.getSiteKey(), Result.folder(item));
+        else VideoActivity.start(this, item.getSiteKey(), item.getVodId(), item.getVodName(), item.getVodPic());
     }
 
     @Override

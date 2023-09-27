@@ -12,13 +12,18 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.databinding.DialogUaBinding;
 import com.fongmi.android.tv.impl.UaCallback;
+import com.fongmi.android.tv.ui.custom.CustomTextListener;
+import com.fongmi.android.tv.utils.Sniffer;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
+import okhttp3.internal.Util;
 
 public class UaDialog {
 
     private final DialogUaBinding binding;
     private final UaCallback callback;
     private AlertDialog dialog;
+    private boolean append;
 
     public static UaDialog create(Fragment fragment) {
         return new UaDialog(fragment);
@@ -27,6 +32,7 @@ public class UaDialog {
     public UaDialog(Fragment fragment) {
         this.callback = (UaCallback) fragment;
         this.binding = DialogUaBinding.inflate(LayoutInflater.from(fragment.getContext()));
+        this.append = true;
     }
 
     public void show() {
@@ -42,16 +48,36 @@ public class UaDialog {
     }
 
     private void initView() {
-        String ua = Setting.getUa();
-        binding.text.setText(ua);
-        binding.text.setSelection(TextUtils.isEmpty(ua) ? 0 : ua.length());
+        String text = Setting.getUa();
+        binding.text.setText(text);
+        binding.text.setSelection(TextUtils.isEmpty(text) ? 0 : text.length());
     }
 
     private void initEvent() {
+        binding.text.addTextChangedListener(new CustomTextListener() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                detect(s.toString());
+            }
+        });
         binding.text.setOnEditorActionListener((textView, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) dialog.getButton(DialogInterface.BUTTON_POSITIVE).performClick();
             return true;
         });
+    }
+
+    private void detect(String s) {
+        if (append && s.equalsIgnoreCase("c")) {
+            append = false;
+            binding.text.setText(Sniffer.CHROME);
+        } else if (append && s.equalsIgnoreCase("o")) {
+            append = false;
+            binding.text.setText(Util.userAgent);
+        } else if (s.length() > 1) {
+            append = false;
+        } else if (s.length() == 0) {
+            append = true;
+        }
     }
 
     private void onPositive(DialogInterface dialog, int which) {

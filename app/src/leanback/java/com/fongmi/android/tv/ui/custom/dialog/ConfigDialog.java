@@ -20,6 +20,7 @@ import com.fongmi.android.tv.databinding.DialogConfigBinding;
 import com.fongmi.android.tv.event.ServerEvent;
 import com.fongmi.android.tv.impl.ConfigCallback;
 import com.fongmi.android.tv.server.Server;
+import com.fongmi.android.tv.ui.custom.CustomTextListener;
 import com.fongmi.android.tv.utils.QRCode;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Utils;
@@ -36,6 +37,7 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
     private final FragmentActivity activity;
     private final ConfigCallback callback;
     private final AlertDialog dialog;
+    private boolean append;
     private String url;
     private int type;
 
@@ -53,6 +55,7 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
         this.callback = (ConfigCallback) activity;
         this.binding = DialogConfigBinding.inflate(LayoutInflater.from(activity));
         this.dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).create();
+        this.append = true;
     }
 
     public void show() {
@@ -84,6 +87,12 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
         binding.storage.setOnClickListener(this::onStorage);
         binding.positive.setOnClickListener(this::onPositive);
         binding.negative.setOnClickListener(this::onNegative);
+        binding.text.addTextChangedListener(new CustomTextListener() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                detect(s.toString());
+            }
+        });
         binding.text.setOnEditorActionListener((textView, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) binding.positive.performClick();
             return true;
@@ -105,6 +114,20 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
 
     private void onStorage(View view) {
         PermissionX.init(activity).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> binding.storage.setVisibility(allGranted ? View.GONE : View.VISIBLE));
+    }
+
+    private void detect(String s) {
+        if (append && s.equalsIgnoreCase("h")) {
+            append = false;
+            binding.text.append("ttp://");
+        } else if (append && s.equalsIgnoreCase("f")) {
+            append = false;
+            binding.text.append("ile://");
+        } else if (s.length() > 1) {
+            append = false;
+        } else if (s.length() == 0) {
+            append = true;
+        }
     }
 
     private void onPositive(View view) {

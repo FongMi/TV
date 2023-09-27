@@ -15,7 +15,7 @@ import com.fongmi.android.tv.databinding.DialogReceiveBinding;
 import com.fongmi.android.tv.event.CastEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.impl.Callback;
-import com.fongmi.android.tv.ui.activity.DetailActivity;
+import com.fongmi.android.tv.ui.activity.VideoActivity;
 import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.Notify;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -71,7 +71,7 @@ public class ReceiveDialog extends BaseDialog {
 
     private void onReceiveCast() {
         if (ApiConfig.get().getConfig().equals(event.getConfig())) {
-            DetailActivity.cast(getActivity(), event.getHistory().update(ApiConfig.getCid()));
+            VideoActivity.cast(getActivity(), event.getHistory().update(ApiConfig.getCid()));
             dismiss();
         } else {
             showProgress();

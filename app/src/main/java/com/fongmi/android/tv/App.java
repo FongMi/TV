@@ -87,7 +87,7 @@ public class App extends Application {
     }
 
     private LogAdapter getLogAdapter() {
-        return new AndroidLogAdapter(PrettyFormatStrategy.newBuilder().showThreadInfo(false).tag("").build()) {
+        return new AndroidLogAdapter(PrettyFormatStrategy.newBuilder().methodCount(0).showThreadInfo(false).tag("").build()) {
             @Override
             public boolean isLoggable(int priority, String tag) {
                 return true;
@@ -106,6 +106,7 @@ public class App extends Application {
         super.onCreate();
         Notify.createChannel();
         Logger.addLogAdapter(getLogAdapter());
+        OkHttp.get().setProxy(Setting.getProxy());
         OkHttp.get().setDoh(Doh.objectFrom(Setting.getDoh()));
         CaocConfig.Builder.create().backgroundMode(CaocConfig.BACKGROUND_MODE_SILENT).errorActivity(CrashActivity.class).apply();
         registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {

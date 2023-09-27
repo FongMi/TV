@@ -3,12 +3,11 @@ plugins {
 }
 
 android {
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         minSdk 21
         targetSdk 28
-        //noinspection ChromeOsAbiSupport
         ndk { abiFilters "armeabi-v7a" }
     }
 }

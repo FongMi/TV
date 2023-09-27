@@ -3,8 +3,8 @@ plugins {
 }
 
 android {
-    compileSdk 33
-    flavorDimensions "mode", "api", "abi"
+    compileSdk 34
+    flavorDimensions = ["mode", "api", "abi"]
 
     defaultConfig {
         applicationId "com.fongmi.android.tv"
@@ -20,13 +20,13 @@ android {
     productFlavors {
         leanback {
             dimension "mode"
-            versionCode 205
-            versionName "2.0.5"
+            versionCode 206
+            versionName "2.0.6"
         }
         mobile {
             dimension "mode"
-            versionCode 205
-            versionName "2.0.5"
+            versionCode 206
+            versionName "2.0.6"
         }
         java {
             dimension "api"
@@ -36,12 +36,10 @@ android {
         }
         armeabi_v7a {
             dimension "abi"
-            //noinspection ChromeOsAbiSupport
             ndk { abiFilters "armeabi-v7a" }
         }
         arm64_v8a {
             dimension "abi"
-            //noinspection ChromeOsAbiSupport
             ndk { abiFilters "arm64-v8a" }
         }
     }
@@ -53,7 +51,6 @@ android {
     buildTypes {
         release {
             minifyEnabled true
-            zipAlignEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -68,14 +65,13 @@ android {
         targetCompatibility JavaVersion.VERSION_11
     }
 
-    android.applicationVariants.all {
-        variant -> variant.outputs.all {
-            output -> outputFileName = "${variant.productFlavors[0].name}-${variant.productFlavors[1].name}-${variant.productFlavors[2].name}.apk"
+    android.applicationVariants.configureEach { variant ->
+        variant.outputs.configureEach { output ->
+            outputFileName = "${variant.productFlavors[0].name}-${variant.productFlavors[1].name}-${variant.productFlavors[2].name}.apk"
         }
     }
 
     lint {
-        abortOnError false
         disable 'UnsafeOptInUsageError'
     }
 }
@@ -84,12 +80,13 @@ dependencies {
     implementation project(':hook')
     implementation project(':tvbus')
     implementation project(':catvod')
+    implementation project(':danmaku')
     implementation project(':quickjs')
     implementation project(':thunder')
     implementation project(':jianpian')
     implementation project(':forcetech')
     implementation project(':ijkplayer')
-    //pythonImplementation project(':pyramid')
+    implementation platform('org.jetbrains.kotlin:kotlin-bom:1.8.20')
     implementation 'androidx.media3:media3-database:' + media3Version
     implementation 'androidx.media3:media3-datasource:' + media3Version
     implementation 'androidx.media3:media3-datasource-okhttp:' + media3Version
@@ -104,25 +101,27 @@ dependencies {
     implementation 'androidx.media3:media3-ui:1.1.1'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.biometric:biometric:1.1.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel:2.5.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel:2.6.2'
     implementation 'androidx.room:room-runtime:2.5.2'
+    implementation 'androidx.media:media:1.6.0'
     implementation 'cat.ereza:customactivityoncrash:2.4.0'
     implementation 'com.github.bassaer:materialdesigncolors:1.0.0'
     implementation 'com.github.bumptech.glide:glide:4.15.1'
     implementation 'com.github.bumptech.glide:annotations:4.15.1'
     implementation 'com.github.bumptech.glide:okhttp3-integration:4.15.1'
-    implementation 'com.github.TeamNewPipe:NewPipeExtractor:340095515d45ecbee576872c7198992ebd8e4f08'
+    implementation 'com.github.TeamNewPipe:NewPipeExtractor:289db1178ab66694c23893e6a487d4708343c47b'
     implementation 'com.google.android.material:material:1.9.0'
     implementation 'com.google.zxing:core:3.3.0'
     implementation 'com.guolindev.permissionx:permissionx:1.7.1'
     implementation 'org.greenrobot:eventbus:3.3.1'
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
     implementation('org.simpleframework:simple-xml:2.7.1') { exclude group: 'stax', module: 'stax-api' exclude group: 'xpp3', module: 'xpp3' }
-    leanbackImplementation 'androidx.leanback:leanback:1.2.0-alpha02'
+    leanbackImplementation 'androidx.leanback:leanback:1.2.0-alpha03'
     leanbackImplementation 'me.jessyan:autosize:1.2.1'
     mobileImplementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     mobileImplementation 'com.github.chrisbanes:PhotoView:2.3.0'
     mobileImplementation 'com.github.devin1014.DLNA-Cast:dlna-dmc:V1.0.0'
+    mobileImplementation 'com.google.android.flexbox:flexbox:3.0.0'
     mobileImplementation('com.journeyapps:zxing-android-embedded:4.3.0') { transitive = false }
     annotationProcessor 'androidx.room:room-compiler:2.5.2'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.15.1'

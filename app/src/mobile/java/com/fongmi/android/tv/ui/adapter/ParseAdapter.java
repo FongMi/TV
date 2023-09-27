@@ -45,6 +45,10 @@ public class ParseAdapter extends RecyclerView.Adapter<ParseAdapter.ViewHolder> 
         return mItems.get(0);
     }
 
+    public boolean isEmpty() {
+        return getItemCount() == 0;
+    }
+
     @Override
     public int getItemCount() {
         return mItems.size();

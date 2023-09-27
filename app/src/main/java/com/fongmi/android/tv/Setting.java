@@ -14,6 +14,14 @@ public class Setting {
         Prefers.put("doh", doh);
     }
 
+    public static String getProxy() {
+        return Prefers.getString("proxy");
+    }
+
+    public static void putProxy(String proxy) {
+        Prefers.put("proxy", proxy);
+    }
+
     public static String getKeep() {
         return Prefers.getString("keep");
     }
@@ -166,6 +174,14 @@ public class Setting {
         Prefers.put("update", update);
     }
 
+    public static boolean isDanmu() {
+        return Prefers.getBoolean("danmu");
+    }
+
+    public static void putDanmu(boolean danmu) {
+        Prefers.put("danmu", danmu);
+    }
+
     public static String getUa() {
         return Prefers.getString("ua");
     }
@@ -206,6 +222,14 @@ public class Setting {
         Prefers.put("flag", mode);
     }
 
+    public static int getBackground() {
+        return Prefers.getInt("background", 2);
+    }
+
+    public static void putBackground(int background) {
+        Prefers.put("background", background);
+    }
+
     public static int getSiteMode() {
         return Prefers.getInt("site_mode");
     }
@@ -216,5 +240,17 @@ public class Setting {
 
     public static float getThumbnail() {
         return 0.3f * getQuality() + 0.4f;
+    }
+
+    public static boolean isBackgroundOff() {
+        return getBackground() == 0;
+    }
+
+    public static boolean isBackgroundOn() {
+        return getBackground() == 1;
+    }
+
+    public static boolean isBackgroundPiP() {
+        return getBackground() == 2;
     }
 }

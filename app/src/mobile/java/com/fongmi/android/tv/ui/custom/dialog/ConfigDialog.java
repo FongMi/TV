@@ -16,6 +16,7 @@ import com.fongmi.android.tv.api.WallConfig;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.databinding.DialogConfigBinding;
 import com.fongmi.android.tv.impl.ConfigCallback;
+import com.fongmi.android.tv.ui.custom.CustomTextListener;
 import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.Utils;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -26,6 +27,7 @@ public class ConfigDialog {
     private final ConfigCallback callback;
     private final Fragment fragment;
     private AlertDialog dialog;
+    private boolean append;
     private String url;
     private int type;
 
@@ -42,6 +44,7 @@ public class ConfigDialog {
         this.fragment = fragment;
         this.callback = (ConfigCallback) fragment;
         this.binding = DialogConfigBinding.inflate(LayoutInflater.from(fragment.getContext()));
+        this.append = true;
     }
 
     public void show() {
@@ -63,6 +66,12 @@ public class ConfigDialog {
     }
 
     private void initEvent() {
+        binding.text.addTextChangedListener(new CustomTextListener() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                detect(s.toString());
+            }
+        });
         binding.text.setOnEditorActionListener((textView, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) dialog.getButton(DialogInterface.BUTTON_POSITIVE).performClick();
             return true;
@@ -85,6 +94,20 @@ public class ConfigDialog {
     private void onChoose(View view) {
         FileChooser.from(fragment).show();
         dialog.dismiss();
+    }
+
+    private void detect(String s) {
+        if (append && s.equalsIgnoreCase("h")) {
+            append = false;
+            binding.text.append("ttp://");
+        } else if (append && s.equalsIgnoreCase("f")) {
+            append = false;
+            binding.text.append("ile://");
+        } else if (s.length() > 1) {
+            append = false;
+        } else if (s.length() == 0) {
+            append = true;
+        }
     }
 
     private void onPositive(DialogInterface dialog, int which) {

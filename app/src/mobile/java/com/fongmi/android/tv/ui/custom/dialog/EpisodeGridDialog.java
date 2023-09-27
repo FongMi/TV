@@ -13,6 +13,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import com.fongmi.android.tv.bean.Episode;
 import com.fongmi.android.tv.databinding.DialogEpisodeGridBinding;
 import com.fongmi.android.tv.ui.fragment.EpisodeFragment;
+import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.tabs.TabLayoutMediator;
 
@@ -66,13 +67,14 @@ public class EpisodeGridDialog extends BaseDialog {
 
     private void setSpanCount() {
         int total = 0;
+        int row = ResUtil.isLand(getActivity()) ? 5 : 10;
         for (Episode item : episodes) total += item.getName().length();
         int offset = (int) Math.ceil((double) total / episodes.size());
         if (offset >= 12) spanCount = 1;
         else if (offset >= 8) spanCount = 2;
         else if (offset >= 4) spanCount = 3;
         else if (offset >= 2) spanCount = 4;
-        itemCount = spanCount * 10;
+        itemCount = spanCount * row;
     }
 
     private void setTitles() {

@@ -30,8 +30,10 @@ public class SearchAdapter extends RecyclerView.Adapter<BaseVodHolder> {
         this.mItems = new ArrayList<>();
     }
 
-    public void setViewType(int viewType) {
-        Setting.putViewType(this.viewType = viewType);
+    public void setViewType(int viewType, int count) {
+        if (this.viewType > 0 && this.viewType != viewType && count == 1) notifyDataSetChanged();
+        Setting.putViewType(viewType);
+        this.viewType = viewType;
     }
 
     public void setSize(int[] size) {

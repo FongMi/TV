@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import okhttp3.Dns;
+import okhttp3.OkHttpClient;
 
 public abstract class Spider {
 
@@ -64,5 +65,9 @@ public abstract class Spider {
 
     public static Dns safeDns() {
         return OkHttp.dns();
+    }
+
+    public OkHttpClient client() {
+        return OkHttp.client();
     }
 }

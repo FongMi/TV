@@ -99,7 +99,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
         Headers header = getHeader(object.optString("header"));
         ArrayMap<String, String> param = getParam(object.optString("param"));
         if (object.optString("type").equals("stream")) {
-            return new Object[]{code, type, OkHttp.newCall(url, param, header).execute().body().byteStream()};
+            return new Object[]{code, type, OkHttp.newCall(url, header, param).execute().body().byteStream()};
         } else {
             if (content.isEmpty()) content = OkHttp.newCall(url, header).execute().body().string();
             return new Object[]{code, type, new ByteArrayInputStream(content.getBytes())};

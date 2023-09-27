@@ -61,8 +61,8 @@ import java.util.List;
 
 public class HomeActivity extends BaseActivity implements CustomTitleView.Listener, VodPresenter.OnClickListener, FuncPresenter.OnClickListener, HistoryPresenter.OnClickListener {
 
-    private ArrayObjectAdapter mHistoryAdapter;
     private ActivityHomeBinding mBinding;
+    private ArrayObjectAdapter mHistoryAdapter;
     private HistoryPresenter mPresenter;
     private ArrayObjectAdapter mAdapter;
     private SiteViewModel mViewModel;
@@ -107,12 +107,12 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     private void checkAction(Intent intent) {
         if (Intent.ACTION_SEND.equals(intent.getAction())) {
-            DetailActivity.push(this, Uri.parse(intent.getStringExtra(Intent.EXTRA_TEXT)));
+            VideoActivity.push(this, Uri.parse(intent.getStringExtra(Intent.EXTRA_TEXT)));
         } else if (Intent.ACTION_VIEW.equals(intent.getAction()) && intent.getData() != null) {
             if ("text/plain".equals(intent.getType()) || Util.path(intent.getData()).endsWith(".m3u")) {
                 loadLive("file:/" + FileChooser.getPathFromUri(this, intent.getData()));
             } else {
-                DetailActivity.push(this, intent.getData());
+                VideoActivity.push(this, intent.getData());
             }
         }
     }
@@ -283,7 +283,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     public void onItemClick(Vod item) {
-        DetailActivity.start(this, item.getVodId(), item.getVodName(), item.getVodPic());
+        VideoActivity.start(this, item.getVodId(), item.getVodName(), item.getVodPic());
     }
 
     @Override
@@ -294,7 +294,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     public void onItemClick(History item) {
-        DetailActivity.start(this, item.getSiteKey(), item.getVodId(), item.getVodName(), item.getVodPic());
+        VideoActivity.start(this, item.getSiteKey(), item.getVodId(), item.getVodName(), item.getVodPic());
     }
 
     @Override
@@ -355,7 +355,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
                 CollectActivity.start(this, event.getText(), true);
                 break;
             case PUSH:
-                DetailActivity.push(this, event.getText(), true);
+                VideoActivity.push(this, event.getText(), true);
                 break;
         }
     }
@@ -363,7 +363,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onCastEvent(CastEvent event) {
         if (ApiConfig.get().getConfig().equals(event.getConfig())) {
-            DetailActivity.cast(this, event.getHistory().update(ApiConfig.getCid()));
+            VideoActivity.cast(this, event.getHistory().update(ApiConfig.getCid()));
         } else {
             ApiConfig.load(event.getConfig(), getCallback(event));
         }
