@@ -3,7 +3,6 @@ package com.github.catvod.net;
 import android.net.Uri;
 
 import com.github.catvod.utils.Util;
-import com.orhanobut.logger.Logger;
 
 import java.io.IOException;
 import java.net.Authenticator;
