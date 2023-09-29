@@ -77,7 +77,7 @@ public class Parser extends BaseDanmakuParser {
     private void setSpecial() {
         String[] textArr = null;
         try {
-            JSONArray jsonArray = new JSONArray(item.getText());
+            JSONArray jsonArray = new JSONArray(item.getText().toString());
             textArr = new String[jsonArray.length()];
             for (int i = 0; i < textArr.length; i++) {
                 textArr[i] = jsonArray.getString(i);

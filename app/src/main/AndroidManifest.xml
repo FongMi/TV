@@ -51,25 +51,5 @@
             android:name=".ui.activity.CrashActivity"
             android:process=":error_activity" />
 
-        <receiver
-            android:name="androidx.media.session.MediaButtonReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MEDIA_BUTTON" />
-            </intent-filter>
-        </receiver>
-
-        <receiver
-            android:name=".receiver.ActionReceiver"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="${applicationId}.stop" />
-                <action android:name="${applicationId}.prev" />
-                <action android:name="${applicationId}.next" />
-                <action android:name="${applicationId}.play" />
-                <action android:name="${applicationId}.pause" />
-            </intent-filter>
-        </receiver>
-
     </application>
 </manifest>
