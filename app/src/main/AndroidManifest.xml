@@ -58,6 +58,14 @@
         </receiver>
 
         <receiver
+            android:name="android.support.v4.media.session.MediaButtonReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MEDIA_BUTTON" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
             android:name=".receiver.ActionReceiver"
             android:exported="false">
             <intent-filter>
