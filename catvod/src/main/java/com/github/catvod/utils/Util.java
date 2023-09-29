@@ -109,6 +109,14 @@ public class Util {
         return md5(Path.jar(name)).equalsIgnoreCase(md5);
     }
 
+    public static boolean containOrMatch(String text, String regex) {
+        try {
+            return text.contains(regex) || text.matches(regex);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public static long format(SimpleDateFormat format, String src) {
         try {
             return format.parse(src).getTime();
