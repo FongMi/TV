@@ -96,6 +96,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -1033,7 +1034,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                List<String> items = List.of(source);
+                List<String> items = Arrays.asList(source);
                 App.post(() -> mPartAdapter.setItems(items, null));
                 App.post(() -> mBinding.part.setVisibility(View.VISIBLE));
             }
