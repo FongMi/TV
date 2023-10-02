@@ -37,7 +37,7 @@ public class CustomKeyDownLive extends GestureDetector.SimpleOnGestureListener {
     }
 
     private CustomKeyDownLive(Activity activity, View videoView) {
-        this.manager = (AudioManager) App.get().getSystemService(Context.AUDIO_SERVICE);
+        this.manager = (AudioManager) activity.getSystemService(Context.AUDIO_SERVICE);
         this.detector = new GestureDetector(activity, this);
         this.listener = (Listener) activity;
         this.videoView = videoView;
