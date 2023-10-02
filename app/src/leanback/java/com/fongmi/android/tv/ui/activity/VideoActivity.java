@@ -534,7 +534,6 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void seamless(Flag flag, boolean force) {
-        if (mEpisodeAdapter.size() > 0) mBinding.episode.requestFocus();
         if (Setting.getFlag() == 1 && (mHistory.isNew() || !force)) return;
         Episode episode = flag.find(mHistory.getVodRemarks(), getMark().isEmpty());
         setQualityVisible(episode != null && episode.isActivated() && mQualityAdapter.getItemCount() > 1);
@@ -628,7 +627,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void exitFullscreen() {
-        (mEpisodeAdapter.size() > 0 ? mBinding.episode : mBinding.video).requestFocus();
+        mBinding.video.requestFocus();
         mBinding.video.setForeground(ResUtil.getDrawable(R.drawable.selector_video));
         mBinding.video.setLayoutParams(mFrameParams);
         mDanmakuContext.setScaleTextSize(0.8f);
