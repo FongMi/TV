@@ -97,7 +97,7 @@ public class XLTaskHelper {
         TorrentFileInfo[] fileInfos = torrentInfo.mSubFileInfo;
         BtTaskParam taskParam = new BtTaskParam();
         taskParam.setCreateMode(1);
-        taskParam.setMaxConcurrent(10);
+        taskParam.setMaxConcurrent(3);
         taskParam.setSeqId(getSeq().incrementAndGet());
         taskParam.setFilePath(savePath.getAbsolutePath());
         taskParam.setTorrentPath(torrent.getAbsolutePath());

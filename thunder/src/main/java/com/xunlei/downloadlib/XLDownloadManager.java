@@ -1,11 +1,7 @@
 package com.xunlei.downloadlib;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Build;
-import android.util.Log;
 
 import com.github.catvod.Init;
 import com.github.catvod.utils.Prefers;
@@ -27,10 +23,7 @@ import com.xunlei.downloadlib.parameter.XLTaskLocalUrl;
 
 public class XLDownloadManager {
 
-    private final String TAG = XLDownloadManager.class.getSimpleName();
     private XLLoader loader;
-
-    private NetworkChangeReceiver receiver;
     private Context context;
 
     public XLDownloadManager() {
@@ -41,47 +34,23 @@ public class XLDownloadManager {
 
     public void init() {
         InitParam param = new InitParam(context.getFilesDir().getPath());
-        loader.init(param.getSoKey(), "com.android.providers.downloads", param.mAppVersion, "", getPeerId(), getGuid(), param.mStatSavePath, param.mStatCfgSavePath, XLUtil.getNetworkType(context), param.mPermissionLevel, param.mQueryConfOnInit);
+        loader.init(param.getSoKey(), "com.android.providers.downloads", param.mAppVersion, "", getPeerId(), getGuid(), param.mStatSavePath, param.mStatCfgSavePath, 0, param.mPermissionLevel, param.mQueryConfOnInit);
         getDownloadLibVersion(new GetDownloadLibVersion());
         setOSVersion(Build.VERSION.INCREMENTAL + "_alpha");
         setLocalProperty("PhoneModel", Build.MODEL);
         setStatReportSwitch(false);
         setSpeedLimit(-1, -1);
-        registerReceiver();
     }
 
     public void release() {
         if (loader != null) loader.unInit();
-        unregisterReceiver();
         context = null;
         loader = null;
     }
 
-    private void registerReceiver() {
-        receiver = new NetworkChangeReceiver();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
-        context.registerReceiver(receiver, intentFilter);
-    }
-
-    private void unregisterReceiver() {
-        try {
-            context.unregisterReceiver(receiver);
-        } catch (Exception ignored) {
-        }
-    }
-
-    private void notifyNetWorkType(int type) {
-        try {
-            loader.notifyNetWorkType(type);
-        } catch (Error e) {
-            Log.e(TAG, "notifyNetWorkType failed," + e.getMessage());
-        }
-    }
-
     private String getPeerId() {
         String uuid = Prefers.getString("phoneId5", "");
-        if (uuid.isEmpty()) Prefers.put("phoneId5", XLUtil.getPeerId());
+        if (uuid.isEmpty()) Prefers.put("phoneId5", uuid = XLUtil.getPeerId());
         return uuid;
     }
 
@@ -111,18 +80,6 @@ public class XLDownloadManager {
 
     public void setOriginUserAgent(long taskId, String userAgent) {
         loader.setOriginUserAgent(taskId, userAgent);
-    }
-
-    private void notifyNetWorkCarrier(int carrier) {
-        loader.setNotifyNetWorkCarrier(carrier);
-    }
-
-    private void notifyWifiBSSID(String bssid) {
-        try {
-            loader.setNotifyWifiBSSID(bssid);
-        } catch (Error e) {
-            Log.e(TAG, "setNotifyWifiBSSID failed," + e.getMessage());
-        }
     }
 
     public void setDownloadTaskOrigin(long taskId, String str) {
@@ -191,26 +148,5 @@ public class XLDownloadManager {
 
     public void setSpeedLimit(long min, long max) {
         loader.setSpeedLimit(min, max);
-    }
-
-    private class NetworkChangeHandlerThread implements Runnable {
-
-        @Override
-        public void run() {
-            notifyNetWorkCarrier(XLUtil.getNetWorkCarrier(context).ordinal());
-            notifyNetWorkType(XLUtil.getNetworkType(context));
-            notifyWifiBSSID(XLUtil.getBSSID(context));
-        }
-    }
-
-    private class NetworkChangeReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (action != null && action.equals("android.net.conn.CONNECTIVITY_CHANGE")) {
-                new Thread(new NetworkChangeHandlerThread()).start();
-            }
-        }
     }
 }
