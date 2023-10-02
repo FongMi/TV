@@ -42,7 +42,6 @@ public class CollectActivity extends BaseActivity {
     private ActivityCollectBinding mBinding;
     private ArrayObjectAdapter mAdapter;
     private SiteViewModel mViewModel;
-    private PageAdapter mPageAdapter;
     private PauseExecutor mExecutor;
     private List<Site> mSites;
     private View mOldView;
@@ -56,6 +55,10 @@ public class CollectActivity extends BaseActivity {
         if (clear) intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         intent.putExtra("keyword", keyword);
         activity.startActivityForResult(intent, 1000);
+    }
+
+    private CollectFragment getFragment() {
+        return (CollectFragment) mBinding.pager.getAdapter().instantiateItem(mBinding.pager, 0);
     }
 
     private String getKeyword() {
@@ -101,14 +104,14 @@ public class CollectActivity extends BaseActivity {
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mViewModel.search.observe(this, result -> {
-            mAdapter.add(Collect.create(result.getList()));
             getFragment().addVideo(result.getList());
-            mPageAdapter.notifyDataSetChanged();
+            mAdapter.add(Collect.create(result.getList()));
+            mBinding.pager.getAdapter().notifyDataSetChanged();
         });
     }
 
     private void setPager() {
-        mBinding.pager.setAdapter(mPageAdapter = new PageAdapter(getSupportFragmentManager()));
+        mBinding.pager.setAdapter(new PageAdapter(getSupportFragmentManager()));
     }
 
     private void setSite() {
@@ -122,7 +125,7 @@ public class CollectActivity extends BaseActivity {
 
     private void search() {
         mAdapter.add(Collect.all());
-        mPageAdapter.notifyDataSetChanged();
+        mBinding.pager.getAdapter().notifyDataSetChanged();
         mExecutor = new PauseExecutor(Constant.THREAD_POOL, 0, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
         mBinding.result.setText(getString(R.string.collect_result, getKeyword()));
         for (Site site : mSites) mExecutor.execute(() -> search(site));
@@ -155,10 +158,6 @@ public class CollectActivity extends BaseActivity {
             mBinding.pager.setCurrentItem(mBinding.recycler.getSelectedPosition());
         }
     };
-
-    private CollectFragment getFragment() {
-        return (CollectFragment) mPageAdapter.instantiateItem(mBinding.pager, 0);
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
