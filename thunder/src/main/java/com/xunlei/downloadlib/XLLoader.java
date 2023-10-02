@@ -43,25 +43,15 @@ class XLLoader {
 
     public native int init(String str, String str2, String str3, String str4, String str5, String str6, String str7, String str8, int i, int i2, int i3);
 
-    public native int notifyNetWorkType(int i);
-
     public native int parserThunderUrl(String str, ThunderUrlInfo thunderUrlInfo);
 
     public native int releaseTask(long j);
 
-    public native int selectBtSubTask(long j, BtIndexSet btIndexSet);
-
     public native int setDownloadTaskOrigin(long j, String str);
-
-    public native int setHttpHeaderProperty(long j, String str, String str2);
 
     public native int setLocalProperty(String str, String str2);
 
     public native int setMiUiVersion(String str);
-
-    public native int setNotifyNetWorkCarrier(int i);
-
-    public native int setNotifyWifiBSSID(String str);
 
     public native int setOriginUserAgent(long j, String str);
 

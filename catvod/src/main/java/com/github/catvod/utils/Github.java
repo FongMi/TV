@@ -68,11 +68,19 @@ public class Github {
     public static String getSo(String name) {
         try {
             File file = Path.so(name);
+            moveExist(Path.externalCache(), file);
+            moveExist(Path.externalFiles(), file);
             String url = name.startsWith("http") ? name : getUrl("so", file.getName());
             if (file.length() < 300) Path.write(file, OkHttp.newCall(url).execute().body().bytes());
             return file.getAbsolutePath();
         } catch (Exception e) {
             return "";
         }
+    }
+
+    private static void moveExist(File path, File file) {
+        File temp = new File(path, file.getName());
+        if (temp.exists()) Path.copy(temp, file);
+        if (temp.exists()) Path.clear(temp);
     }
 }

@@ -41,6 +41,14 @@ public class Path {
         return Init.context().getFilesDir();
     }
 
+    public static File externalFiles() {
+        return Init.context().getExternalFilesDir("");
+    }
+
+    public static File externalCache() {
+        return Init.context().getExternalCacheDir();
+    }
+
     public static String rootPath() {
         return root().getAbsolutePath();
     }
