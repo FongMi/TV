@@ -493,6 +493,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         setText(mBinding.director, R.string.detail_director, Html.fromHtml(item.getVodDirector()).toString());
         mFlagAdapter.setItems(item.getVodFlags(), null);
         mBinding.content.setMaxLines(getMaxLines());
+        mBinding.video.requestFocus();
         setArtwork(item.getVodPic());
         getPart(item.getVodName());
         App.removeCallbacks(mR3);
