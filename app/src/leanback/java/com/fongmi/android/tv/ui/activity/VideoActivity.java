@@ -132,6 +132,8 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private Runnable mR2;
     private Runnable mR3;
     private Clock mClock;
+    private View mFocus1;
+    private View mFocus2;
 
     public static void push(FragmentActivity activity, Uri uri) {
         if (Sniffer.isPush(uri)) push(activity, uri.toString(), true);
@@ -615,6 +617,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void enterFullscreen() {
+        mFocus1 = getCurrentFocus();
         mBinding.video.requestFocus();
         mBinding.video.setForeground(null);
         mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
@@ -627,11 +630,11 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void exitFullscreen() {
-        mBinding.video.requestFocus();
         mBinding.video.setForeground(ResUtil.getDrawable(R.drawable.selector_video));
         mBinding.video.setLayoutParams(mFrameParams);
         mDanmakuContext.setScaleTextSize(0.8f);
         mKeyDown.setFull(false);
+        mFocus1.requestFocus();
         setFullscreen(false);
         setSubtitle(16);
         hideInfo();
@@ -834,7 +837,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     private void onToggle() {
         if (isVisible(mBinding.control.getRoot())) hideControl();
-        else showControl(mBinding.control.next);
+        else showControl(mFocus2 == null ? mBinding.control.next : mFocus2);
     }
 
     private void showProgress() {
@@ -1296,6 +1299,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (isFullscreen() && Utils.isMenuKey(event)) onToggle();
         if (isVisible(mBinding.control.getRoot())) setR1Callback();
+        if (isVisible(mBinding.control.getRoot())) mFocus2 = getCurrentFocus();
         if (isFullscreen() && isGone(mBinding.control.getRoot()) && mKeyDown.hasEvent(event)) return mKeyDown.onKeyDown(event);
         return super.dispatchKeyEvent(event);
     }
@@ -1369,7 +1373,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     @Override
     public void onKeyDown() {
-        showControl(mBinding.control.next);
+        showControl(mFocus2 == null ? mBinding.control.next : mFocus2);
     }
 
     @Override
