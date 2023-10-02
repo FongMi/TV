@@ -493,7 +493,6 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         setText(mBinding.director, R.string.detail_director, Html.fromHtml(item.getVodDirector()).toString());
         mFlagAdapter.setItems(item.getVodFlags(), null);
         mBinding.content.setMaxLines(getMaxLines());
-        mBinding.video.requestFocus();
         setArtwork(item.getVodPic());
         getPart(item.getVodName());
         App.removeCallbacks(mR3);
@@ -522,6 +521,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mBinding.flag.setSelectedPosition(mFlagAdapter.indexOf(item));
         notifyItemChanged(mBinding.flag, mFlagAdapter);
         setEpisodeAdapter(item.getEpisodes());
+        mBinding.episode.requestFocus();
         setQualityVisible(false);
         seamless(item, force);
     }
