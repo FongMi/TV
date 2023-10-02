@@ -626,6 +626,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         setSubtitle(Setting.getSubtitle());
         mKeyDown.setFull(true);
         setFullscreen(true);
+        mFocus2 = null;
         onPlay();
     }
 
@@ -637,6 +638,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mFocus1.requestFocus();
         setFullscreen(false);
         setSubtitle(16);
+        mFocus2 = null;
         hideInfo();
     }
 
