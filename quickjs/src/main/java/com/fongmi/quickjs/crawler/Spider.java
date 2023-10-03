@@ -26,7 +26,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -40,13 +39,11 @@ public class Spider extends com.github.catvod.crawler.Spider {
     private final DexClassLoader dex;
     private QuickJSContext ctx;
     private JSObject jsObject;
-    private final String name;
     private final String key;
     private final String api;
     private boolean cat;
 
     public Spider(String key, String api, DexClassLoader dex) throws Exception {
-        this.name = "__" + UUID.randomUUID().toString().replace("-", "") + "__";
         this.executor = Executors.newSingleThreadExecutor();
         this.key = key;
         this.api = api;
@@ -136,28 +133,27 @@ public class Spider extends com.github.catvod.crawler.Spider {
         submit(() -> {
             if (ctx == null) createCtx();
             if (dex != null) createDex();
-            String content = getContent();
-            ctx.evaluateModule(content, api);
-            jsObject = (JSObject) ctx.getProperty(ctx.getGlobalObject(), name);
+            createObj();
             return null;
         }).get();
     }
 
     private void createCtx() {
         ctx = QuickJSContext.create();
-        ctx.setConsole(new Console());
+        ctx.evaluate(Path.asset("js/lib/http.js"));
         Global.create(ctx, executor).setProperty();
         ctx.getGlobalObject().setProperty("local", Local.class);
-        ctx.getGlobalObject().getContext().evaluate(Path.asset("js/lib/http.js"));
-        ctx.setModuleLoader(new QuickJSContext.DefaultModuleLoader() {
+        ctx.getGlobalObject().setProperty("console", Console.class);
+        ctx.setModuleLoader(new QuickJSContext.BytecodeModuleLoader() {
             @Override
             public String moduleNormalizeName(String baseModuleName, String moduleName) {
                 return UriUtil.resolve(baseModuleName, moduleName);
             }
 
             @Override
-            public String getModuleStringCode(String moduleName) {
-                return Module.get().fetch(moduleName);
+            public byte[] getModuleBytecode(String moduleName) {
+                String code = Module.get().fetch(moduleName);
+                return code.startsWith("//bb") ? Module.get().bb(code) : ctx.compileModule(code, moduleName);
             }
         });
     }
@@ -205,17 +201,20 @@ public class Spider extends com.github.catvod.crawler.Spider {
         });
     }
 
-    private String getContent() {
-        String global = "globalThis." + name;
+    private void createObj() {
+        String spider = "__JS_SPIDER__";
+        String global = "globalThis." + spider;
         String content = Module.get().fetch(api);
+        String catOnly = "\n" + global + " = __jsEvalReturn();";
         if (content.contains("__jsEvalReturn")) {
             cat = true;
-            return content.concat(global + " = __jsEvalReturn()");
-        } else if (content.contains("__JS_SPIDER__")) {
-            return content.replace("__JS_SPIDER__", global);
+            ctx.evaluateModule(content.concat(catOnly), api);
+        } else if (content.contains(spider)) {
+            ctx.evaluateModule(content.replace(spider, global), api);
         } else {
-            return content.replaceAll("export default.*?[{]", global + " = {");
+            ctx.evaluateModule(content.replaceAll("export default.*?[{]", global + " = {"), api);
         }
+        jsObject = (JSObject) ctx.getProperty(ctx.getGlobalObject(), spider);
     }
 
     private Object[] proxy1(Map<String, String> params) throws Exception {

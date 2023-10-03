@@ -33,6 +33,7 @@ public class Module {
     public String fetch(String name) {
         if (cache.contains(name)) return cache.get(name);
         if (name.startsWith("http")) cache.put(name, request(name));
+        if (name.startsWith("lib/")) cache.put(name, Path.asset("js/" + name));
         if (name.startsWith("assets")) cache.put(name, Path.asset(name.substring(9)));
         return cache.get(name);
     }
