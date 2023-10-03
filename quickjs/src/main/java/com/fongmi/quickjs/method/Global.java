@@ -7,10 +7,11 @@ import androidx.annotation.NonNull;
 
 import com.fongmi.quickjs.bean.Req;
 import com.fongmi.quickjs.utils.Connect;
+import com.fongmi.quickjs.utils.JSUtil;
 import com.fongmi.quickjs.utils.Parser;
 import com.fongmi.quickjs.utils.Proxy;
 import com.github.catvod.utils.Trans;
-import com.google.gson.Gson;
+import com.whl.quickjs.wrapper.JSArray;
 import com.whl.quickjs.wrapper.JSFunction;
 import com.whl.quickjs.wrapper.JSMethod;
 import com.whl.quickjs.wrapper.JSObject;
@@ -38,7 +39,6 @@ public class Global {
     private final QuickJSContext ctx;
     private final Parser parser;
     private final Timer timer;
-    private final Gson gson;
 
     public static Global create(QuickJSContext ctx, ExecutorService executor) {
         return new Global(ctx, executor);
@@ -48,7 +48,6 @@ public class Global {
         this.parser = new Parser();
         this.executor = executor;
         this.timer = new Timer();
-        this.gson = new Gson();
         this.ctx = ctx;
     }
 
@@ -72,21 +71,13 @@ public class Global {
     @Keep
     @JSMethod
     public String s2t(String text) {
-        try {
-            return Trans.s2t(false, text);
-        } catch (Exception e) {
-            return "";
-        }
+        return Trans.s2t(false, text);
     }
 
     @Keep
     @JSMethod
     public String t2s(String text) {
-        try {
-            return Trans.t2s(false, text);
-        } catch (Exception e) {
-            return "";
-        }
+        return Trans.t2s(false, text);
     }
 
     @Keep
@@ -134,51 +125,31 @@ public class Global {
     @Keep
     @JSMethod
     public String pd(String html, String rule, String urlKey) {
-        try {
-            return parser.pdfh(html, rule, urlKey);
-        } catch (Exception e) {
-            return "";
-        }
-    }
-
-    @Keep
-    @JSMethod
-    public Object pdfa(String html, String rule) {
-        try {
-            return ctx.parse(gson.toJson(parser.pdfa(html, rule)));
-        } catch (Exception e) {
-            return ctx.createNewJSObject();
-        }
+        return parser.pdfh(html, rule, urlKey);
     }
 
     @Keep
     @JSMethod
     public String pdfh(String html, String rule) {
-        try {
-            return parser.pdfh(html, rule, "");
-        } catch (Exception e) {
-            return "";
-        }
+        return parser.pdfh(html, rule, "");
     }
 
     @Keep
     @JSMethod
-    public Object pdfl(String html, String rule, String texts, String urls, String urlKey) {
-        try {
-            return ctx.parse(gson.toJson(parser.pdfl(html, rule, texts, urls, urlKey)));
-        } catch (Exception e) {
-            return ctx.createNewJSObject();
-        }
+    public JSArray pdfa(String html, String rule) {
+        return JSUtil.toArray(ctx, parser.pdfa(html, rule));
+    }
+
+    @Keep
+    @JSMethod
+    public JSArray pdfl(String html, String rule, String texts, String urls, String urlKey) {
+        return JSUtil.toArray(ctx, parser.pdfl(html, rule, texts, urls, urlKey));
     }
 
     @Keep
     @JSMethod
     public String joinUrl(String parent, String child) {
-        try {
-            return parser.joinUrl(parent, child);
-        } catch (Exception e) {
-            return "";
-        }
+        return parser.joinUrl(parent, child);
     }
 
     @Keep
