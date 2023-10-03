@@ -8,32 +8,32 @@ import java.util.concurrent.Callable;
 
 public class Function implements Callable<Object> {
 
-    private final JSObject jsObject;
+    private final JSObject object;
     private final Object[] args;
     private final String name;
     private Object result;
 
-    public static Function call(JSObject jsObject, String name, Object[] args) {
-        return new Function(jsObject, name, args);
+    public static Function call(JSObject object, String name, Object[] args) {
+        return new Function(object, name, args);
     }
 
-    private Function(JSObject jsObject, String name, Object[] args) {
-        this.jsObject = jsObject;
+    private Function(JSObject object, String name, Object[] args) {
+        this.object = object;
         this.name = name;
         this.args = args;
     }
 
     @Override
     public Object call() throws Exception {
-        result = jsObject.getJSFunction(name).call(args);
+        result = object.getJSFunction(name).call(args);
         if (!(result instanceof JSObject)) return result;
         JSObject promise = (JSObject) result;
         JSFunction then = promise.getJSFunction("then");
-        if (then != null) then.call(jsCallFunction);
+        if (then != null) then.call(func);
         return result;
     }
 
-    private final JSCallFunction jsCallFunction = new JSCallFunction() {
+    private final JSCallFunction func = new JSCallFunction() {
         @Override
         public Object call(Object... args) {
             return result = args[0];

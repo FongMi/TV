@@ -1,6 +1,7 @@
 package com.fongmi.quickjs.utils;
 
 import android.net.Uri;
+import android.util.Base64;
 
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Path;
@@ -51,5 +52,13 @@ public class Module {
             e.printStackTrace();
             return "";
         }
+    }
+
+    public byte[] bb(String content) {
+        byte[] bytes = Base64.decode(content.substring(4), Base64.DEFAULT);
+        byte[] newBytes = new byte[bytes.length - 4];
+        newBytes[0] = 1;
+        System.arraycopy(bytes, 5, newBytes, 1, bytes.length - 5);
+        return newBytes;
     }
 }

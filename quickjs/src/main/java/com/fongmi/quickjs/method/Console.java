@@ -5,7 +5,7 @@ import com.whl.quickjs.wrapper.QuickJSContext;
 
 public class Console implements QuickJSContext.Console {
 
-    private static final String TAG = Console.class.getSimpleName();
+    private static final String TAG = "quickjs";
 
     @Override
     public void log(String info) {
