@@ -173,6 +173,11 @@ public class Path {
         }
     }
 
+    public static void move(File in, File out) {
+        copy(in, out);
+        clear(in);
+    }
+
     public static void copy(File in, File out) {
         try {
             copy(new FileInputStream(in), new FileOutputStream(out));

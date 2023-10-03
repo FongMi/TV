@@ -80,7 +80,6 @@ public class Github {
 
     private static void moveExist(File path, File file) {
         File temp = new File(path, file.getName());
-        if (temp.exists()) Path.copy(temp, file);
-        if (temp.exists()) Path.clear(temp);
+        if (temp.exists()) Path.move(temp, file);
     }
 }
