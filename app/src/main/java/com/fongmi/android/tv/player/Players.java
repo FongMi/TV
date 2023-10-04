@@ -486,7 +486,9 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     private boolean isIllegal(String url) {
         Uri uri = Uri.parse(url);
-        return TextUtils.isEmpty(uri.getScheme()) || TextUtils.isEmpty(uri.getHost());
+        String host = com.github.catvod.utils.Util.host(uri);
+        String scheme = com.github.catvod.utils.Util.scheme(uri);
+        return !scheme.equals("file") && (host.isEmpty() || scheme.isEmpty());
     }
 
     @Override
