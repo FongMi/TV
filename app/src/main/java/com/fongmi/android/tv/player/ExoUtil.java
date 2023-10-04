@@ -81,7 +81,7 @@ public class ExoUtil {
     }
 
     public static int getRetry(int errorCode) {
-        if (errorCode == PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED) return 0;
+        if (errorCode == PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED || errorCode == PlaybackException.ERROR_CODE_IO_FILE_NOT_FOUND) return 0;
         if (errorCode == PlaybackException.ERROR_CODE_PARSING_MANIFEST_MALFORMED || errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED || errorCode == PlaybackException.ERROR_CODE_IO_UNSPECIFIED) return 2;
         return 1;
     }

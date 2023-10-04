@@ -3,6 +3,7 @@ package com.fongmi.android.tv.player;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
@@ -355,7 +356,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     public void start(Channel channel, int timeout) {
-        if (channel.getUrl().isEmpty()) {
+        if (isIllegal(channel.getUrl())) {
             ErrorEvent.url();
         } else {
             this.timeout = timeout;
@@ -366,7 +367,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     public void start(Result result, boolean useParse, int timeout) {
         if (result.hasMsg()) {
             ErrorEvent.extract(result.getMsg());
-        } else if (result.getUrl().isEmpty()) {
+        } else if (isIllegal(result.getRealUrl())) {
             ErrorEvent.url();
         } else if (result.getParse(1) == 1 || result.getJx() == 1) {
             stopParse();
@@ -481,6 +482,11 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     private boolean hasDanmu() {
         return danmuView != null && danmuView.isPrepared();
+    }
+
+    private boolean isIllegal(String url) {
+        Uri uri = Uri.parse(url);
+        return TextUtils.isEmpty(uri.getScheme()) || TextUtils.isEmpty(uri.getHost());
     }
 
     @Override
