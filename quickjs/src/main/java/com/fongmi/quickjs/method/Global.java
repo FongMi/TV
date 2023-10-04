@@ -1,16 +1,16 @@
 package com.fongmi.quickjs.method;
 
-import android.util.Base64;
-
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 
 import com.fongmi.quickjs.bean.Req;
 import com.fongmi.quickjs.utils.Connect;
+import com.fongmi.quickjs.utils.Crypto;
 import com.fongmi.quickjs.utils.JSUtil;
 import com.fongmi.quickjs.utils.Parser;
 import com.fongmi.quickjs.utils.Proxy;
 import com.github.catvod.utils.Trans;
+import com.orhanobut.logger.Logger;
 import com.whl.quickjs.wrapper.JSArray;
 import com.whl.quickjs.wrapper.JSFunction;
 import com.whl.quickjs.wrapper.JSMethod;
@@ -20,14 +20,9 @@ import com.whl.quickjs.wrapper.QuickJSContext;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URLEncoder;
-import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
-
-import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -105,7 +100,7 @@ public class Global {
     public JSObject _http(String url, JSObject options) {
         JSFunction complete = options.getJSFunction("complete");
         if (complete == null) return req(url, options);
-        Req req = Req.objectFrom(ctx.stringify(options));
+        Req req = Req.objectFrom(options.stringify());
         Connect.to(url, req).enqueue(getCallback(complete, req));
         return null;
     }
@@ -114,7 +109,7 @@ public class Global {
     @JSMethod
     public JSObject req(String url, JSObject options) {
         try {
-            Req req = Req.objectFrom(ctx.stringify(options));
+            Req req = Req.objectFrom(options.stringify());
             Response res = Connect.to(url, req).execute();
             return Connect.success(ctx, req, res);
         } catch (Exception e) {
@@ -155,21 +150,17 @@ public class Global {
     @Keep
     @JSMethod
     public String aesX(String mode, boolean encrypt, String input, boolean inBase64, String key, String iv, boolean outBase64) {
-        try {
-            byte[] keyBuf = key.getBytes();
-            if (keyBuf.length < 16) keyBuf = Arrays.copyOf(keyBuf, 16);
-            byte[] ivBuf = iv == null ? new byte[0] : iv.getBytes();
-            if (ivBuf.length < 16) ivBuf = Arrays.copyOf(ivBuf, 16);
-            Cipher cipher = Cipher.getInstance(mode + "Padding");
-            SecretKeySpec keySpec = new SecretKeySpec(keyBuf, "AES");
-            if (iv == null) cipher.init(encrypt ? Cipher.ENCRYPT_MODE : Cipher.DECRYPT_MODE, keySpec);
-            else cipher.init(encrypt ? Cipher.ENCRYPT_MODE : Cipher.DECRYPT_MODE, keySpec, new IvParameterSpec(ivBuf));
-            byte[] inBuf = inBase64 ? Base64.decode(input, Base64.DEFAULT) : input.getBytes("UTF-8");
-            return outBase64 ? Base64.encodeToString(cipher.doFinal(inBuf), Base64.DEFAULT) : new String(cipher.doFinal(inBuf), "UTF-8");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "";
-        }
+        String result = Crypto.aes(mode, encrypt, input, inBase64, key, iv, outBase64);
+        Logger.t("aesX").d("mode:%s\nencrypt:%s\ninBase64:%s\noutBase64:%s\nkey:%s\niv:%s\ninput:\n%s\nresult:\n%s", mode, encrypt, inBase64, outBase64, key, iv, input, result);
+        return result;
+    }
+
+    @Keep
+    @JSMethod
+    public String rsaX(String mode, boolean pub, boolean encrypt, String input, boolean inBase64, String key, boolean outBase64) {
+        String result = Crypto.rsa(pub, encrypt, input, inBase64, key, outBase64);
+        Logger.t("rsaX").d("mode:%s\npub:%s\nencrypt:%s\ninBase64:%s\noutBase64:%s\nkey:\n%s\ninput:\n%s\nresult:\n%s", mode, pub, encrypt, inBase64, outBase64, key, input, result);
+        return result;
     }
 
     private Callback getCallback(JSFunction complete, Req req) {
