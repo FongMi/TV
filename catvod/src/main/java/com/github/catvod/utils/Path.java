@@ -29,6 +29,10 @@ public class Path {
         return file;
     }
 
+    public static boolean exists(String path) {
+        return new File(path).exists();
+    }
+
     public static File root() {
         return Environment.getExternalStorageDirectory();
     }

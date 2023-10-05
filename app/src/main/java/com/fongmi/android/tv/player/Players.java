@@ -32,6 +32,7 @@ import com.fongmi.android.tv.impl.SessionCallback;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Utils;
+import com.github.catvod.utils.Path;
 import com.orhanobut.logger.Logger;
 
 import java.util.Formatter;
@@ -488,7 +489,8 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         Uri uri = Uri.parse(url);
         String host = com.github.catvod.utils.Util.host(uri);
         String scheme = com.github.catvod.utils.Util.scheme(uri);
-        return !scheme.equals("file") && (host.isEmpty() || scheme.isEmpty());
+        if (scheme.isEmpty()) return !Path.exists(url);
+        return !scheme.equals("file") && host.isEmpty();
     }
 
     @Override
