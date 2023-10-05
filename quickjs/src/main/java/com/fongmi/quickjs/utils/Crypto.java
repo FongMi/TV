@@ -28,7 +28,7 @@ public class Crypto {
             if (iv == null) cipher.init(encrypt ? Cipher.ENCRYPT_MODE : Cipher.DECRYPT_MODE, keySpec);
             else cipher.init(encrypt ? Cipher.ENCRYPT_MODE : Cipher.DECRYPT_MODE, keySpec, new IvParameterSpec(ivBuf));
             byte[] inBuf = inBase64 ? Base64.decode(input.replaceAll("_", "/").replaceAll("-", "+"), Base64.DEFAULT) : input.getBytes("UTF-8");
-            return outBase64 ? Base64.encodeToString(cipher.doFinal(inBuf), Base64.DEFAULT) : new String(cipher.doFinal(inBuf), "UTF-8");
+            return outBase64 ? Base64.encodeToString(cipher.doFinal(inBuf), Base64.NO_WRAP) : new String(cipher.doFinal(inBuf), "UTF-8");
         } catch (Exception e) {
             e.printStackTrace();
             return "";
@@ -53,7 +53,7 @@ public class Crypto {
                 bufIdx = bufEndIdx;
                 outBytes = concatArrays(outBytes, tmpBytes);
             }
-            return outBase64 ? Base64.encodeToString(outBytes, Base64.DEFAULT) : new String(outBytes, "UTF-8");
+            return outBase64 ? Base64.encodeToString(outBytes, Base64.NO_WRAP) : new String(outBytes, "UTF-8");
         } catch (Exception e) {
             e.printStackTrace();
             return "";
