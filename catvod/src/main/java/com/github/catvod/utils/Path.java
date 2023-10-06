@@ -30,7 +30,7 @@ public class Path {
     }
 
     public static boolean exists(String path) {
-        return new File(path).exists();
+        return new File(path.replace("file://", "")).exists();
     }
 
     public static File root() {
