@@ -25,15 +25,20 @@ public class Function implements Callable<Object> {
 
     @Override
     public Object call() throws Exception {
-        result = object.getJSFunction(name).call(args);
-        if (!(result instanceof JSObject)) return result;
-        JSObject promise = (JSObject) result;
-        JSFunction then = promise.getJSFunction("then");
-        if (then != null) then.call(func);
+        JSFunction function = object.getJSFunction(name);
+        if (function == null) return null;
+        result = function.call(args);
+        if (result instanceof JSObject) then(result);
         return result;
     }
 
-    private final JSCallFunction func = new JSCallFunction() {
+    private void then(Object result) {
+        JSObject promise = (JSObject) result;
+        JSFunction then = promise.getJSFunction("then");
+        if (then != null) then.call(callback);
+    }
+
+    private final JSCallFunction callback = new JSCallFunction() {
         @Override
         public Object call(Object... args) {
             return result = args[0];

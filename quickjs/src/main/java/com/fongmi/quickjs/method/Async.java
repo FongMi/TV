@@ -35,11 +35,11 @@ public class Async {
     private CompletableFuture<Object> then(Object result) {
         JSObject promise = (JSObject) result;
         JSFunction then = promise.getJSFunction("then");
-        if (then != null) then.call(func);
+        if (then != null) then.call(callback);
         return future;
     }
 
-    private final JSCallFunction func = new JSCallFunction() {
+    private final JSCallFunction callback = new JSCallFunction() {
         @Override
         public Object call(Object... args) {
             future.complete(args[0]);

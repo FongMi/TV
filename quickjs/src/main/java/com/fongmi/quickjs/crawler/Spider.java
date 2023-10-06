@@ -61,6 +61,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
     }
 
     private Object call(String func, Object... args) throws Exception {
+        //return executor.submit((Function.call(jsObject, func, args))).get();
         return CompletableFuture.supplyAsync(() -> Async.run(jsObject, func, args), executor).join().get();
     }
 
