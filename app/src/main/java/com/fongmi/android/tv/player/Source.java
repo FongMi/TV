@@ -47,14 +47,15 @@ public class Source {
 
     public String fetch(Result result) throws Exception {
         String url = result.getUrl().v();
+        url = url.trim().replace("\\", "");
         Extractor extractor = getExtractor(url);
         if (extractor != null) result.setParse(0);
-        return extractor == null ? url : extractor.fetch(url.trim());
+        return extractor == null ? url : extractor.fetch(url);
     }
 
     public String fetch(String url) throws Exception {
-        Extractor extractor = getExtractor(url);
-        return extractor == null ? url : extractor.fetch(url.trim());
+        Extractor extractor = getExtractor(url = url.trim().replace("\\", ""));
+        return extractor == null ? url : extractor.fetch(url);
     }
 
     public void stop() {

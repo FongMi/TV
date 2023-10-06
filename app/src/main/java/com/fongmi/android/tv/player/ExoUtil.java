@@ -117,7 +117,7 @@ public class ExoUtil {
     }
 
     private static MediaSource getSource(Map<String, String> headers, String url, String format, List<Sub> subs, Drm drm, int errorCode) {
-        Uri uri = Uri.parse(url.trim().replace("\\", ""));
+        Uri uri = Uri.parse(url);
         String mimeType = getMimeType(format, errorCode);
         if (uri.getUserInfo() != null) headers.put(HttpHeaders.AUTHORIZATION, Util.basic(uri));
         return new DefaultMediaSourceFactory(getDataSourceFactory(headers), getExtractorsFactory()).createMediaSource(getMediaItem(uri, mimeType, subs, drm));
