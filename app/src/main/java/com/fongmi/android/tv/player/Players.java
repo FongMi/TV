@@ -489,8 +489,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         Uri uri = Uri.parse(url);
         String host = com.github.catvod.utils.Util.host(uri);
         String scheme = com.github.catvod.utils.Util.scheme(uri);
-        if (scheme.isEmpty()) return !Path.exists(url);
-        return !scheme.equals("file") && host.isEmpty();
+        return (scheme.isEmpty() || scheme.equals("file")) ? !Path.exists(url) : host.isEmpty();
     }
 
     @Override
