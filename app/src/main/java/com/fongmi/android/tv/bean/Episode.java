@@ -19,6 +19,7 @@ public class Episode implements Parcelable {
 
     private int number;
     private boolean activated;
+    private boolean selected;
 
     public static Episode create(String name, String url) {
         return new Episode(name, "", url);
@@ -66,12 +67,21 @@ public class Episode implements Parcelable {
         return activated;
     }
 
-    public void deactivated() {
-        this.activated = false;
-    }
-
     public void setActivated(boolean activated) {
         this.activated = activated;
+        this.selected = activated;
+    }
+
+    public void deactivated() {
+        setActivated(false);
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 
     public boolean rule1(String name) {
@@ -114,6 +124,7 @@ public class Episode implements Parcelable {
         dest.writeString(this.url);
         dest.writeInt(this.number);
         dest.writeByte(this.activated ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.selected ? (byte) 1 : (byte) 0);
     }
 
     protected Episode(Parcel in) {
@@ -122,6 +133,7 @@ public class Episode implements Parcelable {
         this.url = in.readString();
         this.number = in.readInt();
         this.activated = in.readByte() != 0;
+        this.selected = in.readByte() != 0;
     }
 
     public static final Creator<Episode> CREATOR = new Creator<>() {

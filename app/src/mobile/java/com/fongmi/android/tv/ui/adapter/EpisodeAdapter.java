@@ -51,6 +51,10 @@ public class EpisodeAdapter extends RecyclerView.Adapter<BaseEpisodeHolder> {
         return 0;
     }
 
+    public int getPosition(Episode item) {
+        return mItems.indexOf(item);
+    }
+
     public Episode getActivated() {
         return mItems.get(getPosition());
     }

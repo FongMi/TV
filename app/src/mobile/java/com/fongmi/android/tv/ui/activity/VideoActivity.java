@@ -593,9 +593,8 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         setQualityVisible(episode != null && episode.isActivated() && mQualityAdapter.getItemCount() > 1);
         if (episode == null || episode.isActivated()) return;
         if (Setting.getFlag() == 1) {
-            episode.setActivated(true);
-            mBinding.episode.scrollToPosition(mEpisodeAdapter.getPosition());
-            episode.setActivated(false);
+            episode.setSelected(true);
+            mBinding.episode.scrollToPosition(mEpisodeAdapter.getPosition(episode));
         } else {
             mHistory.setVodRemarks(episode.getName());
             onItemClick(episode);
