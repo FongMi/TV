@@ -537,13 +537,13 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     @Override
-    public void onItemClick(Flag item, boolean force) {
+    public void onItemClick(Flag item) {
         if (item.isActivated()) return;
         mFlagAdapter.setActivated(item);
         mBinding.flag.scrollToPosition(mFlagAdapter.getPosition());
         setEpisodeAdapter(item.getEpisodes());
         setQualityVisible(false);
-        seamless(item, force);
+        seamless(item);
     }
 
     @Override
@@ -588,14 +588,19 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mEpisodeAdapter.addAll(items);
     }
 
-    private void seamless(Flag flag, boolean force) {
-        if (Setting.getFlag() == 1 && (mHistory.isNew() || !force)) return;
+    private void seamless(Flag flag) {
         Episode episode = flag.find(mHistory.getVodRemarks(), getMark().isEmpty());
         setQualityVisible(episode != null && episode.isActivated() && mQualityAdapter.getItemCount() > 1);
         if (episode == null || episode.isActivated()) return;
-        mHistory.setVodRemarks(episode.getName());
-        onItemClick(episode);
-        hidePreview();
+        if (Setting.getFlag() == 1) {
+            episode.setActivated(true);
+            mBinding.episode.scrollToPosition(mEpisodeAdapter.getPosition());
+            episode.setActivated(false);
+        } else {
+            mHistory.setVodRemarks(episode.getName());
+            onItemClick(episode);
+            hidePreview();
+        }
     }
 
     private void setQualityVisible(boolean visible) {
@@ -998,7 +1003,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         if (empty) {
             ErrorEvent.episode();
         } else {
-            onItemClick(mHistory.getFlag(), true);
+            onItemClick(mHistory.getFlag());
             if (mHistory.isRevSort()) reverseEpisode(true);
         }
     }
@@ -1299,7 +1304,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private void nextFlag(int position) {
         Flag flag = mFlagAdapter.get(position + 1);
         Notify.show(getString(R.string.play_switch_flag, flag.getFlag()));
-        onItemClick(flag, true);
+        onItemClick(flag);
     }
 
     private void nextSite() {
