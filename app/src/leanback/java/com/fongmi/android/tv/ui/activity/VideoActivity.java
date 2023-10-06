@@ -543,7 +543,6 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
             episode.setActivated(true);
             mBinding.episode.requestFocus();
             mBinding.episode.setSelectedPosition(getEpisodePosition());
-            episode.setActivated(false);
         } else {
             mHistory.setVodRemarks(episode.getName());
             setEpisodeActivated(episode);
@@ -617,7 +616,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private boolean shouldEnterFullscreen(Episode item) {
-        boolean enter = !isFullscreen() && item.isActivated();
+        boolean enter = !isFullscreen() && item.isActivated() && mPlayers.isPlaying();
         if (enter) enterFullscreen();
         return enter;
     }

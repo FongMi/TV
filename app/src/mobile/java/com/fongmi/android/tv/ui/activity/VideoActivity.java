@@ -595,7 +595,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         if (Setting.getFlag() == 1) {
             episode.setActivated(true);
             mBinding.episode.scrollToPosition(mEpisodeAdapter.getPosition());
-            episode.setActivated(false);
         } else {
             mHistory.setVodRemarks(episode.getName());
             onItemClick(episode);
@@ -851,7 +850,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private boolean shouldEnterFullscreen(Episode item) {
-        boolean enter = !isFullscreen() && item.isActivated();
+        boolean enter = !isFullscreen() && item.isActivated() && mPlayers.isPlaying();
         if (enter) enterFullscreen();
         return enter;
     }
