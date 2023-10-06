@@ -22,8 +22,8 @@ public class Async {
         JSFunction function = object.getJSFunction(name);
         if (function == null) return empty();
         Object result = function.call(args);
-        if (result instanceof JSObject) return then(result);
-        future.complete(result);
+        if (result instanceof JSObject) then(result);
+        else future.complete(result);
         return future;
     }
 
@@ -32,11 +32,10 @@ public class Async {
         return future;
     }
 
-    private CompletableFuture<Object> then(Object result) {
+    private void then(Object result) {
         JSObject promise = (JSObject) result;
         JSFunction then = promise.getJSFunction("then");
         if (then != null) then.call(callback);
-        return future;
     }
 
     private final JSCallFunction callback = new JSCallFunction() {
