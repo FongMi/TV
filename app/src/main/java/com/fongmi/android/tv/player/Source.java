@@ -1,5 +1,6 @@
 package com.fongmi.android.tv.player;
 
+import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.player.extractor.BiliBili;
 import com.fongmi.android.tv.player.extractor.Force;
@@ -53,8 +54,10 @@ public class Source {
         return extractor == null ? url : extractor.fetch(url);
     }
 
-    public String fetch(String url) throws Exception {
-        Extractor extractor = getExtractor(url = url.trim().replace("\\", ""));
+    public String fetch(Channel channel) throws Exception {
+        String url = channel.getCurrent().split("\\$")[0];
+        url = url.trim().replace("\\", "");
+        Extractor extractor = getExtractor(url);
         return extractor == null ? url : extractor.fetch(url);
     }
 
