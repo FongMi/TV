@@ -6,13 +6,11 @@ import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 
-import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.gson.FilterAdapter;
 import com.fongmi.android.tv.gson.MsgAdapter;
 import com.fongmi.android.tv.gson.UrlAdapter;
 import com.github.catvod.utils.Json;
 import com.github.catvod.utils.Trans;
-import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.JsonAdapter;
@@ -24,7 +22,6 @@ import org.simpleframework.xml.Path;
 import org.simpleframework.xml.Root;
 import org.simpleframework.xml.core.Persister;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -297,15 +294,12 @@ public class Result implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeList(this.types);
         dest.writeTypedList(this.list);
-        dest.writeString(App.gson().toJson(this.filters));
     }
 
     protected Result(Parcel in) {
         this.types = new ArrayList<>();
         in.readList(this.types, Class.class.getClassLoader());
         this.list = in.createTypedArrayList(Vod.CREATOR);
-        Type listType = new TypeToken<LinkedHashMap<String, List<Filter>>>() {}.getType();
-        this.filters = App.gson().fromJson(in.readString(), listType);
     }
 
     public static final Creator<Result> CREATOR = new Creator<>() {

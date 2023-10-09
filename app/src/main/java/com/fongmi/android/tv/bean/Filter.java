@@ -10,7 +10,9 @@ import com.google.common.collect.Iterables;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -28,6 +30,12 @@ public class Filter implements Parcelable {
 
     public static Filter objectFrom(JsonElement element) {
         return new Gson().fromJson(element, Filter.class);
+    }
+
+    public static List<Filter> arrayFrom(String result) {
+        Type listType = new TypeToken<List<Filter>>() {}.getType();
+        List<Filter> items = new Gson().fromJson(result, listType);
+        return items == null ? Collections.emptyList() : items;
     }
 
     public Filter() {

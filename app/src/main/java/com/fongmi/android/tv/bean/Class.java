@@ -68,7 +68,9 @@ public class Class implements Parcelable {
     }
 
     public void setFilters(List<Filter> filters) {
+        if (filters == null || filters.isEmpty()) return;
         this.filters = filters;
+        this.setFilter(false);
     }
 
     public void setFilter(Boolean filter) {
