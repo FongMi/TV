@@ -39,6 +39,7 @@ import com.fongmi.android.tv.ui.base.ViewType;
 import com.fongmi.android.tv.ui.custom.CustomScroller;
 import com.fongmi.android.tv.ui.custom.CustomTextListener;
 import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
+import com.fongmi.android.tv.utils.PauseExecutor;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.net.OkHttp;
@@ -48,8 +49,8 @@ import com.google.android.flexbox.FlexboxLayoutManager;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
 import okhttp3.Response;
@@ -60,10 +61,10 @@ public class CollectActivity extends BaseActivity implements CustomScroller.Call
     private CollectAdapter mCollectAdapter;
     private SearchAdapter mSearchAdapter;
     private RecordAdapter mRecordAdapter;
-    private ExecutorService mExecutor;
     private WordAdapter mWordAdapter;
     private CustomScroller mScroller;
     private SiteViewModel mViewModel;
+    private PauseExecutor mExecutor;
     private List<Site> mSites;
 
     public static void start(Activity activity) {
@@ -189,7 +190,7 @@ public class CollectActivity extends BaseActivity implements CustomScroller.Call
         mBinding.view.setVisibility(View.VISIBLE);
         mBinding.result.setVisibility(View.VISIBLE);
         if (mExecutor != null) mExecutor.shutdownNow();
-        mExecutor = Executors.newFixedThreadPool(Constant.THREAD_POOL * 2);
+        mExecutor = new PauseExecutor(Constant.THREAD_POOL * 2, 0, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
         String keyword = mBinding.keyword.getText().toString().trim();
         for (Site site : mSites) mExecutor.execute(() -> search(site, keyword));
         App.post(() -> mRecordAdapter.add(keyword), 250);
@@ -288,6 +289,18 @@ public class CollectActivity extends BaseActivity implements CustomScroller.Call
         mViewModel.searchContent(activated.getSite(), mBinding.keyword.getText().toString(), page);
         activated.setPage(Integer.parseInt(page));
         mScroller.setLoading(true);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mExecutor != null) mExecutor.resume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mExecutor != null) mExecutor.pause();
     }
 
     @Override
