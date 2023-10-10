@@ -640,8 +640,8 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mBinding.video.setForeground(ResUtil.getDrawable(R.drawable.selector_video));
         mBinding.video.setLayoutParams(mFrameParams);
         mDanmakuContext.setScaleTextSize(0.8f);
+        getFocus1().requestFocus();
         mKeyDown.setFull(false);
-        mFocus1.requestFocus();
         setFullscreen(false);
         setSubtitle(16);
         mFocus2 = null;
@@ -1301,6 +1301,10 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     public void resetToggle() {
         this.toggleCount = 0;
+    }
+
+    private View getFocus1() {
+        return mFocus1 == null ? mBinding.video : mFocus1;
     }
 
     private View getFocus2() {
