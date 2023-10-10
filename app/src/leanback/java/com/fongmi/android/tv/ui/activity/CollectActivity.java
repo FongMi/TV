@@ -2,6 +2,7 @@ package com.fongmi.android.tv.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Parcelable;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -210,6 +211,16 @@ public class CollectActivity extends BaseActivity {
 
         @Override
         public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
+        }
+
+        @Nullable
+        @Override
+        public Parcelable saveState() {
+            return null;
+        }
+
+        @Override
+        public void restoreState(@Nullable Parcelable state, @Nullable ClassLoader loader) {
         }
     }
 }

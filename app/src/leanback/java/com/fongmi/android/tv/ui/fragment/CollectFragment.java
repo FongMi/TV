@@ -115,18 +115,6 @@ public class CollectFragment extends BaseFragment implements CustomScroller.Call
     }
 
     @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putParcelable("collect", mCollect);
-    }
-
-    @Override
-    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
-        if (savedInstanceState != null) mCollect = savedInstanceState.getParcelable("collect");
-    }
-
-    @Override
     public void onItemClick(Vod item) {
         getActivity().setResult(Activity.RESULT_OK);
         if (item.isFolder()) VodActivity.start(getActivity(), item.getSiteKey(), Result.folder(item));
