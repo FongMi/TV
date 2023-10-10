@@ -48,7 +48,6 @@ public class Source {
 
     public String fetch(Result result) throws Exception {
         String url = result.getUrl().v();
-        url = url.trim().replace("\\", "");
         Extractor extractor = getExtractor(url);
         if (extractor != null) result.setParse(0);
         return extractor == null ? url : extractor.fetch(url);
@@ -56,7 +55,6 @@ public class Source {
 
     public String fetch(Channel channel) throws Exception {
         String url = channel.getCurrent().split("\\$")[0];
-        url = url.trim().replace("\\", "");
         Extractor extractor = getExtractor(url);
         return extractor == null ? url : extractor.fetch(url);
     }

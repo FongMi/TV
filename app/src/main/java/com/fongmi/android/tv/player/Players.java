@@ -13,7 +13,6 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
-import androidx.media3.common.util.Util;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.analytics.AnalyticsListener;
 import androidx.media3.exoplayer.util.EventLogger;
@@ -33,6 +32,7 @@ import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.utils.Path;
+import com.github.catvod.utils.Util;
 import com.orhanobut.logger.Logger;
 
 import java.util.Formatter;
@@ -177,7 +177,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     public String stringToTime(long time) {
-        return Util.getStringForTime(builder, formatter, time);
+        return Util.format(builder, formatter, time);
     }
 
     public float getSpeed() {
@@ -486,9 +486,9 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     private boolean isIllegal(String url) {
-        Uri uri = Uri.parse(url);
-        String host = com.github.catvod.utils.Util.host(uri);
-        String scheme = com.github.catvod.utils.Util.scheme(uri);
+        Uri uri = Uri.parse(Util.fixUrl(url));
+        String host = Util.host(uri);
+        String scheme = Util.scheme(uri);
         return scheme.isEmpty() || scheme.equals("file") ? !Path.exists(url) : host.isEmpty();
     }
 

@@ -16,6 +16,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.Formatter;
 
 public class Util {
 
@@ -125,7 +126,19 @@ public class Util {
         }
     }
 
-    public static String fix(String key) {
+    public static String format(StringBuilder builder, Formatter formatter, long timeMs) {
+        try {
+            return androidx.media3.common.util.Util.getStringForTime(builder, formatter, timeMs);
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    public static String fixUrl(String url) {
+        return url.trim().replace("\\", "");
+    }
+
+    public static String fixHeader(String key) {
         if (key.equalsIgnoreCase(HttpHeaders.USER_AGENT)) return HttpHeaders.USER_AGENT;
         if (key.equalsIgnoreCase(HttpHeaders.REFERER)) return HttpHeaders.REFERER;
         if (key.equalsIgnoreCase(HttpHeaders.COOKIE)) return HttpHeaders.COOKIE;
