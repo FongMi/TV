@@ -160,7 +160,6 @@ public class SiteViewModel extends ViewModel {
                 if (result.getFlag().isEmpty()) result.setFlag(flag);
                 result.setUrl(Source.get().fetch(result));
                 result.setHeader(site.getHeader());
-                checkDanmaku(result);
                 result.setKey(key);
                 return result;
             } else if (site.getType() == 4) {
@@ -173,7 +172,6 @@ public class SiteViewModel extends ViewModel {
                 if (result.getFlag().isEmpty()) result.setFlag(flag);
                 result.setUrl(Source.get().fetch(result));
                 result.setHeader(site.getHeader());
-                checkDanmaku(result);
                 return result;
             } else if (site.isEmpty() && key.equals("push_agent")) {
                 Result result = new Result();
@@ -272,11 +270,6 @@ public class SiteViewModel extends ViewModel {
             for (Future<List<Episode>> future : executor.invokeAll(flag.getMagnet(), 30, TimeUnit.SECONDS)) flag.getEpisodes().addAll(future.get());
             executor.shutdownNow();
         }
-    }
-
-    private void checkDanmaku(Result result) throws Exception {
-        if (result.getDanmaku().isEmpty() || !result.getDanmaku().startsWith("http")) return;
-        result.setDanmaku(OkHttp.newCall(result.getDanmaku()).execute().body().string());
     }
 
     private void post(Site site, Result result) {

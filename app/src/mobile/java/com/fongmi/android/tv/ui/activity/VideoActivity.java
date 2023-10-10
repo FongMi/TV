@@ -87,6 +87,7 @@ import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Sniffer;
 import com.fongmi.android.tv.utils.Traffic;
 import com.fongmi.android.tv.utils.Utils;
+import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Util;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.permissionx.guolindev.PermissionX;
@@ -533,7 +534,11 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private void checkDanmu(String danmu) {
         mBinding.danmaku.release();
         mBinding.danmaku.setVisibility(danmu.isEmpty() ? View.GONE : View.VISIBLE);
-        if (danmu.length() > 0) mBinding.danmaku.prepare(new Parser(danmu), mDanmakuContext);
+        App.execute(() -> {
+            String temp = danmu;
+            if (temp.startsWith("http")) temp = OkHttp.string(temp);
+            if (temp.length() > 0) mBinding.danmaku.prepare(new Parser(temp), mDanmakuContext);
+        });
     }
 
     @Override

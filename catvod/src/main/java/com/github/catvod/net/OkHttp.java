@@ -79,6 +79,14 @@ public class OkHttp {
         return redirect ? client(timeout) : noRedirect(timeout);
     }
 
+    public static String string(String url) {
+        try {
+            return url.startsWith("http") ? newCall(url).execute().body().string() : "";
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
     public static Call newCall(String url) {
         Uri uri = Uri.parse(url);
         if (uri.getUserInfo() != null) return newCall(url, Headers.of(HttpHeaders.AUTHORIZATION, Util.basic(uri)));

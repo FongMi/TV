@@ -58,10 +58,10 @@ public class Decoder {
         }
     }
 
-    private static String getData(String url) throws Exception {
-        if (url.startsWith("http")) return OkHttp.newCall(url).execute().body().string();
+    private static String getData(String url) {
+        if (url.startsWith("http")) return OkHttp.string(url);
         if (url.startsWith("file")) return Path.read(url);
-        throw new Exception();
+        return "";
     }
 
     private static String ecb(String data, String key) throws Exception {

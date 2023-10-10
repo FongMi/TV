@@ -78,7 +78,7 @@ public class Updater implements Download.Callback {
 
     private void doInBackground() {
         try {
-            JSONObject object = new JSONObject(OkHttp.newCall(getJson()).execute().body().string());
+            JSONObject object = new JSONObject(OkHttp.string(getJson()));
             String name = object.optString("name");
             String desc = object.optString("desc");
             int code = object.optInt("code");
