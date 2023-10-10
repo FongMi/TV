@@ -570,8 +570,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     public void prepared() {
         App.post(() -> {
             if (danmuView == null) return;
-            if (!Setting.isDanmu()) danmuView.hide();
-            if (isPlaying() && danmuView.isPrepared()) danmuView.start(getPosition());
+            if (isPlaying() && danmuView.isPrepared()) danmuView.start(getPosition(), Setting.isDanmu());
         });
     }
 }
