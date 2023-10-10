@@ -32,7 +32,6 @@ import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.utils.Prefers;
 import com.github.catvod.utils.Trans;
-import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +53,7 @@ public class VodActivity extends BaseActivity implements TypePresenter.OnClickLi
         Intent intent = new Intent(activity, VodActivity.class);
         intent.putExtra("key", key);
         intent.putExtra("result", result);
-        for (Map.Entry<String, List<Filter>> entry : result.getFilters().entrySet()) Prefers.put(entry.getKey(), new Gson().toJson(entry.getValue()));
+        for (Map.Entry<String, List<Filter>> entry : result.getFilters().entrySet()) Prefers.put(entry.getKey(), App.gson().toJson(entry.getValue()));
         activity.startActivity(intent);
     }
 

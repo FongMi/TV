@@ -5,10 +5,10 @@ import android.widget.ImageView;
 
 import androidx.annotation.StringRes;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.ResUtil;
-import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 
@@ -33,7 +33,7 @@ public class Group {
 
     public static List<Group> arrayFrom(String str) {
         Type listType = new TypeToken<List<Group>>() {}.getType();
-        List<Group> items = new Gson().fromJson(str, listType);
+        List<Group> items = App.gson().fromJson(str, listType);
         return items == null ? Collections.emptyList() : items;
     }
 

@@ -1,5 +1,6 @@
 package com.fongmi.android.tv.bean;
 
+import com.fongmi.android.tv.App;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
@@ -13,7 +14,7 @@ public class Suggest {
     private List<Data> data;
 
     private static Suggest objectFrom(String str) {
-        return new Gson().fromJson(str, Suggest.class);
+        return App.gson().fromJson(str, Suggest.class);
     }
 
     public static List<String> get(String str) {

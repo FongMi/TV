@@ -4,12 +4,12 @@ import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.utils.Json;
 import com.github.catvod.utils.Util;
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
 
@@ -32,7 +32,7 @@ public class Parse {
     private boolean activated;
 
     public static Parse objectFrom(JsonElement element) {
-        return new Gson().fromJson(element, Parse.class);
+        return App.gson().fromJson(element, Parse.class);
     }
 
     public static Parse get(String name) {
@@ -155,7 +155,7 @@ public class Parse {
         @NonNull
         @Override
         public String toString() {
-            return new Gson().toJson(this);
+            return App.gson().toJson(this);
         }
     }
 }

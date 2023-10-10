@@ -6,12 +6,12 @@ import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.gson.FilterAdapter;
 import com.fongmi.android.tv.gson.MsgAdapter;
 import com.fongmi.android.tv.gson.UrlAdapter;
 import com.github.catvod.utils.Json;
 import com.github.catvod.utils.Trans;
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
@@ -78,7 +78,7 @@ public class Result implements Parcelable {
 
     public static Result objectFrom(String str) {
         try {
-            return new Gson().fromJson(str, Result.class);
+            return App.gson().fromJson(str, Result.class);
         } catch (Exception e) {
             return empty();
         }
@@ -282,7 +282,7 @@ public class Result implements Parcelable {
     @NonNull
     @Override
     public String toString() {
-        return new Gson().toJson(this);
+        return App.gson().toJson(this);
     }
 
     @Override

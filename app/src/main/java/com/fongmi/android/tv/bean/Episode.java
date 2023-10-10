@@ -3,6 +3,7 @@ package com.fongmi.android.tv.bean;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.utils.Trans;
 import com.google.gson.Gson;
@@ -30,7 +31,7 @@ public class Episode implements Parcelable {
     }
 
     public static Episode objectFrom(String str) {
-        return new Gson().fromJson(str, Episode.class);
+        return App.gson().fromJson(str, Episode.class);
     }
 
     public Episode(String name, String desc, String url) {

@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.gson.ExtAdapter;
@@ -65,7 +66,7 @@ public class Site implements Parcelable {
 
     public static Site objectFrom(JsonElement element) {
         try {
-            return new Gson().fromJson(element, Site.class);
+            return App.gson().fromJson(element, Site.class);
         } catch (Exception e) {
             return new Site();
         }

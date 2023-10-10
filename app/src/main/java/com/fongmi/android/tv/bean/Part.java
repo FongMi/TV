@@ -2,6 +2,7 @@ package com.fongmi.android.tv.bean;
 
 import android.text.TextUtils;
 
+import com.fongmi.android.tv.App;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
@@ -18,7 +19,7 @@ public class Part {
     private static List<Part> arrayFrom(String str) {
         try {
             Type listType = new TypeToken<List<Part>>() {}.getType();
-            return new Gson().fromJson(str, listType);
+            return App.gson().fromJson(str, listType);
         } catch (Exception e) {
             return new ArrayList<>();
         }

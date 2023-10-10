@@ -5,8 +5,8 @@ import android.os.Parcelable;
 import android.text.TextUtils;
 import android.view.View;
 
+import com.fongmi.android.tv.App;
 import com.github.catvod.utils.Trans;
-import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 
@@ -86,7 +86,7 @@ public class Vod implements Parcelable {
 
     public static List<Vod> arrayFrom(String str) {
         Type listType = new TypeToken<List<Vod>>() {}.getType();
-        List<Vod> items = new Gson().fromJson(str, listType);
+        List<Vod> items = App.gson().fromJson(str, listType);
         return items == null ? Collections.emptyList() : items;
     }
 

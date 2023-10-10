@@ -2,6 +2,7 @@ package com.fongmi.android.tv.bean;
 
 import android.text.TextUtils;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
@@ -20,7 +21,7 @@ public class Depot {
 
     public static List<Depot> arrayFrom(String str) {
         Type listType = new TypeToken<List<Depot>>() {}.getType();
-        List<Depot> items = new Gson().fromJson(str, listType);
+        List<Depot> items = App.gson().fromJson(str, listType);
         return items == null ? Collections.emptyList() : items;
     }
 

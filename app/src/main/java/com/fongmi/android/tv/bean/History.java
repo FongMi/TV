@@ -12,7 +12,6 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.event.RefreshEvent;
-import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 
@@ -61,12 +60,12 @@ public class History {
     private int cid;
 
     public static History objectFrom(String str) {
-        return new Gson().fromJson(str, History.class);
+        return App.gson().fromJson(str, History.class);
     }
 
     public static List<History> arrayFrom(String str) {
         Type listType = new TypeToken<List<History>>() {}.getType();
-        List<History> items = new Gson().fromJson(str, listType);
+        List<History> items = App.gson().fromJson(str, listType);
         return items == null ? Collections.emptyList() : items;
     }
 
@@ -356,6 +355,6 @@ public class History {
     @NonNull
     @Override
     public String toString() {
-        return new Gson().toJson(this);
+        return App.gson().toJson(this);
     }
 }
