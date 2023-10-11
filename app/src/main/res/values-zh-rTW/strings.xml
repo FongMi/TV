@@ -69,6 +69,7 @@
     <string name="setting_player_ua">User-Agent</string>
     <string name="setting_player_flag">線路播放</string>
     <string name="setting_player_http">連線方式</string>
+    <string name="setting_player_buffer">緩衝時間</string>
     <string name="setting_player_tunnel">隧道模式</string>
     <string name="setting_player_subtitle">字幕大小</string>
     <string name="setting_player_background">背景播放</string>
@@ -123,6 +124,7 @@
 
     <!-- UNIT -->
     <string name="all">全部</string>
+    <string name="minute">分鐘</string>
 
     <string-array name="select_decode">
         <item>軟解</item>

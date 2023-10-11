@@ -214,6 +214,14 @@ public class Setting {
         Prefers.put("exo_http", http);
     }
 
+    public static int getBuffer() {
+        return Math.max(Prefers.getInt("exo_buffer"), 1);
+    }
+
+    public static void putBuffer(int buffer) {
+        Prefers.put("exo_buffer", buffer);
+    }
+
     public static int getFlag() {
         return Prefers.getInt("flag");
     }
