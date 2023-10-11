@@ -13,6 +13,7 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
+import androidx.media3.common.util.Log;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.analytics.AnalyticsListener;
 import androidx.media3.exoplayer.util.EventLogger;
@@ -366,14 +367,14 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     public void start(Result result, boolean useParse, int timeout) {
-        if (result.hasMsg()) {
-            ErrorEvent.extract(result.getMsg());
-        } else if (isIllegal(result.getRealUrl())) {
-            ErrorEvent.url();
-        } else if (result.getParse(1) == 1 || result.getJx() == 1) {
+        if (result.getParse(1) == 1 || result.getJx() == 1) {
             stopParse();
             parseJob = ParseJob.create(this).start(result, useParse);
             this.timeout = timeout;
+        } else if (result.hasMsg()) {
+            ErrorEvent.extract(result.getMsg());
+        } else if (isIllegal(result.getRealUrl())) {
+            ErrorEvent.url();
         } else {
             this.timeout = timeout;
             setMediaSource(result);
