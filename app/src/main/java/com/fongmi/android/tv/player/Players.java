@@ -366,12 +366,11 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     public void start(Result result, boolean useParse, int timeout) {
-        if (result.getParse(1) == 1 || result.getJx() == 1) {
-            stopParse();
-            parseJob = ParseJob.create(this).start(result, useParse);
-            this.timeout = timeout;
-        } else if (result.hasMsg()) {
+        if (result.hasMsg()) {
             ErrorEvent.extract(result.getMsg());
+        } else if (result.getParse(1) == 1 || result.getJx() == 1) {
+            this.timeout = timeout;
+            startParse(result, useParse);
         } else if (isIllegal(result.getRealUrl())) {
             ErrorEvent.url();
         } else {
@@ -416,6 +415,11 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         if (ijkPlayer == null) return;
         ijkPlayer.release();
         ijkPlayer = null;
+    }
+
+    private void startParse(Result result, boolean useParse) {
+        stopParse();
+        parseJob = ParseJob.create(this).start(result, useParse);
     }
 
     private void stopParse() {
