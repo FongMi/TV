@@ -489,6 +489,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         Uri uri = Uri.parse(Util.fixUrl(url));
         String host = Util.host(uri);
         String scheme = Util.scheme(uri);
+        if (scheme.equals("data")) return false;
         return scheme.isEmpty() || scheme.equals("file") ? !Path.exists(url) : host.isEmpty();
     }
 

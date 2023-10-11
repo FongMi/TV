@@ -14,7 +14,7 @@
         android:nextFocusDown="@id/positive"
         android:stepSize="1"
         android:valueFrom="1"
-        android:valueTo="120"
+        android:valueTo="30"
         app:thumbColor="@color/blue_500"
         app:trackColorActive="@color/blue_500"
         app:trackColorInactive="@color/blue_50" />

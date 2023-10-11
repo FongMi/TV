@@ -215,7 +215,7 @@ public class Setting {
     }
 
     public static int getBuffer() {
-        return Math.max(Prefers.getInt("exo_buffer"), 1);
+        return Math.min(Math.max(Prefers.getInt("exo_buffer"), 1), 30);
     }
 
     public static void putBuffer(int buffer) {
