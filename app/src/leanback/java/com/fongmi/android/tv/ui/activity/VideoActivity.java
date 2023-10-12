@@ -11,6 +11,7 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,7 +62,6 @@ import com.fongmi.android.tv.player.Source;
 import com.fongmi.android.tv.player.danmu.Parser;
 import com.fongmi.android.tv.ui.adapter.QualityAdapter;
 import com.fongmi.android.tv.ui.base.BaseActivity;
-import com.fongmi.android.tv.ui.custom.CustomClickSpan;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
 import com.fongmi.android.tv.ui.custom.dialog.DescDialog;
 import com.fongmi.android.tv.ui.custom.dialog.TrackDialog;
@@ -538,7 +538,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         SpannableString span = new SpannableString(text);
         for (String s : map.keySet()) {
             int index = text.indexOf(s);
-            span.setSpan(CustomClickSpan.create(this, getKey(), map.get(s)), index, index + s.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            span.setSpan(getClickableSpan(map.get(s)), index, index + s.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
         return span;
     }
@@ -552,6 +552,16 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
             map.put(key, val);
         }
         return text;
+    }
+
+    private ClickableSpan getClickableSpan(String json) {
+        return new ClickableSpan() {
+            @Override
+            public void onClick(@NonNull View view) {
+                VodActivity.start(getActivity(), getKey(), Result.type(json));
+                mPlayers.pause();
+            }
+        };
     }
 
     private void setFlagActivated(Flag item) {
