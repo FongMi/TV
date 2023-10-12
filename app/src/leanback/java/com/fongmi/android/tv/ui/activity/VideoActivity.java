@@ -525,11 +525,10 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     private void setText(TextView view, int resId, String text) {
         view.setTag(text);
-        view.setLinksClickable(true);
         view.setLinkTextColor(MDColor.YELLOW_500);
-        view.setMovementMethod(LinkMovementMethod.getInstance());
         view.setVisibility(text.isEmpty() ? View.GONE : View.VISIBLE);
         view.setText(getSpan(resId, text), TextView.BufferType.SPANNABLE);
+        if (Sniffer.CLICKER.matcher(text).find()) view.setMovementMethod(LinkMovementMethod.getInstance());
     }
 
     private SpannableString getSpan(int resId, String text) {
@@ -688,7 +687,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     private void onDesc() {
         CharSequence desc = mBinding.content.getText();
-        if (desc.length() > 0) DescDialog.show(this, desc);
+        if (desc.length() > 3) DescDialog.show(this, desc.subSequence(3, desc.length()));
     }
 
     private void onKeep() {

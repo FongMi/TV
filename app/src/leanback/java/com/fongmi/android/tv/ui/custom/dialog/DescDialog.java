@@ -1,7 +1,9 @@
 package com.fongmi.android.tv.ui.custom.dialog;
 
 import android.app.Activity;
+import android.text.Editable;
 import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.view.LayoutInflater;
 import android.widget.TextView;
 
@@ -26,9 +28,10 @@ public class DescDialog {
     }
 
     private void initView(TextView view, CharSequence desc) {
-        view.setLinksClickable(true);
         view.setLinkTextColor(MDColor.BLUE_500);
         view.setText(desc, TextView.BufferType.SPANNABLE);
-        view.setMovementMethod(LinkMovementMethod.getInstance());
+        Editable e = new Editable.Factory().newEditable(view.getText());
+        ClickableSpan[] spans = e.getSpans(0, e.length(), ClickableSpan.class);
+        if (spans.length > 0) view.setMovementMethod(LinkMovementMethod.getInstance());
     }
 }
