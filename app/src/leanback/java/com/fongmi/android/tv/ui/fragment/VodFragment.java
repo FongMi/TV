@@ -38,6 +38,7 @@ import com.fongmi.android.tv.ui.custom.CustomSelector;
 import com.fongmi.android.tv.ui.presenter.FilterPresenter;
 import com.fongmi.android.tv.ui.presenter.VodPresenter;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.github.catvod.utils.Prefers;
 import com.google.common.collect.Lists;
 
 import java.io.Serializable;
@@ -58,13 +59,12 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     private boolean mOpen;
     private Page mPage;
 
-    public static VodFragment newInstance(String key, String typeId, List<Filter> filter, HashMap<String, String> extend, boolean folder) {
+    public static VodFragment newInstance(String key, String typeId, HashMap<String, String> extend, boolean folder) {
         Bundle args = new Bundle();
         args.putString("key", key);
         args.putString("typeId", typeId);
         args.putBoolean("folder", folder);
         args.putSerializable("extend", extend);
-        args.putParcelableArrayList("filter", new ArrayList<>(filter));
         VodFragment fragment = new VodFragment();
         fragment.setArguments(args);
         return fragment;
@@ -78,8 +78,8 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         return mPages.isEmpty() ? getArguments().getString("typeId") : getLastPage().getVodId();
     }
 
-    private ArrayList<Filter> getFilter() {
-        return getArguments().getParcelableArrayList("filter");
+    private List<Filter> getFilter() {
+        return Filter.arrayFrom(Prefers.getString(getTypeId()));
     }
 
     private HashMap<String, String> getExtend() {
