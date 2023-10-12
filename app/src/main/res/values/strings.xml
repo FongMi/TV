@@ -124,7 +124,7 @@
 
     <!-- UNIT -->
     <string name="all">All</string>
-    <string name="minute">min</string>
+    <string name="times">times</string>
 
     <string-array name="select_decode">
         <item>Soft</item>

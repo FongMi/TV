@@ -124,7 +124,7 @@
 
     <!-- UNIT -->
     <string name="all">全部</string>
-    <string name="minute">分钟</string>
+    <string name="times">倍</string>
 
     <string-array name="select_decode">
         <item>软解</item>

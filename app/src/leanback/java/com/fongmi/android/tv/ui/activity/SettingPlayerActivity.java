@@ -99,9 +99,9 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
     }
 
     @Override
-    public void setBuffer(int minute) {
-        mBinding.bufferText.setText(String.valueOf(minute));
-        Setting.putBuffer(minute);
+    public void setBuffer(int times) {
+        mBinding.bufferText.setText(String.valueOf(times));
+        Setting.putBuffer(times);
     }
 
     @Override
