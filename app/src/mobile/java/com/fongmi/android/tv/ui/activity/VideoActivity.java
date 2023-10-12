@@ -16,6 +16,7 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -73,7 +74,6 @@ import com.fongmi.android.tv.ui.adapter.QualityAdapter;
 import com.fongmi.android.tv.ui.adapter.QuickAdapter;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.base.ViewType;
-import com.fongmi.android.tv.ui.custom.CustomClickSpan;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.ui.custom.dialog.CastDialog;
@@ -516,7 +516,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         SpannableString span = new SpannableString(text);
         for (String s : map.keySet()) {
             int index = text.indexOf(s);
-            span.setSpan(CustomClickSpan.create(this, getKey(), map.get(s)), index, index + s.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            span.setSpan(getClickableSpan(map.get(s)), index, index + s.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
         return span;
     }
@@ -530,6 +530,16 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
             map.put(key, val);
         }
         return text;
+    }
+
+    private ClickableSpan getClickableSpan(String json) {
+        return new ClickableSpan() {
+            @Override
+            public void onClick(@NonNull View view) {
+                FolderActivity.start(getActivity(), getKey(), Result.type(json));
+                mPlayers.pause();
+            }
+        };
     }
 
     private void setOther(TextView view, Vod item) {
