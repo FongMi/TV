@@ -43,10 +43,7 @@ public class BufferDialog {
     }
 
     private void initEvent() {
-        binding.slider.addOnChangeListener((slider, value, fromUser) -> {
-            callback.setBuffer((int) value);
-            Setting.putBuffer((int) value);
-        });
+        binding.slider.addOnChangeListener((slider, value, fromUser) -> callback.setBuffer((int) value));
         binding.slider.setOnKeyListener((view, keyCode, event) -> {
             boolean enter = Utils.isEnterKey(event);
             if (enter) dialog.dismiss();

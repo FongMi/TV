@@ -44,7 +44,6 @@ public class BufferDialog {
 
     private void onPositive(DialogInterface dialog, int which) {
         callback.setBuffer((int) binding.slider.getValue());
-        Setting.putBuffer((int) binding.slider.getValue());
         dialog.dismiss();
     }
 

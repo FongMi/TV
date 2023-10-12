@@ -64,7 +64,6 @@ public class SubtitleDialog {
 
     private void onPositive(View view) {
         callback.setSubtitle((int) binding.slider.getValue());
-        Setting.putSubtitle((int) binding.slider.getValue());
         dialog.dismiss();
     }
 
