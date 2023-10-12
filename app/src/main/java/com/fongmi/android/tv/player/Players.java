@@ -115,6 +115,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     private void setupExo(PlayerView view) {
         exoPlayer = new ExoPlayer.Builder(App.get()).setLoadControl(ExoUtil.buildLoadControl()).setRenderersFactory(ExoUtil.buildRenderersFactory()).setTrackSelector(ExoUtil.buildTrackSelector()).build();
         exoPlayer.addAnalyticsListener(new EventLogger());
+        exoPlayer.setSkipSilenceEnabled(true);
         exoPlayer.addAnalyticsListener(this);
         exoPlayer.setPlayWhenReady(true);
         exoPlayer.addListener(this);
