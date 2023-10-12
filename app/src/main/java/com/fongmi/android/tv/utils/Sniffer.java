@@ -19,7 +19,7 @@ public class Sniffer {
 
     private static final String TAG = Sniffer.class.getSimpleName();
 
-    public static final Pattern CLICKER = Pattern.compile("\\[a=cr:(\\S+)\\/](\\S+)\\[\\/a]");
+    public static final Pattern CLICKER = Pattern.compile("\\[a=cr:(\\{.*?\\})\\/](.*?)\\[\\/a]");
     public static final String CHROME = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36";
     public static final String RULE = "http((?!http).){12,}?\\.(m3u8|mp4|flv|avi|mkv|rm|wmv|mpg|m4a|mp3)\\?.*|http((?!http).){12,}\\.(m3u8|mp4|flv|avi|mkv|rm|wmv|mpg|m4a|mp3)|http((?!http).)*?video/tos*";
     public static final List<String> PUSH = Arrays.asList("smb", "http", "https", "thunder", "magnet", "ed2k", "mitv", "jianpian");
