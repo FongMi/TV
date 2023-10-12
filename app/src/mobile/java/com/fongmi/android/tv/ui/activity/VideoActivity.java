@@ -12,7 +12,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.media.MediaMetadataCompat;
 import android.text.Html;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.method.LinkMovementMethod;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +32,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.media3.common.C;
 import androidx.media3.common.Player;
+import androidx.media3.common.util.Log;
 import androidx.media3.ui.PlayerView;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
@@ -70,6 +74,7 @@ import com.fongmi.android.tv.ui.adapter.QualityAdapter;
 import com.fongmi.android.tv.ui.adapter.QuickAdapter;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.base.ViewType;
+import com.fongmi.android.tv.ui.custom.CustomClickSpan;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.ui.custom.dialog.CastDialog;
@@ -87,6 +92,7 @@ import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Sniffer;
 import com.fongmi.android.tv.utils.Traffic;
 import com.fongmi.android.tv.utils.Utils;
+import com.github.bassaer.library.MDColor;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Util;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -100,9 +106,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
 
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDisplay;
@@ -495,9 +503,35 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private void setText(TextView view, int resId, String text) {
-        view.setVisibility(text.isEmpty() ? View.GONE : View.VISIBLE);
-        view.setText(resId > 0 ? getString(resId, text) : text);
         view.setTag(text);
+        view.setLinksClickable(true);
+        view.setLinkTextColor(MDColor.YELLOW_500);
+        view.setMovementMethod(LinkMovementMethod.getInstance());
+        view.setVisibility(text.isEmpty() ? View.GONE : View.VISIBLE);
+        view.setText(getSpan(resId, text), TextView.BufferType.SPANNABLE);
+    }
+
+    private SpannableString getSpan(int resId, String text) {
+        if (resId > 0) text = getString(resId, text);
+        Map<String, String> map = new HashMap<>();
+        text = findClicker(text, map);
+        SpannableString span = new SpannableString(text);
+        for (String s : map.keySet()) {
+            int index = text.indexOf(s);
+            span.setSpan(CustomClickSpan.create(this, getKey(), map.get(s)), index, index + s.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+        return span;
+    }
+
+    private String findClicker(String text, Map<String, String> map) {
+        Matcher m = Sniffer.CLICKER.matcher(text);
+        while (m.find()) {
+            String val = m.group(1);
+            String key = m.group(2);
+            text = text.replace(m.group(), key);
+            map.put(key, val);
+        }
+        return text;
     }
 
     private void setOther(TextView view, Vod item) {

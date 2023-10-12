@@ -7,7 +7,10 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.text.Html;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.method.LinkMovementMethod;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,6 +61,7 @@ import com.fongmi.android.tv.player.Source;
 import com.fongmi.android.tv.player.danmu.Parser;
 import com.fongmi.android.tv.ui.adapter.QualityAdapter;
 import com.fongmi.android.tv.ui.base.BaseActivity;
+import com.fongmi.android.tv.ui.custom.CustomClickSpan;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
 import com.fongmi.android.tv.ui.custom.dialog.DescDialog;
 import com.fongmi.android.tv.ui.custom.dialog.TrackDialog;
@@ -75,6 +79,7 @@ import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Sniffer;
 import com.fongmi.android.tv.utils.Traffic;
 import com.fongmi.android.tv.utils.Utils;
+import com.github.bassaer.library.MDColor;
 import com.github.catvod.net.OkHttp;
 import com.permissionx.guolindev.PermissionX;
 
@@ -89,9 +94,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
 
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDisplay;
@@ -517,9 +524,35 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void setText(TextView view, int resId, String text) {
-        view.setVisibility(text.isEmpty() ? View.GONE : View.VISIBLE);
-        view.setText(resId > 0 ? getString(resId, text) : text);
         view.setTag(text);
+        view.setLinksClickable(true);
+        view.setLinkTextColor(MDColor.YELLOW_500);
+        view.setMovementMethod(LinkMovementMethod.getInstance());
+        view.setVisibility(text.isEmpty() ? View.GONE : View.VISIBLE);
+        view.setText(getSpan(resId, text), TextView.BufferType.SPANNABLE);
+    }
+
+    private SpannableString getSpan(int resId, String text) {
+        if (resId > 0) text = getString(resId, text);
+        Map<String, String> map = new HashMap<>();
+        text = findClicker(text, map);
+        SpannableString span = new SpannableString(text);
+        for (String s : map.keySet()) {
+            int index = text.indexOf(s);
+            span.setSpan(CustomClickSpan.create(this, getKey(), map.get(s)), index, index + s.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+        return span;
+    }
+
+    private String findClicker(String text, Map<String, String> map) {
+        Matcher m = Sniffer.CLICKER.matcher(text);
+        while (m.find()) {
+            String val = m.group(1);
+            String key = m.group(2);
+            text = text.replace(m.group(), key);
+            map.put(key, val);
+        }
+        return text;
     }
 
     private void setFlagActivated(Flag item) {
@@ -654,7 +687,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void onDesc() {
-        String desc = mBinding.content.getTag().toString();
+        CharSequence desc = mBinding.content.getText();
         if (desc.length() > 0) DescDialog.show(this, desc);
     }
 
