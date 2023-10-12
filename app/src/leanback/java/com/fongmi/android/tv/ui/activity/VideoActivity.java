@@ -559,7 +559,6 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
             @Override
             public void onClick(@NonNull View view) {
                 VodActivity.start(getActivity(), getKey(), Result.type(json));
-                mPlayers.pause();
             }
         };
     }
