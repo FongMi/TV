@@ -141,6 +141,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private boolean fullscreen;
     private boolean initTrack;
     private boolean initAuto;
+    private boolean redirect;
     private boolean autoMode;
     private boolean useParse;
     private boolean rotate;
@@ -537,7 +538,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
             @Override
             public void onClick(@NonNull View view) {
                 FolderActivity.start(getActivity(), getKey(), Result.type(json));
-                mPlayers.pause();
+                setRedirect(true);
             }
         };
     }
@@ -1396,6 +1397,14 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         this.initAuto = initAuto;
     }
 
+    public boolean isRedirect() {
+        return redirect;
+    }
+
+    public void setRedirect(boolean redirect) {
+        this.redirect = redirect;
+    }
+
     private boolean isAutoMode() {
         return autoMode;
     }
@@ -1619,6 +1628,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         App.removeCallbacks(mR0);
         App.post(mR0, 1000);
         setForeground(true);
+        setRedirect(false);
     }
 
     @Override
@@ -1626,7 +1636,8 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         super.onPause();
         setForeground(false);
         App.removeCallbacks(mR0);
-        if (Setting.isBackgroundOn() && !isFinishing()) PlaybackService.start(mPlayers);
+        if (isRedirect()) mPlayers.pause();
+        else if (Setting.isBackgroundOn() && !isFinishing()) PlaybackService.start(mPlayers);
     }
 
     @Override
