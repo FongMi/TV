@@ -15,7 +15,6 @@ import android.text.Html;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
-import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.view.MotionEvent;
 import android.view.View;
@@ -75,6 +74,7 @@ import com.fongmi.android.tv.ui.adapter.QuickAdapter;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.base.ViewType;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
+import com.fongmi.android.tv.ui.custom.CustomMovement;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.ui.custom.dialog.CastDialog;
 import com.fongmi.android.tv.ui.custom.dialog.ControlDialog;
@@ -502,11 +502,11 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private void setText(TextView view, int resId, String text) {
-        view.setTag(text);
-        view.setLinkTextColor(MDColor.YELLOW_500);
-        view.setVisibility(text.isEmpty() ? View.GONE : View.VISIBLE);
         view.setText(getSpan(resId, text), TextView.BufferType.SPANNABLE);
-        if (Sniffer.CLICKER.matcher(text).find()) view.setMovementMethod(LinkMovementMethod.getInstance());
+        view.setVisibility(text.isEmpty() ? View.GONE : View.VISIBLE);
+        view.setLinkTextColor(MDColor.YELLOW_500);
+        CustomMovement.bind(view);
+        view.setTag(text);
     }
 
     private SpannableString getSpan(int resId, String text) {
@@ -1607,8 +1607,8 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     @Override
     protected void onStart() {
         super.onStart();
-        if (Setting.isBackgroundOff()) mPlayers.play();
         mClock.stop().start();
+        mPlayers.play();
         setStop(false);
     }
 

@@ -108,7 +108,7 @@
 
         <TextView
             android:id="@+id/other"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/site"
             android:layout_alignStart="@+id/name"
@@ -121,7 +121,7 @@
 
         <TextView
             android:id="@+id/director"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/other"
             android:layout_alignStart="@+id/name"
@@ -134,7 +134,7 @@
 
         <TextView
             android:id="@+id/actor"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/director"
             android:layout_alignStart="@+id/name"
