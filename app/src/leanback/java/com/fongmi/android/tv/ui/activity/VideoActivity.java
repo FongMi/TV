@@ -10,7 +10,6 @@ import android.text.Html;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
-import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.view.KeyEvent;
 import android.view.View;
@@ -63,6 +62,7 @@ import com.fongmi.android.tv.player.danmu.Parser;
 import com.fongmi.android.tv.ui.adapter.QualityAdapter;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
+import com.fongmi.android.tv.ui.custom.CustomMovement;
 import com.fongmi.android.tv.ui.custom.dialog.DescDialog;
 import com.fongmi.android.tv.ui.custom.dialog.TrackDialog;
 import com.fongmi.android.tv.ui.presenter.ArrayPresenter;
@@ -524,11 +524,11 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void setText(TextView view, int resId, String text) {
-        view.setTag(text);
-        view.setLinkTextColor(MDColor.YELLOW_500);
-        view.setVisibility(text.isEmpty() ? View.GONE : View.VISIBLE);
         view.setText(getSpan(resId, text), TextView.BufferType.SPANNABLE);
-        if (Sniffer.CLICKER.matcher(text).find()) view.setMovementMethod(LinkMovementMethod.getInstance());
+        view.setVisibility(text.isEmpty() ? View.GONE : View.VISIBLE);
+        view.setLinkTextColor(MDColor.YELLOW_500);
+        CustomMovement.bind(view);
+        view.setTag(text);
     }
 
     private SpannableString getSpan(int resId, String text) {

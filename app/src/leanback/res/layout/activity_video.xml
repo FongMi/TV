@@ -18,6 +18,7 @@
         android:focusableInTouchMode="true"
         android:foreground="@drawable/selector_video"
         android:nextFocusLeft="@id/video"
+        android:nextFocusRight="@id/desc"
         android:nextFocusUp="@id/video"
         android:nextFocusDown="@id/flag">
 
@@ -146,7 +147,7 @@
 
     <TextView
         android:id="@+id/director"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/row1"
         android:layout_alignStart="@+id/name"
@@ -159,7 +160,7 @@
 
     <TextView
         android:id="@+id/actor"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/director"
         android:layout_alignStart="@+id/name"
