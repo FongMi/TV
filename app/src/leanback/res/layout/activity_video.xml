@@ -166,6 +166,7 @@
         android:layout_alignStart="@+id/name"
         android:layout_marginTop="6dp"
         android:layout_marginEnd="24dp"
+        android:nextFocusDown="@id/content"
         android:singleLine="true"
         android:textColor="@color/white"
         android:textSize="16sp"
@@ -182,6 +183,7 @@
         android:ellipsize="end"
         android:lineSpacingExtra="4dp"
         android:maxLines="1"
+        android:nextFocusDown="@id/desc"
         android:textColor="@color/white"
         android:textSize="16sp"
         tools:text="簡介：" />
