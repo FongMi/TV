@@ -1,4 +1,4 @@
-package com.fongmi.quickjs.utils;
+package com.github.catvod.utils;
 
 import android.util.Base64;
 

@@ -5,7 +5,7 @@ import androidx.annotation.NonNull;
 
 import com.fongmi.quickjs.bean.Req;
 import com.fongmi.quickjs.utils.Connect;
-import com.fongmi.quickjs.utils.Crypto;
+import com.github.catvod.utils.Crypto;
 import com.fongmi.quickjs.utils.JSUtil;
 import com.fongmi.quickjs.utils.Parser;
 import com.fongmi.quickjs.utils.Proxy;
