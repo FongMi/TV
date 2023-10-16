@@ -81,6 +81,7 @@ import com.fongmi.android.tv.utils.Traffic;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.bassaer.library.MDColor;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.Trans;
 import com.permissionx.guolindev.PermissionX;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -547,7 +548,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         Matcher m = Sniffer.CLICKER.matcher(text);
         while (m.find()) {
             String val = m.group(1);
-            String key = m.group(2);
+            String key = Trans.s2t(m.group(2));
             text = text.replace(m.group(), key);
             map.put(key, val);
         }

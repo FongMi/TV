@@ -128,7 +128,7 @@ public class Result implements Parcelable {
     public static Result type(String json) {
         Result result = new Result();
         result.setTypes(List.of(Class.objectFrom(json)));
-        return result;
+        return result.trans();
     }
 
     public static Result list(List<Vod> items) {
