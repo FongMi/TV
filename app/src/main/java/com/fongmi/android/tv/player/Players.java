@@ -1,6 +1,7 @@
 package com.fongmi.android.tv.player;
 
 import android.app.Activity;
+import android.net.Uri;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
@@ -22,6 +23,8 @@ import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.impl.ParseCallback;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.github.catvod.utils.Path;
+import com.github.catvod.utils.Util;
 import com.orhanobut.logger.Logger;
 
 import java.util.Formatter;

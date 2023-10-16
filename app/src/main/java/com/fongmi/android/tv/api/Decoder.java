@@ -9,7 +9,6 @@ import com.github.catvod.utils.Path;
 import com.github.catvod.utils.Util;
 
 import java.io.File;
-import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -67,7 +66,7 @@ public class Decoder {
         SecretKeySpec spec = new SecretKeySpec(padEnd(key).getBytes(), "AES");
         Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
         cipher.init(Cipher.DECRYPT_MODE, spec);
-        return new String(cipher.doFinal(decodeHex(data)), StandardCharsets.UTF_8);
+        return new String(cipher.doFinal(decodeHex(data)), "UTF-8");
     }
 
     private static String cbc(String data) throws Exception {
@@ -80,7 +79,7 @@ public class Decoder {
         cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
         data = data.substring(data.indexOf("2324") + 4, data.length() - 26);
         byte[] decryptData = cipher.doFinal(decodeHex(data));
-        return new String(decryptData, StandardCharsets.UTF_8);
+        return new String(decryptData, "UTF-8");
     }
 
     private static String base64(String data) {
