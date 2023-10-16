@@ -62,7 +62,7 @@ public class ExoUtil {
     private static Cache cache;
 
     public static LoadControl buildLoadControl() {
-        return new DefaultLoadControl(Setting.getBuffer());
+        return new DefaultLoadControl();
     }
 
     public static TrackSelector buildTrackSelector() {
