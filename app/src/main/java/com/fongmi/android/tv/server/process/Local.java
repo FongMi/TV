@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -41,7 +42,8 @@ public class Local implements Process {
         try {
             File file = Path.root(url.substring(6));
             if (file.isFile()) return Nano.newChunkedResponse(NanoHTTPD.Response.Status.OK, "application/octet-stream", new FileInputStream(file));
-            else return Nano.success(listFiles(file));
+            if (file.isDirectory()) return Nano.success(listFiles(file));
+            throw new FileNotFoundException();
         } catch (Exception e) {
             return Nano.error(e.getMessage());
         }

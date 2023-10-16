@@ -3,8 +3,8 @@ package com.fongmi.android.tv.bean;
 import android.net.Uri;
 import android.text.TextUtils;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
@@ -53,12 +53,12 @@ public class Live {
     private boolean activated;
 
     public static Live objectFrom(JsonElement element) {
-        return new Gson().fromJson(element, Live.class);
+        return App.gson().fromJson(element, Live.class);
     }
 
     public static List<Live> arrayFrom(String str) {
         Type listType = new TypeToken<List<Live>>() {}.getType();
-        List<Live> items = new Gson().fromJson(str, listType);
+        List<Live> items = App.gson().fromJson(str, listType);
         return items == null ? Collections.emptyList() : items;
     }
 

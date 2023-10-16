@@ -201,7 +201,7 @@ public class DetailActivity extends BaseActivity implements FlagAdapter.OnClickL
         if (empty) {
             ErrorEvent.episode();
         } else {
-            onItemClick(mHistory.getFlag(), true);
+            onItemClick(mHistory.getFlag());
             if (mHistory.isRevSort()) reverseEpisode(true);
         }
     }
@@ -222,7 +222,7 @@ public class DetailActivity extends BaseActivity implements FlagAdapter.OnClickL
     }
 
     @Override
-    public void onItemClick(Flag item, boolean force) {
+    public void onItemClick(Flag item) {
         if (item.isActivated()) return;
         mFlagAdapter.setActivated(item);
         mBinding.flag.scrollToPosition(mFlagAdapter.getPosition());

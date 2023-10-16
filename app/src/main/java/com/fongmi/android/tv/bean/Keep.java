@@ -8,7 +8,6 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.event.RefreshEvent;
-import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 
@@ -38,7 +37,7 @@ public class Keep {
 
     public static List<Keep> arrayFrom(String str) {
         Type listType = new TypeToken<List<Keep>>() {}.getType();
-        List<Keep> items = new Gson().fromJson(str, listType);
+        List<Keep> items = App.gson().fromJson(str, listType);
         return items == null ? Collections.emptyList() : items;
     }
 

@@ -349,6 +349,12 @@ public class DanmakuView extends View implements IDanmakuView, IDanmakuViewContr
         start();
     }
 
+    public void start(long position, boolean show) {
+        start(position);
+        if (show) show();
+        else hide();
+    }
+
     @Override
     public void start() {
         start(0);

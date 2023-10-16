@@ -10,18 +10,18 @@ public class Local {
     @Keep
     @JSMethod
     public String get(String rule, String key) {
-        return Prefers.getString("js_engine_" + rule + "_" + key);
+        return Prefers.getString(rule + "_" + key);
     }
 
     @Keep
     @JSMethod
     public void set(String rule, String key, String value) {
-        Prefers.put("js_engine_" + rule + "_" + key, value);
+        Prefers.put(rule + "_" + key, value);
     }
 
     @Keep
     @JSMethod
     public void delete(String rule, String key) {
-        Prefers.remove("js_engine_" + rule + "_" + key);
+        Prefers.remove(rule + "_" + key);
     }
 }

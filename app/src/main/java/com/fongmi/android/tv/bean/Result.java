@@ -12,8 +12,6 @@ import com.fongmi.android.tv.gson.MsgAdapter;
 import com.fongmi.android.tv.gson.UrlAdapter;
 import com.github.catvod.utils.Json;
 import com.github.catvod.utils.Trans;
-import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
@@ -24,7 +22,6 @@ import org.simpleframework.xml.Path;
 import org.simpleframework.xml.Root;
 import org.simpleframework.xml.core.Persister;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -81,7 +78,7 @@ public class Result implements Parcelable {
 
     public static Result objectFrom(String str) {
         try {
-            return new Gson().fromJson(str, Result.class);
+            return App.gson().fromJson(str, Result.class);
         } catch (Exception e) {
             return empty();
         }
@@ -126,6 +123,12 @@ public class Result implements Parcelable {
         type.setTypeName(item.getVodName());
         result.setTypes(List.of(type));
         return result;
+    }
+
+    public static Result type(String json) {
+        Result result = new Result();
+        result.setTypes(List.of(Class.objectFrom(json)));
+        return result.trans();
     }
 
     public static Result list(List<Vod> items) {
@@ -285,7 +288,7 @@ public class Result implements Parcelable {
     @NonNull
     @Override
     public String toString() {
-        return new Gson().toJson(this);
+        return App.gson().toJson(this);
     }
 
     @Override
@@ -297,15 +300,12 @@ public class Result implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeList(this.types);
         dest.writeTypedList(this.list);
-        dest.writeString(App.gson().toJson(this.filters));
     }
 
     protected Result(Parcel in) {
         this.types = new ArrayList<>();
         in.readList(this.types, Class.class.getClassLoader());
         this.list = in.createTypedArrayList(Vod.CREATOR);
-        Type listType = new TypeToken<LinkedHashMap<String, List<Filter>>>() {}.getType();
-        this.filters = App.gson().fromJson(in.readString(), listType);
     }
 
     public static final Creator<Result> CREATOR = new Creator<>() {

@@ -103,16 +103,11 @@ public class LiveParser {
     }
 
     private static String getText(String url) {
-        try {
-            if (url.startsWith("file")) return Path.read(url);
-            if (url.startsWith("http")) return OkHttp.newCall(url).execute().body().string();
-            if (url.endsWith(".txt") || url.endsWith(".m3u")) return getText(Utils.convert(LiveConfig.getUrl(), url));
-            if (url.length() > 0 && url.length() % 4 == 0) return getText(new String(Base64.decode(url, Base64.DEFAULT)));
-            return "";
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "";
-        }
+        if (url.startsWith("file")) return Path.read(url);
+        if (url.startsWith("http")) return OkHttp.string(url);
+        if (url.endsWith(".txt") || url.endsWith(".m3u")) return getText(Utils.convert(LiveConfig.getUrl(), url));
+        if (url.length() > 0 && url.length() % 4 == 0) return getText(new String(Base64.decode(url, Base64.DEFAULT)));
+        return "";
     }
 
     private static class Setting {

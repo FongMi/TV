@@ -7,7 +7,6 @@ import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Json;
 import com.github.catvod.utils.Path;
 import com.github.catvod.utils.Util;
-import com.google.common.io.BaseEncoding;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -58,33 +57,29 @@ public class Decoder {
         }
     }
 
-    private static String getData(String url) throws Exception {
-        if (url.startsWith("http")) return OkHttp.newCall(url).execute().body().string();
+    private static String getData(String url) {
+        if (url.startsWith("http")) return OkHttp.string(url);
         if (url.startsWith("file")) return Path.read(url);
-        throw new Exception();
+        return "";
     }
 
     private static String ecb(String data, String key) throws Exception {
-        SecretKeySpec spec = new SecretKeySpec(padEnd(key), "AES");
+        SecretKeySpec spec = new SecretKeySpec(padEnd(key).getBytes(), "AES");
         Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
         cipher.init(Cipher.DECRYPT_MODE, spec);
         return new String(cipher.doFinal(decodeHex(data)), StandardCharsets.UTF_8);
     }
 
     private static String cbc(String data) throws Exception {
-        int indexKey = data.indexOf("2324") + 4;
-        String key = new String(decodeHex(data.substring(0, indexKey)), StandardCharsets.UTF_8);
-        key = key.replace("$#", "").replace("#$", "");
-        int indexIv = data.length() - 26;
-        String iv = data.substring(indexIv).trim();
-        iv = new String(decodeHex(iv), StandardCharsets.UTF_8);
-        SecretKeySpec keySpec = new SecretKeySpec(padEnd(key), "AES");
-        IvParameterSpec ivSpec = new IvParameterSpec(padEnd(iv));
+        String decode = new String(decodeHex(data)).toLowerCase();
+        String key = padEnd(decode.substring(decode.indexOf("$#") + 2, decode.indexOf("#$")));
+        String iv = padEnd(decode.substring(decode.length() - 13));
+        SecretKeySpec keySpec = new SecretKeySpec(key.getBytes(), "AES");
+        IvParameterSpec ivSpec = new IvParameterSpec(iv.getBytes());
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
         cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
-        data = data.substring(indexKey, indexIv).trim();
-        byte[] encryptDataBytes = decodeHex(data);
-        byte[] decryptData = cipher.doFinal(encryptDataBytes);
+        data = data.substring(data.indexOf("2324") + 4, data.length() - 26);
+        byte[] decryptData = cipher.doFinal(decodeHex(data));
         return new String(decryptData, StandardCharsets.UTF_8);
     }
 
@@ -99,11 +94,13 @@ public class Decoder {
         return matcher.find() ? data.substring(data.indexOf(matcher.group()) + 10) : "";
     }
 
-    private static byte[] padEnd(String key) {
-        return (key + "0000000000000000".substring(key.length())).getBytes(StandardCharsets.UTF_8);
+    private static String padEnd(String key) {
+        return key + "0000000000000000".substring(key.length());
     }
 
     private static byte[] decodeHex(String s) {
-        return BaseEncoding.base16().decode(s.toUpperCase());
+        byte[] bytes = new byte[s.length() / 2];
+        for (int i = 0; i < bytes.length; i++) bytes[i] = Integer.valueOf(s.substring(i * 2, i * 2 + 2), 16).byteValue();
+        return bytes;
     }
 }

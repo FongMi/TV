@@ -21,6 +21,7 @@ import androidx.viewpager.widget.ViewPager;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Class;
+import com.fongmi.android.tv.bean.Filter;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.databinding.ActivityVodBinding;
@@ -29,10 +30,12 @@ import com.fongmi.android.tv.ui.fragment.VodFragment;
 import com.fongmi.android.tv.ui.presenter.TypePresenter;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Utils;
+import com.github.catvod.utils.Prefers;
 import com.github.catvod.utils.Trans;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class VodActivity extends BaseActivity implements TypePresenter.OnClickListener {
 
@@ -50,6 +53,7 @@ public class VodActivity extends BaseActivity implements TypePresenter.OnClickLi
         Intent intent = new Intent(activity, VodActivity.class);
         intent.putExtra("key", key);
         intent.putExtra("result", result);
+        for (Map.Entry<String, List<Filter>> entry : result.getFilters().entrySet()) Prefers.put(entry.getKey(), App.gson().toJson(entry.getValue()));
         activity.startActivity(intent);
     }
 
@@ -59,6 +63,10 @@ public class VodActivity extends BaseActivity implements TypePresenter.OnClickLi
 
     private Result getResult() {
         return getIntent().getParcelableExtra("result");
+    }
+
+    private List<Filter> getFilter(String typeId) {
+        return Filter.arrayFrom(Prefers.getString(typeId));
     }
 
     private Site getSite() {
@@ -108,8 +116,7 @@ public class VodActivity extends BaseActivity implements TypePresenter.OnClickLi
     private void setTypes() {
         Result result = getResult();
         result.setTypes(getTypes(result));
-        for (Class item : result.getTypes()) if (result.getFilters().containsKey(item.getTypeId())) item.setFilter(false);
-        for (Class item : result.getTypes()) if (result.getFilters().containsKey(item.getTypeId())) item.setFilters(result.getFilters().get(item.getTypeId()));
+        for (Class item : result.getTypes()) item.setFilters(getFilter(item.getTypeId()));
         mAdapter.setItems(result.getTypes(), null);
     }
 
@@ -176,7 +183,7 @@ public class VodActivity extends BaseActivity implements TypePresenter.OnClickLi
         @Override
         public Fragment getItem(int position) {
             Class type = (Class) mAdapter.get(position);
-            return VodFragment.newInstance(getKey(), type.getTypeId(), type.getFilters(), type.getExtend(), type.getTypeFlag().equals("1"));
+            return VodFragment.newInstance(getKey(), type.getTypeId(), type.getExtend(), type.getTypeFlag().equals("1"));
         }
 
         @Override

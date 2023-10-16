@@ -3,6 +3,7 @@ package com.fongmi.android.tv.player;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
@@ -12,7 +13,6 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
-import androidx.media3.common.util.Util;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.analytics.AnalyticsListener;
 import androidx.media3.exoplayer.util.EventLogger;
@@ -31,6 +31,8 @@ import com.fongmi.android.tv.impl.SessionCallback;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Utils;
+import com.github.catvod.utils.Path;
+import com.github.catvod.utils.Util;
 import com.orhanobut.logger.Logger;
 
 import java.util.Formatter;
@@ -175,7 +177,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     public String stringToTime(long time) {
-        return Util.getStringForTime(builder, formatter, time);
+        return Util.format(builder, formatter, time);
     }
 
     public float getSpeed() {
@@ -355,7 +357,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     public void start(Channel channel, int timeout) {
-        if (channel.getUrl().isEmpty()) {
+        if (isIllegal(channel.getUrl())) {
             ErrorEvent.url();
         } else {
             this.timeout = timeout;
@@ -366,12 +368,11 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     public void start(Result result, boolean useParse, int timeout) {
         if (result.hasMsg()) {
             ErrorEvent.extract(result.getMsg());
-        } else if (result.getUrl().isEmpty()) {
-            ErrorEvent.url();
         } else if (result.getParse(1) == 1 || result.getJx() == 1) {
-            stopParse();
-            parseJob = ParseJob.create(this).start(result, useParse);
             this.timeout = timeout;
+            startParse(result, useParse);
+        } else if (isIllegal(result.getRealUrl())) {
+            ErrorEvent.url();
         } else {
             this.timeout = timeout;
             setMediaSource(result);
@@ -414,6 +415,11 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         if (ijkPlayer == null) return;
         ijkPlayer.release();
         ijkPlayer = null;
+    }
+
+    private void startParse(Result result, boolean useParse) {
+        stopParse();
+        parseJob = ParseJob.create(this).start(result, useParse);
     }
 
     private void stopParse() {
@@ -481,6 +487,14 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     private boolean hasDanmu() {
         return danmuView != null && danmuView.isPrepared();
+    }
+
+    private boolean isIllegal(String url) {
+        Uri uri = Uri.parse(Util.fixUrl(url));
+        String host = Util.host(uri);
+        String scheme = Util.scheme(uri);
+        if (scheme.equals("data")) return false;
+        return scheme.isEmpty() || scheme.equals("file") ? !Path.exists(url) : host.isEmpty();
     }
 
     @Override
@@ -561,8 +575,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     public void prepared() {
         App.post(() -> {
             if (danmuView == null) return;
-            if (!Setting.isDanmu()) danmuView.hide();
-            if (isPlaying() && danmuView.isPrepared()) danmuView.start(getPosition());
+            if (isPlaying() && danmuView.isPrepared()) danmuView.start(getPosition(), Setting.isDanmu());
         });
     }
 }

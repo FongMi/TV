@@ -29,6 +29,10 @@ public class Path {
         return file;
     }
 
+    public static boolean exists(String path) {
+        return new File(path.replace("file://", "")).exists();
+    }
+
     public static File root() {
         return Environment.getExternalStorageDirectory();
     }
@@ -39,6 +43,14 @@ public class Path {
 
     public static File files() {
         return Init.context().getFilesDir();
+    }
+
+    public static File externalFiles() {
+        return Init.context().getExternalFilesDir("");
+    }
+
+    public static File externalCache() {
+        return Init.context().getExternalCacheDir();
     }
 
     public static String rootPath() {
@@ -163,6 +175,11 @@ public class Path {
         } catch (Exception ignored) {
             return file;
         }
+    }
+
+    public static void move(File in, File out) {
+        copy(in, out);
+        clear(in);
     }
 
     public static void copy(File in, File out) {

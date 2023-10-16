@@ -4,12 +4,12 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.github.catvod.utils.Json;
 import com.google.common.net.HttpHeaders;
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
 
@@ -49,7 +49,7 @@ public class Channel {
     private int line;
 
     public static Channel objectFrom(JsonElement element) {
-        return new Gson().fromJson(element, Channel.class);
+        return App.gson().fromJson(element, Channel.class);
     }
 
     public static Channel create(int number) {
