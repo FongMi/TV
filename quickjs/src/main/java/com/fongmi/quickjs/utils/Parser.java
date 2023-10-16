@@ -98,11 +98,7 @@ public class Parser {
     }
 
     public String joinUrl(String parent, String child) {
-        try {
-            return UriUtil.resolve(parent, child);
-        } catch (Throwable e) {
-            return "";
-        }
+        return UriUtil.resolve(parent, child);
     }
 
     public List<String> pdfa(String html, String rule) {

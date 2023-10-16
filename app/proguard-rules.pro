@@ -50,6 +50,9 @@
 # Mozilla
 -keep class org.mozilla.javascript.** { *; }
 
+# QuickJS
+-keep class com.whl.quickjs.** { *; }
+
 # Sardine
 -keep class com.thegrizzlylabs.sardineandroid.** { *; }
 

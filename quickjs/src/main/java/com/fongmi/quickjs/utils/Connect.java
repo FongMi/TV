@@ -10,11 +10,13 @@ import com.whl.quickjs.wrapper.QuickJSContext;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import okhttp3.Call;
 import okhttp3.FormBody;
 import okhttp3.Headers;
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -63,19 +65,28 @@ public class Connect {
     private static RequestBody getPostBody(Req req, String contentType) {
         if (req.getData() != null && req.getPostType().equals("json")) return getJsonBody(req);
         if (req.getData() != null && req.getPostType().equals("form")) return getFormBody(req);
-        if (req.getBody() != null && contentType != null) return RequestBody.create(MediaType.get(contentType), req.getBody());
-        return RequestBody.create(null, "");
+        if (req.getData() != null && req.getPostType().equals("form-data")) return getFormDataBody(req);
+        if (req.getBody() != null && contentType != null) return RequestBody.create(req.getBody(), MediaType.get(contentType));
+        return RequestBody.create("", null);
     }
 
     private static RequestBody getJsonBody(Req req) {
-        return RequestBody.create(MediaType.get("application/json"), req.getData().toString());
+        return RequestBody.create(req.getData().toString(), MediaType.get("application/json"));
     }
 
     private static RequestBody getFormBody(Req req) {
-        FormBody.Builder formBody = new FormBody.Builder();
+        FormBody.Builder builder = new FormBody.Builder();
         Map<String, String> params = Json.toMap(req.getData());
-        for (String key : params.keySet()) formBody.add(key, params.get(key));
-        return formBody.build();
+        for (String key : params.keySet()) builder.add(key, params.get(key));
+        return builder.build();
+    }
+
+    private static RequestBody getFormDataBody(Req req) {
+        String boundary = "--dio-boundary-" + new Random().nextInt(42949) + "" + new Random().nextInt(67296);
+        MultipartBody.Builder builder = new MultipartBody.Builder(boundary).setType(MultipartBody.FORM);
+        Map<String, String> params = Json.toMap(req.getData());
+        for (String key : params.keySet()) builder.addFormDataPart(key, params.get(key));
+        return builder.build();
     }
 
     private static void setHeader(QuickJSContext ctx, Response res, JSObject object) {

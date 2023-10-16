@@ -5,6 +5,7 @@ import android.os.Parcelable;
 import android.text.TextUtils;
 
 import com.github.catvod.utils.Trans;
+import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
 import org.simpleframework.xml.Attribute;
@@ -20,11 +21,11 @@ import java.util.List;
 public class Class implements Parcelable {
 
     @Attribute(name = "id", required = false)
-    @SerializedName("type_id")
+    @SerializedName(value = "type_id", alternate = "id")
     private String typeId;
 
     @Text
-    @SerializedName("type_name")
+    @SerializedName(value = "type_name", alternate = "name")
     private String typeName;
 
     @SerializedName("type_flag")
@@ -37,6 +38,10 @@ public class Class implements Parcelable {
     private boolean activated;
 
     public Class() {
+    }
+
+    public static Class objectFrom(String json) {
+        return new Gson().fromJson(json, Class.class);
     }
 
     public String getTypeId() {
@@ -68,7 +73,9 @@ public class Class implements Parcelable {
     }
 
     public void setFilters(List<Filter> filters) {
+        if (filters == null || filters.isEmpty()) return;
         this.filters = filters;
+        this.setFilter(false);
     }
 
     public void setFilter(Boolean filter) {

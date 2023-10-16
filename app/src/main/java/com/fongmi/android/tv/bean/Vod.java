@@ -5,8 +5,9 @@ import android.os.Parcelable;
 import android.text.TextUtils;
 import android.view.View;
 
+import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.utils.Sniffer;
 import com.github.catvod.utils.Trans;
-import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 
@@ -86,7 +87,7 @@ public class Vod implements Parcelable {
 
     public static List<Vod> arrayFrom(String str) {
         Type listType = new TypeToken<List<Vod>>() {}.getType();
-        List<Vod> items = new Gson().fromJson(str, listType);
+        List<Vod> items = App.gson().fromJson(str, listType);
         return items == null ? Collections.emptyList() : items;
     }
 
@@ -232,10 +233,10 @@ public class Vod implements Parcelable {
         this.vodName = Trans.s2t(vodName);
         this.vodArea = Trans.s2t(vodArea);
         this.typeName = Trans.s2t(typeName);
-        this.vodActor = Trans.s2t(vodActor);
         this.vodRemarks = Trans.s2t(vodRemarks);
-        this.vodContent = Trans.s2t(vodContent);
-        this.vodDirector = Trans.s2t(vodDirector);
+        if (vodActor != null) this.vodActor = Sniffer.CLICKER.matcher(vodActor).find() ? vodActor : Trans.s2t(vodActor);
+        if (vodContent != null) this.vodContent = Sniffer.CLICKER.matcher(vodContent).find() ? vodContent : Trans.s2t(vodContent);
+        if (vodDirector != null) this.vodDirector = Sniffer.CLICKER.matcher(vodDirector).find() ? vodDirector : Trans.s2t(vodDirector);
     }
 
     public void setVodFlags() {

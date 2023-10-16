@@ -46,7 +46,7 @@ public class LiveViewModel extends ViewModel {
     public void fetch(Channel item) {
         execute(CHANNEL, () -> {
             Source.get().stop();
-            item.setUrl(Source.get().fetch(item.getCurrent().split("\\$")[0]));
+            item.setUrl(Source.get().fetch(item));
             return item;
         });
     }

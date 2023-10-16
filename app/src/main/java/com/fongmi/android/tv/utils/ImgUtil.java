@@ -81,7 +81,7 @@ public class ImgUtil {
 
     private static void addHeader(LazyHeaders.Builder builder, String header) {
         Map<String, String> map = Json.toMap(JsonParser.parseString(header));
-        for (Map.Entry<String, String> entry : map.entrySet()) builder.addHeader(Util.fix(entry.getKey()), entry.getValue());
+        for (Map.Entry<String, String> entry : map.entrySet()) builder.addHeader(Util.fixHeader(entry.getKey()), entry.getValue());
     }
 
     public static byte[] resize(byte[] bytes) {
