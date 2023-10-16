@@ -209,6 +209,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
+                android:layout_marginRight="16dp"
                 android:text="@string/setting_player_buffer"
                 android:textColor="@color/white"
                 android:textSize="18sp" />
@@ -227,6 +228,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
+                android:layout_marginLeft="4dp"
                 android:text="@string/times"
                 android:textColor="@color/white"
                 android:textSize="18sp" />
