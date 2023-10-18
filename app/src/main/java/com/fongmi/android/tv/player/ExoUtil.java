@@ -57,7 +57,6 @@ import okhttp3.Call;
 public class ExoUtil {
 
     private static HttpDataSource.Factory httpDataSourceFactory;
-    private static long MAX_CACHE_BYTE = 100 * 1024 * 1024;
     private static DataSource.Factory dataSourceFactory;
     private static ExtractorsFactory extractorsFactory;
     private static DatabaseProvider database;
@@ -191,7 +190,7 @@ public class ExoUtil {
     }
 
     private static synchronized Cache getCache() {
-        if (cache == null) cache = new SimpleCache(Path.exo(), new LeastRecentlyUsedCacheEvictor(MAX_CACHE_BYTE), getDatabase());
+        if (cache == null) cache = new SimpleCache(Path.exo(), new LeastRecentlyUsedCacheEvictor(100 * 1024 * 1024), getDatabase());
         return cache;
     }
 
