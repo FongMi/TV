@@ -3,7 +3,6 @@ package com.fongmi.android.tv.player;
 import android.graphics.Color;
 import android.net.Uri;
 
-import androidx.media3.common.C;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.MimeTypes;
 import androidx.media3.common.PlaybackException;
@@ -17,8 +16,6 @@ import androidx.media3.datasource.DefaultHttpDataSource;
 import androidx.media3.datasource.HttpDataSource;
 import androidx.media3.datasource.cache.Cache;
 import androidx.media3.datasource.cache.CacheDataSource;
-import androidx.media3.datasource.cache.CacheEvictor;
-import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor;
 import androidx.media3.datasource.cache.NoOpCacheEvictor;
 import androidx.media3.datasource.cache.SimpleCache;
 import androidx.media3.datasource.okhttp.OkHttpDataSource;
@@ -59,13 +56,10 @@ import okhttp3.Call;
 
 public class ExoUtil {
 
-    private static LeastRecentlyUsedCacheEvictor usedCacheEvictor;
     private static HttpDataSource.Factory httpDataSourceFactory;
     private static DataSource.Factory dataSourceFactory;
     private static ExtractorsFactory extractorsFactory;
-    private static NoOpCacheEvictor noOpCacheEvictor;
     private static DatabaseProvider database;
-    private static CacheEvictor evictor;
     private static Cache cache;
 
     public static LoadControl buildLoadControl() {
@@ -126,7 +120,6 @@ public class ExoUtil {
         Uri uri = Uri.parse(Util.fixUrl(url));
         String mimeType = getMimeType(format, errorCode);
         if (uri.getUserInfo() != null) headers.put(HttpHeaders.AUTHORIZATION, Util.basic(uri));
-        checkEvictor(androidx.media3.common.util.Util.inferContentType(uri) == C.CONTENT_TYPE_OTHER && !MimeTypes.APPLICATION_M3U8.equals(mimeType));
         return new DefaultMediaSourceFactory(getDataSourceFactory(headers), getExtractorsFactory()).createMediaSource(getMediaItem(uri, mimeType, subs, drm));
     }
 
@@ -171,14 +164,6 @@ public class ExoUtil {
         player.setTrackSelectionParameters(player.getTrackSelectionParameters().buildUpon().setOverrideForType(new TrackSelectionOverride(player.getCurrentTracks().getGroups().get(group).getMediaTrackGroup(), trackIndices)).build());
     }
 
-    private static void checkEvictor(boolean cache) {
-        if (noOpCacheEvictor == null) noOpCacheEvictor = new NoOpCacheEvictor();
-        if (usedCacheEvictor == null) usedCacheEvictor = new LeastRecentlyUsedCacheEvictor(256 * 1024 * 1024);
-        CacheEvictor evictor = cache ? usedCacheEvictor : noOpCacheEvictor;
-        if (!evictor.equals(ExoUtil.evictor)) reset();
-        ExoUtil.evictor = evictor;
-    }
-
     private static synchronized ExtractorsFactory getExtractorsFactory() {
         if (extractorsFactory == null) extractorsFactory = new DefaultExtractorsFactory().setTsExtractorFlags(DefaultTsPayloadReaderFactory.FLAG_ENABLE_HDMV_DTS_AUDIO_STREAMS).setTsExtractorTimestampSearchBytes(TsExtractor.DEFAULT_TIMESTAMP_SEARCH_BYTES * 3);
         return extractorsFactory;
@@ -205,7 +190,7 @@ public class ExoUtil {
     }
 
     private static synchronized Cache getCache() {
-        if (cache == null) cache = new SimpleCache(Path.exo(), evictor, getDatabase());
+        if (cache == null) cache = new SimpleCache(Path.exo(), new NoOpCacheEvictor(), getDatabase());
         return cache;
     }
 
