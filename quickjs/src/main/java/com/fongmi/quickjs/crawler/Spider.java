@@ -13,6 +13,7 @@ import com.fongmi.quickjs.utils.JSUtil;
 import com.fongmi.quickjs.utils.Module;
 import com.github.catvod.utils.Json;
 import com.github.catvod.utils.Path;
+
 import com.whl.quickjs.wrapper.JSArray;
 import com.whl.quickjs.wrapper.JSMethod;
 import com.whl.quickjs.wrapper.JSObject;
@@ -209,7 +210,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
         String spider = "__JS_SPIDER__";
         String global = "globalThis." + spider;
         String content = Module.get().fetch(api);
-        if (content.startsWith("//bb")) ctx.execute(Module.get().bb(content), spider);
+        if (content.startsWith("//bb")) ctx.execute(Module.get().bb(content));
         else ctx.evaluateModule(content.replace(spider, global), api);
         ctx.evaluateModule(String.format(Path.asset("js/lib/spider.js"), api));
         if (content.startsWith("//bb") || content.contains(jsEval)) cat = true;
