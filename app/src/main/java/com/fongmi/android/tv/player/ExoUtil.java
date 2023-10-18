@@ -16,7 +16,7 @@ import androidx.media3.datasource.DefaultHttpDataSource;
 import androidx.media3.datasource.HttpDataSource;
 import androidx.media3.datasource.cache.Cache;
 import androidx.media3.datasource.cache.CacheDataSource;
-import androidx.media3.datasource.cache.NoOpCacheEvictor;
+import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor;
 import androidx.media3.datasource.cache.SimpleCache;
 import androidx.media3.datasource.okhttp.OkHttpDataSource;
 import androidx.media3.exoplayer.DefaultLoadControl;
@@ -57,6 +57,7 @@ import okhttp3.Call;
 public class ExoUtil {
 
     private static HttpDataSource.Factory httpDataSourceFactory;
+    private static long MAX_CACHE_BYTE = 100 * 1024 * 1024;
     private static DataSource.Factory dataSourceFactory;
     private static ExtractorsFactory extractorsFactory;
     private static DatabaseProvider database;
@@ -181,7 +182,7 @@ public class ExoUtil {
     }
 
     private static CacheDataSource.Factory buildReadOnlyCacheDataSource(DataSource.Factory upstreamFactory, Cache cache) {
-        return new CacheDataSource.Factory().setCache(cache).setUpstreamDataSourceFactory(upstreamFactory).setCacheWriteDataSinkFactory(null).setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR);
+        return new CacheDataSource.Factory().setCache(cache).setUpstreamDataSourceFactory(upstreamFactory).setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR);
     }
 
     private static synchronized DatabaseProvider getDatabase() {
@@ -190,7 +191,7 @@ public class ExoUtil {
     }
 
     private static synchronized Cache getCache() {
-        if (cache == null) cache = new SimpleCache(Path.exo(), new NoOpCacheEvictor(), getDatabase());
+        if (cache == null) cache = new SimpleCache(Path.exo(), new LeastRecentlyUsedCacheEvictor(MAX_CACHE_BYTE), getDatabase());
         return cache;
     }
 
