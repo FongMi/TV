@@ -172,7 +172,7 @@ public class ExoUtil {
 
     private static void checkEvictor(boolean cache) {
         if (noOpCacheEvictor == null) noOpCacheEvictor = new NoOpCacheEvictor();
-        if (usedCacheEvictor == null) usedCacheEvictor = new LeastRecentlyUsedCacheEvictor(100 * 1024 * 1024);
+        if (usedCacheEvictor == null) usedCacheEvictor = new LeastRecentlyUsedCacheEvictor(200 * 1024 * 1024);
         CacheEvictor evictor = cache ? usedCacheEvictor : noOpCacheEvictor;
         if (!evictor.equals(ExoUtil.evictor)) reset();
         ExoUtil.evictor = evictor;
