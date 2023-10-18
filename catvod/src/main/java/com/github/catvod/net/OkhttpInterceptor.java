@@ -3,6 +3,7 @@ package com.github.catvod.net;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.github.catvod.utils.Util;
 import com.google.common.net.HttpHeaders;
 
 import java.io.IOException;
@@ -18,8 +19,6 @@ import okio.BufferedSource;
 import okio.Okio;
 
 public class OkhttpInterceptor implements Interceptor {
-
-    public static final String CHROME = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36";
 
     @NonNull
     @Override
@@ -49,8 +48,8 @@ public class OkhttpInterceptor implements Interceptor {
     }
 
     private Request getRequest(@NonNull Chain chain) {
-        Request original = chain.request();
-        if (original.url().host().equals("gitcode.net")) return original.newBuilder().addHeader(HttpHeaders.USER_AGENT, CHROME).build();
-        return original;
+        Request request = chain.request();
+        if (request.url().host().equals("gitcode.net")) return request.newBuilder().addHeader(HttpHeaders.USER_AGENT, Util.CHROME).build();
+        return request;
     }
 }

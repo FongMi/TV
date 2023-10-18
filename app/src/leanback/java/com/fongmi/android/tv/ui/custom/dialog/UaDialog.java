@@ -19,7 +19,6 @@ import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.ui.custom.CustomTextListener;
 import com.fongmi.android.tv.utils.QRCode;
 import com.fongmi.android.tv.utils.ResUtil;
-import com.fongmi.android.tv.utils.Sniffer;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.greenrobot.eventbus.EventBus;
@@ -89,7 +88,7 @@ public class UaDialog implements DialogInterface.OnDismissListener {
     private void detect(String s) {
         if (append && s.equalsIgnoreCase("c")) {
             append = false;
-            binding.text.setText(Sniffer.CHROME);
+            binding.text.setText(com.github.catvod.utils.Util.CHROME);
         } else if (append && s.equalsIgnoreCase("o")) {
             append = false;
             binding.text.setText(Util.userAgent);

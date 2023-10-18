@@ -20,6 +20,7 @@ import java.util.Formatter;
 
 public class Util {
 
+    public static final String CHROME = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36";
     public static final String[] UNITS = new String[]{"bytes", "KB", "MB", "GB", "TB"};
 
     public static String getDeviceId() {

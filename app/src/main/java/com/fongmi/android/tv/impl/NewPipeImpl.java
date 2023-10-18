@@ -2,8 +2,8 @@ package com.fongmi.android.tv.impl;
 
 import androidx.annotation.NonNull;
 
-import com.fongmi.android.tv.utils.Sniffer;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.Util;
 import com.google.common.net.HttpHeaders;
 
 import org.schabi.newpipe.extractor.downloader.Downloader;
@@ -26,7 +26,7 @@ public class NewPipeImpl extends Downloader {
         RequestBody reqBody = null;
         byte[] dataToSend = request.dataToSend();
         if (dataToSend != null) reqBody = RequestBody.create(dataToSend, null);
-        okhttp3.Request.Builder builder = new okhttp3.Request.Builder().method(request.httpMethod(), reqBody).url(url).addHeader(HttpHeaders.USER_AGENT, Sniffer.CHROME);
+        okhttp3.Request.Builder builder = new okhttp3.Request.Builder().method(request.httpMethod(), reqBody).url(url).addHeader(HttpHeaders.USER_AGENT, Util.CHROME);
         for (Map.Entry<String, List<String>> pair : request.headers().entrySet()) {
             String headerName = pair.getKey();
             List<String> headerValueList = pair.getValue();
