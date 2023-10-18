@@ -12,6 +12,11 @@ import com.fongmi.android.tv.ui.activity.VideoActivity;
 public class Push implements Source.Extractor {
 
     @Override
+    public boolean useCache() {
+        return false;
+    }
+
+    @Override
     public boolean match(String scheme, String host) {
         return scheme.equals("push");
     }

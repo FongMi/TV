@@ -14,6 +14,11 @@ public class JianPian implements Source.Extractor {
     private String path;
 
     @Override
+    public boolean useCache() {
+        return true;
+    }
+
+    @Override
     public boolean match(String scheme, String host) {
         return scheme.equals("tvbox-xg") || scheme.equals("jianpian");
     }

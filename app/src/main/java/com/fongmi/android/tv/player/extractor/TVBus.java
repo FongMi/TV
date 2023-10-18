@@ -16,6 +16,11 @@ public class TVBus implements Source.Extractor, Listener {
     private Core core;
 
     @Override
+    public boolean useCache() {
+        return false;
+    }
+
+    @Override
     public boolean match(String scheme, String host) {
         return scheme.equals("tvbus");
     }

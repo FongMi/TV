@@ -75,6 +75,8 @@ public class Result implements Parcelable {
     @JsonAdapter(MsgAdapter.class)
     @SerializedName("msg")
     private String msg;
+    @SerializedName("cache")
+    private boolean cache;
 
     public static Result objectFrom(String str) {
         try {
@@ -258,6 +260,14 @@ public class Result implements Parcelable {
 
     public void setMsg(String msg) {
         this.msg = msg;
+    }
+
+    public boolean isCache() {
+        return cache;
+    }
+
+    public void setCache(boolean cache) {
+        this.cache = cache;
     }
 
     public boolean hasMsg() {

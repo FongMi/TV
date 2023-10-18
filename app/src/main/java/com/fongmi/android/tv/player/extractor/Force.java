@@ -23,6 +23,11 @@ public class Force implements Source.Extractor {
     private final HashSet<String> set = new HashSet<>();
 
     @Override
+    public boolean useCache() {
+        return false;
+    }
+
+    @Override
     public boolean match(String scheme, String host) {
         return !scheme.equals("push") && scheme.startsWith("p") || scheme.equals("mitv");
     }

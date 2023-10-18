@@ -9,6 +9,11 @@ public class ZLive implements Source.Extractor {
     private final String BASE = "http://127.0.0.1:6677/stream/";
     private boolean init;
 
+    @Override
+    public boolean useCache() {
+        return false;
+    }
+
     public void init() {
         //com.east.android.zlive.ZLive.INSTANCE.OnLiveStart(6677);
         //init = true;

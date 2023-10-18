@@ -43,6 +43,7 @@ public class Channel {
     private Drm drm;
 
     private boolean selected;
+    private boolean cache;
     private Group group;
     private String url;
     private Epg data;
@@ -193,6 +194,14 @@ public class Channel {
 
     public void setSelected(Channel item) {
         this.selected = item.equals(this);
+    }
+
+    public boolean isCache() {
+        return cache;
+    }
+
+    public void setCache(boolean cache) {
+        this.cache = cache;
     }
 
     public int getLineVisible() {

@@ -16,7 +16,9 @@ import androidx.media3.datasource.DefaultHttpDataSource;
 import androidx.media3.datasource.HttpDataSource;
 import androidx.media3.datasource.cache.Cache;
 import androidx.media3.datasource.cache.CacheDataSource;
+import androidx.media3.datasource.cache.CacheEvictor;
 import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor;
+import androidx.media3.datasource.cache.NoOpCacheEvictor;
 import androidx.media3.datasource.cache.SimpleCache;
 import androidx.media3.datasource.okhttp.OkHttpDataSource;
 import androidx.media3.exoplayer.DefaultLoadControl;
@@ -56,10 +58,13 @@ import okhttp3.Call;
 
 public class ExoUtil {
 
+    private static LeastRecentlyUsedCacheEvictor usedCacheEvictor;
     private static HttpDataSource.Factory httpDataSourceFactory;
     private static DataSource.Factory dataSourceFactory;
     private static ExtractorsFactory extractorsFactory;
+    private static NoOpCacheEvictor noOpCacheEvictor;
     private static DatabaseProvider database;
+    private static CacheEvictor evictor;
     private static Cache cache;
 
     public static LoadControl buildLoadControl() {
@@ -105,18 +110,19 @@ public class ExoUtil {
     }
 
     public static MediaSource getSource(Result result, int errorCode) {
-        return getSource(result.getHeaders(), result.getRealUrl(), result.getFormat(), result.getSubs(), null, errorCode);
+        return getSource(result.getHeaders(), result.getRealUrl(), result.getFormat(), result.getSubs(), null, errorCode, result.isCache());
     }
 
     public static MediaSource getSource(Channel channel, int errorCode) {
-        return getSource(channel.getHeaders(), channel.getUrl(), null, Collections.emptyList(), channel.getDrm(), errorCode);
+        return getSource(channel.getHeaders(), channel.getUrl(), null, Collections.emptyList(), channel.getDrm(), errorCode, channel.isCache());
     }
 
     public static MediaSource getSource(Map<String, String> headers, String url, int errorCode) {
-        return getSource(headers, url, null, Collections.emptyList(), null, errorCode);
+        return getSource(headers, url, null, Collections.emptyList(), null, errorCode, false);
     }
 
-    private static MediaSource getSource(Map<String, String> headers, String url, String format, List<Sub> subs, Drm drm, int errorCode) {
+    private static MediaSource getSource(Map<String, String> headers, String url, String format, List<Sub> subs, Drm drm, int errorCode, boolean cache) {
+        checkEvictor(cache);
         Uri uri = Uri.parse(Util.fixUrl(url));
         String mimeType = getMimeType(format, errorCode);
         if (uri.getUserInfo() != null) headers.put(HttpHeaders.AUTHORIZATION, Util.basic(uri));
@@ -164,6 +170,14 @@ public class ExoUtil {
         player.setTrackSelectionParameters(player.getTrackSelectionParameters().buildUpon().setOverrideForType(new TrackSelectionOverride(player.getCurrentTracks().getGroups().get(group).getMediaTrackGroup(), trackIndices)).build());
     }
 
+    private static void checkEvictor(boolean cache) {
+        if (noOpCacheEvictor == null) noOpCacheEvictor = new NoOpCacheEvictor();
+        if (usedCacheEvictor == null) usedCacheEvictor = new LeastRecentlyUsedCacheEvictor(100 * 1024 * 1024);
+        CacheEvictor evictor = cache ? usedCacheEvictor : noOpCacheEvictor;
+        if (!evictor.equals(ExoUtil.evictor)) reset();
+        ExoUtil.evictor = evictor;
+    }
+
     private static synchronized ExtractorsFactory getExtractorsFactory() {
         if (extractorsFactory == null) extractorsFactory = new DefaultExtractorsFactory().setTsExtractorFlags(DefaultTsPayloadReaderFactory.FLAG_ENABLE_HDMV_DTS_AUDIO_STREAMS).setTsExtractorTimestampSearchBytes(TsExtractor.DEFAULT_TIMESTAMP_SEARCH_BYTES * 3);
         return extractorsFactory;
@@ -190,7 +204,7 @@ public class ExoUtil {
     }
 
     private static synchronized Cache getCache() {
-        if (cache == null) cache = new SimpleCache(Path.exo(), new LeastRecentlyUsedCacheEvictor(100 * 1024 * 1024), getDatabase());
+        if (cache == null) cache = new SimpleCache(Path.exo(), evictor, getDatabase());
         return cache;
     }
 

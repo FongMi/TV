@@ -24,6 +24,11 @@ import okhttp3.Headers;
 public class Youtube implements Source.Extractor {
 
     @Override
+    public boolean useCache() {
+        return false;
+    }
+
+    @Override
     public boolean match(String scheme, String host) {
         return host.contains("youtube.com") || host.contains("youtu.be");
     }
