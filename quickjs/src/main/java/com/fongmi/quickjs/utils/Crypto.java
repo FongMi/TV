@@ -35,7 +35,7 @@ public class Crypto {
         }
     }
 
-    public static String rsa(boolean pub, boolean encrypt, String input, boolean inBase64, String key, boolean outBase64) {
+    public static String rsa(String mode, boolean pub, boolean encrypt, String input, boolean inBase64, String key, boolean outBase64) {
         try {
             Key rsaKey = generateKey(pub, key);
             int len = getModulusLength(rsaKey);
