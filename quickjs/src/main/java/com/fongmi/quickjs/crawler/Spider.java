@@ -209,13 +209,11 @@ public class Spider extends com.github.catvod.crawler.Spider {
         String spider = "__JS_SPIDER__";
         String global = "globalThis." + spider;
         String content = Module.get().fetch(api);
+        if (content.startsWith("//bb")) ctx.execute(Module.get().bb(content), spider);
+        else ctx.evaluateModule(content.replace(spider, global), api);
+        ctx.evaluateModule(String.format(Path.asset("js/lib/spider.js"), api));
         if (content.startsWith("//bb") || content.contains(jsEval)) cat = true;
-        if (content.startsWith("//bb")) ctx.execute(Module.get().bb(content), spider, jsEval);
-        else if (content.contains(jsEval)) ctx.evaluateModule(content, api, jsEval);
-        else if (content.contains(spider)) ctx.evaluateModule(content.replace(spider, global), api);
-        else ctx.evaluateModule(content.replaceAll("export default.*?[{]", global + " = {"), api);
         jsObject = (JSObject) ctx.getProperty(ctx.getGlobalObject(), spider);
-        if (cat) ctx.evaluate("req = http");
     }
 
     private JSObject cfg(String ext) {
