@@ -23,8 +23,7 @@ public class Github {
     public static String getSo(String name) {
         try {
             File file = Path.so(name);
-            moveExist(Path.externalCache(), file);
-            moveExist(Path.externalFiles(), file);
+            moveExist(Path.download(), file);
             String url = name.startsWith("http") ? name : getUrl("so", file.getName());
             if (file.length() < 300) Path.write(file, OkHttp.newCall(url).execute().body().bytes());
             return file.getAbsolutePath();
