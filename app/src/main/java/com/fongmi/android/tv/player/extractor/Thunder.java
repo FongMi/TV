@@ -19,11 +19,6 @@ public class Thunder implements Source.Extractor {
     private GetTaskId taskId;
 
     @Override
-    public boolean useCache() {
-        return true;
-    }
-
-    @Override
     public boolean match(String scheme, String host) {
         return scheme.equals("magnet") || scheme.equals("ed2k");
     }

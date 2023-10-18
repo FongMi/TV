@@ -13,11 +13,6 @@ import okhttp3.Headers;
 public class BiliBili implements Source.Extractor {
 
     @Override
-    public boolean useCache() {
-        return false;
-    }
-
-    @Override
     public boolean match(String scheme, String host) {
         return "live.bilibili.com".equals(host);
     }

@@ -49,17 +49,14 @@ public class Source {
     public String fetch(Result result) throws Exception {
         String url = result.getUrl().v();
         Extractor extractor = getExtractor(url);
-        if (extractor == null) return url;
-        result.setCache(extractor.useCache());
-        return extractor.fetch(url);
+        if (extractor != null) result.setParse(0);
+        return extractor == null ? url : extractor.fetch(url);
     }
 
     public String fetch(Channel channel) throws Exception {
         String url = channel.getCurrent().split("\\$")[0];
         Extractor extractor = getExtractor(url);
-        if (extractor == null) return url;
-        channel.setCache(extractor.useCache());
-        return extractor.fetch(url);
+        return extractor == null ? url : extractor.fetch(url);
     }
 
     public void stop() {
@@ -73,8 +70,6 @@ public class Source {
     }
 
     public interface Extractor {
-
-        boolean useCache();
 
         boolean match(String scheme, String host);
 

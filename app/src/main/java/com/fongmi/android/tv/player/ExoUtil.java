@@ -3,6 +3,7 @@ package com.fongmi.android.tv.player;
 import android.graphics.Color;
 import android.net.Uri;
 
+import androidx.media3.common.C;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.MimeTypes;
 import androidx.media3.common.PlaybackException;
@@ -110,22 +111,22 @@ public class ExoUtil {
     }
 
     public static MediaSource getSource(Result result, int errorCode) {
-        return getSource(result.getHeaders(), result.getRealUrl(), result.getFormat(), result.getSubs(), null, errorCode, result.isCache());
+        return getSource(result.getHeaders(), result.getRealUrl(), result.getFormat(), result.getSubs(), null, errorCode);
     }
 
     public static MediaSource getSource(Channel channel, int errorCode) {
-        return getSource(channel.getHeaders(), channel.getUrl(), null, Collections.emptyList(), channel.getDrm(), errorCode, channel.isCache());
+        return getSource(channel.getHeaders(), channel.getUrl(), null, Collections.emptyList(), channel.getDrm(), errorCode);
     }
 
     public static MediaSource getSource(Map<String, String> headers, String url, int errorCode) {
-        return getSource(headers, url, null, Collections.emptyList(), null, errorCode, false);
+        return getSource(headers, url, null, Collections.emptyList(), null, errorCode);
     }
 
-    private static MediaSource getSource(Map<String, String> headers, String url, String format, List<Sub> subs, Drm drm, int errorCode, boolean cache) {
-        checkEvictor(cache);
+    private static MediaSource getSource(Map<String, String> headers, String url, String format, List<Sub> subs, Drm drm, int errorCode) {
         Uri uri = Uri.parse(Util.fixUrl(url));
         String mimeType = getMimeType(format, errorCode);
         if (uri.getUserInfo() != null) headers.put(HttpHeaders.AUTHORIZATION, Util.basic(uri));
+        checkEvictor(androidx.media3.common.util.Util.inferContentType(uri) == C.CONTENT_TYPE_OTHER && !MimeTypes.APPLICATION_M3U8.equals(mimeType));
         return new DefaultMediaSourceFactory(getDataSourceFactory(headers), getExtractorsFactory()).createMediaSource(getMediaItem(uri, mimeType, subs, drm));
     }
 
@@ -172,7 +173,7 @@ public class ExoUtil {
 
     private static void checkEvictor(boolean cache) {
         if (noOpCacheEvictor == null) noOpCacheEvictor = new NoOpCacheEvictor();
-        if (usedCacheEvictor == null) usedCacheEvictor = new LeastRecentlyUsedCacheEvictor(200 * 1024 * 1024);
+        if (usedCacheEvictor == null) usedCacheEvictor = new LeastRecentlyUsedCacheEvictor(256 * 1024 * 1024);
         CacheEvictor evictor = cache ? usedCacheEvictor : noOpCacheEvictor;
         if (!evictor.equals(ExoUtil.evictor)) reset();
         ExoUtil.evictor = evictor;
