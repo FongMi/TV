@@ -268,6 +268,7 @@ public class Result implements Parcelable {
 
     public void setCache(boolean cache) {
         this.cache = cache;
+        this.setParse(0);
     }
 
     public boolean hasMsg() {

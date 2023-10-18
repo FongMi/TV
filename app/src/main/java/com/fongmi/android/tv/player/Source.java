@@ -50,7 +50,6 @@ public class Source {
         String url = result.getUrl().v();
         Extractor extractor = getExtractor(url);
         if (extractor == null) return url;
-        result.setParse(0);
         result.setCache(extractor.useCache());
         return extractor.fetch(url);
     }
