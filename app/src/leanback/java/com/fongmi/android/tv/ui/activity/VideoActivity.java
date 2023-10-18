@@ -539,11 +539,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         SpannableString span = new SpannableString(text);
         for (String s : map.keySet()) {
             int index = text.indexOf(s);
-            try {
-                span.setSpan(getClickableSpan(map.get(s)), index, index + s.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            span.setSpan(getClickableSpan(map.get(s)), index, index + s.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
         return span;
     }
@@ -551,10 +547,9 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private String findClicker(String text, Map<String, String> map) {
         Matcher m = Sniffer.CLICKER.matcher(text);
         while (m.find()) {
-            String val = m.group(1);
-            String key = Trans.s2t(m.group(2));
+            String key = Trans.s2t(m.group(2)).trim();
             text = text.replace(m.group(), key);
-            map.put(key, val);
+            map.put(key, m.group(1));
         }
         return text;
     }
