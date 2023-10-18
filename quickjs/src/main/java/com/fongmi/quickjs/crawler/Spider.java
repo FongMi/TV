@@ -144,10 +144,10 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
     private void createCtx() {
         ctx = QuickJSContext.create();
+        ctx.setConsole(new Console());
         ctx.evaluate(Path.asset("js/lib/http.js"));
         Global.create(ctx, executor).setProperty();
         ctx.getGlobalObject().setProperty("local", Local.class);
-        ctx.getGlobalObject().setProperty("console", Console.class);
         ctx.setModuleLoader(new QuickJSContext.BytecodeModuleLoader() {
             @Override
             public String moduleNormalizeName(String baseModuleName, String moduleName) {
