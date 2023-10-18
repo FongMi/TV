@@ -539,8 +539,11 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         SpannableString span = new SpannableString(text);
         for (String s : map.keySet()) {
             int index = text.indexOf(s);
-            if (index == -1) continue;
-            span.setSpan(getClickableSpan(map.get(s)), index, index + s.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            try {
+                span.setSpan(getClickableSpan(map.get(s)), index, index + s.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         return span;
     }
