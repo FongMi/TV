@@ -1,16 +1,31 @@
 package com.fongmi.android.tv.ui.custom;
 
+import android.graphics.RectF;
 import android.text.Editable;
 import android.text.Layout;
 import android.text.NoCopySpan;
 import android.text.Selection;
 import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.method.ScrollingMovementMethod;
 import android.text.style.ClickableSpan;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+
+import com.fongmi.android.tv.bean.Result;
+import com.fongmi.android.tv.ui.activity.FolderActivity;
+import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.Sniffer;
+import com.github.catvod.utils.Trans;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
 
 public class CustomMovement extends ScrollingMovementMethod {
 
@@ -165,17 +180,22 @@ public class CustomMovement extends ScrollingMovementMethod {
             Layout layout = widget.getLayout();
             int line = layout.getLineForVertical(y);
             int off = layout.getOffsetForHorizontal(line, x);
-            ClickableSpan[] links = buffer.getSpans(off, off, ClickableSpan.class);
-            if (links.length != 0) {
-                ClickableSpan link = links[0];
-                if (action == MotionEvent.ACTION_UP) {
-                    link.onClick(widget);
+            final RectF touchedLineBounds = new RectF();
+            touchedLineBounds.left = layout.getLineLeft(line);
+            touchedLineBounds.top = layout.getLineTop(line);
+            touchedLineBounds.right = layout.getLineWidth(line) + touchedLineBounds.left;
+            touchedLineBounds.bottom = layout.getLineBottom(line);
+            if (touchedLineBounds.contains(x, y)) {
+                ClickableSpan[] links = buffer.getSpans(off, off, ClickableSpan.class);
+                if (links.length != 0) {
+                    ClickableSpan link = links[0];
+                    if (action == MotionEvent.ACTION_UP) {
+                        link.onClick(widget);
+                    }
+                    return true;
                 } else {
-                    Selection.setSelection(buffer, buffer.getSpanStart(link), buffer.getSpanEnd(link));
+                    Selection.removeSelection(buffer);
                 }
-                return true;
-            } else {
-                Selection.removeSelection(buffer);
             }
         }
         return super.onTouchEvent(widget, buffer, event);
