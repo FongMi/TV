@@ -202,7 +202,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     private void addVideo(Result result) {
         Style style = result.getStyle(getHome().getStyle());
-        for (List<Vod> items : Lists.partition(result.getList(), Product.getColumn())) {
+        for (List<Vod> items : Lists.partition(result.getList(), Product.getColumn(style))) {
             ArrayObjectAdapter adapter = new ArrayObjectAdapter(new VodPresenter(this, style));
             adapter.setItems(items, null);
             mAdapter.add(new ListRow(adapter));

@@ -514,30 +514,27 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private SpannableString getSpan(int resId, String text) {
         if (resId > 0) text = getString(resId, text);
         Map<String, String> map = new HashMap<>();
-        text = findClicker(text, map);
-        SpannableString span = new SpannableString(text);
-        for (String s : map.keySet()) {
-            int index = text.indexOf(s);
-            span.setSpan(getClickableSpan(map.get(s)), index, index + s.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        }
-        return span;
-    }
-
-    private String findClicker(String text, Map<String, String> map) {
         Matcher m = Sniffer.CLICKER.matcher(text);
         while (m.find()) {
             String key = Trans.s2t(m.group(2)).trim();
             text = text.replace(m.group(), key);
             map.put(key, m.group(1));
         }
-        return text;
+        SpannableString span = new SpannableString(text);
+        for (String s : map.keySet()) {
+            int index = text.indexOf(s);
+            Result result = Result.type(map.get(s));
+            span.setSpan(getClickSpan(result), index, index + s.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+        return span;
     }
 
-    private ClickableSpan getClickableSpan(String json) {
+    private ClickableSpan getClickSpan(Result result) {
         return new ClickableSpan() {
             @Override
             public void onClick(@NonNull View view) {
-                FolderActivity.start(getActivity(), getKey(), Result.type(json));
+                FolderActivity.start(getActivity(), getKey(), result);
+                ((TextView) view).setMaxLines(Integer.MAX_VALUE);
                 setRedirect(true);
             }
         };

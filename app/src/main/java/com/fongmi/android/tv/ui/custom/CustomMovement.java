@@ -6,26 +6,12 @@ import android.text.Layout;
 import android.text.NoCopySpan;
 import android.text.Selection;
 import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.Spanned;
 import android.text.method.ScrollingMovementMethod;
 import android.text.style.ClickableSpan;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
-
-import androidx.annotation.NonNull;
-
-import com.fongmi.android.tv.bean.Result;
-import com.fongmi.android.tv.ui.activity.FolderActivity;
-import com.fongmi.android.tv.utils.ResUtil;
-import com.fongmi.android.tv.utils.Sniffer;
-import com.github.catvod.utils.Trans;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Matcher;
 
 public class CustomMovement extends ScrollingMovementMethod {
 
