@@ -21,6 +21,7 @@ public class Danmu {
         try {
             return new Persister().read(Danmu.class, str);
         } catch (Exception e) {
+            e.printStackTrace();
             return new Danmu();
         }
     }
@@ -34,7 +35,7 @@ public class Danmu {
         @Attribute(name = "p", required = false)
         public String param;
 
-        @Text
+        @Text(required = false)
         public String text;
 
         public String getParam() {
