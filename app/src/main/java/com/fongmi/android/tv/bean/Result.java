@@ -272,6 +272,10 @@ public class Result implements Parcelable {
         return Json.toMap(getHeader());
     }
 
+    public Style getStyle(Style style) {
+        return getList().isEmpty() ? Style.rect() : getList().get(0).getStyle(style);
+    }
+
     public Result clear() {
         getList().clear();
         return this;

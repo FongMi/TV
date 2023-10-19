@@ -27,6 +27,7 @@ import com.fongmi.android.tv.bean.Func;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
+import com.fongmi.android.tv.bean.Style;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.ActivityHomeBinding;
 import com.fongmi.android.tv.event.CastEvent;
@@ -69,6 +70,10 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     private boolean confirm;
     private Result mResult;
     private Clock mClock;
+
+    private Site getHome() {
+        return ApiConfig.get().getHome();
+    }
 
     @Override
     protected ViewBinding getBinding() {
@@ -187,17 +192,18 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     private void getVideo() {
         mResult = Result.empty();
         int index = getRecommendIndex();
-        String home = ApiConfig.get().getHome().getName();
-        mBinding.title.setText(home.isEmpty() ? ResUtil.getString(R.string.app_name) : home);
+        String title = getHome().getName();
+        mBinding.title.setText(title.isEmpty() ? ResUtil.getString(R.string.app_name) : title);
         if (mAdapter.size() > index) mAdapter.removeItems(index, mAdapter.size() - index);
-        if (ApiConfig.get().getHome().getKey().isEmpty()) return;
+        if (getHome().getKey().isEmpty()) return;
         mViewModel.homeContent();
         mAdapter.add("progress");
     }
 
     private void addVideo(Result result) {
+        Style style = result.getStyle(getHome().getStyle());
         for (List<Vod> items : Lists.partition(result.getList(), Product.getColumn())) {
-            ArrayObjectAdapter adapter = new ArrayObjectAdapter(new VodPresenter(this));
+            ArrayObjectAdapter adapter = new ArrayObjectAdapter(new VodPresenter(this, style));
             adapter.setItems(items, null);
             mAdapter.add(new ListRow(adapter));
         }
