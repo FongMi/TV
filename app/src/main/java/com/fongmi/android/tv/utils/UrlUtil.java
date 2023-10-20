@@ -37,6 +37,7 @@ public class UrlUtil {
     }
 
     public static String convert(String baseUrl, String path) {
+        if (path.startsWith("clan")) return fixUrl(path);
         return path.isEmpty() ? "" : UriUtil.resolve(baseUrl, path);
     }
 
