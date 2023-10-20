@@ -91,11 +91,10 @@ import com.fongmi.android.tv.utils.PiP;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Sniffer;
 import com.fongmi.android.tv.utils.Traffic;
-import com.fongmi.android.tv.utils.Utils;
+import com.fongmi.android.tv.utils.Util;
 import com.github.bassaer.library.MDColor;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Trans;
-import com.github.catvod.utils.Util;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.permissionx.guolindev.PermissionX;
 
@@ -551,7 +550,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         if (!item.getVodArea().isEmpty()) sb.append(getString(R.string.detail_area, item.getVodArea())).append("  ");
         if (!item.getTypeName().isEmpty()) sb.append(getString(R.string.detail_type, item.getTypeName())).append("  ");
         view.setVisibility(sb.length() == 0 ? View.GONE : View.VISIBLE);
-        view.setText(Util.substring(sb.toString(), 2));
+        //view.setText(Util.substring(sb.toString(), 2));
     }
 
     private void getPlayer(Flag flag, Episode episode, boolean replay) {
@@ -914,7 +913,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mDanmakuContext.setScaleTextSize(1.0f);
         setRotate(mPlayers.isPortrait(), true);
         setSubtitle(Setting.getSubtitle());
-        Utils.hideSystemUI(this);
+        Util.hideSystemUI(this);
         App.post(mR3, 2000);
         hideControl();
     }
@@ -1380,7 +1379,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private void setFullscreen(boolean fullscreen) {
-        Utils.toggleFullscreen(this, this.fullscreen = fullscreen);
+        Util.toggleFullscreen(this, this.fullscreen = fullscreen);
     }
 
     private boolean isInitTrack() {
@@ -1607,13 +1606,13 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         super.onConfigurationChanged(newConfig);
         if (isPort() && newConfig.orientation == 1 && !isRotate()) exitFullscreen();
         if (isPort() && newConfig.orientation == 2) enterFullscreen();
-        if (isFullscreen()) Utils.hideSystemUI(this);
+        if (isFullscreen()) Util.hideSystemUI(this);
     }
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        if (isFullscreen() && hasFocus) Utils.hideSystemUI(this);
+        if (isFullscreen() && hasFocus) Util.hideSystemUI(this);
     }
 
     @Override

@@ -16,7 +16,7 @@ import com.fongmi.android.tv.databinding.DialogLinkBinding;
 import com.fongmi.android.tv.ui.activity.VideoActivity;
 import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.Sniffer;
-import com.fongmi.android.tv.utils.Utils;
+import com.fongmi.android.tv.utils.Util;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class LinkDialog {
@@ -47,7 +47,7 @@ public class LinkDialog {
     }
 
     private void initView() {
-        CharSequence text = Utils.getClipText();
+        CharSequence text = Util.getClipText();
         binding.input.setEndIconOnClickListener(this::onChoose);
         if (!TextUtils.isEmpty(text) && (Sniffer.isPush(Uri.parse(text.toString())))) binding.text.setText(text);
     }

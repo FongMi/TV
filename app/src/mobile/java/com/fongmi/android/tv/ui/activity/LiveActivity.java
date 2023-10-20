@@ -65,7 +65,7 @@ import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.PiP;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Traffic;
-import com.fongmi.android.tv.utils.Utils;
+import com.fongmi.android.tv.utils.Util;
 import com.github.catvod.net.OkHttp;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -148,7 +148,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Utils.hideSystemUI(this);
+        Util.hideSystemUI(this);
     }
 
     @Override
@@ -973,13 +973,13 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        Utils.hideSystemUI(this);
+        Util.hideSystemUI(this);
     }
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        if (hasFocus) Utils.hideSystemUI(this);
+        if (hasFocus) Util.hideSystemUI(this);
     }
 
     @Override

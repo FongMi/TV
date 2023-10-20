@@ -36,9 +36,9 @@ import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
-import com.fongmi.android.tv.utils.Util;
 import com.github.catvod.bean.Doh;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.Util;
 import com.permissionx.guolindev.PermissionX;
 
 import java.util.ArrayList;

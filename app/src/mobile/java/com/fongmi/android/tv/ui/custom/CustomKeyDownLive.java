@@ -10,9 +10,8 @@ import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 
-import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.utils.ResUtil;
-import com.fongmi.android.tv.utils.Utils;
+import com.fongmi.android.tv.utils.Util;
 
 public class CustomKeyDownLive extends GestureDetector.SimpleOnGestureListener {
 
@@ -62,7 +61,7 @@ public class CustomKeyDownLive extends GestureDetector.SimpleOnGestureListener {
     public boolean onDown(@NonNull MotionEvent e) {
         if (isEdge(e) || lock) return true;
         volume = manager.getStreamVolume(AudioManager.STREAM_MUSIC);
-        bright = Utils.getBrightness(activity);
+        bright = Util.getBrightness(activity);
         changeBright = false;
         changeVolume = false;
         center = false;

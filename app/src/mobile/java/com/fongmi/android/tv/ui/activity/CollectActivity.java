@@ -41,7 +41,7 @@ import com.fongmi.android.tv.ui.custom.CustomTextListener;
 import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
 import com.fongmi.android.tv.utils.PauseExecutor;
 import com.fongmi.android.tv.utils.ResUtil;
-import com.fongmi.android.tv.utils.Utils;
+import com.fongmi.android.tv.utils.Util;
 import com.github.catvod.net.OkHttp;
 import com.google.android.flexbox.FlexDirection;
 import com.google.android.flexbox.FlexboxLayoutManager;
@@ -184,7 +184,7 @@ public class CollectActivity extends BaseActivity implements CustomScroller.Call
         if (empty()) return;
         mSearchAdapter.clear();
         mCollectAdapter.clear();
-        Utils.hideKeyboard(mBinding.keyword);
+        Util.hideKeyboard(mBinding.keyword);
         mBinding.site.setVisibility(View.GONE);
         mBinding.agent.setVisibility(View.GONE);
         mBinding.view.setVisibility(View.VISIBLE);
@@ -221,7 +221,7 @@ public class CollectActivity extends BaseActivity implements CustomScroller.Call
     }
 
     private void onSite(View view) {
-        Utils.hideKeyboard(mBinding.keyword);
+        Util.hideKeyboard(mBinding.keyword);
         App.post(() -> SiteDialog.create(this).search().show(), 50);
     }
 
