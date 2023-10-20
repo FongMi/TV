@@ -9,16 +9,16 @@ import com.github.catvod.utils.Util;
 
 public class UrlUtil {
 
-    public static String checkClan(String text) {
-        if (text.contains("/localhost/")) text = text.replace("/localhost/", "/");
-        if (text.startsWith("clan")) text = text.replace("clan", "file");
-        return text;
+    public static String checkClan(String url) {
+        if (url.contains("/localhost/")) url = url.replace("/localhost/", "/");
+        if (url.startsWith("clan")) url = url.replace("clan", "file");
+        return url;
     }
 
-    public static String convert(String baseUrl, String text) {
-        if (TextUtils.isEmpty(text)) return "";
-        if (text.startsWith("clan")) return checkClan(text);
-        return UriUtil.resolve(baseUrl, text);
+    public static String convert(String baseUrl, String path) {
+        if (TextUtils.isEmpty(path)) return "";
+        if (path.startsWith("clan")) return checkClan(path);
+        return UriUtil.resolve(baseUrl, path);
     }
 
     public static String convert(String url) {
