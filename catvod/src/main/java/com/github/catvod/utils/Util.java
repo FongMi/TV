@@ -7,7 +7,6 @@ import android.text.TextUtils;
 import android.util.Base64;
 
 import com.github.catvod.Init;
-import com.google.common.net.HttpHeaders;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -131,16 +130,5 @@ public class Util {
         } catch (Exception e) {
             return "";
         }
-    }
-
-    public static String fixUrl(String url) {
-        return url.trim().replace("\\", "");
-    }
-
-    public static String fixHeader(String key) {
-        if (key.equalsIgnoreCase(HttpHeaders.USER_AGENT)) return HttpHeaders.USER_AGENT;
-        if (key.equalsIgnoreCase(HttpHeaders.REFERER)) return HttpHeaders.REFERER;
-        if (key.equalsIgnoreCase(HttpHeaders.COOKIE)) return HttpHeaders.COOKIE;
-        return key;
     }
 }

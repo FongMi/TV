@@ -4,6 +4,7 @@ import androidx.media3.common.util.UriUtil;
 
 import com.fongmi.android.tv.server.Server;
 import com.github.catvod.utils.Util;
+import com.google.common.net.HttpHeaders;
 
 public class UrlUtil {
 
@@ -27,4 +28,14 @@ public class UrlUtil {
         return url;
     }
 
+    public static String fixUrl(String url) {
+        return url.trim().replace("\\", "");
+    }
+
+    public static String fixHeader(String key) {
+        if (key.equalsIgnoreCase(HttpHeaders.USER_AGENT)) return HttpHeaders.USER_AGENT;
+        if (key.equalsIgnoreCase(HttpHeaders.REFERER)) return HttpHeaders.REFERER;
+        if (key.equalsIgnoreCase(HttpHeaders.COOKIE)) return HttpHeaders.COOKIE;
+        return key;
+    }
 }

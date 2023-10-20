@@ -30,6 +30,7 @@ import com.fongmi.android.tv.impl.ParseCallback;
 import com.fongmi.android.tv.impl.SessionCallback;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.UrlUtil;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.utils.Path;
 import com.github.catvod.utils.Util;
@@ -491,7 +492,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     private boolean isIllegal(String url) {
-        Uri uri = Uri.parse(Util.fixUrl(url));
+        Uri uri = Uri.parse(UrlUtil.fixUrl(url));
         String host = Util.host(uri);
         String scheme = Util.scheme(uri);
         if (scheme.equals("data")) return false;
