@@ -28,6 +28,6 @@ public class IjkUtil {
         Uri uri = Uri.parse(Util.fixUrl(url));
         boolean m3u8Ad = Sniffer.getRegex(uri).size() > 0;
         if (m3u8Ad) uri = Uri.parse(Server.get().getAddress().concat("/m3u8?url=").concat(URLEncoder.encode(uri.toString())));
-        return new MediaSource(Utils.checkUa(headers), uri);
+        return new MediaSource(Players.checkUa(headers), uri);
     }
 }

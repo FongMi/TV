@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.UrlUtil;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.utils.Json;
 import com.github.catvod.utils.Util;
@@ -72,7 +73,7 @@ public class Parse {
     }
 
     public String getUrl() {
-        return TextUtils.isEmpty(url) ? "" : Utils.convert(url);
+        return TextUtils.isEmpty(url) ? "" : UrlUtil.convert(url);
     }
 
     public void setUrl(String url) {

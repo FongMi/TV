@@ -33,6 +33,7 @@ import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.utils.Path;
 import com.github.catvod.utils.Util;
+import com.google.common.net.HttpHeaders;
 import com.orhanobut.logger.Logger;
 
 import java.util.Formatter;
@@ -495,6 +496,13 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         String scheme = Util.scheme(uri);
         if (scheme.equals("data")) return false;
         return scheme.isEmpty() || scheme.equals("file") ? !Path.exists(url) : host.isEmpty();
+    }
+
+    public static Map<String, String> checkUa(Map<String, String> headers) {
+        if (Setting.getUa().isEmpty()) return headers;
+        for (Map.Entry<String, String> header : headers.entrySet()) if (header.getKey().equalsIgnoreCase(HttpHeaders.USER_AGENT)) return headers;
+        headers.put(HttpHeaders.USER_AGENT, Setting.getUa());
+        return headers;
     }
 
     @Override

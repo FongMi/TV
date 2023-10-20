@@ -11,7 +11,7 @@ import com.fongmi.android.tv.bean.Rule;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.utils.Notify;
-import com.fongmi.android.tv.utils.Utils;
+import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.bean.Doh;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderNull;
@@ -214,18 +214,18 @@ public class ApiConfig {
     private String parseApi(String api) {
         if (TextUtils.isEmpty(api)) return api;
         if (api.startsWith("http")) return api;
-        if (api.startsWith("file")) return Utils.convert(api);
-        if (api.endsWith(".js")) return parseApi(Utils.convert(config.getUrl(), api));
+        if (api.startsWith("file")) return UrlUtil.convert(api);
+        if (api.endsWith(".js")) return parseApi(UrlUtil.convert(config.getUrl(), api));
         return api;
     }
 
     private String parseExt(String ext) {
         if (TextUtils.isEmpty(ext)) return ext;
         if (ext.startsWith("http")) return ext;
-        if (ext.startsWith("file")) return Utils.convert(ext);
+        if (ext.startsWith("file")) return UrlUtil.convert(ext);
         if (ext.startsWith("img+")) return Decoder.getExt(ext);
         if (ext.contains("http") || ext.contains("file")) return ext;
-        if (ext.endsWith(".txt") || ext.endsWith(".json") || ext.endsWith(".py") || ext.endsWith(".js")) return parseExt(Utils.convert(config.getUrl(), ext));
+        if (ext.endsWith(".txt") || ext.endsWith(".json") || ext.endsWith(".py") || ext.endsWith(".js")) return parseExt(UrlUtil.convert(config.getUrl(), ext));
         return ext;
     }
 
