@@ -550,7 +550,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         if (!item.getVodArea().isEmpty()) sb.append(getString(R.string.detail_area, item.getVodArea())).append("  ");
         if (!item.getTypeName().isEmpty()) sb.append(getString(R.string.detail_type, item.getTypeName())).append("  ");
         view.setVisibility(sb.length() == 0 ? View.GONE : View.VISIBLE);
-        //view.setText(Util.substring(sb.toString(), 2));
+        view.setText(Util.substring(sb.toString(), 2));
     }
 
     private void getPlayer(Flag flag, Episode episode, boolean replay) {
