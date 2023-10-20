@@ -179,15 +179,20 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     public static void start(Activity activity, String key, String id, String name) {
-        start(activity, key, id, name, null, null);
+        start(activity, key, id, name, null, false, null);
     }
 
     public static void start(Activity activity, String key, String id, String name, String pic) {
-        start(activity, key, id, name, pic, null);
+        start(activity, key, id, name, pic, false, null);
     }
 
-    public static void start(Activity activity, String key, String id, String name, String pic, String mark) {
+    public static void start(Activity activity, String key, String id, String name, String pic, boolean collect) {
+        start(activity, key, id, name, pic, collect, null);
+    }
+
+    public static void start(Activity activity, String key, String id, String name, String pic, boolean collect, String mark) {
         Intent intent = new Intent(activity, VideoActivity.class);
+        intent.putExtra("collect", collect);
         intent.putExtra("mark", mark);
         intent.putExtra("name", name);
         intent.putExtra("pic", pic);
@@ -253,7 +258,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private boolean isFromCollect() {
-        return getCallingActivity() != null && getCallingActivity().getShortClassName().contains(CollectActivity.class.getSimpleName());
+        return getIntent().getBooleanExtra("collect", false);
     }
 
     private boolean isAutoRotate() {
