@@ -10,6 +10,7 @@ import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.media.MediaMetadataCompat;
 import android.text.Html;
 import android.text.SpannableString;
@@ -166,7 +167,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     public static void file(FragmentActivity activity, String path) {
         if (TextUtils.isEmpty(path)) return;
         String name = new File(path).getName();
-        if (Utils.hasPermission(activity)) start(activity, "push_agent", "file://" + path, name);
+        if (PermissionX.isGranted(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE)) start(activity, "push_agent", "file://" + path, name);
         else PermissionX.init(activity).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> start(activity, "push_agent", "file://" + path, name));
     }
 
@@ -254,6 +255,10 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     private boolean isFromCollect() {
         return getCallingActivity() != null && getCallingActivity().getShortClassName().contains(CollectActivity.class.getSimpleName());
+    }
+
+    private boolean isAutoRotate() {
+        return Settings.System.getInt(getContentResolver(), Settings.System.ACCELEROMETER_ROTATION, 0) == 1;
     }
 
     private boolean isLand() {
@@ -932,7 +937,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
             return ResUtil.isLand(this) ? ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
         } else if (isRotate()) {
             return ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT;
-        } else if (isPort() && Utils.isAutoRotate()) {
+        } else if (isPort() && isAutoRotate()) {
             return ActivityInfo.SCREEN_ORIENTATION_FULL_USER;
         } else {
             return ResUtil.isLand(this) ? ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT;
@@ -1009,8 +1014,8 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private void setOrient() {
-        if (isPort() && Utils.isAutoRotate()) setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_USER);
-        if (isLand() && Utils.isAutoRotate()) setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE);
+        if (isPort() && isAutoRotate()) setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_USER);
+        if (isLand() && isAutoRotate()) setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE);
     }
 
     private void setR1Callback() {

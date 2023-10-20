@@ -1,6 +1,5 @@
 package com.fongmi.android.tv.utils;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -11,10 +10,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
-import androidx.fragment.app.FragmentActivity;
-
 import com.fongmi.android.tv.App;
-import com.permissionx.guolindev.PermissionX;
 
 public class Utils {
 
@@ -41,14 +37,6 @@ public class Utils {
         IBinder windowToken = view.getWindowToken();
         if (imm == null || windowToken == null) return;
         imm.hideSoftInputFromWindow(windowToken, 0);
-    }
-
-    public static boolean isAutoRotate() {
-        return Settings.System.getInt(App.get().getContentResolver(), Settings.System.ACCELEROMETER_ROTATION, 0) == 1;
-    }
-
-    public static boolean hasPermission(FragmentActivity activity) {
-        return PermissionX.isGranted(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
     }
 
     public static CharSequence getClipText() {
