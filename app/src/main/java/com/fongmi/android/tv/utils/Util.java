@@ -3,6 +3,7 @@ package com.fongmi.android.tv.utils;
 import android.app.Activity;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.os.Build;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.view.View;
@@ -11,6 +12,10 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
 import com.fongmi.android.tv.App;
+import com.github.catvod.Init;
+
+import java.text.SimpleDateFormat;
+import java.util.Formatter;
 
 public class Util {
 
@@ -39,6 +44,16 @@ public class Util {
         imm.hideSoftInputFromWindow(windowToken, 0);
     }
 
+    public static float getBrightness(Activity activity) {
+        try {
+            float value = activity.getWindow().getAttributes().screenBrightness;
+            if (WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL >= value && value >= WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_OFF) return value;
+            return Settings.System.getFloat(activity.getContentResolver(), Settings.System.SCREEN_BRIGHTNESS) / 128;
+        } catch (Exception e) {
+            return 0.5f;
+        }
+    }
+
     public static CharSequence getClipText() {
         return ((ClipboardManager) App.get().getSystemService(Context.CLIPBOARD_SERVICE)).getText();
     }
@@ -52,13 +67,38 @@ public class Util {
         }
     }
 
-    public static float getBrightness(Activity activity) {
+    public static String getDeviceId() {
+        return Settings.Secure.getString(Init.context().getContentResolver(), Settings.Secure.ANDROID_ID);
+    }
+
+    public static String getDeviceName() {
+        String model = Build.MODEL;
+        String manufacturer = Build.MANUFACTURER;
+        return model.startsWith(manufacturer) ? model : manufacturer + " " + model;
+    }
+
+    public static String substring(String text) {
+        return substring(text, 1);
+    }
+
+    public static String substring(String text, int num) {
+        if (text != null && text.length() > num) return text.substring(0, text.length() - num);
+        return text;
+    }
+
+    public static long format(SimpleDateFormat format, String src) {
         try {
-            float value = activity.getWindow().getAttributes().screenBrightness;
-            if (WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL >= value && value >= WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_OFF) return value;
-            return Settings.System.getFloat(activity.getContentResolver(), Settings.System.SCREEN_BRIGHTNESS) / 128;
+            return format.parse(src).getTime();
         } catch (Exception e) {
-            return 0.5f;
+            return 0;
+        }
+    }
+
+    public static String format(StringBuilder builder, Formatter formatter, long timeMs) {
+        try {
+            return androidx.media3.common.util.Util.getStringForTime(builder, formatter, timeMs);
+        } catch (Exception e) {
+            return "";
         }
     }
 }

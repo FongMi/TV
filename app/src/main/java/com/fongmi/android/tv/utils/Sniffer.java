@@ -29,7 +29,7 @@ public class Sniffer {
     }
 
     public static boolean isThunder(String url) {
-        return THUNDER.contains(Util.scheme(url)) || isTorrent(url);
+        return THUNDER.contains(UrlUtil.scheme(url)) || isTorrent(url);
     }
 
     public static boolean isTorrent(String url) {
@@ -57,7 +57,7 @@ public class Sniffer {
 
     public static List<String> getRegex(Uri uri) {
         if (uri.getHost() == null) return Collections.emptyList();
-        String hosts = TextUtils.join(",", Arrays.asList(Util.host(uri), Util.host(uri.getQueryParameter("url"))));
+        String hosts = TextUtils.join(",", Arrays.asList(UrlUtil.host(uri), UrlUtil.host(uri.getQueryParameter("url"))));
         for (Rule rule : ApiConfig.get().getRules()) for (String host : rule.getHosts()) if (Util.containOrMatch(hosts, host)) return rule.getRegex();
         return Collections.emptyList();
     }

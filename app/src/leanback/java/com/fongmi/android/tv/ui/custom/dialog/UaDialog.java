@@ -19,13 +19,12 @@ import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.ui.custom.CustomTextListener;
 import com.fongmi.android.tv.utils.QRCode;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.github.catvod.utils.Util;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-
-import okhttp3.internal.Util;
 
 public class UaDialog implements DialogInterface.OnDismissListener {
 
@@ -88,10 +87,10 @@ public class UaDialog implements DialogInterface.OnDismissListener {
     private void detect(String s) {
         if (append && s.equalsIgnoreCase("c")) {
             append = false;
-            binding.text.setText(com.github.catvod.utils.Util.CHROME);
+            binding.text.setText(Util.CHROME);
         } else if (append && s.equalsIgnoreCase("o")) {
             append = false;
-            binding.text.setText(Util.userAgent);
+            binding.text.setText(okhttp3.internal.Util.userAgent);
         } else if (s.length() > 1) {
             append = false;
         } else if (s.length() == 0) {

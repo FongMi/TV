@@ -13,9 +13,8 @@ import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.databinding.DialogUaBinding;
 import com.fongmi.android.tv.impl.UaCallback;
 import com.fongmi.android.tv.ui.custom.CustomTextListener;
+import com.github.catvod.utils.Util;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-
-import okhttp3.internal.Util;
 
 public class UaDialog {
 
@@ -68,10 +67,10 @@ public class UaDialog {
     private void detect(String s) {
         if (append && s.equalsIgnoreCase("c")) {
             append = false;
-            binding.text.setText(com.github.catvod.utils.Util.CHROME);
+            binding.text.setText(Util.CHROME);
         } else if (append && s.equalsIgnoreCase("o")) {
             append = false;
-            binding.text.setText(Util.userAgent);
+            binding.text.setText(okhttp3.internal.Util.userAgent);
         } else if (s.length() > 1) {
             append = false;
         } else if (s.length() == 0) {

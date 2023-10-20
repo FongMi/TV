@@ -52,7 +52,8 @@ import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.KeyUtil;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
-import com.github.catvod.utils.Util;
+import com.fongmi.android.tv.utils.UrlUtil;
+import com.fongmi.android.tv.utils.Util;
 import com.google.common.collect.Lists;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -114,7 +115,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         if (Intent.ACTION_SEND.equals(intent.getAction())) {
             VideoActivity.push(this, Uri.parse(intent.getStringExtra(Intent.EXTRA_TEXT)));
         } else if (Intent.ACTION_VIEW.equals(intent.getAction()) && intent.getData() != null) {
-            if ("text/plain".equals(intent.getType()) || Util.path(intent.getData()).endsWith(".m3u")) {
+            if ("text/plain".equals(intent.getType()) || UrlUtil.path(intent.getData()).endsWith(".m3u")) {
                 loadLive("file:/" + FileChooser.getPathFromUri(this, intent.getData()));
             } else {
                 VideoActivity.push(this, intent.getData());

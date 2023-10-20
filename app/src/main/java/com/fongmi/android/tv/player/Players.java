@@ -31,8 +31,8 @@ import com.fongmi.android.tv.impl.SessionCallback;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.UrlUtil;
+import com.fongmi.android.tv.utils.Util;
 import com.github.catvod.utils.Path;
-import com.github.catvod.utils.Util;
 import com.google.common.net.HttpHeaders;
 import com.orhanobut.logger.Logger;
 
@@ -492,8 +492,8 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     private boolean isIllegal(String url) {
         Uri uri = UrlUtil.uri(url);
-        String host = Util.host(uri);
-        String scheme = Util.scheme(uri);
+        String host = UrlUtil.host(uri);
+        String scheme = UrlUtil.scheme(uri);
         if (scheme.equals("data")) return false;
         return scheme.isEmpty() || scheme.equals("file") ? !Path.exists(url) : host.isEmpty();
     }

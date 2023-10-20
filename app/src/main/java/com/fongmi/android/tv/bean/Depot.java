@@ -25,7 +25,7 @@ public class Depot {
     }
 
     public String getUrl() {
-        return TextUtils.isEmpty(url) ? "" : UrlUtil.checkClan(url);
+        return TextUtils.isEmpty(url) ? "" : UrlUtil.fixUrl(url);
     }
 
     public String getName() {

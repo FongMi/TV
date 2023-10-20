@@ -5,6 +5,7 @@ import android.os.SystemClock;
 
 import com.fongmi.android.tv.exception.ExtractException;
 import com.fongmi.android.tv.player.Source;
+import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.utils.Path;
 import com.github.catvod.utils.Util;
 import com.xunlei.downloadlib.XLTaskHelper;
@@ -25,7 +26,7 @@ public class Thunder implements Source.Extractor {
 
     @Override
     public String fetch(String url) throws Exception {
-        return Util.scheme(url).equals("magnet") ? addTorrentTask(Uri.parse(url)) : addThunderTask(url);
+        return UrlUtil.scheme(url).equals("magnet") ? addTorrentTask(Uri.parse(url)) : addThunderTask(url);
     }
 
     private String addTorrentTask(Uri uri) throws Exception {

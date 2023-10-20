@@ -40,10 +40,10 @@ import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.bean.Doh;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Path;
-import com.github.catvod.utils.Util;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.permissionx.guolindev.PermissionX;
 
@@ -90,7 +90,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.wallUrl.setText(WallConfig.getDesc());
         mBinding.dohText.setText(getDohList()[getDohIndex()]);
         mBinding.versionText.setText(BuildConfig.VERSION_NAME);
-        mBinding.proxyText.setText(Util.scheme(Setting.getProxy()));
+        mBinding.proxyText.setText(UrlUtil.scheme(Setting.getProxy()));
         mBinding.sizeText.setText((size = ResUtil.getStringArray(R.array.select_size))[Setting.getSize()]);
         mBinding.scaleText.setText((scale = ResUtil.getStringArray(R.array.select_scale))[Setting.getScale()]);
         mBinding.playerText.setText((player = ResUtil.getStringArray(R.array.select_player))[Setting.getPlayer()]);
@@ -334,7 +334,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         OkHttp.get().setProxy(proxy);
         Notify.progress(getActivity());
         ApiConfig.load(Config.vod(), getCallback());
-        mBinding.proxyText.setText(Util.scheme(proxy));
+        mBinding.proxyText.setText(UrlUtil.scheme(proxy));
     }
 
     private void onCache(View view) {

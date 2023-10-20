@@ -131,7 +131,7 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
     }
 
     private void onPositive(View view) {
-        String text = UrlUtil.checkClan(binding.text.getText().toString().trim());
+        String text = UrlUtil.fixUrl(binding.text.getText().toString().trim());
         if (text.isEmpty()) Config.delete(url, type);
         callback.setConfig(Config.find(text, type));
         dialog.dismiss();
