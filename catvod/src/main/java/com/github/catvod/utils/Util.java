@@ -14,14 +14,12 @@ import java.io.FileInputStream;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Formatter;
 
 public class Util {
 
     public static final String CHROME = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36";
-    public static final String[] UNITS = new String[]{"bytes", "KB", "MB", "GB", "TB"};
 
     public static String getDeviceId() {
         return Settings.Secure.getString(Init.context().getContentResolver(), Settings.Secure.ANDROID_ID);
@@ -144,11 +142,5 @@ public class Util {
         if (key.equalsIgnoreCase(HttpHeaders.REFERER)) return HttpHeaders.REFERER;
         if (key.equalsIgnoreCase(HttpHeaders.COOKIE)) return HttpHeaders.COOKIE;
         return key;
-    }
-
-    public static String size(long size) {
-        if (size <= 0) return "";
-        int group = (int) (Math.log10(size) / Math.log10(1024));
-        return "[" + new DecimalFormat("###0.#").format(size / Math.pow(1024, group)) + " " + UNITS[group] + "] ";
     }
 }
