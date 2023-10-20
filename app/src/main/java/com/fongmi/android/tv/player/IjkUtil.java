@@ -24,7 +24,7 @@ public class IjkUtil {
     }
 
     public static MediaSource getSource(Map<String, String> headers, String url) {
-        Uri uri = Uri.parse(UrlUtil.fixUrl(url));
+        Uri uri = UrlUtil.uri(url);
         boolean m3u8Ad = Sniffer.getRegex(uri).size() > 0;
         if (m3u8Ad) uri = Uri.parse(Server.get().getAddress().concat("/m3u8?url=").concat(URLEncoder.encode(uri.toString())));
         return new MediaSource(Players.checkUa(headers), uri);

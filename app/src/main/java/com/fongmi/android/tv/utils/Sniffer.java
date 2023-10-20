@@ -42,14 +42,14 @@ public class Sniffer {
 
     public static boolean isVideoFormat(String url, Map<String, String> headers) {
         Logger.t(TAG).d(url);
-        if (matchOrContain(url)) return true;
+        if (containOrMatch(url)) return true;
         if (headers.containsKey("Accept") && headers.get("Accept").startsWith("image")) return false;
         if (url.contains("url=http") || url.contains("v=http") || url.contains(".css") || url.contains(".html")) return false;
         return url.matches(RULE);
     }
 
-    private static boolean matchOrContain(String url) {
-        List<String> items = getRegex(Uri.parse(url));
+    private static boolean containOrMatch(String url) {
+        List<String> items = getRegex(UrlUtil.uri(url));
         for (String regex : items) if (url.contains(regex)) return true;
         for (String regex : items) if (url.matches(regex)) return true;
         return false;

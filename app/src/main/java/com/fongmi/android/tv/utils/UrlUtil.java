@@ -1,5 +1,7 @@
 package com.fongmi.android.tv.utils;
 
+import android.net.Uri;
+
 import androidx.media3.common.util.UriUtil;
 
 import com.fongmi.android.tv.server.Server;
@@ -7,6 +9,10 @@ import com.github.catvod.utils.Util;
 import com.google.common.net.HttpHeaders;
 
 public class UrlUtil {
+
+    public static Uri uri(String url) {
+        return Uri.parse(url.trim().replace("\\", ""));
+    }
 
     public static String checkClan(String url) {
         if (url.contains("/localhost/")) url = url.replace("/localhost/", "/");
@@ -26,10 +32,6 @@ public class UrlUtil {
         if ("local".equals(scheme)) return Server.get().getAddress(host);
         if ("proxy".equals(scheme)) return url.replace("proxy://", Server.get().getAddress("proxy?"));
         return url;
-    }
-
-    public static String fixUrl(String url) {
-        return url.trim().replace("\\", "");
     }
 
     public static String fixHeader(String key) {

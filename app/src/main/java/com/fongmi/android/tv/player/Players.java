@@ -492,7 +492,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     private boolean isIllegal(String url) {
-        Uri uri = Uri.parse(UrlUtil.fixUrl(url));
+        Uri uri = UrlUtil.uri(url);
         String host = Util.host(uri);
         String scheme = Util.scheme(uri);
         if (scheme.equals("data")) return false;
