@@ -2,10 +2,8 @@ package com.fongmi.android.tv.utils;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.PendingIntent;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.os.Build;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.view.View;
@@ -55,10 +53,6 @@ public class Utils {
 
     public static CharSequence getClipText() {
         return ((ClipboardManager) App.get().getSystemService(Context.CLIPBOARD_SERVICE)).getText();
-    }
-
-    public static int getPendingFlag() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE : PendingIntent.FLAG_UPDATE_CURRENT;
     }
 
     public static int getDigit(String text) {
