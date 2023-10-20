@@ -15,7 +15,7 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.utils.KeyUtil;
 import com.fongmi.android.tv.utils.ResUtil;
-import com.fongmi.android.tv.utils.Utils;
+import com.fongmi.android.tv.utils.Util;
 
 public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
 
@@ -90,7 +90,7 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
     public boolean onDown(@NonNull MotionEvent e) {
         if (!full) return false;
         volume = manager.getStreamVolume(AudioManager.STREAM_MUSIC);
-        bright = Utils.getBrightness(activity);
+        bright = Util.getBrightness(activity);
         changeBright = false;
         changeVolume = false;
         touch = true;

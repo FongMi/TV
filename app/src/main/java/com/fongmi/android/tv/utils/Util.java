@@ -12,7 +12,7 @@ import android.view.inputmethod.InputMethodManager;
 
 import com.fongmi.android.tv.App;
 
-public class Utils {
+public class Util {
 
     public static void toggleFullscreen(Activity activity, boolean fullscreen) {
         if (fullscreen) hideSystemUI(activity);

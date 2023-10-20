@@ -24,7 +24,6 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
 import com.github.catvod.utils.Json;
-import com.github.catvod.utils.Util;
 import com.google.common.net.HttpHeaders;
 import com.google.gson.JsonParser;
 

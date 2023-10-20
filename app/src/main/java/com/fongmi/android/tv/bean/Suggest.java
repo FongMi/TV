@@ -1,7 +1,6 @@
 package com.fongmi.android.tv.bean;
 
 import com.fongmi.android.tv.App;
-import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;

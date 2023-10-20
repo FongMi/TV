@@ -28,7 +28,7 @@ import com.fongmi.android.tv.ui.custom.CustomTextListener;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
 import com.fongmi.android.tv.utils.KeyUtil;
-import com.fongmi.android.tv.utils.Utils;
+import com.fongmi.android.tv.utils.Util;
 import com.github.catvod.net.OkHttp;
 import com.google.common.net.HttpHeaders;
 
@@ -138,7 +138,7 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
     public void onSearch() {
         String keyword = mBinding.keyword.getText().toString().trim();
         mBinding.keyword.setSelection(mBinding.keyword.length());
-        Utils.hideKeyboard(mBinding.keyword);
+        Util.hideKeyboard(mBinding.keyword);
         if (TextUtils.isEmpty(keyword)) return;
         CollectActivity.start(this, keyword);
         App.post(() -> mRecordAdapter.add(keyword), 250);

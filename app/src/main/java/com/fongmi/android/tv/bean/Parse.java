@@ -8,9 +8,8 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.UrlUtil;
-import com.fongmi.android.tv.utils.Utils;
+import com.fongmi.android.tv.utils.Util;
 import com.github.catvod.utils.Json;
-import com.github.catvod.utils.Util;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
 

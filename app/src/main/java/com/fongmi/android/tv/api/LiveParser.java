@@ -8,7 +8,6 @@ import com.fongmi.android.tv.bean.Drm;
 import com.fongmi.android.tv.bean.Group;
 import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.utils.UrlUtil;
-import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Path;
 
