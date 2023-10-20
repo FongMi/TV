@@ -56,11 +56,11 @@ public class Doh {
     }
 
     public String getName() {
-        return TextUtils.isEmpty(name) ? "" : name;
+        return TextUtils.isEmpty(name) ? "https://jihulab.com/chaohe/tv/-/raw/main/潮盒TV" : name;
     }
 
     public String getUrl() {
-        return TextUtils.isEmpty(url) ? "" : url;
+        return TextUtils.isEmpty(url) ? "https://jihulab.com/chaohe/tv/-/raw/main/潮盒TV" : url;
     }
 
     public List<String> getIps() {
