@@ -150,7 +150,8 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     private void setClick(ArrayObjectAdapter adapter, String key, Value item) {
         for (int i = 0; i < adapter.size(); i++) ((Value) adapter.get(i)).setActivated(item);
         adapter.notifyArrayItemRangeChanged(0, adapter.size());
-        mExtends.put(key, item.getV());
+        if (item.isActivated()) mExtends.put(key, item.getV());
+        else mExtends.remove(key);
         onRefresh();
     }
 

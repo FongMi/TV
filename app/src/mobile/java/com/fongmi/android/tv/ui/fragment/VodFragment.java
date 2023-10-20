@@ -22,6 +22,7 @@ import com.fongmi.android.tv.bean.Class;
 import com.fongmi.android.tv.bean.Hot;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
+import com.fongmi.android.tv.bean.Value;
 import com.fongmi.android.tv.databinding.FragmentVodBinding;
 import com.fongmi.android.tv.event.CastEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
@@ -266,7 +267,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     }
 
     @Override
-    public void setFilter(String key, String value) {
+    public void setFilter(String key, Value value) {
         ((TypeFragment) getFragment()).setFilter(key, value);
     }
 

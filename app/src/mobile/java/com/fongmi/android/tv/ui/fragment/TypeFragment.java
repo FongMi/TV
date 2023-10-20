@@ -18,6 +18,7 @@ import com.fongmi.android.tv.bean.Page;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Style;
+import com.fongmi.android.tv.bean.Value;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.FragmentTypeBinding;
 import com.fongmi.android.tv.model.SiteViewModel;
@@ -191,8 +192,9 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         }
     }
 
-    public void setFilter(String key, String value) {
-        mExtends.put(key, value);
+    public void setFilter(String key, Value value) {
+        if (value.isActivated()) mExtends.put(key, value.getV());
+        else mExtends.remove(key);
         onRefresh();
     }
 
