@@ -1,7 +1,5 @@
 package com.fongmi.android.tv.utils;
 
-import android.text.TextUtils;
-
 import androidx.media3.common.util.UriUtil;
 
 import com.fongmi.android.tv.server.Server;
@@ -16,9 +14,8 @@ public class UrlUtil {
     }
 
     public static String convert(String baseUrl, String path) {
-        if (TextUtils.isEmpty(path)) return "";
         if (path.startsWith("clan")) return checkClan(path);
-        return UriUtil.resolve(baseUrl, path);
+        return path.isEmpty() ? "" : UriUtil.resolve(baseUrl, path);
     }
 
     public static String convert(String url) {

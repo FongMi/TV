@@ -8,7 +8,7 @@ import androidx.fragment.app.FragmentActivity;
 import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.databinding.DialogBufferBinding;
 import com.fongmi.android.tv.impl.BufferCallback;
-import com.fongmi.android.tv.utils.Utils;
+import com.fongmi.android.tv.utils.KeyUtil;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class BufferDialog {
@@ -45,7 +45,7 @@ public class BufferDialog {
     private void initEvent() {
         binding.slider.addOnChangeListener((slider, value, fromUser) -> callback.setBuffer((int) value));
         binding.slider.setOnKeyListener((view, keyCode, event) -> {
-            boolean enter = Utils.isEnterKey(event);
+            boolean enter = KeyUtil.isEnterKey(event);
             if (enter) dialog.dismiss();
             return enter;
         });

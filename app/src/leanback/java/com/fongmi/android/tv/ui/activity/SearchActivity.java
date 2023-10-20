@@ -27,6 +27,7 @@ import com.fongmi.android.tv.ui.custom.CustomKeyboard;
 import com.fongmi.android.tv.ui.custom.CustomTextListener;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
+import com.fongmi.android.tv.utils.KeyUtil;
 import com.fongmi.android.tv.utils.Utils;
 import com.github.catvod.net.OkHttp;
 import com.google.common.net.HttpHeaders;
@@ -145,7 +146,7 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (Utils.isMenuKey(event)) showDialog();
+        if (KeyUtil.isMenuKey(event)) showDialog();
         return super.dispatchKeyEvent(event);
     }
 

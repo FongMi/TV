@@ -10,7 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatTextView;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.utils.Utils;
+import com.fongmi.android.tv.utils.KeyUtil;
 
 public class CustomTypeView extends AppCompatTextView {
 
@@ -30,7 +30,7 @@ public class CustomTypeView extends AppCompatTextView {
     }
 
     private boolean hasEvent(KeyEvent event) {
-        return !coolDown && event.getAction() == KeyEvent.ACTION_DOWN && Utils.isUpKey(event);
+        return !coolDown && event.getAction() == KeyEvent.ACTION_DOWN && KeyUtil.isUpKey(event);
     }
 
     @Override
