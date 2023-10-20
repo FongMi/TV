@@ -1,6 +1,7 @@
 package com.fongmi.android.tv.server.process;
 
 import com.fongmi.android.tv.server.Nano;
+import com.fongmi.android.tv.utils.FileUtil;
 import com.github.catvod.utils.Path;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -54,7 +55,7 @@ public class Local implements Process {
         for (String k : files.keySet()) {
             String fn = params.get(k);
             File temp = new File(files.get(k));
-            if (fn.toLowerCase().endsWith(".zip")) Path.unzip(temp, Path.root(path));
+            if (fn.toLowerCase().endsWith(".zip")) FileUtil.unzip(temp, Path.root(path));
             else Path.copy(temp, Path.root(path, fn));
         }
         return Nano.success();
