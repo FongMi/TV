@@ -70,7 +70,7 @@ public class Nano extends NanoHTTPD {
         return getAssets(url.substring(1));
     }
 
-    private void parse(NanoHTTPD.IHTTPSession session, Map<String, String> files) {
+    private void parse(IHTTPSession session, Map<String, String> files) {
         String ct = session.getHeaders().get("content-type");
         if (ct != null && ct.toLowerCase().contains("multipart/form-data") && !ct.toLowerCase().contains("charset=")) {
             Matcher matcher = Pattern.compile("[ |\t]*(boundary[ |\t]*=[ |\t]*['|\"]?[^\"^'^;^,]*['|\"]?)", Pattern.CASE_INSENSITIVE).matcher(ct);
