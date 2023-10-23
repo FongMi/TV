@@ -184,7 +184,11 @@ public class Site implements Parcelable {
     }
 
     public Style getStyle() {
-        return style == null ? Style.rect() : style;
+        return style;
+    }
+
+    public Style getStyle(Style style) {
+        return getStyle() != null ? getStyle() : style != null ? style : Style.rect();
     }
 
     public boolean isActivated() {

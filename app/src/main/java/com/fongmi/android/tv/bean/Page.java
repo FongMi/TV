@@ -5,19 +5,25 @@ import androidx.annotation.Nullable;
 public class Page {
 
     private final String vodId;
+    private final Style style;
     private final int position;
 
-    public static Page get(String vodId, int position) {
-        return new Page(vodId, position);
+    public static Page get(Vod vod, int position) {
+        return new Page(vod, position);
     }
 
-    private Page(String vodId, int position) {
-        this.vodId = vodId;
+    private Page(Vod vod, int position) {
+        this.vodId = vod.getVodId();
+        this.style = vod.getCate() != null ? vod.getCate().getStyle() : null;
         this.position = position;
     }
 
     public String getVodId() {
         return vodId;
+    }
+
+    public Style getStyle() {
+        return style;
     }
 
     public int getPosition() {

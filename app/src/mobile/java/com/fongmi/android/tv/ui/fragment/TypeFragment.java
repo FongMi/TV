@@ -44,11 +44,12 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     private List<Page> mPages;
     private Page mPage;
 
-    public static TypeFragment newInstance(String key, String typeId, HashMap<String, String> extend, boolean folder) {
+    public static TypeFragment newInstance(String key, String typeId, Style style, HashMap<String, String> extend, boolean folder) {
         Bundle args = new Bundle();
         args.putString("key", key);
         args.putString("typeId", typeId);
         args.putBoolean("folder", folder);
+        args.putParcelable("style", style);
         args.putSerializable("extend", extend);
         TypeFragment fragment = new TypeFragment();
         fragment.setArguments(args);
@@ -61,6 +62,10 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     private String getTypeId() {
         return mPages.isEmpty() ? getArguments().getString("typeId") : getLastPage().getVodId();
+    }
+
+    private Style getStyle() {
+        return isFolder() ? Style.list() : getSite().getStyle(mPages.isEmpty() ? getArguments().getParcelable("style") : getLastPage().getStyle());
     }
 
     private HashMap<String, String> getExtend() {
@@ -86,10 +91,6 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
 
     private Page getLastPage() {
         return mPages.get(mPages.size() - 1);
-    }
-
-    private Style getStyle() {
-        return isFolder() ? Style.list() : getSite().getStyle();
     }
 
     @Override
@@ -213,7 +214,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     @Override
     public void onItemClick(Vod item) {
         if (item.isFolder()) {
-            mPages.add(Page.get(item.getVodId(), findPosition()));
+            mPages.add(Page.get(item, findPosition()));
             getVideo(item.getVodId(), "1");
         } else {
             if (item.isManga()) DetailActivity.start(getActivity(), getKey(), item.getVodId(), item.getVodName(), item.getVodPic());

@@ -10,6 +10,12 @@ public class Cate implements Parcelable {
     @SerializedName("land")
     private int land;
 
+    @SerializedName("circle")
+    private int circle;
+
+    @SerializedName("ratio")
+    private float ratio;
+
     public Cate() {
     }
 
@@ -17,8 +23,16 @@ public class Cate implements Parcelable {
         return land;
     }
 
-    public void setLand(int land) {
-        this.land = land;
+    public int getCircle() {
+        return circle;
+    }
+
+    public float getRatio() {
+        return ratio;
+    }
+
+    public Style getStyle() {
+        return Style.get(getLand(), getCircle(), getRatio());
     }
 
     @Override
@@ -29,10 +43,14 @@ public class Cate implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(this.land);
+        dest.writeInt(this.circle);
+        dest.writeFloat(this.ratio);
     }
 
     protected Cate(Parcel in) {
         this.land = in.readInt();
+        this.circle = in.readInt();
+        this.ratio = in.readFloat();
     }
 
     public static final Creator<Cate> CREATOR = new Creator<>() {

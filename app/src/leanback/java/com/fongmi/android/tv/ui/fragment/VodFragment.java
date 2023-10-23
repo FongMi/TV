@@ -59,11 +59,12 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     private boolean mOpen;
     private Page mPage;
 
-    public static VodFragment newInstance(String key, String typeId, HashMap<String, String> extend, boolean folder) {
+    public static VodFragment newInstance(String key, String typeId, Style style, HashMap<String, String> extend, boolean folder) {
         Bundle args = new Bundle();
         args.putString("key", key);
         args.putString("typeId", typeId);
         args.putBoolean("folder", folder);
+        args.putParcelable("style", style);
         args.putSerializable("extend", extend);
         VodFragment fragment = new VodFragment();
         fragment.setArguments(args);
@@ -100,7 +101,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     }
 
     private Style getStyle() {
-        return isFolder() ? Style.list() : getSite().getStyle();
+        return isFolder() ? Style.list() : getSite().getStyle(mPages.isEmpty() ? getArguments().getParcelable("style") : getLastPage().getStyle());
     }
 
     @Override
@@ -261,7 +262,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     @Override
     public void onItemClick(Vod item) {
         if (item.isFolder()) {
-            mPages.add(Page.get(item.getVodId(), mBinding.recycler.getSelectedPosition()));
+            mPages.add(Page.get(item, mBinding.recycler.getSelectedPosition()));
             mBinding.recycler.setMoveTop(false);
             getVideo(item.getVodId(), "1");
         } else {
