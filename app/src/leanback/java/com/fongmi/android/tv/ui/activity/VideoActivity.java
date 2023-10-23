@@ -1248,8 +1248,9 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private boolean mismatch(Vod item) {
-        String keyword = mBinding.part.getTag().toString();
+        if (getId().equals(item.getVodId())) return true;
         if (mBroken.contains(item.getVodId())) return true;
+        String keyword = mBinding.part.getTag().toString();
         if (isAutoMode()) return !item.getVodName().equals(keyword);
         else return !item.getVodName().contains(keyword);
     }

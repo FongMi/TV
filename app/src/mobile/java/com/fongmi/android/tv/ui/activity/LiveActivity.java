@@ -108,7 +108,6 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     private boolean lock;
     private int toggleCount;
     private int passCount;
-    private String url;
     private PiP mPiP;
 
     public static void start(Activity activity) {
@@ -289,11 +288,11 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private void onCast() {
-        CastDialog.create().video(CastVideo.get(mBinding.control.title.getText().toString(), getUrl())).fm(false).show(this);
+        CastDialog.create().video(CastVideo.get(mBinding.control.title.getText().toString(), mPlayers.getUrl())).fm(false).show(this);
     }
 
     private void onShare() {
-        ShareCompat.IntentBuilder builder = new ShareCompat.IntentBuilder(this).setType("text/plain").setText(getUrl());
+        ShareCompat.IntentBuilder builder = new ShareCompat.IntentBuilder(this).setType("text/plain").setText(mPlayers.getUrl());
         builder.getIntent().putExtra("title", mBinding.control.title.getText());
         builder.getIntent().putExtra("name", mBinding.control.title.getText());
         builder.startChooser();
@@ -426,8 +425,8 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private void showControl() {
-        mBinding.control.share.setVisibility(getUrl() == null ? View.GONE : View.VISIBLE);
-        mBinding.control.cast.setVisibility(getUrl() == null ? View.GONE : View.VISIBLE);
+        mBinding.control.share.setVisibility(mPlayers.getUrl() == null ? View.GONE : View.VISIBLE);
+        mBinding.control.cast.setVisibility(mPlayers.getUrl() == null ? View.GONE : View.VISIBLE);
         mBinding.control.right.rotate.setVisibility(isLock() ? View.GONE : View.VISIBLE);
         mBinding.control.right.back.setVisibility(isLock() ? View.GONE : View.VISIBLE);
         mBinding.control.bottom.setVisibility(isLock() ? View.GONE : View.VISIBLE);
@@ -592,8 +591,8 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         if (mChannel == null) return;
         LiveConfig.get().setKeep(mChannel);
         mViewModel.fetch(mChannel);
+        mPlayers.clean();
         showProgress();
-        setUrl(null);
     }
 
     private void start(Channel result) {
@@ -670,7 +669,6 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     public void onPlayerEvent(PlayerEvent event) {
         switch (event.getState()) {
             case 0:
-                setUrl(event.getUrl());
                 setTrackVisible(false);
                 break;
             case Player.STATE_IDLE:
@@ -857,14 +855,6 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         this.lock = lock;
     }
 
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
     public int getToggleCount() {
         return toggleCount;
     }
@@ -1024,7 +1014,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         } else if (isVisible(mBinding.recycler)) {
             hideUI();
         } else if (!isLock()) {
-            finish();
+            super.onBackPressed();
         }
     }
 

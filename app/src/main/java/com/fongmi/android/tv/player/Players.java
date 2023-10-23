@@ -57,6 +57,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     public static final int SOFT = 0;
     public static final int HARD = 1;
 
+    private Map<String, String> headers;
     private MediaSessionCompat session;
     private IjkVideoView ijkPlayer;
     private DanmakuView danmuView;
@@ -65,6 +66,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     private ExoPlayer exoPlayer;
     private ParseJob parseJob;
     private Runnable runnable;
+    private String url;
     private int errorCode;
     private int timeout;
     private int retry;
@@ -138,6 +140,19 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     public IjkVideoView ijk() {
         return ijkPlayer;
+    }
+
+    public Map<String, String> getHeaders() {
+        return headers;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void clean() {
+        this.headers = null;
+        this.url = null;
     }
 
     public MediaSessionCompat getSession() {
@@ -432,7 +447,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         if (isIjk() && ijkPlayer != null) ijkPlayer.setMediaSource(IjkUtil.getSource(result));
         if (isExo() && exoPlayer != null) exoPlayer.setMediaSource(ExoUtil.getSource(result, errorCode));
         if (isExo() && exoPlayer != null) exoPlayer.prepare();
-        setTimeoutCheck(result.getRealUrl());
+        setTimeoutCheck(result.getHeaders(), result.getRealUrl());
     }
 
     private void setMediaSource(Channel channel) {
@@ -440,7 +455,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         if (isIjk() && ijkPlayer != null) ijkPlayer.setMediaSource(IjkUtil.getSource(channel));
         if (isExo() && exoPlayer != null) exoPlayer.setMediaSource(ExoUtil.getSource(channel, errorCode));
         if (isExo() && exoPlayer != null) exoPlayer.prepare();
-        setTimeoutCheck(channel.getUrl());
+        setTimeoutCheck(channel.getHeaders(), channel.getUrl());
     }
 
     private void setMediaSource(Map<String, String> headers, String url) {
@@ -448,12 +463,14 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         if (isIjk() && ijkPlayer != null) ijkPlayer.setMediaSource(IjkUtil.getSource(headers, url));
         if (isExo() && exoPlayer != null) exoPlayer.setMediaSource(ExoUtil.getSource(headers, url, errorCode));
         if (isExo() && exoPlayer != null) exoPlayer.prepare();
-        setTimeoutCheck(url);
+        setTimeoutCheck(headers, url);
     }
 
-    private void setTimeoutCheck(String url) {
+    private void setTimeoutCheck(Map<String, String> headers, String url) {
         App.post(runnable, timeout);
-        PlayerEvent.url(url);
+        this.headers = headers;
+        PlayerEvent.state(0);
+        this.url = url;
     }
 
     private void removeTimeoutCheck() {

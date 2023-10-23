@@ -562,10 +562,10 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mBinding.control.title.setText(getString(R.string.detail_title, mBinding.name.getText(), episode.getName()));
         mViewModel.playerContent(getKey(), flag.getFlag(), episode.getUrl());
         updateHistory(episode, replay);
+        mPlayers.clean();
         showProgress();
         setMetadata();
         hidePreview();
-        setUrl(null);
     }
 
     private void setPlayer(Result result) {
@@ -697,7 +697,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private void onCast() {
-        CastDialog.create().history(mHistory).video(CastVideo.get(mBinding.name.getText().toString(), getUrl())).fm(true).show(this);
+        CastDialog.create().history(mHistory).video(CastVideo.get(mBinding.name.getText().toString(), mPlayers.getUrl())).fm(true).show(this);
     }
 
     private void onFull() {
@@ -715,7 +715,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private void onShare() {
-        ShareCompat.IntentBuilder builder = new ShareCompat.IntentBuilder(this).setType("text/plain").setText(getUrl());
+        ShareCompat.IntentBuilder builder = new ShareCompat.IntentBuilder(this).setType("text/plain").setText(mPlayers.getUrl());
         builder.getIntent().putExtra("title", mBinding.control.title.getText());
         builder.getIntent().putExtra("name", mBinding.control.title.getText());
         builder.startChooser();
@@ -979,9 +979,9 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mBinding.control.right.back.setVisibility(isFullscreen() && !isLock() ? View.VISIBLE : View.GONE);
         mBinding.control.parse.setVisibility(isFullscreen() && isUseParse() ? View.VISIBLE : View.GONE);
         mBinding.control.action.getRoot().setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
+        mBinding.control.share.setVisibility(mPlayers.getUrl() == null ? View.GONE : View.VISIBLE);
+        mBinding.control.cast.setVisibility(mPlayers.getUrl() == null ? View.GONE : View.VISIBLE);
         mBinding.control.right.lock.setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
-        mBinding.control.share.setVisibility(getUrl() == null ? View.GONE : View.VISIBLE);
-        mBinding.control.cast.setVisibility(getUrl() == null ? View.GONE : View.VISIBLE);
         mBinding.control.center.setVisibility(isLock() ? View.GONE : View.VISIBLE);
         mBinding.control.bottom.setVisibility(isLock() ? View.GONE : View.VISIBLE);
         mBinding.control.top.setVisibility(isLock() ? View.GONE : View.VISIBLE);
@@ -1162,7 +1162,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
                 setPosition();
                 setInitTrack(true);
                 setTrackVisible(false);
-                setUrl(event.getUrl());
                 mClock.setCallback(this);
                 break;
             case Player.STATE_IDLE:
@@ -1343,8 +1342,9 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private boolean mismatch(Vod item) {
-        String keyword = mBinding.name.getText().toString();
+        if (getId().equals(item.getVodId())) return true;
         if (mBroken.contains(item.getVodId())) return true;
+        String keyword = mBinding.name.getText().toString();
         if (isAutoMode()) return !item.getVodName().equals(keyword);
         else return !item.getVodName().contains(keyword);
     }
@@ -1458,14 +1458,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     public void setLock(boolean lock) {
         this.lock = lock;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
     }
 
     public int getToggleCount() {
@@ -1663,7 +1655,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
             exitFullscreen();
         } else if (!isLock()) {
             stopSearch();
-            finish();
+            super.onBackPressed();
         }
     }
 
