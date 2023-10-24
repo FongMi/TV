@@ -1,7 +1,7 @@
 package com.fongmi.android.tv.ui.activity;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.view.KeyEvent;
@@ -100,8 +100,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private int toggleCount;
     private int count;
 
-    public static void start(Activity activity) {
-        if (!LiveConfig.isEmpty()) activity.startActivity(new Intent(activity, LiveActivity.class));
+    public static void start(Context context) {
+        if (!LiveConfig.isEmpty()) context.startActivity(new Intent(context, LiveActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
     }
 
     private PlayerView getExo() {
