@@ -30,39 +30,47 @@ import com.google.gson.JsonParser;
 import java.io.ByteArrayOutputStream;
 import java.util.Map;
 
-public class ImgUtil {
+import jahirfiquitiva.libs.textdrawable.TextDrawable;
 
-    public static void load(String url, ImageView view) {
-        load(url, view, ImageView.ScaleType.CENTER);
-    }
+public class ImgUtil {
 
     public static void load(String url, int error, CustomTarget<Drawable> target) {
         if (TextUtils.isEmpty(url)) target.onLoadFailed(ResUtil.getDrawable(error));
         else Glide.with(App.get()).load(getUrl(url)).error(error).skipMemoryCache(true).dontAnimate().signature(new ObjectKey(url + "_" + Setting.getQuality())).into(target);
     }
 
-    public static void load(String url, ImageView view, ImageView.ScaleType scaleType) {
+    public static void rect(String text, String url, ImageView view) {
+        load(text, url, view, ImageView.ScaleType.CENTER, true);
+    }
+
+    public static void oval(String text, String url, ImageView view) {
+        load(text, url, view, ImageView.ScaleType.CENTER, false);
+    }
+
+    public static void load(String text, String url, ImageView view, ImageView.ScaleType scaleType, boolean rect) {
         view.setScaleType(scaleType);
-        if (TextUtils.isEmpty(url)) view.setImageResource(R.drawable.ic_img_error);
-        else Glide.with(App.get()).asBitmap().load(getUrl(url)).placeholder(R.drawable.ic_img_loading).skipMemoryCache(true).dontAnimate().sizeMultiplier(Setting.getThumbnail()).signature(new ObjectKey(url + "_" + Setting.getQuality())).listener(getListener(view, scaleType)).into(view);
+        if (!TextUtils.isEmpty(url)) Glide.with(App.get()).asBitmap().load(getUrl(url)).placeholder(R.drawable.ic_img_loading).skipMemoryCache(true).dontAnimate().sizeMultiplier(Setting.getThumbnail()).signature(new ObjectKey(url + "_" + Setting.getQuality())).listener(getListener(view, scaleType)).into(view);
+        else if (text.length() > 0) view.setImageDrawable(getTextDrawable(text.substring(0, 1), rect));
+        else view.setImageResource(R.drawable.ic_img_error);
     }
 
-    public static void loadKeep(String url, ImageView view) {
+    public static void loadVod(String text, String url, ImageView view) {
         view.setScaleType(ImageView.ScaleType.CENTER);
-        if (TextUtils.isEmpty(url)) view.setImageResource(R.drawable.ic_img_error);
-        else Glide.with(App.get()).asBitmap().load(getUrl(url)).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).listener(getListener(view)).into(view);
-    }
-
-    public static void loadHistory(String url, ImageView view) {
-        view.setScaleType(ImageView.ScaleType.CENTER);
-        if (TextUtils.isEmpty(url)) view.setImageResource(R.drawable.ic_img_error);
-        else Glide.with(App.get()).asBitmap().load(getUrl(url)).error(R.drawable.ic_img_error).placeholder(R.drawable.ic_img_loading).listener(getListener(view)).into(view);
+        if (!TextUtils.isEmpty(url)) Glide.with(App.get()).asBitmap().load(getUrl(url)).placeholder(R.drawable.ic_img_loading).listener(getListener(view)).into(view);
+        else if (text.length() > 0) view.setImageDrawable(getTextDrawable(text.substring(0, 1), true));
+        else view.setImageResource(R.drawable.ic_img_error);
     }
 
     public static void loadLive(String url, ImageView view) {
         view.setVisibility(TextUtils.isEmpty(url) ? View.GONE : View.VISIBLE);
         if (TextUtils.isEmpty(url)) view.setImageResource(R.drawable.ic_img_empty);
         else Glide.with(App.get()).asBitmap().load(url).error(R.drawable.ic_img_empty).skipMemoryCache(true).dontAnimate().signature(new ObjectKey(url)).into(view);
+    }
+
+    private static Drawable getTextDrawable(String text, boolean rect) {
+        TextDrawable.Builder builder = new TextDrawable.Builder().withBorder(ResUtil.dp2px(2), ColorGenerator.get700(text));
+        if (rect) return builder.buildRoundRect(text, ColorGenerator.get500(text), ResUtil.dp2px(8));
+        return builder.buildRound(text, ColorGenerator.get500(text));
     }
 
     public static Object getUrl(String url) {

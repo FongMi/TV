@@ -166,7 +166,7 @@ public class DetailActivity extends BaseActivity implements FlagAdapter.OnClickL
         setText(mBinding.site, R.string.detail_site, getSite().getName());
         setText(mBinding.content, 0, Html.fromHtml(item.getVodContent()).toString());
         setText(mBinding.director, R.string.detail_director, Html.fromHtml(item.getVodDirector()).toString());
-        ImgUtil.load(item.getVodPic(getPic()), mBinding.pic);
+        ImgUtil.rect(item.getVodName(), item.getVodPic(getPic()), mBinding.pic);
         mFlagAdapter.addAll(item.getVodFlags());
         checkHistory(item);
         checkFlag(item);
