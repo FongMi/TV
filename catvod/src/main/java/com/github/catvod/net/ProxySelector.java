@@ -31,7 +31,7 @@ public class ProxySelector extends java.net.ProxySelector {
     public List<Proxy> select(URI uri) {
         if (proxy == null || hosts == null || hosts.isEmpty() || uri.getHost() == null || "127.0.0.1".equals(uri.getHost())) return Collections.singletonList(Proxy.NO_PROXY);
         for (String host : hosts) if (Util.containOrMatch(uri.getHost(), host)) return Collections.singletonList(proxy);
-        return getDefault().select(uri);
+        return Collections.singletonList(Proxy.NO_PROXY);
     }
 
     @Override
