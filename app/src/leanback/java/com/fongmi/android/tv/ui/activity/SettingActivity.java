@@ -108,7 +108,9 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.proxy.setOnClickListener(this::onProxy);
         mBinding.cache.setOnClickListener(this::onCache);
         mBinding.version.setOnClickListener(this::onVersion);
+        mBinding.vod.setOnLongClickListener(this::onVodEdit);
         mBinding.vodHome.setOnClickListener(this::onVodHome);
+        mBinding.live.setOnLongClickListener(this::onLiveEdit);
         mBinding.liveHome.setOnClickListener(this::onLiveHome);
         mBinding.vodHistory.setOnClickListener(this::onVodHistory);
         mBinding.version.setOnLongClickListener(this::onVersionDev);
@@ -218,6 +220,16 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
 
     private void onWall(View view) {
         ConfigDialog.create(this).type(type = 2).show();
+    }
+
+    private boolean onVodEdit(View view) {
+        ConfigDialog.create(this).type(type = 0).edit().show();
+        return true;
+    }
+
+    private boolean onLiveEdit(View view) {
+        ConfigDialog.create(this).type(type = 1).edit().show();
+        return true;
     }
 
     private void onVodHome(View view) {

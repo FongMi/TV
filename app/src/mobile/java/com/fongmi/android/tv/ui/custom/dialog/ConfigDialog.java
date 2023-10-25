@@ -28,6 +28,7 @@ public class ConfigDialog {
     private final Fragment fragment;
     private AlertDialog dialog;
     private boolean append;
+    private boolean edit;
     private String url;
     private int type;
 
@@ -37,6 +38,11 @@ public class ConfigDialog {
 
     public ConfigDialog type(int type) {
         this.type = type;
+        return this;
+    }
+
+    public ConfigDialog edit() {
+        this.edit = true;
         return this;
     }
 
@@ -112,6 +118,7 @@ public class ConfigDialog {
 
     private void onPositive(DialogInterface dialog, int which) {
         String text = UrlUtil.fixUrl(binding.text.getText().toString().trim());
+        if (edit) Config.find(url, type).url(text).update();
         if (text.isEmpty()) Config.delete(url, type);
         callback.setConfig(Config.find(text, type));
         dialog.dismiss();

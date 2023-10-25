@@ -38,6 +38,7 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
     private final ConfigCallback callback;
     private final AlertDialog dialog;
     private boolean append;
+    private boolean edit;
     private String url;
     private int type;
 
@@ -47,6 +48,11 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
 
     public ConfigDialog type(int type) {
         this.type = type;
+        return this;
+    }
+
+    public ConfigDialog edit() {
+        this.edit = true;
         return this;
     }
 
@@ -132,6 +138,7 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
 
     private void onPositive(View view) {
         String text = UrlUtil.fixUrl(binding.text.getText().toString().trim());
+        if (edit) Config.find(url, type).url(text).update();
         if (text.isEmpty()) Config.delete(url, type);
         callback.setConfig(Config.find(text, type));
         dialog.dismiss();
