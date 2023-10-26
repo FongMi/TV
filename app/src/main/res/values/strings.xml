@@ -93,6 +93,7 @@
     <string name="search_hot">Hot</string>
 
     <!-- Dialog -->
+    <string name="dialog_edit">Edit</string>
     <string name="dialog_positive">OK</string>
     <string name="dialog_negative">Cancel</string>
     <string name="dialog_config_hint">Please enter the config…</string>

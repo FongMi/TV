@@ -93,6 +93,7 @@
     <string name="search_hot">热搜</string>
 
     <!-- Dialog -->
+    <string name="dialog_edit">修改</string>
     <string name="dialog_positive">确定</string>
     <string name="dialog_negative">取消</string>
     <string name="dialog_config_hint">请输入接口…</string>
