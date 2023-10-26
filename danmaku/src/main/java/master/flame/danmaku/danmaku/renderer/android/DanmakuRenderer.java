@@ -161,6 +161,11 @@ public class DanmakuRenderer extends Renderer {
                 if (drawItem.lines == null && drawItem.getBottom() > disp.getHeight()) {
                     return ACTION_CONTINUE;
                 }
+                if (drawItem.getDrawingCache() == null || drawItem.getDrawingCache().get() == null) {
+                    if (mCacheManager != null) {
+                        mCacheManager.buildDanmakuCache(drawItem);
+                    }
+                }
                 int renderingType = drawItem.draw(disp);
                 if (renderingType == IRenderer.CACHE_RENDERING) {
                     renderingState.cacheHitCount++;
