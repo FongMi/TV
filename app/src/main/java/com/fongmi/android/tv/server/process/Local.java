@@ -146,11 +146,7 @@ public class Local implements Process {
                 res.addHeader("Content-Range", "bytes */" + fileLen);
                 res.addHeader("Accept-Ranges", "bytes");
                 res.addHeader("ETag", etag);
-            } else if (range == null && headerIfNoneMatchPresentAndMatching) {
-                res = NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.NOT_MODIFIED, mime, "");
-                res.addHeader("Accept-Ranges", "bytes");
-                res.addHeader("ETag", etag);
-            } else if (!headerIfRangeMissingOrMatching && headerIfNoneMatchPresentAndMatching) {
+            } else if (headerIfNoneMatchPresentAndMatching && (!headerIfRangeMissingOrMatching || range == null)) {
                 res = NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.NOT_MODIFIED, mime, "");
                 res.addHeader("Accept-Ranges", "bytes");
                 res.addHeader("ETag", etag);
