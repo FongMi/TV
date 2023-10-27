@@ -133,9 +133,9 @@ public class Class implements Parcelable {
         return Style.get(getLand(), getCircle(), getRatio());
     }
 
-    public HashMap<String, String> getExtend() {
+    public HashMap<String, String> getExtend(boolean change) {
         HashMap<String, String> extend = new HashMap<>();
-        for (Filter filter : getFilters()) if (filter.getInit() != null) extend.put(filter.getKey(), filter.setActivated(filter.getInit()));
+        for (Filter filter : getFilters()) if (filter.getInit() != null) extend.put(filter.getKey(), change ? filter.setActivated(filter.getInit()) : filter.getInit());
         return extend;
     }
 

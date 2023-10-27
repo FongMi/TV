@@ -116,6 +116,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         mFilters = getFilter();
         setRecyclerView();
         setViewModel();
+        setFilters();
     }
 
     @Override
@@ -146,6 +147,14 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
             checkMore(size);
             hideProgress();
         });
+    }
+
+    private void setFilters() {
+        for (Filter filter : mFilters) {
+            if (mExtends.containsKey(filter.getKey())) {
+                filter.setActivated(mExtends.get(filter.getKey()));
+            }
+        }
     }
 
     private void setClick(ArrayObjectAdapter adapter, String key, Value item) {
