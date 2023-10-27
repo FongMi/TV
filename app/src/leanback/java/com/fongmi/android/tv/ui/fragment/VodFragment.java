@@ -80,7 +80,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     }
 
     private List<Filter> getFilter() {
-        return Filter.arrayFrom(Prefers.getString(getTypeId()));
+        return Filter.arrayFrom(Prefers.getString("filter_" + getTypeId()));
     }
 
     private HashMap<String, String> getExtend() {

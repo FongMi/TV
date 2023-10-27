@@ -53,7 +53,7 @@ public class VodActivity extends BaseActivity implements TypePresenter.OnClickLi
         Intent intent = new Intent(activity, VodActivity.class);
         intent.putExtra("key", key);
         intent.putExtra("result", result);
-        for (Map.Entry<String, List<Filter>> entry : result.getFilters().entrySet()) Prefers.put(entry.getKey(), App.gson().toJson(entry.getValue()));
+        for (Map.Entry<String, List<Filter>> entry : result.getFilters().entrySet()) Prefers.put("filter_" + entry.getKey(), App.gson().toJson(entry.getValue()));
         activity.startActivity(intent);
     }
 
@@ -66,7 +66,7 @@ public class VodActivity extends BaseActivity implements TypePresenter.OnClickLi
     }
 
     private List<Filter> getFilter(String typeId) {
-        return Filter.arrayFrom(Prefers.getString(typeId));
+        return Filter.arrayFrom(Prefers.getString("filter_" + typeId));
     }
 
     private Site getSite() {
