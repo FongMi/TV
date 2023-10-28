@@ -50,6 +50,7 @@ import com.fongmi.android.tv.bean.Track;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.ActivityVideoBinding;
 import com.fongmi.android.tv.db.AppDatabase;
+import com.fongmi.android.tv.event.ActionEvent;
 import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
@@ -1078,6 +1079,19 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         if (mHistory.getEnding() > 0 && duration > 0 && mHistory.getEnding() + position >= duration) {
             mClock.setCallback(null);
             checkNext();
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onActionEvent(ActionEvent event) {
+        if (ActionEvent.PLAY.equals(event.getAction()) || ActionEvent.PAUSE.equals(event.getAction())) {
+            onKeyCenter();
+        } else if (ActionEvent.NEXT.equals(event.getAction())) {
+            mBinding.control.next.performClick();
+        } else if (ActionEvent.PREV.equals(event.getAction())) {
+            mBinding.control.prev.performClick();
+        } else if (ActionEvent.STOP.equals(event.getAction())) {
+            finish();
         }
     }
 

@@ -34,6 +34,7 @@ import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.bean.Track;
 import com.fongmi.android.tv.databinding.ActivityLiveBinding;
+import com.fongmi.android.tv.event.ActionEvent;
 import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.impl.Callback;
@@ -280,6 +281,11 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         for (int i = 0; i < mChannelAdapter.size(); i++) ((Channel) mChannelAdapter.get(i)).setSelected(mChannel);
         notifyItemChanged(mBinding.channel, mChannelAdapter);
         fetch();
+    }
+
+    private void checkPlay() {
+        if (mPlayers.isPlaying()) mPlayers.pause();
+        else mPlayers.play();
     }
 
     private void onTrack(View view) {
@@ -593,6 +599,19 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
             if (first) onItemClick(mGroup = item);
             iterator.remove();
             first = false;
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onActionEvent(ActionEvent event) {
+        if (ActionEvent.PLAY.equals(event.getAction()) || ActionEvent.PAUSE.equals(event.getAction())) {
+            checkPlay();
+        } else if (ActionEvent.NEXT.equals(event.getAction())) {
+            nextChannel();
+        } else if (ActionEvent.PREV.equals(event.getAction())) {
+            prevChannel();
+        } else if (ActionEvent.STOP.equals(event.getAction())) {
+            finish();
         }
     }
 
