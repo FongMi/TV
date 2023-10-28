@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.support.v4.media.MediaMetadataCompat;
 import android.view.KeyEvent;
 import android.view.View;
 
@@ -420,6 +421,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void showEpg() {
         mBinding.widget.play.setText(mChannel.getData().getEpg());
+        setMetadata();
     }
 
     private void setTraffic() {
@@ -452,12 +454,14 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
             public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
                 getExo().setDefaultArtwork(resource);
                 getIjk().setDefaultArtwork(resource);
+                setMetadata();
             }
 
             @Override
             public void onLoadFailed(@Nullable Drawable error) {
                 getExo().setDefaultArtwork(error);
                 getIjk().setDefaultArtwork(error);
+                setMetadata();
             }
 
             @Override
@@ -628,6 +632,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
                 break;
             case Player.STATE_READY:
                 resetToggle();
+                setMetadata();
                 hideProgress();
                 mPlayers.reset();
                 setSpeedVisible();
@@ -647,6 +652,17 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.control.text.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_TEXT) ? View.VISIBLE : View.GONE);
         mBinding.control.audio.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_AUDIO) ? View.VISIBLE : View.GONE);
         mBinding.control.video.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_VIDEO) ? View.VISIBLE : View.GONE);
+    }
+
+    private void setMetadata() {
+        String title = mChannel == null ? "" : mChannel.getName();
+        String artist = mChannel == null ? "" : mChannel.getData().getEpg();
+        MediaMetadataCompat.Builder builder = new MediaMetadataCompat.Builder();
+        builder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, title);
+        builder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, artist);
+        builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, getIjk().getDefaultArtwork());
+        builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, mPlayers.getDuration());
+        mPlayers.setMetadata(builder.build());
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
