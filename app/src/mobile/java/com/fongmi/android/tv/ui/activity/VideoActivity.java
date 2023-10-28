@@ -342,6 +342,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mBinding.control.next.setOnClickListener(view -> checkNext());
         mBinding.control.prev.setOnClickListener(view -> checkPrev());
         mBinding.control.setting.setOnClickListener(view -> onSetting());
+        mBinding.control.share.setOnLongClickListener(view -> onChoose());
         mBinding.control.title.setOnLongClickListener(view -> onChange());
         mBinding.control.right.back.setOnClickListener(view -> onFull());
         mBinding.control.right.lock.setOnClickListener(view -> onLock());
@@ -719,6 +720,18 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         builder.getIntent().putExtra("title", mBinding.control.title.getText());
         builder.getIntent().putExtra("name", mBinding.control.title.getText());
         builder.startChooser();
+        checkPlayImg(false);
+        setRedirect(true);
+    }
+
+    private boolean onChoose() {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setDataAndType(Uri.parse(mPlayers.getUrl()), "video/*");
+        startActivity(Intent.createChooser(intent, null));
+        checkPlayImg(false);
+        setRedirect(true);
+        return true;
     }
 
     private void onDanmu() {

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.media.MediaMetadataCompat;
@@ -103,6 +104,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     private Runnable mR3;
     private Clock mClock;
     private boolean foreground;
+    private boolean redirect;
     private boolean rotate;
     private boolean stop;
     private boolean lock;
@@ -178,6 +180,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mBinding.control.seek.setListener(mPlayers);
         mBinding.control.cast.setOnClickListener(view -> onCast());
         mBinding.control.share.setOnClickListener(view -> onShare());
+        mBinding.control.share.setOnLongClickListener(view -> onChoose());
         mBinding.control.right.back.setOnClickListener(view -> onBack());
         mBinding.control.right.lock.setOnClickListener(view -> onLock());
         mBinding.control.right.rotate.setOnClickListener(view -> onRotate());
@@ -296,6 +299,18 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         builder.getIntent().putExtra("title", mBinding.control.title.getText());
         builder.getIntent().putExtra("name", mBinding.control.title.getText());
         builder.startChooser();
+        checkPlayImg(false);
+        setRedirect(true);
+    }
+
+    private boolean onChoose() {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setDataAndType(Uri.parse(mPlayers.getUrl()), "video/*");
+        startActivity(Intent.createChooser(intent, null));
+        checkPlayImg(false);
+        setRedirect(true);
+        return true;
     }
 
     private void onBack() {
@@ -829,6 +844,14 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         this.foreground = foreground;
     }
 
+    public boolean isRedirect() {
+        return redirect;
+    }
+
+    public void setRedirect(boolean redirect) {
+        this.redirect = redirect;
+    }
+
     public boolean isRotate() {
         return rotate;
     }
@@ -938,6 +961,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     @Override
     protected void onUserLeaveHint() {
         super.onUserLeaveHint();
+        if (isRedirect()) return;
         mPiP.enter(this, Setting.getLiveScale() == 2);
         if (isLock()) App.post(this::onLock, 500);
     }
@@ -975,8 +999,8 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     @Override
     protected void onStart() {
         super.onStart();
-        if (Setting.isBackgroundOff()) mPlayers.play();
         mClock.stop().start();
+        mPlayers.play();
         setStop(false);
     }
 
@@ -987,6 +1011,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         App.removeCallbacks(mR0);
         App.post(mR0, 1000);
         setForeground(true);
+        setRedirect(false);
     }
 
     @Override
@@ -994,6 +1019,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         super.onPause();
         setForeground(false);
         App.removeCallbacks(mR0);
+        if (isRedirect()) mPlayers.pause();
         if (Setting.isBackgroundOn() && !isFinishing()) PlaybackService.start(mPlayers);
     }
 
@@ -1021,6 +1047,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        mClock.release();
         mPlayers.release();
         Source.get().stop();
         PlaybackService.stop();
