@@ -299,7 +299,6 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         builder.getIntent().putExtra("title", mBinding.control.title.getText());
         builder.getIntent().putExtra("name", mBinding.control.title.getText());
         builder.startChooser();
-        checkPlayImg(false);
         setRedirect(true);
     }
 
@@ -308,7 +307,6 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.setDataAndType(Uri.parse(mPlayers.getUrl()), "video/*");
         startActivity(Intent.createChooser(intent, null));
-        checkPlayImg(false);
         setRedirect(true);
         return true;
     }
@@ -331,9 +329,8 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private void checkPlay() {
-        checkPlayImg(!mPlayers.isPlaying());
-        if (mPlayers.isPlaying()) mPlayers.pause();
-        else mPlayers.play();
+        if (mPlayers.isPlaying()) onPaused();
+        else onPlay();
     }
 
     private void onTrack(View view) {
@@ -836,6 +833,16 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         showProgress();
     }
 
+    private void onPaused() {
+        checkPlayImg(false);
+        mPlayers.pause();
+    }
+
+    private void onPlay() {
+        checkPlayImg(true);
+        mPlayers.play();
+    }
+
     public boolean isForeground() {
         return foreground;
     }
@@ -1000,14 +1007,15 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     protected void onStart() {
         super.onStart();
         mClock.stop().start();
-        mPlayers.play();
         setStop(false);
+        onPlay();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         if (isForeground()) return;
+        if (isRedirect()) onPlay();
         App.removeCallbacks(mR0);
         App.post(mR0, 1000);
         setForeground(true);
@@ -1019,14 +1027,14 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         super.onPause();
         setForeground(false);
         App.removeCallbacks(mR0);
-        if (isRedirect()) mPlayers.pause();
+        if (isRedirect()) onPaused();
         if (Setting.isBackgroundOn() && !isFinishing()) PlaybackService.start(mPlayers);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if (Setting.isBackgroundOff()) mPlayers.pause();
+        if (Setting.isBackgroundOff()) onPaused();
         if (Setting.isBackgroundOff()) mClock.stop();
         setStop(true);
     }

@@ -720,7 +720,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         builder.getIntent().putExtra("title", mBinding.control.title.getText());
         builder.getIntent().putExtra("name", mBinding.control.title.getText());
         builder.startChooser();
-        checkPlayImg(false);
         setRedirect(true);
     }
 
@@ -729,7 +728,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.setDataAndType(Uri.parse(mPlayers.getUrl()), "video/*");
         startActivity(Intent.createChooser(intent, null));
-        checkPlayImg(false);
         setRedirect(true);
         return true;
     }
@@ -747,9 +745,8 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     private void checkPlay() {
         setR1Callback();
-        checkPlayImg(!mPlayers.isPlaying());
-        if (mPlayers.isPlaying()) mPlayers.pause();
-        else mPlayers.play();
+        if (mPlayers.isPlaying()) onPaused();
+        else onPlay();
     }
 
     private void checkNext() {
@@ -1384,6 +1381,16 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         getDetail(item);
     }
 
+    private void onPaused() {
+        checkPlayImg(false);
+        mPlayers.pause();
+    }
+
+    private void onPlay() {
+        checkPlayImg(true);
+        mPlayers.play();
+    }
+
     public boolean isForeground() {
         return foreground;
     }
@@ -1491,8 +1498,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     @Override
     public void onCastTo() {
-        checkPlayImg(false);
-        mPlayers.pause();
+        onPaused();
     }
 
     @Override
@@ -1561,8 +1567,8 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     public void onSeekEnd(int time) {
         mBinding.widget.seek.setVisibility(View.GONE);
         mPlayers.seekTo(time);
-        mPlayers.play();
         showProgress();
+        onPlay();
     }
 
     @Override
@@ -1576,11 +1582,11 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         if (!isFullscreen()) {
             App.post(this::enterFullscreen, 250);
         } else if (mPlayers.isPlaying()) {
-            mPlayers.pause();
             showControl();
+            onPaused();
         } else {
-            mPlayers.play();
             hideControl();
+            onPlay();
         }
     }
 
@@ -1629,14 +1635,15 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     protected void onStart() {
         super.onStart();
         mClock.stop().start();
-        mPlayers.play();
         setStop(false);
+        onPlay();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         if (isForeground()) return;
+        if (isRedirect()) onPlay();
         App.removeCallbacks(mR0);
         App.post(mR0, 1000);
         setForeground(true);
@@ -1648,14 +1655,14 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         super.onPause();
         setForeground(false);
         App.removeCallbacks(mR0);
-        if (isRedirect()) mPlayers.pause();
+        if (isRedirect()) onPaused();
         else if (Setting.isBackgroundOn() && !isFinishing()) PlaybackService.start(mPlayers);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if (Setting.isBackgroundOff()) mPlayers.pause();
+        if (Setting.isBackgroundOff()) onPaused();
         if (Setting.isBackgroundOff()) mClock.stop();
         setStop(true);
     }
