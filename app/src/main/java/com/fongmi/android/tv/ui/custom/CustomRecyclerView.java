@@ -69,13 +69,14 @@ public class CustomRecyclerView extends RecyclerView {
             case MotionEvent.ACTION_DOWN:
                 x1 = event.getX();
                 y1 = event.getY();
+                getParent().requestDisallowInterceptTouchEvent(true);
                 break;
             case MotionEvent.ACTION_MOVE:
                 float x2 = event.getX();
                 float y2 = event.getY();
                 float offsetX = Math.abs(x2 - x1);
                 float offsetY = Math.abs(y2 - y1);
-                if (Math.abs(offsetX) >= Math.abs(offsetY)) getParent().requestDisallowInterceptTouchEvent(false);
+                if (Math.abs(offsetX) > Math.abs(offsetY)) getParent().requestDisallowInterceptTouchEvent(false);
                 break;
         }
         return super.dispatchTouchEvent(event);
