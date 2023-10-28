@@ -155,7 +155,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private Runnable mR3;
     private Runnable mR4;
     private Clock mClock;
-    private String url;
     private PiP mPiP;
 
     public static void push(FragmentActivity activity, Uri uri) {
@@ -725,9 +724,12 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     private boolean onChoose() {
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra("return_result", true);
+        intent.putExtra("headers", mPlayers.getHeaderArray());
+        intent.putExtra("position", (int) mPlayers.getPosition());
+        intent.putExtra("title", mBinding.control.title.getText());
         intent.setDataAndType(Uri.parse(mPlayers.getUrl()), "video/*");
-        startActivity(Intent.createChooser(intent, null));
+        startActivityForResult(Intent.createChooser(intent, null), 1001);
         setRedirect(true);
         return true;
     }
@@ -1588,6 +1590,12 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
             hideControl();
             onPlay();
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) mPlayers.checkData(data);
     }
 
     @Override

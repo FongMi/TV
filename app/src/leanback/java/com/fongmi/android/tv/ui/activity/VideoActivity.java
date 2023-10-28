@@ -859,9 +859,12 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     private boolean onChoose() {
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra("return_result", true);
+        intent.putExtra("headers", mPlayers.getHeaderArray());
+        intent.putExtra("position", (int) mPlayers.getPosition());
+        intent.putExtra("title", mBinding.widget.title.getText());
         intent.setDataAndType(Uri.parse(mPlayers.getUrl()), "video/*");
-        startActivity(Intent.createChooser(intent, null));
+        startActivityForResult(Intent.createChooser(intent, null), 1001);
         return true;
     }
 
@@ -1496,8 +1499,15 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode != RESULT_OK) return;
-        setResult(RESULT_OK);
-        finish();
+        switch (requestCode) {
+            case 1000:
+                setResult(RESULT_OK);
+                finish();
+                break;
+            case 1001:
+                mPlayers.checkData(data);
+                break;
+        }
     }
 
     @Override

@@ -24,6 +24,7 @@ import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Track;
+import com.fongmi.android.tv.event.ActionEvent;
 import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.impl.ParseCallback;
@@ -36,6 +37,8 @@ import com.github.catvod.utils.Path;
 import com.google.common.net.HttpHeaders;
 import com.orhanobut.logger.Logger;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Formatter;
 import java.util.List;
 import java.util.Locale;
@@ -144,6 +147,12 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     public Map<String, String> getHeaders() {
         return headers;
+    }
+
+    public String[] getHeaderArray() {
+        List<String> list = new ArrayList<>();
+        for (Map.Entry<String, String> entry : getHeaders().entrySet()) list.addAll(Arrays.asList(entry.getKey(), entry.getValue()));
+        return list.toArray(new String[0]);
     }
 
     public String getUrl() {
@@ -520,6 +529,18 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         for (Map.Entry<String, String> header : headers.entrySet()) if (header.getKey().equalsIgnoreCase(HttpHeaders.USER_AGENT)) return headers;
         headers.put(HttpHeaders.USER_AGENT, Setting.getUa());
         return headers;
+    }
+
+    public void checkData(Intent data) {
+        try {
+            if (data == null || data.getExtras() == null) return;
+            int position = data.getExtras().getInt("position", 0);
+            String endBy = data.getExtras().getString("end_by", "");
+            if (endBy.equals("playback_completion")) ActionEvent.next();
+            if (endBy.equals("user")) seekTo(position, true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
