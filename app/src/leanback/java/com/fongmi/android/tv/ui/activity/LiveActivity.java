@@ -62,6 +62,7 @@ import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Traffic;
+import com.fongmi.android.tv.utils.Util;
 import com.github.catvod.net.OkHttp;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -345,8 +346,10 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private boolean onChoose() {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra("headers", mPlayers.getHeaderArray());
+        intent.putExtra("title", mBinding.widget.name.getText());
         intent.setDataAndType(Uri.parse(mPlayers.getUrl()), "video/*");
-        startActivity(Intent.createChooser(intent, null));
+        startActivity(Util.getChooser(intent));
         return true;
     }
 

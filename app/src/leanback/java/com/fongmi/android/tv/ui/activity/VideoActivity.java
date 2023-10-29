@@ -81,6 +81,7 @@ import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Sniffer;
 import com.fongmi.android.tv.utils.Traffic;
+import com.fongmi.android.tv.utils.Util;
 import com.github.bassaer.library.MDColor;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Trans;
@@ -859,12 +860,13 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     private boolean onChoose() {
         Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("return_result", true);
         intent.putExtra("headers", mPlayers.getHeaderArray());
         intent.putExtra("position", (int) mPlayers.getPosition());
         intent.putExtra("title", mBinding.widget.title.getText());
         intent.setDataAndType(Uri.parse(mPlayers.getUrl()), "video/*");
-        startActivityForResult(Intent.createChooser(intent, null), 1001);
+        startActivityForResult(Util.getChooser(intent), 1001);
         return true;
     }
 

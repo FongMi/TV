@@ -26,7 +26,6 @@ import android.widget.TextView;
 import androidx.annotation.Dimension;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ShareCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
@@ -715,21 +714,25 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private void onShare() {
-        ShareCompat.IntentBuilder builder = new ShareCompat.IntentBuilder(this).setType("text/plain").setText(mPlayers.getUrl());
-        builder.getIntent().putExtra("title", mBinding.control.title.getText());
-        builder.getIntent().putExtra("name", mBinding.control.title.getText());
-        builder.startChooser();
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_TEXT, mPlayers.getUrl());
+        intent.putExtra("name", mBinding.control.title.getText());
+        intent.putExtra("title", mBinding.control.title.getText());
+        startActivity(Util.getChooser(intent));
         setRedirect(true);
     }
 
     private boolean onChoose() {
         Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("return_result", true);
         intent.putExtra("headers", mPlayers.getHeaderArray());
         intent.putExtra("position", (int) mPlayers.getPosition());
         intent.putExtra("title", mBinding.control.title.getText());
         intent.setDataAndType(Uri.parse(mPlayers.getUrl()), "video/*");
-        startActivityForResult(Intent.createChooser(intent, null), 1001);
+        startActivityForResult(Util.getChooser(intent), 1001);
         setRedirect(true);
         return true;
     }

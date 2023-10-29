@@ -2,9 +2,13 @@ package com.fongmi.android.tv.utils;
 
 import android.app.Activity;
 import android.content.ClipboardManager;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.ResolveInfo;
 import android.os.Build;
 import android.os.IBinder;
+import android.os.Parcelable;
 import android.provider.Settings;
 import android.view.View;
 import android.view.Window;
@@ -15,7 +19,9 @@ import com.fongmi.android.tv.App;
 import com.github.catvod.Init;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Formatter;
+import java.util.List;
 
 public class Util {
 
@@ -99,6 +105,21 @@ public class Util {
             return androidx.media3.common.util.Util.getStringForTime(builder, formatter, timeMs);
         } catch (Exception e) {
             return "";
+        }
+    }
+
+    public static Intent getChooser(Intent intent) {
+        List<ComponentName> components = new ArrayList<>();
+        for (ResolveInfo resolveInfo : App.get().getPackageManager().queryIntentActivities(intent, 0)) {
+            String pkgName = resolveInfo.activityInfo.packageName;
+            if (pkgName.equals(App.get().getPackageName())) {
+                components.add(new ComponentName(pkgName, resolveInfo.activityInfo.name));
+            }
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return Intent.createChooser(intent, null).putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, components.toArray(new Parcelable[]{}));
+        } else {
+            return Intent.createChooser(intent, null);
         }
     }
 }

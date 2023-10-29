@@ -15,7 +15,6 @@ import android.view.View;
 import androidx.annotation.Dimension;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ShareCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.media3.common.C;
@@ -295,18 +294,23 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private void onShare() {
-        ShareCompat.IntentBuilder builder = new ShareCompat.IntentBuilder(this).setType("text/plain").setText(mPlayers.getUrl());
-        builder.getIntent().putExtra("title", mBinding.control.title.getText());
-        builder.getIntent().putExtra("name", mBinding.control.title.getText());
-        builder.startChooser();
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_TEXT, mPlayers.getUrl());
+        intent.putExtra("name", mBinding.control.title.getText());
+        intent.putExtra("title", mBinding.control.title.getText());
+        startActivity(Util.getChooser(intent));
         setRedirect(true);
     }
 
     private boolean onChoose() {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra("headers", mPlayers.getHeaderArray());
+        intent.putExtra("title", mBinding.control.title.getText());
         intent.setDataAndType(Uri.parse(mPlayers.getUrl()), "video/*");
-        startActivity(Intent.createChooser(intent, null));
+        startActivity(Util.getChooser(intent));
         setRedirect(true);
         return true;
     }
