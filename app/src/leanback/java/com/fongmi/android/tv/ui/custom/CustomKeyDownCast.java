@@ -62,6 +62,11 @@ public class CustomKeyDownCast extends GestureDetector.SimpleOnGestureListener {
     }
 
     @Override
+    public boolean onDown(@NonNull MotionEvent e) {
+        return true;
+    }
+
+    @Override
     public boolean onDoubleTap(@NonNull MotionEvent e) {
         listener.onDoubleTap();
         return true;

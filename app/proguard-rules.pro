@@ -33,6 +33,7 @@
 
 # Cling
 -keep class org.fourthline.cling.** { *; }
+-keep class javax.xml.** { *; }
 
 # Cronet
 -keep class org.chromium.net.** { *; }
