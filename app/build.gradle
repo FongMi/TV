@@ -102,7 +102,6 @@ dependencies {
     implementation project(':media-lib-session')
     implementation project(':media-lib-ui')
     implementation platform('org.jetbrains.kotlin:kotlin-bom:1.8.20')
-    implementation(ext: 'aar', name: 'dlna-core', group: 'fongmi', version: 'release')
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.biometric:biometric:1.1.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.6.2'
@@ -126,14 +125,15 @@ dependencies {
     implementation 'org.greenrobot:eventbus:3.3.1'
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
     implementation('org.simpleframework:simple-xml:2.7.1') { exclude group: 'stax', module: 'stax-api' exclude group: 'xpp3', module: 'xpp3' }
-    leanbackImplementation(ext: 'aar', name: 'dlna-dmr', group: 'fongmi', version: 'release')
+    implementation(ext: 'aar', name: 'dlna-core', group: 'fongmi', version: 'release')
     leanbackImplementation 'androidx.leanback:leanback:1.2.0-alpha03'
     leanbackImplementation 'me.jessyan:autosize:1.2.1'
-    mobileImplementation(ext: 'aar', name: 'dlna-dmc', group: 'fongmi', version: 'release')
+    leanbackImplementation(ext: 'aar', name: 'dlna-dmr', group: 'fongmi', version: 'release')
     mobileImplementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     mobileImplementation 'com.github.chrisbanes:PhotoView:2.3.0'
     mobileImplementation 'com.google.android.flexbox:flexbox:3.0.0'
     mobileImplementation('com.journeyapps:zxing-android-embedded:4.3.0') { transitive = false }
+    mobileImplementation(ext: 'aar', name: 'dlna-dmc', group: 'fongmi', version: 'release')
     annotationProcessor 'androidx.room:room-compiler:2.6.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.15.1'
 }
