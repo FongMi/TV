@@ -332,8 +332,8 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     public void play() {
         if (isEnd()) return;
         session.setActive(true);
-        if (isExo()) exoPlayer.play();
-        if (isIjk()) ijkPlayer.start();
+        if (isExo()) playExo();
+        if (isIjk()) playIjk();
         if (hasDanmu()) danmuView.resume();
         setPlaybackState(PlaybackStateCompat.STATE_PLAYING);
     }
@@ -410,20 +410,34 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         return isExo() ? exoPlayer.getVideoSize().height : ijkPlayer.getVideoHeight();
     }
 
+    private void playExo() {
+        if (exoPlayer == null) return;
+        exoPlayer.play();
+    }
+
+    private void playIjk() {
+        if (ijkPlayer == null) return;
+        ijkPlayer.start();
+    }
+
     private void pauseExo() {
+        if (exoPlayer == null) return;
         exoPlayer.pause();
     }
 
     private void pauseIjk() {
+        if (ijkPlayer == null) return;
         ijkPlayer.pause();
     }
 
     private void stopExo() {
+        if (exoPlayer == null) return;
         exoPlayer.stop();
         exoPlayer.clearMediaItems();
     }
 
     private void stopIjk() {
+        if (ijkPlayer == null) return;
         ijkPlayer.stop();
     }
 
