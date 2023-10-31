@@ -83,7 +83,7 @@ import okhttp3.Call;
 import okhttp3.Response;
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class LiveActivity extends BaseActivity implements CustomKeyDownLive.Listener, CastDialog.Listener, TrackDialog.Listener, Biometric.Callback, PassCallback, LiveCallback, GroupAdapter.OnClickListener, ChannelAdapter.OnClickListener, SubtitleCallback {
+public class LiveActivity extends BaseActivity implements CustomKeyDownLive.Listener, TrackDialog.Listener, Biometric.Callback, PassCallback, LiveCallback, GroupAdapter.OnClickListener, ChannelAdapter.OnClickListener, SubtitleCallback {
 
     private ActivityLiveBinding mBinding;
     private Observer<Channel> mObserveChannel;
@@ -899,10 +899,6 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
 
     private void stopService() {
         PlaybackService.stop();
-    }
-
-    @Override
-    public void onCastTo() {
     }
 
     @Override
