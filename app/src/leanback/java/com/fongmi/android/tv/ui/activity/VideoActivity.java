@@ -376,6 +376,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mPlayers.set(getExo(), getIjk());
         getExo().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
         getIjk().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
+        mBinding.control.reset.setText(ResUtil.getStringArray(R.array.select_reset)[Setting.getReset()]);
         setSubtitle(16);
     }
 
@@ -413,7 +414,6 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mBinding.control.player.setText(mPlayers.getPlayerText());
         getExo().setVisibility(mPlayers.isExo() ? View.VISIBLE : View.GONE);
         getIjk().setVisibility(mPlayers.isIjk() ? View.VISIBLE : View.GONE);
-        mBinding.control.reset.setText(ResUtil.getStringArray(R.array.select_reset)[Setting.getReset()]);
     }
 
     private void setDecodeView() {

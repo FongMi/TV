@@ -19,6 +19,7 @@ import androidx.media3.exoplayer.util.EventLogger;
 import androidx.media3.ui.PlayerView;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.bean.Channel;
@@ -40,6 +41,7 @@ import com.orhanobut.logger.Logger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Formatter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -71,7 +73,6 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     private Runnable runnable;
     private String url;
     private int errorCode;
-    private int timeout;
     private int retry;
     private int decode;
     private int player;
@@ -385,8 +386,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         if (isIllegal(channel.getUrl())) {
             ErrorEvent.url();
         } else {
-            this.timeout = timeout;
-            setMediaSource(channel);
+            setMediaSource(channel, timeout);
         }
     }
 
@@ -394,13 +394,11 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         if (result.hasMsg()) {
             ErrorEvent.extract(result.getMsg());
         } else if (result.getParse(1) == 1 || result.getJx() == 1) {
-            this.timeout = timeout;
             startParse(result, useParse);
         } else if (isIllegal(result.getRealUrl())) {
             ErrorEvent.url();
         } else {
-            this.timeout = timeout;
-            setMediaSource(result);
+            setMediaSource(result, timeout);
         }
     }
 
@@ -451,31 +449,35 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         if (parseJob != null) parseJob.stop();
     }
 
-    private void setMediaSource(Result result) {
+    public void setMediaSource(String url) {
+        setMediaSource(new HashMap<>(), url, Constant.TIMEOUT_PLAY);
+    }
+
+    private void setMediaSource(Result result, int timeout) {
         Logger.t(TAG).d(errorCode + "," + result.getRealUrl());
         if (isIjk() && ijkPlayer != null) ijkPlayer.setMediaSource(IjkUtil.getSource(result));
         if (isExo() && exoPlayer != null) exoPlayer.setMediaSource(ExoUtil.getSource(result, errorCode));
         if (isExo() && exoPlayer != null) exoPlayer.prepare();
-        setTimeoutCheck(result.getHeaders(), result.getRealUrl());
+        setTimeoutCheck(result.getHeaders(), result.getRealUrl(), timeout);
     }
 
-    private void setMediaSource(Channel channel) {
+    private void setMediaSource(Channel channel, int timeout) {
         Logger.t(TAG).d(errorCode + "," + channel.getUrl());
         if (isIjk() && ijkPlayer != null) ijkPlayer.setMediaSource(IjkUtil.getSource(channel));
         if (isExo() && exoPlayer != null) exoPlayer.setMediaSource(ExoUtil.getSource(channel, errorCode));
         if (isExo() && exoPlayer != null) exoPlayer.prepare();
-        setTimeoutCheck(channel.getHeaders(), channel.getUrl());
+        setTimeoutCheck(channel.getHeaders(), channel.getUrl(), timeout);
     }
 
-    private void setMediaSource(Map<String, String> headers, String url) {
+    private void setMediaSource(Map<String, String> headers, String url, int timeout) {
         Logger.t(TAG).d(errorCode + "," + url);
         if (isIjk() && ijkPlayer != null) ijkPlayer.setMediaSource(IjkUtil.getSource(headers, url));
         if (isExo() && exoPlayer != null) exoPlayer.setMediaSource(ExoUtil.getSource(headers, url, errorCode));
         if (isExo() && exoPlayer != null) exoPlayer.prepare();
-        setTimeoutCheck(headers, url);
+        setTimeoutCheck(headers, url, timeout);
     }
 
-    private void setTimeoutCheck(Map<String, String> headers, String url) {
+    private void setTimeoutCheck(Map<String, String> headers, String url, int timeout) {
         App.post(runnable, timeout);
         this.headers = headers;
         PlayerEvent.state(0);
@@ -545,9 +547,8 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     @Override
     public void onParseSuccess(Map<String, String> headers, String url, String from) {
-        setMediaSource(headers, url);
-        if (TextUtils.isEmpty(from)) return;
-        Notify.show(ResUtil.getString(R.string.parse_from, from));
+        if (!TextUtils.isEmpty(from)) Notify.show(ResUtil.getString(R.string.parse_from, from));
+        setMediaSource(headers, url, Constant.TIMEOUT_PLAY);
     }
 
     @Override

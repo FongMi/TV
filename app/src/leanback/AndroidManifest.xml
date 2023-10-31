@@ -81,6 +81,18 @@
         </activity>
 
         <activity
+            android:name=".ui.activity.CastActivity"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
+            android:exported="true"
+            android:launchMode="singleTop"
+            android:screenOrientation="sensorLandscape">
+            <intent-filter>
+                <action android:name="${applicationId}.cast" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
             android:name=".ui.activity.VodActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
             android:screenOrientation="sensorLandscape" />
@@ -125,6 +137,10 @@
             android:name=".ui.activity.SettingPlayerActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
             android:screenOrientation="sensorLandscape" />
+
+        <service
+            android:name="com.android.cast.dlna.dmr.DLNARendererService"
+            android:exported="false" />
 
     </application>
 </manifest>

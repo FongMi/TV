@@ -394,8 +394,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         getExo().setVisibility(mPlayers.isExo() ? View.VISIBLE : View.GONE);
         getIjk().setVisibility(mPlayers.isIjk() ? View.VISIBLE : View.GONE);
         if (mControlDialog != null && mControlDialog.isVisible()) mControlDialog.updatePlayer();
-        mBinding.control.action.reset.setText(ResUtil.getStringArray(R.array.select_reset)[Setting.getReset()]);
-        mBinding.video.addOnLayoutChangeListener((view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> mPiP.update(getActivity(), view));
     }
 
     private void setDecodeView() {
@@ -407,6 +405,8 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         if (isPort() && ResUtil.isLand(this)) enterFullscreen();
         getExo().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
         getIjk().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
+        mBinding.control.action.reset.setText(ResUtil.getStringArray(R.array.select_reset)[Setting.getReset()]);
+        mBinding.video.addOnLayoutChangeListener((view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> mPiP.update(getActivity(), view));
         setSubtitle(14);
     }
 

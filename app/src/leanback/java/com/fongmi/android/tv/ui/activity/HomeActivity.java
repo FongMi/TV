@@ -15,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
+import com.android.cast.dlna.dmr.DLNARendererService;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.R;
@@ -89,6 +90,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     @Override
     protected void initView() {
         mClock = Clock.create(mBinding.time).format("MM/dd HH:mm:ss");
+        DLNARendererService.Companion.startService(this);
         mBinding.progressLayout.showProgress();
         Updater.get().release().start();
         Server.get().start();
