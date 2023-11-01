@@ -771,12 +771,6 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mHistory.setSpeed(mPlayers.getSpeed());
     }
 
-    private boolean onSpeedLong() {
-        mBinding.control.speed.setText(mPlayers.toggleSpeed());
-        mHistory.setSpeed(mPlayers.getSpeed());
-        return true;
-    }
-
     private void onSpeedAdd() {
         mBinding.control.speed.setText(mPlayers.addSpeed(0.25f));
         mHistory.setSpeed(mPlayers.getSpeed());
@@ -785,6 +779,12 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private void onSpeedSub() {
         mBinding.control.speed.setText(mPlayers.subSpeed(0.25f));
         mHistory.setSpeed(mPlayers.getSpeed());
+    }
+
+    private boolean onSpeedLong() {
+        mBinding.control.speed.setText(mPlayers.toggleSpeed());
+        mHistory.setSpeed(mPlayers.getSpeed());
+        return true;
     }
 
     private void onRefresh() {

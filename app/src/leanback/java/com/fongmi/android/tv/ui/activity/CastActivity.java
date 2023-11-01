@@ -93,19 +93,20 @@ public class CastActivity extends BaseActivity implements CustomKeyDownCast.List
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
         setVideoView();
+        checkAction();
     }
 
     @Override
     @SuppressLint("ClickableViewAccessibility")
     protected void initEvent() {
         mBinding.control.seek.setListener(mPlayers);
-        mBinding.control.text.setOnClickListener(this::onTrack);
-        mBinding.control.audio.setOnClickListener(this::onTrack);
-        mBinding.control.video.setOnClickListener(this::onTrack);
         mBinding.control.text.setAddListener(this::onTextAdd);
         mBinding.control.text.setSubListener(this::onTextSub);
         mBinding.control.speed.setAddListener(this::onSpeedAdd);
         mBinding.control.speed.setSubListener(this::onSpeedSub);
+        mBinding.control.text.setOnClickListener(this::onTrack);
+        mBinding.control.audio.setOnClickListener(this::onTrack);
+        mBinding.control.video.setOnClickListener(this::onTrack);
         mBinding.control.scale.setOnClickListener(view -> onScale());
         mBinding.control.speed.setOnClickListener(view -> onSpeed());
         mBinding.control.reset.setOnClickListener(view -> onReset());
@@ -182,17 +183,17 @@ public class CastActivity extends BaseActivity implements CustomKeyDownCast.List
         mBinding.control.speed.setText(mPlayers.addSpeed());
     }
 
-    private boolean onSpeedLong() {
-        mBinding.control.speed.setText(mPlayers.toggleSpeed());
-        return true;
-    }
-
     private void onSpeedAdd() {
         mBinding.control.speed.setText(mPlayers.addSpeed(0.25f));
     }
 
     private void onSpeedSub() {
         mBinding.control.speed.setText(mPlayers.subSpeed(0.25f));
+    }
+
+    private boolean onSpeedLong() {
+        mBinding.control.speed.setText(mPlayers.toggleSpeed());
+        return true;
     }
 
     private void onReset() {
@@ -386,7 +387,6 @@ public class CastActivity extends BaseActivity implements CustomKeyDownCast.List
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
         ((RendererServiceBinder) service).getService().bindRealPlayer(this);
-        checkAction();
     }
 
     @Override
