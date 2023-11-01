@@ -125,7 +125,6 @@ public class CastDialog extends BaseDialog implements DeviceAdapter.OnClickListe
 
     private void getDevice() {
         if (fm) adapter.addAll(Device.getAll());
-        onRefresh(false);
     }
 
     private void initDLNA() {
@@ -134,25 +133,13 @@ public class CastDialog extends BaseDialog implements DeviceAdapter.OnClickListe
     }
 
     private void onRefresh() {
-        onRefresh(true);
-    }
-
-    private void onRefresh(boolean clear) {
         if (fm) ScanTask.create(this).start(adapter.getIps());
         DLNACastManager.INSTANCE.search(null);
-        if (clear) adapter.clear();
+        adapter.clear();
     }
 
     private void onScan() {
         ScanActivity.start(getActivity());
-    }
-
-    private void onSuccess() {
-        dismiss();
-    }
-
-    private void onFailure() {
-        Notify.show(R.string.device_offline);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -182,30 +169,29 @@ public class CastDialog extends BaseDialog implements DeviceAdapter.OnClickListe
 
     @Override
     public void onDisconnected(@NonNull org.fourthline.cling.model.meta.Device<?, ?, ?> device) {
-        onFailure();
+        Notify.show(R.string.device_offline);
     }
 
     @Override
     public void onSuccess(Unit unit) {
         control.play("1", null);
-        onSuccess();
+        dismiss();
     }
 
     @Override
     public void onFailure(@NonNull String s) {
-        onFailure();
+        Notify.show(s);
     }
 
     @Override
     public void onFailure(@NonNull Call call, @NonNull IOException e) {
-        App.post(this::onFailure);
+        App.post(() -> Notify.show(e.getMessage()));
     }
 
     @Override
     public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-        boolean ok = response.body().string().equals("OK");
-        if (ok) App.post(this::onSuccess);
-        else App.post(this::onFailure);
+        if (response.body().string().equals("OK")) App.post(this::dismiss);
+        else App.post(() -> Notify.show(R.string.device_offline));
     }
 
     @Override
@@ -224,19 +210,19 @@ public class CastDialog extends BaseDialog implements DeviceAdapter.OnClickListe
     }
 
     @Override
-    public void onAvTransportStateChanged(@NonNull TransportState transportState) {
+    public void onAvTransportStateChanged(@NonNull TransportState state) {
     }
 
     @Override
-    public void onEventChanged(@NonNull EventedValue<?> eventedValue) {
+    public void onEventChanged(@NonNull EventedValue<?> event) {
     }
 
     @Override
-    public void onRendererVolumeChanged(int i) {
+    public void onRendererVolumeChanged(int volume) {
     }
 
     @Override
-    public void onRendererVolumeMuteChanged(boolean b) {
+    public void onRendererVolumeMuteChanged(boolean mute) {
     }
 
     @Override
