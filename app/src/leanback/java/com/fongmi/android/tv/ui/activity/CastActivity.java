@@ -53,6 +53,7 @@ import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 public class CastActivity extends BaseActivity implements CustomKeyDownCast.Listener, TrackDialog.Listener, RenderControl, ServiceConnection {
 
     private ActivityCastBinding mBinding;
+    private DLNARendererService mService;
     private CustomKeyDownCast mKeyDown;
     private RenderState mState;
     private CastAction mAction;
@@ -93,7 +94,6 @@ public class CastActivity extends BaseActivity implements CustomKeyDownCast.List
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
         setVideoView();
-        checkAction();
     }
 
     @Override
@@ -386,7 +386,8 @@ public class CastActivity extends BaseActivity implements CustomKeyDownCast.List
 
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
-        ((RendererServiceBinder) service).getService().bindRealPlayer(this);
+        (mService = ((RendererServiceBinder) service).getService()).bindRealPlayer(this);
+        checkAction();
     }
 
     @Override
@@ -410,7 +411,7 @@ public class CastActivity extends BaseActivity implements CustomKeyDownCast.List
     }
 
     public void setState(RenderState state) {
-        this.mState = state;
+        if (mService != null) mService.notifyAvTransportLastChange(this.mState = state);
     }
 
     @Override
@@ -532,6 +533,7 @@ public class CastActivity extends BaseActivity implements CustomKeyDownCast.List
         mPlayers.release();
         Source.get().stop();
         unbindService(this);
+        mService.bindRealPlayer(null);
         App.removeCallbacks(mR1, mR2);
     }
 }
