@@ -380,6 +380,16 @@ public class CastActivity extends BaseActivity implements CustomKeyDownCast.List
         mPlayers.stop();
     }
 
+    private void setState(RenderState state) {
+        if (mService != null) mService.notifyAvTransportLastChange(this.mState = state);
+    }
+
+    @NonNull
+    @Override
+    public RenderState getState() {
+        return mState;
+    }
+
     @Override
     public void onTrackClick(Track item) {
     }
@@ -396,27 +406,16 @@ public class CastActivity extends BaseActivity implements CustomKeyDownCast.List
 
     @Override
     public long getCurrentPosition() {
-        return mPlayers.getPosition();
+        return 0;
     }
 
     @Override
     public long getDuration() {
-        return mPlayers.getDuration();
-    }
-
-    @NonNull
-    @Override
-    public RenderState getState() {
-        return mState;
-    }
-
-    public void setState(RenderState state) {
-        if (mService != null) mService.notifyAvTransportLastChange(this.mState = state);
+        return 0;
     }
 
     @Override
     public void seek(long time) {
-        mPlayers.seekTo(time, true);
     }
 
     @Override
@@ -425,7 +424,7 @@ public class CastActivity extends BaseActivity implements CustomKeyDownCast.List
     }
 
     @Override
-    public void play(@Nullable Double aDouble) {
+    public void play(@Nullable Double speed) {
         onPlay();
     }
 
