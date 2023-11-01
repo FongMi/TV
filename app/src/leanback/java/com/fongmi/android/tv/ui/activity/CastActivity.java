@@ -94,6 +94,7 @@ public class CastActivity extends BaseActivity implements CustomKeyDownCast.List
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
         setVideoView();
+        checkAction();
     }
 
     @Override
@@ -397,7 +398,6 @@ public class CastActivity extends BaseActivity implements CustomKeyDownCast.List
     @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
         (mService = ((RendererServiceBinder) service).getService()).bindRealPlayer(this);
-        checkAction();
     }
 
     @Override
@@ -420,17 +420,14 @@ public class CastActivity extends BaseActivity implements CustomKeyDownCast.List
 
     @Override
     public void pause() {
-        onPause(true);
     }
 
     @Override
     public void play(@Nullable Double speed) {
-        onPlay();
     }
 
     @Override
     public void stop() {
-        onStopped();
     }
 
     @Override
