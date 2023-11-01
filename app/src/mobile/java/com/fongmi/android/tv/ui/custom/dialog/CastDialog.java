@@ -58,7 +58,6 @@ public class CastDialog extends BaseDialog implements DeviceAdapter.OnClickListe
     private DeviceAdapter adapter;
     private DeviceControl control;
     private CastVideo video;
-    private long position;
     private boolean fm;
 
     public static CastDialog create() {
@@ -79,7 +78,6 @@ public class CastDialog extends BaseDialog implements DeviceAdapter.OnClickListe
         if (fd.startsWith("file")) fd = Server.get().getAddress() + "/" + fd.replace(Path.rootPath(), "");
         if (fd.contains("127.0.0.1")) fd = fd.replace("127.0.0.1", Server.get().getIP());
         body.add("history", history.toString().replace(id, fd));
-        position = history.getPosition();
         return this;
     }
 
@@ -125,6 +123,7 @@ public class CastDialog extends BaseDialog implements DeviceAdapter.OnClickListe
 
     private void getDevice() {
         if (fm) adapter.addAll(Device.getAll());
+        adapter.addAll(CastDevice.get().getAll());
     }
 
     private void initDLNA() {
@@ -203,7 +202,7 @@ public class CastDialog extends BaseDialog implements DeviceAdapter.OnClickListe
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        CastDevice.get().clear();
+        CastDevice.get().disconnect();
         EventBus.getDefault().unregister(this);
         DLNACastManager.INSTANCE.unregisterListener(this);
         DLNACastManager.INSTANCE.unbindCastService(App.get());

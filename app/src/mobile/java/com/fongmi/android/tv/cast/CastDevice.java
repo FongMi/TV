@@ -51,9 +51,8 @@ public class CastDevice {
         return create(device);
     }
 
-    public void clear() {
+    public void disconnect() {
         for (org.fourthline.cling.model.meta.Device<?, ?, ?> device : devices) DLNACastManager.INSTANCE.disconnectDevice(device);
-        devices.clear();
     }
 
     public org.fourthline.cling.model.meta.Device<?, ?, ?> find(com.fongmi.android.tv.bean.Device item) {
