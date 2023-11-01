@@ -36,13 +36,12 @@ public class App extends Application {
     private static App instance;
     private Activity activity;
     private final Gson gson;
-    private Looper looper;
     private boolean hook;
 
     public App() {
         instance = this;
         executor = Executors.newFixedThreadPool(Constant.THREAD_POOL);
-        handler = HandlerCompat.createAsync(looper = Looper.getMainLooper());
+        handler = HandlerCompat.createAsync(Looper.getMainLooper());
         gson = new Gson();
     }
 
@@ -52,10 +51,6 @@ public class App extends Application {
 
     public static Gson gson() {
         return get().gson;
-    }
-
-    public static Looper looper() {
-        return get().looper;
     }
 
     public static Activity activity() {
