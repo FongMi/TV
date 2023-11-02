@@ -1,4 +1,4 @@
-package com.fongmi.android.tv.ui.custom.dialog;
+package com.fongmi.android.tv.ui.dialog;
 
 import android.content.DialogInterface;
 import android.net.Uri;

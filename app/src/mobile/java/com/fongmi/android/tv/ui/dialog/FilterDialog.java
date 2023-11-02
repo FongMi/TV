@@ -1,4 +1,4 @@
-package com.fongmi.android.tv.ui.custom.dialog;
+package com.fongmi.android.tv.ui.dialog;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -12,6 +12,7 @@ import com.fongmi.android.tv.bean.Filter;
 import com.fongmi.android.tv.databinding.DialogFilterBinding;
 import com.fongmi.android.tv.impl.FilterCallback;
 import com.fongmi.android.tv.ui.adapter.FilterAdapter;
+import com.fongmi.android.tv.ui.custom.dialog.BaseDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import java.util.List;

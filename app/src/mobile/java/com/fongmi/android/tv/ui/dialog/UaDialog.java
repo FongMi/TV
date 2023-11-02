@@ -1,4 +1,4 @@
-package com.fongmi.android.tv.ui.custom.dialog;
+package com.fongmi.android.tv.ui.dialog;
 
 import android.content.DialogInterface;
 import android.text.TextUtils;
@@ -10,25 +10,26 @@ import androidx.fragment.app.Fragment;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
-import com.fongmi.android.tv.databinding.DialogProxyBinding;
-import com.fongmi.android.tv.impl.ProxyCallback;
+import com.fongmi.android.tv.databinding.DialogUaBinding;
+import com.fongmi.android.tv.impl.UaCallback;
 import com.fongmi.android.tv.ui.custom.CustomTextListener;
+import com.github.catvod.utils.Util;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-public class ProxyDialog {
+public class UaDialog {
 
-    private final DialogProxyBinding binding;
-    private final ProxyCallback callback;
+    private final DialogUaBinding binding;
+    private final UaCallback callback;
     private AlertDialog dialog;
     private boolean append;
 
-    public static ProxyDialog create(Fragment fragment) {
-        return new ProxyDialog(fragment);
+    public static UaDialog create(Fragment fragment) {
+        return new UaDialog(fragment);
     }
 
-    public ProxyDialog(Fragment fragment) {
-        this.callback = (ProxyCallback) fragment;
-        this.binding = DialogProxyBinding.inflate(LayoutInflater.from(fragment.getContext()));
+    public UaDialog(Fragment fragment) {
+        this.callback = (UaCallback) fragment;
+        this.binding = DialogUaBinding.inflate(LayoutInflater.from(fragment.getContext()));
         this.append = true;
     }
 
@@ -39,13 +40,13 @@ public class ProxyDialog {
     }
 
     private void initDialog() {
-        dialog = new MaterialAlertDialogBuilder(binding.getRoot().getContext()).setTitle(R.string.setting_proxy).setView(binding.getRoot()).setPositiveButton(R.string.dialog_positive, this::onPositive).setNegativeButton(R.string.dialog_negative, this::onNegative).create();
+        dialog = new MaterialAlertDialogBuilder(binding.getRoot().getContext()).setTitle(R.string.setting_player_ua).setView(binding.getRoot()).setPositiveButton(R.string.dialog_positive, this::onPositive).setNegativeButton(R.string.dialog_negative, this::onNegative).create();
         dialog.getWindow().setDimAmount(0);
         dialog.show();
     }
 
     private void initView() {
-        String text = Setting.getProxy();
+        String text = Setting.getUa();
         binding.text.setText(text);
         binding.text.setSelection(TextUtils.isEmpty(text) ? 0 : text.length());
     }
@@ -64,15 +65,12 @@ public class ProxyDialog {
     }
 
     private void detect(String s) {
-        if (append && s.equalsIgnoreCase("h")) {
+        if (append && s.equalsIgnoreCase("c")) {
             append = false;
-            binding.text.append("ttp://");
-        } else if (append && s.equalsIgnoreCase("s")) {
+            binding.text.setText(Util.CHROME);
+        } else if (append && s.equalsIgnoreCase("o")) {
             append = false;
-            binding.text.append("ocks5://");
-        } else if (append && s.length() == 1) {
-            append = false;
-            binding.text.getText().insert(0, "socks5://");
+            binding.text.setText(okhttp3.internal.Util.userAgent);
         } else if (s.length() > 1) {
             append = false;
         } else if (s.length() == 0) {
@@ -81,7 +79,7 @@ public class ProxyDialog {
     }
 
     private void onPositive(DialogInterface dialog, int which) {
-        callback.setProxy(binding.text.getText().toString().trim());
+        callback.setUa(binding.text.getText().toString().trim());
         dialog.dismiss();
     }
 
