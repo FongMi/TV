@@ -24,7 +24,7 @@ public class Product {
         return getSpec(space, column, style);
     }
 
-    private static int[] getSpec(int space, int column, Style style) {
+    public static int[] getSpec(int space, int column, Style style) {
         int base = ResUtil.getScreenWidth() - space;
         int width = base / column;
         int height = (int) (width / style.getRatio());
