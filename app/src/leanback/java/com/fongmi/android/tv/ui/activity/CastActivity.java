@@ -441,7 +441,7 @@ public class CastActivity extends BaseActivity implements CustomKeyDownCast.List
 
     @Override
     public void stop() {
-        App.post(this::onStopped);
+        App.post(this::finish);
     }
 
     @Override
