@@ -1,5 +1,6 @@
-package com.fongmi.android.tv.ui.custom.dialog;
+package com.fongmi.android.tv.ui.dialog;
 
+import android.Manifest;
 import android.content.DialogInterface;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -11,35 +12,54 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
 
 import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.Setting;
-import com.fongmi.android.tv.databinding.DialogUaBinding;
+import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.api.LiveConfig;
+import com.fongmi.android.tv.api.WallConfig;
+import com.fongmi.android.tv.bean.Config;
+import com.fongmi.android.tv.databinding.DialogConfigBinding;
 import com.fongmi.android.tv.event.ServerEvent;
-import com.fongmi.android.tv.impl.UaCallback;
+import com.fongmi.android.tv.impl.ConfigCallback;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.ui.custom.CustomTextListener;
 import com.fongmi.android.tv.utils.QRCode;
 import com.fongmi.android.tv.utils.ResUtil;
-import com.github.catvod.utils.Util;
+import com.fongmi.android.tv.utils.UrlUtil;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.permissionx.guolindev.PermissionX;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-public class UaDialog implements DialogInterface.OnDismissListener {
+public class ConfigDialog implements DialogInterface.OnDismissListener {
 
-    private final DialogUaBinding binding;
-    private final UaCallback callback;
+    private final DialogConfigBinding binding;
+    private final FragmentActivity activity;
+    private final ConfigCallback callback;
     private final AlertDialog dialog;
     private boolean append;
+    private boolean edit;
+    private String url;
+    private int type;
 
-    public static UaDialog create(FragmentActivity activity) {
-        return new UaDialog(activity);
+    public static ConfigDialog create(FragmentActivity activity) {
+        return new ConfigDialog(activity);
     }
 
-    public UaDialog(FragmentActivity activity) {
-        this.callback = (UaCallback) activity;
-        this.binding = DialogUaBinding.inflate(LayoutInflater.from(activity));
+    public ConfigDialog type(int type) {
+        this.type = type;
+        return this;
+    }
+
+    public ConfigDialog edit() {
+        this.edit = true;
+        return this;
+    }
+
+    public ConfigDialog(FragmentActivity activity) {
+        this.activity = activity;
+        this.callback = (ConfigCallback) activity;
+        this.binding = DialogConfigBinding.inflate(LayoutInflater.from(activity));
         this.dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).create();
         this.append = true;
     }
@@ -60,16 +80,18 @@ public class UaDialog implements DialogInterface.OnDismissListener {
     }
 
     private void initView() {
-        String text = Setting.getUa();
         String address = Server.get().getAddress();
-        binding.text.setText(text);
+        binding.text.setText(url = getUrl());
         binding.code.setImageBitmap(QRCode.getBitmap(address, 200, 0));
-        binding.text.setSelection(TextUtils.isEmpty(text) ? 0 : text.length());
+        binding.text.setSelection(TextUtils.isEmpty(url) ? 0 : url.length());
+        binding.positive.setText(edit ? R.string.dialog_edit : R.string.dialog_positive);
         binding.info.setText(ResUtil.getString(R.string.push_info, address).replace("，", "\n"));
+        binding.storage.setVisibility(PermissionX.isGranted(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) ? View.GONE : View.VISIBLE);
     }
 
     private void initEvent() {
         EventBus.getDefault().register(this);
+        binding.storage.setOnClickListener(this::onStorage);
         binding.positive.setOnClickListener(this::onPositive);
         binding.negative.setOnClickListener(this::onNegative);
         binding.text.addTextChangedListener(new CustomTextListener() {
@@ -84,13 +106,30 @@ public class UaDialog implements DialogInterface.OnDismissListener {
         });
     }
 
+    private String getUrl() {
+        switch (type) {
+            case 0:
+                return ApiConfig.getUrl();
+            case 1:
+                return LiveConfig.getUrl();
+            case 2:
+                return WallConfig.getUrl();
+            default:
+                return "";
+        }
+    }
+
+    private void onStorage(View view) {
+        PermissionX.init(activity).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> binding.storage.setVisibility(allGranted ? View.GONE : View.VISIBLE));
+    }
+
     private void detect(String s) {
-        if (append && s.equalsIgnoreCase("c")) {
+        if (append && s.equalsIgnoreCase("h")) {
             append = false;
-            binding.text.setText(Util.CHROME);
-        } else if (append && s.equalsIgnoreCase("o")) {
+            binding.text.append("ttp://");
+        } else if (append && s.equalsIgnoreCase("f")) {
             append = false;
-            binding.text.setText(okhttp3.internal.Util.userAgent);
+            binding.text.append("ile://");
         } else if (s.length() > 1) {
             append = false;
         } else if (s.length() == 0) {
@@ -99,7 +138,10 @@ public class UaDialog implements DialogInterface.OnDismissListener {
     }
 
     private void onPositive(View view) {
-        callback.setUa(binding.text.getText().toString().trim());
+        String text = UrlUtil.fixUrl(binding.text.getText().toString().trim());
+        if (edit) Config.find(url, type).url(text).update();
+        if (text.isEmpty()) Config.delete(url, type);
+        callback.setConfig(Config.find(text, type));
         dialog.dismiss();
     }
 
@@ -111,7 +153,7 @@ public class UaDialog implements DialogInterface.OnDismissListener {
     public void onServerEvent(ServerEvent event) {
         if (event.getType() != ServerEvent.Type.API) return;
         binding.text.setText(event.getText());
-        binding.positive.performClick();
+        binding.text.setSelection(binding.text.getText().length());
     }
 
     @Override
