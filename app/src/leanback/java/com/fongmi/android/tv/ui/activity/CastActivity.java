@@ -50,7 +50,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class CastActivity extends BaseActivity implements CustomKeyDownCast.Listener, TrackDialog.Listener, RenderControl, ServiceConnection {
+public class CastActivity extends BaseActivity implements CustomKeyDownCast.Listener, TrackDialog.Listener, RenderControl, ServiceConnection, Clock.Callback {
 
     private ActivityCastBinding mBinding;
     private DLNARendererService mService;
@@ -62,6 +62,8 @@ public class CastActivity extends BaseActivity implements CustomKeyDownCast.List
     private Runnable mR1;
     private Runnable mR2;
     private Clock mClock;
+    private long position;
+    private long duration;
     private int scale;
 
     private PlayerView getExo() {
@@ -128,6 +130,7 @@ public class CastActivity extends BaseActivity implements CustomKeyDownCast.List
     private void checkAction() {
         mAction = getIntent().getParcelableExtra(RendererInterfaceKt.keyExtraCastAction);
         mBinding.widget.title.setText(getName());
+        position = duration = 0;
         start();
     }
 
@@ -311,6 +314,7 @@ public class CastActivity extends BaseActivity implements CustomKeyDownCast.List
         switch (event.getState()) {
             case 0:
                 setTrackVisible(false);
+                mClock.setCallback(this);
                 setState(RenderState.PREPARING);
                 break;
             case Player.STATE_IDLE:
@@ -361,7 +365,7 @@ public class CastActivity extends BaseActivity implements CustomKeyDownCast.List
         onStopped();
     }
 
-    private void onPause(boolean visible) {
+    private void onPaused(boolean visible) {
         mBinding.widget.exoDuration.setText(mPlayers.getDurationTime());
         mBinding.widget.exoPosition.setText(mPlayers.getPositionTime(0));
         setState(RenderState.PAUSED);
@@ -396,6 +400,12 @@ public class CastActivity extends BaseActivity implements CustomKeyDownCast.List
     }
 
     @Override
+    public void onTimeChanged() {
+        position = mPlayers.getPosition();
+        duration = mPlayers.getDuration();
+    }
+
+    @Override
     public void onServiceConnected(ComponentName name, IBinder service) {
         (mService = ((RendererServiceBinder) service).getService()).bindRealPlayer(this);
     }
@@ -406,28 +416,32 @@ public class CastActivity extends BaseActivity implements CustomKeyDownCast.List
 
     @Override
     public long getCurrentPosition() {
-        return 0;
+        return position;
     }
 
     @Override
     public long getDuration() {
-        return 0;
+        return duration;
     }
 
     @Override
     public void seek(long time) {
+        App.post(() -> mPlayers.seekTo(time, true));
     }
 
     @Override
     public void pause() {
+        App.post(() -> onPaused(true));
     }
 
     @Override
     public void play(@Nullable Double speed) {
+        App.post(this::onPlay);
     }
 
     @Override
     public void stop() {
+        App.post(this::onStopped);
     }
 
     @Override
@@ -482,7 +496,7 @@ public class CastActivity extends BaseActivity implements CustomKeyDownCast.List
 
     @Override
     public void onKeyCenter() {
-        if (mPlayers.isPlaying()) onPause(true);
+        if (mPlayers.isPlaying()) onPaused(true);
         else onPlay();
         hideControl();
     }
@@ -507,7 +521,7 @@ public class CastActivity extends BaseActivity implements CustomKeyDownCast.List
     @Override
     protected void onPause() {
         super.onPause();
-        onPause(false);
+        onPaused(false);
         mClock.stop();
     }
 
