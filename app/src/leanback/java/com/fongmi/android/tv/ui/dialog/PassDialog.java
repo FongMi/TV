@@ -15,7 +15,6 @@ import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.databinding.DialogPassBinding;
 import com.fongmi.android.tv.impl.PassCallback;
-import com.fongmi.android.tv.ui.custom.dialog.BaseDialog;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
