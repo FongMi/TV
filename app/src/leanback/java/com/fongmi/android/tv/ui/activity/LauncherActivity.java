@@ -26,7 +26,7 @@ public class LauncherActivity extends BaseActivity implements AppAdapter.OnClick
 
     @Override
     protected void initView() {
-        DLNARendererService.Companion.startService(this, R.drawable.ic_logo);
+        DLNARendererService.Companion.start(this, R.drawable.ic_logo);
         setRecyclerView();
         getApps();
     }
