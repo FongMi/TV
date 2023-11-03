@@ -453,7 +453,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         } else if (!confirm) {
             setConfirm();
         } else {
-            super.onBackPressed();
+            finish();
         }
     }
 
