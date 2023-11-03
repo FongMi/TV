@@ -23,11 +23,18 @@ import com.fongmi.android.tv.db.dao.HistoryDao;
 import com.fongmi.android.tv.db.dao.KeepDao;
 import com.fongmi.android.tv.db.dao.SiteDao;
 import com.fongmi.android.tv.db.dao.TrackDao;
+import com.fongmi.android.tv.utils.Util;
+import com.github.catvod.utils.Path;
+
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 @Database(entities = {Keep.class, Site.class, Track.class, Config.class, Device.class, History.class}, version = AppDatabase.VERSION)
 public abstract class AppDatabase extends RoomDatabase {
 
     public static final int VERSION = 25;
+    public static final String NAME = "tv";
     public static final String SYMBOL = "@@@";
 
     private static volatile AppDatabase instance;
@@ -37,8 +44,39 @@ public abstract class AppDatabase extends RoomDatabase {
         return instance;
     }
 
+    public static String getDate() {
+        File file = new File(Path.tv(), NAME);
+        return file.exists() ? Util.format(new SimpleDateFormat("yyyyMMdd", Locale.getDefault()), file.lastModified()) : "";
+    }
+
+    public static void backup(com.fongmi.android.tv.impl.Callback callback) {
+        App.execute(() -> {
+            File db = App.get().getDatabasePath(NAME).getAbsoluteFile();
+            File wal = App.get().getDatabasePath(NAME + "-wal").getAbsoluteFile();
+            File shm = App.get().getDatabasePath(NAME + "-shm").getAbsoluteFile();
+            boolean exists = db.exists() && wal.exists() && shm.exists();
+            if (exists) Path.copy(db, new File(Path.tv(), db.getName()));
+            if (exists) Path.copy(wal, new File(Path.tv(), wal.getName()));
+            if (exists) Path.copy(shm, new File(Path.tv(), shm.getName()));
+            if (exists) App.post(callback::success);
+        });
+    }
+
+    public static void restore(com.fongmi.android.tv.impl.Callback callback) {
+        App.execute(() -> {
+            File db = new File(Path.tv(), NAME);
+            File wal = new File(Path.tv(), NAME + "-wal");
+            File shm = new File(Path.tv(), NAME + "-shm");
+            boolean exists = db.exists() && wal.exists() && shm.exists();
+            if (exists) Path.copy(db, App.get().getDatabasePath(db.getName()).getAbsoluteFile());
+            if (exists) Path.copy(wal, App.get().getDatabasePath(wal.getName()).getAbsoluteFile());
+            if (exists) Path.copy(shm, App.get().getDatabasePath(shm.getName()).getAbsoluteFile());
+            if (exists) App.post(callback::success);
+        });
+    }
+
     private static AppDatabase create(Context context) {
-        return Room.databaseBuilder(context, AppDatabase.class, "tv")
+        return Room.databaseBuilder(context, AppDatabase.class, NAME)
                 .addMigrations(MIGRATION_11_12)
                 .addMigrations(MIGRATION_12_13)
                 .addMigrations(MIGRATION_13_14)

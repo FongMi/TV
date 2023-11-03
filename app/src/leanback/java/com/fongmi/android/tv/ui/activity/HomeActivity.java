@@ -1,7 +1,9 @@
 package com.fongmi.android.tv.ui.activity;
 
+import android.Manifest;
 import android.content.Intent;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 
@@ -31,6 +33,7 @@ import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Style;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.ActivityHomeBinding;
+import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.event.CastEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.event.ServerEvent;
@@ -55,6 +58,7 @@ import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.UrlUtil;
 import com.google.common.collect.Lists;
+import com.permissionx.guolindev.PermissionX;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -169,12 +173,22 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
             @Override
             public void error(String msg) {
-                mBinding.progressLayout.showContent();
+                if (TextUtils.isEmpty(msg) && AppDatabase.getDate().length() > 0) onRestore();
+                else mBinding.progressLayout.showContent();
                 mResult = Result.empty();
                 Notify.show(msg);
                 setFocus();
             }
         };
+    }
+
+    private void onRestore() {
+        PermissionX.init(this).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> AppDatabase.restore(new Callback() {
+            @Override
+            public void success() {
+                initConfig();
+            }
+        }));
     }
 
     private void loadLive(String url) {
@@ -422,7 +436,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         } else if (!confirm) {
             setConfirm();
         } else {
-            finish();
+            super.onBackPressed();
         }
     }
 

@@ -81,6 +81,7 @@
     <string name="setting_doh">DoH</string>
     <string name="setting_proxy">Proxy</string>
     <string name="setting_cache">暫存</string>
+    <string name="setting_backup">備份</string>
     <string name="setting_version">版本</string>
     <string name="setting_storage">權限</string>
     <string name="setting_off">關閉</string>

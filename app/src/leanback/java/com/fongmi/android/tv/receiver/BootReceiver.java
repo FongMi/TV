@@ -13,6 +13,5 @@ public class BootReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         DLNARendererService.Companion.start(App.get(), R.drawable.ic_logo);
-        context.startActivity(context.getPackageManager().getLaunchIntentForPackage(context.getPackageName()).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
     }
 }

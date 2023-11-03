@@ -100,6 +100,14 @@ public class Util {
         }
     }
 
+    public static String format(SimpleDateFormat format, long time) {
+        try {
+            return format.format(time);
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
     public static String format(StringBuilder builder, Formatter formatter, long timeMs) {
         try {
             return androidx.media3.common.util.Util.getStringForTime(builder, formatter, timeMs);

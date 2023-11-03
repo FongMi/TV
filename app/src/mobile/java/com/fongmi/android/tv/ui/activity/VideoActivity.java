@@ -164,8 +164,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     public static void file(FragmentActivity activity, String path) {
         if (TextUtils.isEmpty(path)) return;
         String name = new File(path).getName();
-        if (PermissionX.isGranted(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE)) start(activity, "push_agent", "file://" + path, name);
-        else PermissionX.init(activity).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> start(activity, "push_agent", "file://" + path, name));
+        PermissionX.init(activity).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> start(activity, "push_agent", "file://" + path, name));
     }
 
     public static void cast(Activity activity, History history) {
