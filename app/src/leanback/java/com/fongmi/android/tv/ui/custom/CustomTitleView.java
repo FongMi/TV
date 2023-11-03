@@ -47,9 +47,7 @@ public class CustomTitleView extends AppCompatTextView {
     @Override
     protected void onFocusChanged(boolean focused, int direction, Rect previouslyFocusedRect) {
         super.onFocusChanged(focused, direction, previouslyFocusedRect);
-        App.post(() -> coolDown = false, 500);
         if (focused) startAnimation(flicker);
-        if (focused) coolDown = true;
         else clearAnimation();
     }
 
@@ -67,7 +65,7 @@ public class CustomTitleView extends AppCompatTextView {
             listener.setSite(getSite(true));
         } else if (event.getAction() == KeyEvent.ACTION_DOWN && KeyUtil.isRightKey(event)) {
             listener.setSite(getSite(false));
-        } else if (event.getAction() == KeyEvent.ACTION_UP && KeyUtil.isUpKey(event)) {
+        } else if (event.getAction() == KeyEvent.ACTION_DOWN && KeyUtil.isUpKey(event)) {
             onKeyUp();
         }
         return true;

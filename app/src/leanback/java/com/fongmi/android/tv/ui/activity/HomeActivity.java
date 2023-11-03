@@ -205,8 +205,8 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     private void setFocus() {
         setLoading(false);
-        mBinding.recycler.requestFocus();
         App.post(() -> mBinding.title.setFocusable(true), 500);
+        if (!mBinding.title.hasFocus()) mBinding.recycler.requestFocus();
     }
 
     private void getVideo() {
