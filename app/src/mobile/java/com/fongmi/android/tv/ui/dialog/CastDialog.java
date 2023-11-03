@@ -57,6 +57,7 @@ public class CastDialog extends BaseDialog implements DeviceAdapter.OnClickListe
     private DialogDeviceBinding binding;
     private DeviceAdapter adapter;
     private DeviceControl control;
+    private Listener listener;
     private CastVideo video;
     private boolean fm;
 
@@ -94,6 +95,7 @@ public class CastDialog extends BaseDialog implements DeviceAdapter.OnClickListe
     public void show(FragmentActivity activity) {
         for (Fragment f : activity.getSupportFragmentManager().getFragments()) if (f instanceof BottomSheetDialogFragment) return;
         show(activity.getSupportFragmentManager(), null);
+        this.listener = (Listener) activity;
     }
 
     @Override
@@ -141,6 +143,11 @@ public class CastDialog extends BaseDialog implements DeviceAdapter.OnClickListe
         ScanActivity.start(getActivity());
     }
 
+    private void onCasted() {
+        listener.onCasted();
+        dismiss();
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onScanEvent(ScanEvent event) {
         ScanTask.create(this).start(event.getAddress());
@@ -174,7 +181,7 @@ public class CastDialog extends BaseDialog implements DeviceAdapter.OnClickListe
     @Override
     public void onSuccess(Unit unit) {
         control.play("1", null);
-        dismiss();
+        onCasted();
     }
 
     @Override
@@ -189,7 +196,7 @@ public class CastDialog extends BaseDialog implements DeviceAdapter.OnClickListe
 
     @Override
     public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-        if (response.body().string().equals("OK")) App.post(this::dismiss);
+        if (response.body().string().equals("OK")) App.post(this::onCasted);
         else App.post(() -> Notify.show(R.string.device_offline));
     }
 
@@ -227,5 +234,10 @@ public class CastDialog extends BaseDialog implements DeviceAdapter.OnClickListe
     @Override
     public boolean onLongClick(Device item) {
         return false;
+    }
+
+    public interface Listener {
+
+        void onCasted();
     }
 }
