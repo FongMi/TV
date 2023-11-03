@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatTextView;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Site;
@@ -23,6 +24,7 @@ public class CustomTitleView extends AppCompatTextView {
 
     private Listener listener;
     private Animation flicker;
+    private boolean coolDown;
 
     public CustomTitleView(@NonNull Context context) {
         super(context);
@@ -39,13 +41,15 @@ public class CustomTitleView extends AppCompatTextView {
     }
 
     private boolean hasEvent(KeyEvent event) {
-        return KeyUtil.isEnterKey(event) || KeyUtil.isLeftKey(event) || KeyUtil.isRightKey(event);
+        return KeyUtil.isEnterKey(event) || KeyUtil.isLeftKey(event) || KeyUtil.isRightKey(event) || (KeyUtil.isUpKey(event) && !coolDown);
     }
 
     @Override
     protected void onFocusChanged(boolean focused, int direction, Rect previouslyFocusedRect) {
         super.onFocusChanged(focused, direction, previouslyFocusedRect);
+        App.post(() -> coolDown = false, 500);
         if (focused) startAnimation(flicker);
+        if (focused) coolDown = true;
         else clearAnimation();
     }
 
@@ -63,8 +67,16 @@ public class CustomTitleView extends AppCompatTextView {
             listener.setSite(getSite(true));
         } else if (event.getAction() == KeyEvent.ACTION_DOWN && KeyUtil.isRightKey(event)) {
             listener.setSite(getSite(false));
+        } else if (event.getAction() == KeyEvent.ACTION_UP && KeyUtil.isUpKey(event)) {
+            onKeyUp();
         }
         return true;
+    }
+
+    private void onKeyUp() {
+        App.post(() -> coolDown = false, 3000);
+        listener.onRefresh();
+        coolDown = true;
     }
 
     private Site getSite(boolean next) {
@@ -78,5 +90,7 @@ public class CustomTitleView extends AppCompatTextView {
     public interface Listener extends SiteCallback {
 
         void showDialog();
+
+        void onRefresh();
     }
 }

@@ -72,6 +72,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     private HistoryPresenter mPresenter;
     private ArrayObjectAdapter mAdapter;
     private SiteViewModel mViewModel;
+    private boolean loading;
     private boolean confirm;
     private Result mResult;
     private Clock mClock;
@@ -155,9 +156,11 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     }
 
     private void initConfig() {
+        if (isLoading()) return;
         WallConfig.get().init();
         LiveConfig.get().init();
         ApiConfig.get().init().load(getCallback());
+        setLoading(true);
     }
 
     private Callback getCallback() {
@@ -201,6 +204,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     }
 
     private void setFocus() {
+        setLoading(false);
         mBinding.recycler.requestFocus();
         App.post(() -> mBinding.title.setFocusable(true), 500);
     }
@@ -279,6 +283,14 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         App.post(() -> confirm = false, 5000);
     }
 
+    public boolean isLoading() {
+        return loading;
+    }
+
+    public void setLoading(boolean loading) {
+        this.loading = loading;
+    }
+
     @Override
     public void onItemClick(Func item) {
         switch (item.getResId()) {
@@ -337,6 +349,11 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     @Override
     public void showDialog() {
         SiteDialog.create(this).show();
+    }
+
+    @Override
+    public void onRefresh() {
+        initConfig();
     }
 
     @Override
