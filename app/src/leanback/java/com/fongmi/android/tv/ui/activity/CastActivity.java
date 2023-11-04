@@ -401,8 +401,8 @@ public class CastActivity extends BaseActivity implements CustomKeyDownCast.List
 
     @Override
     public void onTimeChanged() {
-        App.post(() -> position = mPlayers.getPosition());
-        App.post(() -> duration = mPlayers.getDuration());
+        position = mPlayers.getPosition();
+        duration = mPlayers.getDuration();
     }
 
     @Override

@@ -51,6 +51,7 @@ public abstract class AppDatabase extends RoomDatabase {
 
     public static void backup(com.fongmi.android.tv.impl.Callback callback) {
         App.execute(() -> {
+            if (get().isOpen()) get().close();
             File db = App.get().getDatabasePath(NAME).getAbsoluteFile();
             File wal = App.get().getDatabasePath(NAME + "-wal").getAbsoluteFile();
             File shm = App.get().getDatabasePath(NAME + "-shm").getAbsoluteFile();
@@ -64,6 +65,7 @@ public abstract class AppDatabase extends RoomDatabase {
 
     public static void restore(com.fongmi.android.tv.impl.Callback callback) {
         App.execute(() -> {
+            if (get().isOpen()) get().close();
             File db = new File(Path.tv(), NAME);
             File wal = new File(Path.tv(), NAME + "-wal");
             File shm = new File(Path.tv(), NAME + "-shm");
