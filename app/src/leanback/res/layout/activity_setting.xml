@@ -522,17 +522,18 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:layout_marginEnd="16dp"
                     android:text="@string/setting_backup"
                     android:textColor="@color/white"
                     android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/backupText"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:gravity="end"
                     android:textColor="@color/white"
                     android:textSize="18sp"
                     tools:text="20231103" />
@@ -551,17 +552,18 @@
             android:orientation="horizontal">
 
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_marginEnd="16dp"
                 android:text="@string/setting_version"
                 android:textColor="@color/white"
                 android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/versionText"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="end"
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 tools:text="1.2.1" />
