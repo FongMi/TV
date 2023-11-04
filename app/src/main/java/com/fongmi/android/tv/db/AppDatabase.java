@@ -51,29 +51,25 @@ public abstract class AppDatabase extends RoomDatabase {
 
     public static void backup(com.fongmi.android.tv.impl.Callback callback) {
         App.execute(() -> {
-            if (get().isOpen()) get().close();
             File db = App.get().getDatabasePath(NAME).getAbsoluteFile();
             File wal = App.get().getDatabasePath(NAME + "-wal").getAbsoluteFile();
             File shm = App.get().getDatabasePath(NAME + "-shm").getAbsoluteFile();
-            boolean exists = db.exists() && wal.exists() && shm.exists();
-            if (exists) Path.copy(db, new File(Path.tv(), db.getName()));
-            if (exists) Path.copy(wal, new File(Path.tv(), wal.getName()));
-            if (exists) Path.copy(shm, new File(Path.tv(), shm.getName()));
-            if (exists) App.post(callback::success);
+            if (db.exists()) Path.copy(db, new File(Path.tv(), db.getName()));
+            if (wal.exists()) Path.copy(wal, new File(Path.tv(), wal.getName()));
+            if (shm.exists()) Path.copy(shm, new File(Path.tv(), shm.getName()));
+            if (db.exists()) App.post(callback::success);
         });
     }
 
     public static void restore(com.fongmi.android.tv.impl.Callback callback) {
         App.execute(() -> {
-            if (get().isOpen()) get().close();
             File db = new File(Path.tv(), NAME);
             File wal = new File(Path.tv(), NAME + "-wal");
             File shm = new File(Path.tv(), NAME + "-shm");
-            boolean exists = db.exists() && wal.exists() && shm.exists();
-            if (exists) Path.copy(db, App.get().getDatabasePath(db.getName()).getAbsoluteFile());
-            if (exists) Path.copy(wal, App.get().getDatabasePath(wal.getName()).getAbsoluteFile());
-            if (exists) Path.copy(shm, App.get().getDatabasePath(shm.getName()).getAbsoluteFile());
-            if (exists) App.post(callback::success);
+            if (db.exists()) Path.copy(db, App.get().getDatabasePath(db.getName()).getAbsoluteFile());
+            if (wal.exists()) Path.copy(wal, App.get().getDatabasePath(wal.getName()).getAbsoluteFile());
+            if (shm.exists()) Path.copy(shm, App.get().getDatabasePath(shm.getName()).getAbsoluteFile());
+            if (db.exists()) App.post(callback::success);
         });
     }
 
