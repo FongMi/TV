@@ -57,7 +57,7 @@ public abstract class AppDatabase extends RoomDatabase {
             if (db.exists()) Path.copy(db, new File(Path.tv(), db.getName()));
             if (wal.exists()) Path.copy(wal, new File(Path.tv(), wal.getName()));
             if (shm.exists()) Path.copy(shm, new File(Path.tv(), shm.getName()));
-            if (db.exists()) App.post(callback::success);
+            App.post(callback::success);
         });
     }
 
@@ -66,10 +66,10 @@ public abstract class AppDatabase extends RoomDatabase {
             File db = new File(Path.tv(), NAME);
             File wal = new File(Path.tv(), NAME + "-wal");
             File shm = new File(Path.tv(), NAME + "-shm");
-            if (db.exists()) Path.copy(db, App.get().getDatabasePath(db.getName()).getAbsoluteFile());
-            if (wal.exists()) Path.copy(wal, App.get().getDatabasePath(wal.getName()).getAbsoluteFile());
-            if (shm.exists()) Path.copy(shm, App.get().getDatabasePath(shm.getName()).getAbsoluteFile());
-            if (db.exists()) App.post(callback::success);
+            if (db.exists()) Path.move(db, App.get().getDatabasePath(db.getName()).getAbsoluteFile());
+            if (wal.exists()) Path.move(wal, App.get().getDatabasePath(wal.getName()).getAbsoluteFile());
+            if (shm.exists()) Path.move(shm, App.get().getDatabasePath(shm.getName()).getAbsoluteFile());
+            App.post(callback::success);
         });
     }
 
