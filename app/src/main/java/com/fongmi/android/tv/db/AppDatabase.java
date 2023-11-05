@@ -79,7 +79,7 @@ public abstract class AppDatabase extends RoomDatabase {
             if (shm.exists()) Path.move(shm, App.get().getDatabasePath(shm.getName()).getAbsoluteFile());
             if (pref.exists()) Prefers.restore(pref);
             App.post(callback::success);
-            Path.clear(getBackupKey());
+            Path.clear(Path.tv());
         });
     }
 

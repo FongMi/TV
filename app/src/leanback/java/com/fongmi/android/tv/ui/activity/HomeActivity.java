@@ -176,7 +176,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
             @Override
             public void error(String msg) {
-                if (TextUtils.isEmpty(msg) && AppDatabase.getDate().length() > 0) onRestore();
+                if (TextUtils.isEmpty(msg) && AppDatabase.getBackupKey().exists()) onRestore();
                 else mBinding.progressLayout.showContent();
                 mResult = Result.empty();
                 Notify.show(msg);
