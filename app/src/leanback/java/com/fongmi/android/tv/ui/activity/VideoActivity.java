@@ -158,7 +158,11 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     public static void cast(Activity activity, History history) {
-        start(activity, history.getSiteKey(), history.getVodId(), history.getVodName(), history.getVodPic(), null, true, true);
+        start(activity, history.getSiteKey(), history.getVodId(), history.getVodName(), history.getVodPic(), null, true, true, false);
+    }
+
+    public static void collect(Activity activity, String key, String id, String name, String pic) {
+        start(activity, key, id, name, pic, null, false, false, true);
     }
 
     public static void push(Activity activity, String url, boolean clear) {
@@ -178,16 +182,17 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     public static void start(Activity activity, String key, String id, String name, boolean clear) {
-        start(activity, key, id, name, null, null, clear, false);
+        start(activity, key, id, name, null, null, clear, false, false);
     }
 
     public static void start(Activity activity, String key, String id, String name, String pic, String mark, boolean clear) {
-        start(activity, key, id, name, pic, mark, clear, false);
+        start(activity, key, id, name, pic, mark, clear, false, false);
     }
 
-    public static void start(Activity activity, String key, String id, String name, String pic, String mark, boolean clear, boolean cast) {
+    public static void start(Activity activity, String key, String id, String name, String pic, String mark, boolean clear, boolean cast, boolean collect) {
         Intent intent = new Intent(activity, VideoActivity.class);
         if (clear) intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra("collect", collect);
         intent.putExtra("cast", cast);
         intent.putExtra("mark", mark);
         intent.putExtra("name", name);
@@ -268,7 +273,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private boolean isFromCollect() {
-        return getCallingActivity() != null && getCallingActivity().getShortClassName().contains(CollectActivity.class.getSimpleName());
+        return getIntent().getBooleanExtra("collect", false);
     }
 
     @Override
@@ -404,7 +409,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     private void checkId() {
         if (getId().startsWith("push://")) getIntent().putExtra("key", "push_agent").putExtra("id", getId().substring(7));
-        if (getId().isEmpty() || getId().startsWith("msearch:")) setEmpty();
+        if (getId().isEmpty() || getId().startsWith("msearch:")) setEmpty(false);
         else getDetail();
     }
 
@@ -445,7 +450,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void setDetail(Result result) {
-        if (result.getList().isEmpty()) setEmpty();
+        if (result.getList().isEmpty()) setEmpty(result.hasMsg());
         else setDetail(result.getList().get(0));
         Notify.show(result.getMsg());
     }
@@ -480,8 +485,8 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         });
     }
 
-    private void setEmpty() {
-        if (isFromCollect()) {
+    private void setEmpty(boolean finish) {
+        if (isFromCollect() || finish) {
             finish();
         } else if (getName().isEmpty()) {
             showEmpty();

@@ -171,23 +171,23 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         start(activity, history.getSiteKey(), history.getVodId(), history.getVodName(), history.getVodPic());
     }
 
+    public static void collect(Activity activity, String key, String id, String name, String pic) {
+        start(activity, key, id, name, pic, null, true);
+    }
+
     public static void push(Activity activity, String url) {
         start(activity, "push_agent", url, url, null);
     }
 
     public static void start(Activity activity, String key, String id, String name) {
-        start(activity, key, id, name, null, false, null);
+        start(activity, key, id, name, null, null, false);
     }
 
     public static void start(Activity activity, String key, String id, String name, String pic) {
-        start(activity, key, id, name, pic, false, null);
+        start(activity, key, id, name, pic, null, false);
     }
 
-    public static void start(Activity activity, String key, String id, String name, String pic, boolean collect) {
-        start(activity, key, id, name, pic, collect, null);
-    }
-
-    public static void start(Activity activity, String key, String id, String name, String pic, boolean collect, String mark) {
+    public static void start(Activity activity, String key, String id, String name, String pic, String mark, boolean collect) {
         Intent intent = new Intent(activity, VideoActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("collect", collect);
         intent.putExtra("mark", mark);
@@ -445,7 +445,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     private void checkId() {
         if (getId().startsWith("push://")) getIntent().putExtra("key", "push_agent").putExtra("id", getId().substring(7));
-        if (getId().isEmpty() || getId().startsWith("msearch:")) setEmpty();
+        if (getId().isEmpty() || getId().startsWith("msearch:")) setEmpty(false);
         else getDetail();
     }
 
@@ -467,13 +467,13 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     private void setDetail(Result result) {
         mBinding.swipeLayout.setRefreshing(false);
-        if (result.getList().isEmpty()) setEmpty();
+        if (result.getList().isEmpty()) setEmpty(result.hasMsg());
         else setDetail(result.getList().get(0));
         Notify.show(result.getMsg());
     }
 
-    private void setEmpty() {
-        if (isFromCollect()) {
+    private void setEmpty(boolean finish) {
+        if (isFromCollect() || finish) {
             finish();
         } else if (getName().isEmpty()) {
             showEmpty();
