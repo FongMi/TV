@@ -50,6 +50,10 @@ public abstract class AppDatabase extends RoomDatabase {
         return file.exists() ? Util.format(new SimpleDateFormat("yyyyMMdd", Locale.getDefault()), file.lastModified()) : "";
     }
 
+    public static File getBackupKey() {
+        return new File(Path.tv(), "." + Util.getDeviceId());
+    }
+
     public static void backup(com.fongmi.android.tv.impl.Callback callback) {
         App.execute(() -> {
             File db = App.get().getDatabasePath(NAME).getAbsoluteFile();
@@ -59,6 +63,7 @@ public abstract class AppDatabase extends RoomDatabase {
             if (wal.exists()) Path.copy(wal, new File(Path.tv(), wal.getName()));
             if (shm.exists()) Path.copy(shm, new File(Path.tv(), shm.getName()));
             Prefers.backup(new File(Path.tv(), NAME + "-pref"));
+            Path.newFile(getBackupKey());
             App.post(callback::success);
         });
     }
@@ -74,6 +79,7 @@ public abstract class AppDatabase extends RoomDatabase {
             if (shm.exists()) Path.move(shm, App.get().getDatabasePath(shm.getName()).getAbsoluteFile());
             if (pref.exists()) Prefers.restore(pref);
             App.post(callback::success);
+            Path.clear(getBackupKey());
         });
     }
 

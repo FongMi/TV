@@ -201,6 +201,13 @@ public class Path {
         }
     }
 
+    public static void newFile(File file) {
+        try {
+            file.createNewFile();
+        } catch (Exception ignored) {
+        }
+    }
+
     public static List<File> list(File dir) {
         File[] files = dir.listFiles();
         return files == null ? Collections.emptyList() : Arrays.asList(files);
