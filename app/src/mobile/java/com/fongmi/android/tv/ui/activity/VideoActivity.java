@@ -13,7 +13,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.media.MediaMetadataCompat;
 import android.text.Html;
-import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.ClickableSpan;
@@ -518,7 +518,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         view.setTag(text);
     }
 
-    private SpannableString getSpan(int resId, String text) {
+    private SpannableStringBuilder getSpan(int resId, String text) {
         if (resId > 0) text = getString(resId, text);
         Map<String, String> map = new HashMap<>();
         Matcher m = Sniffer.CLICKER.matcher(text);
@@ -527,7 +527,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
             text = text.replace(m.group(), key);
             map.put(key, m.group(1));
         }
-        SpannableString span = new SpannableString(text);
+        SpannableStringBuilder span = new SpannableStringBuilder(text);
         for (String s : map.keySet()) {
             int index = text.indexOf(s);
             Result result = Result.type(map.get(s));
