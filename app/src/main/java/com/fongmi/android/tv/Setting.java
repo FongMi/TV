@@ -190,6 +190,14 @@ public class Setting {
         Prefers.put("ua", ua);
     }
 
+    public static boolean isCaption() {
+        return Prefers.getBoolean("caption");
+    }
+
+    public static void putCaption(boolean caption) {
+        Prefers.put("caption", caption);
+    }
+
     public static int getSubtitle() {
         return Math.max(Prefers.getInt("subtitle", 16), 14);
     }

@@ -71,6 +71,7 @@
     <string name="setting_player_http">連線方式</string>
     <string name="setting_player_buffer">緩衝時間</string>
     <string name="setting_player_tunnel">隧道模式</string>
+    <string name="setting_player_caption">系統字幕</string>
     <string name="setting_player_subtitle">字幕大小</string>
     <string name="setting_player_background">背景播放</string>
     <string name="setting_decode">解碼方式</string>

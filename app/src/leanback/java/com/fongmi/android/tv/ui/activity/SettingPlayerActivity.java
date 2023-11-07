@@ -2,6 +2,7 @@ package com.fongmi.android.tv.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.provider.Settings;
 import android.view.View;
 
 import androidx.viewbinding.ViewBinding;
@@ -43,6 +44,7 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
     protected void initView() {
         mBinding.uaText.setText(Setting.getUa());
         mBinding.tunnelText.setText(getSwitch(Setting.isTunnel()));
+        mBinding.captionText.setText(getSwitch(Setting.isCaption()));
         mBinding.bufferText.setText(String.valueOf(Setting.getBuffer()));
         mBinding.subtitleText.setText(String.valueOf(Setting.getSubtitle()));
         mBinding.http.setVisibility(Players.isExo(Setting.getPlayer()) ? View.VISIBLE : View.GONE);
@@ -59,11 +61,19 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
         mBinding.flag.setOnClickListener(this::setFlag);
         mBinding.buffer.setOnClickListener(this::onBuffer);
         mBinding.tunnel.setOnClickListener(this::setTunnel);
+        mBinding.caption.setOnClickListener(this::setCaption);
         mBinding.subtitle.setOnClickListener(this::onSubtitle);
+        mBinding.caption.setOnLongClickListener(this::onCaption);
     }
 
     private void onUa(View view) {
         UaDialog.create(this).show();
+    }
+
+    @Override
+    public void setUa(String ua) {
+        mBinding.uaText.setText(ua);
+        Setting.putUa(ua);
     }
 
     private void setHttp(View view) {
@@ -79,29 +89,33 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
         mBinding.flagText.setText(flag[index]);
     }
 
-    private void setTunnel(View view) {
-        Setting.putTunnel(!Setting.isTunnel());
-        mBinding.tunnelText.setText(getSwitch(Setting.isTunnel()));
-    }
-
     private void onBuffer(View view) {
         BufferDialog.create(this).show();
-    }
-
-    private void onSubtitle(View view) {
-        SubtitleDialog.create(this).show();
-    }
-
-    @Override
-    public void setUa(String ua) {
-        mBinding.uaText.setText(ua);
-        Setting.putUa(ua);
     }
 
     @Override
     public void setBuffer(int times) {
         mBinding.bufferText.setText(String.valueOf(times));
         Setting.putBuffer(times);
+    }
+
+    private void setTunnel(View view) {
+        Setting.putTunnel(!Setting.isTunnel());
+        mBinding.tunnelText.setText(getSwitch(Setting.isTunnel()));
+    }
+
+    private void setCaption(View view) {
+        Setting.putCaption(!Setting.isCaption());
+        mBinding.captionText.setText(getSwitch(Setting.isCaption()));
+    }
+
+    private boolean onCaption(View view) {
+        startActivity(new Intent(Settings.ACTION_CAPTIONING_SETTINGS));
+        return true;
+    }
+
+    private void onSubtitle(View view) {
+        SubtitleDialog.create(this).show();
     }
 
     @Override
