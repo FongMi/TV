@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:stepSize="1"
         android:valueFrom="1"
-        android:valueTo="30"
+        android:valueTo="15"
         app:trackColorInactive="@color/blue_50" />
 
 </LinearLayout>
