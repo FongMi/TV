@@ -22,7 +22,7 @@ import java.util.List;
 
 import okhttp3.Headers;
 
-@Entity(ignoredColumns = {"api", "ext", "jar", "type", "playUrl", "timeout", "playerType", "categories", "header", "style"})
+@Entity(ignoredColumns = {"api", "ext", "jar", "playUrl", "type", "timeout", "playerType", "categories", "header", "style", "activated"})
 public class Site implements Parcelable {
 
     @NonNull
@@ -48,8 +48,6 @@ public class Site implements Parcelable {
     private Integer playerType;
     @SerializedName("searchable")
     private Integer searchable;
-    @SerializedName("filterable")
-    private Integer filterable;
     @SerializedName("changeable")
     private Integer changeable;
     @SerializedName("recordable")
@@ -149,14 +147,6 @@ public class Site implements Parcelable {
 
     public void setSearchable(Integer searchable) {
         this.searchable = searchable;
-    }
-
-    public Integer getFilterable() {
-        return filterable == null ? 1 : filterable;
-    }
-
-    public void setFilterable(Integer filterable) {
-        this.filterable = filterable;
     }
 
     public Integer getChangeable() {
@@ -280,7 +270,6 @@ public class Site implements Parcelable {
         dest.writeValue(this.timeout);
         dest.writeValue(this.playerType);
         dest.writeValue(this.searchable);
-        dest.writeValue(this.filterable);
         dest.writeValue(this.changeable);
         dest.writeValue(this.recordable);
         dest.writeStringList(this.categories);
@@ -299,7 +288,6 @@ public class Site implements Parcelable {
         this.timeout = (Integer) in.readValue(Integer.class.getClassLoader());
         this.playerType = (Integer) in.readValue(Integer.class.getClassLoader());
         this.searchable = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.filterable = (Integer) in.readValue(Integer.class.getClassLoader());
         this.changeable = (Integer) in.readValue(Integer.class.getClassLoader());
         this.recordable = (Integer) in.readValue(Integer.class.getClassLoader());
         this.categories = in.createStringArrayList();

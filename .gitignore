@@ -3,5 +3,5 @@
 *build
 *.jks
 /local.properties
-/media
+/media*
 /Release

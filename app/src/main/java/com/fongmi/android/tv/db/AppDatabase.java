@@ -34,7 +34,7 @@ import java.util.Locale;
 @Database(entities = {Keep.class, Site.class, Track.class, Config.class, Device.class, History.class}, version = AppDatabase.VERSION)
 public abstract class AppDatabase extends RoomDatabase {
 
-    public static final int VERSION = 25;
+    public static final int VERSION = 26;
     public static final String NAME = "tv";
     public static final String SYMBOL = "@@@";
 
@@ -99,6 +99,7 @@ public abstract class AppDatabase extends RoomDatabase {
                 .addMigrations(MIGRATION_22_23)
                 .addMigrations(MIGRATION_23_24)
                 .addMigrations(MIGRATION_24_25)
+                .addMigrations(MIGRATION_25_26)
                 .allowMainThreadQueries()
                 .fallbackToDestructiveMigration()
                 .build();
@@ -218,6 +219,16 @@ public abstract class AppDatabase extends RoomDatabase {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             database.execSQL("ALTER TABLE Site ADD COLUMN recordable INTEGER DEFAULT 1");
+        }
+    };
+
+    static final Migration MIGRATION_25_26 = new Migration(25, 26) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("CREATE TABLE Site_Backup (`key` TEXT NOT NULL, name TEXT, searchable INTEGER, changeable INTEGER, recordable INTEGER, PRIMARY KEY (`key`))");
+            database.execSQL("INSERT INTO Site_Backup SELECT `key`, name, searchable, changeable, recordable FROM Site");
+            database.execSQL("DROP TABLE Site");
+            database.execSQL("ALTER TABLE Site_Backup RENAME to Site");
         }
     };
 }

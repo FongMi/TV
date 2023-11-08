@@ -76,6 +76,12 @@
             tools:visibility="visible" />
 
         <TextView
+            android:id="@+id/invert"
+            style="@style/Control.Action"
+            android:text="@string/play_invert"
+            android:textColor="@color/text" />
+
+        <TextView
             android:id="@+id/across"
             style="@style/Control.Action"
             android:text="@string/play_across"
