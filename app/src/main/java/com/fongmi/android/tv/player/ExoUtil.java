@@ -22,6 +22,7 @@ import androidx.media3.datasource.cache.NoOpCacheEvictor;
 import androidx.media3.datasource.cache.SimpleCache;
 import androidx.media3.datasource.okhttp.OkHttpDataSource;
 import androidx.media3.exoplayer.DefaultLoadControl;
+import androidx.media3.exoplayer.DefaultRenderersFactory;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.LoadControl;
 import androidx.media3.exoplayer.RenderersFactory;
@@ -53,7 +54,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import io.github.anilbeesetti.nextlib.media3ext.ffdecoder.NextRenderersFactory;
 import okhttp3.Call;
 
 public class ExoUtil {
@@ -75,7 +75,7 @@ public class ExoUtil {
     }
 
     public static RenderersFactory buildRenderersFactory() {
-        return new NextRenderersFactory(App.get()).setEnableDecoderFallback(true).setExtensionRendererMode(Math.abs(Setting.getDecode() - 2));
+        return new DefaultRenderersFactory(App.get()).setEnableDecoderFallback(true).setExtensionRendererMode(Math.abs(Setting.getDecode() - 2));
     }
 
     public static CaptionStyleCompat getCaptionStyle() {
