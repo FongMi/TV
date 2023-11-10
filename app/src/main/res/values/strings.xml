@@ -83,6 +83,7 @@
     <string name="setting_proxy">Proxy</string>
     <string name="setting_cache">Cache</string>
     <string name="setting_backup">Backup</string>
+    <string name="setting_backup_auto">Auto</string>
     <string name="setting_version">Version</string>
     <string name="setting_storage">Permission</string>
     <string name="setting_off">Off</string>

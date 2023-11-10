@@ -10,6 +10,7 @@ import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Device;
@@ -23,6 +24,7 @@ import com.fongmi.android.tv.db.dao.HistoryDao;
 import com.fongmi.android.tv.db.dao.KeepDao;
 import com.fongmi.android.tv.db.dao.SiteDao;
 import com.fongmi.android.tv.db.dao.TrackDao;
+import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Util;
 import com.github.catvod.utils.Path;
 import com.github.catvod.utils.Prefers;
@@ -46,12 +48,15 @@ public abstract class AppDatabase extends RoomDatabase {
     }
 
     public static String getDate() {
-        File file = new File(Path.tv(), NAME);
-        return file.exists() ? Util.format(new SimpleDateFormat("yyyyMMdd", Locale.getDefault()), file.lastModified()) : "";
+        return Setting.isBackupAuto() ? ResUtil.getString(R.string.setting_backup_auto) : getBackupKey().exists() ? Util.format(new SimpleDateFormat("yyyyMMdd", Locale.getDefault()), getBackupKey().lastModified()) : "";
     }
 
     public static File getBackupKey() {
         return new File(Path.tv(), "." + Util.getDeviceId());
+    }
+
+    public static void backup() {
+        if (Setting.isBackupAuto()) backup(new com.fongmi.android.tv.impl.Callback());
     }
 
     public static void backup(com.fongmi.android.tv.impl.Callback callback) {

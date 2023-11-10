@@ -123,6 +123,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.vodHome.setOnClickListener(this::onVodHome);
         mBinding.live.setOnLongClickListener(this::onLiveEdit);
         mBinding.liveHome.setOnClickListener(this::onLiveHome);
+        mBinding.backup.setOnLongClickListener(this::onBackupAuto);
         mBinding.vodHistory.setOnClickListener(this::onVodHistory);
         mBinding.version.setOnLongClickListener(this::onVersionDev);
         mBinding.liveHistory.setOnClickListener(this::onLiveHistory);
@@ -368,6 +369,12 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
                 mBinding.backupText.setText(AppDatabase.getDate());
             }
         }));
+    }
+
+    private boolean onBackupAuto(View view) {
+        Setting.putBackupAuto(!Setting.isBackupAuto());
+        mBinding.backupText.setText(AppDatabase.getDate());
+        return true;
     }
 
     @Override

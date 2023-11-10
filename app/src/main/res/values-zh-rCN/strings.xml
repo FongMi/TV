@@ -83,6 +83,7 @@
     <string name="setting_proxy">Proxy</string>
     <string name="setting_cache">缓存</string>
     <string name="setting_backup">备份</string>
+    <string name="setting_backup_auto">自动</string>
     <string name="setting_version">版本</string>
     <string name="setting_storage">权限</string>
     <string name="setting_off">关闭</string>
