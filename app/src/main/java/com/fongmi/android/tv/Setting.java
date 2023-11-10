@@ -1,6 +1,9 @@
 package com.fongmi.android.tv;
 
 
+import android.content.Intent;
+import android.provider.Settings;
+
 import com.fongmi.android.tv.player.Players;
 import com.github.catvod.utils.Prefers;
 
@@ -268,5 +271,9 @@ public class Setting {
 
     public static boolean isBackgroundPiP() {
         return getBackground() == 2;
+    }
+
+    public static boolean hasCaption() {
+        return new Intent(Settings.ACTION_CAPTIONING_SETTINGS).resolveActivity(App.get().getPackageManager()) != null;
     }
 }

@@ -47,6 +47,7 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
         mBinding.captionText.setText(getSwitch(Setting.isCaption()));
         mBinding.bufferText.setText(String.valueOf(Setting.getBuffer()));
         mBinding.subtitleText.setText(String.valueOf(Setting.getSubtitle()));
+        mBinding.caption.setVisibility(Setting.hasCaption() ? View.VISIBLE : View.GONE);
         mBinding.http.setVisibility(Players.isExo(Setting.getPlayer()) ? View.VISIBLE : View.GONE);
         mBinding.buffer.setVisibility(Players.isExo(Setting.getPlayer()) ? View.VISIBLE : View.GONE);
         mBinding.tunnel.setVisibility(Players.isExo(Setting.getPlayer()) ? View.VISIBLE : View.GONE);

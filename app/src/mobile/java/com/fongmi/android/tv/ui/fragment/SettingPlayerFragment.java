@@ -72,6 +72,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
     }
 
     private void setVisible() {
+        mBinding.caption.setVisibility(Setting.hasCaption() ? View.VISIBLE : View.GONE);
         mBinding.http.setVisibility(Players.isExo(Setting.getPlayer()) ? View.VISIBLE : View.GONE);
         mBinding.buffer.setVisibility(Players.isExo(Setting.getPlayer()) ? View.VISIBLE : View.GONE);
         mBinding.tunnel.setVisibility(Players.isExo(Setting.getPlayer()) ? View.VISIBLE : View.GONE);
