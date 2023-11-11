@@ -59,7 +59,7 @@ public class M3U8 {
             BigDecimal t = BigDecimal.ZERO;
             Matcher m2 = REGEX_MEDIA_DURATION.matcher(group);
             while (m2.find()) t = t.add(new BigDecimal(m2.group(1)));
-            for (String ad : ads) if (t.toString().startsWith(ad)) line = line.replaceAll(group, "");
+            for (String ad : ads) if (t.toString().startsWith(ad)) line = line.replace(group, "");
         }
         return line;
     }
