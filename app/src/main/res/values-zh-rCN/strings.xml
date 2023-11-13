@@ -71,7 +71,7 @@
     <string name="setting_player_http">连线方式</string>
     <string name="setting_player_buffer">缓冲时间</string>
     <string name="setting_player_tunnel">隧道模式</string>
-    <string name="setting_player_caption">系统字幕</string>
+    <string name="setting_player_caption">字幕样式</string>
     <string name="setting_player_subtitle">字幕大小</string>
     <string name="setting_player_background">后台播放</string>
     <string name="setting_decode">解码方式</string>
@@ -175,6 +175,11 @@
     <string-array name="select_flag">
         <item>自动</item>
         <item>手动</item>
+    </string-array>
+
+    <string-array name="select_caption">
+        <item>预设</item>
+        <item>系统</item>
     </string-array>
 
 </resources>

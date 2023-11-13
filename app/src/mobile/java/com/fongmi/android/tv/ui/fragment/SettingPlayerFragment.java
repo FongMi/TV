@@ -29,6 +29,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
 
     private FragmentSettingPlayerBinding mBinding;
     private String[] background;
+    private String[] caption;
     private String[] http;
     private String[] flag;
 
@@ -54,6 +55,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
         mBinding.subtitleText.setText(String.valueOf(Setting.getSubtitle()));
         mBinding.flagText.setText((flag = ResUtil.getStringArray(R.array.select_flag))[Setting.getFlag()]);
         mBinding.httpText.setText((http = ResUtil.getStringArray(R.array.select_exo_http))[Setting.getHttp()]);
+        mBinding.captionText.setText((caption = ResUtil.getStringArray(R.array.select_caption))[Setting.isCaption() ? 1 : 0]);
         mBinding.backgroundText.setText((background = ResUtil.getStringArray(R.array.select_background))[Setting.getBackground()]);
         setVisible();
     }
@@ -118,12 +120,12 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
 
     private void setCaption(View view) {
         Setting.putCaption(!Setting.isCaption());
-        mBinding.captionText.setText(getSwitch(Setting.isCaption()));
+        mBinding.captionText.setText(caption[Setting.isCaption() ? 1 : 0]);
     }
 
     private boolean onCaption(View view) {
-        startActivity(new Intent(Settings.ACTION_CAPTIONING_SETTINGS));
-        return true;
+        if (Setting.isCaption()) startActivity(new Intent(Settings.ACTION_CAPTIONING_SETTINGS));
+        return Setting.isCaption();
     }
 
     private void onSubtitle(View view) {

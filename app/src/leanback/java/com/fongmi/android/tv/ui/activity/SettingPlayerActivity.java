@@ -24,6 +24,7 @@ import com.fongmi.android.tv.utils.ResUtil;
 public class SettingPlayerActivity extends BaseActivity implements UaCallback, BufferCallback, SubtitleCallback {
 
     private ActivitySettingPlayerBinding mBinding;
+    private String[] caption;
     private String[] http;
     private String[] flag;
 
@@ -44,7 +45,6 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
     protected void initView() {
         mBinding.uaText.setText(Setting.getUa());
         mBinding.tunnelText.setText(getSwitch(Setting.isTunnel()));
-        mBinding.captionText.setText(getSwitch(Setting.isCaption()));
         mBinding.bufferText.setText(String.valueOf(Setting.getBuffer()));
         mBinding.subtitleText.setText(String.valueOf(Setting.getSubtitle()));
         mBinding.caption.setVisibility(Setting.hasCaption() ? View.VISIBLE : View.GONE);
@@ -53,6 +53,7 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
         mBinding.tunnel.setVisibility(Players.isExo(Setting.getPlayer()) ? View.VISIBLE : View.GONE);
         mBinding.flagText.setText((flag = ResUtil.getStringArray(R.array.select_flag))[Setting.getFlag()]);
         mBinding.httpText.setText((http = ResUtil.getStringArray(R.array.select_exo_http))[Setting.getHttp()]);
+        mBinding.captionText.setText((caption = ResUtil.getStringArray(R.array.select_caption))[Setting.isCaption() ? 1 : 0]);
     }
 
     @Override
@@ -107,12 +108,12 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
 
     private void setCaption(View view) {
         Setting.putCaption(!Setting.isCaption());
-        mBinding.captionText.setText(getSwitch(Setting.isCaption()));
+        mBinding.captionText.setText(caption[Setting.isCaption() ? 1 : 0]);
     }
 
     private boolean onCaption(View view) {
-        startActivity(new Intent(Settings.ACTION_CAPTIONING_SETTINGS));
-        return true;
+        if (Setting.isCaption()) startActivity(new Intent(Settings.ACTION_CAPTIONING_SETTINGS));
+        return Setting.isCaption();
     }
 
     private void onSubtitle(View view) {

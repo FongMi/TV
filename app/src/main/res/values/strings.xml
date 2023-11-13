@@ -71,7 +71,7 @@
     <string name="setting_player_http">HTTP method</string>
     <string name="setting_player_buffer">Buffer time</string>
     <string name="setting_player_tunnel">Tunnel mode</string>
-    <string name="setting_player_caption">System caption</string>
+    <string name="setting_player_caption">Caption style</string>
     <string name="setting_player_subtitle">Subtitle size</string>
     <string name="setting_player_background">Background play</string>
     <string name="setting_decode">Decode</string>
@@ -180,6 +180,11 @@
     <string-array name="select_flag">
         <item>Auto</item>
         <item>Manual</item>
+    </string-array>
+
+    <string-array name="select_caption">
+        <item>Default</item>
+        <item>System</item>
     </string-array>
 
 </resources>
