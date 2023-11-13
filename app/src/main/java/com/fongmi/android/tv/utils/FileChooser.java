@@ -39,7 +39,7 @@ public class FileChooser {
     }
 
     public void show(String mimeType) {
-        show(mimeType, null, REQUEST_PICK_FILE);
+        show(mimeType, new String[]{"*/*"}, REQUEST_PICK_FILE);
     }
 
     public void show(String[] mimeTypes) {

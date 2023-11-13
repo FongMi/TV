@@ -35,7 +35,6 @@ include ':thunder'
 include ':jianpian'
 include ':forcetech'
 include ':ijkplayer'
-include ':media3ext'
 rootProject.name = "TV"
 gradle.ext.androidxMediaModulePrefix = 'media-'
 apply from: file("/media/core_settings.gradle")
