@@ -90,7 +90,7 @@ public final class TrackDialog extends BaseDialog implements TrackAdapter.OnClic
     }
 
     private void showSubtitle(View view) {
-        SubtitleDialog.create(activity).show();
+        SubtitleDialog.create(activity).listen(true).show();
         dismiss();
     }
 

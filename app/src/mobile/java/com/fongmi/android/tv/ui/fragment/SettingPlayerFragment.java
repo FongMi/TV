@@ -135,7 +135,6 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
     @Override
     public void setSubtitle(int size) {
         mBinding.subtitleText.setText(String.valueOf(size));
-        Setting.putSubtitle(size);
     }
 
     private void setBackground(View view) {

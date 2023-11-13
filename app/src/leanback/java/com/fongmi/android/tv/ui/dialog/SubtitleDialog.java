@@ -23,6 +23,7 @@ public class SubtitleDialog {
     private final DialogSubtitleBinding binding;
     private final SubtitleCallback callback;
     private final AlertDialog dialog;
+    private boolean listen;
     private int value;
 
     public static SubtitleDialog create(FragmentActivity activity) {
@@ -33,6 +34,11 @@ public class SubtitleDialog {
         this.callback = (SubtitleCallback) activity;
         this.binding = DialogSubtitleBinding.inflate(LayoutInflater.from(activity));
         this.dialog = new MaterialAlertDialogBuilder(activity).setView(binding.getRoot()).create();
+    }
+
+    public SubtitleDialog listen(boolean listen) {
+        this.listen = listen;
+        return this;
     }
 
     public void show() {
@@ -52,6 +58,7 @@ public class SubtitleDialog {
     private void initView() {
         binding.slider.setValue(Setting.getSubtitle());
         binding.preview.setStyle(ExoUtil.getCaptionStyle());
+        binding.preview.setVisibility(listen ? View.GONE : View.VISIBLE);
         binding.preview.setFixedTextSize(Dimension.SP, value = Setting.getSubtitle());
         binding.preview.setCues(Arrays.asList(new Cue.Builder().setText("影視天下第一").build()));
     }
@@ -59,11 +66,13 @@ public class SubtitleDialog {
     private void initEvent() {
         binding.positive.setOnClickListener(this::onPositive);
         binding.negative.setOnClickListener(this::onNegative);
-        binding.slider.addOnChangeListener((slider, value, fromUser) -> binding.preview.setFixedTextSize(Dimension.SP, value));
+        if (listen) binding.slider.addOnChangeListener((slider, value, fromUser) -> callback.setSubtitle((int) value));
+        else binding.slider.addOnChangeListener((slider, value, fromUser) -> binding.preview.setFixedTextSize(Dimension.SP, value));
     }
 
     private void onPositive(View view) {
         callback.setSubtitle((int) binding.slider.getValue());
+        Setting.putSubtitle((int) binding.slider.getValue());
         dialog.dismiss();
     }
 

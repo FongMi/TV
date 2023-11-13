@@ -54,7 +54,7 @@
         android:paddingEnd="16dp"
         android:paddingBottom="16dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:maxHeight="228dp"
+        app:maxHeight="212dp"
         tools:listitem="@layout/adapter_track" />
 
 </LinearLayout>
