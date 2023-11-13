@@ -28,8 +28,8 @@ public class Sub {
 
     public static Sub from(File file) {
         Sub sub = new Sub();
-        sub.url = file.getAbsolutePath();
         sub.name = file.getName();
+        sub.url = file.getAbsolutePath();
         sub.format = ExoUtil.getMimeType(file.getName());
         return sub;
     }
