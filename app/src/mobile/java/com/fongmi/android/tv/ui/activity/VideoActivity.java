@@ -80,7 +80,6 @@ import com.fongmi.android.tv.ui.dialog.CastDialog;
 import com.fongmi.android.tv.ui.dialog.ControlDialog;
 import com.fongmi.android.tv.ui.dialog.EpisodeGridDialog;
 import com.fongmi.android.tv.ui.dialog.EpisodeListDialog;
-import com.fongmi.android.tv.ui.dialog.SubtitleDialog;
 import com.fongmi.android.tv.ui.dialog.TrackDialog;
 import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.FileChooser;
@@ -356,7 +355,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mBinding.control.action.ending.setOnClickListener(view -> onEnding());
         mBinding.control.action.opening.setOnClickListener(view -> onOpening());
         mBinding.control.action.episodes.setOnClickListener(view -> onEpisodes());
-        mBinding.control.action.text.setOnLongClickListener(view -> onTextLong());
         mBinding.control.action.speed.setOnLongClickListener(view -> onSpeedLong());
         mBinding.control.action.reset.setOnLongClickListener(view -> onResetToggle());
         mBinding.control.action.ending.setOnLongClickListener(view -> onEndingReset());
@@ -800,12 +798,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         hideControl();
     }
 
-    private boolean onTextLong() {
-        SubtitleDialog.create(this).show();
-        hideControl();
-        return true;
-    }
-
     private void onLoop() {
         mBinding.control.action.loop.setActivated(!mBinding.control.action.loop.isActivated());
     }
@@ -1223,7 +1215,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private void setTrackVisible(boolean visible) {
-        mBinding.control.action.text.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_TEXT) ? View.VISIBLE : View.GONE);
+        mBinding.control.action.text.setVisibility(visible && (mPlayers.haveTrack(C.TRACK_TYPE_TEXT) || mPlayers.isExo()) ? View.VISIBLE : View.GONE);
         mBinding.control.action.audio.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_AUDIO) ? View.VISIBLE : View.GONE);
         mBinding.control.action.video.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_VIDEO) ? View.VISIBLE : View.GONE);
         if (mControlDialog != null && mControlDialog.isVisible()) mControlDialog.setTrackVisible();

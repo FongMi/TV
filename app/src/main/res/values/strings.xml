@@ -187,4 +187,10 @@
         <item>System</item>
     </string-array>
 
+    <string-array name="select_track">
+        <item>Select audio track</item>
+        <item>Select video track</item>
+        <item>Select subtitle track</item>
+    </string-array>
+
 </resources>

@@ -106,20 +106,28 @@ public class ExoUtil {
         setTrackParameters(player, group, trackIndices);
     }
 
-    public static MediaSource getSource(Result result, int errorCode) {
-        return getSource(result.getHeaders(), result.getRealUrl(), result.getFormat(), result.getSubs(), null, errorCode);
+    public static String getMimeType(String path) {
+        if (path.endsWith(".vtt")) return MimeTypes.TEXT_VTT;
+        if (path.endsWith(".ssa") || path.endsWith(".ass")) return MimeTypes.TEXT_SSA;
+        if (path.endsWith(".ttml") || path.endsWith(".xml") || path.endsWith(".dfxp")) return MimeTypes.APPLICATION_TTML;
+        return MimeTypes.APPLICATION_SUBRIP;
     }
 
-    public static MediaSource getSource(Channel channel, int errorCode) {
-        return getSource(channel.getHeaders(), channel.getUrl(), null, Collections.emptyList(), channel.getDrm(), errorCode);
+    public static MediaSource getSource(Sub sub, Result result, int errorCode) {
+        return getSource(sub, result.getHeaders(), result.getRealUrl(), result.getFormat(), result.getSubs(), null, errorCode);
     }
 
-    public static MediaSource getSource(Map<String, String> headers, String url, int errorCode) {
-        return getSource(headers, url, null, Collections.emptyList(), null, errorCode);
+    public static MediaSource getSource(Sub sub, Channel channel, int errorCode) {
+        return getSource(sub, channel.getHeaders(), channel.getUrl(), null, Collections.emptyList(), channel.getDrm(), errorCode);
     }
 
-    private static MediaSource getSource(Map<String, String> headers, String url, String format, List<Sub> subs, Drm drm, int errorCode) {
+    public static MediaSource getSource(Sub sub, Map<String, String> headers, String url, int errorCode) {
+        return getSource(sub, headers, url, null, new ArrayList<>(), null, errorCode);
+    }
+
+    private static MediaSource getSource(Sub sub, Map<String, String> headers, String url, String format, List<Sub> subs, Drm drm, int errorCode) {
         Uri uri = UrlUtil.uri(url);
+        if (sub != null) subs.add(sub);
         String mimeType = getMimeType(format, errorCode);
         if (uri.getUserInfo() != null) headers.put(HttpHeaders.AUTHORIZATION, Util.basic(uri));
         return new DefaultMediaSourceFactory(getDataSourceFactory(headers), getExtractorsFactory()).createMediaSource(getMediaItem(uri, mimeType, subs, drm));

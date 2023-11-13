@@ -4,6 +4,7 @@
     android:id="@+id/text"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_margin="8dp"
     android:background="@drawable/shape_accent"
     android:ellipsize="marquee"
     android:singleLine="true"

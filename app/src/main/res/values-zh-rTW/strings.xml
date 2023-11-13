@@ -182,4 +182,10 @@
         <item>系統</item>
     </string-array>
 
+    <string-array name="select_track">
+        <item>選擇音軌</item>
+        <item>選擇視軌</item>
+        <item>選擇字幕</item>
+    </string-array>
+
 </resources>

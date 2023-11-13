@@ -5,8 +5,11 @@ import android.text.TextUtils;
 
 import androidx.media3.common.MediaItem;
 
+import com.fongmi.android.tv.player.ExoUtil;
 import com.github.catvod.utils.Trans;
 import com.google.gson.annotations.SerializedName;
+
+import java.io.File;
 
 public class Sub {
 
@@ -19,6 +22,14 @@ public class Sub {
     @SerializedName("format")
     private String format;
 
+    public static Sub from(String path) {
+        Sub sub = new Sub();
+        sub.url = path;
+        sub.name = new File(path).getName();
+        sub.format = ExoUtil.getMimeType(path);
+        return sub;
+    }
+
     public String getUrl() {
         return TextUtils.isEmpty(url) ? "" : url;
     }
@@ -28,7 +39,7 @@ public class Sub {
     }
 
     public String getLang() {
-        return TextUtils.isEmpty(lang) ? "zh" : lang;
+        return TextUtils.isEmpty(lang) ? "" : lang;
     }
 
     public String getFormat() {

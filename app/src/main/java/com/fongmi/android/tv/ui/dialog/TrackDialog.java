@@ -1,21 +1,28 @@
 package com.fongmi.android.tv.ui.dialog;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.media3.common.C;
 import androidx.media3.common.Tracks;
 import androidx.viewbinding.ViewBinding;
 
+import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.bean.Sub;
 import com.fongmi.android.tv.bean.Track;
 import com.fongmi.android.tv.databinding.DialogTrackBinding;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.player.TrackNameProvider;
 import com.fongmi.android.tv.ui.adapter.TrackAdapter;
-import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
+import com.fongmi.android.tv.utils.FileChooser;
+import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import java.util.ArrayList;
@@ -29,6 +36,7 @@ public final class TrackDialog extends BaseDialog implements TrackAdapter.OnClic
     private final TrackAdapter adapter;
     private DialogTrackBinding binding;
     private Listener listener;
+    private Activity activity;
     private Players player;
     private int type;
 
@@ -55,6 +63,7 @@ public final class TrackDialog extends BaseDialog implements TrackAdapter.OnClic
         for (Fragment f : activity.getSupportFragmentManager().getFragments()) if (f instanceof BottomSheetDialogFragment) return;
         show(activity.getSupportFragmentManager(), null);
         this.listener = (Listener) activity;
+        this.activity = activity;
     }
 
     @Override
@@ -66,8 +75,26 @@ public final class TrackDialog extends BaseDialog implements TrackAdapter.OnClic
     protected void initView() {
         binding.recycler.setHasFixedSize(true);
         binding.recycler.setAdapter(adapter.addAll(getTrack()));
-        binding.recycler.addItemDecoration(new SpaceItemDecoration(1, 16));
         binding.recycler.post(() -> binding.recycler.scrollToPosition(adapter.getSelected()));
+        binding.choose.setVisibility(type == C.TRACK_TYPE_TEXT && player.isExo() ? View.VISIBLE : View.GONE);
+        binding.size.setVisibility(type == C.TRACK_TYPE_TEXT ? View.VISIBLE : View.GONE);
+        binding.title.setText(ResUtil.getStringArray(R.array.select_track)[type - 1]);
+    }
+
+    @Override
+    protected void initEvent() {
+        binding.size.setOnClickListener(this::showSubtitle);
+        binding.choose.setOnClickListener(this::showChooser);
+    }
+
+    private void showSubtitle(View view) {
+        SubtitleDialog.create(activity).show();
+        dismiss();
+    }
+
+    private void showChooser(View view) {
+        FileChooser.from(this).show(new String[]{"application/octet-stream"});
+        player.pause();
     }
 
     private List<Track> getTrack() {
@@ -113,6 +140,14 @@ public final class TrackDialog extends BaseDialog implements TrackAdapter.OnClic
         if (listener != null) listener.onTrackClick(item);
         player.setTrack(List.of(item));
         if (item.isAdaptive()) return;
+        dismiss();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode != Activity.RESULT_OK || requestCode != FileChooser.REQUEST_PICK_FILE) return;
+        player.setSub(Sub.from(FileChooser.getPathFromUri(getContext(), data.getData())));
         dismiss();
     }
 

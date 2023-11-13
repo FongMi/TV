@@ -38,15 +38,18 @@ public class FileChooser {
     }
 
     public void show(String mimeType) {
-        show(mimeType, REQUEST_PICK_FILE);
+        show(mimeType, null, REQUEST_PICK_FILE);
     }
 
-    public void show(String mimeType, int code) {
-        String[] mimeTypes = mimeType.split(" ");
+    public void show(String[] mimeTypes) {
+        show("*/*", mimeTypes, REQUEST_PICK_FILE);
+    }
+
+    public void show(String mimeType, String[] mimeTypes, int code) {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-        intent.setType(mimeTypes[0]);
-        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
+        intent.setType(mimeType);
         intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false);
         Intent destIntent = Intent.createChooser(intent, "");
         if (fragment != null) fragment.startActivityForResult(destIntent, code);

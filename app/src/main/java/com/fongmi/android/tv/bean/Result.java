@@ -241,7 +241,7 @@ public class Result implements Parcelable {
     }
 
     public List<Sub> getSubs() {
-        return subs == null ? Collections.emptyList() : subs;
+        return subs == null ? new ArrayList<>() : subs;
     }
 
     public Integer getPageCount() {
