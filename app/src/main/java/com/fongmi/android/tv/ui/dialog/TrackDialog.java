@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.media3.common.C;
+import androidx.media3.common.MimeTypes;
 import androidx.media3.common.Tracks;
 import androidx.viewbinding.ViewBinding;
 
@@ -95,7 +96,7 @@ public final class TrackDialog extends BaseDialog implements TrackAdapter.OnClic
     }
 
     private void showChooser(View view) {
-        FileChooser.from(this).show(new String[]{"application/octet-stream"});
+        FileChooser.from(this).show(new String[]{MimeTypes.APPLICATION_SUBRIP, MimeTypes.TEXT_SSA, MimeTypes.TEXT_VTT, MimeTypes.APPLICATION_TTML, "text/*", "application/octet-stream"});
         player.pause();
     }
 
