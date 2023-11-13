@@ -13,6 +13,7 @@ import android.provider.MediaStore;
 
 import androidx.fragment.app.Fragment;
 
+import com.fongmi.android.tv.App;
 import com.github.catvod.utils.Path;
 
 import java.io.File;
@@ -51,8 +52,8 @@ public class FileChooser {
         intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
         intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false);
-        Intent destIntent = Intent.createChooser(intent, "");
-        if (fragment != null) fragment.startActivityForResult(destIntent, code);
+        if (intent.resolveActivity(App.get().getPackageManager()) == null) return;
+        if (fragment != null) fragment.startActivityForResult(Intent.createChooser(intent, ""), code);
     }
 
     public static String getPathFromUri(Context context, Uri uri) {
