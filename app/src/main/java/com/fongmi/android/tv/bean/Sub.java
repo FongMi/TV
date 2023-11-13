@@ -23,10 +23,14 @@ public class Sub {
     private String format;
 
     public static Sub from(String path) {
+        return from(new File(path));
+    }
+
+    public static Sub from(File file) {
         Sub sub = new Sub();
-        sub.url = path;
-        sub.name = new File(path).getName();
-        sub.format = ExoUtil.getMimeType(path);
+        sub.url = file.getAbsolutePath();
+        sub.name = file.getName();
+        sub.format = ExoUtil.getMimeType(file.getName());
         return sub;
     }
 

@@ -47,6 +47,7 @@ import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Part;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
+import com.fongmi.android.tv.bean.Sub;
 import com.fongmi.android.tv.bean.Track;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.ActivityVideoBinding;
@@ -55,6 +56,7 @@ import com.fongmi.android.tv.event.ActionEvent;
 import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
+import com.fongmi.android.tv.event.ServerEvent;
 import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.impl.SubtitleCallback;
 import com.fongmi.android.tv.model.SiteViewModel;
@@ -85,6 +87,7 @@ import com.fongmi.android.tv.utils.Traffic;
 import com.fongmi.android.tv.utils.Util;
 import com.github.bassaer.library.MDColor;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.Path;
 import com.github.catvod.utils.Trans;
 import com.permissionx.guolindev.PermissionX;
 
@@ -1111,6 +1114,12 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         } else if (ActionEvent.STOP.equals(event.getAction())) {
             finish();
         }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onServerEvent(ServerEvent event) {
+        if (event.getType() != ServerEvent.Type.API) return;
+        if (mPlayers.isExo()) mPlayers.setSub(Sub.from(Path.local(event.getText())));
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
