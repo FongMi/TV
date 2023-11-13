@@ -21,6 +21,7 @@ import com.fongmi.android.tv.databinding.DialogTrackBinding;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.player.TrackNameProvider;
 import com.fongmi.android.tv.ui.adapter.TrackAdapter;
+import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -35,8 +36,8 @@ public final class TrackDialog extends BaseDialog implements TrackAdapter.OnClic
     private final TrackNameProvider provider;
     private final TrackAdapter adapter;
     private DialogTrackBinding binding;
+    private FragmentActivity activity;
     private Listener listener;
-    private Activity activity;
     private Players player;
     private int type;
 
@@ -75,6 +76,7 @@ public final class TrackDialog extends BaseDialog implements TrackAdapter.OnClic
     protected void initView() {
         binding.recycler.setHasFixedSize(true);
         binding.recycler.setAdapter(adapter.addAll(getTrack()));
+        binding.recycler.addItemDecoration(new SpaceItemDecoration(1, 16));
         binding.recycler.post(() -> binding.recycler.scrollToPosition(adapter.getSelected()));
         binding.choose.setVisibility(type == C.TRACK_TYPE_TEXT && player.isExo() ? View.VISIBLE : View.GONE);
         binding.size.setVisibility(type == C.TRACK_TYPE_TEXT ? View.VISIBLE : View.GONE);
