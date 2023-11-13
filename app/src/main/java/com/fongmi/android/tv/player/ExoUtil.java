@@ -52,6 +52,7 @@ import com.google.common.net.HttpHeaders;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import okhttp3.Call;
@@ -70,7 +71,7 @@ public class ExoUtil {
 
     public static TrackSelector buildTrackSelector() {
         DefaultTrackSelector trackSelector = new DefaultTrackSelector(App.get());
-        trackSelector.setParameters(trackSelector.buildUponParameters().setPreferredTextLanguage("zh").setForceHighestSupportedBitrate(true).setTunnelingEnabled(Setting.isTunnel()));
+        trackSelector.setParameters(trackSelector.buildUponParameters().setPreferredTextLanguage(Locale.getDefault().getISO3Language()).setForceHighestSupportedBitrate(true).setTunnelingEnabled(Setting.isTunnel()));
         return trackSelector;
     }
 
@@ -157,6 +158,7 @@ public class ExoUtil {
     }
 
     private static void selectTrack(ExoPlayer player, int group, int track, List<Integer> trackIndices) {
+        if (group >= player.getCurrentTracks().getGroups().size()) return;
         Tracks.Group trackGroup = player.getCurrentTracks().getGroups().get(group);
         for (int i = 0; i < trackGroup.length; i++) {
             if (i == track || trackGroup.isTrackSelected(i)) trackIndices.add(i);
@@ -164,6 +166,7 @@ public class ExoUtil {
     }
 
     private static void deselectTrack(ExoPlayer player, int group, int track, List<Integer> trackIndices) {
+        if (group >= player.getCurrentTracks().getGroups().size()) return;
         Tracks.Group trackGroup = player.getCurrentTracks().getGroups().get(group);
         for (int i = 0; i < trackGroup.length; i++) {
             if (i != track && trackGroup.isTrackSelected(i)) trackIndices.add(i);
@@ -171,6 +174,7 @@ public class ExoUtil {
     }
 
     private static void setTrackParameters(ExoPlayer player, int group, List<Integer> trackIndices) {
+        if (group >= player.getCurrentTracks().getGroups().size()) return;
         player.setTrackSelectionParameters(player.getTrackSelectionParameters().buildUpon().setOverrideForType(new TrackSelectionOverride(player.getCurrentTracks().getGroups().get(group).getMediaTrackGroup(), trackIndices)).build());
     }
 
