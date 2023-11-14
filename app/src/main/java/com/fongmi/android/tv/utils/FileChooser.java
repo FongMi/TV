@@ -13,6 +13,7 @@ import android.provider.MediaStore;
 
 import androidx.fragment.app.Fragment;
 
+import com.fongmi.android.tv.App;
 import com.github.catvod.utils.Path;
 
 import java.io.File;
@@ -38,18 +39,22 @@ public class FileChooser {
     }
 
     public void show(String mimeType) {
-        show(mimeType, REQUEST_PICK_FILE);
+        show(mimeType, new String[]{"*/*"}, REQUEST_PICK_FILE);
     }
 
-    public void show(String mimeType, int code) {
-        String[] mimeTypes = mimeType.split(" ");
+    public void show(String[] mimeTypes) {
+        show("*/*", mimeTypes, REQUEST_PICK_FILE);
+    }
+
+    public void show(String mimeType, String[] mimeTypes, int code) {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-        intent.setType(mimeTypes[0]);
+        intent.setType(mimeType);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
-        intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false);
-        Intent destIntent = Intent.createChooser(intent, "");
-        if (fragment != null) fragment.startActivityForResult(destIntent, code);
+        intent.putExtra("android.content.extra.SHOW_ADVANCED", true);
+        if (intent.resolveActivity(App.get().getPackageManager()) == null) return;
+        if (fragment != null) fragment.startActivityForResult(Intent.createChooser(intent, ""), code);
     }
 
     public static String getPathFromUri(Context context, Uri uri) {

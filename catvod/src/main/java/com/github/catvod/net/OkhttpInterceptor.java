@@ -3,6 +3,7 @@ package com.github.catvod.net;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.github.catvod.utils.Util;
 import com.google.common.net.HttpHeaders;
 
 import java.io.IOException;
@@ -11,6 +12,7 @@ import java.util.zip.InflaterInputStream;
 
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
+import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import okio.BufferedSource;
@@ -21,7 +23,7 @@ public class OkhttpInterceptor implements Interceptor {
     @NonNull
     @Override
     public Response intercept(@NonNull Chain chain) throws IOException {
-        Response response = chain.proceed(chain.request());
+        Response response = chain.proceed(getRequest(chain));
         String encoding = response.header(HttpHeaders.CONTENT_ENCODING);
         if (response.body() == null || encoding == null || !encoding.equals("deflate")) return response;
         InflaterInputStream is = new InflaterInputStream(response.body().byteStream(), new Inflater(true));
@@ -43,5 +45,11 @@ public class OkhttpInterceptor implements Interceptor {
                 return Okio.buffer(Okio.source(is));
             }
         }).build();
+    }
+
+    private Request getRequest(@NonNull Chain chain) {
+        Request request = chain.request();
+        if (request.url().host().equals("gitcode.net")) return request.newBuilder().addHeader(HttpHeaders.USER_AGENT, Util.CHROME).build();
+        return request;
     }
 }

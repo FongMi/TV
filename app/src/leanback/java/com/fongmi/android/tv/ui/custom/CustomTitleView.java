@@ -10,12 +10,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatTextView;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.impl.SiteCallback;
+import com.fongmi.android.tv.utils.KeyUtil;
 import com.fongmi.android.tv.utils.ResUtil;
-import com.fongmi.android.tv.utils.Utils;
 
 import java.util.List;
 
@@ -23,6 +24,7 @@ public class CustomTitleView extends AppCompatTextView {
 
     private Listener listener;
     private Animation flicker;
+    private boolean coolDown;
 
     public CustomTitleView(@NonNull Context context) {
         super(context);
@@ -39,7 +41,7 @@ public class CustomTitleView extends AppCompatTextView {
     }
 
     private boolean hasEvent(KeyEvent event) {
-        return Utils.isEnterKey(event) || Utils.isLeftKey(event) || Utils.isRightKey(event);
+        return KeyUtil.isEnterKey(event) || KeyUtil.isLeftKey(event) || KeyUtil.isRightKey(event) || (KeyUtil.isUpKey(event) && !coolDown);
     }
 
     @Override
@@ -57,14 +59,22 @@ public class CustomTitleView extends AppCompatTextView {
     }
 
     private boolean onKeyDown(KeyEvent event) {
-        if (event.getAction() == KeyEvent.ACTION_UP && Utils.isEnterKey(event)) {
+        if (event.getAction() == KeyEvent.ACTION_UP && KeyUtil.isEnterKey(event)) {
             listener.showDialog();
-        } else if (event.getAction() == KeyEvent.ACTION_DOWN && Utils.isLeftKey(event)) {
+        } else if (event.getAction() == KeyEvent.ACTION_DOWN && KeyUtil.isLeftKey(event)) {
             listener.setSite(getSite(true));
-        } else if (event.getAction() == KeyEvent.ACTION_DOWN && Utils.isRightKey(event)) {
+        } else if (event.getAction() == KeyEvent.ACTION_DOWN && KeyUtil.isRightKey(event)) {
             listener.setSite(getSite(false));
+        } else if (event.getAction() == KeyEvent.ACTION_DOWN && KeyUtil.isUpKey(event)) {
+            onKeyUp();
         }
         return true;
+    }
+
+    private void onKeyUp() {
+        App.post(() -> coolDown = false, 3000);
+        listener.onRefresh();
+        coolDown = true;
     }
 
     private Site getSite(boolean next) {
@@ -78,5 +88,7 @@ public class CustomTitleView extends AppCompatTextView {
     public interface Listener extends SiteCallback {
 
         void showDialog();
+
+        void onRefresh();
     }
 }

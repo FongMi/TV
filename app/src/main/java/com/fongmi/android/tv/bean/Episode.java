@@ -4,9 +4,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.utils.Utils;
+import com.fongmi.android.tv.utils.Util;
 import com.github.catvod.utils.Trans;
-import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
 public class Episode implements Parcelable {
@@ -35,7 +34,7 @@ public class Episode implements Parcelable {
     }
 
     public Episode(String name, String desc, String url) {
-        this.number = Utils.getDigit(name);
+        this.number = Util.getDigit(name);
         this.name = Trans.s2t(name);
         this.desc = Trans.s2t(desc);
         this.url = url;

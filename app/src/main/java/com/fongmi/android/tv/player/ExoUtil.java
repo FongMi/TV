@@ -1,7 +1,9 @@
 package com.fongmi.android.tv.player;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.net.Uri;
+import android.view.accessibility.CaptioningManager;
 
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.MimeTypes;
@@ -41,7 +43,7 @@ import com.fongmi.android.tv.bean.Drm;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Sub;
 import com.fongmi.android.tv.utils.Sniffer;
-import com.fongmi.android.tv.utils.Utils;
+import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Path;
 import com.github.catvod.utils.Util;
@@ -50,6 +52,7 @@ import com.google.common.net.HttpHeaders;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import okhttp3.Call;
@@ -68,16 +71,16 @@ public class ExoUtil {
 
     public static TrackSelector buildTrackSelector() {
         DefaultTrackSelector trackSelector = new DefaultTrackSelector(App.get());
-        trackSelector.setParameters(trackSelector.buildUponParameters().setPreferredTextLanguage("zh").setForceHighestSupportedBitrate(true).setTunnelingEnabled(Setting.isTunnel()));
+        trackSelector.setParameters(trackSelector.buildUponParameters().setPreferredTextLanguage(Locale.getDefault().getISO3Language()).setForceHighestSupportedBitrate(true).setTunnelingEnabled(Setting.isTunnel()));
         return trackSelector;
     }
 
     public static RenderersFactory buildRenderersFactory() {
-        return new DefaultRenderersFactory(App.get()).setExtensionRendererMode(Math.abs(Setting.getDecode() - 2));
+        return new DefaultRenderersFactory(App.get()).setEnableDecoderFallback(true).setExtensionRendererMode(Math.abs(Setting.getDecode() - 2));
     }
 
     public static CaptionStyleCompat getCaptionStyle() {
-        return new CaptionStyleCompat(Color.WHITE, Color.TRANSPARENT, Color.TRANSPARENT, CaptionStyleCompat.EDGE_TYPE_OUTLINE, Color.BLACK, null);
+        return Setting.isCaption() ? CaptionStyleCompat.createFromCaptionStyle(((CaptioningManager) App.get().getSystemService(Context.CAPTIONING_SERVICE)).getUserStyle()) : new CaptionStyleCompat(Color.WHITE, Color.TRANSPARENT, Color.TRANSPARENT, CaptionStyleCompat.EDGE_TYPE_OUTLINE, Color.BLACK, null);
     }
 
     public static int getRetry(int errorCode) {
@@ -104,20 +107,28 @@ public class ExoUtil {
         setTrackParameters(player, group, trackIndices);
     }
 
-    public static MediaSource getSource(Result result, int errorCode) {
-        return getSource(result.getHeaders(), result.getRealUrl(), result.getFormat(), result.getSubs(), null, errorCode);
+    public static String getMimeType(String path) {
+        if (path.endsWith(".vtt")) return MimeTypes.TEXT_VTT;
+        if (path.endsWith(".ssa") || path.endsWith(".ass")) return MimeTypes.TEXT_SSA;
+        if (path.endsWith(".ttml") || path.endsWith(".xml") || path.endsWith(".dfxp")) return MimeTypes.APPLICATION_TTML;
+        return MimeTypes.APPLICATION_SUBRIP;
+    }
+
+    public static MediaSource getSource(Result result, Sub sub, int errorCode) {
+        return getSource(result.getHeaders(), result.getRealUrl(), result.getFormat(), result.getSubs(), sub, null, errorCode);
     }
 
     public static MediaSource getSource(Channel channel, int errorCode) {
-        return getSource(channel.getHeaders(), channel.getUrl(), null, Collections.emptyList(), channel.getDrm(), errorCode);
+        return getSource(channel.getHeaders(), channel.getUrl(), null, Collections.emptyList(), null, channel.getDrm(), errorCode);
     }
 
-    public static MediaSource getSource(Map<String, String> headers, String url, int errorCode) {
-        return getSource(headers, url, null, Collections.emptyList(), null, errorCode);
+    public static MediaSource getSource(Map<String, String> headers, String url, Sub sub, int errorCode) {
+        return getSource(headers, url, null, new ArrayList<>(), sub, null, errorCode);
     }
 
-    private static MediaSource getSource(Map<String, String> headers, String url, String format, List<Sub> subs, Drm drm, int errorCode) {
-        Uri uri = Uri.parse(Util.fixUrl(url));
+    private static MediaSource getSource(Map<String, String> headers, String url, String format, List<Sub> subs, Sub sub, Drm drm, int errorCode) {
+        Uri uri = UrlUtil.uri(url);
+        if (sub != null) subs.add(sub);
         String mimeType = getMimeType(format, errorCode);
         if (uri.getUserInfo() != null) headers.put(HttpHeaders.AUTHORIZATION, Util.basic(uri));
         return new DefaultMediaSourceFactory(getDataSourceFactory(headers), getExtractorsFactory()).createMediaSource(getMediaItem(uri, mimeType, subs, drm));
@@ -147,6 +158,7 @@ public class ExoUtil {
     }
 
     private static void selectTrack(ExoPlayer player, int group, int track, List<Integer> trackIndices) {
+        if (group >= player.getCurrentTracks().getGroups().size()) return;
         Tracks.Group trackGroup = player.getCurrentTracks().getGroups().get(group);
         for (int i = 0; i < trackGroup.length; i++) {
             if (i == track || trackGroup.isTrackSelected(i)) trackIndices.add(i);
@@ -154,6 +166,7 @@ public class ExoUtil {
     }
 
     private static void deselectTrack(ExoPlayer player, int group, int track, List<Integer> trackIndices) {
+        if (group >= player.getCurrentTracks().getGroups().size()) return;
         Tracks.Group trackGroup = player.getCurrentTracks().getGroups().get(group);
         for (int i = 0; i < trackGroup.length; i++) {
             if (i != track && trackGroup.isTrackSelected(i)) trackIndices.add(i);
@@ -161,6 +174,7 @@ public class ExoUtil {
     }
 
     private static void setTrackParameters(ExoPlayer player, int group, List<Integer> trackIndices) {
+        if (group >= player.getCurrentTracks().getGroups().size()) return;
         player.setTrackSelectionParameters(player.getTrackSelectionParameters().buildUpon().setOverrideForType(new TrackSelectionOverride(player.getCurrentTracks().getGroups().get(group).getMediaTrackGroup(), trackIndices)).build());
     }
 
@@ -176,7 +190,7 @@ public class ExoUtil {
 
     private static synchronized DataSource.Factory getDataSourceFactory(Map<String, String> headers) {
         if (dataSourceFactory == null) dataSourceFactory = buildReadOnlyCacheDataSource(new DefaultDataSource.Factory(App.get(), getHttpDataSourceFactory()), getCache());
-        httpDataSourceFactory.setDefaultRequestProperties(Utils.checkUa(headers));
+        httpDataSourceFactory.setDefaultRequestProperties(Players.checkUa(headers));
         return dataSourceFactory;
     }
 

@@ -49,7 +49,9 @@ public class Value implements Parcelable {
     }
 
     public void setActivated(Value item) {
-        this.activated = item.equals(this);
+        boolean equal = item.equals(this);
+        if (activated && equal) activated = false;
+        else activated = equal;
     }
 
     public void trans() {

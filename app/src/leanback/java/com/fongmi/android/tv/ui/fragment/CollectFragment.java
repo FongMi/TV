@@ -118,7 +118,7 @@ public class CollectFragment extends BaseFragment implements CustomScroller.Call
     public void onItemClick(Vod item) {
         getActivity().setResult(Activity.RESULT_OK);
         if (item.isFolder()) VodActivity.start(getActivity(), item.getSiteKey(), Result.folder(item));
-        else VideoActivity.start(getActivity(), item.getSiteKey(), item.getVodId(), item.getVodName(), item.getVodPic());
+        else VideoActivity.collect(getActivity(), item.getSiteKey(), item.getVodId(), item.getVodName(), item.getVodPic());
     }
 
     @Override

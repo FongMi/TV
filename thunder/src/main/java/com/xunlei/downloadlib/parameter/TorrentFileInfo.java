@@ -2,7 +2,7 @@ package com.xunlei.downloadlib.parameter;
 
 import android.text.TextUtils;
 
-import com.github.catvod.utils.Util;
+import com.xunlei.downloadlib.Util;
 
 import java.io.File;
 import java.util.Collections;

@@ -15,10 +15,7 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 public class Path {
 
@@ -45,16 +42,16 @@ public class Path {
         return Init.context().getFilesDir();
     }
 
-    public static File externalFiles() {
-        return Init.context().getExternalFilesDir("");
-    }
-
-    public static File externalCache() {
-        return Init.context().getExternalCacheDir();
+    public static File download() {
+        return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
     }
 
     public static String rootPath() {
         return root().getAbsolutePath();
+    }
+
+    public static File tv() {
+        return check(new File(root() + File.separator + "TV"));
     }
 
     public static File so() {
@@ -204,6 +201,13 @@ public class Path {
         }
     }
 
+    public static void newFile(File file) {
+        try {
+            file.createNewFile();
+        } catch (Exception ignored) {
+        }
+    }
+
     public static List<File> list(File dir) {
         File[] files = dir.listFiles();
         return files == null ? Collections.emptyList() : Arrays.asList(files);
@@ -213,20 +217,6 @@ public class Path {
         if (dir == null) return;
         if (dir.isDirectory()) for (File file : list(dir)) clear(file);
         if (dir.delete()) Log.d(TAG, "Deleted:" + dir.getAbsolutePath());
-    }
-
-    public static void unzip(File target, File path) {
-        try (ZipFile zip = new ZipFile(target.getAbsolutePath())) {
-            Enumeration<?> entries = zip.entries();
-            while (entries.hasMoreElements()) {
-                ZipEntry entry = (ZipEntry) entries.nextElement();
-                File out = new File(path, entry.getName());
-                if (entry.isDirectory()) out.mkdirs();
-                else copy(zip.getInputStream(entry), out);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public static File chmod(File file) {

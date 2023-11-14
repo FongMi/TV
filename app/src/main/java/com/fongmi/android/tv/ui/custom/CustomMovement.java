@@ -1,5 +1,6 @@
 package com.fongmi.android.tv.ui.custom;
 
+import android.graphics.RectF;
 import android.text.Editable;
 import android.text.Layout;
 import android.text.NoCopySpan;
@@ -165,17 +166,22 @@ public class CustomMovement extends ScrollingMovementMethod {
             Layout layout = widget.getLayout();
             int line = layout.getLineForVertical(y);
             int off = layout.getOffsetForHorizontal(line, x);
-            ClickableSpan[] links = buffer.getSpans(off, off, ClickableSpan.class);
-            if (links.length != 0) {
-                ClickableSpan link = links[0];
-                if (action == MotionEvent.ACTION_UP) {
-                    link.onClick(widget);
+            final RectF touchedLineBounds = new RectF();
+            touchedLineBounds.left = layout.getLineLeft(line);
+            touchedLineBounds.top = layout.getLineTop(line);
+            touchedLineBounds.right = layout.getLineWidth(line) + touchedLineBounds.left;
+            touchedLineBounds.bottom = layout.getLineBottom(line);
+            if (touchedLineBounds.contains(x, y)) {
+                ClickableSpan[] links = buffer.getSpans(off, off, ClickableSpan.class);
+                if (links.length != 0) {
+                    ClickableSpan link = links[0];
+                    if (action == MotionEvent.ACTION_UP) {
+                        link.onClick(widget);
+                    }
+                    return true;
                 } else {
-                    Selection.setSelection(buffer, buffer.getSpanStart(link), buffer.getSpanEnd(link));
+                    Selection.removeSelection(buffer);
                 }
-                return true;
-            } else {
-                Selection.removeSelection(buffer);
             }
         }
         return super.onTouchEvent(widget, buffer, event);

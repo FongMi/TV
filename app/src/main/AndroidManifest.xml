@@ -13,8 +13,24 @@
 
     <uses-sdk tools:overrideLibrary="com.whl.quickjs.android" />
 
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.OPEN_DOCUMENT" />
+            <data android:mimeType="*/*" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:mimeType="video/*" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.SEND" />
+            <data android:mimeType="text/plain" />
+        </intent>
+    </queries>
+
     <application
         android:name=".App"
+        android:allowBackup="true"
         android:appCategory="video"
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"

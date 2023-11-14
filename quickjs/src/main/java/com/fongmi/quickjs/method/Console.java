@@ -1,41 +1,29 @@
 package com.fongmi.quickjs.method;
 
-import androidx.annotation.Keep;
-
 import com.orhanobut.logger.Logger;
-import com.whl.quickjs.wrapper.JSMethod;
+import com.whl.quickjs.wrapper.QuickJSContext;
 
-public class Console {
+public class Console implements QuickJSContext.Console {
 
-    private final String TAG = "quickjs";
+    private static final String TAG = "quickjs";
 
-    @Keep
-    @JSMethod
-    public void debug(Object array) {
-        Logger.t(TAG).d(String.valueOf(array));
+    @Override
+    public void log(String info) {
+        Logger.t(TAG).d(info);
     }
 
-    @Keep
-    @JSMethod
-    public void error(Object array) {
-        Logger.t(TAG).e(String.valueOf(array));
+    @Override
+    public void info(String info) {
+        Logger.t(TAG).i(info);
     }
 
-    @Keep
-    @JSMethod
-    public void warn(Object array) {
-        Logger.t(TAG).w(String.valueOf(array));
+    @Override
+    public void warn(String info) {
+        Logger.t(TAG).w(info);
     }
 
-    @Keep
-    @JSMethod
-    public void info(Object array) {
-        Logger.t(TAG).i(String.valueOf(array));
-    }
-
-    @Keep
-    @JSMethod
-    public void log(Object array) {
-        Logger.t(TAG).v(String.valueOf(array));
+    @Override
+    public void error(String info) {
+        Logger.t(TAG).e(info);
     }
 }

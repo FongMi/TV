@@ -1,6 +1,9 @@
 package com.fongmi.android.tv;
 
 
+import android.content.Intent;
+import android.provider.Settings;
+
 import com.fongmi.android.tv.player.Players;
 import com.github.catvod.utils.Prefers;
 
@@ -28,6 +31,30 @@ public class Setting {
 
     public static void putKeep(String keep) {
         Prefers.put("keep", keep);
+    }
+
+    public static String getKeyword() {
+        return Prefers.getString("keyword");
+    }
+
+    public static void putKeyword(String keyword) {
+        Prefers.put("keyword", keyword);
+    }
+
+    public static String getHot() {
+        return Prefers.getString("hot");
+    }
+
+    public static void putHot(String hot) {
+        Prefers.put("hot", hot);
+    }
+
+    public static String getUa() {
+        return Prefers.getString("ua");
+    }
+
+    public static void putUa(String ua) {
+        Prefers.put("ua", ua);
     }
 
     public static int getWall() {
@@ -94,22 +121,6 @@ public class Setting {
         Prefers.put("size", size);
     }
 
-    public static String getKeyword() {
-        return Prefers.getString("keyword");
-    }
-
-    public static void putKeyword(String keyword) {
-        Prefers.put("keyword", keyword);
-    }
-
-    public static String getHot() {
-        return Prefers.getString("hot");
-    }
-
-    public static void putHot(String hot) {
-        Prefers.put("hot", hot);
-    }
-
     public static int getViewType(int viewType) {
         return Prefers.getInt("viewType", viewType);
     }
@@ -132,6 +143,54 @@ public class Setting {
 
     public static void putLiveScale(int scale) {
         Prefers.put("scale_live", scale);
+    }
+
+    public static int getSubtitle() {
+        return Math.max(Prefers.getInt("subtitle", 16), 14);
+    }
+
+    public static void putSubtitle(int subtitle) {
+        Prefers.put("subtitle", subtitle);
+    }
+
+    public static int getHttp() {
+        return Prefers.getInt("exo_http");
+    }
+
+    public static void putHttp(int http) {
+        Prefers.put("exo_http", http);
+    }
+
+    public static int getBuffer() {
+        return Math.min(Math.max(Prefers.getInt("exo_buffer"), 1), 15);
+    }
+
+    public static void putBuffer(int buffer) {
+        Prefers.put("exo_buffer", buffer);
+    }
+
+    public static int getFlag() {
+        return Prefers.getInt("flag");
+    }
+
+    public static void putFlag(int mode) {
+        Prefers.put("flag", mode);
+    }
+
+    public static int getBackground() {
+        return Prefers.getInt("background", 2);
+    }
+
+    public static void putBackground(int background) {
+        Prefers.put("background", background);
+    }
+
+    public static int getSiteMode() {
+        return Prefers.getInt("site_mode");
+    }
+
+    public static void putSiteMode(int mode) {
+        Prefers.put("site_mode", mode);
     }
 
     public static boolean isBootLive() {
@@ -182,20 +241,12 @@ public class Setting {
         Prefers.put("danmu", danmu);
     }
 
-    public static String getUa() {
-        return Prefers.getString("ua");
+    public static boolean isCaption() {
+        return Prefers.getBoolean("caption");
     }
 
-    public static void putUa(String ua) {
-        Prefers.put("ua", ua);
-    }
-
-    public static int getSubtitle() {
-        return Math.max(Prefers.getInt("subtitle", 16), 14);
-    }
-
-    public static void putSubtitle(int subtitle) {
-        Prefers.put("subtitle", subtitle);
+    public static void putCaption(boolean caption) {
+        Prefers.put("caption", caption);
     }
 
     public static boolean isTunnel() {
@@ -206,44 +257,12 @@ public class Setting {
         Prefers.put("exo_tunnel", tunnel);
     }
 
-    public static int getHttp() {
-        return Prefers.getInt("exo_http");
+    public static boolean isBackupAuto() {
+        return Prefers.getBoolean("backup_auto");
     }
 
-    public static void putHttp(int http) {
-        Prefers.put("exo_http", http);
-    }
-
-    public static int getBuffer() {
-        return Math.min(Math.max(Prefers.getInt("exo_buffer"), 1), 30);
-    }
-
-    public static void putBuffer(int buffer) {
-        Prefers.put("exo_buffer", buffer);
-    }
-
-    public static int getFlag() {
-        return Prefers.getInt("flag");
-    }
-
-    public static void putFlag(int mode) {
-        Prefers.put("flag", mode);
-    }
-
-    public static int getBackground() {
-        return Prefers.getInt("background", 2);
-    }
-
-    public static void putBackground(int background) {
-        Prefers.put("background", background);
-    }
-
-    public static int getSiteMode() {
-        return Prefers.getInt("site_mode");
-    }
-
-    public static void putSiteMode(int mode) {
-        Prefers.put("site_mode", mode);
+    public static void putBackupAuto(boolean auto) {
+        Prefers.put("backup_auto", auto);
     }
 
     public static float getThumbnail() {
@@ -260,5 +279,9 @@ public class Setting {
 
     public static boolean isBackgroundPiP() {
         return getBackground() == 2;
+    }
+
+    public static boolean hasCaption() {
+        return new Intent(Settings.ACTION_CAPTIONING_SETTINGS).resolveActivity(App.get().getPackageManager()) != null;
     }
 }

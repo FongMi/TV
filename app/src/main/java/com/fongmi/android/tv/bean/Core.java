@@ -6,7 +6,7 @@ import android.text.TextUtils;
 
 import androidx.annotation.Nullable;
 
-import com.fongmi.android.tv.utils.Utils;
+import com.fongmi.android.tv.utils.UrlUtil;
 import com.fongmi.hook.PackageManager;
 import com.google.gson.annotations.SerializedName;
 
@@ -30,7 +30,7 @@ public class Core extends PackageManager {
     private String so;
 
     public String getAuth() {
-        return TextUtils.isEmpty(auth) ? "" : Utils.convert(auth);
+        return TextUtils.isEmpty(auth) ? "" : UrlUtil.convert(auth);
     }
 
     public String getName() {

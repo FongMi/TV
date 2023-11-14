@@ -155,8 +155,8 @@ public class LiveConfig {
     }
 
     private void bootLive() {
-        LiveActivity.start(App.activity());
         Setting.putBootLive(false);
+        LiveActivity.start(App.get());
     }
 
     public void parse(JsonObject object) {

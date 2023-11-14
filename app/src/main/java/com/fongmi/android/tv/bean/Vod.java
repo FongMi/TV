@@ -79,6 +79,15 @@ public class Vod implements Parcelable {
     @SerializedName("style")
     private Style style;
 
+    @SerializedName("land")
+    private int land;
+
+    @SerializedName("circle")
+    private int circle;
+
+    @SerializedName("ratio")
+    private float ratio;
+
     @Path("dl")
     @ElementList(entry = "dd", required = false, inline = true)
     private List<Flag> vodFlags;
@@ -86,7 +95,8 @@ public class Vod implements Parcelable {
     private Site site;
 
     public static List<Vod> arrayFrom(String str) {
-        Type listType = new TypeToken<List<Vod>>() {}.getType();
+        Type listType = new TypeToken<List<Vod>>() {
+        }.getType();
         List<Vod> items = App.gson().fromJson(str, listType);
         return items == null ? Collections.emptyList() : items;
     }
@@ -163,7 +173,19 @@ public class Vod implements Parcelable {
     }
 
     public Style getStyle() {
-        return style;
+        return style != null ? style : Style.get(getLand(), getCircle(), getRatio());
+    }
+
+    public int getLand() {
+        return land;
+    }
+
+    public int getCircle() {
+        return circle;
+    }
+
+    public float getRatio() {
+        return ratio;
     }
 
     public List<Flag> getVodFlags() {
@@ -215,7 +237,7 @@ public class Vod implements Parcelable {
     }
 
     public Style getStyle(Style style) {
-        return getStyle() == null ? style : getStyle();
+        return getStyle() != null ? getStyle() : style != null ? style : Style.rect();
     }
 
     public String getVodPic(String pic) {
@@ -282,6 +304,9 @@ public class Vod implements Parcelable {
         dest.writeString(this.vodPlayFrom);
         dest.writeString(this.vodPlayUrl);
         dest.writeString(this.vodTag);
+        dest.writeInt(this.land);
+        dest.writeInt(this.circle);
+        dest.writeFloat(this.ratio);
         dest.writeParcelable(this.cate, flags);
         dest.writeParcelable(this.style, flags);
         dest.writeTypedList(this.vodFlags);
@@ -302,6 +327,9 @@ public class Vod implements Parcelable {
         this.vodPlayFrom = in.readString();
         this.vodPlayUrl = in.readString();
         this.vodTag = in.readString();
+        this.land = in.readInt();
+        this.circle = in.readInt();
+        this.ratio = in.readFloat();
         this.cate = in.readParcelable(Cate.class.getClassLoader());
         this.style = in.readParcelable(Style.class.getClassLoader());
         this.vodFlags = in.createTypedArrayList(Flag.CREATOR);

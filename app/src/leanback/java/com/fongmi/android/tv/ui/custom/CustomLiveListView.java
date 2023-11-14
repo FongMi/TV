@@ -10,7 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.leanback.widget.VerticalGridView;
 
 import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.utils.Utils;
+import com.fongmi.android.tv.utils.KeyUtil;
 
 public class CustomLiveListView extends VerticalGridView {
 
@@ -50,8 +50,8 @@ public class CustomLiveListView extends VerticalGridView {
     public boolean dispatchKeyEvent(@NonNull KeyEvent event) {
         if (getVisibility() == View.GONE || event.getAction() != KeyEvent.ACTION_DOWN) return super.dispatchKeyEvent(event);
         if (getVisibility() == View.VISIBLE) listener.setUITimer();
-        if (Utils.isDownKey(event)) return onKeyDown();
-        if (Utils.isUpKey(event)) return onKeyUp();
+        if (KeyUtil.isDownKey(event)) return onKeyDown();
+        if (KeyUtil.isUpKey(event)) return onKeyUp();
         return super.dispatchKeyEvent(event);
     }
 

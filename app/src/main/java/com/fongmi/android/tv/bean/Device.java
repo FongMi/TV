@@ -11,7 +11,8 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.server.Server;
-import com.github.catvod.utils.Util;
+import com.fongmi.android.tv.utils.UrlUtil;
+import com.fongmi.android.tv.utils.Util;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
@@ -101,7 +102,7 @@ public class Device {
     }
 
     public String getHost() {
-        return isDLNA() ? getUuid() : Util.host(getIp());
+        return isDLNA() ? getUuid() : UrlUtil.host(getIp());
     }
 
     public Device save() {

@@ -23,7 +23,7 @@ android {
         leanback {
             dimension "default"
             versionCode 207
-            versionName "2.0.7"
+            versionName "20231114#2"
         }
     }
 
@@ -90,20 +90,28 @@ dependencies {
     implementation 'androidx.biometric:biometric:1.1.0'
     implementation 'androidx.leanback:leanback:1.2.0-alpha03'
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.6.2'
-    implementation 'androidx.room:room-runtime:2.5.2'
+    implementation 'androidx.room:room-runtime:2.6.0
     implementation 'cat.ereza:customactivityoncrash:2.4.0'
     implementation 'com.github.bassaer:materialdesigncolors:1.0.0'
     implementation 'com.github.bumptech.glide:glide:4.15.1'
     implementation 'com.github.bumptech.glide:annotations:4.15.1'
     implementation 'com.github.bumptech.glide:okhttp3-integration:4.15.1'
+    implementation 'com.github.jahirfiquitiva:TextDrawable:1.0.3'
     implementation 'com.github.TeamNewPipe:NewPipeExtractor:289db1178ab66694c23893e6a487d4708343c47b'
-    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'com.google.android.material:material:1.10.0'
     implementation 'com.google.zxing:core:3.3.0'
     implementation 'com.guolindev.permissionx:permissionx:1.7.1'
     implementation 'me.jessyan:autosize:1.2.1'
+    implementation 'org.eclipse.jetty:jetty-client:8.1.21.v20160908'
+    implementation 'org.eclipse.jetty:jetty-server:8.1.21.v20160908'
+    implementation 'org.eclipse.jetty:jetty-servlet:8.1.21.v20160908'
+    implementation 'org.fourthline.cling:cling-core:2.1.1'
+    implementation 'org.fourthline.cling:cling-support:2.1.1'
     implementation 'org.greenrobot:eventbus:3.3.1'
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
     implementation('org.simpleframework:simple-xml:2.7.1') { exclude group: 'stax', module: 'stax-api' exclude group: 'xpp3', module: 'xpp3' }
-    annotationProcessor 'androidx.room:room-compiler:2.5.2'
+	implementation(ext: 'aar', name: 'dlna-core', group: 'fongmi', version: 'release')
+    implementation(ext: 'aar', name: 'dlna-dmr', group: 'fongmi', version: 'release')
+    annotationProcessor 'androidx.room:room-compiler:2.6.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.15.1'
 }

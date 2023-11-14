@@ -56,9 +56,14 @@ public class Group {
     public Group(String name, boolean pass) {
         this.name = name;
         this.position = -1;
-        if (!name.contains("_")) return;
-        setName(name.split("_")[0]);
-        setPass(pass ? "" : name.split("_")[1]);
+        if (name.contains("_")) parse(pass);
+    }
+
+    private void parse(boolean pass) {
+        String[] splits = name.split("_");
+        setName(splits[0]);
+        if (pass || splits.length == 1) return;
+        setPass(splits[1]);
     }
 
     public List<Channel> getChannel() {
