@@ -18,6 +18,7 @@ import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.databinding.ActivitySettingBinding;
+import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.impl.ConfigCallback;
@@ -27,19 +28,18 @@ import com.fongmi.android.tv.impl.ProxyCallback;
 import com.fongmi.android.tv.impl.SiteCallback;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.ui.base.BaseActivity;
-import com.fongmi.android.tv.ui.custom.dialog.ConfigDialog;
-import com.fongmi.android.tv.ui.custom.dialog.DohDialog;
-import com.fongmi.android.tv.ui.custom.dialog.HistoryDialog;
-import com.fongmi.android.tv.ui.custom.dialog.LiveDialog;
-import com.fongmi.android.tv.ui.custom.dialog.ProxyDialog;
-import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
+import com.fongmi.android.tv.ui.dialog.ConfigDialog;
+import com.fongmi.android.tv.ui.dialog.DohDialog;
+import com.fongmi.android.tv.ui.dialog.HistoryDialog;
+import com.fongmi.android.tv.ui.dialog.LiveDialog;
+import com.fongmi.android.tv.ui.dialog.ProxyDialog;
+import com.fongmi.android.tv.ui.dialog.SiteDialog;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
-import com.fongmi.android.tv.utils.Utils;
+import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.bean.Doh;
 import com.github.catvod.net.OkHttp;
-import com.github.catvod.utils.Util;
 import com.permissionx.guolindev.PermissionX;
 
 import java.util.ArrayList;
@@ -80,9 +80,10 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.vodUrl.setText(ApiConfig.getDesc());
         mBinding.liveUrl.setText(LiveConfig.getDesc());
         mBinding.wallUrl.setText(WallConfig.getDesc());
+        mBinding.backupText.setText(AppDatabase.getDate());
         mBinding.dohText.setText(getDohList()[getDohIndex()]);
         mBinding.versionText.setText(BuildConfig.VERSION_NAME);
-        mBinding.proxyText.setText(Util.scheme(Setting.getProxy()));
+        mBinding.proxyText.setText(UrlUtil.scheme(Setting.getProxy()));
         mBinding.sizeText.setText((size = ResUtil.getStringArray(R.array.select_size))[Setting.getSize()]);
         mBinding.scaleText.setText((scale = ResUtil.getStringArray(R.array.select_scale))[Setting.getScale()]);
         mBinding.playerText.setText((player = ResUtil.getStringArray(R.array.select_player))[Setting.getPlayer()]);
@@ -108,9 +109,13 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.wall.setOnClickListener(this::onWall);
         mBinding.proxy.setOnClickListener(this::onProxy);
         mBinding.cache.setOnClickListener(this::onCache);
+        mBinding.backup.setOnClickListener(this::onBackup);
         mBinding.version.setOnClickListener(this::onVersion);
+        mBinding.vod.setOnLongClickListener(this::onVodEdit);
         mBinding.vodHome.setOnClickListener(this::onVodHome);
+        mBinding.live.setOnLongClickListener(this::onLiveEdit);
         mBinding.liveHome.setOnClickListener(this::onLiveHome);
+        mBinding.backup.setOnLongClickListener(this::onBackupAuto);
         mBinding.vodHistory.setOnClickListener(this::onVodHistory);
         mBinding.version.setOnLongClickListener(this::onVersionDev);
         mBinding.liveHistory.setOnClickListener(this::onLiveHistory);
@@ -128,7 +133,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
 
     @Override
     public void setConfig(Config config) {
-        if (config.getUrl().startsWith("file") && !Utils.hasPermission(this)) {
+        if (config.getUrl().startsWith("file") && !PermissionX.isGranted(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             PermissionX.init(this).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> load(config));
         } else {
             load(config);
@@ -219,6 +224,16 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
 
     private void onWall(View view) {
         ConfigDialog.create(this).type(type = 2).show();
+    }
+
+    private boolean onVodEdit(View view) {
+        ConfigDialog.create(this).type(type = 0).edit().show();
+        return true;
+    }
+
+    private boolean onLiveEdit(View view) {
+        ConfigDialog.create(this).type(type = 1).edit().show();
+        return true;
     }
 
     private void onVodHome(View view) {
@@ -328,7 +343,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         OkHttp.get().setProxy(proxy);
         Notify.progress(getActivity());
         ApiConfig.load(Config.vod(), getCallback());
-        mBinding.proxyText.setText(Util.scheme(proxy));
+        mBinding.proxyText.setText(UrlUtil.scheme(proxy));
     }
 
     private void onCache(View view) {
@@ -338,5 +353,20 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
                 setCacheText();
             }
         });
+    }
+
+    private void onBackup(View view) {
+        PermissionX.init(this).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> AppDatabase.backup(new Callback() {
+            @Override
+            public void success() {
+                mBinding.backupText.setText(AppDatabase.getDate());
+            }
+        }));
+    }
+
+    private boolean onBackupAuto(View view) {
+        Setting.putBackupAuto(!Setting.isBackupAuto());
+        mBinding.backupText.setText(AppDatabase.getDate());
+        return true;
     }
 }

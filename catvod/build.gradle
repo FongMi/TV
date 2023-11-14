@@ -17,11 +17,9 @@ dependencies {
     api 'androidx.preference:preference:1.2.1'
     api('com.github.thegrizzlylabs:sardine-android:0.8') { exclude group: 'com.squareup.okhttp3', module: 'okhttp' }
     api 'com.google.code.gson:gson:' + gsonVersion
-    api 'com.google.net.cronet:cronet-okhttp:0.1.0'
     api 'com.hierynomus:smbj:0.11.5'
     api 'com.orhanobut:logger:2.2.0'
     api 'com.squareup.okhttp3:okhttp:' + okhttpVersion
     api 'com.squareup.okhttp3:okhttp-dnsoverhttps:' + okhttpVersion
-    api 'org.chromium.net:cronet-embedded:101.4951.41'
     api 'org.jsoup:jsoup:' + jsoupVersion
 }

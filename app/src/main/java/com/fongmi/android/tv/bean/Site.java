@@ -13,7 +13,6 @@ import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.gson.ExtAdapter;
 import com.github.catvod.utils.Json;
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
@@ -23,7 +22,7 @@ import java.util.List;
 
 import okhttp3.Headers;
 
-@Entity(ignoredColumns = {"api", "ext", "jar", "type", "playUrl", "timeout", "playerType", "categories", "header", "style"})
+@Entity(ignoredColumns = {"api", "ext", "jar", "playUrl", "type", "timeout", "playerType", "categories", "header", "style", "activated"})
 public class Site implements Parcelable {
 
     @NonNull
@@ -49,8 +48,6 @@ public class Site implements Parcelable {
     private Integer playerType;
     @SerializedName("searchable")
     private Integer searchable;
-    @SerializedName("filterable")
-    private Integer filterable;
     @SerializedName("changeable")
     private Integer changeable;
     @SerializedName("recordable")
@@ -152,14 +149,6 @@ public class Site implements Parcelable {
         this.searchable = searchable;
     }
 
-    public Integer getFilterable() {
-        return filterable == null ? 1 : filterable;
-    }
-
-    public void setFilterable(Integer filterable) {
-        this.filterable = filterable;
-    }
-
     public Integer getChangeable() {
         return changeable == null ? 1 : changeable;
     }
@@ -185,7 +174,11 @@ public class Site implements Parcelable {
     }
 
     public Style getStyle() {
-        return style == null ? Style.rect() : style;
+        return style;
+    }
+
+    public Style getStyle(Style style) {
+        return getStyle() != null ? getStyle() : style != null ? style : Style.rect();
     }
 
     public boolean isActivated() {
@@ -277,7 +270,6 @@ public class Site implements Parcelable {
         dest.writeValue(this.timeout);
         dest.writeValue(this.playerType);
         dest.writeValue(this.searchable);
-        dest.writeValue(this.filterable);
         dest.writeValue(this.changeable);
         dest.writeValue(this.recordable);
         dest.writeStringList(this.categories);
@@ -296,7 +288,6 @@ public class Site implements Parcelable {
         this.timeout = (Integer) in.readValue(Integer.class.getClassLoader());
         this.playerType = (Integer) in.readValue(Integer.class.getClassLoader());
         this.searchable = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.filterable = (Integer) in.readValue(Integer.class.getClassLoader());
         this.changeable = (Integer) in.readValue(Integer.class.getClassLoader());
         this.recordable = (Integer) in.readValue(Integer.class.getClassLoader());
         this.categories = in.createStringArrayList();

@@ -13,8 +13,9 @@ import androidx.annotation.NonNull;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
+import com.fongmi.android.tv.utils.KeyUtil;
 import com.fongmi.android.tv.utils.ResUtil;
-import com.fongmi.android.tv.utils.Utils;
+import com.fongmi.android.tv.utils.Util;
 
 public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
 
@@ -56,7 +57,7 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
     }
 
     public boolean hasEvent(KeyEvent event) {
-        return Utils.isEnterKey(event) || Utils.isUpKey(event) || Utils.isDownKey(event) || Utils.isLeftKey(event) || Utils.isRightKey(event);
+        return KeyUtil.isEnterKey(event) || KeyUtil.isUpKey(event) || KeyUtil.isDownKey(event) || KeyUtil.isLeftKey(event) || KeyUtil.isRightKey(event);
     }
 
     public boolean onKeyDown(KeyEvent event) {
@@ -65,21 +66,21 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
     }
 
     private void check(KeyEvent event) {
-        if (event.getAction() == KeyEvent.ACTION_DOWN && Utils.isLeftKey(event)) {
+        if (event.getAction() == KeyEvent.ACTION_DOWN && KeyUtil.isLeftKey(event)) {
             listener.onSeeking(subTime());
-        } else if (event.getAction() == KeyEvent.ACTION_DOWN && Utils.isRightKey(event)) {
+        } else if (event.getAction() == KeyEvent.ACTION_DOWN && KeyUtil.isRightKey(event)) {
             listener.onSeeking(addTime());
-        } else if (event.getAction() == KeyEvent.ACTION_UP && (Utils.isLeftKey(event) || Utils.isRightKey(event))) {
+        } else if (event.getAction() == KeyEvent.ACTION_UP && (KeyUtil.isLeftKey(event) || KeyUtil.isRightKey(event))) {
             App.post(() -> listener.onSeekTo(holdTime), 250);
-        } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isUpKey(event)) {
+        } else if (event.getAction() == KeyEvent.ACTION_UP && KeyUtil.isUpKey(event)) {
             if (changeSpeed) listener.onSpeedEnd();
             else listener.onKeyUp();
             changeSpeed = false;
-        } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isDownKey(event)) {
+        } else if (event.getAction() == KeyEvent.ACTION_UP && KeyUtil.isDownKey(event)) {
             listener.onKeyDown();
-        } else if (event.getAction() == KeyEvent.ACTION_UP && Utils.isEnterKey(event)) {
+        } else if (event.getAction() == KeyEvent.ACTION_UP && KeyUtil.isEnterKey(event)) {
             listener.onKeyCenter();
-        } else if (event.isLongPress() && Utils.isUpKey(event)) {
+        } else if (event.isLongPress() && KeyUtil.isUpKey(event)) {
             listener.onSpeedUp();
             changeSpeed = true;
         }
@@ -89,7 +90,7 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
     public boolean onDown(@NonNull MotionEvent e) {
         if (!full) return false;
         volume = manager.getStreamVolume(AudioManager.STREAM_MUSIC);
-        bright = Utils.getBrightness(activity);
+        bright = Util.getBrightness(activity);
         changeBright = false;
         changeVolume = false;
         touch = true;

@@ -47,7 +47,7 @@ public class ValueAdapter extends RecyclerView.Adapter<ValueAdapter.ViewHolder> 
     private void onItemClick(Value value) {
         for (Value item : mItems) item.setActivated(value);
         notifyItemRangeChanged(0, getItemCount());
-        mListener.setFilter(mKey, value.getV());
+        mListener.setFilter(mKey, value);
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {

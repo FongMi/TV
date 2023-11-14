@@ -14,6 +14,9 @@ import com.github.catvod.utils.Path;
 import java.io.File;
 import java.net.URLConnection;
 import java.text.DecimalFormat;
+import java.util.Enumeration;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 public class FileUtil {
 
@@ -27,6 +30,20 @@ public class FileUtil {
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         intent.setDataAndType(getShareUri(file), FileUtil.getMimeType(file.getName()));
         App.get().startActivity(intent);
+    }
+
+    public static void unzip(File target, File path) {
+        try (ZipFile zip = new ZipFile(target)) {
+            Enumeration<?> entries = zip.entries();
+            while (entries.hasMoreElements()) {
+                ZipEntry entry = (ZipEntry) entries.nextElement();
+                File out = new File(path, entry.getName());
+                if (entry.isDirectory()) out.mkdirs();
+                else Path.copy(zip.getInputStream(entry), out);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void clearCache(Callback callback) {

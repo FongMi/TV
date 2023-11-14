@@ -357,7 +357,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     @Override
     public int getAudioSessionId() {
-        return 0;
+        return mPlayer.getAudioSessionId();
     }
 
     public boolean haveTrack(int type) {

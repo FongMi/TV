@@ -10,7 +10,7 @@ import com.fongmi.android.tv.player.extractor.TVBus;
 import com.fongmi.android.tv.player.extractor.Thunder;
 import com.fongmi.android.tv.player.extractor.Youtube;
 import com.fongmi.android.tv.player.extractor.ZLive;
-import com.github.catvod.utils.Util;
+import com.fongmi.android.tv.utils.UrlUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,8 +40,8 @@ public class Source {
     }
 
     private Extractor getExtractor(String url) {
-        String host = Util.host(url);
-        String scheme = Util.scheme(url);
+        String host = UrlUtil.host(url);
+        String scheme = UrlUtil.scheme(url);
         for (Extractor extractor : extractors) if (extractor.match(scheme, host)) return extractor;
         return null;
     }

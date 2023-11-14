@@ -14,6 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import okhttp3.Headers;
+import okhttp3.Response;
 
 public class M3U8 {
 
@@ -25,14 +26,21 @@ public class M3U8 {
     private static final Pattern REGEX_MEDIA_DURATION = Pattern.compile(TAG_MEDIA_DURATION + ":([\\d\\.]+)\\b");
     private static final Pattern REGEX_URI = Pattern.compile("URI=\"(.+?)\"");
 
-    public static String get(String url, Map<String, String> headers) throws Exception {
-        String result = OkHttp.newCall(url, getHeader(headers)).execute().body().string();
-        Matcher matcher = Pattern.compile("#EXT-X-STREAM-INF(.*)\\n?(.*)").matcher(result);
-        if (matcher.find() && matcher.groupCount() > 1) return get(UriUtil.resolve(url, matcher.group(2)), headers);
-        StringBuilder sb = new StringBuilder();
-        for (String line : result.split("\n")) sb.append(shouldResolve(line) ? resolve(url, line) : line).append("\n");
-        List<String> ads = Sniffer.getRegex(Uri.parse(url));
-        return clean(sb.toString(), ads);
+    public static String get(String url, Map<String, String> headers) {
+        try {
+            Response response = OkHttp.newCall(url, getHeader(headers)).execute();
+            if (response.header(HttpHeaders.ACCEPT_RANGES) != null) return "";
+            String result = response.body().string();
+            Matcher matcher = Pattern.compile("#EXT-X-STREAM-INF(.*)\\n?(.*)").matcher(result);
+            if (matcher.find() && matcher.groupCount() > 1) return get(UriUtil.resolve(url, matcher.group(2)), headers);
+            StringBuilder sb = new StringBuilder();
+            for (String line : result.split("\n")) sb.append(shouldResolve(line) ? resolve(url, line) : line).append("\n");
+            List<String> ads = Sniffer.getRegex(Uri.parse(url));
+            return clean(sb.toString(), ads);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 
     private static String clean(String line, List<String> ads) {
@@ -48,10 +56,10 @@ public class M3U8 {
         Matcher m1 = REGEX_X_DISCONTINUITY.matcher(line);
         while (m1.find()) {
             String group = m1.group();
-            BigDecimal t = BigDecimal.ZERO;;
+            BigDecimal t = BigDecimal.ZERO;
             Matcher m2 = REGEX_MEDIA_DURATION.matcher(group);
             while (m2.find()) t = t.add(new BigDecimal(m2.group(1)));
-            for (String ad : ads) if (t.toString().startsWith(ad)) line = line.replaceAll(group, "");
+            for (String ad : ads) if (t.toString().startsWith(ad)) line = line.replace(group, "");
         }
         return line;
     }
@@ -59,6 +67,7 @@ public class M3U8 {
     private static Headers getHeader(Map<String, String> headers) {
         Headers.Builder builder = new Headers.Builder();
         for (Map.Entry<String, String> header : headers.entrySet()) if (header.getKey().equalsIgnoreCase(HttpHeaders.USER_AGENT) || header.getKey().equalsIgnoreCase(HttpHeaders.REFERER)) builder.add(header.getKey(), header.getValue());
+        builder.add(HttpHeaders.RANGE, "bytes=0-");
         return builder.build();
     }
 

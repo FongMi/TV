@@ -5,7 +5,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
-import javax.annotation.Nonnull;
+import androidx.annotation.NonNull;
 
 import master.flame.danmaku.controller.IDanmakuView;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
@@ -28,7 +28,7 @@ public class DanmakuTouchHelper {
         this.mDanmakuBounds = new RectF();
         this.mTouchDelegate = new GestureDetector(((View) danmakuView).getContext(), new GestureDetector.SimpleOnGestureListener() {
             @Override
-            public boolean onDown(@Nonnull MotionEvent event) {
+            public boolean onDown(@NonNull MotionEvent event) {
                 IDanmakuView.OnDanmakuClickListener onDanmakuClickListener = danmakuView.getOnDanmakuClickListener();
                 if (onDanmakuClickListener != null) {
                     mXOff = danmakuView.getXOff();
@@ -39,7 +39,7 @@ public class DanmakuTouchHelper {
             }
 
             @Override
-            public boolean onSingleTapConfirmed(@Nonnull MotionEvent event) {
+            public boolean onSingleTapConfirmed(@NonNull MotionEvent event) {
                 IDanmakus clickDanmakus = touchHitDanmaku(event.getX(), event.getY());
                 boolean isEventConsumed = false;
                 if (!clickDanmakus.isEmpty()) {
@@ -52,7 +52,7 @@ public class DanmakuTouchHelper {
             }
 
             @Override
-            public void onLongPress(@Nonnull MotionEvent event) {
+            public void onLongPress(@NonNull MotionEvent event) {
                 IDanmakuView.OnDanmakuClickListener onDanmakuClickListener = danmakuView.getOnDanmakuClickListener();
                 if (onDanmakuClickListener == null) return;
                 mXOff = danmakuView.getXOff();

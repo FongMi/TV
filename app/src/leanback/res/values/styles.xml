@@ -19,7 +19,7 @@
         <item name="android:background">@drawable/shape_bottom_sheet</item>
     </style>
 
-    <style name="BottomSheetDialog" parent="Theme.MaterialComponents.DayNight.BottomSheetDialog">
+    <style name="BottomSheetDialog" parent="Theme.MaterialComponents.Light.BottomSheetDialog">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primaryDark</item>
         <item name="colorAccent">@color/accent</item>

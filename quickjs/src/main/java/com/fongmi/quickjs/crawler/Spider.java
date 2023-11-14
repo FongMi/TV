@@ -143,10 +143,10 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
     private void createCtx() {
         ctx = QuickJSContext.create();
+        ctx.setConsole(new Console());
         ctx.evaluate(Path.asset("js/lib/http.js"));
         Global.create(ctx, executor).setProperty();
         ctx.getGlobalObject().setProperty("local", Local.class);
-        ctx.getGlobalObject().setProperty("console", Console.class);
         ctx.setModuleLoader(new QuickJSContext.BytecodeModuleLoader() {
             @Override
             public String moduleNormalizeName(String baseModuleName, String moduleName) {
@@ -209,13 +209,11 @@ public class Spider extends com.github.catvod.crawler.Spider {
         String spider = "__JS_SPIDER__";
         String global = "globalThis." + spider;
         String content = Module.get().fetch(api);
+        if (content.startsWith("//bb")) ctx.execute(Module.get().bb(content));
+        else ctx.evaluateModule(content.replace(spider, global), api);
+        ctx.evaluateModule(String.format(Path.asset("js/lib/spider.js"), api));
         if (content.startsWith("//bb") || content.contains(jsEval)) cat = true;
-        if (content.startsWith("//bb")) ctx.execute(Module.get().bb(content), spider, jsEval);
-        else if (content.contains(jsEval)) ctx.evaluateModule(content, api, jsEval);
-        else if (content.contains(spider)) ctx.evaluateModule(content.replace(spider, global), api);
-        else ctx.evaluateModule(content.replaceAll("export default.*?[{]", global + " = {"), api);
         jsObject = (JSObject) ctx.getProperty(ctx.getGlobalObject(), spider);
-        if (cat) ctx.evaluate("req = http");
     }
 
     private JSObject cfg(String ext) {

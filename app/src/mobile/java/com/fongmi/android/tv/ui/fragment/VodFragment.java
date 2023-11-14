@@ -22,6 +22,7 @@ import com.fongmi.android.tv.bean.Class;
 import com.fongmi.android.tv.bean.Hot;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
+import com.fongmi.android.tv.bean.Value;
 import com.fongmi.android.tv.databinding.FragmentVodBinding;
 import com.fongmi.android.tv.event.CastEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
@@ -35,10 +36,10 @@ import com.fongmi.android.tv.ui.activity.KeepActivity;
 import com.fongmi.android.tv.ui.activity.VideoActivity;
 import com.fongmi.android.tv.ui.adapter.TypeAdapter;
 import com.fongmi.android.tv.ui.base.BaseFragment;
-import com.fongmi.android.tv.ui.custom.dialog.FilterDialog;
-import com.fongmi.android.tv.ui.custom.dialog.LinkDialog;
-import com.fongmi.android.tv.ui.custom.dialog.ReceiveDialog;
-import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
+import com.fongmi.android.tv.ui.dialog.FilterDialog;
+import com.fongmi.android.tv.ui.dialog.LinkDialog;
+import com.fongmi.android.tv.ui.dialog.ReceiveDialog;
+import com.fongmi.android.tv.ui.dialog.SiteDialog;
 import com.fongmi.android.tv.utils.FileChooser;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Trans;
@@ -266,7 +267,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     }
 
     @Override
-    public void setFilter(String key, String value) {
+    public void setFilter(String key, Value value) {
         ((TypeFragment) getFragment()).setFilter(key, value);
     }
 
@@ -301,7 +302,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         @Override
         public Fragment getItem(int position) {
             Class type = mAdapter.get(position);
-            return TypeFragment.newInstance(getSite().getKey(), type.getTypeId(), type.getExtend(), type.getTypeFlag().equals("1"));
+            return TypeFragment.newInstance(getSite().getKey(), type.getTypeId(), type.getStyle(), type.getExtend(true), type.getTypeFlag().equals("1"));
         }
 
         @Override

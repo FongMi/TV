@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatTextView;
 
-import com.fongmi.android.tv.utils.Utils;
+import com.fongmi.android.tv.utils.KeyUtil;
 
 public class CustomUpDownView extends AppCompatTextView {
 
@@ -32,7 +32,7 @@ public class CustomUpDownView extends AppCompatTextView {
     }
 
     private boolean hasEvent(KeyEvent event) {
-        return event.getAction() == KeyEvent.ACTION_DOWN && (Utils.isUpKey(event) || Utils.isDownKey(event));
+        return event.getAction() == KeyEvent.ACTION_DOWN && (KeyUtil.isUpKey(event) || KeyUtil.isDownKey(event));
     }
 
     @Override
@@ -42,8 +42,8 @@ public class CustomUpDownView extends AppCompatTextView {
     }
 
     private boolean onKeyDown(KeyEvent event) {
-        if (Utils.isUpKey(event)) addListener.onAdd();
-        if (Utils.isDownKey(event)) subListener.onSud();
+        if (KeyUtil.isUpKey(event)) addListener.onAdd();
+        if (KeyUtil.isDownKey(event)) subListener.onSud();
         return true;
     }
 

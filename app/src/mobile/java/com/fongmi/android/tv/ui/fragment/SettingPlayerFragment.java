@@ -1,5 +1,7 @@
 package com.fongmi.android.tv.ui.fragment;
 
+import android.content.Intent;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,9 +19,9 @@ import com.fongmi.android.tv.impl.UaCallback;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.base.BaseFragment;
-import com.fongmi.android.tv.ui.custom.dialog.BufferDialog;
-import com.fongmi.android.tv.ui.custom.dialog.SubtitleDialog;
-import com.fongmi.android.tv.ui.custom.dialog.UaDialog;
+import com.fongmi.android.tv.ui.dialog.BufferDialog;
+import com.fongmi.android.tv.ui.dialog.SubtitleDialog;
+import com.fongmi.android.tv.ui.dialog.UaDialog;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -27,6 +29,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
 
     private FragmentSettingPlayerBinding mBinding;
     private String[] background;
+    private String[] caption;
     private String[] http;
     private String[] flag;
 
@@ -47,10 +50,12 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
     protected void initView() {
         mBinding.uaText.setText(Setting.getUa());
         mBinding.tunnelText.setText(getSwitch(Setting.isTunnel()));
+        mBinding.captionText.setText(getSwitch(Setting.isCaption()));
         mBinding.bufferText.setText(String.valueOf(Setting.getBuffer()));
         mBinding.subtitleText.setText(String.valueOf(Setting.getSubtitle()));
         mBinding.flagText.setText((flag = ResUtil.getStringArray(R.array.select_flag))[Setting.getFlag()]);
         mBinding.httpText.setText((http = ResUtil.getStringArray(R.array.select_exo_http))[Setting.getHttp()]);
+        mBinding.captionText.setText((caption = ResUtil.getStringArray(R.array.select_caption))[Setting.isCaption() ? 1 : 0]);
         mBinding.backgroundText.setText((background = ResUtil.getStringArray(R.array.select_background))[Setting.getBackground()]);
         setVisible();
     }
@@ -62,11 +67,14 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
         mBinding.flag.setOnClickListener(this::setFlag);
         mBinding.buffer.setOnClickListener(this::onBuffer);
         mBinding.tunnel.setOnClickListener(this::setTunnel);
+        mBinding.caption.setOnClickListener(this::setCaption);
         mBinding.subtitle.setOnClickListener(this::onSubtitle);
+        mBinding.caption.setOnLongClickListener(this::onCaption);
         mBinding.background.setOnClickListener(this::setBackground);
     }
 
     private void setVisible() {
+        mBinding.caption.setVisibility(Setting.hasCaption() ? View.VISIBLE : View.GONE);
         mBinding.http.setVisibility(Players.isExo(Setting.getPlayer()) ? View.VISIBLE : View.GONE);
         mBinding.buffer.setVisibility(Players.isExo(Setting.getPlayer()) ? View.VISIBLE : View.GONE);
         mBinding.tunnel.setVisibility(Players.isExo(Setting.getPlayer()) ? View.VISIBLE : View.GONE);
@@ -74,6 +82,12 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
 
     private void onUa(View view) {
         UaDialog.create(this).show();
+    }
+
+    @Override
+    public void setUa(String ua) {
+        mBinding.uaText.setText(ua);
+        Setting.putUa(ua);
     }
 
     private void setHttp(View view) {
@@ -89,31 +103,8 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
         mBinding.flagText.setText(flag[index]);
     }
 
-    private void setTunnel(View view) {
-        Setting.putTunnel(!Setting.isTunnel());
-        mBinding.tunnelText.setText(getSwitch(Setting.isTunnel()));
-    }
-
     private void onBuffer(View view) {
         BufferDialog.create(this).show();
-    }
-
-    private void onSubtitle(View view) {
-        SubtitleDialog.create(this).show();
-    }
-
-    private void setBackground(View view) {
-        new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.setting_player_background).setNegativeButton(R.string.dialog_negative, null).setSingleChoiceItems(background, Setting.getBackground(), (dialog, which) -> {
-            mBinding.backgroundText.setText(background[which]);
-            Setting.putBackground(which);
-            dialog.dismiss();
-        }).show();
-    }
-
-    @Override
-    public void setUa(String ua) {
-        mBinding.uaText.setText(ua);
-        Setting.putUa(ua);
     }
 
     @Override
@@ -122,10 +113,36 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
         Setting.putBuffer(times);
     }
 
+    private void setTunnel(View view) {
+        Setting.putTunnel(!Setting.isTunnel());
+        mBinding.tunnelText.setText(getSwitch(Setting.isTunnel()));
+    }
+
+    private void setCaption(View view) {
+        Setting.putCaption(!Setting.isCaption());
+        mBinding.captionText.setText(caption[Setting.isCaption() ? 1 : 0]);
+    }
+
+    private boolean onCaption(View view) {
+        if (Setting.isCaption()) startActivity(new Intent(Settings.ACTION_CAPTIONING_SETTINGS));
+        return Setting.isCaption();
+    }
+
+    private void onSubtitle(View view) {
+        SubtitleDialog.create(this).show();
+    }
+
     @Override
     public void setSubtitle(int size) {
         mBinding.subtitleText.setText(String.valueOf(size));
-        Setting.putSubtitle(size);
+    }
+
+    private void setBackground(View view) {
+        new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.setting_player_background).setNegativeButton(R.string.dialog_negative, null).setSingleChoiceItems(background, Setting.getBackground(), (dialog, which) -> {
+            mBinding.backgroundText.setText(background[which]);
+            Setting.putBackground(which);
+            dialog.dismiss();
+        }).show();
     }
 
     @Override

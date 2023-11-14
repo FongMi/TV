@@ -10,6 +10,7 @@ import com.fongmi.android.tv.server.process.Local;
 import com.fongmi.android.tv.server.process.Process;
 import com.fongmi.android.tv.utils.M3U8;
 import com.github.catvod.Init;
+import com.google.common.net.HttpHeaders;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -55,6 +56,13 @@ public class Nano extends NanoHTTPD {
         return newFixedLengthResponse(status, MIME_PLAINTEXT, text);
     }
 
+    public static Response redirect(String url, Map<String, String> headers) {
+        Response response = newFixedLengthResponse(Response.Status.REDIRECT, MIME_HTML, "");
+        for (Map.Entry<String, String> entry : headers.entrySet()) response.addHeader(entry.getKey(), entry.getValue());
+        response.addHeader(HttpHeaders.LOCATION, url);
+        return response;
+    }
+
     @Override
     public Response serve(IHTTPSession session) {
         String url = session.getUri().trim();
@@ -70,7 +78,7 @@ public class Nano extends NanoHTTPD {
         return getAssets(url.substring(1));
     }
 
-    private void parse(NanoHTTPD.IHTTPSession session, Map<String, String> files) {
+    private void parse(IHTTPSession session, Map<String, String> files) {
         String ct = session.getHeaders().get("content-type");
         if (ct != null && ct.toLowerCase().contains("multipart/form-data") && !ct.toLowerCase().contains("charset=")) {
             Matcher matcher = Pattern.compile("[ |\t]*(boundary[ |\t]*=[ |\t]*['|\"]?[^\"^'^;^,]*['|\"]?)", Pattern.CASE_INSENSITIVE).matcher(ct);
@@ -84,13 +92,10 @@ public class Nano extends NanoHTTPD {
     }
 
     private Response m3u8(IHTTPSession session) {
-        try {
-            String url = session.getParms().get("url");
-            String result = M3U8.get(url, session.getHeaders());
-            return newChunkedResponse(Response.Status.OK, MIME_PLAINTEXT, new ByteArrayInputStream(result.getBytes(StandardCharsets.UTF_8)));
-        } catch (Exception e) {
-            return error(e.getMessage());
-        }
+        String url = session.getParms().get("url");
+        String result = M3U8.get(url, session.getHeaders());
+        if (result.isEmpty()) return redirect(url, session.getHeaders());
+        return newChunkedResponse(Response.Status.OK, MIME_PLAINTEXT, new ByteArrayInputStream(result.getBytes(StandardCharsets.UTF_8)));
     }
 
     private Response proxy(Map<String, String> params) {

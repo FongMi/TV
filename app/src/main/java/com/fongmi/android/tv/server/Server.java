@@ -30,6 +30,10 @@ public class Server {
         this.port = 9978;
     }
 
+    public int getPort() {
+        return port;
+    }
+
     public String getAddress() {
         return getAddress(false);
     }
@@ -39,7 +43,7 @@ public class Server {
     }
 
     public String getAddress(boolean local) {
-        return "http://" + (local ? "127.0.0.1" : getIP()) + ":" + port;
+        return "http://" + (local ? "127.0.0.1" : getIP()) + ":" + getPort();
     }
 
     public void start() {

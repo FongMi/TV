@@ -10,9 +10,10 @@ import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.media.MediaMetadataCompat;
 import android.text.Html;
-import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.ClickableSpan;
@@ -25,7 +26,6 @@ import android.widget.TextView;
 import androidx.annotation.Dimension;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ShareCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Observer;
@@ -76,12 +76,11 @@ import com.fongmi.android.tv.ui.base.ViewType;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
 import com.fongmi.android.tv.ui.custom.CustomMovement;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
-import com.fongmi.android.tv.ui.custom.dialog.CastDialog;
-import com.fongmi.android.tv.ui.custom.dialog.ControlDialog;
-import com.fongmi.android.tv.ui.custom.dialog.EpisodeGridDialog;
-import com.fongmi.android.tv.ui.custom.dialog.EpisodeListDialog;
-import com.fongmi.android.tv.ui.custom.dialog.SubtitleDialog;
-import com.fongmi.android.tv.ui.custom.dialog.TrackDialog;
+import com.fongmi.android.tv.ui.dialog.CastDialog;
+import com.fongmi.android.tv.ui.dialog.ControlDialog;
+import com.fongmi.android.tv.ui.dialog.EpisodeGridDialog;
+import com.fongmi.android.tv.ui.dialog.EpisodeListDialog;
+import com.fongmi.android.tv.ui.dialog.TrackDialog;
 import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.ImgUtil;
@@ -90,11 +89,10 @@ import com.fongmi.android.tv.utils.PiP;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Sniffer;
 import com.fongmi.android.tv.utils.Traffic;
-import com.fongmi.android.tv.utils.Utils;
+import com.fongmi.android.tv.utils.Util;
 import com.github.bassaer.library.MDColor;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Trans;
-import com.github.catvod.utils.Util;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.permissionx.guolindev.PermissionX;
 
@@ -117,7 +115,7 @@ import master.flame.danmaku.danmaku.model.IDisplay;
 import master.flame.danmaku.danmaku.model.android.DanmakuContext;
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class VideoActivity extends BaseActivity implements Clock.Callback, CustomKeyDownVod.Listener, CastDialog.Listener, TrackDialog.Listener, ControlDialog.Listener, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, QualityAdapter.OnClickListener, QuickAdapter.OnClickListener, ParseAdapter.OnClickListener, SubtitleCallback {
+public class VideoActivity extends BaseActivity implements Clock.Callback, CustomKeyDownVod.Listener, TrackDialog.Listener, ControlDialog.Listener, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, QualityAdapter.OnClickListener, QuickAdapter.OnClickListener, ParseAdapter.OnClickListener, SubtitleCallback, CastDialog.Listener {
 
     private ActivityVideoBinding mBinding;
     private ViewGroup.LayoutParams mFrameParams;
@@ -155,7 +153,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private Runnable mR3;
     private Runnable mR4;
     private Clock mClock;
-    private String url;
     private PiP mPiP;
 
     public static void push(FragmentActivity activity, Uri uri) {
@@ -166,12 +163,15 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     public static void file(FragmentActivity activity, String path) {
         if (TextUtils.isEmpty(path)) return;
         String name = new File(path).getName();
-        if (Utils.hasPermission(activity)) start(activity, "push_agent", "file://" + path, name);
-        else PermissionX.init(activity).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> start(activity, "push_agent", "file://" + path, name));
+        PermissionX.init(activity).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> start(activity, "push_agent", "file://" + path, name));
     }
 
     public static void cast(Activity activity, History history) {
         start(activity, history.getSiteKey(), history.getVodId(), history.getVodName(), history.getVodPic());
+    }
+
+    public static void collect(Activity activity, String key, String id, String name, String pic) {
+        start(activity, key, id, name, pic, null, true);
     }
 
     public static void push(Activity activity, String url) {
@@ -179,15 +179,16 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     public static void start(Activity activity, String key, String id, String name) {
-        start(activity, key, id, name, null, null);
+        start(activity, key, id, name, null, null, false);
     }
 
     public static void start(Activity activity, String key, String id, String name, String pic) {
-        start(activity, key, id, name, pic, null);
+        start(activity, key, id, name, pic, null, false);
     }
 
-    public static void start(Activity activity, String key, String id, String name, String pic, String mark) {
-        Intent intent = new Intent(activity, VideoActivity.class);
+    public static void start(Activity activity, String key, String id, String name, String pic, String mark, boolean collect) {
+        Intent intent = new Intent(activity, VideoActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra("collect", collect);
         intent.putExtra("mark", mark);
         intent.putExtra("name", name);
         intent.putExtra("pic", pic);
@@ -253,7 +254,11 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private boolean isFromCollect() {
-        return getCallingActivity() != null && getCallingActivity().getShortClassName().contains(CollectActivity.class.getSimpleName());
+        return getIntent().getBooleanExtra("collect", false);
+    }
+
+    private boolean isAutoRotate() {
+        return Settings.System.getInt(getContentResolver(), Settings.System.ACCELEROMETER_ROTATION, 0) == 1;
     }
 
     private boolean isLand() {
@@ -333,6 +338,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mBinding.control.next.setOnClickListener(view -> checkNext());
         mBinding.control.prev.setOnClickListener(view -> checkPrev());
         mBinding.control.setting.setOnClickListener(view -> onSetting());
+        mBinding.control.share.setOnLongClickListener(view -> onChoose());
         mBinding.control.title.setOnLongClickListener(view -> onChange());
         mBinding.control.right.back.setOnClickListener(view -> onFull());
         mBinding.control.right.lock.setOnClickListener(view -> onLock());
@@ -349,7 +355,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mBinding.control.action.ending.setOnClickListener(view -> onEnding());
         mBinding.control.action.opening.setOnClickListener(view -> onOpening());
         mBinding.control.action.episodes.setOnClickListener(view -> onEpisodes());
-        mBinding.control.action.text.setOnLongClickListener(view -> onTextLong());
         mBinding.control.action.speed.setOnLongClickListener(view -> onSpeedLong());
         mBinding.control.action.reset.setOnLongClickListener(view -> onResetToggle());
         mBinding.control.action.ending.setOnLongClickListener(view -> onEndingReset());
@@ -386,8 +391,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         getExo().setVisibility(mPlayers.isExo() ? View.VISIBLE : View.GONE);
         getIjk().setVisibility(mPlayers.isIjk() ? View.VISIBLE : View.GONE);
         if (mControlDialog != null && mControlDialog.isVisible()) mControlDialog.updatePlayer();
-        mBinding.control.action.reset.setText(ResUtil.getStringArray(R.array.select_reset)[Setting.getReset()]);
-        mBinding.video.addOnLayoutChangeListener((view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> mPiP.update(getActivity(), view));
     }
 
     private void setDecodeView() {
@@ -399,6 +402,8 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         if (isPort() && ResUtil.isLand(this)) enterFullscreen();
         getExo().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
         getIjk().getSubtitleView().setStyle(ExoUtil.getCaptionStyle());
+        mBinding.control.action.reset.setText(ResUtil.getStringArray(R.array.select_reset)[Setting.getReset()]);
+        mBinding.video.addOnLayoutChangeListener((view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> mPiP.update(getActivity(), view));
         setSubtitle(14);
     }
 
@@ -438,7 +443,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     private void checkId() {
         if (getId().startsWith("push://")) getIntent().putExtra("key", "push_agent").putExtra("id", getId().substring(7));
-        if (getId().isEmpty() || getId().startsWith("msearch:")) setEmpty();
+        if (getId().isEmpty() || getId().startsWith("msearch:")) setEmpty(false);
         else getDetail();
     }
 
@@ -460,13 +465,13 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     private void setDetail(Result result) {
         mBinding.swipeLayout.setRefreshing(false);
-        if (result.getList().isEmpty()) setEmpty();
+        if (result.getList().isEmpty()) setEmpty(result.hasMsg());
         else setDetail(result.getList().get(0));
         Notify.show(result.getMsg());
     }
 
-    private void setEmpty() {
-        if (isFromCollect()) {
+    private void setEmpty(boolean finish) {
+        if (isFromCollect() || finish) {
             finish();
         } else if (getName().isEmpty()) {
             showEmpty();
@@ -511,34 +516,30 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         view.setTag(text);
     }
 
-    private SpannableString getSpan(int resId, String text) {
+    private SpannableStringBuilder getSpan(int resId, String text) {
         if (resId > 0) text = getString(resId, text);
         Map<String, String> map = new HashMap<>();
-        text = findClicker(text, map);
-        SpannableString span = new SpannableString(text);
+        Matcher m = Sniffer.CLICKER.matcher(text);
+        while (m.find()) {
+            String key = Trans.s2t(m.group(2)).trim();
+            text = text.replace(m.group(), key);
+            map.put(key, m.group(1));
+        }
+        SpannableStringBuilder span = new SpannableStringBuilder(text);
         for (String s : map.keySet()) {
             int index = text.indexOf(s);
-            span.setSpan(getClickableSpan(map.get(s)), index, index + s.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            Result result = Result.type(map.get(s));
+            span.setSpan(getClickSpan(result), index, index + s.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
         return span;
     }
 
-    private String findClicker(String text, Map<String, String> map) {
-        Matcher m = Sniffer.CLICKER.matcher(text);
-        while (m.find()) {
-            String val = m.group(1);
-            String key = Trans.s2t(m.group(2));
-            text = text.replace(m.group(), key);
-            map.put(key, val);
-        }
-        return text;
-    }
-
-    private ClickableSpan getClickableSpan(String json) {
+    private ClickableSpan getClickSpan(Result result) {
         return new ClickableSpan() {
             @Override
             public void onClick(@NonNull View view) {
-                FolderActivity.start(getActivity(), getKey(), Result.type(json));
+                FolderActivity.start(getActivity(), getKey(), result);
+                ((TextView) view).setMaxLines(Integer.MAX_VALUE);
                 setRedirect(true);
             }
         };
@@ -557,10 +558,10 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mBinding.control.title.setText(getString(R.string.detail_title, mBinding.name.getText(), episode.getName()));
         mViewModel.playerContent(getKey(), flag.getFlag(), episode.getUrl());
         updateHistory(episode, replay);
+        mPlayers.clean();
         showProgress();
         setMetadata();
         hidePreview();
-        setUrl(null);
     }
 
     private void setPlayer(Result result) {
@@ -692,7 +693,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private void onCast() {
-        CastDialog.create().history(mHistory).video(CastVideo.get(mBinding.name.getText().toString(), getUrl())).fm(true).show(this);
+        CastDialog.create().history(mHistory).video(CastVideo.get(mBinding.name.getText().toString(), mPlayers.getUrl())).fm(true).show(this);
     }
 
     private void onFull() {
@@ -710,10 +711,27 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private void onShare() {
-        ShareCompat.IntentBuilder builder = new ShareCompat.IntentBuilder(this).setType("text/plain").setText(getUrl());
-        builder.getIntent().putExtra("title", mBinding.control.title.getText());
-        builder.getIntent().putExtra("name", mBinding.control.title.getText());
-        builder.startChooser();
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_TEXT, mPlayers.getUrl());
+        intent.putExtra("name", mBinding.control.title.getText());
+        intent.putExtra("title", mBinding.control.title.getText());
+        startActivity(Util.getChooser(intent));
+        setRedirect(true);
+    }
+
+    private boolean onChoose() {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra("return_result", true);
+        intent.putExtra("headers", mPlayers.getHeaderArray());
+        intent.putExtra("position", (int) mPlayers.getPosition());
+        intent.putExtra("title", mBinding.control.title.getText());
+        intent.setDataAndType(Uri.parse(mPlayers.getUrl()), "video/*");
+        startActivityForResult(Util.getChooser(intent), 1001);
+        setRedirect(true);
+        return true;
     }
 
     private void onDanmu() {
@@ -729,9 +747,8 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     private void checkPlay() {
         setR1Callback();
-        checkPlayImg(!mPlayers.isPlaying());
-        if (mPlayers.isPlaying()) mPlayers.pause();
-        else mPlayers.play();
+        if (mPlayers.isPlaying()) onPaused();
+        else onPlay();
     }
 
     private void checkNext() {
@@ -779,12 +796,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private void onTrack(View view) {
         TrackDialog.create().player(mPlayers).type(Integer.parseInt(view.getTag().toString())).show(this);
         hideControl();
-    }
-
-    private boolean onTextLong() {
-        SubtitleDialog.create(this).show();
-        hideControl();
-        return true;
     }
 
     private void onLoop() {
@@ -913,7 +924,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mDanmakuContext.setScaleTextSize(1.0f);
         setRotate(mPlayers.isPortrait(), true);
         setSubtitle(Setting.getSubtitle());
-        Utils.hideSystemUI(this);
+        Util.hideSystemUI(this);
         App.post(mR3, 2000);
         hideControl();
     }
@@ -936,7 +947,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
             return ResUtil.isLand(this) ? ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
         } else if (isRotate()) {
             return ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT;
-        } else if (isPort() && Utils.isAutoRotate()) {
+        } else if (isPort() && isAutoRotate()) {
             return ActivityInfo.SCREEN_ORIENTATION_FULL_USER;
         } else {
             return ResUtil.isLand(this) ? ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT;
@@ -974,9 +985,9 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mBinding.control.right.back.setVisibility(isFullscreen() && !isLock() ? View.VISIBLE : View.GONE);
         mBinding.control.parse.setVisibility(isFullscreen() && isUseParse() ? View.VISIBLE : View.GONE);
         mBinding.control.action.getRoot().setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
+        mBinding.control.share.setVisibility(mPlayers.getUrl() == null ? View.GONE : View.VISIBLE);
+        mBinding.control.cast.setVisibility(mPlayers.getUrl() == null ? View.GONE : View.VISIBLE);
         mBinding.control.right.lock.setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
-        mBinding.control.share.setVisibility(getUrl() == null ? View.GONE : View.VISIBLE);
-        mBinding.control.cast.setVisibility(getUrl() == null ? View.GONE : View.VISIBLE);
         mBinding.control.center.setVisibility(isLock() ? View.GONE : View.VISIBLE);
         mBinding.control.bottom.setVisibility(isLock() ? View.GONE : View.VISIBLE);
         mBinding.control.top.setVisibility(isLock() ? View.GONE : View.VISIBLE);
@@ -1013,8 +1024,8 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private void setOrient() {
-        if (isPort() && Utils.isAutoRotate()) setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_USER);
-        if (isLand() && Utils.isAutoRotate()) setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE);
+        if (isPort() && isAutoRotate()) setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_FULL_USER);
+        if (isLand() && isAutoRotate()) setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE);
     }
 
     private void setR1Callback() {
@@ -1157,7 +1168,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
                 setPosition();
                 setInitTrack(true);
                 setTrackVisible(false);
-                setUrl(event.getUrl());
                 mClock.setCallback(this);
                 break;
             case Player.STATE_IDLE:
@@ -1205,7 +1215,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private void setTrackVisible(boolean visible) {
-        mBinding.control.action.text.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_TEXT) ? View.VISIBLE : View.GONE);
+        mBinding.control.action.text.setVisibility(visible && (mPlayers.haveTrack(C.TRACK_TYPE_TEXT) || mPlayers.isExo()) ? View.VISIBLE : View.GONE);
         mBinding.control.action.audio.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_AUDIO) ? View.VISIBLE : View.GONE);
         mBinding.control.action.video.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_VIDEO) ? View.VISIBLE : View.GONE);
         if (mControlDialog != null && mControlDialog.isVisible()) mControlDialog.setTrackVisible();
@@ -1338,8 +1348,9 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private boolean mismatch(Vod item) {
-        String keyword = mBinding.name.getText().toString();
+        if (getId().equals(item.getVodId())) return true;
         if (mBroken.contains(item.getVodId())) return true;
+        String keyword = mBinding.name.getText().toString();
         if (isAutoMode()) return !item.getVodName().equals(keyword);
         else return !item.getVodName().contains(keyword);
     }
@@ -1366,6 +1377,16 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         getDetail(item);
     }
 
+    private void onPaused() {
+        checkPlayImg(false);
+        mPlayers.pause();
+    }
+
+    private void onPlay() {
+        checkPlayImg(true);
+        mPlayers.play();
+    }
+
     public boolean isForeground() {
         return foreground;
     }
@@ -1379,7 +1400,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private void setFullscreen(boolean fullscreen) {
-        Utils.toggleFullscreen(this, this.fullscreen = fullscreen);
+        Util.toggleFullscreen(this, this.fullscreen = fullscreen);
     }
 
     private boolean isInitTrack() {
@@ -1455,14 +1476,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         this.lock = lock;
     }
 
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
     public int getToggleCount() {
         return toggleCount;
     }
@@ -1480,9 +1493,8 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     @Override
-    public void onCastTo() {
-        checkPlayImg(false);
-        mPlayers.pause();
+    public void onCasted() {
+        onPaused();
     }
 
     @Override
@@ -1551,8 +1563,8 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     public void onSeekEnd(int time) {
         mBinding.widget.seek.setVisibility(View.GONE);
         mPlayers.seekTo(time);
-        mPlayers.play();
         showProgress();
+        onPlay();
     }
 
     @Override
@@ -1566,12 +1578,18 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         if (!isFullscreen()) {
             App.post(this::enterFullscreen, 250);
         } else if (mPlayers.isPlaying()) {
-            mPlayers.pause();
             showControl();
+            onPaused();
         } else {
-            mPlayers.play();
             hideControl();
+            onPlay();
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) mPlayers.checkData(data);
     }
 
     @Override
@@ -1606,27 +1624,28 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         super.onConfigurationChanged(newConfig);
         if (isPort() && newConfig.orientation == 1 && !isRotate()) exitFullscreen();
         if (isPort() && newConfig.orientation == 2) enterFullscreen();
-        if (isFullscreen()) Utils.hideSystemUI(this);
+        if (isFullscreen()) Util.hideSystemUI(this);
     }
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        if (isFullscreen() && hasFocus) Utils.hideSystemUI(this);
+        if (isFullscreen() && hasFocus) Util.hideSystemUI(this);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         mClock.stop().start();
-        mPlayers.play();
         setStop(false);
+        onPlay();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         if (isForeground()) return;
+        if (isRedirect()) onPlay();
         App.removeCallbacks(mR0);
         App.post(mR0, 1000);
         setForeground(true);
@@ -1638,14 +1657,14 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         super.onPause();
         setForeground(false);
         App.removeCallbacks(mR0);
-        if (isRedirect()) mPlayers.pause();
+        if (isRedirect()) onPaused();
         else if (Setting.isBackgroundOn() && !isFinishing()) PlaybackService.start(mPlayers);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if (Setting.isBackgroundOff()) mPlayers.pause();
+        if (Setting.isBackgroundOff()) onPaused();
         if (Setting.isBackgroundOff()) mClock.stop();
         setStop(true);
     }
@@ -1658,7 +1677,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
             exitFullscreen();
         } else if (!isLock()) {
             stopSearch();
-            finish();
+            super.onBackPressed();
         }
     }
 

@@ -1,9 +1,11 @@
 package com.fongmi.android.tv.ui.activity;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
@@ -18,6 +20,7 @@ import com.fongmi.android.tv.api.LiveConfig;
 import com.fongmi.android.tv.api.WallConfig;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.databinding.ActivityMainBinding;
+import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.event.ServerEvent;
 import com.fongmi.android.tv.impl.Callback;
@@ -30,8 +33,9 @@ import com.fongmi.android.tv.ui.fragment.SettingPlayerFragment;
 import com.fongmi.android.tv.ui.fragment.VodFragment;
 import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.Notify;
-import com.github.catvod.utils.Util;
+import com.fongmi.android.tv.utils.UrlUtil;
 import com.google.android.material.navigation.NavigationBarView;
+import com.permissionx.guolindev.PermissionX;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -70,7 +74,7 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
         if (Intent.ACTION_SEND.equals(intent.getAction())) {
             VideoActivity.push(this, Uri.parse(intent.getStringExtra(Intent.EXTRA_TEXT)));
         } else if (Intent.ACTION_VIEW.equals(intent.getAction()) && intent.getData() != null) {
-            if ("text/plain".equals(intent.getType()) || Util.path(intent.getData()).endsWith(".m3u")) {
+            if ("text/plain".equals(intent.getType()) || UrlUtil.path(intent.getData()).endsWith(".m3u")) {
                 loadLive("file:/" + FileChooser.getPathFromUri(this, intent.getData()));
             } else {
                 VideoActivity.push(this, intent.getData());
@@ -108,11 +112,21 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
 
             @Override
             public void error(String msg) {
+                if (TextUtils.isEmpty(msg) && AppDatabase.getBackupKey().exists()) onRestore();
+                else RefreshEvent.empty();
                 RefreshEvent.config();
-                RefreshEvent.empty();
                 Notify.show(msg);
             }
         };
+    }
+
+    private void onRestore() {
+        PermissionX.init(this).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> AppDatabase.restore(new Callback() {
+            @Override
+            public void success() {
+                initConfig();
+            }
+        }));
     }
 
     private void loadLive(String url) {
@@ -191,6 +205,7 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
         WallConfig.get().clear();
         LiveConfig.get().clear();
         ApiConfig.get().clear();
+        AppDatabase.backup();
         Source.get().exit();
         Server.get().stop();
     }

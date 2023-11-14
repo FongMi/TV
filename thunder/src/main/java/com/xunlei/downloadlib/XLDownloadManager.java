@@ -49,7 +49,7 @@ public class XLDownloadManager {
     }
 
     private String getPeerId() {
-        String uuid = Prefers.getString("phoneId5", "");
+        String uuid = Prefers.getString("phoneId5");
         if (uuid.isEmpty()) Prefers.put("phoneId5", uuid = XLUtil.getPeerId());
         return uuid;
     }

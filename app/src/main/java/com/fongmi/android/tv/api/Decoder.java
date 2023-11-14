@@ -2,7 +2,7 @@ package com.fongmi.android.tv.api;
 
 import android.util.Base64;
 
-import com.fongmi.android.tv.utils.Utils;
+import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Json;
 import com.github.catvod.utils.Path;
@@ -32,7 +32,7 @@ public class Decoder {
     }
 
     private static String fix(String url, String data) {
-        if (url.startsWith("file")) url = Utils.convert(url);
+        if (url.startsWith("file")) url = UrlUtil.convert(url);
         data = data.replace("./", url.substring(0, url.lastIndexOf("/") + 1));
         return data;
     }

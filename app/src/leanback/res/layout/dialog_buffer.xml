@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:stepSize="1"
         android:valueFrom="1"
-        android:valueTo="30"
+        android:valueTo="15"
         app:thumbColor="@color/blue_500"
         app:trackColorActive="@color/blue_500"
         app:trackColorInactive="@color/blue_50" />

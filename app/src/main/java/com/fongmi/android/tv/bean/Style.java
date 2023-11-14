@@ -14,7 +14,7 @@ public class Style implements Parcelable {
     @SerializedName("type")
     private String type;
     @SerializedName("ratio")
-    private Float ratio;
+    private float ratio;
 
     public static Style rect() {
         return new Style("rect", 0.75f);
@@ -24,6 +24,12 @@ public class Style implements Parcelable {
         return new Style("list");
     }
 
+    public static Style get(int land, int circle, float ratio) {
+        if (land == 1) return new Style("rect", ratio == 0 ? 1.33f : ratio);
+        if (circle == 1) return new Style("oval", ratio == 0 ? 1.0f : ratio);
+        return null;
+    }
+
     public Style() {
     }
 
@@ -31,7 +37,7 @@ public class Style implements Parcelable {
         this.type = type;
     }
 
-    public Style(String type, Float ratio) {
+    public Style(String type, float ratio) {
         this.type = type;
         this.ratio = ratio;
     }
@@ -40,8 +46,8 @@ public class Style implements Parcelable {
         return TextUtils.isEmpty(type) ? "rect" : type;
     }
 
-    public Float getRatio() {
-        return ratio == null || ratio <= 0 ? (isOval() ? 1.0f : 0.75f) : Math.min(4, ratio);
+    public float getRatio() {
+        return ratio <= 0 ? (isOval() ? 1.0f : 0.75f) : Math.min(4, ratio);
     }
 
     public boolean isRect() {
@@ -76,7 +82,7 @@ public class Style implements Parcelable {
         if (this == obj) return true;
         if (!(obj instanceof Style)) return false;
         Style it = (Style) obj;
-        return getType().equals(it.getType()) && getRatio().equals(it.getRatio());
+        return getType().equals(it.getType()) && getRatio() == it.getRatio();
     }
 
     @Override
@@ -87,12 +93,12 @@ public class Style implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.type);
-        dest.writeValue(this.ratio);
+        dest.writeFloat(this.ratio);
     }
 
     protected Style(Parcel in) {
         this.type = in.readString();
-        this.ratio = (Float) in.readValue(Float.class.getClassLoader());
+        this.ratio = in.readFloat();
     }
 
     public static final Creator<Style> CREATOR = new Creator<>() {

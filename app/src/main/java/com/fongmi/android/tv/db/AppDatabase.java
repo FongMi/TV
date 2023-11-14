@@ -10,6 +10,7 @@ import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Device;
@@ -23,11 +24,20 @@ import com.fongmi.android.tv.db.dao.HistoryDao;
 import com.fongmi.android.tv.db.dao.KeepDao;
 import com.fongmi.android.tv.db.dao.SiteDao;
 import com.fongmi.android.tv.db.dao.TrackDao;
+import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.Util;
+import com.github.catvod.utils.Path;
+import com.github.catvod.utils.Prefers;
+
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 @Database(entities = {Keep.class, Site.class, Track.class, Config.class, Device.class, History.class}, version = AppDatabase.VERSION)
 public abstract class AppDatabase extends RoomDatabase {
 
-    public static final int VERSION = 25;
+    public static final int VERSION = 26;
+    public static final String NAME = "tv";
     public static final String SYMBOL = "@@@";
 
     private static volatile AppDatabase instance;
@@ -37,8 +47,50 @@ public abstract class AppDatabase extends RoomDatabase {
         return instance;
     }
 
+    public static String getDate() {
+        File db = new File(Path.tv(), NAME);
+        return Setting.isBackupAuto() ? ResUtil.getString(R.string.setting_backup_auto) : getBackupKey().exists() && db.exists() ? Util.format(new SimpleDateFormat("MMddHHmmss", Locale.getDefault()), db.lastModified()) : "";
+    }
+
+    public static File getBackupKey() {
+        return new File(Path.tv(), "." + Util.getDeviceId());
+    }
+
+    public static void backup() {
+        if (Setting.isBackupAuto()) backup(new com.fongmi.android.tv.impl.Callback());
+    }
+
+    public static void backup(com.fongmi.android.tv.impl.Callback callback) {
+        App.execute(() -> {
+            File db = App.get().getDatabasePath(NAME).getAbsoluteFile();
+            File wal = App.get().getDatabasePath(NAME + "-wal").getAbsoluteFile();
+            File shm = App.get().getDatabasePath(NAME + "-shm").getAbsoluteFile();
+            if (db.exists()) Path.copy(db, new File(Path.tv(), db.getName()));
+            if (wal.exists()) Path.copy(wal, new File(Path.tv(), wal.getName()));
+            if (shm.exists()) Path.copy(shm, new File(Path.tv(), shm.getName()));
+            Prefers.backup(new File(Path.tv(), NAME + "-pref"));
+            Path.newFile(getBackupKey());
+            App.post(callback::success);
+        });
+    }
+
+    public static void restore(com.fongmi.android.tv.impl.Callback callback) {
+        App.execute(() -> {
+            File db = new File(Path.tv(), NAME);
+            File wal = new File(Path.tv(), NAME + "-wal");
+            File shm = new File(Path.tv(), NAME + "-shm");
+            File pref = new File(Path.tv(), NAME + "-pref");
+            if (db.exists()) Path.move(db, App.get().getDatabasePath(db.getName()).getAbsoluteFile());
+            if (wal.exists()) Path.move(wal, App.get().getDatabasePath(wal.getName()).getAbsoluteFile());
+            if (shm.exists()) Path.move(shm, App.get().getDatabasePath(shm.getName()).getAbsoluteFile());
+            if (pref.exists()) Prefers.restore(pref);
+            App.post(callback::success);
+            Path.clear(Path.tv());
+        });
+    }
+
     private static AppDatabase create(Context context) {
-        return Room.databaseBuilder(context, AppDatabase.class, "tv")
+        return Room.databaseBuilder(context, AppDatabase.class, NAME)
                 .addMigrations(MIGRATION_11_12)
                 .addMigrations(MIGRATION_12_13)
                 .addMigrations(MIGRATION_13_14)
@@ -53,6 +105,7 @@ public abstract class AppDatabase extends RoomDatabase {
                 .addMigrations(MIGRATION_22_23)
                 .addMigrations(MIGRATION_23_24)
                 .addMigrations(MIGRATION_24_25)
+                .addMigrations(MIGRATION_25_26)
                 .allowMainThreadQueries()
                 .fallbackToDestructiveMigration()
                 .build();
@@ -172,6 +225,16 @@ public abstract class AppDatabase extends RoomDatabase {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             database.execSQL("ALTER TABLE Site ADD COLUMN recordable INTEGER DEFAULT 1");
+        }
+    };
+
+    static final Migration MIGRATION_25_26 = new Migration(25, 26) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("CREATE TABLE Site_Backup (`key` TEXT NOT NULL, name TEXT, searchable INTEGER, changeable INTEGER, recordable INTEGER, PRIMARY KEY (`key`))");
+            database.execSQL("INSERT INTO Site_Backup SELECT `key`, name, searchable, changeable, recordable FROM Site");
+            database.execSQL("DROP TABLE Site");
+            database.execSQL("ALTER TABLE Site_Backup RENAME to Site");
         }
     };
 }

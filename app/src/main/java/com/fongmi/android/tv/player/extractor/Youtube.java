@@ -2,8 +2,8 @@ package com.fongmi.android.tv.player.extractor;
 
 import com.fongmi.android.tv.impl.NewPipeImpl;
 import com.fongmi.android.tv.player.Source;
-import com.fongmi.android.tv.utils.Sniffer;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.Util;
 import com.google.common.net.HttpHeaders;
 
 import org.schabi.newpipe.extractor.NewPipe;
@@ -34,10 +34,10 @@ public class Youtube implements Source.Extractor {
 
     @Override
     public String fetch(String url) throws Exception {
-        String html = OkHttp.newCall(url, Headers.of(HttpHeaders.USER_AGENT, Sniffer.CHROME)).execute().body().string();
+        String html = OkHttp.newCall(url, Headers.of(HttpHeaders.USER_AGENT, Util.CHROME)).execute().body().string();
         Matcher matcher = Pattern.compile("hlsManifestUrl\\S*?(https\\S*?\\.m3u8)").matcher(html);
         if (matcher.find()) {
-            html = OkHttp.newCall(matcher.group(1), Headers.of(HttpHeaders.USER_AGENT, Sniffer.CHROME)).execute().body().string();
+            html = OkHttp.newCall(matcher.group(1), Headers.of(HttpHeaders.USER_AGENT, Util.CHROME)).execute().body().string();
             return find(html);
         } else {
             LinkHandler handler = YoutubeStreamLinkHandlerFactory.getInstance().fromUrl(url);

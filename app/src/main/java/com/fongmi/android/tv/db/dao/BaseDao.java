@@ -18,7 +18,7 @@ public abstract class BaseDao<T> {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     public abstract List<Long> insert(List<T> items);
 
-    @Update
+    @Update(onConflict = OnConflictStrategy.REPLACE)
     public abstract void update(T item);
 
     @Update

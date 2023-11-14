@@ -17,8 +17,8 @@ import androidx.appcompat.widget.AppCompatImageView;
 import androidx.fragment.app.FragmentActivity;
 
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.utils.KeyUtil;
 import com.fongmi.android.tv.utils.ResUtil;
-import com.fongmi.android.tv.utils.Utils;
 import com.github.bassaer.library.MDColor;
 import com.permissionx.guolindev.PermissionX;
 
@@ -96,7 +96,7 @@ public class CustomMic extends AppCompatImageView {
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (isListen() && Utils.isBackKey(event)) return stop();
+        if (isListen() && KeyUtil.isBackKey(event)) return stop();
         else return super.dispatchKeyEvent(event);
     }
 }

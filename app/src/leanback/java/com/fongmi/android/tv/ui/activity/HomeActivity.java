@@ -1,7 +1,9 @@
 package com.fongmi.android.tv.ui.activity;
 
+import android.Manifest;
 import android.content.Intent;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 
@@ -15,6 +17,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
+import com.android.cast.dlna.dmr.DLNARendererService;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.R;
@@ -27,8 +30,10 @@ import com.fongmi.android.tv.bean.Func;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
+import com.fongmi.android.tv.bean.Style;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.ActivityHomeBinding;
+import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.event.CastEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.event.ServerEvent;
@@ -40,7 +45,7 @@ import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.CustomRowPresenter;
 import com.fongmi.android.tv.ui.custom.CustomSelector;
 import com.fongmi.android.tv.ui.custom.CustomTitleView;
-import com.fongmi.android.tv.ui.custom.dialog.SiteDialog;
+import com.fongmi.android.tv.ui.dialog.SiteDialog;
 import com.fongmi.android.tv.ui.presenter.FuncPresenter;
 import com.fongmi.android.tv.ui.presenter.HeaderPresenter;
 import com.fongmi.android.tv.ui.presenter.HistoryPresenter;
@@ -48,11 +53,12 @@ import com.fongmi.android.tv.ui.presenter.ProgressPresenter;
 import com.fongmi.android.tv.ui.presenter.VodPresenter;
 import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.FileChooser;
+import com.fongmi.android.tv.utils.KeyUtil;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
-import com.fongmi.android.tv.utils.Utils;
-import com.github.catvod.utils.Util;
+import com.fongmi.android.tv.utils.UrlUtil;
 import com.google.common.collect.Lists;
+import com.permissionx.guolindev.PermissionX;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -66,9 +72,14 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     private HistoryPresenter mPresenter;
     private ArrayObjectAdapter mAdapter;
     private SiteViewModel mViewModel;
+    private boolean loading;
     private boolean confirm;
     private Result mResult;
     private Clock mClock;
+
+    private Site getHome() {
+        return ApiConfig.get().getHome();
+    }
 
     @Override
     protected ViewBinding getBinding() {
@@ -83,6 +94,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     protected void initView() {
+        DLNARendererService.Companion.start(this, R.drawable.ic_logo);
         mClock = Clock.create(mBinding.time).format("MM/dd HH:mm:ss");
         mBinding.progressLayout.showProgress();
         Updater.get().release().start();
@@ -109,7 +121,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         if (Intent.ACTION_SEND.equals(intent.getAction())) {
             VideoActivity.push(this, Uri.parse(intent.getStringExtra(Intent.EXTRA_TEXT)));
         } else if (Intent.ACTION_VIEW.equals(intent.getAction()) && intent.getData() != null) {
-            if ("text/plain".equals(intent.getType()) || Util.path(intent.getData()).endsWith(".m3u")) {
+            if ("text/plain".equals(intent.getType()) || UrlUtil.path(intent.getData()).endsWith(".m3u")) {
                 loadLive("file:/" + FileChooser.getPathFromUri(this, intent.getData()));
             } else {
                 VideoActivity.push(this, intent.getData());
@@ -144,9 +156,11 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     }
 
     private void initConfig() {
+        if (isLoading()) return;
         WallConfig.get().init();
         LiveConfig.get().init();
         ApiConfig.get().init().load(getCallback());
+        setLoading(true);
     }
 
     private Callback getCallback() {
@@ -162,12 +176,22 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
             @Override
             public void error(String msg) {
-                mBinding.progressLayout.showContent();
+                if (TextUtils.isEmpty(msg) && AppDatabase.getBackupKey().exists()) onRestore();
+                else mBinding.progressLayout.showContent();
                 mResult = Result.empty();
                 Notify.show(msg);
                 setFocus();
             }
         };
+    }
+
+    private void onRestore() {
+        PermissionX.init(this).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> AppDatabase.restore(new Callback() {
+            @Override
+            public void success() {
+                initConfig();
+            }
+        }));
     }
 
     private void loadLive(String url) {
@@ -180,24 +204,26 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     }
 
     private void setFocus() {
-        mBinding.recycler.requestFocus();
+        setLoading(false);
         App.post(() -> mBinding.title.setFocusable(true), 500);
+        if (!mBinding.title.hasFocus()) mBinding.recycler.requestFocus();
     }
 
     private void getVideo() {
         mResult = Result.empty();
         int index = getRecommendIndex();
-        String home = ApiConfig.get().getHome().getName();
-        mBinding.title.setText(home.isEmpty() ? ResUtil.getString(R.string.app_name) : home);
+        String title = getHome().getName();
+        mBinding.title.setText(title.isEmpty() ? ResUtil.getString(R.string.app_name) : title);
         if (mAdapter.size() > index) mAdapter.removeItems(index, mAdapter.size() - index);
-        if (ApiConfig.get().getHome().getKey().isEmpty()) return;
+        if (getHome().getKey().isEmpty()) return;
         mViewModel.homeContent();
         mAdapter.add("progress");
     }
 
     private void addVideo(Result result) {
-        for (List<Vod> items : Lists.partition(result.getList(), Product.getColumn())) {
-            ArrayObjectAdapter adapter = new ArrayObjectAdapter(new VodPresenter(this));
+        Style style = result.getStyle(getHome().getStyle());
+        for (List<Vod> items : Lists.partition(result.getList(), Product.getColumn(style))) {
+            ArrayObjectAdapter adapter = new ArrayObjectAdapter(new VodPresenter(this, style));
             adapter.setItems(items, null);
             mAdapter.add(new ListRow(adapter));
         }
@@ -255,6 +281,14 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         confirm = true;
         Notify.show(R.string.app_exit);
         App.post(() -> confirm = false, 5000);
+    }
+
+    public boolean isLoading() {
+        return loading;
+    }
+
+    public void setLoading(boolean loading) {
+        this.loading = loading;
     }
 
     @Override
@@ -315,6 +349,11 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     @Override
     public void showDialog() {
         SiteDialog.create(this).show();
+    }
+
+    @Override
+    public void onRefresh() {
+        initConfig();
     }
 
     @Override
@@ -387,7 +426,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (Utils.isMenuKey(event)) showDialog();
+        if (KeyUtil.isMenuKey(event)) showDialog();
         return super.dispatchKeyEvent(event);
     }
 
@@ -424,6 +463,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         WallConfig.get().clear();
         LiveConfig.get().clear();
         ApiConfig.get().clear();
+        AppDatabase.backup();
         Server.get().stop();
         Source.get().exit();
     }

@@ -29,6 +29,6 @@ public class VodListHolder extends BaseVodHolder {
         binding.remark.setVisibility(item.getRemarkVisible());
         binding.getRoot().setOnClickListener(v -> listener.onItemClick(item));
         binding.getRoot().setOnLongClickListener(v -> listener.onLongClick(item));
-        ImgUtil.load(item.getVodPic(), binding.image, ImageView.ScaleType.FIT_CENTER);
+        ImgUtil.load(item.getVodName(), item.getVodPic(), binding.image, ImageView.ScaleType.FIT_CENTER, false);
     }
 }

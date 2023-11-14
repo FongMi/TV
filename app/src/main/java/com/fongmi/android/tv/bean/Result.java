@@ -241,7 +241,7 @@ public class Result implements Parcelable {
     }
 
     public List<Sub> getSubs() {
-        return subs == null ? Collections.emptyList() : subs;
+        return subs == null ? new ArrayList<>() : subs;
     }
 
     public Integer getPageCount() {
@@ -270,6 +270,10 @@ public class Result implements Parcelable {
 
     public Map<String, String> getHeaders() {
         return Json.toMap(getHeader());
+    }
+
+    public Style getStyle(Style style) {
+        return getList().isEmpty() ? Style.rect() : getList().get(0).getStyle(style);
     }
 
     public Result clear() {
