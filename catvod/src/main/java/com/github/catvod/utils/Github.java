@@ -7,10 +7,10 @@ import java.io.File;
 public class Github {
 
     public static final String URL = "https://gh-proxy.com/https://raw.githubusercontent.com/FongMi/Release/main";
-    public static String abi;
+    private static String ABI;
 
     public static void setAbi(String abi) {
-        Github.abi = abi.replace("_", "-");
+        Github.ABI = abi.replace("_", "-");
     }
 
     private static String getUrl(String path, String name) {
@@ -29,7 +29,7 @@ public class Github {
         try {
             File file = Path.so(name);
             moveExist(Path.download(), file);
-            String url = name.startsWith("http") ? name : getUrl("so/" + abi, file.getName());
+            String url = name.startsWith("http") ? name : getUrl("so/" + ABI, file.getName());
             if (file.length() < 300) Path.write(file, OkHttp.newCall(url).execute().body().bytes());
             return file.getAbsolutePath();
         } catch (Exception e) {
