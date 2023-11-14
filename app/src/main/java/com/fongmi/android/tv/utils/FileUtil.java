@@ -33,7 +33,7 @@ public class FileUtil {
     }
 
     public static void unzip(File target, File path) {
-        try (ZipFile zip = new ZipFile(target.getAbsolutePath())) {
+        try (ZipFile zip = new ZipFile(target)) {
             Enumeration<?> entries = zip.entries();
             while (entries.hasMoreElements()) {
                 ZipEntry entry = (ZipEntry) entries.nextElement();
