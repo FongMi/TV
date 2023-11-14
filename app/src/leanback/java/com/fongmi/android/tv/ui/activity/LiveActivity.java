@@ -566,6 +566,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         if (mChannel == null) return;
         LiveConfig.get().setKeep(mChannel);
         mViewModel.fetch(mChannel);
+        mPlayers.clean();
         showProgress();
     }
 
