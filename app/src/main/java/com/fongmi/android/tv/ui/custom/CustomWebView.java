@@ -18,8 +18,8 @@ import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.impl.ParseCallback;
 import com.fongmi.android.tv.utils.Sniffer;
+import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.crawler.Spider;
-import com.github.catvod.utils.Util;
 import com.google.common.net.HttpHeaders;
 
 import java.io.ByteArrayInputStream;
@@ -79,7 +79,7 @@ public class CustomWebView extends WebView {
         return new WebViewClient() {
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
-                String host = Util.host(url);
+                String host = UrlUtil.host(url);
                 if (TextUtils.isEmpty(host)) return empty;
                 if (ApiConfig.get().getAds().contains(host)) return empty;
                 if (isVideoFormat(url)) post(url);

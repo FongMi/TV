@@ -6,7 +6,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.support.v4.media.MediaMetadataCompat;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -460,7 +459,6 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mViewModel.playerContent(getKey(), flag.getFlag(), episode.getUrl());
         updateHistory(episode, replay);
         showProgress();
-        setMetadata();
         hidePreview();
         hideCenter();
     }
@@ -989,7 +987,6 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
                 getExo().setDefaultArtwork(resource);
                 getIjk().setDefaultArtwork(resource);
                 showPreview(resource);
-                setMetadata();
             }
 
             @Override
@@ -998,7 +995,6 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
                 getIjk().setDefaultArtwork(error);
                 hideProgress();
                 hidePreview();
-                setMetadata();
             }
 
             @Override
@@ -1139,7 +1135,6 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
                 break;
             case Player.STATE_READY:
                 stopSearch();
-                setMetadata();
                 resetToggle();
                 hideProgress();
                 mPlayers.reset();
@@ -1178,18 +1173,6 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
             mPlayers.prepared();
             mPlayers.setTrack(Track.find(getHistoryKey()));
         }
-    }
-
-    private void setMetadata() {
-        String title = mHistory == null ? getName() : mHistory.getVodName();
-        String artist = mEpisodeAdapter.size() == 0 ? "" : getEpisode().getName();
-        artist = title.equals(artist) ? "" : getString(R.string.play_now, artist);
-        MediaMetadataCompat.Builder builder = new MediaMetadataCompat.Builder();
-        builder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, title);
-        builder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, artist);
-        builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, getIjk().getDefaultArtwork());
-        builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, mPlayers.getDuration());
-        mPlayers.setMetadata(builder.build());
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

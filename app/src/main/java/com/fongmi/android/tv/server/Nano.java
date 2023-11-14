@@ -15,7 +15,6 @@ import com.google.common.net.HttpHeaders;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -92,10 +91,14 @@ public class Nano extends NanoHTTPD {
     }
 
     private Response m3u8(IHTTPSession session) {
-        String url = session.getParms().get("url");
-        String result = M3U8.get(url, session.getHeaders());
-        if (result.isEmpty()) return redirect(url, session.getHeaders());
-        return newChunkedResponse(Response.Status.OK, MIME_PLAINTEXT, new ByteArrayInputStream(result.getBytes(StandardCharsets.UTF_8)));
+        try {
+            String url = session.getParms().get("url");
+            String result = M3U8.get(url, session.getHeaders());
+            if (result.isEmpty()) return redirect(url, session.getHeaders());
+            return newChunkedResponse(Response.Status.OK, MIME_PLAINTEXT, new ByteArrayInputStream(result.getBytes("UTF-8")));
+        } catch (Exception e) {
+            return error(e.getMessage());
+        }
     }
 
     private Response proxy(Map<String, String> params) {
