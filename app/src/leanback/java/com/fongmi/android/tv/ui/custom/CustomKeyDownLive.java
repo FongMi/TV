@@ -111,9 +111,11 @@ public class CustomKeyDownLive extends GestureDetector.SimpleOnGestureListener {
         } else if (e2.getX() - e1.getX() > DISTANCE && Math.abs(velocityX) > VELOCITY) {
             listener.onKeyRight(Constant.INTERVAL_SEEK * 3);
         } else if (e1.getY() - e2.getY() > DISTANCE && Math.abs(velocityY) > VELOCITY) {
-            listener.onKeyUp();
+            if (Setting.isInvert()) listener.onKeyDown();
+            else listener.onKeyUp();
         } else if (e2.getY() - e1.getY() > DISTANCE && Math.abs(velocityY) > VELOCITY) {
-            listener.onKeyDown();
+            if (Setting.isInvert()) listener.onKeyUp();
+            else listener.onKeyDown();
         }
     }
 
