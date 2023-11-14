@@ -142,7 +142,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mR3 = this::setChannelActivated;
         mR4 = this::setTraffic;
         mHides = new ArrayList<>();
-        mPlayers = new Players().init(this);
+        mPlayers = new Players().init();
         mKeyDown = CustomKeyDownLive.create(this);
         mClock = Clock.create(mBinding.widget.time);
         mFormatDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());

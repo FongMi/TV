@@ -7,18 +7,10 @@ import androidx.preference.PreferenceManager;
 import com.github.catvod.Init;
 import com.google.gson.internal.LazilyParsedNumber;
 
-import java.io.File;
-
 public class Prefers {
 
     private static SharedPreferences getPrefers() {
         return PreferenceManager.getDefaultSharedPreferences(Init.context());
-    }
-
-    public static void backup(File file) {
-    }
-
-    public static void restore(File file) {
     }
 
     public static String getString(String key) {
