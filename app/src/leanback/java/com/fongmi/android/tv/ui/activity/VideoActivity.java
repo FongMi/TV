@@ -458,6 +458,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mBinding.widget.title.setText(getString(R.string.detail_title, mBinding.name.getText(), episode.getName()));
         mViewModel.playerContent(getKey(), flag.getFlag(), episode.getUrl());
         updateHistory(episode, replay);
+        mPlayers.clean();
         showProgress();
         setMetadata();
         hidePreview();
