@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
-import android.support.v4.media.MediaMetadataCompat;
 import android.view.KeyEvent;
 import android.view.View;
 
@@ -140,7 +139,6 @@ public class CastActivity extends BaseActivity implements CustomKeyDownCast.List
     private void start() {
         mPlayers.setMediaSource(mAction.getCurrentURI());
         showProgress();
-        setMetadata();
         hideCenter();
     }
 
@@ -328,7 +326,6 @@ public class CastActivity extends BaseActivity implements CustomKeyDownCast.List
                 setState(RenderState.PREPARING);
                 break;
             case Player.STATE_READY:
-                setMetadata();
                 hideProgress();
                 mPlayers.reset();
                 setTrackVisible(true);
@@ -346,15 +343,6 @@ public class CastActivity extends BaseActivity implements CustomKeyDownCast.List
         mBinding.control.text.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_TEXT) ? View.VISIBLE : View.GONE);
         mBinding.control.audio.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_AUDIO) ? View.VISIBLE : View.GONE);
         mBinding.control.video.setVisibility(visible && mPlayers.haveTrack(C.TRACK_TYPE_VIDEO) ? View.VISIBLE : View.GONE);
-    }
-
-    private void setMetadata() {
-        String title = mBinding.widget.title.getText().toString();
-        MediaMetadataCompat.Builder builder = new MediaMetadataCompat.Builder();
-        builder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, title);
-        builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, getIjk().getDefaultArtwork());
-        builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, mPlayers.getDuration());
-        mPlayers.setMetadata(builder.build());
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
