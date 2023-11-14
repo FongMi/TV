@@ -79,6 +79,7 @@ public final class TrackDialog extends BaseDialog implements TrackAdapter.OnClic
         binding.recycler.setAdapter(adapter.addAll(getTrack()));
         binding.recycler.addItemDecoration(new SpaceItemDecoration(1, 16));
         binding.recycler.post(() -> binding.recycler.scrollToPosition(adapter.getSelected()));
+        binding.recycler.setVisibility(adapter.getItemCount() == 0 ? View.GONE : View.VISIBLE);
         binding.choose.setVisibility(type == C.TRACK_TYPE_TEXT && player.isExo() ? View.VISIBLE : View.GONE);
         binding.size.setVisibility(type == C.TRACK_TYPE_TEXT ? View.VISIBLE : View.GONE);
         binding.title.setText(ResUtil.getStringArray(R.array.select_track)[type - 1]);

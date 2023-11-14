@@ -49,9 +49,11 @@ public class FileChooser {
     public void show(String mimeType, String[] mimeTypes, int code) {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.setType(mimeType);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
         intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false);
+        intent.putExtra("android.content.extra.SHOW_ADVANCED", true);
         if (intent.resolveActivity(App.get().getPackageManager()) == null) return;
         if (fragment != null) fragment.startActivityForResult(Intent.createChooser(intent, ""), code);
     }
