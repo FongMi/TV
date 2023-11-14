@@ -176,6 +176,7 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
         if (mBinding.navigation.getSelectedItemId() == item.getItemId()) return false;
         if (item.getItemId() == R.id.vod) return mManager.change(0);
         if (item.getItemId() == R.id.setting) return mManager.change(1);
+        if (item.getItemId() == R.id.live) return openLive();
         return false;
     }
 
