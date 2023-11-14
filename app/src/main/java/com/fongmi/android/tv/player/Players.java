@@ -152,6 +152,11 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         return url;
     }
 
+    public void clean() {
+        this.headers = null;
+        this.url = null;
+    }
+
     public int getPlayer() {
         return player;
     }
