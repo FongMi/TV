@@ -86,7 +86,6 @@ dependencies {
     implementation project(':jianpian')
     implementation project(':forcetech')
     implementation project(':ijkplayer')
-    //implementation project(':media3ext')
     pythonImplementation project(':pyramid')
     implementation project(':media-lib-database')
     implementation project(':media-lib-datasource')
