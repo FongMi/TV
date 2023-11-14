@@ -197,6 +197,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
             tools:src="@drawable/ic_widget_bright_high" />
 
         <com.google.android.material.progressindicator.LinearProgressIndicator
@@ -225,6 +226,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
             tools:src="@drawable/ic_widget_volume_high" />
 
         <com.google.android.material.progressindicator.LinearProgressIndicator
