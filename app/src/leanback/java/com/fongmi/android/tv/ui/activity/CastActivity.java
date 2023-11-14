@@ -90,7 +90,7 @@ public class CastActivity extends BaseActivity implements CustomKeyDownCast.List
         bindService(new Intent(this, DLNARendererService.class), this, Context.BIND_AUTO_CREATE);
         mClock = Clock.create(mBinding.widget.time);
         mKeyDown = CustomKeyDownCast.create(this);
-        mPlayers = new Players().init(this);
+        mPlayers = new Players().init();
         mParser = new DIDLParser();
         mR1 = this::hideControl;
         mR2 = this::setTraffic;

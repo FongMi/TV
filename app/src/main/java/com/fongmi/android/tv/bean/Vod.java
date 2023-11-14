@@ -95,8 +95,7 @@ public class Vod implements Parcelable {
     private Site site;
 
     public static List<Vod> arrayFrom(String str) {
-        Type listType = new TypeToken<List<Vod>>() {
-        }.getType();
+        Type listType = new TypeToken<List<Vod>>() {}.getType();
         List<Vod> items = App.gson().fromJson(str, listType);
         return items == null ? Collections.emptyList() : items;
     }

@@ -3,6 +3,7 @@ package com.fongmi.android.tv.player;
 import android.content.Context;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.view.accessibility.CaptioningManager;
 
 import androidx.media3.common.MediaItem;
@@ -80,7 +81,7 @@ public class ExoUtil {
     }
 
     public static CaptionStyleCompat getCaptionStyle() {
-        return Setting.isCaption() ? CaptionStyleCompat.createFromCaptionStyle(((CaptioningManager) App.get().getSystemService(Context.CAPTIONING_SERVICE)).getUserStyle()) : new CaptionStyleCompat(Color.WHITE, Color.TRANSPARENT, Color.TRANSPARENT, CaptionStyleCompat.EDGE_TYPE_OUTLINE, Color.BLACK, null);
+        return Setting.isCaption() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT ? CaptionStyleCompat.createFromCaptionStyle(((CaptioningManager) App.get().getSystemService(Context.CAPTIONING_SERVICE)).getUserStyle()) : new CaptionStyleCompat(Color.WHITE, Color.TRANSPARENT, Color.TRANSPARENT, CaptionStyleCompat.EDGE_TYPE_OUTLINE, Color.BLACK, null);
     }
 
     public static int getRetry(int errorCode) {

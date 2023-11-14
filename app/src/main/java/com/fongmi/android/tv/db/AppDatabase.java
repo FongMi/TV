@@ -27,7 +27,6 @@ import com.fongmi.android.tv.db.dao.TrackDao;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Util;
 import com.github.catvod.utils.Path;
-import com.github.catvod.utils.Prefers;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -68,7 +67,6 @@ public abstract class AppDatabase extends RoomDatabase {
             if (db.exists()) Path.copy(db, new File(Path.tv(), db.getName()));
             if (wal.exists()) Path.copy(wal, new File(Path.tv(), wal.getName()));
             if (shm.exists()) Path.copy(shm, new File(Path.tv(), shm.getName()));
-            Prefers.backup(new File(Path.tv(), NAME + "-pref"));
             Path.newFile(getBackupKey());
             App.post(callback::success);
         });
@@ -83,7 +81,6 @@ public abstract class AppDatabase extends RoomDatabase {
             if (db.exists()) Path.move(db, App.get().getDatabasePath(db.getName()).getAbsoluteFile());
             if (wal.exists()) Path.move(wal, App.get().getDatabasePath(wal.getName()).getAbsoluteFile());
             if (shm.exists()) Path.move(shm, App.get().getDatabasePath(shm.getName()).getAbsoluteFile());
-            if (pref.exists()) Prefers.restore(pref);
             App.post(callback::success);
             Path.clear(Path.tv());
         });

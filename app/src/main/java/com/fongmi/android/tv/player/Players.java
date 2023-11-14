@@ -1,6 +1,5 @@
 package com.fongmi.android.tv.player;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.text.TextUtils;
@@ -89,7 +88,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         return player == SYS || player == IJK;
     }
 
-    public Players init(Activity activity) {
+    public Players init() {
         player = Setting.getPlayer();
         decode = Setting.getDecode();
         builder = new StringBuilder();
@@ -151,11 +150,6 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     public String getUrl() {
         return url;
-    }
-
-    public void clean() {
-        this.headers = null;
-        this.url = null;
     }
 
     public int getPlayer() {
@@ -223,10 +217,6 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         if (isExo() && exoPlayer != null) return exoPlayer.getPlaybackState() == Player.STATE_ENDED;
         if (isIjk() && ijkPlayer != null) return ijkPlayer.getPlaybackState() == IjkVideoView.STATE_ENDED;
         return false;
-    }
-
-    public boolean isPortrait() {
-        return getVideoHeight() > getVideoWidth();
     }
 
     public String getSizeText() {
