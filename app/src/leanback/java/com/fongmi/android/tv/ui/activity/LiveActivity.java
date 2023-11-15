@@ -249,6 +249,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mGroupAdapter.setItems(items, null);
         setPosition(LiveConfig.get().find(items));
         mBinding.control.home.setText(home.getName());
+        mBinding.group.getLayoutParams().width = home.getWidth();
     }
 
     private void setPosition(int[] position) {

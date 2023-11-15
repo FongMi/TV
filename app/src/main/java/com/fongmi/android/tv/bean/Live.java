@@ -5,6 +5,7 @@ import android.text.TextUtils;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
+import com.fongmi.android.tv.utils.ResUtil;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
@@ -167,6 +168,18 @@ public class Live {
         for (Group group : getGroups()) if (group.getName().equals(item.getName())) return group;
         getGroups().add(item);
         return item;
+    }
+
+    public boolean hasLogo() {
+        for (Group group : getGroups()) if (group.getLogo().length() > 0) return true;
+        return false;
+    }
+
+    public int getWidth() {
+        int width = 0;
+        for (Group group : getGroups()) width = Math.max(width, ResUtil.getTextWidth(group.getName(), 16) + ResUtil.dp2px(60));
+        if (hasLogo()) width += ResUtil.dp2px(48);
+        return width;
     }
 
     @Override
