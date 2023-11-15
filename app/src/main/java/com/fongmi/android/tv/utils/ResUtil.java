@@ -131,9 +131,9 @@ public class ResUtil {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.R ? activity.getDisplay() : activity.getWindowManager().getDefaultDisplay();
     }
 
-    public static int getTextWidth(String content, int textSize) {
+    public static int getTextWidth(String content, int size) {
         Paint paint = new Paint();
-        paint.setTextSize(sp2px(textSize));
+        paint.setTextSize(sp2px(size));
         return (int) paint.measureText(content);
     }
 }
