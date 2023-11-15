@@ -5,7 +5,6 @@ import android.text.TextUtils;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
-import com.fongmi.android.tv.utils.ResUtil;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
@@ -52,6 +51,7 @@ public class Live {
     private Core core;
 
     private boolean activated;
+    private int width;
 
     public static Live objectFrom(JsonElement element) {
         return App.gson().fromJson(element, Live.class);
@@ -152,6 +152,14 @@ public class Live {
         this.activated = item.equals(this);
     }
 
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
     public Live check() {
         boolean proxy = getChannels().size() > 0 && getChannels().get(0).getUrls().size() > 0 && getChannels().get(0).getUrls().get(0).startsWith("proxy");
         if (proxy) setProxy();
@@ -173,13 +181,6 @@ public class Live {
     public boolean hasLogo() {
         for (Group group : getGroups()) if (group.getLogo().length() > 0) return true;
         return false;
-    }
-
-    public int getWidth() {
-        int width = 0;
-        for (Group group : getGroups()) width = Math.max(width, ResUtil.getTextWidth(group.getName(), 16) + ResUtil.dp2px(60));
-        if (hasLogo()) width += ResUtil.dp2px(48);
-        return width;
     }
 
     @Override

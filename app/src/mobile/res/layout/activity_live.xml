@@ -62,7 +62,7 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/group"
-            android:layout_width="wrap_content"
+            android:layout_width="140dp"
             android:layout_height="match_parent"
             android:clipChildren="false"
             android:clipToPadding="false"
@@ -78,11 +78,10 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/channel"
-            android:layout_width="wrap_content"
+            android:layout_width="260dp"
             android:layout_height="match_parent"
             android:clipChildren="false"
             android:clipToPadding="false"
-            android:minWidth="260dp"
             android:padding="8dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:itemCount="5"
