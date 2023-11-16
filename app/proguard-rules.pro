@@ -47,6 +47,9 @@
 # Mozilla
 -keep class org.mozilla.javascript.** { *; }
 
+# Nano
+-keep class fi.iki.elonen.** { *; }
+
 # QuickJS
 -keep class com.whl.quickjs.** { *; }
 
