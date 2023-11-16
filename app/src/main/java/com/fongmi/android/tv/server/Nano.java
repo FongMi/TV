@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -101,9 +100,8 @@ public class Nano extends NanoHTTPD {
 
     private Response proxy(IHTTPSession session) {
         try {
-            Map<String, String> params = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+            Map<String, String> params = session.getParms();
             params.putAll(session.getHeaders());
-            params.putAll(session.getParms());
             Object[] rs = ApiConfig.get().proxyLocal(params);
             return rs[0] instanceof Response ? (Response) rs[0] : newChunkedResponse(Response.Status.lookup((Integer) rs[0]), (String) rs[1], (InputStream) rs[2]);
         } catch (Exception e) {
