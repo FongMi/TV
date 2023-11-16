@@ -14,8 +14,8 @@ import com.xunlei.downloadlib.parameter.XLTaskLocalUrl;
 class XLLoader {
 
     public XLLoader() {
-        System.load(Github.getSo("xl_stat_armeabi_v7a"));
-        System.load(Github.getSo("xl_thunder_sdk_armeabi_v7a"));
+        System.load(Github.getSo("xl_stat"));
+        System.load(Github.getSo("xl_thunder_sdk"));
     }
 
     public native int createBtMagnetTask(String str, String str2, String str3, GetTaskId getTaskId);

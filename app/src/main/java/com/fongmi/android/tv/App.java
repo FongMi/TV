@@ -19,6 +19,7 @@ import com.fongmi.android.tv.utils.Notify;
 import com.github.catvod.Init;
 import com.github.catvod.bean.Doh;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.Github;
 import com.google.gson.Gson;
 import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.LogAdapter;
@@ -107,6 +108,7 @@ public class App extends MultiDexApplication {
     public void onCreate() {
         super.onCreate();
         Notify.createChannel();
+        Github.setAbi(BuildConfig.FLAVOR_abi);
         Logger.addLogAdapter(getLogAdapter());
         OkHttp.get().setProxy(Setting.getProxy());
         OkHttp.get().setDoh(Doh.objectFrom(Setting.getDoh()));

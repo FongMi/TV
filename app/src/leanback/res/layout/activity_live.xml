@@ -59,7 +59,8 @@
         android:layout_height="match_parent"
         android:background="@drawable/shape_live_list"
         android:orientation="horizontal"
-        android:visibility="gone">
+        android:visibility="gone"
+        tools:visibility="visible">
 
         <com.fongmi.android.tv.ui.custom.CustomLiveListView
             android:id="@+id/group"
