@@ -231,6 +231,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mViewModel.live.observe(this, live -> {
             hideProgress();
             setGroup(live);
+            setWidth(live);
         });
     }
 
@@ -242,13 +243,18 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         showProgress();
     }
 
-    private void setGroup(Live home) {
+    private void setGroup(Live live) {
         List<Group> items = new ArrayList<>();
         items.add(Group.create(R.string.keep));
-        for (Group group : home.getGroups()) (group.isHidden() ? mHides : items).add(group);
+        for (Group group : live.getGroups()) (group.isHidden() ? mHides : items).add(group);
         mGroupAdapter.setItems(items, null);
         setPosition(LiveConfig.get().find(items));
-        mBinding.control.home.setText(home.getName());
+        mBinding.control.home.setText(live.getName());
+    }
+
+    private void setWidth(Live live) {
+        for (Group group : live.getGroups()) live.setWidth(Math.max(live.getWidth(), ResUtil.getTextWidth(group.getName(), 16)));
+        mBinding.group.getLayoutParams().width = Math.min(live.getWidth() + ResUtil.dp2px(live.hasLogo() ? 98 : 50), ResUtil.dp2px(260));
     }
 
     private void setPosition(int[] position) {

@@ -51,6 +51,7 @@ public class Live {
     private Core core;
 
     private boolean activated;
+    private int width;
 
     public static Live objectFrom(JsonElement element) {
         return App.gson().fromJson(element, Live.class);
@@ -151,6 +152,14 @@ public class Live {
         this.activated = item.equals(this);
     }
 
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
     public Live check() {
         boolean proxy = getChannels().size() > 0 && getChannels().get(0).getUrls().size() > 0 && getChannels().get(0).getUrls().get(0).startsWith("proxy");
         if (proxy) setProxy();
@@ -167,6 +176,11 @@ public class Live {
         for (Group group : getGroups()) if (group.getName().equals(item.getName())) return group;
         getGroups().add(item);
         return item;
+    }
+
+    public boolean hasLogo() {
+        for (Group group : getGroups()) if (group.getLogo().length() > 0) return true;
+        return false;
     }
 
     @Override

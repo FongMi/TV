@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -128,5 +129,11 @@ public class ResUtil {
 
     public static Display getDisplay(Activity activity) {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.R ? activity.getDisplay() : activity.getWindowManager().getDefaultDisplay();
+    }
+
+    public static int getTextWidth(String content, int size) {
+        Paint paint = new Paint();
+        paint.setTextSize(sp2px(size));
+        return (int) paint.measureText(content);
     }
 }

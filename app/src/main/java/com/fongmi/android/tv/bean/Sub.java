@@ -3,6 +3,7 @@ package com.fongmi.android.tv.bean;
 import android.net.Uri;
 import android.text.TextUtils;
 
+import androidx.media3.common.C;
 import androidx.media3.common.MediaItem;
 
 import com.fongmi.android.tv.player.ExoUtil;
@@ -21,6 +22,8 @@ public class Sub {
     private String lang;
     @SerializedName("format")
     private String format;
+    @SerializedName("flag")
+    private int flag;
 
     public static Sub from(String path) {
         return from(new File(path));
@@ -30,6 +33,7 @@ public class Sub {
         Sub sub = new Sub();
         sub.name = file.getName();
         sub.url = file.getAbsolutePath();
+        sub.flag = C.SELECTION_FLAG_FORCED;
         sub.format = ExoUtil.getMimeType(file.getName());
         return sub;
     }
@@ -50,12 +54,16 @@ public class Sub {
         return TextUtils.isEmpty(format) ? "" : format;
     }
 
+    public int getFlag() {
+        return flag == 0 ? C.SELECTION_FLAG_DEFAULT : flag;
+    }
+
     public void trans() {
         if (Trans.pass()) return;
         this.name = Trans.s2t(name);
     }
 
     public MediaItem.SubtitleConfiguration getExo() {
-        return new MediaItem.SubtitleConfiguration.Builder(Uri.parse(getUrl())).setLabel(getName()).setMimeType(getFormat()).setLanguage(getLang()).build();
+        return new MediaItem.SubtitleConfiguration.Builder(Uri.parse(getUrl())).setLabel(getName()).setMimeType(getFormat()).setSelectionFlags(getFlag()).setLanguage(getLang()).build();
     }
 }

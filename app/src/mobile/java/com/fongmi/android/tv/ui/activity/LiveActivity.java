@@ -250,6 +250,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mViewModel.live.observe(this, live -> {
             hideProgress();
             setGroup(live);
+            setWidth(live);
         });
     }
 
@@ -261,13 +262,18 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         showProgress();
     }
 
-    private void setGroup(Live home) {
+    private void setGroup(Live live) {
         List<Group> items = new ArrayList<>();
         items.add(Group.create(R.string.keep));
-        for (Group group : home.getGroups()) (group.isHidden() ? mHides : items).add(group);
+        for (Group group : live.getGroups()) (group.isHidden() ? mHides : items).add(group);
         mGroupAdapter.addAll(items);
         setPosition(LiveConfig.get().find(items));
-        mBinding.control.action.home.setText(home.getName());
+        mBinding.control.action.home.setText(live.getName());
+    }
+
+    private void setWidth(Live live) {
+        for (Group group : live.getGroups()) live.setWidth(Math.max(live.getWidth(), ResUtil.getTextWidth(group.getName(), 14)));
+        mBinding.group.getLayoutParams().width = Math.min(live.getWidth() + ResUtil.dp2px(live.hasLogo() ? 90 : 45), ResUtil.dp2px(260));
     }
 
     private void setPosition(int[] position) {
