@@ -3,7 +3,7 @@ package com.fongmi.android.tv.api;
 import android.content.Context;
 
 import com.fongmi.android.tv.App;
-import com.github.catvod.crawler.Spider;
+import com.undcover.freedom.pyramid.Spider;
 import com.github.catvod.crawler.SpiderNull;
 
 import java.lang.reflect.Method;
@@ -47,7 +47,7 @@ public class PyLoader {
             return spider;
         } catch (Throwable e) {
             e.printStackTrace();
-            return new SpiderNull();
+            return null;
         }
     }
 

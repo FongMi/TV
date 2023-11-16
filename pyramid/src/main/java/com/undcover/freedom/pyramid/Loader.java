@@ -12,6 +12,7 @@ import com.github.catvod.utils.Path;
 public class Loader {
 
     private PyObject app;
+    private PyObject test;
     private String cache;
 
     @Keep
