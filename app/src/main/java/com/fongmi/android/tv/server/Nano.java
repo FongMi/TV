@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -70,7 +71,7 @@ public class Nano extends NanoHTTPD {
         if (session.getMethod() == Method.POST) parse(session, files);
         if (url.contains("?")) url = url.substring(0, url.indexOf('?'));
         if (url.startsWith("/m3u8")) return m3u8(session);
-        if (url.startsWith("/proxy")) return proxy(session.getParms());
+        if (url.startsWith("/proxy")) return proxy(session);
         if (url.startsWith("/tvbus")) return success(LiveConfig.getResp());
         if (url.startsWith("/device")) return success(Device.get().toString());
         if (url.startsWith("/license")) return success(new String(Base64.decode(url.substring(9), Base64.DEFAULT)));
@@ -98,10 +99,13 @@ public class Nano extends NanoHTTPD {
         return newChunkedResponse(Response.Status.OK, MIME_PLAINTEXT, new ByteArrayInputStream(result.getBytes(StandardCharsets.UTF_8)));
     }
 
-    private Response proxy(Map<String, String> params) {
+    private Response proxy(IHTTPSession session) {
         try {
+            Map<String, String> params = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+            params.putAll(session.getHeaders());
+            params.putAll(session.getParms());
             Object[] rs = ApiConfig.get().proxyLocal(params);
-            return newChunkedResponse(Response.Status.lookup((Integer) rs[0]), (String) rs[1], (InputStream) rs[2]);
+            return rs[0] instanceof Response ? (Response) rs[0] : newChunkedResponse(Response.Status.lookup((Integer) rs[0]), (String) rs[1], (InputStream) rs[2]);
         } catch (Exception e) {
             return error(e.getMessage());
         }
