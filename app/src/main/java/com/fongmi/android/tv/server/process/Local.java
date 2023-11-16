@@ -127,8 +127,8 @@ public class Local implements Process {
         if (headerIfRangeMissingOrMatching && range != null && startFrom >= 0 && startFrom < fileLen) {
             if (headerIfNoneMatchPresentAndMatching) {
                 res = NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.NOT_MODIFIED, mime, "");
-                res.addHeader("Accept-Ranges", "bytes");
-                res.addHeader("ETag", etag);
+                res.addHeader(HttpHeaders.ACCEPT_RANGES, "bytes");
+                res.addHeader(HttpHeaders.ETAG, etag);
             } else {
                 if (endAt < 0) endAt = fileLen - 1;
                 long newLen = endAt - startFrom + 1;
