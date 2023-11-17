@@ -20,6 +20,7 @@ public class M3U8 {
 
     private static final String TAG_DISCONTINUITY = "#EXT-X-DISCONTINUITY";
     private static final String TAG_MEDIA_DURATION = "#EXTINF";
+    private static final String TAG_ENDLIST = "#EXT-X-ENDLIST";
     private static final String TAG_KEY = "#EXT-X-KEY";
 
     private static final Pattern REGEX_X_DISCONTINUITY = Pattern.compile("#EXT-X-DISCONTINUITY[\\s\\S]*?(?=#EXT-X-DISCONTINUITY|$)");
@@ -59,7 +60,7 @@ public class M3U8 {
             BigDecimal t = BigDecimal.ZERO;
             Matcher m2 = REGEX_MEDIA_DURATION.matcher(group);
             while (m2.find()) t = t.add(new BigDecimal(m2.group(1)));
-            for (String ad : ads) if (t.toString().startsWith(ad)) line = line.replace(group, "");
+            for (String ad : ads) if (t.toString().startsWith(ad)) line = line.replace(group.replace(TAG_ENDLIST, ""), "");
         }
         return line;
     }

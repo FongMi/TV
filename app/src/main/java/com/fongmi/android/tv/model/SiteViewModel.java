@@ -66,7 +66,7 @@ public class SiteViewModel extends ViewModel {
         execute(result, () -> {
             Site site = ApiConfig.get().getHome();
             if (site.getType() == 3) {
-                Spider spider = ApiConfig.get().getCSP(site);
+                Spider spider = ApiConfig.get().getSpider(site);
                 String homeContent = spider.homeContent(true);
                 SpiderDebug.log(homeContent);
                 ApiConfig.get().setRecent(site);
@@ -94,7 +94,7 @@ public class SiteViewModel extends ViewModel {
         execute(result, () -> {
             Site site = ApiConfig.get().getSite(key);
             if (site.getType() == 3) {
-                Spider spider = ApiConfig.get().getCSP(site);
+                Spider spider = ApiConfig.get().getSpider(site);
                 String categoryContent = spider.categoryContent(tid, page, filter, extend);
                 SpiderDebug.log(categoryContent);
                 ApiConfig.get().setRecent(site);
@@ -117,7 +117,7 @@ public class SiteViewModel extends ViewModel {
         execute(result, () -> {
             Site site = ApiConfig.get().getSite(key);
             if (site.getType() == 3) {
-                Spider spider = ApiConfig.get().getCSP(site);
+                Spider spider = ApiConfig.get().getSpider(site);
                 String detailContent = spider.detailContent(Arrays.asList(id));
                 SpiderDebug.log(detailContent);
                 ApiConfig.get().setRecent(site);
@@ -152,7 +152,7 @@ public class SiteViewModel extends ViewModel {
             Source.get().stop();
             Site site = ApiConfig.get().getSite(key);
             if (site.getType() == 3) {
-                Spider spider = ApiConfig.get().getCSP(site);
+                Spider spider = ApiConfig.get().getSpider(site);
                 String playerContent = spider.playerContent(flag, id, ApiConfig.get().getFlags());
                 SpiderDebug.log(playerContent);
                 ApiConfig.get().setRecent(site);
@@ -197,7 +197,7 @@ public class SiteViewModel extends ViewModel {
 
     public void searchContent(Site site, String keyword, boolean quick) throws Throwable {
         if (site.getType() == 3) {
-            Spider spider = ApiConfig.get().getCSP(site);
+            Spider spider = ApiConfig.get().getSpider(site);
             String searchContent = spider.searchContent(Trans.t2s(keyword), quick);
             SpiderDebug.log(site.getName() + "," + searchContent);
             post(site, Result.fromJson(searchContent));
@@ -214,7 +214,7 @@ public class SiteViewModel extends ViewModel {
     public void searchContent(Site site, String keyword, String page) {
         execute(result, () -> {
             if (site.getType() == 3) {
-                Spider spider = ApiConfig.get().getCSP(site);
+                Spider spider = ApiConfig.get().getSpider(site);
                 String searchContent = spider.searchContent(Trans.t2s(keyword), false, page);
                 SpiderDebug.log(site.getName() + "," + searchContent);
                 Result result = Result.fromJson(searchContent);
