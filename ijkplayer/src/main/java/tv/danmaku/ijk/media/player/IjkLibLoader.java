@@ -1,22 +1,36 @@
-/*
- * Copyright (C) 2013-2014 Bilibili
- * Copyright (C) 2013-2014 Zhang Rui <bbcallen@gmail.com>
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package tv.danmaku.ijk.media.player;
 
-public interface IjkLibLoader {
-    void loadLibrary(String libName) throws UnsatisfiedLinkError, SecurityException;
+import android.util.Log;
+
+import java.util.Arrays;
+
+public abstract class IjkLibLoader {
+
+    private static final String TAG = "IjkLibLoader";
+
+    private final String[] nativeLibraries;
+    private boolean loadAttempted;
+    private boolean isAvailable;
+
+    public IjkLibLoader(String... libraries) {
+        nativeLibraries = libraries;
+    }
+
+    public synchronized boolean isAvailable() {
+        if (loadAttempted) return isAvailable;
+        loadAttempted = true;
+        try {
+            for (String lib : nativeLibraries) {
+                loadLibrary(lib);
+            }
+            isAvailable = true;
+        } catch (Throwable exception) {
+            // Log a warning as an attempt to check for the library indicates that the app depends on an
+            // extension and generally would expect its native libraries to be available.
+            Log.w(TAG, "Failed to load " + Arrays.toString(nativeLibraries));
+        }
+        return isAvailable;
+    }
+
+    protected abstract void loadLibrary(String name);
 }
