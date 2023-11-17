@@ -102,7 +102,7 @@ public class CustomWebView extends WebView {
     private boolean isVideoFormat(String url) {
         try {
             Site site = ApiConfig.get().getSite(key);
-            Spider spider = ApiConfig.get().getCSP(site);
+            Spider spider = ApiConfig.get().getSpider(site);
             if (spider.manualVideoCheck()) return spider.isVideoFormat(url);
             return Sniffer.isVideoFormat(url);
         } catch (Exception ignored) {

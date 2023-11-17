@@ -55,7 +55,7 @@ public class JsLoader {
     private Spider find(Map<String, String> params) {
         if (!params.containsKey("siteKey")) return spiders.get(recent);
         Site site = ApiConfig.get().getSite(params.get("siteKey"));
-        return site.isEmpty() ? null : ApiConfig.get().getCSP(site);
+        return site.isEmpty() ? null : ApiConfig.get().getSpider(site);
     }
 
     public Object[] proxyInvoke(Map<String, String> params) {

@@ -3,6 +3,7 @@ package com.fongmi.android.tv.server.process;
 import com.fongmi.android.tv.server.Nano;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.github.catvod.utils.Path;
+import com.google.common.net.HttpHeaders;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -126,8 +127,8 @@ public class Local implements Process {
         if (headerIfRangeMissingOrMatching && range != null && startFrom >= 0 && startFrom < fileLen) {
             if (headerIfNoneMatchPresentAndMatching) {
                 res = NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.NOT_MODIFIED, mime, "");
-                res.addHeader("Accept-Ranges", "bytes");
-                res.addHeader("ETag", etag);
+                res.addHeader(HttpHeaders.ACCEPT_RANGES, "bytes");
+                res.addHeader(HttpHeaders.ETAG, etag);
             } else {
                 if (endAt < 0) endAt = fileLen - 1;
                 long newLen = endAt - startFrom + 1;
@@ -135,26 +136,26 @@ public class Local implements Process {
                 FileInputStream fis = new FileInputStream(file);
                 fis.skip(startFrom);
                 res = NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.PARTIAL_CONTENT, mime, fis, newLen);
-                res.addHeader("Accept-Ranges", "bytes");
-                res.addHeader("Content-Length", newLen + "");
-                res.addHeader("Content-Range", "bytes " + startFrom + "-" + endAt + "/" + fileLen);
-                res.addHeader("ETag", etag);
+                res.addHeader(HttpHeaders.CONTENT_LENGTH, newLen + "");
+                res.addHeader(HttpHeaders.CONTENT_RANGE, "bytes " + startFrom + "-" + endAt + "/" + fileLen);
+                res.addHeader(HttpHeaders.ACCEPT_RANGES, "bytes");
+                res.addHeader(HttpHeaders.ETAG, etag);
             }
         } else {
             if (headerIfRangeMissingOrMatching && range != null && startFrom >= fileLen) {
                 res = NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.RANGE_NOT_SATISFIABLE, NanoHTTPD.MIME_PLAINTEXT, "");
-                res.addHeader("Content-Range", "bytes */" + fileLen);
-                res.addHeader("Accept-Ranges", "bytes");
-                res.addHeader("ETag", etag);
+                res.addHeader(HttpHeaders.CONTENT_RANGE, "bytes */" + fileLen);
+                res.addHeader(HttpHeaders.ACCEPT_RANGES, "bytes");
+                res.addHeader(HttpHeaders.ETAG, etag);
             } else if (headerIfNoneMatchPresentAndMatching && (!headerIfRangeMissingOrMatching || range == null)) {
                 res = NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.NOT_MODIFIED, mime, "");
-                res.addHeader("Accept-Ranges", "bytes");
-                res.addHeader("ETag", etag);
+                res.addHeader(HttpHeaders.ACCEPT_RANGES, "bytes");
+                res.addHeader(HttpHeaders.ETAG, etag);
             } else {
                 res = NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, mime, new FileInputStream(file), (int) file.length());
-                res.addHeader("Content-Length", fileLen + "");
-                res.addHeader("Accept-Ranges", "bytes");
-                res.addHeader("ETag", etag);
+                res.addHeader(HttpHeaders.CONTENT_LENGTH, fileLen + "");
+                res.addHeader(HttpHeaders.ACCEPT_RANGES, "bytes");
+                res.addHeader(HttpHeaders.ETAG, etag);
             }
         }
         return res;

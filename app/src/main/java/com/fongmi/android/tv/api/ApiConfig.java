@@ -229,7 +229,7 @@ public class ApiConfig {
         return ext;
     }
 
-    public Spider getCSP(Site site) {
+    public Spider getSpider(Site site) {
         boolean js = site.getApi().contains(".js");
         boolean py = site.getApi().startsWith("py_");
         boolean csp = site.getApi().startsWith("csp_");
