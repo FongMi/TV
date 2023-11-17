@@ -11,7 +11,7 @@ android {
         minSdk 16
         targetSdk 28
         versionCode 207
-        versionName "20231116#2"
+        versionName "20231117"
         multiDexEnabled true
         ndk { abiFilters "armeabi-v7a" }
         javaCompileOptions {
