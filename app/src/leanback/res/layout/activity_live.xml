@@ -64,7 +64,7 @@
 
         <com.fongmi.android.tv.ui.custom.CustomLiveListView
             android:id="@+id/group"
-            android:layout_width="140dp"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
             tools:itemCount="5"
             tools:listitem="@layout/adapter_group" />
