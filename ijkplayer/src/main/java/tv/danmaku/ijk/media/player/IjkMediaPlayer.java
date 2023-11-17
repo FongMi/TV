@@ -36,7 +36,6 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 
 import androidx.annotation.NonNull;
-import androidx.media3.common.util.LibraryLoader;
 
 import com.google.common.net.HttpHeaders;
 
@@ -148,13 +147,10 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     private long mNativeMediaPlayer;
     @AccessedByNative
     private long mNativeMediaDataSource;
-
     @AccessedByNative
     private long mNativeAndroidIO;
-
     @AccessedByNative
     private int mNativeSurfaceTexture;
-
     @AccessedByNative
     private int mListenerContext;
 
@@ -169,7 +165,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     private int mVideoSarNum;
     private int mVideoSarDen;
 
-    private static final LibraryLoader LOADER = new LibraryLoader("ijkffmpeg", "ijksdl", "player") {
+    private static final IjkLibLoader LOADER = new IjkLibLoader("ijkffmpeg", "ijksdl", "player") {
         @Override
         protected void loadLibrary(@NonNull String name) {
             System.loadLibrary(name);
