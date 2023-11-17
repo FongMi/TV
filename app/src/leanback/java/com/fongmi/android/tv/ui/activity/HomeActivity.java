@@ -97,7 +97,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         DLNARendererService.Companion.start(this, R.drawable.ic_logo);
         mClock = Clock.create(mBinding.time).format("MM/dd HH:mm:ss");
         mBinding.progressLayout.showProgress();
-        Updater.get().release().start();
+        Updater.get().release().start(this);
         Server.get().start();
         setRecyclerView();
         setViewModel();
