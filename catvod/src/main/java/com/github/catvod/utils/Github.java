@@ -7,11 +7,7 @@ import java.io.File;
 public class Github {
 
     public static final String URL = "https://gh-proxy.com/https://raw.githubusercontent.com/FongMi/Release/main";
-    private static String ABI;
-
-    public static void setAbi(String abi) {
-        Github.ABI = abi.replace("_", "-");
-    }
+    private static final String ABI = "armeabi-v7a";
 
     private static String getUrl(String path, String name) {
         return URL + "/" + path + "/" + name;

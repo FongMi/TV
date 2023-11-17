@@ -24,8 +24,6 @@ android {
     productFlavors {
         leanback {
             dimension "default"
-            versionCode 207
-            versionName "20231115#4"
         }
     }
 
@@ -90,7 +88,7 @@ dependencies {
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.biometric:biometric:1.1.0'
-    implementation 'androidx.leanback:leanback:1.2.0-alpha03'
+    implementation 'androidx.leanback:leanback:1.2.0-alpha04'
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.6.2'
     implementation 'androidx.room:room-runtime:2.6.0'
     implementation 'cat.ereza:customactivityoncrash:2.4.0'

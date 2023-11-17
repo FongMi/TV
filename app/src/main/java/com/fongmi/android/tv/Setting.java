@@ -154,7 +154,7 @@ public class Setting {
     }
 
     public static int getHttp() {
-        return Prefers.getInt("exo_http");
+        return Prefers.getInt("exo_http", 1);
     }
 
     public static void putHttp(int http) {
