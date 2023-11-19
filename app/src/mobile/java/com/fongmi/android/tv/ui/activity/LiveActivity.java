@@ -255,6 +255,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private void getLive() {
+        mBinding.control.action.home.setText(getHome().getName());
         mPlayers.setPlayer(getPlayerType(-1));
         mViewModel.getLive(getHome());
         setPlayerView();
@@ -268,12 +269,13 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         for (Group group : live.getGroups()) (group.isHidden() ? mHides : items).add(group);
         mGroupAdapter.addAll(items);
         setPosition(LiveConfig.get().find(items));
-        mBinding.control.action.home.setText(live.getName());
     }
 
     private void setWidth(Live live) {
+        int base = ResUtil.dp2px(live.hasLogo() ? 90 : 45);
         for (Group group : live.getGroups()) live.setWidth(Math.max(live.getWidth(), ResUtil.getTextWidth(group.getName(), 14)));
-        mBinding.group.getLayoutParams().width = Math.min(live.getWidth() + ResUtil.dp2px(live.hasLogo() ? 90 : 45), ResUtil.dp2px(260));
+        mBinding.group.getLayoutParams().width = live.getWidth() == 0 ? 0 : Math.min(live.getWidth() + base, ResUtil.dp2px(200));
+        mBinding.divide.setVisibility(live.getWidth() == 0 ? View.GONE : View.VISIBLE);
     }
 
     private void setPosition(int[] position) {
@@ -834,12 +836,14 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private void prevLine() {
+        if (mChannel == null) return;
         mChannel.prevLine();
         showInfo();
         fetch();
     }
 
     private void nextLine(boolean show) {
+        if (mChannel == null) return;
         mChannel.nextLine();
         if (show) showInfo();
         else setInfo();
