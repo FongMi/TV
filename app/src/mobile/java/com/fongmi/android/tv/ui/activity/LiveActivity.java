@@ -272,8 +272,10 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private void setWidth(Live live) {
+        int base = ResUtil.dp2px(live.hasLogo() ? 90 : 45);
         for (Group group : live.getGroups()) live.setWidth(Math.max(live.getWidth(), ResUtil.getTextWidth(group.getName(), 14)));
-        mBinding.group.getLayoutParams().width = Math.min(live.getWidth() + ResUtil.dp2px(live.hasLogo() ? 90 : 45), ResUtil.dp2px(260));
+        mBinding.group.getLayoutParams().width = live.getWidth() == 0 ? 0 : Math.min(live.getWidth() + base, ResUtil.dp2px(200));
+        mBinding.divide.setVisibility(live.getWidth() == 0 ? View.GONE : View.VISIBLE);
     }
 
     private void setPosition(int[] position) {

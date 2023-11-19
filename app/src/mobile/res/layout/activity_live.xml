@@ -72,9 +72,11 @@
             tools:listitem="@layout/adapter_group" />
 
         <View
+            android:id="@+id/divide"
             android:layout_width="0.3dp"
             android:layout_height="match_parent"
-            android:background="@color/grey_700" />
+            android:background="@color/grey_700"
+            android:visibility="gone" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/channel"
