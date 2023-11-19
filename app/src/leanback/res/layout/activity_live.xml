@@ -70,9 +70,11 @@
             tools:listitem="@layout/adapter_group" />
 
         <View
+            android:id="@+id/divide"
             android:layout_width="0.3dp"
             android:layout_height="match_parent"
-            android:background="@color/grey_700" />
+            android:background="@color/grey_700"
+            android:visibility="gone" />
 
         <com.fongmi.android.tv.ui.custom.CustomLiveListView
             android:id="@+id/channel"
