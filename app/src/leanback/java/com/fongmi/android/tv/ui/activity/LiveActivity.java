@@ -440,7 +440,9 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void showEpg() {
-        mBinding.widget.play.setText(mChannel.getData().getEpg());
+        String epg = mChannel.getData().getEpg();
+        mBinding.widget.name.setMaxEms(epg.isEmpty() ? mChannel.getName().length() : 12);
+        mBinding.widget.play.setText(epg);
     }
 
     private void setTraffic() {
@@ -576,7 +578,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         showProgress();
     }
 
-    private void release() {
+    private void resetAdapter() {
+        mBinding.divide.setVisibility(View.GONE);
         mChannelAdapter.clear();
         mGroupAdapter.clear();
         mHides.clear();
@@ -592,8 +595,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     public void setLive(Live item) {
         LiveConfig.get().setHome(item);
         mPlayers.stop();
+        resetAdapter();
         hideControl();
-        release();
         getLive();
     }
 
