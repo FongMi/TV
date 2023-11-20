@@ -18,7 +18,7 @@ public class Push implements Source.Extractor {
 
     @Override
     public String fetch(String url) throws Exception {
-        VideoActivity.push((FragmentActivity) App.activity(), Uri.parse(url.substring(7)));
+        VideoActivity.start(App.activity(), url.substring(7));
         SystemClock.sleep(500);
         return "";
     }

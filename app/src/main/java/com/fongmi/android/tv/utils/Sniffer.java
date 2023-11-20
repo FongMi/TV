@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Sniffer {
@@ -21,11 +22,12 @@ public class Sniffer {
 
     public static final Pattern CLICKER = Pattern.compile("\\[a=cr:(\\{.*?\\})\\/](.*?)\\[\\/a]");
     public static final String RULE = "http((?!http).){12,}?\\.(m3u8|mp4|flv|avi|mkv|rm|wmv|mpg|m4a|mp3)\\?.*|http((?!http).){12,}\\.(m3u8|mp4|flv|avi|mkv|rm|wmv|mpg|m4a|mp3)|http((?!http).)*?video/tos*";
-    public static final List<String> PUSH = Arrays.asList("smb", "http", "https", "thunder", "magnet", "ed2k", "mitv", "jianpian");
     public static final List<String> THUNDER = Arrays.asList("thunder", "magnet", "ed2k");
 
-    public static boolean isPush(Uri uri) {
-        return PUSH.contains(uri.getScheme());
+    public static String getUrl(String text) {
+        Matcher m = Pattern.compile("(http|https|rtmp|rtsp|smb|thunder|magnet|ed2k|mitv|tvbox-xg|jianpian):[^\\s]+", Pattern.MULTILINE).matcher(text);
+        if (m.find()) return m.group(0);
+        return "";
     }
 
     public static boolean isThunder(String url) {

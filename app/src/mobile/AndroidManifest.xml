@@ -48,6 +48,8 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data android:scheme="smb" />
+                <data android:scheme="rtmp" />
+                <data android:scheme="rtsp" />
                 <data android:scheme="http" />
                 <data android:scheme="https" />
                 <data android:mimeType="video/*" />

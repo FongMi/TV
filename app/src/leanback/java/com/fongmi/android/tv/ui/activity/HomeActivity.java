@@ -2,7 +2,6 @@ package com.fongmi.android.tv.ui.activity;
 
 import android.Manifest;
 import android.content.Intent;
-import android.net.Uri;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
@@ -119,12 +118,12 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     private void checkAction(Intent intent) {
         if (Intent.ACTION_SEND.equals(intent.getAction())) {
-            VideoActivity.push(this, Uri.parse(intent.getStringExtra(Intent.EXTRA_TEXT)));
+            VideoActivity.push(this, intent.getStringExtra(Intent.EXTRA_TEXT));
         } else if (Intent.ACTION_VIEW.equals(intent.getAction()) && intent.getData() != null) {
             if ("text/plain".equals(intent.getType()) || UrlUtil.path(intent.getData()).endsWith(".m3u")) {
                 loadLive("file:/" + FileChooser.getPathFromUri(this, intent.getData()));
             } else {
-                VideoActivity.push(this, intent.getData());
+                VideoActivity.push(this, intent.getData().toString());
             }
         }
     }
@@ -394,7 +393,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
                 CollectActivity.start(this, event.getText(), true);
                 break;
             case PUSH:
-                VideoActivity.push(this, event.getText(), true);
+                VideoActivity.push(this, event.getText());
                 break;
         }
     }

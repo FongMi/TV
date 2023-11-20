@@ -47,12 +47,12 @@ public class LinkDialog {
     }
 
     private void initView() {
-        CharSequence text = Util.getClipText();
-        binding.input.setEndIconOnClickListener(this::onChoose);
-        if (!TextUtils.isEmpty(text) && (Sniffer.isPush(Uri.parse(text.toString())))) binding.text.setText(text);
+        String text = Sniffer.getUrl(Util.getClipText().toString());
+        if (!TextUtils.isEmpty(text)) binding.text.setText(text);
     }
 
     private void initEvent() {
+        binding.input.setEndIconOnClickListener(this::onChoose);
         binding.text.setOnEditorActionListener((textView, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) dialog.getButton(DialogInterface.BUTTON_POSITIVE).performClick();
             return true;
@@ -66,7 +66,7 @@ public class LinkDialog {
 
     private void onPositive(DialogInterface dialog, int which) {
         String text = binding.text.getText().toString().trim();
-        if (!text.isEmpty()) VideoActivity.push(App.activity(), text);
+        if (!text.isEmpty()) VideoActivity.start(App.activity(), text);
         dialog.dismiss();
     }
 
