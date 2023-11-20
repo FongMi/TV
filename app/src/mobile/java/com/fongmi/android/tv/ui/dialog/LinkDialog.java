@@ -47,8 +47,8 @@ public class LinkDialog {
     }
 
     private void initView() {
-        String text = Sniffer.getUrl(Util.getClipText().toString());
-        if (!TextUtils.isEmpty(text)) binding.text.setText(text);
+        CharSequence text = Util.getClipText();
+        if (!TextUtils.isEmpty(text)) binding.text.setText(Sniffer.getUrl(text.toString()));
     }
 
     private void initEvent() {

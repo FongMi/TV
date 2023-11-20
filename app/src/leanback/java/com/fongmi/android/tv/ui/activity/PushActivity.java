@@ -38,7 +38,7 @@ public class PushActivity extends BaseActivity {
     }
 
     private void onClip(View view) {
-        String text = Sniffer.getUrl(Util.getClipText().toString());
-        if (!TextUtils.isEmpty(text)) VideoActivity.start(this, text, false);
+        CharSequence text = Util.getClipText();
+        if (!TextUtils.isEmpty(text)) VideoActivity.start(this, Sniffer.getUrl(text.toString()), false);
     }
 }
