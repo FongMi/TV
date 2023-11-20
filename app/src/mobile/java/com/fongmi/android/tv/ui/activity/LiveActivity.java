@@ -489,7 +489,9 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private void showEpg() {
-        mBinding.widget.play.setText(mChannel.getData().getEpg());
+        String epg = mChannel.getData().getEpg();
+        mBinding.widget.name.setMaxEms(epg.isEmpty() ? mChannel.getName().length() : 12);
+        mBinding.widget.play.setText(epg);
         setMetadata();
     }
 
@@ -745,8 +747,8 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private void setMetadata() {
-        String title = mChannel == null ? "" : mChannel.getName();
-        String artist = mChannel == null ? "" : mChannel.getData().getEpg();
+        String title = mBinding.widget.name.getText().toString();
+        String artist = mBinding.widget.play.getText().toString();
         MediaMetadataCompat.Builder builder = new MediaMetadataCompat.Builder();
         builder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, title);
         builder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, artist);
