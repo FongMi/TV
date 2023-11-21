@@ -1,7 +1,8 @@
 package com.github.catvod.net;
 
 import android.net.Uri;
-import android.util.ArrayMap;
+
+import androidx.collection.ArrayMap;
 
 import com.github.catvod.bean.Doh;
 import com.github.catvod.utils.Path;
@@ -14,10 +15,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
@@ -55,7 +54,7 @@ public class OkHttp {
 
     public void setDoh(Doh doh) {
         OkHttpClient dohClient = new OkHttpClient.Builder().cache(new Cache(Path.doh(), CACHE)).build();
-        dns = doh.getUrl().isEmpty() ? null : new DnsOverHttps.Builder().client(new OkHttpClient.Builder().cache(new Cache(Path.doh(), CACHE)).build()).url(HttpUrl.get(doh.getUrl())).bootstrapDnsHosts(doh.getHosts()).build();
+        dns = doh.getUrl().isEmpty() ? null : new DnsOverHttps.Builder().client(dohClient).url(HttpUrl.get(doh.getUrl())).bootstrapDnsHosts(doh.getHosts()).build();
         client = null;
     }
 
