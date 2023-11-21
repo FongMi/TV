@@ -2,8 +2,8 @@ package com.fongmi.android.tv.model;
 
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.ArrayMap;
 
-import androidx.collection.ArrayMap;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 

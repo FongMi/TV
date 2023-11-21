@@ -1,6 +1,7 @@
 package com.fongmi.android.tv.ui.custom;
 
-import androidx.collection.ArrayMap;
+import android.util.ArrayMap;
+
 import androidx.leanback.widget.ListRow;
 import androidx.leanback.widget.Presenter;
 import androidx.leanback.widget.PresenterSelector;
