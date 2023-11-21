@@ -25,6 +25,9 @@ import com.orhanobut.logger.LogAdapter;
 import com.orhanobut.logger.Logger;
 import com.orhanobut.logger.PrettyFormatStrategy;
 
+import org.conscrypt.Conscrypt;
+
+import java.security.Security;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -98,6 +101,7 @@ public class App extends Application {
 
     @Override
     protected void attachBaseContext(Context base) {
+        Security.insertProviderAt(Conscrypt.newProvider(), 1);
         super.attachBaseContext(base);
         Init.set(base);
     }
