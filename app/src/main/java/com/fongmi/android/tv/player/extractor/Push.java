@@ -1,9 +1,6 @@
 package com.fongmi.android.tv.player.extractor;
 
-import android.net.Uri;
 import android.os.SystemClock;
-
-import androidx.fragment.app.FragmentActivity;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.player.Source;

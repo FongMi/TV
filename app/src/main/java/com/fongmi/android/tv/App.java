@@ -11,12 +11,10 @@ import android.os.Looper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.os.HandlerCompat;
-import androidx.media3.common.util.Log;
 
 import com.fongmi.android.tv.api.LiveConfig;
 import com.fongmi.android.tv.ui.activity.CrashActivity;
 import com.fongmi.android.tv.utils.Notify;
-import com.fongmi.android.tv.utils.Sniffer;
 import com.github.catvod.Init;
 import com.github.catvod.bean.Doh;
 import com.github.catvod.net.OkHttp;
