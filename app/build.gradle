@@ -11,7 +11,7 @@ android {
         minSdk 21
         targetSdk 28
         versionCode 208
-        versionName "20231122"
+        versionName "20231122#2"
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
@@ -118,7 +118,6 @@ dependencies {
     implementation 'com.google.zxing:core:3.3.0'
     implementation 'com.guolindev.permissionx:permissionx:1.7.1'
     implementation 'com.hierynomus:smbj:0.11.5'
-    implementation 'org.conscrypt:conscrypt-android:2.5.2'
     implementation 'org.chromium.net:cronet-embedded:76.3809.111'
     implementation 'org.eclipse.jetty:jetty-client:8.1.21.v20160908'
     implementation 'org.eclipse.jetty:jetty-server:8.1.21.v20160908'
