@@ -56,12 +56,12 @@
                 android:src="@drawable/ic_control_cast" />
 
             <ImageView
-                android:id="@+id/share"
+                android:id="@+id/info"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:padding="8dp"
-                android:src="@drawable/ic_control_share" />
+                android:src="@drawable/ic_control_info" />
 
         </LinearLayout>
     </LinearLayout>

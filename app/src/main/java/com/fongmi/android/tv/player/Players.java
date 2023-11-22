@@ -157,7 +157,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     public Map<String, String> getHeaders() {
-        return headers;
+        return checkUa(headers);
     }
 
     public String[] getHeaderArray() {
