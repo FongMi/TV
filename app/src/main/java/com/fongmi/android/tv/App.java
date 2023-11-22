@@ -21,9 +21,6 @@ import com.google.gson.Gson;
 import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.Logger;
 
-import org.conscrypt.Conscrypt;
-
-import java.security.Security;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -36,10 +33,6 @@ public class App extends MultiDexApplication {
     private static App instance;
     private Activity activity;
     private final Gson gson;
-
-    static {
-        Security.insertProviderAt(Conscrypt.newProvider(), 1);
-    }
 
     public App() {
         instance = this;
