@@ -119,7 +119,6 @@ dependencies {
     implementation 'com.guolindev.permissionx:permissionx:1.7.1'
     implementation 'com.hierynomus:smbj:0.11.5'
     implementation 'org.chromium.net:cronet-embedded:76.3809.111'
-    implementation 'org.conscrypt:conscrypt-android:2.5.2'
     implementation 'org.eclipse.jetty:jetty-client:8.1.21.v20160908'
     implementation 'org.eclipse.jetty:jetty-server:8.1.21.v20160908'
     implementation 'org.eclipse.jetty:jetty-servlet:8.1.21.v20160908'

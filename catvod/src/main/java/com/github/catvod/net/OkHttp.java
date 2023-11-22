@@ -9,7 +9,10 @@ import com.github.catvod.utils.Path;
 import com.github.catvod.utils.Util;
 import com.google.common.net.HttpHeaders;
 
+import org.conscrypt.Conscrypt;
+
 import java.security.SecureRandom;
+import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Map;
@@ -52,6 +55,10 @@ public class OkHttp {
 
     public static Dns dns() {
         return get().dns != null ? get().dns : Dns.SYSTEM;
+    }
+
+    public OkHttp() {
+        Security.insertProviderAt(Conscrypt.newProvider(), 1);
     }
 
     public void setDoh(Doh doh) {
