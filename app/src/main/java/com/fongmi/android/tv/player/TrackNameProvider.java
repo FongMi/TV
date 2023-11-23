@@ -29,7 +29,7 @@ public class TrackNameProvider {
         String trackName;
         int trackType = inferPrimaryTrackType(format);
         if (trackType == C.TRACK_TYPE_VIDEO) {
-            trackName = joinWithSeparator(buildRoleString(format), buildResolutionString(format), buildBitrateString(format));
+            trackName = joinWithSeparator(buildRoleString(format), buildResolutionString(format), buildMimeString(format), buildBitrateString(format));
         } else if (trackType == C.TRACK_TYPE_AUDIO) {
             trackName = joinWithSeparator(buildLanguageOrLabelString(format), buildAudioChannelString(format), buildMimeString(format), buildBitrateString(format));
         } else {
@@ -204,7 +204,7 @@ public class TrackNameProvider {
             case MimeTypes.APPLICATION_DVBSUBS:
                 return "DVB";
             default:
-                return "";
+                return format.sampleMimeType;
         }
     }
 }

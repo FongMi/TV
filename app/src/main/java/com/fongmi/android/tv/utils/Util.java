@@ -1,6 +1,7 @@
 package com.fongmi.android.tv.utils;
 
 import android.app.Activity;
+import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ComponentName;
 import android.content.Context;
@@ -42,7 +43,13 @@ public class Util {
     }
 
     public static CharSequence getClipText() {
-        return ((ClipboardManager) App.get().getSystemService(Context.CLIPBOARD_SERVICE)).getText();
+        ClipboardManager manager = (ClipboardManager) App.get().getSystemService(Context.CLIPBOARD_SERVICE);
+        return manager.getText();
+    }
+
+    public static void copy(String text) {
+        ClipboardManager manager = (ClipboardManager) App.get().getSystemService(Context.CLIPBOARD_SERVICE);
+        manager.setPrimaryClip(ClipData.newPlainText("", text));
     }
 
     public static int getDigit(String text) {
