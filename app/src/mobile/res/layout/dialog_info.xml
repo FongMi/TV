@@ -16,7 +16,7 @@
             android:layout_height="wrap_content"
             android:linksClickable="false"
             android:textColor="?android:attr/textColorPrimary"
-            android:textSize="16sp"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
         <TextView
@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:textColor="?android:attr/textColorPrimary"
-            android:textSize="12sp" />
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/url"
@@ -35,7 +35,7 @@
             android:autoLink="all"
             android:linksClickable="false"
             android:textColor="?android:attr/textColorPrimary"
-            android:textSize="12sp" />
+            android:textSize="14sp" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
