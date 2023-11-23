@@ -407,6 +407,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private boolean onChoose() {
+        if (mPlayers.isEmpty()) return false;
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("headers", mPlayers.getHeaderArray());
