@@ -731,6 +731,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private void checkPlay() {
         setR1Callback();
         if (mPlayers.isPlaying()) onPaused();
+        else if (mPlayers.isEmpty()) onRefresh();
         else onPlay();
     }
 
@@ -981,9 +982,9 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mBinding.control.right.back.setVisibility(isFullscreen() && !isLock() ? View.VISIBLE : View.GONE);
         mBinding.control.parse.setVisibility(isFullscreen() && isUseParse() ? View.VISIBLE : View.GONE);
         mBinding.control.action.getRoot().setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
-        mBinding.control.info.setVisibility(mPlayers.getUrl() == null ? View.GONE : View.VISIBLE);
-        mBinding.control.cast.setVisibility(mPlayers.getUrl() == null ? View.GONE : View.VISIBLE);
         mBinding.control.right.lock.setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
+        mBinding.control.info.setVisibility(mPlayers.isEmpty() ? View.GONE : View.VISIBLE);
+        mBinding.control.cast.setVisibility(mPlayers.isEmpty() ? View.GONE : View.VISIBLE);
         mBinding.control.center.setVisibility(isLock() ? View.GONE : View.VISIBLE);
         mBinding.control.bottom.setVisibility(isLock() ? View.GONE : View.VISIBLE);
         mBinding.control.top.setVisibility(isLock() ? View.GONE : View.VISIBLE);
