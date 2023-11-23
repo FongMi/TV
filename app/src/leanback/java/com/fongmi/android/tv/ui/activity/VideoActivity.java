@@ -352,6 +352,12 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
                 if (mFlagAdapter.size() > 0) setFlagActivated((Flag) mFlagAdapter.get(position));
             }
         });
+        mBinding.episode.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
+            @Override
+            public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
+                if (child != null && mBinding.video != mFocus1) mFocus1 = child.itemView;
+            }
+        });
         mBinding.array.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
