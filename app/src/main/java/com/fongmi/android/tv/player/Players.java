@@ -139,7 +139,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     public Map<String, String> getHeaders() {
-        return checkUa(headers);
+        return headers == null ? new HashMap<>() : checkUa(headers);
     }
 
     public String[] getHeaderArray() {
