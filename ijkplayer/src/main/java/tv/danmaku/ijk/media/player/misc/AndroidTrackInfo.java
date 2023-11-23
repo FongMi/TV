@@ -63,6 +63,12 @@ public class AndroidTrackInfo implements ITrackInfo {
     }
 
     @Override
+    public String getMimeType() {
+        if (mTrackInfo == null || mTrackInfo.getFormat() == null) return "";
+        return mTrackInfo.getFormat().getString(MediaFormat.KEY_MIME);
+    }
+
+    @Override
     public int getChannelCount() {
         if (mTrackInfo == null || mTrackInfo.getFormat() == null) return 0;
         return mTrackInfo.getFormat().getInteger(MediaFormat.KEY_CHANNEL_COUNT);

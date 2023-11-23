@@ -42,11 +42,11 @@ public class TrackNameProvider {
         String trackName;
         int trackType = trackInfo.getTrackType();
         if (trackType == C.TRACK_TYPE_VIDEO) {
-            trackName = joinWithSeparator(buildResolutionString(trackInfo.getWidth(), trackInfo.getHeight()), buildBitrateString(trackInfo.getBitrate()));
+            trackName = joinWithSeparator(buildResolutionString(trackInfo.getWidth(), trackInfo.getHeight()), buildMimeString(trackInfo.getMimeType()), buildBitrateString(trackInfo.getBitrate()));
         } else if (trackType == C.TRACK_TYPE_AUDIO) {
-            trackName = joinWithSeparator(buildLanguageString(trackInfo.getLanguage()), buildAudioChannelString(trackInfo.getChannelCount()), buildBitrateString(trackInfo.getBitrate()));
+            trackName = joinWithSeparator(buildLanguageString(trackInfo.getLanguage()), buildAudioChannelString(trackInfo.getChannelCount()), buildMimeString(trackInfo.getMimeType()), buildBitrateString(trackInfo.getBitrate()));
         } else {
-            trackName = buildLanguageString(trackInfo.getLanguage());
+            trackName = joinWithSeparator(buildLanguageString(trackInfo.getLanguage()), buildMimeString(trackInfo.getMimeType()));
         }
         return TextUtils.isEmpty(trackName) ? resources.getString(R.string.exo_track_unknown) : trackName;
     }
@@ -150,7 +150,11 @@ public class TrackNameProvider {
 
     private String buildMimeString(Format format) {
         if (format.sampleMimeType == null) return "";
-        switch (format.sampleMimeType) {
+        return buildMimeString(format.sampleMimeType);
+    }
+
+    private String buildMimeString(String mimeType) {
+        switch (mimeType) {
             case MimeTypes.AUDIO_DTS:
                 return "DTS";
             case MimeTypes.AUDIO_DTS_HD:
@@ -204,7 +208,7 @@ public class TrackNameProvider {
             case MimeTypes.APPLICATION_DVBSUBS:
                 return "DVB";
             default:
-                return format.sampleMimeType;
+                return mimeType;
         }
     }
 }

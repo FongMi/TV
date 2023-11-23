@@ -26,6 +26,8 @@ public interface ITrackInfo {
 
     String getLanguage();
 
+    String getMimeType();
+
     int getTrackType();
 
     int getChannelCount();
