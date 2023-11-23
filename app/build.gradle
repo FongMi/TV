@@ -64,6 +64,7 @@ dependencies {
     implementation project(':tvbus')
     implementation project(':catvod')
     implementation project(':danmaku')
+    //implementation project(':pyramid')
     implementation project(':quickjs')
     implementation project(':thunder')
     implementation project(':jianpian')
