@@ -29,26 +29,26 @@ public class TrackNameProvider {
         String trackName;
         int trackType = inferPrimaryTrackType(format);
         if (trackType == C.TRACK_TYPE_VIDEO) {
-            trackName = joinWithSeparator(buildRoleString(format), buildResolutionString(format), buildMimeString(format), buildBitrateString(format));
+            trackName = joinWithSeparator(buildRoleString(format), buildResolutionString(format), buildBitrateString(format));
         } else if (trackType == C.TRACK_TYPE_AUDIO) {
-            trackName = joinWithSeparator(buildLanguageOrLabelString(format), buildAudioChannelString(format), buildMimeString(format), buildBitrateString(format));
+            trackName = joinWithSeparator(buildLanguageOrLabelString(format), buildAudioChannelString(format), buildBitrateString(format));
         } else {
-            trackName = joinWithSeparator(buildLanguageString(format), buildLabelString(format), buildMimeString(format));
+            trackName = joinWithSeparator(buildLanguageString(format), buildLabelString(format));
         }
-        return TextUtils.isEmpty(trackName) ? resources.getString(R.string.exo_track_unknown) : trackName;
+        return TextUtils.isEmpty(trackName) ? resources.getString(R.string.exo_track_unknown) : joinWithSeparator(trackName, buildMimeString(format));
     }
 
     public String getTrackName(ITrackInfo trackInfo) {
         String trackName;
         int trackType = trackInfo.getTrackType();
         if (trackType == C.TRACK_TYPE_VIDEO) {
-            trackName = joinWithSeparator(buildResolutionString(trackInfo.getWidth(), trackInfo.getHeight()), buildMimeString(trackInfo.getMimeType()), buildBitrateString(trackInfo.getBitrate()));
+            trackName = joinWithSeparator(buildResolutionString(trackInfo.getWidth(), trackInfo.getHeight()), buildBitrateString(trackInfo.getBitrate()));
         } else if (trackType == C.TRACK_TYPE_AUDIO) {
-            trackName = joinWithSeparator(buildLanguageString(trackInfo.getLanguage()), buildAudioChannelString(trackInfo.getChannelCount()), buildMimeString(trackInfo.getMimeType()), buildBitrateString(trackInfo.getBitrate()));
+            trackName = joinWithSeparator(buildLanguageString(trackInfo.getLanguage()), buildAudioChannelString(trackInfo.getChannelCount()), buildBitrateString(trackInfo.getBitrate()));
         } else {
-            trackName = joinWithSeparator(buildLanguageString(trackInfo.getLanguage()), buildMimeString(trackInfo.getMimeType()));
+            trackName = joinWithSeparator(buildLanguageString(trackInfo.getLanguage()));
         }
-        return TextUtils.isEmpty(trackName) ? resources.getString(R.string.exo_track_unknown) : trackName;
+        return TextUtils.isEmpty(trackName) ? resources.getString(R.string.exo_track_unknown) : joinWithSeparator(trackName, buildMimeString(trackInfo.getMimeType()));
     }
 
     private String buildResolutionString(Format format) {
