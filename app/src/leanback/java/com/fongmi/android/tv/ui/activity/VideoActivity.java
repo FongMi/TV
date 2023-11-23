@@ -150,9 +150,10 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private View mFocus1;
     private View mFocus2;
 
-    public static void push(FragmentActivity activity, Uri uri) {
-        if (Sniffer.isPush(uri)) push(activity, uri.toString(), true);
-        else file(activity, FileChooser.getPathFromUri(activity, uri));
+    public static void push(FragmentActivity activity, String text) {
+        String url = Sniffer.getUrl(text);
+        if (url.length() > 0) start(activity, url);
+        else file(activity, FileChooser.getPathFromUri(activity, Uri.parse(text)));
     }
 
     public static void file(FragmentActivity activity, String path) {
@@ -169,7 +170,11 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         start(activity, key, id, name, pic, null, false, false, true);
     }
 
-    public static void push(Activity activity, String url, boolean clear) {
+    public static void start(Activity activity, String url) {
+        start(activity, url, true);
+    }
+
+    public static void start(Activity activity, String url, boolean clear) {
         start(activity, "push_agent", url, url, clear);
     }
 
@@ -345,6 +350,12 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
                 if (mFlagAdapter.size() > 0) setFlagActivated((Flag) mFlagAdapter.get(position));
+            }
+        });
+        mBinding.episode.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
+            @Override
+            public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
+                if (child != null && mBinding.video != mFocus1) mFocus1 = child.itemView;
             }
         });
         mBinding.array.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {

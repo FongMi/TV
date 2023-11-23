@@ -157,7 +157,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     public Map<String, String> getHeaders() {
-        return headers;
+        return checkUa(headers);
     }
 
     public String[] getHeaderArray() {
@@ -280,7 +280,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     public String addSpeed() {
         float speed = getSpeed();
         float addon = speed >= 2 ? 1f : 0.25f;
-        speed = speed == 5 ? 0.25f : speed + addon;
+        speed = speed >= 5 ? 0.25f : Math.min(speed + addon, 5.0f);
         return setSpeed(speed);
     }
 

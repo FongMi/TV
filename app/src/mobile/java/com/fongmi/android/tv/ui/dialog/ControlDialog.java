@@ -85,7 +85,7 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
     protected void initView() {
         if (players == null) dismiss();
         if (players == null) return;
-        binding.speed.setValue(Math.max(players.getSpeed(), 1.0f));
+        binding.speed.setValue(Math.max(players.getSpeed(), 0.5f));
         binding.player.setText(parent.control.action.player.getText());
         binding.decode.setText(parent.control.action.decode.getText());
         binding.ending.setText(parent.control.action.ending.getText());
@@ -108,6 +108,7 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
         binding.decode.setOnClickListener(v -> click(binding.decode, parent.control.action.decode));
         binding.ending.setOnClickListener(v -> click(binding.ending, parent.control.action.ending));
         binding.opening.setOnClickListener(v -> click(binding.opening, parent.control.action.opening));
+        binding.player.setOnLongClickListener(v -> longClick(binding.player, parent.control.action.player));
         binding.ending.setOnLongClickListener(v -> longClick(binding.ending, parent.control.action.ending));
         binding.opening.setOnLongClickListener(v -> longClick(binding.opening, parent.control.action.opening));
     }

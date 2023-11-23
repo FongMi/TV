@@ -12,7 +12,7 @@ import java.security.NoSuchAlgorithmException;
 
 public class Util {
 
-    public static final String CHROME = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36";
+    public static final String CHROME = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36";
 
     public static String base64(String ext) {
         return base64(ext.getBytes());

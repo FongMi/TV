@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.media.MediaMetadataCompat;
+import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.annotation.Dimension;
@@ -54,6 +55,7 @@ import com.fongmi.android.tv.ui.adapter.GroupAdapter;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownLive;
 import com.fongmi.android.tv.ui.dialog.CastDialog;
+import com.fongmi.android.tv.ui.dialog.InfoDialog;
 import com.fongmi.android.tv.ui.dialog.LiveDialog;
 import com.fongmi.android.tv.ui.dialog.PassDialog;
 import com.fongmi.android.tv.ui.dialog.SubtitleDialog;
@@ -178,8 +180,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     protected void initEvent() {
         mBinding.control.seek.setListener(mPlayers);
         mBinding.control.cast.setOnClickListener(view -> onCast());
-        mBinding.control.share.setOnClickListener(view -> onShare());
-        mBinding.control.share.setOnLongClickListener(view -> onChoose());
+        mBinding.control.info.setOnClickListener(view -> onInfo());
         mBinding.control.right.back.setOnClickListener(view -> onBack());
         mBinding.control.right.lock.setOnClickListener(view -> onLock());
         mBinding.control.right.rotate.setOnClickListener(view -> onRotate());
@@ -196,8 +197,10 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mBinding.control.action.player.setOnClickListener(view -> onPlayer());
         mBinding.control.action.decode.setOnClickListener(view -> onDecode());
         mBinding.control.action.text.setOnLongClickListener(view -> onTextLong());
+        mBinding.control.action.player.setOnLongClickListener(view -> onChoose());
         mBinding.control.action.speed.setOnLongClickListener(view -> onSpeedLong());
         mBinding.video.setOnTouchListener((view, event) -> mKeyDown.onTouchEvent(event));
+        mBinding.control.action.getRoot().setOnTouchListener(this::onActionTouch);
     }
 
     private void setRecyclerView() {
@@ -303,26 +306,9 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         CastDialog.create().video(CastVideo.get(mBinding.control.title.getText().toString(), mPlayers.getUrl())).fm(false).show(this);
     }
 
-    private void onShare() {
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_TEXT, mPlayers.getUrl());
-        intent.putExtra("name", mBinding.control.title.getText());
-        intent.putExtra("title", mBinding.control.title.getText());
-        startActivity(Util.getChooser(intent));
+    private void onInfo() {
+        InfoDialog.create(this).title(mBinding.control.title.getText()).headers(mPlayers.getHeaders()).url(mPlayers.getUrl()).show();
         setRedirect(true);
-    }
-
-    private boolean onChoose() {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra("headers", mPlayers.getHeaderArray());
-        intent.putExtra("title", mBinding.control.title.getText());
-        intent.setDataAndType(Uri.parse(mPlayers.getUrl()), "video/*");
-        startActivity(Util.getChooser(intent));
-        setRedirect(true);
-        return true;
     }
 
     private void onBack() {
@@ -420,6 +406,22 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         fetch();
     }
 
+    private boolean onChoose() {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra("headers", mPlayers.getHeaderArray());
+        intent.putExtra("title", mBinding.control.title.getText());
+        intent.setDataAndType(Uri.parse(mPlayers.getUrl()), "video/*");
+        startActivity(Util.getChooser(intent));
+        setRedirect(true);
+        return true;
+    }
+
+    private boolean onActionTouch(View v, MotionEvent e) {
+        setR1Callback();
+        return false;
+    }
+
     private void hideUI() {
         if (isGone(mBinding.recycler)) return;
         mBinding.recycler.setVisibility(View.GONE);
@@ -457,7 +459,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private void showControl() {
-        mBinding.control.share.setVisibility(mPlayers.getUrl() == null ? View.GONE : View.VISIBLE);
+        mBinding.control.info.setVisibility(mPlayers.getUrl() == null ? View.GONE : View.VISIBLE);
         mBinding.control.cast.setVisibility(mPlayers.getUrl() == null ? View.GONE : View.VISIBLE);
         mBinding.control.right.rotate.setVisibility(isLock() ? View.GONE : View.VISIBLE);
         mBinding.control.right.back.setVisibility(isLock() ? View.GONE : View.VISIBLE);

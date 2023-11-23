@@ -62,6 +62,7 @@ public class CustomRecyclerView extends RecyclerView {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
+        if (event.getPointerCount() != 1) return false;
         switch (event.getAction()) {
             case MotionEvent.ACTION_UP:
                 x1 = y1 = 0;

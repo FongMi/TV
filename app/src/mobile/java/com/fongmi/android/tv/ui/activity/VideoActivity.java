@@ -80,6 +80,7 @@ import com.fongmi.android.tv.ui.dialog.CastDialog;
 import com.fongmi.android.tv.ui.dialog.ControlDialog;
 import com.fongmi.android.tv.ui.dialog.EpisodeGridDialog;
 import com.fongmi.android.tv.ui.dialog.EpisodeListDialog;
+import com.fongmi.android.tv.ui.dialog.InfoDialog;
 import com.fongmi.android.tv.ui.dialog.TrackDialog;
 import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.FileChooser;
@@ -155,9 +156,10 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private Clock mClock;
     private PiP mPiP;
 
-    public static void push(FragmentActivity activity, Uri uri) {
-        if (Sniffer.isPush(uri)) push(activity, uri.toString());
-        else file(activity, FileChooser.getPathFromUri(activity, uri));
+    public static void push(FragmentActivity activity, String text) {
+        String url = Sniffer.getUrl(text);
+        if (url.length() > 0) start(activity, url);
+        else file(activity, FileChooser.getPathFromUri(activity, Uri.parse(text)));
     }
 
     public static void file(FragmentActivity activity, String path) {
@@ -174,7 +176,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         start(activity, key, id, name, pic, null, true);
     }
 
-    public static void push(Activity activity, String url) {
+    public static void start(Activity activity, String url) {
         start(activity, "push_agent", url, url, null);
     }
 
@@ -330,15 +332,14 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mBinding.reverse.setOnClickListener(view -> onReverse());
         mBinding.name.setOnLongClickListener(view -> onChange());
         mBinding.control.cast.setOnClickListener(view -> onCast());
+        mBinding.control.info.setOnClickListener(view -> onInfo());
         mBinding.control.full.setOnClickListener(view -> onFull());
         mBinding.control.keep.setOnClickListener(view -> onKeep());
-        mBinding.control.share.setOnClickListener(view -> onShare());
         mBinding.control.danmu.setOnClickListener(view -> onDanmu());
         mBinding.control.play.setOnClickListener(view -> checkPlay());
         mBinding.control.next.setOnClickListener(view -> checkNext());
         mBinding.control.prev.setOnClickListener(view -> checkPrev());
         mBinding.control.setting.setOnClickListener(view -> onSetting());
-        mBinding.control.share.setOnLongClickListener(view -> onChoose());
         mBinding.control.title.setOnLongClickListener(view -> onChange());
         mBinding.control.right.back.setOnClickListener(view -> onFull());
         mBinding.control.right.lock.setOnClickListener(view -> onLock());
@@ -355,6 +356,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mBinding.control.action.ending.setOnClickListener(view -> onEnding());
         mBinding.control.action.opening.setOnClickListener(view -> onOpening());
         mBinding.control.action.episodes.setOnClickListener(view -> onEpisodes());
+        mBinding.control.action.player.setOnLongClickListener(view -> onChoose());
         mBinding.control.action.speed.setOnLongClickListener(view -> onSpeedLong());
         mBinding.control.action.reset.setOnLongClickListener(view -> onResetToggle());
         mBinding.control.action.ending.setOnLongClickListener(view -> onEndingReset());
@@ -696,6 +698,11 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         CastDialog.create().history(mHistory).video(CastVideo.get(mBinding.name.getText().toString(), mPlayers.getUrl())).fm(true).show(this);
     }
 
+    private void onInfo() {
+        InfoDialog.create(this).title(mBinding.control.title.getText()).headers(mPlayers.getHeaders()).url(mPlayers.getUrl()).show();
+        setRedirect(true);
+    }
+
     private void onFull() {
         setR1Callback();
         toggleFullscreen();
@@ -708,30 +715,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         else createKeep();
         RefreshEvent.keep();
         checkKeepImg();
-    }
-
-    private void onShare() {
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_TEXT, mPlayers.getUrl());
-        intent.putExtra("name", mBinding.control.title.getText());
-        intent.putExtra("title", mBinding.control.title.getText());
-        startActivity(Util.getChooser(intent));
-        setRedirect(true);
-    }
-
-    private boolean onChoose() {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra("return_result", true);
-        intent.putExtra("headers", mPlayers.getHeaderArray());
-        intent.putExtra("position", (int) mPlayers.getPosition());
-        intent.putExtra("title", mBinding.control.title.getText());
-        intent.setDataAndType(Uri.parse(mPlayers.getUrl()), "video/*");
-        startActivityForResult(Util.getChooser(intent), 1001);
-        setRedirect(true);
-        return true;
     }
 
     private void onDanmu() {
@@ -895,6 +878,19 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mDialogs.add(EpisodeListDialog.create(this).episodes(mEpisodeAdapter.getItems()).show());
     }
 
+    private boolean onChoose() {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra("return_result", true);
+        intent.putExtra("headers", mPlayers.getHeaderArray());
+        intent.putExtra("position", (int) mPlayers.getPosition());
+        intent.putExtra("title", mBinding.control.title.getText());
+        intent.setDataAndType(Uri.parse(mPlayers.getUrl()), "video/*");
+        startActivityForResult(Util.getChooser(intent), 1001);
+        setRedirect(true);
+        return true;
+    }
+
     private boolean onActionTouch(View v, MotionEvent e) {
         setR1Callback();
         return false;
@@ -985,7 +981,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mBinding.control.right.back.setVisibility(isFullscreen() && !isLock() ? View.VISIBLE : View.GONE);
         mBinding.control.parse.setVisibility(isFullscreen() && isUseParse() ? View.VISIBLE : View.GONE);
         mBinding.control.action.getRoot().setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
-        mBinding.control.share.setVisibility(mPlayers.getUrl() == null ? View.GONE : View.VISIBLE);
+        mBinding.control.info.setVisibility(mPlayers.getUrl() == null ? View.GONE : View.VISIBLE);
         mBinding.control.cast.setVisibility(mPlayers.getUrl() == null ? View.GONE : View.VISIBLE);
         mBinding.control.right.lock.setVisibility(isFullscreen() ? View.VISIBLE : View.GONE);
         mBinding.control.center.setVisibility(isLock() ? View.GONE : View.VISIBLE);
