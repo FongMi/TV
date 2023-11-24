@@ -20,6 +20,7 @@ import android.text.style.ClickableSpan;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -559,7 +560,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private void getPlayer(Flag flag, Episode episode, boolean replay) {
         mBinding.control.title.setText(getString(R.string.detail_title, mBinding.name.getText(), episode.getName()));
         mViewModel.playerContent(getKey(), flag.getFlag(), episode.getUrl());
-        getBinding().getRoot().setKeepScreenOn(true);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         updateHistory(episode, replay);
         mPlayers.clean();
         showProgress();
@@ -1209,7 +1210,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         if (mBinding.control.action.loop.isActivated()) {
             onReset(true);
         } else {
-            getBinding().getRoot().setKeepScreenOn(false);
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             checkNext();
         }
     }
@@ -1378,13 +1379,13 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private void onPaused() {
-        getBinding().getRoot().setKeepScreenOn(false);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         checkPlayImg(false);
         mPlayers.pause();
     }
 
     private void onPlay() {
-        getBinding().getRoot().setKeepScreenOn(true);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         checkPlayImg(true);
         mPlayers.play();
     }
