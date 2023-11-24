@@ -52,6 +52,7 @@ public class InfoDialog {
     public void show() {
         initDialog();
         initView();
+        initEvent();
     }
 
     private void initDialog() {
@@ -64,6 +65,10 @@ public class InfoDialog {
         binding.url.setText(url);
         binding.title.setText(title);
         binding.header.setText(header);
+        binding.header.setVisibility(header.isEmpty() ? View.GONE : View.VISIBLE);
+    }
+
+    private void initEvent() {
         binding.url.setOnClickListener(this::onShare);
         binding.url.setOnLongClickListener(this::onCopy);
     }
