@@ -83,6 +83,7 @@ public class OkHttp {
         try {
             return url.startsWith("http") ? newCall(url).execute().body().string() : "";
         } catch (Exception e) {
+            e.printStackTrace();
             return "";
         }
     }

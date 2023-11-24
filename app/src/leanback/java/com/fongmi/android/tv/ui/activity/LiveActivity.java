@@ -38,7 +38,6 @@ import com.fongmi.android.tv.databinding.ActivityLiveBinding;
 import com.fongmi.android.tv.event.ActionEvent;
 import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.event.PlayerEvent;
-import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.impl.LiveCallback;
 import com.fongmi.android.tv.impl.PassCallback;
 import com.fongmi.android.tv.impl.SubtitleCallback;
@@ -62,21 +61,14 @@ import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Traffic;
 import com.fongmi.android.tv.utils.Util;
-import com.github.catvod.net.OkHttp;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 
-import okhttp3.Call;
-import okhttp3.Response;
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
 public class LiveActivity extends BaseActivity implements GroupPresenter.OnClickListener, ChannelPresenter.OnClickListener, CustomKeyDownLive.Listener, CustomLiveListView.Callback, TrackDialog.Listener, Biometric.Callback, PassCallback, LiveCallback, SubtitleCallback {
@@ -84,8 +76,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private ActivityLiveBinding mBinding;
     private ArrayObjectAdapter mChannelAdapter;
     private ArrayObjectAdapter mGroupAdapter;
-    private SimpleDateFormat mFormatDate;
-    private SimpleDateFormat mFormatTime;
     private CustomKeyDownLive mKeyDown;
     private LiveViewModel mViewModel;
     private List<Group> mHides;
@@ -148,8 +138,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mPlayers = new Players().init();
         mKeyDown = CustomKeyDownLive.create(this);
         mClock = Clock.create(mBinding.widget.time);
-        mFormatDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        mFormatTime = new SimpleDateFormat("yyyy-MM-ddHH:mm", Locale.getDefault());
         setRecyclerView();
         setVideoView();
         setViewModel();
@@ -226,7 +214,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(LiveViewModel.class);
-        mViewModel.channel.observe(this, result -> mPlayers.start(result, getHome().getTimeout()));
+        mViewModel.url.observe(this, result -> mPlayers.start(result, getHome().getTimeout()));
+        mViewModel.epg.observe(this, this::setEpg);
         mViewModel.live.observe(this, live -> {
             hideProgress();
             setGroup(live);
@@ -351,6 +340,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private boolean onChoose() {
+        if (mPlayers.isEmpty()) return false;
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("headers", mPlayers.getHeaderArray());
@@ -443,6 +433,10 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         String epg = mChannel.getData().getEpg();
         mBinding.widget.name.setMaxEms(epg.isEmpty() ? mChannel.getName().length() : 12);
         mBinding.widget.play.setText(epg);
+    }
+
+    private void setEpg(Epg epg) {
+        if (mChannel != null && mChannel.getName().equals(epg.getKey())) showEpg();
     }
 
     private void setTraffic() {
@@ -542,6 +536,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void setInfo() {
+        mViewModel.getEpg(mChannel);
         mChannel.loadLogo(mBinding.widget.logo);
         mBinding.widget.name.setText(mChannel.getName());
         mBinding.widget.line.setText(mChannel.getLineText());
@@ -550,30 +545,12 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.widget.line.setVisibility(mChannel.getLineVisible());
         mBinding.control.line.setVisibility(mChannel.getLineVisible());
         showEpg();
-        checkEpg();
-    }
-
-    private void checkEpg() {
-        if (mChannel.getEpg().isEmpty()) return;
-        String date = mFormatDate.format(new Date());
-        String epg = mChannel.getEpg().replace("{date}", date);
-        if (!mChannel.getData().equal(date)) getEpg(epg, mChannel);
-    }
-
-    private void getEpg(String epg, Channel channel) {
-        OkHttp.newCall(epg).enqueue(new Callback() {
-            @Override
-            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                channel.setData(Epg.objectFrom(response.body().string(), mFormatTime));
-                if (mChannel.equals(channel)) App.post(() -> showEpg());
-            }
-        });
     }
 
     private void fetch() {
         if (mChannel == null) return;
         LiveConfig.get().setKeep(mChannel);
-        mViewModel.fetch(mChannel);
+        mViewModel.getUrl(mChannel);
         mPlayers.clean();
         showProgress();
     }

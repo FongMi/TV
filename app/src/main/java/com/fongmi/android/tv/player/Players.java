@@ -157,6 +157,10 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         this.url = null;
     }
 
+    public boolean isEmpty() {
+        return TextUtils.isEmpty(getUrl());
+    }
+
     public int getPlayer() {
         return player;
     }
