@@ -55,76 +55,73 @@
         android:textColor="?android:attr/textColorPrimary"
         android:textSize="16sp" />
 
-    <LinearLayout
-        android:layout_width="wrap_content"
+    <HorizontalScrollView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:fillViewport="true"
+        android:scrollbars="none">
 
-        <TextView
-            android:id="@+id/scale_0"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:background="@drawable/shape_accent"
-            android:gravity="center"
-            android:singleLine="true"
-            android:tag="0"
-            android:textColor="@color/control"
-            android:textSize="14sp"
-            tools:text="預設" />
+            android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/scale_1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:background="@drawable/shape_accent"
-            android:gravity="center"
-            android:singleLine="true"
-            android:tag="1"
-            android:textColor="@color/control"
-            android:textSize="14sp"
-            tools:text="16:9" />
+            <TextView
+                android:id="@+id/scale_0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/shape_accent"
+                android:tag="0"
+                android:textColor="@color/control"
+                android:textSize="14sp"
+                tools:text="預設" />
 
-        <TextView
-            android:id="@+id/scale_2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:background="@drawable/shape_accent"
-            android:gravity="center"
-            android:singleLine="true"
-            android:tag="2"
-            android:textColor="@color/control"
-            android:textSize="14sp"
-            tools:text="4:3" />
+            <TextView
+                android:id="@+id/scale_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/shape_accent"
+                android:tag="1"
+                android:textColor="@color/control"
+                android:textSize="14sp"
+                tools:text="16:9" />
 
-        <TextView
-            android:id="@+id/scale_3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:background="@drawable/shape_accent"
-            android:gravity="center"
-            android:singleLine="true"
-            android:tag="3"
-            android:textColor="@color/control"
-            android:textSize="14sp"
-            tools:text="填充" />
+            <TextView
+                android:id="@+id/scale_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/shape_accent"
+                android:tag="2"
+                android:textColor="@color/control"
+                android:textSize="14sp"
+                tools:text="4:3" />
 
-        <TextView
-            android:id="@+id/scale_4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/shape_accent"
-            android:gravity="center"
-            android:singleLine="true"
-            android:tag="4"
-            android:textColor="@color/control"
-            android:textSize="14sp"
-            tools:text="裁剪" />
+            <TextView
+                android:id="@+id/scale_3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/shape_accent"
+                android:tag="3"
+                android:textColor="@color/control"
+                android:textSize="14sp"
+                tools:text="填充" />
 
-    </LinearLayout>
+            <TextView
+                android:id="@+id/scale_4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/shape_accent"
+                android:tag="4"
+                android:textColor="@color/control"
+                android:textSize="14sp"
+                tools:text="裁剪" />
+
+        </LinearLayout>
+    </HorizontalScrollView>
 
     <TextView
         android:layout_width="wrap_content"
@@ -135,72 +132,69 @@
         android:textColor="?android:attr/textColorPrimary"
         android:textSize="16sp" />
 
-    <LinearLayout
-        android:layout_width="wrap_content"
+    <HorizontalScrollView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:fillViewport="true"
+        android:scrollbars="none">
 
-        <TextView
-            android:id="@+id/player"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:background="@drawable/shape_accent"
-            android:gravity="center"
-            android:singleLine="true"
-            android:textColor="@color/control"
-            android:textSize="14sp"
-            tools:text="EXO" />
+            android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/decode"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:background="@drawable/shape_accent"
-            android:gravity="center"
-            android:singleLine="true"
-            android:textColor="@color/control"
-            android:textSize="14sp"
-            tools:text="硬解" />
+            <TextView
+                android:id="@+id/player"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/shape_accent"
+                android:textColor="@color/control"
+                android:textSize="14sp"
+                tools:text="EXO" />
 
-        <TextView
-            android:id="@+id/loop"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:background="@drawable/shape_accent"
-            android:gravity="center"
-            android:singleLine="true"
-            android:text="@string/play_loop"
-            android:textColor="@color/control"
-            android:textSize="14sp" />
+            <TextView
+                android:id="@+id/decode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/shape_accent"
+                android:textColor="@color/control"
+                android:textSize="14sp"
+                tools:text="硬解" />
 
-        <TextView
-            android:id="@+id/opening"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:background="@drawable/shape_accent"
-            android:gravity="center"
-            android:singleLine="true"
-            android:textColor="@color/control"
-            android:textSize="14sp"
-            tools:text="片頭" />
+            <TextView
+                android:id="@+id/loop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/shape_accent"
+                android:text="@string/play_loop"
+                android:textColor="@color/control"
+                android:textSize="14sp" />
 
-        <TextView
-            android:id="@+id/ending"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="0dp"
-            android:background="@drawable/shape_accent"
-            android:gravity="center"
-            android:singleLine="true"
-            android:textColor="@color/control"
-            android:textSize="14sp"
-            tools:text="片尾" />
+            <TextView
+                android:id="@+id/opening"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/shape_accent"
+                android:textColor="@color/control"
+                android:textSize="14sp"
+                tools:text="片頭" />
 
-    </LinearLayout>
+            <TextView
+                android:id="@+id/ending"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/shape_accent"
+                android:textColor="@color/control"
+                android:textSize="14sp"
+                tools:text="片尾" />
+
+        </LinearLayout>
+    </HorizontalScrollView>
 
     <TextView
         android:id="@+id/track"
@@ -225,7 +219,6 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:background="@drawable/shape_accent"
-            android:gravity="center"
             android:tag="3"
             android:text="@string/play_track_text"
             android:textColor="@color/control"
@@ -239,7 +232,6 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:background="@drawable/shape_accent"
-            android:gravity="center"
             android:tag="1"
             android:text="@string/play_track_audio"
             android:textColor="@color/control"
@@ -252,7 +244,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/shape_accent"
-            android:gravity="center"
             android:tag="2"
             android:text="@string/play_track_video"
             android:textColor="@color/control"

@@ -157,7 +157,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     public Map<String, String> getHeaders() {
-        return checkUa(headers);
+        return headers == null ? new HashMap<>() : checkUa(headers);
     }
 
     public String[] getHeaderArray() {
@@ -173,6 +173,10 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     public void clean() {
         this.headers = null;
         this.url = null;
+    }
+
+    public boolean isEmpty() {
+        return TextUtils.isEmpty(getUrl());
     }
 
     public MediaSessionCompat getSession() {

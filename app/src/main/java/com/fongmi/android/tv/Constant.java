@@ -11,6 +11,8 @@ public class Constant {
     public static final int TIMEOUT_VOD = 30 * 1000;
     //直播爬蟲時間
     public static final int TIMEOUT_LIVE = 30 * 1000;
+    //節目爬蟲時間
+    public static final int TIMEOUT_EPG = 5 * 1000;
     //播放超時時間
     public static final int TIMEOUT_PLAY = 15 * 1000;
     //解析預設時間
