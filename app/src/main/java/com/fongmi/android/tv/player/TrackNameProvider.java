@@ -193,6 +193,30 @@ public class TrackNameProvider {
                 return "AMR-NB";
             case MimeTypes.AUDIO_AMR_WB:
                 return "AMR-WB";
+            case MimeTypes.VIDEO_MP4:
+                return "MP4";
+            case MimeTypes.VIDEO_FLV:
+                return "FLV";
+            case MimeTypes.VIDEO_AV1:
+                return "AV1";
+            case MimeTypes.VIDEO_AVI:
+                return "AVI";
+            case MimeTypes.VIDEO_MPEG:
+                return "MPEG";
+            case MimeTypes.VIDEO_MPEG2:
+                return "MPEG2";
+            case MimeTypes.VIDEO_H263:
+                return "H263";
+            case MimeTypes.VIDEO_H264:
+                return "H264";
+            case MimeTypes.VIDEO_H265:
+                return "H265";
+            case MimeTypes.VIDEO_VP8:
+                return "VP8";
+            case MimeTypes.VIDEO_VP9:
+                return "VP9";
+            case MimeTypes.VIDEO_DOLBY_VISION:
+                return "DOLBY";
             case MimeTypes.APPLICATION_PGS:
                 return "PGS";
             case MimeTypes.APPLICATION_SUBRIP:
