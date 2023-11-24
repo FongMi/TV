@@ -49,7 +49,7 @@ public class SiteViewModel extends ViewModel {
     public MutableLiveData<Result> player;
     public MutableLiveData<Result> search;
     public MutableLiveData<Danmu> danmaku;
-    public ExecutorService executor;
+    private ExecutorService executor;
 
     public SiteViewModel() {
         this.episode = new MutableLiveData<>();

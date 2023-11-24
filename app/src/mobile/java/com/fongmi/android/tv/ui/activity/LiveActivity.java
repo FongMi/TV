@@ -41,7 +41,6 @@ import com.fongmi.android.tv.databinding.ActivityLiveBinding;
 import com.fongmi.android.tv.event.ActionEvent;
 import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.event.PlayerEvent;
-import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.impl.LiveCallback;
 import com.fongmi.android.tv.impl.PassCallback;
 import com.fongmi.android.tv.impl.SubtitleCallback;
@@ -68,32 +67,24 @@ import com.fongmi.android.tv.utils.PiP;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Traffic;
 import com.fongmi.android.tv.utils.Util;
-import com.github.catvod.net.OkHttp;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 
-import okhttp3.Call;
-import okhttp3.Response;
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
 public class LiveActivity extends BaseActivity implements CustomKeyDownLive.Listener, TrackDialog.Listener, Biometric.Callback, PassCallback, LiveCallback, GroupAdapter.OnClickListener, ChannelAdapter.OnClickListener, SubtitleCallback, CastDialog.Listener {
 
     private ActivityLiveBinding mBinding;
-    private Observer<Channel> mObserveChannel;
     private ChannelAdapter mChannelAdapter;
-    private SimpleDateFormat mFormatDate;
-    private SimpleDateFormat mFormatTime;
+    private Observer<Channel> mObserveUrl;
     private CustomKeyDownLive mKeyDown;
     private GroupAdapter mGroupAdapter;
+    private Observer<Epg> mObserveEpg;
     private LiveViewModel mViewModel;
     private List<Group> mHides;
     private Players mPlayers;
@@ -155,13 +146,12 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
 
     @Override
     protected void initView(Bundle savedInstanceState) {
-        mFormatTime = new SimpleDateFormat("yyyy-MM-ddHH:mm", Locale.getDefault());
-        mFormatDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         mKeyDown = CustomKeyDownLive.create(this, mBinding.video);
         mClock = Clock.create(mBinding.widget.time);
         setPadding(mBinding.control.getRoot());
         mPlayers = new Players().init(this);
-        mObserveChannel = this::start;
+        mObserveEpg = this::setEpg;
+        mObserveUrl = this::start;
         mHides = new ArrayList<>();
         mR0 = this::stopService;
         mR1 = this::hideControl;
@@ -249,7 +239,8 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
 
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(LiveViewModel.class);
-        mViewModel.channel.observeForever(mObserveChannel);
+        mViewModel.url.observeForever(mObserveUrl);
+        mViewModel.epg.observeForever(mObserveEpg);
         mViewModel.live.observe(this, live -> {
             hideProgress();
             setGroup(live);
@@ -498,6 +489,10 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         setMetadata();
     }
 
+    private void setEpg(Epg epg) {
+        if (mChannel != null && mChannel.getName().equals(epg.getKey())) showEpg();
+    }
+
     private void setTraffic() {
         Traffic.setSpeed(mBinding.widget.traffic);
         App.post(mR2, Constant.INTERVAL_TRAFFIC);
@@ -593,6 +588,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private void setInfo() {
+        mViewModel.getEpg(mChannel);
         mChannel.loadLogo(mBinding.widget.logo);
         mBinding.widget.name.setText(mChannel.getName());
         mBinding.control.title.setText(mChannel.getName());
@@ -604,30 +600,12 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mBinding.control.action.line.setText(mBinding.widget.line.getText());
         mBinding.control.action.line.setVisibility(mBinding.widget.line.getVisibility());
         showEpg();
-        checkEpg();
-    }
-
-    private void checkEpg() {
-        if (mChannel.getEpg().isEmpty()) return;
-        String date = mFormatDate.format(new Date());
-        String epg = mChannel.getEpg().replace("{date}", date);
-        if (!mChannel.getData().equal(date)) getEpg(epg, mChannel);
-    }
-
-    private void getEpg(String epg, Channel channel) {
-        OkHttp.newCall(epg).enqueue(new Callback() {
-            @Override
-            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                channel.setData(Epg.objectFrom(response.body().string(), mFormatTime));
-                if (mChannel.equals(channel)) App.post(() -> showEpg());
-            }
-        });
     }
 
     private void fetch() {
         if (mChannel == null) return;
         LiveConfig.get().setKeep(mChannel);
-        mViewModel.fetch(mChannel);
+        mViewModel.getUrl(mChannel);
         mPlayers.clean();
         showProgress();
     }
@@ -1088,6 +1066,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         Source.get().stop();
         PlaybackService.stop();
         App.removeCallbacks(mR1, mR2, mR3);
-        mViewModel.channel.removeObserver(mObserveChannel);
+        mViewModel.url.removeObserver(mObserveUrl);
+        mViewModel.epg.removeObserver(mObserveEpg);
     }
 }
