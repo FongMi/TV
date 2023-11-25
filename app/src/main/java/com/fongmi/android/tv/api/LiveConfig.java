@@ -120,7 +120,7 @@ public class LiveConfig {
         LiveParser.text(live, text);
         App.post(callback::success);
         lives.remove(live);
-        lives.add(live);
+        lives.add(live.sync());
         setHome(live);
     }
 
@@ -151,7 +151,7 @@ public class LiveConfig {
     }
 
     private void add(Live live) {
-        if (!lives.contains(live)) lives.add(live);
+        if (!lives.contains(live)) lives.add(live.sync());
     }
 
     private void bootLive() {

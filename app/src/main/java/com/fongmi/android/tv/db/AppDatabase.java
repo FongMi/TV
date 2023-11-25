@@ -16,12 +16,14 @@ import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Device;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Keep;
+import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Track;
 import com.fongmi.android.tv.db.dao.ConfigDao;
 import com.fongmi.android.tv.db.dao.DeviceDao;
 import com.fongmi.android.tv.db.dao.HistoryDao;
 import com.fongmi.android.tv.db.dao.KeepDao;
+import com.fongmi.android.tv.db.dao.LiveDao;
 import com.fongmi.android.tv.db.dao.SiteDao;
 import com.fongmi.android.tv.db.dao.TrackDao;
 import com.fongmi.android.tv.utils.ResUtil;
@@ -33,10 +35,10 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-@Database(entities = {Keep.class, Site.class, Track.class, Config.class, Device.class, History.class}, version = AppDatabase.VERSION)
+@Database(entities = {Keep.class, Site.class, Live.class, Track.class, Config.class, Device.class, History.class}, version = AppDatabase.VERSION)
 public abstract class AppDatabase extends RoomDatabase {
 
-    public static final int VERSION = 26;
+    public static final int VERSION = 27;
     public static final String NAME = "tv";
     public static final String SYMBOL = "@@@";
 
@@ -106,6 +108,7 @@ public abstract class AppDatabase extends RoomDatabase {
                 .addMigrations(MIGRATION_23_24)
                 .addMigrations(MIGRATION_24_25)
                 .addMigrations(MIGRATION_25_26)
+                .addMigrations(MIGRATION_26_27)
                 .allowMainThreadQueries()
                 .fallbackToDestructiveMigration()
                 .build();
@@ -114,6 +117,8 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract KeepDao getKeepDao();
 
     public abstract SiteDao getSiteDao();
+
+    public abstract LiveDao getLiveDao();
 
     public abstract TrackDao getTrackDao();
 
@@ -235,6 +240,13 @@ public abstract class AppDatabase extends RoomDatabase {
             database.execSQL("INSERT INTO Site_Backup SELECT `key`, name, searchable, changeable, recordable FROM Site");
             database.execSQL("DROP TABLE Site");
             database.execSQL("ALTER TABLE Site_Backup RENAME to Site");
+        }
+    };
+
+    static final Migration MIGRATION_26_27 = new Migration(26, 27) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `Live` (`name` TEXT NOT NULL, `boot` INTEGER NOT NULL, `pass` INTEGER NOT NULL, PRIMARY KEY(`name`))");
         }
     };
 }
