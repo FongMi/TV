@@ -93,7 +93,7 @@ public class LiveConfig {
         if (isEmpty()) load(new Callback());
     }
 
-    public void load(Callback callback) {
+    private void load(Callback callback) {
         new Thread(() -> loadConfig(callback)).start();
     }
 
@@ -121,7 +121,7 @@ public class LiveConfig {
         App.post(callback::success);
         lives.remove(live);
         lives.add(live.sync());
-        setHome(live);
+        setHome(live, true);
     }
 
     private void checkJson(JsonObject object, Callback callback) {
@@ -132,7 +132,7 @@ public class LiveConfig {
         }
     }
 
-    public void parseDepot(JsonObject object, Callback callback) {
+    private void parseDepot(JsonObject object, Callback callback) {
         List<Depot> items = Depot.arrayFrom(object.getAsJsonArray("urls").toString());
         List<Config> configs = new ArrayList<>();
         for (Depot item : items) configs.add(Config.find(item, 1));
@@ -141,12 +141,11 @@ public class LiveConfig {
         loadConfig(callback);
     }
 
-    public void parseConfig(JsonObject object, Callback callback) {
+    private void parseConfig(JsonObject object, Callback callback) {
         if (!object.has("lives")) return;
         for (JsonElement element : Json.safeListElement(object, "lives")) add(Live.objectFrom(element).check());
-        for (Live live : lives) if (live.getName().equals(config.getHome())) setHome(live);
-        if (home == null) setHome(lives.isEmpty() ? new Live() : lives.get(0));
-        if (home.isBoot() || Setting.isBootLive()) App.post(this::bootLive);
+        for (Live live : lives) if (live.getName().equals(config.getHome())) setHome(live, true);
+        if (home == null) setHome(lives.isEmpty() ? new Live() : lives.get(0), true);
         if (callback != null) App.post(callback::success);
     }
 
@@ -225,9 +224,14 @@ public class LiveConfig {
     }
 
     public void setHome(Live home) {
+        setHome(home, false);
+    }
+
+    private void setHome(Live home, boolean check) {
         this.home = home;
         this.home.setActivated(true);
         config.home(home.getName()).update();
         for (Live item : lives) item.setActivated(home);
+        if (check) if (home.isBoot() || Setting.isBootLive()) App.post(this::bootLive);
     }
 }
