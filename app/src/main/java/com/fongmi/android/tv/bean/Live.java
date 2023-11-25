@@ -218,6 +218,7 @@ public class Live {
     }
 
     public Live pass(boolean pass) {
+        getGroups().clear();
         setPass(pass);
         return this;
     }
