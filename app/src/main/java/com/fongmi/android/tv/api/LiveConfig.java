@@ -232,6 +232,7 @@ public class LiveConfig {
         this.home.setActivated(true);
         config.home(home.getName()).update();
         for (Live item : getLives()) item.setActivated(home);
+        if (App.activity() != null && App.activity() instanceof LiveActivity) return;
         if (check) if (home.isBoot() || Setting.isBootLive()) App.post(this::bootLive);
     }
 }

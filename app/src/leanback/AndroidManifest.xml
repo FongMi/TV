@@ -105,6 +105,7 @@
             android:name=".ui.activity.LiveActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
             android:exported="true"
+            android:launchMode="singleTop"
             android:screenOrientation="sensorLandscape"
             android:theme="@style/AppTheme.Live" />
 
