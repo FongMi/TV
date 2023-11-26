@@ -27,7 +27,7 @@ public class Sniffer {
     public static String getUrl(String text) {
         Matcher m = Pattern.compile("(http|https|rtmp|rtsp|smb|thunder|magnet|ed2k|mitv|tvbox-xg|jianpian):[^\\s]+", Pattern.MULTILINE).matcher(text);
         if (m.find()) return m.group(0);
-        return "";
+        return text;
     }
 
     public static boolean isThunder(String url) {
