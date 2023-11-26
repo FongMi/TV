@@ -84,8 +84,8 @@ public class LiveConfig {
     }
 
     public LiveConfig clear() {
-        this.home = null;
         getLives().clear();
+        this.home = null;
         return this;
     }
 
