@@ -22,7 +22,7 @@ public class WallConfig {
 
     private Drawable drawable;
     private Config config;
-    private boolean same;
+    private boolean sync;
 
     private static class Loader {
         static volatile WallConfig INSTANCE = new WallConfig();
@@ -56,7 +56,8 @@ public class WallConfig {
 
     public WallConfig config(Config config) {
         this.config = config;
-        this.same = config.getUrl().equals(ApiConfig.get().getWall());
+        if (config.getUrl() == null) return this;
+        this.sync = config.getUrl().equals(ApiConfig.get().getWall());
         return this;
     }
 
@@ -98,8 +99,8 @@ public class WallConfig {
         return file;
     }
 
-    public boolean isSame(String url) {
-        return same || TextUtils.isEmpty(config.getUrl()) || url.equals(config.getUrl());
+    public boolean needSync(String url) {
+        return sync || TextUtils.isEmpty(config.getUrl()) || url.equals(config.getUrl());
     }
 
     public static void refresh(int index) {

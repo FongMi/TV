@@ -366,7 +366,7 @@ public class ApiConfig {
 
     private void setWall(String wall) {
         this.wall = wall;
-        boolean load = !TextUtils.isEmpty(wall) && WallConfig.get().isSame(wall);
+        boolean load = !TextUtils.isEmpty(wall) && WallConfig.get().needSync(wall);
         if (load) WallConfig.get().config(Config.find(wall, config.getName(), 2).update());
     }
 }
