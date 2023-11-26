@@ -116,12 +116,12 @@ public class LiveConfig {
     }
 
     private void parseText(String text, Callback callback) {
-        Live live = new Live(config.getUrl());
+        Live live = new Live(config.getUrl()).sync();
         LiveParser.text(live, text);
-        App.post(callback::success);
         lives.remove(live);
-        lives.add(live.sync());
+        lives.add(live);
         setHome(live, true);
+        App.post(callback::success);
     }
 
     private void checkJson(JsonObject object, Callback callback) {
