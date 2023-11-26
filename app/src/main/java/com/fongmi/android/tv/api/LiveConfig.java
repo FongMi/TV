@@ -27,7 +27,7 @@ public class LiveConfig {
 
     private List<Live> lives;
     private Config config;
-    private boolean same;
+    private boolean sync;
     private Live home;
 
     private static class Loader {
@@ -72,14 +72,13 @@ public class LiveConfig {
 
     public LiveConfig init() {
         this.home = null;
-        this.config = Config.live();
-        return this;
+        return config(Config.live());
     }
 
     public LiveConfig config(Config config) {
         this.config = config;
         if (config.getUrl() == null) return this;
-        this.same = config.getUrl().equals(ApiConfig.getUrl());
+        this.sync = config.getUrl().equals(ApiConfig.getUrl());
         return this;
     }
 
@@ -93,7 +92,7 @@ public class LiveConfig {
         if (isEmpty()) load(new Callback());
     }
 
-    private void load(Callback callback) {
+    public void load(Callback callback) {
         new Thread(() -> loadConfig(callback)).start();
     }
 
@@ -207,8 +206,8 @@ public class LiveConfig {
         return new int[]{-1, -1};
     }
 
-    public boolean isSame(String url) {
-        return same || TextUtils.isEmpty(config.getUrl()) || url.equals(config.getUrl());
+    public boolean needSync(String url) {
+        return sync || TextUtils.isEmpty(config.getUrl()) || url.equals(config.getUrl());
     }
 
     public List<Live> getLives() {

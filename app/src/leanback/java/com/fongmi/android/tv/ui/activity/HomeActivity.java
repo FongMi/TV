@@ -157,7 +157,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     private void initConfig() {
         if (isLoading()) return;
         WallConfig.get().init();
-        LiveConfig.get().init();
+        LiveConfig.get().init().load();
         ApiConfig.get().init().load(getCallback());
         setLoading(true);
     }

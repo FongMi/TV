@@ -8,14 +8,12 @@ import com.android.cast.dlna.dmr.DLNARendererService;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.LiveConfig;
-import com.fongmi.android.tv.bean.Config;
-import com.fongmi.android.tv.impl.Callback;
 
 public class BootReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
         DLNARendererService.Companion.start(App.get(), R.drawable.ic_logo);
-        LiveConfig.load(Config.live(), new Callback());
+        LiveConfig.get().init().load();
     }
 }

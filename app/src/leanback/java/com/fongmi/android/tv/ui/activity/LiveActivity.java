@@ -30,7 +30,6 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.api.LiveConfig;
 import com.fongmi.android.tv.bean.Channel;
-import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Epg;
 import com.fongmi.android.tv.bean.Group;
 import com.fongmi.android.tv.bean.Keep;
@@ -232,7 +231,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void checkLive() {
         if (isEmpty()) {
-            LiveConfig.load(Config.live(), getCallback());
+            LiveConfig.get().init().load(getCallback());
         } else {
             getLive();
         }

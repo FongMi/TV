@@ -51,8 +51,7 @@ public class WallConfig {
     }
 
     public WallConfig init() {
-        this.config = Config.wall();
-        return this;
+        return config(Config.wall());
     }
 
     public WallConfig config(Config config) {
