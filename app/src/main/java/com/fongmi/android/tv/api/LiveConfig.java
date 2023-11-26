@@ -73,19 +73,19 @@ public class LiveConfig {
     public LiveConfig init() {
         this.home = null;
         this.config = Config.live();
-        this.lives = new ArrayList<>();
         return this;
     }
 
     public LiveConfig config(Config config) {
         this.config = config;
+        if (config.getUrl() == null) return this;
         this.same = config.getUrl().equals(ApiConfig.getUrl());
         return this;
     }
 
     public LiveConfig clear() {
         this.home = null;
-        this.lives.clear();
+        getLives().clear();
         return this;
     }
 
@@ -118,8 +118,8 @@ public class LiveConfig {
     private void parseText(String text, Callback callback) {
         Live live = new Live(config.getUrl()).sync();
         LiveParser.text(live, text);
-        lives.remove(live);
-        lives.add(live);
+        getLives().remove(live);
+        getLives().add(live);
         setHome(live, true);
         App.post(callback::success);
     }
@@ -144,13 +144,13 @@ public class LiveConfig {
     private void parseConfig(JsonObject object, Callback callback) {
         if (!object.has("lives")) return;
         for (JsonElement element : Json.safeListElement(object, "lives")) add(Live.objectFrom(element).check());
-        for (Live live : lives) if (live.getName().equals(config.getHome())) setHome(live, true);
-        if (home == null) setHome(lives.isEmpty() ? new Live() : lives.get(0), true);
+        for (Live live : getLives()) if (live.getName().equals(config.getHome())) setHome(live, true);
+        if (home == null) setHome(getLives().isEmpty() ? new Live() : getLives().get(0), true);
         if (callback != null) App.post(callback::success);
     }
 
     private void add(Live live) {
-        if (!lives.contains(live)) lives.add(live.sync());
+        if (!getLives().contains(live)) getLives().add(live.sync());
     }
 
     private void bootLive() {
@@ -212,7 +212,7 @@ public class LiveConfig {
     }
 
     public List<Live> getLives() {
-        return lives;
+        return lives == null ? lives = new ArrayList<>() : lives;
     }
 
     public Config getConfig() {
@@ -231,7 +231,7 @@ public class LiveConfig {
         this.home = home;
         this.home.setActivated(true);
         config.home(home.getName()).update();
-        for (Live item : lives) item.setActivated(home);
+        for (Live item : getLives()) item.setActivated(home);
         if (check) if (home.isBoot() || Setting.isBootLive()) App.post(this::bootLive);
     }
 }

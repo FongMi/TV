@@ -31,6 +31,7 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.api.LiveConfig;
 import com.fongmi.android.tv.bean.Channel;
+import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Epg;
 import com.fongmi.android.tv.bean.Group;
 import com.fongmi.android.tv.bean.Keep;
@@ -41,6 +42,7 @@ import com.fongmi.android.tv.databinding.ActivityLiveBinding;
 import com.fongmi.android.tv.event.ActionEvent;
 import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.event.PlayerEvent;
+import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.impl.LiveCallback;
 import com.fongmi.android.tv.impl.PassCallback;
 import com.fongmi.android.tv.impl.SubtitleCallback;
@@ -105,7 +107,11 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     private PiP mPiP;
 
     public static void start(Context context) {
-        if (!LiveConfig.isEmpty()) context.startActivity(new Intent(context, LiveActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        if (!LiveConfig.isEmpty()) context.startActivity(new Intent(context, LiveActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).putExtra("empty", false));
+    }
+
+    private boolean isEmpty() {
+        return getIntent().getBooleanExtra("empty", true);
     }
 
     private PlayerView getExo() {
@@ -162,7 +168,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         setRecyclerView();
         setVideoView();
         setViewModel();
-        getLive();
+        checkLive();
     }
 
     @Override
@@ -246,6 +252,28 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
             setGroup(live);
             setWidth(live);
         });
+    }
+
+    private void checkLive() {
+        if (isEmpty()) {
+            LiveConfig.load(Config.live(), getCallback());
+        } else {
+            getLive();
+        }
+    }
+
+    private Callback getCallback() {
+        return new Callback() {
+            @Override
+            public void success() {
+                getLive();
+            }
+
+            @Override
+            public void error(String msg) {
+                Notify.show(msg);
+            }
+        };
     }
 
     private void getLive() {

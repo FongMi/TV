@@ -37,6 +37,7 @@
 
     <!-- Hint -->
     <string name="copied">已複製</string>
+    <string name="shortcut"> 已於主螢幕新增捷徑。</string>
 
     <string-array name="select_background">
         <item>關閉</item>
