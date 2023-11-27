@@ -49,6 +49,7 @@ import com.fongmi.android.tv.model.LiveViewModel;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.player.Source;
+import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.service.PlaybackService;
 import com.fongmi.android.tv.ui.adapter.ChannelAdapter;
 import com.fongmi.android.tv.ui.adapter.GroupAdapter;
@@ -163,6 +164,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mR2 = this::setTraffic;
         mR3 = this::hideInfo;
         mPiP = new PiP();
+        Server.get().start();
         setForeground(true);
         setRecyclerView();
         setVideoView();
