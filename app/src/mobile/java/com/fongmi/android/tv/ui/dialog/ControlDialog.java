@@ -32,11 +32,12 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
 
     private DialogControlBinding binding;
     private ActivityVideoBinding parent;
+    private FragmentActivity activity;
     private List<TextView> scales;
     private final String[] scale;
     private Listener listener;
-    private Players players;
     private History history;
+    private Players player;
     private boolean parse;
 
     public static ControlDialog create() {
@@ -57,8 +58,8 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
         return this;
     }
 
-    public ControlDialog players(Players players) {
-        this.players = players;
+    public ControlDialog player(Players player) {
+        this.player = player;
         return this;
     }
 
@@ -71,6 +72,7 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
         for (Fragment f : activity.getSupportFragmentManager().getFragments()) if (f instanceof BottomSheetDialogFragment) return this;
         show(activity.getSupportFragmentManager(), null);
         this.listener = (Listener) activity;
+        this.activity = activity;
         return this;
     }
 
@@ -83,9 +85,9 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
 
     @Override
     protected void initView() {
-        if (players == null) dismiss();
-        if (players == null) return;
-        binding.speed.setValue(Math.max(players.getSpeed(), 0.5f));
+        if (player == null) dismiss();
+        if (player == null) return;
+        binding.speed.setValue(Math.max(player.getSpeed(), 0.5f));
         binding.player.setText(parent.control.action.player.getText());
         binding.decode.setText(parent.control.action.decode.getText());
         binding.ending.setText(parent.control.action.ending.getText());
@@ -98,6 +100,7 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
 
     @Override
     protected void initEvent() {
+        binding.timer.setOnClickListener(this::onTimer);
         binding.speed.addOnChangeListener(this::setSpeed);
         for (TextView view : scales) view.setOnClickListener(this::setScale);
         binding.text.setOnClickListener(v -> dismiss(parent.control.action.text));
@@ -113,9 +116,14 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
         binding.opening.setOnLongClickListener(v -> longClick(binding.opening, parent.control.action.opening));
     }
 
+    private void onTimer(View view) {
+        App.post(() -> TimerDialog.create().show(activity), 200);
+        dismiss();
+    }
+
     private void setSpeed(@NonNull Slider slider, float value, boolean fromUser) {
-        parent.control.action.speed.setText(players.setSpeed(value));
-        if (history != null) history.setSpeed(players.getSpeed());
+        parent.control.action.speed.setText(player.setSpeed(value));
+        if (history != null) history.setSpeed(player.getSpeed());
     }
 
     private void setScaleText() {

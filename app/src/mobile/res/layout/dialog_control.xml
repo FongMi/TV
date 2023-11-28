@@ -193,6 +193,15 @@
                 android:textSize="14sp"
                 tools:text="片尾" />
 
+            <TextView
+                android:id="@+id/timer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/shape_accent"
+                android:text="@string/play_timer"
+                android:textColor="@color/control"
+                android:textSize="14sp" />
+
         </LinearLayout>
     </HorizontalScrollView>
 

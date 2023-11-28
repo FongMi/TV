@@ -65,6 +65,7 @@ import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.player.Source;
+import com.fongmi.android.tv.player.Timer;
 import com.fongmi.android.tv.player.danmu.Parser;
 import com.fongmi.android.tv.service.PlaybackService;
 import com.fongmi.android.tv.ui.adapter.EpisodeAdapter;
@@ -762,7 +763,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private void onSetting() {
-        mControlDialog = ControlDialog.create().parent(mBinding).history(mHistory).players(mPlayers).parse(isUseParse()).show(this);
+        mControlDialog = ControlDialog.create().parent(mBinding).history(mHistory).player(mPlayers).parse(isUseParse()).show(this);
     }
 
     private void onLock() {
@@ -1690,6 +1691,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         stopSearch();
         mClock.release();
         mPlayers.release();
+        Timer.get().reset();
         Source.get().stop();
         RefreshEvent.history();
         App.removeCallbacks(mR1, mR2, mR3, mR4);
