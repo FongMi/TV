@@ -25,18 +25,6 @@
             android:exported="false" />
 
         <service
-            android:name="com.forcetech.service.P7PService"
-            android:exported="false" />
-
-        <service
-            android:name="com.forcetech.service.P8PService"
-            android:exported="false" />
-
-        <service
-            android:name="com.forcetech.service.P9PService"
-            android:exported="false" />
-
-        <service
             android:name="com.gsoft.mitv.MainActivity"
             android:exported="false" />
 
