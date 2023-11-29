@@ -77,7 +77,8 @@ public class TVBus implements Source.Extractor, Listener {
     @Override
     public void onPrepared(String result) {
         JsonObject json = App.gson().fromJson(result, JsonObject.class);
-        hls = json.has("hls") ? json.get("hls").getAsString() : "-9999";
+        if (json.get("hls") == null) return;
+        hls = json.get("hls").getAsString();
         onNotify();
     }
 
