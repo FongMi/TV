@@ -24,8 +24,9 @@ public class MainActivity extends Service {
     }
 
     private void checkLibrary() throws Exception {
-        File cache = Path.cache("libmitv.so");
-        if (!cache.exists()) Path.copy(getAssets().open("libmitv.so"), cache);
+        String name = "libmitv.so";
+        File cache = Path.cache(name);
+        if (!cache.exists()) Path.copy(getAssets().open(name), cache);
     }
 
     @Override
