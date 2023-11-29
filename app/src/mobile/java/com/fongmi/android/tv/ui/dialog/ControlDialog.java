@@ -18,6 +18,7 @@ import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.databinding.ActivityVideoBinding;
 import com.fongmi.android.tv.databinding.DialogControlBinding;
 import com.fongmi.android.tv.player.Players;
+import com.fongmi.android.tv.player.Timer;
 import com.fongmi.android.tv.ui.adapter.ParseAdapter;
 import com.fongmi.android.tv.ui.base.ViewType;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
@@ -93,6 +94,7 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
         binding.ending.setText(parent.control.action.ending.getText());
         binding.opening.setText(parent.control.action.opening.getText());
         binding.loop.setActivated(parent.control.action.loop.isActivated());
+        binding.timer.setActivated(Timer.get().isRunning());
         setTrackVisible();
         setScaleText();
         setParse();
