@@ -397,7 +397,11 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     public void start(Channel channel, int timeout) {
-        if (isIllegal(channel.getUrl())) {
+        if (channel.hasMsg()) {
+            ErrorEvent.extract(channel.getMsg());
+        } else if (channel.getParse() == 1) {
+            startParse(channel.result(), false);
+        } else if (isIllegal(channel.getUrl())) {
             ErrorEvent.url();
         } else {
             setMediaSource(channel, timeout);
