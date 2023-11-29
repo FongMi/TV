@@ -4,7 +4,7 @@ public class ForceTV {
 
     public void start(String lib, int port) {
         try {
-            System.load(lib);
+            System.loadLibrary(lib);
             start(port, 20 * 1024 * 1024);
         } catch (Throwable ignored) {
         }

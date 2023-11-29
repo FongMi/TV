@@ -6,6 +6,9 @@ import android.os.IBinder;
 
 import com.anymediacloud.iptv.standard.ForceTV;
 import com.forcetech.Util;
+import com.github.catvod.utils.Path;
+
+import java.io.File;
 
 public class MainActivity extends Service {
 
@@ -14,9 +17,15 @@ public class MainActivity extends Service {
 
     public MainActivity() {
         try {
+            checkLibrary();
             System.loadLibrary("mitv");
         } catch (Throwable ignored) {
         }
+    }
+
+    private void checkLibrary() throws Exception {
+        File cache = Path.cache("libmitv.so");
+        if (!cache.exists()) Path.copy(getAssets().open("libmitv.so"), cache);
     }
 
     @Override
