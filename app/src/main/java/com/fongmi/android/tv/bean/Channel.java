@@ -303,8 +303,8 @@ public class Channel {
 
     public Result result() {
         Result result = new Result();
-        result.setHeader(getHeader());
         result.setUrl(Url.create().add(getUrl()));
+        result.setHeader(Json.toObject(getHeaders()));
         return result;
     }
 
