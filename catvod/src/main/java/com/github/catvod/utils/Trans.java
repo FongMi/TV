@@ -51,10 +51,12 @@ public class Trans {
     }
 
     public static String s2t(String text) {
+        if (TextUtils.isEmpty(text)) return "";
         return s2t(pass(), text);
     }
 
     public static String t2s(String text) {
+        if (TextUtils.isEmpty(text)) return "";
         return t2s(pass(), text);
     }
 

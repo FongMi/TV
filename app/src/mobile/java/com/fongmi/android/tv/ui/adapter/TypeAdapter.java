@@ -55,10 +55,6 @@ public class TypeAdapter extends RecyclerView.Adapter<TypeAdapter.ViewHolder> {
         notifyItemRangeChanged(0, mItems.size());
     }
 
-    public List<Class> getTypes() {
-        return mItems;
-    }
-
     public Class get(int position) {
         return mItems.get(position);
     }
