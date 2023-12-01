@@ -71,6 +71,7 @@ public class LiveViewModel extends ViewModel {
 
     public void getUrl(Channel item) {
         execute(URL, () -> {
+            item.setMsg(null);
             Source.get().stop();
             item.setUrl(Source.get().fetch(item));
             //checkPLTV(item);

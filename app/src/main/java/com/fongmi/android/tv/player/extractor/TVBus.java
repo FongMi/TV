@@ -86,7 +86,7 @@ public class TVBus implements Source.Extractor, Listener {
     public void onStop(String result) {
         JsonObject json = App.gson().fromJson(result, JsonObject.class);
         hls = json.get("errno").getAsString();
-        onNotify();
+        if (hls.startsWith("-")) onNotify();
     }
 
     @Override
