@@ -90,6 +90,8 @@ public class IjkMediaCodecInfo {
         // ------ AMLogic -----
         // MiBox1, 1s, 2
         sKnownCodecList.put("OMX.amlogic.avc.decoder.awesome", RANK_TESTED);
+        sKnownCodecList.put("OMX.amlogic.avs.decoder.awesome", RANK_TESTED);
+        sKnownCodecList.put("OMX.amlogic.avs2.decoder.awesome", RANK_TESTED);
 
         // ------ Marvell ------
         // Lenovo A788t
