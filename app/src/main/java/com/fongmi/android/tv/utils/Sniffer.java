@@ -5,6 +5,7 @@ import android.text.TextUtils;
 
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Rule;
+import com.github.catvod.utils.Json;
 import com.github.catvod.utils.Util;
 import com.orhanobut.logger.Logger;
 
@@ -25,6 +26,7 @@ public class Sniffer {
     public static final List<String> THUNDER = Arrays.asList("thunder", "magnet", "ed2k");
 
     public static String getUrl(String text) {
+        if (Json.valid(text)) return text;
         Matcher m = Pattern.compile("(http|https|rtmp|rtsp|smb|thunder|magnet|ed2k|mitv|tvbox-xg|jianpian):[^\\s]+", Pattern.MULTILINE).matcher(text);
         if (m.find()) return m.group(0);
         return text;
