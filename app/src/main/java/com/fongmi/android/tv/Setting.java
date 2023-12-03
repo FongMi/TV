@@ -7,6 +7,8 @@ import android.provider.Settings;
 import com.fongmi.android.tv.player.Players;
 import com.github.catvod.utils.Prefers;
 
+import kotlin.Triple;
+
 public class Setting {
 
     public static String getDoh() {
@@ -283,5 +285,18 @@ public class Setting {
 
     public static boolean hasCaption() {
         return new Intent(Settings.ACTION_CAPTIONING_SETTINGS).resolveActivity(App.get().getPackageManager()) != null;
+    }
+
+    public static Triple<String, String, String> getWebWav() {
+        String url = Prefers.getString("web_dav_url");
+        String user = Prefers.getString("web_dav_user");
+        String password = Prefers.getString("web_dav_password");
+        return new Triple<>(url, user, password);
+    }
+
+    public static void setWebDav(String url,   String user, String password) {
+        Prefers.put("web_dav_url", url);
+        Prefers.put("web_dav_user", user);
+        Prefers.put("web_dav_password", password);
     }
 }

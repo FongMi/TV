@@ -134,6 +134,10 @@
             android:name=".service.PlaybackService"
             android:exported="false"
             android:foregroundServiceType="mediaPlayback" />
+        <activity android:name=".ui.activity.BackupActivity"
+            android:exported="true"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout"
+            android:screenOrientation="fullUser" />
 
     </application>
 </manifest>

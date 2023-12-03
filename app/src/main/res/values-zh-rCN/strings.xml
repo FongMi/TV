@@ -89,6 +89,10 @@
     <string name="setting_storage">权限</string>
     <string name="setting_off">关闭</string>
     <string name="setting_on">开启</string>
+    <string name="web_dav_server_address">WebDav 服务器地址</string>
+    <string name="web_dav_account">WebDav账号</string>
+    <string name="web_dav_password">WebDav密码</string>
+    <string name="restore">恢复</string>
 
     <!-- Search -->
     <string name="search_keyword">关键字…</string>

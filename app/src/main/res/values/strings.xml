@@ -89,6 +89,10 @@
     <string name="setting_storage">Permission</string>
     <string name="setting_off">Off</string>
     <string name="setting_on">On</string>
+    <string name="web_dav_server_address">WebDav server address</string>
+    <string name="web_dav_account">WebDav account</string>
+    <string name="web_dav_password">WebDav password</string>
+    <string name="restore">restore</string>
 
     <!-- Search -->
     <string name="search_keyword">Keywords…</string>

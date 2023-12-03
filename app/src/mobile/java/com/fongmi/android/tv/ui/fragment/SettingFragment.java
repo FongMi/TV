@@ -21,6 +21,7 @@ import com.fongmi.android.tv.api.WallConfig;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.bean.Site;
+import com.fongmi.android.tv.bean.TimeEvent;
 import com.fongmi.android.tv.databinding.FragmentSettingBinding;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.event.RefreshEvent;
@@ -30,6 +31,7 @@ import com.fongmi.android.tv.impl.LiveCallback;
 import com.fongmi.android.tv.impl.ProxyCallback;
 import com.fongmi.android.tv.impl.SiteCallback;
 import com.fongmi.android.tv.player.ExoUtil;
+import com.fongmi.android.tv.ui.activity.BackupActivity;
 import com.fongmi.android.tv.ui.activity.MainActivity;
 import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.dialog.ConfigDialog;
@@ -47,6 +49,9 @@ import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Path;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.permissionx.guolindev.PermissionX;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -363,12 +368,13 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
     }
 
     private void onBackup(View view) {
-        PermissionX.init(this).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> AppDatabase.backup(new Callback() {
-            @Override
-            public void success() {
-                mBinding.backupText.setText(AppDatabase.getDate());
-            }
-        }));
+        startActivity(new Intent(requireContext(), BackupActivity.class));
+//        PermissionX.init(this).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> AppDatabase.backup(new Callback() {
+//            @Override
+//            public void success() {
+//                mBinding.backupText.setText(AppDatabase.getDate());
+//            }
+//        }));
     }
 
     private boolean onBackupAuto(View view) {
@@ -394,5 +400,11 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode != Activity.RESULT_OK || requestCode != FileChooser.REQUEST_PICK_FILE) return;
         setConfig(Config.find("file:/" + FileChooser.getPathFromUri(getContext(), data.getData()).replace(Path.rootPath(), ""), type));
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void setTime(TimeEvent event) {
+        mBinding.backupText.setText(String.valueOf(event.getTime()));
+        setConfig();
     }
 }
