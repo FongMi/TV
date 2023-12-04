@@ -161,13 +161,8 @@ public class VodActivity extends BaseActivity implements TypePresenter.OnClickLi
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN && event.getRepeatCount() > 0) {
-            getFragment().backRoot();
-            return true;
-        }
-        if (KeyUtil.isMenuKey(event)) {
-            updateFilter((Class) mAdapter.get(mBinding.pager.getCurrentItem()));
-        }
+        if (KeyUtil.isBackKey(event) && event.isLongPress()) getFragment().goRoot();
+        if (KeyUtil.isMenuKey(event)) updateFilter((Class) mAdapter.get(mBinding.pager.getCurrentItem()));
         return super.dispatchKeyEvent(event);
     }
 
@@ -175,7 +170,7 @@ public class VodActivity extends BaseActivity implements TypePresenter.OnClickLi
     public void onBackPressed() {
         Class item = (Class) mAdapter.get(mBinding.pager.getCurrentItem());
         if (item.getFilter() != null && item.getFilter()) updateFilter(item);
-        else if (getFragment().canGoBack()) getFragment().goBack();
+        else if (getFragment().canBack()) getFragment().goBack();
         else super.onBackPressed();
     }
 

@@ -254,16 +254,11 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         mOpen = open;
     }
 
-     public void backRoot() {
-        mPages.clear();
-        getVideo(getTypeId(), "1");
-    }
-
     public void onRefresh() {
         getVideo();
     }
 
-    public boolean canGoBack() {
+    public boolean canBack() {
         return !mPages.isEmpty();
     }
 
@@ -271,6 +266,12 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         if (mPages.size() == 1) mBinding.recycler.setMoveTop(true);
         mPages.remove(mPage = getLastPage());
         onRefresh();
+    }
+
+    public void goRoot() {
+        if (mPages.isEmpty()) return;
+        mPages.clear();
+        getVideo();
     }
 
     @Override
