@@ -268,10 +268,11 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         onRefresh();
     }
 
-    public void goRoot() {
-        if (mPages.isEmpty()) return;
+    public boolean goRoot() {
+        if (mPages.isEmpty()) return false;
         mPages.clear();
         getVideo();
+        return true;
     }
 
     @Override

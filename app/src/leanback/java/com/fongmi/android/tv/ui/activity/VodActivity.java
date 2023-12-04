@@ -42,6 +42,7 @@ public class VodActivity extends BaseActivity implements TypePresenter.OnClickLi
     private ActivityVodBinding mBinding;
     private ArrayObjectAdapter mAdapter;
     private PageAdapter mPageAdapter;
+    private boolean coolDown;
     private View mOldView;
 
     public static void start(Activity activity, Result result) {
@@ -149,6 +150,11 @@ public class VodActivity extends BaseActivity implements TypePresenter.OnClickLi
         return (VodFragment) mPageAdapter.instantiateItem(mBinding.pager, mBinding.pager.getCurrentItem());
     }
 
+    private void setCoolDown() {
+        App.post(() -> coolDown = false, 2000);
+        coolDown = true;
+    }
+
     @Override
     public void onItemClick(Class item) {
         updateFilter(item);
@@ -161,8 +167,8 @@ public class VodActivity extends BaseActivity implements TypePresenter.OnClickLi
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (KeyUtil.isBackKey(event) && event.isLongPress()) getFragment().goRoot();
         if (KeyUtil.isMenuKey(event)) updateFilter((Class) mAdapter.get(mBinding.pager.getCurrentItem()));
+        if (KeyUtil.isBackKey(event) && event.isLongPress() && getFragment().goRoot()) setCoolDown();
         return super.dispatchKeyEvent(event);
     }
 
@@ -171,7 +177,7 @@ public class VodActivity extends BaseActivity implements TypePresenter.OnClickLi
         Class item = (Class) mAdapter.get(mBinding.pager.getCurrentItem());
         if (item.getFilter() != null && item.getFilter()) updateFilter(item);
         else if (getFragment().canBack()) getFragment().goBack();
-        else super.onBackPressed();
+        else if (!coolDown) super.onBackPressed();
     }
 
     class PageAdapter extends FragmentStatePagerAdapter {
