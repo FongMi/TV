@@ -254,6 +254,11 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         mOpen = open;
     }
 
+     public void backRoot() {
+        mPages.clear();
+        getVideo(getTypeId(), "1");
+    }
+
     public void onRefresh() {
         getVideo();
     }

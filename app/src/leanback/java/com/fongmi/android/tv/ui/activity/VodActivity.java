@@ -161,7 +161,13 @@ public class VodActivity extends BaseActivity implements TypePresenter.OnClickLi
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (KeyUtil.isMenuKey(event)) updateFilter((Class) mAdapter.get(mBinding.pager.getCurrentItem()));
+        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN && event.getRepeatCount() > 0) {
+            getFragment().backRoot();
+            return true;
+        }
+        if (KeyUtil.isMenuKey(event)) {
+            updateFilter((Class) mAdapter.get(mBinding.pager.getCurrentItem()));
+        }
         return super.dispatchKeyEvent(event);
     }
 
