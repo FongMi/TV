@@ -30,7 +30,7 @@ public class Action implements Process {
 
     @Override
     public boolean isRequest(NanoHTTPD.IHTTPSession session, String path) {
-        return session.getMethod() == NanoHTTPD.Method.POST && path.equals("/action");
+        return path.equals("/action");
     }
 
     @Override
@@ -45,6 +45,9 @@ public class Action implements Process {
                 break;
             case "api":
                 onApi(params);
+                break;
+            case "refresh":
+                onRefresh(params);
                 break;
             case "cast":
                 onCast(params);
@@ -70,6 +73,15 @@ public class Action implements Process {
         String url = Objects.requireNonNullElse(params.get("url"), "");
         if (url.endsWith(".apk")) FileUtil.openFile(Path.local(url));
         else if (url.length() > 0) ServerEvent.api(url);
+    }
+
+    private void onRefresh(Map<String, String> params) {
+        String type = params.get("type");
+        if ("detail".equals(type)) {
+            RefreshEvent.detail();
+        } else if ("player".equals(type)) {
+            RefreshEvent.player();
+        }
     }
 
     private void onCast(Map<String, String> params) {

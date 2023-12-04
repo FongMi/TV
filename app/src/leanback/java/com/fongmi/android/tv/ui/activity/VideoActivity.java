@@ -1136,6 +1136,12 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onRefreshEvent(RefreshEvent event) {
+        if (event.getType() == RefreshEvent.Type.DETAIL) getDetail();
+        if (event.getType() == RefreshEvent.Type.PLAYER) onRefresh();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onPlayerEvent(PlayerEvent event) {
         switch (event.getState()) {
             case 0:

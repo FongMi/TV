@@ -38,6 +38,14 @@ public class RefreshEvent {
         EventBus.getDefault().post(new RefreshEvent(Type.WALL));
     }
 
+    public static void detail() {
+        EventBus.getDefault().post(new RefreshEvent(Type.DETAIL));
+    }
+
+    public static void player() {
+        EventBus.getDefault().post(new RefreshEvent(Type.PLAYER));
+    }
+
     private RefreshEvent(Type type) {
         this.type = type;
     }
@@ -47,6 +55,6 @@ public class RefreshEvent {
     }
 
     public enum Type {
-        EMPTY, CONFIG, IMAGE, VIDEO, HISTORY, KEEP, SIZE, WALL
+        EMPTY, CONFIG, IMAGE, VIDEO, HISTORY, KEEP, SIZE, WALL, DETAIL, PLAYER
     }
 }
