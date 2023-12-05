@@ -218,10 +218,10 @@ function showPanel(id) {
     let tab = $('#tab' + id)[0];
     $(tab).attr('aria-selected', 'true').addClass('weui-bar__item_on');
     $(tab).siblings('.weui-bar__item_on').removeClass('weui-bar__item_on').attr('aria-selected', 'false');
-    if (id === 3) listFile('')
     var panelId = '#' + $(tab).attr('aria-controls');
     $(panelId).css('display', 'block');
     $(panelId).siblings('.weui-tab__panel').css('display', 'none');
+    if (id === 4) listFile('')
 }
 
 $(function () {
