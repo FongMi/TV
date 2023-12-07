@@ -22,7 +22,8 @@ public class Sniffer {
     private static final String TAG = Sniffer.class.getSimpleName();
 
     public static final Pattern CLICKER = Pattern.compile("\\[a=cr:(\\{.*?\\})\\/](.*?)\\[\\/a]");
-    public static final String RULE = "http((?!http).){12,}?\\.(m3u8|mp4|mkv|flv|mp3|m4a|aac)\\?.*|http((?!http).){12,}\\.(m3u8|mp4|mkv|flv|mp3|m4a|aac)|http((?!http).)*?video/tos*";
+    public static final Pattern SNIFFER = Pattern.compile("http((?!http).){12,}?\\.(m3u8|mp4|mkv|flv|mp3|m4a|aac)\\?.*|http((?!http).){12,}\\.(m3u8|mp4|mkv|flv|mp3|m4a|aac)|http((?!http).)*?video/tos*");
+
     public static final List<String> THUNDER = Arrays.asList("thunder", "magnet", "ed2k");
 
     public static String getUrl(String text) {
@@ -49,13 +50,13 @@ public class Sniffer {
         if (containOrMatch(url)) return true;
         if (headers.containsKey("Accept") && headers.get("Accept").startsWith("image")) return false;
         if (url.contains("url=http") || url.contains("v=http") || url.contains(".css") || url.contains(".html")) return false;
-        return url.matches(RULE);
+        return SNIFFER.matcher(url).find();
     }
 
     private static boolean containOrMatch(String url) {
         List<String> items = getRegex(UrlUtil.uri(url));
         for (String regex : items) if (url.contains(regex)) return true;
-        for (String regex : items) if (url.matches(regex)) return true;
+        for (String regex : items) if (Pattern.compile(regex).matcher(url).find()) return true;
         return false;
     }
 
