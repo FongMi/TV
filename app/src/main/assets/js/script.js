@@ -126,7 +126,7 @@ function uploadFile() {
 }
 
 function uploadTip() {
-    let files = $('#file_uploader').files;
+    let files = $('#file_uploader')[0].files;
     if (files.length <= 0) return false;
     let tip = '';
     for (var i = 0; i < files.length; i++) {
@@ -140,7 +140,7 @@ function uploadTip() {
 function doUpload(yes) {
     $('#uploadTip').hide();
     if (yes == 1) {
-        let files = $('#file_uploader').files;
+        let files = $('#file_uploader')[0].files;
         if (files.length <= 0) return false;
         var formData = new FormData();
         formData.append('path', current_root);
@@ -169,10 +169,10 @@ function newFolder() {
 function doNewFolder(yes) {
     $('#newFolder').hide();
     if (yes == 1) {
-        let name = $('#newFolderContent').value.trim();
+        let name = $('#newFolderContent')[0].value.trim();
         if (name.length <= 0) return false;
         $('#loadingToast').show();
-        $.post('/newFolder', { path: current_root, name: '' + name }, function (data) {
+        $.post('/newFolder', { path: current_root, name: name }, function (data) {
             $('#loadingToast').hide();
             listFile(current_root);
         });
