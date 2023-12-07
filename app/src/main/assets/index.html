@@ -112,31 +112,15 @@
             </div>
         </div>
     </div>
-    <div id="fileInfoDialog" role="dialog" aria-modal="false" aria-hidden="true" style="display: none;">
-        <div role="button" class="weui-mask"></div>
-        <div class="weui-half-screen-dialog">
-            <div class="weui-half-screen-dialog__hd">
-                <div class="weui-half-screen-dialog__hd__main">本地網址</div>
-            </div>
-            <div class="weui-half-screen-dialog__bd" id="fileInfo">
-                <div class="weui-form__control-area" style="margin-bottom: 0px !important;">
-                    <div class="weui-cells__group weui-cells__group_form">
-                        <div class="weui-cells">
-                            <div class="weui-cell weui-cell_active weui-cell_vcode weui-cell_wrap">
-                                <div class="weui-cell__bd weui-flex">
-                                    <input id="fileUrl" class="weui-input weui-cell__control weui-cell__control_flex" type="text" value="" readonly />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="weui-half-screen-dialog__ft" style="padding-bottom: 30px;">
-                <div class="weui-half-screen-dialog__btn-area">
-                    <a href="javascript:void(0)" class="weui-btn weui-btn_default" onclick="pushFile()">使用</a>
-                    <a href="javascript:void(0)" class="weui-btn weui-btn_default" onclick="hideFileInfo()">關閉</a>
-                    <a href="javascript:void(0)" id="delFileBtn" class="weui-btn weui-btn_warn" onclick="delFile()">刪除</a>
-                </div>
+    <div role="dialog" aria-hidden="true" aria-modal="true" id="fileInfoDialog" style="display: none;">
+        <div class="weui-mask"></div>
+        <div class="weui-dialog">
+            <div class="weui-dialog__hd"><strong class="weui-dialog__title">本地路徑</strong></div>
+            <div class="weui-dialog__bd" id="fileUrl"></div>
+            <div class="weui-dialog__ft">
+                <a role="button" href="javascript:void(0)" onclick="pushFile(0)" class="weui-dialog__btn weui-dialog__btn_default">關閉</a>
+                <a role="button" href="javascript:void(0)" onclick="pushFile(1)" class="weui-dialog__btn weui-dialog__btn_primary">使用</a>
+                <a role="button" href="javascript:void(0)" onclick="delFile()" class="weui-dialog__btn weui-dialog__btn_primary" id="delFileBtn">刪除</a>
             </div>
         </div>
     </div>

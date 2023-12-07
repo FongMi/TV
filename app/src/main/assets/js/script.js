@@ -13,7 +13,7 @@ function push() {
 }
 
 function setting() {
-    doAction('setting', { url: $('#setting_text').val() });
+    doAction('setting', { text: $('#setting_text').val() });
 }
 
 function file(path) {
@@ -73,13 +73,15 @@ function selectFile(path, canDel) {
     current_file = path;
     if (canDel) $("#delFileBtn").show();
     else $("#delFileBtn").hide();
-    $("#fileUrl")[0].value = "file:/" + current_file;
+    $("#fileUrl").html("file:/" + current_file);
     $("#fileInfoDialog").show();
 }
 
-function pushFile() {
-    file("file:/" + current_file);
+function pushFile(yes) {
     hideFileInfo();
+    if (yes == 1) {
+        file("file:/" + current_file);
+    }
 }
 
 function hideFileInfo() {
@@ -124,7 +126,7 @@ function uploadFile() {
 }
 
 function uploadTip() {
-    let files = $('#file_uploader')[0].files;
+    let files = $('#file_uploader').files;
     if (files.length <= 0) return false;
     let tip = '';
     for (var i = 0; i < files.length; i++) {
@@ -138,7 +140,7 @@ function uploadTip() {
 function doUpload(yes) {
     $('#uploadTip').hide();
     if (yes == 1) {
-        let files = $('#file_uploader')[0].files;
+        let files = $('#file_uploader').files;
         if (files.length <= 0) return false;
         var formData = new FormData();
         formData.append('path', current_root);
@@ -167,7 +169,7 @@ function newFolder() {
 function doNewFolder(yes) {
     $('#newFolder').hide();
     if (yes == 1) {
-        let name = $('#newFolderContent')[0].value.trim();
+        let name = $('#newFolderContent').value.trim();
         if (name.length <= 0) return false;
         $('#loadingToast').show();
         $.post('/newFolder', { path: current_root, name: '' + name }, function (data) {
@@ -194,9 +196,9 @@ function doDelFolder(yes) {
 }
 
 function delFile() {
-    hideFileInfo();
     $('#delFileContent').html('是否刪除 ' + current_file);
     $('#delFile').show();
+    hideFileInfo();
 }
 
 function doDelFile(yes) {
@@ -219,7 +221,7 @@ function warnToast(msg) {
 }
 
 function showPanel(id) {
-    let tab = $('#tab' + id)[0];
+    let tab = $('#tab' + id);
     $(tab).attr('aria-selected', 'true').addClass('weui-bar__item_on');
     $(tab).siblings('.weui-bar__item_on').removeClass('weui-bar__item_on').attr('aria-selected', 'false');
     var panelId = '#' + $(tab).attr('aria-controls');
