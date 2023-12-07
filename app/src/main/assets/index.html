@@ -46,7 +46,7 @@
                                 <div class="weui-cells">
                                     <div class="weui-cell weui-cell_active weui-cell_vcode weui-cell_wrap">
                                         <div class="weui-cell__bd weui-flex">
-                                            <input id="push_url" class="weui-input weui-cell__control weui-cell__control_flex" type="text" value="" placeholder="請輸入網址..." />
+                                            <input id="push_url" class="weui-input weui-cell__control weui-cell__control_flex" type="text" value="" placeholder="請輸入播放網址..." />
                                             <button onclick="push(); return false;" class="weui-cell__control weui-btn weui-btn_default weui-vcode-btn">確定</button>
                                         </div>
                                     </div>
@@ -58,15 +58,15 @@
                 <div id="panel3" role="tabpanel" aria-labelledby="tab3" class="weui-tab__panel" style="display: none;">
                     <div class="weui-form">
                         <div class="weui-form__text-area">
-                            <h2 class="weui-form__title">接口</h2>
+                            <h2 class="weui-form__title">接口/Proxy/User-Agent</h2>
                         </div>
                         <div class="weui-form__control-area" style="margin-bottom: 0px !important;">
                             <div class="weui-cells__group weui-cells__group_form">
                                 <div class="weui-cells">
                                     <div class="weui-cell weui-cell_active weui-cell_vcode weui-cell_wrap">
                                         <div class="weui-cell__bd weui-flex">
-                                            <input id="api_url" class="weui-input weui-cell__control weui-cell__control_flex" type="text" value="" placeholder="請輸入接口..." />
-                                            <button onclick="api(); return false;" class="weui-cell__control weui-btn weui-btn_default weui-vcode-btn">確定</button>
+                                            <input id="setting_text" class="weui-input weui-cell__control weui-cell__control_flex" type="text" value="" placeholder="請輸入..." />
+                                            <button onclick="setting(); return false;" class="weui-cell__control weui-btn weui-btn_default weui-vcode-btn">確定</button>
                                         </div>
                                     </div>
                                 </div>
@@ -102,7 +102,7 @@
                     </div>
                     <div id="tab3" role="tab" aria-labelledby="t3_title" aria-selected="false" aria-controls="panel3" class="weui-tabbar__item">
                         <img style="width: 20px; height: 20px; margin: 5px 0 5px 0;" alt="" src="images/ic_setting.svg" class="weui-tabbar__icon">
-                        <p id="t3_title" aria-hidden="true" class="weui-tabbar__label">接口</p>
+                        <p id="t3_title" aria-hidden="true" class="weui-tabbar__label">設定</p>
                     </div>
                     <div id="tab4" role="tab" aria-labelledby="t4_title" aria-selected="false" aria-controls="panel4" class="weui-tabbar__item">
                         <img style="width: 20px; height: 20px; margin: 5px 0 5px 0;" alt="" src="images/ic_local.svg" class="weui-tabbar__icon">
@@ -116,15 +116,12 @@
         <div role="button" class="weui-mask"></div>
         <div class="weui-half-screen-dialog">
             <div class="weui-half-screen-dialog__hd">
-                <div class="weui-half-screen-dialog__hd__main">接口設定</div>
+                <div class="weui-half-screen-dialog__hd__main">本地網址</div>
             </div>
             <div class="weui-half-screen-dialog__bd" id="fileInfo">
                 <div class="weui-form__control-area" style="margin-bottom: 0px !important;">
                     <div class="weui-cells__group weui-cells__group_form">
                         <div class="weui-cells">
-                            <div class="weui-cell weui-cell_active weui-cell_vcode weui-cell_wrap">
-                                <div class="weui-cell__hd"><label class="weui-label">本機地址</label></div>
-                            </div>
                             <div class="weui-cell weui-cell_active weui-cell_vcode weui-cell_wrap">
                                 <div class="weui-cell__bd weui-flex">
                                     <input id="fileUrl" class="weui-input weui-cell__control weui-cell__control_flex" type="text" value="" readonly />
@@ -136,8 +133,8 @@
             </div>
             <div class="weui-half-screen-dialog__ft" style="padding-bottom: 30px;">
                 <div class="weui-half-screen-dialog__btn-area">
+                    <a href="javascript:void(0)" class="weui-btn weui-btn_default" onclick="pushFile()">使用</a>
                     <a href="javascript:void(0)" class="weui-btn weui-btn_default" onclick="hideFileInfo()">關閉</a>
-                    <a href="javascript:void(0)" class="weui-btn weui-btn_default" onclick="fileToApi()">使用</a>
                     <a href="javascript:void(0)" id="delFileBtn" class="weui-btn weui-btn_warn" onclick="delFile()">刪除</a>
                 </div>
             </div>

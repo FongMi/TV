@@ -12,8 +12,12 @@ function push() {
     doAction('push', { url: $('#push_url').val() });
 }
 
-function api() {
-    doAction('api', { url: $('#api_url').val() });
+function setting() {
+    doAction('setting', { url: $('#setting_text').val() });
+}
+
+function file(path) {
+    doAction('file', { path: path });
 }
 
 function doAction(action, kv) {
@@ -73,8 +77,8 @@ function selectFile(path, canDel) {
     $("#fileInfoDialog").show();
 }
 
-function fileToApi() {
-    doAction('api', { url: "file:/" + current_file });
+function pushFile() {
+    file("file:/" + current_file);
     hideFileInfo();
 }
 

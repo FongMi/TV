@@ -7,6 +7,7 @@ import androidx.media3.common.C;
 import androidx.media3.common.MediaItem;
 
 import com.fongmi.android.tv.player.ExoUtil;
+import com.github.catvod.utils.Path;
 import com.github.catvod.utils.Trans;
 import com.google.gson.annotations.SerializedName;
 
@@ -26,10 +27,24 @@ public class Sub {
     private int flag;
 
     public static Sub from(String path) {
-        return from(new File(path));
+        if (path.startsWith("http")) {
+            return http(path);
+        } else {
+            return file(Path.local(path));
+        }
     }
 
-    public static Sub from(File file) {
+    private static Sub http(String url) {
+        Uri uri = Uri.parse(url);
+        Sub sub = new Sub();
+        sub.url = url;
+        sub.name = uri.getLastPathSegment();
+        sub.flag = C.SELECTION_FLAG_FORCED;
+        sub.format = ExoUtil.getMimeType(uri.getLastPathSegment());
+        return sub;
+    }
+
+    private static Sub file(File file) {
         Sub sub = new Sub();
         sub.name = file.getName();
         sub.url = file.getAbsolutePath();

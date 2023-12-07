@@ -51,6 +51,7 @@ import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
+import com.fongmi.android.tv.bean.Sub;
 import com.fongmi.android.tv.bean.Track;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.cast.CastVideo;
@@ -94,7 +95,6 @@ import com.fongmi.android.tv.utils.Sniffer;
 import com.fongmi.android.tv.utils.Traffic;
 import com.fongmi.android.tv.utils.Util;
 import com.github.bassaer.library.MDColor;
-import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Trans;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.permissionx.guolindev.PermissionX;
@@ -584,11 +584,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private void checkDanmu(String danmu) {
         mBinding.danmaku.release();
         mBinding.danmaku.setVisibility(danmu.isEmpty() ? View.GONE : View.VISIBLE);
-        App.execute(() -> {
-            String temp = danmu;
-            if (temp.startsWith("http")) temp = OkHttp.string(temp);
-            if (temp.length() > 0) mBinding.danmaku.prepare(new Parser(temp), mDanmakuContext);
-        });
+        if (danmu.length() > 0) App.execute(() -> mBinding.danmaku.prepare(new Parser(danmu), mDanmakuContext));
     }
 
     @Override
@@ -1165,7 +1161,9 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefreshEvent(RefreshEvent event) {
         if (event.getType() == RefreshEvent.Type.DETAIL) getDetail();
-        if (event.getType() == RefreshEvent.Type.PLAYER) onRefresh();
+        else if (event.getType() == RefreshEvent.Type.PLAYER) onRefresh();
+        else if (event.getType() == RefreshEvent.Type.DANMAKU) checkDanmu(event.getPath());
+        else if (event.getType() == RefreshEvent.Type.SUBTITLE) mPlayers.setSub(Sub.from(event.getPath()));
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

@@ -145,6 +145,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     public void setSub(Sub sub) {
         this.sub = sub;
+        if (isIjk()) return;
         setMediaSource(headers, url);
     }
 

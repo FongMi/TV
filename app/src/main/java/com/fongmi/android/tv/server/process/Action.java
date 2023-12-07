@@ -43,8 +43,11 @@ public class Action implements Process {
             case "push":
                 onPush(params);
                 break;
-            case "api":
-                onApi(params);
+            case "setting":
+                onSetting(params);
+                break;
+            case "file":
+                onFile(params);
                 break;
             case "refresh":
                 onRefresh(params);
@@ -60,27 +63,49 @@ public class Action implements Process {
     }
 
     private void onSearch(Map<String, String> params) {
-        String word = Objects.requireNonNullElse(params.get("word"), "");
-        if (word.length() > 0) ServerEvent.search(word);
+        String word = params.get("word");
+        if (TextUtils.isEmpty(word)) return;
+        ServerEvent.search(word);
     }
 
     private void onPush(Map<String, String> params) {
-        String url = Objects.requireNonNullElse(params.get("url"), "");
-        if (url.length() > 0) ServerEvent.push(url);
+        String url = params.get("url");
+        if (TextUtils.isEmpty(url)) return;
+        ServerEvent.push(url);
     }
 
-    private void onApi(Map<String, String> params) {
-        String url = Objects.requireNonNullElse(params.get("url"), "");
-        if (url.endsWith(".apk")) FileUtil.openFile(Path.local(url));
-        else if (url.length() > 0) ServerEvent.api(url);
+    private void onSetting(Map<String, String> params) {
+        String text = params.get("text");
+        if (TextUtils.isEmpty(text)) return;
+        ServerEvent.setting(text);
+    }
+
+    private void onFile(Map<String, String> params) {
+        String path = params.get("path");
+        if (TextUtils.isEmpty(path)) return;
+        if (path.endsWith(".xml")) RefreshEvent.danmaku(path);
+        else if (path.endsWith(".apk")) FileUtil.openFile(Path.local(path));
+        else if (path.endsWith(".srt") || path.endsWith(".ssa") || path.endsWith(".ass")) RefreshEvent.subtitle(path);
+        else ServerEvent.setting(path);
     }
 
     private void onRefresh(Map<String, String> params) {
         String type = params.get("type");
-        if ("detail".equals(type)) {
-            RefreshEvent.detail();
-        } else if ("player".equals(type)) {
-            RefreshEvent.player();
+        String path = params.get("path");
+        if (TextUtils.isEmpty(type)) return;
+        switch (type) {
+            case "detail":
+                RefreshEvent.detail();
+                break;
+            case "player":
+                RefreshEvent.player();
+                break;
+            case "subtitle":
+                RefreshEvent.subtitle(path);
+                break;
+            case "danmaku":
+                RefreshEvent.danmaku(path);
+                break;
         }
     }
 
