@@ -100,11 +100,11 @@ public class Action implements Process {
             case "player":
                 RefreshEvent.player();
                 break;
-            case "subtitle":
-                RefreshEvent.subtitle(path);
-                break;
             case "danmaku":
                 RefreshEvent.danmaku(path);
+                break;
+            case "subtitle":
+                RefreshEvent.subtitle(path);
                 break;
         }
     }
