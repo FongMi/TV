@@ -17,6 +17,8 @@ android {
                 install "requests"
                 install 'pycryptodome'
                 install 'beautifulsoup4'
+                install 'urllib3==1.25.11'
+                install 'soupsieve==2.3.2'
             }
         }
     }
