@@ -35,6 +35,9 @@
     <string name="dialog_delete_keep">收藏紀錄將會全部刪除。</string>
     <string name="dialog_delete_history">觀看紀錄將會全部刪除。</string>
 
+    <!-- Hint -->
+    <string name="copied">已複製</string>
+
     <string-array name="select_background">
         <item>關閉</item>
         <item>開啟</item>

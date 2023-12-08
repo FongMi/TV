@@ -3,6 +3,7 @@ package com.fongmi.android.tv.utils;
 import com.fongmi.android.tv.App;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Path;
+import com.google.common.net.HttpHeaders;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -41,7 +42,7 @@ public class Download {
         try {
             Path.clear(file);
             Response response = OkHttp.newCall(url).execute();
-            download(response.body().byteStream(), Double.parseDouble(response.header("Content-Length", "1")));
+            download(response.body().byteStream(), Double.parseDouble(response.header(HttpHeaders.CONTENT_LENGTH, "1")));
             if (callback != null) App.post(() -> callback.success(Path.chmod(file)));
         } catch (Exception e) {
             if (callback != null) App.post(() -> callback.error(e.getMessage()));

@@ -25,18 +25,29 @@ public class Epg {
     private String start;
     @SerializedName("end")
     private String end;
+    @SerializedName("key")
+    private String key;
 
     private long startTime;
     private long endTime;
 
-    public static Epg objectFrom(String str, SimpleDateFormat format) {
+    public static Epg objectFrom(String str, String key, SimpleDateFormat format) {
         try {
             Epg item = App.gson().fromJson(str, Epg.class);
             item.setTime(format);
+            item.setKey(key);
             return item;
         } catch (Exception e) {
             return new Epg();
         }
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public String getDate() {

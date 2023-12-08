@@ -13,6 +13,7 @@ import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.utils.QRCode;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.Sniffer;
 import com.fongmi.android.tv.utils.Util;
 
 public class PushActivity extends BaseActivity {
@@ -38,6 +39,6 @@ public class PushActivity extends BaseActivity {
 
     private void onClip(View view) {
         CharSequence text = Util.getClipText();
-        if (!TextUtils.isEmpty(text)) VideoActivity.push(this, text.toString(), false);
+        if (!TextUtils.isEmpty(text)) VideoActivity.start(this, Sniffer.getUrl(text.toString()), false);
     }
 }

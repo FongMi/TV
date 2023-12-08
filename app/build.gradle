@@ -10,6 +10,8 @@ android {
         applicationId "com.fongmi.android.tv"
         minSdk 21
         targetSdk 28
+        versionCode 210
+        versionName "2.1.0"
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
@@ -20,13 +22,9 @@ android {
     productFlavors {
         leanback {
             dimension "mode"
-            versionCode 207
-            versionName "20231115#4"
         }
         mobile {
             dimension "mode"
-            versionCode 207
-            versionName "20231115#4"
         }
         java {
             dimension "api"
@@ -112,9 +110,13 @@ dependencies {
     implementation 'com.github.bumptech.glide:okhttp3-integration:4.15.1'
     implementation 'com.github.jahirfiquitiva:TextDrawable:1.0.3'
     implementation 'com.github.TeamNewPipe:NewPipeExtractor:289db1178ab66694c23893e6a487d4708343c47b'
+    implementation('com.github.thegrizzlylabs:sardine-android:0.8') { exclude group: 'com.squareup.okhttp3', module: 'okhttp' }
     implementation 'com.google.android.material:material:1.10.0'
+    implementation 'com.google.net.cronet:cronet-okhttp:0.1.0'
     implementation 'com.google.zxing:core:3.3.0'
     implementation 'com.guolindev.permissionx:permissionx:1.7.1'
+    implementation 'com.hierynomus:smbj:0.11.5'
+    implementation 'org.chromium.net:cronet-embedded:76.3809.111'
     implementation 'org.eclipse.jetty:jetty-client:8.1.21.v20160908'
     implementation 'org.eclipse.jetty:jetty-server:8.1.21.v20160908'
     implementation 'org.eclipse.jetty:jetty-servlet:8.1.21.v20160908'
@@ -125,12 +127,13 @@ dependencies {
     implementation('org.simpleframework:simple-xml:2.7.1') { exclude group: 'stax', module: 'stax-api' exclude group: 'xpp3', module: 'xpp3' }
     implementation(ext: 'aar', name: 'dlna-core', group: 'fongmi', version: 'release')
     leanbackImplementation(ext: 'aar', name: 'dlna-dmr', group: 'fongmi', version: 'release')
-    leanbackImplementation 'androidx.leanback:leanback:1.2.0-alpha03'
+    leanbackImplementation 'androidx.leanback:leanback:1.2.0-alpha04'
     leanbackImplementation 'me.jessyan:autosize:1.2.1'
     mobileImplementation(ext: 'aar', name: 'dlna-dmc', group: 'fongmi', version: 'release')
+    //mobileImplementation 'androidx.mediarouter:mediarouter:1.6.0'
     mobileImplementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
-    mobileImplementation 'com.github.chrisbanes:PhotoView:2.3.0'
     mobileImplementation 'com.google.android.flexbox:flexbox:3.0.0'
+    //mobileImplementation 'com.google.android.gms:play-services-cast-framework:21.3.0'
     mobileImplementation('com.journeyapps:zxing-android-embedded:4.3.0') { transitive = false }
     annotationProcessor 'androidx.room:room-compiler:2.6.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.15.1'

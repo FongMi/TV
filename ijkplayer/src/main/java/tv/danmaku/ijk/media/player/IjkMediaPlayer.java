@@ -35,6 +35,8 @@ import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 
+import androidx.annotation.NonNull;
+
 import com.google.common.net.HttpHeaders;
 
 import java.io.IOException;
@@ -145,19 +147,16 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     private long mNativeMediaPlayer;
     @AccessedByNative
     private long mNativeMediaDataSource;
-
     @AccessedByNative
     private long mNativeAndroidIO;
-
     @AccessedByNative
     private int mNativeSurfaceTexture;
-
     @AccessedByNative
     private int mListenerContext;
 
     private SurfaceHolder mSurfaceHolder;
     private EventHandler mEventHandler;
-    private PowerManager.WakeLock mWakeLock = null;
+    private PowerManager.WakeLock mWakeLock;
     private boolean mScreenOnWhilePlaying;
     private boolean mStayAwake;
 
@@ -166,37 +165,21 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     private int mVideoSarNum;
     private int mVideoSarDen;
 
-    /**
-     * Default library loader
-     * Load them by yourself, if your libraries are not installed at default place.
-     */
-    private static final IjkLibLoader sLocalLibLoader = System::loadLibrary;
-
-    private static volatile boolean mIsLibLoaded = false;
-
-    public static void loadLibrariesOnce(IjkLibLoader libLoader) {
-        synchronized (IjkMediaPlayer.class) {
-            if (!mIsLibLoaded) {
-                if (libLoader == null) libLoader = sLocalLibLoader;
-                libLoader.loadLibrary("ijkffmpeg");
-                libLoader.loadLibrary("ijksdl");
-                libLoader.loadLibrary("player");
-                mIsLibLoaded = true;
-            }
+    private static final IjkLibLoader LOADER = new IjkLibLoader("ijkffmpeg", "ijksdl", "player") {
+        @Override
+        protected void loadLibrary(@NonNull String name) {
+            System.loadLibrary(name);
         }
-    }
+    };
 
     private static volatile boolean mIsNativeInitialized = false;
 
     private static void initNativeOnce() {
-        synchronized (IjkMediaPlayer.class) {
-            if (!mIsNativeInitialized) {
-                native_init();
-                native_setDot(0);
-                native_setLogLevel(IjkMediaPlayer.IJK_LOG_DEBUG);
-                mIsNativeInitialized = true;
-            }
-        }
+        if (mIsNativeInitialized) return;
+        native_init();
+        native_setDot(0);
+        native_setLogLevel(IjkMediaPlayer.IJK_LOG_SILENT);
+        mIsNativeInitialized = true;
     }
 
     /**
@@ -209,35 +192,19 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
      * </p>
      */
     public IjkMediaPlayer() {
-        this(sLocalLibLoader);
+        initPlayer();
+        initHandler();
     }
 
-    /**
-     * do not loadLibaray
-     *
-     * @param libLoader custom library loader, can be null.
-     */
-    public IjkMediaPlayer(IjkLibLoader libLoader) {
-        initPlayer(libLoader);
-    }
-
-    private void initPlayer(IjkLibLoader libLoader) {
-        loadLibrariesOnce(libLoader);
+    private void initPlayer() {
+        if (!LOADER.isAvailable()) return;
         initNativeOnce();
-
-        Looper looper;
-        if ((looper = Looper.myLooper()) != null) {
-            mEventHandler = new EventHandler(this, looper);
-        } else if ((looper = Looper.getMainLooper()) != null) {
-            mEventHandler = new EventHandler(this, looper);
-        } else {
-            mEventHandler = null;
-        }
-        /*
-         * Native setup requires a weak reference to our object. It's easier to
-         * create it here than in C++.
-         */
         native_setup(new WeakReference<>(this));
+    }
+
+    private void initHandler() {
+        Looper myLooper = Looper.myLooper();
+        mEventHandler = new EventHandler(this, myLooper != null ? myLooper : Looper.getMainLooper());
     }
 
     private native void _setFrameAtTime(String imgCachePath, long startTime, long endTime, int num, int imgDefinition) throws IllegalArgumentException, IllegalStateException;
@@ -450,7 +417,7 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
 
     @Override
     public List<ITrackInfo> getTrackInfo() {
-        return IjkTrackInfo.fromMediaMeta(getMediaMeta());
+        return LOADER.isAvailable() ? IjkTrackInfo.fromMediaMeta(getMediaMeta()) : new ArrayList<>();
     }
 
     @Override
@@ -539,9 +506,9 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     @Override
     public void release() {
         stayAwake(false);
-        updateSurfaceScreenOn();
         resetListeners();
-        _release();
+        updateSurfaceScreenOn();
+        if (LOADER.isAvailable()) _release();
     }
 
     private native void _release();
@@ -549,9 +516,8 @@ public final class IjkMediaPlayer extends AbstractMediaPlayer {
     @Override
     public void reset() {
         stayAwake(false);
-        _reset();
-        // make sure none of the listeners get called anymore
         mEventHandler.removeCallbacksAndMessages(null);
+        if (LOADER.isAvailable()) _reset();
         mVideoWidth = 0;
         mVideoHeight = 0;
     }

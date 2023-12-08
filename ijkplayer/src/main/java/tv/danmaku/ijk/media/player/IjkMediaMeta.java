@@ -300,57 +300,13 @@ public class IjkMediaMeta {
             }
         }
 
-        public String getCodecLongNameInline() {
+        public String getCodecName() {
             if (!TextUtils.isEmpty(mCodecLongName)) {
                 return mCodecLongName;
             } else if (!TextUtils.isEmpty(mCodecName)) {
                 return mCodecName;
             } else {
-                return "N/A";
-            }
-        }
-
-        public String getCodecShortNameInline() {
-            if (!TextUtils.isEmpty(mCodecName)) {
-                return mCodecName;
-            } else {
-                return "N/A";
-            }
-        }
-
-        public String getResolutionInline() {
-            if (mWidth <= 0 || mHeight <= 0) {
-                return "N/A";
-            } else if (mSarNum <= 0 || mSarDen <= 0) {
-                return String.format(Locale.US, "%d x %d", mWidth, mHeight);
-            } else {
-                return String.format(Locale.US, "%d x %d [SAR %d:%d]", mWidth, mHeight, mSarNum, mSarDen);
-            }
-        }
-
-        public String getFpsInline() {
-            if (mFpsNum <= 0 || mFpsDen <= 0) {
-                return "N/A";
-            } else {
-                return String.valueOf(((float) (mFpsNum)) / mFpsDen);
-            }
-        }
-
-        public String getBitrateInline() {
-            if (mBitrate <= 0) {
-                return "N/A";
-            } else if (mBitrate < 1000) {
-                return String.format(Locale.US, "%d bit/s", mBitrate);
-            } else {
-                return String.format(Locale.US, "%d kb/s", mBitrate / 1000);
-            }
-        }
-
-        public String getSampleRateInline() {
-            if (mSampleRate <= 0) {
-                return "N/A";
-            } else {
-                return String.format(Locale.US, "%d Hz", mSampleRate);
+                return "";
             }
         }
 
@@ -369,30 +325,6 @@ public class IjkMediaMeta {
                 return 8;
             } else {
                 return (int) mChannelLayout;
-            }
-        }
-
-        public String getChannelLayoutInline() {
-            if (mChannelLayout <= 0) {
-                return "N/A";
-            } else {
-                if (mChannelLayout == AV_CH_LAYOUT_MONO) {
-                    return "mono";
-                } else if (mChannelLayout == AV_CH_LAYOUT_STEREO) {
-                    return "stereo";
-                } else if (mChannelLayout == AV_CH_LAYOUT_5POINT1) {
-                    return "AV_CH_LAYOUT_5POINT1";
-                } else if (mChannelLayout == AV_CH_LAYOUT_5POINT0) {
-                    return "AV_CH_LAYOUT_5POINT0";
-                } else if (mChannelLayout == AV_CH_LAYOUT_7POINT1) {
-                    return "AV_CH_LAYOUT_7POINT1";
-                } else if (mChannelLayout == AV_CH_LAYOUT_7POINT0) {
-                    return "AV_CH_LAYOUT_7POINT0";
-                } else if (mChannelLayout == AV_CH_LAYOUT_7POINT1_WIDE) {
-                    return "AV_CH_LAYOUT_7POINT1_WIDE";
-                } else {
-                    return String.format(Locale.US, "%x", mChannelLayout);
-                }
             }
         }
     }

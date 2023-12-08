@@ -31,11 +31,11 @@ public class TrackNameProvider {
         if (trackType == C.TRACK_TYPE_VIDEO) {
             trackName = joinWithSeparator(buildRoleString(format), buildResolutionString(format), buildBitrateString(format));
         } else if (trackType == C.TRACK_TYPE_AUDIO) {
-            trackName = joinWithSeparator(buildLanguageOrLabelString(format), buildAudioChannelString(format), buildMimeString(format), buildBitrateString(format));
+            trackName = joinWithSeparator(buildLanguageOrLabelString(format), buildAudioChannelString(format), buildBitrateString(format));
         } else {
-            trackName = joinWithSeparator(buildLanguageString(format), buildLabelString(format), buildMimeString(format));
+            trackName = joinWithSeparator(buildLanguageString(format), buildLabelString(format));
         }
-        return TextUtils.isEmpty(trackName) ? resources.getString(R.string.exo_track_unknown) : trackName;
+        return TextUtils.isEmpty(trackName) ? resources.getString(R.string.exo_track_unknown) : joinWithSeparator(trackName, buildMimeString(format));
     }
 
     public String getTrackName(ITrackInfo trackInfo) {
@@ -46,9 +46,9 @@ public class TrackNameProvider {
         } else if (trackType == C.TRACK_TYPE_AUDIO) {
             trackName = joinWithSeparator(buildLanguageString(trackInfo.getLanguage()), buildAudioChannelString(trackInfo.getChannelCount()), buildBitrateString(trackInfo.getBitrate()));
         } else {
-            trackName = buildLanguageString(trackInfo.getLanguage());
+            trackName = joinWithSeparator(buildLanguageString(trackInfo.getLanguage()));
         }
-        return TextUtils.isEmpty(trackName) ? resources.getString(R.string.exo_track_unknown) : trackName;
+        return TextUtils.isEmpty(trackName) ? resources.getString(R.string.exo_track_unknown) : joinWithSeparator(trackName, buildMimeString(trackInfo.getMimeType()));
     }
 
     private String buildResolutionString(Format format) {
@@ -150,7 +150,11 @@ public class TrackNameProvider {
 
     private String buildMimeString(Format format) {
         if (format.sampleMimeType == null) return "";
-        switch (format.sampleMimeType) {
+        return buildMimeString(format.sampleMimeType);
+    }
+
+    private String buildMimeString(String mimeType) {
+        switch (mimeType) {
             case MimeTypes.AUDIO_DTS:
                 return "DTS";
             case MimeTypes.AUDIO_DTS_HD:
@@ -189,6 +193,30 @@ public class TrackNameProvider {
                 return "AMR-NB";
             case MimeTypes.AUDIO_AMR_WB:
                 return "AMR-WB";
+            case MimeTypes.VIDEO_MP4:
+                return "MP4";
+            case MimeTypes.VIDEO_FLV:
+                return "FLV";
+            case MimeTypes.VIDEO_AV1:
+                return "AV1";
+            case MimeTypes.VIDEO_AVI:
+                return "AVI";
+            case MimeTypes.VIDEO_MPEG:
+                return "MPEG";
+            case MimeTypes.VIDEO_MPEG2:
+                return "MPEG2";
+            case MimeTypes.VIDEO_H263:
+                return "H263";
+            case MimeTypes.VIDEO_H264:
+                return "H264";
+            case MimeTypes.VIDEO_H265:
+                return "H265";
+            case MimeTypes.VIDEO_VP8:
+                return "VP8";
+            case MimeTypes.VIDEO_VP9:
+                return "VP9";
+            case MimeTypes.VIDEO_DOLBY_VISION:
+                return "DOLBY";
             case MimeTypes.APPLICATION_PGS:
                 return "PGS";
             case MimeTypes.APPLICATION_SUBRIP:
@@ -204,7 +232,7 @@ public class TrackNameProvider {
             case MimeTypes.APPLICATION_DVBSUBS:
                 return "DVB";
             default:
-                return "";
+                return mimeType;
         }
     }
 }

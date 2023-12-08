@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
@@ -20,30 +19,22 @@ import javax.net.ssl.X509TrustManager;
 
 public class SSLCompat extends SSLSocketFactory {
 
-    public static final HostnameVerifier VERIFIER = (hostname, session) -> true;
-    private static String[] cipherSuites;
-    private static String[] protocols;
     private SSLSocketFactory factory;
+    private String[] cipherSuites;
+    private String[] protocols;
 
-    static {
+    public SSLCompat() {
         try {
+            List<String> list = new LinkedList<>();
             SSLSocket socket = (SSLSocket) SSLSocketFactory.getDefault().createSocket();
-            List<String> protocols = new LinkedList<>();
-            for (String protocol : socket.getSupportedProtocols()) if (!protocol.toUpperCase().contains("SSL")) protocols.add(protocol);
-            SSLCompat.protocols = protocols.toArray(new String[protocols.size()]);
+            for (String protocol : socket.getSupportedProtocols()) if (!protocol.toUpperCase().contains("SSL")) list.add(protocol);
+            protocols = list.toArray(new String[0]);
             List<String> allowedCiphers = Arrays.asList("TLS_RSA_WITH_AES_256_GCM_SHA384", "TLS_RSA_WITH_AES_128_GCM_SHA256", "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256", "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256", "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256", "TLS_ECHDE_RSA_WITH_AES_128_GCM_SHA256", "TLS_RSA_WITH_3DES_EDE_CBC_SHA", "TLS_RSA_WITH_AES_128_CBC_SHA", "TLS_RSA_WITH_AES_256_CBC_SHA", "TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA", "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA", "TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA", "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA");
             List<String> availableCiphers = Arrays.asList(socket.getSupportedCipherSuites());
             HashSet<String> preferredCiphers = new HashSet<>(allowedCiphers);
             preferredCiphers.retainAll(availableCiphers);
             preferredCiphers.addAll(new HashSet<>(Arrays.asList(socket.getEnabledCipherSuites())));
-            SSLCompat.cipherSuites = preferredCiphers.toArray(new String[preferredCiphers.size()]);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public SSLCompat() {
-        try {
+            cipherSuites = preferredCiphers.toArray(new String[0]);
             SSLContext context = SSLContext.getInstance("TLS");
             context.init(null, new X509TrustManager[]{TM}, null);
             HttpsURLConnection.setDefaultSSLSocketFactory(factory = context.getSocketFactory());

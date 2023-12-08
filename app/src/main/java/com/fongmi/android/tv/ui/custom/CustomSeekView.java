@@ -29,6 +29,7 @@ public class CustomSeekView extends FrameLayout implements TimeBar.OnScrubListen
 
     private long currentDuration;
     private long currentPosition;
+    private long currentBuffered;
     private boolean scrubbing;
 
     public CustomSeekView(Context context) {
@@ -81,16 +82,20 @@ public class CustomSeekView extends FrameLayout implements TimeBar.OnScrubListen
         long buffered = player.getBuffered();
         boolean positionChanged = position != currentPosition;
         boolean durationChanged = duration != currentDuration;
+        boolean bufferedChanged = buffered != currentBuffered;
         currentDuration = duration;
         currentPosition = position;
+        currentBuffered = buffered;
         if (durationChanged) {
             timeBar.setDuration(duration);
             durationView.setText(player.stringToTime(duration < 0 ? 0 : duration));
         }
         if (positionChanged && !scrubbing) {
             timeBar.setPosition(position);
-            timeBar.setBufferedPosition(buffered);
             positionView.setText(player.stringToTime(position < 0 ? 0 : position));
+        }
+        if (bufferedChanged) {
+            timeBar.setBufferedPosition(buffered);
         }
         removeCallbacks(runnable);
         if (player.isPlaying()) {

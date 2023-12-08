@@ -6,7 +6,7 @@ import java.io.File;
 
 public class Github {
 
-    public static final String URL = "https://gh-proxy.com/https://raw.githubusercontent.com/FongMi/Release/main";
+    public static final String URL = "https://my.t4tv.hz.cz";
     private static String ABI;
 
     public static void setAbi(String abi) {

@@ -18,26 +18,6 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/number"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="12dp"
-            android:textColor="@color/grey_800"
-            android:textSize="18sp"
-            tools:text="005" />
-
-        <TextView
-            android:id="@+id/name"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="12dp"
-            android:layout_weight="1"
-            android:singleLine="true"
-            android:textColor="@color/grey_800"
-            android:textSize="18sp"
-            tools:text="民視" />
-
-        <TextView
             android:id="@+id/player"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -89,6 +69,32 @@
             tools:text="預設" />
 
         <TextView
+            android:id="@+id/home"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/selector_text"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            tools:text="首頁" />
+
+        <TextView
+            android:id="@+id/line"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/selector_text"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:visibility="gone"
+            tools:text="來源 1"
+            tools:visibility="visible" />
+
+        <TextView
             android:id="@+id/text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -131,32 +137,6 @@
             android:textColor="@color/white"
             android:textSize="14sp"
             android:visibility="gone"
-            tools:visibility="visible" />
-
-        <TextView
-            android:id="@+id/home"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="12dp"
-            android:background="@drawable/selector_text"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            tools:text="首頁" />
-
-        <TextView
-            android:id="@+id/line"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="12dp"
-            android:background="@drawable/selector_text"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            android:visibility="gone"
-            tools:text="來源 1"
             tools:visibility="visible" />
 
         <TextView
