@@ -31,7 +31,7 @@ public class Sniffer {
         if (Json.valid(text)) return text;
         Matcher m = AI_PUSH.matcher(text);
         if (m.find()) return m.group(0);
-        return "";
+        return text;
     }
 
     public static boolean isThunder(String url) {

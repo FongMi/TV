@@ -58,6 +58,14 @@ public class FileChooser {
         if (fragment != null) fragment.startActivityForResult(Intent.createChooser(intent, ""), code);
     }
 
+    public static boolean isValid(Context context, Uri uri) {
+        try {
+            return DocumentsContract.isDocumentUri(context, uri) || ContentResolver.SCHEME_CONTENT.equals(uri.getScheme()) || ContentResolver.SCHEME_FILE.equalsIgnoreCase(uri.getScheme());
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public static String getPathFromUri(Context context, Uri uri) {
         if (uri == null) return null;
         String path = null;
