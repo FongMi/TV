@@ -183,11 +183,11 @@ public class Path {
         }
     }
 
-    public static void copy(InputStream inputStream, OutputStream outputStream) throws IOException {
+    public static void copy(InputStream in, OutputStream out) throws IOException {
         byte[] buffer = new byte[8192];
         int amountRead;
-        while ((amountRead = inputStream.read(buffer)) != -1) {
-            outputStream.write(buffer, 0, amountRead);
+        while ((amountRead = in.read(buffer)) != -1) {
+            out.write(buffer, 0, amountRead);
         }
     }
 

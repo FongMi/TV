@@ -17,7 +17,6 @@ import com.fongmi.android.tv.App;
 import com.github.catvod.utils.Path;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URLDecoder;
 
@@ -123,14 +122,9 @@ public class FileChooser {
             if (cursor == null || !cursor.moveToFirst()) return null;
             InputStream is = context.getContentResolver().openInputStream(uri);
             if (is == null) return null;
-            int count;
-            byte[] buffer = new byte[4096];
             int column = cursor.getColumnIndexOrThrow(projection[0]);
             File file = Path.cache(cursor.getString(column));
-            FileOutputStream os = new FileOutputStream(file);
-            while ((count = is.read(buffer)) != -1) os.write(buffer, 0, count);
-            os.close();
-            is.close();
+            Path.copy(is, file);
             return file.getAbsolutePath();
         } catch (Exception e) {
             return null;
