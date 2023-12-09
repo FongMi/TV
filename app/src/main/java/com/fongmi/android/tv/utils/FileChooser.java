@@ -47,7 +47,7 @@ public class FileChooser {
     }
 
     public void show(String mimeType, String[] mimeTypes, int code) {
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        Intent intent = new Intent(getAction());
         intent.setType(mimeType);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
@@ -55,6 +55,17 @@ public class FileChooser {
         intent.putExtra("android.content.extra.SHOW_ADVANCED", true);
         if (intent.resolveActivity(App.get().getPackageManager()) == null) return;
         if (fragment != null) fragment.startActivityForResult(Intent.createChooser(intent, ""), code);
+    }
+
+    private String getAction() {
+        return hasSAFChooser() ? Intent.ACTION_OPEN_DOCUMENT : Intent.ACTION_GET_CONTENT;
+    }
+
+    private boolean hasSAFChooser() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("video/*");
+        return intent.resolveActivity(App.get().getPackageManager()) != null;
     }
 
     public static boolean isValid(Context context, Uri uri) {
