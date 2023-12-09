@@ -155,6 +155,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mKeyDown = CustomKeyDownLive.create(this, mBinding.video);
         mClock = Clock.create(mBinding.widget.time);
         setPadding(mBinding.control.getRoot());
+        setPadding(mBinding.recycler, true);
         mPlayers = new Players().init(this);
         mObserveEpg = this::setEpg;
         mObserveUrl = this::start;
@@ -295,7 +296,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private void setWidth(Live live) {
-        int base = ResUtil.dp2px(live.hasLogo() ? 90 : 45);
+        int base = ResUtil.dp2px(45);
         for (Group group : live.getGroups()) live.setWidth(Math.max(live.getWidth(), ResUtil.getTextWidth(group.getName(), 14)));
         mBinding.group.getLayoutParams().width = live.getWidth() == 0 ? 0 : Math.min(live.getWidth() + base, ResUtil.dp2px(200));
         mBinding.divide.setVisibility(live.getWidth() == 0 ? View.GONE : View.VISIBLE);
@@ -900,8 +901,13 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
 
     public void setRotate(boolean rotate) {
         this.rotate = rotate;
-        if (rotate) noPadding(mBinding.control.getRoot());
-        if (!rotate) setPadding(mBinding.control.getRoot());
+        if (rotate) {
+            noPadding(mBinding.recycler);
+            noPadding(mBinding.control.getRoot());
+        } else {
+            setPadding(mBinding.recycler, true);
+            setPadding(mBinding.control.getRoot());
+        }
     }
 
     public boolean isStop() {

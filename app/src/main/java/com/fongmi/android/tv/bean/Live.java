@@ -199,11 +199,6 @@ public class Live {
         return item;
     }
 
-    public boolean hasLogo() {
-        for (Group group : getGroups()) if (group.getLogo().length() > 0) return true;
-        return false;
-    }
-
     public int getBootIcon() {
         return isBoot() ? R.drawable.ic_live_boot : R.drawable.ic_live_block;
     }

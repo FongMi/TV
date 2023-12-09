@@ -49,7 +49,7 @@ public class LiveParser {
     private static void json(Live live, String text) {
         live.getGroups().addAll(Group.arrayFrom(text));
         for (Group group : live.getGroups()) {
-            for (Channel channel : group.live(live).getChannel()) {
+            for (Channel channel : group.getChannel()) {
                 channel.live(live);
             }
         }

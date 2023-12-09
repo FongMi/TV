@@ -68,6 +68,10 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     protected void setPadding(ViewGroup layout) {
+        setPadding(layout, false);
+    }
+
+    protected void setPadding(ViewGroup layout, boolean leftOnly) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return;
         DisplayCutout cutout = ResUtil.getDisplay(this).getCutout();
         if (cutout == null) return;
@@ -76,7 +80,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         int right = cutout.getSafeInsetRight();
         int bottom = cutout.getSafeInsetBottom();
         int padding = left | right | top | bottom;
-        layout.setPadding(padding, 0, padding, 0);
+        layout.setPadding(padding, 0, leftOnly ? 0 : padding, 0);
     }
 
     protected void noPadding(ViewGroup layout) {

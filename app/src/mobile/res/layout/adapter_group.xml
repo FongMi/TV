@@ -13,14 +13,6 @@
     android:paddingEnd="12dp"
     android:paddingBottom="6dp">
 
-    <ImageView
-        android:id="@+id/logo"
-        android:layout_width="33dp"
-        android:layout_height="33dp"
-        android:layout_marginEnd="12dp"
-        android:scaleType="fitCenter"
-        android:visibility="gone" />
-
     <TextView
         android:id="@+id/name"
         android:layout_width="wrap_content"
