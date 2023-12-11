@@ -31,16 +31,28 @@ def download_file(name, ext):
 
 def init_py(path, name, ext):
     py_name = path + '/' + name + '.py'
-    download_file(py_name, ext)
+    try:
+        ext_json = json.loads(ext)
+        download_file(py_name,ext_json["py_url"])
+    except:
+        download_file(py_name, ext)
     return SourceFileLoader(name, py_name).load_module().Spider()
+
+def init(ru, extend):
+    extend_str = ""
+    try:
+        ext_json = json.loads(extend)
+        ext_json.pop("py_url")
+        extend_str = json.dumps(ext_json)
+    except:
+        pass
+    ru.init(extend_str)
 
 
 def str2json(content):
     return json.loads(content)
 
 
-def init(ru, extend):
-    ru.init([""])
 
 
 def homeContent(ru, filter):
