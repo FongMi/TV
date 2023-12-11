@@ -199,8 +199,12 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
         RefreshEvent.video();
     }
 
+    protected boolean handleBack() {
+        return true;
+    }
+
     @Override
-    public void onBackPressed() {
+    protected void onBackPress() {
         if (!mBinding.navigation.getMenu().findItem(R.id.vod).isVisible()) {
             setNavigation();
         } else if (mManager.isVisible(2)) {

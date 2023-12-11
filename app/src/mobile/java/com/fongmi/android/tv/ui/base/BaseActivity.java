@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewbinding.ViewBinding;
 
@@ -36,6 +37,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         if (transparent()) setTransparent(this);
         setContentView(getBinding().getRoot());
         EventBus.getDefault().register(this);
+        setBackCallback();
         setWall();
         initView(savedInstanceState);
         initEvent();
@@ -53,10 +55,17 @@ public abstract class BaseActivity extends AppCompatActivity {
         return true;
     }
 
+    protected boolean handleBack() {
+        return false;
+    }
+
     protected void initView(Bundle savedInstanceState) {
     }
 
     protected void initEvent() {
+    }
+
+    protected void onBackPress() {
     }
 
     protected boolean isVisible(View view) {
@@ -85,6 +94,15 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     protected void noPadding(ViewGroup layout) {
         layout.setPadding(0, 0, 0, 0);
+    }
+
+    private void setBackCallback() {
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(handleBack()) {
+            @Override
+            public void handleOnBackPressed() {
+                onBackPress();
+            }
+        });
     }
 
     private void setWall() {
