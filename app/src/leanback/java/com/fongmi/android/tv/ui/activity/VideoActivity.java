@@ -1189,22 +1189,6 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         else onRefresh();
     }
 
-    private void checkError(ErrorEvent event) {
-        if (getSite().getPlayerType() == -1 && event.isFormat() && event.getRetry() > 0 && getToggleCount() < 2 && mPlayers.getPlayer() != Players.SYS) {
-            toggleCount++;
-            nextPlayer();
-        } else {
-            resetToggle();
-            onError(event);
-        }
-    }
-
-    private void nextPlayer() {
-        mPlayers.nextPlayer();
-        setPlayerView();
-        onRefresh();
-    }
-
     private void onError(ErrorEvent event) {
         showError(event.getMsg());
         mClock.setCallback(null);
