@@ -24,7 +24,7 @@ public class Loader {
     @Keep
     public Spider spider(Context context, String key, String api) {
         if (app == null) init(context);
-        PyObject obj = app.callAttr("init_py", cache, key, api);
+        PyObject obj = app.callAttr("spider", cache, key, api);
         return new Spider(app, obj);
     }
 }
