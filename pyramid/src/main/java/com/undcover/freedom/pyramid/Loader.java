@@ -22,9 +22,9 @@ public class Loader {
     }
 
     @Keep
-    public Spider spider(Context context, String name, String api) {
+    public Spider spider(Context context, String key, String api) {
         if (app == null) init(context);
-        PyObject obj = app.callAttr("init_py", cache, name, api);
+        PyObject obj = app.callAttr("init_py", cache, key, api);
         return new Spider(app, obj);
     }
 }
