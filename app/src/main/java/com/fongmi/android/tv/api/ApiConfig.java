@@ -230,7 +230,7 @@ public class ApiConfig {
 
     public Spider getSpider(Site site) {
         boolean js = site.getApi().contains(".js");
-        boolean py = site.getApi().startsWith("py_");
+        boolean py = site.getApi().contains(".py");
         boolean csp = site.getApi().startsWith("csp_");
         if (py) return pyLoader.getSpider(site.getKey(), site.getApi(), site.getExt());
         else if (js) return jsLoader.getSpider(site.getKey(), site.getApi(), site.getExt(), site.getJar());
