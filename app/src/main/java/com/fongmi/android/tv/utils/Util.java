@@ -1,12 +1,15 @@
 package com.fongmi.android.tv.utils;
 
 import android.app.Activity;
+import android.app.UiModeManager;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.Parcelable;
@@ -14,6 +17,8 @@ import android.provider.Settings;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+
+import androidx.annotation.RequiresApi;
 
 import com.fongmi.android.tv.App;
 import com.github.catvod.Init;
@@ -117,5 +122,38 @@ public class Util {
         } else {
             return Intent.createChooser(intent, null);
         }
+    }
+
+    public static boolean hasSAFChooser() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) return false;
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("video/*");
+        return intent.resolveActivity(App.get().getPackageManager()) != null;
+    }
+
+    public static boolean isTvBox() {
+        PackageManager pm = App.get().getPackageManager();
+        if (Configuration.UI_MODE_TYPE_TELEVISION == ((UiModeManager) App.get().getSystemService(Context.UI_MODE_SERVICE)).getCurrentModeType()) {
+            return true;
+        }
+        if (pm.hasSystemFeature("amazon.hardware.fire_tv")) {
+            return true;
+        }
+        if (!hasSAFChooser()) {
+            return true;
+        }
+        if (Build.VERSION.SDK_INT < 30) {
+            if (!pm.hasSystemFeature(PackageManager.FEATURE_TOUCHSCREEN)) {
+                return true;
+            }
+            if (pm.hasSystemFeature("android.hardware.hdmi.cec")) {
+                return true;
+            }
+            if (Build.MANUFACTURER.equalsIgnoreCase("zidoo")) {
+                return true;
+            }
+        }
+        return false;
     }
 }
