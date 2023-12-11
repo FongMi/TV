@@ -29,12 +29,12 @@ public class LiveDialog implements LiveAdapter.OnClickListener {
         return new LiveDialog(fragment);
     }
 
-    public LiveDialog(Activity activity) {
+    private LiveDialog(Activity activity) {
         this.callback = (LiveCallback) activity;
         init(activity);
     }
 
-    public LiveDialog(Fragment fragment) {
+    private LiveDialog(Fragment fragment) {
         this.callback = (LiveCallback) fragment;
         init(fragment.getActivity());
     }
@@ -45,6 +45,11 @@ public class LiveDialog implements LiveAdapter.OnClickListener {
         this.adapter = new LiveAdapter(this);
     }
 
+    public LiveDialog action() {
+        adapter.setAction(true);
+        return this;
+    }
+
     public void show() {
         setRecyclerView();
         setDialog();
@@ -52,6 +57,7 @@ public class LiveDialog implements LiveAdapter.OnClickListener {
 
     private void setRecyclerView() {
         binding.recycler.setAdapter(adapter);
+        binding.recycler.setItemAnimator(null);
         binding.recycler.setHasFixedSize(true);
         binding.recycler.addItemDecoration(new SpaceItemDecoration(1, 8));
         binding.recycler.post(() -> binding.recycler.scrollToPosition(LiveConfig.getHomeIndex()));
@@ -67,5 +73,33 @@ public class LiveDialog implements LiveAdapter.OnClickListener {
     public void onItemClick(Live item) {
         callback.setLive(item);
         dialog.dismiss();
+    }
+
+    @Override
+    public void onBootClick(int position, Live item) {
+        item.boot(!item.isBoot()).save();
+        adapter.notifyItemChanged(position);
+    }
+
+    @Override
+    public void onPassClick(int position, Live item) {
+        item.pass(!item.isPass()).save();
+        adapter.notifyItemChanged(position);
+    }
+
+    @Override
+    public boolean onBootLongClick(Live item) {
+        boolean result = !item.isBoot();
+        for (Live live : LiveConfig.get().getLives()) live.boot(result).save();
+        adapter.notifyItemRangeChanged(0, adapter.getItemCount());
+        return true;
+    }
+
+    @Override
+    public boolean onPassLongClick(Live item) {
+        boolean result = !item.isPass();
+        for (Live live : LiveConfig.get().getLives()) live.pass(result).save();
+        adapter.notifyItemRangeChanged(0, adapter.getItemCount());
+        return true;
     }
 }

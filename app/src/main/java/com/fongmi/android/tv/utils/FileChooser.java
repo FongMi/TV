@@ -17,8 +17,8 @@ import com.fongmi.android.tv.App;
 import com.github.catvod.utils.Path;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.net.URLDecoder;
 
 public class FileChooser {
 
@@ -47,7 +47,7 @@ public class FileChooser {
     }
 
     public void show(String mimeType, String[] mimeTypes, int code) {
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        Intent intent = new Intent(Util.isTvBox() ? Intent.ACTION_GET_CONTENT : Intent.ACTION_OPEN_DOCUMENT);
         intent.setType(mimeType);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
@@ -57,13 +57,21 @@ public class FileChooser {
         if (fragment != null) fragment.startActivityForResult(Intent.createChooser(intent, ""), code);
     }
 
+    public static boolean isValid(Context context, Uri uri) {
+        try {
+            return DocumentsContract.isDocumentUri(context, uri) || ContentResolver.SCHEME_CONTENT.equals(uri.getScheme()) || ContentResolver.SCHEME_FILE.equalsIgnoreCase(uri.getScheme());
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public static String getPathFromUri(Context context, Uri uri) {
         if (uri == null) return null;
         String path = null;
         if (DocumentsContract.isDocumentUri(context, uri)) path = getPathFromDocumentUri(context, uri);
         else if (ContentResolver.SCHEME_CONTENT.equals(uri.getScheme())) path = getDataColumn(context, uri);
         else if (ContentResolver.SCHEME_FILE.equalsIgnoreCase(uri.getScheme())) path = uri.getPath();
-        return path != null ? path : createFileFromUri(context, uri);
+        return path != null ? URLDecoder.decode(path) : createFileFromUri(context, uri);
     }
 
     private static String getPathFromDocumentUri(Context context, Uri uri) {
@@ -114,14 +122,9 @@ public class FileChooser {
             if (cursor == null || !cursor.moveToFirst()) return null;
             InputStream is = context.getContentResolver().openInputStream(uri);
             if (is == null) return null;
-            int count;
-            byte[] buffer = new byte[4096];
             int column = cursor.getColumnIndexOrThrow(projection[0]);
             File file = Path.cache(cursor.getString(column));
-            FileOutputStream os = new FileOutputStream(file);
-            while ((count = is.read(buffer)) != -1) os.write(buffer, 0, count);
-            os.close();
-            is.close();
+            Path.copy(is, file);
             return file.getAbsolutePath();
         } catch (Exception e) {
             return null;

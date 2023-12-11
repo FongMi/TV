@@ -41,6 +41,7 @@ import com.fongmi.android.tv.databinding.ActivityLiveBinding;
 import com.fongmi.android.tv.event.ActionEvent;
 import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.event.PlayerEvent;
+import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.impl.LiveCallback;
 import com.fongmi.android.tv.impl.PassCallback;
 import com.fongmi.android.tv.impl.SubtitleCallback;
@@ -48,6 +49,7 @@ import com.fongmi.android.tv.model.LiveViewModel;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.player.Source;
+import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.service.PlaybackService;
 import com.fongmi.android.tv.ui.adapter.ChannelAdapter;
 import com.fongmi.android.tv.ui.adapter.GroupAdapter;
@@ -105,7 +107,11 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     private PiP mPiP;
 
     public static void start(Context context) {
-        if (!LiveConfig.isEmpty()) context.startActivity(new Intent(context, LiveActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        if (!LiveConfig.isEmpty()) context.startActivity(new Intent(context, LiveActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).putExtra("empty", false));
+    }
+
+    private boolean isEmpty() {
+        return getIntent().getBooleanExtra("empty", true);
     }
 
     private PlayerView getExo() {
@@ -149,6 +155,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mKeyDown = CustomKeyDownLive.create(this, mBinding.video);
         mClock = Clock.create(mBinding.widget.time);
         setPadding(mBinding.control.getRoot());
+        setPadding(mBinding.recycler, true);
         mPlayers = new Players().init(this);
         mObserveEpg = this::setEpg;
         mObserveUrl = this::start;
@@ -158,11 +165,12 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mR2 = this::setTraffic;
         mR3 = this::hideInfo;
         mPiP = new PiP();
+        Server.get().start();
         setForeground(true);
         setRecyclerView();
         setVideoView();
         setViewModel();
-        getLive();
+        checkLive();
     }
 
     @Override
@@ -248,6 +256,28 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         });
     }
 
+    private void checkLive() {
+        if (isEmpty()) {
+            LiveConfig.get().init().load(getCallback());
+        } else {
+            getLive();
+        }
+    }
+
+    private Callback getCallback() {
+        return new Callback() {
+            @Override
+            public void success() {
+                getLive();
+            }
+
+            @Override
+            public void error(String msg) {
+                Notify.show(msg);
+            }
+        };
+    }
+
     private void getLive() {
         mBinding.control.action.home.setText(getHome().getName());
         mPlayers.setPlayer(getPlayerType(-1));
@@ -266,7 +296,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private void setWidth(Live live) {
-        int base = ResUtil.dp2px(live.hasLogo() ? 90 : 45);
+        int base = ResUtil.dp2px(45);
         for (Group group : live.getGroups()) live.setWidth(Math.max(live.getWidth(), ResUtil.getTextWidth(group.getName(), 14)));
         mBinding.group.getLayoutParams().width = live.getWidth() == 0 ? 0 : Math.min(live.getWidth() + base, ResUtil.dp2px(200));
         mBinding.divide.setVisibility(live.getWidth() == 0 ? View.GONE : View.VISIBLE);
@@ -871,8 +901,13 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
 
     public void setRotate(boolean rotate) {
         this.rotate = rotate;
-        if (rotate) noPadding(mBinding.control.getRoot());
-        if (!rotate) setPadding(mBinding.control.getRoot());
+        if (rotate) {
+            noPadding(mBinding.recycler);
+            noPadding(mBinding.control.getRoot());
+        } else {
+            setPadding(mBinding.recycler, true);
+            setPadding(mBinding.control.getRoot());
+        }
     }
 
     public boolean isStop() {

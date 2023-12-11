@@ -1,13 +1,18 @@
 package com.fongmi.android.tv.ui.activity;
 
 import android.Manifest;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.MenuItem;
+import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.pm.ShortcutInfoCompat;
+import androidx.core.content.pm.ShortcutManagerCompat;
+import androidx.core.graphics.drawable.IconCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewbinding.ViewBinding;
 
@@ -24,6 +29,7 @@ import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.event.ServerEvent;
 import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.player.Source;
+import com.fongmi.android.tv.receiver.ShortcutReceiver;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.FragmentStateManager;
@@ -67,6 +73,7 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
     @Override
     protected void initEvent() {
         mBinding.navigation.setOnItemSelectedListener(this);
+        mBinding.navigation.findViewById(R.id.live).setOnLongClickListener(this::addShortcut);
     }
 
     private void checkAction(Intent intent) {
@@ -96,7 +103,7 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
 
     private void initConfig() {
         WallConfig.get().init();
-        LiveConfig.get().init();
+        LiveConfig.get().init().load();
         ApiConfig.get().init().load(getCallback());
     }
 
@@ -148,6 +155,13 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
         return false;
     }
 
+    private boolean addShortcut(View view) {
+        ShortcutInfoCompat info = new ShortcutInfoCompat.Builder(this, getString(R.string.nav_live)).setIcon(IconCompat.createWithResource(this, R.mipmap.ic_launcher)).setIntent(new Intent(Intent.ACTION_VIEW, null, this, LiveActivity.class)).setShortLabel(getString(R.string.nav_live)).build();
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, new Intent(this, ShortcutReceiver.class).setAction(ShortcutReceiver.ACTION), PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        ShortcutManagerCompat.requestPinShortcut(this, info, pendingIntent.getIntentSender());
+        return true;
+    }
+
     private void setConfirm() {
         confirm = true;
         Notify.show(R.string.app_exit);
@@ -185,8 +199,12 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
         RefreshEvent.video();
     }
 
+    protected boolean handleBack() {
+        return true;
+    }
+
     @Override
-    public void onBackPressed() {
+    protected void onBackPress() {
         if (!mBinding.navigation.getMenu().findItem(R.id.vod).isVisible()) {
             setNavigation();
         } else if (mManager.isVisible(2)) {

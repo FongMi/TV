@@ -11,7 +11,7 @@ android {
         minSdk 21
         targetSdk 28
         versionCode 210
-        versionName "2.1.0"
+        versionName "20231211"
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
@@ -100,7 +100,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.biometric:biometric:1.1.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.6.2'
-    implementation 'androidx.room:room-runtime:2.6.0'
+    implementation 'androidx.room:room-runtime:2.6.1'
     implementation 'androidx.media:media:1.6.0'
     implementation 'cat.ereza:customactivityoncrash:2.4.0'
     implementation 'com.github.bassaer:materialdesigncolors:1.0.0'
@@ -134,6 +134,6 @@ dependencies {
     mobileImplementation 'com.google.android.flexbox:flexbox:3.0.0'
     //mobileImplementation 'com.google.android.gms:play-services-cast-framework:21.3.0'
     mobileImplementation('com.journeyapps:zxing-android-embedded:4.3.0') { transitive = false }
-    annotationProcessor 'androidx.room:room-compiler:2.6.0'
+    annotationProcessor 'androidx.room:room-compiler:2.6.1'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.15.1'
 }

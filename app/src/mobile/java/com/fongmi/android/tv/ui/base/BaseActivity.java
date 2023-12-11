@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewbinding.ViewBinding;
 
@@ -36,6 +37,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         if (transparent()) setTransparent(this);
         setContentView(getBinding().getRoot());
         EventBus.getDefault().register(this);
+        setBackCallback();
         setWall();
         initView(savedInstanceState);
         initEvent();
@@ -53,10 +55,17 @@ public abstract class BaseActivity extends AppCompatActivity {
         return true;
     }
 
+    protected boolean handleBack() {
+        return false;
+    }
+
     protected void initView(Bundle savedInstanceState) {
     }
 
     protected void initEvent() {
+    }
+
+    protected void onBackPress() {
     }
 
     protected boolean isVisible(View view) {
@@ -68,6 +77,10 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     protected void setPadding(ViewGroup layout) {
+        setPadding(layout, false);
+    }
+
+    protected void setPadding(ViewGroup layout, boolean leftOnly) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return;
         DisplayCutout cutout = ResUtil.getDisplay(this).getCutout();
         if (cutout == null) return;
@@ -76,11 +89,20 @@ public abstract class BaseActivity extends AppCompatActivity {
         int right = cutout.getSafeInsetRight();
         int bottom = cutout.getSafeInsetBottom();
         int padding = left | right | top | bottom;
-        layout.setPadding(padding, 0, padding, 0);
+        layout.setPadding(padding, 0, leftOnly ? 0 : padding, 0);
     }
 
     protected void noPadding(ViewGroup layout) {
         layout.setPadding(0, 0, 0, 0);
+    }
+
+    private void setBackCallback() {
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(handleBack()) {
+            @Override
+            public void handleOnBackPressed() {
+                onBackPress();
+            }
+        });
     }
 
     private void setWall() {

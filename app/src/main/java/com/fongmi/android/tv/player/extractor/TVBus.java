@@ -4,6 +4,7 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.api.LiveConfig;
 import com.fongmi.android.tv.bean.Core;
+import com.fongmi.android.tv.exception.ExtractException;
 import com.fongmi.android.tv.player.Source;
 import com.google.gson.JsonObject;
 import com.tvbus.engine.Listener;
@@ -36,7 +37,12 @@ public class TVBus implements Source.Extractor, Listener {
         if (tvcore == null) init(core = LiveConfig.get().getHome().getCore());
         tvcore.start(url);
         onWait();
+        onCheck();
         return hls;
+    }
+
+    private void onCheck() throws Exception {
+        if (hls.startsWith("-")) throw new ExtractException("Error Code : " + hls);
     }
 
     private void onWait() throws InterruptedException {
@@ -78,6 +84,9 @@ public class TVBus implements Source.Extractor, Listener {
 
     @Override
     public void onStop(String result) {
+        JsonObject json = App.gson().fromJson(result, JsonObject.class);
+        hls = json.get("errno").getAsString();
+        if (hls.startsWith("-")) onNotify();
     }
 
     @Override

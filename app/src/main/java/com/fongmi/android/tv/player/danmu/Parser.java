@@ -4,6 +4,8 @@ import android.graphics.Color;
 import android.text.TextUtils;
 
 import com.fongmi.android.tv.bean.Danmu;
+import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.Path;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,8 +29,14 @@ public class Parser extends BaseDanmakuParser {
     private float scaleY;
     private int index;
 
-    public Parser(String xml) {
-        this.danmu = Danmu.fromXml(xml);
+    public Parser(String path) {
+        this.danmu = Danmu.fromXml(getContent(path));
+    }
+
+    private String getContent(String path) {
+        if (path.startsWith("file")) return Path.read(path);
+        if (path.startsWith("http")) return OkHttp.string(path);
+        return path;
     }
 
     @Override

@@ -4,6 +4,10 @@
         <item name="android:windowTranslucentStatus">true</item>
     </style>
 
+    <style name="AppTheme.Live" parent="AppTheme">
+        <item name="android:windowBackground">@color/black</item>
+    </style>
+
     <style name="AppTheme.Detail" parent="AppTheme">
         <item name="android:statusBarColor">@color/black</item>
         <item name="android:windowTranslucentStatus">false</item>

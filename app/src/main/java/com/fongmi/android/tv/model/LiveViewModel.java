@@ -9,6 +9,7 @@ import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Epg;
 import com.fongmi.android.tv.bean.Group;
 import com.fongmi.android.tv.bean.Live;
+import com.fongmi.android.tv.exception.ExtractException;
 import com.fongmi.android.tv.player.Source;
 import com.github.catvod.net.OkHttp;
 
@@ -70,6 +71,7 @@ public class LiveViewModel extends ViewModel {
 
     public void getUrl(Channel item) {
         execute(URL, () -> {
+            item.setMsg(null);
             Source.get().stop();
             item.setUrl(Source.get().fetch(item));
             //checkPLTV(item);
@@ -119,7 +121,8 @@ public class LiveViewModel extends ViewModel {
                 if (type == URL) url.postValue((Channel) executor.submit(callable).get(Constant.TIMEOUT_PARSE_LIVE, TimeUnit.MILLISECONDS));
             } catch (Throwable e) {
                 if (e instanceof InterruptedException || Thread.interrupted()) return;
-                if (type == URL) url.postValue(new Channel());
+                if (e.getCause() instanceof ExtractException) url.postValue(Channel.error(e.getCause().getMessage()));
+                else if (type == URL) url.postValue(new Channel());
                 if (type == LIVE) live.postValue(new Live());
                 if (type == EPG) epg.postValue(new Epg());
                 e.printStackTrace();

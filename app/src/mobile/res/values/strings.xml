@@ -29,14 +29,24 @@
     <string name="control_speed">Speed</string>
     <string name="control_scale">Scale</string>
     <string name="control_track">Track</string>
+    <string name="control_other">Other</string>
 
     <!-- Dialog -->
     <string name="dialog_delete_record">Delete all records?</string>
     <string name="dialog_delete_keep">All keep records will be removed.</string>
     <string name="dialog_delete_history">All history records will be removed.</string>
 
+    <!-- Timer -->
+    <string name="timer_5">5 minutes</string>
+    <string name="timer_15">15 minutes</string>
+    <string name="timer_30">30 minutes</string>
+    <string name="timer_60">1 hour</string>
+    <string name="timer_delay">Add 5 minutes</string>
+    <string name="timer_cancel">Cancel timer</string>
+
     <!-- Hint -->
     <string name="copied">Copied</string>
+    <string name="shortcut">Shortcut has been added.</string>
 
     <string-array name="select_background">
         <item>Off</item>

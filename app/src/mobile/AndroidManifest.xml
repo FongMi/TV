@@ -96,10 +96,12 @@
         <activity
             android:name=".ui.activity.LiveActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
+            android:exported="true"
             android:launchMode="singleTop"
             android:resizeableActivity="true"
             android:screenOrientation="sensorLandscape"
-            android:supportsPictureInPicture="true" />
+            android:supportsPictureInPicture="true"
+            android:theme="@style/AppTheme.Live" />
 
         <activity
             android:name=".ui.activity.ScanActivity"
@@ -119,6 +121,10 @@
             android:name=".ui.activity.MangaActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout"
             android:screenOrientation="fullUser" />
+
+        <receiver
+            android:name=".receiver.ShortcutReceiver"
+            android:exported="false" />
 
         <service
             android:name="com.android.cast.dlna.dmc.DLNACastService"

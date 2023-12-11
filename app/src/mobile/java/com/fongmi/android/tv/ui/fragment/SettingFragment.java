@@ -249,7 +249,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
     }
 
     private void onLiveHome(View view) {
-        LiveDialog.create(this).show();
+        LiveDialog.create(this).action().show();
     }
 
     private void onVodHistory(View view) {

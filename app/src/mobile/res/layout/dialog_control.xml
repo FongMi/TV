@@ -164,16 +164,6 @@
                 tools:text="硬解" />
 
             <TextView
-                android:id="@+id/loop"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:background="@drawable/shape_accent"
-                android:text="@string/play_loop"
-                android:textColor="@color/control"
-                android:textSize="14sp" />
-
-            <TextView
                 android:id="@+id/opening"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -250,6 +240,42 @@
             android:textSize="14sp"
             android:visibility="gone"
             tools:visibility="visible" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/other"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        android:text="@string/control_other"
+        android:textColor="?android:attr/textColorPrimary"
+        android:textSize="16sp" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/loop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/shape_accent"
+            android:text="@string/play_loop"
+            android:textColor="@color/control"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/timer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/shape_accent"
+            android:text="@string/play_timer"
+            android:textColor="@color/control"
+            android:textSize="14sp" />
 
     </LinearLayout>
 </LinearLayout>

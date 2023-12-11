@@ -106,7 +106,6 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         Notify.createChannel();
-        Github.setAbi(BuildConfig.FLAVOR_abi);
         Logger.addLogAdapter(getLogAdapter());
         OkHttp.get().setProxy(Setting.getProxy());
         OkHttp.get().setDoh(Doh.objectFrom(Setting.getDoh()));
