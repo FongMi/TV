@@ -1146,6 +1146,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onActionEvent(ActionEvent event) {
+        if (isRedirect()) return;
         if (ActionEvent.PLAY.equals(event.getAction()) || ActionEvent.PAUSE.equals(event.getAction())) {
             mBinding.control.play.performClick();
         } else if (ActionEvent.NEXT.equals(event.getAction())) {
@@ -1159,14 +1160,26 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefreshEvent(RefreshEvent event) {
-        if (event.getType() == RefreshEvent.Type.DETAIL) getDetail();
-        else if (event.getType() == RefreshEvent.Type.PLAYER) onRefresh();
-        else if (event.getType() == RefreshEvent.Type.DANMAKU) checkDanmu(event.getPath());
-        else if (event.getType() == RefreshEvent.Type.SUBTITLE) mPlayers.setSub(Sub.from(event.getPath()));
+        if (isRedirect()) return;
+        switch (event.getType()) {
+            case DETAIL:
+                getDetail();
+                break;
+            case PLAYER:
+                onRefresh();
+                break;
+            case DANMAKU:
+                checkDanmu(event.getPath());
+                break;
+            case SUBTITLE:
+                mPlayers.setSub(Sub.from(event.getPath()));
+                break;
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onPlayerEvent(PlayerEvent event) {
+        if (isRedirect()) return;
         switch (event.getState()) {
             case 0:
                 setPosition();
@@ -1249,6 +1262,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onErrorEvent(ErrorEvent event) {
+        if (isRedirect()) return;
         if (mPlayers.addRetry() > event.getRetry()) checkError(event);
         else onRefresh();
     }
