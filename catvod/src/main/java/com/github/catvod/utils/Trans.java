@@ -51,11 +51,11 @@ public class Trans {
     }
 
     public static String s2t(String text) {
-        return s2t(pass(), text);
+        return text == null ? "" : s2t(pass(), text);
     }
 
     public static String t2s(String text) {
-        return t2s(pass(), text);
+        return text == null ? "" : t2s(pass(), text);
     }
 
     public static String s2t(boolean pass, String text) {

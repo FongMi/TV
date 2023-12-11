@@ -39,12 +39,15 @@ public class Channel {
     private JsonElement header;
     @SerializedName("playerType")
     private Integer playerType;
+    @SerializedName("parse")
+    private Integer parse;
     @SerializedName("drm")
     private Drm drm;
 
     private boolean selected;
     private Group group;
     private String url;
+    private String msg;
     private Epg data;
     private int line;
 
@@ -62,6 +65,12 @@ public class Channel {
 
     public static Channel create(Channel channel) {
         return new Channel().copy(channel);
+    }
+
+    public static Channel error(String msg) {
+        Channel result = new Channel();
+        result.setMsg(msg);
+        return result;
     }
 
     public Channel() {
@@ -143,6 +152,14 @@ public class Channel {
         this.playerType = playerType;
     }
 
+    public Integer getParse() {
+        return parse == null ? 0 : parse;
+    }
+
+    public void setParse(Integer parse) {
+        this.parse = parse;
+    }
+
     public Drm getDrm() {
         return drm;
     }
@@ -165,6 +182,18 @@ public class Channel {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getMsg() {
+        return TextUtils.isEmpty(msg) ? "" : msg;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
+
+    public boolean hasMsg() {
+        return getMsg().length() > 0;
     }
 
     public Epg getData() {
@@ -270,6 +299,13 @@ public class Channel {
         setUrls(item.getUrls());
         setUa(item.getUa());
         return this;
+    }
+
+    public Result result() {
+        Result result = new Result();
+        result.setUrl(Url.create().add(getUrl()));
+        result.setHeader(Json.toObject(getHeaders()));
+        return result;
     }
 
     @Override

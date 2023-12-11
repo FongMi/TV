@@ -22,17 +22,18 @@ def redirect(url):
         return rsp
 
 
-def download_file(name, ext):
-    if ext.startswith('http'):
-        write_file(name, redirect(ext).content)
+def download_file(name, api):
+    if api.startswith('http'):
+        write_file(name, redirect(api).content)
     else:
-        write_file(name, str.encode(ext))
+        write_file(name, str.encode(api))
 
 
-def init_py(path, name, ext):
-    py_name = path + '/' + name + '.py'
-    download_file(py_name, ext)
-    return SourceFileLoader(name, py_name).load_module().Spider()
+def init_py(cache, key, api):
+    name = os.path.basename(api)
+    path = cache + '/' + name
+    download_file(path, api)
+    return SourceFileLoader(name, path).load_module().Spider()
 
 
 def str2json(content):
@@ -40,7 +41,7 @@ def str2json(content):
 
 
 def init(ru, extend):
-    ru.init([""])
+    ru.init(extend)
 
 
 def homeContent(ru, filter):

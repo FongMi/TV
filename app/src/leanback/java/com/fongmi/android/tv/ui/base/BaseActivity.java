@@ -6,6 +6,8 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.View;
 
+import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.recyclerview.widget.RecyclerView;
@@ -35,6 +37,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(getBinding().getRoot());
         EventBus.getDefault().register(this);
+        setBackCallback();
         setWall();
         initView();
         initEvent();
@@ -48,10 +51,17 @@ public abstract class BaseActivity extends AppCompatActivity {
         return true;
     }
 
+    protected boolean handleBack() {
+        return false;
+    }
+
     protected void initView() {
     }
 
     protected void initEvent() {
+    }
+
+    protected void onBackPress() {
     }
 
     protected boolean isVisible(View view) {
@@ -64,6 +74,15 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     protected void notifyItemChanged(RecyclerView view, ArrayObjectAdapter adapter) {
         if (!view.isComputingLayout()) adapter.notifyArrayItemRangeChanged(0, adapter.size());
+    }
+
+    private void setBackCallback() {
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(handleBack()) {
+            @Override
+            public void handleOnBackPressed() {
+                onBackPress();
+            }
+        });
     }
 
     private void setWall() {

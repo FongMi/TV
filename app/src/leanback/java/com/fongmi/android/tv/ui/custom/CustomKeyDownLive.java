@@ -81,7 +81,7 @@ public class CustomKeyDownLive extends GestureDetector.SimpleOnGestureListener {
         if (text.length() >= 4) return;
         text.append(getNumber(keyCode));
         listener.onShow(text.toString());
-        App.post(runnable, 1000);
+        App.post(runnable, 2000);
     }
 
     @Override

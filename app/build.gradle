@@ -11,7 +11,7 @@ android {
         minSdk 16
         targetSdk 28
         versionCode 210
-        versionName "2.1.0"
+        versionName "20231211"
         multiDexEnabled true
         ndk { abiFilters "armeabi-v7a" }
         javaCompileOptions {
@@ -90,7 +90,7 @@ dependencies {
     implementation 'androidx.biometric:biometric:1.1.0'
     implementation 'androidx.leanback:leanback:1.2.0-alpha04'
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.6.2'
-    implementation 'androidx.room:room-runtime:2.6.0'
+    implementation 'androidx.room:room-runtime:2.6.1'
     implementation 'cat.ereza:customactivityoncrash:2.4.0'
     implementation 'com.github.bassaer:materialdesigncolors:1.0.0'
     implementation 'com.github.bumptech.glide:glide:4.15.1'
@@ -116,6 +116,6 @@ dependencies {
     implementation('org.simpleframework:simple-xml:2.7.1') { exclude group: 'stax', module: 'stax-api' exclude group: 'xpp3', module: 'xpp3' }
 	implementation(ext: 'aar', name: 'dlna-core', group: 'fongmi', version: 'release')
     implementation(ext: 'aar', name: 'dlna-dmr', group: 'fongmi', version: 'release')
-    annotationProcessor 'androidx.room:room-compiler:2.6.0'
+    annotationProcessor 'androidx.room:room-compiler:2.6.1'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.15.1'
 }

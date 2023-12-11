@@ -55,7 +55,6 @@ import com.fongmi.android.tv.event.ActionEvent;
 import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
-import com.fongmi.android.tv.event.ServerEvent;
 import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.impl.SubtitleCallback;
 import com.fongmi.android.tv.model.SiteViewModel;
@@ -86,7 +85,6 @@ import com.fongmi.android.tv.utils.Traffic;
 import com.fongmi.android.tv.utils.Util;
 import com.github.bassaer.library.MDColor;
 import com.github.catvod.net.OkHttp;
-import com.github.catvod.utils.Path;
 import com.github.catvod.utils.Trans;
 import com.permissionx.guolindev.PermissionX;
 
@@ -151,9 +149,8 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private View mFocus2;
 
     public static void push(FragmentActivity activity, String text) {
-        String url = Sniffer.getUrl(text);
-        if (url.length() > 0) start(activity, url);
-        else file(activity, FileChooser.getPathFromUri(activity, Uri.parse(text)));
+        if (FileChooser.isValid(activity, Uri.parse(text))) file(activity, FileChooser.getPathFromUri(activity, Uri.parse(text)));
+        else start(activity, Sniffer.getUrl(text));
     }
 
     public static void file(FragmentActivity activity, String path) {
@@ -488,11 +485,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private void checkDanmu(String danmu) {
         mBinding.danmaku.release();
         mBinding.danmaku.setVisibility(danmu.isEmpty() ? View.GONE : View.VISIBLE);
-        App.execute(() -> {
-            String temp = danmu;
-            if (temp.startsWith("http")) temp = OkHttp.string(temp);
-            if (temp.length() > 0) mBinding.danmaku.prepare(new Parser(temp), mDanmakuContext);
-        });
+        if (danmu.length() > 0) App.execute(() -> mBinding.danmaku.prepare(new Parser(danmu), mDanmakuContext));
     }
 
     private void setEmpty(boolean finish) {
@@ -1127,9 +1120,11 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onServerEvent(ServerEvent event) {
-        if (event.getType() != ServerEvent.Type.API) return;
-        if (mPlayers.isExo()) mPlayers.setSub(Sub.from(Path.local(event.getText())));
+    public void onRefreshEvent(RefreshEvent event) {
+        if (event.getType() == RefreshEvent.Type.DETAIL) getDetail();
+        else if (event.getType() == RefreshEvent.Type.PLAYER) onRefresh();
+        else if (event.getType() == RefreshEvent.Type.DANMAKU) checkDanmu(event.getPath());
+        else if (event.getType() == RefreshEvent.Type.SUBTITLE) mPlayers.setSub(Sub.from(event.getPath()));
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -1152,6 +1147,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
                 hideProgress();
                 mPlayers.reset();
                 setDefaultTrack();
+                mPlayers.prepared();
                 setTrackVisible(true);
                 mHistory.setPlayer(mPlayers.getPlayer());
                 mBinding.widget.size.setText(mPlayers.getSizeText());
@@ -1183,7 +1179,6 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private void setDefaultTrack() {
         if (isInitTrack()) {
             setInitTrack(false);
-            mPlayers.prepared();
             mPlayers.setTrack(Track.find(getHistoryKey()));
         }
     }

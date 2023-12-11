@@ -240,7 +240,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
     }
 
     private void onLiveHome(View view) {
-        LiveDialog.create(this).show();
+        LiveDialog.create(this).action().show();
     }
 
     private void onVodHistory(View view) {

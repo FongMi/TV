@@ -65,4 +65,10 @@ public class Json {
         for (String key : object.keySet()) map.put(key, safeString(object, key));
         return map;
     }
+
+    public static JsonObject toObject(Map<String, String> map) {
+        JsonObject object = new JsonObject();
+        for (String key : map.keySet()) object.addProperty(key, map.get(key));
+        return object;
+    }
 }

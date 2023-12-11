@@ -2,15 +2,15 @@
 <html lang="zh-cmn-Hans">
 
 <head>
-    <title>TV</title>
+    <title>影視</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0,viewport-fit=cover">
     <meta name="wechat-enable-text-zoom-em" content="true">
     <meta name="layoutmode" content="standard">
-    <link rel="stylesheet" type="text/css" href="style.css">
-    <link rel="stylesheet" type="text/css" href="ui.css">
-    <script src="jquery.min.js"></script>
-    <script src="script.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" type="text/css" href="css/ui.css">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/script.js"></script>
 </head>
 
 <body>
@@ -46,7 +46,7 @@
                                 <div class="weui-cells">
                                     <div class="weui-cell weui-cell_active weui-cell_vcode weui-cell_wrap">
                                         <div class="weui-cell__bd weui-flex">
-                                            <input id="push_url" class="weui-input weui-cell__control weui-cell__control_flex" type="text" value="" placeholder="請輸入網址..." />
+                                            <input id="push_url" class="weui-input weui-cell__control weui-cell__control_flex" type="text" value="" placeholder="請輸入播放網址..." />
                                             <button onclick="push(); return false;" class="weui-cell__control weui-btn weui-btn_default weui-vcode-btn">確定</button>
                                         </div>
                                     </div>
@@ -56,24 +56,26 @@
                     </div>
                 </div>
                 <div id="panel3" role="tabpanel" aria-labelledby="tab3" class="weui-tab__panel" style="display: none;">
-                    <div class="weui-form" style="min-height: 0;">
+                    <div class="weui-form">
                         <div class="weui-form__text-area">
-                            <h2 class="weui-form__title">接口</h2>
+                            <h2 class="weui-form__title">接口/Proxy/User-Agent</h2>
                         </div>
                         <div class="weui-form__control-area" style="margin-bottom: 0px !important;">
                             <div class="weui-cells__group weui-cells__group_form">
                                 <div class="weui-cells">
                                     <div class="weui-cell weui-cell_active weui-cell_vcode weui-cell_wrap">
                                         <div class="weui-cell__bd weui-flex">
-                                            <input id="api_url" class="weui-input weui-cell__control weui-cell__control_flex" type="text" value="" placeholder="請輸入接口..." />
-                                            <button onclick="api(); return false;" class="weui-cell__control weui-btn weui-btn_default weui-vcode-btn">確定</button>
+                                            <input id="setting_text" class="weui-input weui-cell__control weui-cell__control_flex" type="text" value="" placeholder="請輸入..." />
+                                            <button onclick="setting(); return false;" class="weui-cell__control weui-btn weui-btn_default weui-vcode-btn">確定</button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="weui-form" style="padding-top: 50px; min-height: 0;">
+                </div>
+                <div id="panel4" role="tabpanel" aria-labelledby="tab4" class="weui-tab__panel" style="display: none;">
+                    <div class="weui-form" style="min-height: 0;">
                         <div class="weui-form__text-area">
                             <h2 class="weui-form__title">本地</h2>
                         </div>
@@ -91,49 +93,34 @@
                 </div>
                 <div role="tablist" class="weui-tabbar">
                     <div id="tab1" role="tab" aria-labelledby="t1_title" aria-selected="true" aria-controls="panel1" class="weui-tabbar__item weui-bar__item_on">
-                        <img style="width: 20px; height: 20px; margin: 5px 0 5px 0;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAuQAAALkB4qdB6AAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAKfSURBVFiFxdfPi1ZVGMDxz31HCnOq0ZkK00THlxhpIToELdxILkQMRMN1bly1EAlxY/0BswqiFi7KnW3aBSJFKTg2iJY/CsIfEZqjmSJiipKdFvfR9/Jy7zv3bd55PXA4l3vO8zzf85zznPOcLKWkU8mybCE2YhPGsATDuIGr+Blf43BK6U5HZWUlpVRaMQ/78ACpRr2H3WhU6SyrWZkHsixbjc+xJpSfwUmcivZCeGMtxqO+EeLHsCOldL5rD2AAH+FhGP4Nb9eZCd7BHwVv7Kol16bkk1DwLz7FYDfuxBC+KCzLh7UBsLMguLUbwyUgOwoT2T4jABbjbgh9NhvjBYiDoe8vDM0EsD8GX8CCHgEskodpwkSHcYbxT7hrXS+MF5RvCoC/8VwVwHsx6JdeGi8YmA79W8r6G9gcEXmiVtx2X05Gu7mss4FmnwCaZZ0N+dneD4AlZZ0NDMb39TkCeKz3mSqA6fheO0cAa6I9XQVwJb7fnCOA8WhPVQFMPk0AeEsep7cxv8dnwItaN+trVQdRhvMx6OMeAxwIvd/OdBe8q3V7re+R8S1auUGzI0AIHAmB3/HCLI2/JA+/hL0dxxaEFssjIuEoVvxP42PyQy3JQ29eLYAQHsefIXwX75PnjTUMD2AP7mslNsfxfG2Agvu+LCj5PtazaheviD00VZCZLExkstOSdprRtsI6Pq43cEieO36Dm239l0QKJs+Sr8X/KRVZ0UxuHcEEfm0zVKz38SM+wLNt8qu08oETWNhuo/RdUFayLFup9TIakqdv53AxpfSog9zr+A6vBuiGlNKtJwNmE25dREYTl8MTP2Gk1hL0GGJUfsYknMXLfQUIiOXy11aSP2pfqb0HelWyLFsm3xOj+KHvAAGxFF/h8n+GU+2I7XnhZwAAAABJRU5ErkJggg==" alt="" class="weui-tabbar__icon">
+                        <img style="width: 20px; height: 20px; margin: 5px 0 5px 0;" alt="" src="images/ic_search.svg" class="weui-tabbar__icon">
                         <p id="t1_title" aria-hidden="true" class="weui-tabbar__label">搜尋</p>
                     </div>
                     <div id="tab2" role="tab" aria-labelledby="t2_title" aria-selected="false" aria-controls="panel2" class="weui-tabbar__item">
-                        <img style="width: 20px; height: 20px; margin: 5px 0 5px 0;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAuQAAALkB4qdB6AAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAJlSURBVFiF7ddNSNRBGMfxzy6B4aUsoxfMXiQwO1kEHewQXUI6FXWqIIzQgii69XILOnToFlYE3SMSkiCJolsW7CUIen+j6FJBiGWm02FHG9fddZdELw48/Hdmfs/zfGfmYZjNhBDMZsvOavY5AMyrRpzJZLagHRuj1eAFnqI7hJCrmiCEMKVhIa5gFKGM9aGhkpjjsStI3orPMcEPXMQeNKAeW3Ea36LmEzZNCwAW4FUM/BItZbR1uBm1X7F8OgBuxIDPUFfBbtXgYfS5/V8A2JycbXvFW8pajCS71o29qK8W4FQMcr/EfAOeIIfVBXM9RQp0AIeqAbgfHSc7sTKpjYB3WJPMz0MzduMs3ibam1hUEgDz0Ymh6NBWJPnrIit8n0IU+NTiPH4X7mqhsANfCgLXJ/ONSfJconmUQKwts6ttCUTHBACcSwL24WB6tliFN0nyRYl+QQLxAU1lIE5E3XcsGxs8GQcH0VnEaVVyjrmxMxwDiL9TiI9TQIzV11FYKn/DBewv4fCkMHkhQBGIp2UAuqLmGlyInZ4yDpfRmyYvBpBA3ML1MvGakgV5EDu7SjmUCTQJoEK/xdH3RxYb5Fu/mWvN8fssi+HYGZxBgG3x25+VLzBYNxOZM5lMLY7F7t0sHsfOvpkAwHEswb0Qwh1YIf+YGMSOKoupF71V6Lfjj/yxt4zfhHH1IU4crraqK0zeKv9QCTgyPp4ILvl3teZwBuunKXkHfsbYJybMFQh3+vf+m24bQNckuCK0C3EAV/Ecv6INRfsdbTixP9FGoo2a+ILuQWOx3cnEpLPWZv2f0RzAX4u0r6Ikm0C7AAAAAElFTkSuQmCC" alt="" class="weui-tabbar__icon">
+                        <img style="width: 20px; height: 20px; margin: 5px 0 5px 0;" alt="" src="images/ic_push.svg" class="weui-tabbar__icon">
                         <p aria-hidden="true" id="t2_title" class="weui-tabbar__label">推送</p>
                     </div>
                     <div id="tab3" role="tab" aria-labelledby="t3_title" aria-selected="false" aria-controls="panel3" class="weui-tabbar__item">
-                        <img style="width: 20px; height: 20px; margin: 5px 0 5px 0;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAA3NCSVQICAjb4U/gAAAACXBIWXMAAAC5AAAAuQHip0HoAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAANtQTFRF////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAhQHXOQAAAEh0Uk5TAAECBAUGCQoNDxITGiAhKC4xMjM0Nzg8P0BDT1dmbHR4fX+MlpedoKOkp6issri5vL2/zs/S19zd4OHi5OXp7e/x8/f6+/z+bkNkuAAAATRJREFUOMuNk2kzAmAUhR8iUSHSokWobCFLtFBI9fz/X+RDzdQY9brfzl3mbufAghVfVF+KLLHoh6p+RJckHGkxmSzq0ZKEjF2ArplfgcPjHYBC2w5Ax3YBYOf4cBovjfw82dy71/ElwOVY7/c2Tz4dlQB2h6q9b3uVxLQiUen53VMd7gINWwflgT7G503jjzoop55sQN5JBuK12sbiWBu1WhzSE/PcectSu/WOjs31uWcrm92ao/WmHc70OTtzbNfHOq5vz2D2Wc9Yq3zpBQCxV+339TUGwIV+VdaAxIMtAKq+5SD3bhWAlg+zvc+9BogMzQHkHEYAbjyf9bryFGDf/hT33Qc49eq/CaEWgSGDawYPFTx18Fl5J+mV76bhU2oVYcKUC5I2TPuwcP4tvaB4/5T/D6drVhrBHvH6AAAAAElFTkSuQmCC" alt="" class="weui-tabbar__icon">
-                        <p id="t3_title" aria-hidden="true" class="weui-tabbar__label">接口</p>
+                        <img style="width: 20px; height: 20px; margin: 5px 0 5px 0;" alt="" src="images/ic_setting.svg" class="weui-tabbar__icon">
+                        <p id="t3_title" aria-hidden="true" class="weui-tabbar__label">設定</p>
+                    </div>
+                    <div id="tab4" role="tab" aria-labelledby="t4_title" aria-selected="false" aria-controls="panel4" class="weui-tabbar__item">
+                        <img style="width: 20px; height: 20px; margin: 5px 0 5px 0;" alt="" src="images/ic_local.svg" class="weui-tabbar__icon">
+                        <p id="t4_title" aria-hidden="true" class="weui-tabbar__label">本地</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div id="fileInfoDialog" role="dialog" aria-modal="false" aria-hidden="true" style="display: none;">
-        <div role="button" class="weui-mask"></div>
-        <div class="weui-half-screen-dialog">
-            <div class="weui-half-screen-dialog__hd">
-                <div class="weui-half-screen-dialog__hd__main">接口設定</div>
-            </div>
-            <div class="weui-half-screen-dialog__bd" id="fileInfo">
-                <div class="weui-form__control-area" style="margin-bottom: 0px !important;">
-                    <div class="weui-cells__group weui-cells__group_form">
-                        <div class="weui-cells">
-                            <div class="weui-cell weui-cell_active weui-cell_vcode weui-cell_wrap">
-                                <div class="weui-cell__hd"><label class="weui-label">本機地址</label></div>
-                                <div class="weui-cell__bd weui-flex"><button onclick="fileToApi(); return false;" class="weui-cell__control weui-btn weui-btn_default weui-vcode-btn">使用</button></div>
-                            </div>
-                            <div class="weui-cell weui-cell_active weui-cell_vcode weui-cell_wrap">
-                                <div class="weui-cell__bd weui-flex">
-                                    <input id="fileUrl" class="weui-input weui-cell__control weui-cell__control_flex" type="text" value="" readonly />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="weui-half-screen-dialog__ft" style="padding-bottom: 30px;">
-                <div class="weui-half-screen-dialog__btn-area">
-                    <a href="javascript:void(0)" class="weui-btn weui-btn_default" onclick="hideFileInfo()">關閉</a>
-                    <a href="javascript:void(0)" id="delFileBtn" class="weui-btn weui-btn_warn" onclick="delFile()">刪除</a>
-                </div>
+    <div role="dialog" aria-hidden="true" aria-modal="true" id="fileInfoDialog" style="display: none;">
+        <div class="weui-mask"></div>
+        <div class="weui-dialog">
+            <div class="weui-dialog__hd"><strong class="weui-dialog__title">本地路徑</strong></div>
+            <div class="weui-dialog__bd" id="fileUrl"></div>
+            <div class="weui-dialog__ft">
+                <a role="button" href="javascript:void(0)" onclick="pushFile(0)" class="weui-dialog__btn weui-dialog__btn_default">關閉</a>
+                <a role="button" href="javascript:void(0)" onclick="pushFile(1)" class="weui-dialog__btn weui-dialog__btn_primary">使用</a>
+                <a role="button" href="javascript:void(0)" onclick="delFile()" class="weui-dialog__btn weui-dialog__btn_primary" id="delFileBtn">刪除</a>
             </div>
         </div>
     </div>

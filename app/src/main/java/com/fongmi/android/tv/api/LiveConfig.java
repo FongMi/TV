@@ -27,7 +27,7 @@ public class LiveConfig {
 
     private List<Live> lives;
     private Config config;
-    private boolean same;
+    private boolean sync;
     private Live home;
 
     private static class Loader {
@@ -72,20 +72,19 @@ public class LiveConfig {
 
     public LiveConfig init() {
         this.home = null;
-        this.config = Config.live();
-        this.lives = new ArrayList<>();
-        return this;
+        return config(Config.live());
     }
 
     public LiveConfig config(Config config) {
         this.config = config;
-        this.same = config.getUrl().equals(ApiConfig.getUrl());
+        if (config.getUrl() == null) return this;
+        this.sync = config.getUrl().equals(ApiConfig.getUrl());
         return this;
     }
 
     public LiveConfig clear() {
+        getLives().clear();
         this.home = null;
-        this.lives.clear();
         return this;
     }
 
@@ -116,12 +115,12 @@ public class LiveConfig {
     }
 
     private void parseText(String text, Callback callback) {
-        Live live = new Live(config.getUrl());
+        Live live = new Live(config.getUrl()).sync();
         LiveParser.text(live, text);
+        getLives().remove(live);
+        getLives().add(live);
+        setHome(live, true);
         App.post(callback::success);
-        lives.remove(live);
-        lives.add(live);
-        setHome(live);
     }
 
     private void checkJson(JsonObject object, Callback callback) {
@@ -132,7 +131,7 @@ public class LiveConfig {
         }
     }
 
-    public void parseDepot(JsonObject object, Callback callback) {
+    private void parseDepot(JsonObject object, Callback callback) {
         List<Depot> items = Depot.arrayFrom(object.getAsJsonArray("urls").toString());
         List<Config> configs = new ArrayList<>();
         for (Depot item : items) configs.add(Config.find(item, 1));
@@ -141,17 +140,16 @@ public class LiveConfig {
         loadConfig(callback);
     }
 
-    public void parseConfig(JsonObject object, Callback callback) {
+    private void parseConfig(JsonObject object, Callback callback) {
         if (!object.has("lives")) return;
         for (JsonElement element : Json.safeListElement(object, "lives")) add(Live.objectFrom(element).check());
-        for (Live live : lives) if (live.getName().equals(config.getHome())) setHome(live);
-        if (home == null) setHome(lives.isEmpty() ? new Live() : lives.get(0));
-        if (home.isBoot() || Setting.isBootLive()) App.post(this::bootLive);
+        for (Live live : getLives()) if (live.getName().equals(config.getHome())) setHome(live, true);
+        if (home == null) setHome(getLives().isEmpty() ? new Live() : getLives().get(0), true);
         if (callback != null) App.post(callback::success);
     }
 
     private void add(Live live) {
-        if (!lives.contains(live)) lives.add(live);
+        if (!getLives().contains(live)) getLives().add(live.sync());
     }
 
     private void bootLive() {
@@ -208,12 +206,12 @@ public class LiveConfig {
         return new int[]{-1, -1};
     }
 
-    public boolean isSame(String url) {
-        return same || TextUtils.isEmpty(config.getUrl()) || url.equals(config.getUrl());
+    public boolean needSync(String url) {
+        return sync || TextUtils.isEmpty(config.getUrl()) || url.equals(config.getUrl());
     }
 
     public List<Live> getLives() {
-        return lives;
+        return lives == null ? lives = new ArrayList<>() : lives;
     }
 
     public Config getConfig() {
@@ -225,9 +223,15 @@ public class LiveConfig {
     }
 
     public void setHome(Live home) {
+        setHome(home, false);
+    }
+
+    private void setHome(Live home, boolean check) {
         this.home = home;
         this.home.setActivated(true);
         config.home(home.getName()).update();
-        for (Live item : lives) item.setActivated(home);
+        for (Live item : getLives()) item.setActivated(home);
+        if (App.activity() != null && App.activity() instanceof LiveActivity) return;
+        if (check) if (home.isBoot() || Setting.isBootLive()) App.post(this::bootLive);
     }
 }

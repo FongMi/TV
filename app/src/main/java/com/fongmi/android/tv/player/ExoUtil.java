@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
+import android.text.TextUtils;
 import android.view.accessibility.CaptioningManager;
 
 import androidx.media3.common.MediaItem;
@@ -109,6 +110,7 @@ public class ExoUtil {
     }
 
     public static String getMimeType(String path) {
+        if (TextUtils.isEmpty(path)) return "";
         if (path.endsWith(".vtt")) return MimeTypes.TEXT_VTT;
         if (path.endsWith(".ssa") || path.endsWith(".ass")) return MimeTypes.TEXT_SSA;
         if (path.endsWith(".ttml") || path.endsWith(".xml") || path.endsWith(".dfxp")) return MimeTypes.APPLICATION_TTML;

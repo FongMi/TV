@@ -40,6 +40,7 @@ public class ApiConfig {
     private JarLoader jarLoader;
     private PyLoader pyLoader;
     private JsLoader jsLoader;
+    private boolean loadLive;
     private Config config;
     private Parse parse;
     private String wall;
@@ -92,6 +93,7 @@ public class ApiConfig {
         this.jarLoader = new JarLoader();
         this.pyLoader = new PyLoader();
         this.jsLoader = new JsLoader();
+        this.loadLive = false;
         return this;
     }
 
@@ -113,6 +115,7 @@ public class ApiConfig {
         this.jarLoader.clear();
         this.pyLoader.clear();
         this.jsLoader.clear();
+        this.loadLive = true;
         return this;
     }
 
@@ -126,7 +129,6 @@ public class ApiConfig {
         } catch (Throwable e) {
             if (TextUtils.isEmpty(config.getUrl())) App.post(() -> callback.error(""));
             else loadCache(callback, e);
-            LiveConfig.get().load();
             e.printStackTrace();
         }
     }
@@ -156,9 +158,9 @@ public class ApiConfig {
     private void parseConfig(JsonObject object, Callback callback) {
         try {
             initSite(object);
-            initLive(object);
             initParse(object);
             initOther(object);
+            if (loadLive && object.has("lives")) initLive(object);
             jarLoader.parseJar("", Json.safeString(object, "spider"));
             config.json(object.toString()).update();
             App.post(callback::success);
@@ -184,12 +186,9 @@ public class ApiConfig {
     }
 
     private void initLive(JsonObject object) {
-        Config temp = null;
-        boolean live = object.has("lives");
-        boolean same = LiveConfig.get().isSame(config.getUrl());
-        if (live) temp = Config.find(config, 1).update();
-        if (live && same) LiveConfig.get().clear().config(temp).parse(object);
-        else LiveConfig.get().load();
+        Config temp = Config.find(config, 1);
+        boolean sync = LiveConfig.get().needSync(config.getUrl());
+        if (sync) LiveConfig.get().clear().config(temp).parse(object);
     }
 
     private void initParse(JsonObject object) {
@@ -231,7 +230,7 @@ public class ApiConfig {
 
     public Spider getSpider(Site site) {
         boolean js = site.getApi().contains(".js");
-        boolean py = site.getApi().startsWith("py_");
+        boolean py = site.getApi().contains(".py");
         boolean csp = site.getApi().startsWith("csp_");
         if (py) return pyLoader.getSpider(site.getKey(), site.getApi(), site.getExt());
         else if (js) return jsLoader.getSpider(site.getKey(), site.getApi(), site.getExt(), site.getJar());
@@ -367,7 +366,7 @@ public class ApiConfig {
 
     private void setWall(String wall) {
         this.wall = wall;
-        boolean load = !TextUtils.isEmpty(wall) && WallConfig.get().isSame(wall);
+        boolean load = !TextUtils.isEmpty(wall) && WallConfig.get().needSync(wall);
         if (load) WallConfig.get().config(Config.find(wall, config.getName(), 2).update());
     }
 }

@@ -97,6 +97,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         mClock = Clock.create(mBinding.time).format("MM/dd HH:mm:ss");
         mBinding.progressLayout.showProgress();
         Updater.get().start(this);
+        mResult = Result.empty();
         Server.get().start();
         setRecyclerView();
         setViewModel();
@@ -157,7 +158,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     private void initConfig() {
         if (isLoading()) return;
         WallConfig.get().init();
-        LiveConfig.get().init();
+        LiveConfig.get().init().load();
         ApiConfig.get().init().load(getCallback());
         setLoading(true);
     }
@@ -442,7 +443,12 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     }
 
     @Override
-    public void onBackPressed() {
+    protected boolean handleBack() {
+        return true;
+    }
+
+    @Override
+    protected void onBackPress() {
         if (mBinding.progressLayout.isProgress()) {
             mBinding.progressLayout.showContent();
         } else if (mPresenter.isDelete()) {

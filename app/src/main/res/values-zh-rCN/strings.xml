@@ -110,7 +110,7 @@
     <string name="error_play_prev">已经是第一集了！</string>
     <string name="error_play_parse">播放地址解析失败</string>
     <string name="error_play_url">播放数据加载失败</string>
-    <string name="error_play_format">不支援的影片格式</string>
+    <string name="error_play_format">不支持的影片格式</string>
     <string name="error_play_timeout">连接超时</string>
     <string name="error_play_episode">暂无播放数据</string>
     <string name="error_empty">找不到数据</string>

@@ -49,7 +49,7 @@ public class LiveParser {
     private static void json(Live live, String text) {
         live.getGroups().addAll(Group.arrayFrom(text));
         for (Group group : live.getGroups()) {
-            for (Channel channel : group.live(live).getChannel()) {
+            for (Channel channel : group.getChannel()) {
                 channel.live(live);
             }
         }
@@ -116,6 +116,7 @@ public class LiveParser {
         private String key;
         private String type;
         private String referer;
+        private Integer parse;
         private Integer player;
 
         public static Setting create() {
@@ -124,6 +125,7 @@ public class LiveParser {
 
         public void check(String line) {
             if (line.startsWith("ua")) ua(line);
+            if (line.startsWith("parse")) parse(line);
             if (line.startsWith("player")) player(line);
             if (line.startsWith("referer")) referer(line);
             if (line.startsWith("#EXTVLCOPT:http-user-agent")) ua(line);
@@ -135,6 +137,7 @@ public class LiveParser {
 
         public Setting copy(Channel channel) {
             if (ua != null) channel.setUa(ua);
+            if (parse != null) channel.setParse(parse);
             if (referer != null) channel.setReferer(referer);
             if (player != null) channel.setPlayerType(player);
             if (key != null && type != null) channel.setDrm(Drm.create(key, type));
@@ -154,6 +157,14 @@ public class LiveParser {
                 referer = line.split("=")[1].trim();
             } catch (Exception e) {
                 referer = null;
+            }
+        }
+
+        private void parse(String line) {
+            try {
+                parse = Integer.parseInt(line.split("=")[1].trim());
+            } catch (Exception e) {
+                parse = null;
             }
         }
 
@@ -185,6 +196,7 @@ public class LiveParser {
             ua = null;
             key = null;
             type = null;
+            parse = null;
             player = null;
             referer = null;
         }
