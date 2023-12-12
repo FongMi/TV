@@ -37,7 +37,7 @@ class Spider(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def searchContent(self, key, quick, pg):
+    def searchContent(self, key, quick):
         pass
 
     @abstractmethod

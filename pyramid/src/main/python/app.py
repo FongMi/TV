@@ -69,8 +69,8 @@ def playerContent(ru, flag, id, vipFlags):
     return formatJo
 
 
-def searchContent(ru, key, quick, pg):
-    result = ru.searchContent(key, quick, pg)
+def searchContent(ru, key, quick):
+    result = ru.searchContent(key, quick)
     formatJo = json.dumps(result, ensure_ascii=False)
     return formatJo
 
