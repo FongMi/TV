@@ -23,8 +23,8 @@ class Runner():
     def detailContent(self, ids):
         return self.spider.detailContent(ids)
 
-    def searchContent(self, key, quick):
-        return self.spider.searchContent(key, quick)
+    def searchContent(self, key, quick, pg):
+        return self.spider.searchContent(key, quick, pg)
 
     def playerContent(self, flag, id, vipFlags):
         return self.spider.playerContent(flag, id, vipFlags)

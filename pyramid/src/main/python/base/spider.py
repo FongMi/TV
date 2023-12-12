@@ -37,7 +37,7 @@ class Spider(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def searchContent(self, key, quick):
+    def searchContent(self, key, quick, pg):
         pass
 
     @abstractmethod
@@ -62,9 +62,6 @@ class Spider(metaclass=ABCMeta):
 
     def getDependence(self):
         return []
-
-    def setExtendInfo(self, extend):
-        self.extend = extend
 
     def regStr(self, src, reg, group=1):
         m = re.search(reg, src)
@@ -105,5 +102,5 @@ class Spider(metaclass=ABCMeta):
         else:
             return ele[0]
 
-    def loadModule(self, name, fileName):
-        return SourceFileLoader(name, fileName).load_module()
+    def loadModule(self, name, path):
+        return SourceFileLoader(name, path).load_module()
