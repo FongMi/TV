@@ -13,8 +13,12 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
 
+import go_proxy_video.GoVideoProxy;
+import go_proxy_video.Go_proxy_video;
+
 public class Server {
 
+    private GoVideoProxy proxy;
     private Nano nano;
     private int port;
 
@@ -53,6 +57,8 @@ public class Server {
                 nano = new Nano(port);
                 Proxy.set(port);
                 nano.start();
+                proxy = Go_proxy_video.newGoVideoProxy();
+                App.execute(() -> proxy.start());
                 break;
             } catch (Exception e) {
                 ++port;
@@ -66,6 +72,10 @@ public class Server {
         if (nano != null) {
             nano.stop();
             nano = null;
+        }
+        if (proxy != null) {
+            proxy.stop();
+            proxy = null;
         }
     }
 
