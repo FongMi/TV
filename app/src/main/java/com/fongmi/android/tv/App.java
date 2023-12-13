@@ -40,7 +40,7 @@ public class App extends Application {
 
     public App() {
         instance = this;
-        executor = Executors.newFixedThreadPool(Constant.THREAD_POOL);
+        executor = Executors.newFixedThreadPool(Constant.THREAD_POOL * 2);
         handler = HandlerCompat.createAsync(Looper.getMainLooper());
         gson = new Gson();
     }

@@ -75,6 +75,12 @@ def searchContent(ru, key, quick):
     return formatJo
 
 
+def searchContentPage(ru, key, quick, pg):
+    result = ru.searchContentPage(key, quick, pg)
+    formatJo = json.dumps(result, ensure_ascii=False)
+    return formatJo
+
+
 def localProxy(ru, param):
     result = ru.localProxy(str2json(param))
     return result

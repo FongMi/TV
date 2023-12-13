@@ -41,6 +41,10 @@ class Spider(metaclass=ABCMeta):
         pass
 
     @abstractmethod
+    def searchContentPage(self, key, quick, pg):
+        pass
+
+    @abstractmethod
     def playerContent(self, flag, id, vipFlags):
         pass
 

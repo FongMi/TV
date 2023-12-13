@@ -48,7 +48,7 @@ public class ScanTask {
 
     private void getDevice(List<String> urls) throws Exception {
         CountDownLatch cd = new CountDownLatch(urls.size());
-        for (String url : urls) App.execute(() -> findDevice(cd, url));
+        for (String url : urls) new Thread(() -> findDevice(cd, url)).start();
         cd.await();
     }
 

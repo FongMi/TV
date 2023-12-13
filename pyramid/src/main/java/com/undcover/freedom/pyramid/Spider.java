@@ -70,7 +70,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
     @Override
     public String searchContent(String key, boolean quick, String pg) {
-        return app.callAttr("searchContent", obj, key, quick, pg).toString();
+        return app.callAttr("searchContentPage", obj, key, quick, pg).toString();
     }
 
     @Override
