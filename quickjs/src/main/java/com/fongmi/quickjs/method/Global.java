@@ -8,7 +8,7 @@ import com.fongmi.quickjs.utils.Connect;
 import com.fongmi.quickjs.utils.Crypto;
 import com.fongmi.quickjs.utils.JSUtil;
 import com.fongmi.quickjs.utils.Parser;
-import com.fongmi.quickjs.utils.Proxy;
+import com.github.catvod.Proxy;
 import com.github.catvod.utils.Trans;
 import com.orhanobut.logger.Logger;
 import com.whl.quickjs.wrapper.JSArray;
@@ -78,13 +78,13 @@ public class Global {
     @Keep
     @JSMethod
     public String getProxy(Boolean local) {
-        return Proxy.getUrl() + "?do=js";
+        return Proxy.getUrl(local) + "?do=js";
     }
 
     @Keep
     @JSMethod
     public String js2Proxy(Boolean dynamic, Integer siteType, String siteKey, String url, JSObject headers) {
-        return getProxy(true) + "&from=catvod" + "&siteType=" + siteType + "&siteKey=" + siteKey + "&header=" + URLEncoder.encode(headers.stringify()) + "&url=" + URLEncoder.encode(url);
+        return getProxy(!dynamic) + "&from=catvod" + "&siteType=" + siteType + "&siteKey=" + siteKey + "&header=" + URLEncoder.encode(headers.stringify()) + "&url=" + URLEncoder.encode(url);
     }
 
     @Keep

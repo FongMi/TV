@@ -1,14 +1,24 @@
 package com.github.catvod.utils;
 
+import android.content.Context;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.text.TextUtils;
+import android.text.format.Formatter;
 import android.util.Base64;
+
+import com.github.catvod.Init;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.math.BigInteger;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Enumeration;
 
 public class Util {
 
@@ -66,5 +76,29 @@ public class Util {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public static String getIp() {
+        try {
+            WifiManager manager = (WifiManager) Init.context().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+            int address = manager.getConnectionInfo().getIpAddress();
+            if (address != 0) return Formatter.formatIpAddress(address);
+            return getHostAddress();
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    private static String getHostAddress() throws SocketException {
+        for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
+            NetworkInterface interfaces = en.nextElement();
+            for (Enumeration<InetAddress> addresses = interfaces.getInetAddresses(); addresses.hasMoreElements(); ) {
+                InetAddress inetAddress = addresses.nextElement();
+                if (!inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address) {
+                    return inetAddress.getHostAddress();
+                }
+            }
+        }
+        return "";
     }
 }

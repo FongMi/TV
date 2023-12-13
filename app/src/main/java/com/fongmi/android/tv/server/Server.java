@@ -1,17 +1,8 @@
 package com.fongmi.android.tv.server;
 
-import android.content.Context;
-import android.net.wifi.WifiManager;
-import android.text.format.Formatter;
-
 import com.fongmi.android.tv.App;
-import com.fongmi.quickjs.utils.Proxy;
-
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.util.Enumeration;
+import com.github.catvod.Proxy;
+import com.github.catvod.utils.Util;
 
 import go_proxy_video.GoVideoProxy;
 import go_proxy_video.Go_proxy_video;
@@ -47,7 +38,7 @@ public class Server {
     }
 
     public String getAddress(boolean local) {
-        return "http://" + (local ? "127.0.0.1" : getIP()) + ":" + getPort();
+        return "http://" + (local ? "127.0.0.1" : Util.getIp()) + ":" + getPort();
     }
 
     public void start() {
@@ -77,29 +68,5 @@ public class Server {
             proxy.stop();
             proxy = null;
         }
-    }
-
-    public String getIP() {
-        try {
-            WifiManager manager = (WifiManager) App.get().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-            int address = manager.getConnectionInfo().getIpAddress();
-            if (address != 0) return Formatter.formatIpAddress(address);
-            return getHostAddress();
-        } catch (Exception e) {
-            return "";
-        }
-    }
-
-    private String getHostAddress() throws SocketException {
-        for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
-            NetworkInterface interfaces = en.nextElement();
-            for (Enumeration<InetAddress> addresses = interfaces.getInetAddresses(); addresses.hasMoreElements(); ) {
-                InetAddress inetAddress = addresses.nextElement();
-                if (!inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address) {
-                    return inetAddress.getHostAddress();
-                }
-            }
-        }
-        return "";
     }
 }
