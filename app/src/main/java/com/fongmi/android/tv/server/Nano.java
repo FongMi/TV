@@ -10,6 +10,7 @@ import com.fongmi.android.tv.server.process.Local;
 import com.fongmi.android.tv.server.process.Process;
 import com.fongmi.android.tv.utils.M3U8;
 import com.github.catvod.Init;
+import com.github.catvod.net.OkHttp;
 import com.google.common.net.HttpHeaders;
 
 import java.io.ByteArrayInputStream;
@@ -69,7 +70,7 @@ public class Nano extends NanoHTTPD {
         Map<String, String> files = new HashMap<>();
         if (session.getMethod() == Method.POST) parse(session, files);
         if (url.contains("?")) url = url.substring(0, url.indexOf('?'));
-        if (url.startsWith("/go")) return go(session);
+        if (url.startsWith("/go")) return go();
         if (url.startsWith("/m3u8")) return m3u8(session);
         if (url.startsWith("/proxy")) return proxy(session);
         if (url.startsWith("/tvbus")) return success(LiveConfig.getResp());
@@ -92,10 +93,8 @@ public class Nano extends NanoHTTPD {
         }
     }
 
-    private Response go(IHTTPSession session) {
-        String action = session.getParms().get("action");
-        if ("start".equals(action)) Server.get().startGo();
-        else if ("stop".equals(action)) Server.get().stopGo();
+    private Response go() {
+        if (OkHttp.string("http://127.0.0.1:7777").isEmpty()) Server.get().go();
         return success();
     }
 
