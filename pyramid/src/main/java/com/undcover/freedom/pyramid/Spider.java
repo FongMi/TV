@@ -75,7 +75,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
     @Override
     public String playerContent(String flag, String id, List<String> vipFlags) {
-        return replaceLocalUrl(app.callAttr("playerContent", obj, flag, id, gson.toJson(vipFlags)).toString());
+        return replaceProxy(app.callAttr("playerContent", obj, flag, id, gson.toJson(vipFlags)).toString());
     }
 
     @Override
@@ -103,11 +103,11 @@ public class Spider extends com.github.catvod.crawler.Spider {
             return new Object[]{code, type, OkHttp.newCall(url, header, param).execute().body().byteStream()};
         } else {
             if (content.isEmpty()) content = OkHttp.newCall(url, header).execute().body().string();
-            return new Object[]{code, type, new ByteArrayInputStream(replaceLocalUrl(content).getBytes())};
+            return new Object[]{code, type, new ByteArrayInputStream(replaceProxy(content).getBytes())};
         }
     }
 
-    private String replaceLocalUrl(String content) {
+    private String replaceProxy(String content) {
         return content.replace("http://127.0.0.1:UndCover/proxy", Proxy.getUrl(true) + "?do=py");
     }
 
