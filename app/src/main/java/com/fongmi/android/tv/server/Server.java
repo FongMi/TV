@@ -41,6 +41,18 @@ public class Server {
         return "http://" + (local ? "127.0.0.1" : Util.getIp()) + ":" + getPort();
     }
 
+    public void startGo() {
+        if (proxy != null) return;
+        proxy = Go_proxy_video.newGoVideoProxy();
+        App.execute(() -> proxy.start());
+    }
+
+    public void stopGo() {
+        if (proxy == null) return;
+        proxy.stop();
+        proxy = null;
+    }
+
     public void start() {
         if (nano != null) return;
         do {
@@ -48,8 +60,6 @@ public class Server {
                 nano = new Nano(port);
                 Proxy.set(port);
                 nano.start();
-                proxy = Go_proxy_video.newGoVideoProxy();
-                App.execute(() -> proxy.start());
                 break;
             } catch (Exception e) {
                 ++port;
