@@ -118,7 +118,7 @@ import master.flame.danmaku.danmaku.model.IDisplay;
 import master.flame.danmaku.danmaku.model.android.DanmakuContext;
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class VideoActivity extends BaseActivity implements Clock.Callback, CustomKeyDownVod.Listener, TrackDialog.Listener, ControlDialog.Listener, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, QualityAdapter.OnClickListener, QuickAdapter.OnClickListener, ParseAdapter.OnClickListener, SubtitleCallback, CastDialog.Listener {
+public class VideoActivity extends BaseActivity implements Clock.Callback, CustomKeyDownVod.Listener, TrackDialog.Listener, ControlDialog.Listener, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, QualityAdapter.OnClickListener, QuickAdapter.OnClickListener, ParseAdapter.OnClickListener, SubtitleCallback, CastDialog.Listener, InfoDialog.Listener {
 
     private ActivityVideoBinding mBinding;
     private ViewGroup.LayoutParams mFrameParams;
@@ -698,7 +698,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     private void onInfo() {
         InfoDialog.create(this).title(mBinding.control.title.getText()).headers(mPlayers.getHeaders()).url(mPlayers.getUrl()).show();
-        setRedirect(true);
     }
 
     private void onFull() {
@@ -1605,6 +1604,18 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
             hideControl();
             onPlay();
         }
+    }
+
+    @Override
+    public void onShare(CharSequence title, String url) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra(Intent.EXTRA_TEXT, url);
+        intent.putExtra("name", title);
+        intent.putExtra("title", title);
+        intent.setType("text/plain");
+        startActivity(Util.getChooser(intent));
+        setRedirect(true);
     }
 
     @Override
