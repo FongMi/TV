@@ -95,7 +95,7 @@ public class Nano extends NanoHTTPD {
     private Response go(IHTTPSession session) {
         String action = session.getParms().get("action");
         if ("start".equals(action)) Server.get().startGo();
-        if ("stop".equals(action)) Server.get().stopGo();
+        else if ("stop".equals(action)) Server.get().stopGo();
         return success();
     }
 
