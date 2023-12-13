@@ -10,7 +10,6 @@ import com.fongmi.android.tv.server.process.Local;
 import com.fongmi.android.tv.server.process.Process;
 import com.fongmi.android.tv.utils.M3U8;
 import com.github.catvod.Init;
-import com.github.catvod.net.OkHttp;
 import com.google.common.net.HttpHeaders;
 
 import java.io.ByteArrayInputStream;
@@ -94,7 +93,7 @@ public class Nano extends NanoHTTPD {
     }
 
     private Response go() {
-        if (OkHttp.string("http://127.0.0.1:7777").isEmpty()) Server.get().go();
+        Server.get().go();
         return success();
     }
 
