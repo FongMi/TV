@@ -115,7 +115,7 @@ dependencies {
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
     implementation('org.simpleframework:simple-xml:2.7.1') { exclude group: 'stax', module: 'stax-api' exclude group: 'xpp3', module: 'xpp3' }
     implementation(ext: 'aar', name: 'go-proxy-video', group: 'fongmi', version: 'release')
-	implementation(ext: 'aar', name: 'dlna-core', group: 'fongmi', version: 'release')
+    implementation(ext: 'aar', name: 'dlna-core', group: 'fongmi', version: 'release')
     implementation(ext: 'aar', name: 'dlna-dmr', group: 'fongmi', version: 'release')
     annotationProcessor 'androidx.room:room-compiler:2.6.1'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.15.1'
