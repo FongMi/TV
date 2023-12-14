@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import androidx.collection.ArrayMap;
 
 import com.chaquo.python.PyObject;
+import com.github.catvod.Proxy;
 import com.github.catvod.net.OkHttp;
 import com.google.gson.Gson;
 
@@ -69,12 +70,12 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
     @Override
     public String searchContent(String key, boolean quick, String pg) {
-        return app.callAttr("searchContent", obj, key, quick, pg).toString();
+        return app.callAttr("searchContentPage", obj, key, quick, pg).toString();
     }
 
     @Override
     public String playerContent(String flag, String id, List<String> vipFlags) {
-        return app.callAttr("playerContent", obj, flag, id, gson.toJson(vipFlags)).toString();
+        return replaceProxy(app.callAttr("playerContent", obj, flag, id, gson.toJson(vipFlags)).toString());
     }
 
     @Override
@@ -102,8 +103,12 @@ public class Spider extends com.github.catvod.crawler.Spider {
             return new Object[]{code, type, OkHttp.newCall(url, header, param).execute().body().byteStream()};
         } else {
             if (content.isEmpty()) content = OkHttp.newCall(url, header).execute().body().string();
-            return new Object[]{code, type, new ByteArrayInputStream(content.getBytes())};
+            return new Object[]{code, type, new ByteArrayInputStream(replaceProxy(content).getBytes())};
         }
+    }
+
+    private String replaceProxy(String content) {
+        return content.replace("http://127.0.0.1:UndCover/proxy?", Proxy.getUrl(true) + "?do=py&");
     }
 
     private Headers getHeader(String header) throws JSONException {

@@ -39,27 +39,28 @@ public class Action implements Process {
         switch (Objects.requireNonNullElse(params.get("do"), "")) {
             case "search":
                 onSearch(params);
-                break;
+                return Nano.success();
             case "push":
                 onPush(params);
-                break;
+                return Nano.success();
             case "setting":
                 onSetting(params);
-                break;
+                return Nano.success();
             case "file":
                 onFile(params);
-                break;
+                return Nano.success();
             case "refresh":
                 onRefresh(params);
-                break;
+                return Nano.success();
             case "cast":
                 onCast(params);
-                break;
+                return Nano.success();
             case "sync":
                 onSync(params);
-                break;
+                return Nano.success();
+            default:
+                return Nano.error(null);
         }
-        return Nano.success();
     }
 
     private void onSearch(Map<String, String> params) {

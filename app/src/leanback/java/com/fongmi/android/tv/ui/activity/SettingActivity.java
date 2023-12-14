@@ -77,6 +77,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
 
     @Override
     protected void initView() {
+        mBinding.vod.requestFocus();
         mBinding.vodUrl.setText(ApiConfig.getDesc());
         mBinding.liveUrl.setText(LiveConfig.getDesc());
         mBinding.wallUrl.setText(WallConfig.getDesc());

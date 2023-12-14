@@ -75,7 +75,7 @@ public class WallConfig {
     }
 
     public void load(Callback callback) {
-        new Thread(() -> loadConfig(callback)).start();
+        App.execute(() -> loadConfig(callback));
     }
 
     private void loadConfig(Callback callback) {

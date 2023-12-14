@@ -4,12 +4,21 @@ from importlib.machinery import SourceFileLoader
 import json
 
 
-def create_file(file_path):
-    if os.path.exists(file_path) is False:
-        os.makedirs(file_path)
+def spider(cache, key, api):
+    name = os.path.basename(api)
+    path = cache + '/' + name
+    downloadFile(path, api)
+    return SourceFileLoader(name, path).load_module().Spider()
 
 
-def write_file(name, content):
+def downloadFile(name, api):
+    if api.startswith('http'):
+        writeFile(name, redirect(api).content)
+    else:
+        writeFile(name, str.encode(api))
+
+
+def writeFile(name, content):
     with open(name, 'wb') as f:
         f.write(content)
 
@@ -20,20 +29,6 @@ def redirect(url):
         return redirect(rsp.headers['Location'])
     else:
         return rsp
-
-
-def download_file(name, api):
-    if api.startswith('http'):
-        write_file(name, redirect(api).content)
-    else:
-        write_file(name, str.encode(api))
-
-
-def init_py(cache, key, api):
-    name = os.path.basename(api)
-    path = cache + '/' + name
-    download_file(path, api)
-    return SourceFileLoader(name, path).load_module().Spider()
 
 
 def str2json(content):
@@ -76,6 +71,12 @@ def playerContent(ru, flag, id, vipFlags):
 
 def searchContent(ru, key, quick):
     result = ru.searchContent(key, quick)
+    formatJo = json.dumps(result, ensure_ascii=False)
+    return formatJo
+
+
+def searchContentPage(ru, key, quick, pg):
+    result = ru.searchContentPage(key, quick, pg)
     formatJo = json.dumps(result, ensure_ascii=False)
     return formatJo
 
