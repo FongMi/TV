@@ -1,7 +1,6 @@
 package com.fongmi.android.tv.ui.dialog;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -18,7 +17,7 @@ import java.util.Map;
 public class InfoDialog {
 
     private final DialogInfoBinding binding;
-    private final Activity activity;
+    private final Listener callback;
     private AlertDialog dialog;
     private CharSequence title;
     private String header;
@@ -29,7 +28,8 @@ public class InfoDialog {
     }
 
     public InfoDialog(Activity activity) {
-        this.binding = DialogInfoBinding.inflate(LayoutInflater.from(this.activity = activity));
+        this.binding = DialogInfoBinding.inflate(LayoutInflater.from(activity));
+        this.callback = (Listener) activity;
     }
 
     public InfoDialog title(CharSequence title) {
@@ -74,13 +74,7 @@ public class InfoDialog {
     }
 
     private void onShare(View view) {
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra(Intent.EXTRA_TEXT, url);
-        intent.putExtra("name", title);
-        intent.putExtra("title", title);
-        intent.setType("text/plain");
-        activity.startActivity(Util.getChooser(intent));
+        callback.onShare(title, url);
         dialog.dismiss();
     }
 
@@ -88,5 +82,10 @@ public class InfoDialog {
         Notify.show(R.string.copied);
         Util.copy(url);
         return true;
+    }
+
+    public interface Listener {
+
+        void onShare(CharSequence title, String url);
     }
 }

@@ -79,7 +79,7 @@ import java.util.List;
 
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class LiveActivity extends BaseActivity implements CustomKeyDownLive.Listener, TrackDialog.Listener, Biometric.Callback, PassCallback, LiveCallback, GroupAdapter.OnClickListener, ChannelAdapter.OnClickListener, SubtitleCallback, CastDialog.Listener {
+public class LiveActivity extends BaseActivity implements CustomKeyDownLive.Listener, TrackDialog.Listener, Biometric.Callback, PassCallback, LiveCallback, GroupAdapter.OnClickListener, ChannelAdapter.OnClickListener, SubtitleCallback, CastDialog.Listener, InfoDialog.Listener {
 
     private ActivityLiveBinding mBinding;
     private ChannelAdapter mChannelAdapter;
@@ -329,7 +329,6 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
 
     private void onInfo() {
         InfoDialog.create(this).title(mBinding.control.title.getText()).headers(mPlayers.getHeaders()).url(mPlayers.getUrl()).show();
-        setRedirect(true);
     }
 
     private void onBack() {
@@ -1004,6 +1003,18 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         if (isVisible(mBinding.recycler)) hideUI();
         else if (isVisible(mBinding.control.getRoot())) hideControl();
         else showControl();
+    }
+
+    @Override
+    public void onShare(CharSequence title, String url) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra(Intent.EXTRA_TEXT, url);
+        intent.putExtra("name", title);
+        intent.putExtra("title", title);
+        intent.setType("text/plain");
+        startActivity(Util.getChooser(intent));
+        setRedirect(true);
     }
 
     @Override

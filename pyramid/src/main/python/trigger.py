@@ -24,6 +24,10 @@ class Trigger():
         return sp_obj.searchContent(key, quick)
 
     @staticmethod
+    def searchContentPage(sp_obj, key, quick, pg):
+        return sp_obj.searchContentPage(key, quick, pg)
+
+    @staticmethod
     def playerContent(sp_obj, flag, id, vipFlags):
         return sp_obj.playerContent(flag, id, vipFlags)
 
