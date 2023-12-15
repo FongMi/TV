@@ -6,7 +6,7 @@ import com.fongmi.android.tv.player.extractor.BiliBili;
 import com.fongmi.android.tv.player.extractor.Force;
 import com.fongmi.android.tv.player.extractor.JianPian;
 import com.fongmi.android.tv.player.extractor.Push;
-import com.fongmi.android.tv.player.extractor.Sniffer;
+import com.fongmi.android.tv.player.extractor.Video;
 import com.fongmi.android.tv.player.extractor.TVBus;
 import com.fongmi.android.tv.player.extractor.Thunder;
 import com.fongmi.android.tv.player.extractor.Youtube;
@@ -34,7 +34,7 @@ public class Source {
         extractors.add(new Force());
         extractors.add(new JianPian());
         extractors.add(new Push());
-        extractors.add(new Sniffer());
+        extractors.add(new Video());
         extractors.add(new Thunder());
         extractors.add(new TVBus());
         extractors.add(new Youtube());
@@ -52,7 +52,7 @@ public class Source {
         String url = result.getUrl().v();
         Extractor extractor = getExtractor(url);
         if (extractor != null) result.setParse(0);
-        if (extractor instanceof Sniffer) result.setParse(1);
+        if (extractor instanceof Video) result.setParse(1);
         return extractor == null ? url : extractor.fetch(url);
     }
 
@@ -60,7 +60,7 @@ public class Source {
         String url = channel.getCurrent().split("\\$")[0];
         Extractor extractor = getExtractor(url);
         if (extractor != null) channel.setParse(0);
-        if (extractor instanceof Sniffer) channel.setParse(1);
+        if (extractor instanceof Video) channel.setParse(1);
         return extractor == null ? url : extractor.fetch(url);
     }
 

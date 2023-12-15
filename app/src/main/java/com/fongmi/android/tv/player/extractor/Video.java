@@ -2,7 +2,7 @@ package com.fongmi.android.tv.player.extractor;
 
 import com.fongmi.android.tv.player.Source;
 
-public class Sniffer implements Source.Extractor {
+public class Video implements Source.Extractor {
 
     @Override
     public boolean match(String scheme, String host) {
