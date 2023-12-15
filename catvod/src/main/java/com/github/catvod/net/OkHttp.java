@@ -32,6 +32,7 @@ public class OkHttp {
     private static final int CACHE = 100 * 1024 * 1024;
     private static final ProxySelector defaultSelector;
 
+    private boolean proxy;
     private DnsOverHttps dns;
     private OkHttpClient client;
     private OkProxySelector selector;
@@ -61,6 +62,7 @@ public class OkHttp {
     public void setProxy(String proxy) {
         ProxySelector.setDefault(TextUtils.isEmpty(proxy) ? defaultSelector : selector());
         if (!TextUtils.isEmpty(proxy)) selector().setProxy(proxy);
+        this.proxy = !TextUtils.isEmpty(proxy);
         client = null;
     }
 
@@ -140,7 +142,7 @@ public class OkHttp {
 
     private static OkHttpClient.Builder getBuilder() {
         OkHttpClient.Builder builder = new OkHttpClient.Builder().addInterceptor(new OkhttpInterceptor()).connectTimeout(TIMEOUT, TimeUnit.MILLISECONDS).readTimeout(TIMEOUT, TimeUnit.MILLISECONDS).writeTimeout(TIMEOUT, TimeUnit.MILLISECONDS).dns(dns()).hostnameVerifier((hostname, session) -> true).sslSocketFactory(new SSLCompat(), SSLCompat.TM);
-        builder.proxySelector(ProxySelector.getDefault());
+        builder.proxySelector(get().proxy ? selector() : defaultSelector);
         return builder;
     }
 }
