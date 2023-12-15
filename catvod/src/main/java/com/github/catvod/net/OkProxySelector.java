@@ -9,12 +9,13 @@ import java.net.Authenticator;
 import java.net.InetSocketAddress;
 import java.net.PasswordAuthentication;
 import java.net.Proxy;
+import java.net.ProxySelector;
 import java.net.SocketAddress;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 
-public class OkProxySelector extends java.net.ProxySelector {
+public class OkProxySelector extends ProxySelector {
 
     private List<String> hosts;
     private Proxy proxy;
