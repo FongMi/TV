@@ -14,7 +14,7 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 
-public class ProxySelector extends java.net.ProxySelector {
+public class OkProxySelector extends java.net.ProxySelector {
 
     private List<String> hosts;
     private Proxy proxy;

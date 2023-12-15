@@ -10,8 +10,8 @@ android {
         applicationId "com.fongmi.android.tv"
         minSdk 16
         targetSdk 28
-        versionCode 210
-        versionName "20231214"
+        versionCode 211
+        versionName "2.1.1"
         multiDexEnabled true
         ndk { abiFilters "armeabi-v7a" }
         javaCompileOptions {
@@ -93,9 +93,9 @@ dependencies {
     implementation 'androidx.room:room-runtime:2.6.1'
     implementation 'cat.ereza:customactivityoncrash:2.4.0'
     implementation 'com.github.bassaer:materialdesigncolors:1.0.0'
-    implementation 'com.github.bumptech.glide:glide:4.15.1'
-    implementation 'com.github.bumptech.glide:annotations:4.15.1'
-    implementation 'com.github.bumptech.glide:okhttp3-integration:4.15.1'
+    implementation 'com.github.bumptech.glide:glide:4.16.0'
+    implementation 'com.github.bumptech.glide:annotations:4.16.0'
+    implementation 'com.github.bumptech.glide:okhttp3-integration:4.16.0'
     implementation 'com.github.jahirfiquitiva:TextDrawable:1.0.3'
     implementation 'com.github.TeamNewPipe:NewPipeExtractor:289db1178ab66694c23893e6a487d4708343c47b'
     implementation('com.github.thegrizzlylabs:sardine-android:0.8') { exclude group: 'com.squareup.okhttp3', module: 'okhttp' }
@@ -118,5 +118,5 @@ dependencies {
     implementation(ext: 'aar', name: 'dlna-core', group: 'fongmi', version: 'release')
     implementation(ext: 'aar', name: 'dlna-dmr', group: 'fongmi', version: 'release')
     annotationProcessor 'androidx.room:room-compiler:2.6.1'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.15.1'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.16.0'
 }

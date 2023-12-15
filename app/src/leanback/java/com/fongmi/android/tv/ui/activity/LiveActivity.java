@@ -432,13 +432,15 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void showControl(View view) {
         mBinding.control.getRoot().setVisibility(View.VISIBLE);
+        mBinding.widget.top.setVisibility(View.VISIBLE);
         view.requestFocus();
-        setR2Callback();
+        setR1Callback();
         hideInfo();
     }
 
     private void hideControl() {
         mBinding.control.getRoot().setVisibility(View.GONE);
+        mBinding.widget.top.setVisibility(View.GONE);
         App.removeCallbacks(mR1);
     }
 
@@ -448,13 +450,13 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void showInfo() {
-        mBinding.widget.info.setVisibility(View.VISIBLE);
-        setR1Callback();
+        mBinding.widget.bottom.setVisibility(View.VISIBLE);
+        setR3Callback();
         setInfo();
     }
 
     private void hideInfo() {
-        mBinding.widget.info.setVisibility(View.GONE);
+        mBinding.widget.bottom.setVisibility(View.GONE);
         App.removeCallbacks(mR3);
     }
 
@@ -474,11 +476,11 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void setR1Callback() {
-        App.post(mR3, Constant.INTERVAL_HIDE);
+        App.post(mR1, Constant.INTERVAL_HIDE);
     }
 
-    private void setR2Callback() {
-        App.post(mR1, Constant.INTERVAL_HIDE);
+    private void setR3Callback() {
+        App.post(mR3, Constant.INTERVAL_HIDE);
     }
 
     private void onToggle() {
@@ -568,6 +570,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mViewModel.getEpg(mChannel);
         mChannel.loadLogo(mBinding.widget.logo);
         mBinding.widget.name.setText(mChannel.getName());
+        mBinding.widget.title.setText(mChannel.getName());
         mBinding.widget.line.setText(mChannel.getLineText());
         mBinding.widget.number.setText(mChannel.getNumber());
         mBinding.control.line.setText(mChannel.getLineText());
@@ -661,6 +664,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
                 mPlayers.reset();
                 setSpeedVisible();
                 setTrackVisible(true);
+                mBinding.widget.size.setText(mPlayers.getSizeText());
                 break;
             case Player.STATE_ENDED:
                 nextChannel();
@@ -755,7 +759,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (isVisible(mBinding.control.getRoot())) setR2Callback();
+        if (isVisible(mBinding.control.getRoot())) setR1Callback();
         if (mKeyDown.hasEvent(event)) mKeyDown.onKeyDown(event);
         return super.dispatchKeyEvent(event);
     }
@@ -891,7 +895,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     public void onBackPressed() {
         if (isVisible(mBinding.control.getRoot())) {
             hideControl();
-        } else if (isVisible(mBinding.widget.info)) {
+        } else if (isVisible(mBinding.widget.bottom)) {
             hideInfo();
         } else if (isVisible(mBinding.recycler)) {
             hideUI();
