@@ -34,9 +34,9 @@ public class Source {
         extractors.add(new Force());
         extractors.add(new JianPian());
         extractors.add(new Push());
-        extractors.add(new Video());
         extractors.add(new Thunder());
         extractors.add(new TVBus());
+        extractors.add(new Video());
         extractors.add(new Youtube());
         extractors.add(new ZLive());
     }
