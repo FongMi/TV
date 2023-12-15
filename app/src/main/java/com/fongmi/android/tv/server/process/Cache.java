@@ -6,7 +6,6 @@ import com.fongmi.android.tv.server.Nano;
 import com.github.catvod.utils.Prefers;
 
 import java.util.Map;
-import java.util.Objects;
 
 import fi.iki.elonen.NanoHTTPD;
 
@@ -26,7 +25,7 @@ public class Cache implements Process {
         Map<String, String> params = session.getParms();
         String rule = params.get("rule");
         String key = params.get("key");
-        switch (Objects.requireNonNullElse(params.get("do"), "")) {
+        switch (params.get("do")) {
             case "get":
                 return Nano.success(Prefers.getString(getKey(rule, key)));
             case "set":
