@@ -435,7 +435,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.control.getRoot().setVisibility(View.VISIBLE);
         mBinding.widget.top.setVisibility(View.VISIBLE);
         view.requestFocus();
-        setR2Callback();
+        setR1Callback();
         hideInfo();
     }
 
@@ -452,7 +452,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void showInfo() {
         mBinding.widget.bottom.setVisibility(View.VISIBLE);
-        setR1Callback();
+        setR3Callback();
         setInfo();
     }
 
@@ -478,11 +478,11 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void setR1Callback() {
-        App.post(mR3, Constant.INTERVAL_HIDE);
+        App.post(mR1, Constant.INTERVAL_HIDE);
     }
 
-    private void setR2Callback() {
-        App.post(mR1, Constant.INTERVAL_HIDE);
+    private void setR3Callback() {
+        App.post(mR3, Constant.INTERVAL_HIDE);
     }
 
     private void onToggle() {
@@ -791,7 +791,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (isVisible(mBinding.control.getRoot())) setR2Callback();
+        if (isVisible(mBinding.control.getRoot())) setR1Callback();
         if (mKeyDown.hasEvent(event)) mKeyDown.onKeyDown(event);
         return super.dispatchKeyEvent(event);
     }
