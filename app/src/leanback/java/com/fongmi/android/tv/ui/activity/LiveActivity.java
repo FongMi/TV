@@ -433,6 +433,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void showControl(View view) {
         mBinding.control.getRoot().setVisibility(View.VISIBLE);
+        mBinding.widget.top.setVisibility(View.VISIBLE);
         view.requestFocus();
         setR2Callback();
         hideInfo();
@@ -440,6 +441,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void hideControl() {
         mBinding.control.getRoot().setVisibility(View.GONE);
+        mBinding.widget.top.setVisibility(View.GONE);
         App.removeCallbacks(mR1);
     }
 
@@ -449,13 +451,13 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void showInfo() {
-        mBinding.widget.info.setVisibility(View.VISIBLE);
+        mBinding.widget.bottom.setVisibility(View.VISIBLE);
         setR1Callback();
         setInfo();
     }
 
     private void hideInfo() {
-        mBinding.widget.info.setVisibility(View.GONE);
+        mBinding.widget.bottom.setVisibility(View.GONE);
         App.removeCallbacks(mR3);
     }
 
@@ -572,6 +574,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mViewModel.getEpg(mChannel);
         mChannel.loadLogo(mBinding.widget.logo);
         mBinding.widget.name.setText(mChannel.getName());
+        mBinding.widget.title.setText(mChannel.getName());
         mBinding.widget.line.setText(mChannel.getLineText());
         mBinding.widget.number.setText(mChannel.getNumber());
         mBinding.control.line.setText(mChannel.getLineText());
@@ -666,6 +669,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
                 mPlayers.reset();
                 setSpeedVisible();
                 setTrackVisible(true);
+                mBinding.widget.size.setText(mPlayers.getSizeText());
                 break;
             case Player.STATE_ENDED:
                 nextChannel();
@@ -923,7 +927,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     public void onBackPressed() {
         if (isVisible(mBinding.control.getRoot())) {
             hideControl();
-        } else if (isVisible(mBinding.widget.info)) {
+        } else if (isVisible(mBinding.widget.bottom)) {
             hideInfo();
         } else if (isVisible(mBinding.recycler)) {
             hideUI();
