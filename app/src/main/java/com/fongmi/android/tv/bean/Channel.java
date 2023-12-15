@@ -293,10 +293,16 @@ public class Channel {
     }
 
     public Channel copy(Channel item) {
+        setPlayerType(item.getPlayerType());
+        setReferer(item.getReferer());
+        setHeader(item.getHeader());
         setNumber(item.getNumber());
+        setParse(item.getParse());
         setLogo(item.getLogo());
         setName(item.getName());
         setUrls(item.getUrls());
+        setDrm(item.getDrm());
+        setEpg(item.getEpg());
         setUa(item.getUa());
         return this;
     }

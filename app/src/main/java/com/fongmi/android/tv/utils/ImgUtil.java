@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.bumptech.glide.Glide;
@@ -124,14 +125,14 @@ public class ImgUtil {
     private static RequestListener<Bitmap> getListener(ImageView view, ImageView.ScaleType scaleType) {
         return new RequestListener<>() {
             @Override
-            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
+            public boolean onLoadFailed(@Nullable GlideException e, Object model, @NonNull Target<Bitmap> target, boolean isFirstResource) {
                 view.setScaleType(scaleType);
                 view.setImageResource(R.drawable.ic_img_error);
                 return true;
             }
 
             @Override
-            public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
+            public boolean onResourceReady(@NonNull Bitmap resource, @NonNull Object model, Target<Bitmap> target, @NonNull DataSource dataSource, boolean isFirstResource) {
                 view.setScaleType(ImageView.ScaleType.CENTER_CROP);
                 return false;
             }
