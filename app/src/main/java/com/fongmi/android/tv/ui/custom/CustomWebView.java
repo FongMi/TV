@@ -85,7 +85,7 @@ public class CustomWebView extends WebView {
                 if (TextUtils.isEmpty(host)) return empty;
                 if (ApiConfig.get().getAds().contains(host)) return empty;
                 Map<String, String> headers = request.getRequestHeaders();
-                if (isVideoFormat(url, headers)) post(headers, url);
+                if (isVideoFormat(headers, url)) post(headers, url);
                 return super.shouldInterceptRequest(view, request);
             }
 
@@ -102,7 +102,7 @@ public class CustomWebView extends WebView {
         };
     }
 
-    private boolean isVideoFormat(String url, Map<String, String> headers) {
+    private boolean isVideoFormat(Map<String, String> headers, String url) {
         try {
             Site site = ApiConfig.get().getSite(key);
             Spider spider = ApiConfig.get().getSpider(site);

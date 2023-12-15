@@ -28,7 +28,7 @@ public class Cache implements Process {
         String key = params.get("key");
         switch (Objects.requireNonNullElse(params.get("do"), "")) {
             case "get":
-                return Nano.success(getKey(rule, key));
+                return Nano.success(Prefers.getString(getKey(rule, key)));
             case "set":
                 Prefers.put(getKey(rule, key), params.get("value"));
                 return Nano.success();
