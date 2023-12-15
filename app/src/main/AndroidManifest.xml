@@ -11,7 +11,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
-    <uses-sdk tools:overrideLibrary="com.whl.quickjs.android" />
+    <uses-sdk tools:overrideLibrary="com.whl.quickjs.android, go.go_proxy_video.gojni" />
 
     <queries>
         <intent>
