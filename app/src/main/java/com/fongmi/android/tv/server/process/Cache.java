@@ -20,8 +20,7 @@ public class Cache implements Process {
         Map<String, String> params = session.getParms();
         switch (Objects.requireNonNullElse(params.get("do"), "")) {
             case "get":
-                Prefers.getString("cache_" + params.get("key"));
-                return Nano.success();
+                return Nano.success(Prefers.getString("cache_" + params.get("key")));
             case "set":
                 Prefers.put("cache_" + params.get("key"), params.get("value"));
                 return Nano.success();
