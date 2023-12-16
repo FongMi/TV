@@ -39,7 +39,7 @@ public class Sniffer {
     }
 
     public static boolean isTorrent(String url) {
-        return url.split(";")[0].endsWith(".torrent");
+        return !url.startsWith("magnet") && url.split(";")[0].endsWith(".torrent");
     }
 
     public static boolean isVideoFormat(String url) {
