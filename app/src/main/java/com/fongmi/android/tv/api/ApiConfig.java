@@ -240,7 +240,7 @@ public class ApiConfig {
 
     public void setRecent(Site site) {
         boolean js = site.getApi().contains(".js");
-        boolean py = site.getApi().startsWith("py_");
+        boolean py = site.getApi().contains(".py");
         boolean csp = site.getApi().startsWith("csp_");
         if (js) jsLoader.setRecent(site.getKey());
         else if (py) pyLoader.setRecent(site.getKey());
