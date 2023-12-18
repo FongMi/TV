@@ -89,6 +89,7 @@ public class Nano extends NanoHTTPD {
             if (boundary != null) session.getHeaders().put("content-type", "multipart/form-data; charset=utf-8; " + boundary);
         }
         try {
+            session.parseBody(session.getParms());
             session.parseBody(files);
         } catch (Exception ignored) {
         }
