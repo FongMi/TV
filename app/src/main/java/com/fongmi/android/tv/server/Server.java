@@ -1,8 +1,6 @@
 package com.fongmi.android.tv.server;
 
-import com.fongmi.android.tv.App;
 import com.github.catvod.Proxy;
-import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Util;
 
 import go_proxy_video.Go_proxy_video;
@@ -10,6 +8,8 @@ import go_proxy_video.Go_proxy_video;
 public class Server {
     private Nano nano;
     private int port;
+
+    private Thread goThread;
 
     private static class Loader {
         static volatile Server INSTANCE = new Server();
@@ -40,7 +40,10 @@ public class Server {
     }
 
     public void go() {
-        new Thread(Go_proxy_video::start).start();
+        if (goThread == null) {
+            goThread = new Thread(Go_proxy_video::start);
+            goThread.start();
+        }
     }
 
     public void start() {
@@ -60,10 +63,13 @@ public class Server {
     }
 
     public void stop() {
-        App.execute(() -> OkHttp.string("http://127.0.0.1:7777/stop"));
         if (nano != null) {
             nano.stop();
             nano = null;
+        }
+        if (goThread != null) {
+            goThread.stop();
+            goThread = null;
         }
     }
 }
