@@ -40,7 +40,7 @@ public class Server {
     }
 
     public void go() {
-        new Thread(Go_proxy_video::start);
+        new Thread(Go_proxy_video::start).start();
     }
 
     public void start() {
