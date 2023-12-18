@@ -68,7 +68,7 @@ public class Server {
             nano = null;
         }
         if (goThread != null) {
-            goThread.stop();
+            goThread.interrupt();
             goThread = null;
         }
     }
