@@ -40,10 +40,9 @@ public class Server {
     }
 
     public void go() {
-        if (goThread == null) {
-            goThread = new Thread(Go_proxy_video::start);
-            goThread.start();
-        }
+        if (goThread != null) goThread.interrupt();
+        goThread = new Thread(Go_proxy_video::start);
+        goThread.start();
     }
 
     public void start() {

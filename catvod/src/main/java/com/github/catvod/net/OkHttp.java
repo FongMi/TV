@@ -90,7 +90,6 @@ public class OkHttp {
 
     public static String string(String url) {
         try {
-            if (url.contains("/file://")) url = url.replace("+", "%2B");
             return url.startsWith("http") ? newCall(url).execute().body().string() : "";
         } catch (Exception e) {
             e.printStackTrace();
