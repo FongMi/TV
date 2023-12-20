@@ -128,7 +128,6 @@ dependencies {
     implementation 'org.nanohttpd:nanohttpd:2.3.1'
     implementation('org.simpleframework:simple-xml:2.7.1') { exclude group: 'stax', module: 'stax-api' exclude group: 'xpp3', module: 'xpp3' }
     implementation(ext: 'aar', name: 'dlna-core', group: 'fongmi', version: 'release')
-    implementation(ext: 'aar', name: 'go-proxy-video', group: 'fongmi', version: 'release')
     leanbackImplementation(ext: 'aar', name: 'dlna-dmr', group: 'fongmi', version: 'release')
     leanbackImplementation 'androidx.leanback:leanback:1.2.0-alpha04'
     leanbackImplementation 'me.jessyan:autosize:1.2.1'
