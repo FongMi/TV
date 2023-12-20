@@ -8,6 +8,7 @@ import com.chaquo.python.PyObject;
 import com.github.catvod.Proxy;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Json;
+import com.google.common.net.HttpHeaders;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -17,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import fi.iki.elonen.NanoHTTPD;
 import okhttp3.Headers;
 
 public class Spider extends com.github.catvod.crawler.Spider {
@@ -89,17 +91,22 @@ public class Spider extends com.github.catvod.crawler.Spider {
     @Override
     public Object[] proxyLocal(Map<String, String> params) throws Exception {
         List<PyObject> list = app.callAttr("localProxy", obj, gson.toJson(params)).asList();
-        int code = list.get(0).toInt();
-        String type = list.get(1).toString();
-        String content = list.get(3).toString();
         JsonObject action = JsonParser.parseString(list.get(2).toString()).getAsJsonObject();
-        Headers headers = Headers.of(Json.toMap(action.get("header")));
+        Map<String, String> headers = Json.toMap(action.get("header"));
         String url = action.get("url").getAsString();
-        if (action.get("type").getAsString().equals("stream")) {
+        String content = list.get(3).toString();
+        String type = list.get(1).toString();
+        int code = list.get(0).toInt();
+        if (action.get("type").getAsString().equals("redirect")) {
+            NanoHTTPD.Response response = NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.lookup(code), NanoHTTPD.MIME_HTML, "");
+            for (Map.Entry<String, String> entry : headers.entrySet()) response.addHeader(entry.getKey(), entry.getValue());
+            response.addHeader(HttpHeaders.LOCATION, url);
+            return new Object[]{response};
+        } else if (action.get("type").getAsString().equals("stream")) {
             ArrayMap<String, String> param = Json.toArrayMap(action.get("param"));
-            return new Object[]{code, type, OkHttp.newCall(url, headers, param).execute().body().byteStream()};
+            return new Object[]{code, type, OkHttp.newCall(url, Headers.of(headers), param).execute().body().byteStream()};
         } else {
-            if (content.isEmpty()) content = OkHttp.newCall(url, headers).execute().body().string();
+            if (content.isEmpty()) content = OkHttp.newCall(url, Headers.of(headers)).execute().body().string();
             return new Object[]{code, type, new ByteArrayInputStream(replaceProxy(content).getBytes())};
         }
     }
