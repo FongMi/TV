@@ -189,6 +189,8 @@ public class Path {
         while ((amountRead = in.read(buffer)) != -1) {
             out.write(buffer, 0, amountRead);
         }
+        in.close();
+        out.close();
     }
 
     public static void newFile(File file) {
