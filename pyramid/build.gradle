@@ -22,6 +22,10 @@ android {
     }
 
     productFlavors {
+        x86 {
+            dimension "abi"
+            ndk { abiFilters "x86" }
+        }
         armeabi_v7a {
             dimension "abi"
             ndk { abiFilters "armeabi-v7a" }
