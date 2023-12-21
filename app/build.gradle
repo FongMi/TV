@@ -11,7 +11,7 @@ android {
         minSdk 21
         targetSdk 28
         versionCode 212
-        versionName "20231220"
+        versionName "20231222"
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
@@ -31,6 +31,10 @@ android {
         }
         python {
             dimension "api"
+        }
+        x86 {
+            dimension "abi"
+            ndk { abiFilters "x86" }
         }
         armeabi_v7a {
             dimension "abi"

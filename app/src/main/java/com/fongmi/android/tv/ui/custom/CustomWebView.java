@@ -1,9 +1,12 @@
 package com.fongmi.android.tv.ui.custom;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.net.http.SslError;
 import android.text.TextUtils;
+import android.view.ViewGroup;
 import android.webkit.CookieManager;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebResourceRequest;
@@ -30,6 +33,7 @@ public class CustomWebView extends WebView {
 
     private WebResourceResponse empty;
     private ParseCallback callback;
+    private AlertDialog dialog;
     private Runnable timer;
     private String from;
     private String key;
@@ -82,11 +86,17 @@ public class CustomWebView extends WebView {
             public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
                 String url = request.getUrl().toString();
                 String host = request.getUrl().getHost();
-                if (TextUtils.isEmpty(host)) return empty;
-                if (ApiConfig.get().getAds().contains(host)) return empty;
+                if (TextUtils.isEmpty(host) || ApiConfig.get().getAds().contains(host)) return empty;
+                if (host.equals("challenges.cloudflare.com")) App.post(() -> showDialog());
                 Map<String, String> headers = request.getRequestHeaders();
                 if (isVideoFormat(headers, url)) post(headers, url);
                 return super.shouldInterceptRequest(view, request);
+            }
+
+            @Override
+            public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                super.onPageStarted(view, url, favicon);
+                if (dialog != null) hideDialog();
             }
 
             @Override
@@ -119,12 +129,15 @@ public class CustomWebView extends WebView {
         onParseSuccess(headers, url);
     }
 
-    public void stop(boolean error) {
-        stopLoading();
-        loadUrl("about:blank");
-        App.removeCallbacks(timer);
-        if (error) onParseError();
-        else callback = null;
+    private void showDialog() {
+        if (dialog != null) return;
+        if (getParent() != null) ((ViewGroup) getParent()).removeView(this);
+        dialog = new AlertDialog.Builder(App.activity()).setView(this).show();
+    }
+
+    private void hideDialog() {
+        if (dialog != null) dialog.dismiss();
+        dialog = null;
     }
 
     private void onParseSuccess(Map<String, String> headers, String url) {
@@ -136,5 +149,14 @@ public class CustomWebView extends WebView {
     private void onParseError() {
         if (callback != null) callback.onParseError();
         callback = null;
+    }
+
+    public void stop(boolean error) {
+        hideDialog();
+        stopLoading();
+        loadUrl("about:blank");
+        App.removeCallbacks(timer);
+        if (error) onParseError();
+        else callback = null;
     }
 }
