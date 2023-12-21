@@ -13,7 +13,7 @@ public class Go {
         new Thread(() -> {
             File file = Path.cache(GO);
             if (!file.exists()) Path.copy(Path.getAsset(GO), file);
-            Shell.exec("chmod 777 " + file);
+            Shell.exec("killall -9 " + GO);
             Shell.exec("nohup " + file);
         }).start();
     }

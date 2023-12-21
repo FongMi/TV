@@ -10,7 +10,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
@@ -179,24 +178,22 @@ public class Path {
 
     public static void copy(File in, File out) {
         try {
-            copy(new FileInputStream(in), new FileOutputStream(out));
+            copy(new FileInputStream(in), out);
         } catch (Exception ignored) {
         }
     }
 
     public static void copy(InputStream in, File out) {
         try {
-            copy(in, new FileOutputStream(out));
+            int read;
+            byte[] buffer = new byte[8192];
+            FileOutputStream fos = new FileOutputStream(out);
+            while ((read = in.read(buffer)) != -1) fos.write(buffer, 0, read);
+            fos.close();
+            in.close();
+            chmod(out);
         } catch (Exception ignored) {
         }
-    }
-
-    public static void copy(InputStream in, OutputStream out) throws IOException {
-        int read;
-        byte[] buffer = new byte[8192];
-        while ((read = in.read(buffer)) != -1) out.write(buffer, 0, read);
-        out.close();
-        in.close();
     }
 
     public static void newFile(File file) {

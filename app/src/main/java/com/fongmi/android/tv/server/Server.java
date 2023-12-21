@@ -37,7 +37,6 @@ public class Server {
     }
 
     public void go() {
-        Go.stop();
         Go.start();
     }
 
