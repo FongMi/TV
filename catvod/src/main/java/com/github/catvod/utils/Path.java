@@ -115,9 +115,17 @@ public class Path {
         return file2.exists() ? file2 : file1.exists() ? file1 : new File(path);
     }
 
+    public static InputStream getAsset(String fileName) {
+        try {
+            return Init.context().getAssets().open(fileName);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public static String asset(String fileName) {
         try {
-            return read(Init.context().getAssets().open(fileName));
+            return read(getAsset(fileName));
         } catch (Exception e) {
             return "";
         }
@@ -184,13 +192,11 @@ public class Path {
     }
 
     public static void copy(InputStream in, OutputStream out) throws IOException {
+        int read;
         byte[] buffer = new byte[8192];
-        int amountRead;
-        while ((amountRead = in.read(buffer)) != -1) {
-            out.write(buffer, 0, amountRead);
-        }
-        in.close();
+        while ((read = in.read(buffer)) != -1) out.write(buffer, 0, read);
         out.close();
+        in.close();
     }
 
     public static void newFile(File file) {
@@ -213,8 +219,7 @@ public class Path {
 
     public static File chmod(File file) {
         try {
-            Process process = Runtime.getRuntime().exec("chmod 777 " + file);
-            process.waitFor();
+            Shell.exec("chmod 777 " + file);
             return file;
         } catch (Exception e) {
             e.printStackTrace();

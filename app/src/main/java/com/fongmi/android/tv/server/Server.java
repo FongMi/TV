@@ -4,9 +4,9 @@ import com.github.catvod.Proxy;
 import com.github.catvod.utils.Util;
 
 public class Server {
+
     private Nano nano;
     private int port;
-    private Go go;
 
     private static class Loader {
         static volatile Server INSTANCE = new Server();
@@ -37,12 +37,8 @@ public class Server {
     }
 
     public void go() {
-        if (go != null) {
-            go.start();
-            return;
-        }
-        go = new Go();
-        go.start();
+        Go.stop();
+        Go.start();
     }
 
     public void start() {
@@ -59,17 +55,11 @@ public class Server {
                 nano = null;
             }
         } while (port < 9999);
-        Go.prepare();
     }
 
     public void stop() {
-        if (nano != null) {
-            nano.stop();
-            nano = null;
-        }
-        if (go != null) {
-            go.stop();
-            go = null;
-        }
+        if (nano != null) nano.stop();
+        nano = null;
+        Go.stop();
     }
 }
