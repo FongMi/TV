@@ -24,8 +24,8 @@ public class Decoder {
         String key = url.contains(";") ? url.split(";")[2] : "";
         url = url.contains(";") ? url.split(";")[0] : url;
         String data = getData(url);
-        if (Json.valid(data)) return fix(url, data);
         if (data.isEmpty()) throw new Exception();
+        if (Json.valid(data)) return fix(url, data);
         if (data.contains("**")) data = base64(data);
         if (data.startsWith("2423")) data = cbc(data);
         if (key.length() > 0) data = ecb(data, key);
