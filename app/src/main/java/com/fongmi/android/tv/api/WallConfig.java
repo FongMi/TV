@@ -13,6 +13,7 @@ import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.Notify;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.Asset;
 import com.github.catvod.utils.Path;
 
 import java.io.File;
@@ -94,6 +95,7 @@ public class WallConfig {
 
     private File write(File file) throws IOException {
         if (getUrl().startsWith("file")) Path.copy(Path.local(getUrl()), file);
+        else if (getUrl().startsWith("assets")) Path.copy(Asset.open(getUrl()), file);
         else if (getUrl().startsWith("http")) Path.write(file, ImgUtil.resize(OkHttp.newCall(getUrl()).execute().body().bytes()));
         else file.delete();
         return file;
