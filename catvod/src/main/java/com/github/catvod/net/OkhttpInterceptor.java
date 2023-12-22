@@ -49,7 +49,10 @@ public class OkhttpInterceptor implements Interceptor {
 
     private Request getRequest(@NonNull Chain chain) {
         Request request = chain.request();
-        if (request.url().host().equals("gitcode.net")) return request.newBuilder().addHeader(HttpHeaders.USER_AGENT, Util.CHROME).build();
-        return request;
+        String url = request.url().toString();
+        Request.Builder builder = request.newBuilder();
+        if (url.contains("/file://")) builder.url(url.replace("+", "%2B"));
+        if (url.contains("gitcode.net")) builder.addHeader(HttpHeaders.USER_AGENT, Util.CHROME);
+        return builder.build();
     }
 }

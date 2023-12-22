@@ -11,7 +11,7 @@ android {
         minSdk 21
         targetSdk 28
         versionCode 212
-        versionName "2.1.2"
+        versionName "20231222#3"
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
@@ -32,13 +32,17 @@ android {
         python {
             dimension "api"
         }
-        armeabi_v7a {
+        x86 {
             dimension "abi"
-            ndk { abiFilters "armeabi-v7a" }
+            ndk { abiFilters "x86" }
         }
         arm64_v8a {
             dimension "abi"
             ndk { abiFilters "arm64-v8a" }
+        }
+        armeabi_v7a {
+            dimension "abi"
+            ndk { abiFilters "armeabi-v7a" }
         }
     }
 
@@ -101,7 +105,7 @@ dependencies {
     implementation 'androidx.biometric:biometric:1.1.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.6.2'
     implementation 'androidx.room:room-runtime:2.6.1'
-    implementation 'androidx.media:media:1.6.0'
+    implementation 'androidx.media:media:1.7.0'
     implementation 'cat.ereza:customactivityoncrash:2.4.0'
     implementation 'com.github.bassaer:materialdesigncolors:1.0.0'
     implementation 'com.github.bumptech.glide:glide:4.16.0'
@@ -110,7 +114,7 @@ dependencies {
     implementation 'com.github.jahirfiquitiva:TextDrawable:1.0.3'
     implementation 'com.github.TeamNewPipe:NewPipeExtractor:289db1178ab66694c23893e6a487d4708343c47b'
     implementation('com.github.thegrizzlylabs:sardine-android:0.8') { exclude group: 'com.squareup.okhttp3', module: 'okhttp' }
-    implementation 'com.google.android.material:material:1.10.0'
+    implementation 'com.google.android.material:material:1.11.0'
     implementation 'com.google.net.cronet:cronet-okhttp:0.1.0'
     implementation 'com.google.zxing:core:3.3.0'
     implementation 'com.guolindev.permissionx:permissionx:1.7.1'
@@ -122,18 +126,14 @@ dependencies {
     implementation 'org.fourthline.cling:cling-core:2.1.1'
     implementation 'org.fourthline.cling:cling-support:2.1.1'
     implementation 'org.greenrobot:eventbus:3.3.1'
-    implementation 'org.nanohttpd:nanohttpd:2.3.1'
     implementation('org.simpleframework:simple-xml:2.7.1') { exclude group: 'stax', module: 'stax-api' exclude group: 'xpp3', module: 'xpp3' }
     implementation(ext: 'aar', name: 'dlna-core', group: 'fongmi', version: 'release')
-    implementation(ext: 'aar', name: 'go-proxy-video', group: 'fongmi', version: 'release')
     leanbackImplementation(ext: 'aar', name: 'dlna-dmr', group: 'fongmi', version: 'release')
     leanbackImplementation 'androidx.leanback:leanback:1.2.0-alpha04'
     leanbackImplementation 'me.jessyan:autosize:1.2.1'
     mobileImplementation(ext: 'aar', name: 'dlna-dmc', group: 'fongmi', version: 'release')
-    //mobileImplementation 'androidx.mediarouter:mediarouter:1.6.0'
     mobileImplementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     mobileImplementation 'com.google.android.flexbox:flexbox:3.0.0'
-    //mobileImplementation 'com.google.android.gms:play-services-cast-framework:21.3.0'
     mobileImplementation('com.journeyapps:zxing-android-embedded:4.3.0') { transitive = false }
     annotationProcessor 'androidx.room:room-compiler:2.6.1'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.16.0'

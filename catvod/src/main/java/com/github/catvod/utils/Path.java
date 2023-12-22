@@ -10,7 +10,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
@@ -115,14 +114,6 @@ public class Path {
         return file2.exists() ? file2 : file1.exists() ? file1 : new File(path);
     }
 
-    public static String asset(String fileName) {
-        try {
-            return read(Init.context().getAssets().open(fileName));
-        } catch (Exception e) {
-            return "";
-        }
-    }
-
     public static String read(File file) {
         try {
             return read(new FileInputStream(file));
@@ -171,23 +162,21 @@ public class Path {
 
     public static void copy(File in, File out) {
         try {
-            copy(new FileInputStream(in), new FileOutputStream(out));
+            copy(new FileInputStream(in), out);
         } catch (Exception ignored) {
         }
     }
 
     public static void copy(InputStream in, File out) {
         try {
-            copy(in, new FileOutputStream(out));
+            int read;
+            byte[] buffer = new byte[8192];
+            FileOutputStream fos = new FileOutputStream(out);
+            while ((read = in.read(buffer)) != -1) fos.write(buffer, 0, read);
+            fos.close();
+            in.close();
+            chmod(out);
         } catch (Exception ignored) {
-        }
-    }
-
-    public static void copy(InputStream in, OutputStream out) throws IOException {
-        byte[] buffer = new byte[8192];
-        int amountRead;
-        while ((amountRead = in.read(buffer)) != -1) {
-            out.write(buffer, 0, amountRead);
         }
     }
 
@@ -211,8 +200,7 @@ public class Path {
 
     public static File chmod(File file) {
         try {
-            Process process = Runtime.getRuntime().exec("chmod 777 " + file);
-            process.waitFor();
+            Shell.exec("chmod 777 " + file);
             return file;
         } catch (Exception e) {
             e.printStackTrace();

@@ -80,18 +80,18 @@ class Spider(metaclass=ABCMeta):
         clean = re.sub('[\U0001F600-\U0001F64F\U0001F300-\U0001F5FF\U0001F680-\U0001F6FF\U0001F1E0-\U0001F1FF]', '', src)
         return clean
 
-    def fetch(self, url, cookies=None, headers=None, timeout=5, verify=True):
-        rsp = requests.get(url, cookies=cookies, headers=headers, timeout=timeout, verify=verify)
+    def fetch(self, url, cookies=None, headers=None, timeout=5, verify=True, stream=False, allow_redirects = True):
+        rsp = requests.get(url, cookies=cookies, headers=headers, timeout=timeout, verify=verify, stream=stream, allow_redirects=allow_redirects)
         rsp.encoding = 'utf-8'
         return rsp
 
-    def post(self, url, data, cookies=None, headers=None, timeout=5, verify=True):
-        rsp = requests.post(url, data=data, cookies=cookies, headers=headers, timeout=timeout, verify=verify)
+    def post(self, url, data, cookies=None, headers=None, timeout=5, verify=True, stream=False, allow_redirects = True):
+        rsp = requests.post(url, data=data, cookies=cookies, headers=headers, timeout=timeout, verify=verify, stream=stream, allow_redirects=allow_redirects)
         rsp.encoding = 'utf-8'
         return rsp
 
-    def postJson(self, url, json, cookies=None, headers=None, timeout=5, verify=True):
-        rsp = requests.post(url, json=json, cookies=cookies, headers=headers, timeout=timeout, verify=verify)
+    def postJson(self, url, json, cookies=None, headers=None, timeout=5, verify=True, stream=False, allow_redirects = True):
+        rsp = requests.post(url, json=json, cookies=cookies, headers=headers, timeout=timeout, verify=verify, stream=stream, allow_redirects=allow_redirects)
         rsp.encoding = 'utf-8'
         return rsp
 

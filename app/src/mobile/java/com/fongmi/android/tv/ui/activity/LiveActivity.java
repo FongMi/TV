@@ -131,7 +131,11 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private int getPlayerType(int playerType) {
-        return playerType != -1 ? playerType : getHome().getPlayerType() != -1 ? getHome().getPlayerType() : Setting.getLivePlayer();
+        return playerType != -1 ? playerType : getHome() != null && getHome().getPlayerType() != -1 ? getHome().getPlayerType() : Setting.getLivePlayer();
+    }
+
+    private int getTimeout() {
+        return getHome() != null ? getHome().getTimeout() : Constant.TIMEOUT_PLAY;
     }
 
     @Override
@@ -640,7 +644,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private void start(Channel result) {
-        mPlayers.start(result, getHome().getTimeout());
+        mPlayers.start(result, getTimeout());
     }
 
     private void checkPlayImg(boolean playing) {
@@ -775,7 +779,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private void checkError(ErrorEvent event) {
-        if (getHome().getPlayerType() == -1 && event.isFormat() && event.getRetry() > 0 && getToggleCount() < 2 && mPlayers.getPlayer() != Players.SYS) {
+        if (getHome() != null && getHome().getPlayerType() == -1 && event.isFormat() && event.getRetry() > 0 && getToggleCount() < 2 && mPlayers.getPlayer() != Players.SYS) {
             toggleCount++;
             nextPlayer();
         } else {

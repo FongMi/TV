@@ -1,15 +1,10 @@
 package com.fongmi.android.tv.server;
 
-import com.fongmi.android.tv.App;
 import com.github.catvod.Proxy;
 import com.github.catvod.utils.Util;
 
-import go_proxy_video.GoVideoProxy;
-import go_proxy_video.Go_proxy_video;
-
 public class Server {
 
-    private GoVideoProxy proxy;
     private Nano nano;
     private int port;
 
@@ -42,9 +37,7 @@ public class Server {
     }
 
     public void go() {
-        if (proxy != null) proxy.stop();
-        proxy = Go_proxy_video.newGoVideoProxy();
-        App.execute(() -> proxy.start());
+        Go.start();
     }
 
     public void start() {
@@ -64,13 +57,8 @@ public class Server {
     }
 
     public void stop() {
-        if (nano != null) {
-            nano.stop();
-            nano = null;
-        }
-        if (proxy != null) {
-            proxy.stop();
-            proxy = null;
-        }
+        if (nano != null) nano.stop();
+        nano = null;
+        Go.stop();
     }
 }

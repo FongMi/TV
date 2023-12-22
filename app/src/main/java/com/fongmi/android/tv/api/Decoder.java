@@ -4,6 +4,7 @@ import android.util.Base64;
 
 import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.Asset;
 import com.github.catvod.utils.Json;
 import com.github.catvod.utils.Path;
 import com.github.catvod.utils.Util;
@@ -32,7 +33,7 @@ public class Decoder {
     }
 
     private static String fix(String url, String data) {
-        if (url.startsWith("file")) url = UrlUtil.convert(url);
+        if (url.startsWith("file") || url.startsWith("assets")) url = UrlUtil.convert(url);
         data = data.replace("./", url.substring(0, url.lastIndexOf("/") + 1));
         return data;
     }
@@ -58,8 +59,9 @@ public class Decoder {
     }
 
     private static String getData(String url) {
-        if (url.startsWith("http")) return OkHttp.string(url);
         if (url.startsWith("file")) return Path.read(url);
+        if (url.startsWith("assets")) return Asset.read(url);
+        if (url.startsWith("http")) return OkHttp.string(url);
         return "";
     }
 
