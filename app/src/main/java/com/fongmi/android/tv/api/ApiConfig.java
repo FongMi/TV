@@ -214,17 +214,17 @@ public class ApiConfig {
         if (TextUtils.isEmpty(api)) return api;
         if (api.startsWith("http")) return api;
         if (api.startsWith("file")) return UrlUtil.convert(api);
-        if (api.endsWith(".js")) return parseApi(UrlUtil.convert(config.getUrl(), api));
+        if (api.endsWith(".js") || api.endsWith(".py")) return parseApi(UrlUtil.convert(config.getUrl(), api));
         return api;
     }
 
     private String parseExt(String ext) {
         if (TextUtils.isEmpty(ext)) return ext;
         if (ext.startsWith("http")) return ext;
-        if (ext.startsWith("file")) return UrlUtil.convert(ext);
         if (ext.startsWith("img+")) return Decoder.getExt(ext);
+        if (ext.startsWith("file")) return UrlUtil.convert(ext);
         if (ext.contains("http") || ext.contains("file")) return ext;
-        if (ext.endsWith(".txt") || ext.endsWith(".json") || ext.endsWith(".py") || ext.endsWith(".js")) return parseExt(UrlUtil.convert(config.getUrl(), ext));
+        if (ext.endsWith(".txt") || ext.endsWith(".json") || ext.endsWith(".js") || ext.endsWith(".py")) return parseExt(UrlUtil.convert(config.getUrl(), ext));
         return ext;
     }
 

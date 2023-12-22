@@ -4,6 +4,7 @@ import android.net.Uri;
 import android.util.Base64;
 
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.Asset;
 import com.github.catvod.utils.Path;
 import com.google.common.net.HttpHeaders;
 
@@ -33,8 +34,8 @@ public class Module {
     public String fetch(String name) {
         if (cache.contains(name)) return cache.get(name);
         if (name.startsWith("http")) cache.put(name, request(name));
-        if (name.startsWith("lib/")) cache.put(name, Path.asset("js/" + name));
-        if (name.startsWith("assets")) cache.put(name, Path.asset(name.substring(9)));
+        if (name.startsWith("assets")) cache.put(name, Asset.read(name));
+        if (name.startsWith("lib/")) cache.put(name, Asset.read("js/" + name));
         return cache.get(name);
     }
 

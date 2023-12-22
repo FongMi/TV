@@ -130,6 +130,9 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
         } else if (append && s.equalsIgnoreCase("f")) {
             append = false;
             binding.text.append("ile://");
+        } else if (append && s.equalsIgnoreCase("a")) {
+            append = false;
+            binding.text.append("ssets://");
         } else if (s.length() > 1) {
             append = false;
         } else if (s.length() == 0) {

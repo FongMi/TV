@@ -11,8 +11,8 @@ import com.fongmi.quickjs.method.Global;
 import com.fongmi.quickjs.method.Local;
 import com.fongmi.quickjs.utils.JSUtil;
 import com.fongmi.quickjs.utils.Module;
+import com.github.catvod.utils.Asset;
 import com.github.catvod.utils.Json;
-import com.github.catvod.utils.Path;
 import com.whl.quickjs.wrapper.JSArray;
 import com.whl.quickjs.wrapper.JSMethod;
 import com.whl.quickjs.wrapper.JSObject;
@@ -144,7 +144,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
     private void createCtx() {
         ctx = QuickJSContext.create();
         ctx.setConsole(new Console());
-        ctx.evaluate(Path.asset("js/lib/http.js"));
+        ctx.evaluate(Asset.read("js/lib/http.js"));
         Global.create(ctx, executor).setProperty();
         ctx.getGlobalObject().setProperty("local", Local.class);
         ctx.setModuleLoader(new QuickJSContext.BytecodeModuleLoader() {
@@ -211,7 +211,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
         String content = Module.get().fetch(api);
         if (content.startsWith("//bb")) ctx.execute(Module.get().bb(content));
         else ctx.evaluateModule(content.replace(spider, global), api);
-        ctx.evaluateModule(String.format(Path.asset("js/lib/spider.js"), api));
+        ctx.evaluateModule(String.format(Asset.read("js/lib/spider.js"), api));
         if (content.startsWith("//bb") || content.contains(jsEval)) cat = true;
         jsObject = (JSObject) ctx.getProperty(ctx.getGlobalObject(), spider);
     }

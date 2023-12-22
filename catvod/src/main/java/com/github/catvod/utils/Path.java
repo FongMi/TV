@@ -114,22 +114,6 @@ public class Path {
         return file2.exists() ? file2 : file1.exists() ? file1 : new File(path);
     }
 
-    public static InputStream getAsset(String fileName) {
-        try {
-            return Init.context().getAssets().open(fileName);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    public static String asset(String fileName) {
-        try {
-            return read(getAsset(fileName));
-        } catch (Exception e) {
-            return "";
-        }
-    }
-
     public static String read(File file) {
         try {
             return read(new FileInputStream(file));

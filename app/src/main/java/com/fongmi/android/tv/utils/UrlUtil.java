@@ -38,6 +38,7 @@ public class UrlUtil {
 
     public static String convert(String baseUrl, String path) {
         if (path.startsWith("clan")) return fixUrl(path);
+        if (path.startsWith("assets")) return convert(path);
         return path.isEmpty() ? "" : UriUtil.resolve(baseUrl, path);
     }
 
@@ -46,6 +47,7 @@ public class UrlUtil {
         String scheme = scheme(url);
         if ("file".equals(scheme)) return Server.get().getAddress(url);
         if ("local".equals(scheme)) return Server.get().getAddress(host);
+        if ("assets".equals(scheme)) return Server.get().getAddress(url.substring(9));
         if ("proxy".equals(scheme)) return url.replace("proxy://", Server.get().getAddress("proxy?"));
         return url;
     }
