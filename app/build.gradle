@@ -100,7 +100,7 @@ dependencies {
     implementation 'androidx.media3:media3-exoplayer-smoothstreaming:' + media3Version
     implementation 'androidx.media3:media3-extractor:' + media3Version
     implementation 'androidx.media3:media3-session:' + media3Version
-    implementation 'androidx.media3:media3-ui:1.1.1'
+    implementation 'androidx.media3:media3-ui:' + media3Version
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.biometric:biometric:1.1.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.6.2'
