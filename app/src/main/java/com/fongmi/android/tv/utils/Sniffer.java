@@ -67,4 +67,11 @@ public class Sniffer {
         for (Rule rule : ApiConfig.get().getRules()) for (String host : rule.getHosts()) if (Util.containOrMatch(hosts, host)) return rule.getRegex();
         return Collections.emptyList();
     }
+
+    public static List<String> getScript(Uri uri) {
+        if (uri.getHost() == null) return Collections.emptyList();
+        String hosts = TextUtils.join(",", Arrays.asList(UrlUtil.host(uri), UrlUtil.host(uri.getQueryParameter("url"))));
+        for (Rule rule : ApiConfig.get().getRules()) for (String host : rule.getHosts()) if (Util.containOrMatch(hosts, host)) return rule.getScript();
+        return Collections.emptyList();
+    }
 }

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.net.http.SslError;
 import android.text.TextUtils;
 import android.view.ViewGroup;
@@ -27,6 +28,7 @@ import com.github.catvod.crawler.Spider;
 import com.google.common.net.HttpHeaders;
 
 import java.io.ByteArrayInputStream;
+import java.util.List;
 import java.util.Map;
 
 public class CustomWebView extends WebView {
@@ -87,9 +89,9 @@ public class CustomWebView extends WebView {
                 String url = request.getUrl().toString();
                 String host = request.getUrl().getHost();
                 if (TextUtils.isEmpty(host) || ApiConfig.get().getAds().contains(host)) return empty;
-                if (host.equals("challenges.cloudflare.com")) App.post(() -> showDialog());
+                if (url.contains("challenges.cloudflare.com/cdn-cgi/")) App.post(() -> showDialog());
                 Map<String, String> headers = request.getRequestHeaders();
-                if (isVideoFormat(headers, url)) post(headers, url);
+                if (isVideoFormat(headers, url)) interrupt(headers, url);
                 return super.shouldInterceptRequest(view, request);
             }
 
@@ -97,6 +99,12 @@ public class CustomWebView extends WebView {
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
                 if (dialog != null) hideDialog();
+            }
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                evaluate(Sniffer.getScript(Uri.parse(url)));
             }
 
             @Override
@@ -112,6 +120,21 @@ public class CustomWebView extends WebView {
         };
     }
 
+    private void showDialog() {
+        if (dialog != null) return;
+        if (getParent() != null) ((ViewGroup) getParent()).removeView(this);
+        dialog = new AlertDialog.Builder(App.activity()).setView(this).show();
+    }
+
+    private void hideDialog() {
+        if (dialog != null) dialog.dismiss();
+        dialog = null;
+    }
+
+    private void evaluate(List<String> script) {
+        if (script.size() > 0) evaluateJavascript(script.get(0), value -> evaluate(script.subList(1, script.size())));
+    }
+
     private boolean isVideoFormat(Map<String, String> headers, String url) {
         try {
             Site site = ApiConfig.get().getSite(key);
@@ -123,21 +146,10 @@ public class CustomWebView extends WebView {
         }
     }
 
-    private void post(Map<String, String> headers, String url) {
+    private void interrupt(Map<String, String> headers, String url) {
         String cookie = CookieManager.getInstance().getCookie(url);
         if (cookie != null) headers.put(HttpHeaders.COOKIE, cookie);
         onParseSuccess(headers, url);
-    }
-
-    private void showDialog() {
-        if (dialog != null) return;
-        if (getParent() != null) ((ViewGroup) getParent()).removeView(this);
-        dialog = new AlertDialog.Builder(App.activity()).setView(this).show();
-    }
-
-    private void hideDialog() {
-        if (dialog != null) dialog.dismiss();
-        dialog = null;
     }
 
     private void onParseSuccess(Map<String, String> headers, String url) {
