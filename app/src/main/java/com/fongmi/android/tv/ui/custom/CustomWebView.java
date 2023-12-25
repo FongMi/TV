@@ -37,8 +37,8 @@ public class CustomWebView extends WebView {
     private ParseCallback callback;
     private AlertDialog dialog;
     private Runnable timer;
+    private boolean detect;
     private String from;
-    private boolean sub;
     private String key;
 
     public static CustomWebView create(@NonNull Context context) {
@@ -73,14 +73,14 @@ public class CustomWebView extends WebView {
         }
     }
 
-    public CustomWebView start(String key, String from, Map<String, String> headers, String url, ParseCallback callback, boolean sub) {
+    public CustomWebView start(String key, String from, Map<String, String> headers, String url, ParseCallback callback, boolean detect) {
         App.post(timer, Constant.TIMEOUT_PARSE_WEB);
         this.callback = callback;
         setUserAgent(headers);
         loadUrl(url, headers);
+        this.detect = detect;
         this.from = from;
         this.key = key;
-        this.sub = sub;
         return this;
     }
 
@@ -93,7 +93,7 @@ public class CustomWebView extends WebView {
                 Map<String, String> headers = request.getRequestHeaders();
                 if (TextUtils.isEmpty(host) || ApiConfig.get().getAds().contains(host)) return empty;
                 if (url.contains("challenges.cloudflare.com/cdn-cgi")) App.post(() -> showDialog());
-                if (sub && url.contains("player/?url=")) onParseAdd(headers, url);
+                if (detect && url.contains("player/?url=")) onParseAdd(headers, url);
                 else if (isVideoFormat(headers, url)) interrupt(headers, url);
                 return super.shouldInterceptRequest(view, request);
             }
