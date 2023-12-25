@@ -110,9 +110,9 @@
     <string name="error_play_prev">It\'s the first episode!</string>
     <string name="error_play_parse">Unable to parse url</string>
     <string name="error_play_url">Unable to load url</string>
-    <string name="error_play_format">Unsupported video format</string>
+    <string name="error_play_flag">No flag data</string>
     <string name="error_play_timeout">Timed out</string>
-    <string name="error_play_episode">No episode data</string>
+    <string name="error_detail">No play data</string>
     <string name="error_empty">Not found</string>
 
     <!-- Update -->
