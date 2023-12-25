@@ -58,8 +58,8 @@ public class TVBus implements Source.Extractor, Listener {
     }
 
     private void change() {
-        App.post(() -> System.exit(0), 250);
         Setting.putBootLive(true);
+        App.post(() -> System.exit(0), 250);
     }
 
     @Override
