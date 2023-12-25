@@ -176,8 +176,8 @@ public class ParseJob implements ParseCallback {
         startWeb("", "", headers, url);
     }
 
-    private void startWeb(String key, String form, Map<String, String> headers, String url) {
-        App.post(() -> webViews.add(CustomWebView.create(App.get()).start(key, form, headers, url, this)));
+    private void startWeb(String key, String from, Map<String, String> headers, String url) {
+        App.post(() -> webViews.add(CustomWebView.create(App.get()).start(key, from, headers, url, this, true)));
     }
 
     private Map<String, String> getHeader(JsonObject object) {
