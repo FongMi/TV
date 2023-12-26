@@ -57,6 +57,12 @@ public class ParseJob implements ParseCallback {
         if (result.getPlayUrl().startsWith("parse:")) parse = ApiConfig.get().getParse(result.getPlayUrl().substring(6));
         if (parse == null) parse = Parse.get(0, result.getPlayUrl());
         parse.setHeader(result.getHeader());
+        parse.setClick(getClick(result));
+    }
+
+    private String getClick(Result result) {
+        if (result.getClick().length() > 0) return result.getClick();
+        return ApiConfig.get().getSite(result.getKey()).getClick();
     }
 
     private void execute(Result result) {
@@ -169,15 +175,15 @@ public class ParseJob implements ParseCallback {
     }
 
     private void startWeb(String key, Parse item, String webUrl) {
-        startWeb(key, item.getName(), item.getHeaders(), item.getUrl() + webUrl);
+        startWeb(key, item.getName(), item.getHeaders(), item.getUrl() + webUrl, item.getClick());
     }
 
     private void startWeb(Map<String, String> headers, String url) {
-        startWeb("", "", headers, url);
+        startWeb("", "", headers, url, "");
     }
 
-    private void startWeb(String key, String form, Map<String, String> headers, String url) {
-        App.post(() -> webViews.add(CustomWebView.create(App.get()).start(key, form, headers, url, this)));
+    private void startWeb(String key, String from, Map<String, String> headers, String url, String click) {
+        App.post(() -> webViews.add(CustomWebView.create(App.get()).start(key, from, headers, url, click, this, !url.contains("player/?url="))));
     }
 
     private Map<String, String> getHeader(JsonObject object) {

@@ -101,6 +101,7 @@
     <string name="dialog_positive">OK</string>
     <string name="dialog_negative">Cancel</string>
     <string name="dialog_config_hint">Please enter the config…</string>
+    <string name="dialog_config_name">Please enter the name…</string>
     <string name="dialog_config_url">Please enter the url…</string>
 
     <!-- Error -->
@@ -110,9 +111,9 @@
     <string name="error_play_prev">It\'s the first episode!</string>
     <string name="error_play_parse">Unable to parse url</string>
     <string name="error_play_url">Unable to load url</string>
-    <string name="error_play_format">Unsupported video format</string>
+    <string name="error_play_flag">No flag data</string>
     <string name="error_play_timeout">Timed out</string>
-    <string name="error_play_episode">No episode data</string>
+    <string name="error_detail">No play data</string>
     <string name="error_empty">Not found</string>
 
     <!-- Update -->

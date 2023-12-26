@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-@Entity(ignoredColumns = {"type", "group", "url", "logo", "epg", "ua", "referer", "timeout", "header", "playerType", "channels", "groups", "core", "activated", "width"})
+@Entity(ignoredColumns = {"type", "group", "url", "logo", "epg", "ua", "click", "referer", "timeout", "header", "playerType", "channels", "groups", "core", "activated", "width"})
 public class Live {
 
     @NonNull
@@ -44,6 +44,8 @@ public class Live {
     private String epg;
     @SerializedName("ua")
     private String ua;
+    @SerializedName("click")
+    private String click;
     @SerializedName("referer")
     private String referer;
     @SerializedName("timeout")
@@ -135,6 +137,10 @@ public class Live {
 
     public String getReferer() {
         return TextUtils.isEmpty(referer) ? "" : referer;
+    }
+
+    public String getClick() {
+        return TextUtils.isEmpty(click) ? "" : click;
     }
 
     public Integer getTimeout() {

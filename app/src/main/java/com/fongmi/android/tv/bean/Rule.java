@@ -21,6 +21,8 @@ public class Rule {
     private List<String> hosts;
     @SerializedName("regex")
     private List<String> regex;
+    @SerializedName("script")
+    private List<String> script;
 
     public static Rule create(String name) {
         return new Rule(name);
@@ -46,6 +48,10 @@ public class Rule {
 
     public List<String> getRegex() {
         return regex == null ? Collections.emptyList() : regex;
+    }
+
+    public List<String> getScript() {
+        return script == null ? Collections.emptyList() : script;
     }
 
     @Override

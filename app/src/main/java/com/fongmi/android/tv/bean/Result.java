@@ -45,36 +45,41 @@ public class Result implements Parcelable {
     @SerializedName("filters")
     @JsonAdapter(FilterAdapter.class)
     private LinkedHashMap<String, List<Filter>> filters;
+
+    @SerializedName("url")
+    @JsonAdapter(UrlAdapter.class)
+    private Url url;
+
+    @JsonAdapter(MsgAdapter.class)
+    @SerializedName("msg")
+    private String msg;
+
     @SerializedName("header")
     private JsonElement header;
     @SerializedName("playUrl")
     private String playUrl;
     @SerializedName("jxFrom")
     private String jxFrom;
-    @SerializedName("parse")
-    private Integer parse;
-    @SerializedName("jx")
-    private Integer jx;
     @SerializedName("flag")
     private String flag;
     @SerializedName("danmaku")
     private String danmaku;
     @SerializedName("format")
     private String format;
-    @SerializedName("url")
-    @JsonAdapter(UrlAdapter.class)
-    private Url url;
+    @SerializedName("click")
+    private String click;
     @SerializedName("key")
     private String key;
     @SerializedName("subs")
     private List<Sub> subs;
     @SerializedName("pagecount")
     private Integer pagecount;
+    @SerializedName("parse")
+    private Integer parse;
     @SerializedName("code")
     private Integer code;
-    @JsonAdapter(MsgAdapter.class)
-    @SerializedName("msg")
-    private String msg;
+    @SerializedName("jx")
+    private Integer jx;
 
     public static Result objectFrom(String str) {
         try {
@@ -210,6 +215,14 @@ public class Result implements Parcelable {
 
     public String getFormat() {
         return format;
+    }
+
+    public String getClick() {
+        return TextUtils.isEmpty(click) ? "" : click;
+    }
+
+    public void setClick(String click) {
+        this.click = click;
     }
 
     public String getFlag() {

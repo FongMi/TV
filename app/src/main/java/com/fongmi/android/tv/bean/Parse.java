@@ -30,6 +30,7 @@ public class Parse {
     private Ext ext;
 
     private boolean activated;
+    private String click;
 
     public static Parse objectFrom(JsonElement element) {
         return App.gson().fromJson(element, Parse.class);
@@ -93,6 +94,14 @@ public class Parse {
 
     public void setActivated(Parse item) {
         this.activated = item.equals(this);
+    }
+
+    public String getClick() {
+        return TextUtils.isEmpty(click) ? "" : click;
+    }
+
+    public void setClick(String click) {
+        this.click = click;
     }
 
     public Map<String, String> getHeaders() {

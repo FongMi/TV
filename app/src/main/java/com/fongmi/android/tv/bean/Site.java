@@ -22,7 +22,7 @@ import java.util.List;
 
 import okhttp3.Headers;
 
-@Entity(ignoredColumns = {"api", "ext", "jar", "playUrl", "type", "timeout", "playerType", "categories", "header", "style", "activated"})
+@Entity(ignoredColumns = {"api", "ext", "jar", "click", "playUrl", "type", "timeout", "playerType", "categories", "header", "style", "activated"})
 public class Site implements Parcelable {
 
     @NonNull
@@ -38,6 +38,8 @@ public class Site implements Parcelable {
     private String ext;
     @SerializedName("jar")
     private String jar;
+    @SerializedName("click")
+    private String click;
     @SerializedName("playUrl")
     private String playUrl;
     @SerializedName("type")
@@ -119,6 +121,10 @@ public class Site implements Parcelable {
 
     public String getJar() {
         return TextUtils.isEmpty(jar) ? "" : jar;
+    }
+
+    public String getClick() {
+        return TextUtils.isEmpty(click) ? "" : click;
     }
 
     public String getPlayUrl() {
@@ -265,6 +271,7 @@ public class Site implements Parcelable {
         dest.writeString(this.api);
         dest.writeString(this.ext);
         dest.writeString(this.jar);
+        dest.writeString(this.click);
         dest.writeString(this.playUrl);
         dest.writeValue(this.type);
         dest.writeValue(this.timeout);
@@ -283,6 +290,7 @@ public class Site implements Parcelable {
         this.api = in.readString();
         this.ext = in.readString();
         this.jar = in.readString();
+        this.click = in.readString();
         this.playUrl = in.readString();
         this.type = (Integer) in.readValue(Integer.class.getClassLoader());
         this.timeout = (Integer) in.readValue(Integer.class.getClassLoader());

@@ -7,7 +7,6 @@ import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Rule;
 import com.github.catvod.utils.Json;
 import com.github.catvod.utils.Util;
-import com.orhanobut.logger.Logger;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,8 +17,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Sniffer {
-
-    private static final String TAG = Sniffer.class.getSimpleName();
 
     public static final Pattern CLICKER = Pattern.compile("\\[a=cr:(\\{.*?\\})\\/](.*?)\\[\\/a]");
     public static final Pattern AI_PUSH = Pattern.compile("(http|https|rtmp|rtsp|smb|thunder|magnet|ed2k|mitv|tvbox-xg|jianpian|video):[^\\s]+", Pattern.MULTILINE);
@@ -47,7 +44,6 @@ public class Sniffer {
     }
 
     public static boolean isVideoFormat(String url, Map<String, String> headers) {
-        Logger.t(TAG).d(url);
         if (containOrMatch(url)) return true;
         if (headers.containsKey("Accept") && headers.get("Accept").startsWith("image")) return false;
         if (url.contains("url=http") || url.contains("v=http") || url.contains(".css") || url.contains(".html")) return false;
@@ -65,6 +61,13 @@ public class Sniffer {
         if (uri.getHost() == null) return Collections.emptyList();
         String hosts = TextUtils.join(",", Arrays.asList(UrlUtil.host(uri), UrlUtil.host(uri.getQueryParameter("url"))));
         for (Rule rule : ApiConfig.get().getRules()) for (String host : rule.getHosts()) if (Util.containOrMatch(hosts, host)) return rule.getRegex();
+        return Collections.emptyList();
+    }
+
+    public static List<String> getScript(Uri uri) {
+        if (uri.getHost() == null) return Collections.emptyList();
+        String hosts = TextUtils.join(",", Arrays.asList(UrlUtil.host(uri), UrlUtil.host(uri.getQueryParameter("url"))));
+        for (Rule rule : ApiConfig.get().getRules()) for (String host : rule.getHosts()) if (Util.containOrMatch(hosts, host)) return rule.getScript();
         return Collections.emptyList();
     }
 }

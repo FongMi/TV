@@ -172,7 +172,8 @@ public class Config {
     }
 
     public static void delete(String url, int type) {
-        AppDatabase.get().getConfigDao().delete(url, type);
+        if (type == 2) AppDatabase.get().getConfigDao().delete(type);
+        else AppDatabase.get().getConfigDao().delete(url, type);
     }
 
     public static Config vod() {
