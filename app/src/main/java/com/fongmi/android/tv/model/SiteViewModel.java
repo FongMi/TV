@@ -190,6 +190,7 @@ public class SiteViewModel extends ViewModel {
                 result.setHeader(site.getHeader());
                 result.setPlayUrl(site.getPlayUrl());
                 result.setParse(Sniffer.isVideoFormat(url.v()) && result.getPlayUrl().isEmpty() ? 0 : 1);
+                SpiderDebug.log(result.toString());
                 return result;
             }
         });

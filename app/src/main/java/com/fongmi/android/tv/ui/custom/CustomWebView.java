@@ -27,12 +27,17 @@ import com.fongmi.android.tv.impl.ParseCallback;
 import com.fongmi.android.tv.utils.Sniffer;
 import com.github.catvod.crawler.Spider;
 import com.google.common.net.HttpHeaders;
+import com.orhanobut.logger.Logger;
 
 import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class CustomWebView extends WebView {
+
+    private static final String TAG = CustomWebView.class.getSimpleName();
+    private static final String BLANK = "about:blank";
 
     private WebResourceResponse empty;
     private ParseCallback callback;
@@ -110,7 +115,8 @@ public class CustomWebView extends WebView {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                evaluate(Sniffer.getScript(Uri.parse(url)));
+                if (url.equals(BLANK)) return;
+                evaluate(getScript(url));
             }
 
             @Override
@@ -137,12 +143,25 @@ public class CustomWebView extends WebView {
         dialog = null;
     }
 
+    private List<String> getScript(String url) {
+        List<String> script = new ArrayList<>(Sniffer.getScript(Uri.parse(url)));
+        String click = ApiConfig.get().getSite(key).getClick();
+        if (click.length() > 0) script.add(0, click);
+        return script;
+    }
+
     private void evaluate(List<String> script) {
-        if (script.size() > 0) evaluateJavascript(script.get(0), value -> evaluate(script.subList(1, script.size())));
+        if (script.isEmpty()) return;
+        if (TextUtils.isEmpty(script.get(0))) {
+            evaluate(script.subList(1, script.size()));
+        } else {
+            evaluateJavascript(script.get(0), value -> evaluate(script.subList(1, script.size())));
+        }
     }
 
     private boolean isVideoFormat(Map<String, String> headers, String url) {
         try {
+            Logger.t(TAG).d(url);
             Site site = ApiConfig.get().getSite(key);
             Spider spider = ApiConfig.get().getSpider(site);
             if (spider.manualVideoCheck()) return spider.isVideoFormat(url);
@@ -176,7 +195,7 @@ public class CustomWebView extends WebView {
     public void stop(boolean error) {
         hideDialog();
         stopLoading();
-        loadUrl("about:blank");
+        loadUrl(BLANK);
         App.removeCallbacks(timer);
         if (error) onParseError();
         else callback = null;
