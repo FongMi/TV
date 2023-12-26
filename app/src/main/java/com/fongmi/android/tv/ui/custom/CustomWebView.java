@@ -148,7 +148,8 @@ public class CustomWebView extends WebView {
 
     private List<String> getScript(String url) {
         List<String> script = new ArrayList<>(Sniffer.getScript(Uri.parse(url)));
-        if (!TextUtils.isEmpty(click) && !script.contains(click)) script.add(0, click);
+        if (TextUtils.isEmpty(click) || script.contains(click)) return script;
+        script.add(0, click);
         return script;
     }
 
