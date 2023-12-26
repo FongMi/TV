@@ -101,6 +101,7 @@
     <string name="dialog_positive">确定</string>
     <string name="dialog_negative">取消</string>
     <string name="dialog_config_hint">请输入接口…</string>
+    <string name="dialog_config_name">请输入名称…</string>
     <string name="dialog_config_url">请输入地址…</string>
 
     <!-- Error -->

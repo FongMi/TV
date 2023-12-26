@@ -65,6 +65,7 @@ public class CustomWebView extends WebView {
         getSettings().setDomStorageEnabled(true);
         getSettings().setJavaScriptEnabled(true);
         getSettings().setLoadWithOverviewMode(true);
+        getSettings().setMediaPlaybackRequiresUserGesture(false);
         getSettings().setJavaScriptCanOpenWindowsAutomatically(false);
         getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         setWebViewClient(webViewClient());

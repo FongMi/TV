@@ -101,6 +101,7 @@
     <string name="dialog_positive">OK</string>
     <string name="dialog_negative">Cancel</string>
     <string name="dialog_config_hint">Please enter the config…</string>
+    <string name="dialog_config_name">Please enter the name…</string>
     <string name="dialog_config_url">Please enter the url…</string>
 
     <!-- Error -->
