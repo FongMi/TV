@@ -20,6 +20,7 @@ import androidx.annotation.NonNull;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
+import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.api.ApiConfig;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.impl.ParseCallback;
@@ -65,7 +66,9 @@ public class CustomWebView extends WebView {
     }
 
     private void setUserAgent(Map<String, String> headers) {
-        for (String key : headers.keySet()) {
+        if (headers.isEmpty()) {
+            getSettings().setUserAgentString(Setting.getUa());
+        } else for (String key : headers.keySet()) {
             if (key.equalsIgnoreCase(HttpHeaders.USER_AGENT)) {
                 getSettings().setUserAgentString(headers.get(key));
                 break;
