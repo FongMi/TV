@@ -44,6 +44,7 @@ public class CustomWebView extends WebView {
     private AlertDialog dialog;
     private Runnable timer;
     private boolean detect;
+    private String click;
     private String from;
     private String key;
 
@@ -82,12 +83,13 @@ public class CustomWebView extends WebView {
         }
     }
 
-    public CustomWebView start(String key, String from, Map<String, String> headers, String url, ParseCallback callback, boolean detect) {
+    public CustomWebView start(String key, String from, Map<String, String> headers, String url, String click, ParseCallback callback, boolean detect) {
         App.post(timer, Constant.TIMEOUT_PARSE_WEB);
         this.callback = callback;
         setUserAgent(headers);
         loadUrl(url, headers);
         this.detect = detect;
+        this.click = click;
         this.from = from;
         this.key = key;
         return this;
@@ -146,8 +148,7 @@ public class CustomWebView extends WebView {
 
     private List<String> getScript(String url) {
         List<String> script = new ArrayList<>(Sniffer.getScript(Uri.parse(url)));
-        String click = ApiConfig.get().getSite(key).getClick();
-        if (click.length() > 0) script.add(0, click);
+        if (!TextUtils.isEmpty(click)) script.add(0, click);
         return script;
     }
 
@@ -179,7 +180,7 @@ public class CustomWebView extends WebView {
     }
 
     private void onParseAdd(Map<String, String> headers, String url) {
-        App.post(() -> CustomWebView.create(App.get()).start(key, from, headers, url, callback, false));
+        App.post(() -> CustomWebView.create(App.get()).start(key, from, headers, url, click, callback, false));
     }
 
     private void onParseSuccess(Map<String, String> headers, String url) {

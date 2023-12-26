@@ -115,6 +115,7 @@ public class LiveParser {
         private String ua;
         private String key;
         private String type;
+        private String click;
         private String referer;
         private Integer parse;
         private Integer player;
@@ -126,6 +127,7 @@ public class LiveParser {
         public void check(String line) {
             if (line.startsWith("ua")) ua(line);
             if (line.startsWith("parse")) parse(line);
+            if (line.startsWith("click")) click(line);
             if (line.startsWith("player")) player(line);
             if (line.startsWith("referer")) referer(line);
             if (line.startsWith("#EXTVLCOPT:http-user-agent")) ua(line);
@@ -138,6 +140,7 @@ public class LiveParser {
         public Setting copy(Channel channel) {
             if (ua != null) channel.setUa(ua);
             if (parse != null) channel.setParse(parse);
+            if (click != null) channel.setClick(click);
             if (referer != null) channel.setReferer(referer);
             if (player != null) channel.setPlayerType(player);
             if (key != null && type != null) channel.setDrm(Drm.create(key, type));
@@ -165,6 +168,14 @@ public class LiveParser {
                 parse = Integer.parseInt(line.split("=")[1].trim());
             } catch (Exception e) {
                 parse = null;
+            }
+        }
+
+        private void click(String line) {
+            try {
+                click = line.split("=")[1].trim();
+            } catch (Exception e) {
+                click = null;
             }
         }
 
@@ -197,6 +208,7 @@ public class LiveParser {
             key = null;
             type = null;
             parse = null;
+            click = null;
             player = null;
             referer = null;
         }
