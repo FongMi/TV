@@ -62,7 +62,6 @@ public class SiteAdapter extends RecyclerView.Adapter<SiteAdapter.ViewHolder> {
         holder.binding.check.setChecked(getChecked(item));
         holder.binding.text.setSelected(item.isActivated());
         holder.binding.text.setActivated(item.isActivated());
-        holder.binding.check.setEnabled(type != 1 || item.getSearchable() != 0);
         holder.binding.check.setVisibility(type == 0 ? View.GONE : View.VISIBLE);
         holder.binding.getRoot().setOnLongClickListener(v -> setLongListener(item));
         holder.binding.getRoot().setOnClickListener(v -> setListener(item, position));

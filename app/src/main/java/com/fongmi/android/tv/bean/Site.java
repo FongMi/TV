@@ -213,7 +213,7 @@ public class Site implements Parcelable {
     }
 
     public Site setChangeable(boolean changeable) {
-        setChangeable(changeable ? 1 : 0);
+        if (getChangeable() != 0) setChangeable(changeable ? 1 : 2);
         return this;
     }
 
@@ -222,7 +222,7 @@ public class Site implements Parcelable {
     }
 
     public Site setRecordable(boolean recordable) {
-        setRecordable(recordable ? 1 : 0);
+        if (getRecordable() != 0) setRecordable(recordable ? 1 : 2);
         return this;
     }
 
@@ -237,8 +237,8 @@ public class Site implements Parcelable {
     public Site sync() {
         Site item = find(getKey());
         if (item == null) return this;
-        setChangeable(item.getChangeable());
-        setRecordable(item.getRecordable());
+        if (getChangeable() != 0) setChangeable(Math.max(1, item.getChangeable()));
+        if (getRecordable() != 0) setRecordable(Math.max(1, item.getRecordable()));
         if (getSearchable() != 0) setSearchable(Math.max(1, item.getSearchable()));
         return this;
     }
