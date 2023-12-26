@@ -191,12 +191,12 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
             case 1:
                 setCacheText();
                 Notify.dismiss();
-                mBinding.liveUrl.setText(LiveConfig.getUrl());
+                mBinding.liveUrl.setText(LiveConfig.getDesc());
                 break;
             case 2:
                 setCacheText();
                 Notify.dismiss();
-                mBinding.wallUrl.setText(WallConfig.getUrl());
+                mBinding.wallUrl.setText(WallConfig.getDesc());
                 break;
         }
     }
