@@ -8,6 +8,8 @@ import com.github.catvod.net.OkHttp;
 import com.google.common.net.HttpHeaders;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -54,15 +56,120 @@ public class M3U8 {
     }
 
     private static String scan(String line, List<String> ads) {
-        Matcher m1 = REGEX_X_DISCONTINUITY.matcher(line);
-        while (m1.find()) {
-            String group = m1.group();
-            BigDecimal t = BigDecimal.ZERO;
-            Matcher m2 = REGEX_MEDIA_DURATION.matcher(group);
-            while (m2.find()) t = t.add(new BigDecimal(m2.group(1)));
-            for (String ad : ads) if (t.toString().startsWith(ad)) line = line.replace(group.replace(TAG_ENDLIST, ""), "");
+        class Slice{
+            private String text;
+            private BigDecimal time;
+            private String prefix;
+
+            Slice(String text){
+                this.text = text;
+
+                BigDecimal t = BigDecimal.ZERO;
+                Matcher m2 = REGEX_MEDIA_DURATION.matcher(text);
+                while (m2.find()) t = t.add(new BigDecimal(m2.group(1)));
+                this.time = t;
+
+                int prefixLen = 0;
+                String[] lines = text.split("\n");
+                for (String line : lines) {
+                    if (!line.startsWith("#")) {
+                        if (prefixLen == 0 || (line.length() < prefixLen  && line.strip().length() > 0)) {
+                            prefixLen = line.length();
+                        }
+                    }
+                }
+                prefixLen -= 7;
+                String prefix = null;
+                while(prefixLen > 0) {
+                    boolean redo = false;
+                    for (String line : lines) {
+                        if (!line.startsWith("#")) {
+                            if (prefix == null) {
+                                prefix = line.substring(0, prefixLen);
+                            } else {
+                                if (!line.startsWith(prefix)) {
+                                    redo = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (redo) {
+                        prefixLen -= 1;
+                        prefix = null;
+                    } else {
+                        break;
+                    }
+                }
+                this.prefix = prefix;
+            }
+
+            public String getPrefix() {
+                return this.prefix;
+            }
+
+            public BigDecimal getTime() {
+                return this.time;
+            }
+
+            public String getText() {
+                return this.text;
+            }
         }
-        return line;
+
+        double adTimeLong = 0.0;
+        for (String ad : ads) {
+            if (isDouble(ad)) {
+                double t = Double.parseDouble(ad);
+                if (adTimeLong < t) {
+                    adTimeLong = t;
+                }
+            }
+        }
+
+        ArrayList<Slice> slices = new ArrayList<>();
+        HashMap<String, BigDecimal> slicesTime = new HashMap<>();
+        int idx = 0;
+        while (idx < line.length()) {
+            int i = line.indexOf(TAG_DISCONTINUITY, idx + 1);
+            Slice slice;
+            if (i == -1) {
+                slice = new Slice(line.substring(idx));
+                idx = line.length();
+            } else {
+                slice = new Slice(line.substring(idx, i));
+                idx = i;
+            }
+            slices.add(slice);
+            if (slice.getPrefix() != null) {
+                BigDecimal t = slicesTime.get(slice.getPrefix());
+                if (t == null) {
+                    slicesTime.put(slice.getPrefix(), slice.getTime());
+                } else {
+                    slicesTime.put(slice.getPrefix(), t.add(slice.getTime()));
+                }
+            }
+        }
+
+        ArrayList<Slice> listOk = slices;
+        for (String key : slicesTime.keySet()) {
+            BigDecimal t = slicesTime.get(key);
+            if (new BigDecimal(adTimeLong).compareTo(t) >= 0) {
+                ArrayList<Slice> list = new ArrayList<>();
+                for (Slice slice : listOk) {
+                    if (!key.equals(slice.getPrefix())) {
+                        list.add(slice);
+                    }
+                }
+                listOk = list;
+            }
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for (Slice slice : listOk) {
+            sb.append(slice.getText());
+        }
+        return sb.toString();
     }
 
     private static Headers getHeader(Map<String, String> headers) {
