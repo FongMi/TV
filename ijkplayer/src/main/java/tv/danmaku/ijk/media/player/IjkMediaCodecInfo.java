@@ -16,6 +16,7 @@ public class IjkMediaCodecInfo {
 
     private final static String TAG = "IjkMediaCodecInfo";
 
+    public static final int RANK_MAX = 1000;
     public static final int RANK_TESTED = 800;
     public static final int RANK_ACCEPTABLE = 700;
     public static final int RANK_LAST_CHANCE = 600;
@@ -56,8 +57,13 @@ public class IjkMediaCodecInfo {
         // Xiaomi MI 1S
         sKnownCodecList.put("OMX.qcom.video.decoder.avc", RANK_TESTED);
         sKnownCodecList.put("OMX.qcom.video.decoder.avc.secure", RANK_SECURE);
+        sKnownCodecList.put("OMX.qcom.video.decoder.avc.low_latency", RANK_MAX);
         sKnownCodecList.put("OMX.qcom.video.decoder.hevc", RANK_TESTED);
         sKnownCodecList.put("OMX.qcom.video.decoder.hevc.secure", RANK_SECURE);
+        sKnownCodecList.put("OMX.qcom.video.decoder.hevc.low_latency", RANK_MAX);
+        sKnownCodecList.put("OMX.qcom.video.decoder.vp9", RANK_TESTED);
+        sKnownCodecList.put("OMX.qcom.video.decoder.vp9.secure", RANK_SECURE);
+        sKnownCodecList.put("OMX.qcom.video.decoder.vp9.low_latency", RANK_MAX);
         sKnownCodecList.put("OMX.ittiam.video.decoder.avc", RANK_NO_SENSE);
 
         // ----- Samsung -----
