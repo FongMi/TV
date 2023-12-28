@@ -31,6 +31,10 @@ public class Drm {
         return TextUtils.isEmpty(key) ? "" : key;
     }
 
+    public void setKey(String key) {
+        this.key = key;
+    }
+
     private String getType() {
         return TextUtils.isEmpty(type) ? "" : type;
     }
@@ -43,7 +47,19 @@ public class Drm {
 
     private String getUri() {
         if (getKey().startsWith("http")) return getKey();
+        if (!getKey().startsWith("{") && getKey().contains(":")) convert();
         return Server.get().getAddress("license/") + Util.base64(getKey());
+    }
+
+    private void convert() {
+        String[] split = getKey().split(":");
+        String kid = getBase64(split[0]);
+        String key = getBase64(split[1]);
+        setKey(String.format("{ \"keys\":[ { \"kty\":\"oct\", \"k\":\"%s\", \"kid\":\"%s\" } ], \"type\":\"temporary\" }", key, kid));
+    }
+
+    private String getBase64(String s) {
+        return Util.base64(Util.hex2byte(s)).replace("=", "");
     }
 
     public MediaItem.DrmConfiguration get() {

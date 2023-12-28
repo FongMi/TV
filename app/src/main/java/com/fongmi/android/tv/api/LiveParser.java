@@ -59,15 +59,16 @@ public class LiveParser {
         Setting setting = Setting.create();
         Channel channel = Channel.create("");
         for (String line : text.split("\n")) {
-            setting.check(line);
             if (Thread.interrupted()) break;
             if (line.startsWith("#EXTINF:")) {
                 Group group = live.find(Group.create(extract(line, GROUP)));
                 channel = group.find(Channel.create(extract(line, NAME)));
                 channel.setLogo(extract(line, LOGO));
-                setting.copy(channel).clear();
             } else if (line.contains("://")) {
+                setting.copy(channel).clear();
                 channel.getUrls().add(line);
+            } else {
+                setting.check(line);
             }
         }
     }
