@@ -13,7 +13,8 @@ https://github.com/CatVodTVOfficial/CatVodTVJarLoader
 | recordable | 1    | 是否紀錄 | 0：關閉；1：啟用        |
 | playerType | none | 播放器  | 0：系統；1：IJK；2：EXO |
 | timeout    | 15   | 播放超時 | 單位：秒             |
-| header     | none | 標頭   | 格式：json          |
+| header     | none | 請求標頭 | 格式：json          |
+| click      | none | 點擊js | javascript       |
 
 ### 直播欄位
 
@@ -27,7 +28,8 @@ https://github.com/CatVodTVOfficial/CatVodTVJarLoader
 | boot       | false | 是否自啟動 |                  |
 | playerType | none  | 播放器   | 0：系統；1：IJK；2：EXO |
 | timeout    | 15    | 播放超時  | 單位：秒             |
-| header     | none  | 標頭    | 格式：json          |
+| header     | none  | 請求標頭  | 格式：json          |
+| click      | none  | 點擊js  | javascript       |
 
 ### 配置範例
 

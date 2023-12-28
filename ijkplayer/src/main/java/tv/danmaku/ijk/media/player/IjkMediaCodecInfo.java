@@ -26,8 +26,8 @@ public class IjkMediaCodecInfo {
     public static final int RANK_NO_SENSE = 0;
 
     public MediaCodecInfo mCodecInfo;
-    public int mRank = 0;
     public String mMimeType;
+    public int mRank = 0;
 
     private static Map<String, Integer> sKnownCodecList;
 
@@ -56,6 +56,14 @@ public class IjkMediaCodecInfo {
         // MSM8260
         // Xiaomi MI 1S
         sKnownCodecList.put("OMX.qcom.video.decoder.avc", RANK_TESTED);
+        sKnownCodecList.put("OMX.qcom.video.decoder.avc.secure", RANK_SECURE);
+        sKnownCodecList.put("OMX.qcom.video.decoder.avc.low_latency", RANK_MAX);
+        sKnownCodecList.put("OMX.qcom.video.decoder.hevc", RANK_TESTED);
+        sKnownCodecList.put("OMX.qcom.video.decoder.hevc.secure", RANK_SECURE);
+        sKnownCodecList.put("OMX.qcom.video.decoder.hevc.low_latency", RANK_MAX);
+        sKnownCodecList.put("OMX.qcom.video.decoder.vp9", RANK_TESTED);
+        sKnownCodecList.put("OMX.qcom.video.decoder.vp9.secure", RANK_SECURE);
+        sKnownCodecList.put("OMX.qcom.video.decoder.vp9.low_latency", RANK_MAX);
         sKnownCodecList.put("OMX.ittiam.video.decoder.avc", RANK_NO_SENSE);
 
         // ----- Samsung -----
@@ -98,38 +106,8 @@ public class IjkMediaCodecInfo {
         sKnownCodecList.put("OMX.MARVELL.VIDEO.HW.CODA7542DECODER", RANK_TESTED);
         sKnownCodecList.put("OMX.MARVELL.VIDEO.H264DECODER", RANK_SOFTWARE);
 
-        // ----- TODO: need test -----
-        sKnownCodecList.remove("OMX.Action.Video.Decoder");
-        sKnownCodecList.remove("OMX.allwinner.video.decoder.avc");
-        sKnownCodecList.remove("OMX.BRCM.vc4.decoder.avc");
-        sKnownCodecList.remove("OMX.brcm.video.h264.hw.decoder");
-        sKnownCodecList.remove("OMX.brcm.video.h264.decoder");
-        sKnownCodecList.remove("OMX.cosmo.video.decoder.avc");
-        sKnownCodecList.remove("OMX.duos.h264.decoder");
-        sKnownCodecList.remove("OMX.hantro.81x0.video.decoder");
-        sKnownCodecList.remove("OMX.hantro.G1.video.decoder");
-        sKnownCodecList.remove("OMX.hisi.video.decoder");
-        sKnownCodecList.remove("OMX.LG.decoder.video.avc");
-        sKnownCodecList.remove("OMX.MS.AVC.Decoder");
-        sKnownCodecList.remove("OMX.RENESAS.VIDEO.DECODER.H264");
-        sKnownCodecList.remove("OMX.RTK.video.decoder");
-        sKnownCodecList.remove("OMX.sprd.h264.decoder");
-        sKnownCodecList.remove("OMX.ST.VFM.H264Dec");
-        sKnownCodecList.remove("OMX.vpu.video_decoder.avc");
-        sKnownCodecList.remove("OMX.WMT.decoder.avc");
-
-        // Really ?
-        sKnownCodecList.remove("OMX.bluestacks.hw.decoder");
-
-        // ---------------
-        // Useless codec
-        // ----- google -----
-        sKnownCodecList.put("OMX.google.h264.decoder", RANK_SOFTWARE);
-        sKnownCodecList.put("OMX.google.h264.lc.decoder", RANK_SOFTWARE);
-        // ----- huawei k920 -----
-        sKnownCodecList.put("OMX.k3.ffmpeg.decoder", RANK_SOFTWARE);
-        sKnownCodecList.put("OMX.ffmpeg.video.decoder", RANK_SOFTWARE);
         // ----- unknown -----
+        sKnownCodecList.put("OMX.sprd.h264.decoder", RANK_TESTED);
         sKnownCodecList.put("OMX.sprd.soft.h264.decoder", RANK_SOFTWARE);
 
         return sKnownCodecList;
@@ -162,8 +140,7 @@ public class IjkMediaCodecInfo {
         } else if (name.startsWith("omx.mtk.")) {
             // 1. MTK only works on 4.3 and above
             // 2. MTK works on MIUI 6 (4.2.1)
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2) rank = RANK_NO_SENSE;
-            else rank = RANK_TESTED;
+            rank = Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR2 ? RANK_NO_SENSE : RANK_TESTED;
         } else {
             Integer knownRank = getKnownCodecList().get(name);
             if (knownRank != null) {

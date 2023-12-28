@@ -69,11 +69,11 @@ public class Decoder {
         SecretKeySpec spec = new SecretKeySpec(padEnd(key).getBytes(), "AES");
         Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
         cipher.init(Cipher.DECRYPT_MODE, spec);
-        return new String(cipher.doFinal(decodeHex(data)), StandardCharsets.UTF_8);
+        return new String(cipher.doFinal(Util.hex2byte(data)), StandardCharsets.UTF_8);
     }
 
     private static String cbc(String data) throws Exception {
-        String decode = new String(decodeHex(data)).toLowerCase();
+        String decode = new String(Util.hex2byte(data)).toLowerCase();
         String key = padEnd(decode.substring(decode.indexOf("$#") + 2, decode.indexOf("#$")));
         String iv = padEnd(decode.substring(decode.length() - 13));
         SecretKeySpec keySpec = new SecretKeySpec(key.getBytes(), "AES");
@@ -81,7 +81,7 @@ public class Decoder {
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
         cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
         data = data.substring(data.indexOf("2324") + 4, data.length() - 26);
-        byte[] decryptData = cipher.doFinal(decodeHex(data));
+        byte[] decryptData = cipher.doFinal(Util.hex2byte(data));
         return new String(decryptData, StandardCharsets.UTF_8);
     }
 
@@ -98,11 +98,5 @@ public class Decoder {
 
     private static String padEnd(String key) {
         return key + "0000000000000000".substring(key.length());
-    }
-
-    private static byte[] decodeHex(String s) {
-        byte[] bytes = new byte[s.length() / 2];
-        for (int i = 0; i < bytes.length; i++) bytes[i] = Integer.valueOf(s.substring(i * 2, i * 2 + 2), 16).byteValue();
-        return bytes;
     }
 }

@@ -31,11 +31,16 @@ public class Drm {
         return TextUtils.isEmpty(key) ? "" : key;
     }
 
+    public void setKey(String key) {
+        this.key = key;
+    }
+
     private String getType() {
         return TextUtils.isEmpty(type) ? "" : type;
     }
 
     private UUID getUUID() {
+        if (getType().contains("playready")) return C.PLAYREADY_UUID;
         if (getType().contains("widevine")) return C.WIDEVINE_UUID;
         if (getType().contains("clearkey")) return C.CLEARKEY_UUID;
         return C.UUID_NIL;

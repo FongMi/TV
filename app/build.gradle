@@ -11,7 +11,7 @@ android {
         minSdk 21
         targetSdk 28
         versionCode 215
-        versionName "2.1.5"
+        versionName "1228#2"
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]

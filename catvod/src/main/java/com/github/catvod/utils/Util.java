@@ -24,8 +24,8 @@ public class Util {
 
     public static final String CHROME = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36";
 
-    public static String base64(String ext) {
-        return base64(ext.getBytes());
+    public static String base64(String s) {
+        return base64(s.getBytes());
     }
 
     public static String base64(byte[] bytes) {
@@ -34,6 +34,12 @@ public class Util {
 
     public static String basic(Uri uri) {
         return "Basic " + base64(uri.getUserInfo());
+    }
+
+    public static byte[] hex2byte(String s) {
+        byte[] bytes = new byte[s.length() / 2];
+        for (int i = 0; i < bytes.length; i++) bytes[i] = Integer.valueOf(s.substring(i * 2, i * 2 + 2), 16).byteValue();
+        return bytes;
     }
 
     public static boolean equals(String name, String md5) {
