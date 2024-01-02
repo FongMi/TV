@@ -15,7 +15,7 @@ public class JianPian implements Source.Extractor {
 
     @Override
     public boolean match(String scheme, String host) {
-        return scheme.equals("tvbox-xg") || scheme.equals("jianpian");
+        return scheme.equals("tvbox-xg") || scheme.equals("jianpian") || scheme.equals("ftp");
     }
 
     private void init() {

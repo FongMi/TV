@@ -7,9 +7,11 @@ import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Drm;
 import com.fongmi.android.tv.bean.Group;
 import com.fongmi.android.tv.bean.Live;
+import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Path;
+import com.github.catvod.utils.Util;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -60,15 +62,17 @@ public class LiveParser {
         Channel channel = Channel.create("");
         for (String line : text.split("\n")) {
             if (Thread.interrupted()) break;
-            if (line.startsWith("#EXTINF:")) {
+            if (setting.find(line)) {
+                setting.check(line);
+            } else if (line.startsWith("#EXTINF:")) {
                 Group group = live.find(Group.create(extract(line, GROUP)));
                 channel = group.find(Channel.create(extract(line, NAME)));
                 channel.setLogo(extract(line, LOGO));
-            } else if (line.contains("://")) {
+            } else if (!line.startsWith("#") && line.contains("://")) {
+                String[] split = line.split("\\|");
+                for (String s : split) setting.check(s);
+                channel.getUrls().add(split[0]);
                 setting.copy(channel).clear();
-                channel.getUrls().add(line);
-            } else {
-                setting.check(line);
             }
         }
     }
@@ -125,17 +129,24 @@ public class LiveParser {
             return new Setting();
         }
 
+        public boolean find(String line) {
+            return line.startsWith("ua") || line.startsWith("parse") || line.startsWith("click") || line.startsWith("player") || line.startsWith("referer") || line.startsWith("#EXTVLCOPT:") || line.startsWith("#KODIPROP:");
+        }
+
         public void check(String line) {
-            if (line.startsWith("ua")) ua(line);
-            if (line.startsWith("parse")) parse(line);
-            if (line.startsWith("click")) click(line);
-            if (line.startsWith("player")) player(line);
-            if (line.startsWith("referer")) referer(line);
-            if (line.startsWith("#EXTVLCOPT:http-user-agent")) ua(line);
-            if (line.startsWith("#EXTVLCOPT:http-referer")) referer(line);
-            if (line.startsWith("#KODIPROP:inputstream.adaptive.license_key")) key(line);
-            if (line.startsWith("#KODIPROP:inputstream.adaptive.license_type")) type(line);
             if (line.contains("#genre#")) clear();
+            else if (line.startsWith("ua")) ua(line);
+            else if (line.startsWith("parse")) parse(line);
+            else if (line.startsWith("click")) click(line);
+            else if (line.startsWith("player")) player(line);
+            else if (line.startsWith("user-agent")) ua(line);
+            else if (line.startsWith("User-Agent")) ua(line);
+            else if (line.startsWith("referer")) referer(line);
+            else if (line.startsWith("Referer")) referer(line);
+            else if (line.startsWith("#EXTVLCOPT:http-user-agent")) ua(line);
+            else if (line.startsWith("#EXTVLCOPT:http-referer")) referer(line);
+            else if (line.startsWith("#KODIPROP:inputstream.adaptive.license_key")) key(line);
+            else if (line.startsWith("#KODIPROP:inputstream.adaptive.license_type")) type(line);
         }
 
         public Setting copy(Channel channel) {
@@ -150,7 +161,7 @@ public class LiveParser {
 
         private void ua(String line) {
             try {
-                ua = line.split("=")[1].trim();
+                ua = line.split("ua=")[1].trim().replace("\"", "");
             } catch (Exception e) {
                 ua = null;
             }
@@ -158,7 +169,7 @@ public class LiveParser {
 
         private void referer(String line) {
             try {
-                referer = line.split("=")[1].trim();
+                referer = line.split("referer=")[1].trim().replace("\"", "");
             } catch (Exception e) {
                 referer = null;
             }
@@ -166,7 +177,7 @@ public class LiveParser {
 
         private void parse(String line) {
             try {
-                parse = Integer.parseInt(line.split("=")[1].trim());
+                parse = Integer.parseInt(line.split("parse=")[1].trim());
             } catch (Exception e) {
                 parse = null;
             }
@@ -174,7 +185,7 @@ public class LiveParser {
 
         private void click(String line) {
             try {
-                click = line.split("=")[1].trim();
+                click = line.split("click=")[1].trim();
             } catch (Exception e) {
                 click = null;
             }
@@ -182,7 +193,7 @@ public class LiveParser {
 
         private void player(String line) {
             try {
-                player = Integer.parseInt(line.split("=")[1].trim());
+                player = Integer.parseInt(line.split("player=")[1].trim());
             } catch (Exception e) {
                 player = null;
             }
@@ -190,18 +201,30 @@ public class LiveParser {
 
         private void key(String line) {
             try {
-                key = line.split("=")[1].trim();
+                key = line.split("license_key=")[1].trim();
+                if (!key.startsWith("http") && !key.startsWith("{") && key.contains(":")) convert();
             } catch (Exception e) {
                 key = null;
+            } finally {
+                player = Players.EXO;
             }
         }
 
         private void type(String line) {
             try {
-                type = line.split("=")[1].trim();
+                type = line.split("license_type=")[1].trim();
             } catch (Exception e) {
                 type = null;
+            } finally {
+                player = Players.EXO;
             }
+        }
+
+        private void convert() {
+            String[] split = key.split(":");
+            String k = Util.base64(Util.hex2byte(split[1])).replace("=", "");
+            String kid = Util.base64(Util.hex2byte(split[0])).replace("=", "");
+            key = String.format("{ \"keys\":[ { \"kty\":\"oct\", \"k\":\"%s\", \"kid\":\"%s\" } ], \"type\":\"temporary\" }", k, kid);
         }
 
         private void clear() {

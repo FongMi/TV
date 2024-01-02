@@ -112,6 +112,10 @@ public class Parse {
         if (getExt().getHeader() == null) getExt().setHeader(header);
     }
 
+    public boolean isEmpty() {
+        return getType() == 0 && getUrl().isEmpty();
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
