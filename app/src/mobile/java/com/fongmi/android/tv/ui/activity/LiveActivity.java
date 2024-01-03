@@ -727,7 +727,6 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
                 showProgress();
                 break;
             case Player.STATE_READY:
-                checkRotate();
                 setMetadata();
                 resetToggle();
                 hideProgress();
@@ -741,13 +740,6 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
             case Player.STATE_ENDED:
                 nextChannel();
                 break;
-        }
-    }
-
-    private void checkRotate() {
-        if (!isRotate() && mPlayers.isPortrait()) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT);
-            setRotate(true);
         }
     }
 
