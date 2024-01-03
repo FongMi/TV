@@ -39,7 +39,7 @@ public class LiveParser {
     public static void text(Live live, String text) {
         int number = 0;
         if (live.getGroups().size() > 0) return;
-        if (text.split("#EXTM3U").length > 1) m3u(live, text);
+        if (text.contains("#EXTM3U")) m3u(live, text);
         else txt(live, text);
         for (Group group : live.getGroups()) {
             for (Channel channel : group.getChannel()) {
