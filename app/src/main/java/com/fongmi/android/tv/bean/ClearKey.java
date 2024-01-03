@@ -32,9 +32,9 @@ public class ClearKey {
 
     private void addKeys(String line) {
         for (String s : line.split(",")) {
-            String[] split = s.split(":");
-            String kid = Util.base64(Util.hex2byte(split[0].trim())).replace("=", "");
-            String k = Util.base64(Util.hex2byte(split[1].trim())).replace("=", "");
+            String[] array = s.split(":");
+            String kid = Util.base64(Util.hex2byte(array[0].trim())).replace("=", "");
+            String k = Util.base64(Util.hex2byte(array[1].trim())).replace("=", "");
             keys.add(new Keys(kid, k));
         }
     }
