@@ -245,9 +245,8 @@ public class LiveParser {
 
         private void header(String line) {
             try {
-                if (header == null) header = new HashMap<>();
-                if (line.contains("#EXTHTTP:")) header.putAll(Json.toMap(JsonParser.parseString(line.split("#EXTHTTP:")[1].trim())));
-                if (line.contains("header=")) header.putAll(Json.toMap(JsonParser.parseString(line.split("header=")[1].trim())));
+                if (line.contains("#EXTHTTP:")) header = Json.toMap(JsonParser.parseString(line.split("#EXTHTTP:")[1].trim()));
+                if (line.contains("header=")) header = Json.toMap(JsonParser.parseString(line.split("header=")[1].trim()));
             } catch (Exception e) {
                 header = null;
             }
@@ -256,15 +255,14 @@ public class LiveParser {
         private void headers(String line) {
             try {
                 if (header == null) header = new HashMap<>();
-                extract(line.split("headers=")[1].trim());
-            } catch (Exception e) {
-                header = null;
+                headers(line.split("headers=")[1].trim().split("&"));
+            } catch (Exception ignored) {
             }
         }
 
-        private void extract(String line) {
-            for (String s : line.split("&")) {
-                String[] a = s.split("=");
+        private void headers(String[] params) {
+            for (String param : params) {
+                String[] a = param.split("=");
                 header.put(a[0].trim(), a[1].trim());
             }
         }
