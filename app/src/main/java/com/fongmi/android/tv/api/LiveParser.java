@@ -248,8 +248,8 @@ public class LiveParser {
                 ClearKey.objectFrom(key);
             } catch (Exception e) {
                 String[] split = key.replace("\"", "").replace("{", "").replace("}", "").split(":");
-                String kid = Util.base64(Util.hex2byte(split[0])).replace("=", "");
-                String k = Util.base64(Util.hex2byte(split[1])).replace("=", "");
+                String kid = Util.base64(Util.hex2byte(split[0].trim())).replace("=", "");
+                String k = Util.base64(Util.hex2byte(split[1].trim())).replace("=", "");
                 key = ClearKey.get(kid, k).toString();
             }
         }

@@ -17,7 +17,7 @@ public class ClearKey {
 
     public static ClearKey objectFrom(String str) throws Exception {
         ClearKey item = App.gson().fromJson(str, ClearKey.class);
-        if (item == null || item.keys == null) throw new Exception();
+        if (item.keys == null) throw new Exception();
         return item;
     }
 
