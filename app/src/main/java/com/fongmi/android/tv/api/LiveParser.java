@@ -12,7 +12,6 @@ import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Path;
-import com.github.catvod.utils.Util;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -247,10 +246,7 @@ public class LiveParser {
             try {
                 ClearKey.objectFrom(key);
             } catch (Exception e) {
-                String[] split = key.replace("\"", "").replace("{", "").replace("}", "").split(":");
-                String kid = Util.base64(Util.hex2byte(split[0].trim())).replace("=", "");
-                String k = Util.base64(Util.hex2byte(split[1].trim())).replace("=", "");
-                key = ClearKey.get(kid, k).toString();
+                key = ClearKey.get(key.replace("\"", "").replace("{", "").replace("}", "")).toString();
             }
         }
 

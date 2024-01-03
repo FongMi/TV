@@ -3,9 +3,10 @@ package com.fongmi.android.tv.bean;
 import androidx.annotation.NonNull;
 
 import com.fongmi.android.tv.App;
+import com.github.catvod.utils.Util;
 import com.google.gson.annotations.SerializedName;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ClearKey {
@@ -21,11 +22,21 @@ public class ClearKey {
         return item;
     }
 
-    public static ClearKey get(String kid, String k) {
-        ClearKey key = new ClearKey();
-        key.keys = Arrays.asList(new Keys(kid, k));
-        key.type = "temporary";
-        return key;
+    public static ClearKey get(String line) {
+        ClearKey item = new ClearKey();
+        item.keys = new ArrayList<>();
+        item.type = "temporary";
+        item.addKeys(line);
+        return item;
+    }
+
+    private void addKeys(String line) {
+        for (String s : line.split(",")) {
+            String[] split = s.split(":");
+            String kid = Util.base64(Util.hex2byte(split[0].trim())).replace("=", "");
+            String k = Util.base64(Util.hex2byte(split[1].trim())).replace("=", "");
+            keys.add(new Keys(kid, k));
+        }
     }
 
     public static class Keys {
