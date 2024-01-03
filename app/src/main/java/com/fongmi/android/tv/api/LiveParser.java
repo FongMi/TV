@@ -4,6 +4,7 @@ import android.util.Base64;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Channel;
+import com.fongmi.android.tv.bean.ClearKey;
 import com.fongmi.android.tv.bean.Drm;
 import com.fongmi.android.tv.bean.Group;
 import com.fongmi.android.tv.bean.Live;
@@ -121,6 +122,7 @@ public class LiveParser {
         private String key;
         private String type;
         private String click;
+        private String origin;
         private String referer;
         private Integer parse;
         private Integer player;
@@ -130,7 +132,7 @@ public class LiveParser {
         }
 
         public boolean find(String line) {
-            return line.startsWith("ua") || line.startsWith("parse") || line.startsWith("click") || line.startsWith("player") || line.startsWith("referer") || line.startsWith("#EXTVLCOPT:") || line.startsWith("#KODIPROP:");
+            return line.startsWith("ua") || line.startsWith("parse") || line.startsWith("click") || line.startsWith("player") || line.startsWith("origin") || line.startsWith("referer") || line.startsWith("#EXTVLCOPT:") || line.startsWith("#KODIPROP:");
         }
 
         public void check(String line) {
@@ -139,20 +141,25 @@ public class LiveParser {
             else if (line.startsWith("parse")) parse(line);
             else if (line.startsWith("click")) click(line);
             else if (line.startsWith("player")) player(line);
+            else if (line.startsWith("origin")) origin(line);
+            else if (line.startsWith("Origin")) origin(line);
             else if (line.startsWith("user-agent")) ua(line);
             else if (line.startsWith("User-Agent")) ua(line);
             else if (line.startsWith("referer")) referer(line);
             else if (line.startsWith("Referer")) referer(line);
+            else if (line.startsWith("#EXTVLCOPT:http-origin")) origin(line);
             else if (line.startsWith("#EXTVLCOPT:http-user-agent")) ua(line);
-            else if (line.startsWith("#EXTVLCOPT:http-referer")) referer(line);
+            else if (line.startsWith("#EXTVLCOPT:http-referrer")) referer(line);
             else if (line.startsWith("#KODIPROP:inputstream.adaptive.license_key")) key(line);
             else if (line.startsWith("#KODIPROP:inputstream.adaptive.license_type")) type(line);
+            else if (line.startsWith("#KODIPROP:inputstream.adaptive.stream_headers")) headers(line);
         }
 
         public Setting copy(Channel channel) {
             if (ua != null) channel.setUa(ua);
             if (parse != null) channel.setParse(parse);
             if (click != null) channel.setClick(click);
+            if (origin != null) channel.setOrigin(origin);
             if (referer != null) channel.setReferer(referer);
             if (player != null) channel.setPlayerType(player);
             if (key != null && type != null) channel.setDrm(Drm.create(key, type));
@@ -161,7 +168,8 @@ public class LiveParser {
 
         private void ua(String line) {
             try {
-                ua = line.split("ua=")[1].trim().replace("\"", "");
+                if (line.contains("ua=")) ua = line.split("ua=")[1].trim().replace("\"", "");
+                if (line.contains("user-agent=")) ua = line.split("(?i)user-agent=")[1].trim().replace("\"", "");
             } catch (Exception e) {
                 ua = null;
             }
@@ -169,7 +177,7 @@ public class LiveParser {
 
         private void referer(String line) {
             try {
-                referer = line.split("referer=")[1].trim().replace("\"", "");
+                referer = line.split("(?i)referer=")[1].trim().replace("\"", "");
             } catch (Exception e) {
                 referer = null;
             }
@@ -199,10 +207,18 @@ public class LiveParser {
             }
         }
 
+        private void origin(String line) {
+            try {
+                origin = line.split("(?i)origin=")[1].trim();
+            } catch (Exception e) {
+                origin = null;
+            }
+        }
+
         private void key(String line) {
             try {
                 key = line.split("license_key=")[1].trim();
-                if (!key.startsWith("http") && !key.startsWith("{") && key.contains(":")) convert();
+                if (!key.startsWith("http")) convert();
             } catch (Exception e) {
                 key = null;
             } finally {
@@ -220,11 +236,22 @@ public class LiveParser {
             }
         }
 
+        private void headers(String line) {
+            try {
+                check(line.split("headers=")[1].trim());
+            } catch (Exception ignored) {
+            }
+        }
+
         private void convert() {
-            String[] split = key.split(":");
-            String k = Util.base64(Util.hex2byte(split[1])).replace("=", "");
-            String kid = Util.base64(Util.hex2byte(split[0])).replace("=", "");
-            key = String.format("{ \"keys\":[ { \"kty\":\"oct\", \"k\":\"%s\", \"kid\":\"%s\" } ], \"type\":\"temporary\" }", k, kid);
+            try {
+                ClearKey.objectFrom(key);
+            } catch (Exception e) {
+                String[] split = key.replace("\"", "").replace("{", "").replace("}", "").split(":");
+                String kid = Util.base64(Util.hex2byte(split[0])).replace("=", "");
+                String k = Util.base64(Util.hex2byte(split[1])).replace("=", "");
+                key = ClearKey.get(kid, k).toString();
+            }
         }
 
         private void clear() {
@@ -234,6 +261,7 @@ public class LiveParser {
             parse = null;
             click = null;
             player = null;
+            origin = null;
             referer = null;
         }
     }
