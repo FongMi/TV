@@ -11,10 +11,12 @@ import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.Json;
 import com.github.catvod.utils.Path;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -127,14 +129,14 @@ public class LiveParser {
         private String referer;
         private Integer parse;
         private Integer player;
-        private JsonElement header;
+        private Map<String, String> header;
 
         public static Setting create() {
             return new Setting();
         }
 
         public boolean find(String line) {
-            return line.startsWith("ua") || line.startsWith("parse") || line.startsWith("click") || line.startsWith("player") || line.startsWith("header") || line.startsWith("origin") || line.startsWith("referer") || line.startsWith("#EXTVLCOPT:") || line.startsWith("#KODIPROP:") || line.startsWith("#EXTHTTP:");
+            return line.startsWith("ua") || line.startsWith("parse") || line.startsWith("click") || line.startsWith("player") || line.startsWith("header") || line.startsWith("origin") || line.startsWith("referer") || line.startsWith("#EXTHTTP:") || line.startsWith("#EXTVLCOPT:") || line.startsWith("#KODIPROP:");
         }
 
         public void check(String line) {
@@ -163,10 +165,10 @@ public class LiveParser {
             if (ua != null) channel.setUa(ua);
             if (parse != null) channel.setParse(parse);
             if (click != null) channel.setClick(click);
-            if (header != null) channel.setHeader(header);
             if (origin != null) channel.setOrigin(origin);
             if (referer != null) channel.setReferer(referer);
             if (player != null) channel.setPlayerType(player);
+            if (header != null) channel.setHeader(Json.toObject(header));
             if (key != null && type != null) channel.setDrm(Drm.create(key, type));
             return this;
         }
@@ -243,8 +245,9 @@ public class LiveParser {
 
         private void header(String line) {
             try {
-                if (line.contains("#EXTHTTP:")) header = JsonParser.parseString(line.split("#EXTHTTP:")[1].trim());
-                if (line.contains("header=")) header = JsonParser.parseString(line.split("header=")[1].trim());
+                if (header == null) header = new HashMap<>();
+                if (line.contains("#EXTHTTP:")) header.putAll(Json.toMap(JsonParser.parseString(line.split("#EXTHTTP:")[1].trim())));
+                if (line.contains("header=")) header.putAll(Json.toMap(JsonParser.parseString(line.split("header=")[1].trim())));
             } catch (Exception ignored) {
                 header = null;
             }
@@ -252,8 +255,10 @@ public class LiveParser {
 
         private void headers(String line) {
             try {
-                check(line.split("headers=")[1].trim());
+                if (header == null) header = new HashMap<>();
+                extract(line.split("headers=")[1].trim());
             } catch (Exception ignored) {
+                header = null;
             }
         }
 
@@ -262,6 +267,13 @@ public class LiveParser {
                 ClearKey.objectFrom(key);
             } catch (Exception e) {
                 key = ClearKey.get(key.replace("\"", "").replace("{", "").replace("}", "")).toString();
+            }
+        }
+
+        private void extract(String line) {
+            for (String s : line.split("&")) {
+                String[] a = s.split("=");
+                header.put(a[0].trim(), a[1].trim());
             }
         }
 
