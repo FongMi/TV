@@ -175,8 +175,8 @@ public class LiveParser {
 
         private void ua(String line) {
             try {
-                if (line.contains("ua=")) ua = line.split("ua=")[1].trim().replace("\"", "");
                 if (line.contains("user-agent=")) ua = line.split("(?i)user-agent=")[1].trim().replace("\"", "");
+                if (line.contains("ua=")) ua = line.split("ua=")[1].trim().replace("\"", "");
             } catch (Exception e) {
                 ua = null;
             }
