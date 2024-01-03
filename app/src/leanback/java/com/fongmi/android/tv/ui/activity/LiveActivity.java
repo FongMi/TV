@@ -125,7 +125,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private int getTimeout() {
-        return getHome() != null ? getHome().getTimeout() : Constant.TIMEOUT_PLAY;
+        return getHome().isEmpty() ? Constant.TIMEOUT_PLAY : getHome().getTimeout();
     }
 
     @Override

@@ -187,6 +187,10 @@ public class Live {
         this.width = width;
     }
 
+    public boolean isEmpty() {
+        return getName().isEmpty();
+    }
+
     public Live check() {
         boolean proxy = getChannels().size() > 0 && getChannels().get(0).getUrls().size() > 0 && getChannels().get(0).getUrls().get(0).startsWith("proxy");
         if (proxy) setProxy();
