@@ -272,6 +272,7 @@ public class LiveParser {
             parse = null;
             click = null;
             player = null;
+            header = null;
             origin = null;
             referer = null;
         }
