@@ -4,8 +4,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
 
+import com.fongmi.android.tv.App;
 import com.github.catvod.utils.Trans;
-import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
 import org.simpleframework.xml.Attribute;
@@ -50,7 +50,7 @@ public class Class implements Parcelable {
     }
 
     public static Class objectFrom(String json) {
-        return new Gson().fromJson(json, Class.class);
+        return App.gson().fromJson(json, Class.class);
     }
 
     public String getTypeId() {

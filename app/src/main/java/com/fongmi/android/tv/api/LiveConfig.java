@@ -59,7 +59,7 @@ public class LiveConfig {
     }
 
     public static boolean isEmpty() {
-        return get().getHome() == null;
+        return get().getHome().isEmpty();
     }
 
     public static boolean hasUrl() {
@@ -141,8 +141,8 @@ public class LiveConfig {
     }
 
     private void parseConfig(JsonObject object, Callback callback) {
-        if (!object.has("lives")) return;
-        for (JsonElement element : Json.safeListElement(object, "lives")) add(Live.objectFrom(element).check());
+        List<JsonElement> lives = Json.safeListElement(object, "lives");
+        if (lives.size() > 0) for (JsonElement element : lives) add(Live.objectFrom(element).check());
         for (Live live : getLives()) if (live.getName().equals(config.getHome())) setHome(live, true);
         if (home == null) setHome(getLives().isEmpty() ? new Live() : getLives().get(0), true);
         if (callback != null) App.post(callback::success);
@@ -176,7 +176,7 @@ public class LiveConfig {
 
     private int[] getKeep(List<Group> items) {
         String[] splits = Setting.getKeep().split(AppDatabase.SYMBOL);
-        if (!home.getName().equals(splits[0])) return new int[]{1, 0};
+        if (splits.length < 4 || !home.getName().equals(splits[0])) return new int[]{1, 0};
         for (int i = 0; i < items.size(); i++) {
             Group group = items.get(i);
             if (group.getName().equals(splits[1])) {
@@ -219,7 +219,7 @@ public class LiveConfig {
     }
 
     public Live getHome() {
-        return home;
+        return home == null ? new Live() : home;
     }
 
     public void setHome(Live home) {

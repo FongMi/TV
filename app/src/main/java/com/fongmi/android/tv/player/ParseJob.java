@@ -55,7 +55,7 @@ public class ParseJob implements ParseCallback {
         if (useParse) parse = ApiConfig.get().getParse();
         if (result.getPlayUrl().startsWith("json:")) parse = Parse.get(1, result.getPlayUrl().substring(5));
         if (result.getPlayUrl().startsWith("parse:")) parse = ApiConfig.get().getParse(result.getPlayUrl().substring(6));
-        if (parse == null) parse = Parse.get(0, result.getPlayUrl());
+        if (parse == null || parse.isEmpty()) parse = Parse.get(0, result.getPlayUrl());
         parse.setHeader(result.getHeader());
         parse.setClick(getClick(result));
     }
@@ -99,7 +99,7 @@ public class ParseJob implements ParseCallback {
             case 3: //Json聚合
                 jsonMix(webUrl, flag);
                 break;
-            case 4: //上帝模式
+            case 4: //超級解析
                 godParse(webUrl, flag);
                 break;
         }
