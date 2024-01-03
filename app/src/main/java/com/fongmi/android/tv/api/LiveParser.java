@@ -12,6 +12,8 @@ import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Path;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -125,13 +127,14 @@ public class LiveParser {
         private String referer;
         private Integer parse;
         private Integer player;
+        private JsonElement header;
 
         public static Setting create() {
             return new Setting();
         }
 
         public boolean find(String line) {
-            return line.startsWith("ua") || line.startsWith("parse") || line.startsWith("click") || line.startsWith("player") || line.startsWith("origin") || line.startsWith("referer") || line.startsWith("#EXTVLCOPT:") || line.startsWith("#KODIPROP:");
+            return line.startsWith("ua") || line.startsWith("parse") || line.startsWith("click") || line.startsWith("player") || line.startsWith("header") || line.startsWith("origin") || line.startsWith("referer") || line.startsWith("#EXTVLCOPT:") || line.startsWith("#KODIPROP:") || line.startsWith("#EXTHTTP:");
         }
 
         public void check(String line) {
@@ -140,12 +143,14 @@ public class LiveParser {
             else if (line.startsWith("parse")) parse(line);
             else if (line.startsWith("click")) click(line);
             else if (line.startsWith("player")) player(line);
+            else if (line.startsWith("header")) header(line);
             else if (line.startsWith("origin")) origin(line);
             else if (line.startsWith("Origin")) origin(line);
             else if (line.startsWith("user-agent")) ua(line);
             else if (line.startsWith("User-Agent")) ua(line);
             else if (line.startsWith("referer")) referer(line);
             else if (line.startsWith("Referer")) referer(line);
+            else if (line.startsWith("#EXTHTTP:")) header(line);
             else if (line.startsWith("#EXTVLCOPT:http-origin")) origin(line);
             else if (line.startsWith("#EXTVLCOPT:http-user-agent")) ua(line);
             else if (line.startsWith("#EXTVLCOPT:http-referrer")) referer(line);
@@ -158,6 +163,7 @@ public class LiveParser {
             if (ua != null) channel.setUa(ua);
             if (parse != null) channel.setParse(parse);
             if (click != null) channel.setClick(click);
+            if (header != null) channel.setHeader(header);
             if (origin != null) channel.setOrigin(origin);
             if (referer != null) channel.setReferer(referer);
             if (player != null) channel.setPlayerType(player);
@@ -232,6 +238,15 @@ public class LiveParser {
                 type = null;
             } finally {
                 player = Players.EXO;
+            }
+        }
+
+        private void header(String line) {
+            try {
+                if (line.contains("#EXTHTTP:")) header = JsonParser.parseString(line.split("#EXTHTTP:")[1].trim());
+                if (line.contains("header=")) header = JsonParser.parseString(line.split("header=")[1].trim());
+            } catch (Exception ignored) {
+                header = null;
             }
         }
 
