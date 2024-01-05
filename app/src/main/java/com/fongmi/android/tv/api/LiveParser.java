@@ -2,7 +2,6 @@ package com.fongmi.android.tv.api;
 
 import android.util.Base64;
 
-import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.ClearKey;
 import com.fongmi.android.tv.bean.Drm;
@@ -84,13 +83,13 @@ public class LiveParser {
     private static void txt(Live live, String text) {
         Setting setting = Setting.create();
         for (String line : text.split("\n")) {
-            setting.check(line);
-            String[] split = line.split(",");
-            if (split.length < 2) continue;
             if (Thread.interrupted()) break;
+            String[] split = line.split(",");
+            if (setting.find(line)) setting.check(line);
+            if (line.contains("#genre#")) setting.clear();
             if (line.contains("#genre#")) live.getGroups().add(Group.create(split[0], live.isPass()));
-            if (live.getGroups().isEmpty()) live.getGroups().add(Group.create(R.string.live_group));
-            if (split[1].contains("://")) {
+            if (split.length > 1 && live.getGroups().isEmpty()) live.getGroups().add(Group.create());
+            if (split.length > 1 && split[1].contains("://")) {
                 Group group = live.getGroups().get(live.getGroups().size() - 1);
                 Channel channel = group.find(Channel.create(split[0]));
                 channel.addUrls(split[1].split("#"));
@@ -140,8 +139,7 @@ public class LiveParser {
         }
 
         public void check(String line) {
-            if (line.contains("#genre#")) clear();
-            else if (line.startsWith("ua")) ua(line);
+            if (line.startsWith("ua")) ua(line);
             else if (line.startsWith("parse")) parse(line);
             else if (line.startsWith("click")) click(line);
             else if (line.startsWith("player")) player(line);

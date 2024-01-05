@@ -33,6 +33,10 @@ public class Group {
         return items == null ? Collections.emptyList() : items;
     }
 
+    public static Group create() {
+        return create("");
+    }
+
     public static Group create(@StringRes int resId) {
         return new Group(ResUtil.getString(resId));
     }
