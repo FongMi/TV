@@ -31,10 +31,6 @@ public class Drm {
         return TextUtils.isEmpty(key) ? "" : key;
     }
 
-    public void setKey(String key) {
-        this.key = key;
-    }
-
     private String getType() {
         return TextUtils.isEmpty(type) ? "" : type;
     }
