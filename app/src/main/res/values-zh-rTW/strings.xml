@@ -9,7 +9,6 @@
 
     <!-- Live -->
     <string name="live_pass">密碼</string>
-    <string name="live_group">未分類</string>
     <string name="live_line">來源 <xliff:g name="name">%s</xliff:g></string>
 
     <!-- Detail -->
