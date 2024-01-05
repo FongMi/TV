@@ -9,7 +9,6 @@
 
     <!-- Live -->
     <string name="live_pass">Pass</string>
-    <string name="live_group">Group</string>
     <string name="live_line">Line <xliff:g name="name">%s</xliff:g></string>
 
     <!-- Detail -->
