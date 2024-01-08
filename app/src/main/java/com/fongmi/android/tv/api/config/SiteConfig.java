@@ -34,7 +34,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class VodConfig {
+public class SiteConfig {
 
     private List<Doh> doh;
     private List<Rule> rules;
@@ -52,10 +52,10 @@ public class VodConfig {
     private Site home;
 
     private static class Loader {
-        static volatile VodConfig INSTANCE = new VodConfig();
+        static volatile SiteConfig INSTANCE = new SiteConfig();
     }
 
-    public static VodConfig get() {
+    public static SiteConfig get() {
         return Loader.INSTANCE;
     }
 
@@ -83,7 +83,7 @@ public class VodConfig {
         get().clear().config(config).load(callback);
     }
 
-    public VodConfig init() {
+    public SiteConfig init() {
         this.ads = null;
         this.wall = null;
         this.home = null;
@@ -101,12 +101,12 @@ public class VodConfig {
         return this;
     }
 
-    public VodConfig config(Config config) {
+    public SiteConfig config(Config config) {
         this.config = config;
         return this;
     }
 
-    public VodConfig clear() {
+    public SiteConfig clear() {
         this.ads = null;
         this.wall = null;
         this.home = null;

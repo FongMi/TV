@@ -10,7 +10,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.api.config.VodConfig;
+import com.fongmi.android.tv.api.config.SiteConfig;
 import com.fongmi.android.tv.api.config.LiveConfig;
 import com.fongmi.android.tv.api.config.WallConfig;
 import com.fongmi.android.tv.bean.Config;
@@ -89,7 +89,7 @@ public class ConfigDialog {
     private Config getConfig() {
         switch (type) {
             case 0:
-                return VodConfig.get().getConfig();
+                return SiteConfig.get().getConfig();
             case 1:
                 return LiveConfig.get().getConfig();
             case 2:

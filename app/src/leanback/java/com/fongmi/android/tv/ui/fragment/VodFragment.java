@@ -19,7 +19,7 @@ import androidx.viewbinding.ViewBinding;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.api.config.VodConfig;
+import com.fongmi.android.tv.api.config.SiteConfig;
 import com.fongmi.android.tv.bean.Filter;
 import com.fongmi.android.tv.bean.Page;
 import com.fongmi.android.tv.bean.Result;
@@ -93,7 +93,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     }
 
     private Site getSite() {
-        return VodConfig.get().getSite(getKey());
+        return SiteConfig.get().getSite(getKey());
     }
 
     private Page getLastPage() {

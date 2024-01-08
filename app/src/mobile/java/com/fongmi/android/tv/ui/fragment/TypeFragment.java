@@ -13,7 +13,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.Product;
-import com.fongmi.android.tv.api.config.VodConfig;
+import com.fongmi.android.tv.api.config.SiteConfig;
 import com.fongmi.android.tv.bean.Page;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
@@ -82,7 +82,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     }
 
     private Site getSite() {
-        return VodConfig.get().getSite(getKey());
+        return SiteConfig.get().getSite(getKey());
     }
 
     private VodFragment getParent() {

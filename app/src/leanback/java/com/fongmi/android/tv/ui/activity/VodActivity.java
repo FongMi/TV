@@ -19,7 +19,7 @@ import androidx.viewbinding.ViewBinding;
 import androidx.viewpager.widget.ViewPager;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.api.config.VodConfig;
+import com.fongmi.android.tv.api.config.SiteConfig;
 import com.fongmi.android.tv.bean.Class;
 import com.fongmi.android.tv.bean.Filter;
 import com.fongmi.android.tv.bean.Result;
@@ -46,7 +46,7 @@ public class VodActivity extends BaseActivity implements TypePresenter.OnClickLi
     private View mOldView;
 
     public static void start(Activity activity, Result result) {
-        start(activity, VodConfig.get().getHome().getKey(), result);
+        start(activity, SiteConfig.get().getHome().getKey(), result);
     }
 
     public static void start(Activity activity, String key, Result result) {
@@ -71,7 +71,7 @@ public class VodActivity extends BaseActivity implements TypePresenter.OnClickLi
     }
 
     private Site getSite() {
-        return VodConfig.get().getSite(getKey());
+        return SiteConfig.get().getSite(getKey());
     }
 
     @Override

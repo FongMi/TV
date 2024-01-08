@@ -2,7 +2,7 @@ package com.fongmi.android.tv.server;
 
 import android.util.Base64;
 
-import com.fongmi.android.tv.api.config.VodConfig;
+import com.fongmi.android.tv.api.config.SiteConfig;
 import com.fongmi.android.tv.api.config.LiveConfig;
 import com.fongmi.android.tv.bean.Device;
 import com.fongmi.android.tv.server.process.Action;
@@ -110,7 +110,7 @@ public class Nano extends NanoHTTPD {
         try {
             Map<String, String> params = session.getParms();
             params.putAll(session.getHeaders());
-            Object[] rs = VodConfig.get().proxyLocal(params);
+            Object[] rs = SiteConfig.get().proxyLocal(params);
             return rs[0] instanceof Response ? (Response) rs[0] : newChunkedResponse(Response.Status.lookup((Integer) rs[0]), (String) rs[1], (InputStream) rs[2]);
         } catch (Exception e) {
             return error(e.getMessage());
