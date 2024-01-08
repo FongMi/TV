@@ -3,7 +3,6 @@ package com.fongmi.android.tv.bean;
 import android.text.TextUtils;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.utils.UrlUtil;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 
@@ -25,7 +24,7 @@ public class Depot {
     }
 
     public String getUrl() {
-        return TextUtils.isEmpty(url) ? "" : UrlUtil.fixUrl(url);
+        return TextUtils.isEmpty(url) ? "" : url;
     }
 
     public String getName() {

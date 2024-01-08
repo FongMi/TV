@@ -44,12 +44,6 @@ public class UrlUtil {
         return url;
     }
 
-    public static String fixUrl(String url) {
-        if (url.contains("/localhost/")) url = url.replace("/localhost/", "/");
-        if (url.startsWith("clan")) url = url.replace("clan", "file");
-        return url;
-    }
-
     public static String fixHeader(String key) {
         if (key.equalsIgnoreCase(HttpHeaders.USER_AGENT)) return HttpHeaders.USER_AGENT;
         if (key.equalsIgnoreCase(HttpHeaders.REFERER)) return HttpHeaders.REFERER;

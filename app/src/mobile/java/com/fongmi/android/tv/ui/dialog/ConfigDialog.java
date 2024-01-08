@@ -18,7 +18,6 @@ import com.fongmi.android.tv.databinding.DialogConfigBinding;
 import com.fongmi.android.tv.impl.ConfigCallback;
 import com.fongmi.android.tv.ui.custom.CustomTextListener;
 import com.fongmi.android.tv.utils.FileChooser;
-import com.fongmi.android.tv.utils.UrlUtil;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class ConfigDialog {
@@ -122,8 +121,8 @@ public class ConfigDialog {
     }
 
     private void onPositive(DialogInterface dialog, int which) {
+        String url = binding.url.getText().toString().trim();
         String name = binding.name.getText().toString().trim();
-        String url = UrlUtil.fixUrl(binding.url.getText().toString().trim());
         if (edit) Config.find(ori, type).url(url).name(name).update();
         if (url.isEmpty()) Config.delete(ori, type);
         callback.setConfig(Config.find(url, type));

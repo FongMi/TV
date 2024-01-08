@@ -92,7 +92,7 @@ public class JarLoader {
             load(key, download(jar));
         } else if (jar.startsWith("file")) {
             load(key, Path.local(jar));
-        } else if (!jar.isEmpty()) {
+        } else if (jar.startsWith("assets")) {
             parseJar(key, UrlUtil.convert(jar));
         }
     }
