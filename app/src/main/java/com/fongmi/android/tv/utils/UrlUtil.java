@@ -37,7 +37,6 @@ public class UrlUtil {
     public static String convert(String url) {
         String host = host(url);
         String scheme = scheme(url);
-        if ("clan".equals(scheme)) fixUrl(url);
         if ("file".equals(scheme)) return Server.get().getAddress(url);
         if ("local".equals(scheme)) return Server.get().getAddress(host);
         if ("assets".equals(scheme)) return Server.get().getAddress(url.substring(9));
