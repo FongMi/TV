@@ -2,7 +2,7 @@ package com.fongmi.android.tv.player;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
-import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.impl.ParseCallback;
@@ -52,9 +52,9 @@ public class ParseJob implements ParseCallback {
     }
 
     private void setParse(Result result, boolean useParse) {
-        if (useParse) parse = ApiConfig.get().getParse();
+        if (useParse) parse = VodConfig.get().getParse();
         if (result.getPlayUrl().startsWith("json:")) parse = Parse.get(1, result.getPlayUrl().substring(5));
-        if (result.getPlayUrl().startsWith("parse:")) parse = ApiConfig.get().getParse(result.getPlayUrl().substring(6));
+        if (result.getPlayUrl().startsWith("parse:")) parse = VodConfig.get().getParse(result.getPlayUrl().substring(6));
         if (parse == null || parse.isEmpty()) parse = Parse.get(0, result.getPlayUrl());
         parse.setHeader(result.getHeader());
         parse.setClick(getClick(result));
@@ -62,7 +62,7 @@ public class ParseJob implements ParseCallback {
 
     private String getClick(Result result) {
         if (result.getClick().length() > 0) return result.getClick();
-        return ApiConfig.get().getSite(result.getKey()).getClick();
+        return VodConfig.get().getSite(result.getKey()).getClick();
     }
 
     private void execute(Result result) {
@@ -116,19 +116,19 @@ public class ParseJob implements ParseCallback {
 
     private void jsonExtend(String webUrl) throws Throwable {
         LinkedHashMap<String, String> jxs = new LinkedHashMap<>();
-        for (Parse item : ApiConfig.get().getParses()) if (item.getType() == 1) jxs.put(item.getName(), item.extUrl());
-        checkResult(Result.fromObject(ApiConfig.get().jsonExt(parse.getUrl(), jxs, webUrl)));
+        for (Parse item : VodConfig.get().getParses()) if (item.getType() == 1) jxs.put(item.getName(), item.extUrl());
+        checkResult(Result.fromObject(VodConfig.get().jsonExt(parse.getUrl(), jxs, webUrl)));
     }
 
     private void jsonMix(String webUrl, String flag) throws Throwable {
         LinkedHashMap<String, HashMap<String, String>> jxs = new LinkedHashMap<>();
-        for (Parse item : ApiConfig.get().getParses()) jxs.put(item.getName(), item.mixMap());
-        checkResult(Result.fromObject(ApiConfig.get().jsonExtMix(flag, parse.getUrl(), parse.getName(), jxs, webUrl)));
+        for (Parse item : VodConfig.get().getParses()) jxs.put(item.getName(), item.mixMap());
+        checkResult(Result.fromObject(VodConfig.get().jsonExtMix(flag, parse.getUrl(), parse.getName(), jxs, webUrl)));
     }
 
     private void godParse(String webUrl, String flag) throws Exception {
-        List<Parse> json = ApiConfig.get().getParses(1, flag);
-        List<Parse> webs = ApiConfig.get().getParses(0, flag);
+        List<Parse> json = VodConfig.get().getParses(1, flag);
+        List<Parse> webs = VodConfig.get().getParses(0, flag);
         CountDownLatch latch = new CountDownLatch(json.size());
         for (Parse item : json) infinite.execute(() -> jsonParse(latch, item, webUrl));
         latch.await();

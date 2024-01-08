@@ -18,7 +18,7 @@ import com.android.cast.dlna.dmc.control.ServiceActionCallback;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Device;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.cast.CastDevice;
@@ -69,7 +69,7 @@ public class CastDialog extends BaseDialog implements DeviceAdapter.OnClickListe
     public CastDialog() {
         client = OkHttp.client(Constant.TIMEOUT_SYNC);
         body = new FormBody.Builder();
-        body.add("url", ApiConfig.getUrl());
+        body.add("url", VodConfig.getUrl());
         body.add("device", Device.get().toString());
     }
 

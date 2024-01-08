@@ -1,4 +1,4 @@
-package com.fongmi.android.tv.api;
+package com.fongmi.android.tv.api.config;
 
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
@@ -58,7 +58,7 @@ public class WallConfig {
     public WallConfig config(Config config) {
         this.config = config;
         if (config.getUrl() == null) return this;
-        this.sync = config.getUrl().equals(ApiConfig.get().getWall());
+        this.sync = config.getUrl().equals(VodConfig.get().getWall());
         return this;
     }
 
@@ -83,12 +83,12 @@ public class WallConfig {
         try {
             File file = write(FileUtil.getWall(0));
             if (file.exists() && file.length() > 0) refresh(0);
-            else config(Config.find(ApiConfig.get().getWall(), 2));
+            else config(Config.find(VodConfig.get().getWall(), 2));
             App.post(callback::success);
             config.update();
         } catch (Throwable e) {
             App.post(() -> callback.error(Notify.getError(R.string.error_config_parse, e)));
-            config(Config.find(ApiConfig.get().getWall(), 2));
+            config(Config.find(VodConfig.get().getWall(), 2));
             e.printStackTrace();
         }
     }

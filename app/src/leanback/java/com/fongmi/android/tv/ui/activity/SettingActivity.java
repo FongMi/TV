@@ -11,9 +11,9 @@ import com.fongmi.android.tv.BuildConfig;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.Updater;
-import com.fongmi.android.tv.api.ApiConfig;
-import com.fongmi.android.tv.api.LiveConfig;
-import com.fongmi.android.tv.api.WallConfig;
+import com.fongmi.android.tv.api.config.LiveConfig;
+import com.fongmi.android.tv.api.config.VodConfig;
+import com.fongmi.android.tv.api.config.WallConfig;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.bean.Site;
@@ -61,12 +61,12 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
     }
 
     private int getDohIndex() {
-        return Math.max(0, ApiConfig.get().getDoh().indexOf(Doh.objectFrom(Setting.getDoh())));
+        return Math.max(0, VodConfig.get().getDoh().indexOf(Doh.objectFrom(Setting.getDoh())));
     }
 
     private String[] getDohList() {
         List<String> list = new ArrayList<>();
-        for (Doh item : ApiConfig.get().getDoh()) list.add(item.getName());
+        for (Doh item : VodConfig.get().getDoh()) list.add(item.getName());
         return list.toArray(new String[0]);
     }
 
@@ -78,7 +78,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
     @Override
     protected void initView() {
         mBinding.vod.requestFocus();
-        mBinding.vodUrl.setText(ApiConfig.getDesc());
+        mBinding.vodUrl.setText(VodConfig.getDesc());
         mBinding.liveUrl.setText(LiveConfig.getDesc());
         mBinding.wallUrl.setText(WallConfig.getDesc());
         mBinding.backupText.setText(AppDatabase.getDate());
@@ -146,7 +146,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         switch (config.getType()) {
             case 0:
                 Notify.progress(this);
-                ApiConfig.load(config, getCallback());
+                VodConfig.load(config, getCallback());
                 mBinding.vodUrl.setText(config.getDesc());
                 break;
             case 1:
@@ -184,7 +184,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
                 Notify.dismiss();
                 RefreshEvent.video();
                 RefreshEvent.history();
-                mBinding.vodUrl.setText(ApiConfig.getDesc());
+                mBinding.vodUrl.setText(VodConfig.getDesc());
                 mBinding.liveUrl.setText(LiveConfig.getDesc());
                 mBinding.wallUrl.setText(WallConfig.getDesc());
                 break;
@@ -203,7 +203,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
 
     @Override
     public void setSite(Site item) {
-        ApiConfig.get().setHome(item);
+        VodConfig.get().setHome(item);
         RefreshEvent.video();
     }
 
@@ -336,7 +336,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         Notify.progress(getActivity());
         Setting.putDoh(doh.toString());
         mBinding.dohText.setText(doh.getName());
-        ApiConfig.load(Config.vod(), getCallback());
+        VodConfig.load(Config.vod(), getCallback());
     }
 
     private void onProxy(View view) {
@@ -349,7 +349,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         Setting.putProxy(proxy);
         OkHttp.get().setProxy(proxy);
         Notify.progress(getActivity());
-        ApiConfig.load(Config.vod(), getCallback());
+        VodConfig.load(Config.vod(), getCallback());
         mBinding.proxyText.setText(UrlUtil.scheme(proxy));
     }
 

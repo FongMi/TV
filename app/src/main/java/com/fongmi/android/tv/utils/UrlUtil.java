@@ -2,8 +2,6 @@ package com.fongmi.android.tv.utils;
 
 import android.net.Uri;
 
-import androidx.media3.common.util.UriUtil;
-
 import com.fongmi.android.tv.server.Server;
 import com.google.common.net.HttpHeaders;
 
@@ -34,12 +32,6 @@ public class UrlUtil {
     public static String path(Uri uri) {
         String path = uri.getPath();
         return path == null ? "" : path.trim();
-    }
-
-    public static String convert(String baseUrl, String path) {
-        if (path.startsWith("clan")) return fixUrl(path);
-        if (path.startsWith("assets")) return convert(path);
-        return path.isEmpty() ? "" : UriUtil.resolve(baseUrl, path);
     }
 
     public static String convert(String url) {

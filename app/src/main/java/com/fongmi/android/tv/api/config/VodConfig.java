@@ -1,9 +1,13 @@
-package com.fongmi.android.tv.api;
+package com.fongmi.android.tv.api.config;
 
 import android.text.TextUtils;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.api.Decoder;
+import com.fongmi.android.tv.api.loader.JarLoader;
+import com.fongmi.android.tv.api.loader.JsLoader;
+import com.fongmi.android.tv.api.loader.PyLoader;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Depot;
 import com.fongmi.android.tv.bean.Parse;
@@ -30,7 +34,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ApiConfig {
+public class VodConfig {
 
     private List<Doh> doh;
     private List<Rule> rules;
@@ -48,10 +52,10 @@ public class ApiConfig {
     private Site home;
 
     private static class Loader {
-        static volatile ApiConfig INSTANCE = new ApiConfig();
+        static volatile VodConfig INSTANCE = new VodConfig();
     }
 
-    public static ApiConfig get() {
+    public static VodConfig get() {
         return Loader.INSTANCE;
     }
 
@@ -79,7 +83,7 @@ public class ApiConfig {
         get().clear().config(config).load(callback);
     }
 
-    public ApiConfig init() {
+    public VodConfig init() {
         this.ads = null;
         this.wall = null;
         this.home = null;
@@ -97,12 +101,12 @@ public class ApiConfig {
         return this;
     }
 
-    public ApiConfig config(Config config) {
+    public VodConfig config(Config config) {
         this.config = config;
         return this;
     }
 
-    public ApiConfig clear() {
+    public VodConfig clear() {
         this.ads = null;
         this.wall = null;
         this.home = null;
@@ -211,20 +215,15 @@ public class ApiConfig {
     }
 
     private String parseApi(String api) {
-        if (TextUtils.isEmpty(api)) return api;
         if (api.startsWith("http")) return api;
-        if (api.startsWith("file")) return UrlUtil.convert(api);
-        if (api.endsWith(".js") || api.endsWith(".py")) return parseApi(UrlUtil.convert(config.getUrl(), api));
+        if (api.startsWith("file") || api.startsWith("assets")) return UrlUtil.convert(api);
         return api;
     }
 
     private String parseExt(String ext) {
-        if (TextUtils.isEmpty(ext)) return ext;
         if (ext.startsWith("http")) return ext;
         if (ext.startsWith("img+")) return Decoder.getExt(ext);
-        if (ext.startsWith("file")) return UrlUtil.convert(ext);
-        if (ext.contains("http") || ext.contains("file")) return ext;
-        if (ext.endsWith(".txt") || ext.endsWith(".json") || ext.endsWith(".js") || ext.endsWith(".py")) return parseExt(UrlUtil.convert(config.getUrl(), ext));
+        if (ext.startsWith("file") || ext.startsWith("assets")) return UrlUtil.convert(ext);
         return ext;
     }
 

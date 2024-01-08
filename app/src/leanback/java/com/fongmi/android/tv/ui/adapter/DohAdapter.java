@@ -6,7 +6,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.databinding.AdapterDohBinding;
 import com.github.catvod.bean.Doh;
 
@@ -19,7 +19,7 @@ public class DohAdapter extends RecyclerView.Adapter<DohAdapter.ViewHolder> {
     private int select;
 
     public DohAdapter(OnClickListener listener) {
-        this.mItems = ApiConfig.get().getDoh();
+        this.mItems = VodConfig.get().getDoh();
         this.mListener = listener;
     }
 

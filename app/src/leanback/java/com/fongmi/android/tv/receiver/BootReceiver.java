@@ -7,7 +7,7 @@ import android.content.Intent;
 import com.android.cast.dlna.dmr.DLNARendererService;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.api.LiveConfig;
+import com.fongmi.android.tv.api.config.LiveConfig;
 
 public class BootReceiver extends BroadcastReceiver {
 
