@@ -17,7 +17,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Setting;
-import com.fongmi.android.tv.api.config.SiteConfig;
+import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Class;
 import com.fongmi.android.tv.bean.Hot;
 import com.fongmi.android.tv.bean.Result;
@@ -76,7 +76,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     }
 
     private Site getSite() {
-        return SiteConfig.get().getHome();
+        return VodConfig.get().getHome();
     }
 
     @Override
@@ -252,7 +252,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
 
     @Override
     public void setSite(Site item) {
-        SiteConfig.get().setHome(item);
+        VodConfig.get().setHome(item);
         homeContent();
     }
 

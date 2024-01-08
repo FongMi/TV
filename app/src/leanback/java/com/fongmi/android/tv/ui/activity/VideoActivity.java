@@ -38,7 +38,7 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
-import com.fongmi.android.tv.api.config.SiteConfig;
+import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Episode;
 import com.fongmi.android.tv.bean.Flag;
 import com.fongmi.android.tv.bean.History;
@@ -176,7 +176,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     public static void start(Activity activity, String id, String name, String pic) {
-        start(activity, SiteConfig.get().getHome().getKey(), id, name, pic);
+        start(activity, VodConfig.get().getHome().getKey(), id, name, pic);
     }
 
     public static void start(Activity activity, String key, String id, String name, String pic) {
@@ -233,11 +233,11 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private String getHistoryKey() {
-        return getKey().concat(AppDatabase.SYMBOL).concat(getId()).concat(AppDatabase.SYMBOL) + SiteConfig.getCid();
+        return getKey().concat(AppDatabase.SYMBOL).concat(getId()).concat(AppDatabase.SYMBOL) + VodConfig.getCid();
     }
 
     private Site getSite() {
-        return SiteConfig.get().getSite(getKey());
+        return VodConfig.get().getSite(getKey());
     }
 
     private Flag getFlag() {
@@ -385,7 +385,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mBinding.control.parse.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.control.parse.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         mBinding.control.parse.setAdapter(new ItemBridgeAdapter(mParseAdapter = new ArrayObjectAdapter(new ParsePresenter(this::setParseActivated))));
-        mParseAdapter.setItems(SiteConfig.get().getParses(), null);
+        mParseAdapter.setItems(VodConfig.get().getParses(), null);
     }
 
     private void setVideoView() {
@@ -475,7 +475,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     private void setPlayer(Result result) {
         result.getUrl().set(mQualityAdapter.getPosition());
-        setUseParse(SiteConfig.hasParse() && ((result.getPlayUrl().isEmpty() && SiteConfig.get().getFlags().contains(result.getFlag())) || result.getJx() == 1));
+        setUseParse(VodConfig.hasParse() && ((result.getPlayUrl().isEmpty() && VodConfig.get().getFlags().contains(result.getFlag())) || result.getJx() == 1));
         mPlayers.start(result, isUseParse(), getSite().isChangeable() ? getSite().getTimeout() : -1);
         mBinding.control.parse.setVisibility(isUseParse() ? View.VISIBLE : View.GONE);
         setQualityVisible(result.getUrl().isMulti());
@@ -642,7 +642,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void setParseActivated(Parse item) {
-        SiteConfig.get().setParse(item);
+        VodConfig.get().setParse(item);
         notifyItemChanged(mBinding.control.parse, mParseAdapter);
         onRefresh();
     }
@@ -1065,7 +1065,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private History createHistory(Vod item) {
         History history = new History();
         history.setKey(getHistoryKey());
-        history.setCid(SiteConfig.getCid());
+        history.setCid(VodConfig.getCid());
         history.setVodPic(item.getVodPic());
         history.setVodName(item.getVodName());
         history.findEpisode(item.getVodFlags());
@@ -1089,7 +1089,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private void createKeep() {
         Keep keep = new Keep();
         keep.setKey(getHistoryKey());
-        keep.setCid(SiteConfig.getCid());
+        keep.setCid(VodConfig.getCid());
         keep.setSiteName(getSite().getName());
         keep.setVodPic(mBinding.video.getTag().toString());
         keep.setVodName(mBinding.name.getText().toString());
@@ -1251,7 +1251,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     private void initParse() {
         if (mParseAdapter.size() == 0) return;
-        SiteConfig.get().setParse((Parse) mParseAdapter.get(0));
+        VodConfig.get().setParse((Parse) mParseAdapter.get(0));
         notifyItemChanged(mBinding.control.parse, mParseAdapter);
     }
 
@@ -1283,7 +1283,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mQuickAdapter.clear();
         List<Site> sites = new ArrayList<>();
         mExecutor = Executors.newFixedThreadPool(Constant.THREAD_POOL);
-        for (Site site : SiteConfig.get().getSites()) if (isPass(site)) sites.add(site);
+        for (Site site : VodConfig.get().getSites()) if (isPass(site)) sites.add(site);
         for (Site site : sites) mExecutor.execute(() -> search(site, keyword));
     }
 

@@ -21,7 +21,7 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Updater;
-import com.fongmi.android.tv.api.config.SiteConfig;
+import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.api.config.LiveConfig;
 import com.fongmi.android.tv.api.config.WallConfig;
 import com.fongmi.android.tv.bean.Config;
@@ -77,7 +77,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     private Clock mClock;
 
     private Site getHome() {
-        return SiteConfig.get().getHome();
+        return VodConfig.get().getHome();
     }
 
     @Override
@@ -159,7 +159,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         if (isLoading()) return;
         WallConfig.get().init();
         LiveConfig.get().init().load();
-        SiteConfig.get().init().load(getCallback());
+        VodConfig.get().init().load(getCallback());
         setLoading(true);
     }
 
@@ -262,7 +262,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     private void clearHistory() {
         mAdapter.removeItems(getHistoryIndex(), 1);
-        History.delete(SiteConfig.getCid());
+        History.delete(VodConfig.getCid());
         mPresenter.setDelete(false);
         mHistoryAdapter.clear();
     }
@@ -358,7 +358,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     public void setSite(Site item) {
-        SiteConfig.get().setHome(item);
+        VodConfig.get().setHome(item);
         getVideo();
     }
 
@@ -401,10 +401,10 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onCastEvent(CastEvent event) {
-        if (SiteConfig.get().getConfig().equals(event.getConfig())) {
-            VideoActivity.cast(this, event.getHistory().update(SiteConfig.getCid()));
+        if (VodConfig.get().getConfig().equals(event.getConfig())) {
+            VideoActivity.cast(this, event.getHistory().update(VodConfig.getCid()));
         } else {
-            SiteConfig.load(event.getConfig(), getCallback(event));
+            VodConfig.load(event.getConfig(), getCallback(event));
         }
     }
 
@@ -467,7 +467,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         super.onDestroy();
         WallConfig.get().clear();
         LiveConfig.get().clear();
-        SiteConfig.get().clear();
+        VodConfig.get().clear();
         AppDatabase.backup();
         Server.get().stop();
         Source.get().exit();
