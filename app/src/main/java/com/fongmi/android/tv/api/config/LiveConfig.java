@@ -1,10 +1,12 @@
-package com.fongmi.android.tv.api;
+package com.fongmi.android.tv.api.config;
 
 import android.text.TextUtils;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
+import com.fongmi.android.tv.api.Decoder;
+import com.fongmi.android.tv.api.LiveParser;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Depot;
@@ -78,7 +80,7 @@ public class LiveConfig {
     public LiveConfig config(Config config) {
         this.config = config;
         if (config.getUrl() == null) return this;
-        this.sync = config.getUrl().equals(ApiConfig.getUrl());
+        this.sync = config.getUrl().equals(VodConfig.getUrl());
         return this;
     }
 

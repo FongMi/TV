@@ -3,7 +3,7 @@ package com.fongmi.android.tv.utils;
 import android.net.Uri;
 import android.text.TextUtils;
 
-import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Rule;
 import com.github.catvod.utils.Json;
 import com.github.catvod.utils.Util;
@@ -60,14 +60,14 @@ public class Sniffer {
     public static List<String> getRegex(Uri uri) {
         if (uri.getHost() == null) return Collections.emptyList();
         String hosts = TextUtils.join(",", Arrays.asList(UrlUtil.host(uri), UrlUtil.host(uri.getQueryParameter("url"))));
-        for (Rule rule : ApiConfig.get().getRules()) for (String host : rule.getHosts()) if (Util.containOrMatch(hosts, host)) return rule.getRegex();
+        for (Rule rule : VodConfig.get().getRules()) for (String host : rule.getHosts()) if (Util.containOrMatch(hosts, host)) return rule.getRegex();
         return Collections.emptyList();
     }
 
     public static List<String> getScript(Uri uri) {
         if (uri.getHost() == null) return Collections.emptyList();
         String hosts = TextUtils.join(",", Arrays.asList(UrlUtil.host(uri), UrlUtil.host(uri.getQueryParameter("url"))));
-        for (Rule rule : ApiConfig.get().getRules()) for (String host : rule.getHosts()) if (Util.containOrMatch(hosts, host)) return rule.getScript();
+        for (Rule rule : VodConfig.get().getRules()) for (String host : rule.getHosts()) if (Util.containOrMatch(hosts, host)) return rule.getScript();
         return Collections.emptyList();
     }
 }

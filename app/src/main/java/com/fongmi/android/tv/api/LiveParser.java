@@ -2,6 +2,7 @@ package com.fongmi.android.tv.api;
 
 import android.util.Base64;
 
+import com.fongmi.android.tv.api.config.LiveConfig;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.ClearKey;
 import com.fongmi.android.tv.bean.Drm;
@@ -14,6 +15,7 @@ import com.github.catvod.utils.Json;
 import com.github.catvod.utils.Path;
 import com.google.gson.JsonParser;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -73,7 +75,7 @@ public class LiveParser {
                 channel.setLogo(extract(line, LOGO));
             } else if (!line.startsWith("#") && line.contains("://")) {
                 String[] split = line.split("\\|");
-                for (String s : split) setting.check(s);
+                if (split.length > 1) setting.headers(Arrays.copyOfRange(split, 1, split.length));
                 channel.getUrls().add(split[0]);
                 setting.copy(channel).clear();
             }
@@ -145,11 +147,7 @@ public class LiveParser {
             else if (line.startsWith("player")) player(line);
             else if (line.startsWith("header")) header(line);
             else if (line.startsWith("origin")) origin(line);
-            else if (line.startsWith("Origin")) origin(line);
-            else if (line.startsWith("user-agent")) ua(line);
-            else if (line.startsWith("User-Agent")) ua(line);
             else if (line.startsWith("referer")) referer(line);
-            else if (line.startsWith("Referer")) referer(line);
             else if (line.startsWith("#EXTHTTP:")) header(line);
             else if (line.startsWith("#EXTVLCOPT:http-origin")) origin(line);
             else if (line.startsWith("#EXTVLCOPT:http-user-agent")) ua(line);
@@ -252,16 +250,16 @@ public class LiveParser {
 
         private void headers(String line) {
             try {
-                if (header == null) header = new HashMap<>();
                 headers(line.split("headers=")[1].trim().split("&"));
             } catch (Exception ignored) {
             }
         }
 
         private void headers(String[] params) {
+            if (header == null) header = new HashMap<>();
             for (String param : params) {
                 String[] a = param.split("=");
-                header.put(a[0].trim(), a[1].trim());
+                header.put(a[0].trim(), a[1].trim().replace("\"", ""));
             }
         }
 

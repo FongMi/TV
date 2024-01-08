@@ -12,7 +12,7 @@ import androidx.appcompat.widget.AppCompatTextView;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.impl.SiteCallback;
 import com.fongmi.android.tv.utils.KeyUtil;
@@ -53,7 +53,7 @@ public class CustomTitleView extends AppCompatTextView {
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (ApiConfig.get().getSites().isEmpty()) return false;
+        if (VodConfig.get().getSites().isEmpty()) return false;
         if (hasEvent(event)) return onKeyDown(event);
         else return super.dispatchKeyEvent(event);
     }
@@ -78,8 +78,8 @@ public class CustomTitleView extends AppCompatTextView {
     }
 
     private Site getSite(boolean next) {
-        List<Site> items = ApiConfig.get().getSites();
-        int position = ApiConfig.getHomeIndex();
+        List<Site> items = VodConfig.get().getSites();
+        int position = VodConfig.getHomeIndex();
         if (next) position = position > 0 ? --position : items.size() - 1;
         else position = position < items.size() - 1 ? ++position : 0;
         return items.get(position);
