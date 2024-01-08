@@ -4,7 +4,6 @@ import android.content.Context;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.api.Decoder;
-import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderNull;
@@ -94,7 +93,7 @@ public class JarLoader {
         } else if (jar.startsWith("file")) {
             load(key, Path.local(jar));
         } else if (!jar.isEmpty()) {
-            parseJar(key, UrlUtil.convert(VodConfig.getUrl(), jar));
+            parseJar(key, UrlUtil.convert(jar));
         }
     }
 
