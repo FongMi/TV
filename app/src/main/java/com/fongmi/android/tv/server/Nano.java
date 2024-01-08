@@ -2,8 +2,8 @@ package com.fongmi.android.tv.server;
 
 import android.util.Base64;
 
-import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.api.config.LiveConfig;
+import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Device;
 import com.fongmi.android.tv.server.process.Action;
 import com.fongmi.android.tv.server.process.Cache;
