@@ -43,68 +43,118 @@ https://github.com/CatVodTVOfficial/CatVodTVJarLoader
 |       | 1.33 | 4：3 |
 
 直式
+
 ```json
-"style":{ "type":"rect" }
+{
+  "style": {
+    "type": "rect"
+  }
+}
 ```
+
 橫式
+
 ```json
-"style":{ "type":"rect", "ratio":1.33 }
+{
+  "style": {
+    "type": "rect",
+    "ratio": 1.33
+  }
+}
 ```
+
 正方
+
 ```json
-"style":{ "type":"rect", "ratio":1 }
+{
+  "style": {
+    "type": "rect",
+    "ratio": 1
+  }
+}
 ```
+
 正圓
+
 ```json
-"style":{ "type":"oval" }
+{
+  "style": {
+    "type": "oval"
+  }
+}
 ```
+
 橢圓
+
 ```json
-"style":{ "type":"oval", "ratio":1.1 }
+{
+  "style": {
+    "type": "oval",
+    "ratio": 1.1
+  }
+}
 ```
 
 ### API
-刷新詳情  
+
+刷新詳情
+
 ```
 http://127.0.0.1:9978/action?do=refresh&type=detail
 ```  
-刷新播放  
+
+刷新播放
+
 ```
 http://127.0.0.1:9978/action?do=refresh&type=player
 ```  
-推送字幕  
+
+推送字幕
+
 ```
 http://127.0.0.1:9978/action?do=refresh&type=subtitle&path=http://xxx
 ```  
-推送彈幕  
+
+推送彈幕
+
 ```
 http://127.0.0.1:9978/action?do=refresh&type=danmaku&path=http://xxx
 ```
-新增緩存字串  
+
+新增緩存字串
+
 ```
 http://127.0.0.1:9978/cache?do=set&key=xxx&value=xxx
 ``` 
-取得緩存字串  
+
+取得緩存字串
+
 ```
 http://127.0.0.1:9978/cache?do=get&key=xxx
 ```   
-刪除緩存字串  
+
+刪除緩存字串
+
 ```
 http://127.0.0.1:9978/cache?do=del&key=xxx
 ```
 
 ### Proxy
+
 scheme 支持 http, https, socks4, socks5
+
 ```
 scheme://username:password@host:port
 ```
+
 配置 rules 新增 proxy 判斷 host 是否走代理
+
 ```json
 {
-   "name":"proxy",
-   "hosts":[
-      "api.nivodz.com"
-   ]
+  "name": "proxy",
+  "hosts": [
+    "api.nivodz.com"
+  ]
 }
 ```
 
