@@ -2,7 +2,6 @@ package com.fongmi.android.tv.api;
 
 import android.util.Base64;
 
-import com.fongmi.android.tv.api.config.LiveConfig;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.ClearKey;
 import com.fongmi.android.tv.bean.Drm;
@@ -115,7 +114,7 @@ public class LiveParser {
     private static String getText(String url) {
         if (url.startsWith("file")) return Path.read(url);
         if (url.startsWith("http")) return OkHttp.string(url);
-        if (url.endsWith(".txt") || url.endsWith(".m3u")) return getText(UrlUtil.convert(LiveConfig.getUrl(), url));
+        if (url.startsWith("clan")) return getText(UrlUtil.fixUrl(url));
         if (url.length() > 0 && url.length() % 4 == 0) return getText(new String(Base64.decode(url, Base64.DEFAULT)));
         return "";
     }
