@@ -36,7 +36,7 @@ public class UrlUtil {
 
     public static String convert(String url) {
         String scheme = scheme(url);
-        if ("local".equals(scheme)) return Server.get().getAddress(host(url));
+        if ("local".equals(scheme)) return url.replace("local://", Server.get().getAddress(""));
         if ("assets".equals(scheme)) return url.replace("assets://", Server.get().getAddress(""));
         if ("file".equals(scheme)) return url.replace("file://", Server.get().getAddress("file/"));
         if ("proxy".equals(scheme)) return url.replace("proxy://", Server.get().getAddress("proxy?"));
