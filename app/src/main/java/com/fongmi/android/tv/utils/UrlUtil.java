@@ -35,11 +35,10 @@ public class UrlUtil {
     }
 
     public static String convert(String url) {
-        String host = host(url);
         String scheme = scheme(url);
-        if ("file".equals(scheme)) return Server.get().getAddress(url);
-        if ("local".equals(scheme)) return Server.get().getAddress(host);
-        if ("assets".equals(scheme)) return Server.get().getAddress(url.substring(9));
+        if ("local".equals(scheme)) return url.replace("local://", Server.get().getAddress(""));
+        if ("assets".equals(scheme)) return url.replace("assets://", Server.get().getAddress(""));
+        if ("file".equals(scheme)) return url.replace("file://", Server.get().getAddress("file/"));
         if ("proxy".equals(scheme)) return url.replace("proxy://", Server.get().getAddress("proxy?"));
         return url;
     }

@@ -891,7 +891,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         intent.putExtra("headers", mPlayers.getHeaderArray());
         intent.putExtra("position", (int) mPlayers.getPosition());
         intent.putExtra("title", mBinding.control.title.getText());
-        intent.setDataAndType(Uri.parse(mPlayers.getUrl()), "video/*");
+        intent.setDataAndType(mPlayers.getUri(), "video/*");
         startActivityForResult(Util.getChooser(intent), 1001);
         setRedirect(true);
         return true;

@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.media.MediaMetadataCompat;
@@ -436,7 +435,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("headers", mPlayers.getHeaderArray());
         intent.putExtra("title", mBinding.control.title.getText());
-        intent.setDataAndType(Uri.parse(mPlayers.getUrl()), "video/*");
+        intent.setDataAndType(mPlayers.getUri(), "video/*");
         startActivity(Util.getChooser(intent));
         setRedirect(true);
         return true;
