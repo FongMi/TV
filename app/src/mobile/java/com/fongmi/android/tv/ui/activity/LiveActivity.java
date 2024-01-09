@@ -433,6 +433,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         if (mPlayers.isEmpty()) return false;
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         intent.putExtra("headers", mPlayers.getHeaderArray());
         intent.putExtra("title", mBinding.control.title.getText());
         intent.setDataAndType(mPlayers.getUri(), "video/*");

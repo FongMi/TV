@@ -887,6 +887,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         if (mPlayers.isEmpty()) return false;
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         intent.putExtra("return_result", true);
         intent.putExtra("headers", mPlayers.getHeaderArray());
         intent.putExtra("position", (int) mPlayers.getPosition());
