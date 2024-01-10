@@ -61,14 +61,18 @@ public class CustomWebView extends WebView {
     public void initSettings() {
         this.timer = () -> stop(true);
         this.empty = new WebResourceResponse("text/plain", "utf-8", new ByteArrayInputStream("".getBytes()));
+        getSettings().setSupportZoom(true);
         getSettings().setUseWideViewPort(true);
         getSettings().setDatabaseEnabled(true);
         getSettings().setDomStorageEnabled(true);
         getSettings().setJavaScriptEnabled(true);
+        getSettings().setBuiltInZoomControls(true);
+        getSettings().setDisplayZoomControls(false);
         getSettings().setLoadWithOverviewMode(true);
         getSettings().setMediaPlaybackRequiresUserGesture(false);
         getSettings().setJavaScriptCanOpenWindowsAutomatically(false);
         getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        CookieManager.getInstance().setAcceptThirdPartyCookies(this, true);
         setWebViewClient(webViewClient());
     }
 
