@@ -75,8 +75,9 @@ android {
 
     configurations.configureEach {
         resolutionStrategy {
-            force 'org.seamless:seamless-http:1.1.1'
+            force 'com.squareup.okhttp3:okhttp:' + okhttpVersion
             force 'org.seamless:seamless-swing:1.1.1'
+            force 'org.seamless:seamless-http:1.1.1'
             force 'org.seamless:seamless-util:1.1.1'
             force 'org.seamless:seamless-xml:1.1.1'
         }
