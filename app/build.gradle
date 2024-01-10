@@ -73,6 +73,16 @@ android {
         }
     }
 
+    configurations.configureEach {
+        resolutionStrategy {
+            force 'com.squareup.okhttp3:okhttp:' + okhttpVersion
+            force 'org.seamless:seamless-swing:1.1.1'
+            force 'org.seamless:seamless-http:1.1.1'
+            force 'org.seamless:seamless-util:1.1.1'
+            force 'org.seamless:seamless-xml:1.1.1'
+        }
+    }
+
     lint {
         disable 'UnsafeOptInUsageError'
     }
@@ -113,18 +123,18 @@ dependencies {
     implementation 'com.github.bumptech.glide:okhttp3-integration:4.16.0'
     implementation 'com.github.jahirfiquitiva:TextDrawable:1.0.3'
     implementation('com.github.TeamNewPipe:NewPipeExtractor:v0.23.1') { exclude group: 'org.jsoup', module: 'jsoup' }
-    implementation('com.github.thegrizzlylabs:sardine-android:0.8') { exclude group: 'com.squareup.okhttp3', module: 'okhttp' }
+    implementation 'com.github.thegrizzlylabs:sardine-android:0.8'
     implementation 'com.google.android.material:material:1.11.0'
     implementation 'com.google.net.cronet:cronet-okhttp:0.1.0'
     implementation 'com.google.zxing:core:3.3.0'
     implementation 'com.guolindev.permissionx:permissionx:1.7.1'
     implementation 'com.hierynomus:smbj:0.11.5'
     implementation 'org.chromium.net:cronet-embedded:76.3809.111'
-    implementation 'org.eclipse.jetty:jetty-client:8.1.21.v20160908'
-    implementation 'org.eclipse.jetty:jetty-server:8.1.21.v20160908'
-    implementation 'org.eclipse.jetty:jetty-servlet:8.1.21.v20160908'
-    implementation 'org.fourthline.cling:cling-core:2.1.1'
-    implementation 'org.fourthline.cling:cling-support:2.1.1'
+    implementation 'org.eclipse.jetty:jetty-server:8.1.22.v20160922'
+    implementation 'org.eclipse.jetty:jetty-servlet:8.1.22.v20160922'
+    implementation 'org.eclipse.jetty:jetty-client:8.1.22.v20160922'
+    implementation 'org.fourthline.cling:cling-core:2.1.2'
+    implementation 'org.fourthline.cling:cling-support:2.1.2'
     implementation 'org.greenrobot:eventbus:3.3.1'
     implementation('org.simpleframework:simple-xml:2.7.1') { exclude group: 'stax', module: 'stax-api' exclude group: 'xpp3', module: 'xpp3' }
     implementation(ext: 'aar', name: 'dlna-core', group: 'fongmi', version: 'release')
