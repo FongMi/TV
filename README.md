@@ -170,4 +170,6 @@ scheme://username:password@host:port
 [討論群組](https://t.me/fongmi_offical)  
 [發布頻道](https://t.me/fongmi_release)
 
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/E1E5OT2RJ)
+### 贊助
+![photo_2024-01-10_11-39-12](https://github.com/FongMi/TV/assets/3471963/fdc12771-386c-4d5d-9a4d-d0bec0276fa7)
+
