@@ -30,10 +30,8 @@ public class CookieJar implements okhttp3.CookieJar {
     }
 
     @Override
-    public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
-        for (Cookie cookie : cookies) {
-            manager.setCookie(url.toString(), cookie.toString());
-        }
+    public void saveFromResponse(@NonNull HttpUrl url, List<Cookie> cookies) {
+        for (Cookie cookie : cookies) manager.setCookie(url.toString(), cookie.toString());
     }
 
     @NonNull
