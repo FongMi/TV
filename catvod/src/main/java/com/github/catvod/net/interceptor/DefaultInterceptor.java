@@ -50,7 +50,7 @@ public class DefaultInterceptor implements Interceptor {
     private Request getRequest(@NonNull Request request) {
         String url = request.url().toString();
         Request.Builder builder = request.newBuilder();
-        if (url.contains("+")) builder.url(url.replace("+", "%2B"));
+        if (url.contains("+") && url.contains("127.0.0.1")) builder.url(url.replace("+", "%2B"));
         if (url.contains("gitcode.net")) builder.addHeader(HttpHeaders.USER_AGENT, Util.CHROME);
         return builder.build();
     }
