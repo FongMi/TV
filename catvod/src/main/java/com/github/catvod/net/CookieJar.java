@@ -56,6 +56,6 @@ public class CookieJar implements okhttp3.CookieJar {
     }
 
     public void removeAll() {
-        manager.removeAllCookies(null);
+        manager.removeAllCookie();
     }
 }

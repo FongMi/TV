@@ -56,8 +56,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import okhttp3.Call;
-
 public class ExoUtil {
 
     private static HttpDataSource.Factory httpDataSourceFactory;
@@ -184,7 +182,7 @@ public class ExoUtil {
     }
 
     private static synchronized HttpDataSource.Factory getHttpDataSourceFactory() {
-        if (httpDataSourceFactory == null) httpDataSourceFactory = Setting.getHttp() == 0 ? new DefaultHttpDataSource.Factory().setAllowCrossProtocolRedirects(true) : new OkHttpDataSource.Factory((Call.Factory) OkHttp.client());
+        if (httpDataSourceFactory == null) httpDataSourceFactory = Setting.getHttp() == 0 ? new DefaultHttpDataSource.Factory().setAllowCrossProtocolRedirects(true) : new OkHttpDataSource.Factory(OkHttp.client());
         return httpDataSourceFactory;
     }
 

@@ -131,7 +131,7 @@ public class Result implements Parcelable {
 
     public static Result type(String json) {
         Result result = new Result();
-        result.setTypes(List.of(Class.objectFrom(json)));
+        result.setTypes(Arrays.asList(Class.objectFrom(json)));
         return result.trans();
     }
 
