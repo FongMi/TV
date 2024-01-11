@@ -23,6 +23,7 @@ import org.simpleframework.xml.Root;
 import org.simpleframework.xml.core.Persister;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -142,7 +143,7 @@ public class Result implements Parcelable {
     }
 
     public static Result vod(Vod item) {
-        return list(List.of(item));
+        return list(Arrays.asList(item));
     }
 
     public Result() {
