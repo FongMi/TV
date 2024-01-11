@@ -3,6 +3,7 @@ package com.github.catvod.net.interceptor;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.github.catvod.Proxy;
 import com.github.catvod.utils.Util;
 import com.google.common.net.HttpHeaders;
 
@@ -50,7 +51,8 @@ public class DefaultInterceptor implements Interceptor {
     private Request getRequest(@NonNull Request request) {
         String url = request.url().toString();
         Request.Builder builder = request.newBuilder();
-        if (url.contains("+") && (url.contains("127.0.0.1") || url.contains("/file/"))) builder.url(url.replace("+", "%2B"));
+        boolean local = url.contains(":" + Proxy.getPort() + "/");
+        if (url.contains("+") && local) builder.url(url.replace("+", "%2B"));
         if (url.contains("gitcode.net")) builder.addHeader(HttpHeaders.USER_AGENT, Util.CHROME);
         return builder.build();
     }
