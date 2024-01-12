@@ -57,6 +57,7 @@ android {
     configurations.configureEach {
         resolutionStrategy {
             force 'com.squareup.okhttp3:okhttp:' + okhttpVersion
+            force 'com.squareup.okio:okio:' + okioVersion
         }
     }
 

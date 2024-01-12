@@ -1,11 +1,13 @@
 package com.fongmi.android.tv.ui.custom;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.net.http.SslError;
+import android.os.Build;
 import android.text.TextUtils;
 import android.view.ViewGroup;
 import android.webkit.CookieManager;
@@ -25,6 +27,7 @@ import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.impl.ParseCallback;
 import com.fongmi.android.tv.utils.Sniffer;
+import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.crawler.Spider;
 import com.google.common.net.HttpHeaders;
 import com.orhanobut.logger.Logger;
@@ -39,6 +42,7 @@ public class CustomWebView extends WebView {
     private static final String TAG = CustomWebView.class.getSimpleName();
     private static final String BLANK = "about:blank";
 
+    private Map<String, String> headers;
     private WebResourceResponse empty;
     private ParseCallback callback;
     private AlertDialog dialog;
@@ -69,10 +73,10 @@ public class CustomWebView extends WebView {
         getSettings().setBuiltInZoomControls(true);
         getSettings().setDisplayZoomControls(false);
         getSettings().setLoadWithOverviewMode(true);
-        getSettings().setMediaPlaybackRequiresUserGesture(false);
         getSettings().setJavaScriptCanOpenWindowsAutomatically(false);
-        getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
-        CookieManager.getInstance().setAcceptThirdPartyCookies(this, true);
+        if (Build.VERSION.SDK_INT >= 17) getSettings().setMediaPlaybackRequiresUserGesture(false);
+        if (Build.VERSION.SDK_INT >= 21) CookieManager.getInstance().setAcceptThirdPartyCookies(this, true);
+        if (Build.VERSION.SDK_INT >= 21) getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         setWebViewClient(webViewClient());
     }
 
@@ -90,6 +94,7 @@ public class CustomWebView extends WebView {
     public CustomWebView start(String key, String from, Map<String, String> headers, String url, String click, ParseCallback callback, boolean detect) {
         App.post(timer, Constant.TIMEOUT_PARSE_WEB);
         this.callback = callback;
+        this.headers = headers;
         setUserAgent(headers);
         loadUrl(url, headers);
         this.detect = detect;
@@ -102,6 +107,7 @@ public class CustomWebView extends WebView {
     private WebViewClient webViewClient() {
         return new WebViewClient() {
             @Override
+            @TargetApi(Build.VERSION_CODES.LOLLIPOP)
             public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
                 String url = request.getUrl().toString();
                 String host = request.getUrl().getHost();
@@ -114,6 +120,15 @@ public class CustomWebView extends WebView {
             }
 
             @Override
+            public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
+                String host = UrlUtil.host(url);
+                if (TextUtils.isEmpty(host) || VodConfig.get().getAds().contains(host)) return empty;
+                if (host.equals("challenges.cloudflare.com")) App.post(() -> showDialog());
+                if (detect && url.contains("player/?url=")) onParseAdd(headers, url);
+                if (isVideoFormat(headers, url)) interrupt(headers, url);
+                return super.shouldInterceptRequest(view, url);
+            }
+
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
                 if (dialog != null) hideDialog();
@@ -162,7 +177,7 @@ public class CustomWebView extends WebView {
         if (TextUtils.isEmpty(script.get(0))) {
             evaluate(script.subList(1, script.size()));
         } else {
-            evaluateJavascript(script.get(0), value -> evaluate(script.subList(1, script.size())));
+            loadUrl("javascript:" + script.get(0));
         }
     }
 

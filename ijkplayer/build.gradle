@@ -3,14 +3,19 @@ plugins {
 }
 
 android {
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         minSdk 16
-        targetSdk 29
+        targetSdk 28
+    }
+
+    lint {
+        disable 'UnsafeOptInUsageError'
     }
 }
 
 dependencies {
-    implementation 'androidx.annotation:annotation:1.5.0'
+    implementation project(':catvod')
+    implementation project(':media-lib-ui')
 }

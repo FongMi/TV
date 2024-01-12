@@ -3,10 +3,14 @@ plugins {
 }
 
 android {
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         minSdk 16
-        targetSdk 29
+        targetSdk 28
     }
+}
+
+dependencies {
+    implementation project(':catvod')
 }

@@ -27,6 +27,10 @@ public class ActionEvent {
         send(NEXT);
     }
 
+    public static void pause() {
+        send(PAUSE);
+    }
+
     public ActionEvent(String action) {
         this.action = action;
     }

@@ -222,7 +222,7 @@ public class SiteViewModel extends ViewModel {
                 for (Vod vod : result.getList()) vod.setSite(site);
                 return result;
             } else {
-                LinkedHashMap<String, String> params = new LinkedHashMap<>();
+                ArrayMap<String, String> params = new ArrayMap<>();
                 params.put("wd", Trans.t2s(keyword));
                 params.put("pg", page);
                 String searchContent = call(site, params, true);
