@@ -20,95 +20,20 @@ import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.ICacheManager;
 import master.flame.danmaku.danmaku.model.IDanmakus;
-import master.flame.danmaku.danmaku.model.IDisplay;
+import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.IDrawingCache;
 import master.flame.danmaku.danmaku.model.android.DanmakuContext;
 import master.flame.danmaku.danmaku.renderer.IRenderer;
 import master.flame.danmaku.danmaku.renderer.Renderer;
 
+
 public class DanmakuRenderer extends Renderer {
 
-    private final DanmakuContext mContext;
-    private final DanmakusRetainer mDanmakusRetainer;
-    private final Consumer mConsumer = new Consumer();
-
-    private DanmakuTimer mStartTimer;
-    private DanmakusRetainer.Verifier mVerifier;
-    private ICacheManager mCacheManager;
-    private OnDanmakuShownListener mOnDanmakuShownListener;
-
-    private final DanmakusRetainer.Verifier verifier = new DanmakusRetainer.Verifier() {
-        @Override
-        public boolean skipLayout(BaseDanmaku danmaku, float fixedTop, int lines, boolean willHit) {
-            if (danmaku.priority == 0 && mContext.mDanmakuFilters.filterSecondary(danmaku, lines, 0, mStartTimer, willHit, mContext)) {
-                danmaku.setVisibility(false);
-                return true;
-            }
-            return false;
-        }
-    };
-
-    public DanmakuRenderer(DanmakuContext config) {
-        mContext = config;
-        mDanmakusRetainer = new DanmakusRetainer(config.isAlignBottom());
-    }
-
-    @Override
-    public void clear() {
-        clearRetainer();
-        mContext.mDanmakuFilters.clear();
-    }
-
-    @Override
-    public void clearRetainer() {
-        mDanmakusRetainer.clear();
-    }
-
-    @Override
-    public void release() {
-        mDanmakusRetainer.release();
-        mContext.mDanmakuFilters.clear();
-    }
-
-    @Override
-    public void setVerifierEnabled(boolean enabled) {
-        mVerifier = (enabled ? verifier : null);
-    }
-
-    @Override
-    public void draw(final IDisplay disp, IDanmakus danmakus, long startRenderTime, final RenderingState renderingState) {
-        mStartTimer = renderingState.timer;
-        mConsumer.disp = disp;
-        mConsumer.renderingState = renderingState;
-        mConsumer.startRenderTime = startRenderTime;
-        danmakus.forEachSync(mConsumer);
-    }
-
-    public void setCacheManager(ICacheManager cacheManager) {
-        mCacheManager = cacheManager;
-    }
-
-    @Override
-    public void setOnDanmakuShownListener(OnDanmakuShownListener onDanmakuShownListener) {
-        mOnDanmakuShownListener = onDanmakuShownListener;
-    }
-
-    @Override
-    public void removeOnDanmakuShownListener() {
-        mOnDanmakuShownListener = null;
-    }
-
-    public void alignBottom(boolean enable) {
-        if (mDanmakusRetainer != null) {
-            mDanmakusRetainer.alignBottom(enable);
-        }
-    }
-
     private class Consumer extends IDanmakus.DefaultConsumer<BaseDanmaku> {
-        public IDisplay disp;
+        private BaseDanmaku lastItem;
+        public IDisplayer disp;
         public RenderingState renderingState;
         public long startRenderTime;
-        private BaseDanmaku lastItem;
 
         @Override
         public int accept(BaseDanmaku drawItem) {
@@ -159,12 +84,7 @@ public class DanmakuRenderer extends Renderer {
             // draw
             if (drawItem.isShown()) {
                 if (drawItem.lines == null && drawItem.getBottom() > disp.getHeight()) {
-                    return ACTION_CONTINUE;
-                }
-                if (drawItem.getDrawingCache() == null || drawItem.getDrawingCache().get() == null) {
-                    if (mCacheManager != null) {
-                        mCacheManager.buildDanmakuCache(drawItem);
-                    }
+                    return ACTION_CONTINUE;    // skip bottom outside danmaku
                 }
                 int renderingType = drawItem.draw(disp);
                 if (renderingType == IRenderer.CACHE_RENDERING) {
@@ -178,7 +98,9 @@ public class DanmakuRenderer extends Renderer {
                 renderingState.addCount(drawItem.getType(), 1);
                 renderingState.addTotalCount(1);
                 renderingState.appendToRunningDanmakus(drawItem);
-                if (mOnDanmakuShownListener != null && drawItem.firstShownFlag != mContext.mGlobalFlagValues.FIRST_SHOWN_RESET_FLAG) {
+
+                if (mOnDanmakuShownListener != null
+                        && drawItem.firstShownFlag != mContext.mGlobalFlagValues.FIRST_SHOWN_RESET_FLAG) {
                     drawItem.firstShownFlag = mContext.mGlobalFlagValues.FIRST_SHOWN_RESET_FLAG;
                     mOnDanmakuShownListener.onDanmakuShown(drawItem);
                 }
@@ -190,6 +112,80 @@ public class DanmakuRenderer extends Renderer {
         public void after() {
             renderingState.lastDanmaku = lastItem;
             super.after();
+        }
+    }
+
+    private DanmakuTimer mStartTimer;
+    private final DanmakuContext mContext;
+    private DanmakusRetainer.Verifier mVerifier;
+    private final DanmakusRetainer.Verifier verifier = new DanmakusRetainer.Verifier() {
+        @Override
+        public boolean skipLayout(BaseDanmaku danmaku, float fixedTop, int lines, boolean willHit) {
+            if (danmaku.priority == 0 && mContext.mDanmakuFilters.filterSecondary(danmaku, lines, 0, mStartTimer, willHit, mContext)) {
+                danmaku.setVisibility(false);
+                return true;
+            }
+            return false;
+        }
+    };
+    private final DanmakusRetainer mDanmakusRetainer;
+    private ICacheManager mCacheManager;
+    private OnDanmakuShownListener mOnDanmakuShownListener;
+    private Consumer mConsumer = new Consumer();
+
+    public DanmakuRenderer(DanmakuContext config) {
+        mContext = config;
+        mDanmakusRetainer = new DanmakusRetainer(config.isAlignBottom());
+    }
+
+    @Override
+    public void clear() {
+        clearRetainer();
+        mContext.mDanmakuFilters.clear();
+    }
+
+    @Override
+    public void clearRetainer() {
+        mDanmakusRetainer.clear();
+    }
+
+    @Override
+    public void release() {
+        mDanmakusRetainer.release();
+        mContext.mDanmakuFilters.clear();
+    }
+
+    @Override
+    public void setVerifierEnabled(boolean enabled) {
+        mVerifier = (enabled ? verifier : null);
+    }
+
+    @Override
+    public void draw(final IDisplayer disp, IDanmakus danmakus, long startRenderTime, final RenderingState renderingState) {
+        mStartTimer = renderingState.timer;
+        mConsumer.disp = disp;
+        mConsumer.renderingState = renderingState;
+        mConsumer.startRenderTime = startRenderTime;
+        danmakus.forEachSync(mConsumer);
+    }
+
+    public void setCacheManager(ICacheManager cacheManager) {
+        mCacheManager = cacheManager;
+    }
+
+    @Override
+    public void setOnDanmakuShownListener(OnDanmakuShownListener onDanmakuShownListener) {
+        mOnDanmakuShownListener = onDanmakuShownListener;
+    }
+
+    @Override
+    public void removeOnDanmakuShownListener() {
+        mOnDanmakuShownListener = null;
+    }
+
+    public void alignBottom(boolean enable) {
+        if (mDanmakusRetainer != null) {
+            mDanmakusRetainer.alignBottom(enable);
         }
     }
 }

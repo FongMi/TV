@@ -21,11 +21,16 @@ package master.flame.danmaku.danmaku.model;
  */
 public class FTDanmaku extends BaseDanmaku {
 
-    protected float y = -1;
     private float x = 0;
-    private float[] RECT;
+
+    protected float y = -1;
+
+    private float[] RECT = null;
+
     private float mLastLeft;
+
     private float mLastPaintWidth;
+
     private int mLastDispWidth;
 
     public FTDanmaku(Duration duration) {
@@ -33,25 +38,29 @@ public class FTDanmaku extends BaseDanmaku {
     }
 
     @Override
-    public void layout(IDisplay display, float x, float y) {
+    public void layout(IDisplayer displayer, float x, float y) {
         if (mTimer != null) {
             long deltaDuration = mTimer.currMillisecond - getActualTime();
             if (deltaDuration > 0 && deltaDuration < duration.value) {
                 if (!this.isShown()) {
-                    this.x = getLeft(display);
+                    this.x = getLeft(displayer);
                     this.y = y;
                     this.setVisibility(true);
                 }
                 return;
             }
+
             this.setVisibility(false);
             this.y = -1;
-            this.x = display.getWidth();
+            this.x = displayer.getWidth();
         }
+
     }
 
-    protected float getLeft(IDisplay displayer) {
-        if (mLastDispWidth == displayer.getWidth() && mLastPaintWidth == paintWidth) return mLastLeft;
+    protected float getLeft(IDisplayer displayer) {
+        if (mLastDispWidth == displayer.getWidth() && mLastPaintWidth == paintWidth) {
+            return mLastLeft;
+        }
         float left = (displayer.getWidth() - paintWidth) / 2;
         mLastDispWidth = displayer.getWidth();
         mLastPaintWidth = paintWidth;
@@ -60,10 +69,13 @@ public class FTDanmaku extends BaseDanmaku {
     }
 
     @Override
-    public float[] getRectAtTime(IDisplay display, long time) {
-        if (!isMeasured()) return null;
-        float left = getLeft(display);
-        if (RECT == null) RECT = new float[4];
+    public float[] getRectAtTime(IDisplayer displayer, long time) {
+        if (!isMeasured())
+            return null;
+        float left = getLeft(displayer);
+        if (RECT == null) {
+            RECT = new float[4];
+        }
         RECT[0] = left;
         RECT[1] = y;
         RECT[2] = left + paintWidth;

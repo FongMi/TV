@@ -17,7 +17,6 @@
 package master.flame.danmaku.danmaku.model.objectpool;
 
 public class Pools {
-
     private Pools() {
     }
 

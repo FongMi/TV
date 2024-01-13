@@ -20,7 +20,7 @@ import master.flame.danmaku.danmaku.util.DanmakuUtils;
 
 public class Danmaku extends BaseDanmaku {
 
-    public Danmaku(String text) {
+    public Danmaku(CharSequence text) {
         DanmakuUtils.fillText(this, text);
     }
 
@@ -30,12 +30,12 @@ public class Danmaku extends BaseDanmaku {
     }
 
     @Override
-    public void layout(IDisplay display, float x, float y) {
+    public void layout(IDisplayer displayer, float x, float y) {
 
     }
 
     @Override
-    public float[] getRectAtTime(IDisplay display, long time) {
+    public float[] getRectAtTime(IDisplayer displayer, long time) {
         return null;
     }
 

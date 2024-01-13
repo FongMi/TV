@@ -1,3 +1,4 @@
+
 package master.flame.danmaku.controller;
 
 import android.view.View;
@@ -9,124 +10,109 @@ import master.flame.danmaku.danmaku.model.android.DanmakuContext;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 
 public interface IDanmakuView {
+    
+    public final static int THREAD_TYPE_NORMAL_PRIORITY = 0x0;
+    public final static int THREAD_TYPE_MAIN_THREAD = 0x1;
+    public final static int THREAD_TYPE_HIGH_PRIORITY = 0x2;
+    public final static int THREAD_TYPE_LOW_PRIORITY = 0x3;
+    
 
-    int THREAD_TYPE_NORMAL_PRIORITY = 0x0;
-    int THREAD_TYPE_MAIN_THREAD = 0x1;
-    int THREAD_TYPE_HIGH_PRIORITY = 0x2;
-    int THREAD_TYPE_LOW_PRIORITY = 0x3;
+    public boolean isPrepared();
+    
+    public boolean isPaused();
 
-    boolean isPrepared();
-
-    boolean isPaused();
-
-    boolean isHardwareAccelerated();
-
+    public boolean isHardwareAccelerated();
     /**
+     * 
      * @param type One of THREAD_TYPE_MAIN_THREAD, THREAD_TYPE_HIGH_PRIORITY, THREAD_TYPE_NORMAL_PRIORITY, or THREAD_TYPE_LOW_PRIORITY.
      */
-    void setDrawingThreadType(int type);
+    public void setDrawingThreadType(int type);
 
-    void enableDanmakuDrawingCache(boolean enable);
+    public void enableDanmakuDrawingCache(boolean enable);
 
-    boolean isDanmakuDrawingCacheEnabled();
+    public boolean isDanmakuDrawingCacheEnabled();
 
-    void showFPS(boolean show);
-
+    public void showFPS(boolean show);
+    
     /**
      * danmaku.isLive == true的情况下,请在非UI线程中使用此方法,避免可能卡住主线程
-     *
      * @param item
      */
-    void addDanmaku(BaseDanmaku item);
+    public void addDanmaku(BaseDanmaku item);
 
-    void invalidateDanmaku(BaseDanmaku item, boolean remeasure);
+    public void invalidateDanmaku(BaseDanmaku item, boolean remeasure);
+    
+    public void removeAllDanmakus(boolean isClearDanmakusOnScreen);
+    
+    public void removeAllLiveDanmakus();
 
-    void removeAllDanmakus(boolean isClearDanmakusOnScreen);
-
-    void removeAllLiveDanmakus();
-
-    IDanmakus getCurrentVisibleDanmakus();
-
-    IDanmakuView setCallback(Callback callback);
-
+    public IDanmakus getCurrentVisibleDanmakus();
+    
+    public void setCallback(Callback callback);
+    
     /**
      * for getting the accurate play-time. use this method intead of parser.getTimer().currMillisecond
-     *
      * @return
      */
-    long getCurrentTime();
+    public long getCurrentTime();
 
-    DanmakuContext getConfig();
-
+    public DanmakuContext getConfig();
+    
     // ------------- Android View方法  --------------------
+    
+    public View getView();
 
-    View getView();
+    public int getWidth();
 
-    int getWidth();
+    public int getHeight();
 
-    int getHeight();
-
-    void setVisibility(int visibility);
-
-    boolean isShown();
-
+    public void setVisibility(int visibility);
+    
+    public boolean isShown();
+    
 
     // ------------- 播放控制 -------------------
+    
+    public void prepare(BaseDanmakuParser parser, DanmakuContext config);
 
-    void prepare(BaseDanmakuParser parser, DanmakuContext config);
+    public void seekTo(Long ms);
 
-    void seekTo(Long ms);
+    public void start();
 
-    void start();
+    public void start(long postion);
 
-    void start(long postion);
+    public void stop();
 
-    void stop();
+    public void pause();
 
-    void pause();
+    public void resume();
 
-    void resume();
-
-    void release();
-
-    void toggle();
-
-    void show();
-
-    void hide();
-
+    public void release();
+    
+    public void toggle();
+    
+    public void show();
+    
+    public void hide();
+    
     /**
      * show the danmakuview again if you called hideAndPauseDrawTask()
-     *
      * @param position The position you want to resume
      * @see #hideAndPauseDrawTask
      */
-    void showAndResumeDrawTask(Long position);
-
+    public void showAndResumeDrawTask(Long position);
+    
     /**
      * hide the danmakuview and pause the drawtask
-     *
      * @return the paused position
      * @see #showAndResumeDrawTask
      */
-    long hideAndPauseDrawTask();
+    public long hideAndPauseDrawTask();
 
-    void clearDanmakusOnScreen();
-
-    void setOnDanmakuClickListener(OnDanmakuClickListener listener, float xOff, float yOff);
-
-    OnDanmakuClickListener getOnDanmakuClickListener();
-
-    void setOnDanmakuClickListener(OnDanmakuClickListener listener);
-
-    float getXOff();
-
-    float getYOff();
-
-    void forceRender();
+    public void clearDanmakusOnScreen();
 
     // ------------- Click Listener -------------------
-    interface OnDanmakuClickListener {
+    public interface OnDanmakuClickListener {
         /**
          * @param danmakus all to be clicked, this value may be empty;
          *                 danmakus.last() is the latest danmaku which may be null;
@@ -138,4 +124,16 @@ public interface IDanmakuView {
 
         boolean onViewClick(IDanmakuView view);
     }
+
+    public void setOnDanmakuClickListener(OnDanmakuClickListener listener);
+
+    public void setOnDanmakuClickListener(OnDanmakuClickListener listener, float xOff, float yOff);
+
+    public OnDanmakuClickListener getOnDanmakuClickListener();
+
+    public float getXOff();
+
+    public float getYOff();
+
+    void forceRender();
 }

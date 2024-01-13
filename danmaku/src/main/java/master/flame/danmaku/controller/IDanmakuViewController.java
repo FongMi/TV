@@ -7,19 +7,20 @@ import android.content.Context;
  */
 public interface IDanmakuViewController {
 
-    boolean isViewReady();
+    public boolean isViewReady();
 
-    int getViewWidth();
+    public int getViewWidth();
 
-    int getViewHeight();
+    public int getViewHeight();
 
-    Context getContext();
+    public Context getContext();
 
-    long drawDanmakus();
+    public long drawDanmakus();
 
-    void clear();
+    public void clear();
 
-    boolean isHardwareAccelerated();
+    public boolean isHardwareAccelerated();
 
-    boolean isDanmakuDrawingCacheEnabled();
+    public boolean isDanmakuDrawingCacheEnabled();
+
 }
