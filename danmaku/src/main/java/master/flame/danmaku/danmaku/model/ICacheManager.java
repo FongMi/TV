@@ -20,8 +20,5 @@ package master.flame.danmaku.danmaku.model;
  * Created by ch on 15-11-15.
  */
 public interface ICacheManager {
-
     void addDanmaku(BaseDanmaku danmaku);
-
-    void buildDanmakuCache(BaseDanmaku danmaku);
 }

@@ -1,3 +1,4 @@
+
 package master.flame.danmaku.danmaku.model.android;
 
 import android.annotation.SuppressLint;
@@ -7,24 +8,35 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
-import tv.cjump.jni.BitmapFactory;
+import tv.cjump.jni.NativeBitmapFactory;
 
 public class DrawingCacheHolder {
 
     public Canvas canvas;
+
     public Bitmap bitmap;
+    
     public Bitmap[][] bitmapArray;
+
     public Object extra;
+
     public int width;
+
     public int height;
+
+    public boolean drawn;
+
     private int mDensity;
 
     public DrawingCacheHolder() {
+
     }
 
     public void buildCache(int w, int h, int density, boolean checkSizeEquals, int bitsPerPixel) {
         boolean reuse = checkSizeEquals ? (w == width && h == height) : (w <= width && h <= height);
         if (reuse && bitmap != null) {
+//            canvas.drawColor(Color.TRANSPARENT);
+//            canvas.setBitmap(null);
             bitmap.eraseColor(Color.TRANSPARENT);
             canvas.setBitmap(bitmap);
             recycleBitmapArray();
@@ -36,18 +48,19 @@ public class DrawingCacheHolder {
         width = w;
         height = h;
         Bitmap.Config config = Bitmap.Config.ARGB_4444;
-        if (bitsPerPixel == 32) config = Bitmap.Config.ARGB_8888;
-        bitmap = BitmapFactory.createBitmap(w, h, config);
+        if (bitsPerPixel == 32) {
+            config = Bitmap.Config.ARGB_8888;
+        }
+        bitmap = NativeBitmapFactory.createBitmap(w, h, config);
         if (density > 0) {
             mDensity = density;
             bitmap.setDensity(density);
         }
-        if (canvas == null) {
+        if (canvas == null){
             canvas = new Canvas(bitmap);
             canvas.setDensity(density);
-        } else {
+        }else
             canvas.setBitmap(bitmap);
-        }
     }
 
     public void erase() {
@@ -56,11 +69,12 @@ public class DrawingCacheHolder {
     }
 
     public synchronized void recycle() {
-        canvas = null;
         Bitmap bitmapReserve = bitmap;
         bitmap = null;
         width = height = 0;
-        if (bitmapReserve != null) bitmapReserve.recycle();
+        if (bitmapReserve != null) {
+            bitmapReserve.recycle();
+        }
         recycleBitmapArray();
         extra = null;
     }
@@ -68,8 +82,12 @@ public class DrawingCacheHolder {
     @SuppressLint("NewApi")
     public void splitWith(int dispWidth, int dispHeight, int maximumCacheWidth, int maximumCacheHeight) {
         recycleBitmapArray();
-        if (width <= 0 || height <= 0 || bitmap == null) return;
-        if (width <= maximumCacheWidth && height <= maximumCacheHeight) return;
+        if (width <= 0 || height <= 0 || bitmap == null) {
+            return;
+        }
+        if (width <= maximumCacheWidth && height <= maximumCacheHeight) {
+            return;
+        }
         maximumCacheWidth = Math.min(maximumCacheWidth, dispWidth);
         maximumCacheHeight = Math.min(maximumCacheHeight, dispHeight);
         int xCount = width / maximumCacheWidth + (width % maximumCacheWidth == 0 ? 0 : 1);
@@ -77,7 +95,7 @@ public class DrawingCacheHolder {
         int averageWidth = width / xCount;
         int averageHeight = height / yCount;
         final Bitmap[][] bmpArray = new Bitmap[yCount][xCount];
-        if (canvas == null) {
+        if (canvas == null){
             canvas = new Canvas();
             if (mDensity > 0) {
                 canvas.setDensity(mDensity);
@@ -87,7 +105,8 @@ public class DrawingCacheHolder {
         Rect rectDst = new Rect();
         for (int yIndex = 0; yIndex < yCount; yIndex++) {
             for (int xIndex = 0; xIndex < xCount; xIndex++) {
-                Bitmap bmp = bmpArray[yIndex][xIndex] = BitmapFactory.createBitmap(averageWidth, averageHeight, Bitmap.Config.ARGB_8888);
+                Bitmap bmp = bmpArray[yIndex][xIndex] = NativeBitmapFactory.createBitmap(
+                        averageWidth, averageHeight, Bitmap.Config.ARGB_8888);
                 if (mDensity > 0) {
                     bmp.setDensity(mDensity);
                 }
@@ -110,9 +129,9 @@ public class DrawingCacheHolder {
 
     private void eraseBitmapArray() {
         if (bitmapArray != null) {
-            for (Bitmap[] bitmaps : bitmapArray) {
-                for (int j = 0; j < bitmaps.length; j++) {
-                    eraseBitmap(bitmaps[j]);
+            for (int i = 0; i < bitmapArray.length; i++) {
+                for (int j = 0; j < bitmapArray[i].length; j++) {
+                    eraseBitmap(bitmapArray[i][j]);
                 }
             }
         }
@@ -158,4 +177,5 @@ public class DrawingCacheHolder {
         }
         return false;
     }
+
 }

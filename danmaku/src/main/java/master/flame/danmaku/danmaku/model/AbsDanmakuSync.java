@@ -9,6 +9,7 @@ public abstract class AbsDanmakuSync {
     /**
      * Get the uptime of timer synchronization
      *
+     * @return
      */
     public abstract long getUptimeMillis();
 
@@ -23,6 +24,7 @@ public abstract class AbsDanmakuSync {
      * Get the threshold-time of timer synchronization
      * This value should be greater than or equal to 1000L
      *
+     * @return
      */
     public long getThresholdTimeMills() {
         return 1500L;
@@ -30,7 +32,7 @@ public abstract class AbsDanmakuSync {
 
     /**
      * synchronize pause/resume state with outside playback
-     *
+     * @return
      */
     public boolean isSyncPlayingState() {
         return false;

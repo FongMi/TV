@@ -16,65 +16,64 @@
 
 package master.flame.danmaku.controller;
 
-import master.flame.danmaku.danmaku.model.AbsDisplay;
+import master.flame.danmaku.danmaku.model.AbsDisplayer;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDanmakus;
 import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.renderer.IRenderer.RenderingState;
 
 public interface IDrawTask {
+    public static final int PLAY_STATE_PLAYING = 1;
+    public static final int PLAY_STATE_PAUSE = 2;
 
-    int PLAY_STATE_PLAYING = 1;
-    int PLAY_STATE_PAUSE = 2;
+    public void addDanmaku(BaseDanmaku item);
 
-    void addDanmaku(BaseDanmaku item);
+    public void removeAllDanmakus(boolean isClearDanmakusOnScreen);
 
-    void removeAllDanmakus(boolean isClearDanmakusOnScreen);
+    public void removeAllLiveDanmakus();
 
-    void removeAllLiveDanmakus();
+    public void clearDanmakusOnScreen(long currMillis);
 
-    void clearDanmakusOnScreen(long currMillis);
+	public IDanmakus getVisibleDanmakusOnTime(long time);
 
-    IDanmakus getVisibleDanmakusOnTime(long time);
+    public RenderingState draw(AbsDisplayer displayer);
 
-    RenderingState draw(AbsDisplay display);
+    public void reset();
 
-    void reset();
+    public void seek(long mills);
 
-    void seek(long mills);
+    public void start();
 
-    void start();
+    public void quit();
 
-    void quit();
+    public void prepare();
 
-    void prepare();
+    public void onPlayStateChanged(int state);
 
-    void onPlayStateChanged(int state);
-
-    void requestClear();
+    public void requestClear();
 
     void requestClearRetainer();
 
     void requestSync(long fromTimeMills, long toTimeMills, long offsetMills);
 
-    void setParser(BaseDanmakuParser parser);
+    public void setParser(BaseDanmakuParser parser);
 
     void invalidateDanmaku(BaseDanmaku item, boolean remeasure);
 
-    void requestHide();
+    public interface TaskListener {
+        public void ready();
+
+        public void onDanmakuAdd(BaseDanmaku danmaku);
+
+        public void onDanmakuShown(BaseDanmaku danmaku);
+
+        public void onDanmakuConfigChanged();
+
+        public void onDanmakusDrawingFinished();
+    }
+
+    public void requestHide();
 
     void requestRender();
 
-    interface TaskListener {
-
-        void ready();
-
-        void onDanmakuAdd(BaseDanmaku danmaku);
-
-        void onDanmakuShown(BaseDanmaku danmaku);
-
-        void onDanmakuConfigChanged();
-
-        void onDanmakusDrawingFinished();
-    }
 }

@@ -1,3 +1,4 @@
+
 package master.flame.danmaku.danmaku.model.android;
 
 import master.flame.danmaku.danmaku.model.IDrawingCache;
@@ -21,7 +22,8 @@ public class DrawingCache implements IDrawingCache<DrawingCacheHolder>, Poolable
 
     @Override
     public void build(int w, int h, int density, boolean checkSizeEquals, int bitsPerPixel) {
-        mHolder.buildCache(w, h, density, checkSizeEquals, bitsPerPixel);
+        final DrawingCacheHolder holder = mHolder;
+        holder.buildCache(w, h, density, checkSizeEquals, bitsPerPixel);
         mSize = mHolder.bitmap.getRowBytes() * mHolder.bitmap.getHeight();
     }
 
@@ -32,15 +34,20 @@ public class DrawingCache implements IDrawingCache<DrawingCacheHolder>, Poolable
 
     @Override
     public DrawingCacheHolder get() {
-        if (mHolder.bitmap == null) return null;
+        final DrawingCacheHolder holder = mHolder;
+        if (holder.bitmap == null) {
+            return null;
+        }
         return mHolder;
     }
 
     @Override
     public void destroy() {
-        mHolder.recycle();
-        referenceCount = 0;
+        if (mHolder != null) {
+            mHolder.recycle();
+        }
         mSize = 0;
+        referenceCount = 0;
     }
 
     @Override
@@ -49,13 +56,13 @@ public class DrawingCache implements IDrawingCache<DrawingCacheHolder>, Poolable
     }
 
     @Override
-    public DrawingCache getNextPoolable() {
-        return mNextElement;
+    public void setNextPoolable(DrawingCache element) {
+        mNextElement = element;
     }
 
     @Override
-    public void setNextPoolable(DrawingCache element) {
-        mNextElement = element;
+    public DrawingCache getNextPoolable() {
+        return mNextElement;
     }
 
     @Override
@@ -92,4 +99,5 @@ public class DrawingCache implements IDrawingCache<DrawingCacheHolder>, Poolable
     public int height() {
         return mHolder.height;
     }
+
 }

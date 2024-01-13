@@ -17,7 +17,7 @@
 package master.flame.danmaku.danmaku.model;
 
 
-public interface IDisplay {
+public interface IDisplayer {
 
     int DANMAKU_STYLE_DEFAULT = -1; // 自动
     int DANMAKU_STYLE_NONE = 0; // 无
@@ -47,13 +47,14 @@ public interface IDisplay {
 
     float getStrokeWidth();
 
-    boolean isHardwareAccelerated();
-
     void setHardwareAccelerated(boolean enable);
+
+    boolean isHardwareAccelerated();
 
     int getMaximumCacheWidth();
 
     int getMaximumCacheHeight();
+
 
     ////////////////// setter ///////////////////////////
 
@@ -65,11 +66,11 @@ public interface IDisplay {
 
     void setDanmakuStyle(int style, float[] data);
 
-    int getMargin();
-
     void setMargin(int m);
 
-    int getAllMarginTop();
+    int getMargin();
 
     void setAllMarginTop(int m);
+
+    int getAllMarginTop();
 }

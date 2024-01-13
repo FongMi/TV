@@ -19,7 +19,7 @@ public class SpannedCacheStuffer extends SimpleTextCacheStuffer {
     @Override
     public void measure(BaseDanmaku danmaku, TextPaint paint, boolean fromWorkerThread) {
         if (danmaku.text instanceof Spanned) {
-            CharSequence text = danmaku.getText();
+            CharSequence text = danmaku.text;
             if (text != null) {
                 StaticLayout staticLayout = new StaticLayout(text, paint, (int) Math.ceil(StaticLayout.getDesiredWidth(danmaku.text, paint)), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, true);
                 danmaku.paintWidth = staticLayout.getWidth();
@@ -48,6 +48,7 @@ public class SpannedCacheStuffer extends SimpleTextCacheStuffer {
         StaticLayout staticLayout = reference.get();
         boolean requestRemeasure = 0 != (danmaku.requestFlags & BaseDanmaku.FLAG_REQUEST_REMEASURE);
         boolean requestInvalidate = 0 != (danmaku.requestFlags & BaseDanmaku.FLAG_REQUEST_INVALIDATE);
+
         if (requestInvalidate || staticLayout == null) {
             if (requestInvalidate) {
                 danmaku.requestFlags &= ~BaseDanmaku.FLAG_REQUEST_INVALIDATE;

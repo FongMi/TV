@@ -241,6 +241,14 @@ public class Setting {
         Prefers.put("danmu", danmu);
     }
 
+    public static int getDanmuMaxLine(int defaultValue) {
+        return Prefers.getInt("danmu_maxline", defaultValue);
+    }
+
+    public static void putDanmuMaxLine(int maxline) {
+        Prefers.put("danmu_maxline", maxline);
+    }
+
     public static boolean isCaption() {
         return Prefers.getBoolean("caption");
     }
