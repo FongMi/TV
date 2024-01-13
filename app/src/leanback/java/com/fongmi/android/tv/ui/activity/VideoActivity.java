@@ -401,10 +401,11 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private void setDanmuView() {
         mPlayers.setDanmuView(mBinding.danmaku);
         HashMap<Integer, Integer> maxLines = new HashMap<>();
-        maxLines.put(BaseDanmaku.TYPE_FIX_TOP, 3);
-        maxLines.put(BaseDanmaku.TYPE_SCROLL_RL, 3);
-        maxLines.put(BaseDanmaku.TYPE_SCROLL_LR, 3);
-        maxLines.put(BaseDanmaku.TYPE_FIX_BOTTOM, 1);
+        int maxLine = Setting.getDanmuMaxLine(3);
+        maxLines.put(BaseDanmaku.TYPE_FIX_TOP, maxLine);
+        maxLines.put(BaseDanmaku.TYPE_SCROLL_RL, maxLine);
+        maxLines.put(BaseDanmaku.TYPE_SCROLL_LR, maxLine);
+        maxLines.put(BaseDanmaku.TYPE_FIX_BOTTOM, maxLine);
         mDanmakuContext.setDanmakuStyle(IDisplay.DANMAKU_STYLE_STROKEN, 3).setMaximumLines(maxLines).setDanmakuMargin(12).setScaleTextSize(0.8f);
         mBinding.control.danmu.setActivated(Setting.isDanmu());
     }

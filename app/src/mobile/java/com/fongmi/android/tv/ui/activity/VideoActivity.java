@@ -414,10 +414,11 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private void setDanmuView() {
         mPlayers.setDanmuView(mBinding.danmaku);
         HashMap<Integer, Integer> maxLines = new HashMap<>();
-        maxLines.put(BaseDanmaku.TYPE_FIX_TOP, 2);
-        maxLines.put(BaseDanmaku.TYPE_SCROLL_RL, 2);
-        maxLines.put(BaseDanmaku.TYPE_SCROLL_LR, 2);
-        maxLines.put(BaseDanmaku.TYPE_FIX_BOTTOM, 1);
+        int maxLine = Setting.getDanmuMaxLine(2);
+        maxLines.put(BaseDanmaku.TYPE_FIX_TOP, maxLine);
+        maxLines.put(BaseDanmaku.TYPE_SCROLL_RL, maxLine);
+        maxLines.put(BaseDanmaku.TYPE_SCROLL_LR, maxLine);
+        maxLines.put(BaseDanmaku.TYPE_FIX_BOTTOM, maxLine);
         mDanmakuContext.setDanmakuStyle(IDisplay.DANMAKU_STYLE_STROKEN, 3).setMaximumLines(maxLines).setDanmakuMargin(8).setScaleTextSize(0.8f);
         checkDanmuImg();
     }
