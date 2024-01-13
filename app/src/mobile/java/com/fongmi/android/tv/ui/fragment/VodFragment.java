@@ -102,6 +102,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         mBinding.keep.setOnClickListener(this::onKeep);
         mBinding.retry.setOnClickListener(this::onRetry);
         mBinding.filter.setOnClickListener(this::onFilter);
+        mBinding.uptop.setOnClickListener(this::onUptop);
         mBinding.search.setOnClickListener(this::onSearch);
         mBinding.history.setOnClickListener(this::onHistory);
         mBinding.pager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
@@ -166,17 +167,27 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         if (mAdapter.getItemCount() == 0) {
             mBinding.filter.setVisibility(View.GONE);
             mBinding.link.setVisibility(View.VISIBLE);
+            mBinding.uptop.setVisibility(View.INVISIBLE);
         } else if (mAdapter.get(position).getFilters().size() > 0) {
             mBinding.link.setVisibility(View.GONE);
             mBinding.filter.show();
+            mBinding.uptop.setVisibility(View.INVISIBLE);
         } else if (position == 0 || mAdapter.get(position).getFilters().isEmpty()) {
             mBinding.link.show();
             mBinding.filter.setVisibility(View.GONE);
+            mBinding.uptop.setVisibility(View.INVISIBLE);
         }
     }
 
     private void checkRetry() {
         mBinding.retry.setVisibility(mAdapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
+    }
+
+    private void onUptop(View view) {
+        ((TypeFragment) getFragment()).scrollToTop();
+        mBinding.uptop.setVisibility(View.INVISIBLE);
+        if (mBinding.filter.getVisibility() == View.INVISIBLE) mBinding.filter.show();
+        else if (mBinding.link.getVisibility() == View.INVISIBLE) mBinding.link.show();
     }
 
     private void onLink(View view) {
