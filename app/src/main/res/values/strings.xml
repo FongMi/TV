@@ -80,6 +80,9 @@
     <string name="setting_quality">Image quality</string>
     <string name="setting_size">Image size</string>
     <string name="setting_doh">DoH</string>
+    <string name="setting_danmu_speed">Bullet Speed</string>
+    <string name="setting_danmu_size">Bullet Size</string>
+    <string name="setting_danmu_maxline">Bullet Max Line</string>
     <string name="setting_proxy">Proxy</string>
     <string name="setting_cache">Cache</string>
     <string name="setting_backup">Backup</string>
@@ -140,6 +143,23 @@
         <item>System</item>
         <item>IJK</item>
         <item>EXO</item>
+    </string-array>
+
+    <string-array name="select_danmu_speed">
+        <item>Super Slow</item>
+        <item>Slow</item>
+        <item>Moderate</item>
+        <item>Fast</item>
+        <item>Super Fast</item>
+    </string-array>
+
+    <string-array name="select_danmu_size">
+        <item>1 times</item>
+        <item>1.2 times</item>
+        <item>1.4 times</item>
+        <item>1.6 times</item>
+        <item>1.8 times</item>
+        <item>2.0 times</item>
     </string-array>
 
     <string-array name="select_render">

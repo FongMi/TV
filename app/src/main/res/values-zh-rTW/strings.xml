@@ -80,6 +80,9 @@
     <string name="setting_quality">圖片品質</string>
     <string name="setting_size">圖片尺寸</string>
     <string name="setting_doh">DoH</string>
+    <string name="setting_danmu_speed">弹幕速度</string>
+    <string name="setting_danmu_size">弹幕大小</string>
+    <string name="setting_danmu_maxline">弹幕最大行數</string>
     <string name="setting_proxy">Proxy</string>
     <string name="setting_cache">暫存</string>
     <string name="setting_backup">備份</string>
@@ -140,6 +143,23 @@
         <item>系統</item>
         <item>IJK</item>
         <item>EXO</item>
+    </string-array>
+
+    <string-array name="select_danmu_speed">
+        <item>超慢</item>
+        <item>慢</item>
+        <item>適中</item>
+        <item>快</item>
+        <item>超快</item>
+    </string-array>
+
+    <string-array name="select_danmu_size">
+        <item>1倍</item>
+        <item>1.2倍</item>
+        <item>1.4倍</item>
+        <item>1.6倍</item>
+        <item>1.8倍</item>
+        <item>2.0倍</item>
     </string-array>
 
     <string-array name="select_quality">

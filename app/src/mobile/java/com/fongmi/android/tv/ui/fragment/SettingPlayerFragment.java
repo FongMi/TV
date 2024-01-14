@@ -14,20 +14,25 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.databinding.FragmentSettingPlayerBinding;
 import com.fongmi.android.tv.impl.BufferCallback;
+import com.fongmi.android.tv.impl.DanmuMaxLineCallback;
 import com.fongmi.android.tv.impl.SubtitleCallback;
 import com.fongmi.android.tv.impl.UaCallback;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.dialog.BufferDialog;
+import com.fongmi.android.tv.ui.dialog.DanmuMaxLineDialog;
 import com.fongmi.android.tv.ui.dialog.SubtitleDialog;
 import com.fongmi.android.tv.ui.dialog.UaDialog;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-public class SettingPlayerFragment extends BaseFragment implements UaCallback, BufferCallback, SubtitleCallback {
+public class SettingPlayerFragment extends BaseFragment implements UaCallback, BufferCallback, SubtitleCallback, DanmuMaxLineCallback {
 
     private FragmentSettingPlayerBinding mBinding;
+    private String[] player;
+    private String[] danmuSpeed;
+    private String[] danmuSize;
     private String[] background;
     private String[] caption;
     private String[] http;
@@ -48,6 +53,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
 
     @Override
     protected void initView() {
+        mBinding.playerText.setText((player = ResUtil.getStringArray(R.array.select_player))[Setting.getPlayer()]);
         mBinding.uaText.setText(Setting.getUa());
         mBinding.tunnelText.setText(getSwitch(Setting.isTunnel()));
         mBinding.captionText.setText(getSwitch(Setting.isCaption()));
@@ -57,11 +63,15 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
         mBinding.httpText.setText((http = ResUtil.getStringArray(R.array.select_exo_http))[Setting.getHttp()]);
         mBinding.captionText.setText((caption = ResUtil.getStringArray(R.array.select_caption))[Setting.isCaption() ? 1 : 0]);
         mBinding.backgroundText.setText((background = ResUtil.getStringArray(R.array.select_background))[Setting.getBackground()]);
+        mBinding.danmuMaxLineText.setText(String.valueOf(Setting.getDanmuMaxLine(2)));
+        mBinding.danmuSizeText.setText((danmuSize = ResUtil.getStringArray(R.array.select_danmu_size))[Setting.getDanmuSize()]);
+        mBinding.danmuSpeedText.setText((danmuSpeed = ResUtil.getStringArray(R.array.select_danmu_speed))[Setting.getDanmuSpeed()]);
         setVisible();
     }
 
     @Override
     protected void initEvent() {
+        mBinding.player.setOnClickListener(this::setPlayer);
         mBinding.ua.setOnClickListener(this::onUa);
         mBinding.http.setOnClickListener(this::setHttp);
         mBinding.flag.setOnClickListener(this::setFlag);
@@ -71,6 +81,9 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
         mBinding.subtitle.setOnClickListener(this::onSubtitle);
         mBinding.caption.setOnLongClickListener(this::onCaption);
         mBinding.background.setOnClickListener(this::setBackground);
+        mBinding.danmuSpeed.setOnClickListener(this::setDanmuSpeed);
+        mBinding.danmuSize.setOnClickListener(this::setDanmuSize);
+        mBinding.danmuMaxLine.setOnClickListener(this::onDanmuMaxLine);
     }
 
     private void setVisible() {
@@ -82,6 +95,12 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
 
     private void onUa(View view) {
         UaDialog.create(this).show();
+    }
+
+    private void setPlayer(View view) {
+        int index = Setting.getPlayer();
+        Setting.putPlayer(index = index == player.length - 1 ? 0 : ++index);
+        mBinding.playerText.setText(player[index]);
     }
 
     @Override
@@ -149,4 +168,27 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
     public void onHiddenChanged(boolean hidden) {
         if (!hidden) setVisible();
     }
+
+    public void setDanmuSpeed(View view) {
+        int index = Setting.getDanmuSpeed();
+        Setting.putDanmuSpeed(index = index == danmuSpeed.length - 1 ? 0 : ++index);
+        mBinding.danmuSpeedText.setText(danmuSpeed[index]);
+    }
+
+    public void setDanmuSize(View view) {
+        int index = Setting.getDanmuSize();
+        Setting.putDanmuSize(index = index == danmuSize.length - 1 ? 0 : ++index);
+        mBinding.danmuSizeText.setText(danmuSize[index]);
+    }
+
+    public void onDanmuMaxLine(View view) {
+        DanmuMaxLineDialog.create(this).show();
+    }
+
+    @Override
+    public void setDanmuMaxLine(int maxLine) {
+        mBinding.danmuMaxLineText.setText(String.valueOf(maxLine));
+        Setting.putDanmuMaxLine(maxLine);
+    }
+
 }
