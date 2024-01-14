@@ -26,4 +26,5 @@ public class FBDanmaku extends FTDanmaku {
     public int getType() {
         return TYPE_FIX_BOTTOM;
     }
+
 }

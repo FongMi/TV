@@ -17,7 +17,6 @@
 package master.flame.danmaku.danmaku.model.objectpool;
 
 class SynchronizedPool<T extends Poolable<T>> implements Pool<T> {
-
     private final Pool<T> mPool;
 
     private final Object mLock;

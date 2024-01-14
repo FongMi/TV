@@ -18,7 +18,7 @@ package master.flame.danmaku.danmaku.renderer.android;
 
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDanmakus;
-import master.flame.danmaku.danmaku.model.IDisplay;
+import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.util.DanmakuUtils;
 
@@ -47,7 +47,8 @@ public class DanmakusRetainer {
         }
     }
 
-    public void fix(BaseDanmaku danmaku, IDisplay disp, Verifier verifier) {
+    public void fix(BaseDanmaku danmaku, IDisplayer disp, Verifier verifier) {
+
         int type = danmaku.getType();
         switch (type) {
             case BaseDanmaku.TYPE_SCROLL_RL:
@@ -66,6 +67,7 @@ public class DanmakusRetainer {
                 danmaku.layout(disp, 0, 0);
                 break;
         }
+
     }
 
     public void clear() {
@@ -82,21 +84,23 @@ public class DanmakusRetainer {
             fbdrInstance.clear();
         }
     }
-
-    public void release() {
+    
+    public void release(){
         clear();
     }
 
     public interface Verifier {
 
-        boolean skipLayout(BaseDanmaku danmaku, float fixedTop, int lines, boolean willHit);
+        public boolean skipLayout(BaseDanmaku danmaku, float fixedTop, int lines, boolean willHit);
+
     }
 
     public interface IDanmakusRetainer {
 
-        void fix(BaseDanmaku drawItem, IDisplay disp, Verifier verifier);
+        public void fix(BaseDanmaku drawItem, IDisplayer disp, Verifier verifier);
 
-        void clear();
+        public void clear();
+
     }
 
     private static class RetainerState {
@@ -107,15 +111,88 @@ public class DanmakusRetainer {
         public boolean willHit = false;
     }
 
+
     private static class AlignTopRetainer implements IDanmakusRetainer {
+        protected class RetainerConsumer extends IDanmakus.Consumer<BaseDanmaku, RetainerState> {
+            public IDisplayer disp;
+            int lines = 0;
+            public BaseDanmaku insertItem = null, firstItem = null, lastItem = null, minRightRow = null, drawItem = null;
+            boolean overwriteInsert = false;
+            boolean shown = false;
+            boolean willHit = false;
+
+            @Override
+            public void before() {
+                lines = 0;
+                insertItem = firstItem = lastItem = minRightRow = null;
+                overwriteInsert = shown = willHit = false;
+            }
+
+            @Override
+            public int accept(BaseDanmaku item) {
+                if (mCancelFixingFlag) {
+                    return ACTION_BREAK;
+                }
+                lines++;
+                if(item == drawItem){
+                    insertItem = item;
+                    lastItem = null;
+                    shown = true;
+                    willHit = false;
+                    return ACTION_BREAK;
+                }
+
+                if (firstItem == null)
+                    firstItem = item;
+
+                if (drawItem.paintHeight + item.getTop() > disp.getHeight()) {
+                    overwriteInsert = true;
+                    return ACTION_BREAK;
+                }
+
+                if (minRightRow == null) {
+                    minRightRow = item;
+                } else {
+                    if (minRightRow.getRight() >= item.getRight()) {
+                        minRightRow = item;
+                    }
+                }
+
+                // 检查碰撞
+                willHit = DanmakuUtils.willHitInDuration(disp, item, drawItem,
+                        drawItem.getDuration(), drawItem.getTimer().currMillisecond);
+                if (!willHit) {
+                    insertItem = item;
+                    return ACTION_BREAK;
+                }
+
+                lastItem = item;
+                return ACTION_CONTINUE;
+            }
+
+            @Override
+            public RetainerState result() {
+                RetainerState retainerState = new RetainerState();
+                retainerState.lines = this.lines;
+                retainerState.firstItem = this.firstItem;
+                retainerState.insertItem = this.insertItem;
+                retainerState.lastItem = this.lastItem;
+                retainerState.minRightRow = this.minRightRow;
+                retainerState.overwriteInsert = this.overwriteInsert;
+                retainerState.shown = this.shown;
+                retainerState.willHit = this.willHit;
+                return retainerState;
+            }
+        }
 
         protected Danmakus mVisibleDanmakus = new Danmakus(Danmakus.ST_BY_YPOS);
         protected boolean mCancelFixingFlag = false;
         protected RetainerConsumer mConsumer = new RetainerConsumer();
 
         @Override
-        public void fix(BaseDanmaku drawItem, IDisplay disp, Verifier verifier) {
-            if (drawItem.isOutside()) return;
+        public void fix(BaseDanmaku drawItem, IDisplayer disp, Verifier verifier) {
+            if (drawItem.isOutside())
+                return;
             float topPos = disp.getAllMarginTop();
             int lines = 0;
             boolean shown = drawItem.isShown();
@@ -125,6 +202,7 @@ public class DanmakusRetainer {
             int margin = disp.getMargin();
             if (!shown) {
                 mCancelFixingFlag = false;
+                // 确定弹幕位置
                 BaseDanmaku insertItem = null, firstItem = null, lastItem = null, minRightRow = null;
                 boolean overwriteInsert = false;
                 mConsumer.disp = disp;
@@ -143,9 +221,11 @@ public class DanmakusRetainer {
                 }
                 boolean checkEdge = true;
                 if (insertItem != null) {
-                    if (lastItem != null) topPos = lastItem.getBottom() + margin;
-                    else topPos = insertItem.getTop();
-                    if (insertItem != drawItem) {
+                    if (lastItem != null)
+                        topPos = lastItem.getBottom() + margin;
+                    else
+                        topPos = insertItem.getTop();
+                    if (insertItem != drawItem){
                         removeItem = insertItem;
                         shown = false;
                     }
@@ -164,7 +244,8 @@ public class DanmakusRetainer {
                     topPos = disp.getAllMarginTop();
                 }
                 if (checkEdge) {
-                    isOutOfVertialEdge = isOutVerticalEdge(overwriteInsert, drawItem, disp, topPos, firstItem, lastItem);
+                    isOutOfVertialEdge = isOutVerticalEdge(overwriteInsert, drawItem, disp, topPos, firstItem,
+                            lastItem);
                 }
                 if (isOutOfVertialEdge) {
                     topPos = disp.getAllMarginTop();
@@ -192,10 +273,15 @@ public class DanmakusRetainer {
                 mVisibleDanmakus.removeItem(removeItem);
                 mVisibleDanmakus.addItem(drawItem);
             }
+
         }
 
-        protected boolean isOutVerticalEdge(boolean overwriteInsert, BaseDanmaku drawItem, IDisplay disp, float topPos, BaseDanmaku firstItem, BaseDanmaku lastItem) {
-            return topPos < disp.getAllMarginTop() || (firstItem != null && firstItem.getTop() > 0) || topPos + drawItem.paintHeight > disp.getHeight();
+        protected boolean isOutVerticalEdge(boolean overwriteInsert, BaseDanmaku drawItem,
+                                            IDisplayer disp, float topPos, BaseDanmaku firstItem, BaseDanmaku lastItem) {
+            if (topPos < disp.getAllMarginTop() || (firstItem != null && firstItem.getTop() > 0) || topPos + drawItem.paintHeight > disp.getHeight()) {
+                return true;
+            }
+            return false;
         }
 
         @Override
@@ -204,20 +290,34 @@ public class DanmakusRetainer {
             mVisibleDanmakus.clear();
         }
 
-        protected class RetainerConsumer extends IDanmakus.Consumer<BaseDanmaku, RetainerState> {
+    }
 
-            public IDisplay disp;
-            public BaseDanmaku insertItem = null, firstItem = null, lastItem = null, minRightRow = null, drawItem = null;
+    private static class FTDanmakusRetainer extends AlignTopRetainer {
+
+        @Override
+        protected boolean isOutVerticalEdge(boolean overwriteInsert, BaseDanmaku drawItem,
+                                            IDisplayer disp, float topPos, BaseDanmaku firstItem, BaseDanmaku lastItem) {
+            if (topPos + drawItem.paintHeight > disp.getHeight()) {
+                return true;
+            }
+            return false;
+        }
+
+    }
+
+    private static class AlignBottomRetainer extends FTDanmakusRetainer {
+        protected class RetainerConsumer extends IDanmakus.Consumer<BaseDanmaku, RetainerState> {
+            public IDisplayer disp;
             int lines = 0;
-            boolean overwriteInsert = false;
-            boolean shown = false;
+            public BaseDanmaku removeItem = null, firstItem = null, drawItem = null;
             boolean willHit = false;
+            float topPos;
 
             @Override
             public void before() {
                 lines = 0;
-                insertItem = firstItem = lastItem = minRightRow = null;
-                overwriteInsert = shown = willHit = false;
+                removeItem = firstItem = null;
+                willHit = false;
             }
 
             @Override
@@ -227,38 +327,33 @@ public class DanmakusRetainer {
                 }
                 lines++;
                 if (item == drawItem) {
-                    insertItem = item;
-                    lastItem = null;
-                    shown = true;
+                    removeItem = null;
                     willHit = false;
                     return ACTION_BREAK;
                 }
 
                 if (firstItem == null) {
                     firstItem = item;
-                }
-
-                if (drawItem.paintHeight + item.getTop() > disp.getHeight()) {
-                    overwriteInsert = true;
-                    return ACTION_BREAK;
-                }
-
-                if (minRightRow == null) {
-                    minRightRow = item;
-                } else {
-                    if (minRightRow.getRight() >= item.getRight()) {
-                        minRightRow = item;
+                    if (firstItem.getBottom() != disp.getHeight()) {
+                        return ACTION_BREAK;
                     }
                 }
 
-                // 检查碰撞
-                willHit = DanmakuUtils.willHitInDuration(disp, item, drawItem, drawItem.getDuration(), drawItem.getTimer().currMillisecond);
-                if (!willHit) {
-                    insertItem = item;
+                if (topPos < disp.getAllMarginTop()) {
+                    removeItem = null;
                     return ACTION_BREAK;
                 }
 
-                lastItem = item;
+                // 检查碰撞
+                willHit = DanmakuUtils.willHitInDuration(disp, item, drawItem,
+                        drawItem.getDuration(), drawItem.getTimer().currMillisecond);
+                if (!willHit) {
+                    removeItem = item;
+                    // topPos = item.getBottom() - drawItem.paintHeight;
+                    return ACTION_BREAK;
+                }
+
+                topPos = item.getTop() - disp.getMargin() - drawItem.paintHeight;
                 return ACTION_CONTINUE;
             }
 
@@ -267,33 +362,19 @@ public class DanmakusRetainer {
                 RetainerState retainerState = new RetainerState();
                 retainerState.lines = this.lines;
                 retainerState.firstItem = this.firstItem;
-                retainerState.insertItem = this.insertItem;
-                retainerState.lastItem = this.lastItem;
-                retainerState.minRightRow = this.minRightRow;
-                retainerState.overwriteInsert = this.overwriteInsert;
-                retainerState.shown = this.shown;
+                retainerState.removeItem = this.removeItem;
                 retainerState.willHit = this.willHit;
                 return retainerState;
             }
         }
-    }
-
-    private static class FTDanmakusRetainer extends AlignTopRetainer {
-
-        @Override
-        protected boolean isOutVerticalEdge(boolean overwriteInsert, BaseDanmaku drawItem, IDisplay disp, float topPos, BaseDanmaku firstItem, BaseDanmaku lastItem) {
-            return topPos + drawItem.paintHeight > disp.getHeight();
-        }
-    }
-
-    private static class AlignBottomRetainer extends FTDanmakusRetainer {
 
         protected RetainerConsumer mConsumer = new RetainerConsumer();
         protected Danmakus mVisibleDanmakus = new Danmakus(Danmakus.ST_BY_YPOS_DESC);
 
         @Override
-        public void fix(BaseDanmaku drawItem, IDisplay disp, Verifier verifier) {
-            if (drawItem.isOutside()) return;
+        public void fix(BaseDanmaku drawItem, IDisplayer disp, Verifier verifier) {
+            if (drawItem.isOutside())
+                return;
             boolean shown = drawItem.isShown();
             float topPos = shown ? drawItem.getTop() : -1;
             int lines = 0;
@@ -332,6 +413,7 @@ public class DanmakusRetainer {
                         lines--;
                     }
                 }
+
             }
 
             if (verifier != null && verifier.skipLayout(drawItem, topPos, lines, willHit)) {
@@ -348,10 +430,15 @@ public class DanmakusRetainer {
                 mVisibleDanmakus.removeItem(removeItem);
                 mVisibleDanmakus.addItem(drawItem);
             }
+
         }
 
-        protected boolean isOutVerticalEdge(boolean overwriteInsert, BaseDanmaku drawItem, IDisplay disp, float topPos, BaseDanmaku firstItem, BaseDanmaku lastItem) {
-            return topPos < disp.getAllMarginTop() || (firstItem != null && firstItem.getBottom() != disp.getHeight());
+        protected boolean isOutVerticalEdge(boolean overwriteInsert, BaseDanmaku drawItem,
+                                            IDisplayer disp, float topPos, BaseDanmaku firstItem, BaseDanmaku lastItem) {
+            if (topPos < disp.getAllMarginTop() || (firstItem != null && firstItem.getBottom() != disp.getHeight())) {
+                return true;
+            }
+            return false;
         }
 
         @Override
@@ -360,64 +447,6 @@ public class DanmakusRetainer {
             mVisibleDanmakus.clear();
         }
 
-        protected class RetainerConsumer extends IDanmakus.Consumer<BaseDanmaku, RetainerState> {
-
-            public IDisplay disp;
-            public BaseDanmaku removeItem = null, firstItem = null, drawItem = null;
-            int lines = 0;
-            boolean willHit = false;
-            float topPos;
-
-            @Override
-            public void before() {
-                lines = 0;
-                removeItem = firstItem = null;
-                willHit = false;
-            }
-
-            @Override
-            public int accept(BaseDanmaku item) {
-                if (mCancelFixingFlag) {
-                    return ACTION_BREAK;
-                }
-                lines++;
-                if (item == drawItem) {
-                    removeItem = null;
-                    willHit = false;
-                    return ACTION_BREAK;
-                }
-
-                if (firstItem == null) {
-                    firstItem = item;
-                    if (firstItem.getBottom() != disp.getHeight()) {
-                        return ACTION_BREAK;
-                    }
-                }
-
-                if (topPos < disp.getAllMarginTop()) {
-                    removeItem = null;
-                    return ACTION_BREAK;
-                }
-
-                willHit = DanmakuUtils.willHitInDuration(disp, item, drawItem, drawItem.getDuration(), drawItem.getTimer().currMillisecond);
-                if (!willHit) {
-                    removeItem = item;
-                    return ACTION_BREAK;
-                }
-
-                topPos = item.getTop() - disp.getMargin() - drawItem.paintHeight;
-                return ACTION_CONTINUE;
-            }
-
-            @Override
-            public RetainerState result() {
-                RetainerState retainerState = new RetainerState();
-                retainerState.lines = this.lines;
-                retainerState.firstItem = this.firstItem;
-                retainerState.removeItem = this.removeItem;
-                retainerState.willHit = this.willHit;
-                return retainerState;
-            }
-        }
     }
+
 }

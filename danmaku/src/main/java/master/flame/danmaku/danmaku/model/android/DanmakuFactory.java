@@ -16,11 +16,13 @@
 
 package master.flame.danmaku.danmaku.model.android;
 
+import android.util.Log;
+
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.Duration;
 import master.flame.danmaku.danmaku.model.FBDanmaku;
 import master.flame.danmaku.danmaku.model.FTDanmaku;
-import master.flame.danmaku.danmaku.model.IDisplay;
+import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.L2RDanmaku;
 import master.flame.danmaku.danmaku.model.R2LDanmaku;
 import master.flame.danmaku.danmaku.model.SpecialDanmaku;
@@ -44,30 +46,30 @@ public class DanmakuFactory {
     public final static long MAX_DANMAKU_DURATION_HIGH_DENSITY = 9000;
 
     public int CURRENT_DISP_WIDTH = 0, CURRENT_DISP_HEIGHT = 0;
-    public long REAL_DANMAKU_DURATION = COMMON_DANMAKU_DURATION;
-    public long MAX_DANMAKU_DURATION = MIN_DANMAKU_DURATION;
-    public Duration MAX_Duration_Scroll_Danmaku;
-    public Duration MAX_Duration_Fix_Danmaku;
-    public Duration MAX_Duration_Special_Danmaku;
-    public IDisplay sLastDisp;
-    private SpecialDanmaku.ScaleFactor mScaleFactor = null;
-    private float CURRENT_DISP_SIZE_FACTOR = 1.0f;
-    private DanmakuContext sLastConfig;
 
-    protected DanmakuFactory() {
-    }
+    private SpecialDanmaku.ScaleFactor mScaleFactor = null;
+
+    private float CURRENT_DISP_SIZE_FACTOR = 1.0f;
+
+    public long REAL_DANMAKU_DURATION = COMMON_DANMAKU_DURATION;
+
+    public long MAX_DANMAKU_DURATION = MIN_DANMAKU_DURATION;
+
+    public Duration MAX_Duration_Scroll_Danmaku;
+
+    public Duration MAX_Duration_Fix_Danmaku;
+
+    public Duration MAX_Duration_Special_Danmaku;
+
+    public IDisplayer sLastDisp;
+    private DanmakuContext sLastConfig;
 
     public static DanmakuFactory create() {
         return new DanmakuFactory();
     }
 
-    public static void fillLinePathData(BaseDanmaku item, float[][] points, float scaleX, float scaleY) {
-        if (item.getType() != BaseDanmaku.TYPE_SPECIAL || points.length == 0 || points[0].length != 2) return;
-        for (int i = 0; i < points.length; i++) {
-            points[i][0] *= scaleX;
-            points[i][1] *= scaleY;
-        }
-        ((SpecialDanmaku) item).setLinePathData(points);
+    protected DanmakuFactory() {
+
     }
 
     public void resetDurationsData() {
@@ -81,7 +83,7 @@ public class DanmakuFactory {
 
     public void notifyDispSizeChanged(DanmakuContext context) {
         sLastConfig = context;
-        sLastDisp = context.getDisplay();
+        sLastDisp = context.getDisplayer();
         createDanmaku(BaseDanmaku.TYPE_SCROLL_RL, context);
     }
 
@@ -90,14 +92,16 @@ public class DanmakuFactory {
     }
 
     public BaseDanmaku createDanmaku(int type, DanmakuContext context) {
-        if (context == null) return null;
+        if (context == null)
+            return null;
         sLastConfig = context;
-        sLastDisp = context.getDisplay();
+        sLastDisp = context.getDisplayer();
         return createDanmaku(type, sLastDisp.getWidth(), sLastDisp.getHeight(), CURRENT_DISP_SIZE_FACTOR, context.scrollSpeedFactor);
     }
 
-    public BaseDanmaku createDanmaku(int type, IDisplay disp, float viewportScale, float scrollSpeedFactor) {
-        if (disp == null) return null;
+    public BaseDanmaku createDanmaku(int type, IDisplayer disp, float viewportScale, float scrollSpeedFactor) {
+        if (disp == null)
+            return null;
         sLastDisp = disp;
         return createDanmaku(type, disp.getWidth(), disp.getHeight(), viewportScale, scrollSpeedFactor);
     }
@@ -111,7 +115,8 @@ public class DanmakuFactory {
      * @param viewportScale  缩放比例,会影响滚动弹幕的存活时间(duration)
      * @return
      */
-    public BaseDanmaku createDanmaku(int type, int viewportWidth, int viewportHeight, float viewportScale, float scrollSpeedFactor) {
+    public BaseDanmaku createDanmaku(int type, int viewportWidth, int viewportHeight,
+                                     float viewportScale, float scrollSpeedFactor) {
         return createDanmaku(type, (float) viewportWidth, (float) viewportHeight, viewportScale, scrollSpeedFactor);
     }
 
@@ -124,7 +129,8 @@ public class DanmakuFactory {
      * @param viewportSizeFactor 会影响滚动弹幕的速度/存活时间(duration)
      * @return
      */
-    public BaseDanmaku createDanmaku(int type, float viewportWidth, float viewportHeight, float viewportSizeFactor, float scrollSpeedFactor) {
+    public BaseDanmaku createDanmaku(int type, float viewportWidth, float viewportHeight,
+                                     float viewportSizeFactor, float scrollSpeedFactor) {
         int oldDispWidth = CURRENT_DISP_WIDTH;
         int oldDispHeight = CURRENT_DISP_HEIGHT;
         boolean sizeChanged = updateViewportState(viewportWidth, viewportHeight, viewportSizeFactor);
@@ -177,17 +183,25 @@ public class DanmakuFactory {
     }
 
     private void updateScaleFactor(int width, int height, float scaleX, float scaleY) {
-        if (mScaleFactor == null) mScaleFactor = new SpecialDanmaku.ScaleFactor(width, height, scaleX, scaleY);
+        if (mScaleFactor == null) {
+            mScaleFactor = new SpecialDanmaku.ScaleFactor(width, height, scaleX, scaleY);
+        }
         mScaleFactor.update(width, height, scaleX, scaleY);
     }
 
-    public boolean updateViewportState(float viewportWidth, float viewportHeight, float viewportSizeFactor) {
+    public boolean updateViewportState(float viewportWidth, float viewportHeight,
+                                       float viewportSizeFactor) {
         boolean sizeChanged = false;
-        if (CURRENT_DISP_WIDTH != (int) viewportWidth || CURRENT_DISP_HEIGHT != (int) viewportHeight || CURRENT_DISP_SIZE_FACTOR != viewportSizeFactor) {
+        if (CURRENT_DISP_WIDTH != (int) viewportWidth
+                || CURRENT_DISP_HEIGHT != (int) viewportHeight
+                || CURRENT_DISP_SIZE_FACTOR != viewportSizeFactor) {
             sizeChanged = true;
-            REAL_DANMAKU_DURATION = (long) (COMMON_DANMAKU_DURATION * (viewportSizeFactor * viewportWidth / BILI_PLAYER_WIDTH));
-            REAL_DANMAKU_DURATION = Math.min(MAX_DANMAKU_DURATION_HIGH_DENSITY, REAL_DANMAKU_DURATION);
+            REAL_DANMAKU_DURATION = (long) (COMMON_DANMAKU_DURATION * (viewportSizeFactor
+                    * viewportWidth / BILI_PLAYER_WIDTH));
+            REAL_DANMAKU_DURATION = Math.min(MAX_DANMAKU_DURATION_HIGH_DENSITY,
+                    REAL_DANMAKU_DURATION);
             REAL_DANMAKU_DURATION = Math.max(MIN_DANMAKU_DURATION, REAL_DANMAKU_DURATION);
+
             CURRENT_DISP_WIDTH = (int) viewportWidth;
             CURRENT_DISP_HEIGHT = (int) viewportHeight;
             CURRENT_DISP_SIZE_FACTOR = viewportSizeFactor;
@@ -202,15 +216,20 @@ public class DanmakuFactory {
     }
 
     public void updateMaxDanmakuDuration() {
-        long maxScrollDuration = (MAX_Duration_Scroll_Danmaku == null ? 0 : MAX_Duration_Scroll_Danmaku.value), maxFixDuration = (MAX_Duration_Fix_Danmaku == null ? 0 : MAX_Duration_Fix_Danmaku.value), maxSpecialDuration = (MAX_Duration_Special_Danmaku == null ? 0 : MAX_Duration_Special_Danmaku.value);
+        long maxScrollDuration = (MAX_Duration_Scroll_Danmaku == null ? 0 : MAX_Duration_Scroll_Danmaku.value),
+                maxFixDuration = (MAX_Duration_Fix_Danmaku == null ? 0 : MAX_Duration_Fix_Danmaku.value),
+                maxSpecialDuration = (MAX_Duration_Special_Danmaku == null ? 0 : MAX_Duration_Special_Danmaku.value);
+
         MAX_DANMAKU_DURATION = Math.max(maxScrollDuration, maxFixDuration);
         MAX_DANMAKU_DURATION = Math.max(MAX_DANMAKU_DURATION, maxSpecialDuration);
+
         MAX_DANMAKU_DURATION = Math.max(COMMON_DANMAKU_DURATION, MAX_DANMAKU_DURATION);
         MAX_DANMAKU_DURATION = Math.max(REAL_DANMAKU_DURATION, MAX_DANMAKU_DURATION);
     }
 
     public void updateDurationFactor(float f) {
-        if (MAX_Duration_Scroll_Danmaku == null || MAX_Duration_Fix_Danmaku == null) return;
+        if (MAX_Duration_Scroll_Danmaku == null || MAX_Duration_Fix_Danmaku == null)
+            return;
         MAX_Duration_Scroll_Danmaku.setFactor(f);
         updateMaxDanmakuDuration();
     }
@@ -227,10 +246,26 @@ public class DanmakuFactory {
      * @param translationDuration
      * @param translationStartDelay
      */
-    public void fillTranslationData(BaseDanmaku item, float beginX, float beginY, float endX, float endY, long translationDuration, long translationStartDelay, float scaleX, float scaleY) {
-        if (item.getType() != BaseDanmaku.TYPE_SPECIAL) return;
-        ((SpecialDanmaku) item).setTranslationData(beginX * scaleX, beginY * scaleY, endX * scaleX, endY * scaleY, translationDuration, translationStartDelay);
+    public void fillTranslationData(BaseDanmaku item, float beginX, float beginY,
+                                    float endX, float endY, long translationDuration, long translationStartDelay,
+                                    float scaleX, float scaleY) {
+        if (item.getType() != BaseDanmaku.TYPE_SPECIAL)
+            return;
+        ((SpecialDanmaku) item).setTranslationData(beginX * scaleX, beginY * scaleY, endX * scaleX,
+                endY * scaleY, translationDuration, translationStartDelay);
         updateSpecicalDanmakuDuration(item);
+    }
+
+    public static void fillLinePathData(BaseDanmaku item, float[][] points, float scaleX,
+                                        float scaleY) {
+        if (item.getType() != BaseDanmaku.TYPE_SPECIAL || points.length == 0
+                || points[0].length != 2)
+            return;
+        for (int i = 0; i < points.length; i++) {
+            points[i][0] *= scaleX;
+            points[i][1] *= scaleY;
+        }
+        ((SpecialDanmaku) item).setLinePathData(points);
     }
 
     /**
@@ -241,8 +276,10 @@ public class DanmakuFactory {
      * @param endAlpha
      * @param alphaDuraion
      */
-    public void fillAlphaData(BaseDanmaku item, int beginAlpha, int endAlpha, long alphaDuraion) {
-        if (item.getType() != BaseDanmaku.TYPE_SPECIAL) return;
+    public void fillAlphaData(BaseDanmaku item, int beginAlpha, int endAlpha,
+                              long alphaDuraion) {
+        if (item.getType() != BaseDanmaku.TYPE_SPECIAL)
+            return;
         ((SpecialDanmaku) item).setAlphaData(beginAlpha, endAlpha, alphaDuraion);
         updateSpecicalDanmakuDuration(item);
     }
@@ -253,4 +290,5 @@ public class DanmakuFactory {
             updateMaxDanmakuDuration();
         }
     }
+
 }

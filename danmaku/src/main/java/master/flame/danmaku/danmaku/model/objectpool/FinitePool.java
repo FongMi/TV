@@ -17,29 +17,19 @@
 package master.flame.danmaku.danmaku.model.objectpool;
 
 class FinitePool<T extends Poolable<T>> implements Pool<T> {
-    /**
-     * Factory used to create new pool objects
-     */
+    /** Factory used to create new pool objects */
     private final PoolableManager<T> mManager;
 
-    /**
-     * Maximum number of objects in the pool
-     */
+    /** Maximum number of objects in the pool */
     private final int mLimit;
 
-    /**
-     * If true, mLimit is ignored
-     */
+    /** If true, mLimit is ignored */
     private final boolean mInfinite;
 
-    /**
-     * Next object to acquire
-     */
+    /** Next object to acquire */
     private T mRoot;
 
-    /**
-     * Number of objects in the pool
-     */
+    /** Number of objects in the pool */
     private int mPoolCount;
 
     FinitePool(PoolableManager<T> manager) {
@@ -49,7 +39,10 @@ class FinitePool<T extends Poolable<T>> implements Pool<T> {
     }
 
     FinitePool(PoolableManager<T> manager, int limit) {
-        if (limit <= 0) throw new IllegalArgumentException("The pool limit must be > 0");
+        if (limit <= 0) {
+            throw new IllegalArgumentException("The pool limit must be > 0");
+        }
+
         mManager = manager;
         mLimit = limit;
         mInfinite = false;
@@ -57,6 +50,7 @@ class FinitePool<T extends Poolable<T>> implements Pool<T> {
 
     public T acquire() {
         T element;
+
         if (mRoot != null) {
             element = mRoot;
             mRoot = element.getNextPoolable();
@@ -64,11 +58,13 @@ class FinitePool<T extends Poolable<T>> implements Pool<T> {
         } else {
             element = mManager.newInstance();
         }
+
         if (element != null) {
             element.setNextPoolable(null);
             element.setPooled(false);
             mManager.onAcquired(element);
         }
+
         return element;
     }
 

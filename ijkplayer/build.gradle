@@ -17,5 +17,5 @@ android {
 
 dependencies {
     implementation project(':catvod')
-    implementation project(':media-lib-ui')
+    implementation 'androidx.media3:media3-ui:1.1.1'
 }

@@ -16,65 +16,97 @@
 
 package master.flame.danmaku.danmaku.parser;
 
+import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.IDanmakus;
-import master.flame.danmaku.danmaku.model.IDisplay;
+import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.DanmakuContext;
 
+/**
+ *
+ */
 public abstract class BaseDanmakuParser {
 
-    protected DanmakuContext mContext;
-    protected DanmakuTimer mTimer;
-    private IDanmakus mDanmakus;
-    private IDisplay mDisp;
-
-    protected float mDisplayDensity;
-    protected float mScaledDensity;
-    protected int mDisplayHeight;
-    protected int mDisplayWidth;
-
-    public IDisplay getDisplay() {
-        return mDisp;
+    public interface Listener {
+        void onDanmakuAdd(BaseDanmaku danmaku);
     }
 
-    public BaseDanmakuParser setDisplay(IDisplay disp) {
+    protected IDataSource<?> mDataSource;
+
+    protected DanmakuTimer mTimer;
+    protected int mDispWidth;
+    protected int mDispHeight;
+    protected float mDispDensity;
+    protected float mScaledDensity;
+
+    private IDanmakus mDanmakus;
+
+    protected IDisplayer mDisp;
+    protected DanmakuContext mContext;
+    protected Listener mListener;
+
+    public BaseDanmakuParser setDisplayer(IDisplayer disp){
         mDisp = disp;
-        mDisplayWidth = disp.getWidth();
-        mDisplayHeight = disp.getHeight();
-        mDisplayDensity = disp.getDensity();
+    	mDispWidth = disp.getWidth();
+        mDispHeight = disp.getHeight();
+        mDispDensity = disp.getDensity();
         mScaledDensity = disp.getScaledDensity();
-        mContext.mDanmakuFactory.updateViewportState(mDisplayWidth, mDisplayHeight, getViewportSizeFactor());
+        mContext.mDanmakuFactory.updateViewportState(mDispWidth, mDispHeight, getViewportSizeFactor());
         mContext.mDanmakuFactory.updateMaxDanmakuDuration();
         return this;
     }
 
+    public IDisplayer getDisplayer(){
+        return mDisp;
+    }
+
+    public BaseDanmakuParser setListener(Listener listener) {
+        mListener = listener;
+        return this;
+    }
+    
     /**
      * decide the speed of scroll-danmakus
+     * @return
      */
     protected float getViewportSizeFactor() {
-        return 1 / (mDisplayDensity - 0.6f);
+        return 1 / (mDispDensity - 0.6f);
     }
-
-    public DanmakuTimer getTimer() {
-        return mTimer;
+    
+    public BaseDanmakuParser load(IDataSource<?> source) {
+        mDataSource = source;
+        return this;
     }
-
+    
     public BaseDanmakuParser setTimer(DanmakuTimer timer) {
         mTimer = timer;
         return this;
     }
 
+    public DanmakuTimer getTimer() {
+        return mTimer;
+    }
+    
     public IDanmakus getDanmakus() {
-        if (mDanmakus != null) return mDanmakus;
+        if (mDanmakus != null)
+            return mDanmakus;
         mContext.mDanmakuFactory.resetDurationsData();
         mDanmakus = parse();
+        releaseDataSource();
         mContext.mDanmakuFactory.updateMaxDanmakuDuration();
         return mDanmakus;
+    }
+    
+    protected void releaseDataSource() {
+        if(mDataSource!=null)
+            mDataSource.release();
+        mDataSource = null;
     }
 
     protected abstract IDanmakus parse();
 
     public void release() {
+        releaseDataSource();
     }
 
     public BaseDanmakuParser setConfig(DanmakuContext config) {

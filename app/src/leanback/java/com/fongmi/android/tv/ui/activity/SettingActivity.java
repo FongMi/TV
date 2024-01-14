@@ -125,7 +125,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.wallDefault.setOnClickListener(this::setWallDefault);
         mBinding.wallRefresh.setOnClickListener(this::setWallRefresh);
         mBinding.quality.setOnClickListener(this::setQuality);
-        mBinding.player.setOnClickListener(this::setPlayer);
+        mBinding.player.setOnClickListener(this::onPlayerSetting);
         mBinding.decode.setOnClickListener(this::setDecode);
         mBinding.render.setOnClickListener(this::setRender);
         mBinding.scale.setOnClickListener(this::setScale);
@@ -293,12 +293,6 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         Setting.putQuality(index = index == quality.length - 1 ? 0 : ++index);
         mBinding.qualityText.setText(quality[index]);
         RefreshEvent.image();
-    }
-
-    private void setPlayer(View view) {
-        int index = Setting.getPlayer();
-        Setting.putPlayer(index = index == player.length - 1 ? 0 : ++index);
-        mBinding.playerText.setText(player[index]);
     }
 
     private void setDecode(View view) {

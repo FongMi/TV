@@ -16,43 +16,53 @@
 
 package master.flame.danmaku.danmaku.renderer;
 
-import master.flame.danmaku.danmaku.model.BaseDanmaku;
+
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.ICacheManager;
+import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.IDanmakus;
-import master.flame.danmaku.danmaku.model.IDisplay;
+import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
 
 public interface IRenderer {
-
+    
     int NOTHING_RENDERING = 0;
     int CACHE_RENDERING = 1;
     int TEXT_RENDERING = 2;
-
-    void draw(IDisplay disp, IDanmakus danmakus, long startRenderTime, RenderingState renderingState);
-
-    void clear();
-
-    void clearRetainer();
-
-    void release();
-
-    void setVerifierEnabled(boolean enabled);
-
-    void setCacheManager(ICacheManager cacheManager);
-
-    void setOnDanmakuShownListener(OnDanmakuShownListener onDanmakuShownListener);
-
-    void removeOnDanmakuShownListener();
-
-    void alignBottom(boolean enable);
 
     interface OnDanmakuShownListener {
         void onDanmakuShown(BaseDanmaku danmaku);
     }
 
-    class RenderingState {
+    class Area {
 
+        public final float[] mRefreshRect = new float[4];
+        private int mMaxHeight;
+        private int mMaxWidth;
+
+        public void setEdge(int maxWidth, int maxHeight) {
+            mMaxWidth = maxWidth;
+            mMaxHeight = maxHeight;
+        }
+
+        public void reset() {
+            set(mMaxWidth, mMaxHeight, 0, 0);
+        }
+
+        public void resizeToMax() {
+            set(0, 0, mMaxWidth, mMaxHeight);
+        }
+
+        public void set(float left, float top, float right, float bottom) {
+            mRefreshRect[0] = left;
+            mRefreshRect[1] = top;
+            mRefreshRect[2] = right;
+            mRefreshRect[3] = bottom;
+        }
+
+    }
+
+    public class RenderingState {
         public final static int UNKNOWN_TIME = -1;
 
         public boolean isRunningDanmakus;
@@ -79,27 +89,30 @@ public interface IRenderer {
         private IDanmakus runningDanmakus = new Danmakus(Danmakus.ST_BY_LIST);
         private boolean mIsObtaining;
 
-        public void addTotalCount(int count) {
+        public int addTotalCount(int count) {
             totalDanmakuCount += count;
+            return totalDanmakuCount;
         }
 
-        public void addCount(int type, int count) {
+        public int addCount(int type, int count) {
             switch (type) {
                 case BaseDanmaku.TYPE_SCROLL_RL:
                     r2lDanmakuCount += count;
-                    return;
+                    return r2lDanmakuCount;
                 case BaseDanmaku.TYPE_SCROLL_LR:
                     l2rDanmakuCount += count;
-                    return;
+                    return l2rDanmakuCount;
                 case BaseDanmaku.TYPE_FIX_TOP:
                     ftDanmakuCount += count;
-                    return;
+                    return ftDanmakuCount;
                 case BaseDanmaku.TYPE_FIX_BOTTOM:
                     fbDanmakuCount += count;
-                    return;
+                    return fbDanmakuCount;
                 case BaseDanmaku.TYPE_SPECIAL:
                     specialDanmakuCount += count;
+                    return specialDanmakuCount;
             }
+            return 0;
         }
 
         public void reset() {
@@ -113,7 +126,8 @@ public interface IRenderer {
         }
 
         public void set(RenderingState other) {
-            if (other == null) return;
+            if(other == null)
+                return;
             lastTotalDanmakuCount = other.lastTotalDanmakuCount;
             r2lDanmakuCount = other.r2lDanmakuCount;
             l2rDanmakuCount = other.l2rDanmakuCount;
@@ -146,5 +160,25 @@ public interface IRenderer {
             mIsObtaining = false;
             return danmakus;
         }
+
     }
+
+    void draw(IDisplayer disp, IDanmakus danmakus, long startRenderTime, RenderingState renderingState);
+
+    void clear();
+
+    void clearRetainer();
+
+    void release();
+
+    void setVerifierEnabled(boolean enabled);
+
+    void setCacheManager(ICacheManager cacheManager);
+
+    void setOnDanmakuShownListener(OnDanmakuShownListener onDanmakuShownListener);
+
+    void removeOnDanmakuShownListener();
+
+    void alignBottom(boolean enable);
+
 }

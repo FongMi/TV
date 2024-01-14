@@ -131,7 +131,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.player.setOnLongClickListener(this::onPlayerSetting);
         mBinding.wallDefault.setOnClickListener(this::setWallDefault);
         mBinding.wallRefresh.setOnClickListener(this::setWallRefresh);
-        mBinding.player.setOnClickListener(this::setPlayer);
+        mBinding.player.setOnClickListener(this::onPlayerSetting);
         mBinding.decode.setOnClickListener(this::setDecode);
         mBinding.render.setOnClickListener(this::setRender);
         mBinding.scale.setOnClickListener(this::setScale);
@@ -293,12 +293,6 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
                 setCacheText();
             }
         });
-    }
-
-    private void setPlayer(View view) {
-        int index = Setting.getPlayer();
-        Setting.putPlayer(index = index == player.length - 1 ? 0 : ++index);
-        mBinding.playerText.setText(player[index]);
     }
 
     private void setDecode(View view) {
