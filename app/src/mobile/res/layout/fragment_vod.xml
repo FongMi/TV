@@ -142,16 +142,17 @@
         tools:visibility="visible" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/uptop"
+        android:id="@+id/top"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:tag="uptop"
+        android:tag="top"
+        android:visibility="invisible"
         app:backgroundTint="@color/blue_500"
         app:layout_anchor="@id/pager"
         app:layout_anchorGravity="end|bottom"
         app:layout_behavior="com.fongmi.android.tv.ui.custom.CustomFabBehavior"
-        app:srcCompat="@drawable/ic_fab_uptop"
+        app:srcCompat="@drawable/ic_fab_top"
         app:tint="@color/white"
         tools:visibility="visible" />
 

@@ -28,7 +28,7 @@ public class CustomFabBehavior extends FloatingActionButton.Behavior {
     @Override
     public void onNestedScroll(@NonNull CoordinatorLayout coordinatorLayout, @NonNull FloatingActionButton child, @NonNull View target, int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed, int type, @NonNull int[] consumed) {
         super.onNestedScroll(coordinatorLayout, child, target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, type, consumed);
-        if ("uptop".equals(child.getTag())) {
+        if ("top".equals(child.getTag())) {
             if (dyConsumed > 0 && child.getVisibility() == View.INVISIBLE) {
                 child.show();
             } else if (dyConsumed < 0 && child.getVisibility() == View.VISIBLE) {
