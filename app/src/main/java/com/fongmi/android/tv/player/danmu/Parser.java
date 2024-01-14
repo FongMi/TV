@@ -3,6 +3,7 @@ package com.fongmi.android.tv.player.danmu;
 import android.graphics.Color;
 import android.text.TextUtils;
 
+import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.bean.Danmu;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Path;
@@ -14,7 +15,7 @@ import master.flame.danmaku.danmaku.model.AlphaValue;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.Duration;
 import master.flame.danmaku.danmaku.model.IDanmakus;
-import master.flame.danmaku.danmaku.model.IDisplay;
+import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.SpecialDanmaku;
 import master.flame.danmaku.danmaku.model.android.DanmakuFactory;
 import master.flame.danmaku.danmaku.model.android.Danmakus;
@@ -28,9 +29,11 @@ public class Parser extends BaseDanmakuParser {
     private float scaleX;
     private float scaleY;
     private int index;
+    private float danmuSizeTimes;
 
     public Parser(String path) {
         this.danmu = Danmu.fromXml(getContent(path));
+        this.danmuSizeTimes = 1.0f + (Setting.getDanmuSize() * 0.2f);
     }
 
     private String getContent(String path) {
@@ -55,25 +58,25 @@ public class Parser extends BaseDanmakuParser {
     }
 
     @Override
-    public BaseDanmakuParser setDisplay(IDisplay display) {
-        super.setDisplay(display);
-        scaleX = mDisplayWidth / DanmakuFactory.BILI_PLAYER_WIDTH;
-        scaleY = mDisplayHeight / DanmakuFactory.BILI_PLAYER_HEIGHT;
+    public BaseDanmakuParser setDisplayer(IDisplayer display) {
+        super.setDisplayer(display);
+        scaleX = mDispWidth / DanmakuFactory.BILI_PLAYER_WIDTH;
+        scaleY = mDispHeight / DanmakuFactory.BILI_PLAYER_HEIGHT;
         return this;
     }
 
     private void setParam(String[] values) {
         int type = Integer.parseInt(values[1]);
         long time = (long) (Float.parseFloat(values[0]) * 1000);
-        float size = Float.parseFloat(values[2]) * (mDisplayDensity - 0.6f);
+        float size = Float.parseFloat(values[2]) * (mDispDensity - 0.6f);
         int color = (int) ((0x00000000ff000000L | Long.parseLong(values[3])) & 0x00000000ffffffffL);
         item = mContext.mDanmakuFactory.createDanmaku(type, mContext);
         item.setTime(time);
         item.setTimer(mTimer);
-        item.setTextSize(size);
-        item.setTextColor(color);
-        item.setTextShadowColor(color <= Color.BLACK ? Color.WHITE : Color.BLACK);
-        item.setFlags(mContext.mGlobalFlagValues);
+        item.textSize = size * danmuSizeTimes;
+        item.textColor = color;
+        item.textShadowColor = color <= Color.BLACK ? Color.WHITE : Color.BLACK;
+        item.flags = mContext.mGlobalFlagValues;
     }
 
     private void setText(String text) {
@@ -85,7 +88,7 @@ public class Parser extends BaseDanmakuParser {
     private void setSpecial() {
         String[] textArr = null;
         try {
-            JSONArray jsonArray = new JSONArray(item.getText());
+            JSONArray jsonArray = new JSONArray(item.text);
             textArr = new String[jsonArray.length()];
             for (int i = 0; i < textArr.length; i++) {
                 textArr[i] = jsonArray.getString(i);

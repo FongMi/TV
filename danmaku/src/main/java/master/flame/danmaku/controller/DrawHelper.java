@@ -28,18 +28,18 @@ public class DrawHelper {
     public static Paint PAINT, PAINT_FPS;
 
     public static RectF RECT;
-
+    
     private static boolean USE_DRAWCOLOR_TO_CLEAR_CANVAS = true;
-
-    private static boolean USE_DRAWCOLOR_MODE_CLEAR = true;
-
+    
+    private static boolean USE_DRAWCOLOR_MODE_CLEAR = true; 
+    
     static {
         PAINT = new Paint();
         PAINT.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         PAINT.setColor(Color.TRANSPARENT);
         RECT = new RectF();
     }
-
+    
     public static void useDrawColorToClearCanvas(boolean use, boolean useClearMode) {
         USE_DRAWCOLOR_TO_CLEAR_CANVAS = use;
         USE_DRAWCOLOR_MODE_CLEAR = useClearMode;
@@ -52,13 +52,14 @@ public class DrawHelper {
             PAINT_FPS.setTextSize(30);
         }
         int top = canvas.getHeight() - 50;
+        
         clearCanvas(canvas, 10, top - 50, (int) (PAINT_FPS.measureText(text) + 20), canvas.getHeight());
         canvas.drawText(text, 10, top, PAINT_FPS);
     }
 
     public static void clearCanvas(Canvas canvas) {
         if (USE_DRAWCOLOR_TO_CLEAR_CANVAS) {
-            if (USE_DRAWCOLOR_MODE_CLEAR) {
+            if(USE_DRAWCOLOR_MODE_CLEAR) {
                 canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
             } else {
                 canvas.drawColor(Color.TRANSPARENT);
@@ -68,8 +69,8 @@ public class DrawHelper {
             clearCanvas(canvas, RECT);
         }
     }
-
-    public static void fillTransparent(Canvas canvas) {
+    
+    public static void fillTransparent(Canvas canvas){
         canvas.drawColor(0x00000000, PorterDuff.Mode.CLEAR);
     }
 
@@ -79,7 +80,9 @@ public class DrawHelper {
     }
 
     private static void clearCanvas(Canvas canvas, RectF rect) {
-        if (rect.width() <= 0 || rect.height() <= 0) return;
+        if (rect.width() <= 0 || rect.height() <= 0) {
+            return;
+        }
         canvas.drawRect(rect, PAINT);
     }
 }

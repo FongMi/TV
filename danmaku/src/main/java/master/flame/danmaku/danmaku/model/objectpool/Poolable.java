@@ -17,10 +17,9 @@
 package master.flame.danmaku.danmaku.model.objectpool;
 
 public interface Poolable<T> {
+    void setNextPoolable(T element);
 
     T getNextPoolable();
-
-    void setNextPoolable(T element);
 
     boolean isPooled();
 

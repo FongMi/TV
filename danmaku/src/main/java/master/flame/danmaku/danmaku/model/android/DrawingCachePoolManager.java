@@ -1,3 +1,4 @@
+
 package master.flame.danmaku.danmaku.model.android;
 
 import master.flame.danmaku.danmaku.model.objectpool.PoolableManager;
@@ -11,9 +12,12 @@ public class DrawingCachePoolManager implements PoolableManager<DrawingCache> {
 
     @Override
     public void onAcquired(DrawingCache element) {
+
     }
 
     @Override
     public void onReleased(DrawingCache element) {
+
     }
+
 }

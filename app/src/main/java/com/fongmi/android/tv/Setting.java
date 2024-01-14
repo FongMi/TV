@@ -241,6 +241,30 @@ public class Setting {
         Prefers.put("danmu", danmu);
     }
 
+    public static int getDanmuMaxLine(int defaultValue) {
+        return Prefers.getInt("danmu_maxline", defaultValue);
+    }
+
+    public static void putDanmuMaxLine(int maxline) {
+        Prefers.put("danmu_maxline", maxline);
+    }
+
+    public static int getDanmuSpeed() {
+        return Prefers.getInt("danmu_speed", 2);
+    }
+
+    public static void putDanmuSpeed(int speed) {
+        Prefers.put("danmu_speed", speed);
+    }
+
+    public static int getDanmuSize() {
+        return Prefers.getInt("danmu_size", 0);
+    }
+
+    public static void putDanmuSize(int size) {
+        Prefers.put("danmu_size", size);
+    }
+
     public static boolean isCaption() {
         return Prefers.getBoolean("caption");
     }
