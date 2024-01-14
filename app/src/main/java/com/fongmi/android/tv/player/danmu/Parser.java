@@ -3,6 +3,7 @@ package com.fongmi.android.tv.player.danmu;
 import android.graphics.Color;
 import android.text.TextUtils;
 
+import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.bean.Danmu;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Path;
@@ -28,9 +29,11 @@ public class Parser extends BaseDanmakuParser {
     private float scaleX;
     private float scaleY;
     private int index;
+    private float danmuSizeTimes;
 
     public Parser(String path) {
         this.danmu = Danmu.fromXml(getContent(path));
+        this.danmuSizeTimes = 1.0f + (Setting.getDanmuSize() * 0.2f);
     }
 
     private String getContent(String path) {
@@ -70,7 +73,7 @@ public class Parser extends BaseDanmakuParser {
         item = mContext.mDanmakuFactory.createDanmaku(type, mContext);
         item.setTime(time);
         item.setTimer(mTimer);
-        item.textSize = size;
+        item.textSize = size * danmuSizeTimes;
         item.textColor = color;
         item.textShadowColor = color <= Color.BLACK ? Color.WHITE : Color.BLACK;
         item.flags = mContext.mGlobalFlagValues;
