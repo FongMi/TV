@@ -12,7 +12,7 @@ android {
 }
 
 dependencies {
-    api 'androidx.media3:media3-common:' + media3Version
+    api project(':media-lib-common')
     api 'androidx.annotation:annotation:' + annotationVersion
     api 'androidx.preference:preference:1.2.1'
     api 'com.google.code.gson:gson:' + gsonVersion
