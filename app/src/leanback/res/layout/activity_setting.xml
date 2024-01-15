@@ -159,6 +159,7 @@
                 android:background="@drawable/selector_item"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
+                android:nextFocusDown="@id/player"
                 android:orientation="horizontal">
 
                 <TextView
@@ -193,6 +194,7 @@
                 android:background="@drawable/selector_item"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
+                android:nextFocusDown="@id/player"
                 android:padding="8dp"
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_setting_home" />
@@ -204,6 +206,7 @@
                 android:background="@drawable/selector_item"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
+                android:nextFocusDown="@id/player"
                 android:padding="8dp"
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_setting_refresh" />
