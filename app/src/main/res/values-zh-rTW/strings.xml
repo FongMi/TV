@@ -79,7 +79,7 @@
     <string name="setting_on">開啟</string>
 
     <!-- Player -->
-    <string name="player">播放器</string>
+    <string name="player">播放核心</string>
     <string name="player_render">渲染方式</string>
     <string name="player_caption">字幕樣式</string>
     <string name="player_subtitle">字幕大小</string>
