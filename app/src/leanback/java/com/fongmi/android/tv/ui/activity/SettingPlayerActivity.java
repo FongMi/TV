@@ -31,6 +31,7 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
     private String[] danmuSpeed;
     private String[] caption;
     private String[] player;
+    private String[] render;
     private String[] http;
     private String[] flag;
 
@@ -60,6 +61,7 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
         mBinding.flagText.setText((flag = ResUtil.getStringArray(R.array.select_flag))[Setting.getFlag()]);
         mBinding.httpText.setText((http = ResUtil.getStringArray(R.array.select_exo_http))[Setting.getHttp()]);
         mBinding.playerText.setText((player = ResUtil.getStringArray(R.array.select_player))[Setting.getPlayer()]);
+        mBinding.renderText.setText((render = ResUtil.getStringArray(R.array.select_render))[Setting.getRender()]);
         mBinding.captionText.setText((caption = ResUtil.getStringArray(R.array.select_caption))[Setting.isCaption() ? 1 : 0]);
         mBinding.danmuSpeedText.setText((danmuSpeed = ResUtil.getStringArray(R.array.select_danmu_speed))[Setting.getDanmuSpeed()]);
     }
@@ -71,6 +73,7 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
         mBinding.flag.setOnClickListener(this::setFlag);
         mBinding.buffer.setOnClickListener(this::onBuffer);
         mBinding.player.setOnClickListener(this::setPlayer);
+        mBinding.render.setOnClickListener(this::setRender);
         mBinding.tunnel.setOnClickListener(this::setTunnel);
         mBinding.caption.setOnClickListener(this::setCaption);
         mBinding.subtitle.setOnClickListener(this::onSubtitle);
@@ -125,6 +128,12 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
         Setting.putPlayer(index = index == player.length - 1 ? 0 : ++index);
         mBinding.playerText.setText(player[index]);
         setVisible();
+    }
+
+    private void setRender(View view) {
+        int index = Setting.getRender();
+        Setting.putRender(index = index == render.length - 1 ? 0 : ++index);
+        mBinding.renderText.setText(render[index]);
     }
 
     private void setTunnel(View view) {
