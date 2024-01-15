@@ -111,7 +111,7 @@ dependencies {
     implementation 'androidx.biometric:biometric:1.1.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.6.2'
     implementation 'androidx.room:room-runtime:2.6.1'
-    implementation 'androidx.media:media:1.7.0'
+    implementation 'androidx.media:media:1.7.0-alpha01'
     implementation 'cat.ereza:customactivityoncrash:2.4.0'
     implementation 'com.github.bassaer:materialdesigncolors:1.0.0'
     implementation 'com.github.bumptech.glide:glide:4.16.0'
@@ -120,7 +120,7 @@ dependencies {
     implementation 'com.github.jahirfiquitiva:TextDrawable:1.0.3'
     implementation('com.github.TeamNewPipe:NewPipeExtractor:v0.23.1') { exclude group: 'org.jsoup', module: 'jsoup' }
     implementation 'com.github.thegrizzlylabs:sardine-android:0.8'
-    implementation 'com.google.android.material:material:1.11.0'
+    implementation 'com.google.android.material:material:1.10.0'
     implementation 'com.google.net.cronet:cronet-okhttp:0.1.0'
     implementation 'com.google.zxing:core:3.3.0'
     implementation 'com.guolindev.permissionx:permissionx:1.7.1'
@@ -133,7 +133,7 @@ dependencies {
     implementation 'org.fourthline.cling:cling-support:2.1.1'
     implementation 'org.greenrobot:eventbus:3.3.1'
     implementation('org.simpleframework:simple-xml:2.7.1') { exclude group: 'stax', module: 'stax-api' exclude group: 'xpp3', module: 'xpp3' }
-    implementation(ext: 'aar', name: 'dlna-core', group: 'fongmi', version: 'release')
+    implementationimplementation(ext: 'aar', name: 'dlna-core')
     leanbackImplementation(ext: 'aar', name: 'dlna-dmr', group: 'fongmi', version: 'release')
     leanbackImplementation 'androidx.leanback:leanback:1.2.0-alpha04'
     leanbackImplementation 'me.jessyan:autosize:1.2.1'
