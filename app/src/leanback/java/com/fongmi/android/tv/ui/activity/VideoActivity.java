@@ -399,11 +399,11 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void setDanmuView() {
+        int maxLine = Setting.getDanmuLine(3);
         mPlayers.setDanmuView(mBinding.danmaku);
         HashMap<Integer, Integer> maxLines = new HashMap<>();
         float scrollSpeedFactor = 1.6f - (Setting.getDanmuSpeed() * 0.2f);
         scrollSpeedFactor = scrollSpeedFactor < 0 ? 1.2f : scrollSpeedFactor;
-        int maxLine = Setting.getDanmuMaxLine(3);
         maxLines.put(BaseDanmaku.TYPE_FIX_TOP, maxLine);
         maxLines.put(BaseDanmaku.TYPE_SCROLL_RL, maxLine);
         maxLines.put(BaseDanmaku.TYPE_SCROLL_LR, maxLine);

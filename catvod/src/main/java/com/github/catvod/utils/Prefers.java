@@ -47,6 +47,14 @@ public class Prefers {
         return getPrefers().getInt(key, defaultValue);
     }
 
+    public static float getFloat(String key) {
+        return getFloat(key, 0);
+    }
+
+    public static float getFloat(String key, float defaultValue) {
+        return getPrefers().getFloat(key, defaultValue);
+    }
+
     public static boolean getBoolean(String key) {
         return getBoolean(key, false);
     }

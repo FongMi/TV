@@ -74,15 +74,15 @@
     <string name="setting_player_caption">Caption style</string>
     <string name="setting_player_subtitle">Subtitle size</string>
     <string name="setting_player_background">Background play</string>
+    <string name="setting_danmu_size">Danmu size</string>
+    <string name="setting_danmu_speed">Danmu speed</string>
+    <string name="setting_danmu_line">Danmu line</string>
     <string name="setting_decode">Decode</string>
     <string name="setting_render">Render</string>
     <string name="setting_scale">Scale</string>
     <string name="setting_quality">Image quality</string>
     <string name="setting_size">Image size</string>
     <string name="setting_doh">DoH</string>
-    <string name="setting_danmu_speed">Bullet Speed</string>
-    <string name="setting_danmu_size">Bullet Size</string>
-    <string name="setting_danmu_maxline">Bullet Max Line</string>
     <string name="setting_proxy">Proxy</string>
     <string name="setting_cache">Cache</string>
     <string name="setting_backup">Backup</string>
@@ -133,6 +133,7 @@
     <!-- UNIT -->
     <string name="all">All</string>
     <string name="times">times</string>
+    <string name="lines">lines</string>
 
     <string-array name="select_decode">
         <item>Soft</item>
@@ -151,15 +152,6 @@
         <item>Moderate</item>
         <item>Fast</item>
         <item>Super Fast</item>
-    </string-array>
-
-    <string-array name="select_danmu_size">
-        <item>1 times</item>
-        <item>1.2 times</item>
-        <item>1.4 times</item>
-        <item>1.6 times</item>
-        <item>1.8 times</item>
-        <item>2.0 times</item>
     </string-array>
 
     <string-array name="select_render">

@@ -662,11 +662,9 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     public void prepared() {
         App.post(() -> {
             if (danmuView == null) return;
-            if (isPlaying() && danmuView.isPrepared()) {
-                danmuView.start(getPosition());
-                if (Setting.isDanmu()) danmuView.show();
-                else danmuView.hide();
-            }
+            if (isPlaying() && danmuView.isPrepared()) danmuView.start(getPosition());
+            if (Setting.isDanmu()) danmuView.show();
+            else danmuView.hide();
         });
     }
 
@@ -677,12 +675,9 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     @Override
     public void danmakuShown(BaseDanmaku danmaku) {
-
     }
 
     @Override
     public void drawingFinished() {
-
     }
-
 }

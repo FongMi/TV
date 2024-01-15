@@ -128,7 +128,6 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.vodHistory.setOnClickListener(this::onVodHistory);
         mBinding.version.setOnLongClickListener(this::onVersionDev);
         mBinding.liveHistory.setOnClickListener(this::onLiveHistory);
-        mBinding.player.setOnLongClickListener(this::onPlayerSetting);
         mBinding.wallDefault.setOnClickListener(this::setWallDefault);
         mBinding.wallRefresh.setOnClickListener(this::setWallRefresh);
         mBinding.player.setOnClickListener(this::onPlayerSetting);
@@ -266,9 +265,8 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         HistoryDialog.create(this).type(type = 1).show();
     }
 
-    private boolean onPlayerSetting(View view) {
+    private void onPlayerSetting(View view) {
         getRoot().change(2);
-        return true;
     }
 
     private void onVersion(View view) {
