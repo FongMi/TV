@@ -36,6 +36,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
     private String[] background;
     private String[] caption;
     private String[] player;
+    private String[] render;
     private String[] http;
     private String[] flag;
 
@@ -65,6 +66,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
         mBinding.flagText.setText((flag = ResUtil.getStringArray(R.array.select_flag))[Setting.getFlag()]);
         mBinding.httpText.setText((http = ResUtil.getStringArray(R.array.select_exo_http))[Setting.getHttp()]);
         mBinding.playerText.setText((player = ResUtil.getStringArray(R.array.select_player))[Setting.getPlayer()]);
+        mBinding.renderText.setText((render = ResUtil.getStringArray(R.array.select_render))[Setting.getRender()]);
         mBinding.captionText.setText((caption = ResUtil.getStringArray(R.array.select_caption))[Setting.isCaption() ? 1 : 0]);
         mBinding.backgroundText.setText((background = ResUtil.getStringArray(R.array.select_background))[Setting.getBackground()]);
         mBinding.danmuSpeedText.setText((danmuSpeed = ResUtil.getStringArray(R.array.select_danmu_speed))[Setting.getDanmuSpeed()]);
@@ -77,6 +79,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
         mBinding.flag.setOnClickListener(this::setFlag);
         mBinding.buffer.setOnClickListener(this::onBuffer);
         mBinding.player.setOnClickListener(this::setPlayer);
+        mBinding.render.setOnClickListener(this::setRender);
         mBinding.tunnel.setOnClickListener(this::setTunnel);
         mBinding.caption.setOnClickListener(this::setCaption);
         mBinding.subtitle.setOnClickListener(this::onSubtitle);
@@ -134,6 +137,12 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
         setVisible();
     }
 
+    private void setRender(View view) {
+        int index = Setting.getRender();
+        Setting.putRender(index = index == render.length - 1 ? 0 : ++index);
+        mBinding.renderText.setText(render[index]);
+    }
+
     private void setTunnel(View view) {
         Setting.putTunnel(!Setting.isTunnel());
         mBinding.tunnelText.setText(getSwitch(Setting.isTunnel()));
@@ -179,7 +188,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
     }
 
     public void onDanmuSpeed(View view) {
-        new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.setting_danmu_speed).setNegativeButton(R.string.dialog_negative, null).setSingleChoiceItems(danmuSpeed, Setting.getDanmuSpeed(), (dialog, which) -> {
+        new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.player_danmu_speed).setNegativeButton(R.string.dialog_negative, null).setSingleChoiceItems(danmuSpeed, Setting.getDanmuSpeed(), (dialog, which) -> {
             mBinding.danmuSpeedText.setText(danmuSpeed[which]);
             Setting.putDanmuSpeed(which);
             dialog.dismiss();
@@ -187,7 +196,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
     }
 
     private void setBackground(View view) {
-        new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.setting_player_background).setNegativeButton(R.string.dialog_negative, null).setSingleChoiceItems(background, Setting.getBackground(), (dialog, which) -> {
+        new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.player_background).setNegativeButton(R.string.dialog_negative, null).setSingleChoiceItems(background, Setting.getBackground(), (dialog, which) -> {
             mBinding.backgroundText.setText(background[which]);
             Setting.putBackground(which);
             dialog.dismiss();
