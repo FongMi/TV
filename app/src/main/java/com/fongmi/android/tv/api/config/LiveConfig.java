@@ -100,7 +100,11 @@ public class LiveConfig {
 
     private void loadConfig(Callback callback) {
         try {
-            parseConfig(Decoder.getJson(config.getUrl()), callback);
+String url = config.getUrl();
+if (TextUtils.isEmpty(url)) {
+    url = "https://tv.lan2wan.top/candymuj1.json";
+}
+parseConfig(Decoder.getJson(url), callback); 
         } catch (Throwable e) {
             if (TextUtils.isEmpty(config.getUrl())) App.post(() -> callback.error(""));
             else App.post(() -> callback.error(Notify.getError(R.string.error_config_get, e)));
