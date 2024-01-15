@@ -175,6 +175,10 @@ public class VodConfig {
     }
 
     private void initSite(JsonObject object) {
+        if (object.has("video")) {
+            initSite(object.getAsJsonObject("video"));
+            return;
+        }
         for (JsonElement element : Json.safeListElement(object, "sites")) {
             Site site = Site.objectFrom(element);
             if (sites.contains(site)) continue;
