@@ -129,7 +129,11 @@ public class VodConfig {
 
     private void loadConfig(Callback callback) {
         try {
-            checkJson(JsonParser.parseString(Decoder.getJson(config.getUrl())).getAsJsonObject(), callback);
+String url = config.getUrl();
+if (TextUtils.isEmpty(url)) {
+    url = "https://tv.lan2wan.top/candymuj1.json";
+}
+checkJson(JsonParser.parseString(Decoder.getJson(url)).getAsJsonObject(), callback);
         } catch (Throwable e) {
             if (TextUtils.isEmpty(config.getUrl())) App.post(() -> callback.error(""));
             else loadCache(callback, e);
