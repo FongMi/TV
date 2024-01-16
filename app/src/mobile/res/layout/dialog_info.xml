@@ -12,7 +12,7 @@
 
         <TextView
             android:id="@+id/title"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:linksClickable="false"
@@ -22,7 +22,7 @@
 
         <TextView
             android:id="@+id/vid"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:singleLine="true"
             android:textColor="?android:attr/textColorPrimary"
@@ -30,14 +30,14 @@
 
         <TextView
             android:id="@+id/header"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="?android:attr/textColorPrimary"
             android:textSize="14sp" />
 
         <TextView
             android:id="@+id/url"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:autoLink="all"
