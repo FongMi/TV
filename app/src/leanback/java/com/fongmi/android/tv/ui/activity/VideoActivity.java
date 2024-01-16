@@ -719,6 +719,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mArrayPresenter.setNextFocusUp(findFocusUp(3));
         mPartPresenter.setNextFocusUp(findFocusUp(5));
         notifyItemChanged(getEpisodeView(), mEpisodeAdapter);
+        notifyItemChanged(mBinding.quality, mQualityAdapter);
         notifyItemChanged(mBinding.array, mArrayAdapter);
         notifyItemChanged(mBinding.part, mPartAdapter);
         notifyItemChanged(mBinding.flag, mFlagAdapter);
@@ -1055,7 +1056,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void setR2Callback() {
-        App.post(mR2, 1000);
+        App.post(mR2, 500);
     }
 
     private void setArtwork(String url) {
