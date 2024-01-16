@@ -185,7 +185,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
 
     private void onTop(View view) {
         getFragment().scrollToTop();
-        mBinding.top.setVisibility(View.GONE);
+        mBinding.top.setVisibility(View.INVISIBLE);
         if (mBinding.filter.getVisibility() == View.INVISIBLE) mBinding.filter.show();
         else if (mBinding.link.getVisibility() == View.INVISIBLE) mBinding.link.show();
     }
