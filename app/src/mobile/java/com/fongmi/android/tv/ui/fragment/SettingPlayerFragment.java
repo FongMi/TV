@@ -37,6 +37,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
     private String[] caption;
     private String[] player;
     private String[] render;
+    private String[] scale;
     private String[] http;
     private String[] flag;
 
@@ -65,6 +66,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
         mBinding.danmuLineText.setText(String.valueOf(Setting.getDanmuLine(2)));
         mBinding.flagText.setText((flag = ResUtil.getStringArray(R.array.select_flag))[Setting.getFlag()]);
         mBinding.httpText.setText((http = ResUtil.getStringArray(R.array.select_exo_http))[Setting.getHttp()]);
+        mBinding.scaleText.setText((scale = ResUtil.getStringArray(R.array.select_scale))[Setting.getScale()]);
         mBinding.playerText.setText((player = ResUtil.getStringArray(R.array.select_player))[Setting.getPlayer()]);
         mBinding.renderText.setText((render = ResUtil.getStringArray(R.array.select_render))[Setting.getRender()]);
         mBinding.captionText.setText((caption = ResUtil.getStringArray(R.array.select_caption))[Setting.isCaption() ? 1 : 0]);
@@ -77,6 +79,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
         mBinding.ua.setOnClickListener(this::onUa);
         mBinding.http.setOnClickListener(this::setHttp);
         mBinding.flag.setOnClickListener(this::setFlag);
+        mBinding.scale.setOnClickListener(this::onScale);
         mBinding.buffer.setOnClickListener(this::onBuffer);
         mBinding.player.setOnClickListener(this::setPlayer);
         mBinding.render.setOnClickListener(this::setRender);
@@ -87,7 +90,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
         mBinding.danmuSize.setOnClickListener(this::onDanmuSize);
         mBinding.danmuLine.setOnClickListener(this::onDanmuLine);
         mBinding.danmuSpeed.setOnClickListener(this::onDanmuSpeed);
-        mBinding.background.setOnClickListener(this::setBackground);
+        mBinding.background.setOnClickListener(this::onBackground);
     }
 
     private void setVisible() {
@@ -118,6 +121,14 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
         int index = Setting.getFlag();
         Setting.putFlag(index = index == flag.length - 1 ? 0 : ++index);
         mBinding.flagText.setText(flag[index]);
+    }
+
+    private void onScale(View view) {
+        new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.player_scale).setNegativeButton(R.string.dialog_negative, null).setSingleChoiceItems(scale, Setting.getScale(), (dialog, which) -> {
+            mBinding.scaleText.setText(scale[which]);
+            Setting.putScale(which);
+            dialog.dismiss();
+        }).show();
     }
 
     private void onBuffer(View view) {
@@ -195,7 +206,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
         }).show();
     }
 
-    private void setBackground(View view) {
+    private void onBackground(View view) {
         new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.player_background).setNegativeButton(R.string.dialog_negative, null).setSingleChoiceItems(background, Setting.getBackground(), (dialog, which) -> {
             mBinding.backgroundText.setText(background[which]);
             Setting.putBackground(which);
