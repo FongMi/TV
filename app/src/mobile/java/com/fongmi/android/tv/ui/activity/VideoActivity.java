@@ -707,7 +707,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private void onInfo() {
-        InfoDialog.create(this).title(mBinding.control.title.getText()).headers(mPlayers.getHeaders()).url(mPlayers.getUrl()).show();
+        InfoDialog.create(this).title(mBinding.control.title.getText()).headers(mPlayers.getHeaders()).vid(getId()).url(mPlayers.getUrl()).show();
     }
 
     private void onFull() {
