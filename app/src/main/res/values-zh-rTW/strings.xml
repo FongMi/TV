@@ -194,8 +194,8 @@
     </string-array>
 
     <string-array name="select_episode">
-        <item>單列</item>
-        <item>多列</item>
+        <item>單行</item>
+        <item>多行</item>
     </string-array>
 
     <string-array name="select_caption">
