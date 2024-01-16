@@ -127,6 +127,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private QualityAdapter mQualityAdapter;
     private DanmakuContext mDanmakuContext;
     private FlagPresenter mFlagPresenter;
+    private ArrayPresenter mArrayPresenter;
     private PartPresenter mPartPresenter;
     private CustomKeyDownVod mKeyDown;
     private ExecutorService mExecutor;
@@ -370,14 +371,14 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mBinding.flag.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         mBinding.flag.setAdapter(new ItemBridgeAdapter(mFlagAdapter = new ArrayObjectAdapter(mFlagPresenter = new FlagPresenter(this::setFlagActivated))));
         mBinding.episode.setHorizontalSpacing(ResUtil.dp2px(8));
-        mBinding.episode.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+        mBinding.episode.setVerticalSpacing(ResUtil.dp2px(8));
         mBinding.episode.setAdapter(new ItemBridgeAdapter(mEpisodeAdapter = new ArrayObjectAdapter(mEpisodePresenter = new EpisodePresenter(this::setEpisodeActivated))));
         mBinding.quality.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.quality.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         mBinding.quality.setAdapter(mQualityAdapter = new QualityAdapter(this::setQualityActivated));
         mBinding.array.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.array.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-        mBinding.array.setAdapter(new ItemBridgeAdapter(mArrayAdapter = new ArrayObjectAdapter(new ArrayPresenter(this))));
+        mBinding.array.setAdapter(new ItemBridgeAdapter(mArrayAdapter = new ArrayObjectAdapter(mArrayPresenter = new ArrayPresenter(this))));
         mBinding.part.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.part.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         mBinding.part.setAdapter(new ItemBridgeAdapter(mPartAdapter = new ArrayObjectAdapter(mPartPresenter = new PartPresenter(item -> initSearch(item, false)))));
@@ -588,9 +589,28 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void setEpisodeAdapter(List<Episode> items) {
+        int size = items.size();
+        for(int i = 0; i < size; i ++) { items.get(i).setIndex(i); }
+        int episodeNameLength = items.isEmpty() ? 0 : items.get(0).getName().length();
+        int numColumns = 10;
+        if (episodeNameLength > 40) numColumns = 2;
+        else if (episodeNameLength > 20) numColumns = 4;
+        else if (episodeNameLength > 5) numColumns = 6;
+        else if (episodeNameLength > 2) numColumns = 8;
+        if (size < numColumns) numColumns = size;
+        int rowNum = (int)Math.ceil((double) size/ (double) numColumns);
+        int width = ResUtil.getScreenWidth() - ResUtil.dp2px(48);
+        mBinding.episode.setNumColumns(numColumns);
+        mBinding.episode.setColumnWidth((width - ((numColumns - 1) * ResUtil.dp2px(8))) / numColumns);
+        ViewGroup.LayoutParams layoutParams = mBinding.episode.getLayoutParams();
+        layoutParams.width = ResUtil.getScreenWidth();
+        layoutParams.height = rowNum > 6 ? ResUtil.dp2px(300) : ResUtil.dp2px(rowNum * 50);
+        mBinding.episode.setLayoutParams(layoutParams);
         mBinding.episode.setVisibility(items.isEmpty() ? View.GONE : View.VISIBLE);
+        mEpisodePresenter.setNumColumns(numColumns);
+        mEpisodePresenter.setNumRows(rowNum);
         mEpisodeAdapter.setItems(items, null);
-        setArray(items.size());
+        setArray(size);
         updateFocus();
     }
 
@@ -622,10 +642,15 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void setQualityVisible(boolean visible) {
-        mFlagPresenter.setNextFocusDown(visible ? R.id.quality : R.id.episode);
-        mEpisodePresenter.setNextFocusUp(visible ? R.id.quality : R.id.flag);
+        mFlagPresenter.setNextFocusDown(visible ? R.id.quality : R.id.array);
+        mArrayPresenter.setNextFocusUp(visible ? R.id.quality : R.id.flag);
+        mArrayPresenter.setNextFocusDown(isVisible(mBinding.episode) ? R.id.episode : R.id.part);
+        mEpisodePresenter.setNextFocusUp(R.id.array);
+        mQualityAdapter.setNextFocusUp(R.id.flag);
+        mQualityAdapter.setNextFocusDown(R.id.array);
         mBinding.quality.setVisibility(visible ? View.VISIBLE : View.GONE);
         notifyItemChanged(mBinding.episode, mEpisodeAdapter);
+        notifyItemChanged(mBinding.array, mArrayAdapter);
         notifyItemChanged(mBinding.flag, mFlagAdapter);
     }
 
@@ -663,8 +688,8 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void updateFocus() {
-        mEpisodePresenter.setNextFocusDown(isVisible(mBinding.array) ? R.id.array : R.id.part);
-        mPartPresenter.setNextFocusUp(isVisible(mBinding.array) ? R.id.array : R.id.episode);
+        mEpisodePresenter.setNextFocusDown(isVisible(mBinding.part) ? R.id.part : R.id.flag);
+        mPartPresenter.setNextFocusUp(isVisible(mBinding.episode) ? R.id.episode : R.id.array);
         notifyItemChanged(mBinding.episode, mEpisodeAdapter);
         notifyItemChanged(mBinding.part, mPartAdapter);
     }
@@ -1031,14 +1056,20 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
                 List<String> items = Part.get(response.body().string());
                 if (!items.contains(source)) items.add(0, source);
                 App.post(() -> mPartAdapter.setItems(items, null));
-                App.post(() -> mBinding.part.setVisibility(View.VISIBLE));
+                App.post(() -> {
+                    mBinding.part.setVisibility(View.VISIBLE);
+                    updateFocus();
+                });
             }
 
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 List<String> items = List.of(source);
                 App.post(() -> mPartAdapter.setItems(items, null));
-                App.post(() -> mBinding.part.setVisibility(View.VISIBLE));
+                App.post(() -> {
+                    mBinding.part.setVisibility(View.VISIBLE);
+                    updateFocus();
+                });
             }
         });
     }
