@@ -1435,6 +1435,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     private void setFullscreen(boolean fullscreen) {
         this.fullscreen = fullscreen;
+        mPlayers.setFullscreen(fullscreen);
     }
 
     private boolean isInitTrack() {

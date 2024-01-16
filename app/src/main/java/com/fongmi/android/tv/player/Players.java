@@ -83,6 +83,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     private int decode;
     private int player;
     private long lastDanmuUpdate;
+    private boolean fullscreen;
 
     public static boolean isExo(int type) {
         return type == EXO;
@@ -146,6 +147,14 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     public void setDanmuView(DanmakuView view) {
         view.setCallback(this);
         danmuView = view;
+    }
+
+    public void setFullscreen(boolean fullscreen) {
+        this.fullscreen = fullscreen;
+    }
+
+    public boolean getFullscreen() {
+        return fullscreen;
     }
 
     public void setSub(Sub sub) {
@@ -672,7 +681,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     @Override
     public void updateTimer(DanmakuTimer timer) {
         long timestamp = System.currentTimeMillis();
-        if (lastDanmuUpdate <= 0 || (timestamp - lastDanmuUpdate) > 300) {
+        if (lastDanmuUpdate <= 0 || (getFullscreen() && (timestamp - lastDanmuUpdate) > 300)) {
             App.post(() -> timer.update(getPosition()));
             lastDanmuUpdate = timestamp;
         }
