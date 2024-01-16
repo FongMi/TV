@@ -17,8 +17,8 @@ public class ArrayPresenter extends Presenter {
     private final String backward;
     private final String forward;
     private final String reverse;
-    private int nextFocusUp;
     private int nextFocusDown;
+    private int nextFocusUp;
 
     public ArrayPresenter(OnClickListener listener) {
         this.mListener = listener;
@@ -34,12 +34,12 @@ public class ArrayPresenter extends Presenter {
         void onRevPlay(TextView view);
     }
 
-    public void setNextFocusUp(int nextFocusUp) {
-        this.nextFocusUp = nextFocusUp;
-    }
-
     public void setNextFocusDown(int nextFocusDown) {
         this.nextFocusDown = nextFocusDown;
+    }
+
+    public void setNextFocusUp(int nextFocusUp) {
+        this.nextFocusUp = nextFocusUp;
     }
 
     @Override
