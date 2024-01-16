@@ -12,10 +12,9 @@ import com.fongmi.android.tv.databinding.AdapterQualityBinding;
 public class QualityAdapter extends RecyclerView.Adapter<QualityAdapter.ViewHolder> {
 
     private final OnClickListener mListener;
+    private int nextFocusDown;
     private Result mResult;
     private int position;
-    private int nextFocusUp;
-    private int nextFocusDown;
 
     public QualityAdapter(OnClickListener listener) {
         this.mListener = listener;
@@ -27,16 +26,12 @@ public class QualityAdapter extends RecyclerView.Adapter<QualityAdapter.ViewHold
         void onItemClick(Result result);
     }
 
-    public int getPosition() {
-        return position;
-    }
-
-    public void setNextFocusUp(int nextFocusUp) {
-        this.nextFocusUp = nextFocusUp;
-    }
-
     public void setNextFocusDown(int nextFocusDown) {
         this.nextFocusDown = nextFocusDown;
+    }
+
+    public int getPosition() {
+        return position;
     }
 
     public void addAll(Result result) {
@@ -57,7 +52,6 @@ public class QualityAdapter extends RecyclerView.Adapter<QualityAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.binding.text.setNextFocusUpId(nextFocusUp);
         holder.binding.text.setNextFocusDownId(nextFocusDown);
         holder.binding.text.setText(mResult.getUrl().n(position));
         holder.binding.text.setOnClickListener(v -> onItemClick(position));

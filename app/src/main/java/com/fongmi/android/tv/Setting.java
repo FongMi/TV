@@ -173,8 +173,16 @@ public class Setting {
         return Prefers.getInt("flag");
     }
 
-    public static void putFlag(int mode) {
-        Prefers.put("flag", mode);
+    public static void putFlag(int flag) {
+        Prefers.put("flag", flag);
+    }
+
+    public static int getEpisode() {
+        return Prefers.getInt("episode");
+    }
+
+    public static void putEpisode(int episode) {
+        Prefers.put("episode", episode);
     }
 
     public static int getBackground() {

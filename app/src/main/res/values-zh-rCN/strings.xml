@@ -89,6 +89,7 @@
     <string name="player_danmu_line">弹幕行数</string>
     <string name="player_background">后台播放</string>
     <string name="player_flag">线路播放</string>
+    <string name="player_episode">选集样式</string>
     <string name="player_exo_tunnel">隧道模式</string>
     <string name="player_exo_http">连线方式</string>
     <string name="player_exo_buffer">缓冲时间</string>
@@ -190,6 +191,11 @@
     <string-array name="select_flag">
         <item>自动</item>
         <item>手动</item>
+    </string-array>
+
+    <string-array name="select_episode">
+        <item>单列</item>
+        <item>多列</item>
     </string-array>
 
     <string-array name="select_caption">

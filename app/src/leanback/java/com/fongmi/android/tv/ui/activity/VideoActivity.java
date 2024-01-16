@@ -23,6 +23,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 import androidx.leanback.widget.ArrayObjectAdapter;
+import androidx.leanback.widget.BaseGridView;
 import androidx.leanback.widget.ItemBridgeAdapter;
 import androidx.leanback.widget.OnChildViewHolderSelectedListener;
 import androidx.lifecycle.ViewModelProvider;
@@ -276,6 +277,10 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         return mBinding.ijk;
     }
 
+    private BaseGridView getEpisodeView() {
+        return Setting.getEpisode() == 0 ? mBinding.episodeHori : mBinding.episodeVert;
+    }
+
     private boolean isReplay() {
         return Setting.getReset() == 1;
     }
@@ -302,6 +307,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mR3 = this::showEmpty;
         setBackground(false);
         setRecyclerView();
+        setEpisodeView();
         setVideoView();
         setDanmuView();
         setViewModel();
@@ -352,7 +358,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
                 if (mFlagAdapter.size() > 0) setFlagActivated((Flag) mFlagAdapter.get(position));
             }
         });
-        mBinding.episode.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
+        getEpisodeView().addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
                 if (child != null && mBinding.video != mFocus1) mFocus1 = child.itemView;
@@ -361,7 +367,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mBinding.array.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
-                if (mEpisodeAdapter.size() > 20 && position > 1) mBinding.episode.setSelectedPosition((position - 2) * 20);
+                if (mEpisodeAdapter.size() > 20 && position > 1) getEpisodeView().setSelectedPosition((position - 2) * 20);
             }
         });
     }
@@ -370,9 +376,6 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mBinding.flag.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.flag.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         mBinding.flag.setAdapter(new ItemBridgeAdapter(mFlagAdapter = new ArrayObjectAdapter(mFlagPresenter = new FlagPresenter(this::setFlagActivated))));
-        mBinding.episode.setVerticalSpacing(ResUtil.dp2px(8));
-        mBinding.episode.setHorizontalSpacing(ResUtil.dp2px(8));
-        mBinding.episode.setAdapter(new ItemBridgeAdapter(mEpisodeAdapter = new ArrayObjectAdapter(mEpisodePresenter = new EpisodePresenter(this::setEpisodeActivated))));
         mBinding.quality.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.quality.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         mBinding.quality.setAdapter(mQualityAdapter = new QualityAdapter(this::setQualityActivated));
@@ -389,6 +392,13 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mBinding.control.parse.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         mBinding.control.parse.setAdapter(new ItemBridgeAdapter(mParseAdapter = new ArrayObjectAdapter(new ParsePresenter(this::setParseActivated))));
         mParseAdapter.setItems(VodConfig.get().getParses(), null);
+    }
+
+    private void setEpisodeView() {
+        getEpisodeView().setHorizontalSpacing(ResUtil.dp2px(8));
+        getEpisodeView().setAdapter(new ItemBridgeAdapter(mEpisodeAdapter = new ArrayObjectAdapter(mEpisodePresenter = new EpisodePresenter(this::setEpisodeActivated))));
+        if (Setting.getEpisode() == 0) mBinding.episodeHori.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+        else mBinding.episodeVert.setVerticalSpacing(ResUtil.dp2px(8));
     }
 
     private void setVideoView() {
@@ -589,6 +599,14 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void setEpisodeAdapter(List<Episode> items) {
+        getEpisodeView().setVisibility(items.isEmpty() ? View.GONE : View.VISIBLE);
+        if (items.size() > 0 && Setting.getEpisode() == 1) setEpisodeView(items);
+        mEpisodeAdapter.setItems(items, null);
+        setArrayAdapter(items.size());
+        updateFocus();
+    }
+
+    private void setEpisodeView(List<Episode> items) {
         int size = items.size();
         for (int i = 0; i < size; i++) items.get(i).setIndex(i);
         int episodeNameLength = items.isEmpty() ? 0 : items.get(0).getName().length();
@@ -601,18 +619,14 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         if (size < numColumns) numColumns = size;
         int rowNum = (int) Math.ceil((double) size / (double) numColumns);
         int width = ResUtil.getScreenWidth() - ResUtil.dp2px(48);
-        mBinding.episode.setNumColumns(numColumns);
-        mBinding.episode.setColumnWidth((width - ((numColumns - 1) * ResUtil.dp2px(8))) / numColumns);
-        ViewGroup.LayoutParams layoutParams = mBinding.episode.getLayoutParams();
-        layoutParams.width = ResUtil.getScreenWidth();
-        layoutParams.height = rowNum > 6 ? ResUtil.dp2px(300) : ResUtil.dp2px(rowNum * 50);
-        mBinding.episode.setLayoutParams(layoutParams);
-        mBinding.episode.setVisibility(items.isEmpty() ? View.GONE : View.VISIBLE);
+        ViewGroup.LayoutParams params = mBinding.episodeVert.getLayoutParams();
+        params.width = ResUtil.getScreenWidth();
+        params.height = rowNum > 6 ? ResUtil.dp2px(300) : ResUtil.dp2px(rowNum * 50);
+        mBinding.episodeVert.setNumColumns(numColumns);
+        mBinding.episodeVert.setColumnWidth((width - ((numColumns - 1) * ResUtil.dp2px(8))) / numColumns);
+        mBinding.episodeVert.setLayoutParams(params);
         mEpisodePresenter.setNumColumns(numColumns);
         mEpisodePresenter.setNumRows(rowNum);
-        mEpisodeAdapter.setItems(items, null);
-        setArray(size);
-        updateFocus();
     }
 
     private void seamless(Flag flag) {
@@ -621,8 +635,8 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         if (episode == null || episode.isActivated()) return;
         if (Setting.getFlag() == 1) {
             episode.setActivated(true);
-            mBinding.episode.requestFocus();
-            mBinding.episode.setSelectedPosition(getEpisodePosition());
+            getEpisodeView().requestFocus();
+            getEpisodeView().setSelectedPosition(getEpisodePosition());
             episode.setActivated(false);
         } else {
             mHistory.setVodRemarks(episode.getName());
@@ -635,24 +649,16 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         if (shouldEnterFullscreen(item)) return;
         setCurrentFlag(mBinding.flag.getSelectedPosition());
         for (int i = 0; i < mFlagAdapter.size(); i++) ((Flag) mFlagAdapter.get(i)).toggle(getCurrentFlag() == i, item);
-        mBinding.episode.setSelectedPosition(getEpisodePosition());
-        notifyItemChanged(mBinding.episode, mEpisodeAdapter);
+        getEpisodeView().setSelectedPosition(getEpisodePosition());
+        notifyItemChanged(getEpisodeView(), mEpisodeAdapter);
         if (mEpisodeAdapter.size() == 0) return;
         if (isFullscreen()) Notify.show(getString(R.string.play_ready, item.getName()));
         onRefresh();
     }
 
     private void setQualityVisible(boolean visible) {
-        mArrayPresenter.setNextFocusDown(isVisible(mBinding.episode) ? R.id.episode : R.id.part);
-        mFlagPresenter.setNextFocusDown(visible ? R.id.quality : R.id.array);
         mBinding.quality.setVisibility(visible ? View.VISIBLE : View.GONE);
-        mArrayPresenter.setNextFocusUp(visible ? R.id.quality : R.id.flag);
-        mEpisodePresenter.setNextFocusUp(R.id.array);
-        mQualityAdapter.setNextFocusDown(R.id.array);
-        mQualityAdapter.setNextFocusUp(R.id.flag);
-        notifyItemChanged(mBinding.episode, mEpisodeAdapter);
-        notifyItemChanged(mBinding.array, mArrayAdapter);
-        notifyItemChanged(mBinding.flag, mFlagAdapter);
+        updateFocus();
     }
 
     private void setQualityActivated(Result result) {
@@ -669,7 +675,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private void reverseEpisode(boolean scroll) {
         for (int i = 0; i < mFlagAdapter.size(); i++) Collections.reverse(((Flag) mFlagAdapter.get(i)).getEpisodes());
         setEpisodeAdapter(getFlag().getEpisodes());
-        if (scroll) mBinding.episode.setSelectedPosition(getEpisodePosition());
+        if (scroll) getEpisodeView().setSelectedPosition(getEpisodePosition());
     }
 
     private void setParseActivated(Parse item) {
@@ -678,7 +684,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         onRefresh();
     }
 
-    private void setArray(int size) {
+    private void setArrayAdapter(int size) {
         List<String> items = new ArrayList<>();
         items.add(getString(R.string.play_reverse));
         items.add(getString(mHistory.getRevPlayText()));
@@ -689,10 +695,27 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void updateFocus() {
-        mPartPresenter.setNextFocusUp(isVisible(mBinding.episode) ? R.id.episode : R.id.array);
-        mEpisodePresenter.setNextFocusDown(isVisible(mBinding.part) ? R.id.part : R.id.flag);
-        notifyItemChanged(mBinding.episode, mEpisodeAdapter);
+        if (Setting.getEpisode() == 0) {
+            mArrayPresenter.setNextFocusUp(R.id.episodeHori);
+            mQualityAdapter.setNextFocusDown(R.id.episodeHori);
+            mArrayPresenter.setNextFocusDown(isVisible(mBinding.part) ? R.id.part : R.id.quick);
+            mEpisodePresenter.setNextFocusDown(isVisible(mBinding.array) ? R.id.array : R.id.part);
+            mEpisodePresenter.setNextFocusUp(isVisible(mBinding.quality) ? R.id.quality : R.id.flag);
+            mPartPresenter.setNextFocusUp(isVisible(mBinding.array) ? R.id.array : R.id.episodeHori);
+            mFlagPresenter.setNextFocusDown(isVisible(mBinding.quality) ? R.id.quality : R.id.episodeHori);
+        } else {
+            mArrayPresenter.setNextFocusDown(R.id.episodeVert);
+            mEpisodePresenter.setNextFocusDown(isVisible(mBinding.part) ? R.id.part : R.id.quick);
+            mArrayPresenter.setNextFocusUp(isVisible(mBinding.quality) ? R.id.quality : R.id.flag);
+            mQualityAdapter.setNextFocusDown(isVisible(mBinding.array) ? R.id.array : R.id.episodeVert);
+            mEpisodePresenter.setNextFocusUp(isVisible(mBinding.array) ? R.id.array : isVisible(mBinding.quality) ? R.id.quality : R.id.flag);
+            mFlagPresenter.setNextFocusDown(isVisible(mBinding.quality) ? R.id.quality : isVisible(mBinding.array) ? R.id.array : R.id.episodeVert);
+            mPartPresenter.setNextFocusUp(isVisible(mBinding.episodeVert) ? R.id.episodeVert : isVisible(mBinding.quality) ? R.id.quality : R.id.flag);
+        }
+        notifyItemChanged(getEpisodeView(), mEpisodeAdapter);
+        notifyItemChanged(mBinding.array, mArrayAdapter);
         notifyItemChanged(mBinding.part, mPartAdapter);
+        notifyItemChanged(mBinding.flag, mFlagAdapter);
     }
 
     @Override
@@ -1056,23 +1079,21 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 List<String> items = Part.get(response.body().string());
                 if (!items.contains(source)) items.add(0, source);
-                App.post(() -> {
-                    mBinding.part.setVisibility(View.VISIBLE);
-                    mPartAdapter.setItems(items, null);
-                    updateFocus();
-                });
+                App.post(() -> setPartAdapter(items));
             }
 
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 List<String> items = List.of(source);
-                App.post(() -> {
-                    mBinding.part.setVisibility(View.VISIBLE);
-                    mPartAdapter.setItems(items, null);
-                    updateFocus();
-                });
+                App.post(() -> setPartAdapter(items));
             }
         });
+    }
+
+    private void setPartAdapter(List<String> items) {
+        mBinding.part.setVisibility(View.VISIBLE);
+        mPartAdapter.setItems(items, null);
+        updateFocus();
     }
 
     private void checkFlag(Vod item) {

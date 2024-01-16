@@ -89,6 +89,7 @@
     <string name="player_danmu_line">Danmu line</string>
     <string name="player_background">Background play</string>
     <string name="player_flag">Flag play</string>
+    <string name="player_episode">Episode style</string>
     <string name="player_exo_tunnel">Tunnel mode</string>
     <string name="player_exo_http">HTTP method</string>
     <string name="player_exo_buffer">Buffer time</string>
@@ -195,6 +196,11 @@
     <string-array name="select_flag">
         <item>Auto</item>
         <item>Manual</item>
+    </string-array>
+
+    <string-array name="select_episode">
+        <item>Single</item>
+        <item>Multiple</item>
     </string-array>
 
     <string-array name="select_caption">
