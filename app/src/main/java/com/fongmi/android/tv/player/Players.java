@@ -82,6 +82,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     private int retry;
     private int decode;
     private int player;
+    private long lastDanmuUpdate;
 
     public static boolean isExo(int type) {
         return type == EXO;
@@ -670,7 +671,11 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     @Override
     public void updateTimer(DanmakuTimer timer) {
-        App.post(() -> timer.update(getPosition()));
+        long timestamp = System.currentTimeMillis();
+        if (lastDanmuUpdate <= 0 || (timestamp - lastDanmuUpdate) > 300) {
+            App.post(() -> timer.update(getPosition()));
+            lastDanmuUpdate = timestamp;
+        }
     }
 
     @Override
