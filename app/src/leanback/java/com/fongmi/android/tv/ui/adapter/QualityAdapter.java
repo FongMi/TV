@@ -27,6 +27,10 @@ public class QualityAdapter extends RecyclerView.Adapter<QualityAdapter.ViewHold
         void onItemClick(Result result);
     }
 
+    public int getPosition() {
+        return position;
+    }
+
     public void setNextFocusUp(int nextFocusUp) {
         this.nextFocusUp = nextFocusUp;
     }
@@ -38,10 +42,6 @@ public class QualityAdapter extends RecyclerView.Adapter<QualityAdapter.ViewHold
     public void addAll(Result result) {
         mResult = result;
         notifyDataSetChanged();
-    }
-
-    public int getPosition() {
-        return position;
     }
 
     @Override
@@ -57,9 +57,9 @@ public class QualityAdapter extends RecyclerView.Adapter<QualityAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.binding.text.setText(mResult.getUrl().n(position));
         holder.binding.text.setNextFocusUpId(nextFocusUp);
         holder.binding.text.setNextFocusDownId(nextFocusDown);
+        holder.binding.text.setText(mResult.getUrl().n(position));
         holder.binding.text.setOnClickListener(v -> onItemClick(position));
         holder.binding.text.setActivated(mResult.getUrl().getPosition() == position);
     }

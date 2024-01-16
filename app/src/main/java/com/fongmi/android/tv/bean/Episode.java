@@ -17,10 +17,10 @@ public class Episode implements Parcelable {
     @SerializedName("url")
     private String url;
 
+    private int index;
     private int number;
     private boolean activated;
     private boolean selected;
-    private int index;
 
     public static Episode create(String name, String url) {
         return new Episode(name, "", url);
@@ -60,12 +60,16 @@ public class Episode implements Parcelable {
         return url;
     }
 
-    public int getNumber() {
-        return number;
-    }
-
     public int getIndex() {
         return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
+    public int getNumber() {
+        return number;
     }
 
     public boolean isActivated() {
@@ -87,10 +91,6 @@ public class Episode implements Parcelable {
 
     public void setSelected(boolean selected) {
         this.selected = selected;
-    }
-
-    public void setIndex(int index) {
-        this.index = index;
     }
 
     public boolean rule1(String name) {

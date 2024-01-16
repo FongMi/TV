@@ -13,10 +13,10 @@ import com.fongmi.android.tv.databinding.AdapterEpisodeBinding;
 public class EpisodePresenter extends Presenter {
 
     private final OnClickListener mListener;
+    private int nextFocusDown;
+    private int nextFocusUp;
     private int numColumns;
     private int numRows;
-    private int nextFocusUp;
-    private int nextFocusDown;
 
     public EpisodePresenter(OnClickListener listener) {
         this.mListener = listener;
@@ -26,12 +26,12 @@ public class EpisodePresenter extends Presenter {
         void onItemClick(Episode item);
     }
 
-    public void setNextFocusUp(int nextFocus) {
-        this.nextFocusUp = nextFocus;
-    }
-
     public void setNextFocusDown(int nextFocus) {
         this.nextFocusDown = nextFocus;
+    }
+
+    public void setNextFocusUp(int nextFocus) {
+        this.nextFocusUp = nextFocus;
     }
 
     public void setNumColumns(int numColumns) {
@@ -41,6 +41,7 @@ public class EpisodePresenter extends Presenter {
     public void setNumRows(int numRows) {
         this.numRows = numRows;
     }
+
     @Override
     public Presenter.ViewHolder onCreateViewHolder(ViewGroup parent) {
         return new ViewHolder(AdapterEpisodeBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
@@ -50,13 +51,11 @@ public class EpisodePresenter extends Presenter {
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object object) {
         Episode item = (Episode) object;
         ViewHolder holder = (ViewHolder) viewHolder;
-        if (item.getIndex() < numColumns) holder.binding.text.setNextFocusUpId(nextFocusUp);
-        else holder.binding.text.setNextFocusUpId(0);
-        if (item.getIndex() >= (numRows - 1) * numColumns) holder.binding.text.setNextFocusDownId(nextFocusDown);
-        else holder.binding.text.setNextFocusDownId(0);
         holder.binding.text.setMaxEms(Product.getEms());
         holder.binding.text.setActivated(item.isActivated());
         holder.binding.text.setText(item.getDesc().concat(item.getName()));
+        holder.binding.text.setNextFocusUpId(item.getIndex() < numColumns ? nextFocusUp : 0);
+        holder.binding.text.setNextFocusDownId(item.getIndex() >= (numRows - 1) * numColumns ? nextFocusDown : 0);
         setOnClickListener(holder, view -> mListener.onItemClick(item));
     }
 
