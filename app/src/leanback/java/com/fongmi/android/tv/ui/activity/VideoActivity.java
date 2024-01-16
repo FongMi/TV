@@ -612,8 +612,9 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         int episodeNameLength = items.isEmpty() ? 0 : items.get(0).getName().length();
         int numColumns = 10;
         if (episodeNameLength > 40) numColumns = 2;
-        else if (episodeNameLength > 20) numColumns = 4;
-        else if (episodeNameLength > 5) numColumns = 6;
+        else if (episodeNameLength > 20) numColumns = 3;
+        else if (episodeNameLength > 10) numColumns = 4;
+        else if (episodeNameLength > 6) numColumns = 6;
         else if (episodeNameLength > 2) numColumns = 8;
         if (size < numColumns) numColumns = size;
         int rowNum = (int) Math.ceil((double) size / (double) numColumns);

@@ -54,8 +54,8 @@ public class EpisodePresenter extends Presenter {
         holder.binding.text.setMaxEms(Product.getEms());
         holder.binding.text.setActivated(item.isActivated());
         holder.binding.text.setText(item.getDesc().concat(item.getName()));
-        holder.binding.text.setNextFocusUpId(item.getIndex() < numColumns ? nextFocusUp : 0);
-        holder.binding.text.setNextFocusDownId(item.getIndex() >= (numRows - 1) * numColumns ? nextFocusDown : 0);
+        holder.binding.text.setNextFocusUpId(numColumns > 0 ? (item.getIndex() < numColumns ? nextFocusUp : 0) : nextFocusUp);
+        holder.binding.text.setNextFocusDownId(numColumns > 0 ? (item.getIndex() >= (numRows - 1) * numColumns ? nextFocusDown : 0) : nextFocusDown);
         setOnClickListener(holder, view -> mListener.onItemClick(item));
     }
 
