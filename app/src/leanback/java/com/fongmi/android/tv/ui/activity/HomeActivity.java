@@ -189,7 +189,8 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         PermissionX.init(this).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> AppDatabase.restore(new Callback() {
             @Override
             public void success() {
-                initConfig();
+                if (allGranted) initConfig();
+                else mBinding.progressLayout.showContent();
             }
         }));
     }
