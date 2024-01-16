@@ -13,8 +13,10 @@ import com.fongmi.android.tv.databinding.AdapterEpisodeBinding;
 public class EpisodePresenter extends Presenter {
 
     private final OnClickListener mListener;
-    private int nextFocusDown;
+    private int numColumns;
+    private int numRows;
     private int nextFocusUp;
+    private int nextFocusDown;
 
     public EpisodePresenter(OnClickListener listener) {
         this.mListener = listener;
@@ -32,6 +34,13 @@ public class EpisodePresenter extends Presenter {
         this.nextFocusDown = nextFocus;
     }
 
+    public void setNumColumns(int numColumns) {
+        this.numColumns = numColumns;
+    }
+
+    public void setNumRows(int numRows) {
+        this.numRows = numRows;
+    }
     @Override
     public Presenter.ViewHolder onCreateViewHolder(ViewGroup parent) {
         return new ViewHolder(AdapterEpisodeBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
@@ -41,9 +50,11 @@ public class EpisodePresenter extends Presenter {
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object object) {
         Episode item = (Episode) object;
         ViewHolder holder = (ViewHolder) viewHolder;
+        if (item.getIndex() < numColumns) holder.binding.text.setNextFocusUpId(nextFocusUp);
+        else holder.binding.text.setNextFocusUpId(0);
+        if (item.getIndex() >= (numRows - 1) * numColumns) holder.binding.text.setNextFocusDownId(nextFocusDown);
+        else holder.binding.text.setNextFocusDownId(0);
         holder.binding.text.setMaxEms(Product.getEms());
-        holder.binding.text.setNextFocusUpId(nextFocusUp);
-        holder.binding.text.setNextFocusDownId(nextFocusDown);
         holder.binding.text.setActivated(item.isActivated());
         holder.binding.text.setText(item.getDesc().concat(item.getName()));
         setOnClickListener(holder, view -> mListener.onItemClick(item));

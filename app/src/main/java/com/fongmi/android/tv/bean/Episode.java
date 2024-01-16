@@ -20,6 +20,7 @@ public class Episode implements Parcelable {
     private int number;
     private boolean activated;
     private boolean selected;
+    private int index;
 
     public static Episode create(String name, String url) {
         return new Episode(name, "", url);
@@ -63,6 +64,10 @@ public class Episode implements Parcelable {
         return number;
     }
 
+    public int getIndex() {
+        return index;
+    }
+
     public boolean isActivated() {
         return activated;
     }
@@ -82,6 +87,10 @@ public class Episode implements Parcelable {
 
     public void setSelected(boolean selected) {
         this.selected = selected;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
     }
 
     public boolean rule1(String name) {
