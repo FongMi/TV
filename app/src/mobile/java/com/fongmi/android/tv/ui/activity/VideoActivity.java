@@ -927,7 +927,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         App.post(() -> mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT)), 50);
         setRequestedOrientation(mPlayers.isPortrait() ? ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
         mBinding.control.full.setVisibility(View.GONE);
-        mDanmakuContext.setScaleTextSize(0.8f);
+        mDanmakuContext.setScaleTextSize(1.0f);
         setRotate(mPlayers.isPortrait(), true);
         setSubtitle(Setting.getSubtitle());
         Util.hideSystemUI(this);
