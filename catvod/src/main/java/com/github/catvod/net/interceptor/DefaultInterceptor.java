@@ -55,8 +55,8 @@ public class DefaultInterceptor implements Interceptor {
         Request.Builder builder = request.newBuilder();
         boolean local = url.contains(":" + Proxy.getPort() + "/");
         if (url.contains("+") && local) builder.url(url.replace("+", "%2B"));
-        if (url.contains("gitcode.net")) builder.addHeader(HttpHeaders.USER_AGENT, Util.CHROME);
-        if (uri.getUserInfo() != null) builder.addHeader(HttpHeaders.AUTHORIZATION, Util.basic(uri.getUserInfo()));
+        if (url.contains("gitcode.net")) builder.header(HttpHeaders.USER_AGENT, Util.CHROME);
+        if (uri.getUserInfo() != null) builder.header(HttpHeaders.AUTHORIZATION, Util.basic(uri.getUserInfo()));
         return builder.build();
     }
 }
