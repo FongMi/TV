@@ -266,7 +266,7 @@ public class Setting {
     }
 
     public static int getDanmuLine(int line) {
-        return Math.min(Prefers.getInt("danmu_line", line), 15);
+        return Math.min(Math.max(Prefers.getInt("danmu_line", line), 1), 15);
     }
 
     public static void putDanmuLine(int line) {
