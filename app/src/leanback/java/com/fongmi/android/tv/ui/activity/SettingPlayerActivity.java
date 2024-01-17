@@ -202,12 +202,6 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
         Setting.putDanmuLine(line);
     }
 
-    public void setDanmuSpeed(View view) {
-        int index = Setting.getDanmuSpeed();
-        Setting.putDanmuSpeed(index = index == danmuSpeed.length - 1 ? 0 : ++index);
-        mBinding.danmuSpeedText.setText(danmuSpeed[index]);
-    }
-
     public void onDanmuAlpha(View view) {
         DanmuAlphaDialog.create(this).show();
     }
@@ -218,4 +212,9 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
         Setting.putDanmuAlpha(alpha);
     }
 
+    public void setDanmuSpeed(View view) {
+        int index = Setting.getDanmuSpeed();
+        Setting.putDanmuSpeed(index = index == danmuSpeed.length - 1 ? 0 : ++index);
+        mBinding.danmuSpeedText.setText(danmuSpeed[index]);
+    }
 }

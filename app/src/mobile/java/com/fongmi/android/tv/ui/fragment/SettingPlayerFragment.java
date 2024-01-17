@@ -202,14 +202,6 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
         Setting.putDanmuLine(line);
     }
 
-    public void onDanmuSpeed(View view) {
-        new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.player_danmu_speed).setNegativeButton(R.string.dialog_negative, null).setSingleChoiceItems(danmuSpeed, Setting.getDanmuSpeed(), (dialog, which) -> {
-            mBinding.danmuSpeedText.setText(danmuSpeed[which]);
-            Setting.putDanmuSpeed(which);
-            dialog.dismiss();
-        }).show();
-    }
-
     public void onDanmuAlpha(View view) {
         DanmuAlphaDialog.create(this).show();
     }
@@ -218,6 +210,14 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
     public void setDanmuAlpha(int alpha) {
         mBinding.danmuAlphaText.setText(String.valueOf(alpha));
         Setting.putDanmuAlpha(alpha);
+    }
+
+    public void onDanmuSpeed(View view) {
+        new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.player_danmu_speed).setNegativeButton(R.string.dialog_negative, null).setSingleChoiceItems(danmuSpeed, Setting.getDanmuSpeed(), (dialog, which) -> {
+            mBinding.danmuSpeedText.setText(danmuSpeed[which]);
+            Setting.putDanmuSpeed(which);
+            dialog.dismiss();
+        }).show();
     }
 
     private void onBackground(View view) {
