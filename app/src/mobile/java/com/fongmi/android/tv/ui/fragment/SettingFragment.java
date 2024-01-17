@@ -54,10 +54,6 @@ import java.util.List;
 public class SettingFragment extends BaseFragment implements ConfigCallback, SiteCallback, LiveCallback, ProxyCallback {
 
     private FragmentSettingBinding mBinding;
-    private String[] render;
-    private String[] decode;
-    private String[] player;
-    private String[] scale;
     private String[] size;
     private int type;
 
@@ -94,10 +90,6 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.versionText.setText(BuildConfig.VERSION_NAME);
         mBinding.proxyText.setText(UrlUtil.scheme(Setting.getProxy()));
         mBinding.sizeText.setText((size = ResUtil.getStringArray(R.array.select_size))[Setting.getSize()]);
-        mBinding.scaleText.setText((scale = ResUtil.getStringArray(R.array.select_scale))[Setting.getScale()]);
-        mBinding.playerText.setText((player = ResUtil.getStringArray(R.array.select_player))[Setting.getPlayer()]);
-        mBinding.decodeText.setText((decode = ResUtil.getStringArray(R.array.select_decode))[Setting.getDecode()]);
-        mBinding.renderText.setText((render = ResUtil.getStringArray(R.array.select_render))[Setting.getRender()]);
         setCacheText();
     }
 
@@ -118,6 +110,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.proxy.setOnClickListener(this::onProxy);
         mBinding.cache.setOnClickListener(this::onCache);
         mBinding.backup.setOnClickListener(this::onBackup);
+        mBinding.player.setOnClickListener(this::onPlayer);
         mBinding.version.setOnClickListener(this::onVersion);
         mBinding.vod.setOnLongClickListener(this::onVodEdit);
         mBinding.vodHome.setOnClickListener(this::onVodHome);
@@ -128,13 +121,8 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.vodHistory.setOnClickListener(this::onVodHistory);
         mBinding.version.setOnLongClickListener(this::onVersionDev);
         mBinding.liveHistory.setOnClickListener(this::onLiveHistory);
-        mBinding.player.setOnLongClickListener(this::onPlayerSetting);
         mBinding.wallDefault.setOnClickListener(this::setWallDefault);
         mBinding.wallRefresh.setOnClickListener(this::setWallRefresh);
-        mBinding.player.setOnClickListener(this::onPlayerSetting);
-        mBinding.decode.setOnClickListener(this::setDecode);
-        mBinding.render.setOnClickListener(this::setRender);
-        mBinding.scale.setOnClickListener(this::setScale);
         mBinding.size.setOnClickListener(this::setSize);
         mBinding.doh.setOnClickListener(this::setDoh);
     }
@@ -266,9 +254,8 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         HistoryDialog.create(this).type(type = 1).show();
     }
 
-    private boolean onPlayerSetting(View view) {
+    private void onPlayer(View view) {
         getRoot().change(2);
-        return true;
     }
 
     private void onVersion(View view) {
@@ -293,26 +280,6 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
                 setCacheText();
             }
         });
-    }
-
-    private void setDecode(View view) {
-        int index = Setting.getDecode();
-        Setting.putDecode(index = index == decode.length - 1 ? 0 : ++index);
-        mBinding.decodeText.setText(decode[index]);
-    }
-
-    private void setRender(View view) {
-        int index = Setting.getRender();
-        Setting.putRender(index = index == render.length - 1 ? 0 : ++index);
-        mBinding.renderText.setText(render[index]);
-    }
-
-    private void setScale(View view) {
-        new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.setting_scale).setNegativeButton(R.string.dialog_negative, null).setSingleChoiceItems(scale, Setting.getScale(), (dialog, which) -> {
-            mBinding.scaleText.setText(scale[which]);
-            Setting.putScale(which);
-            dialog.dismiss();
-        }).show();
     }
 
     private void setSize(View view) {
@@ -379,13 +346,11 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
 
     @Override
     public void onHiddenChanged(boolean hidden) {
-        if (hidden || player == null || decode == null) return;
+        if (hidden) return;
         mBinding.vodUrl.setText(VodConfig.getDesc());
         mBinding.liveUrl.setText(LiveConfig.getDesc());
         mBinding.wallUrl.setText(WallConfig.getDesc());
         mBinding.dohText.setText(getDohList()[getDohIndex()]);
-        mBinding.playerText.setText(player[Setting.getPlayer()]);
-        mBinding.decodeText.setText(decode[Setting.getDecode()]);
         setCacheText();
     }
 

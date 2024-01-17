@@ -146,7 +146,7 @@ public class Setting {
     }
 
     public static int getSubtitle() {
-        return Math.max(Prefers.getInt("subtitle", 16), 14);
+        return Math.min(Math.max(Prefers.getInt("subtitle", 16), 14), 48);
     }
 
     public static void putSubtitle(int subtitle) {
@@ -173,8 +173,16 @@ public class Setting {
         return Prefers.getInt("flag");
     }
 
-    public static void putFlag(int mode) {
-        Prefers.put("flag", mode);
+    public static void putFlag(int flag) {
+        Prefers.put("flag", flag);
+    }
+
+    public static int getEpisode() {
+        return Prefers.getInt("episode");
+    }
+
+    public static void putEpisode(int episode) {
+        Prefers.put("episode", episode);
     }
 
     public static int getBackground() {
@@ -241,14 +249,6 @@ public class Setting {
         Prefers.put("danmu", danmu);
     }
 
-    public static int getDanmuMaxLine(int defaultValue) {
-        return Prefers.getInt("danmu_maxline", defaultValue);
-    }
-
-    public static void putDanmuMaxLine(int maxline) {
-        Prefers.put("danmu_maxline", maxline);
-    }
-
     public static int getDanmuSpeed() {
         return Prefers.getInt("danmu_speed", 2);
     }
@@ -257,12 +257,20 @@ public class Setting {
         Prefers.put("danmu_speed", speed);
     }
 
-    public static int getDanmuSize() {
-        return Prefers.getInt("danmu_size", 0);
+    public static float getDanmuSize() {
+        return Math.min(Math.max(Prefers.getFloat("danmu_size"), 1.0f), 2.0f);
     }
 
-    public static void putDanmuSize(int size) {
+    public static void putDanmuSize(float size) {
         Prefers.put("danmu_size", size);
+    }
+
+    public static int getDanmuLine(int line) {
+        return Math.min(Math.max(Prefers.getInt("danmu_line"), line), 15);
+    }
+
+    public static void putDanmuLine(int line) {
+        Prefers.put("danmu_line", line);
     }
 
     public static boolean isCaption() {

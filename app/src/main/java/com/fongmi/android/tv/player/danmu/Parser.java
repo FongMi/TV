@@ -25,15 +25,15 @@ import master.flame.danmaku.danmaku.util.DanmakuUtils;
 public class Parser extends BaseDanmakuParser {
 
     private final Danmu danmu;
+    private final float dSize;
     private BaseDanmaku item;
     private float scaleX;
     private float scaleY;
     private int index;
-    private float danmuSizeTimes;
 
     public Parser(String path) {
         this.danmu = Danmu.fromXml(getContent(path));
-        this.danmuSizeTimes = 1.0f + (Setting.getDanmuSize() * 0.2f);
+        this.dSize = Setting.getDanmuSize();
     }
 
     private String getContent(String path) {
@@ -73,7 +73,7 @@ public class Parser extends BaseDanmakuParser {
         item = mContext.mDanmakuFactory.createDanmaku(type, mContext);
         item.setTime(time);
         item.setTimer(mTimer);
-        item.textSize = size * danmuSizeTimes;
+        item.textSize = size * dSize;
         item.textColor = color;
         item.textShadowColor = color <= Color.BLACK ? Color.WHITE : Color.BLACK;
         item.flags = mContext.mGlobalFlagValues;

@@ -49,10 +49,6 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
 
     private ActivitySettingBinding mBinding;
     private String[] quality;
-    private String[] render;
-    private String[] decode;
-    private String[] player;
-    private String[] scale;
     private String[] size;
     private int type;
 
@@ -86,10 +82,6 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.versionText.setText(BuildConfig.VERSION_NAME);
         mBinding.proxyText.setText(UrlUtil.scheme(Setting.getProxy()));
         mBinding.sizeText.setText((size = ResUtil.getStringArray(R.array.select_size))[Setting.getSize()]);
-        mBinding.scaleText.setText((scale = ResUtil.getStringArray(R.array.select_scale))[Setting.getScale()]);
-        mBinding.playerText.setText((player = ResUtil.getStringArray(R.array.select_player))[Setting.getPlayer()]);
-        mBinding.decodeText.setText((decode = ResUtil.getStringArray(R.array.select_decode))[Setting.getDecode()]);
-        mBinding.renderText.setText((render = ResUtil.getStringArray(R.array.select_render))[Setting.getRender()]);
         mBinding.qualityText.setText((quality = ResUtil.getStringArray(R.array.select_quality))[Setting.getQuality()]);
         setCacheText();
     }
@@ -111,6 +103,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.proxy.setOnClickListener(this::onProxy);
         mBinding.cache.setOnClickListener(this::onCache);
         mBinding.backup.setOnClickListener(this::onBackup);
+        mBinding.player.setOnClickListener(this::onPlayer);
         mBinding.version.setOnClickListener(this::onVersion);
         mBinding.vod.setOnLongClickListener(this::onVodEdit);
         mBinding.vodHome.setOnClickListener(this::onVodHome);
@@ -121,14 +114,9 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.vodHistory.setOnClickListener(this::onVodHistory);
         mBinding.version.setOnLongClickListener(this::onVersionDev);
         mBinding.liveHistory.setOnClickListener(this::onLiveHistory);
-        mBinding.player.setOnLongClickListener(this::onPlayerSetting);
         mBinding.wallDefault.setOnClickListener(this::setWallDefault);
         mBinding.wallRefresh.setOnClickListener(this::setWallRefresh);
         mBinding.quality.setOnClickListener(this::setQuality);
-        mBinding.player.setOnClickListener(this::onPlayerSetting);
-        mBinding.decode.setOnClickListener(this::setDecode);
-        mBinding.render.setOnClickListener(this::setRender);
-        mBinding.scale.setOnClickListener(this::setScale);
         mBinding.size.setOnClickListener(this::setSize);
         mBinding.doh.setOnClickListener(this::setDoh);
     }
@@ -259,9 +247,8 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         HistoryDialog.create(this).type(type = 1).show();
     }
 
-    private boolean onPlayerSetting(View view) {
+    private void onPlayer(View view) {
         SettingPlayerActivity.start(this);
-        return true;
     }
 
     private void onVersion(View view) {
@@ -293,24 +280,6 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         Setting.putQuality(index = index == quality.length - 1 ? 0 : ++index);
         mBinding.qualityText.setText(quality[index]);
         RefreshEvent.image();
-    }
-
-    private void setDecode(View view) {
-        int index = Setting.getDecode();
-        Setting.putDecode(index = index == decode.length - 1 ? 0 : ++index);
-        mBinding.decodeText.setText(decode[index]);
-    }
-
-    private void setRender(View view) {
-        int index = Setting.getRender();
-        Setting.putRender(index = index == render.length - 1 ? 0 : ++index);
-        mBinding.renderText.setText(render[index]);
-    }
-
-    private void setScale(View view) {
-        int index = Setting.getScale();
-        Setting.putScale(index = index == scale.length - 1 ? 0 : ++index);
-        mBinding.scaleText.setText(scale[index]);
     }
 
     private void setSize(View view) {

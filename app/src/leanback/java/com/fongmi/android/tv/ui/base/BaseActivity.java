@@ -79,6 +79,10 @@ public abstract class BaseActivity extends AppCompatActivity {
         if (!view.isComputingLayout()) adapter.notifyArrayItemRangeChanged(0, adapter.size());
     }
 
+    protected void notifyItemChanged(RecyclerView view, RecyclerView.Adapter<?> adapter) {
+        if (!view.isComputingLayout()) adapter.notifyItemRangeChanged(0, adapter.getItemCount());
+    }
+
     private void setBackCallback() {
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(handleBack()) {
             @Override

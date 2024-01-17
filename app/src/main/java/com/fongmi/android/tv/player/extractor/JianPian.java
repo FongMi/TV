@@ -3,6 +3,7 @@ package com.fongmi.android.tv.player.extractor;
 import android.net.Uri;
 
 import com.fongmi.android.tv.player.Source;
+import com.github.catvod.utils.Path;
 import com.p2p.P2PClass;
 
 import java.net.URLDecoder;
@@ -26,21 +27,16 @@ public class JianPian implements Source.Extractor {
     public String fetch(String url) throws Exception {
         init();
         stop();
-        set(url);
-        start();
+        start(url);
         return "http://127.0.0.1:" + p2p.port + "/" + URLEncoder.encode(Uri.parse(path).getLastPathSegment(), "GBK");
     }
 
-    private void set(String url) {
-        path = URLDecoder.decode(url).split("\\|")[0];
-        path = path.replace("jianpian://pathtype=url&path=", "");
-        path = path.replace("tvbox-xg://", "").replace("tvbox-xg:", "");
-        path = path.replace("xg://", "ftp://").replace("xgplay://", "ftp://");
-    }
-
-    private void start() {
+    private void start(String url) {
         try {
-            if (p2p == null || path == null) return;
+            path = URLDecoder.decode(url).split("\\|")[0];
+            path = path.replace("jianpian://pathtype=url&path=", "");
+            path = path.replace("tvbox-xg://", "").replace("tvbox-xg:", "");
+            path = path.replace("xg://", "ftp://").replace("xgplay://", "ftp://");
             p2p.P2Pdoxstart(path.getBytes("GBK"));
             p2p.P2Pdoxadd(path.getBytes("GBK"));
         } catch (Exception e) {
@@ -54,7 +50,6 @@ public class JianPian implements Source.Extractor {
             if (p2p == null || path == null) return;
             p2p.P2Pdoxpause(path.getBytes("GBK"));
             p2p.P2Pdoxdel(path.getBytes("GBK"));
-            path = null;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -62,5 +57,6 @@ public class JianPian implements Source.Extractor {
 
     @Override
     public void exit() {
+        Path.clear(Path.jpa());
     }
 }

@@ -65,24 +65,10 @@
     <string name="setting_vod">點播</string>
     <string name="setting_live">直播</string>
     <string name="setting_wall">壁紙</string>
-    <string name="setting_player">播放器</string>
-    <string name="setting_player_ua">User-Agent</string>
-    <string name="setting_player_flag">線路播放</string>
-    <string name="setting_player_http">連線方式</string>
-    <string name="setting_player_buffer">緩衝時間</string>
-    <string name="setting_player_tunnel">隧道模式</string>
-    <string name="setting_player_caption">字幕樣式</string>
-    <string name="setting_player_subtitle">字幕大小</string>
-    <string name="setting_player_background">背景播放</string>
-    <string name="setting_decode">解碼方式</string>
-    <string name="setting_render">渲染方式</string>
-    <string name="setting_scale">縮放比例</string>
+    <string name="setting_player">播放設定</string>
     <string name="setting_quality">圖片品質</string>
     <string name="setting_size">圖片尺寸</string>
     <string name="setting_doh">DoH</string>
-    <string name="setting_danmu_speed">弹幕速度</string>
-    <string name="setting_danmu_size">弹幕大小</string>
-    <string name="setting_danmu_maxline">弹幕最大行數</string>
     <string name="setting_proxy">Proxy</string>
     <string name="setting_cache">暫存</string>
     <string name="setting_backup">備份</string>
@@ -91,6 +77,23 @@
     <string name="setting_storage">權限</string>
     <string name="setting_off">關閉</string>
     <string name="setting_on">開啟</string>
+
+    <!-- Player -->
+    <string name="player">播放核心</string>
+    <string name="player_render">渲染方式</string>
+    <string name="player_scale">縮放比例</string>
+    <string name="player_caption">字幕樣式</string>
+    <string name="player_subtitle">字幕大小</string>
+    <string name="player_danmu_speed">彈幕速度</string>
+    <string name="player_danmu_size">彈幕大小</string>
+    <string name="player_danmu_line">彈幕行數</string>
+    <string name="player_background">背景播放</string>
+    <string name="player_flag">線路播放</string>
+    <string name="player_episode">選集樣式</string>
+    <string name="player_exo_tunnel">隧道模式</string>
+    <string name="player_exo_http">連線方式</string>
+    <string name="player_exo_buffer">緩衝時間</string>
+    <string name="player_ua">User-Agent</string>
 
     <!-- Search -->
     <string name="search_keyword">關鍵字…</string>
@@ -133,6 +136,7 @@
     <!-- UNIT -->
     <string name="all">全部</string>
     <string name="times">倍</string>
+    <string name="lines">行</string>
 
     <string-array name="select_decode">
         <item>軟解</item>
@@ -153,15 +157,6 @@
         <item>超快</item>
     </string-array>
 
-    <string-array name="select_danmu_size">
-        <item>1倍</item>
-        <item>1.2倍</item>
-        <item>1.4倍</item>
-        <item>1.6倍</item>
-        <item>1.8倍</item>
-        <item>2.0倍</item>
-    </string-array>
-
     <string-array name="select_quality">
         <item>低</item>
         <item>中</item>
@@ -176,7 +171,7 @@
     </string-array>
 
     <string-array name="select_scale">
-        <item>預設</item>
+        <item>原始</item>
         <item>16:9</item>
         <item>4:3</item>
         <item>填充</item>
@@ -196,6 +191,11 @@
     <string-array name="select_flag">
         <item>自動</item>
         <item>手動</item>
+    </string-array>
+
+    <string-array name="select_episode">
+        <item>單行</item>
+        <item>多行</item>
     </string-array>
 
     <string-array name="select_caption">

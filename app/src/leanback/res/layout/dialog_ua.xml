@@ -34,7 +34,7 @@
         android:layout_above="@+id/bottom"
         android:layout_alignStart="@+id/info"
         android:layout_marginBottom="10dp"
-        android:hint="@string/setting_player_ua"
+        android:hint="@string/player_ua"
         android:imeOptions="actionDone"
         android:importantForAutofill="no"
         android:inputType="text"
