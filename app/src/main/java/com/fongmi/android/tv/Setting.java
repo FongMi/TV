@@ -258,7 +258,7 @@ public class Setting {
     }
 
     public static float getDanmuSize() {
-        return Math.min(Math.max(Prefers.getFloat("danmu_size"), 1.0f), 2.0f);
+        return Math.min(Math.max(Prefers.getFloat("danmu_size", 1.0f), 0.5f), 2.0f);
     }
 
     public static void putDanmuSize(float size) {
@@ -266,7 +266,15 @@ public class Setting {
     }
 
     public static int getDanmuLine(int line) {
-        return Math.min(Math.max(Prefers.getInt("danmu_line"), line), 15);
+        return Math.min(Math.max(Prefers.getInt("danmu_line", line), 1), 15);
+    }
+
+    public static void putDanmuAlpha(int alpha) {
+        Prefers.put("danmu_alpha", alpha);
+    }
+
+    public static int getDanmuAlpha() {
+        return Math.min(Math.max(Prefers.getInt("danmu_alpha", 90), 10), 100);
     }
 
     public static void putDanmuLine(int line) {

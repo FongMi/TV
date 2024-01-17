@@ -9,9 +9,9 @@
         android:id="@+id/slider"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:stepSize="0.2"
-        android:valueFrom="0.6"
-        android:valueTo="2"
+        android:stepSize="5"
+        android:valueFrom="10"
+        android:valueTo="100"
         app:thumbColor="@color/blue_500"
         app:trackColorActive="@color/blue_500"
         app:trackColorInactive="@color/blue_50" />

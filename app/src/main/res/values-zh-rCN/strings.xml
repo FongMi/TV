@@ -87,6 +87,7 @@
     <string name="player_danmu_speed">弹幕速度</string>
     <string name="player_danmu_size">弹幕大小</string>
     <string name="player_danmu_line">弹幕行数</string>
+    <string name="player_danmu_alpha">弹幕透明</string>
     <string name="player_background">后台播放</string>
     <string name="player_flag">线路播放</string>
     <string name="player_episode">选集样式</string>
