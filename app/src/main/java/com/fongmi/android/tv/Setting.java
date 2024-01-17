@@ -273,12 +273,12 @@ public class Setting {
         Prefers.put("danmu_line", line);
     }
 
-    public static void putDanmuAlpha(int alpha) {
-        Prefers.put("danmu_alpha", alpha);
-    }
-
     public static int getDanmuAlpha() {
         return Math.min(Math.max(Prefers.getInt("danmu_alpha", 90), 10), 100);
+    }
+
+    public static void putDanmuAlpha(int alpha) {
+        Prefers.put("danmu_alpha", alpha);
     }
 
     public static boolean isCaption() {
