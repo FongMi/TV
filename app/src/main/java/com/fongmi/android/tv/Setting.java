@@ -249,7 +249,7 @@ public class Setting {
         Prefers.put("danmu", danmu);
     }
 
-    public static boolean getDanmuLoad() {
+    public static boolean isDanmuLoad() {
         return Prefers.getBoolean("danmu_load");
     }
 
