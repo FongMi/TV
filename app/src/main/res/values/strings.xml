@@ -84,6 +84,7 @@
     <string name="player_scale">Scale</string>
     <string name="player_caption">Caption style</string>
     <string name="player_subtitle">Subtitle size</string>
+    <string name="player_danmu_load">Danmu load</string>
     <string name="player_danmu_speed">Danmu speed</string>
     <string name="player_danmu_size">Danmu size</string>
     <string name="player_danmu_line">Danmu line</string>
