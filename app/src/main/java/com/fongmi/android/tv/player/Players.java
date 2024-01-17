@@ -355,9 +355,11 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     public void play() {
         if (isEnd()) return;
         session.setActive(true);
+        boolean danmuResume = true;
+        if (isPlaying()) danmuResume = false;
         if (isExo()) playExo();
         if (isIjk()) playIjk();
-        if (hasDanmu()) danmuView.resume();
+        if (hasDanmu() && danmuResume) danmuView.resume();
         setPlaybackState(PlaybackStateCompat.STATE_PLAYING);
     }
 
