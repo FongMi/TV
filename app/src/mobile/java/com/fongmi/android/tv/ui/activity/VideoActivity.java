@@ -1433,7 +1433,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     private void setFullscreen(boolean fullscreen) {
         Util.toggleFullscreen(this, this.fullscreen = fullscreen);
-        mPlayers.setFullscreen(fullscreen);
     }
 
     private boolean isInitTrack() {
