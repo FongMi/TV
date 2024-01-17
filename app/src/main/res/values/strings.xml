@@ -87,6 +87,7 @@
     <string name="player_danmu_speed">Danmu speed</string>
     <string name="player_danmu_size">Danmu size</string>
     <string name="player_danmu_line">Danmu line</string>
+    <string name="player_danmu_alpha">Danmu alpha</string>
     <string name="player_background">Background play</string>
     <string name="player_flag">Flag play</string>
     <string name="player_episode">Episode style</string>
