@@ -64,6 +64,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
         mBinding.captionText.setText(getSwitch(Setting.isCaption()));
         mBinding.bufferText.setText(String.valueOf(Setting.getBuffer()));
         mBinding.subtitleText.setText(String.valueOf(Setting.getSubtitle()));
+        mBinding.danmuLoadText.setText(getSwitch(Setting.getDanmuLoad()));
         mBinding.danmuSizeText.setText(String.valueOf(Setting.getDanmuSize()));
         mBinding.danmuLineText.setText(String.valueOf(Setting.getDanmuLine(2)));
         mBinding.danmuAlphaText.setText(String.valueOf(Setting.getDanmuAlpha()));
@@ -90,6 +91,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
         mBinding.caption.setOnClickListener(this::setCaption);
         mBinding.subtitle.setOnClickListener(this::onSubtitle);
         mBinding.caption.setOnLongClickListener(this::onCaption);
+        mBinding.danmuLoad.setOnClickListener(this::setDanmuLoad);
         mBinding.danmuSize.setOnClickListener(this::onDanmuSize);
         mBinding.danmuLine.setOnClickListener(this::onDanmuLine);
         mBinding.danmuAlpha.setOnClickListener(this::onDanmuAlpha);
@@ -180,6 +182,12 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
     @Override
     public void setSubtitle(int size) {
         mBinding.subtitleText.setText(String.valueOf(size));
+    }
+
+    public void setDanmuLoad(View view) {
+        boolean load = Setting.getDanmuLoad();
+        Setting.putDanmuLoad(!load);
+        mBinding.danmuLoadText.setText(getSwitch(!load));
     }
 
     public void onDanmuSize(View view) {

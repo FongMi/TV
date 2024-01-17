@@ -249,6 +249,14 @@ public class Setting {
         Prefers.put("danmu", danmu);
     }
 
+    public static boolean getDanmuLoad() {
+        return Prefers.getBoolean("danmu_load");
+    }
+
+    public static void putDanmuLoad(boolean load) {
+        Prefers.put("danmu_load", load);
+    }
+
     public static int getDanmuSpeed() {
         return Prefers.getInt("danmu_speed", 2);
     }
