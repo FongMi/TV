@@ -63,8 +63,8 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
         mBinding.tunnelText.setText(getSwitch(Setting.isTunnel()));
         mBinding.captionText.setText(getSwitch(Setting.isCaption()));
         mBinding.bufferText.setText(String.valueOf(Setting.getBuffer()));
+        mBinding.danmuLoadText.setText(getSwitch(Setting.isDanmuLoad()));
         mBinding.subtitleText.setText(String.valueOf(Setting.getSubtitle()));
-        mBinding.danmuLoadText.setText(getSwitch(Setting.getDanmuLoad()));
         mBinding.danmuSizeText.setText(String.valueOf(Setting.getDanmuSize()));
         mBinding.danmuLineText.setText(String.valueOf(Setting.getDanmuLine(2)));
         mBinding.danmuAlphaText.setText(String.valueOf(Setting.getDanmuAlpha()));
@@ -91,9 +91,9 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
         mBinding.caption.setOnClickListener(this::setCaption);
         mBinding.subtitle.setOnClickListener(this::onSubtitle);
         mBinding.caption.setOnLongClickListener(this::onCaption);
-        mBinding.danmuLoad.setOnClickListener(this::setDanmuLoad);
         mBinding.danmuSize.setOnClickListener(this::onDanmuSize);
         mBinding.danmuLine.setOnClickListener(this::onDanmuLine);
+        mBinding.danmuLoad.setOnClickListener(this::setDanmuLoad);
         mBinding.danmuAlpha.setOnClickListener(this::onDanmuAlpha);
         mBinding.danmuSpeed.setOnClickListener(this::onDanmuSpeed);
         mBinding.background.setOnClickListener(this::onBackground);
@@ -184,13 +184,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
         mBinding.subtitleText.setText(String.valueOf(size));
     }
 
-    public void setDanmuLoad(View view) {
-        boolean load = Setting.getDanmuLoad();
-        Setting.putDanmuLoad(!load);
-        mBinding.danmuLoadText.setText(getSwitch(!load));
-    }
-
-    public void onDanmuSize(View view) {
+    private void onDanmuSize(View view) {
         DanmuSizeDialog.create(this).show();
     }
 
@@ -200,7 +194,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
         Setting.putDanmuSize(size);
     }
 
-    public void onDanmuLine(View view) {
+    private void onDanmuLine(View view) {
         DanmuLineDialog.create(this).show();
     }
 
@@ -210,7 +204,12 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
         Setting.putDanmuLine(line);
     }
 
-    public void onDanmuAlpha(View view) {
+    private void setDanmuLoad(View view) {
+        Setting.putDanmuLoad(!Setting.isDanmuLoad());
+        mBinding.danmuLoadText.setText(getSwitch(Setting.isDanmuLoad()));
+    }
+
+    private void onDanmuAlpha(View view) {
         DanmuAlphaDialog.create(this).show();
     }
 
@@ -220,7 +219,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
         Setting.putDanmuAlpha(alpha);
     }
 
-    public void onDanmuSpeed(View view) {
+    private void onDanmuSpeed(View view) {
         new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.player_danmu_speed).setNegativeButton(R.string.dialog_negative, null).setSingleChoiceItems(danmuSpeed, Setting.getDanmuSpeed(), (dialog, which) -> {
             mBinding.danmuSpeedText.setText(danmuSpeed[which]);
             Setting.putDanmuSpeed(which);
