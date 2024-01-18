@@ -156,7 +156,6 @@
         <item>Slow</item>
         <item>Moderate</item>
         <item>Fast</item>
-        <item>Super fast</item>
     </string-array>
 
     <string-array name="select_render">

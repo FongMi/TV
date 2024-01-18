@@ -250,7 +250,7 @@ public class Setting {
     }
 
     public static boolean isDanmuLoad() {
-        return Prefers.getBoolean("danmu_load");
+        return Prefers.getBoolean("danmu_load", true);
     }
 
     public static void putDanmuLoad(boolean load) {
