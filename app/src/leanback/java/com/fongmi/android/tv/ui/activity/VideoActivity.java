@@ -416,14 +416,15 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private void setDanmuView() {
         int maxLine = Setting.getDanmuLine(3);
         mPlayers.setDanmuView(mBinding.danmaku);
+        float[] range = {2.4f, 1.8f, 1.2f, 0.8f};
+        float speed = range[Setting.getDanmuSpeed()];
+        float alpha = Setting.getDanmuAlpha() / 100.0f;
         HashMap<Integer, Integer> maxLines = new HashMap<>();
-        float scrollSpeedFactor = 1.6f - (Setting.getDanmuSpeed() * 0.2f);
-        scrollSpeedFactor = scrollSpeedFactor < 0 ? 1.2f : scrollSpeedFactor;
         maxLines.put(BaseDanmaku.TYPE_FIX_TOP, maxLine);
         maxLines.put(BaseDanmaku.TYPE_SCROLL_RL, maxLine);
         maxLines.put(BaseDanmaku.TYPE_SCROLL_LR, maxLine);
         maxLines.put(BaseDanmaku.TYPE_FIX_BOTTOM, maxLine);
-        mDanmakuContext.setDanmakuStyle(IDisplayer.DANMAKU_STYLE_STROKEN, 3).setMaximumLines(maxLines).setScrollSpeedFactor(scrollSpeedFactor).setDanmakuMargin(12).setScaleTextSize(0.8f);
+        mDanmakuContext.setDanmakuStyle(IDisplayer.DANMAKU_STYLE_STROKEN, 3).setMaximumLines(maxLines).setScrollSpeedFactor(speed).setDanmakuTransparency(alpha).setDanmakuMargin(12).setScaleTextSize(0.8f);
         mBinding.control.danmu.setActivated(Setting.isDanmu());
     }
 
@@ -505,6 +506,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     private void checkDanmu(String danmu) {
         mBinding.danmaku.release();
+        if (!Setting.isDanmuLoad()) return;
         mBinding.danmaku.setVisibility(danmu.isEmpty() ? View.GONE : View.VISIBLE);
         if (danmu.length() > 0) App.execute(() -> mBinding.danmaku.prepare(new Parser(danmu), mDanmakuContext));
     }
@@ -620,7 +622,6 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         else if (episodeNameLength > 10) numColumns = 4;
         else if (episodeNameLength > 6) numColumns = 6;
         else if (episodeNameLength > 2) numColumns = 8;
-        if (size < numColumns) numColumns = size;
         int rowNum = (int) Math.ceil((double) size / (double) numColumns);
         int width = ResUtil.getScreenWidth() - ResUtil.dp2px(48);
         ViewGroup.LayoutParams params = mBinding.episodeVert.getLayoutParams();
@@ -1230,7 +1231,6 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
                 hideProgress();
                 mPlayers.reset();
                 setDefaultTrack();
-                mPlayers.prepared();
                 setTrackVisible(true);
                 mHistory.setPlayer(mPlayers.getPlayer());
                 mBinding.widget.size.setText(mPlayers.getSizeText());
@@ -1262,6 +1262,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private void setDefaultTrack() {
         if (isInitTrack()) {
             setInitTrack(false);
+            mPlayers.prepared();
             mPlayers.setTrack(Track.find(getHistoryKey()));
         }
     }

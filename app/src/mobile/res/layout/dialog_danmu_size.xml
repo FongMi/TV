@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:stepSize="0.2"
-        android:valueFrom="1"
+        android:valueFrom="0.6"
         android:valueTo="2"
         app:trackColorInactive="@color/blue_50" />
 

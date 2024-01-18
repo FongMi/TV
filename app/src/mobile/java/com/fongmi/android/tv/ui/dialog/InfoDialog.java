@@ -72,7 +72,7 @@ public class InfoDialog {
         binding.url.setText(url);
         binding.title.setText(title);
         binding.header.setText(header);
-        binding.vid.setText("Vid : ".concat(vid));
+        if (!TextUtils.isEmpty(vid)) binding.vid.setText("id : ".concat(vid));
         binding.vid.setVisibility(TextUtils.isEmpty(vid) ? View.GONE : View.VISIBLE);
         binding.url.setVisibility(TextUtils.isEmpty(url) ? View.GONE : View.VISIBLE);
         binding.header.setVisibility(TextUtils.isEmpty(header) ? View.GONE : View.VISIBLE);

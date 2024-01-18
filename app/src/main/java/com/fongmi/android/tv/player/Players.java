@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.media3.common.AudioAttributes;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
+import androidx.media3.common.util.Log;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.analytics.AnalyticsListener;
 import androidx.media3.exoplayer.util.EventLogger;
@@ -353,7 +354,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     public void play() {
-        if (isEnd()) return;
+        if (isPlaying() || isEnd()) return;
         session.setActive(true);
         if (isExo()) playExo();
         if (isIjk()) playIjk();
@@ -488,6 +489,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     private void stopParse() {
         if (parseJob != null) parseJob.stop();
+        parseJob = null;
     }
 
     public void setMediaSource(String url) {
