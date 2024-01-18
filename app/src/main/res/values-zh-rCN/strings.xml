@@ -156,7 +156,6 @@
         <item>慢</item>
         <item>适中</item>
         <item>快</item>
-        <item>超快</item>
     </string-array>
 
     <string-array name="select_quality">
