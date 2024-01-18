@@ -258,7 +258,7 @@ public class Setting {
     }
 
     public static int getDanmuSpeed() {
-        return Prefers.getInt("danmu_speed", 2);
+        return Math.min(Math.max(Prefers.getInt("danmu_speed", 2), 0), 3);
     }
 
     public static void putDanmuSpeed(int speed) {

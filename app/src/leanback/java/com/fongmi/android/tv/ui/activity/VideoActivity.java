@@ -415,11 +415,10 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     private void setDanmuView() {
         int maxLine = Setting.getDanmuLine(3);
-        int danmuSpeed = Setting.getDanmuSpeed();
         mPlayers.setDanmuView(mBinding.danmaku);
+        float[] range = {2.4f, 1.8f, 1.2f, 0.8f};
+        float speed = range[Setting.getDanmuSpeed()];
         float alpha = Setting.getDanmuAlpha() / 100.0f;
-        float[] speedRange = {2.4f, 1.8f, 1.2f, 0.8f };
-        float speed = danmuSpeed < speedRange.length ? speedRange[danmuSpeed] : 1.2f;
         HashMap<Integer, Integer> maxLines = new HashMap<>();
         maxLines.put(BaseDanmaku.TYPE_FIX_TOP, maxLine);
         maxLines.put(BaseDanmaku.TYPE_SCROLL_RL, maxLine);
