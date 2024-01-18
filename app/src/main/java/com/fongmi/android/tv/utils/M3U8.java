@@ -1,6 +1,7 @@
 package com.fongmi.android.tv.utils;
 
 import android.net.Uri;
+import android.text.TextUtils;
 
 import androidx.media3.common.util.UriUtil;
 
@@ -29,10 +30,11 @@ public class M3U8 {
 
     public static String get(String url, Map<String, String> headers) {
         try {
+            if (TextUtils.isEmpty(url)) return "";
             Response response = OkHttp.newCall(url, getHeader(headers)).execute();
             if (response.header(HttpHeaders.ACCEPT_RANGES) != null) return "";
             String result = response.body().string();
-            Matcher matcher = Pattern.compile("#EXT-X-STREAM-INF(.*)\\n?(.*)").matcher(result);
+            Matcher matcher = Pattern.compile("#EXT-X-STREAM-INF(.*)\\n?(.*)").matcher(result.replaceAll("\r\n", "\n"));
             if (matcher.find() && matcher.groupCount() > 1) return get(UriUtil.resolve(url, matcher.group(2)), headers);
             StringBuilder sb = new StringBuilder();
             for (String line : result.split("\n")) sb.append(shouldResolve(line) ? resolve(url, line) : line).append("\n");
