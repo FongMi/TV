@@ -1212,7 +1212,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
                 hideProgress();
                 mPlayers.reset();
                 setDefaultTrack();
-                mPlayers.prepared();
                 setTrackVisible(true);
                 checkPlayImg(mPlayers.isPlaying());
                 mHistory.setPlayer(mPlayers.getPlayer());
@@ -1255,6 +1254,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private void setDefaultTrack() {
         if (isInitTrack()) {
             setInitTrack(false);
+            mPlayers.prepared();
             mPlayers.setTrack(Track.find(getHistoryKey()));
         }
     }
