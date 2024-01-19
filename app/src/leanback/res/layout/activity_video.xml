@@ -250,30 +250,29 @@
 
     </LinearLayout>
 
+    <com.fongmi.android.tv.ui.custom.CustomHorizontalGridView
+        android:id="@+id/flag"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/video"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:paddingStart="24dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="24dp"
+        android:visibility="gone" />
+
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/video"
-        android:layout_marginTop="16dp"
+        android:layout_below="@+id/flag"
         android:overScrollMode="never">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
-
-            <com.fongmi.android.tv.ui.custom.CustomHorizontalGridView
-                android:id="@+id/flag"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clipChildren="false"
-                android:clipToPadding="false"
-                android:paddingStart="24dp"
-                android:paddingTop="8dp"
-                android:paddingEnd="24dp"
-                android:paddingBottom="8dp"
-                android:visibility="gone" />
 
             <com.fongmi.android.tv.ui.custom.CustomHorizontalGridView
                 android:id="@+id/quality"
@@ -284,7 +283,6 @@
                 android:paddingStart="24dp"
                 android:paddingTop="8dp"
                 android:paddingEnd="24dp"
-                android:paddingBottom="8dp"
                 android:visibility="gone" />
 
             <com.fongmi.android.tv.ui.custom.CustomHorizontalGridView
@@ -296,7 +294,6 @@
                 android:paddingStart="24dp"
                 android:paddingTop="8dp"
                 android:paddingEnd="24dp"
-                android:paddingBottom="8dp"
                 android:focusable="false"
                 android:visibility="gone" />
 
@@ -309,7 +306,6 @@
                 android:paddingStart="24dp"
                 android:paddingTop="8dp"
                 android:paddingEnd="24dp"
-                android:paddingBottom="8dp"
                 android:visibility="gone" />
 
             <androidx.leanback.widget.VerticalGridView
@@ -321,7 +317,6 @@
                 android:paddingStart="24dp"
                 android:paddingTop="8dp"
                 android:paddingEnd="24dp"
-                android:paddingBottom="8dp"
                 android:focusable="false"
                 android:visibility="gone" />
 
@@ -334,7 +329,6 @@
                 android:paddingStart="24dp"
                 android:paddingTop="8dp"
                 android:paddingEnd="24dp"
-                android:paddingBottom="8dp"
                 android:visibility="gone" />
 
             <androidx.leanback.widget.HorizontalGridView
