@@ -1642,8 +1642,8 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     protected void onUserLeaveHint() {
         super.onUserLeaveHint();
         if (isRedirect()) return;
-        mPiP.enter(this, getScale() == 2);
         if (isLock()) App.post(this::onLock, 500);
+        if (mPlayers.haveTrack(C.TRACK_TYPE_VIDEO)) mPiP.enter(this, getScale() == 2);
     }
 
     @Override
