@@ -614,10 +614,14 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     private void setEpisodeView(List<Episode> items) {
         int size = items.size();
-        for (int i = 0; i < size; i++) items.get(i).setIndex(i);
         int episodeNameLength = items.isEmpty() ? 0 : items.get(0).getName().length();
+        for (int i = 0; i < size; i++) {
+            items.get(i).setIndex(i);
+            int length = items.get(i).getName() == null ? 0 : items.get(i).getName().length();
+            if (length > episodeNameLength) episodeNameLength = length;
+        }
         int numColumns = 10;
-        if (episodeNameLength > 40) numColumns = 2;
+        if (episodeNameLength > 30) numColumns = 2;
         else if (episodeNameLength > 15) numColumns = 3;
         else if (episodeNameLength > 10) numColumns = 4;
         else if (episodeNameLength > 6) numColumns = 6;
