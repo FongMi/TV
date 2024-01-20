@@ -630,7 +630,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         int width = ResUtil.getScreenWidth() - ResUtil.dp2px(48);
         ViewGroup.LayoutParams params = mBinding.episodeVert.getLayoutParams();
         params.width = ResUtil.getScreenWidth();
-        params.height = rowNum > 6 ? ResUtil.dp2px(300) : ResUtil.dp2px(rowNum * 50);
+        params.height = rowNum > 6 ? ResUtil.dp2px(300) : ResUtil.dp2px(rowNum * 44);
         mBinding.episodeVert.setNumColumns(numColumns);
         mBinding.episodeVert.setColumnWidth((width - ((numColumns - 1) * ResUtil.dp2px(8))) / numColumns);
         mBinding.episodeVert.setLayoutParams(params);

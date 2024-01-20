@@ -296,6 +296,8 @@
                 android:paddingStart="24dp"
                 android:paddingEnd="24dp"
                 android:focusable="false"
+                app:focusOutEnd="true"
+                app:focusOutFront="true"
                 android:visibility="gone" />
 
             <com.fongmi.android.tv.ui.custom.CustomHorizontalGridView
@@ -319,6 +321,8 @@
                 android:paddingStart="24dp"
                 android:paddingEnd="24dp"
                 android:focusable="false"
+                app:focusOutEnd="true"
+                app:focusOutFront="true"
                 android:visibility="gone" />
 
             <com.fongmi.android.tv.ui.custom.CustomHorizontalGridView
