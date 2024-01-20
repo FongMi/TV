@@ -10,7 +10,7 @@ android {
         applicationId "com.fongmi.android.tv"
         minSdk 21
         targetSdk 28
-        versionCode 222
+        versionCode 223
         versionName "2.2.3"
         javaCompileOptions {
             annotationProcessorOptions {
