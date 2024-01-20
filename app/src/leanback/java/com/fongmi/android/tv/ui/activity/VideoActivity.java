@@ -614,11 +614,15 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     private void setEpisodeView(List<Episode> items) {
         int size = items.size();
-        for (int i = 0; i < size; i++) items.get(i).setIndex(i);
         int episodeNameLength = items.isEmpty() ? 0 : items.get(0).getName().length();
+        for (int i = 0; i < size; i++) {
+            items.get(i).setIndex(i);
+            int length = items.get(i).getName() == null ? 0 : items.get(i).getName().length();
+            if (length > episodeNameLength) episodeNameLength = length;
+        }
         int numColumns = 10;
-        if (episodeNameLength > 40) numColumns = 2;
-        else if (episodeNameLength > 20) numColumns = 3;
+        if (episodeNameLength > 30) numColumns = 2;
+        else if (episodeNameLength > 15) numColumns = 3;
         else if (episodeNameLength > 10) numColumns = 4;
         else if (episodeNameLength > 6) numColumns = 6;
         else if (episodeNameLength > 2) numColumns = 8;
@@ -626,7 +630,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         int width = ResUtil.getScreenWidth() - ResUtil.dp2px(48);
         ViewGroup.LayoutParams params = mBinding.episodeVert.getLayoutParams();
         params.width = ResUtil.getScreenWidth();
-        params.height = rowNum > 6 ? ResUtil.dp2px(300) : ResUtil.dp2px(rowNum * 50);
+        params.height = rowNum > 6 ? ResUtil.dp2px(300) : ResUtil.dp2px(rowNum * 44);
         mBinding.episodeVert.setNumColumns(numColumns);
         mBinding.episodeVert.setColumnWidth((width - ((numColumns - 1) * ResUtil.dp2px(8))) / numColumns);
         mBinding.episodeVert.setLayoutParams(params);
@@ -1507,6 +1511,11 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
+        if (!isFullscreen() && KeyUtil.isBackKey(event) && getFocus1() != mBinding.video) {
+            mBinding.video.requestFocus();
+            mFocus1 = null;
+            return true;
+        }
         if (isFullscreen() && KeyUtil.isMenuKey(event)) onToggle();
         if (isVisible(mBinding.control.getRoot())) setR1Callback();
         if (isVisible(mBinding.control.getRoot())) mFocus2 = getCurrentFocus();

@@ -69,7 +69,7 @@ public class LiveParser {
             if (setting.find(line)) {
                 setting.check(line);
             } else if (line.startsWith("#EXTINF:")) {
-                Group group = live.find(Group.create(extract(line, GROUP)));
+                Group group = live.find(Group.create(extract(line, GROUP), live.isPass()));
                 channel = group.find(Channel.create(extract(line, NAME)));
                 channel.setLogo(extract(line, LOGO));
             } else if (!line.startsWith("#") && line.contains("://")) {
@@ -102,7 +102,7 @@ public class LiveParser {
     private static void proxy(Live live, String text) {
         int number = 0;
         for (Live item : Live.arrayFrom(text)) {
-            Group group = live.find(Group.create(item.getGroup()));
+            Group group = live.find(Group.create(item.getGroup(), live.isPass()));
             for (Channel channel : item.getChannels()) {
                 channel.setNumber(++number);
                 channel.live(live);
