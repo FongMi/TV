@@ -1018,8 +1018,8 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     protected void onUserLeaveHint() {
         super.onUserLeaveHint();
         if (isRedirect()) return;
-        mPiP.enter(this, Setting.getLiveScale() == 2);
         if (isLock()) App.post(this::onLock, 500);
+        if (mPlayers.haveTrack(C.TRACK_TYPE_VIDEO)) mPiP.enter(this, Setting.getLiveScale() == 2);
     }
 
     @Override

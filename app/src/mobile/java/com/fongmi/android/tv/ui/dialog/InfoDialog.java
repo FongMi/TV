@@ -22,7 +22,6 @@ public class InfoDialog {
     private AlertDialog dialog;
     private CharSequence title;
     private String header;
-    private String vid;
     private String url;
 
     public static InfoDialog create(Activity activity) {
@@ -43,11 +42,6 @@ public class InfoDialog {
         StringBuilder sb = new StringBuilder();
         for (String key : headers.keySet()) sb.append(key).append(" : ").append(headers.get(key)).append("\n");
         this.header = Util.substring(sb.toString());
-        return this;
-    }
-
-    public InfoDialog vid(String vid) {
-        this.vid = vid;
         return this;
     }
 
@@ -72,15 +66,12 @@ public class InfoDialog {
         binding.url.setText(url);
         binding.title.setText(title);
         binding.header.setText(header);
-        if (!TextUtils.isEmpty(vid)) binding.vid.setText("id : ".concat(vid));
-        binding.vid.setVisibility(TextUtils.isEmpty(vid) ? View.GONE : View.VISIBLE);
         binding.url.setVisibility(TextUtils.isEmpty(url) ? View.GONE : View.VISIBLE);
         binding.header.setVisibility(TextUtils.isEmpty(header) ? View.GONE : View.VISIBLE);
     }
 
     private void initEvent() {
         binding.url.setOnClickListener(this::onShare);
-        binding.vid.setOnLongClickListener(v -> onCopy(vid));
         binding.url.setOnLongClickListener(v -> onCopy(url));
         binding.header.setOnLongClickListener(v -> onCopy(header));
     }

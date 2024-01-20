@@ -69,8 +69,8 @@ public class CastDialog extends BaseDialog implements DeviceAdapter.OnClickListe
     public CastDialog() {
         client = OkHttp.client(Constant.TIMEOUT_SYNC);
         body = new FormBody.Builder();
-        body.add("url", VodConfig.getUrl());
         body.add("device", Device.get().toString());
+        if (VodConfig.getUrl() != null) body.add("url", VodConfig.getUrl());
     }
 
     public CastDialog history(History history) {
