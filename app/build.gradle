@@ -111,7 +111,7 @@ dependencies {
     implementation platform('org.jetbrains.kotlin:kotlin-bom:1.8.20')
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.biometric:biometric:1.1.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel:2.6.2'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel:2.7.0'
     implementation 'androidx.room:room-runtime:2.6.1'
     implementation 'androidx.media:media:1.7.0'
     implementation 'cat.ereza:customactivityoncrash:2.4.0'
