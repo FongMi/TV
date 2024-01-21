@@ -672,10 +672,8 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mPartPresenter.setNextFocusUp(findFocusUp(4));
         mEpisodePresenter.setNextFocusUp(findFocusUp(2));
         mFlagPresenter.setNextFocusDown(findFocusDown(0));
-        mQualityAdapter.setNextFocusDown(findFocusDown(1));
         mEpisodePresenter.setNextFocusDown(findFocusDown(2));
         notifyItemChanged(mBinding.episode, mEpisodeAdapter);
-        notifyItemChanged(mBinding.quality, mQualityAdapter);
         notifyItemChanged(mBinding.part, mPartAdapter);
         notifyItemChanged(mBinding.flag, mFlagAdapter);
     }
