@@ -34,6 +34,10 @@ public class EpisodePresenter extends Presenter {
         this.nextFocusUp = nextFocus;
     }
 
+    public int getNumColumns() {
+        return numColumns;
+    }
+
     public void setNumColumns(int numColumns) {
         this.numColumns = numColumns;
     }
