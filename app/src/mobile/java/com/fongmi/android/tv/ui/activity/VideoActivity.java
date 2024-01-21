@@ -333,6 +333,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mBinding.content.setOnClickListener(view -> onContent());
         mBinding.reverse.setOnClickListener(view -> onReverse());
         mBinding.name.setOnLongClickListener(view -> onChange());
+        mBinding.content.setOnLongClickListener(view -> onCopy());
         mBinding.control.cast.setOnClickListener(view -> onCast());
         mBinding.control.info.setOnClickListener(view -> onInfo());
         mBinding.control.full.setOnClickListener(view -> onFull());
@@ -701,6 +702,11 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     private boolean onChange() {
         checkSearch(true);
+        return true;
+    }
+
+    private boolean onCopy() {
+        Util.copy(mBinding.content.getText().toString());
         return true;
     }
 
