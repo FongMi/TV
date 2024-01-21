@@ -211,138 +211,145 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/danmuSpeed"
+                android:id="@+id/danmu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:background="@drawable/shape_item"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
-                    android:text="@string/player_danmu_speed"
-                    android:textColor="@color/white"
-                    android:textSize="16sp" />
-
-                <TextView
-                    android:id="@+id/danmuSpeedText"
+                <LinearLayout
+                    android:id="@+id/danmuSpeed"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="end"
-                    android:textColor="@color/white"
-                    android:textSize="16sp"
-                    tools:text="慢" />
+                    android:background="@drawable/shape_item"
+                    android:orientation="horizontal">
 
-            </LinearLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="16dp"
+                        android:text="@string/player_danmu_speed"
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
 
-            <LinearLayout
-                android:id="@+id/danmuSize"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:background="@drawable/shape_item"
-                android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/danmuSpeedText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="end"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        tools:text="慢" />
 
-                <TextView
-                    android:layout_width="wrap_content"
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/danmuSize"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
-                    android:text="@string/player_danmu_size"
-                    android:textColor="@color/white"
-                    android:textSize="16sp" />
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/shape_item"
+                    android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/danmuSizeText"
-                    android:layout_width="0dp"
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="16dp"
+                        android:text="@string/player_danmu_size"
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/danmuSizeText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="end"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        tools:text="1" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:text="@string/times"
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/danmuLine"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="end"
-                    android:textColor="@color/white"
-                    android:textSize="16sp"
-                    tools:text="1" />
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/shape_item"
+                    android:orientation="horizontal">
 
-                <TextView
-                    android:layout_width="wrap_content"
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="16dp"
+                        android:text="@string/player_danmu_line"
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/danmuLineText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="end"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        tools:text="1" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:text="@string/lines"
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/danmuAlpha"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:text="@string/times"
-                    android:textColor="@color/white"
-                    android:textSize="16sp" />
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/shape_item"
+                    android:orientation="horizontal">
 
-            </LinearLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="16dp"
+                        android:text="@string/player_danmu_alpha"
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
 
-            <LinearLayout
-                android:id="@+id/danmuLine"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:background="@drawable/shape_item"
-                android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/danmuAlphaText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="end"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        tools:text="1" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
-                    android:text="@string/player_danmu_line"
-                    android:textColor="@color/white"
-                    android:textSize="16sp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:text="%"
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
 
-                <TextView
-                    android:id="@+id/danmuLineText"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="end"
-                    android:textColor="@color/white"
-                    android:textSize="16sp"
-                    tools:text="1" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:text="@string/lines"
-                    android:textColor="@color/white"
-                    android:textSize="16sp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/danmuAlpha"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:background="@drawable/shape_item"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
-                    android:text="@string/player_danmu_alpha"
-                    android:textColor="@color/white"
-                    android:textSize="16sp" />
-
-                <TextView
-                    android:id="@+id/danmuAlphaText"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="end"
-                    android:textColor="@color/white"
-                    android:textSize="16sp"
-                    tools:text="1" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:text="%"
-                    android:textColor="@color/white"
-                    android:textSize="16sp" />
-
+                </LinearLayout>
             </LinearLayout>
 
             <LinearLayout
@@ -373,122 +380,100 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/flag"
+                android:id="@+id/exo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:background="@drawable/shape_item"
-                android:orientation="horizontal">
+                android:orientation="vertical">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
-                    android:text="@string/player_flag"
-                    android:textColor="@color/white"
-                    android:textSize="16sp" />
-
-                <TextView
-                    android:id="@+id/flagText"
+                <LinearLayout
+                    android:id="@+id/tunnel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:ellipsize="middle"
-                    android:gravity="end"
-                    android:singleLine="true"
-                    android:textColor="@color/white"
-                    android:textSize="16sp"
-                    tools:text="自動" />
+                    android:background="@drawable/shape_item"
+                    android:orientation="horizontal">
 
-            </LinearLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="16dp"
+                        android:text="@string/player_exo_tunnel"
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
 
-            <LinearLayout
-                android:id="@+id/tunnel"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:background="@drawable/shape_item"
-                android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/tunnelText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="end"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        tools:text="關" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
-                    android:text="@string/player_exo_tunnel"
-                    android:textColor="@color/white"
-                    android:textSize="16sp" />
+                </LinearLayout>
 
-                <TextView
-                    android:id="@+id/tunnelText"
+                <LinearLayout
+                    android:id="@+id/http"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="end"
-                    android:textColor="@color/white"
-                    android:textSize="16sp"
-                    tools:text="關" />
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/shape_item"
+                    android:orientation="horizontal">
 
-            </LinearLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="16dp"
+                        android:text="@string/player_exo_http"
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
 
-            <LinearLayout
-                android:id="@+id/http"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:background="@drawable/shape_item"
-                android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/httpText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="end"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        tools:text="OkHttp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
-                    android:text="@string/player_exo_http"
-                    android:textColor="@color/white"
-                    android:textSize="16sp" />
+                </LinearLayout>
 
-                <TextView
-                    android:id="@+id/httpText"
+                <LinearLayout
+                    android:id="@+id/buffer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="end"
-                    android:textColor="@color/white"
-                    android:textSize="16sp"
-                    tools:text="OkHttp" />
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/shape_item"
+                    android:orientation="horizontal">
 
-            </LinearLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="16dp"
+                        android:text="@string/player_exo_buffer"
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
 
-            <LinearLayout
-                android:id="@+id/buffer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:background="@drawable/shape_item"
-                android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/bufferText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="end"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        tools:text="1" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
-                    android:text="@string/player_exo_buffer"
-                    android:textColor="@color/white"
-                    android:textSize="16sp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:text="@string/times"
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
 
-                <TextView
-                    android:id="@+id/bufferText"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="end"
-                    android:textColor="@color/white"
-                    android:textSize="16sp"
-                    tools:text="1" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:text="@string/times"
-                    android:textColor="@color/white"
-                    android:textSize="16sp" />
-
+                </LinearLayout>
             </LinearLayout>
 
             <LinearLayout

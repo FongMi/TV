@@ -169,22 +169,6 @@ public class Setting {
         Prefers.put("exo_buffer", buffer);
     }
 
-    public static int getFlag() {
-        return Prefers.getInt("flag");
-    }
-
-    public static void putFlag(int flag) {
-        Prefers.put("flag", flag);
-    }
-
-    public static int getEpisode() {
-        return Prefers.getInt("episode");
-    }
-
-    public static void putEpisode(int episode) {
-        Prefers.put("episode", episode);
-    }
-
     public static int getBackground() {
         return Prefers.getInt("background", 2);
     }

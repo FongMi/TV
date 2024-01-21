@@ -90,8 +90,6 @@
     <string name="player_danmu_line">彈幕行數</string>
     <string name="player_danmu_alpha">彈幕透明</string>
     <string name="player_background">背景播放</string>
-    <string name="player_flag">線路播放</string>
-    <string name="player_episode">選集樣式</string>
     <string name="player_exo_tunnel">隧道模式</string>
     <string name="player_exo_http">連線方式</string>
     <string name="player_exo_buffer">緩衝時間</string>
@@ -187,16 +185,6 @@
     <string-array name="select_exo_http">
         <item>預設</item>
         <item>OkHttp</item>
-    </string-array>
-
-    <string-array name="select_flag">
-        <item>自動</item>
-        <item>手動</item>
-    </string-array>
-
-    <string-array name="select_episode">
-        <item>單行</item>
-        <item>多行</item>
     </string-array>
 
     <string-array name="select_caption">

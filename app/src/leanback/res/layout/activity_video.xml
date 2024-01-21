@@ -288,7 +288,7 @@
                 android:visibility="gone" />
 
             <com.fongmi.android.tv.ui.custom.CustomHorizontalGridView
-                android:id="@+id/episodeHori"
+                android:id="@+id/episode"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clipChildren="false"
@@ -310,20 +310,6 @@
                 android:paddingEnd="24dp"
                 android:paddingBottom="8dp"
                 android:visibility="gone" />
-
-            <androidx.leanback.widget.VerticalGridView
-                android:id="@+id/episodeVert"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clipChildren="false"
-                android:clipToPadding="false"
-                android:paddingStart="24dp"
-                android:paddingTop="8dp"
-                android:paddingEnd="24dp"
-                android:paddingBottom="8dp"
-                android:visibility="gone"
-                app:focusOutEnd="true"
-                app:focusOutFront="true" />
 
             <com.fongmi.android.tv.ui.custom.CustomHorizontalGridView
                 android:id="@+id/part"

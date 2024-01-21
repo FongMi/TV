@@ -570,7 +570,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mPlayers.clean();
         showProgress();
         setMetadata();
-        hidePreview();
     }
 
     private void setPlayer(Result result) {
@@ -655,14 +654,8 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         Episode episode = flag.find(mHistory.getVodRemarks(), getMark().isEmpty());
         setQualityVisible(episode != null && episode.isActivated() && mQualityAdapter.getItemCount() > 1);
         if (episode == null || episode.isActivated()) return;
-        if (Setting.getFlag() == 1) {
-            episode.setSelected(true);
-            mBinding.episode.scrollToPosition(mEpisodeAdapter.getPosition(episode));
-        } else {
-            mHistory.setVodRemarks(episode.getName());
-            onItemClick(episode);
-            hidePreview();
-        }
+        mHistory.setVodRemarks(episode.getName());
+        onItemClick(episode);
     }
 
     private void setQualityVisible(boolean visible) {
@@ -1016,17 +1009,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mDialogs.clear();
     }
 
-    private void showPreview(Drawable preview) {
-        if (Setting.getFlag() == 0 || isGone(mBinding.widget.preview)) return;
-        mBinding.widget.preview.setVisibility(View.VISIBLE);
-        mBinding.widget.preview.setImageDrawable(preview);
-    }
-
-    private void hidePreview() {
-        mBinding.widget.preview.setVisibility(View.GONE);
-        mBinding.widget.preview.setImageDrawable(null);
-    }
-
     private void setTraffic() {
         Traffic.setSpeed(mBinding.widget.traffic);
         App.post(mR2, Constant.INTERVAL_TRAFFIC);
@@ -1047,7 +1029,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
             public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
                 getExo().setDefaultArtwork(resource);
                 getIjk().setDefaultArtwork(resource);
-                showPreview(resource);
                 setMetadata();
             }
 
@@ -1056,7 +1037,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
                 getExo().setDefaultArtwork(error);
                 getIjk().setDefaultArtwork(error);
                 hideProgress();
-                hidePreview();
                 setMetadata();
             }
 

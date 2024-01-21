@@ -41,7 +41,6 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
     private String[] render;
     private String[] scale;
     private String[] http;
-    private String[] flag;
 
     public static SettingPlayerFragment newInstance() {
         return new SettingPlayerFragment();
@@ -68,7 +67,6 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
         mBinding.danmuSizeText.setText(String.valueOf(Setting.getDanmuSize()));
         mBinding.danmuLineText.setText(String.valueOf(Setting.getDanmuLine(2)));
         mBinding.danmuAlphaText.setText(String.valueOf(Setting.getDanmuAlpha()));
-        mBinding.flagText.setText((flag = ResUtil.getStringArray(R.array.select_flag))[Setting.getFlag()]);
         mBinding.httpText.setText((http = ResUtil.getStringArray(R.array.select_exo_http))[Setting.getHttp()]);
         mBinding.scaleText.setText((scale = ResUtil.getStringArray(R.array.select_scale))[Setting.getScale()]);
         mBinding.playerText.setText((player = ResUtil.getStringArray(R.array.select_player))[Setting.getPlayer()]);
@@ -82,7 +80,6 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
     protected void initEvent() {
         mBinding.ua.setOnClickListener(this::onUa);
         mBinding.http.setOnClickListener(this::setHttp);
-        mBinding.flag.setOnClickListener(this::setFlag);
         mBinding.scale.setOnClickListener(this::onScale);
         mBinding.buffer.setOnClickListener(this::onBuffer);
         mBinding.player.setOnClickListener(this::setPlayer);
@@ -100,10 +97,9 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
     }
 
     private void setVisible() {
+        mBinding.danmu.setVisibility(Setting.isDanmuLoad() ? View.VISIBLE : View.GONE);
         mBinding.caption.setVisibility(Setting.hasCaption() ? View.VISIBLE : View.GONE);
-        mBinding.http.setVisibility(Players.isExo(Setting.getPlayer()) ? View.VISIBLE : View.GONE);
-        mBinding.buffer.setVisibility(Players.isExo(Setting.getPlayer()) ? View.VISIBLE : View.GONE);
-        mBinding.tunnel.setVisibility(Players.isExo(Setting.getPlayer()) ? View.VISIBLE : View.GONE);
+        mBinding.exo.setVisibility(Players.isExo(Setting.getPlayer()) ? View.VISIBLE : View.GONE);
     }
 
     private void onUa(View view) {
@@ -121,12 +117,6 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
         Setting.putHttp(index = index == http.length - 1 ? 0 : ++index);
         mBinding.httpText.setText(http[index]);
         ExoUtil.reset();
-    }
-
-    private void setFlag(View view) {
-        int index = Setting.getFlag();
-        Setting.putFlag(index = index == flag.length - 1 ? 0 : ++index);
-        mBinding.flagText.setText(flag[index]);
     }
 
     private void onScale(View view) {
@@ -207,6 +197,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
     private void setDanmuLoad(View view) {
         Setting.putDanmuLoad(!Setting.isDanmuLoad());
         mBinding.danmuLoadText.setText(getSwitch(Setting.isDanmuLoad()));
+        setVisible();
     }
 
     private void onDanmuAlpha(View view) {

@@ -32,7 +32,6 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
     private ActivitySettingPlayerBinding mBinding;
     private String[] danmuSpeed;
     private String[] caption;
-    private String[] episode;
     private String[] player;
     private String[] render;
     private String[] scale;
@@ -64,12 +63,10 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
         mBinding.danmuSizeText.setText(String.valueOf(Setting.getDanmuSize()));
         mBinding.danmuLineText.setText(String.valueOf(Setting.getDanmuLine(3)));
         mBinding.danmuAlphaText.setText(String.valueOf(Setting.getDanmuAlpha()));
-        mBinding.flagText.setText((flag = ResUtil.getStringArray(R.array.select_flag))[Setting.getFlag()]);
         mBinding.httpText.setText((http = ResUtil.getStringArray(R.array.select_exo_http))[Setting.getHttp()]);
         mBinding.scaleText.setText((scale = ResUtil.getStringArray(R.array.select_scale))[Setting.getScale()]);
         mBinding.playerText.setText((player = ResUtil.getStringArray(R.array.select_player))[Setting.getPlayer()]);
         mBinding.renderText.setText((render = ResUtil.getStringArray(R.array.select_render))[Setting.getRender()]);
-        mBinding.episodeText.setText((episode = ResUtil.getStringArray(R.array.select_episode))[Setting.getEpisode()]);
         mBinding.captionText.setText((caption = ResUtil.getStringArray(R.array.select_caption))[Setting.isCaption() ? 1 : 0]);
         mBinding.danmuSpeedText.setText((danmuSpeed = ResUtil.getStringArray(R.array.select_danmu_speed))[Setting.getDanmuSpeed()]);
     }
@@ -78,13 +75,11 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
     protected void initEvent() {
         mBinding.ua.setOnClickListener(this::onUa);
         mBinding.http.setOnClickListener(this::setHttp);
-        mBinding.flag.setOnClickListener(this::setFlag);
         mBinding.scale.setOnClickListener(this::setScale);
         mBinding.buffer.setOnClickListener(this::onBuffer);
         mBinding.player.setOnClickListener(this::setPlayer);
         mBinding.render.setOnClickListener(this::setRender);
         mBinding.tunnel.setOnClickListener(this::setTunnel);
-        mBinding.episode.setOnClickListener(this::setEpisode);
         mBinding.caption.setOnClickListener(this::setCaption);
         mBinding.subtitle.setOnClickListener(this::onSubtitle);
         mBinding.caption.setOnLongClickListener(this::onCaption);
@@ -96,10 +91,9 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
     }
 
     private void setVisible() {
+        mBinding.danmu.setVisibility(Setting.isDanmuLoad() ? View.VISIBLE : View.GONE);
         mBinding.caption.setVisibility(Setting.hasCaption() ? View.VISIBLE : View.GONE);
-        mBinding.http.setVisibility(Players.isExo(Setting.getPlayer()) ? View.VISIBLE : View.GONE);
-        mBinding.buffer.setVisibility(Players.isExo(Setting.getPlayer()) ? View.VISIBLE : View.GONE);
-        mBinding.tunnel.setVisibility(Players.isExo(Setting.getPlayer()) ? View.VISIBLE : View.GONE);
+        mBinding.exo.setVisibility(Players.isExo(Setting.getPlayer()) ? View.VISIBLE : View.GONE);
     }
 
     private void onUa(View view) {
@@ -117,12 +111,6 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
         Setting.putHttp(index = index == http.length - 1 ? 0 : ++index);
         mBinding.httpText.setText(http[index]);
         ExoUtil.reset();
-    }
-
-    private void setFlag(View view) {
-        int index = Setting.getFlag();
-        Setting.putFlag(index = index == flag.length - 1 ? 0 : ++index);
-        mBinding.flagText.setText(flag[index]);
     }
 
     private void setScale(View view) {
@@ -157,12 +145,6 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
     private void setTunnel(View view) {
         Setting.putTunnel(!Setting.isTunnel());
         mBinding.tunnelText.setText(getSwitch(Setting.isTunnel()));
-    }
-
-    private void setEpisode(View view) {
-        int index = Setting.getEpisode();
-        Setting.putEpisode(index = index == episode.length - 1 ? 0 : ++index);
-        mBinding.episodeText.setText(episode[index]);
     }
 
     private void setCaption(View view) {
@@ -201,6 +183,7 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
     private void setDanmuLoad(View view) {
         Setting.putDanmuLoad(!Setting.isDanmuLoad());
         mBinding.danmuLoadText.setText(getSwitch(Setting.isDanmuLoad()));
+        setVisible();
     }
 
     @Override
