@@ -118,11 +118,6 @@
             android:supportsPictureInPicture="true"
             android:theme="@style/AppTheme.Detail" />
 
-        <activity
-            android:name=".ui.activity.MangaActivity"
-            android:configChanges="screenSize|smallestScreenSize|screenLayout"
-            android:screenOrientation="fullUser" />
-
         <receiver
             android:name=".receiver.ShortcutReceiver"
             android:exported="false" />

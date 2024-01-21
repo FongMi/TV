@@ -20,6 +20,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.R;
 import com.github.catvod.Init;
 
 import java.text.SimpleDateFormat;
@@ -72,6 +73,7 @@ public class Util {
     public static void copy(String text) {
         ClipboardManager manager = (ClipboardManager) App.get().getSystemService(Context.CLIPBOARD_SERVICE);
         manager.setPrimaryClip(ClipData.newPlainText("", text));
+        Notify.show(R.string.copied);
     }
 
     public static int getDigit(String text) {
