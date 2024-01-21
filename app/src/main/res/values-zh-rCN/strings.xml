@@ -135,6 +135,9 @@
     <string name="crash_details_title">错误信息</string>
     <string name="crash_details_close">关闭</string>
 
+    <!-- Hint -->
+    <string name="copied">已复制</string>
+
     <!-- UNIT -->
     <string name="all">全部</string>
     <string name="times">倍</string>
