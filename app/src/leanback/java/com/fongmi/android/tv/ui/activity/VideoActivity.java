@@ -371,7 +371,11 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mBinding.array.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
-                if (mEpisodeAdapter.size() > getGroupSize() && position > 1) getEpisodeView().setSelectedPosition((position - 2) * getGroupSize() + 1);
+                if (mEpisodeAdapter.size() > getGroupSize() && position > 1) {
+                    int pos = (position - 2) * getGroupSize() + 1;
+                    if (Setting.getEpisode() == 1) pos += 3 * mEpisodePresenter.getNumColumns();
+                    getEpisodeView().setSelectedPosition(pos);
+                }
             }
         });
     }
