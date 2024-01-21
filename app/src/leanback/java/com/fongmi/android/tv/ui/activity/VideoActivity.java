@@ -145,6 +145,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private boolean useParse;
     private int currentFlag;
     private int toggleCount;
+    private int groupSize;
     private Runnable mR1;
     private Runnable mR2;
     private Runnable mR3;
@@ -370,7 +371,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mBinding.array.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
-                if (mEpisodeAdapter.size() > 20 && position > 1) getEpisodeView().setSelectedPosition((position - 2) * 20);
+                if (mEpisodeAdapter.size() > getGroupSize() && position > 1) getEpisodeView().setSelectedPosition((position - 2) * getGroupSize() + 1);
             }
         });
     }
@@ -694,12 +695,15 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void setArrayAdapter(int size) {
+        if (size > 200) setGroupSize(100);
+        else if (size > 100) setGroupSize(40);
+        else setGroupSize(20);
         List<String> items = new ArrayList<>();
         items.add(getString(R.string.play_reverse));
         items.add(getString(mHistory.getRevPlayText()));
         mBinding.array.setVisibility(size > 1 ? View.VISIBLE : View.GONE);
-        if (mHistory.isRevSort()) for (int i = size; i > 0; i -= 20) items.add(i + "-" + Math.max(i - 19, 1));
-        else for (int i = 0; i < size; i += 20) items.add((i + 1) + "-" + Math.min(i + 20, size));
+        if (mHistory.isRevSort()) for (int i = size; i > 0; i -= getGroupSize()) items.add(i + "-" + Math.max(i - (getGroupSize() - 1), 1));
+        else for (int i = 0; i < size; i += getGroupSize()) items.add((i + 1) + "-" + Math.min(i + getGroupSize(), size));
         mArrayAdapter.setItems(items, null);
     }
 
@@ -1013,16 +1017,25 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void showInfo() {
-        mBinding.widget.center.setVisibility(View.VISIBLE);
         mBinding.widget.info.setVisibility(View.VISIBLE);
     }
 
     private void hideInfo() {
-        mBinding.widget.center.setVisibility(View.GONE);
         mBinding.widget.info.setVisibility(View.GONE);
     }
 
+    private void showInfoAndCenter() {
+        showInfo();
+        mBinding.widget.center.setVisibility(View.VISIBLE);
+    }
+
+    private void hideInfoAndCenter() {
+        hideInfo();
+        mBinding.widget.center.setVisibility(View.GONE);
+    }
+
     private void showControl(View view) {
+        showInfo();
         mBinding.control.danmu.setVisibility(mBinding.danmaku.isPrepared() ? View.VISIBLE : View.GONE);
         mBinding.control.getRoot().setVisibility(View.VISIBLE);
         view.requestFocus();
@@ -1030,6 +1043,11 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void hideControl() {
+        hideControl(true);
+    }
+
+    private void hideControl(boolean hideInfo) {
+        if (hideInfo) hideInfo();
         mBinding.control.text.setText(R.string.play_track_text);
         mBinding.control.getRoot().setVisibility(View.GONE);
         App.removeCallbacks(mR1);
@@ -1037,7 +1055,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     private void hideCenter() {
         mBinding.widget.action.setImageResource(R.drawable.ic_widget_play);
-        hideInfo();
+        mBinding.widget.center.setVisibility(View.GONE);
     }
 
     private void showPreview(Drawable preview) {
@@ -1427,8 +1445,8 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private void onPaused(boolean visible) {
         mBinding.widget.exoDuration.setText(mPlayers.getDurationTime());
         mBinding.widget.exoPosition.setText(mPlayers.getPositionTime(0));
-        if (visible) showInfo();
-        else hideInfo();
+        if (visible) showInfoAndCenter();
+        else hideInfoAndCenter();
         mPlayers.pause();
     }
 
@@ -1499,6 +1517,14 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     public void resetToggle() {
         this.toggleCount = 0;
+    }
+
+    public int getGroupSize() {
+        return groupSize;
+    }
+
+    public void setGroupSize(int size) {
+        groupSize = size;
     }
 
     private View getFocus1() {
@@ -1597,9 +1623,13 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     @Override
     public void onKeyCenter() {
-        if (mPlayers.isPlaying()) onPaused(true);
-        else onPlay();
-        hideControl();
+        if (mPlayers.isPlaying()) {
+            onPaused(true);
+            hideControl(false);
+        } else {
+            onPlay();
+            hideControl(true);
+        }
     }
 
     @Override
