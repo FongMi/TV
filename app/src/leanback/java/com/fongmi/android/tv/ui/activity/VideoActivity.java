@@ -284,6 +284,11 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         return Setting.getEpisode() == 0 ? mBinding.episodeHori : mBinding.episodeVert;
     }
 
+    private void setEpisodeSelectedPosition(int position) {
+        if (Setting.getEpisode() == 1) position += 3 * mEpisodePresenter.getNumColumns();//temporary solution
+        getEpisodeView().setSelectedPosition(position);
+    }
+
     private boolean isReplay() {
         return Setting.getReset() == 1;
     }
@@ -371,11 +376,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mBinding.array.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
-                if (mEpisodeAdapter.size() > getGroupSize() && position > 1) {
-                    int pos = (position - 2) * getGroupSize() + 1;
-                    if (Setting.getEpisode() == 1) pos += 3 * mEpisodePresenter.getNumColumns();
-                    getEpisodeView().setSelectedPosition(pos);
-                }
+                if (mEpisodeAdapter.size() > getGroupSize() && position > 1) setEpisodeSelectedPosition((position - 2) * getGroupSize() + 1);
             }
         });
     }
@@ -650,7 +651,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         if (Setting.getFlag() == 1) {
             episode.setActivated(true);
             getEpisodeView().requestFocus();
-            getEpisodeView().setSelectedPosition(getEpisodePosition());
+            setEpisodeSelectedPosition(getEpisodePosition());
             episode.setActivated(false);
         } else {
             mHistory.setVodRemarks(episode.getName());
@@ -663,7 +664,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         if (shouldEnterFullscreen(item)) return;
         setCurrentFlag(mBinding.flag.getSelectedPosition());
         for (int i = 0; i < mFlagAdapter.size(); i++) ((Flag) mFlagAdapter.get(i)).toggle(getCurrentFlag() == i, item);
-        getEpisodeView().setSelectedPosition(getEpisodePosition());
+        setEpisodeSelectedPosition(getEpisodePosition());
         notifyItemChanged(getEpisodeView(), mEpisodeAdapter);
         if (mEpisodeAdapter.size() == 0) return;
         if (isFullscreen()) Notify.show(getString(R.string.play_ready, item.getName()));
@@ -689,7 +690,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private void reverseEpisode(boolean scroll) {
         for (int i = 0; i < mFlagAdapter.size(); i++) Collections.reverse(((Flag) mFlagAdapter.get(i)).getEpisodes());
         setEpisodeAdapter(getFlag().getEpisodes());
-        if (scroll) getEpisodeView().setSelectedPosition(getEpisodePosition());
+        if (scroll) setEpisodeSelectedPosition(getEpisodePosition());
     }
 
     private void setParseActivated(Parse item) {
