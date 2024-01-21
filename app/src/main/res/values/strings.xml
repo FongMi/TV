@@ -133,6 +133,9 @@
     <string name="crash_details_title">Error details</string>
     <string name="crash_details_close">Close</string>
 
+    <!-- Hint -->
+    <string name="copied">Copied</string>
+
     <!-- UNIT -->
     <string name="all">All</string>
     <string name="times">times</string>

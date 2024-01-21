@@ -45,7 +45,6 @@
     <string name="timer_cancel">Cancel timer</string>
 
     <!-- Hint -->
-    <string name="copied">Copied</string>
     <string name="shortcut">Shortcut has been added.</string>
 
     <string-array name="select_background">

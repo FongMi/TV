@@ -45,7 +45,6 @@
     <string name="timer_cancel">取消定時器</string>
 
     <!-- Hint -->
-    <string name="copied">已複製</string>
     <string name="shortcut"> 已於主螢幕新增捷徑。</string>
 
     <string-array name="select_background">
