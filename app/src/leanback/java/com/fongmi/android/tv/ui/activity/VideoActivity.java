@@ -1035,7 +1035,6 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void showControl(View view) {
-        showInfo();
         mBinding.control.danmu.setVisibility(mBinding.danmaku.isPrepared() ? View.VISIBLE : View.GONE);
         mBinding.control.getRoot().setVisibility(View.VISIBLE);
         view.requestFocus();
@@ -1613,6 +1612,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     public void onKeyUp() {
         long current = mPlayers.getPosition();
         long half = mPlayers.getDuration() / 2;
+        showInfo();
         showControl(current < half ? mBinding.control.opening : mBinding.control.ending);
     }
 
