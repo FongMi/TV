@@ -162,7 +162,7 @@ public class Setting {
     }
 
     public static int getBuffer() {
-        return Math.min(Math.max(Prefers.getInt("exo_buffer"), 1), 15);
+        return Math.min(Math.max(Prefers.getInt("exo_buffer"), 1), 10);
     }
 
     public static void putBuffer(int buffer) {
@@ -258,7 +258,7 @@ public class Setting {
     }
 
     public static int getDanmuLine(int line) {
-        return Math.min(Math.max(Prefers.getInt("danmu_line", line), 1), 15);
+        return Math.min(Math.max(Prefers.getInt("danmu_line", line), 1), 10);
     }
 
     public static void putDanmuLine(int line) {
