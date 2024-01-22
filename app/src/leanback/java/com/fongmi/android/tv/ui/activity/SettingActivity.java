@@ -48,8 +48,6 @@ import java.util.List;
 public class SettingActivity extends BaseActivity implements ConfigCallback, SiteCallback, LiveCallback, DohCallback, ProxyCallback {
 
     private ActivitySettingBinding mBinding;
-    private String[] quality;
-    private String[] size;
     private int type;
 
     public static void start(Activity activity) {
@@ -81,8 +79,6 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.dohText.setText(getDohList()[getDohIndex()]);
         mBinding.versionText.setText(BuildConfig.VERSION_NAME);
         mBinding.proxyText.setText(UrlUtil.scheme(Setting.getProxy()));
-        mBinding.sizeText.setText((size = ResUtil.getStringArray(R.array.select_size))[Setting.getSize()]);
-        mBinding.qualityText.setText((quality = ResUtil.getStringArray(R.array.select_quality))[Setting.getQuality()]);
         setCacheText();
     }
 
@@ -104,6 +100,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.cache.setOnClickListener(this::onCache);
         mBinding.backup.setOnClickListener(this::onBackup);
         mBinding.player.setOnClickListener(this::onPlayer);
+        mBinding.danmu.setOnClickListener(this::onDanmu);
         mBinding.version.setOnClickListener(this::onVersion);
         mBinding.vod.setOnLongClickListener(this::onVodEdit);
         mBinding.vodHome.setOnClickListener(this::onVodHome);
@@ -116,8 +113,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.liveHistory.setOnClickListener(this::onLiveHistory);
         mBinding.wallDefault.setOnClickListener(this::setWallDefault);
         mBinding.wallRefresh.setOnClickListener(this::setWallRefresh);
-        mBinding.quality.setOnClickListener(this::setQuality);
-        mBinding.size.setOnClickListener(this::setSize);
+        mBinding.custom.setOnClickListener(this::onCustom);
         mBinding.doh.setOnClickListener(this::setDoh);
     }
 
@@ -251,6 +247,10 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         SettingPlayerActivity.start(this);
     }
 
+    private void onDanmu(View view) {
+        SettingDanmuActivity.start(this);
+    }
+
     private void onVersion(View view) {
         Updater.get().force().release().start(this);
     }
@@ -275,18 +275,8 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         });
     }
 
-    private void setQuality(View view) {
-        int index = Setting.getQuality();
-        Setting.putQuality(index = index == quality.length - 1 ? 0 : ++index);
-        mBinding.qualityText.setText(quality[index]);
-        RefreshEvent.image();
-    }
-
-    private void setSize(View view) {
-        int index = Setting.getSize();
-        Setting.putSize(index = index == size.length - 1 ? 0 : ++index);
-        mBinding.sizeText.setText(size[index]);
-        RefreshEvent.size();
+    private void onCustom(View view) {
+        SettingCustomActivity.start(this);
     }
 
     private void setDoh(View view) {
