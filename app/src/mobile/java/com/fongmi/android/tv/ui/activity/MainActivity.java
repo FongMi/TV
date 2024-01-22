@@ -212,6 +212,10 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
     protected void onBackPress() {
         if (!mBinding.navigation.getMenu().findItem(R.id.vod).isVisible()) {
             setNavigation();
+        } else if (mManager.isVisible(4)) {
+            change(1);
+        } else if (mManager.isVisible(3)) {
+            change(1);
         } else if (mManager.isVisible(2)) {
             change(1);
         } else if (mManager.isVisible(1)) {
