@@ -1090,7 +1090,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mHistory.setVodRemarks(item.getName());
         mHistory.setVodFlag(getFlag().getFlag());
         mHistory.setCreateTime(System.currentTimeMillis());
-        mPlayers.setPosition(Math.max(mHistory.getOpening(), mHistory.getPosition()));
+        mPlayers.setPosition(Math.max(mHistory.getOpening(), position));
     }
 
     private void checkKeep() {

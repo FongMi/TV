@@ -1094,7 +1094,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mHistory.setVodRemarks(item.getName());
         mHistory.setVodFlag(getFlag().getFlag());
         mHistory.setCreateTime(System.currentTimeMillis());
-        mPlayers.setPosition(Math.max(mHistory.getOpening(), mHistory.getPosition()));
+        mPlayers.setPosition(Math.max(mHistory.getOpening(), position));
     }
 
     private void checkPlayImg(boolean playing) {
