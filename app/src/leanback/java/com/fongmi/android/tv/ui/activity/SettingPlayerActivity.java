@@ -27,16 +27,18 @@ import com.fongmi.android.tv.ui.dialog.SubtitleDialog;
 import com.fongmi.android.tv.ui.dialog.UaDialog;
 import com.fongmi.android.tv.utils.ResUtil;
 
+import java.text.DecimalFormat;
+
 public class SettingPlayerActivity extends BaseActivity implements UaCallback, BufferCallback, SubtitleCallback, DanmuLineCallback, DanmuSizeCallback, DanmuAlphaCallback {
 
     private ActivitySettingPlayerBinding mBinding;
+    private DecimalFormat format;
     private String[] danmuSpeed;
     private String[] caption;
     private String[] player;
     private String[] render;
     private String[] scale;
     private String[] http;
-    private String[] flag;
 
     public static void start(Activity activity) {
         activity.startActivity(new Intent(activity, SettingPlayerActivity.class));
@@ -54,13 +56,14 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
     @Override
     protected void initView() {
         setVisible();
+        format = new DecimalFormat("#.#");
         mBinding.player.requestFocus();
         mBinding.uaText.setText(Setting.getUa());
         mBinding.tunnelText.setText(getSwitch(Setting.isTunnel()));
         mBinding.danmuLoadText.setText(getSwitch(Setting.isDanmuLoad()));
         mBinding.bufferText.setText(String.valueOf(Setting.getBuffer()));
         mBinding.subtitleText.setText(String.valueOf(Setting.getSubtitle()));
-        mBinding.danmuSizeText.setText(String.valueOf(Setting.getDanmuSize()));
+        mBinding.danmuSizeText.setText(format.format(Setting.getDanmuSize()));
         mBinding.danmuLineText.setText(String.valueOf(Setting.getDanmuLine(3)));
         mBinding.danmuAlphaText.setText(String.valueOf(Setting.getDanmuAlpha()));
         mBinding.httpText.setText((http = ResUtil.getStringArray(R.array.select_exo_http))[Setting.getHttp()]);
@@ -172,7 +175,7 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
 
     @Override
     public void setDanmuSize(float size) {
-        mBinding.danmuSizeText.setText(String.valueOf(size));
+        mBinding.danmuSizeText.setText(format.format(size));
         Setting.putDanmuSize(size);
     }
 

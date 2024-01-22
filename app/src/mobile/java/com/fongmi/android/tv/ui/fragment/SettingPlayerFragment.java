@@ -31,9 +31,12 @@ import com.fongmi.android.tv.ui.dialog.UaDialog;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import java.text.DecimalFormat;
+
 public class SettingPlayerFragment extends BaseFragment implements UaCallback, BufferCallback, SubtitleCallback, DanmuLineCallback, DanmuSizeCallback, DanmuAlphaCallback {
 
     private FragmentSettingPlayerBinding mBinding;
+    private DecimalFormat format;
     private String[] danmuSpeed;
     private String[] background;
     private String[] caption;
@@ -58,13 +61,14 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
     @Override
     protected void initView() {
         setVisible();
+        format = new DecimalFormat("#.#");
         mBinding.uaText.setText(Setting.getUa());
         mBinding.tunnelText.setText(getSwitch(Setting.isTunnel()));
         mBinding.captionText.setText(getSwitch(Setting.isCaption()));
         mBinding.bufferText.setText(String.valueOf(Setting.getBuffer()));
         mBinding.danmuLoadText.setText(getSwitch(Setting.isDanmuLoad()));
         mBinding.subtitleText.setText(String.valueOf(Setting.getSubtitle()));
-        mBinding.danmuSizeText.setText(String.valueOf(Setting.getDanmuSize()));
+        mBinding.danmuSizeText.setText(format.format(Setting.getDanmuSize()));
         mBinding.danmuLineText.setText(String.valueOf(Setting.getDanmuLine(2)));
         mBinding.danmuAlphaText.setText(String.valueOf(Setting.getDanmuAlpha()));
         mBinding.httpText.setText((http = ResUtil.getStringArray(R.array.select_exo_http))[Setting.getHttp()]);
@@ -180,7 +184,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
 
     @Override
     public void setDanmuSize(float size) {
-        mBinding.danmuSizeText.setText(String.valueOf(size));
+        mBinding.danmuSizeText.setText(format.format(size));
         Setting.putDanmuSize(size);
     }
 
