@@ -3300,6 +3300,9 @@ page {
   svg {
     fill: #07c160;
   }
+  svg {
+    fill: var(--weui-BRAND);
+  }
 }
 
 .weui-tabbar__icon {
