@@ -568,7 +568,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mViewModel.playerContent(getKey(), flag.getFlag(), episode.getUrl());
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         updateHistory(episode, replay);
-        mPlayers.clean();
+        mPlayers.clear();
         showProgress();
         setMetadata();
     }
@@ -1094,6 +1094,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mHistory.setVodRemarks(item.getName());
         mHistory.setVodFlag(getFlag().getFlag());
         mHistory.setCreateTime(System.currentTimeMillis());
+        mPlayers.setPosition(Math.max(mHistory.getOpening(), mHistory.getPosition()));
     }
 
     private void checkPlayImg(boolean playing) {
@@ -1181,7 +1182,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         if (isRedirect()) return;
         switch (event.getState()) {
             case 0:
-                setPosition();
                 setInitTrack(true);
                 setTrackVisible(false);
                 mClock.setCallback(this);
@@ -1209,10 +1209,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
                 checkEnded();
                 break;
         }
-    }
-
-    private void setPosition() {
-        mPlayers.seekTo(Math.max(mHistory.getOpening(), mHistory.getPosition()), false);
     }
 
     private void checkRotate() {
