@@ -14,7 +14,6 @@ import com.fongmi.android.tv.player.Source;
 import com.github.catvod.net.OkHttp;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Locale;
@@ -30,7 +29,6 @@ public class LiveViewModel extends ViewModel {
     private static final int URL = 2;
 
     private final SimpleDateFormat formatDate;
-    private final SimpleDateFormat formatSeek;
     private final SimpleDateFormat formatTime;
 
     public MutableLiveData<Channel> url;
@@ -43,7 +41,6 @@ public class LiveViewModel extends ViewModel {
 
     public LiveViewModel() {
         this.formatTime = new SimpleDateFormat("yyyy-MM-ddHH:mm", Locale.getDefault());
-        this.formatSeek = new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault());
         this.formatDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         this.live = new MutableLiveData<>();
         this.epg = new MutableLiveData<>();
@@ -74,7 +71,6 @@ public class LiveViewModel extends ViewModel {
             item.setMsg(null);
             Source.get().stop();
             item.setUrl(Source.get().fetch(item));
-            //checkPLTV(item);
             return item;
         });
     }
@@ -82,14 +78,6 @@ public class LiveViewModel extends ViewModel {
     private void verify(Live item) {
         Iterator<Group> iterator = item.getGroups().iterator();
         while (iterator.hasNext()) if (iterator.next().isEmpty()) iterator.remove();
-    }
-
-    private void checkPLTV(Channel item) {
-        if (!item.getUrl().contains("/PLTV/")) return;
-        Calendar calendar = Calendar.getInstance();
-        String endTime = formatSeek.format(calendar.getTime());
-        String startTime = formatSeek.format(calendar.getTime());
-        item.setUrl(item.getUrl().replace("/PLTV/", "/TVOD/") + "?playseek=" + startTime + "-" + endTime);
     }
 
     private void execute(int type, Callable<?> callable) {
