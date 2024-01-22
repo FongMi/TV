@@ -19,7 +19,7 @@ public class SessionCallback extends MediaSessionCompat.Callback {
 
     @Override
     public void onSeekTo(long pos) {
-        players.seekTo(pos, true);
+        players.seekTo(pos);
     }
 
     @Override
