@@ -1294,6 +1294,11 @@ input.weui-btn_mini {
   vertical-align: bottom;
 }
 
+.weui-cell__name {
+  color: rgba(0, 0, 0, 0.9);
+  color: var(--weui-FG-0);
+}
+
 .weui-cell__desc {
   font-size: 12px;
   color: rgba(0, 0, 0, 0.3);
@@ -3897,8 +3902,10 @@ a.weui-media-box:active {
 
 .weui-dialog__title {
   font-weight: 700;
-  font-size: 17px;
+  font-size: 20px;
   line-height: 1.4;
+  color: rgba(0, 0, 0, 0.9);
+  color: var(--weui-FG-0);
 }
 
 .weui-dialog__bd {
