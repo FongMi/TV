@@ -33,6 +33,8 @@ import com.fongmi.android.tv.receiver.ShortcutReceiver;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.FragmentStateManager;
+import com.fongmi.android.tv.ui.fragment.SettingCustomFragment;
+import com.fongmi.android.tv.ui.fragment.SettingDanmuFragment;
 import com.fongmi.android.tv.ui.fragment.SettingFragment;
 import com.fongmi.android.tv.ui.fragment.SettingPlayerFragment;
 import com.fongmi.android.tv.ui.fragment.VodFragment;
@@ -95,6 +97,8 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
                 if (position == 0) return VodFragment.newInstance();
                 if (position == 1) return SettingFragment.newInstance();
                 if (position == 2) return SettingPlayerFragment.newInstance();
+                if (position == 3) return SettingDanmuFragment.newInstance();
+                if (position == 4) return SettingCustomFragment.newInstance();
                 return null;
             }
         };

@@ -66,6 +66,8 @@
     <string name="setting_live">直播</string>
     <string name="setting_wall">壁紙</string>
     <string name="setting_player">播放設定</string>
+    <string name="setting_danmu">彈幕設定</string>
+    <string name="setting_custom">個性設定</string>
     <string name="setting_quality">圖片品質</string>
     <string name="setting_size">圖片尺寸</string>
     <string name="setting_doh">DoH</string>
