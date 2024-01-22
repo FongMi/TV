@@ -285,8 +285,9 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void setEpisodeSelectedPosition(int position) {
-        if (Setting.getEpisode() == 1) position += 3 * mEpisodePresenter.getNumColumns();//temporary solution
-        getEpisodeView().setSelectedPosition(position);
+        getEpisodeView().postDelayed(() -> {
+            getEpisodeView().setSelectedPosition(position);
+        }, 100);
     }
 
     private boolean isReplay() {
@@ -640,6 +641,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mBinding.episodeVert.setNumColumns(numColumns);
         mBinding.episodeVert.setColumnWidth((width - ((numColumns - 1) * ResUtil.dp2px(8))) / numColumns);
         mBinding.episodeVert.setLayoutParams(params);
+        mBinding.episodeVert.setWindowAlignmentOffsetPercent(6);
         mEpisodePresenter.setNumColumns(numColumns);
         mEpisodePresenter.setNumRows(rowNum);
     }
@@ -664,8 +666,8 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         if (shouldEnterFullscreen(item)) return;
         setCurrentFlag(mBinding.flag.getSelectedPosition());
         for (int i = 0; i < mFlagAdapter.size(); i++) ((Flag) mFlagAdapter.get(i)).toggle(getCurrentFlag() == i, item);
-        setEpisodeSelectedPosition(getEpisodePosition());
         notifyItemChanged(getEpisodeView(), mEpisodeAdapter);
+        setEpisodeSelectedPosition(getEpisodePosition());
         if (mEpisodeAdapter.size() == 0) return;
         if (isFullscreen()) Notify.show(getString(R.string.play_ready, item.getName()));
         onRefresh();
