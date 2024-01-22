@@ -285,9 +285,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void setEpisodeSelectedPosition(int position) {
-        getEpisodeView().postDelayed(() -> {
-            getEpisodeView().setSelectedPosition(position);
-        }, 100);
+        getEpisodeView().setSelectedPosition(position);
     }
 
     private boolean isReplay() {
@@ -666,8 +664,8 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         if (shouldEnterFullscreen(item)) return;
         setCurrentFlag(mBinding.flag.getSelectedPosition());
         for (int i = 0; i < mFlagAdapter.size(); i++) ((Flag) mFlagAdapter.get(i)).toggle(getCurrentFlag() == i, item);
-        notifyItemChanged(getEpisodeView(), mEpisodeAdapter);
         setEpisodeSelectedPosition(getEpisodePosition());
+        notifyItemChanged(getEpisodeView(), mEpisodeAdapter);
         if (mEpisodeAdapter.size() == 0) return;
         if (isFullscreen()) Notify.show(getString(R.string.play_ready, item.getName()));
         onRefresh();
@@ -736,7 +734,6 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mPartPresenter.setNextFocusUp(findFocusUp(5));
         notifyItemChanged(getEpisodeView(), mEpisodeAdapter);
         notifyItemChanged(mBinding.quality, mQualityAdapter);
-        notifyItemChanged(mBinding.array, mArrayAdapter);
         notifyItemChanged(mBinding.part, mPartAdapter);
         notifyItemChanged(mBinding.flag, mFlagAdapter);
     }
