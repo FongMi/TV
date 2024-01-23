@@ -140,7 +140,7 @@ public class CustomWebView extends WebView {
     }
 
     private void showDialog() {
-        if (dialog != null) return;
+        if (dialog != null || App.activity() == null) return;
         if (getParent() != null) ((ViewGroup) getParent()).removeView(this);
         dialog = new AlertDialog.Builder(App.activity()).setView(this).show();
     }
