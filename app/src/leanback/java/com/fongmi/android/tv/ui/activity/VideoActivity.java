@@ -746,13 +746,14 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void onDanmu() {
+        if (mPlayers.isEnd()) return;
         Setting.putDanmu(!Setting.isDanmu());
         mBinding.control.danmu.setActivated(Setting.isDanmu());
         showDanmu();
     }
 
     private void showDanmu() {
-        if (!mPlayers.isEnd() && Setting.isDanmu()) mBinding.danmaku.show();
+        if (Setting.isDanmu()) mBinding.danmaku.show();
         else mBinding.danmaku.hide();
     }
 
