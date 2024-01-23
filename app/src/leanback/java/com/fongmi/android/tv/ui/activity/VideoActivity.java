@@ -305,7 +305,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     protected void initView() {
         mKeyDown = CustomKeyDownVod.create(this, mBinding.video);
         mFrameParams = mBinding.video.getLayoutParams();
-        mClock = Clock.create(mBinding.widget.time);
+        mClock = Clock.create(mBinding.display.time);
         mDanmakuContext = DanmakuContext.create();
         mPlayers = new Players().init(this);
         mBroken = new ArrayList<>();
@@ -317,6 +317,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         setRecyclerView();
         setEpisodeView();
         setVideoView();
+        setDisplayView();
         setDanmuView();
         setViewModel();
         checkCast();
@@ -431,6 +432,11 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         maxLines.put(BaseDanmaku.TYPE_FIX_BOTTOM, maxLine);
         mDanmakuContext.setDanmakuStyle(IDisplayer.DANMAKU_STYLE_STROKEN, 3).setMaximumLines(maxLines).setScrollSpeedFactor(speed).setDanmakuTransparency(alpha).setDanmakuMargin(12).setScaleTextSize(0.8f);
         mBinding.control.danmu.setActivated(Setting.isDanmu());
+    }
+
+    private void setDisplayView() {
+        mBinding.display.getRoot().setVisibility(View.VISIBLE);
+        showDisplayInfo();
     }
 
     private void setViewModel() {
@@ -741,6 +747,16 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         notifyItemChanged(mBinding.flag, mFlagAdapter);
     }
 
+    private void showDisplayInfo() {
+        boolean infoVisible = isVisible(mBinding.widget.info);
+        mBinding.display.time.setVisibility(Setting.isDisplayTime() || infoVisible  ? View.VISIBLE : View.GONE);
+        mBinding.display.netspeed.setVisibility(Setting.isDisplaySpeed() ? View.VISIBLE : View.GONE);
+    }
+
+    private void onTimeChangeDisplaySpeed() {
+        if (Setting.isDisplaySpeed() && !isVisible(mBinding.control.getRoot())) Traffic.setSpeed(mBinding.display.netspeed);
+    }
+
     @Override
     public void onRevSort() {
         mHistory.setRevSort(!mHistory.isRevSort());
@@ -1025,10 +1041,12 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     private void showInfo() {
         mBinding.widget.info.setVisibility(View.VISIBLE);
+        showDisplayInfo();
     }
 
     private void hideInfo() {
         mBinding.widget.info.setVisibility(View.GONE);
+        showDisplayInfo();
     }
 
     private void showInfoAndCenter() {
@@ -1205,6 +1223,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     @Override
     public void onTimeChanged() {
+        onTimeChangeDisplaySpeed();
         long position, duration;
         mHistory.setPosition(position = mPlayers.getPosition());
         mHistory.setDuration(duration = mPlayers.getDuration());

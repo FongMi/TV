@@ -39,6 +39,7 @@ public class SettingDanmuActivity extends BaseActivity implements DanmuLineCallb
 
     @Override
     protected void initView() {
+        mBinding.danmuLoad.requestFocus();
         mBinding.danmuLoadText.setText(getSwitch(Setting.isDanmuLoad()));
         mBinding.danmuSizeText.setText(String.valueOf(Setting.getDanmuSize()));
         mBinding.danmuLineText.setText(String.valueOf(Setting.getDanmuLine(3)));
