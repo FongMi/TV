@@ -666,16 +666,22 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     @Override
     public void prepared() {
         App.post(() -> {
-            if (danmuView == null) return;
-            if (isPlaying() && danmuView.isPrepared()) danmuView.start(getPosition());
-            if (Setting.isDanmu()) danmuView.show();
+            boolean start = haveDanmu() && isPlaying();
+            boolean show = start && Setting.isDanmu();
+            if (start) danmuView.start(getPosition());
+            if (show) danmuView.show();
             else danmuView.hide();
         });
     }
 
     @Override
     public void updateTimer(DanmakuTimer timer) {
-        if (speed != 1) timer.add((long) (timer.lastInterval() * (speed - 1)));
+        App.post(() -> {
+            long position = getPosition();
+            long duration = getDuration();
+            if (position >= duration) timer.add(Integer.MAX_VALUE);
+            else timer.update(position);
+        });
     }
 
     @Override

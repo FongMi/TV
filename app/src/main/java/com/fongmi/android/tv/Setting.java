@@ -233,22 +233,6 @@ public class Setting {
         Prefers.put("danmu", danmu);
     }
 
-    public static boolean isDanmuLoad() {
-        return Prefers.getBoolean("danmu_load", true);
-    }
-
-    public static void putDanmuLoad(boolean load) {
-        Prefers.put("danmu_load", load);
-    }
-
-    public static int getDanmuSpeed() {
-        return Math.min(Math.max(Prefers.getInt("danmu_speed", 2), 0), 3);
-    }
-
-    public static void putDanmuSpeed(int speed) {
-        Prefers.put("danmu_speed", speed);
-    }
-
     public static float getDanmuSize() {
         return Math.min(Math.max(Prefers.getFloat("danmu_size", 1.0f), 0.6f), 2.0f);
     }

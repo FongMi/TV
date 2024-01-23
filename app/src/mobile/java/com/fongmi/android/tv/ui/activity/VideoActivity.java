@@ -415,15 +415,13 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private void setDanmuView() {
         int maxLine = Setting.getDanmuLine(2);
         mPlayers.setDanmuView(mBinding.danmaku);
-        float[] range = {2.4f, 1.8f, 1.2f, 0.8f};
-        float speed = range[Setting.getDanmuSpeed()];
         float alpha = Setting.getDanmuAlpha() / 100.0f;
         HashMap<Integer, Integer> maxLines = new HashMap<>();
         maxLines.put(BaseDanmaku.TYPE_FIX_TOP, maxLine);
         maxLines.put(BaseDanmaku.TYPE_SCROLL_RL, maxLine);
         maxLines.put(BaseDanmaku.TYPE_SCROLL_LR, maxLine);
         maxLines.put(BaseDanmaku.TYPE_FIX_BOTTOM, maxLine);
-        mDanmakuContext.setDanmakuStyle(IDisplayer.DANMAKU_STYLE_STROKEN, 3).setMaximumLines(maxLines).setScrollSpeedFactor(speed).setDanmakuTransparency(alpha).setDanmakuMargin(8).setScaleTextSize(0.8f);
+        mDanmakuContext.setDanmakuStyle(IDisplayer.DANMAKU_STYLE_STROKEN, 3).setMaximumLines(maxLines).setDanmakuTransparency(alpha).setDanmakuMargin(8).setScaleTextSize(0.8f * Setting.getDanmuSize());
         checkDanmuImg();
     }
 
@@ -587,7 +585,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     private void checkDanmu(String danmu) {
         mBinding.danmaku.release();
-        if (!Setting.isDanmuLoad()) return;
         mBinding.danmaku.setVisibility(danmu.isEmpty() ? View.GONE : View.VISIBLE);
         if (danmu.length() > 0) App.execute(() -> mBinding.danmaku.prepare(new Parser(danmu), mDanmakuContext));
     }
@@ -927,8 +924,8 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         if (isFullscreen()) return;
         App.post(() -> mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT)), 50);
         setRequestedOrientation(mPlayers.isPortrait() ? ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+        mDanmakuContext.setScaleTextSize(1.0f * Setting.getDanmuSize());
         mBinding.control.full.setVisibility(View.GONE);
-        mDanmakuContext.setScaleTextSize(1.0f);
         setRotate(mPlayers.isPortrait(), true);
         setSubtitle(Setting.getSubtitle());
         Util.hideSystemUI(this);
@@ -940,9 +937,9 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         if (!isFullscreen()) return;
         setRequestedOrientation(isPort() ? ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_FULL_USER);
         mBinding.episode.scrollToPosition(mEpisodeAdapter.getPosition());
+        mDanmakuContext.setScaleTextSize(0.8f * Setting.getDanmuSize());
         mBinding.control.full.setVisibility(View.VISIBLE);
         mBinding.video.setLayoutParams(mFrameParams);
-        mDanmakuContext.setScaleTextSize(0.8f);
         setRotate(false, false);
         App.post(mR3, 2000);
         setSubtitle(14);

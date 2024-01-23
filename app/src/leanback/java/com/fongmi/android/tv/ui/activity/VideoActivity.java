@@ -402,18 +402,15 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void setDanmuView() {
-        if (!Setting.isDanmuLoad()) return;
         int maxLine = Setting.getDanmuLine(3);
         mPlayers.setDanmuView(mBinding.danmaku);
-        float[] range = {2.4f, 1.8f, 1.2f, 0.8f};
-        float speed = range[Setting.getDanmuSpeed()];
         float alpha = Setting.getDanmuAlpha() / 100.0f;
         HashMap<Integer, Integer> maxLines = new HashMap<>();
         maxLines.put(BaseDanmaku.TYPE_FIX_TOP, maxLine);
         maxLines.put(BaseDanmaku.TYPE_SCROLL_RL, maxLine);
         maxLines.put(BaseDanmaku.TYPE_SCROLL_LR, maxLine);
         maxLines.put(BaseDanmaku.TYPE_FIX_BOTTOM, maxLine);
-        mDanmakuContext.setDanmakuStyle(IDisplayer.DANMAKU_STYLE_STROKEN, 3).setMaximumLines(maxLines).setScrollSpeedFactor(speed).setDanmakuTransparency(alpha).setDanmakuMargin(12).setScaleTextSize(0.8f);
+        mDanmakuContext.setDanmakuStyle(IDisplayer.DANMAKU_STYLE_STROKEN, 3).setMaximumLines(maxLines).setDanmakuTransparency(alpha).setDanmakuMargin(12).setScaleTextSize(0.8f * Setting.getDanmuSize());
         mBinding.control.danmu.setActivated(Setting.isDanmu());
     }
 
@@ -494,7 +491,6 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     private void checkDanmu(String danmu) {
         mBinding.danmaku.release();
-        if (!Setting.isDanmuLoad()) return;
         mBinding.danmaku.setVisibility(danmu.isEmpty() ? View.GONE : View.VISIBLE);
         if (danmu.length() > 0) App.execute(() -> mBinding.danmaku.prepare(new Parser(danmu), mDanmakuContext));
     }
@@ -702,8 +698,8 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mBinding.video.requestFocus();
         mBinding.video.setForeground(null);
         mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
+        mDanmakuContext.setScaleTextSize(1.2f * Setting.getDanmuSize());
         mBinding.flag.setSelectedPosition(getCurrentFlag());
-        mDanmakuContext.setScaleTextSize(1.2f);
         setSubtitle(Setting.getSubtitle());
         mKeyDown.setFull(true);
         setFullscreen(true);
@@ -713,8 +709,8 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     private void exitFullscreen() {
         mBinding.video.setForeground(ResUtil.getDrawable(R.drawable.selector_video));
+        mDanmakuContext.setScaleTextSize(0.8f * Setting.getDanmuSize());
         mBinding.video.setLayoutParams(mFrameParams);
-        mDanmakuContext.setScaleTextSize(0.8f);
         getFocus1().requestFocus();
         mKeyDown.setFull(false);
         setFullscreen(false);

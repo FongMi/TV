@@ -84,8 +84,6 @@
     <string name="player_scale">Scale</string>
     <string name="player_caption">Caption style</string>
     <string name="player_subtitle">Subtitle size</string>
-    <string name="player_danmu_load">Danmu load</string>
-    <string name="player_danmu_speed">Danmu speed</string>
     <string name="player_danmu_size">Danmu size</string>
     <string name="player_danmu_line">Danmu line</string>
     <string name="player_danmu_alpha">Danmu alpha</string>
@@ -150,13 +148,6 @@
         <item>System</item>
         <item>IJK</item>
         <item>EXO</item>
-    </string-array>
-
-    <string-array name="select_danmu_speed">
-        <item>Super slow</item>
-        <item>Slow</item>
-        <item>Moderate</item>
-        <item>Fast</item>
     </string-array>
 
     <string-array name="select_render">

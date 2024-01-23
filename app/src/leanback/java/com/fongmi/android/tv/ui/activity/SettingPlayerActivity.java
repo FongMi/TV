@@ -33,7 +33,6 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
 
     private ActivitySettingPlayerBinding mBinding;
     private DecimalFormat format;
-    private String[] danmuSpeed;
     private String[] caption;
     private String[] player;
     private String[] render;
@@ -60,7 +59,6 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
         mBinding.player.requestFocus();
         mBinding.uaText.setText(Setting.getUa());
         mBinding.tunnelText.setText(getSwitch(Setting.isTunnel()));
-        mBinding.danmuLoadText.setText(getSwitch(Setting.isDanmuLoad()));
         mBinding.bufferText.setText(String.valueOf(Setting.getBuffer()));
         mBinding.subtitleText.setText(String.valueOf(Setting.getSubtitle()));
         mBinding.danmuSizeText.setText(format.format(Setting.getDanmuSize()));
@@ -71,7 +69,6 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
         mBinding.playerText.setText((player = ResUtil.getStringArray(R.array.select_player))[Setting.getPlayer()]);
         mBinding.renderText.setText((render = ResUtil.getStringArray(R.array.select_render))[Setting.getRender()]);
         mBinding.captionText.setText((caption = ResUtil.getStringArray(R.array.select_caption))[Setting.isCaption() ? 1 : 0]);
-        mBinding.danmuSpeedText.setText((danmuSpeed = ResUtil.getStringArray(R.array.select_danmu_speed))[Setting.getDanmuSpeed()]);
     }
 
     @Override
@@ -88,13 +85,10 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
         mBinding.caption.setOnLongClickListener(this::onCaption);
         mBinding.danmuSize.setOnClickListener(this::onDanmuSize);
         mBinding.danmuLine.setOnClickListener(this::onDanmuLine);
-        mBinding.danmuLoad.setOnClickListener(this::setDanmuLoad);
         mBinding.danmuAlpha.setOnClickListener(this::onDanmuAlpha);
-        mBinding.danmuSpeed.setOnClickListener(this::setDanmuSpeed);
     }
 
     private void setVisible() {
-        mBinding.danmu.setVisibility(Setting.isDanmuLoad() ? View.VISIBLE : View.GONE);
         mBinding.caption.setVisibility(Setting.hasCaption() ? View.VISIBLE : View.GONE);
         mBinding.exo.setVisibility(Players.isExo(Setting.getPlayer()) ? View.VISIBLE : View.GONE);
     }
@@ -183,12 +177,6 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
         DanmuLineDialog.create(this).show();
     }
 
-    private void setDanmuLoad(View view) {
-        Setting.putDanmuLoad(!Setting.isDanmuLoad());
-        mBinding.danmuLoadText.setText(getSwitch(Setting.isDanmuLoad()));
-        setVisible();
-    }
-
     @Override
     public void setDanmuLine(int line) {
         mBinding.danmuLineText.setText(String.valueOf(line));
@@ -203,11 +191,5 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
     public void setDanmuAlpha(int alpha) {
         mBinding.danmuAlphaText.setText(String.valueOf(alpha));
         Setting.putDanmuAlpha(alpha);
-    }
-
-    private void setDanmuSpeed(View view) {
-        int index = Setting.getDanmuSpeed();
-        Setting.putDanmuSpeed(index = index == danmuSpeed.length - 1 ? 0 : ++index);
-        mBinding.danmuSpeedText.setText(danmuSpeed[index]);
     }
 }
