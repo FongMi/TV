@@ -21,9 +21,9 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Updater;
-import com.fongmi.android.tv.api.ApiConfig;
-import com.fongmi.android.tv.api.LiveConfig;
-import com.fongmi.android.tv.api.WallConfig;
+import com.fongmi.android.tv.api.config.LiveConfig;
+import com.fongmi.android.tv.api.config.VodConfig;
+import com.fongmi.android.tv.api.config.WallConfig;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Func;
 import com.fongmi.android.tv.bean.History;
@@ -77,7 +77,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     private Clock mClock;
 
     private Site getHome() {
-        return ApiConfig.get().getHome();
+        return VodConfig.get().getHome();
     }
 
     @Override
@@ -97,6 +97,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         mClock = Clock.create(mBinding.time).format("MM/dd HH:mm:ss");
         mBinding.progressLayout.showProgress();
         Updater.get().release().start(this);
+        mResult = Result.empty();
         Server.get().start();
         setRecyclerView();
         setViewModel();
@@ -157,8 +158,8 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     private void initConfig() {
         if (isLoading()) return;
         WallConfig.get().init();
-        LiveConfig.get().init();
-        ApiConfig.get().init().load(getCallback());
+        LiveConfig.get().init().load();
+        VodConfig.get().init().load(getCallback());
         setLoading(true);
     }
 
@@ -175,7 +176,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
             @Override
             public void error(String msg) {
-                if (TextUtils.isEmpty(msg) && AppDatabase.getBackupKey().exists()) onRestore();
+                if (TextUtils.isEmpty(msg) && AppDatabase.getBackup().exists()) onRestore();
                 else mBinding.progressLayout.showContent();
                 mResult = Result.empty();
                 Notify.show(msg);
@@ -188,7 +189,8 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         PermissionX.init(this).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> AppDatabase.restore(new Callback() {
             @Override
             public void success() {
-                initConfig();
+                if (allGranted) initConfig();
+                else mBinding.progressLayout.showContent();
             }
         }));
     }
@@ -261,7 +263,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     private void clearHistory() {
         mAdapter.removeItems(getHistoryIndex(), 1);
-        History.delete(ApiConfig.getCid());
+        History.delete(VodConfig.getCid());
         mPresenter.setDelete(false);
         mHistoryAdapter.clear();
     }
@@ -357,7 +359,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     public void setSite(Site item) {
-        ApiConfig.get().setHome(item);
+        VodConfig.get().setHome(item);
         getVideo();
     }
 
@@ -400,10 +402,10 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onCastEvent(CastEvent event) {
-        if (ApiConfig.get().getConfig().equals(event.getConfig())) {
-            VideoActivity.cast(this, event.getHistory().update(ApiConfig.getCid()));
+        if (VodConfig.get().getConfig().equals(event.getConfig())) {
+            VideoActivity.cast(this, event.getHistory().update(VodConfig.getCid()));
         } else {
-            ApiConfig.load(event.getConfig(), getCallback(event));
+            VodConfig.load(event.getConfig(), getCallback(event));
         }
     }
 
@@ -442,7 +444,12 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     }
 
     @Override
-    public void onBackPressed() {
+    protected boolean handleBack() {
+        return true;
+    }
+
+    @Override
+    protected void onBackPress() {
         if (mBinding.progressLayout.isProgress()) {
             mBinding.progressLayout.showContent();
         } else if (mPresenter.isDelete()) {
@@ -461,7 +468,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         super.onDestroy();
         WallConfig.get().clear();
         LiveConfig.get().clear();
-        ApiConfig.get().clear();
+        VodConfig.get().clear();
         AppDatabase.backup();
         Server.get().stop();
         Source.get().exit();

@@ -60,7 +60,11 @@ public class FileUtil {
         });
     }
 
-    private static Uri getShareUri(File file) {
+    public static Uri getShareUri(String path) {
+        return getShareUri(new File(path.replace("file://", "")));
+    }
+
+    public static Uri getShareUri(File file) {
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.N ? Uri.fromFile(file) : FileProvider.getUriForFile(App.get(), App.get().getPackageName() + ".provider", file);
     }
 

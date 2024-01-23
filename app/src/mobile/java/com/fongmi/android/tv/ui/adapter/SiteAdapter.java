@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.databinding.AdapterSiteBinding;
 
@@ -23,7 +23,7 @@ public class SiteAdapter extends RecyclerView.Adapter<SiteAdapter.ViewHolder> {
 
     public SiteAdapter(OnClickListener listener) {
         this.mListener = listener;
-        this.mItems = ApiConfig.get().getSites();
+        this.mItems = VodConfig.get().getSites();
     }
 
     public SiteAdapter search(boolean search) {

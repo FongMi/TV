@@ -9,7 +9,7 @@ import androidx.room.PrimaryKey;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.google.gson.annotations.SerializedName;
@@ -213,7 +213,7 @@ public class History {
     }
 
     public String getSiteName() {
-        return ApiConfig.get().getSite(getSiteKey()).getName();
+        return VodConfig.get().getSite(getSiteKey()).getName();
     }
 
     public String getSiteKey() {
@@ -249,7 +249,7 @@ public class History {
     }
 
     public static List<History> get() {
-        return get(ApiConfig.getCid());
+        return get(VodConfig.getCid());
     }
 
     public static List<History> get(int cid) {
@@ -257,7 +257,7 @@ public class History {
     }
 
     public static History find(String key) {
-        return AppDatabase.get().getHistoryDao().find(ApiConfig.getCid(), key);
+        return AppDatabase.get().getHistoryDao().find(VodConfig.getCid(), key);
     }
 
     public static void delete(int cid) {
@@ -299,13 +299,13 @@ public class History {
     }
 
     public History delete() {
-        AppDatabase.get().getHistoryDao().delete(ApiConfig.getCid(), getKey());
+        AppDatabase.get().getHistoryDao().delete(VodConfig.getCid(), getKey());
         AppDatabase.get().getTrackDao().delete(getKey());
         return this;
     }
 
     public List<History> find() {
-        return AppDatabase.get().getHistoryDao().findByName(ApiConfig.getCid(), getVodName());
+        return AppDatabase.get().getHistoryDao().findByName(VodConfig.getCid(), getVodName());
     }
 
     public void findEpisode(List<Flag> flags) {
@@ -333,12 +333,12 @@ public class History {
         for (History target : targets) {
             List<History> items = target.find();
             if (items.isEmpty()) {
-                target.update(ApiConfig.getCid(), items);
+                target.update(VodConfig.getCid(), items);
                 continue;
             }
             for (History item : items) {
                 if (target.getCreateTime() > item.getCreateTime()) {
-                    target.update(ApiConfig.getCid(), items);
+                    target.update(VodConfig.getCid(), items);
                     break;
                 }
             }

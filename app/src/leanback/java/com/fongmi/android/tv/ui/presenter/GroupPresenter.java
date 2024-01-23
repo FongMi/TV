@@ -30,7 +30,6 @@ public class GroupPresenter extends Presenter {
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object object) {
         Group item = (Group) object;
         ViewHolder holder = (ViewHolder) viewHolder;
-        item.loadLogo(holder.binding.logo);
         holder.binding.name.setText(item.getName());
         setOnClickListener(holder, view -> mListener.onItemClick(item));
     }

@@ -40,6 +40,9 @@ class Spider(metaclass=ABCMeta):
     def searchContent(self, key, quick):
         pass
 
+    def searchContentPage(self, key, quick, pg):
+        pass
+
     @abstractmethod
     def playerContent(self, flag, id, vipFlags):
         pass
@@ -63,9 +66,6 @@ class Spider(metaclass=ABCMeta):
     def getDependence(self):
         return []
 
-    def setExtendInfo(self, extend):
-        self.extend = extend
-
     def regStr(self, src, reg, group=1):
         m = re.search(reg, src)
         src = ''
@@ -80,18 +80,18 @@ class Spider(metaclass=ABCMeta):
         clean = re.sub('[\U0001F600-\U0001F64F\U0001F300-\U0001F5FF\U0001F680-\U0001F6FF\U0001F1E0-\U0001F1FF]', '', src)
         return clean
 
-    def fetch(self, url, headers={}, cookies=""):
-        rsp = requests.get(url, headers=headers, cookies=cookies)
+    def fetch(self, url, cookies=None, headers=None, timeout=5, verify=True, stream=False, allow_redirects = True):
+        rsp = requests.get(url, cookies=cookies, headers=headers, timeout=timeout, verify=verify, stream=stream, allow_redirects=allow_redirects)
         rsp.encoding = 'utf-8'
         return rsp
 
-    def post(self, url, data, headers={}, cookies={}):
-        rsp = requests.post(url, data=data, headers=headers, cookies=cookies)
+    def post(self, url, data, cookies=None, headers=None, timeout=5, verify=True, stream=False, allow_redirects = True):
+        rsp = requests.post(url, data=data, cookies=cookies, headers=headers, timeout=timeout, verify=verify, stream=stream, allow_redirects=allow_redirects)
         rsp.encoding = 'utf-8'
         return rsp
 
-    def postJson(self, url, json, headers={}, cookies={}):
-        rsp = requests.post(url, json=json, headers=headers, cookies=cookies)
+    def postJson(self, url, json, cookies=None, headers=None, timeout=5, verify=True, stream=False, allow_redirects = True):
+        rsp = requests.post(url, json=json, cookies=cookies, headers=headers, timeout=timeout, verify=verify, stream=stream, allow_redirects=allow_redirects)
         rsp.encoding = 'utf-8'
         return rsp
 
@@ -105,5 +105,5 @@ class Spider(metaclass=ABCMeta):
         else:
             return ele[0]
 
-    def loadModule(self, name, fileName):
-        return SourceFileLoader(name, fileName).load_module()
+    def loadModule(self, name, path):
+        return SourceFileLoader(name, path).load_module()

@@ -80,7 +80,7 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/channel"
-            android:layout_width="260dp"
+            android:layout_width="280dp"
             android:layout_height="match_parent"
             android:clipChildren="false"
             android:clipToPadding="false"

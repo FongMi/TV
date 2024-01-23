@@ -6,7 +6,7 @@ import android.view.LayoutInflater;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
-import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.databinding.DialogSiteBinding;
 import com.fongmi.android.tv.impl.SiteCallback;
@@ -71,7 +71,7 @@ public class SiteDialog implements SiteAdapter.OnClickListener {
         binding.recycler.setItemAnimator(null);
         binding.recycler.setHasFixedSize(true);
         binding.recycler.addItemDecoration(new SpaceItemDecoration(1, 8));
-        binding.recycler.post(() -> binding.recycler.scrollToPosition(ApiConfig.getHomeIndex()));
+        binding.recycler.post(() -> binding.recycler.scrollToPosition(VodConfig.getHomeIndex()));
     }
 
     private void setDialog() {
@@ -103,7 +103,7 @@ public class SiteDialog implements SiteAdapter.OnClickListener {
     @Override
     public boolean onSearchLongClick(Site item) {
         boolean result = !item.isSearchable();
-        for (Site site : ApiConfig.get().getSites()) site.setSearchable(result).save();
+        for (Site site : VodConfig.get().getSites()) site.setSearchable(result).save();
         adapter.notifyItemRangeChanged(0, adapter.getItemCount());
         callback.onChanged();
         return true;
@@ -112,7 +112,7 @@ public class SiteDialog implements SiteAdapter.OnClickListener {
     @Override
     public boolean onChangeLongClick(Site item) {
         boolean result = !item.isChangeable();
-        for (Site site : ApiConfig.get().getSites()) site.setChangeable(result).save();
+        for (Site site : VodConfig.get().getSites()) site.setChangeable(result).save();
         adapter.notifyItemRangeChanged(0, adapter.getItemCount());
         return true;
     }

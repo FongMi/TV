@@ -10,7 +10,8 @@
         android:layout_height="wrap_content"
         android:background="@color/transparent"
         android:elevation="0dp"
-        app:elevation="0dp">
+        app:elevation="0dp"
+        app:liftOnScrollColor="@color/transparent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -93,7 +94,7 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.viewpager.widget.ViewPager
+    <com.fongmi.android.tv.ui.custom.CustomViewPager
         android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -137,6 +138,21 @@
         app:layout_anchorGravity="end|bottom"
         app:layout_behavior="com.fongmi.android.tv.ui.custom.CustomFabBehavior"
         app:srcCompat="@drawable/ic_fab_link"
+        app:tint="@color/white"
+        tools:visibility="visible" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/top"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:tag="top"
+        android:visibility="invisible"
+        app:backgroundTint="@color/blue_500"
+        app:layout_anchor="@id/pager"
+        app:layout_anchorGravity="end|bottom"
+        app:layout_behavior="com.fongmi.android.tv.ui.custom.CustomFabBehavior"
+        app:srcCompat="@drawable/ic_fab_top"
         app:tint="@color/white"
         tools:visibility="visible" />
 

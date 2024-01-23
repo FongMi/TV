@@ -3,6 +3,7 @@ package com.fongmi.android.tv.player;
 import android.content.Context;
 import android.graphics.Color;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.view.accessibility.CaptioningManager;
 
 import androidx.media3.common.MediaItem;
@@ -83,9 +84,7 @@ public class ExoUtil {
     }
 
     public static int getRetry(int errorCode) {
-        if (errorCode == PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED || errorCode == PlaybackException.ERROR_CODE_IO_FILE_NOT_FOUND) return 0;
-        if (errorCode == PlaybackException.ERROR_CODE_PARSING_MANIFEST_MALFORMED || errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED || errorCode == PlaybackException.ERROR_CODE_IO_UNSPECIFIED) return 2;
-        return 1;
+        return errorCode >= PlaybackException.ERROR_CODE_PARSING_CONTAINER_MALFORMED && errorCode <= PlaybackException.ERROR_CODE_PARSING_MANIFEST_UNSUPPORTED ? 2 : 1;
     }
 
     public static boolean haveTrack(Tracks tracks, int type) {
@@ -107,10 +106,17 @@ public class ExoUtil {
     }
 
     public static String getMimeType(String path) {
+        if (TextUtils.isEmpty(path)) return "";
         if (path.endsWith(".vtt")) return MimeTypes.TEXT_VTT;
         if (path.endsWith(".ssa") || path.endsWith(".ass")) return MimeTypes.TEXT_SSA;
         if (path.endsWith(".ttml") || path.endsWith(".xml") || path.endsWith(".dfxp")) return MimeTypes.APPLICATION_TTML;
         return MimeTypes.APPLICATION_SUBRIP;
+    }
+
+    private static String getMimeType(String format, int errorCode) {
+        if (format != null) return format;
+        if (errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED || errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_MALFORMED) return MimeTypes.APPLICATION_M3U8;
+        return null;
     }
 
     public static MediaSource getSource(Result result, Sub sub, int errorCode) {
@@ -129,7 +135,7 @@ public class ExoUtil {
         Uri uri = UrlUtil.uri(url);
         if (sub != null) subs.add(sub);
         String mimeType = getMimeType(format, errorCode);
-        if (uri.getUserInfo() != null) headers.put(HttpHeaders.AUTHORIZATION, Util.basic(uri));
+        if (uri.getUserInfo() != null) headers.put(HttpHeaders.AUTHORIZATION, Util.basic(uri.getUserInfo()));
         return new DefaultMediaSourceFactory(getDataSourceFactory(headers), getExtractorsFactory()).createMediaSource(getMediaItem(uri, mimeType, subs, drm));
     }
 
@@ -139,12 +145,6 @@ public class ExoUtil {
         if (drm != null) builder.setDrmConfiguration(drm.get());
         if (mimeType != null) builder.setMimeType(mimeType);
         return builder.build();
-    }
-
-    private static String getMimeType(String format, int errorCode) {
-        if (format != null) return format;
-        if (errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED || errorCode == PlaybackException.ERROR_CODE_IO_UNSPECIFIED) return MimeTypes.APPLICATION_M3U8;
-        return null;
     }
 
     private static List<MediaItem.SubtitleConfiguration> getSubtitles(List<Sub> subs) {

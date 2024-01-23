@@ -8,6 +8,7 @@ import com.fongmi.android.tv.player.extractor.JianPian;
 import com.fongmi.android.tv.player.extractor.Push;
 import com.fongmi.android.tv.player.extractor.TVBus;
 import com.fongmi.android.tv.player.extractor.Thunder;
+import com.fongmi.android.tv.player.extractor.Video;
 import com.fongmi.android.tv.player.extractor.Youtube;
 import com.fongmi.android.tv.player.extractor.ZLive;
 import com.fongmi.android.tv.utils.UrlUtil;
@@ -35,6 +36,7 @@ public class Source {
         extractors.add(new Push());
         extractors.add(new Thunder());
         extractors.add(new TVBus());
+        extractors.add(new Video());
         extractors.add(new Youtube());
         extractors.add(new ZLive());
     }
@@ -50,12 +52,15 @@ public class Source {
         String url = result.getUrl().v();
         Extractor extractor = getExtractor(url);
         if (extractor != null) result.setParse(0);
+        if (extractor instanceof Video) result.setParse(1);
         return extractor == null ? url : extractor.fetch(url);
     }
 
     public String fetch(Channel channel) throws Exception {
         String url = channel.getCurrent().split("\\$")[0];
         Extractor extractor = getExtractor(url);
+        if (extractor != null) channel.setParse(0);
+        if (extractor instanceof Video) channel.setParse(1);
         return extractor == null ? url : extractor.fetch(url);
     }
 

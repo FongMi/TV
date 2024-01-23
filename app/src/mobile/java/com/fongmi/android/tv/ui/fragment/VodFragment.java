@@ -17,7 +17,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Setting;
-import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Class;
 import com.fongmi.android.tv.bean.Hot;
 import com.fongmi.android.tv.bean.Result;
@@ -71,12 +71,12 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         return new VodFragment();
     }
 
-    private BaseFragment getFragment() {
-        return (BaseFragment) mBinding.pager.getAdapter().instantiateItem(mBinding.pager, mBinding.pager.getCurrentItem());
+    private TypeFragment getFragment() {
+        return (TypeFragment) mBinding.pager.getAdapter().instantiateItem(mBinding.pager, mBinding.pager.getCurrentItem());
     }
 
     private Site getSite() {
-        return ApiConfig.get().getHome();
+        return VodConfig.get().getHome();
     }
 
     @Override
@@ -97,6 +97,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     @Override
     protected void initEvent() {
         mBinding.hot.setOnClickListener(this::onHot);
+        mBinding.top.setOnClickListener(this::onTop);
         mBinding.link.setOnClickListener(this::onLink);
         mBinding.logo.setOnClickListener(this::onLogo);
         mBinding.keep.setOnClickListener(this::onKeep);
@@ -164,19 +165,29 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
 
     private void setFabVisible(int position) {
         if (mAdapter.getItemCount() == 0) {
-            mBinding.filter.setVisibility(View.GONE);
+            mBinding.top.setVisibility(View.INVISIBLE);
             mBinding.link.setVisibility(View.VISIBLE);
+            mBinding.filter.setVisibility(View.GONE);
         } else if (mAdapter.get(position).getFilters().size() > 0) {
+            mBinding.top.setVisibility(View.INVISIBLE);
             mBinding.link.setVisibility(View.GONE);
             mBinding.filter.show();
         } else if (position == 0 || mAdapter.get(position).getFilters().isEmpty()) {
-            mBinding.link.show();
+            mBinding.top.setVisibility(View.INVISIBLE);
             mBinding.filter.setVisibility(View.GONE);
+            mBinding.link.show();
         }
     }
 
     private void checkRetry() {
         mBinding.retry.setVisibility(mAdapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
+    }
+
+    private void onTop(View view) {
+        getFragment().scrollToTop();
+        mBinding.top.setVisibility(View.INVISIBLE);
+        if (mBinding.filter.getVisibility() == View.INVISIBLE) mBinding.filter.show();
+        else if (mBinding.link.getVisibility() == View.INVISIBLE) mBinding.link.show();
     }
 
     private void onLink(View view) {
@@ -252,7 +263,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
 
     @Override
     public void setSite(Site item) {
-        ApiConfig.get().setHome(item);
+        VodConfig.get().setHome(item);
         homeContent();
     }
 
@@ -268,7 +279,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
 
     @Override
     public void setFilter(String key, Value value) {
-        ((TypeFragment) getFragment()).setFilter(key, value);
+        getFragment().setFilter(key, value);
     }
 
     @Override

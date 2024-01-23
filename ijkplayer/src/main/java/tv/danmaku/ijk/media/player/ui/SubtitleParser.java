@@ -15,7 +15,7 @@ public class SubtitleParser {
     private static final String DIALOGUE_LINE_PREFIX = "Dialogue:";
 
     public static List<Cue> parse(String text) {
-        if (TextUtils.isEmpty(text) || text.length() >= 4096) return null;
+        if (TextUtils.isEmpty(text) || text.length() >= 512) return null;
         if (text.startsWith(DIALOGUE_LINE_PREFIX)) text = parseDialogueLine(text);
         text = text.replaceAll("\r\n", "<br>").replaceAll("\r", "<br>").replaceAll("\n", "<br>").replaceAll("\\{\\\\.*?\\}", "");
         if (text.endsWith("<br>")) text = text.substring(0, text.lastIndexOf("<br>"));

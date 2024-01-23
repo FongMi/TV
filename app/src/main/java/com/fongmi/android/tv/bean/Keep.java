@@ -5,7 +5,7 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.google.gson.annotations.SerializedName;
@@ -107,7 +107,7 @@ public class Keep {
     }
 
     public static Keep find(String key) {
-        return find(ApiConfig.getCid(), key);
+        return find(VodConfig.getCid(), key);
     }
 
     public static Keep find(int cid, String key) {

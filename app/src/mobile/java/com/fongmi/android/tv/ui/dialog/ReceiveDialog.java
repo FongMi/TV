@@ -9,7 +9,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.viewbinding.ViewBinding;
 
-import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.databinding.DialogReceiveBinding;
 import com.fongmi.android.tv.event.CastEvent;
@@ -70,12 +70,12 @@ public class ReceiveDialog extends BaseDialog {
     }
 
     private void onReceiveCast() {
-        if (ApiConfig.get().getConfig().equals(event.getConfig())) {
-            VideoActivity.cast(getActivity(), event.getHistory().update(ApiConfig.getCid()));
+        if (VodConfig.get().getConfig().equals(event.getConfig())) {
+            VideoActivity.cast(getActivity(), event.getHistory().update(VodConfig.getCid()));
             dismiss();
         } else {
             showProgress();
-            ApiConfig.load(event.getConfig(), getCallback());
+            VodConfig.load(event.getConfig(), getCallback());
         }
     }
 

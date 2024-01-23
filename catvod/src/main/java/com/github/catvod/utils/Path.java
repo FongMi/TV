@@ -1,6 +1,5 @@
 package com.github.catvod.utils;
 
-import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
 
@@ -11,7 +10,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,10 +38,6 @@ public class Path {
 
     public static File files() {
         return Init.context().getFilesDir();
-    }
-
-    public static File download() {
-        return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
     }
 
     public static String rootPath() {
@@ -102,11 +96,6 @@ public class Path {
         return new File(files(), name);
     }
 
-    public static File so(String name) {
-        if (name.startsWith("http")) return new File(so(), Uri.parse(name).getLastPathSegment());
-        return new File("mitv".equals(name) ? cache() : so(), "lib".concat(name).concat(".so"));
-    }
-
     public static File js(String name) {
         return new File(js(), name);
     }
@@ -123,14 +112,6 @@ public class Path {
         File file1 = new File(path.replace("file:/", ""));
         File file2 = new File(path.replace("file:/", rootPath()));
         return file2.exists() ? file2 : file1.exists() ? file1 : new File(path);
-    }
-
-    public static String asset(String fileName) {
-        try {
-            return read(Init.context().getAssets().open(fileName));
-        } catch (Exception e) {
-            return "";
-        }
     }
 
     public static String read(File file) {
@@ -181,23 +162,21 @@ public class Path {
 
     public static void copy(File in, File out) {
         try {
-            copy(new FileInputStream(in), new FileOutputStream(out));
+            copy(new FileInputStream(in), out);
         } catch (Exception ignored) {
         }
     }
 
     public static void copy(InputStream in, File out) {
         try {
-            copy(in, new FileOutputStream(out));
+            int read;
+            byte[] buffer = new byte[8192];
+            FileOutputStream fos = new FileOutputStream(out);
+            while ((read = in.read(buffer)) != -1) fos.write(buffer, 0, read);
+            fos.close();
+            in.close();
+            chmod(out);
         } catch (Exception ignored) {
-        }
-    }
-
-    public static void copy(InputStream inputStream, OutputStream outputStream) throws IOException {
-        byte[] buffer = new byte[8192];
-        int amountRead;
-        while ((amountRead = inputStream.read(buffer)) != -1) {
-            outputStream.write(buffer, 0, amountRead);
         }
     }
 
@@ -221,8 +200,7 @@ public class Path {
 
     public static File chmod(File file) {
         try {
-            Process process = Runtime.getRuntime().exec("chmod 777 " + file);
-            process.waitFor();
+            Shell.exec("chmod 777 " + file);
             return file;
         } catch (Exception e) {
             e.printStackTrace();

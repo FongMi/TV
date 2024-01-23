@@ -9,6 +9,10 @@ android {
         minSdk 21
         targetSdk 28
     }
+
+    lint {
+        disable 'UnsafeOptInUsageError'
+    }
 }
 
 dependencies {

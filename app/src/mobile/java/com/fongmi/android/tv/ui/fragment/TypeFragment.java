@@ -13,7 +13,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.Product;
-import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Page;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
@@ -82,7 +82,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     }
 
     private Site getSite() {
-        return ApiConfig.get().getSite(getKey());
+        return VodConfig.get().getSite(getKey());
     }
 
     private VodFragment getParent() {
@@ -191,6 +191,10 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
         } else if (mBinding.recycler.getLayoutManager() instanceof GridLayoutManager) {
             ((GridLayoutManager) mBinding.recycler.getLayoutManager()).scrollToPositionWithOffset(position, 0);
         }
+    }
+
+    public void scrollToTop() {
+        mBinding.recycler.smoothScrollToPosition(0);
     }
 
     public void setFilter(String key, Value value) {

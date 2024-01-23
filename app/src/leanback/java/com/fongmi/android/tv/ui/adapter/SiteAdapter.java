@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.fongmi.android.tv.Setting;
-import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.databinding.AdapterSiteBinding;
 
@@ -23,7 +23,7 @@ public class SiteAdapter extends RecyclerView.Adapter<SiteAdapter.ViewHolder> {
 
     public SiteAdapter(OnClickListener listener) {
         this.mListener = listener;
-        this.mItems = ApiConfig.get().getSites();
+        this.mItems = VodConfig.get().getSites();
     }
 
     public interface OnClickListener {
@@ -62,7 +62,6 @@ public class SiteAdapter extends RecyclerView.Adapter<SiteAdapter.ViewHolder> {
         holder.binding.check.setChecked(getChecked(item));
         holder.binding.text.setSelected(item.isActivated());
         holder.binding.text.setActivated(item.isActivated());
-        holder.binding.check.setEnabled(type != 1 || item.getSearchable() != 0);
         holder.binding.check.setVisibility(type == 0 ? View.GONE : View.VISIBLE);
         holder.binding.getRoot().setOnLongClickListener(v -> setLongListener(item));
         holder.binding.getRoot().setOnClickListener(v -> setListener(item, position));
@@ -92,9 +91,9 @@ public class SiteAdapter extends RecyclerView.Adapter<SiteAdapter.ViewHolder> {
     }
 
     private void setEnable(boolean enable) {
-        if (type == 1) for (Site site : ApiConfig.get().getSites()) site.setSearchable(enable).save();
-        if (type == 2) for (Site site : ApiConfig.get().getSites()) site.setChangeable(enable).save();
-        if (type == 3) for (Site site : ApiConfig.get().getSites()) site.setRecordable(enable).save();
+        if (type == 1) for (Site site : VodConfig.get().getSites()) site.setSearchable(enable).save();
+        if (type == 2) for (Site site : VodConfig.get().getSites()) site.setChangeable(enable).save();
+        if (type == 3) for (Site site : VodConfig.get().getSites()) site.setRecordable(enable).save();
         notifyItemRangeChanged(0, getItemCount());
     }
 

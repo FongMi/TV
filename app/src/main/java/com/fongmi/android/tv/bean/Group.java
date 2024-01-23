@@ -1,13 +1,11 @@
 package com.fongmi.android.tv.bean;
 
 import android.text.TextUtils;
-import android.widget.ImageView;
 
 import androidx.annotation.StringRes;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
@@ -21,8 +19,6 @@ public class Group {
 
     @SerializedName("channel")
     private List<Channel> channel;
-    @SerializedName("logo")
-    private String logo;
     @SerializedName("name")
     private String name;
     @SerializedName("pass")
@@ -35,6 +31,10 @@ public class Group {
         Type listType = new TypeToken<List<Group>>() {}.getType();
         List<Group> items = App.gson().fromJson(str, listType);
         return items == null ? Collections.emptyList() : items;
+    }
+
+    public static Group create() {
+        return create("");
     }
 
     public static Group create(@StringRes int resId) {
@@ -72,14 +72,6 @@ public class Group {
 
     public void setChannel(List<Channel> channel) {
         this.channel = channel;
-    }
-
-    public String getLogo() {
-        return TextUtils.isEmpty(logo) ? "" : logo;
-    }
-
-    public void setLogo(String logo) {
-        this.logo = logo;
     }
 
     public String getName() {
@@ -130,10 +122,6 @@ public class Group {
         return isKeep();
     }
 
-    public void loadLogo(ImageView view) {
-        ImgUtil.loadLive(getLogo(), view);
-    }
-
     public int find(int number) {
         return getChannel().lastIndexOf(Channel.create(number));
     }
@@ -146,11 +134,6 @@ public class Group {
         int index = getChannel().indexOf(channel);
         if (index == -1) getChannel().add(Channel.create(channel));
         else getChannel().get(index).getUrls().addAll(channel.getUrls());
-    }
-
-    public Group live(Live live) {
-        if (!getLogo().startsWith("http")) setLogo(live.getLogo().replace("{name}", getName()).replace("{logo}", getLogo()));
-        return this;
     }
 
     public Channel find(Channel channel) {

@@ -2,8 +2,6 @@ package com.fongmi.android.tv.utils;
 
 import android.net.Uri;
 
-import androidx.media3.common.util.UriUtil;
-
 import com.fongmi.android.tv.server.Server;
 import com.google.common.net.HttpHeaders;
 
@@ -36,23 +34,12 @@ public class UrlUtil {
         return path == null ? "" : path.trim();
     }
 
-    public static String convert(String baseUrl, String path) {
-        if (path.startsWith("clan")) return fixUrl(path);
-        return path.isEmpty() ? "" : UriUtil.resolve(baseUrl, path);
-    }
-
     public static String convert(String url) {
-        String host = host(url);
         String scheme = scheme(url);
-        if ("file".equals(scheme)) return Server.get().getAddress(url);
-        if ("local".equals(scheme)) return Server.get().getAddress(host);
+        if ("local".equals(scheme)) return url.replace("local://", Server.get().getAddress(""));
+        if ("assets".equals(scheme)) return url.replace("assets://", Server.get().getAddress(""));
+        if ("file".equals(scheme)) return url.replace("file://", Server.get().getAddress("file/"));
         if ("proxy".equals(scheme)) return url.replace("proxy://", Server.get().getAddress("proxy?"));
-        return url;
-    }
-
-    public static String fixUrl(String url) {
-        if (url.contains("/localhost/")) url = url.replace("/localhost/", "/");
-        if (url.startsWith("clan")) url = url.replace("clan", "file");
         return url;
     }
 

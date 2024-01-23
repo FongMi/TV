@@ -29,14 +29,24 @@
     <string name="control_speed">倍速</string>
     <string name="control_scale">缩放</string>
     <string name="control_track">轨道</string>
+    <string name="control_other">其它</string>
 
     <!-- Dialog -->
     <string name="dialog_delete_record">删除全部纪录？</string>
     <string name="dialog_delete_keep">收藏纪录将会全部删除。</string>
     <string name="dialog_delete_history">观看纪录将会全部删除。</string>
 
+    <!-- Timer -->
+    <string name="timer_5">5 分钟</string>
+    <string name="timer_15">15 分钟</string>
+    <string name="timer_30">30 分钟</string>
+    <string name="timer_60">1 小时</string>
+    <string name="timer_delay">延长 5 分钟</string>
+    <string name="timer_cancel">取消定时器</string>
+
     <!-- Hint -->
     <string name="copied">已复制</string>
+    <string name="shortcut"> 已于主萤幕新增捷径。</string>
 
     <string-array name="select_background">
         <item>关闭</item>

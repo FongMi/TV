@@ -4,12 +4,21 @@ from importlib.machinery import SourceFileLoader
 import json
 
 
-def create_file(file_path):
-    if os.path.exists(file_path) is False:
-        os.makedirs(file_path)
+def spider(cache, key, api):
+    name = os.path.basename(api)
+    path = cache + '/' + name
+    downloadFile(path, api)
+    return SourceFileLoader(name, path).load_module().Spider()
 
 
-def write_file(name, content):
+def downloadFile(name, api):
+    if api.startswith('http'):
+        writeFile(name, redirect(api).content)
+    else:
+        writeFile(name, str.encode(api))
+
+
+def writeFile(name, content):
     with open(name, 'wb') as f:
         f.write(content)
 
@@ -22,25 +31,12 @@ def redirect(url):
         return rsp
 
 
-def download_file(name, ext):
-    if ext.startswith('http'):
-        write_file(name, redirect(ext).content)
-    else:
-        write_file(name, str.encode(ext))
-
-
-def init_py(path, name, ext):
-    py_name = path + '/' + name + '.py'
-    download_file(py_name, ext)
-    return SourceFileLoader(name, py_name).load_module().Spider()
-
-
 def str2json(content):
     return json.loads(content)
 
 
 def init(ru, extend):
-    ru.init([""])
+    ru.init(extend)
 
 
 def homeContent(ru, filter):
@@ -75,6 +71,12 @@ def playerContent(ru, flag, id, vipFlags):
 
 def searchContent(ru, key, quick):
     result = ru.searchContent(key, quick)
+    formatJo = json.dumps(result, ensure_ascii=False)
+    return formatJo
+
+
+def searchContentPage(ru, key, quick, pg):
+    result = ru.searchContentPage(key, quick, pg)
     formatJo = json.dumps(result, ensure_ascii=False)
     return formatJo
 

@@ -19,7 +19,7 @@ import androidx.viewbinding.ViewBinding;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Filter;
 import com.fongmi.android.tv.bean.Page;
 import com.fongmi.android.tv.bean.Result;
@@ -93,7 +93,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     }
 
     private Site getSite() {
-        return ApiConfig.get().getSite(getKey());
+        return VodConfig.get().getSite(getKey());
     }
 
     private Page getLastPage() {
@@ -258,7 +258,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         getVideo();
     }
 
-    public boolean canGoBack() {
+    public boolean canBack() {
         return !mPages.isEmpty();
     }
 
@@ -266,6 +266,13 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         if (mPages.size() == 1) mBinding.recycler.setMoveTop(true);
         mPages.remove(mPage = getLastPage());
         onRefresh();
+    }
+
+    public boolean goRoot() {
+        if (mPages.isEmpty()) return false;
+        mPages.clear();
+        getVideo();
+        return true;
     }
 
     @Override

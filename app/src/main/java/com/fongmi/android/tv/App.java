@@ -12,13 +12,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.os.HandlerCompat;
 
-import com.fongmi.android.tv.api.LiveConfig;
+import com.fongmi.android.tv.api.config.LiveConfig;
 import com.fongmi.android.tv.ui.activity.CrashActivity;
 import com.fongmi.android.tv.utils.Notify;
 import com.github.catvod.Init;
 import com.github.catvod.bean.Doh;
 import com.github.catvod.net.OkHttp;
-import com.github.catvod.utils.Github;
 import com.google.gson.Gson;
 import com.orhanobut.logger.AndroidLogAdapter;
 import com.orhanobut.logger.LogAdapter;
@@ -41,7 +40,7 @@ public class App extends Application {
 
     public App() {
         instance = this;
-        executor = Executors.newFixedThreadPool(Constant.THREAD_POOL);
+        executor = Executors.newFixedThreadPool(Constant.THREAD_POOL * 2);
         handler = HandlerCompat.createAsync(Looper.getMainLooper());
         gson = new Gson();
     }
@@ -106,7 +105,6 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         Notify.createChannel();
-        Github.setAbi(BuildConfig.FLAVOR_abi);
         Logger.addLogAdapter(getLogAdapter());
         OkHttp.get().setProxy(Setting.getProxy());
         OkHttp.get().setDoh(Doh.objectFrom(Setting.getDoh()));

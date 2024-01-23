@@ -9,7 +9,6 @@
 
     <!-- Live -->
     <string name="live_pass">密碼</string>
-    <string name="live_group">未分類</string>
     <string name="live_line">來源 <xliff:g name="name">%s</xliff:g></string>
 
     <!-- Detail -->
@@ -66,18 +65,7 @@
     <string name="setting_vod">點播</string>
     <string name="setting_live">直播</string>
     <string name="setting_wall">壁紙</string>
-    <string name="setting_player">播放器</string>
-    <string name="setting_player_ua">User-Agent</string>
-    <string name="setting_player_flag">線路播放</string>
-    <string name="setting_player_http">連線方式</string>
-    <string name="setting_player_buffer">緩衝時間</string>
-    <string name="setting_player_tunnel">隧道模式</string>
-    <string name="setting_player_caption">字幕樣式</string>
-    <string name="setting_player_subtitle">字幕大小</string>
-    <string name="setting_player_background">背景播放</string>
-    <string name="setting_decode">解碼方式</string>
-    <string name="setting_render">渲染方式</string>
-    <string name="setting_scale">縮放比例</string>
+    <string name="setting_player">播放設定</string>
     <string name="setting_quality">圖片品質</string>
     <string name="setting_size">圖片尺寸</string>
     <string name="setting_doh">DoH</string>
@@ -90,6 +78,25 @@
     <string name="setting_off">關閉</string>
     <string name="setting_on">開啟</string>
 
+    <!-- Player -->
+    <string name="player">播放核心</string>
+    <string name="player_render">渲染方式</string>
+    <string name="player_scale">縮放比例</string>
+    <string name="player_caption">字幕樣式</string>
+    <string name="player_subtitle">字幕大小</string>
+    <string name="player_danmu_load">彈幕載入</string>
+    <string name="player_danmu_speed">彈幕速度</string>
+    <string name="player_danmu_size">彈幕大小</string>
+    <string name="player_danmu_line">彈幕行數</string>
+    <string name="player_danmu_alpha">彈幕透明</string>
+    <string name="player_background">背景播放</string>
+    <string name="player_flag">線路播放</string>
+    <string name="player_episode">選集樣式</string>
+    <string name="player_exo_tunnel">隧道模式</string>
+    <string name="player_exo_http">連線方式</string>
+    <string name="player_exo_buffer">緩衝時間</string>
+    <string name="player_ua">User-Agent</string>
+
     <!-- Search -->
     <string name="search_keyword">關鍵字…</string>
     <string name="search_record">歷史</string>
@@ -101,6 +108,7 @@
     <string name="dialog_positive">確定</string>
     <string name="dialog_negative">取消</string>
     <string name="dialog_config_hint">請輸入接口…</string>
+    <string name="dialog_config_name">請輸入名稱…</string>
     <string name="dialog_config_url">請輸入網址…</string>
 
     <!-- Error -->
@@ -109,10 +117,10 @@
     <string name="error_play_next">已經是最後一集了！</string>
     <string name="error_play_prev">已經是第一集了！</string>
     <string name="error_play_parse">播放網址解析失敗</string>
-    <string name="error_play_url">播放資料載入失敗</string>
-    <string name="error_play_format">不支援的影片格式</string>
+    <string name="error_play_url">播放網址載入失敗</string>
+    <string name="error_play_flag">暫無線路資料</string>
     <string name="error_play_timeout">連線逾時</string>
-    <string name="error_play_episode">暫無播放資料</string>
+    <string name="error_detail">暫無播放資料</string>
     <string name="error_empty">找不到資料</string>
 
     <!-- Update -->
@@ -130,6 +138,7 @@
     <!-- UNIT -->
     <string name="all">全部</string>
     <string name="times">倍</string>
+    <string name="lines">行</string>
 
     <string-array name="select_decode">
         <item>軟解</item>
@@ -140,6 +149,13 @@
         <item>系統</item>
         <item>IJK</item>
         <item>EXO</item>
+    </string-array>
+
+    <string-array name="select_danmu_speed">
+        <item>超慢</item>
+        <item>慢</item>
+        <item>適中</item>
+        <item>快</item>
     </string-array>
 
     <string-array name="select_quality">
@@ -156,7 +172,7 @@
     </string-array>
 
     <string-array name="select_scale">
-        <item>預設</item>
+        <item>原始</item>
         <item>16:9</item>
         <item>4:3</item>
         <item>填充</item>
@@ -176,6 +192,11 @@
     <string-array name="select_flag">
         <item>自動</item>
         <item>手動</item>
+    </string-array>
+
+    <string-array name="select_episode">
+        <item>單行</item>
+        <item>多行</item>
     </string-array>
 
     <string-array name="select_caption">

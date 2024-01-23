@@ -18,7 +18,7 @@ import com.android.cast.dlna.dmc.control.ServiceActionCallback;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.api.ApiConfig;
+import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Device;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.cast.CastDevice;
@@ -32,6 +32,7 @@ import com.fongmi.android.tv.ui.adapter.DeviceAdapter;
 import com.fongmi.android.tv.utils.Notify;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Path;
+import com.github.catvod.utils.Util;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import org.fourthline.cling.support.lastchange.EventedValue;
@@ -68,16 +69,16 @@ public class CastDialog extends BaseDialog implements DeviceAdapter.OnClickListe
     public CastDialog() {
         client = OkHttp.client(Constant.TIMEOUT_SYNC);
         body = new FormBody.Builder();
-        body.add("url", ApiConfig.getUrl());
         body.add("device", Device.get().toString());
+        if (VodConfig.getUrl() != null) body.add("url", VodConfig.getUrl());
     }
 
     public CastDialog history(History history) {
         String id = history.getVodId();
         String fd = history.getVodId();
-        if (fd.startsWith("/")) fd = Server.get().getAddress() + "/file://" + fd.replace(Path.rootPath(), "");
+        if (fd.startsWith("/")) fd = Server.get().getAddress() + "/file" + fd.replace(Path.rootPath(), "");
         if (fd.startsWith("file")) fd = Server.get().getAddress() + "/" + fd.replace(Path.rootPath(), "");
-        if (fd.contains("127.0.0.1")) fd = fd.replace("127.0.0.1", Server.get().getIP());
+        if (fd.contains("127.0.0.1")) fd = fd.replace("127.0.0.1", Util.getIp());
         body.add("history", history.toString().replace(id, fd));
         return this;
     }

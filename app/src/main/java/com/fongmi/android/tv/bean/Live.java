@@ -3,8 +3,14 @@ package com.fongmi.android.tv.bean;
 import android.net.Uri;
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
+import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.db.AppDatabase;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
@@ -15,16 +21,19 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@Entity(ignoredColumns = {"type", "group", "url", "logo", "epg", "ua", "click", "origin", "referer", "timeout", "header", "playerType", "channels", "groups", "core", "activated", "width"})
 public class Live {
 
+    @NonNull
+    @PrimaryKey
+    @SerializedName("name")
+    private String name;
     @SerializedName("type")
     private int type;
     @SerializedName("boot")
     private boolean boot;
     @SerializedName("pass")
     private boolean pass;
-    @SerializedName("name")
-    private String name;
     @SerializedName("group")
     private String group;
     @SerializedName("url")
@@ -35,6 +44,10 @@ public class Live {
     private String epg;
     @SerializedName("ua")
     private String ua;
+    @SerializedName("click")
+    private String click;
+    @SerializedName("origin")
+    private String origin;
     @SerializedName("referer")
     private String referer;
     @SerializedName("timeout")
@@ -71,7 +84,7 @@ public class Live {
         this.url = url;
     }
 
-    public Live(String name, String url) {
+    public Live(@NonNull String name, String url) {
         this.name = name;
         this.url = url;
     }
@@ -84,12 +97,24 @@ public class Live {
         return boot;
     }
 
+    public void setBoot(boolean boot) {
+        this.boot = boot;
+    }
+
     public boolean isPass() {
         return pass;
     }
 
+    public void setPass(boolean pass) {
+        this.pass = pass;
+    }
+
     public String getName() {
         return TextUtils.isEmpty(name) ? "" : name;
+    }
+
+    public void setName(@NonNull String name) {
+        this.name = name;
     }
 
     public String getGroup() {
@@ -112,8 +137,16 @@ public class Live {
         return TextUtils.isEmpty(ua) ? "" : ua;
     }
 
+    public String getOrigin() {
+        return TextUtils.isEmpty(origin) ? "" : origin;
+    }
+
     public String getReferer() {
         return TextUtils.isEmpty(referer) ? "" : referer;
+    }
+
+    public String getClick() {
+        return TextUtils.isEmpty(click) ? "" : click;
     }
 
     public Integer getTimeout() {
@@ -160,6 +193,10 @@ public class Live {
         this.width = width;
     }
 
+    public boolean isEmpty() {
+        return getName().isEmpty();
+    }
+
     public Live check() {
         boolean proxy = getChannels().size() > 0 && getChannels().get(0).getUrls().size() > 0 && getChannels().get(0).getUrls().get(0).startsWith("proxy");
         if (proxy) setProxy();
@@ -178,9 +215,39 @@ public class Live {
         return item;
     }
 
-    public boolean hasLogo() {
-        for (Group group : getGroups()) if (group.getLogo().length() > 0) return true;
-        return false;
+    public int getBootIcon() {
+        return isBoot() ? R.drawable.ic_live_boot : R.drawable.ic_live_block;
+    }
+
+    public int getPassIcon() {
+        return isPass() ? R.drawable.ic_live_block : R.drawable.ic_live_pass;
+    }
+
+    public Live boot(boolean boot) {
+        setBoot(boot);
+        return this;
+    }
+
+    public Live pass(boolean pass) {
+        getGroups().clear();
+        setPass(pass);
+        return this;
+    }
+
+    public Live sync() {
+        Live item = find(getName());
+        if (item == null) return this;
+        setBoot(item.isBoot());
+        setPass(item.isPass());
+        return this;
+    }
+
+    public static Live find(String name) {
+        return AppDatabase.get().getLiveDao().find(name);
+    }
+
+    public void save() {
+        AppDatabase.get().getLiveDao().insertOrUpdate(this);
     }
 
     @Override
