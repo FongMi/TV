@@ -308,7 +308,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mObserveSearch = this::setSearch;
         mDialogs = new ArrayList<>();
         mBroken = new ArrayList<>();
-        mClock = Clock.create();
+        mClock = Clock.create(mBinding.display.time);
         mR0 = this::stopService;
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
@@ -318,6 +318,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         setForeground(true);
         setRecyclerView();
         setVideoView();
+        setDisplayView();
         setDanmuView();
         setViewModel();
         showProgress();
@@ -425,6 +426,11 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         maxLines.put(BaseDanmaku.TYPE_FIX_BOTTOM, maxLine);
         mDanmakuContext.setDanmakuStyle(IDisplayer.DANMAKU_STYLE_STROKEN, 3).setMaximumLines(maxLines).setScrollSpeedFactor(speed).setDanmakuTransparency(alpha).setDanmakuMargin(8).setScaleTextSize(0.8f);
         checkDanmuImg();
+    }
+
+    private void setDisplayView() {
+        mBinding.display.getRoot().setVisibility(View.VISIBLE);
+        showDisplayInfo();
     }
 
     @Override
@@ -919,6 +925,17 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         else onRefresh();
     }
 
+    private void showDisplayInfo() {
+        boolean controlVisible = isVisible(mBinding.control.getRoot());
+        boolean visible = (!controlVisible || isLock());
+        mBinding.display.time.setVisibility(Setting.isDisplayTime() && visible  ? View.VISIBLE : View.GONE);
+        mBinding.display.netspeed.setVisibility(Setting.isDisplaySpeed() && visible ? View.VISIBLE : View.GONE);
+    }
+
+    private void onTimeChangeDisplaySpeed() {
+        if (Setting.isDisplaySpeed() && (!isVisible(mBinding.control.getRoot()) || isLock())) Traffic.setSpeed(mBinding.display.netspeed);
+    }
+
     private void toggleFullscreen() {
         if (isFullscreen()) exitFullscreen();
         else enterFullscreen();
@@ -1007,6 +1024,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mBinding.control.bottom.setVisibility(isLock() ? View.GONE : View.VISIBLE);
         mBinding.control.top.setVisibility(isLock() ? View.GONE : View.VISIBLE);
         mBinding.control.getRoot().setVisibility(View.VISIBLE);
+        showDisplayInfo();
         checkPlayImg(mPlayers.isPlaying());
         setR1Callback();
     }
@@ -1014,6 +1032,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private void hideControl() {
         mBinding.control.getRoot().setVisibility(View.GONE);
         App.removeCallbacks(mR1);
+        showDisplayInfo();
     }
 
     private void hideSheet() {
@@ -1154,6 +1173,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     @Override
     public void onTimeChanged() {
+        onTimeChangeDisplaySpeed();
         long position, duration;
         mHistory.setPosition(position = mPlayers.getPosition());
         mHistory.setDuration(duration = mPlayers.getDuration());

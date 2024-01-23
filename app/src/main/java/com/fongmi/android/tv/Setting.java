@@ -332,4 +332,21 @@ public class Setting {
     public static boolean hasCaption() {
         return new Intent(Settings.ACTION_CAPTIONING_SETTINGS).resolveActivity(App.get().getPackageManager()) != null;
     }
+
+    public static boolean isDisplayTime() {
+        return Prefers.getBoolean("display_time", false);
+    }
+
+    public static void putDisplayTime(boolean display) {
+        Prefers.put("display_time", display);
+    }
+
+    public static boolean isDisplaySpeed() {
+        return Prefers.getBoolean("display_speed", false);
+    }
+
+    public static void putDisplaySpeed(boolean display) {
+        Prefers.put("display_speed", display);
+    }
+
 }

@@ -639,7 +639,10 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mBinding.episodeVert.setNumColumns(numColumns);
         mBinding.episodeVert.setColumnWidth((width - ((numColumns - 1) * ResUtil.dp2px(8))) / numColumns);
         mBinding.episodeVert.setLayoutParams(params);
-        mBinding.episodeVert.setWindowAlignmentOffsetPercent(6);
+        mBinding.episodeVert.setWindowAlignment(BaseGridView.WINDOW_ALIGN_LOW_EDGE);
+        mBinding.episodeVert.setWindowAlignmentOffset(0);
+        mBinding.episodeVert.setWindowAlignmentOffsetPercent(0f);
+        mBinding.episodeVert.setItemAlignmentOffsetPercent(0f);
         mEpisodePresenter.setNumColumns(numColumns);
         mEpisodePresenter.setNumRows(rowNum);
     }
@@ -1536,11 +1539,6 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (!isFullscreen() && KeyUtil.isBackKey(event) && getFocus1() != mBinding.video) {
-            mBinding.video.requestFocus();
-            mFocus1 = null;
-            return true;
-        }
         if (isFullscreen() && KeyUtil.isMenuKey(event)) onToggle();
         if (isVisible(mBinding.control.getRoot())) setR1Callback();
         if (isVisible(mBinding.control.getRoot())) mFocus2 = getCurrentFocus();

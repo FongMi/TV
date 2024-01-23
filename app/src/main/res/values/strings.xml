@@ -35,6 +35,8 @@
     <string name="play_prev">Prev</string>
     <string name="play_loop">Loop</string>
     <string name="play_timer">Timer</string>
+    <string name="play_time">Time</string>
+    <string name="play_netspeed">Net Speed</string>
     <string name="play_danmu">Danmu</string>
     <string name="play_change">Change</string>
     <string name="play_forward">→</string>
