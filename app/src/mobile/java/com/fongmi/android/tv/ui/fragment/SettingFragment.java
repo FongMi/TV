@@ -122,7 +122,6 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.wallDefault.setOnClickListener(this::setWallDefault);
         mBinding.wallRefresh.setOnClickListener(this::setWallRefresh);
         mBinding.doh.setOnClickListener(this::setDoh);
-        mBinding.danmu.setOnClickListener(this::onDanmu);
         mBinding.custom.setOnClickListener(this::onCustom);
     }
 
@@ -257,12 +256,8 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         getRoot().change(2);
     }
 
-    private void onDanmu(View view) {
-        getRoot().change(3);
-    }
-
     private void onCustom(View view) {
-        getRoot().change(4);
+        getRoot().change(3);
     }
 
     private void onVersion(View view) {
