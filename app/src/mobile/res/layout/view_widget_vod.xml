@@ -28,7 +28,7 @@
             android:layout_marginTop="8dp"
             android:textColor="@color/white"
             android:textSize="14sp"
-            tools:text="@string/error_play_format" />
+            tools:text="@string/error_play_url" />
 
     </LinearLayout>
 
