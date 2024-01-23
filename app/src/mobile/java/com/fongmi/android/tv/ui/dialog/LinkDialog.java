@@ -9,7 +9,6 @@ import android.view.inputmethod.EditorInfo;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
-import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.DialogLinkBinding;
 import com.fongmi.android.tv.ui.activity.VideoActivity;
@@ -65,7 +64,7 @@ public class LinkDialog {
 
     private void onPositive(DialogInterface dialog, int which) {
         String text = binding.text.getText().toString().trim();
-        if (!text.isEmpty()) VideoActivity.start(App.activity(), text);
+        if (!text.isEmpty()) VideoActivity.start(fragment.getActivity(), text);
         dialog.dismiss();
     }
 
