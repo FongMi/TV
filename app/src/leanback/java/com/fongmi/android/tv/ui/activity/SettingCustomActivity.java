@@ -18,6 +18,7 @@ public class SettingCustomActivity extends BaseActivity {
     private ActivitySettingCustomBinding mBinding;
     private String[] quality;
     private String[] size;
+    private String[] episode;
 
     @Override
     protected ViewBinding getBinding() {
@@ -32,12 +33,15 @@ public class SettingCustomActivity extends BaseActivity {
     protected void initView() {
         mBinding.sizeText.setText((size = ResUtil.getStringArray(R.array.select_size))[Setting.getSize()]);
         mBinding.qualityText.setText((quality = ResUtil.getStringArray(R.array.select_quality))[Setting.getQuality()]);
+        mBinding.episodeText.setText((episode = ResUtil.getStringArray(R.array.select_episode))[Setting.getEpisode()]);
+
     }
 
     @Override
     protected void initEvent() {
         mBinding.quality.setOnClickListener(this::setQuality);
         mBinding.size.setOnClickListener(this::setSize);
+        mBinding.episode.setOnClickListener(this::setEpisode);
     }
 
     private void setQuality(View view) {
@@ -52,6 +56,12 @@ public class SettingCustomActivity extends BaseActivity {
         Setting.putSize(index = index == size.length - 1 ? 0 : ++index);
         mBinding.sizeText.setText(size[index]);
         RefreshEvent.size();
+    }
+
+    private void setEpisode(View view) {
+        int index = Setting.getEpisode();
+        Setting.putEpisode(index = index == episode.length - 1 ? 0 : ++index);
+        mBinding.episodeText.setText(episode[index]);
     }
 
 }
