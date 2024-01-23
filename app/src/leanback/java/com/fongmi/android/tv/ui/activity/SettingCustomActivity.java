@@ -29,12 +29,18 @@ public class SettingCustomActivity extends BaseActivity {
         activity.startActivity(new Intent(activity, SettingCustomActivity.class));
     }
 
+    private String getSwitch(boolean value) {
+        return getString(value ? R.string.setting_on : R.string.setting_off);
+    }
+
     @Override
     protected void initView() {
-        mBinding.sizeText.setText((size = ResUtil.getStringArray(R.array.select_size))[Setting.getSize()]);
+        mBinding.quality.requestFocus();
         mBinding.qualityText.setText((quality = ResUtil.getStringArray(R.array.select_quality))[Setting.getQuality()]);
+        mBinding.sizeText.setText((size = ResUtil.getStringArray(R.array.select_size))[Setting.getSize()]);
         mBinding.episodeText.setText((episode = ResUtil.getStringArray(R.array.select_episode))[Setting.getEpisode()]);
-
+        mBinding.displayTimeText.setText(getSwitch(Setting.isDisplayTime()));
+        mBinding.displayNetspeedText.setText(getSwitch(Setting.isDisplaySpeed()));
     }
 
     @Override
@@ -42,6 +48,8 @@ public class SettingCustomActivity extends BaseActivity {
         mBinding.quality.setOnClickListener(this::setQuality);
         mBinding.size.setOnClickListener(this::setSize);
         mBinding.episode.setOnClickListener(this::setEpisode);
+        mBinding.displayTime.setOnClickListener(this::setDisplayTime);
+        mBinding.displayNetspeed.setOnClickListener(this::setDisplaySpeed);
     }
 
     private void setQuality(View view) {
@@ -62,6 +70,16 @@ public class SettingCustomActivity extends BaseActivity {
         int index = Setting.getEpisode();
         Setting.putEpisode(index = index == episode.length - 1 ? 0 : ++index);
         mBinding.episodeText.setText(episode[index]);
+    }
+
+    private void setDisplayTime(View view) {
+        Setting.putDisplayTime(!Setting.isDisplayTime());
+        mBinding.displayTimeText.setText(getSwitch(Setting.isDisplayTime()));
+    }
+
+    private void setDisplaySpeed(View view) {
+        Setting.putDisplaySpeed(!Setting.isDisplaySpeed());
+        mBinding.displayNetspeedText.setText(getSwitch(Setting.isDisplaySpeed()));
     }
 
 }
