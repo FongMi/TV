@@ -729,7 +729,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private void showDanmu() {
-        if (Setting.isDanmu()) mBinding.danmaku.show();
+        if (!mPlayers.isEnd() && Setting.isDanmu()) mBinding.danmaku.show();
         else mBinding.danmaku.hide();
     }
 
