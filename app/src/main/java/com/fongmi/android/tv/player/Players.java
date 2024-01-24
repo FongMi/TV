@@ -85,6 +85,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     private int player;
     private int error;
     private int retry;
+    private boolean danmuSync;
 
     public static boolean isExo(int type) {
         return type == EXO;
@@ -108,6 +109,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         builder = new StringBuilder();
         runnable = ErrorEvent::timeout;
         formatter = new Formatter(builder, Locale.getDefault());
+        danmuSync = Setting.isDanmuSync();
         createSession(activity);
         return this;
     }
@@ -675,7 +677,8 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     @Override
     public void updateTimer(DanmakuTimer timer) {
-        if (speed != 1) timer.add((long) (timer.lastInterval() * (speed - 1)));
+        if (danmuSync) App.post(() -> timer.update(getPosition()));
+        else if (speed != 1) timer.add((long) (timer.lastInterval() * (speed - 1)));
     }
 
     @Override
