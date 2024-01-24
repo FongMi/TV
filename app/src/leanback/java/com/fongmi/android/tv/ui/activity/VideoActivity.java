@@ -292,10 +292,10 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     @Override
     protected void initView() {
-        mKeyDown = CustomKeyDownVod.create(this, mBinding.video);
         mFrameParams = mBinding.video.getLayoutParams();
         mClock = Clock.create(mBinding.widget.time);
         mDanmakuContext = DanmakuContext.create();
+        mKeyDown = CustomKeyDownVod.create(this);
         mPlayers = new Players().init(this);
         mBroken = new ArrayList<>();
         mR1 = this::hideControl;
@@ -1445,34 +1445,6 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         if (isVisible(mBinding.control.getRoot())) mFocus2 = getCurrentFocus();
         if (isFullscreen() && isGone(mBinding.control.getRoot()) && mKeyDown.hasEvent(event)) return mKeyDown.onKeyDown(event);
         return super.dispatchKeyEvent(event);
-    }
-
-    @Override
-    public void onBright(int progress) {
-        mBinding.widget.bright.setVisibility(View.VISIBLE);
-        mBinding.widget.brightProgress.setProgress(progress);
-        if (progress < 35) mBinding.widget.brightIcon.setImageResource(R.drawable.ic_widget_bright_low);
-        else if (progress < 70) mBinding.widget.brightIcon.setImageResource(R.drawable.ic_widget_bright_medium);
-        else mBinding.widget.brightIcon.setImageResource(R.drawable.ic_widget_bright_high);
-    }
-
-    @Override
-    public void onBrightEnd() {
-        mBinding.widget.bright.setVisibility(View.GONE);
-    }
-
-    @Override
-    public void onVolume(int progress) {
-        mBinding.widget.volume.setVisibility(View.VISIBLE);
-        mBinding.widget.volumeProgress.setProgress(progress);
-        if (progress < 35) mBinding.widget.volumeIcon.setImageResource(R.drawable.ic_widget_volume_low);
-        else if (progress < 70) mBinding.widget.volumeIcon.setImageResource(R.drawable.ic_widget_volume_medium);
-        else mBinding.widget.volumeIcon.setImageResource(R.drawable.ic_widget_volume_high);
-    }
-
-    @Override
-    public void onVolumeEnd() {
-        mBinding.widget.volume.setVisibility(View.GONE);
     }
 
     @Override
