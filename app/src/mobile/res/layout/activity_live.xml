@@ -80,7 +80,7 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/channel"
-            android:layout_width="220dp"
+            android:layout_width="180dp"
             android:layout_height="match_parent"
             android:clipChildren="false"
             android:clipToPadding="false"
@@ -93,7 +93,8 @@
             android:id="@+id/divide2"
             android:layout_width="0.3dp"
             android:layout_height="match_parent"
-            android:background="@color/grey_700" />
+            android:background="@color/grey_700"
+            android:visibility="gone" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/epg"

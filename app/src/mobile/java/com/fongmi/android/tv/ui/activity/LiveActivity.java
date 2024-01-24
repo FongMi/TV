@@ -202,8 +202,8 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mBinding.control.action.text.setOnLongClickListener(view -> onTextLong());
         mBinding.control.action.player.setOnLongClickListener(view -> onChoose());
         mBinding.control.action.speed.setOnLongClickListener(view -> onSpeedLong());
-        mBinding.video.setOnTouchListener((view, event) -> mKeyDown.onTouchEvent(event));
         mBinding.control.action.getRoot().setOnTouchListener(this::onActionTouch);
+        mBinding.video.setOnTouchListener((view, event) -> mKeyDown.onTouchEvent(event));
     }
 
     private void setRecyclerView() {
@@ -303,9 +303,12 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private void setWidth(Live live) {
-        int base = ResUtil.dp2px(44);
-        for (Group group : live.getGroups()) live.setWidth(Math.max(live.getWidth(), ResUtil.getTextWidth(group.getName(), 14)));
-        mBinding.group.getLayoutParams().width = live.getWidth() == 0 ? 0 : Math.min(live.getWidth() + base, ResUtil.dp2px(180));
+        int def = ResUtil.dp2px(160);
+        int logo = ResUtil.dp2px(56);
+        int group = ResUtil.dp2px(44);
+        for (Group item : live.getGroups()) live.setWidth(Math.max(live.getWidth(), ResUtil.getTextWidth(item.getName(), 14)));
+        mBinding.group.getLayoutParams().width = live.getWidth() == 0 ? 0 : Math.min(live.getWidth() + group, def);
+        mBinding.channel.getLayoutParams().width = live.getLogo().isEmpty() ? def : logo;
         mBinding.divide1.setVisibility(live.getWidth() == 0 ? View.GONE : View.VISIBLE);
     }
 
