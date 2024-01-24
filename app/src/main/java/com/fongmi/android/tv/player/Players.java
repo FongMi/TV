@@ -624,9 +624,9 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
             case Player.STATE_READY:
                 PlayerEvent.ready();
                 break;
-            case Player.STATE_BUFFERING:
-            case Player.STATE_ENDED:
             case Player.STATE_IDLE:
+            case Player.STATE_ENDED:
+            case Player.STATE_BUFFERING:
                 PlayerEvent.state(state);
                 break;
         }
@@ -676,12 +676,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     @Override
     public void updateTimer(DanmakuTimer timer) {
-        App.post(() -> {
-            long position = getPosition();
-            long duration = getDuration();
-            if (position >= duration) timer.add(Integer.MAX_VALUE);
-            else timer.update(position);
-        });
+        App.post(() -> timer.update(getPosition()));
     }
 
     @Override

@@ -1181,6 +1181,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         if (mBinding.control.loop.isActivated()) {
             onReset(true);
         } else {
+            mBinding.danmaku.clearDanmakusOnScreen();
             checkNext();
         }
     }
