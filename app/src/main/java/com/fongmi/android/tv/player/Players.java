@@ -80,7 +80,6 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     private Sub sub;
 
     private long position;
-    private float speed;
     private int decode;
     private int player;
     private int error;
@@ -299,8 +298,8 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     public String setSpeed(float speed) {
-        if (exoPlayer != null) exoPlayer.setPlaybackSpeed(this.speed = speed);
-        if (ijkPlayer != null) ijkPlayer.setSpeed(this.speed = speed);
+        if (exoPlayer != null) exoPlayer.setPlaybackSpeed(speed);
+        if (ijkPlayer != null) ijkPlayer.setSpeed(speed);
         return getSpeedText();
     }
 
