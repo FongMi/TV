@@ -37,11 +37,19 @@ public class SettingCustomFragment extends BaseFragment {
     @Override
     protected void initView() {
         mBinding.sizeText.setText((size = ResUtil.getStringArray(R.array.select_size))[Setting.getSize()]);
+        mBinding.danmuSyncText.setText(getSwitch(Setting.isDanmuSync()));
     }
 
     @Override
     protected void initEvent() {
+        mBinding.title.setOnLongClickListener(this::onTitle);
         mBinding.size.setOnClickListener(this::setSize);
+        mBinding.danmuSync.setOnClickListener(this::setDanmuSync);
+    }
+
+    private boolean onTitle(View view) {
+        mBinding.danmuSync.setVisibility(View.VISIBLE);
+        return true;
     }
 
     private void setSize(View view) {
@@ -51,6 +59,11 @@ public class SettingCustomFragment extends BaseFragment {
             RefreshEvent.size();
             dialog.dismiss();
         }).show();
+    }
+
+    private void setDanmuSync(View view) {
+        Setting.putDanmuSync(!Setting.isDanmuSync());
+        mBinding.danmuSyncText.setText(getSwitch(Setting.isDanmuSync()));
     }
 
 

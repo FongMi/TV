@@ -285,6 +285,14 @@ public class Setting {
         return Math.min(Math.max(Prefers.getInt("danmu_alpha", 90), 10), 100);
     }
 
+    public static void putDanmuSync(boolean sync) {
+        Prefers.put("danmu_sync", sync);
+    }
+
+    public static boolean isDanmuSync() {
+        return Prefers.getBoolean("danmu_sync", false);
+    }
+
     public static void putDanmuAlpha(int alpha) {
         Prefers.put("danmu_alpha", alpha);
     }

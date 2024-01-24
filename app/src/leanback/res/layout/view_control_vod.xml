@@ -46,8 +46,7 @@
                 android:nextFocusDown="@id/timeBar"
                 android:text="@string/play_next"
                 android:textColor="@color/white"
-                android:textStyle="bold"
-                android:textSize="18sp" />
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/prev"
@@ -60,8 +59,7 @@
                 android:nextFocusDown="@id/timeBar"
                 android:text="@string/play_prev"
                 android:textColor="@color/white"
-                android:textStyle="bold"
-                android:textSize="18sp" />
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/reset"
@@ -73,8 +71,7 @@
                 android:focusableInTouchMode="true"
                 android:nextFocusDown="@id/timeBar"
                 android:textColor="@color/white"
-                android:textStyle="bold"
-                android:textSize="18sp"
+                android:textSize="14sp"
                 tools:text="刷新" />
 
             <TextView
@@ -88,8 +85,7 @@
                 android:nextFocusDown="@id/timeBar"
                 android:text="@string/play_change"
                 android:textColor="@color/white"
-                android:textStyle="bold"
-                android:textSize="18sp"
+                android:textSize="14sp"
                 tools:text="換源" />
 
             <TextView
@@ -102,8 +98,7 @@
                 android:focusableInTouchMode="true"
                 android:nextFocusDown="@id/timeBar"
                 android:textColor="@color/white"
-                android:textStyle="bold"
-                android:textSize="18sp"
+                android:textSize="14sp"
                 tools:text="EXO" />
 
             <TextView
@@ -116,8 +111,7 @@
                 android:focusableInTouchMode="true"
                 android:nextFocusDown="@id/timeBar"
                 android:textColor="@color/white"
-                android:textStyle="bold"
-                android:textSize="18sp"
+                android:textSize="14sp"
                 tools:text="硬解" />
 
             <com.fongmi.android.tv.ui.custom.CustomUpDownView
@@ -130,8 +124,7 @@
                 android:focusableInTouchMode="true"
                 android:nextFocusDown="@id/timeBar"
                 android:textColor="@color/white"
-                android:textStyle="bold"
-                android:textSize="18sp"
+                android:textSize="14sp"
                 tools:text="1.00" />
 
             <TextView
@@ -144,8 +137,7 @@
                 android:focusableInTouchMode="true"
                 android:nextFocusDown="@id/timeBar"
                 android:textColor="@color/white"
-                android:textStyle="bold"
-                android:textSize="18sp"
+                android:textSize="14sp"
                 tools:text="預設" />
 
             <com.fongmi.android.tv.ui.custom.CustomUpDownView
@@ -160,8 +152,7 @@
                 android:tag="3"
                 android:text="@string/play_track_text"
                 android:textColor="@color/white"
-                android:textStyle="bold"
-                android:textSize="18sp"
+                android:textSize="14sp"
                 android:visibility="gone"
                 tools:visibility="visible" />
 
@@ -177,8 +168,7 @@
                 android:tag="1"
                 android:text="@string/play_track_audio"
                 android:textColor="@color/white"
-                android:textStyle="bold"
-                android:textSize="18sp"
+                android:textSize="14sp"
                 android:visibility="gone"
                 tools:visibility="visible" />
 
@@ -194,8 +184,7 @@
                 android:tag="2"
                 android:text="@string/play_track_video"
                 android:textColor="@color/white"
-                android:textStyle="bold"
-                android:textSize="18sp"
+                android:textSize="14sp"
                 android:visibility="gone"
                 tools:visibility="visible" />
 
@@ -209,8 +198,7 @@
                 android:focusableInTouchMode="true"
                 android:nextFocusDown="@id/timeBar"
                 android:textColor="@color/white"
-                android:textStyle="bold"
-                android:textSize="18sp"
+                android:textSize="14sp"
                 tools:text="00:00" />
 
             <com.fongmi.android.tv.ui.custom.CustomUpDownView
@@ -223,8 +211,7 @@
                 android:focusableInTouchMode="true"
                 android:nextFocusDown="@id/timeBar"
                 android:textColor="@color/white"
-                android:textStyle="bold"
-                android:textSize="18sp"
+                android:textSize="14sp"
                 tools:text="00:00" />
 
             <TextView
@@ -238,8 +225,7 @@
                 android:nextFocusDown="@id/timeBar"
                 android:text="@string/play_danmu"
                 android:textColor="@color/text"
-                android:textStyle="bold"
-                android:textSize="18sp" />
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/loop"
@@ -252,8 +238,7 @@
                 android:nextFocusDown="@id/timeBar"
                 android:text="@string/play_loop"
                 android:textColor="@color/text"
-                android:textStyle="bold"
-                android:textSize="18sp" />
+                android:textSize="14sp" />
 
         </LinearLayout>
     </HorizontalScrollView>

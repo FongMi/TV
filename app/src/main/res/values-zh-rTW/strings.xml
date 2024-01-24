@@ -93,6 +93,7 @@
     <string name="player_danmu_size">彈幕大小</string>
     <string name="player_danmu_line">彈幕行數</string>
     <string name="player_danmu_alpha">彈幕透明</string>
+    <string name="player_danmu_sync">彈幕同步</string>
     <string name="player_background">背景播放</string>
     <string name="player_flag">線路播放</string>
     <string name="player_episode">選集樣式</string>
