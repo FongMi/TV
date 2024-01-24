@@ -646,7 +646,6 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mBinding.episodeVert.setNumColumns(numColumns);
         mBinding.episodeVert.setColumnWidth((width - ((numColumns - 1) * ResUtil.dp2px(8))) / numColumns);
         mBinding.episodeVert.setLayoutParams(params);
-        mBinding.episodeVert.setWindowAlignment(BaseGridView.WINDOW_ALIGN_LOW_EDGE);
         mBinding.episodeVert.setWindowAlignmentOffsetPercent(10f);
         mEpisodePresenter.setNumColumns(numColumns);
         mEpisodePresenter.setNumRows(rowNum);
@@ -747,13 +746,13 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void showDisplayInfo() {
-        boolean infoVisible = isVisible(mBinding.widget.info);
-        mBinding.display.time.setVisibility(Setting.isDisplayTime() || infoVisible  ? View.VISIBLE : View.GONE);
-        mBinding.display.netspeed.setVisibility(Setting.isDisplaySpeed() ? View.VISIBLE : View.GONE);
+        mBinding.display.time.setVisibility(Setting.isDisplayTime() || isVisible(mBinding.widget.info)  ? View.VISIBLE : View.GONE);
+        mBinding.display.netspeed.setVisibility(Setting.isDisplaySpeed() && !isVisible(mBinding.control.getRoot()) ? View.VISIBLE : View.GONE);
     }
 
     private void onTimeChangeDisplaySpeed() {
-        if (Setting.isDisplaySpeed() && !isVisible(mBinding.control.getRoot())) Traffic.setSpeed(mBinding.display.netspeed);
+        if (isVisible(mBinding.control.getRoot())) showDisplayInfo();
+        else if (Setting.isDisplaySpeed()) Traffic.setSpeed(mBinding.display.netspeed);
     }
 
     @Override
