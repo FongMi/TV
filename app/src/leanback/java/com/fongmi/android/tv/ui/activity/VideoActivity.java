@@ -646,10 +646,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mBinding.episodeVert.setNumColumns(numColumns);
         mBinding.episodeVert.setColumnWidth((width - ((numColumns - 1) * ResUtil.dp2px(8))) / numColumns);
         mBinding.episodeVert.setLayoutParams(params);
-        mBinding.episodeVert.setWindowAlignment(BaseGridView.WINDOW_ALIGN_LOW_EDGE);
-        mBinding.episodeVert.setWindowAlignmentOffset(0);
-        mBinding.episodeVert.setWindowAlignmentOffsetPercent(0f);
-        mBinding.episodeVert.setItemAlignmentOffsetPercent(0f);
+        mBinding.episodeVert.setWindowAlignmentOffsetPercent(10f);
         mEpisodePresenter.setNumColumns(numColumns);
         mEpisodePresenter.setNumRows(rowNum);
     }
