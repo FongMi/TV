@@ -7,6 +7,7 @@
 
     <RelativeLayout
         android:id="@+id/info"
+        android:background="@drawable/shape_info"
         android:visibility="invisible"
         tools:visibility="visible"
         android:layout_width="match_parent"
