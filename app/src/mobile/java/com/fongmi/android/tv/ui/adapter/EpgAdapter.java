@@ -14,10 +14,17 @@ import java.util.List;
 
 public class EpgAdapter extends RecyclerView.Adapter<EpgAdapter.ViewHolder> {
 
+    private final OnClickListener mListener;
     private final List<Epg> mItems;
 
-    public EpgAdapter() {
+    public EpgAdapter(OnClickListener listener) {
+        this.mListener = listener;
         this.mItems = new ArrayList<>();
+    }
+
+    public interface OnClickListener {
+
+        void onItemClick(Epg item);
     }
 
     public void clear() {

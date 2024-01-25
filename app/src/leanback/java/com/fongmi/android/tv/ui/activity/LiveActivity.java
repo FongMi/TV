@@ -274,9 +274,9 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void setWidth(Live live) {
-        int base = ResUtil.dp2px(50);
-        for (Group group : live.getGroups()) live.setWidth(Math.max(live.getWidth(), ResUtil.getTextWidth(group.getName(), 16)));
-        mBinding.group.getLayoutParams().width = live.getWidth() == 0 ? 0 : Math.min(live.getWidth() + base, ResUtil.dp2px(200));
+        for (Group item : live.getGroups()) live.setWidth(Math.max(live.getWidth(), ResUtil.getTextWidth(item.getName(), 16)));
+        mBinding.group.getLayoutParams().width = live.getWidth() == 0 ? 0 : Math.min(live.getWidth() + ResUtil.dp2px(50), ResUtil.dp2px(200));
+        mBinding.channel.getLayoutParams().width = live.getLogo().isEmpty() ? ResUtil.dp2px(200) : ResUtil.dp2px(260);
         mBinding.divide.setVisibility(live.getWidth() == 0 ? View.GONE : View.VISIBLE);
     }
 
@@ -465,17 +465,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         App.removeCallbacks(mR3);
     }
 
-    private void showEpg() {
-        String epg = mChannel.getData().getEpg();
-        mBinding.widget.name.setMaxEms(epg.isEmpty() ? mChannel.getName().length() : 12);
-        mBinding.widget.play.setText(epg);
-        setMetadata();
-    }
-
-    private void setEpg(Epg epg) {
-        if (mChannel != null && mChannel.getName().equals(epg.getKey())) showEpg();
-    }
-
     private void setTraffic() {
         Traffic.setSpeed(mBinding.widget.traffic);
         App.post(mR2, Constant.INTERVAL_TRAFFIC);
@@ -584,7 +573,18 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.control.line.setText(mChannel.getLineText());
         mBinding.widget.line.setVisibility(mChannel.getLineVisible());
         mBinding.control.line.setVisibility(mChannel.getLineVisible());
-        showEpg();
+        setEpg();
+    }
+
+    private void setEpg() {
+        String epg = mChannel.getData().getEpg();
+        mBinding.widget.name.setMaxEms(epg.isEmpty() ? mChannel.getName().length() : 12);
+        mBinding.widget.play.setText(epg);
+        setMetadata();
+    }
+
+    private void setEpg(Epg epg) {
+        if (mChannel != null && mChannel.getName().equals(epg.getKey())) setEpg();
     }
 
     private void fetch() {

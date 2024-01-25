@@ -79,7 +79,7 @@ import java.util.List;
 
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class LiveActivity extends BaseActivity implements CustomKeyDownLive.Listener, TrackDialog.Listener, Biometric.Callback, PassCallback, LiveCallback, GroupAdapter.OnClickListener, ChannelAdapter.OnClickListener, SubtitleCallback, CastDialog.Listener, InfoDialog.Listener {
+public class LiveActivity extends BaseActivity implements CustomKeyDownLive.Listener, TrackDialog.Listener, Biometric.Callback, PassCallback, LiveCallback, GroupAdapter.OnClickListener, ChannelAdapter.OnClickListener, EpgAdapter.OnClickListener, SubtitleCallback, CastDialog.Listener, InfoDialog.Listener {
 
     private ActivityLiveBinding mBinding;
     private ChannelAdapter mChannelAdapter;
@@ -204,17 +204,13 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mBinding.control.action.speed.setOnLongClickListener(view -> onSpeedLong());
         mBinding.control.action.getRoot().setOnTouchListener(this::onActionTouch);
         mBinding.video.setOnTouchListener((view, event) -> mKeyDown.onTouchEvent(event));
-        mBinding.channel.setOnTouchListener(this::onRecyclerTouch);
-        mBinding.group.setOnTouchListener(this::onRecyclerTouch);
-        mBinding.epg.setOnTouchListener(this::onRecyclerTouch);
     }
 
     private void setRecyclerView() {
-        mBinding.epg.setItemAnimator(null);
         mBinding.group.setItemAnimator(null);
         mBinding.channel.setItemAnimator(null);
-        mBinding.epg.setAdapter(mEpgAdapter = new EpgAdapter());
         mBinding.group.setAdapter(mGroupAdapter = new GroupAdapter(this));
+        mBinding.widget.epg.setAdapter(mEpgAdapter = new EpgAdapter(this));
         mBinding.channel.setAdapter(mChannelAdapter = new ChannelAdapter(this));
     }
 
@@ -309,7 +305,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         for (Group item : live.getGroups()) live.setWidth(Math.max(live.getWidth(), ResUtil.getTextWidth(item.getName(), 14)));
         mBinding.group.getLayoutParams().width = live.getWidth() == 0 ? 0 : Math.min(live.getWidth() + ResUtil.dp2px(44), ResUtil.dp2px(180));
         mBinding.channel.getLayoutParams().width = live.getLogo().isEmpty() ? ResUtil.dp2px(180) : ResUtil.dp2px(236);
-        mBinding.divide1.setVisibility(live.getWidth() == 0 ? View.GONE : View.VISIBLE);
+        mBinding.divide.setVisibility(live.getWidth() == 0 ? View.GONE : View.VISIBLE);
     }
 
     private void setPosition(int[] position) {
@@ -331,7 +327,6 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         if (change) mChannelAdapter.addAll(mGroup.getChannel());
         mChannelAdapter.setSelected(mGroup.getPosition());
         mBinding.channel.scrollToPosition(mGroup.getPosition());
-        mBinding.epg.scrollToPosition(mEpgAdapter.getPosition());
     }
 
     private void onCast() {
@@ -455,11 +450,6 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         return false;
     }
 
-    private boolean onRecyclerTouch(View v, MotionEvent e) {
-        if (e.getAction() == MotionEvent.ACTION_UP) onSingleTap();
-        return true;
-    }
-
     private void hideUI() {
         if (isGone(mBinding.recycler)) return;
         mBinding.recycler.setVisibility(View.GONE);
@@ -527,20 +517,6 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mBinding.widget.infoPip.setVisibility(View.GONE);
         mBinding.widget.info.setVisibility(View.GONE);
         App.removeCallbacks(mR3);
-    }
-
-    private void showEpg() {
-        String epg = mChannel.getData().getEpg();
-        mBinding.widget.play.setText(epg);
-        mBinding.widget.name.setMaxEms(epg.isEmpty() ? mChannel.getName().length() : 12);
-        mBinding.epg.setVisibility(mChannel.getData().getList().isEmpty() ? View.GONE : View.VISIBLE);
-        mBinding.divide2.setVisibility(mChannel.getData().getList().isEmpty() ? View.GONE : View.VISIBLE);
-        mEpgAdapter.addAll(mChannel.getData().getList());
-        setMetadata();
-    }
-
-    private void setEpg(Epg epg) {
-        if (mChannel != null && mChannel.getName().equals(epg.getKey())) showEpg();
     }
 
     private void setTraffic() {
@@ -623,6 +599,11 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         return true;
     }
 
+    @Override
+    public void onItemClick(Epg item) {
+
+    }
+
     private void addKeep(Channel item) {
         getKeep().add(item);
         Keep keep = new Keep();
@@ -649,7 +630,19 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mBinding.widget.line.setVisibility(mChannel.getLineVisible());
         mBinding.control.action.line.setText(mBinding.widget.line.getText());
         mBinding.control.action.line.setVisibility(mBinding.widget.line.getVisibility());
-        showEpg();
+        setEpg();
+    }
+
+    private void setEpg() {
+        String epg = mChannel.getData().getEpg();
+        mBinding.widget.name.setMaxEms(epg.isEmpty() ? mChannel.getName().length() : 12);
+        mEpgAdapter.addAll(mChannel.getData().getList());
+        mBinding.widget.play.setText(epg);
+        setMetadata();
+    }
+
+    private void setEpg(Epg epg) {
+        if (mChannel != null && mChannel.getName().equals(epg.getKey())) setEpg();
     }
 
     private void fetch() {
@@ -674,8 +667,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private void resetAdapter() {
-        mBinding.divide1.setVisibility(View.GONE);
-        mBinding.divide2.setVisibility(View.GONE);
+        mBinding.divide.setVisibility(View.GONE);
         mChannelAdapter.clear();
         mGroupAdapter.clear();
         mEpgAdapter.clear();
