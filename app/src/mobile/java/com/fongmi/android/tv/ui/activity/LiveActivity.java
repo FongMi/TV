@@ -204,6 +204,9 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mBinding.control.action.speed.setOnLongClickListener(view -> onSpeedLong());
         mBinding.control.action.getRoot().setOnTouchListener(this::onActionTouch);
         mBinding.video.setOnTouchListener((view, event) -> mKeyDown.onTouchEvent(event));
+        mBinding.channel.setOnTouchListener(this::onRecyclerTouch);
+        mBinding.group.setOnTouchListener(this::onRecyclerTouch);
+        mBinding.epg.setOnTouchListener(this::onRecyclerTouch);
     }
 
     private void setRecyclerView() {
@@ -303,12 +306,9 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private void setWidth(Live live) {
-        int def = ResUtil.dp2px(160);
-        int logo = ResUtil.dp2px(56);
-        int group = ResUtil.dp2px(44);
         for (Group item : live.getGroups()) live.setWidth(Math.max(live.getWidth(), ResUtil.getTextWidth(item.getName(), 14)));
-        mBinding.group.getLayoutParams().width = live.getWidth() == 0 ? 0 : Math.min(live.getWidth() + group, def);
-        mBinding.channel.getLayoutParams().width = live.getLogo().isEmpty() ? def : logo;
+        mBinding.group.getLayoutParams().width = live.getWidth() == 0 ? 0 : Math.min(live.getWidth() + ResUtil.dp2px(44), ResUtil.dp2px(180));
+        mBinding.channel.getLayoutParams().width = live.getLogo().isEmpty() ? ResUtil.dp2px(180) : ResUtil.dp2px(236);
         mBinding.divide1.setVisibility(live.getWidth() == 0 ? View.GONE : View.VISIBLE);
     }
 
@@ -451,8 +451,13 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private boolean onActionTouch(View v, MotionEvent e) {
-        setR1Callback();
+        if (e.getAction() == MotionEvent.ACTION_UP) setR1Callback();
         return false;
+    }
+
+    private boolean onRecyclerTouch(View v, MotionEvent e) {
+        if (e.getAction() == MotionEvent.ACTION_UP) onSingleTap();
+        return true;
     }
 
     private void hideUI() {

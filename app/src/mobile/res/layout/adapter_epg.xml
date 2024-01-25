@@ -4,9 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingStart="8dp"
+    android:paddingStart="12dp"
     android:paddingTop="6dp"
-    android:paddingEnd="8dp"
+    android:paddingEnd="12dp"
     android:paddingBottom="6dp">
 
     <TextView
@@ -15,10 +15,6 @@
         android:layout_height="wrap_content"
         android:duplicateParentState="true"
         android:ellipsize="marquee"
-        android:shadowColor="@color/grey_900"
-        android:shadowDx="2"
-        android:shadowDy="2"
-        android:shadowRadius="1"
         android:singleLine="true"
         android:textColor="@color/epg"
         android:textSize="14sp"
@@ -30,10 +26,6 @@
         android:layout_height="wrap_content"
         android:duplicateParentState="true"
         android:ellipsize="marquee"
-        android:shadowColor="@color/grey_900"
-        android:shadowDx="2"
-        android:shadowDy="2"
-        android:shadowRadius="1"
         android:singleLine="true"
         android:textColor="@color/epg"
         android:textSize="14sp"
