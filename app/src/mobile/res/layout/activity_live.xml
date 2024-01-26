@@ -58,7 +58,8 @@
         android:layout_height="match_parent"
         android:background="@drawable/shape_live_list"
         android:orientation="horizontal"
-        android:visibility="gone">
+        android:visibility="gone"
+        tools:visibility="visible">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/group"
@@ -88,6 +89,16 @@
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:itemCount="5"
             tools:listitem="@layout/adapter_channel" />
+
+        <ImageView
+            android:id="@+id/arrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="-32dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="4dp"
+            android:src="@drawable/ic_action_arrow" />
 
     </LinearLayout>
 </FrameLayout>

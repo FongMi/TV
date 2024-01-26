@@ -7,17 +7,18 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.fongmi.android.tv.bean.Epg;
-import com.fongmi.android.tv.databinding.AdapterEpgBinding;
+import com.fongmi.android.tv.bean.EpgData;
+import com.fongmi.android.tv.databinding.AdapterEpgDataBinding;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class EpgAdapter extends RecyclerView.Adapter<EpgAdapter.ViewHolder> {
+public class EpgDataAdapter extends RecyclerView.Adapter<EpgDataAdapter.ViewHolder> {
 
     private final OnClickListener mListener;
-    private final List<Epg> mItems;
+    private final List<EpgData> mItems;
 
-    public EpgAdapter(OnClickListener listener) {
+    public EpgDataAdapter(OnClickListener listener) {
         this.mListener = listener;
         this.mItems = new ArrayList<>();
     }
@@ -32,7 +33,7 @@ public class EpgAdapter extends RecyclerView.Adapter<EpgAdapter.ViewHolder> {
         notifyDataSetChanged();
     }
 
-    public void addAll(List<Epg> items) {
+    public void addAll(List<EpgData> items) {
         mItems.clear();
         mItems.addAll(items);
         notifyDataSetChanged();
@@ -51,12 +52,12 @@ public class EpgAdapter extends RecyclerView.Adapter<EpgAdapter.ViewHolder> {
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(AdapterEpgBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+        return new ViewHolder(AdapterEpgDataBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Epg item = mItems.get(position);
+        EpgData item = mItems.get(position);
         holder.binding.time.setText(item.getTime());
         holder.binding.title.setText(item.getTitle());
         holder.binding.getRoot().setSelected(item.isInRange());
@@ -64,9 +65,9 @@ public class EpgAdapter extends RecyclerView.Adapter<EpgAdapter.ViewHolder> {
 
     static class ViewHolder extends RecyclerView.ViewHolder {
 
-        private final AdapterEpgBinding binding;
+        private final AdapterEpgDataBinding binding;
 
-        ViewHolder(@NonNull AdapterEpgBinding binding) {
+        ViewHolder(@NonNull AdapterEpgDataBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
         }
