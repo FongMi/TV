@@ -98,7 +98,8 @@
             android:layout_marginStart="-32dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="4dp"
-            android:src="@drawable/ic_action_arrow" />
+            android:src="@drawable/ic_action_arrow"
+            android:visibility="gone" />
 
     </LinearLayout>
 </FrameLayout>
