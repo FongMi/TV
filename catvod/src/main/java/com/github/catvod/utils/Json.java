@@ -18,7 +18,7 @@ public class Json {
     public static JsonElement parse(String json) {
         try {
             return JsonParser.parseString(json);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return new JsonParser().parse(json);
         }
     }
