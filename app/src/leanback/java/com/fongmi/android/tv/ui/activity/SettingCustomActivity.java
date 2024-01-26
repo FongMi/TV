@@ -41,6 +41,7 @@ public class SettingCustomActivity extends BaseActivity {
         mBinding.episodeText.setText((episode = ResUtil.getStringArray(R.array.select_episode))[Setting.getEpisode()]);
         mBinding.displayTimeText.setText(getSwitch(Setting.isDisplayTime()));
         mBinding.displayNetspeedText.setText(getSwitch(Setting.isDisplaySpeed()));
+        mBinding.displayDurationText.setText(getSwitch(Setting.isDisplayDuration()));
     }
 
     @Override
@@ -50,6 +51,7 @@ public class SettingCustomActivity extends BaseActivity {
         mBinding.episode.setOnClickListener(this::setEpisode);
         mBinding.displayTime.setOnClickListener(this::setDisplayTime);
         mBinding.displayNetspeed.setOnClickListener(this::setDisplaySpeed);
+        mBinding.displayDuration.setOnClickListener(this::setDisplayDuration);
     }
 
     private void setQuality(View view) {
@@ -80,6 +82,11 @@ public class SettingCustomActivity extends BaseActivity {
     private void setDisplaySpeed(View view) {
         Setting.putDisplaySpeed(!Setting.isDisplaySpeed());
         mBinding.displayNetspeedText.setText(getSwitch(Setting.isDisplaySpeed()));
+    }
+
+    private void setDisplayDuration(View view) {
+        Setting.putDisplayDuration(!Setting.isDisplayDuration());
+        mBinding.displayDurationText.setText(getSwitch(Setting.isDisplayDuration()));
     }
 
 }

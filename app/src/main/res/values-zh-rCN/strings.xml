@@ -37,6 +37,7 @@
     <string name="play_timer">定时</string>
     <string name="play_time">时间</string>
     <string name="play_netspeed">网速</string>
+    <string name="play_duration">进度</string>
     <string name="play_danmu">弹幕</string>
     <string name="play_change">换源</string>
     <string name="play_forward">→</string>

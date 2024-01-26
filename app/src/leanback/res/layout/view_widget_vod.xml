@@ -7,7 +7,6 @@
 
     <RelativeLayout
         android:id="@+id/info"
-        android:background="@drawable/shape_info"
         android:visibility="invisible"
         tools:visibility="visible"
         android:layout_width="match_parent"
@@ -19,7 +18,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginEnd="100dp"
             android:letterSpacing="0.02"
             android:shadowColor="@color/grey_900"
             android:shadowDx="2"
