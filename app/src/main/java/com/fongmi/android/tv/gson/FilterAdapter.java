@@ -11,6 +11,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class FilterAdapter implements JsonDeserializer<LinkedHashMap<String, List<Filter>>> {
 
@@ -19,12 +20,12 @@ public class FilterAdapter implements JsonDeserializer<LinkedHashMap<String, Lis
         LinkedHashMap<String, List<Filter>> filterMap = new LinkedHashMap<>();
         JsonObject filters = json.getAsJsonObject();
         if (filters == null) return filterMap;
-        for (String key : filters.keySet()) {
+        for (Map.Entry<String, JsonElement> entry : filters.entrySet()) {
             List<Filter> items = new ArrayList<>();
-            JsonElement element = filters.get(key);
+            JsonElement element = filters.get(entry.getKey());
             if (element.isJsonObject()) items.add(Filter.objectFrom(element).check().trans());
             else for (JsonElement item : element.getAsJsonArray()) items.add(Filter.objectFrom(item).check().trans());
-            filterMap.put(key, items);
+            filterMap.put(entry.getKey(), items);
         }
         return filterMap;
     }

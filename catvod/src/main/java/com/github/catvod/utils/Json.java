@@ -72,14 +72,14 @@ public class Json {
     public static Map<String, String> toMap(JsonElement element) {
         Map<String, String> map = new HashMap<>();
         JsonObject object = safeObject(element);
-        for (String key : object.keySet()) map.put(key, safeString(object, key));
+        for (Map.Entry<String, JsonElement> entry : object.entrySet()) map.put(entry.getKey(), safeString(object, entry.getKey()));
         return map;
     }
 
     public static ArrayMap<String, String> toArrayMap(JsonElement element) {
         ArrayMap<String, String> map = new ArrayMap<>();
         JsonObject object = safeObject(element);
-        for (String key : object.keySet()) map.put(key, safeString(object, key));
+        for (Map.Entry<String, JsonElement> entry : object.entrySet()) map.put(entry.getKey(), safeString(object, entry.getKey()));
         return map;
     }
 
