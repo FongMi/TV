@@ -275,7 +275,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void setWidth(Live live) {
         for (Group item : live.getGroups()) live.setWidth(Math.max(live.getWidth(), ResUtil.getTextWidth(item.getName(), 16)));
-        mBinding.group.getLayoutParams().width = live.getWidth() == 0 ? 0 : Math.min(live.getWidth() + ResUtil.dp2px(50), ResUtil.dp2px(200));
+        mBinding.group.getLayoutParams().width = live.getWidth() == 0 ? 0 : Math.min(live.getWidth() + ResUtil.dp2px(50), ResUtil.dp2px(180));
         mBinding.channel.getLayoutParams().width = live.getLogo().isEmpty() ? ResUtil.dp2px(200) : ResUtil.dp2px(260);
         mBinding.divide.setVisibility(live.getWidth() == 0 ? View.GONE : View.VISIBLE);
     }
