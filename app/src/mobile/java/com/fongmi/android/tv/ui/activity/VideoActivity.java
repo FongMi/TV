@@ -942,10 +942,16 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         boolean visible = (!controlVisible || isLock());
         mBinding.display.time.setVisibility(Setting.isDisplayTime() && visible  ? View.VISIBLE : View.GONE);
         mBinding.display.netspeed.setVisibility(Setting.isDisplaySpeed() && visible ? View.VISIBLE : View.GONE);
+        mBinding.display.duration.setVisibility(Setting.isDisplayDuration() && visible ? View.VISIBLE : View.GONE);
     }
 
     private void onTimeChangeDisplaySpeed() {
-        if (Setting.isDisplaySpeed() && (!isVisible(mBinding.control.getRoot()) || isLock())) Traffic.setSpeed(mBinding.display.netspeed);
+        boolean controlVisible = isVisible(mBinding.control.getRoot());
+        boolean visible = (!controlVisible || isLock());
+        long position = mPlayers.getPosition();
+        if (Setting.isDisplaySpeed() && visible) Traffic.setSpeed(mBinding.display.netspeed);
+        if (Setting.isDisplayDuration() && visible && position > 0) mBinding.display.duration.setText(mPlayers.getPositionTime(0) + "/" + mPlayers.getDurationTime());
+        showDisplayInfo();
     }
 
     private void toggleFullscreen() {

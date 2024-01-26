@@ -357,4 +357,12 @@ public class Setting {
         Prefers.put("display_speed", display);
     }
 
+    public static boolean isDisplayDuration() {
+        return Prefers.getBoolean("display_duration", false);
+    }
+
+    public static void putDisplayDuration(boolean display) {
+        Prefers.put("display_duration", display);
+    }
+
 }

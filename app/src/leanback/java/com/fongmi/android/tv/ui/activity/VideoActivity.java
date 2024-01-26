@@ -748,11 +748,15 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private void showDisplayInfo() {
         mBinding.display.time.setVisibility(Setting.isDisplayTime() || isVisible(mBinding.widget.info)  ? View.VISIBLE : View.GONE);
         mBinding.display.netspeed.setVisibility(Setting.isDisplaySpeed() && !isVisible(mBinding.control.getRoot()) ? View.VISIBLE : View.GONE);
+        mBinding.display.duration.setVisibility(Setting.isDisplayDuration() && !isVisible(mBinding.control.getRoot()) ? View.VISIBLE : View.GONE);
     }
 
     private void onTimeChangeDisplaySpeed() {
-        if (isVisible(mBinding.control.getRoot())) showDisplayInfo();
-        else if (Setting.isDisplaySpeed()) Traffic.setSpeed(mBinding.display.netspeed);
+        boolean visible = isVisible(mBinding.control.getRoot());
+        long position = mPlayers.getPosition();
+        if (Setting.isDisplaySpeed() && !visible) Traffic.setSpeed(mBinding.display.netspeed);
+        if (Setting.isDisplayDuration() && !visible && position > 0) mBinding.display.duration.setText(mPlayers.getPositionTime(0) + "/" + mPlayers.getDurationTime());
+        showDisplayInfo();
     }
 
     @Override
