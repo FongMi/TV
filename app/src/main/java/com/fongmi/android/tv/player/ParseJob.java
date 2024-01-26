@@ -11,6 +11,7 @@ import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Json;
 import com.google.common.net.HttpHeaders;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
@@ -187,7 +188,7 @@ public class ParseJob implements ParseCallback {
 
     private Map<String, String> getHeader(JsonObject object) {
         Map<String, String> headers = new HashMap<>();
-        for (String key : object.keySet()) if (key.equalsIgnoreCase(HttpHeaders.USER_AGENT) || key.equalsIgnoreCase(HttpHeaders.REFERER)) headers.put(UrlUtil.fixHeader(key), object.get(key).getAsString());
+        for (Map.Entry<String, JsonElement> entry : object.entrySet()) if (entry.getKey().equalsIgnoreCase(HttpHeaders.USER_AGENT) || entry.getKey().equalsIgnoreCase(HttpHeaders.REFERER)) headers.put(UrlUtil.fixHeader(entry.getKey()), object.get(entry.getKey()).getAsString());
         if (headers.isEmpty()) return parse.getHeaders();
         return headers;
     }
