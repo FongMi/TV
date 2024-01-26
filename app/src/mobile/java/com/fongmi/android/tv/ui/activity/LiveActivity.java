@@ -160,6 +160,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mKeyDown = CustomKeyDownLive.create(this, mBinding.video);
         mClock = Clock.create(mBinding.widget.time);
         setPadding(mBinding.control.getRoot());
+        setPadding(mBinding.widget.epg, true);
         setPadding(mBinding.recycler, true);
         mPlayers = new Players().init(this);
         mObserveEpg = this::setEpg;
@@ -1025,6 +1026,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     @Override
     public void onDoubleTap() {
         if (isVisible(mBinding.recycler)) hideUI();
+        else if (isVisible(mBinding.widget.epg)) hideEpg();
         else if (isVisible(mBinding.control.getRoot())) hideControl();
         else showControl();
     }
