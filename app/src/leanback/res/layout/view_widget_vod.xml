@@ -7,6 +7,8 @@
 
     <RelativeLayout
         android:id="@+id/info"
+        android:visibility="invisible"
+        tools:visibility="visible"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -16,8 +18,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_toStartOf="@+id/time"
+            android:layout_marginEnd="100dp"
             android:letterSpacing="0.02"
             android:shadowColor="@color/grey_900"
             android:shadowDx="2"
@@ -42,21 +43,6 @@
             android:textColor="@color/white"
             android:textSize="16sp"
             tools:text="1920 x 1080" />
-
-        <TextView
-            android:id="@+id/time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:shadowColor="@color/grey_900"
-            android:shadowDx="2"
-            android:shadowDy="2"
-            android:shadowRadius="1"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-            tools:text="09:20:00" />
 
     </RelativeLayout>
 
@@ -107,7 +93,7 @@
             android:layout_marginTop="16dp"
             android:textColor="@color/white"
             android:textSize="16sp"
-            tools:text="@string/error_play_format" />
+            tools:text="@string/error_play_url" />
 
     </LinearLayout>
 

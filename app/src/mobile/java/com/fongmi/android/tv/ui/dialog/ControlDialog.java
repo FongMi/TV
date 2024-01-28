@@ -13,6 +13,7 @@ import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.databinding.ActivityVideoBinding;
@@ -95,6 +96,9 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
         binding.opening.setText(parent.control.action.opening.getText());
         binding.loop.setActivated(parent.control.action.loop.isActivated());
         binding.timer.setActivated(Timer.get().isRunning());
+        binding.dptime.setActivated(Setting.isDisplayTime());
+        binding.dpspeed.setActivated(Setting.isDisplaySpeed());
+        binding.dpduration.setActivated(Setting.isDisplayDuration());
         setTrackVisible();
         setScaleText();
         setParse();
@@ -116,6 +120,30 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
         binding.player.setOnLongClickListener(v -> longClick(binding.player, parent.control.action.player));
         binding.ending.setOnLongClickListener(v -> longClick(binding.ending, parent.control.action.ending));
         binding.opening.setOnLongClickListener(v -> longClick(binding.opening, parent.control.action.opening));
+        binding.dptime.setOnClickListener(v -> displayTime());
+        binding.dpspeed.setOnClickListener(v -> displaySpeed());
+        binding.dpduration.setOnClickListener(v -> displayDuration());
+    }
+
+    private void displayTime() {
+        boolean display = Setting.isDisplayTime();
+        parent.display.time.setVisibility(!display ? View.VISIBLE : View.GONE);
+        Setting.putDisplayTime(!display);
+        binding.dptime.setActivated(!display);
+    }
+
+    private void displaySpeed() {
+        boolean display = Setting.isDisplaySpeed();
+        parent.display.netspeed.setVisibility(!display ? View.VISIBLE : View.GONE);
+        Setting.putDisplaySpeed(!display);
+        binding.dpspeed.setActivated(!display);
+    }
+
+    private void displayDuration() {
+        boolean display = Setting.isDisplayDuration();
+        parent.display.duration.setVisibility(!display ? View.VISIBLE : View.GONE);
+        Setting.putDisplayDuration(!display);
+        binding.dpduration.setActivated(!display);
     }
 
     private void onTimer(View view) {

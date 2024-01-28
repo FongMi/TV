@@ -429,7 +429,7 @@ public class CastActivity extends BaseActivity implements CustomKeyDownCast.List
 
     @Override
     public void seek(long time) {
-        App.post(() -> mPlayers.seekTo(time, true));
+        App.post(() -> mPlayers.seekTo(time));
     }
 
     @Override

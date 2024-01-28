@@ -285,6 +285,14 @@ public class Setting {
         return Math.min(Math.max(Prefers.getInt("danmu_alpha", 90), 10), 100);
     }
 
+    public static void putDanmuSync(boolean sync) {
+        Prefers.put("danmu_sync", sync);
+    }
+
+    public static boolean isDanmuSync() {
+        return Prefers.getBoolean("danmu_sync", false);
+    }
+
     public static void putDanmuAlpha(int alpha) {
         Prefers.put("danmu_alpha", alpha);
     }
@@ -332,4 +340,29 @@ public class Setting {
     public static boolean hasCaption() {
         return new Intent(Settings.ACTION_CAPTIONING_SETTINGS).resolveActivity(App.get().getPackageManager()) != null;
     }
+
+    public static boolean isDisplayTime() {
+        return Prefers.getBoolean("display_time", false);
+    }
+
+    public static void putDisplayTime(boolean display) {
+        Prefers.put("display_time", display);
+    }
+
+    public static boolean isDisplaySpeed() {
+        return Prefers.getBoolean("display_speed", false);
+    }
+
+    public static void putDisplaySpeed(boolean display) {
+        Prefers.put("display_speed", display);
+    }
+
+    public static boolean isDisplayDuration() {
+        return Prefers.getBoolean("display_duration", false);
+    }
+
+    public static void putDisplayDuration(boolean display) {
+        Prefers.put("display_duration", display);
+    }
+
 }

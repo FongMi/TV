@@ -112,8 +112,8 @@ public class Flag implements Parcelable {
         if (getEpisodes().size() == 1) return getEpisodes().get(0);
         for (Episode item : getEpisodes()) if (item.rule1(remarks)) return item;
         for (Episode item : getEpisodes()) if (item.rule2(number)) return item;
-        for (Episode item : getEpisodes()) if (item.rule3(remarks)) return item;
-        for (Episode item : getEpisodes()) if (item.rule4(remarks)) return item;
+        if (number == -1) for (Episode item : getEpisodes()) if (item.rule3(remarks)) return item;
+        if (number == -1) for (Episode item : getEpisodes()) if (item.rule4(remarks)) return item;
         if (getPosition() != -1) return getEpisodes().get(getPosition());
         return strict ? null : getEpisodes().get(0);
     }

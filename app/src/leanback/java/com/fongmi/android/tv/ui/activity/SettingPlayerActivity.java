@@ -11,28 +11,20 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.databinding.ActivitySettingPlayerBinding;
 import com.fongmi.android.tv.impl.BufferCallback;
-import com.fongmi.android.tv.impl.DanmuAlphaCallback;
-import com.fongmi.android.tv.impl.DanmuLineCallback;
-import com.fongmi.android.tv.impl.DanmuSizeCallback;
 import com.fongmi.android.tv.impl.SubtitleCallback;
 import com.fongmi.android.tv.impl.UaCallback;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.dialog.BufferDialog;
-import com.fongmi.android.tv.ui.dialog.DanmuAlphaDialog;
-import com.fongmi.android.tv.ui.dialog.DanmuLineDialog;
-import com.fongmi.android.tv.ui.dialog.DanmuSizeDialog;
 import com.fongmi.android.tv.ui.dialog.SubtitleDialog;
 import com.fongmi.android.tv.ui.dialog.UaDialog;
 import com.fongmi.android.tv.utils.ResUtil;
 
-public class SettingPlayerActivity extends BaseActivity implements UaCallback, BufferCallback, SubtitleCallback, DanmuLineCallback, DanmuSizeCallback, DanmuAlphaCallback {
+public class SettingPlayerActivity extends BaseActivity implements UaCallback, BufferCallback, SubtitleCallback {
 
     private ActivitySettingPlayerBinding mBinding;
-    private String[] danmuSpeed;
     private String[] caption;
-    private String[] episode;
     private String[] player;
     private String[] render;
     private String[] scale;
@@ -58,20 +50,14 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
         mBinding.player.requestFocus();
         mBinding.uaText.setText(Setting.getUa());
         mBinding.tunnelText.setText(getSwitch(Setting.isTunnel()));
-        mBinding.danmuLoadText.setText(getSwitch(Setting.isDanmuLoad()));
         mBinding.bufferText.setText(String.valueOf(Setting.getBuffer()));
         mBinding.subtitleText.setText(String.valueOf(Setting.getSubtitle()));
-        mBinding.danmuSizeText.setText(String.valueOf(Setting.getDanmuSize()));
-        mBinding.danmuLineText.setText(String.valueOf(Setting.getDanmuLine(3)));
-        mBinding.danmuAlphaText.setText(String.valueOf(Setting.getDanmuAlpha()));
         mBinding.flagText.setText((flag = ResUtil.getStringArray(R.array.select_flag))[Setting.getFlag()]);
         mBinding.httpText.setText((http = ResUtil.getStringArray(R.array.select_exo_http))[Setting.getHttp()]);
         mBinding.scaleText.setText((scale = ResUtil.getStringArray(R.array.select_scale))[Setting.getScale()]);
         mBinding.playerText.setText((player = ResUtil.getStringArray(R.array.select_player))[Setting.getPlayer()]);
         mBinding.renderText.setText((render = ResUtil.getStringArray(R.array.select_render))[Setting.getRender()]);
-        mBinding.episodeText.setText((episode = ResUtil.getStringArray(R.array.select_episode))[Setting.getEpisode()]);
         mBinding.captionText.setText((caption = ResUtil.getStringArray(R.array.select_caption))[Setting.isCaption() ? 1 : 0]);
-        mBinding.danmuSpeedText.setText((danmuSpeed = ResUtil.getStringArray(R.array.select_danmu_speed))[Setting.getDanmuSpeed()]);
     }
 
     @Override
@@ -84,15 +70,9 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
         mBinding.player.setOnClickListener(this::setPlayer);
         mBinding.render.setOnClickListener(this::setRender);
         mBinding.tunnel.setOnClickListener(this::setTunnel);
-        mBinding.episode.setOnClickListener(this::setEpisode);
         mBinding.caption.setOnClickListener(this::setCaption);
         mBinding.subtitle.setOnClickListener(this::onSubtitle);
         mBinding.caption.setOnLongClickListener(this::onCaption);
-        mBinding.danmuSize.setOnClickListener(this::onDanmuSize);
-        mBinding.danmuLine.setOnClickListener(this::onDanmuLine);
-        mBinding.danmuLoad.setOnClickListener(this::setDanmuLoad);
-        mBinding.danmuAlpha.setOnClickListener(this::onDanmuAlpha);
-        mBinding.danmuSpeed.setOnClickListener(this::setDanmuSpeed);
     }
 
     private void setVisible() {
@@ -159,12 +139,6 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
         mBinding.tunnelText.setText(getSwitch(Setting.isTunnel()));
     }
 
-    private void setEpisode(View view) {
-        int index = Setting.getEpisode();
-        Setting.putEpisode(index = index == episode.length - 1 ? 0 : ++index);
-        mBinding.episodeText.setText(episode[index]);
-    }
-
     private void setCaption(View view) {
         Setting.putCaption(!Setting.isCaption());
         mBinding.captionText.setText(caption[Setting.isCaption() ? 1 : 0]);
@@ -184,44 +158,4 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
         mBinding.subtitleText.setText(String.valueOf(size));
     }
 
-    private void onDanmuSize(View view) {
-        DanmuSizeDialog.create(this).show();
-    }
-
-    @Override
-    public void setDanmuSize(float size) {
-        mBinding.danmuSizeText.setText(String.valueOf(size));
-        Setting.putDanmuSize(size);
-    }
-
-    private void onDanmuLine(View view) {
-        DanmuLineDialog.create(this).show();
-    }
-
-    private void setDanmuLoad(View view) {
-        Setting.putDanmuLoad(!Setting.isDanmuLoad());
-        mBinding.danmuLoadText.setText(getSwitch(Setting.isDanmuLoad()));
-    }
-
-    @Override
-    public void setDanmuLine(int line) {
-        mBinding.danmuLineText.setText(String.valueOf(line));
-        Setting.putDanmuLine(line);
-    }
-
-    private void onDanmuAlpha(View view) {
-        DanmuAlphaDialog.create(this).show();
-    }
-
-    @Override
-    public void setDanmuAlpha(int alpha) {
-        mBinding.danmuAlphaText.setText(String.valueOf(alpha));
-        Setting.putDanmuAlpha(alpha);
-    }
-
-    private void setDanmuSpeed(View view) {
-        int index = Setting.getDanmuSpeed();
-        Setting.putDanmuSpeed(index = index == danmuSpeed.length - 1 ? 0 : ++index);
-        mBinding.danmuSpeedText.setText(danmuSpeed[index]);
-    }
 }

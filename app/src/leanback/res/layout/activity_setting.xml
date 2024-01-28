@@ -221,7 +221,7 @@
             android:background="@drawable/selector_item"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            android:nextFocusDown="@id/quality"
+            android:nextFocusDown="@id/danmu"
             android:orientation="horizontal">
 
             <TextView
@@ -241,7 +241,7 @@
             android:orientation="horizontal">
 
             <LinearLayout
-                android:id="@+id/quality"
+                android:id="@+id/danmu"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
@@ -255,23 +255,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
-                    android:text="@string/setting_quality"
+                    android:text="@string/setting_danmu"
                     android:textColor="@color/white"
                     android:textSize="18sp" />
-
-                <TextView
-                    android:id="@+id/qualityText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="end"
-                    android:textColor="@color/white"
-                    android:textSize="18sp"
-                    tools:text="High" />
 
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/size"
+                android:id="@+id/custom"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -284,20 +275,12 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
-                    android:text="@string/setting_size"
+                    android:text="@string/setting_custom"
                     android:textColor="@color/white"
                     android:textSize="18sp" />
 
-                <TextView
-                    android:id="@+id/sizeText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="end"
-                    android:textColor="@color/white"
-                    android:textSize="18sp"
-                    tools:text="Medium" />
-
             </LinearLayout>
+
         </LinearLayout>
 
         <LinearLayout
