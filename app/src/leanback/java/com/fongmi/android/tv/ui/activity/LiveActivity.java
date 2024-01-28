@@ -81,10 +81,9 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private CustomKeyDownLive mKeyDown;
     private LiveViewModel mViewModel;
     private List<Group> mHides;
-    private View mChannlView;
-    private View mGroupView;
     private Players mPlayers;
     private Channel mChannel;
+    private View mOldView;
     private Group mGroup;
     private Runnable mR0;
     private Runnable mR1;
@@ -182,12 +181,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
                 if (mGroupAdapter.size() > 0) onChildSelected(child, mGroup = (Group) mGroupAdapter.get(position));
-            }
-        });
-        mBinding.channel.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
-            @Override
-            public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
-                if (mChannelAdapter.size() > 0) onChildSelected(child);
             }
         });
     }
@@ -315,18 +308,11 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.channel.setSelectedPosition(mGroup.getPosition());
     }
 
-    private void onChildSelected(@Nullable RecyclerView.ViewHolder child) {
-        if (mChannlView != null) mChannlView.setSelected(false);
-        if (child == null) return;
-        mChannlView = child.itemView;
-        mChannlView.setSelected(true);
-    }
-
     private void onChildSelected(@Nullable RecyclerView.ViewHolder child, Group group) {
-        if (mGroupView != null) mGroupView.setSelected(false);
+        if (mOldView != null) mOldView.setSelected(false);
         if (child == null) return;
-        mGroupView = child.itemView;
-        mGroupView.setSelected(true);
+        mOldView = child.itemView;
+        mOldView.setSelected(true);
         onItemClick(group);
         resetPass();
     }
