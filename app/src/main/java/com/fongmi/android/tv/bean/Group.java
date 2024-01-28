@@ -26,6 +26,7 @@ public class Group {
 
     private boolean selected;
     private int position;
+    private int width;
 
     public static List<Group> arrayFrom(String str) {
         Type listType = new TypeToken<List<Group>>() {}.getType();
@@ -104,6 +105,14 @@ public class Group {
 
     public void setPosition(int position) {
         this.position = position;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
     }
 
     public boolean isHidden() {

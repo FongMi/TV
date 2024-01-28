@@ -94,12 +94,12 @@
             android:id="@+id/arrow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
+            android:layout_gravity="center_vertical"
             android:layout_marginStart="-32dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="4dp"
             android:src="@drawable/ic_action_arrow"
-            android:visibility="gone" />
+            android:visibility="visible" />
 
     </LinearLayout>
 </FrameLayout>

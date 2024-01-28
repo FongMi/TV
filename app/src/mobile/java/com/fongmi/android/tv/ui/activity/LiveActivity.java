@@ -31,6 +31,7 @@ import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.api.config.LiveConfig;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Epg;
+import com.fongmi.android.tv.bean.EpgData;
 import com.fongmi.android.tv.bean.Group;
 import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.bean.Live;
@@ -304,10 +305,17 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private void setWidth(Live live) {
+        int padding = ResUtil.dp2px(48);
         for (Group item : live.getGroups()) live.setWidth(Math.max(live.getWidth(), ResUtil.getTextWidth(item.getName(), 14)));
-        mBinding.group.getLayoutParams().width = live.getWidth() == 0 ? 0 : Math.min(live.getWidth() + ResUtil.dp2px(44), ResUtil.dp2px(180));
-        mBinding.channel.getLayoutParams().width = live.getLogo().isEmpty() ? ResUtil.dp2px(200) : ResUtil.dp2px(260);
+        mBinding.group.getLayoutParams().width = live.getWidth() == 0 ? 0 : Math.min(live.getWidth() + padding, ResUtil.dp2px(180));
         mBinding.divide.setVisibility(live.getWidth() == 0 ? View.GONE : View.VISIBLE);
+    }
+
+    private void setWidth(Group group) {
+        int logo = ResUtil.dp2px(56);
+        int padding = ResUtil.dp2px(52);
+        for (Channel item : group.getChannel()) group.setWidth(Math.max(group.getWidth(), (item.getLogo().isEmpty() ? 0 : logo) + ResUtil.getTextWidth(item.getNumber() + item.getName(), 14)));
+        mBinding.channel.getLayoutParams().width = Math.min(group.getWidth() + padding, ResUtil.getScreenWidth() / 2);
     }
 
     private void setPosition(int[] position) {
@@ -585,6 +593,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
 
     @Override
     public void onItemClick(Group item) {
+        setWidth(item);
         mGroupAdapter.setSelected(mGroup = item);
         mChannelAdapter.addAll(item.getChannel());
         mChannelAdapter.setSelected(item.getPosition());
@@ -639,6 +648,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     private void setInfo() {
         mViewModel.getEpg(mChannel);
         mChannel.loadLogo(mBinding.widget.logo);
+        mBinding.arrow.setVisibility(View.GONE);
         mBinding.widget.name.setText(mChannel.getName());
         mBinding.control.title.setText(mChannel.getName());
         mBinding.widget.namePip.setText(mChannel.getName());
@@ -653,9 +663,11 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
 
     private void setEpg() {
         String epg = mChannel.getData().getEpg();
+        List<EpgData> data = mChannel.getData().getList();
         mBinding.widget.name.setMaxEms(epg.isEmpty() ? mChannel.getName().length() : 12);
-        mEpgDataAdapter.addAll(mChannel.getData().getList());
+        mBinding.arrow.setVisibility(data.isEmpty() ? View.GONE : View.VISIBLE);
         mBinding.widget.play.setText(epg);
+        mEpgDataAdapter.addAll(data);
         setMetadata();
     }
 
@@ -1139,7 +1151,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mPlayers.release();
         Source.get().stop();
         PlaybackService.stop();
-        App.removeCallbacks(mR1, mR2, mR3);
+        App.removeCallbacks(mR0, mR1, mR2, mR3);
         mViewModel.url.removeObserver(mObserveUrl);
         mViewModel.epg.removeObserver(mObserveEpg);
     }
