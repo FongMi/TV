@@ -312,8 +312,8 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private void setWidth(Group group) {
-        int logo = ResUtil.dp2px(56);
-        int padding = ResUtil.dp2px(52);
+        int logo = ResUtil.dp2px(60);
+        int padding = ResUtil.dp2px(60);
         for (Channel item : group.getChannel()) group.setWidth(Math.max(group.getWidth(), (item.getLogo().isEmpty() ? 0 : logo) + ResUtil.getTextWidth(item.getNumber() + item.getName(), 14)));
         mBinding.channel.getLayoutParams().width = Math.min(group.getWidth() + padding, ResUtil.getScreenWidth() / 2);
     }
