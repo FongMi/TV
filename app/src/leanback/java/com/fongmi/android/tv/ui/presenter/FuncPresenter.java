@@ -30,8 +30,11 @@ public class FuncPresenter extends Presenter {
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object object) {
         Func item = (Func) object;
         ViewHolder holder = (ViewHolder) viewHolder;
+        holder.binding.getRoot().setId(item.getId());
         holder.binding.text.setText(item.getText());
         holder.binding.icon.setImageResource(item.getDrawable());
+        if (item.getNextFocusLeft() > 0) holder.binding.getRoot().setNextFocusLeftId(item.getNextFocusLeft());
+        if (item.getNextFocusRight() > 0) holder.binding.getRoot().setNextFocusRightId(item.getNextFocusRight());
         setOnClickListener(holder, view -> mListener.onItemClick(item));
     }
 

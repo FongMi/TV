@@ -30,6 +30,7 @@
     <string name="control_scale">缩放</string>
     <string name="control_track">轨道</string>
     <string name="control_other">其它</string>
+    <string name="control_display">屏显</string>
 
     <!-- Dialog -->
     <string name="dialog_delete_record">删除全部纪录？</string>
@@ -45,7 +46,6 @@
     <string name="timer_cancel">取消定时器</string>
 
     <!-- Hint -->
-    <string name="copied">已复制</string>
     <string name="shortcut"> 已于主萤幕新增捷径。</string>
 
     <string-array name="select_background">

@@ -285,7 +285,6 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void setEpisodeSelectedPosition(int position) {
-        if (Setting.getEpisode() == 1) position += 3 * mEpisodePresenter.getNumColumns();//temporary solution
         getEpisodeView().setSelectedPosition(position);
     }
 
@@ -306,7 +305,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     protected void initView() {
         mKeyDown = CustomKeyDownVod.create(this, mBinding.video);
         mFrameParams = mBinding.video.getLayoutParams();
-        mClock = Clock.create(mBinding.widget.time);
+        mClock = Clock.create(mBinding.display.time);
         mDanmakuContext = DanmakuContext.create();
         mPlayers = new Players().init(this);
         mBroken = new ArrayList<>();
@@ -318,6 +317,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         setRecyclerView();
         setEpisodeView();
         setVideoView();
+        setDisplayView();
         setDanmuView();
         setViewModel();
         checkCast();
@@ -425,13 +425,19 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         float[] range = {2.4f, 1.8f, 1.2f, 0.8f};
         float speed = range[Setting.getDanmuSpeed()];
         float alpha = Setting.getDanmuAlpha() / 100.0f;
+        float sizeScale = Setting.getDanmuSize();
         HashMap<Integer, Integer> maxLines = new HashMap<>();
         maxLines.put(BaseDanmaku.TYPE_FIX_TOP, maxLine);
         maxLines.put(BaseDanmaku.TYPE_SCROLL_RL, maxLine);
         maxLines.put(BaseDanmaku.TYPE_SCROLL_LR, maxLine);
         maxLines.put(BaseDanmaku.TYPE_FIX_BOTTOM, maxLine);
-        mDanmakuContext.setDanmakuStyle(IDisplayer.DANMAKU_STYLE_STROKEN, 3).setMaximumLines(maxLines).setScrollSpeedFactor(speed).setDanmakuTransparency(alpha).setDanmakuMargin(12).setScaleTextSize(0.8f);
+        mDanmakuContext.setDanmakuStyle(IDisplayer.DANMAKU_STYLE_STROKEN, 3).setMaximumLines(maxLines).setScrollSpeedFactor(speed).setDanmakuTransparency(alpha).setDanmakuMargin(12).setScaleTextSize(sizeScale);
         mBinding.control.danmu.setActivated(Setting.isDanmu());
+    }
+
+    private void setDisplayView() {
+        mBinding.display.getRoot().setVisibility(View.VISIBLE);
+        showDisplayInfo();
     }
 
     private void setViewModel() {
@@ -493,7 +499,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mBinding.widget.title.setText(getString(R.string.detail_title, mBinding.name.getText(), episode.getName()));
         mViewModel.playerContent(getKey(), flag.getFlag(), episode.getUrl());
         updateHistory(episode, replay);
-        mPlayers.clean();
+        mPlayers.clear();
         showProgress();
         setMetadata();
         hidePreview();
@@ -640,6 +646,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mBinding.episodeVert.setNumColumns(numColumns);
         mBinding.episodeVert.setColumnWidth((width - ((numColumns - 1) * ResUtil.dp2px(8))) / numColumns);
         mBinding.episodeVert.setLayoutParams(params);
+        mBinding.episodeVert.setWindowAlignmentOffsetPercent(10f);
         mEpisodePresenter.setNumColumns(numColumns);
         mEpisodePresenter.setNumRows(rowNum);
     }
@@ -734,9 +741,22 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mPartPresenter.setNextFocusUp(findFocusUp(5));
         notifyItemChanged(getEpisodeView(), mEpisodeAdapter);
         notifyItemChanged(mBinding.quality, mQualityAdapter);
-        notifyItemChanged(mBinding.array, mArrayAdapter);
         notifyItemChanged(mBinding.part, mPartAdapter);
         notifyItemChanged(mBinding.flag, mFlagAdapter);
+    }
+
+    private void showDisplayInfo() {
+        mBinding.display.time.setVisibility(Setting.isDisplayTime() || isVisible(mBinding.widget.info)  ? View.VISIBLE : View.GONE);
+        mBinding.display.netspeed.setVisibility(Setting.isDisplaySpeed() && !isVisible(mBinding.control.getRoot()) ? View.VISIBLE : View.GONE);
+        mBinding.display.duration.setVisibility(Setting.isDisplayDuration() && !isVisible(mBinding.control.getRoot()) ? View.VISIBLE : View.GONE);
+    }
+
+    private void onTimeChangeDisplaySpeed() {
+        boolean visible = isVisible(mBinding.control.getRoot());
+        long position = mPlayers.getPosition();
+        if (Setting.isDisplaySpeed() && !visible) Traffic.setSpeed(mBinding.display.netspeed);
+        if (Setting.isDisplayDuration() && !visible && position > 0) mBinding.display.duration.setText(mPlayers.getPositionTime(0) + "/" + mPlayers.getDurationTime());
+        showDisplayInfo();
     }
 
     @Override
@@ -764,7 +784,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mBinding.video.setForeground(null);
         mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
         mBinding.flag.setSelectedPosition(getCurrentFlag());
-        mDanmakuContext.setScaleTextSize(1.2f);
+        mDanmakuContext.setScaleTextSize(1.2f * Setting.getDanmuSize());
         setSubtitle(Setting.getSubtitle());
         mKeyDown.setFull(true);
         setFullscreen(true);
@@ -775,7 +795,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private void exitFullscreen() {
         mBinding.video.setForeground(ResUtil.getDrawable(R.drawable.selector_video));
         mBinding.video.setLayoutParams(mFrameParams);
-        mDanmakuContext.setScaleTextSize(0.8f);
+        mDanmakuContext.setScaleTextSize(0.8f * Setting.getDanmuSize());
         getFocus1().requestFocus();
         mKeyDown.setFull(false);
         setFullscreen(false);
@@ -1023,10 +1043,12 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     private void showInfo() {
         mBinding.widget.info.setVisibility(View.VISIBLE);
+        showDisplayInfo();
     }
 
     private void hideInfo() {
         mBinding.widget.info.setVisibility(View.GONE);
+        showDisplayInfo();
     }
 
     private void showInfoAndCenter() {
@@ -1177,6 +1199,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mHistory.setVodRemarks(item.getName());
         mHistory.setVodFlag(getFlag().getFlag());
         mHistory.setCreateTime(System.currentTimeMillis());
+        mPlayers.setPosition(Math.max(mHistory.getOpening(), mHistory.getPosition()));
     }
 
     private void checkKeep() {
@@ -1202,6 +1225,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     @Override
     public void onTimeChanged() {
+        onTimeChangeDisplaySpeed();
         long position, duration;
         mHistory.setPosition(position = mPlayers.getPosition());
         mHistory.setDuration(duration = mPlayers.getDuration());
@@ -1240,7 +1264,6 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         if (isBackground()) return;
         switch (event.getState()) {
             case 0:
-                setPosition();
                 setInitTrack(true);
                 setTrackVisible(false);
                 mClock.setCallback(this);
@@ -1265,10 +1288,6 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
                 checkEnded();
                 break;
         }
-    }
-
-    private void setPosition() {
-        mPlayers.seekTo(Math.max(mHistory.getOpening(), mHistory.getPosition()), false);
     }
 
     private void checkEnded() {
@@ -1541,11 +1560,6 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (!isFullscreen() && KeyUtil.isBackKey(event) && getFocus1() != mBinding.video) {
-            mBinding.video.requestFocus();
-            mFocus1 = null;
-            return true;
-        }
         if (isFullscreen() && KeyUtil.isMenuKey(event)) onToggle();
         if (isVisible(mBinding.control.getRoot())) setR1Callback();
         if (isVisible(mBinding.control.getRoot())) mFocus2 = getCurrentFocus();

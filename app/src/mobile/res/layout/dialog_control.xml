@@ -244,6 +244,52 @@
     </LinearLayout>
 
     <TextView
+        android:id="@+id/display"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        android:text="@string/control_display"
+        android:textColor="?android:attr/textColorPrimary"
+        android:textSize="16sp" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/dptime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/shape_accent"
+            android:text="@string/play_time"
+            android:textColor="@color/control"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/dpspeed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/shape_accent"
+            android:text="@string/play_netspeed"
+            android:textColor="@color/control"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/dpduration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/shape_accent"
+            android:text="@string/play_duration"
+            android:textColor="@color/control"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+    <TextView
         android:id="@+id/other"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -30,9 +30,9 @@ function doAction(action, kv) {
 
 function tpl_top(path) {
     return `<a class="weui-cell  weui-cell_access" href="javascript:void(0)" onclick="listFile('` + path + `')">
-    <div class="weui-cell__hd"><img src="`+ ic_dir + `" alt="" style="width: 32px; margin-right: 16px; display: block;"></div>
+    <div class="weui-cell__hd"><img src="` + ic_dir + `" alt="" style="width: 32px; margin-right: 16px; display: block;"></div>
     <span class="weui-cell__bd">
-        <span>..</span>
+        <span class="weui-cell__name">..</span>
     </span>
     <span class="weui-cell__ft">
     </span>
@@ -41,10 +41,10 @@ function tpl_top(path) {
 
 function tpl_dir(name, time, path) {
     return `<a class="weui-cell  weui-cell_access" href="#" onclick="listFile('` + path + `')">
-    <div class="weui-cell__hd"><img src="`+ ic_dir + `" alt="" style="width: 32px; margin-right: 16px; display: block;"></div>
+    <div class="weui-cell__hd"><img src="` + ic_dir + `" alt="" style="width: 32px; margin-right: 16px; display: block;"></div>
     <span class="weui-cell__bd">
-    <span>`+ name + `</span>
-        <div class="weui-cell__desc">`+ time + `</div>
+    <span class="weui-cell__name">` + name + `</span>
+        <div class="weui-cell__desc">` + time + `</div>
     </span>
     <span class="weui-cell__ft">
     </span>
@@ -53,10 +53,10 @@ function tpl_dir(name, time, path) {
 
 function tpl_file(name, time, path, canDel) {
     return `<a class="weui-cell  weui-cell_access" href="javascript:void(0)" onclick="selectFile('` + path + `', ` + canDel + `)">
-    <div class="weui-cell__hd"><img src="`+ ic_file + `" alt="" style="width: 32px; margin-right: 16px; display: block;"></div>
+    <div class="weui-cell__hd"><img src="` + ic_file + `" alt="" style="width: 32px; margin-right: 16px; display: block;"></div>
     <span class="weui-cell__bd">
-        <span>`+ name + `</span>
-        <div class="weui-cell__desc">`+ time + `</div>
+        <span class="weui-cell__name">` + name + `</span>
+        <div class="weui-cell__desc">` + time + `</div>
     </span>
     </a>`;
 }

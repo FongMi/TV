@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/play_danmu"
+        android:textColor="?android:attr/textColorPrimary"
+        android:textSize="16sp" />
+
+    <LinearLayout
+        android:id="@+id/list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="16dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="8dp"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:text="@string/player_danmu_speed"
+                android:textColor="?android:attr/textColorPrimary"
+                android:gravity="center_vertical|left"
+                android:textSize="16sp" />
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/speed"
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical|center"
+                android:stepSize="1"
+                android:valueFrom="0"
+                android:valueTo="3"
+                app:trackColorInactive="@color/blue_50" />
+
+            <TextView
+                android:id="@+id/speedText"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical|center_horizontal"
+                android:text="适中"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:text="@string/player_danmu_size"
+                android:textColor="?android:attr/textColorPrimary"
+                android:gravity="center_vertical|left"
+                android:textSize="16sp" />
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/size"
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical|center"
+                android:stepSize="0.2"
+                android:valueFrom="0.6"
+                android:valueTo="2"
+                app:trackColorInactive="@color/blue_50" />
+
+            <TextView
+                android:id="@+id/sizeText"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical|center_horizontal"
+                android:text="@string/times"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:text="@string/player_danmu_line"
+                android:textColor="?android:attr/textColorPrimary"
+                android:gravity="center_vertical|left"
+                android:textSize="16sp" />
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/line"
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical|center"
+                android:stepSize="1"
+                android:valueFrom="1"
+                android:valueTo="15"
+                app:trackColorInactive="@color/blue_50" />
+
+            <TextView
+                android:id="@+id/lineText"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical|center_horizontal"
+                android:text="@string/lines"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:text="@string/player_danmu_alpha"
+                android:textColor="?android:attr/textColorPrimary"
+                android:gravity="center_vertical|left"
+                android:textSize="16sp" />
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/alpha"
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical|center"
+                android:stepSize="5"
+                android:valueFrom="10"
+                android:valueTo="100"
+                app:trackColorInactive="@color/blue_50" />
+
+            <TextView
+                android:id="@+id/alphaText"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical|center_horizontal"
+                android:text="%"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</LinearLayout>

@@ -73,12 +73,13 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class LiveActivity extends BaseActivity implements CustomKeyDownLive.Listener, TrackDialog.Listener, Biometric.Callback, PassCallback, LiveCallback, GroupAdapter.OnClickListener, ChannelAdapter.OnClickListener, SubtitleCallback, CastDialog.Listener, InfoDialog.Listener {
+public class LiveActivity extends BaseActivity implements Clock.Callback, CustomKeyDownLive.Listener, TrackDialog.Listener, Biometric.Callback, PassCallback, LiveCallback, GroupAdapter.OnClickListener, ChannelAdapter.OnClickListener, SubtitleCallback, CastDialog.Listener, InfoDialog.Listener {
 
     private ActivityLiveBinding mBinding;
     private ChannelAdapter mChannelAdapter;
@@ -156,7 +157,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     @Override
     protected void initView(Bundle savedInstanceState) {
         mKeyDown = CustomKeyDownLive.create(this, mBinding.video);
-        mClock = Clock.create(mBinding.widget.time);
+        mClock = Clock.create(Arrays.asList(mBinding.widget.time, mBinding.display.time));
         setPadding(mBinding.control.getRoot());
         setPadding(mBinding.recycler, true);
         mPlayers = new Players().init(this);
@@ -172,6 +173,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         setForeground(true);
         setRecyclerView();
         setVideoView();
+        setDisplayView();
         setViewModel();
         checkLive();
     }
@@ -234,6 +236,11 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mBinding.control.action.across.setActivated(Setting.isAcross());
         mBinding.control.action.change.setActivated(Setting.isChange());
         mBinding.control.action.home.setVisibility(LiveConfig.isOnly() ? View.GONE : View.VISIBLE);
+    }
+
+    private void setDisplayView() {
+        mBinding.display.getRoot().setVisibility(View.VISIBLE);
+        showDisplayInfo();
     }
 
     @Override
@@ -501,6 +508,21 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         App.removeCallbacks(mR1);
     }
 
+    private void showDisplayInfo() {
+        boolean controlVisible = isVisible(mBinding.control.getRoot());
+        boolean visible = (!controlVisible || isLock());
+        mBinding.display.time.setVisibility(Setting.isDisplayTime() && visible  ? View.VISIBLE : View.GONE);
+        mBinding.display.netspeed.setVisibility(Setting.isDisplaySpeed() && visible ? View.VISIBLE : View.GONE);
+        mBinding.display.duration.setVisibility(View.GONE);
+    }
+
+    private void onTimeChangeDisplaySpeed() {
+        boolean controlVisible = isVisible(mBinding.control.getRoot());
+        boolean visible = (!controlVisible || isLock());
+        if (Setting.isDisplaySpeed() && visible) Traffic.setSpeed(mBinding.display.netspeed);
+        showDisplayInfo();
+    }
+
     private void showInfo() {
         boolean pip = Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N && isInPictureInPictureMode();
         mBinding.widget.infoPip.setVisibility(pip ? View.VISIBLE : View.GONE);
@@ -640,7 +662,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         if (mChannel == null) return;
         LiveConfig.get().setKeep(mChannel);
         mViewModel.getUrl(mChannel);
-        mPlayers.clean();
+        mPlayers.clear();
         showProgress();
     }
 
@@ -668,6 +690,11 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
 
     @Override
     public void onTrackClick(Track item) {
+    }
+
+    @Override
+    public void onTimeChanged() {
+        onTimeChangeDisplaySpeed();
     }
 
     @Override
@@ -720,6 +747,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         switch (event.getState()) {
             case 0:
                 setTrackVisible(false);
+                mClock.setCallback(this);
                 break;
             case Player.STATE_IDLE:
                 break;

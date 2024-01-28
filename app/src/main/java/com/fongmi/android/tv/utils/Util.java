@@ -77,7 +77,7 @@ public class Util {
     public static int getDigit(String text) {
         try {
             if (text.startsWith("上") || text.startsWith("下")) return -1;
-            return Integer.parseInt(text.replaceAll("(mp4|H264|H265|720p|1080p|2160p|4k|4K)", "").replaceAll("\\D+", ""));
+            return Integer.parseInt(text.replaceAll("(?i)(mp4|H264|H265|720p|1080p|2160p|4K)", "").replaceAll("\\D+", ""));
         } catch (Exception e) {
             return -1;
         }
