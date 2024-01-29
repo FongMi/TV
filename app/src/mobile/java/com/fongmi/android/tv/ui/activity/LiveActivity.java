@@ -311,17 +311,21 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mBinding.divide.setVisibility(live.getWidth() == 0 ? View.GONE : View.VISIBLE);
     }
 
-    private void setWidth(Group group) {
+    @Override
+    public void setWidth(Group group) {
         int logo = ResUtil.dp2px(56);
         int padding = ResUtil.dp2px(60);
+        if (group.isKeep()) group.setWidth(0);
         if (group.getWidth() == 0) for (Channel item : group.getChannel()) group.setWidth(Math.max(group.getWidth(), (item.getLogo().isEmpty() ? 0 : logo) + ResUtil.getTextWidth(item.getNumber() + item.getName(), 14)));
         mBinding.channel.getLayoutParams().width = group.getWidth() == 0 ? 0 : Math.min(group.getWidth() + padding, ResUtil.getScreenWidth() / 2);
     }
 
     private void setWidth(Epg epg) {
         int padding = ResUtil.dp2px(40);
+        if (epg.getList().isEmpty()) return;
+        int minWidth = ResUtil.getTextWidth(epg.getList().get(0).getTime(), 12);
         if (epg.getWidth() == 0) for (EpgData item : epg.getList()) epg.setWidth(Math.max(epg.getWidth(), ResUtil.getTextWidth(item.getTitle(), 14)));
-        mBinding.widget.epgData.getLayoutParams().width = epg.getWidth() == 0 ? 0 : Math.min(epg.getWidth() + padding, ResUtil.getScreenWidth() / 3);
+        mBinding.widget.epgData.getLayoutParams().width = epg.getWidth() == 0 ? 0 : Math.min(Math.max(epg.getWidth(), minWidth) + padding, ResUtil.getScreenWidth() / 3);
     }
 
     private void setPosition(int[] position) {
@@ -599,7 +603,6 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
 
     @Override
     public void onItemClick(Group item) {
-        setWidth(item);
         mGroupAdapter.setSelected(mGroup = item);
         mChannelAdapter.addAll(item.getChannel());
         mChannelAdapter.setSelected(item.getPosition());

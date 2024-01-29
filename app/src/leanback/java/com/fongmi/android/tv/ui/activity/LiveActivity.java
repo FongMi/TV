@@ -280,11 +280,13 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.divide.setVisibility(live.getWidth() == 0 ? View.GONE : View.VISIBLE);
     }
 
-    private void setWidth(Group group) {
+    private Group setWidth(Group group) {
         int logo = ResUtil.dp2px(60);
         int padding = ResUtil.dp2px(60);
+        if (group.isKeep()) group.setWidth(0);
         if (group.getWidth() == 0) for (Channel item : group.getChannel()) group.setWidth(Math.max(group.getWidth(), (item.getLogo().isEmpty() ? 0 : logo) + ResUtil.getTextWidth(item.getNumber() + item.getName(), 16)));
-        mBinding.channel.getLayoutParams().width = Math.min(group.getWidth() + padding, ResUtil.getScreenWidth() / 2);
+        mBinding.channel.getLayoutParams().width = group.getWidth() == 0 ? 0 : Math.min(group.getWidth() + padding, ResUtil.getScreenWidth() / 2);
+        return group;
     }
 
     private void setPosition(int[] position) {
@@ -520,8 +522,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public void onItemClick(Group item) {
-        setWidth(item);
-        mChannelAdapter.setItems(item.getChannel(), null);
+        mChannelAdapter.setItems(setWidth(item).getChannel(), null);
         mBinding.channel.setSelectedPosition(Math.max(item.getPosition(), 0));
         if (!item.isKeep() || ++count < 5 || mHides.isEmpty()) return;
         if (Biometric.enable()) Biometric.show(this);
