@@ -25,7 +25,7 @@
         android:ellipsize="marquee"
         android:singleLine="true"
         android:textColor="@color/epg"
-        android:textSize="14sp"
+        android:textSize="12sp"
         tools:text="18:00 ~ 19:00" />
 
 </LinearLayout>

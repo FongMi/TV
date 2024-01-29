@@ -22,6 +22,8 @@ public class Epg {
     @SerializedName("epg_data")
     private List<EpgData> list;
 
+    private int width;
+
     public static Epg objectFrom(String str, String key, SimpleDateFormat format) {
         try {
             Epg item = App.gson().fromJson(str, Epg.class);
@@ -51,6 +53,14 @@ public class Epg {
 
     public void setList(List<EpgData> list) {
         this.list = list;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
     }
 
     public boolean equal(String date) {

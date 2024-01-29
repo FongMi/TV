@@ -306,16 +306,22 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
 
     private void setWidth(Live live) {
         int padding = ResUtil.dp2px(48);
-        for (Group item : live.getGroups()) live.setWidth(Math.max(live.getWidth(), ResUtil.getTextWidth(item.getName(), 14)));
-        mBinding.group.getLayoutParams().width = live.getWidth() == 0 ? 0 : Math.min(live.getWidth() + padding, ResUtil.dp2px(180));
+        if (live.getWidth() == 0) for (Group item : live.getGroups()) live.setWidth(Math.max(live.getWidth(), ResUtil.getTextWidth(item.getName(), 14)));
+        mBinding.group.getLayoutParams().width = live.getWidth() == 0 ? 0 : Math.min(live.getWidth() + padding, ResUtil.getScreenWidth() / 4);
         mBinding.divide.setVisibility(live.getWidth() == 0 ? View.GONE : View.VISIBLE);
     }
 
     private void setWidth(Group group) {
-        int logo = ResUtil.dp2px(60);
+        int logo = ResUtil.dp2px(56);
         int padding = ResUtil.dp2px(60);
-        for (Channel item : group.getChannel()) group.setWidth(Math.max(group.getWidth(), (item.getLogo().isEmpty() ? 0 : logo) + ResUtil.getTextWidth(item.getNumber() + item.getName(), 14)));
-        mBinding.channel.getLayoutParams().width = Math.min(group.getWidth() + padding, ResUtil.getScreenWidth() / 2);
+        if (group.getWidth() == 0) for (Channel item : group.getChannel()) group.setWidth(Math.max(group.getWidth(), (item.getLogo().isEmpty() ? 0 : logo) + ResUtil.getTextWidth(item.getNumber() + item.getName(), 14)));
+        mBinding.channel.getLayoutParams().width = group.getWidth() == 0 ? 0 : Math.min(group.getWidth() + padding, ResUtil.getScreenWidth() / 2);
+    }
+
+    private void setWidth(Epg epg) {
+        int padding = ResUtil.dp2px(40);
+        if (epg.getWidth() == 0) for (EpgData item : epg.getList()) epg.setWidth(Math.max(epg.getWidth(), ResUtil.getTextWidth(item.getTitle(), 14)));
+        mBinding.widget.epgData.getLayoutParams().width = epg.getWidth() == 0 ? 0 : Math.min(epg.getWidth() + padding, ResUtil.getScreenWidth() / 3);
     }
 
     private void setPosition(int[] position) {
@@ -668,6 +674,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mBinding.arrow.setVisibility(data.isEmpty() ? View.GONE : View.VISIBLE);
         mBinding.widget.play.setText(epg);
         mEpgDataAdapter.addAll(data);
+        setWidth(mChannel.getData());
         setMetadata();
     }
 
