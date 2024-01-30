@@ -69,6 +69,7 @@ import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
 import com.fongmi.android.tv.ui.custom.CustomMovement;
 import com.fongmi.android.tv.ui.dialog.DescDialog;
+import com.fongmi.android.tv.ui.dialog.EpisodeDialog;
 import com.fongmi.android.tv.ui.dialog.TrackDialog;
 import com.fongmi.android.tv.ui.presenter.ArrayPresenter;
 import com.fongmi.android.tv.ui.presenter.EpisodePresenter;
@@ -347,6 +348,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mBinding.control.danmu.setOnClickListener(view -> onDanmu());
         mBinding.control.next.setOnClickListener(view -> checkNext());
         mBinding.control.prev.setOnClickListener(view -> checkPrev());
+        mBinding.control.episodes.setOnClickListener(view -> showEpisodes());
         mBinding.control.scale.setOnClickListener(view -> onScale());
         mBinding.control.speed.setOnClickListener(view -> onSpeed());
         mBinding.control.reset.setOnClickListener(view -> onReset());
@@ -376,7 +378,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mBinding.array.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
-                if (mEpisodeAdapter.size() > getGroupSize() && position > 1) setEpisodeSelectedPosition((position - 2) * getGroupSize() + 1);
+                if (mEpisodeAdapter.size() > getGroupSize() && position > 1) setEpisodeSelectedPosition((position - 2) * getGroupSize());
             }
         });
     }
@@ -637,7 +639,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         else if (episodeNameLength > 15) numColumns = 3;
         else if (episodeNameLength > 10) numColumns = 4;
         else if (episodeNameLength > 6) numColumns = 6;
-        else if (episodeNameLength > 2) numColumns = 8;
+        else if (episodeNameLength > 4) numColumns = 8;
         int rowNum = (int) Math.ceil((double) size / (double) numColumns);
         int width = ResUtil.getScreenWidth() - ResUtil.dp2px(48);
         ViewGroup.LayoutParams params = mBinding.episodeVert.getLayoutParams();
@@ -667,7 +669,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         }
     }
 
-    private void setEpisodeActivated(Episode item) {
+    public void setEpisodeActivated(Episode item) {
         if (shouldEnterFullscreen(item)) return;
         setCurrentFlag(mBinding.flag.getSelectedPosition());
         for (int i = 0; i < mFlagAdapter.size(); i++) ((Flag) mFlagAdapter.get(i)).toggle(getCurrentFlag() == i, item);
@@ -839,6 +841,10 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private void showDanmu() {
         if (Setting.isDanmu()) mBinding.danmaku.show();
         else mBinding.danmaku.hide();
+    }
+
+    private void showEpisodes() {
+        EpisodeDialog.create().episodes(getFlag().getEpisodes()).show(this);
     }
 
     private void checkNext() {
@@ -1486,7 +1492,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         this.background = background;
     }
 
-    private boolean isFullscreen() {
+    public boolean isFullscreen() {
         return fullscreen;
     }
 
@@ -1560,6 +1566,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
+        if (!isFullscreen() && KeyUtil.isMenuKey(event)) showEpisodes();
         if (isFullscreen() && KeyUtil.isMenuKey(event)) onToggle();
         if (isVisible(mBinding.control.getRoot())) setR1Callback();
         if (isVisible(mBinding.control.getRoot())) mFocus2 = getCurrentFocus();

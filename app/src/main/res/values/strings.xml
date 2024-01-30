@@ -33,6 +33,7 @@
     <string name="play_ed">ED</string>
     <string name="play_next">Next</string>
     <string name="play_prev">Prev</string>
+    <string name="play_episodes">Episodes</string>
     <string name="play_loop">Loop</string>
     <string name="play_timer">Timer</string>
     <string name="play_time">Time</string>
