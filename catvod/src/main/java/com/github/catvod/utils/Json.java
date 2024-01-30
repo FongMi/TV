@@ -15,6 +15,14 @@ import java.util.Map;
 
 public class Json {
 
+    public static JsonElement parse(String json) {
+        try {
+            return JsonParser.parseString(json);
+        } catch (Throwable e) {
+            return new JsonParser().parse(json);
+        }
+    }
+
     public static boolean valid(String text) {
         try {
             new JSONObject(text);
@@ -54,7 +62,7 @@ public class Json {
 
     public static JsonObject safeObject(JsonElement element) {
         try {
-            if (element.isJsonPrimitive()) element = JsonParser.parseString(element.getAsJsonPrimitive().getAsString());
+            if (element.isJsonPrimitive()) element = parse(element.getAsJsonPrimitive().getAsString());
             return element.getAsJsonObject();
         } catch (Exception e) {
             return new JsonObject();
@@ -64,14 +72,14 @@ public class Json {
     public static Map<String, String> toMap(JsonElement element) {
         Map<String, String> map = new HashMap<>();
         JsonObject object = safeObject(element);
-        for (String key : object.keySet()) map.put(key, safeString(object, key));
+        for (Map.Entry<String, JsonElement> entry : object.entrySet()) map.put(entry.getKey(), safeString(object, entry.getKey()));
         return map;
     }
 
     public static ArrayMap<String, String> toArrayMap(JsonElement element) {
         ArrayMap<String, String> map = new ArrayMap<>();
         JsonObject object = safeObject(element);
-        for (String key : object.keySet()) map.put(key, safeString(object, key));
+        for (Map.Entry<String, JsonElement> entry : object.entrySet()) map.put(entry.getKey(), safeString(object, entry.getKey()));
         return map;
     }
 
