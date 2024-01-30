@@ -1,5 +1,6 @@
 package com.fongmi.android.tv.ui.dialog;
 
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +15,6 @@ import androidx.leanback.widget.ItemBridgeAdapter;
 import androidx.leanback.widget.OnChildViewHolderSelectedListener;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
-
 import com.fongmi.android.tv.bean.Episode;
 import com.fongmi.android.tv.databinding.DialogEpisodeBinding;
 import com.fongmi.android.tv.ui.activity.VideoActivity;
@@ -37,7 +37,7 @@ public class EpisodeDialog extends BaseDialog implements ArrayPresenter.OnClickL
     private ArrayObjectAdapter mArrayAdapter;
     private ArrayPresenter mArrayPresenter;
     private int groupSize;
-    
+
     public static EpisodeDialog create() {
         return new EpisodeDialog();
     }
@@ -84,7 +84,23 @@ public class EpisodeDialog extends BaseDialog implements ArrayPresenter.OnClickL
         this.binding.episodeVert.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
+                super.onChildViewHolderSelected(parent, child, position, subposition);
                 if (child != null ) mFocus1 = child.itemView;
+                int itemCount = binding.episodeVert.getAdapter().getItemCount();
+                if (itemCount <= 0) return;
+                int columns = mEpisodePresenter.getNumColumns();
+                if (position + columns >= itemCount && (position % columns) + 1 > itemCount % columns) {
+                    child.itemView.setOnKeyListener(new View.OnKeyListener() {
+                        @Override
+                        public boolean onKey(View v, int keyCode, KeyEvent event) {
+                            if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN && event.getAction() == KeyEvent.ACTION_DOWN) {
+                                View lastItem =  binding.episodeVert.getLayoutManager().findViewByPosition(itemCount - 1);
+                                if (lastItem != null) lastItem.requestFocus();
+                            }
+                            return false;
+                        }
+                    });
+                }
             }
         });
     }
@@ -149,7 +165,11 @@ public class EpisodeDialog extends BaseDialog implements ArrayPresenter.OnClickL
         this.binding.episodeVert.setColumnWidth((width - ((numColumns - 1) * ResUtil.dp2px(8))) / numColumns);
         this.binding.episodeVert.setWindowAlignmentOffsetPercent(10f);
         ViewGroup.LayoutParams params = this.binding.getRoot().getLayoutParams();
-        params.height = ResUtil.getScreenHeight() * 3 / 4;
+        int height = ResUtil.getScreenHeight();
+        if (rowNum > 6) height = ResUtil.getScreenHeight() * 3 / 4;
+        else if (rowNum > 2) height = ResUtil.getScreenHeight() * 1 / 2;
+        else if (rowNum > 0) height = ResUtil.getScreenHeight() * 1 / 3;
+        params.height = height;
         this.binding.getRoot().setLayoutParams(params);
         mEpisodePresenter.setNumColumns(numColumns);
         mEpisodePresenter.setNumRows(rowNum);
