@@ -950,9 +950,11 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         this.rotate = rotate;
         if (rotate) {
             noPadding(mBinding.recycler);
+            noPadding(mBinding.widget.epg);
             noPadding(mBinding.control.getRoot());
         } else {
             setPadding(mBinding.recycler, true);
+            setPadding(mBinding.widget.epg, true);
             setPadding(mBinding.control.getRoot());
         }
     }
