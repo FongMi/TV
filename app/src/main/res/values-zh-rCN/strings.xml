@@ -33,6 +33,7 @@
     <string name="play_ed">片尾</string>
     <string name="play_next">下集</string>
     <string name="play_prev">上集</string>
+    <string name="play_episodes">选集</string>
     <string name="play_loop">循环</string>
     <string name="play_timer">定时</string>
     <string name="play_time">时间</string>
