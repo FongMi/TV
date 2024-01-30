@@ -345,8 +345,9 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         boolean change = mGroupAdapter.getPosition() != position;
         if (change) mGroupAdapter.setSelected(position);
         if (change) mChannelAdapter.addAll(mGroup.getChannel());
-        mChannelAdapter.setSelected(mGroup.getPosition());
+        if (change) mChannelAdapter.setSelected(mGroup.getPosition());
         mBinding.channel.scrollToPosition(mGroup.getPosition());
+        mBinding.group.scrollToPosition(position);
     }
 
     private void onArrow() {
