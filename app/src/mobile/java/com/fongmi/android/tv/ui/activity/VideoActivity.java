@@ -938,8 +938,10 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private void showDisplayInfo() {
+        boolean pictureMode = false;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInPictureInPictureMode()) pictureMode = true;
         boolean controlVisible = isVisible(mBinding.control.getRoot());
-        boolean visible = (!controlVisible || isLock());
+        boolean visible = (!controlVisible || isLock()) && !pictureMode;
         mBinding.display.time.setVisibility(Setting.isDisplayTime() && visible  ? View.VISIBLE : View.GONE);
         mBinding.display.netspeed.setVisibility(Setting.isDisplaySpeed() && visible ? View.VISIBLE : View.GONE);
         mBinding.display.duration.setVisibility(Setting.isDisplayDuration() && visible ? View.VISIBLE : View.GONE);
@@ -1029,7 +1031,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private void showControl() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInPictureInPictureMode()) return;
         mBinding.control.danmu.setVisibility(isLock() || !mBinding.danmaku.isPrepared() ? View.GONE : View.VISIBLE);
-        mBinding.control.danmuSetting.setVisibility(isLock() || !Setting.isDanmuLoad() ? View.GONE : View.VISIBLE);
+        mBinding.control.danmuSetting.setVisibility(isLock() || !Setting.isDanmuLoad() || !isVisible(mBinding.danmaku) ? View.GONE : View.VISIBLE);
         mBinding.control.setting.setVisibility(mHistory == null || isFullscreen() ? View.GONE : View.VISIBLE);
         mBinding.control.right.rotate.setVisibility(isFullscreen() && !isLock() ? View.VISIBLE : View.GONE);
         mBinding.control.keep.setVisibility(mHistory == null || isFullscreen() ? View.GONE : View.VISIBLE);
