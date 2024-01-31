@@ -76,6 +76,11 @@ public class Epg {
         }
     }
 
+    public int getIndex() {
+        for (int i = 0; i < getList().size(); i++) if (getList().get(i).isInRange()) return i;
+        return -1;
+    }
+
     public String getEpg() {
         for (EpgData item : getList()) if (item.isInRange()) return item.format();
         return "";

@@ -12,8 +12,8 @@ import com.fongmi.android.tv.utils.KeyUtil;
 
 public class CustomUpDownView extends AppCompatTextView {
 
-    private AddListener addListener;
-    private SubListener subListener;
+    private UpListener upListener;
+    private DownListener downListener;
 
     public CustomUpDownView(@NonNull Context context) {
         super(context);
@@ -23,16 +23,16 @@ public class CustomUpDownView extends AppCompatTextView {
         super(context, attrs);
     }
 
-    public void setAddListener(AddListener addListener) {
-        this.addListener = addListener;
+    public void setUpListener(UpListener upListener) {
+        this.upListener = upListener;
     }
 
-    public void setSubListener(SubListener subListener) {
-        this.subListener = subListener;
+    public void setDownListener(DownListener downListener) {
+        this.downListener = downListener;
     }
 
     private boolean hasEvent(KeyEvent event) {
-        return event.getAction() == KeyEvent.ACTION_DOWN && (KeyUtil.isUpKey(event) || KeyUtil.isDownKey(event));
+        return event.getAction() == KeyEvent.ACTION_DOWN && ((upListener != null && KeyUtil.isUpKey(event)) || (downListener != null && KeyUtil.isDownKey(event)));
     }
 
     @Override
@@ -42,18 +42,18 @@ public class CustomUpDownView extends AppCompatTextView {
     }
 
     private boolean onKeyDown(KeyEvent event) {
-        if (KeyUtil.isUpKey(event)) addListener.onAdd();
-        if (KeyUtil.isDownKey(event)) subListener.onSud();
+        if (upListener != null && KeyUtil.isUpKey(event)) upListener.onUp();
+        if (downListener != null && KeyUtil.isDownKey(event)) downListener.onDown();
         return true;
     }
 
-    public interface AddListener {
+    public interface UpListener {
 
-        void onAdd();
+        void onUp();
     }
 
-    public interface SubListener {
+    public interface DownListener {
 
-        void onSud();
+        void onDown();
     }
 }

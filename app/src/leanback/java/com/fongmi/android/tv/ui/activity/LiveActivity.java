@@ -30,6 +30,7 @@ import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.api.config.LiveConfig;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Epg;
+import com.fongmi.android.tv.bean.EpgData;
 import com.fongmi.android.tv.bean.Group;
 import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.bean.Live;
@@ -55,6 +56,7 @@ import com.fongmi.android.tv.ui.dialog.PassDialog;
 import com.fongmi.android.tv.ui.dialog.SubtitleDialog;
 import com.fongmi.android.tv.ui.dialog.TrackDialog;
 import com.fongmi.android.tv.ui.presenter.ChannelPresenter;
+import com.fongmi.android.tv.ui.presenter.EpgDataPresenter;
 import com.fongmi.android.tv.ui.presenter.GroupPresenter;
 import com.fongmi.android.tv.utils.Biometric;
 import com.fongmi.android.tv.utils.Clock;
@@ -73,10 +75,11 @@ import java.util.List;
 
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class LiveActivity extends BaseActivity implements GroupPresenter.OnClickListener, ChannelPresenter.OnClickListener, CustomKeyDownLive.Listener, CustomLiveListView.Callback, TrackDialog.Listener, Biometric.Callback, PassCallback, LiveCallback, SubtitleCallback {
+public class LiveActivity extends BaseActivity implements GroupPresenter.OnClickListener, ChannelPresenter.OnClickListener, EpgDataPresenter.OnClickListener, CustomKeyDownLive.Listener, CustomLiveListView.Callback, TrackDialog.Listener, Biometric.Callback, PassCallback, LiveCallback, SubtitleCallback {
 
     private ActivityLiveBinding mBinding;
     private ArrayObjectAdapter mChannelAdapter;
+    private ArrayObjectAdapter mEpgDataAdapter;
     private ArrayObjectAdapter mGroupAdapter;
     private CustomKeyDownLive mKeyDown;
     private LiveViewModel mViewModel;
@@ -188,8 +191,10 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private void setRecyclerView() {
         mBinding.group.setItemAnimator(null);
         mBinding.channel.setItemAnimator(null);
+        mBinding.widget.epgData.setItemAnimator(null);
         mBinding.group.setAdapter(new ItemBridgeAdapter(mGroupAdapter = new ArrayObjectAdapter(new GroupPresenter(this))));
         mBinding.channel.setAdapter(new ItemBridgeAdapter(mChannelAdapter = new ArrayObjectAdapter(new ChannelPresenter(this))));
+        mBinding.widget.epgData.setAdapter(new ItemBridgeAdapter(mEpgDataAdapter = new ArrayObjectAdapter(new EpgDataPresenter(this))));
     }
 
     private void setPlayerView() {
@@ -287,6 +292,14 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         if (group.getWidth() == 0) for (Channel item : group.getChannel()) group.setWidth(Math.max(group.getWidth(), (item.getLogo().isEmpty() ? 0 : logo) + ResUtil.getTextWidth(item.getNumber() + item.getName(), 16)));
         mBinding.channel.getLayoutParams().width = group.getWidth() == 0 ? 0 : Math.min(group.getWidth() + padding, ResUtil.getScreenWidth() / 2);
         return group;
+    }
+
+    private void setWidth(Epg epg) {
+        int padding = ResUtil.dp2px(48);
+        if (epg.getList().isEmpty()) return;
+        int minWidth = ResUtil.getTextWidth(epg.getList().get(0).getTime(), 16);
+        if (epg.getWidth() == 0) for (EpgData item : epg.getList()) epg.setWidth(Math.max(epg.getWidth(), ResUtil.getTextWidth(item.getTitle(), 16)));
+        mBinding.widget.epgData.getLayoutParams().width = epg.getWidth() == 0 ? 0 : Math.min(Math.max(epg.getWidth(), minWidth) + padding, ResUtil.getScreenWidth() / 3);
     }
 
     private void setPosition(int[] position) {
@@ -414,11 +427,27 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         setPosition();
     }
 
-    private void showUI() {
+    @Override
+    public void showUI() {
         if (isVisible(mBinding.recycler)) return;
         mBinding.recycler.setVisibility(View.VISIBLE);
         mBinding.channel.requestFocus();
         setPosition();
+        setUITimer();
+        hideEpg();
+    }
+
+    @Override
+    public void showEpg() {
+        if (mChannel == null || mChannel.getData().getList().isEmpty() || mEpgDataAdapter.size() == 0) return;
+        mBinding.widget.epgData.setSelectedPosition(mChannel.getData().getIndex());
+        mBinding.widget.epg.setVisibility(View.VISIBLE);
+        mBinding.widget.epg.requestFocus();
+        hideUI();
+    }
+
+    private void hideEpg() {
+        mBinding.widget.epg.setVisibility(View.GONE);
     }
 
     private void showProgress() {
@@ -450,6 +479,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         view.requestFocus();
         setR1Callback();
         hideInfo();
+        hideEpg();
     }
 
     private void hideControl() {
@@ -548,6 +578,11 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         return true;
     }
 
+    @Override
+    public void onItemClick(EpgData item) {
+
+    }
+
     private void addKeep(Channel item) {
         getKeep().add(item);
         Keep keep = new Keep();
@@ -582,13 +617,16 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.control.line.setText(mChannel.getLineText());
         mBinding.widget.line.setVisibility(mChannel.getLineVisible());
         mBinding.control.line.setVisibility(mChannel.getLineVisible());
+        hideEpg();
         setEpg();
     }
 
     private void setEpg() {
         String epg = mChannel.getData().getEpg();
         mBinding.widget.name.setMaxEms(epg.isEmpty() ? mChannel.getName().length() : 12);
+        mEpgDataAdapter.setItems(mChannel.getData().getList(), null);
         mBinding.widget.play.setText(epg);
+        setWidth(mChannel.getData());
         setMetadata();
     }
 
@@ -605,7 +643,11 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     private void resetAdapter() {
+        mBinding.widget.epgData.getLayoutParams().width = 0;
+        mBinding.channel.getLayoutParams().width = 0;
+        mBinding.group.getLayoutParams().width = 0;
         mBinding.divide.setVisibility(View.GONE);
+        mEpgDataAdapter.clear();
         mChannelAdapter.clear();
         mGroupAdapter.clear();
         mHides.clear();
@@ -842,7 +884,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public boolean dispatch(boolean check) {
-        return !check || isGone(mBinding.recycler) && isGone(mBinding.control.getRoot());
+        return !check || isGone(mBinding.recycler) && isGone(mBinding.control.getRoot()) && isGone(mBinding.widget.epg);
     }
 
     @Override
@@ -912,6 +954,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     @Override
     public void onDoubleTap() {
         if (isVisible(mBinding.recycler)) hideUI();
+        else if (isVisible(mBinding.widget.epg)) hideEpg();
         else if (isVisible(mBinding.control.getRoot())) hideControl();
         else onMenu();
     }
@@ -942,6 +985,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
             hideControl();
         } else if (isVisible(mBinding.widget.bottom)) {
             hideInfo();
+        } else if (isVisible(mBinding.widget.epg)) {
+            hideEpg();
         } else if (isVisible(mBinding.recycler)) {
             hideUI();
         } else if (!confirm) {

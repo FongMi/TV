@@ -106,10 +106,10 @@ public class CastActivity extends BaseActivity implements CustomKeyDownCast.List
     @SuppressLint("ClickableViewAccessibility")
     protected void initEvent() {
         mBinding.control.seek.setListener(mPlayers);
-        mBinding.control.text.setAddListener(this::onTextAdd);
-        mBinding.control.text.setSubListener(this::onTextSub);
-        mBinding.control.speed.setAddListener(this::onSpeedAdd);
-        mBinding.control.speed.setSubListener(this::onSpeedSub);
+        mBinding.control.text.setUpListener(this::onTextAdd);
+        mBinding.control.text.setDownListener(this::onTextSub);
+        mBinding.control.speed.setUpListener(this::onSpeedAdd);
+        mBinding.control.speed.setDownListener(this::onSpeedSub);
         mBinding.control.text.setOnClickListener(this::onTrack);
         mBinding.control.audio.setOnClickListener(this::onTrack);
         mBinding.control.video.setOnClickListener(this::onTrack);
