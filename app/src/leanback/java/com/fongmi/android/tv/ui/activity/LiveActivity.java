@@ -438,8 +438,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     }
 
     @Override
-    public void showEpg() {
-        if (mChannel == null || mChannel.getData().getList().isEmpty() || mEpgDataAdapter.size() == 0) return;
+    public void showEpg(Channel item) {
+        if (mChannel == null || mChannel.getData().getList().isEmpty() || mEpgDataAdapter.size() == 0 || !mChannel.equals(item)) return;
         mBinding.widget.epgData.setSelectedPosition(mChannel.getData().getIndex());
         mBinding.widget.epg.setVisibility(View.VISIBLE);
         mBinding.widget.epg.requestFocus();
