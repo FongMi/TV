@@ -10,16 +10,16 @@ import androidx.annotation.Nullable;
 
 import com.fongmi.android.tv.utils.KeyUtil;
 
-public class CustomLeftRightView extends LinearLayout {
+public class CustomLeftRightLayout extends LinearLayout {
 
     private LeftListener leftListener;
     private RightListener rightListener;
 
-    public CustomLeftRightView(@NonNull Context context) {
+    public CustomLeftRightLayout(@NonNull Context context) {
         super(context);
     }
 
-    public CustomLeftRightView(@NonNull Context context, @Nullable AttributeSet attrs) {
+    public CustomLeftRightLayout(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
     }
 
