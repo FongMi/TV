@@ -10,6 +10,7 @@ import com.fongmi.android.tv.api.loader.JsLoader;
 import com.fongmi.android.tv.api.loader.PyLoader;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Depot;
+import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Rule;
 import com.fongmi.android.tv.bean.Site;
@@ -21,6 +22,7 @@ import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderNull;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Json;
+import com.github.catvod.utils.Util;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -245,6 +247,11 @@ public class VodConfig {
         if (js) jsLoader.setRecent(site.getKey());
         else if (py) pyLoader.setRecent(site.getKey());
         else if (csp) jarLoader.setRecent(site.getJar());
+    }
+
+    public void setRecent(Live live) {
+        jarLoader.parseJar(Util.md5(live.getJar()), live.getJar());
+        jarLoader.setRecent(live.getJar());
     }
 
     public Object[] proxyLocal(Map<String, String> params) {
