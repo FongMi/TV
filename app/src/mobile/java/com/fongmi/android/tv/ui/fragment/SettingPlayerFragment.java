@@ -19,7 +19,6 @@ import com.fongmi.android.tv.impl.DanmuLineCallback;
 import com.fongmi.android.tv.impl.DanmuSizeCallback;
 import com.fongmi.android.tv.impl.SubtitleCallback;
 import com.fongmi.android.tv.impl.UaCallback;
-import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.dialog.BufferDialog;
