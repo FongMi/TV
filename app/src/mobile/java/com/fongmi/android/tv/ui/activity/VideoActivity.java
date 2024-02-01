@@ -770,25 +770,15 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     private void checkNext() {
         setR1Callback();
-        if (mHistory.isRevPlay()) onPrev();
-        else onNext();
+        Episode item = mEpisodeAdapter.getNext();
+        if (item.isActivated()) Notify.show(R.string.error_play_next);
+        else onItemClick(item);
     }
 
     private void checkPrev() {
         setR1Callback();
-        if (mHistory.isRevPlay()) onNext();
-        else onPrev();
-    }
-
-    private void onNext() {
-        Episode item = mEpisodeAdapter.getNext();
-        if (item.isActivated()) Notify.show(mHistory.isRevPlay() ? R.string.error_play_prev : R.string.error_play_next);
-        else onItemClick(item);
-    }
-
-    private void onPrev() {
         Episode item = mEpisodeAdapter.getPrev();
-        if (item.isActivated()) Notify.show(mHistory.isRevPlay() ? R.string.error_play_next : R.string.error_play_prev);
+        if (item.isActivated()) Notify.show(R.string.error_play_prev);
         else onItemClick(item);
     }
 
