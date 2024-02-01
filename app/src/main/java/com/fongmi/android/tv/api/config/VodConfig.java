@@ -10,7 +10,6 @@ import com.fongmi.android.tv.api.loader.JsLoader;
 import com.fongmi.android.tv.api.loader.PyLoader;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Depot;
-import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Rule;
 import com.fongmi.android.tv.bean.Site;
@@ -249,9 +248,9 @@ public class VodConfig {
         else if (csp) jarLoader.setRecent(site.getJar());
     }
 
-    public void setRecent(Live live) {
-        jarLoader.parseJar(Util.md5(live.getJar()), live.getJar());
-        jarLoader.setRecent(live.getJar());
+    public void setRecent(String jar) {
+        jarLoader.parseJar(Util.md5(jar), jar);
+        jarLoader.setRecent(jar);
     }
 
     public Object[] proxyLocal(Map<String, String> params) {
