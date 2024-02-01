@@ -153,14 +153,6 @@ public class Setting {
         Prefers.put("subtitle", subtitle);
     }
 
-    public static int getHttp() {
-        return Prefers.getInt("exo_http", 1);
-    }
-
-    public static void putHttp(int http) {
-        Prefers.put("exo_http", http);
-    }
-
     public static int getBuffer() {
         return Math.min(Math.max(Prefers.getInt("exo_buffer"), 1), 10);
     }

@@ -16,7 +16,6 @@ import com.fongmi.android.tv.impl.DanmuLineCallback;
 import com.fongmi.android.tv.impl.DanmuSizeCallback;
 import com.fongmi.android.tv.impl.SubtitleCallback;
 import com.fongmi.android.tv.impl.UaCallback;
-import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.dialog.BufferDialog;
@@ -37,7 +36,6 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
     private String[] player;
     private String[] render;
     private String[] scale;
-    private String[] http;
 
     public static void start(Activity activity) {
         activity.startActivity(new Intent(activity, SettingPlayerActivity.class));
@@ -64,7 +62,6 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
         mBinding.danmuSizeText.setText(format.format(Setting.getDanmuSize()));
         mBinding.danmuLineText.setText(String.valueOf(Setting.getDanmuLine(3)));
         mBinding.danmuAlphaText.setText(String.valueOf(Setting.getDanmuAlpha()));
-        mBinding.httpText.setText((http = ResUtil.getStringArray(R.array.select_exo_http))[Setting.getHttp()]);
         mBinding.scaleText.setText((scale = ResUtil.getStringArray(R.array.select_scale))[Setting.getScale()]);
         mBinding.playerText.setText((player = ResUtil.getStringArray(R.array.select_player))[Setting.getPlayer()]);
         mBinding.renderText.setText((render = ResUtil.getStringArray(R.array.select_render))[Setting.getRender()]);
@@ -74,7 +71,6 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
     @Override
     protected void initEvent() {
         mBinding.ua.setOnClickListener(this::onUa);
-        mBinding.http.setOnClickListener(this::setHttp);
         mBinding.scale.setOnClickListener(this::setScale);
         mBinding.buffer.setOnClickListener(this::onBuffer);
         mBinding.player.setOnClickListener(this::setPlayer);
@@ -101,13 +97,6 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
     public void setUa(String ua) {
         mBinding.uaText.setText(ua);
         Setting.putUa(ua);
-    }
-
-    private void setHttp(View view) {
-        int index = Setting.getHttp();
-        Setting.putHttp(index = index == http.length - 1 ? 0 : ++index);
-        mBinding.httpText.setText(http[index]);
-        ExoUtil.reset();
     }
 
     private void setScale(View view) {

@@ -42,7 +42,6 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
     private String[] player;
     private String[] render;
     private String[] scale;
-    private String[] http;
 
     public static SettingPlayerFragment newInstance() {
         return new SettingPlayerFragment();
@@ -69,7 +68,6 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
         mBinding.danmuSizeText.setText(format.format(Setting.getDanmuSize()));
         mBinding.danmuLineText.setText(String.valueOf(Setting.getDanmuLine(2)));
         mBinding.danmuAlphaText.setText(String.valueOf(Setting.getDanmuAlpha()));
-        mBinding.httpText.setText((http = ResUtil.getStringArray(R.array.select_exo_http))[Setting.getHttp()]);
         mBinding.scaleText.setText((scale = ResUtil.getStringArray(R.array.select_scale))[Setting.getScale()]);
         mBinding.playerText.setText((player = ResUtil.getStringArray(R.array.select_player))[Setting.getPlayer()]);
         mBinding.renderText.setText((render = ResUtil.getStringArray(R.array.select_render))[Setting.getRender()]);
@@ -80,7 +78,6 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
     @Override
     protected void initEvent() {
         mBinding.ua.setOnClickListener(this::onUa);
-        mBinding.http.setOnClickListener(this::setHttp);
         mBinding.scale.setOnClickListener(this::onScale);
         mBinding.buffer.setOnClickListener(this::onBuffer);
         mBinding.player.setOnClickListener(this::setPlayer);
@@ -108,13 +105,6 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
     public void setUa(String ua) {
         mBinding.uaText.setText(ua);
         Setting.putUa(ua);
-    }
-
-    private void setHttp(View view) {
-        int index = Setting.getHttp();
-        Setting.putHttp(index = index == http.length - 1 ? 0 : ++index);
-        mBinding.httpText.setText(http[index]);
-        ExoUtil.reset();
     }
 
     private void onScale(View view) {

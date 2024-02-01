@@ -89,7 +89,6 @@
     <string name="player_danmu_alpha">彈幕透明</string>
     <string name="player_background">背景播放</string>
     <string name="player_exo_tunnel">隧道模式</string>
-    <string name="player_exo_http">連線方式</string>
     <string name="player_exo_buffer">緩衝時間</string>
     <string name="player_ua">User-Agent</string>
 
@@ -174,11 +173,6 @@
     <string-array name="select_reset">
         <item>刷新</item>
         <item>重播</item>
-    </string-array>
-
-    <string-array name="select_exo_http">
-        <item>預設</item>
-        <item>OkHttp</item>
     </string-array>
 
     <string-array name="select_caption">
