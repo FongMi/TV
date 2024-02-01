@@ -73,8 +73,7 @@ public class Live {
     }
 
     public static List<Live> arrayFrom(String str) {
-        Type listType = new TypeToken<List<Live>>() {
-        }.getType();
+        Type listType = new TypeToken<List<Live>>() {}.getType();
         List<Live> items = App.gson().fromJson(str, listType);
         return items == null ? Collections.emptyList() : items;
     }
