@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-@Entity(ignoredColumns = {"type", "group", "url", "logo", "epg", "ua", "click", "origin", "referer", "timeout", "header", "playerType", "channels", "groups", "core", "activated", "width"})
+@Entity(ignoredColumns = {"type", "group", "url", "jar", "logo", "epg", "ua", "click", "origin", "referer", "timeout", "header", "playerType", "channels", "groups", "core", "activated", "width"})
 public class Live {
 
     @NonNull
@@ -38,6 +38,8 @@ public class Live {
     private String group;
     @SerializedName("url")
     private String url;
+    @SerializedName("jar")
+    private String jar;
     @SerializedName("logo")
     private String logo;
     @SerializedName("epg")
@@ -71,7 +73,8 @@ public class Live {
     }
 
     public static List<Live> arrayFrom(String str) {
-        Type listType = new TypeToken<List<Live>>() {}.getType();
+        Type listType = new TypeToken<List<Live>>() {
+        }.getType();
         List<Live> items = App.gson().fromJson(str, listType);
         return items == null ? Collections.emptyList() : items;
     }
@@ -123,6 +126,10 @@ public class Live {
 
     public String getUrl() {
         return TextUtils.isEmpty(url) ? "" : url;
+    }
+
+    public String getJar() {
+        return TextUtils.isEmpty(jar) ? "" : jar;
     }
 
     public String getLogo() {
