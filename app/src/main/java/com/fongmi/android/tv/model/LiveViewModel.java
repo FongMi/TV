@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.api.LiveParser;
+import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Epg;
 import com.fongmi.android.tv.bean.Group;
