@@ -247,6 +247,12 @@ public class VodConfig {
         else if (csp) jarLoader.setRecent(site.getJar());
     }
 
+    public void setRecent(String recent) {
+        jsLoader.setRecent(recent);
+        pyLoader.setRecent(recent);
+        jarLoader.setRecent(recent);
+    }
+
     public Object[] proxyLocal(Map<String, String> params) {
         if (params.containsKey("do") && params.get("do").equals("js")) {
             return jsLoader.proxyInvoke(params);
