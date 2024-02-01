@@ -53,7 +53,7 @@ public class LiveViewModel extends ViewModel {
 
     public void getLive(Live item) {
         execute(LIVE, () -> {
-            VodConfig.get().setRecent(item);
+            VodConfig.get().setRecent(item.getJar());
             LiveParser.start(item);
             verify(item);
             return item;
