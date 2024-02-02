@@ -690,6 +690,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     private void fetch() {
         if (mChannel == null) return;
         LiveConfig.get().setKeep(mChannel);
+        mBinding.control.seek.reset();
         mViewModel.getUrl(mChannel);
         mPlayers.clear();
         showProgress();
@@ -775,6 +776,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         switch (event.getState()) {
             case 0:
                 setTrackVisible(false);
+                mBinding.control.seek.start();
                 break;
             case Player.STATE_IDLE:
                 break;

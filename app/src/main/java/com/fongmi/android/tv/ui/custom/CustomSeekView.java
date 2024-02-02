@@ -45,25 +45,19 @@ public class CustomSeekView extends FrameLayout implements TimeBar.OnScrubListen
     public CustomSeekView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         LayoutInflater.from(context).inflate(R.layout.view_control_seek, this);
-        initView();
-        initEvent();
-        start();
+        init();
     }
 
-    private void initView() {
+    private void init() {
+        timeBar = findViewById(R.id.timeBar);
         positionView = findViewById(R.id.position);
         durationView = findViewById(R.id.duration);
-        timeBar = findViewById(R.id.timeBar);
         runnable = this::updateProgress;
-    }
-
-    private void initEvent() {
         timeBar.addListener(this);
+        reset();
     }
 
     public void setListener(Players player) {
-        positionView.setText(player.stringToTime(0));
-        durationView.setText(player.stringToTime(0));
         this.player = player;
     }
 
@@ -75,6 +69,14 @@ public class CustomSeekView extends FrameLayout implements TimeBar.OnScrubListen
     public void start() {
         removeCallbacks(runnable);
         post(runnable);
+    }
+
+    public void reset() {
+        timeBar.setPosition(0);
+        timeBar.setDuration(0);
+        removeCallbacks(runnable);
+        positionView.setText(player.stringToTime(0));
+        durationView.setText(player.stringToTime(0));
     }
 
     private void updateProgress() {
