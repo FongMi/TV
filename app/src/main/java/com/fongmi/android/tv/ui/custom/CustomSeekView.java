@@ -61,22 +61,17 @@ public class CustomSeekView extends FrameLayout implements TimeBar.OnScrubListen
         this.player = player;
     }
 
-    private void seekToTimeBarPosition(long positionMs) {
-        player.seekTo(positionMs);
-        updateProgress();
+    public void reset() {
+        timeBar.setPosition(0);
+        timeBar.setDuration(0);
+        removeCallbacks(runnable);
+        positionView.setText("00:00");
+        durationView.setText("00:00");
     }
 
     public void start() {
         removeCallbacks(runnable);
         post(runnable);
-    }
-
-    public void reset() {
-        timeBar.setPosition(0);
-        timeBar.setDuration(0);
-        removeCallbacks(runnable);
-        positionView.setText(player.stringToTime(0));
-        durationView.setText(player.stringToTime(0));
     }
 
     private void updateProgress() {
@@ -133,6 +128,11 @@ public class CustomSeekView extends FrameLayout implements TimeBar.OnScrubListen
         long mediaTimeDelayMs = Math.min(timeBar.getPreferredUpdateDelay(), mediaTimeUntilNextFullSecondMs);
         long delayMs = (long) (mediaTimeDelayMs / player.getSpeed());
         return Util.constrainValue(delayMs, MIN_UPDATE_INTERVAL_MS, MAX_UPDATE_INTERVAL_MS);
+    }
+
+    private void seekToTimeBarPosition(long positionMs) {
+        player.seekTo(positionMs);
+        updateProgress();
     }
 
     @Override
