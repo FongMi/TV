@@ -1,5 +1,7 @@
 package com.fongmi.android.tv.ui.dialog;
 
+import android.app.Dialog;
+import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,12 +17,14 @@ import androidx.leanback.widget.ItemBridgeAdapter;
 import androidx.leanback.widget.OnChildViewHolderSelectedListener;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Episode;
 import com.fongmi.android.tv.databinding.DialogEpisodeBinding;
 import com.fongmi.android.tv.ui.activity.VideoActivity;
 import com.fongmi.android.tv.ui.presenter.ArrayPresenter;
 import com.fongmi.android.tv.ui.presenter.EpisodePresenter;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import java.util.ArrayList;
@@ -37,6 +41,14 @@ public class EpisodeDialog extends BaseDialog implements ArrayPresenter.OnClickL
     private ArrayObjectAdapter mArrayAdapter;
     private ArrayPresenter mArrayPresenter;
     private int groupSize;
+
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        setStyle(STYLE_NORMAL, R.style.TransBottomSheetDialog);
+        BottomSheetDialog dialog = (BottomSheetDialog) super.onCreateDialog(savedInstanceState);
+        return dialog;
+    }
 
     public static EpisodeDialog create() {
         return new EpisodeDialog();

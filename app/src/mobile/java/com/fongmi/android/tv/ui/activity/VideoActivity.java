@@ -1134,6 +1134,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         history.setVodPic(item.getVodPic());
         history.setVodName(item.getVodName());
         history.findEpisode(item.getVodFlags());
+        history.setSpeed(Setting.getPlaySpeed());
         return history;
     }
 
