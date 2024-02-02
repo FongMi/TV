@@ -71,7 +71,6 @@ public class Nano extends NanoHTTPD {
         Map<String, String> files = new HashMap<>();
         if (session.getMethod() == Method.POST) parse(session, files);
         if (url.contains("?")) url = url.substring(0, url.indexOf('?'));
-        if (url.startsWith("/go")) return go();
         if (url.startsWith("/m3u8")) return m3u8(session);
         if (url.startsWith("/proxy")) return proxy(session);
         if (url.startsWith("/tvbus")) return success(LiveConfig.getResp());
@@ -92,11 +91,6 @@ public class Nano extends NanoHTTPD {
             session.parseBody(files);
         } catch (Exception ignored) {
         }
-    }
-
-    private Response go() {
-        Go.start();
-        return success();
     }
 
     private Response m3u8(IHTTPSession session) {
@@ -125,11 +119,5 @@ public class Nano extends NanoHTTPD {
         } catch (IOException e) {
             return newFixedLengthResponse(Response.Status.NOT_FOUND, MIME_HTML, null);
         }
-    }
-
-    @Override
-    public void stop() {
-        super.stop();
-        Go.stop();
     }
 }
