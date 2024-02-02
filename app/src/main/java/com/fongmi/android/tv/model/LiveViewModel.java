@@ -8,6 +8,7 @@ import com.fongmi.android.tv.api.LiveParser;
 import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Epg;
+import com.fongmi.android.tv.bean.EpgData;
 import com.fongmi.android.tv.bean.Group;
 import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.exception.ExtractException;
@@ -73,6 +74,16 @@ public class LiveViewModel extends ViewModel {
             item.setMsg(null);
             Source.get().stop();
             item.setUrl(Source.get().fetch(item));
+            return item;
+        });
+    }
+
+    public void getUrl(Channel item, EpgData data) {
+        execute(URL, () -> {
+            item.setMsg(null);
+            Source.get().stop();
+            SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault());
+            item.setUrl(item.getCurrent() + "?playseek=" + format.format(new Date(data.getStartTime())) + "-" + format.format(new Date(data.getEndTime())));
             return item;
         });
     }

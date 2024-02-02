@@ -17,6 +17,7 @@ public class EpgData {
     @SerializedName("end")
     private String end;
 
+    private boolean selected;
     private long startTime;
     private long endTime;
 
@@ -34,6 +35,14 @@ public class EpgData {
 
     public String getEnd() {
         return TextUtils.isEmpty(end) ? "" : end;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 
     public long getStartTime() {

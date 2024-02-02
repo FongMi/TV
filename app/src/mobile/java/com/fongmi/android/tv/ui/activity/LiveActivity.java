@@ -212,6 +212,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     private void setRecyclerView() {
         mBinding.group.setItemAnimator(null);
         mBinding.channel.setItemAnimator(null);
+        mBinding.widget.epgData.setItemAnimator(null);
         mBinding.group.setAdapter(mGroupAdapter = new GroupAdapter(this));
         mBinding.channel.setAdapter(mChannelAdapter = new ChannelAdapter(this));
         mBinding.widget.epgData.setAdapter(mEpgDataAdapter = new EpgDataAdapter(this));
@@ -637,8 +638,9 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     @Override
-    public void onItemClick(Epg item) {
-
+    public void onItemClick(EpgData item) {
+        mEpgDataAdapter.setSelected(item);
+        mViewModel.getUrl(mChannel, item);
     }
 
     private void addKeep(Channel item) {

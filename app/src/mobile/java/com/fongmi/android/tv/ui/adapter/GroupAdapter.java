@@ -58,15 +58,14 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
         return mItems.indexOf(group);
     }
 
+    public void setSelected(Group group) {
+        setSelected(indexOf(group));
+    }
+
     public void setSelected(int position) {
         for (int i = 0; i < mItems.size(); i++) mItems.get(i).setSelected(i == position);
         notifyItemRangeChanged(0, getItemCount());
         mListener.setWidth(mItems.get(position));
-    }
-
-    public void setSelected(Group group) {
-        int position = mItems.indexOf(group);
-        setSelected(position);
     }
 
     @Override

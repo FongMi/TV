@@ -6,7 +6,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.fongmi.android.tv.bean.Epg;
 import com.fongmi.android.tv.bean.EpgData;
 import com.fongmi.android.tv.databinding.AdapterEpgDataBinding;
 
@@ -25,7 +24,7 @@ public class EpgDataAdapter extends RecyclerView.Adapter<EpgDataAdapter.ViewHold
 
     public interface OnClickListener {
 
-        void onItemClick(Epg item);
+        void onItemClick(EpgData item);
     }
 
     public void clear() {
@@ -36,11 +35,26 @@ public class EpgDataAdapter extends RecyclerView.Adapter<EpgDataAdapter.ViewHold
     public void addAll(List<EpgData> items) {
         mItems.clear();
         mItems.addAll(items);
+        setSelected(current());
         notifyDataSetChanged();
     }
 
-    public int getPosition() {
+    public void setSelected(EpgData item) {
+        setSelected(mItems.indexOf(item));
+    }
+
+    public void setSelected(int position) {
+        for (int i = 0; i < mItems.size(); i++) mItems.get(i).setSelected(i == position);
+        notifyItemRangeChanged(0, getItemCount());
+    }
+
+    public int current() {
         for (int i = 0; i < mItems.size(); i++) if (mItems.get(i).isInRange()) return i;
+        return 0;
+    }
+
+    public int getPosition() {
+        for (int i = 0; i < mItems.size(); i++) if (mItems.get(i).isSelected()) return i;
         return 0;
     }
 
@@ -60,7 +74,8 @@ public class EpgDataAdapter extends RecyclerView.Adapter<EpgDataAdapter.ViewHold
         EpgData item = mItems.get(position);
         holder.binding.time.setText(item.getTime());
         holder.binding.title.setText(item.getTitle());
-        holder.binding.getRoot().setSelected(item.isInRange());
+        holder.binding.getRoot().setSelected(item.isSelected());
+        holder.binding.getRoot().setOnClickListener(view -> mListener.onItemClick(item));
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
