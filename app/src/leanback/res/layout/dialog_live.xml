@@ -5,7 +5,6 @@
     android:id="@+id/recycler"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:overScrollMode="never"
     android:padding="16dp"
     app:maxHeight="264dp"
     tools:itemCount="5"

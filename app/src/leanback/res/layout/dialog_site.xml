@@ -12,7 +12,6 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:overScrollMode="never"
         app:maxHeight="264dp"
         tools:itemCount="5"
         tools:listitem="@layout/adapter_site" />
