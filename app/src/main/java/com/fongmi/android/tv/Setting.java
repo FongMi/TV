@@ -365,4 +365,20 @@ public class Setting {
         Prefers.put("display_duration", display);
     }
 
+    public static float getPlaySpeed() {
+        return Prefers.getFloat("play_speed", 1.0f);
+    }
+
+    public static void putPlaySpeed(float speed) {
+        Prefers.put("play_speed", speed);
+    }
+
+    public static boolean isAggregatedSearch() {
+        return Prefers.getBoolean("aggregated_search", false);
+    }
+
+    public static void putAggregatedSearch(boolean search) {
+        Prefers.put("aggregated_search", search);
+    }
+
 }

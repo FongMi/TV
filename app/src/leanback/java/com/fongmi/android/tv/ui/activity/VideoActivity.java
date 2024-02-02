@@ -1195,6 +1195,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         history.setVodPic(item.getVodPic());
         history.setVodName(item.getVodName());
         history.findEpisode(item.getVodFlags());
+        history.setSpeed(Setting.getPlaySpeed());
         return history;
     }
 
