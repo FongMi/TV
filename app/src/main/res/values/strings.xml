@@ -35,7 +35,6 @@
     <string name="play_prev">Prev</string>
     <string name="play_loop">Loop</string>
     <string name="play_timer">Timer</string>
-    <string name="play_danmu">Danmu</string>
     <string name="play_change">Change</string>
     <string name="play_forward">→</string>
     <string name="play_backward">←</string>
@@ -84,9 +83,6 @@
     <string name="player_scale">Scale</string>
     <string name="player_caption">Caption style</string>
     <string name="player_subtitle">Subtitle size</string>
-    <string name="player_danmu_size">Danmu size</string>
-    <string name="player_danmu_line">Danmu line</string>
-    <string name="player_danmu_alpha">Danmu alpha</string>
     <string name="player_background">Background play</string>
     <string name="player_exo_tunnel">Tunnel mode</string>
     <string name="player_exo_buffer">Buffer time</string>

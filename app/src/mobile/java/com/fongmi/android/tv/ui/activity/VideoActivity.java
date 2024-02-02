@@ -68,7 +68,6 @@ import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.player.Source;
 import com.fongmi.android.tv.player.Timer;
-import com.fongmi.android.tv.player.danmu.Parser;
 import com.fongmi.android.tv.service.PlaybackService;
 import com.fongmi.android.tv.ui.adapter.EpisodeAdapter;
 import com.fongmi.android.tv.ui.adapter.FlagAdapter;
@@ -114,9 +113,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 
-import master.flame.danmaku.danmaku.model.BaseDanmaku;
-import master.flame.danmaku.danmaku.model.IDisplayer;
-import master.flame.danmaku.danmaku.model.android.DanmakuContext;
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
 public class VideoActivity extends BaseActivity implements Clock.Callback, CustomKeyDownVod.Listener, TrackDialog.Listener, ControlDialog.Listener, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, QualityAdapter.OnClickListener, QuickAdapter.OnClickListener, ParseAdapter.OnClickListener, SubtitleCallback, CastDialog.Listener, InfoDialog.Listener {
@@ -126,7 +122,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private Observer<Result> mObserveDetail;
     private Observer<Result> mObservePlayer;
     private Observer<Result> mObserveSearch;
-    private DanmakuContext mDanmakuContext;
     private EpisodeAdapter mEpisodeAdapter;
     private QualityAdapter mQualityAdapter;
     private ControlDialog mControlDialog;
@@ -299,7 +294,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     protected void initView(Bundle savedInstanceState) {
         mKeyDown = CustomKeyDownVod.create(this, mBinding.video);
         mFrameParams = mBinding.video.getLayoutParams();
-        mDanmakuContext = DanmakuContext.create();
         mBinding.progressLayout.showProgress();
         mBinding.swipeLayout.setEnabled(false);
         mPlayers = new Players().init(this);
@@ -318,7 +312,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         setForeground(true);
         setRecyclerView();
         setVideoView();
-        setDanmuView();
         setViewModel();
         showProgress();
         checkId();
@@ -338,7 +331,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mBinding.control.info.setOnClickListener(view -> onInfo());
         mBinding.control.full.setOnClickListener(view -> onFull());
         mBinding.control.keep.setOnClickListener(view -> onKeep());
-        mBinding.control.danmu.setOnClickListener(view -> onDanmu());
         mBinding.control.play.setOnClickListener(view -> checkPlay());
         mBinding.control.next.setOnClickListener(view -> checkNext());
         mBinding.control.prev.setOnClickListener(view -> checkPrev());
@@ -410,19 +402,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mBinding.control.action.reset.setText(ResUtil.getStringArray(R.array.select_reset)[Setting.getReset()]);
         mBinding.video.addOnLayoutChangeListener((view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> mPiP.update(getActivity(), view));
         setSubtitle(14);
-    }
-
-    private void setDanmuView() {
-        int maxLine = Setting.getDanmuLine(2);
-        mPlayers.setDanmuView(mBinding.danmaku);
-        float alpha = Setting.getDanmuAlpha() / 100.0f;
-        HashMap<Integer, Integer> maxLines = new HashMap<>();
-        maxLines.put(BaseDanmaku.TYPE_FIX_TOP, maxLine);
-        maxLines.put(BaseDanmaku.TYPE_SCROLL_RL, maxLine);
-        maxLines.put(BaseDanmaku.TYPE_SCROLL_LR, maxLine);
-        maxLines.put(BaseDanmaku.TYPE_FIX_BOTTOM, maxLine);
-        mDanmakuContext.setDanmakuStyle(IDisplayer.DANMAKU_STYLE_STROKEN, 3).setMaximumLines(maxLines).setDanmakuTransparency(alpha).setDanmakuMargin(8).setScaleTextSize(0.8f * Setting.getDanmuSize());
-        checkDanmuImg();
     }
 
     @Override
@@ -579,14 +558,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mPlayers.start(result, isUseParse(), getSite().isChangeable() ? getSite().getTimeout() : -1);
         setQualityVisible(result.getUrl().isMulti());
         mBinding.swipeLayout.setRefreshing(false);
-        checkDanmu(result.getDanmaku());
         mQualityAdapter.addAll(result);
-    }
-
-    private void checkDanmu(String danmu) {
-        mBinding.danmaku.release();
-        mBinding.danmaku.setVisibility(danmu.isEmpty() ? View.GONE : View.VISIBLE);
-        if (danmu.length() > 0) App.execute(() -> mBinding.danmaku.prepare(new Parser(danmu), mDanmakuContext));
     }
 
     @Override
@@ -613,7 +585,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         try {
             result.setUrl(Source.get().fetch(result));
             mPlayers.start(result, isUseParse(), getSite().isChangeable() ? getSite().getTimeout() : -1);
-            mBinding.danmaku.hide();
         } catch (Exception e) {
             ErrorEvent.extract(e.getMessage());
             e.printStackTrace();
@@ -720,18 +691,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         else createKeep();
         RefreshEvent.keep();
         checkKeepImg();
-    }
-
-    private void onDanmu() {
-        if (mPlayers.isEnd()) return;
-        Setting.putDanmu(!Setting.isDanmu());
-        checkDanmuImg();
-        showDanmu();
-    }
-
-    private void showDanmu() {
-        if (Setting.isDanmu()) mBinding.danmaku.show();
-        else mBinding.danmaku.hide();
     }
 
     private void checkPlay() {
@@ -916,7 +875,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         if (isFullscreen()) return;
         App.post(() -> mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT)), 50);
         setRequestedOrientation(mPlayers.isPortrait() ? ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
-        mDanmakuContext.setScaleTextSize(1.0f * Setting.getDanmuSize());
         mBinding.control.full.setVisibility(View.GONE);
         setRotate(mPlayers.isPortrait(), true);
         setSubtitle(Setting.getSubtitle());
@@ -929,7 +887,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         if (!isFullscreen()) return;
         setRequestedOrientation(isPort() ? ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_FULL_USER);
         mBinding.episode.scrollToPosition(mEpisodeAdapter.getPosition());
-        mDanmakuContext.setScaleTextSize(0.8f * Setting.getDanmuSize());
         mBinding.control.full.setVisibility(View.VISIBLE);
         mBinding.video.setLayoutParams(mFrameParams);
         setRotate(false, false);
@@ -975,7 +932,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     private void showControl() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInPictureInPictureMode()) return;
-        mBinding.control.danmu.setVisibility(isLock() || !mBinding.danmaku.isPrepared() ? View.GONE : View.VISIBLE);
         mBinding.control.setting.setVisibility(mHistory == null || isFullscreen() ? View.GONE : View.VISIBLE);
         mBinding.control.right.rotate.setVisibility(isFullscreen() && !isLock() ? View.VISIBLE : View.GONE);
         mBinding.control.keep.setVisibility(mHistory == null || isFullscreen() ? View.GONE : View.VISIBLE);
@@ -1100,10 +1056,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mBinding.control.right.lock.setImageResource(isLock() ? R.drawable.ic_control_lock_on : R.drawable.ic_control_lock_off);
     }
 
-    private void checkDanmuImg() {
-        mBinding.control.danmu.setImageResource(Setting.isDanmu() ? R.drawable.ic_control_danmu_on : R.drawable.ic_control_danmu_off);
-    }
-
     private void createKeep() {
         Keep keep = new Keep();
         keep.setKey(getHistoryKey());
@@ -1156,9 +1108,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
                 break;
             case PLAYER:
                 onRefresh();
-                break;
-            case DANMAKU:
-                checkDanmu(event.getPath());
                 break;
             case SUBTITLE:
                 mPlayers.setSub(Sub.from(event.getPath()));
@@ -1213,7 +1162,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
             onReset(true);
         } else {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-            mBinding.danmaku.clearDanmakusOnScreen();
             checkNext();
         }
     }
@@ -1228,7 +1176,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private void setDefaultTrack() {
         if (isInitTrack()) {
             setInitTrack(false);
-            mPlayers.prepared();
             mPlayers.setTrack(Track.find(getHistoryKey()));
         }
     }
@@ -1624,13 +1571,11 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         super.onPictureInPictureModeChanged(isInPictureInPictureMode);
         if (isInPictureInPictureMode) {
             PlaybackService.start(mPlayers);
-            mBinding.danmaku.hide();
             enterFullscreen();
             setSubtitle(10);
             hideControl();
             hideSheet();
         } else {
-            showDanmu();
             exitFullscreen();
             setForeground(true);
             PlaybackService.stop();

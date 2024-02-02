@@ -11,7 +11,6 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.config.VodConfig;
-import com.fongmi.android.tv.bean.Danmu;
 import com.fongmi.android.tv.bean.Episode;
 import com.fongmi.android.tv.bean.Flag;
 import com.fongmi.android.tv.bean.Result;
@@ -48,7 +47,6 @@ public class SiteViewModel extends ViewModel {
     public MutableLiveData<Result> result;
     public MutableLiveData<Result> player;
     public MutableLiveData<Result> search;
-    public MutableLiveData<Danmu> danmaku;
     private ExecutorService executor;
 
     public SiteViewModel() {

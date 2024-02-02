@@ -141,19 +141,6 @@
         </FrameLayout>
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/danmu"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_centerVertical="true"
-        android:layout_marginStart="8dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:padding="8dp"
-        android:visibility="gone"
-        tools:src="@drawable/ic_control_danmu_off"
-        tools:visibility="visible" />
-
     <include
         android:id="@+id/right"
         layout="@layout/view_control_right"

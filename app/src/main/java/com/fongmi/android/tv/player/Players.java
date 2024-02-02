@@ -49,14 +49,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import master.flame.danmaku.controller.DrawHandler;
-import master.flame.danmaku.danmaku.model.BaseDanmaku;
-import master.flame.danmaku.danmaku.model.DanmakuTimer;
-import master.flame.danmaku.ui.widget.DanmakuView;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class Players implements Player.Listener, IMediaPlayer.Listener, AnalyticsListener, ParseCallback, DrawHandler.Callback {
+public class Players implements Player.Listener, IMediaPlayer.Listener, AnalyticsListener, ParseCallback {
 
     private static final String TAG = Players.class.getSimpleName();
 
@@ -70,7 +66,6 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     private Map<String, String> headers;
     private MediaSessionCompat session;
     private IjkVideoView ijkPlayer;
-    private DanmakuView danmuView;
     private StringBuilder builder;
     private Formatter formatter;
     private ExoPlayer exoPlayer;
@@ -142,11 +137,6 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         ijkPlayer = view.render(Setting.getRender()).decode(decode);
         ijkPlayer.addListener(this);
         ijkPlayer.setPlayer(player);
-    }
-
-    public void setDanmuView(DanmakuView view) {
-        view.setCallback(this);
-        danmuView = view;
     }
 
     public void setSub(Sub sub) {
@@ -243,10 +233,6 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         if (isExo() && exoPlayer != null) return exoPlayer.getBufferedPosition();
         if (isIjk() && ijkPlayer != null) return ijkPlayer.getBufferedPosition();
         return 0;
-    }
-
-    private boolean haveDanmu() {
-        return danmuView != null && danmuView.isPrepared();
     }
 
     public boolean haveTrack(int type) {
@@ -359,7 +345,6 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     public void seekTo(long time) {
-        if (haveDanmu()) danmuView.seekTo(time);
         if (isExo() && exoPlayer != null) exoPlayer.seekTo(time);
         if (isIjk() && ijkPlayer != null) ijkPlayer.seekTo(time);
     }
@@ -369,14 +354,12 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         session.setActive(true);
         if (isExo()) playExo();
         if (isIjk()) playIjk();
-        if (haveDanmu()) danmuView.resume();
         setPlaybackState(PlaybackStateCompat.STATE_PLAYING);
     }
 
     public void pause() {
         if (isExo()) pauseExo();
         if (isIjk()) pauseIjk();
-        if (haveDanmu()) danmuView.pause();
         setPlaybackState(PlaybackStateCompat.STATE_PAUSED);
     }
 
@@ -385,7 +368,6 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         if (isExo()) stopExo();
         if (isIjk()) stopIjk();
         session.setActive(false);
-        if (haveDanmu()) danmuView.stop();
         setPlaybackState(PlaybackStateCompat.STATE_STOPPED);
     }
 
@@ -394,7 +376,6 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         session.release();
         if (isExo()) releaseExo();
         if (isIjk()) releaseIjk();
-        if (haveDanmu()) danmuView.release();
     }
 
     public void start(Channel channel, int timeout) {
@@ -660,29 +641,5 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     @Override
     public void onCompletion(IMediaPlayer mp) {
         PlayerEvent.state(Player.STATE_ENDED);
-    }
-
-    @Override
-    public void prepared() {
-        App.post(() -> {
-            boolean start = haveDanmu() && isPlaying();
-            boolean show = start && Setting.isDanmu();
-            if (start) danmuView.start(getPosition());
-            if (show) danmuView.show();
-            else danmuView.hide();
-        });
-    }
-
-    @Override
-    public void updateTimer(DanmakuTimer timer) {
-        App.post(() -> timer.update(getPosition()));
-    }
-
-    @Override
-    public void danmakuShown(BaseDanmaku danmaku) {
-    }
-
-    @Override
-    public void drawingFinished() {
     }
 }

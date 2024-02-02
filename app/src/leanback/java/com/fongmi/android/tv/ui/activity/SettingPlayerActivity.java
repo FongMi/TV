@@ -11,27 +11,18 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.databinding.ActivitySettingPlayerBinding;
 import com.fongmi.android.tv.impl.BufferCallback;
-import com.fongmi.android.tv.impl.DanmuAlphaCallback;
-import com.fongmi.android.tv.impl.DanmuLineCallback;
-import com.fongmi.android.tv.impl.DanmuSizeCallback;
 import com.fongmi.android.tv.impl.SubtitleCallback;
 import com.fongmi.android.tv.impl.UaCallback;
 import com.fongmi.android.tv.player.Players;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.dialog.BufferDialog;
-import com.fongmi.android.tv.ui.dialog.DanmuAlphaDialog;
-import com.fongmi.android.tv.ui.dialog.DanmuLineDialog;
-import com.fongmi.android.tv.ui.dialog.DanmuSizeDialog;
 import com.fongmi.android.tv.ui.dialog.SubtitleDialog;
 import com.fongmi.android.tv.ui.dialog.UaDialog;
 import com.fongmi.android.tv.utils.ResUtil;
 
-import java.text.DecimalFormat;
-
-public class SettingPlayerActivity extends BaseActivity implements UaCallback, BufferCallback, SubtitleCallback, DanmuLineCallback, DanmuSizeCallback, DanmuAlphaCallback {
+public class SettingPlayerActivity extends BaseActivity implements UaCallback, BufferCallback, SubtitleCallback {
 
     private ActivitySettingPlayerBinding mBinding;
-    private DecimalFormat format;
     private String[] caption;
     private String[] player;
     private String[] render;
@@ -53,15 +44,11 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
     @Override
     protected void initView() {
         setVisible();
-        format = new DecimalFormat("#.#");
         mBinding.player.requestFocus();
         mBinding.uaText.setText(Setting.getUa());
         mBinding.tunnelText.setText(getSwitch(Setting.isTunnel()));
         mBinding.bufferText.setText(String.valueOf(Setting.getBuffer()));
         mBinding.subtitleText.setText(String.valueOf(Setting.getSubtitle()));
-        mBinding.danmuSizeText.setText(format.format(Setting.getDanmuSize()));
-        mBinding.danmuLineText.setText(String.valueOf(Setting.getDanmuLine(3)));
-        mBinding.danmuAlphaText.setText(String.valueOf(Setting.getDanmuAlpha()));
         mBinding.scaleText.setText((scale = ResUtil.getStringArray(R.array.select_scale))[Setting.getScale()]);
         mBinding.playerText.setText((player = ResUtil.getStringArray(R.array.select_player))[Setting.getPlayer()]);
         mBinding.renderText.setText((render = ResUtil.getStringArray(R.array.select_render))[Setting.getRender()]);
@@ -79,9 +66,6 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
         mBinding.caption.setOnClickListener(this::setCaption);
         mBinding.subtitle.setOnClickListener(this::onSubtitle);
         mBinding.caption.setOnLongClickListener(this::onCaption);
-        mBinding.danmuSize.setOnClickListener(this::onDanmuSize);
-        mBinding.danmuLine.setOnClickListener(this::onDanmuLine);
-        mBinding.danmuAlpha.setOnClickListener(this::onDanmuAlpha);
     }
 
     private void setVisible() {
@@ -152,35 +136,5 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
     @Override
     public void setSubtitle(int size) {
         mBinding.subtitleText.setText(String.valueOf(size));
-    }
-
-    private void onDanmuSize(View view) {
-        DanmuSizeDialog.create(this).show();
-    }
-
-    @Override
-    public void setDanmuSize(float size) {
-        mBinding.danmuSizeText.setText(format.format(size));
-        Setting.putDanmuSize(size);
-    }
-
-    private void onDanmuLine(View view) {
-        DanmuLineDialog.create(this).show();
-    }
-
-    @Override
-    public void setDanmuLine(int line) {
-        mBinding.danmuLineText.setText(String.valueOf(line));
-        Setting.putDanmuLine(line);
-    }
-
-    private void onDanmuAlpha(View view) {
-        DanmuAlphaDialog.create(this).show();
-    }
-
-    @Override
-    public void setDanmuAlpha(int alpha) {
-        mBinding.danmuAlphaText.setText(String.valueOf(alpha));
-        Setting.putDanmuAlpha(alpha);
     }
 }
