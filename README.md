@@ -113,12 +113,6 @@ http://127.0.0.1:9978/action?do=refresh&type=player
 
 ```
 http://127.0.0.1:9978/action?do=refresh&type=subtitle&path=http://xxx
-```  
-
-推送彈幕
-
-```
-http://127.0.0.1:9978/action?do=refresh&type=danmaku&path=http://xxx
 ```
 
 新增緩存字串
