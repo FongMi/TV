@@ -350,7 +350,6 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     public void play() {
-        if (isPlaying() || isEnd()) return;
         session.setActive(true);
         if (isExo()) playExo();
         if (isIjk()) playIjk();
