@@ -11,8 +11,7 @@
         android:id="@+id/video"
         android:layout_width="400dp"
         android:layout_height="225dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
+        android:layout_margin="24dp"
         android:background="@color/black"
         android:focusable="true"
         android:focusableInTouchMode="true"
@@ -65,7 +64,6 @@
         android:id="@+id/name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="24dp"
         android:layout_toEndOf="@+id/video"
@@ -249,85 +247,80 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/video"
-        android:layout_marginTop="16dp"
         android:overScrollMode="never">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingBottom="8dp">
 
             <com.fongmi.android.tv.ui.custom.CustomHorizontalGridView
                 android:id="@+id/flag"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
                 android:clipChildren="false"
                 android:clipToPadding="false"
                 android:paddingStart="24dp"
-                android:paddingTop="8dp"
                 android:paddingEnd="24dp"
-                android:paddingBottom="8dp"
-                android:visibility="gone" />
+                android:visibility="gone"
+                tools:visibility="visible" />
 
             <com.fongmi.android.tv.ui.custom.CustomHorizontalGridView
                 android:id="@+id/quality"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
                 android:clipChildren="false"
                 android:clipToPadding="false"
                 android:paddingStart="24dp"
-                android:paddingTop="8dp"
                 android:paddingEnd="24dp"
-                android:paddingBottom="8dp"
-                android:visibility="gone" />
+                android:visibility="gone"
+                tools:visibility="visible" />
 
             <com.fongmi.android.tv.ui.custom.CustomHorizontalGridView
                 android:id="@+id/episode"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
                 android:clipChildren="false"
                 android:clipToPadding="false"
                 android:paddingStart="24dp"
-                android:paddingTop="8dp"
                 android:paddingEnd="24dp"
-                android:paddingBottom="8dp"
                 android:visibility="gone" />
 
             <com.fongmi.android.tv.ui.custom.CustomHorizontalGridView
                 android:id="@+id/array"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
                 android:clipChildren="false"
                 android:clipToPadding="false"
                 android:paddingStart="24dp"
-                android:paddingTop="8dp"
                 android:paddingEnd="24dp"
-                android:paddingBottom="8dp"
                 android:visibility="gone" />
 
             <com.fongmi.android.tv.ui.custom.CustomHorizontalGridView
                 android:id="@+id/part"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
                 android:clipChildren="false"
                 android:clipToPadding="false"
                 android:paddingStart="24dp"
-                android:paddingTop="8dp"
                 android:paddingEnd="24dp"
-                android:paddingBottom="8dp"
                 android:visibility="gone" />
 
             <androidx.leanback.widget.HorizontalGridView
                 android:id="@+id/quick"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
+                android:layout_marginBottom="16dp"
                 android:clipChildren="false"
                 android:clipToPadding="false"
                 android:paddingStart="24dp"
-                android:paddingTop="8dp"
                 android:paddingEnd="24dp"
-                android:paddingBottom="8dp"
                 android:visibility="gone" />
 
         </LinearLayout>

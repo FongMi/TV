@@ -21,7 +21,7 @@ public class QuickPresenter extends Presenter {
     }
 
     private void setLayoutSize() {
-        int space = ResUtil.dp2px(48) + ResUtil.dp2px(8 * 3);
+        int space = ResUtil.dp2px(24) + ResUtil.dp2px(32);
         int base = ResUtil.getScreenWidth() - space;
         width = base / 4;
     }
