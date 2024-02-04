@@ -42,6 +42,8 @@ public class SettingCustomActivity extends BaseActivity {
         mBinding.displayTimeText.setText(getSwitch(Setting.isDisplayTime()));
         mBinding.displayNetspeedText.setText(getSwitch(Setting.isDisplaySpeed()));
         mBinding.displayDurationText.setText(getSwitch(Setting.isDisplayDuration()));
+        mBinding.speedText.setText(Setting.getPlaySpeed() + "x");
+        mBinding.aggregatedSearchText.setText(getSwitch(Setting.isAggregatedSearch()));
     }
 
     @Override
@@ -52,6 +54,9 @@ public class SettingCustomActivity extends BaseActivity {
         mBinding.displayTime.setOnClickListener(this::setDisplayTime);
         mBinding.displayNetspeed.setOnClickListener(this::setDisplaySpeed);
         mBinding.displayDuration.setOnClickListener(this::setDisplayDuration);
+        mBinding.speed.setOnClickListener(this::setSpeed);
+        mBinding.speed.setOnLongClickListener(this::resetSpeed);
+        mBinding.aggregatedSearch.setOnClickListener(this::setAggregatedSearch);
     }
 
     private void setQuality(View view) {
@@ -87,6 +92,25 @@ public class SettingCustomActivity extends BaseActivity {
     private void setDisplayDuration(View view) {
         Setting.putDisplayDuration(!Setting.isDisplayDuration());
         mBinding.displayDurationText.setText(getSwitch(Setting.isDisplayDuration()));
+    }
+
+    private void setSpeed(View view) {
+        float speed = Setting.getPlaySpeed();
+        float addon = speed >= 2 ? 1f : 0.25f;
+        speed = speed >= 5 ? 0.25f : Math.min(speed + addon, 5.0f);
+        Setting.putPlaySpeed(speed);
+        mBinding.speedText.setText(Setting.getPlaySpeed() + "x");
+    }
+
+    private boolean resetSpeed(View view) {
+        Setting.putPlaySpeed(1.0f);
+        mBinding.speedText.setText(Setting.getPlaySpeed() + "x");
+        return true;
+    }
+
+    private void setAggregatedSearch(View view) {
+        Setting.putAggregatedSearch(!Setting.isAggregatedSearch());
+        mBinding.aggregatedSearchText.setText(getSwitch(Setting.isAggregatedSearch()));
     }
 
 }

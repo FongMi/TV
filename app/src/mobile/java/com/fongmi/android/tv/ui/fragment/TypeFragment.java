@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.viewbinding.ViewBinding;
 
+import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Page;
@@ -221,7 +222,8 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
             mPages.add(Page.get(item, findPosition()));
             getVideo(item.getVodId(), "1");
         } else {
-            if (item.isManga()) DetailActivity.start(getActivity(), getKey(), item.getVodId(), item.getVodName(), item.getVodPic());
+            if (Setting.isAggregatedSearch()) CollectActivity.start(getActivity(), item.getVodName());
+            else if (item.isManga()) DetailActivity.start(getActivity(), getKey(), item.getVodId(), item.getVodName(), item.getVodPic());
             else VideoActivity.start(getActivity(), getKey(), item.getVodId(), item.getVodName(), item.getVodPic(), isFolder() ? item.getVodName() : null, false);
         }
     }

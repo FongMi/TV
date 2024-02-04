@@ -95,7 +95,7 @@ public class Nano extends NanoHTTPD {
     }
 
     private Response go() {
-        Server.get().go();
+        Go.start();
         return success();
     }
 
@@ -125,5 +125,11 @@ public class Nano extends NanoHTTPD {
         } catch (IOException e) {
             return newFixedLengthResponse(Response.Status.NOT_FOUND, MIME_HTML, null);
         }
+    }
+
+    @Override
+    public void stop() {
+        super.stop();
+        Go.stop();
     }
 }

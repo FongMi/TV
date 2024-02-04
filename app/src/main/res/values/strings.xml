@@ -33,12 +33,14 @@
     <string name="play_ed">ED</string>
     <string name="play_next">Next</string>
     <string name="play_prev">Prev</string>
+    <string name="play_episodes">Episodes</string>
     <string name="play_loop">Loop</string>
     <string name="play_timer">Timer</string>
     <string name="play_time">Time</string>
     <string name="play_netspeed">Net Speed</string>
     <string name="play_duration">Duration</string>
     <string name="play_danmu">Danmu</string>
+    <string name="play_speed">Speed</string>
     <string name="play_change">Change</string>
     <string name="play_forward">→</string>
     <string name="play_backward">←</string>
@@ -73,6 +75,7 @@
     <string name="setting_custom">Custom setting</string>
     <string name="setting_quality">Image quality</string>
     <string name="setting_size">Image size</string>
+    <string name="setting_aggregated_search">Aggregated search</string>
     <string name="setting_doh">DoH</string>
     <string name="setting_proxy">Proxy</string>
     <string name="setting_cache">Cache</string>

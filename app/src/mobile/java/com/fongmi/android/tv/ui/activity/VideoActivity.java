@@ -770,25 +770,15 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     private void checkNext() {
         setR1Callback();
-        if (mHistory.isRevPlay()) onPrev();
-        else onNext();
+        Episode item = mEpisodeAdapter.getNext();
+        if (item.isActivated()) Notify.show(R.string.error_play_next);
+        else onItemClick(item);
     }
 
     private void checkPrev() {
         setR1Callback();
-        if (mHistory.isRevPlay()) onNext();
-        else onPrev();
-    }
-
-    private void onNext() {
-        Episode item = mEpisodeAdapter.getNext();
-        if (item.isActivated()) Notify.show(mHistory.isRevPlay() ? R.string.error_play_prev : R.string.error_play_next);
-        else onItemClick(item);
-    }
-
-    private void onPrev() {
         Episode item = mEpisodeAdapter.getPrev();
-        if (item.isActivated()) Notify.show(mHistory.isRevPlay() ? R.string.error_play_next : R.string.error_play_prev);
+        if (item.isActivated()) Notify.show(R.string.error_play_prev);
         else onItemClick(item);
     }
 
@@ -850,6 +840,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     private void onReset(boolean replay) {
         mClock.setCallback(null);
+        mBinding.control.seek.reset();
         if (mFlagAdapter.isEmpty()) return;
         if (mEpisodeAdapter.isEmpty()) return;
         getPlayer(getFlag(), getEpisode(), replay);
@@ -938,8 +929,10 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private void showDisplayInfo() {
+        boolean pictureMode = false;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInPictureInPictureMode()) pictureMode = true;
         boolean controlVisible = isVisible(mBinding.control.getRoot());
-        boolean visible = (!controlVisible || isLock());
+        boolean visible = (!controlVisible || isLock()) && !pictureMode;
         mBinding.display.time.setVisibility(Setting.isDisplayTime() && visible  ? View.VISIBLE : View.GONE);
         mBinding.display.netspeed.setVisibility(Setting.isDisplaySpeed() && visible ? View.VISIBLE : View.GONE);
         mBinding.display.duration.setVisibility(Setting.isDisplayDuration() && visible ? View.VISIBLE : View.GONE);
@@ -1029,7 +1022,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private void showControl() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInPictureInPictureMode()) return;
         mBinding.control.danmu.setVisibility(isLock() || !mBinding.danmaku.isPrepared() ? View.GONE : View.VISIBLE);
-        mBinding.control.danmuSetting.setVisibility(isLock() || !Setting.isDanmuLoad() ? View.GONE : View.VISIBLE);
+        mBinding.control.danmuSetting.setVisibility(isLock() || !Setting.isDanmuLoad() || !isVisible(mBinding.danmaku) ? View.GONE : View.VISIBLE);
         mBinding.control.setting.setVisibility(mHistory == null || isFullscreen() ? View.GONE : View.VISIBLE);
         mBinding.control.right.rotate.setVisibility(isFullscreen() && !isLock() ? View.VISIBLE : View.GONE);
         mBinding.control.keep.setVisibility(mHistory == null || isFullscreen() ? View.GONE : View.VISIBLE);
@@ -1141,6 +1134,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         history.setVodPic(item.getVodPic());
         history.setVodName(item.getVodName());
         history.findEpisode(item.getVodFlags());
+        history.setSpeed(Setting.getPlaySpeed());
         return history;
     }
 
@@ -1244,6 +1238,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
                 setInitTrack(true);
                 setTrackVisible(false);
                 mClock.setCallback(this);
+                mBinding.control.seek.start();
                 break;
             case Player.STATE_IDLE:
                 break;

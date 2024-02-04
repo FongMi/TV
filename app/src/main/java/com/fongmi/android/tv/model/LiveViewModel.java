@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.api.LiveParser;
+import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Epg;
 import com.fongmi.android.tv.bean.Group;
@@ -52,6 +53,7 @@ public class LiveViewModel extends ViewModel {
 
     public void getLive(Live item) {
         execute(LIVE, () -> {
+            VodConfig.get().setRecent(item.getJar());
             LiveParser.start(item);
             verify(item);
             return item;

@@ -38,6 +38,8 @@ public class SettingCustomFragment extends BaseFragment {
     protected void initView() {
         mBinding.sizeText.setText((size = ResUtil.getStringArray(R.array.select_size))[Setting.getSize()]);
         mBinding.danmuSyncText.setText(getSwitch(Setting.isDanmuSync()));
+        mBinding.speedText.setText(Setting.getPlaySpeed() + "x");
+        mBinding.aggregatedSearchText.setText(getSwitch(Setting.isAggregatedSearch()));
     }
 
     @Override
@@ -45,6 +47,9 @@ public class SettingCustomFragment extends BaseFragment {
         mBinding.title.setOnLongClickListener(this::onTitle);
         mBinding.size.setOnClickListener(this::setSize);
         mBinding.danmuSync.setOnClickListener(this::setDanmuSync);
+        mBinding.speed.setOnClickListener(this::setSpeed);
+        mBinding.speed.setOnLongClickListener(this::resetSpeed);
+        mBinding.aggregatedSearch.setOnClickListener(this::setAggregatedSearch);
     }
 
     private boolean onTitle(View view) {
@@ -64,6 +69,25 @@ public class SettingCustomFragment extends BaseFragment {
     private void setDanmuSync(View view) {
         Setting.putDanmuSync(!Setting.isDanmuSync());
         mBinding.danmuSyncText.setText(getSwitch(Setting.isDanmuSync()));
+    }
+
+    private void setSpeed(View view) {
+        float speed = Setting.getPlaySpeed();
+        float addon = speed >= 2 ? 1f : 0.25f;
+        speed = speed >= 5 ? 0.25f : Math.min(speed + addon, 5.0f);
+        Setting.putPlaySpeed(speed);
+        mBinding.speedText.setText(Setting.getPlaySpeed() + "x");
+    }
+
+    private boolean resetSpeed(View view) {
+        Setting.putPlaySpeed(1.0f);
+        mBinding.speedText.setText(Setting.getPlaySpeed() + "x");
+        return true;
+    }
+
+    private void setAggregatedSearch(View view) {
+        Setting.putAggregatedSearch(!Setting.isAggregatedSearch());
+        mBinding.aggregatedSearchText.setText(getSwitch(Setting.isAggregatedSearch()));
     }
 
 
