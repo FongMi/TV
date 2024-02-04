@@ -33,12 +33,14 @@
     <string name="play_ed">片尾</string>
     <string name="play_next">下集</string>
     <string name="play_prev">上集</string>
+    <string name="play_episodes">选集</string>
     <string name="play_loop">循环</string>
     <string name="play_timer">定时</string>
     <string name="play_time">时间</string>
     <string name="play_netspeed">网速</string>
     <string name="play_duration">进度</string>
     <string name="play_danmu">弹幕</string>
+    <string name="play_speed">倍速</string>
     <string name="play_change">换源</string>
     <string name="play_forward">→</string>
     <string name="play_backward">←</string>
@@ -73,6 +75,7 @@
     <string name="setting_custom">个性设置</string>
     <string name="setting_quality">图片品质</string>
     <string name="setting_size">图片尺寸</string>
+    <string name="setting_aggregated_search">聚合搜索</string>
     <string name="setting_doh">DoH</string>
     <string name="setting_proxy">Proxy</string>
     <string name="setting_cache">缓存</string>

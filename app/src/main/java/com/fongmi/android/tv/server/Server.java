@@ -36,10 +36,6 @@ public class Server {
         return "http://" + (local ? "127.0.0.1" : Util.getIp()) + ":" + getPort();
     }
 
-    public void go() {
-        Go.start();
-    }
-
     public void start() {
         if (nano != null) return;
         do {
@@ -59,6 +55,5 @@ public class Server {
     public void stop() {
         if (nano != null) nano.stop();
         nano = null;
-        Go.stop();
     }
 }

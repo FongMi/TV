@@ -132,11 +132,13 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
         int index = Setting.getRender();
         Setting.putRender(index = index == render.length - 1 ? 0 : ++index);
         mBinding.renderText.setText(render[index]);
+        if (Setting.isTunnel() && Setting.getRender() == 1) setTunnel(view);
     }
 
     private void setTunnel(View view) {
         Setting.putTunnel(!Setting.isTunnel());
         mBinding.tunnelText.setText(getSwitch(Setting.isTunnel()));
+        if (Setting.isTunnel() && Setting.getRender() == 1) setRender(view);
     }
 
     private void setCaption(View view) {

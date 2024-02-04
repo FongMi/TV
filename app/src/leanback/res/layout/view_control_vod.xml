@@ -62,6 +62,20 @@
                 android:textSize="14sp" />
 
             <TextView
+                android:id="@+id/episodes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="12dp"
+                android:background="@drawable/selector_text"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:nextFocusDown="@id/timeBar"
+                android:text="@string/play_episodes"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                tools:text="選集" />
+
+            <TextView
                 android:id="@+id/reset"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
