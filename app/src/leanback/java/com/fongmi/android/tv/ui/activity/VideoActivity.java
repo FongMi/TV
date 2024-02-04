@@ -348,7 +348,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mBinding.control.danmu.setOnClickListener(view -> onDanmu());
         mBinding.control.next.setOnClickListener(view -> checkNext());
         mBinding.control.prev.setOnClickListener(view -> checkPrev());
-        mBinding.control.episodes.setOnClickListener(view -> showEpisodes());
+        mBinding.control.episodes.setOnClickListener(view -> onEpisodes());
         mBinding.control.scale.setOnClickListener(view -> onScale());
         mBinding.control.speed.setOnClickListener(view -> onSpeed());
         mBinding.control.reset.setOnClickListener(view -> onReset());
@@ -843,8 +843,9 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         else mBinding.danmaku.hide();
     }
 
-    private void showEpisodes() {
+    private void onEpisodes() {
         EpisodeDialog.create().episodes(getFlag().getEpisodes()).show(this);
+        hideControl();
     }
 
     private void checkNext() {
