@@ -263,7 +263,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void getLive() {
         mBinding.control.home.setText(getHome().getName());
-        mPlayers.setPlayer(getPlayerType(-1));
+        mPlayers.setPlayer(Setting.getLivePlayer());
         mViewModel.getLive(getHome());
         setPlayerView();
         setDecodeView();
