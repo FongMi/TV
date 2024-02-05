@@ -9,9 +9,7 @@ import com.github.catvod.utils.Json;
 import com.github.catvod.utils.Util;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,23 +37,13 @@ public class Sniffer {
     }
 
     public static boolean isVideoFormat(String url) {
-        return isVideoFormat(url, new HashMap<>());
-    }
-
-    public static boolean isVideoFormat(String url, Map<String, String> headers) {
-        if (containOrMatch(url)) return true;
-        if (headers.containsKey("Accept") && headers.get("Accept").startsWith("image")) return false;
-        if (url.contains("url=http") || url.contains("v=http") || url.contains(".css") || url.contains(".html")) return false;
-        return SNIFFER.matcher(url).find();
-    }
-
-    private static boolean containOrMatch(String url) {
         Rule rule = getRule(UrlUtil.uri(url));
         for (String exclude : rule.getExclude()) if (url.contains(exclude)) return false;
         for (String exclude : rule.getExclude()) if (Pattern.compile(exclude).matcher(url).find()) return false;
         for (String regex : rule.getRegex()) if (url.contains(regex)) return true;
         for (String regex : rule.getRegex()) if (Pattern.compile(regex).matcher(url).find()) return true;
-        return false;
+        if (url.contains("url=http") || url.contains("v=http") || url.contains(".css") || url.contains(".html")) return false;
+        return SNIFFER.matcher(url).find();
     }
 
     public static Rule getRule(Uri uri) {
