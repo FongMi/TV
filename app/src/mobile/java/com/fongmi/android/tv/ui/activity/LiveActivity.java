@@ -290,7 +290,7 @@ public class LiveActivity extends BaseActivity implements Clock.Callback, Custom
 
     private void getLive() {
         mBinding.control.action.home.setText(getHome().getName());
-        mPlayers.setPlayer(getPlayerType(-1));
+        mPlayers.setPlayer(Setting.getLivePlayer());
         mViewModel.getLive(getHome());
         setPlayerView();
         setDecodeView();
