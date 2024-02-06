@@ -619,19 +619,21 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     private void setInfo() {
         mViewModel.getEpg(mChannel);
+        mBinding.widget.play.setText("");
         mChannel.loadLogo(mBinding.widget.logo);
         mBinding.widget.name.setText(mChannel.getName());
         mBinding.widget.title.setText(mChannel.getName());
         mBinding.widget.line.setText(mChannel.getLineText());
         mBinding.widget.number.setText(mChannel.getNumber());
         mBinding.control.line.setText(mChannel.getLineText());
+        mBinding.widget.name.setMaxEms(mChannel.getName().length());
         mBinding.widget.line.setVisibility(mChannel.getLineVisible());
         mBinding.control.line.setVisibility(mChannel.getLineVisible());
     }
 
     private void setEpg() {
         String epg = mChannel.getData().getEpg();
-        mBinding.widget.name.setMaxEms(epg.isEmpty() ? mChannel.getName().length() : 12);
+        if (epg.length() > 0) mBinding.widget.name.setMaxEms(12);
         mEpgDataAdapter.setItems(mChannel.getData().getList(), null);
         mBinding.widget.play.setText(epg);
         setWidth(mChannel.getData());

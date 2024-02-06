@@ -663,6 +663,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
 
     private void setInfo() {
         mViewModel.getEpg(mChannel);
+        mBinding.widget.play.setText("");
         mChannel.loadLogo(mBinding.widget.logo);
         mBinding.arrow.setVisibility(View.GONE);
         mBinding.widget.name.setText(mChannel.getName());
@@ -671,6 +672,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mBinding.widget.line.setText(mChannel.getLineText());
         mBinding.widget.number.setText(mChannel.getNumber());
         mBinding.widget.numberPip.setText(mChannel.getNumber());
+        mBinding.widget.name.setMaxEms(mChannel.getName().length());
         mBinding.widget.line.setVisibility(mChannel.getLineVisible());
         mBinding.control.action.line.setText(mBinding.widget.line.getText());
         mBinding.control.action.line.setVisibility(mBinding.widget.line.getVisibility());
@@ -679,8 +681,8 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     private void setEpg() {
         String epg = mChannel.getData().getEpg();
         List<EpgData> data = mChannel.getData().getList();
+        if (epg.length() > 0) mBinding.widget.name.setMaxEms(12);
         mBinding.arrow.setVisibility(data.isEmpty() ? View.GONE : View.VISIBLE);
-        mBinding.widget.name.setMaxEms(epg.isEmpty() ? mChannel.getName().length() : 12);
         mBinding.widget.play.setText(epg);
         mEpgDataAdapter.addAll(data);
         setWidth(mChannel.getData());
