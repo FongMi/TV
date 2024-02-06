@@ -235,3 +235,16 @@ $(function () {
         showPanel(parseInt($(this).attr('id').substr(3)));
     });
 });
+
+$(document).ready(function () {
+    var url = window.location.search;
+    if (url.indexOf('tab=2') > 0) {
+        showPanel(2);
+    } else if (url.indexOf('tab=3') > 0) {
+        showPanel(3);
+    } else if (url.indexOf('tab=4') > 0) {
+        showPanel(4);
+    } else {
+        showPanel(1);
+    }
+});
