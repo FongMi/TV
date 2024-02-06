@@ -138,7 +138,6 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private List<String> mBroken;
     private History mHistory;
     private Players mPlayers;
-    private EpisodeDialog mEpisodeDialog;
     private boolean background;
     private boolean fullscreen;
     private boolean initTrack;
@@ -844,18 +843,9 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         else mBinding.danmaku.hide();
     }
 
-    public void setEpisodeDialog(EpisodeDialog dialog) {
-        mEpisodeDialog = dialog;
-    }
-
     private void onEpisodes() {
-        if (mEpisodeDialog != null) {
-            mEpisodeDialog.dismiss();
-            mEpisodeDialog = null;
-        } else {
-            EpisodeDialog.create().episodes(getFlag().getEpisodes()).show(this);
-            hideControl();
-        }
+        EpisodeDialog.create().episodes(getFlag().getEpisodes()).show(this);
+        hideControl();
     }
 
     private void checkNext() {
