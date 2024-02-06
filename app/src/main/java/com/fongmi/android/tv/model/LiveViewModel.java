@@ -82,8 +82,7 @@ public class LiveViewModel extends ViewModel {
         execute(URL, () -> {
             item.setMsg(null);
             Source.get().stop();
-            SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault());
-            item.setUrl(item.getCurrent() + "?playseek=" + format.format(new Date(data.getStartTime())) + "-" + format.format(new Date(data.getEndTime())));
+            item.setUrl(item.getCurrent() + item.getCatchup().format(data));
             return item;
         });
     }

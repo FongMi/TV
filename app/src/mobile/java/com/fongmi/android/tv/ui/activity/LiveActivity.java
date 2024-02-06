@@ -639,8 +639,9 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
 
     @Override
     public void onItemClick(EpgData item) {
-        mEpgDataAdapter.setSelected(item);
-        mViewModel.getUrl(mChannel, item);
+        if (!mChannel.hasCatchup()) return;
+        //mEpgDataAdapter.setSelected(item);
+        //mViewModel.getUrl(mChannel, item);
     }
 
     private void addKeep(Channel item) {

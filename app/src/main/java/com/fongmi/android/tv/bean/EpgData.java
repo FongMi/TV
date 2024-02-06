@@ -8,6 +8,9 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.gson.annotations.SerializedName;
 
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 public class EpgData {
 
     @SerializedName("title")
@@ -63,6 +66,13 @@ public class EpgData {
 
     public boolean isInRange() {
         return getStartTime() <= System.currentTimeMillis() && System.currentTimeMillis() <= getEndTime();
+    }
+
+    public String format(String group) {
+        String pattern = group.split("\\)")[1].split("\\}")[0];
+        if (group.contains("(b)")) return new SimpleDateFormat(pattern, Locale.getDefault()).format(getStartTime());
+        if (group.contains("(e)")) return new SimpleDateFormat(pattern, Locale.getDefault()).format(getEndTime());
+        return "";
     }
 
     public String format() {

@@ -39,6 +39,8 @@ public class Channel {
     private String origin;
     @SerializedName("referer")
     private String referer;
+    @SerializedName("catchup")
+    private Catchup catchup;
     @SerializedName("header")
     private JsonElement header;
     @SerializedName("playerType")
@@ -154,6 +156,14 @@ public class Channel {
 
     public void setReferer(String referer) {
         this.referer = referer;
+    }
+
+    public Catchup getCatchup() {
+        return catchup;
+    }
+
+    public void setCatchup(Catchup catchup) {
+        this.catchup = catchup;
     }
 
     public JsonElement getHeader() {
@@ -274,6 +284,11 @@ public class Channel {
 
     public boolean isLast() {
         return getUrls().isEmpty() || getLine() == getUrls().size() - 1;
+    }
+
+    public boolean hasCatchup() {
+        if (getCatchup() == null && getCurrent().contains("/PLTV/")) setCatchup(Catchup.PLTV());
+        return getCatchup() != null;
     }
 
     public String getLineText() {
