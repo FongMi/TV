@@ -446,7 +446,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mViewModel.result.observe(this, this::setDetail);
         mViewModel.player.observe(this, this::setPlayer);
-        mViewModel.search.observe(this, result -> setSearch(result.getList()));
+        mViewModel.search.observe(this, this::setSearch);
     }
 
     private void checkCast() {
@@ -1430,7 +1430,8 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         }
     }
 
-    private void setSearch(List<Vod> items) {
+    private void setSearch(Result result) {
+        List<Vod> items = result.getList();
         Iterator<Vod> iterator = items.iterator();
         while (iterator.hasNext()) if (mismatch(iterator.next())) iterator.remove();
         mQuickAdapter.addAll(mQuickAdapter.size(), items);
@@ -1448,7 +1449,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private boolean mismatch(Vod item) {
         if (getId().equals(item.getVodId())) return true;
         if (mBroken.contains(item.getVodId())) return true;
-        String keyword = mBinding.part.getTag().toString();
+        String keyword = Objects.toString(mBinding.part.getTag(), "");
         if (isAutoMode()) return !item.getVodName().equals(keyword);
         else return !item.getVodName().contains(keyword);
     }
