@@ -1,6 +1,7 @@
 package com.fongmi.android.tv.ui.dialog;
 
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -18,11 +19,13 @@ import androidx.leanback.widget.OnChildViewHolderSelectedListener;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.bean.Episode;
 import com.fongmi.android.tv.databinding.DialogEpisodeBinding;
 import com.fongmi.android.tv.ui.activity.VideoActivity;
 import com.fongmi.android.tv.ui.presenter.ArrayPresenter;
 import com.fongmi.android.tv.ui.presenter.EpisodePresenter;
+import com.fongmi.android.tv.utils.KeyUtil;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -47,6 +50,13 @@ public class EpisodeDialog extends BaseDialog implements ArrayPresenter.OnClickL
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         setStyle(STYLE_NORMAL, R.style.TransBottomSheetDialog);
         BottomSheetDialog dialog = (BottomSheetDialog) super.onCreateDialog(savedInstanceState);
+        dialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
+            @Override
+            public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+                if (activity.isFullscreen() && KeyUtil.isMenuKey(event) && Setting.getFullscreenMenuKey() == 1) dismiss();
+                return false;
+            }
+        });
         return dialog;
     }
 
@@ -72,7 +82,6 @@ public class EpisodeDialog extends BaseDialog implements ArrayPresenter.OnClickL
         for (Fragment f : activity.getSupportFragmentManager().getFragments()) if (f instanceof BottomSheetDialogFragment) return;
         show(activity.getSupportFragmentManager(), null);
         this.activity = (VideoActivity) activity;
-        this.activity.setEpisodeDialog(this);
     }
 
     @Override
