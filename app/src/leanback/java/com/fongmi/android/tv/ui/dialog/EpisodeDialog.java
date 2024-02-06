@@ -69,7 +69,12 @@ public class EpisodeDialog extends BaseDialog implements ArrayPresenter.OnClickL
     }
 
     public void show(FragmentActivity activity) {
-        for (Fragment f : activity.getSupportFragmentManager().getFragments()) if (f instanceof BottomSheetDialogFragment) return;
+        for (Fragment f : activity.getSupportFragmentManager().getFragments()) {
+            if (f instanceof EpisodeDialog) {
+                ((EpisodeDialog) f).dismiss();
+                return;
+            }
+        }
         show(activity.getSupportFragmentManager(), null);
         this.activity = (VideoActivity) activity;
     }
