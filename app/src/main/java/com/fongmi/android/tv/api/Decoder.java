@@ -34,7 +34,7 @@ public class Decoder {
 
     private static String fix(String url, String data) {
         if (url.startsWith("file") || url.startsWith("assets")) url = UrlUtil.convert(url);
-        data = data.replace("./", url.substring(0, url.lastIndexOf("/") + 1));
+        data = data.replace("./", url.substring(0, url.split("\\?")[0].lastIndexOf("/") + 1));
         return data;
     }
 
