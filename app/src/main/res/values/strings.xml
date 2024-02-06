@@ -76,6 +76,7 @@
     <string name="setting_quality">Image quality</string>
     <string name="setting_size">Image size</string>
     <string name="setting_aggregated_search">Aggregated search</string>
+    <string name="setting_fullscreen_menu_key">Fullscreen menu key</string>
     <string name="setting_doh">DoH</string>
     <string name="setting_proxy">Proxy</string>
     <string name="setting_cache">Cache</string>
@@ -214,6 +215,11 @@
     <string-array name="select_episode">
         <item>Single</item>
         <item>Multiple</item>
+    </string-array>
+
+    <string-array name="select_fullscreen_menu_key">
+        <item>Control</item>
+        <item>Episodes</item>
     </string-array>
 
     <string-array name="select_caption">

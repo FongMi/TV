@@ -381,4 +381,12 @@ public class Setting {
         Prefers.put("aggregated_search", search);
     }
 
+    public static void putFullscreenMenuKey(int key) {
+        Prefers.put("fullscreen_menu_key", key);
+    }
+
+    public static int getFullscreenMenuKey() {
+        return Prefers.getInt("fullscreen_menu_key", 0);
+    }
+
 }

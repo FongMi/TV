@@ -19,6 +19,7 @@ public class SettingCustomActivity extends BaseActivity {
     private String[] quality;
     private String[] size;
     private String[] episode;
+    private String[] fullscreenMenuKey;
 
     @Override
     protected ViewBinding getBinding() {
@@ -44,6 +45,7 @@ public class SettingCustomActivity extends BaseActivity {
         mBinding.displayDurationText.setText(getSwitch(Setting.isDisplayDuration()));
         mBinding.speedText.setText(Setting.getPlaySpeed() + "x");
         mBinding.aggregatedSearchText.setText(getSwitch(Setting.isAggregatedSearch()));
+        mBinding.fullscreenMenuKeyText.setText((fullscreenMenuKey = ResUtil.getStringArray(R.array.select_fullscreen_menu_key))[Setting.getFullscreenMenuKey()]);
     }
 
     @Override
@@ -57,6 +59,7 @@ public class SettingCustomActivity extends BaseActivity {
         mBinding.speed.setOnClickListener(this::setSpeed);
         mBinding.speed.setOnLongClickListener(this::resetSpeed);
         mBinding.aggregatedSearch.setOnClickListener(this::setAggregatedSearch);
+        mBinding.fullscreenMenuKey.setOnClickListener(this::setfullscreenMenuKey);
     }
 
     private void setQuality(View view) {
@@ -111,6 +114,12 @@ public class SettingCustomActivity extends BaseActivity {
     private void setAggregatedSearch(View view) {
         Setting.putAggregatedSearch(!Setting.isAggregatedSearch());
         mBinding.aggregatedSearchText.setText(getSwitch(Setting.isAggregatedSearch()));
+    }
+
+    private void setfullscreenMenuKey(View view) {
+        int index = Setting.getFullscreenMenuKey();
+        Setting.putFullscreenMenuKey(index = index == fullscreenMenuKey.length - 1 ? 0 : ++index);
+        mBinding.fullscreenMenuKeyText.setText(fullscreenMenuKey[index]);
     }
 
 }
