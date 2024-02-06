@@ -58,6 +58,17 @@ public class EpgDataAdapter extends RecyclerView.Adapter<EpgDataAdapter.ViewHold
         return 0;
     }
 
+    public boolean hasNext() {
+        return getItemCount() > 0 || getPosition() + 1 < getItemCount();
+    }
+
+    public EpgData getNext() {
+        int current = getPosition();
+        int max = getItemCount() - 1;
+        current = ++current > max ? max : current;
+        return mItems.get(current);
+    }
+
     @Override
     public int getItemCount() {
         return mItems.size();

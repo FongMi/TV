@@ -639,9 +639,11 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
 
     @Override
     public void onItemClick(EpgData item) {
-        if (!mChannel.hasCatchup()) return;
-        //mEpgDataAdapter.setSelected(item);
-        //mViewModel.getUrl(mChannel, item);
+        if (item.isFuture() || !mChannel.hasCatchup()) return;
+        Notify.show(getString(R.string.play_ready, item.getTitle()));
+        mEpgDataAdapter.setSelected(item);
+        mViewModel.getUrl(mChannel, item);
+        hideEpg();
     }
 
     private void addKeep(Channel item) {
@@ -678,8 +680,8 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     private void setEpg() {
         String epg = mChannel.getData().getEpg();
         List<EpgData> data = mChannel.getData().getList();
-        mBinding.widget.name.setMaxEms(epg.isEmpty() ? mChannel.getName().length() : 12);
         mBinding.arrow.setVisibility(data.isEmpty() ? View.GONE : View.VISIBLE);
+        mBinding.widget.name.setMaxEms(epg.isEmpty() ? mChannel.getName().length() : 12);
         mBinding.widget.play.setText(epg);
         mEpgDataAdapter.addAll(data);
         setWidth(mChannel.getData());
@@ -798,7 +800,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
                 if (isVisible(mBinding.control.getRoot())) showControl();
                 break;
             case Player.STATE_ENDED:
-                nextChannel();
+                nextEpg();
                 break;
         }
     }
@@ -903,6 +905,14 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         if (Setting.isAcross() && limit) nextGroup();
         else mGroup.setPosition(limit ? 0 : position);
         if (!mGroup.isEmpty()) onItemClick(mGroup.current());
+    }
+
+    public void nextEpg() {
+        if (mEpgDataAdapter.hasNext()) {
+            onItemClick(mEpgDataAdapter.getNext());
+        } else {
+            nextChannel();
+        }
     }
 
     private void prevLine() {

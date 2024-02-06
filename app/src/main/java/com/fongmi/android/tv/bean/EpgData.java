@@ -68,6 +68,10 @@ public class EpgData {
         return getStartTime() <= System.currentTimeMillis() && System.currentTimeMillis() <= getEndTime();
     }
 
+    public boolean isFuture() {
+        return getStartTime() > System.currentTimeMillis();
+    }
+
     public String format(String group) {
         String pattern = group.split("\\)")[1].split("\\}")[0];
         if (group.contains("(b)")) return new SimpleDateFormat(pattern, Locale.getDefault()).format(getStartTime());
