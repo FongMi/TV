@@ -338,6 +338,11 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         fetch();
     }
 
+    private void setActivated(EpgData item) {
+        for (int i = 0; i < mEpgDataAdapter.size(); i++) ((EpgData) mEpgDataAdapter.get(i)).setSelected(item);
+        notifyItemChanged(mBinding.widget.epgData, mEpgDataAdapter);
+    }
+
     private void checkPlay() {
         if (mPlayers.isPlaying()) mPlayers.pause();
         else mPlayers.play();
@@ -440,7 +445,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     @Override
     public void showEpg(Channel item) {
         if (mChannel == null || mChannel.getData().getList().isEmpty() || mEpgDataAdapter.size() == 0 || !mChannel.equals(item)) return;
-        mBinding.widget.epgData.setSelectedPosition(mChannel.getData().getIndex());
+        mBinding.widget.epgData.setSelectedPosition(mChannel.getData().getSelected());
         mBinding.widget.epg.setVisibility(View.VISIBLE);
         mBinding.widget.epg.requestFocus();
         hideUI();
@@ -496,6 +501,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private void showInfo() {
         mBinding.widget.bottom.setVisibility(View.VISIBLE);
         setR3Callback();
+        hideEpg();
         setInfo();
     }
 
@@ -580,7 +586,11 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
 
     @Override
     public void onItemClick(EpgData item) {
-
+        if (item.isFuture() || !mChannel.hasCatchup()) return;
+        Notify.show(getString(R.string.play_ready, item.getTitle()));
+        mViewModel.getUrl(mChannel, item);
+        setActivated(item);
+        hideEpg();
     }
 
     private void addKeep(Channel item) {
@@ -617,8 +627,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mBinding.control.line.setText(mChannel.getLineText());
         mBinding.widget.line.setVisibility(mChannel.getLineVisible());
         mBinding.control.line.setVisibility(mChannel.getLineVisible());
-        hideEpg();
-        setEpg();
     }
 
     private void setEpg() {
@@ -729,7 +737,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
                 mBinding.widget.size.setText(mPlayers.getSizeText());
                 break;
             case Player.STATE_ENDED:
-                nextChannel();
+                nextEpg();
                 break;
         }
     }
@@ -809,6 +817,13 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         if (Setting.isAcross() && limit) nextGroup(true);
         else mGroup.setPosition(limit ? 0 : position);
         if (!mGroup.isEmpty()) setChannel(mGroup.current());
+    }
+
+    public void nextEpg() {
+        int position = mChannel.getData().getSelected() + 1;
+        boolean limit = position > mEpgDataAdapter.size() - 1;
+        if (!limit) onItemClick(mChannel.getData().getList().get(position));
+        else nextChannel();
     }
 
     private void prevLine() {

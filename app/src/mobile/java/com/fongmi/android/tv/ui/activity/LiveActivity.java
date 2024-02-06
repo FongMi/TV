@@ -491,7 +491,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     private void showEpg() {
-        mBinding.widget.epgData.scrollToPosition(mEpgDataAdapter.getPosition());
+        mBinding.widget.epgData.scrollToPosition(mChannel.getData().getSelected());
         mBinding.widget.epg.setVisibility(View.VISIBLE);
         hideUI();
     }
@@ -548,6 +548,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mBinding.widget.info.setVisibility(pip ? View.GONE : View.VISIBLE);
         setR3Callback();
         hideControl();
+        hideEpg();
         setInfo();
     }
 
@@ -673,8 +674,6 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mBinding.widget.line.setVisibility(mChannel.getLineVisible());
         mBinding.control.action.line.setText(mBinding.widget.line.getText());
         mBinding.control.action.line.setVisibility(mBinding.widget.line.getVisibility());
-        hideEpg();
-        setEpg();
     }
 
     private void setEpg() {
@@ -908,11 +907,10 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     }
 
     public void nextEpg() {
-        if (mEpgDataAdapter.hasNext()) {
-            onItemClick(mEpgDataAdapter.getNext());
-        } else {
-            nextChannel();
-        }
+        int position = mChannel.getData().getSelected() + 1;
+        boolean limit = position > mEpgDataAdapter.getItemCount() - 1;
+        if (!limit) onItemClick(mChannel.getData().getList().get(position));
+        else nextChannel();
     }
 
     private void prevLine() {

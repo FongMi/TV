@@ -78,7 +78,16 @@ public class Epg {
 
     public String getEpg() {
         for (EpgData item : getList()) if (item.isSelected()) return item.format();
-        for (EpgData item : getList()) if (item.isInRange()) return item.format();
         return "";
+    }
+
+    public Epg selected() {
+        for (EpgData item : getList()) item.setSelected(item.isInRange());
+        return this;
+    }
+
+    public int getSelected() {
+        for (int i = 0; i < getList().size(); i++) if (getList().get(i).isSelected()) return i;
+        return -1;
     }
 }

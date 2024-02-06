@@ -48,6 +48,10 @@ public class EpgData {
         this.selected = selected;
     }
 
+    public void setSelected(EpgData item) {
+        this.selected = item.equals(this);
+    }
+
     public long getStartTime() {
         return startTime;
     }

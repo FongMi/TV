@@ -35,7 +35,7 @@ public class EpgDataPresenter extends Presenter {
         ViewHolder holder = (ViewHolder) viewHolder;
         holder.binding.time.setText(item.getTime());
         holder.binding.title.setText(item.getTitle());
-        holder.binding.getRoot().setSelected(item.isInRange());
+        holder.binding.getRoot().setSelected(item.isSelected());
         holder.binding.getRoot().setLeftListener(mListener::showUI);
         setOnClickListener(holder, view -> mListener.onItemClick(item));
     }
