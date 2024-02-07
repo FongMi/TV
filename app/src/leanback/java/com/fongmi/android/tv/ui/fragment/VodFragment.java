@@ -282,8 +282,8 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
             mBinding.recycler.setMoveTop(false);
             getVideo(item.getVodId(), "1");
         } else {
-            if (!isFolder()) VideoActivity.start(getActivity(), getKey(), item.getVodId(), item.getVodName(), item.getVodPic());
-            else VideoActivity.start(getActivity(), getKey(), item.getVodId(), item.getVodName(), item.getVodPic(), item.getVodName());
+            if (getSite().isIndex()) CollectActivity.start(getActivity(), item.getVodName());
+            else VideoActivity.start(getActivity(), getKey(), item.getVodId(), item.getVodName(), item.getVodPic(), isFolder() ? item.getVodName() : null);
         }
     }
 

@@ -22,7 +22,7 @@ import java.util.List;
 
 import okhttp3.Headers;
 
-@Entity(ignoredColumns = {"api", "ext", "jar", "click", "playUrl", "type", "timeout", "playerType", "categories", "header", "style", "activated"})
+@Entity(ignoredColumns = {"api", "ext", "jar", "click", "playUrl", "type", "indexs", "timeout", "playerType", "categories", "header", "style", "activated"})
 public class Site implements Parcelable {
 
     @NonNull
@@ -44,6 +44,8 @@ public class Site implements Parcelable {
     private String playUrl;
     @SerializedName("type")
     private Integer type;
+    @SerializedName("indexs")
+    private Integer indexs;
     @SerializedName("timeout")
     private Integer timeout;
     @SerializedName("playerType")
@@ -139,6 +141,14 @@ public class Site implements Parcelable {
         this.type = type;
     }
 
+    public Integer getIndexs() {
+        return indexs == null ? 0 : indexs;
+    }
+
+    public void setIndexs(Integer indexs) {
+        this.indexs = indexs;
+    }
+
     public Integer getTimeout() {
         return timeout == null ? Constant.TIMEOUT_PLAY : Math.max(timeout, 1) * 1000;
     }
@@ -197,6 +207,10 @@ public class Site implements Parcelable {
 
     public void setActivated(Site item) {
         this.activated = item.equals(this);
+    }
+
+    public boolean isIndex() {
+        return getIndexs() == 1;
     }
 
     public boolean isSearchable() {
@@ -274,6 +288,7 @@ public class Site implements Parcelable {
         dest.writeString(this.click);
         dest.writeString(this.playUrl);
         dest.writeValue(this.type);
+        dest.writeValue(this.indexs);
         dest.writeValue(this.timeout);
         dest.writeValue(this.playerType);
         dest.writeValue(this.searchable);
@@ -293,6 +308,7 @@ public class Site implements Parcelable {
         this.click = in.readString();
         this.playUrl = in.readString();
         this.type = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.indexs = (Integer) in.readValue(Integer.class.getClassLoader());
         this.timeout = (Integer) in.readValue(Integer.class.getClassLoader());
         this.playerType = (Integer) in.readValue(Integer.class.getClassLoader());
         this.searchable = (Integer) in.readValue(Integer.class.getClassLoader());
