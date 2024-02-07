@@ -373,14 +373,6 @@ public class Setting {
         Prefers.put("play_speed", speed);
     }
 
-    public static boolean isAggregatedSearch() {
-        return Prefers.getBoolean("aggregated_search", false);
-    }
-
-    public static void putAggregatedSearch(boolean search) {
-        Prefers.put("aggregated_search", search);
-    }
-
     public static void putFullscreenMenuKey(int key) {
         Prefers.put("fullscreen_menu_key", key);
     }

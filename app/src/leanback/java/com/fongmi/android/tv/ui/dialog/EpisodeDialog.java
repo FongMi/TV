@@ -18,7 +18,6 @@ import androidx.leanback.widget.ItemBridgeAdapter;
 import androidx.leanback.widget.OnChildViewHolderSelectedListener;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
-import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.bean.Episode;
 import com.fongmi.android.tv.databinding.DialogEpisodeBinding;
@@ -48,7 +47,6 @@ public class EpisodeDialog extends BaseDialog implements ArrayPresenter.OnClickL
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        setStyle(STYLE_NORMAL, R.style.TransBottomSheetDialog);
         BottomSheetDialog dialog = (BottomSheetDialog) super.onCreateDialog(savedInstanceState);
         dialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
             @Override
