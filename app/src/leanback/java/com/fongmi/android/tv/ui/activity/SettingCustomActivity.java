@@ -44,7 +44,6 @@ public class SettingCustomActivity extends BaseActivity {
         mBinding.displayNetspeedText.setText(getSwitch(Setting.isDisplaySpeed()));
         mBinding.displayDurationText.setText(getSwitch(Setting.isDisplayDuration()));
         mBinding.speedText.setText(Setting.getPlaySpeed() + "x");
-        mBinding.aggregatedSearchText.setText(getSwitch(Setting.isAggregatedSearch()));
         mBinding.fullscreenMenuKeyText.setText((fullscreenMenuKey = ResUtil.getStringArray(R.array.select_fullscreen_menu_key))[Setting.getFullscreenMenuKey()]);
     }
 
@@ -58,7 +57,6 @@ public class SettingCustomActivity extends BaseActivity {
         mBinding.displayDuration.setOnClickListener(this::setDisplayDuration);
         mBinding.speed.setOnClickListener(this::setSpeed);
         mBinding.speed.setOnLongClickListener(this::resetSpeed);
-        mBinding.aggregatedSearch.setOnClickListener(this::setAggregatedSearch);
         mBinding.fullscreenMenuKey.setOnClickListener(this::setfullscreenMenuKey);
     }
 
@@ -109,11 +107,6 @@ public class SettingCustomActivity extends BaseActivity {
         Setting.putPlaySpeed(1.0f);
         mBinding.speedText.setText(Setting.getPlaySpeed() + "x");
         return true;
-    }
-
-    private void setAggregatedSearch(View view) {
-        Setting.putAggregatedSearch(!Setting.isAggregatedSearch());
-        mBinding.aggregatedSearchText.setText(getSwitch(Setting.isAggregatedSearch()));
     }
 
     private void setfullscreenMenuKey(View view) {
