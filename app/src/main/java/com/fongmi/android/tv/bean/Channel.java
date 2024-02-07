@@ -288,6 +288,7 @@ public class Channel {
 
     public boolean hasCatchup() {
         if (getCatchup() == null && getCurrent().contains("/PLTV/")) setCatchup(Catchup.PLTV());
+        if (getCatchup() != null && !getCatchup().getRegex().isEmpty()) return getCatchup().match(getCurrent());
         return getCatchup() != null;
     }
 

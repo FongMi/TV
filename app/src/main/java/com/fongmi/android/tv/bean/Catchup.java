@@ -13,6 +13,8 @@ public class Catchup {
     private String type;
     @SerializedName("days")
     private String days;
+    @SerializedName("regex")
+    private String regex;
     @SerializedName("source")
     private String source;
 
@@ -20,6 +22,7 @@ public class Catchup {
         Catchup item = new Catchup();
         item.setDays("7");
         item.setType("append");
+        item.setRegex("/PLTV/");
         item.setSource("?playseek=${(b)yyyyMMddHHmmss}-${(e)yyyyMMddHHmmss}");
         return item;
     }
@@ -40,12 +43,24 @@ public class Catchup {
         this.days = days;
     }
 
+    public String getRegex() {
+        return TextUtils.isEmpty(regex) ? "" : regex;
+    }
+
+    public void setRegex(String regex) {
+        this.regex = regex;
+    }
+
     public String getSource() {
         return TextUtils.isEmpty(source) ? "" : source;
     }
 
     public void setSource(String source) {
         this.source = source;
+    }
+
+    public boolean match(String url) {
+        return url.contains(getRegex()) || Pattern.compile(getRegex()).matcher(url).find();
     }
 
     public String format(EpgData data) {
