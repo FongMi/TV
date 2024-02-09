@@ -75,7 +75,6 @@
     <string name="setting_custom">Custom setting</string>
     <string name="setting_quality">Image quality</string>
     <string name="setting_size">Image size</string>
-    <string name="setting_aggregated_search">Aggregated search</string>
     <string name="setting_fullscreen_menu_key">Fullscreen menu key</string>
     <string name="setting_doh">DoH</string>
     <string name="setting_proxy">Proxy</string>
