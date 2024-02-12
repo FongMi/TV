@@ -16,15 +16,35 @@
         android:paddingEnd="24dp"
         android:paddingBottom="8dp">
 
-        <com.fongmi.android.tv.ui.custom.CustomTitleView
-            android:id="@+id/title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <LinearLayout
             android:layout_gravity="start"
-            android:focusable="false"
-            android:text="@string/app_name"
-            android:textColor="@color/white"
-            android:textSize="24sp" />
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <com.fongmi.android.tv.ui.custom.CustomTitleView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:layout_marginRight="6dp"
+                android:focusable="false"
+                android:text="@string/app_name"
+                android:textColor="@color/white"
+                android:textSize="24dp" />
+
+            <ImageView
+                android:id="@+id/homeSiteLock"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_gravity="bottom"
+                android:layout_marginBottom="2dp"
+                android:background="@drawable/ic_home_lock"
+                android:focusable="false"
+                android:visibility="gone"
+                tools:visibility="visible" />
+        </LinearLayout>
+
 
         <TextView
             android:id="@+id/time"
