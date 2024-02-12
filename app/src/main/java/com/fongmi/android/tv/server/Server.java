@@ -28,6 +28,10 @@ public class Server {
         return getAddress(false);
     }
 
+    public String getAddress(int tab) {
+        return getAddress(false) + "?tab=" + tab;
+    }
+
     public String getAddress(String path) {
         return getAddress(true) + "/" + path;
     }

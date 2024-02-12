@@ -19,6 +19,7 @@ public class SettingCustomActivity extends BaseActivity {
     private String[] quality;
     private String[] size;
     private String[] episode;
+    private String[] fullscreenMenuKey;
 
     @Override
     protected ViewBinding getBinding() {
@@ -42,8 +43,10 @@ public class SettingCustomActivity extends BaseActivity {
         mBinding.displayTimeText.setText(getSwitch(Setting.isDisplayTime()));
         mBinding.displayNetspeedText.setText(getSwitch(Setting.isDisplaySpeed()));
         mBinding.displayDurationText.setText(getSwitch(Setting.isDisplayDuration()));
+        mBinding.displayMiniProgressText.setText(getSwitch(Setting.isDisplayMiniProgress()));
         mBinding.speedText.setText(Setting.getPlaySpeed() + "x");
-        mBinding.aggregatedSearchText.setText(getSwitch(Setting.isAggregatedSearch()));
+        mBinding.fullscreenMenuKeyText.setText((fullscreenMenuKey = ResUtil.getStringArray(R.array.select_fullscreen_menu_key))[Setting.getFullscreenMenuKey()]);
+        mBinding.homeSiteLockText.setText(getSwitch(Setting.isHomeSiteLock()));
     }
 
     @Override
@@ -54,9 +57,11 @@ public class SettingCustomActivity extends BaseActivity {
         mBinding.displayTime.setOnClickListener(this::setDisplayTime);
         mBinding.displayNetspeed.setOnClickListener(this::setDisplaySpeed);
         mBinding.displayDuration.setOnClickListener(this::setDisplayDuration);
+        mBinding.displayMiniProgress.setOnClickListener(this::setDisplayMiniProgress);
         mBinding.speed.setOnClickListener(this::setSpeed);
         mBinding.speed.setOnLongClickListener(this::resetSpeed);
-        mBinding.aggregatedSearch.setOnClickListener(this::setAggregatedSearch);
+        mBinding.fullscreenMenuKey.setOnClickListener(this::setfullscreenMenuKey);
+        mBinding.homeSiteLock.setOnClickListener(this::setHomeSiteLock);
     }
 
     private void setQuality(View view) {
@@ -94,6 +99,11 @@ public class SettingCustomActivity extends BaseActivity {
         mBinding.displayDurationText.setText(getSwitch(Setting.isDisplayDuration()));
     }
 
+    private void setDisplayMiniProgress(View view) {
+        Setting.putDisplayMiniProgress(!Setting.isDisplayMiniProgress());
+        mBinding.displayMiniProgressText.setText(getSwitch(Setting.isDisplayMiniProgress()));
+    }
+
     private void setSpeed(View view) {
         float speed = Setting.getPlaySpeed();
         float addon = speed >= 2 ? 1f : 0.25f;
@@ -108,9 +118,15 @@ public class SettingCustomActivity extends BaseActivity {
         return true;
     }
 
-    private void setAggregatedSearch(View view) {
-        Setting.putAggregatedSearch(!Setting.isAggregatedSearch());
-        mBinding.aggregatedSearchText.setText(getSwitch(Setting.isAggregatedSearch()));
+    private void setfullscreenMenuKey(View view) {
+        int index = Setting.getFullscreenMenuKey();
+        Setting.putFullscreenMenuKey(index = index == fullscreenMenuKey.length - 1 ? 0 : ++index);
+        mBinding.fullscreenMenuKeyText.setText(fullscreenMenuKey[index]);
+    }
+
+    private void setHomeSiteLock(View view) {
+        Setting.putHomeSiteLock(!Setting.isHomeSiteLock());
+        mBinding.homeSiteLockText.setText(getSwitch(Setting.isHomeSiteLock()));
     }
 
 }

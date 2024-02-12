@@ -39,6 +39,7 @@
     <string name="play_time">時間</string>
     <string name="play_netspeed">網速</string>
     <string name="play_duration">進度</string>
+    <string name="play_mini_progress">迷你進度</string>
     <string name="play_danmu">彈幕</string>
     <string name="play_speed">倍速</string>
     <string name="play_change">換源</string>
@@ -75,7 +76,8 @@
     <string name="setting_custom">個性設定</string>
     <string name="setting_quality">圖片品質</string>
     <string name="setting_size">圖片尺寸</string>
-    <string name="setting_aggregated_search">聚合搜索</string>
+    <string name="setting_fullscreen_menu_key">全屏選單鍵</string>
+    <string name="setting_home_site_lock">首頁源鎖定</string>
     <string name="setting_doh">DoH</string>
     <string name="setting_proxy">Proxy</string>
     <string name="setting_cache">暫存</string>
@@ -209,6 +211,11 @@
     <string-array name="select_episode">
         <item>單行</item>
         <item>多行</item>
+    </string-array>
+
+    <string-array name="select_fullscreen_menu_key">
+        <item>控製欄</item>
+        <item>選集</item>
     </string-array>
 
     <string-array name="select_caption">

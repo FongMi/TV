@@ -51,4 +51,16 @@
         android:textSize="16sp"
         tools:text="10MB/S"/>
 
+    <ProgressBar
+        android:id="@+id/progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="0dp"
+        android:layout_marginBottom="0dp"
+        android:max="100"
+        android:progress="0"
+        tools:progress="50" />
+
 </RelativeLayout>

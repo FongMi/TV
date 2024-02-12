@@ -189,6 +189,35 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/displayMiniProgress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/selector_item"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:text="@string/play_mini_progress"
+                android:textColor="@color/white"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/displayMiniProgressText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                tools:text="開" />
+
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/speed"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -218,7 +247,7 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/aggregatedSearch"
+            android:id="@+id/fullscreenMenuKey"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
@@ -231,18 +260,47 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
-                android:text="@string/setting_aggregated_search"
+                android:text="@string/setting_fullscreen_menu_key"
                 android:textColor="@color/white"
                 android:textSize="18sp" />
 
             <TextView
-                android:id="@+id/aggregatedSearchText"
+                android:id="@+id/fullscreenMenuKeyText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="end"
                 android:textColor="@color/white"
                 android:textSize="18sp"
-                tools:text="開" />
+                tools:text="控制栏" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/homeSiteLock"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/selector_item"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:text="@string/setting_home_site_lock"
+                android:textColor="@color/white"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/homeSiteLockText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                tools:text="開啟" />
 
         </LinearLayout>
 

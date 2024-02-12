@@ -282,8 +282,18 @@
             android:id="@+id/dpduration"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
             android:background="@drawable/shape_accent"
             android:text="@string/play_duration"
+            android:textColor="@color/control"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/dpminiprogress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/shape_accent"
+            android:text="@string/play_mini_progress"
             android:textColor="@color/control"
             android:textSize="14sp" />
 

@@ -32,18 +32,4 @@
         <item name="bottomSheetStyle">@style/ModalBottomSheetDialog</item>
     </style>
 
-
-    <style name="TransModalBottomSheetDialog" parent="Widget.Design.BottomSheet.Modal">
-        <item name="android:background">@drawable/shape_trans_bottom_sheet</item>
-    </style>
-
-    <style name="TransBottomSheetDialog" parent="Theme.MaterialComponents.Light.BottomSheetDialog">
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/primaryDark</item>
-        <item name="colorAccent">@color/accent</item>
-        <item name="android:backgroundDimEnabled">false</item>
-        <item name="android:windowIsFloating">false</item>
-        <item name="bottomSheetStyle">@style/TransModalBottomSheetDialog</item>
-    </style>
-
 </resources>
