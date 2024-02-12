@@ -9,7 +9,7 @@
         android:id="@+id/slider"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:stepSize="0.2"
+        android:stepSize="0.1"
         android:valueFrom="0.6"
         android:valueTo="2"
         app:thumbColor="@color/blue_500"

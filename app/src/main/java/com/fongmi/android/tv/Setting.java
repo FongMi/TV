@@ -365,6 +365,14 @@ public class Setting {
         Prefers.put("display_duration", display);
     }
 
+    public static boolean isDisplayMiniProgress() {
+        return Prefers.getBoolean("display_mini_progress", false);
+    }
+
+    public static void putDisplayMiniProgress(boolean display) {
+        Prefers.put("display_mini_progress", display);
+    }
+
     public static float getPlaySpeed() {
         return Prefers.getFloat("play_speed", 1.0f);
     }
@@ -373,12 +381,20 @@ public class Setting {
         Prefers.put("play_speed", speed);
     }
 
-    public static boolean isAggregatedSearch() {
-        return Prefers.getBoolean("aggregated_search", false);
+    public static void putFullscreenMenuKey(int key) {
+        Prefers.put("fullscreen_menu_key", key);
     }
 
-    public static void putAggregatedSearch(boolean search) {
-        Prefers.put("aggregated_search", search);
+    public static int getFullscreenMenuKey() {
+        return Prefers.getInt("fullscreen_menu_key", 0);
+    }
+
+    public static boolean isHomeSiteLock() {
+        return Prefers.getBoolean("home_site_lock", false);
+    }
+
+    public static void putHomeSiteLock(boolean lock) {
+        Prefers.put("home_site_lock", lock);
     }
 
 }

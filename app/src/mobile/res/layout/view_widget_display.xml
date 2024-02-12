@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:padding="8dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -49,5 +48,17 @@
         android:shadowRadius="1"
         android:textSize="12sp"
         tools:text="10MB/S"/>
+
+    <ProgressBar
+        android:id="@+id/progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="0dp"
+        android:layout_marginBottom="0dp"
+        android:max="100"
+        android:progress="0"
+        tools:progress="50" />
 
 </RelativeLayout>

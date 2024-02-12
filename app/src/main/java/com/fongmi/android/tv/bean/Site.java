@@ -22,7 +22,7 @@ import java.util.List;
 
 import okhttp3.Headers;
 
-@Entity(ignoredColumns = {"api", "ext", "jar", "click", "playUrl", "type", "timeout", "playerType", "categories", "header", "style", "activated"})
+@Entity(ignoredColumns = {"api", "ext", "jar", "click", "playUrl", "type", "timeout", "playerType", "categories", "header", "style", "activated", "indexs"})
 public class Site implements Parcelable {
 
     @NonNull
@@ -54,6 +54,8 @@ public class Site implements Parcelable {
     private Integer changeable;
     @SerializedName("recordable")
     private Integer recordable;
+    @SerializedName("indexs")
+    private Integer indexs;
     @SerializedName("categories")
     private List<String> categories;
     @SerializedName("header")
@@ -171,6 +173,18 @@ public class Site implements Parcelable {
         this.recordable = recordable;
     }
 
+    public boolean isIndexs() {
+        return getIndexs() == 1;
+    }
+
+    public Integer getIndexs() {
+        return indexs == null ? 0 : indexs;
+    }
+
+    public void setIndexs(Integer indexs) {
+        this.indexs = indexs;
+    }
+
     public List<String> getCategories() {
         return categories == null ? Collections.emptyList() : categories;
     }
@@ -279,6 +293,7 @@ public class Site implements Parcelable {
         dest.writeValue(this.searchable);
         dest.writeValue(this.changeable);
         dest.writeValue(this.recordable);
+        dest.writeValue(this.indexs);
         dest.writeStringList(this.categories);
         dest.writeParcelable(this.style, flags);
         dest.writeByte(this.activated ? (byte) 1 : (byte) 0);
@@ -298,6 +313,7 @@ public class Site implements Parcelable {
         this.searchable = (Integer) in.readValue(Integer.class.getClassLoader());
         this.changeable = (Integer) in.readValue(Integer.class.getClassLoader());
         this.recordable = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.indexs = (Integer) in.readValue(Integer.class.getClassLoader());
         this.categories = in.createStringArrayList();
         this.style = in.readParcelable(Style.class.getClassLoader());
         this.activated = in.readByte() != 0;
