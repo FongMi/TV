@@ -61,7 +61,6 @@
         android:layout_marginBottom="0dp"
         android:max="100"
         android:progress="0"
-        tools:progress="50"
-        android:secondaryProgress="100"/>
+        tools:progress="50" />
 
 </RelativeLayout>
