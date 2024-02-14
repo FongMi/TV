@@ -10,7 +10,7 @@ tasks.register('clean', Delete) {
 }
 
 project.ext {
-    gsonVersion = '2.8.6'
+    gsonVersion = '2.10.1'
     okioVersion = '1.15.0'
     jsoupVersion = '1.15.3'
     okhttpVersion = '3.12.13'

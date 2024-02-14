@@ -8,6 +8,7 @@ import com.github.catvod.utils.Util;
 import com.google.common.net.HttpHeaders;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
@@ -49,11 +50,13 @@ public class DefaultInterceptor implements Interceptor {
     }
 
     private Request getRequest(@NonNull Request request) {
+        URI uri = request.url().uri();
         String url = request.url().toString();
         Request.Builder builder = request.newBuilder();
         boolean local = url.contains(":" + Proxy.getPort() + "/");
         if (url.contains("+") && local) builder.url(url.replace("+", "%2B"));
-        if (url.contains("gitcode.net")) builder.addHeader(HttpHeaders.USER_AGENT, Util.CHROME);
+        if (url.contains("gitcode.net")) builder.header(HttpHeaders.USER_AGENT, Util.CHROME);
+        if (uri.getUserInfo() != null) builder.header(HttpHeaders.AUTHORIZATION, Util.basic(uri.getUserInfo()));
         return builder.build();
     }
 }

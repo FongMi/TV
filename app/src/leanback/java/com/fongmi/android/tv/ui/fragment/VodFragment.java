@@ -96,6 +96,10 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
         return VodConfig.get().getSite(getKey());
     }
 
+    private boolean isIndexs() {
+        return getSite().isIndexs();
+    }
+
     private Page getLastPage() {
         return mPages.get(mPages.size() - 1);
     }
@@ -282,7 +286,8 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
             mBinding.recycler.setMoveTop(false);
             getVideo(item.getVodId(), "1");
         } else {
-            if (!isFolder()) VideoActivity.start(getActivity(), getKey(), item.getVodId(), item.getVodName(), item.getVodPic());
+            if (isIndexs()) CollectActivity.start(getActivity(), item.getVodName());
+            else if (!isFolder()) VideoActivity.start(getActivity(), getKey(), item.getVodId(), item.getVodName(), item.getVodPic());
             else VideoActivity.start(getActivity(), getKey(), item.getVodId(), item.getVodName(), item.getVodPic(), item.getVodName());
         }
     }

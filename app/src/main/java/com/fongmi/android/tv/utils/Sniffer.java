@@ -9,10 +9,7 @@ import com.github.catvod.utils.Json;
 import com.github.catvod.utils.Util;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,7 +17,7 @@ public class Sniffer {
 
     public static final Pattern CLICKER = Pattern.compile("\\[a=cr:(\\{.*?\\})\\/](.*?)\\[\\/a]");
     public static final Pattern AI_PUSH = Pattern.compile("(http|https|rtmp|rtsp|smb|ftp|thunder|magnet|ed2k|mitv|tvbox-xg|jianpian|video):[^\\s]+", Pattern.MULTILINE);
-    public static final Pattern SNIFFER = Pattern.compile("http((?!http).){12,}?\\.(m3u8|mp4|mkv|flv|mp3|m4a|aac)\\?.*|http((?!http).){12,}\\.(m3u8|mp4|mkv|flv|mp3|m4a|aac)|http((?!http).)*?video/tos*");
+    public static final Pattern SNIFFER = Pattern.compile("http((?!http).){12,}?\\.(m3u8|mp4|mkv|flv|mp3|m4a|aac)\\?.*|http((?!http).){12,}\\.(m3u8|mp4|mkv|flv|mp3|m4a|aac)|http((?!http).)*?video/tos*|http((?!http).)*?obj/tos*");
 
     public static final List<String> THUNDER = Arrays.asList("thunder", "magnet", "ed2k");
 
@@ -40,34 +37,27 @@ public class Sniffer {
     }
 
     public static boolean isVideoFormat(String url) {
-        return isVideoFormat(url, new HashMap<>());
-    }
-
-    public static boolean isVideoFormat(String url, Map<String, String> headers) {
-        if (containOrMatch(url)) return true;
-        if (headers.containsKey("Accept") && headers.get("Accept").startsWith("image")) return false;
+        Rule rule = getRule(UrlUtil.uri(url));
+        for (String exclude : rule.getExclude()) if (url.contains(exclude)) return false;
+        for (String exclude : rule.getExclude()) if (Pattern.compile(exclude).matcher(url).find()) return false;
+        for (String regex : rule.getRegex()) if (url.contains(regex)) return true;
+        for (String regex : rule.getRegex()) if (Pattern.compile(regex).matcher(url).find()) return true;
         if (url.contains("url=http") || url.contains("v=http") || url.contains(".css") || url.contains(".html")) return false;
         return SNIFFER.matcher(url).find();
     }
 
-    private static boolean containOrMatch(String url) {
-        List<String> items = getRegex(UrlUtil.uri(url));
-        for (String regex : items) if (url.contains(regex)) return true;
-        for (String regex : items) if (Pattern.compile(regex).matcher(url).find()) return true;
-        return false;
+    public static Rule getRule(Uri uri) {
+        if (uri.getHost() == null) return Rule.empty();
+        String hosts = TextUtils.join(",", Arrays.asList(UrlUtil.host(uri), UrlUtil.host(uri.getQueryParameter("url"))));
+        for (Rule rule : VodConfig.get().getRules()) for (String host : rule.getHosts()) if (Util.containOrMatch(hosts, host)) return rule;
+        return Rule.empty();
     }
 
     public static List<String> getRegex(Uri uri) {
-        if (uri.getHost() == null) return Collections.emptyList();
-        String hosts = TextUtils.join(",", Arrays.asList(UrlUtil.host(uri), UrlUtil.host(uri.getQueryParameter("url"))));
-        for (Rule rule : VodConfig.get().getRules()) for (String host : rule.getHosts()) if (Util.containOrMatch(hosts, host)) return rule.getRegex();
-        return Collections.emptyList();
+        return getRule(uri).getRegex();
     }
 
     public static List<String> getScript(Uri uri) {
-        if (uri.getHost() == null) return Collections.emptyList();
-        String hosts = TextUtils.join(",", Arrays.asList(UrlUtil.host(uri), UrlUtil.host(uri.getQueryParameter("url"))));
-        for (Rule rule : VodConfig.get().getRules()) for (String host : rule.getHosts()) if (Util.containOrMatch(hosts, host)) return rule.getScript();
-        return Collections.emptyList();
+        return getRule(uri).getScript();
     }
 }

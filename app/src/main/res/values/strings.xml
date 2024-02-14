@@ -33,9 +33,15 @@
     <string name="play_ed">ED</string>
     <string name="play_next">Next</string>
     <string name="play_prev">Prev</string>
+    <string name="play_episodes">Episodes</string>
     <string name="play_loop">Loop</string>
     <string name="play_timer">Timer</string>
+    <string name="play_time">Time</string>
+    <string name="play_netspeed">Net Speed</string>
+    <string name="play_duration">Duration</string>
+    <string name="play_mini_progress">Mini Progress</string>
     <string name="play_danmu">Danmu</string>
+    <string name="play_speed">Speed</string>
     <string name="play_change">Change</string>
     <string name="play_forward">→</string>
     <string name="play_backward">←</string>
@@ -65,20 +71,13 @@
     <string name="setting_vod">Vod</string>
     <string name="setting_live">Live</string>
     <string name="setting_wall">Wallpaper</string>
-    <string name="setting_player">Player</string>
-    <string name="setting_player_ua">User-Agent</string>
-    <string name="setting_player_flag">Flag play</string>
-    <string name="setting_player_http">HTTP method</string>
-    <string name="setting_player_buffer">Buffer time</string>
-    <string name="setting_player_tunnel">Tunnel mode</string>
-    <string name="setting_player_caption">Caption style</string>
-    <string name="setting_player_subtitle">Subtitle size</string>
-    <string name="setting_player_background">Background play</string>
-    <string name="setting_decode">Decode</string>
-    <string name="setting_render">Render</string>
-    <string name="setting_scale">Scale</string>
+    <string name="setting_player">Player setting</string>
+    <string name="setting_danmu">Danmu setting</string>
+    <string name="setting_custom">Custom setting</string>
     <string name="setting_quality">Image quality</string>
     <string name="setting_size">Image size</string>
+    <string name="setting_fullscreen_menu_key">Fullscreen menu key</string>
+    <string name="setting_home_site_lock">Home site lock</string>
     <string name="setting_doh">DoH</string>
     <string name="setting_proxy">Proxy</string>
     <string name="setting_cache">Cache</string>
@@ -88,6 +87,26 @@
     <string name="setting_storage">Permission</string>
     <string name="setting_off">Off</string>
     <string name="setting_on">On</string>
+
+    <!-- Player -->
+    <string name="player">Player</string>
+    <string name="player_render">Render</string>
+    <string name="player_scale">Scale</string>
+    <string name="player_caption">Caption style</string>
+    <string name="player_subtitle">Subtitle size</string>
+    <string name="player_danmu_load">Danmu load</string>
+    <string name="player_danmu_speed">Danmu speed</string>
+    <string name="player_danmu_size">Danmu size</string>
+    <string name="player_danmu_line">Danmu line</string>
+    <string name="player_danmu_alpha">Danmu alpha</string>
+    <string name="player_danmu_sync">Danmu sync</string>
+    <string name="player_background">Background play</string>
+    <string name="player_flag">Flag play</string>
+    <string name="player_episode">Episode style</string>
+    <string name="player_exo_tunnel">Tunnel mode</string>
+    <string name="player_exo_http">HTTP method</string>
+    <string name="player_exo_buffer">Buffer time</string>
+    <string name="player_ua">User-Agent</string>
 
     <!-- Search -->
     <string name="search_keyword">Keywords…</string>
@@ -127,9 +146,13 @@
     <string name="crash_details_title">Error details</string>
     <string name="crash_details_close">Close</string>
 
+    <!-- Hint -->
+    <string name="copied">Copied</string>
+
     <!-- UNIT -->
     <string name="all">All</string>
     <string name="times">times</string>
+    <string name="lines">lines</string>
 
     <string-array name="select_decode">
         <item>Soft</item>
@@ -140,6 +163,13 @@
         <item>System</item>
         <item>IJK</item>
         <item>EXO</item>
+    </string-array>
+
+    <string-array name="select_danmu_speed">
+        <item>Super slow</item>
+        <item>Slow</item>
+        <item>Moderate</item>
+        <item>Fast</item>
     </string-array>
 
     <string-array name="select_render">
@@ -181,6 +211,16 @@
     <string-array name="select_flag">
         <item>Auto</item>
         <item>Manual</item>
+    </string-array>
+
+    <string-array name="select_episode">
+        <item>Single</item>
+        <item>Multiple</item>
+    </string-array>
+
+    <string-array name="select_fullscreen_menu_key">
+        <item>Control</item>
+        <item>Episodes</item>
     </string-array>
 
     <string-array name="select_caption">

@@ -10,8 +10,8 @@ android {
         applicationId "com.fongmi.android.tv"
         minSdk 16
         targetSdk 28
-        versionCode 220
-        versionName "2.2.0"
+        versionCode 225
+        versionName "0214"
         multiDexEnabled true
         ndk { abiFilters "armeabi-v7a" }
         javaCompileOptions {
@@ -70,8 +70,6 @@ dependencies {
     implementation project(':hook')
     implementation project(':tvbus')
     implementation project(':catvod')
-    implementation project(':danmaku')
-    implementation project(':pyramid')
     implementation project(':quickjs')
     implementation project(':thunder')
     implementation project(':jianpian')
@@ -103,6 +101,7 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.16.0'
     implementation 'com.github.bumptech.glide:annotations:4.16.0'
     implementation 'com.github.bumptech.glide:okhttp3-integration:4.16.0'
+    implementation 'com.github.ctiao:DanmakuFlameMaster:0.9.25'
     implementation 'com.github.jahirfiquitiva:TextDrawable:1.0.3'
     implementation('com.github.TeamNewPipe:NewPipeExtractor:v0.23.1') { exclude group: 'org.jsoup', module: 'jsoup' }
     implementation 'com.github.thegrizzlylabs:sardine-android:0.8'

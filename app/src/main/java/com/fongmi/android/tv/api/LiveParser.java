@@ -12,7 +12,6 @@ import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Json;
 import com.github.catvod.utils.Path;
-import com.google.gson.JsonParser;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -69,7 +68,7 @@ public class LiveParser {
             if (setting.find(line)) {
                 setting.check(line);
             } else if (line.startsWith("#EXTINF:")) {
-                Group group = live.find(Group.create(extract(line, GROUP)));
+                Group group = live.find(Group.create(extract(line, GROUP), live.isPass()));
                 channel = group.find(Channel.create(extract(line, NAME)));
                 channel.setLogo(extract(line, LOGO));
             } else if (!line.startsWith("#") && line.contains("://")) {
@@ -102,7 +101,7 @@ public class LiveParser {
     private static void proxy(Live live, String text) {
         int number = 0;
         for (Live item : Live.arrayFrom(text)) {
-            Group group = live.find(Group.create(item.getGroup()));
+            Group group = live.find(Group.create(item.getGroup(), live.isPass()));
             for (Channel channel : item.getChannels()) {
                 channel.setNumber(++number);
                 channel.live(live);
@@ -240,8 +239,8 @@ public class LiveParser {
 
         private void header(String line) {
             try {
-                if (line.contains("#EXTHTTP:")) header = Json.toMap(JsonParser.parseString(line.split("#EXTHTTP:")[1].trim()));
-                if (line.contains("header=")) header = Json.toMap(JsonParser.parseString(line.split("header=")[1].trim()));
+                if (line.contains("#EXTHTTP:")) header = Json.toMap(Json.parse(line.split("#EXTHTTP:")[1].trim()));
+                if (line.contains("header=")) header = Json.toMap(Json.parse(line.split("header=")[1].trim()));
             } catch (Exception e) {
                 header = null;
             }

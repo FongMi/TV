@@ -12,7 +12,7 @@ import com.fongmi.android.tv.databinding.AdapterPartBinding;
 public class PartPresenter extends Presenter {
 
     private final OnClickListener mListener;
-    private int nextFocus;
+    private int nextFocusUp;
 
     public PartPresenter(OnClickListener listener) {
         this.mListener = listener;
@@ -22,8 +22,8 @@ public class PartPresenter extends Presenter {
         void onItemClick(String item);
     }
 
-    public void setNextFocusUp(int nextFocus) {
-        this.nextFocus = nextFocus;
+    public void setNextFocusUp(int nextFocusUp) {
+        this.nextFocusUp = nextFocusUp;
     }
 
     @Override
@@ -37,7 +37,7 @@ public class PartPresenter extends Presenter {
         ViewHolder holder = (ViewHolder) viewHolder;
         holder.binding.text.setText(text);
         holder.binding.text.setMaxEms(Product.getEms());
-        holder.binding.text.setNextFocusUpId(nextFocus);
+        holder.binding.text.setNextFocusUpId(nextFocusUp);
         setOnClickListener(holder, view -> mListener.onItemClick(text));
     }
 

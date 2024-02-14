@@ -20,6 +20,7 @@ import com.android.cast.dlna.dmr.DLNARendererService;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.Updater;
 import com.fongmi.android.tv.api.config.LiveConfig;
 import com.fongmi.android.tv.api.config.VodConfig;
@@ -99,6 +100,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         Updater.get().start(this);
         mResult = Result.empty();
         Server.get().start();
+        setTitleView();
         setRecyclerView();
         setViewModel();
         setAdapter();
@@ -127,6 +129,10 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
                 VideoActivity.push(this, intent.getData().toString());
             }
         }
+    }
+
+    private void setTitleView() {
+        mBinding.homeSiteLock.setVisibility(Setting.isHomeSiteLock() ? View.VISIBLE : View.GONE);
     }
 
     private void setRecyclerView() {
@@ -189,7 +195,8 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         PermissionX.init(this).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> AppDatabase.restore(new Callback() {
             @Override
             public void success() {
-                initConfig();
+                if (allGranted) initConfig();
+                else mBinding.progressLayout.showContent();
             }
         }));
     }
@@ -237,6 +244,8 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         adapter.add(Func.create(R.string.home_keep));
         adapter.add(Func.create(R.string.home_push));
         adapter.add(Func.create(R.string.home_setting));
+        ((Func) adapter.get(0)).setNextFocusLeft(((Func) adapter.get(adapter.size() - 1)).getId());
+        ((Func) adapter.get(adapter.size() - 1)).setNextFocusRight(((Func) adapter.get(0)).getId());
         return new ListRow(adapter);
     }
 
@@ -317,7 +326,8 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     public void onItemClick(Vod item) {
-        VideoActivity.start(this, item.getVodId(), item.getVodName(), item.getVodPic());
+        if (getHome().isIndexs()) CollectActivity.start(this, item.getVodName());
+        else VideoActivity.start(this, item.getVodId(), item.getVodName(), item.getVodPic());
     }
 
     @Override
@@ -348,6 +358,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     public void showDialog() {
+        if (Setting.isHomeSiteLock()) return;
         SiteDialog.create(this).show();
     }
 
@@ -434,6 +445,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     protected void onResume() {
         super.onResume();
         mClock.start();
+        setTitleView();
     }
 
     @Override
