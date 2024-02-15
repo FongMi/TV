@@ -27,6 +27,7 @@ public class DefaultInterceptor implements Interceptor {
     public Response intercept(@NonNull Chain chain) throws IOException {
         Response response = chain.proceed(getRequest(chain.request()));
         String encoding = response.header(HttpHeaders.CONTENT_ENCODING);
+        if (response.isRedirect() && response.header(HttpHeaders.LOCATION) != null) checkAuth(response);
         if (response.body() == null || encoding == null || !encoding.equals("deflate")) return response;
         InflaterInputStream is = new InflaterInputStream(response.body().byteStream(), new Inflater(true));
         return response.newBuilder().headers(response.headers()).body(new ResponseBody() {
@@ -49,7 +50,7 @@ public class DefaultInterceptor implements Interceptor {
         }).build();
     }
 
-    private Request getRequest(@NonNull Request request) {
+    private Request getRequest(Request request) {
         URI uri = request.url().uri();
         String url = request.url().toString();
         Request.Builder builder = request.newBuilder();
@@ -58,5 +59,10 @@ public class DefaultInterceptor implements Interceptor {
         if (url.contains("gitcode.net")) builder.header(HttpHeaders.USER_AGENT, Util.CHROME);
         if (uri.getUserInfo() != null) builder.header(HttpHeaders.AUTHORIZATION, Util.basic(uri.getUserInfo()));
         return builder.build();
+    }
+
+    private void checkAuth(Response response) {
+        URI uri = URI.create(response.header(HttpHeaders.LOCATION));
+        if (uri.getUserInfo() != null) response.header(HttpHeaders.AUTHORIZATION, Util.basic(uri.getUserInfo()));
     }
 }
