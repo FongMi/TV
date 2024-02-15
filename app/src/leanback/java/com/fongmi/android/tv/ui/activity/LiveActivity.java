@@ -142,7 +142,7 @@ public class LiveActivity extends BaseActivity implements Clock.Callback, GroupP
     protected void initView() {
         mClock = Clock.create(Arrays.asList(mBinding.widget.time, mBinding.display.time));
         mKeyDown = CustomKeyDownLive.create(this);
-        mPlayers = new Players().init(this);
+        mPlayers = new Players().init();
         mHides = new ArrayList<>();
         mR0 = this::setActivated;
         mR1 = this::hideControl;

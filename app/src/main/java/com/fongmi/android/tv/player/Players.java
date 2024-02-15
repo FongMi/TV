@@ -1,13 +1,7 @@
 package com.fongmi.android.tv.player;
 
-import android.app.Activity;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.v4.media.MediaMetadataCompat;
-import android.support.v4.media.session.MediaControllerCompat;
-import android.support.v4.media.session.MediaSessionCompat;
-import android.support.v4.media.session.PlaybackStateCompat;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
@@ -31,7 +25,6 @@ import com.fongmi.android.tv.event.ActionEvent;
 import com.fongmi.android.tv.event.ErrorEvent;
 import com.fongmi.android.tv.event.PlayerEvent;
 import com.fongmi.android.tv.impl.ParseCallback;
-import com.fongmi.android.tv.impl.SessionCallback;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
@@ -68,7 +61,6 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     public static final int HARD = 1;
 
     private Map<String, String> headers;
-    private MediaSessionCompat session;
     private IjkVideoView ijkPlayer;
     private DanmakuView danmuView;
     private StringBuilder builder;
@@ -103,24 +95,14 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         return player == SYS || player == IJK;
     }
 
-    public Players init(Activity activity) {
+    public Players init() {
         player = Setting.getPlayer();
         decode = Setting.getDecode();
         builder = new StringBuilder();
         runnable = ErrorEvent::timeout;
         formatter = new Formatter(builder, Locale.getDefault());
         danmuSync = Setting.isDanmuSync();
-        createSession(activity);
         return this;
-    }
-
-    private void createSession(Activity activity) {
-        session = new MediaSessionCompat(activity, "TV");
-        session.setMediaButtonReceiver(null);
-        session.setCallback(SessionCallback.create(this));
-        session.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
-        session.setSessionActivity(PendingIntent.getActivity(App.get(), 99, new Intent(App.get(), activity.getClass()), PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE));
-        MediaControllerCompat.setMediaController(activity, session.getController());
     }
 
     public void set(PlayerView exo, IjkVideoView ijk) {
@@ -172,15 +154,6 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     public String getUrl() {
         return url;
-    }
-
-
-    public MediaSessionCompat getSession() {
-        return session;
-    }
-
-    public void setMetadata(MediaMetadataCompat metadata) {
-        session.setMetadata(metadata);
     }
 
     public int getPlayer() {
@@ -370,27 +343,22 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     public void play() {
         if (isPlaying() || isEnd()) return;
-        session.setActive(true);
         if (isExo()) playExo();
         if (isIjk()) playIjk();
         if (haveDanmu()) danmuView.resume();
-        setPlaybackState(PlaybackStateCompat.STATE_PLAYING);
     }
 
     public void pause() {
         if (isExo()) pauseExo();
         if (isIjk()) pauseIjk();
         if (haveDanmu()) danmuView.pause();
-        setPlaybackState(PlaybackStateCompat.STATE_PAUSED);
     }
 
     public void stop() {
         reset();
         if (isExo()) stopExo();
         if (isIjk()) stopIjk();
-        session.setActive(false);
         if (haveDanmu()) danmuView.stop();
-        setPlaybackState(PlaybackStateCompat.STATE_STOPPED);
     }
 
     public void release() {
@@ -550,11 +518,6 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         }
     }
 
-    private void setPlaybackState(int state) {
-        long actions = PlaybackStateCompat.ACTION_SEEK_TO | PlaybackStateCompat.ACTION_PLAY_PAUSE | PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS;
-        session.setPlaybackState(new PlaybackStateCompat.Builder().setActions(actions).setState(state, getPosition(), getSpeed()).build());
-    }
-
     private boolean isIllegal(String url) {
         Uri uri = UrlUtil.uri(url);
         String host = UrlUtil.host(uri);
@@ -606,7 +569,6 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     @Override
     public void onPlayerError(@NonNull PlaybackException error) {
         ErrorEvent.url(ExoUtil.getRetry(this.error = error.errorCode));
-        setPlaybackState(PlaybackStateCompat.STATE_ERROR);
     }
 
     @Override

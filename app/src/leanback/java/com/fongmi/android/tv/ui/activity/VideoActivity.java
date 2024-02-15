@@ -308,7 +308,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mFrameParams = mBinding.video.getLayoutParams();
         mClock = Clock.create(mBinding.display.time);
         mDanmakuContext = DanmakuContext.create();
-        mPlayers = new Players().init(this);
+        mPlayers = new Players().init();
         mBroken = new ArrayList<>();
         mR1 = this::hideControl;
         mR2 = this::updateFocus;
