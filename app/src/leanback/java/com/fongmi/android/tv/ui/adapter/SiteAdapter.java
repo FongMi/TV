@@ -71,7 +71,6 @@ public class SiteAdapter extends RecyclerView.Adapter<SiteAdapter.ViewHolder> {
     private boolean getChecked(Site item) {
         if (type == 1) return item.isSearchable();
         if (type == 2) return item.isChangeable();
-        if (type == 3) return !item.isRecordable();
         return false;
     }
 
@@ -79,21 +78,18 @@ public class SiteAdapter extends RecyclerView.Adapter<SiteAdapter.ViewHolder> {
         if (type == 0) mListener.onItemClick(item);
         if (type == 1) item.setSearchable(!item.isSearchable()).save();
         if (type == 2) item.setChangeable(!item.isChangeable()).save();
-        if (type == 3) item.setRecordable(!item.isRecordable()).save();
         if (type != 0) notifyItemChanged(position);
     }
 
     private boolean setLongListener(Site item) {
         if (type == 1) setEnable(!item.isSearchable());
         if (type == 2) setEnable(!item.isChangeable());
-        if (type == 3) setEnable(!item.isRecordable());
         return true;
     }
 
     private void setEnable(boolean enable) {
         if (type == 1) for (Site site : VodConfig.get().getSites()) site.setSearchable(enable).save();
         if (type == 2) for (Site site : VodConfig.get().getSites()) site.setChangeable(enable).save();
-        if (type == 3) for (Site site : VodConfig.get().getSites()) site.setRecordable(enable).save();
         notifyItemRangeChanged(0, getItemCount());
     }
 

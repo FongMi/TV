@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.CompoundButton;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -21,7 +20,7 @@ import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-public class SiteDialog implements SiteAdapter.OnClickListener, CompoundButton.OnCheckedChangeListener {
+public class SiteDialog implements SiteAdapter.OnClickListener{
 
     private RecyclerView.ItemDecoration decoration;
     private final DialogSiteBinding binding;
@@ -80,11 +79,11 @@ public class SiteDialog implements SiteAdapter.OnClickListener, CompoundButton.O
     }
 
     private void initEvent() {
-        binding.check.setOnCheckedChangeListener(this);
+        binding.all.setOnClickListener(this::setAll);
+        binding.none.setOnClickListener(this::setNone);
         binding.mode.setOnClickListener(this::setMode);
         binding.search.setOnClickListener(v -> setType(v.isActivated() ? 0 : 1));
         binding.change.setOnClickListener(v -> setType(v.isActivated() ? 0 : 2));
-        binding.record.setOnClickListener(v -> setType(v.isActivated() ? 0 : 3));
     }
 
     private void setRecyclerView() {
@@ -115,20 +114,22 @@ public class SiteDialog implements SiteAdapter.OnClickListener, CompoundButton.O
     private void setType(int type) {
         binding.search.setActivated(type == 1);
         binding.change.setActivated(type == 2);
-        binding.record.setActivated(type == 3);
         adapter.setType(this.type = type);
+    }
+
+    private void setAll(View view) {
+        if (type == 0) return;
+        adapter.selectAll();
+    }
+
+    private void setNone(View view) {
+        if (type == 0) return;
+        adapter.cancelAll();
     }
 
     private void setMode(View view) {
         Setting.putSiteMode(Math.abs(Setting.getSiteMode() - 1));
         initView();
-    }
-
-    @Override
-    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        if (type == 0) buttonView.setChecked(!isChecked);
-        else if (isChecked) adapter.selectAll();
-        else adapter.cancelAll();
     }
 
     @Override
