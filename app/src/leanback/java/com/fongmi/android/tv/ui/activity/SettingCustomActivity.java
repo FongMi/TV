@@ -47,6 +47,7 @@ public class SettingCustomActivity extends BaseActivity {
         mBinding.speedText.setText(Setting.getPlaySpeed() + "x");
         mBinding.fullscreenMenuKeyText.setText((fullscreenMenuKey = ResUtil.getStringArray(R.array.select_fullscreen_menu_key))[Setting.getFullscreenMenuKey()]);
         mBinding.homeSiteLockText.setText(getSwitch(Setting.isHomeSiteLock()));
+        mBinding.incognitoText.setText(getSwitch(Setting.isIncognito()));
     }
 
     @Override
@@ -62,6 +63,7 @@ public class SettingCustomActivity extends BaseActivity {
         mBinding.speed.setOnLongClickListener(this::resetSpeed);
         mBinding.fullscreenMenuKey.setOnClickListener(this::setfullscreenMenuKey);
         mBinding.homeSiteLock.setOnClickListener(this::setHomeSiteLock);
+        mBinding.incognito.setOnClickListener(this::setIncognito);
     }
 
     private void setQuality(View view) {
@@ -127,6 +129,11 @@ public class SettingCustomActivity extends BaseActivity {
     private void setHomeSiteLock(View view) {
         Setting.putHomeSiteLock(!Setting.isHomeSiteLock());
         mBinding.homeSiteLockText.setText(getSwitch(Setting.isHomeSiteLock()));
+    }
+
+    private void setIncognito(View view) {
+        Setting.putIncognito(!Setting.isIncognito());
+        mBinding.incognitoText.setText(getSwitch(Setting.isIncognito()));
     }
 
 }

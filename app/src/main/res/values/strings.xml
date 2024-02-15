@@ -78,6 +78,7 @@
     <string name="setting_size">Image size</string>
     <string name="setting_fullscreen_menu_key">Fullscreen menu key</string>
     <string name="setting_home_site_lock">Home site lock</string>
+    <string name="setting_incognito">Incognito mode</string>
     <string name="setting_doh">DoH</string>
     <string name="setting_proxy">Proxy</string>
     <string name="setting_cache">Cache</string>
