@@ -11,7 +11,7 @@ android {
         minSdk 21
         targetSdk 28
         versionCode 225
-        versionName "新年快樂"
+        versionName "0215"
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
@@ -98,7 +98,6 @@ dependencies {
     implementation project(':media-lib-datasource-rtmp')
     implementation project(':media-lib-decoder-av1')
     implementation project(':media-lib-decoder-ffmpeg')
-    implementation project(':media-lib-decoder-midi')
     implementation project(':media-lib-exoplayer')
     implementation project(':media-lib-exoplayer-dash')
     implementation project(':media-lib-exoplayer-hls')
