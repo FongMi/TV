@@ -5,7 +5,14 @@ import android.content.SharedPreferences;
 import androidx.preference.PreferenceManager;
 
 import com.github.catvod.Init;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.ToNumberPolicy;
 import com.google.gson.internal.LazilyParsedNumber;
+import com.google.gson.reflect.TypeToken;
+
+import java.io.File;
+import java.util.Map;
 
 public class Prefers {
 
@@ -18,7 +25,11 @@ public class Prefers {
     }
 
     public static String getString(String key, String defaultValue) {
-        return getPrefers().getString(key, defaultValue);
+        try {
+            return getPrefers().getString(key, defaultValue);
+        } catch (Exception e) {
+            return defaultValue;
+        }
     }
 
     public static int getInt(String key) {
@@ -26,7 +37,23 @@ public class Prefers {
     }
 
     public static int getInt(String key, int defaultValue) {
-        return getPrefers().getInt(key, defaultValue);
+        try {
+            return getPrefers().getInt(key, defaultValue);
+        } catch (Exception e) {
+            return defaultValue;
+        }
+    }
+
+    public static float getFloat(String key) {
+        return getFloat(key, 0f);
+    }
+
+    public static float getFloat(String key, float defaultValue) {
+        try {
+            return getPrefers().getFloat(key, defaultValue);
+        } catch (Exception e) {
+            return defaultValue;
+        }
     }
 
     public static boolean getBoolean(String key) {
@@ -34,7 +61,11 @@ public class Prefers {
     }
 
     public static boolean getBoolean(String key, boolean defaultValue) {
-        return getPrefers().getBoolean(key, defaultValue);
+        try {
+            return getPrefers().getBoolean(key, defaultValue);
+        } catch (Exception e) {
+            return defaultValue;
+        }
     }
 
     public static void put(String key, Object obj) {
@@ -56,5 +87,29 @@ public class Prefers {
 
     public static void remove(String key) {
         getPrefers().edit().remove(key).apply();
+    }
+
+    public static void backup(File file) {
+        Path.write(file, new Gson().toJson(getPrefers().getAll()).getBytes());
+    }
+
+    public static void restore(File file) {
+        try {
+            Gson gson = new GsonBuilder().setObjectToNumberStrategy(ToNumberPolicy.LAZILY_PARSED_NUMBER).create();
+            Map<String, Object> map = gson.fromJson(Path.read(file), new TypeToken<Map<String, Object>>() {}.getType());
+            for (Map.Entry<String, ?> entry : map.entrySet()) Prefers.put(entry.getKey(), convert(entry));
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            Path.clear(file);
+        }
+    }
+
+    private static Object convert(Map.Entry<String, ?> entry) {
+        if (entry.getKey().equals("danmu_size")) {
+            return Float.parseFloat(entry.getValue().toString());
+        } else {
+            return entry.getValue();
+        }
     }
 }

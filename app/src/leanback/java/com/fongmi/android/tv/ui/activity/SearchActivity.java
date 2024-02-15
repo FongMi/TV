@@ -157,7 +157,7 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
 
     @Override
     public void onRemote() {
-        PushActivity.start(this);
+        PushActivity.start(this, 1);
     }
 
     @Override

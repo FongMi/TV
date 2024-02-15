@@ -10,8 +10,8 @@ android {
         applicationId "com.fongmi.android.tv"
         minSdk 16
         targetSdk 28
-        versionCode 220
-        versionName "2.2.0"
+        versionCode 225
+        versionName "0214"
         multiDexEnabled true
         ndk { abiFilters "armeabi-v7a" }
         javaCompileOptions {
@@ -70,7 +70,6 @@ dependencies {
     implementation project(':hook')
     implementation project(':tvbus')
     implementation project(':catvod')
-    implementation project(':danmaku')
     implementation project(':pyramid')
     implementation project(':quickjs')
     implementation project(':thunder')
@@ -95,7 +94,6 @@ dependencies {
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.biometric:biometric:1.1.0'
-    implementation 'androidx.leanback:leanback:1.2.0-alpha04'
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.6.2'
     implementation 'androidx.room:room-runtime:2.6.1'
     implementation 'cat.ereza:customactivityoncrash:2.4.0'
@@ -103,6 +101,7 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.16.0'
     implementation 'com.github.bumptech.glide:annotations:4.16.0'
     implementation 'com.github.bumptech.glide:okhttp3-integration:4.16.0'
+    implementation 'com.github.ctiao:DanmakuFlameMaster:0.9.25'
     implementation 'com.github.jahirfiquitiva:TextDrawable:1.0.3'
     implementation('com.github.TeamNewPipe:NewPipeExtractor:v0.23.1') { exclude group: 'org.jsoup', module: 'jsoup' }
     implementation 'com.github.thegrizzlylabs:sardine-android:0.8'
@@ -111,7 +110,6 @@ dependencies {
     implementation 'com.google.zxing:core:3.3.0'
     implementation 'com.guolindev.permissionx:permissionx:1.7.1'
     implementation 'com.hierynomus:smbj:0.11.5'
-    implementation 'me.jessyan:autosize:1.2.1'
     implementation 'org.chromium.net:cronet-embedded:76.3809.111'
     implementation 'org.eclipse.jetty:jetty-client:8.1.21.v20160908'
     implementation 'org.eclipse.jetty:jetty-server:8.1.21.v20160908'
@@ -122,6 +120,8 @@ dependencies {
     implementation('org.simpleframework:simple-xml:2.7.1') { exclude group: 'stax', module: 'stax-api' exclude group: 'xpp3', module: 'xpp3' }
     implementation(ext: 'aar', name: 'dlna-core', group: 'fongmi', version: 'release')
     implementation(ext: 'aar', name: 'dlna-dmr', group: 'fongmi', version: 'release')
+    implementation 'androidx.leanback:leanback:1.2.0-alpha04'
+    implementation 'me.jessyan:autosize:1.2.1'
     annotationProcessor 'androidx.room:room-compiler:2.6.1'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.16.0'
 }

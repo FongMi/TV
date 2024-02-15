@@ -21,9 +21,9 @@ import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderNull;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Json;
+import com.github.catvod.utils.Util;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 import org.json.JSONObject;
 
@@ -129,7 +129,7 @@ public class VodConfig {
 
     private void loadConfig(Callback callback) {
         try {
-            checkJson(JsonParser.parseString(Decoder.getJson(config.getUrl())).getAsJsonObject(), callback);
+            checkJson(Json.parse(Decoder.getJson(config.getUrl())).getAsJsonObject(), callback);
         } catch (Throwable e) {
             if (TextUtils.isEmpty(config.getUrl())) App.post(() -> callback.error(""));
             else loadCache(callback, e);
@@ -138,7 +138,7 @@ public class VodConfig {
     }
 
     private void loadCache(Callback callback, Throwable e) {
-        if (!TextUtils.isEmpty(config.getJson())) checkJson(JsonParser.parseString(config.getJson()).getAsJsonObject(), callback);
+        if (!TextUtils.isEmpty(config.getJson())) checkJson(Json.parse(config.getJson()).getAsJsonObject(), callback);
         else App.post(() -> callback.error(Notify.getError(R.string.error_config_get, e)));
     }
 
@@ -175,6 +175,10 @@ public class VodConfig {
     }
 
     private void initSite(JsonObject object) {
+        if (object.has("video")) {
+            initSite(object.getAsJsonObject("video"));
+            return;
+        }
         for (JsonElement element : Json.safeListElement(object, "sites")) {
             Site site = Site.objectFrom(element);
             if (sites.contains(site)) continue;
@@ -242,6 +246,11 @@ public class VodConfig {
         if (js) jsLoader.setRecent(site.getKey());
         else if (py) pyLoader.setRecent(site.getKey());
         else if (csp) jarLoader.setRecent(site.getJar());
+    }
+
+    public void setRecent(String jar) {
+        jarLoader.parseJar(Util.md5(jar), jar);
+        jarLoader.setRecent(jar);
     }
 
     public Object[] proxyLocal(Map<String, String> params) {

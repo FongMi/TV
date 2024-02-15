@@ -316,6 +316,7 @@ public class CastActivity extends BaseActivity implements CustomKeyDownCast.List
             case 0:
                 setTrackVisible(false);
                 mClock.setCallback(this);
+                mBinding.control.seek.start();
                 setState(RenderState.PREPARING);
                 break;
             case Player.STATE_IDLE:
@@ -417,7 +418,7 @@ public class CastActivity extends BaseActivity implements CustomKeyDownCast.List
 
     @Override
     public void seek(long time) {
-        App.post(() -> mPlayers.seekTo(time, true));
+        App.post(() -> mPlayers.seekTo(time));
     }
 
     @Override

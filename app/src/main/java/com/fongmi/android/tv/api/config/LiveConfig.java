@@ -20,7 +20,6 @@ import com.fongmi.android.tv.utils.Notify;
 import com.github.catvod.utils.Json;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -112,7 +111,7 @@ public class LiveConfig {
         if (Json.invalid(text)) {
             parseText(text, callback);
         } else {
-            checkJson(JsonParser.parseString(text).getAsJsonObject(), callback);
+            checkJson(Json.parse(text).getAsJsonObject(), callback);
         }
     }
 

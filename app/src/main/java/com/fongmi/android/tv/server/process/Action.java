@@ -190,7 +190,7 @@ public class Action implements Process {
         List<Config> configs = Config.arrayFrom(params.get("configs"));
         List<Keep> targets = Keep.arrayFrom(params.get("targets"));
         boolean replace = Objects.equals(params.get("mode"), "1");
-        if (VodConfig.getUrl().isEmpty() && configs.size() > 0) {
+        if (TextUtils.isEmpty(VodConfig.getUrl()) && configs.size() > 0) {
             VodConfig.load(Config.find(configs.get(0), 0), getCallback(configs, targets));
         } else {
             if (replace) Keep.deleteAll();
