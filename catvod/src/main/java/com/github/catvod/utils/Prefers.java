@@ -96,8 +96,7 @@ public class Prefers {
     public static void restore(File file) {
         try {
             Gson gson = new GsonBuilder().setObjectToNumberStrategy(ToNumberPolicy.LAZILY_PARSED_NUMBER).create();
-            Map<String, Object> map = gson.fromJson(Path.read(file), new TypeToken<Map<String, Object>>() {
-            }.getType());
+            Map<String, Object> map = gson.fromJson(Path.read(file), new TypeToken<Map<String, Object>>() {}.getType());
             for (Map.Entry<String, ?> entry : map.entrySet()) Prefers.put(entry.getKey(), convert(entry));
         } catch (Exception e) {
             e.printStackTrace();

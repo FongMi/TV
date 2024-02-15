@@ -38,7 +38,7 @@ import java.util.Locale;
 @Database(entities = {Keep.class, Site.class, Live.class, Track.class, Config.class, Device.class, History.class}, version = AppDatabase.VERSION)
 public abstract class AppDatabase extends RoomDatabase {
 
-    public static final int VERSION = 28;
+    public static final int VERSION = 29;
     public static final String NAME = "tv";
     public static final String SYMBOL = "@@@";
 
@@ -80,16 +80,38 @@ public abstract class AppDatabase extends RoomDatabase {
             File wal = new File(Path.tv(), NAME + "-wal");
             File shm = new File(Path.tv(), NAME + "-shm");
             File pref = new File(Path.tv(), NAME + "-pref");
-            if (db.exists()) Path.move(db, App.get().getDatabasePath(db.getName()).getAbsoluteFile());
-            if (wal.exists()) Path.move(wal, App.get().getDatabasePath(wal.getName()).getAbsoluteFile());
-            if (shm.exists()) Path.move(shm, App.get().getDatabasePath(shm.getName()).getAbsoluteFile());
+            if (db.exists())
+                Path.move(db, App.get().getDatabasePath(db.getName()).getAbsoluteFile());
+            if (wal.exists())
+                Path.move(wal, App.get().getDatabasePath(wal.getName()).getAbsoluteFile());
+            if (shm.exists())
+                Path.move(shm, App.get().getDatabasePath(shm.getName()).getAbsoluteFile());
             if (pref.exists()) Prefers.restore(pref);
             App.post(callback::success);
         });
     }
 
     private static AppDatabase create(Context context) {
-        return Room.databaseBuilder(context, AppDatabase.class, NAME).addMigrations(MIGRATION_11_12).addMigrations(MIGRATION_12_13).addMigrations(MIGRATION_13_14).addMigrations(MIGRATION_14_15).addMigrations(MIGRATION_15_16).addMigrations(MIGRATION_16_17).addMigrations(MIGRATION_17_18).addMigrations(MIGRATION_18_19).addMigrations(MIGRATION_19_20).addMigrations(MIGRATION_20_21).addMigrations(MIGRATION_21_22).addMigrations(MIGRATION_22_23).addMigrations(MIGRATION_23_24).addMigrations(MIGRATION_24_25).addMigrations(MIGRATION_25_26).addMigrations(MIGRATION_26_27).allowMainThreadQueries().fallbackToDestructiveMigration().build();
+        return Room.databaseBuilder(context, AppDatabase.class, NAME)
+                .addMigrations(MIGRATION_11_12)
+                .addMigrations(MIGRATION_12_13)
+                .addMigrations(MIGRATION_13_14)
+                .addMigrations(MIGRATION_14_15)
+                .addMigrations(MIGRATION_15_16)
+                .addMigrations(MIGRATION_16_17)
+                .addMigrations(MIGRATION_17_18)
+                .addMigrations(MIGRATION_18_19)
+                .addMigrations(MIGRATION_19_20)
+                .addMigrations(MIGRATION_20_21)
+                .addMigrations(MIGRATION_21_22)
+                .addMigrations(MIGRATION_22_23)
+                .addMigrations(MIGRATION_23_24)
+                .addMigrations(MIGRATION_24_25)
+                .addMigrations(MIGRATION_25_26)
+                .addMigrations(MIGRATION_26_27)
+                .addMigrations(MIGRATION_27_28)
+                .addMigrations(MIGRATION_28_29)
+                .allowMainThreadQueries().fallbackToDestructiveMigration().build();
     }
 
     public abstract KeepDao getKeepDao();
@@ -225,6 +247,23 @@ public abstract class AppDatabase extends RoomDatabase {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             database.execSQL("CREATE TABLE IF NOT EXISTS `Live` (`name` TEXT NOT NULL, `boot` INTEGER NOT NULL, `pass` INTEGER NOT NULL, PRIMARY KEY(`name`))");
+        }
+    };
+
+    static final Migration MIGRATION_27_28 = new Migration(27, 28) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            Prefers.remove("danmu_size");
+        }
+    };
+
+    static final Migration MIGRATION_28_29 = new Migration(28, 29) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("CREATE TABLE Site_Backup (`key` TEXT NOT NULL, searchable INTEGER, changeable INTEGER, PRIMARY KEY (`key`))");
+            database.execSQL("INSERT INTO Site_Backup SELECT `key`, searchable, changeable FROM Site");
+            database.execSQL("DROP TABLE Site");
+            database.execSQL("ALTER TABLE Site_Backup RENAME to Site");
         }
     };
 }
