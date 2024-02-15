@@ -6,6 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
-    app:maxHeight="264dp"
+    app:maxHeight="296dp"
     tools:itemCount="5"
     tools:listitem="@layout/adapter_live" />
