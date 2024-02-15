@@ -26,8 +26,31 @@ public class DefaultInterceptor implements Interceptor {
     @Override
     public Response intercept(@NonNull Chain chain) throws IOException {
         Response response = chain.proceed(getRequest(chain.request()));
+        String location = response.header(HttpHeaders.LOCATION);
         String encoding = response.header(HttpHeaders.CONTENT_ENCODING);
-        if (response.body() == null || encoding == null || !encoding.equals("deflate")) return response;
+        if (response.isRedirect() && location != null) checkAuth(response, location);
+        if (response.body() != null && "deflate".equals(encoding)) return deflate(response);
+        return response;
+    }
+
+    private Request getRequest(Request request) {
+        URI uri = request.url().uri();
+        String url = request.url().toString();
+        Request.Builder builder = request.newBuilder();
+        boolean local = url.contains(":" + Proxy.getPort() + "/");
+        if (url.contains("+") && local) builder.url(url.replace("+", "%2B"));
+        if (url.contains("gitcode.net")) builder.header(HttpHeaders.USER_AGENT, Util.CHROME);
+        if (uri.getUserInfo() != null) builder.header(HttpHeaders.AUTHORIZATION, Util.basic(uri.getUserInfo()));
+        return builder.build();
+    }
+
+    private void checkAuth(Response response, String location) {
+        URI uri = URI.create(location);
+        if (uri.getUserInfo() == null) return;
+        response.header(HttpHeaders.AUTHORIZATION, Util.basic(uri.getUserInfo()));
+    }
+
+    private Response deflate(Response response) {
         InflaterInputStream is = new InflaterInputStream(response.body().byteStream(), new Inflater(true));
         return response.newBuilder().headers(response.headers()).body(new ResponseBody() {
             @Nullable
@@ -47,16 +70,5 @@ public class DefaultInterceptor implements Interceptor {
                 return Okio.buffer(Okio.source(is));
             }
         }).build();
-    }
-
-    private Request getRequest(@NonNull Request request) {
-        URI uri = request.url().uri();
-        String url = request.url().toString();
-        Request.Builder builder = request.newBuilder();
-        boolean local = url.contains(":" + Proxy.getPort() + "/");
-        if (url.contains("+") && local) builder.url(url.replace("+", "%2B"));
-        if (url.contains("gitcode.net")) builder.header(HttpHeaders.USER_AGENT, Util.CHROME);
-        if (uri.getUserInfo() != null) builder.header(HttpHeaders.AUTHORIZATION, Util.basic(uri.getUserInfo()));
-        return builder.build();
     }
 }
