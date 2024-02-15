@@ -47,13 +47,13 @@
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:nextFocusUp="@id/search"
-            android:nextFocusDown="@id/record"
+            android:nextFocusDown="@id/select"
             android:padding="8dp"
             android:src="@drawable/ic_site_change"
             app:tint="@color/text" />
 
         <ImageView
-            android:id="@+id/record"
+            android:id="@+id/select"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginTop="16dp"
@@ -61,21 +61,22 @@
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:nextFocusUp="@id/change"
-            android:nextFocusDown="@id/check"
+            android:nextFocusDown="@id/cancel"
             android:padding="8dp"
-            android:src="@drawable/ic_site_record"
-            app:tint="@color/text" />
+            android:src="@drawable/ic_site_select"  />
 
-        <com.google.android.material.checkbox.MaterialCheckBox
-            android:id="@+id/check"
+        <ImageView
+            android:id="@+id/cancel"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginTop="16dp"
             android:background="@drawable/selector_text"
-            android:checked="true"
-            android:nextFocusUp="@id/record"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:nextFocusUp="@id/select"
             android:nextFocusDown="@id/mode"
-            app:buttonTint="@color/white" />
+            android:padding="8dp"
+            android:src="@drawable/ic_site_cancel" />
 
         <ImageView
             android:id="@+id/mode"
@@ -85,7 +86,7 @@
             android:background="@drawable/selector_text"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            android:nextFocusUp="@id/check"
+            android:nextFocusUp="@id/none"
             android:nextFocusDown="@id/mode"
             android:padding="8dp"
             tools:src="@drawable/ic_site_list" />
