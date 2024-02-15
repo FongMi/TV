@@ -177,6 +177,14 @@ public class Setting {
         Prefers.put("site_mode", mode);
     }
 
+    public static boolean isIncognito() {
+        return Prefers.getBoolean("incognito");
+    }
+
+    public static void putIncognito(boolean incognito) {
+        Prefers.put("incognito", incognito);
+    }
+
     public static boolean isBootLive() {
         return Prefers.getBoolean("boot_live");
     }

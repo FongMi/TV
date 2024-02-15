@@ -65,6 +65,7 @@
     <string name="setting_live">Live</string>
     <string name="setting_wall">Wallpaper</string>
     <string name="setting_player">Player setting</string>
+    <string name="setting_incognito">Incognito mode</string>
     <string name="setting_quality">Image quality</string>
     <string name="setting_size">Image size</string>
     <string name="setting_doh">DoH</string>

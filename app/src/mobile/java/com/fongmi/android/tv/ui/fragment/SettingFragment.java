@@ -61,6 +61,10 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         return new SettingFragment();
     }
 
+    private String getSwitch(boolean value) {
+        return getString(value ? R.string.setting_on : R.string.setting_off);
+    }
+
     private int getDohIndex() {
         return Math.max(0, VodConfig.get().getDoh().indexOf(Doh.objectFrom(Setting.getDoh())));
     }
@@ -89,6 +93,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.dohText.setText(getDohList()[getDohIndex()]);
         mBinding.versionText.setText(BuildConfig.VERSION_NAME);
         mBinding.proxyText.setText(UrlUtil.scheme(Setting.getProxy()));
+        mBinding.incognitoText.setText(getSwitch(Setting.isIncognito()));
         mBinding.sizeText.setText((size = ResUtil.getStringArray(R.array.select_size))[Setting.getSize()]);
         setCacheText();
     }
@@ -123,6 +128,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.liveHistory.setOnClickListener(this::onLiveHistory);
         mBinding.wallDefault.setOnClickListener(this::setWallDefault);
         mBinding.wallRefresh.setOnClickListener(this::setWallRefresh);
+        mBinding.incognito.setOnClickListener(this::setIncognito);
         mBinding.size.setOnClickListener(this::setSize);
         mBinding.doh.setOnClickListener(this::setDoh);
     }
@@ -282,6 +288,11 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         });
     }
 
+    private void setIncognito(View view) {
+        Setting.putIncognito(!Setting.isIncognito());
+        mBinding.incognitoText.setText(getSwitch(Setting.isIncognito()));
+    }
+
     private void setSize(View view) {
         new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.setting_size).setNegativeButton(R.string.dialog_negative, null).setSingleChoiceItems(size, Setting.getSize(), (dialog, which) -> {
             mBinding.sizeText.setText(size[which]);
@@ -358,7 +369,8 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode != Activity.RESULT_OK || requestCode != FileChooser.REQUEST_PICK_FILE) return;
+        if (resultCode != Activity.RESULT_OK || requestCode != FileChooser.REQUEST_PICK_FILE)
+            return;
         setConfig(Config.find("file:/" + FileChooser.getPathFromUri(getContext(), data.getData()).replace(Path.rootPath(), ""), type));
     }
 }

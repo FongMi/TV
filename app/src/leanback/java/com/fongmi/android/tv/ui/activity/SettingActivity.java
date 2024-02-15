@@ -56,6 +56,10 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         activity.startActivity(new Intent(activity, SettingActivity.class));
     }
 
+    private String getSwitch(boolean value) {
+        return getString(value ? R.string.setting_on : R.string.setting_off);
+    }
+
     private int getDohIndex() {
         return Math.max(0, VodConfig.get().getDoh().indexOf(Doh.objectFrom(Setting.getDoh())));
     }
@@ -81,6 +85,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.dohText.setText(getDohList()[getDohIndex()]);
         mBinding.versionText.setText(BuildConfig.VERSION_NAME);
         mBinding.proxyText.setText(UrlUtil.scheme(Setting.getProxy()));
+        mBinding.incognitoText.setText(getSwitch(Setting.isIncognito()));
         mBinding.sizeText.setText((size = ResUtil.getStringArray(R.array.select_size))[Setting.getSize()]);
         mBinding.qualityText.setText((quality = ResUtil.getStringArray(R.array.select_quality))[Setting.getQuality()]);
         setCacheText();
@@ -116,6 +121,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.liveHistory.setOnClickListener(this::onLiveHistory);
         mBinding.wallDefault.setOnClickListener(this::setWallDefault);
         mBinding.wallRefresh.setOnClickListener(this::setWallRefresh);
+        mBinding.incognito.setOnClickListener(this::setIncognito);
         mBinding.quality.setOnClickListener(this::setQuality);
         mBinding.size.setOnClickListener(this::setSize);
         mBinding.doh.setOnClickListener(this::setDoh);
@@ -273,6 +279,11 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
                 setCacheText();
             }
         });
+    }
+
+    private void setIncognito(View view) {
+        Setting.putIncognito(!Setting.isIncognito());
+        mBinding.incognitoText.setText(getSwitch(Setting.isIncognito()));
     }
 
     private void setQuality(View view) {
