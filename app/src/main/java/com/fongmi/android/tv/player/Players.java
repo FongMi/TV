@@ -134,7 +134,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     private void setupIjk(IjkVideoView view) {
-        ijkPlayer = view.render(Setting.getRender()).decode(decode);
+        ijkPlayer = view.render(Setting.getRender());
         ijkPlayer.addListener(this);
         ijkPlayer.setPlayer(player);
     }

@@ -369,8 +369,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode != Activity.RESULT_OK || requestCode != FileChooser.REQUEST_PICK_FILE)
-            return;
+        if (resultCode != Activity.RESULT_OK || requestCode != FileChooser.REQUEST_PICK_FILE) return;
         setConfig(Config.find("file:/" + FileChooser.getPathFromUri(getContext(), data.getData()).replace(Path.rootPath(), ""), type));
     }
 }

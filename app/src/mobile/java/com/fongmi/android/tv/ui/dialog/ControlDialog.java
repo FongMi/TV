@@ -89,7 +89,6 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
         if (player == null) dismiss();
         if (player == null) return;
         binding.speed.setValue(Math.max(player.getSpeed(), 0.5f));
-        binding.player.setText(parent.control.action.player.getText());
         binding.decode.setText(parent.control.action.decode.getText());
         binding.ending.setText(parent.control.action.ending.getText());
         binding.opening.setText(parent.control.action.opening.getText());
@@ -97,6 +96,7 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
         binding.timer.setActivated(Timer.get().isRunning());
         setTrackVisible();
         setScaleText();
+        setPlayer();
         setParse();
     }
 
@@ -174,8 +174,9 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
         binding.parse.getAdapter().notifyItemRangeChanged(0, binding.parse.getAdapter().getItemCount());
     }
 
-    public void updatePlayer() {
+    public void setPlayer() {
         binding.player.setText(parent.control.action.player.getText());
+        binding.decode.setVisibility(parent.control.action.decode.getVisibility());
     }
 
     public void setParseVisible(boolean visible) {

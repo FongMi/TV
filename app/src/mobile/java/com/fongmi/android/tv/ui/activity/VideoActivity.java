@@ -387,7 +387,8 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mBinding.control.action.player.setText(mPlayers.getPlayerText());
         getExo().setVisibility(mPlayers.isExo() ? View.VISIBLE : View.GONE);
         getIjk().setVisibility(mPlayers.isIjk() ? View.VISIBLE : View.GONE);
-        if (mControlDialog != null && mControlDialog.isVisible()) mControlDialog.updatePlayer();
+        mBinding.control.action.decode.setVisibility(mPlayers.isExo() ? View.VISIBLE : View.GONE);
+        if (mControlDialog != null && mControlDialog.isVisible()) mControlDialog.setPlayer();
     }
 
     private void setDecodeView() {

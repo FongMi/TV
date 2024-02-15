@@ -59,7 +59,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     private int mTargetState;
     private int mCurrentState;
-    private int mCurrentDecode;
     private int mCurrentRender;
     private int mCurrentPlayer;
     private int mCurrentAspectRatio;
@@ -120,11 +119,6 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         } finally {
             a.recycle();
         }
-    }
-
-    public IjkVideoView decode(int decode) {
-        mCurrentDecode = decode;
-        return this;
     }
 
     public IjkVideoView render(int render) {
@@ -462,11 +456,11 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
         mPlayer.setOption(player, "enable-accurate-seek", 0);
         mPlayer.setOption(player, "framedrop", 1);
         mPlayer.setOption(player, "max-buffer-size", 15 * 1024 * 1024);
-        mPlayer.setOption(player, "mediacodec", mCurrentDecode);
-        mPlayer.setOption(player, "mediacodec-hevc", mCurrentDecode);
-        mPlayer.setOption(player, "mediacodec-all-videos", mCurrentDecode);
-        mPlayer.setOption(player, "mediacodec-auto-rotate", mCurrentDecode);
-        mPlayer.setOption(player, "mediacodec-handle-resolution-change", mCurrentDecode);
+        mPlayer.setOption(player, "mediacodec", 1);
+        mPlayer.setOption(player, "mediacodec-hevc", 1);
+        mPlayer.setOption(player, "mediacodec-all-videos", 1);
+        mPlayer.setOption(player, "mediacodec-auto-rotate", 1);
+        mPlayer.setOption(player, "mediacodec-handle-resolution-change", 1);
         mPlayer.setOption(player, "opensles", 0);
         mPlayer.setOption(player, "overlay-format", IjkMediaPlayer.SDL_FCC_RV32);
         mPlayer.setOption(player, "reconnect", 1);
