@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 28,
-    "identityHash": "d4921f6e0b243ebdcdb3a62512537b4d",
+    "version": 29,
+    "identityHash": "fe3a6989063bdf1f7fad4037f38f3b97",
     "entities": [
       {
         "tableName": "Keep",
@@ -62,19 +62,13 @@
       },
       {
         "tableName": "Site",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`key` TEXT NOT NULL, `name` TEXT, `searchable` INTEGER, `changeable` INTEGER, `recordable` INTEGER, PRIMARY KEY(`key`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`key` TEXT NOT NULL, `searchable` INTEGER, `changeable` INTEGER, PRIMARY KEY(`key`))",
         "fields": [
           {
             "fieldPath": "key",
             "columnName": "key",
             "affinity": "TEXT",
             "notNull": true
-          },
-          {
-            "fieldPath": "name",
-            "columnName": "name",
-            "affinity": "TEXT",
-            "notNull": false
           },
           {
             "fieldPath": "searchable",
@@ -85,12 +79,6 @@
           {
             "fieldPath": "changeable",
             "columnName": "changeable",
-            "affinity": "INTEGER",
-            "notNull": false
-          },
-          {
-            "fieldPath": "recordable",
-            "columnName": "recordable",
             "affinity": "INTEGER",
             "notNull": false
           }
@@ -464,7 +452,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd4921f6e0b243ebdcdb3a62512537b4d')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fe3a6989063bdf1f7fad4037f38f3b97')"
     ]
   }
 }

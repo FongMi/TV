@@ -6,6 +6,7 @@ import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import com.fongmi.android.tv.App;
@@ -22,47 +23,74 @@ import java.util.List;
 
 import okhttp3.Headers;
 
-@Entity(ignoredColumns = {"api", "ext", "jar", "click", "playUrl", "type", "timeout", "playerType", "categories", "header", "style", "activated", "indexs"})
+@Entity
 public class Site implements Parcelable {
 
     @NonNull
     @PrimaryKey
     @SerializedName("key")
     private String key;
+
+    @Ignore
     @SerializedName("name")
     private String name;
+
+    @Ignore
     @SerializedName("api")
     private String api;
+
+    @Ignore
     @JsonAdapter(ExtAdapter.class)
     @SerializedName("ext")
     private String ext;
+
+    @Ignore
     @SerializedName("jar")
     private String jar;
+
+    @Ignore
     @SerializedName("click")
     private String click;
+
+    @Ignore
     @SerializedName("playUrl")
     private String playUrl;
+
+    @Ignore
     @SerializedName("type")
     private Integer type;
-    @SerializedName("timeout")
-    private Integer timeout;
-    @SerializedName("playerType")
-    private Integer playerType;
-    @SerializedName("searchable")
-    private Integer searchable;
-    @SerializedName("changeable")
-    private Integer changeable;
-    @SerializedName("recordable")
-    private Integer recordable;
+
+    @Ignore
     @SerializedName("indexs")
     private Integer indexs;
+
+    @Ignore
+    @SerializedName("timeout")
+    private Integer timeout;
+
+    @Ignore
+    @SerializedName("playerType")
+    private Integer playerType;
+
+    @SerializedName("searchable")
+    private Integer searchable;
+
+    @SerializedName("changeable")
+    private Integer changeable;
+
+    @Ignore
     @SerializedName("categories")
     private List<String> categories;
+
+    @Ignore
     @SerializedName("header")
     private JsonElement header;
+
+    @Ignore
     @SerializedName("style")
     private Style style;
 
+    @Ignore
     private boolean activated;
 
     public static Site objectFrom(JsonElement element) {
@@ -137,10 +165,6 @@ public class Site implements Parcelable {
         return type == null ? 0 : type;
     }
 
-    public void setType(int type) {
-        this.type = type;
-    }
-
     public Integer getTimeout() {
         return timeout == null ? Constant.TIMEOUT_PLAY : Math.max(timeout, 1) * 1000;
     }
@@ -165,24 +189,12 @@ public class Site implements Parcelable {
         this.changeable = changeable;
     }
 
-    public Integer getRecordable() {
-        return recordable == null ? 1 : recordable;
-    }
-
-    public void setRecordable(Integer recordable) {
-        this.recordable = recordable;
-    }
-
     public boolean isIndexs() {
         return getIndexs() == 1;
     }
 
     public Integer getIndexs() {
         return indexs == null ? 0 : indexs;
-    }
-
-    public void setIndexs(Integer indexs) {
-        this.indexs = indexs;
     }
 
     public List<String> getCategories() {
@@ -231,15 +243,6 @@ public class Site implements Parcelable {
         return this;
     }
 
-    public boolean isRecordable() {
-        return getRecordable() == 1;
-    }
-
-    public Site setRecordable(boolean recordable) {
-        if (getRecordable() != 0) setRecordable(recordable ? 1 : 2);
-        return this;
-    }
-
     public boolean isEmpty() {
         return getKey().isEmpty() && getName().isEmpty();
     }
@@ -252,7 +255,6 @@ public class Site implements Parcelable {
         Site item = find(getKey());
         if (item == null) return this;
         if (getChangeable() != 0) setChangeable(Math.max(1, item.getChangeable()));
-        if (getRecordable() != 0) setRecordable(Math.max(1, item.getRecordable()));
         if (getSearchable() != 0) setSearchable(Math.max(1, item.getSearchable()));
         return this;
     }
@@ -292,7 +294,6 @@ public class Site implements Parcelable {
         dest.writeValue(this.playerType);
         dest.writeValue(this.searchable);
         dest.writeValue(this.changeable);
-        dest.writeValue(this.recordable);
         dest.writeValue(this.indexs);
         dest.writeStringList(this.categories);
         dest.writeParcelable(this.style, flags);
@@ -312,7 +313,6 @@ public class Site implements Parcelable {
         this.playerType = (Integer) in.readValue(Integer.class.getClassLoader());
         this.searchable = (Integer) in.readValue(Integer.class.getClassLoader());
         this.changeable = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.recordable = (Integer) in.readValue(Integer.class.getClassLoader());
         this.indexs = (Integer) in.readValue(Integer.class.getClassLoader());
         this.categories = in.createStringArrayList();
         this.style = in.readParcelable(Style.class.getClassLoader());

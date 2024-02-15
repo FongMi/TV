@@ -5,6 +5,7 @@ import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import com.fongmi.android.tv.App;
@@ -21,51 +22,88 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-@Entity(ignoredColumns = {"type", "group", "url", "jar", "logo", "epg", "ua", "click", "origin", "referer", "timeout", "header", "playerType", "channels", "groups", "core", "activated", "width"})
+@Entity
 public class Live {
 
     @NonNull
     @PrimaryKey
     @SerializedName("name")
     private String name;
+
+    @Ignore
     @SerializedName("type")
     private int type;
-    @SerializedName("boot")
-    private boolean boot;
-    @SerializedName("pass")
-    private boolean pass;
+
+    @Ignore
     @SerializedName("group")
     private String group;
+
+    @Ignore
     @SerializedName("url")
     private String url;
+
+    @Ignore
     @SerializedName("jar")
     private String jar;
+
+    @Ignore
     @SerializedName("logo")
     private String logo;
+
+    @Ignore
     @SerializedName("epg")
     private String epg;
+
+    @Ignore
     @SerializedName("ua")
     private String ua;
+
+    @Ignore
     @SerializedName("click")
     private String click;
+
+    @Ignore
     @SerializedName("origin")
     private String origin;
+
+    @Ignore
     @SerializedName("referer")
     private String referer;
+
+    @Ignore
     @SerializedName("timeout")
     private Integer timeout;
+
+    @Ignore
     @SerializedName("header")
     private JsonElement header;
+
+    @Ignore
     @SerializedName("playerType")
     private Integer playerType;
+
+    @Ignore
     @SerializedName("channels")
     private List<Channel> channels;
+
+    @Ignore
     @SerializedName("groups")
     private List<Group> groups;
+
+    @Ignore
     @SerializedName("core")
     private Core core;
 
+    @SerializedName("boot")
+    private boolean boot;
+
+    @SerializedName("pass")
+    private boolean pass;
+
+    @Ignore
     private boolean activated;
+
+    @Ignore
     private int width;
 
     public static Live objectFrom(JsonElement element) {
