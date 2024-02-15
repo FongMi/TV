@@ -79,9 +79,9 @@ public class SiteDialog implements SiteAdapter.OnClickListener{
     }
 
     private void initEvent() {
-        binding.all.setOnClickListener(this::setAll);
-        binding.none.setOnClickListener(this::setNone);
         binding.mode.setOnClickListener(this::setMode);
+        binding.select.setOnClickListener(v -> adapter.selectAll());
+        binding.cancel.setOnClickListener(v -> adapter.cancelAll());
         binding.search.setOnClickListener(v -> setType(v.isActivated() ? 0 : 1));
         binding.change.setOnClickListener(v -> setType(v.isActivated() ? 0 : 2));
     }
@@ -114,17 +114,9 @@ public class SiteDialog implements SiteAdapter.OnClickListener{
     private void setType(int type) {
         binding.search.setActivated(type == 1);
         binding.change.setActivated(type == 2);
+        binding.select.setClickable(type > 0);
+        binding.cancel.setClickable(type > 0);
         adapter.setType(this.type = type);
-    }
-
-    private void setAll(View view) {
-        if (type == 0) return;
-        adapter.selectAll();
-    }
-
-    private void setNone(View view) {
-        if (type == 0) return;
-        adapter.cancelAll();
     }
 
     private void setMode(View view) {
