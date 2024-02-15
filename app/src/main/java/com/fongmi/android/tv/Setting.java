@@ -397,4 +397,12 @@ public class Setting {
         Prefers.put("home_site_lock", lock);
     }
 
+    public static boolean isIncognito() {
+        return Prefers.getBoolean("incognito");
+    }
+
+    public static void putIncognito(boolean incognito) {
+        Prefers.put("incognito", incognito);
+    }
+
 }
