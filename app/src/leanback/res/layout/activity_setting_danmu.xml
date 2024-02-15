@@ -17,7 +17,6 @@
             android:id="@+id/danmuLoad"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:background="@drawable/selector_item"
             android:focusable="true"
             android:focusableInTouchMode="true"
@@ -184,10 +183,5 @@
                 android:textSize="18sp" />
 
         </LinearLayout>
-
-
-
-
-
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
