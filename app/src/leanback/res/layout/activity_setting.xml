@@ -243,8 +243,6 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginRight="16dp"
                     android:text="@string/setting_player"
                     android:textColor="@color/white"
                     android:textSize="18sp" />
@@ -264,7 +262,6 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
                     android:text="@string/setting_danmu"
                     android:textColor="@color/white"
                     android:textSize="18sp" />
@@ -282,8 +279,9 @@
                 android:id="@+id/custom"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:layout_marginEnd="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_weight="1"
                 android:background="@drawable/selector_item"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
@@ -292,7 +290,6 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
                     android:text="@string/setting_custom"
                     android:textColor="@color/white"
                     android:textSize="18sp" />
@@ -313,6 +310,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
+                    android:layout_marginRight="16dp"
                     android:text="@string/setting_proxy"
                     android:textColor="@color/white"
                     android:textSize="18sp" />
@@ -327,7 +325,6 @@
                     tools:text="http" />
 
             </LinearLayout>
-
         </LinearLayout>
 
         <LinearLayout
@@ -382,6 +379,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
+                    android:layout_marginRight="16dp"
                     android:text="@string/setting_backup"
                     android:textColor="@color/white"
                     android:textSize="18sp" />
@@ -450,6 +448,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
+                    android:layout_marginRight="16dp"
                     android:text="@string/setting_version"
                     android:textColor="@color/white"
                     android:textSize="18sp" />

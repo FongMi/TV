@@ -9,26 +9,30 @@
         android:id="@+id/array"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
         android:clipChildren="false"
         android:clipToPadding="false"
-        android:layout_marginTop="12dp"
         android:paddingStart="24dp"
+        android:paddingLeft="24dp"
         android:paddingEnd="24dp"
+        android:paddingRight="24dp"
         android:visibility="gone" />
 
     <androidx.leanback.widget.VerticalGridView
         android:id="@+id/episodeVert"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:clipChildren="false"
-        android:clipToPadding="false"
         android:layout_marginTop="12dp"
         android:layout_marginBottom="12dp"
-        android:paddingStart="24dp"
-        android:paddingEnd="24dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
         android:focusable="false"
+        android:paddingStart="24dp"
+        android:paddingLeft="24dp"
+        android:paddingEnd="24dp"
+        android:paddingRight="24dp"
+        android:visibility="gone"
         app:focusOutEnd="true"
-        app:focusOutFront="true"
-        android:visibility="gone" />
+        app:focusOutFront="true" />
 
 </LinearLayout>
