@@ -76,7 +76,6 @@ dependencies {
     implementation project(':jianpian')
     implementation project(':forcetech')
     implementation project(':ijkplayer')
-    pythonImplementation project(':pyramid')
     implementation project(':media-lib-datasource-okhttp')
     implementation project(':media-lib-datasource-rtmp')
     implementation project(':media-lib-decoder-av1')
