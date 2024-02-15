@@ -17,18 +17,18 @@
         android:paddingBottom="8dp">
 
         <LinearLayout
-            android:layout_gravity="start"
-            android:orientation="horizontal"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:orientation="horizontal">
 
             <com.fongmi.android.tv.ui.custom.CustomTitleView
                 android:id="@+id/title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:singleLine="true"
                 android:layout_marginRight="6dp"
                 android:focusable="false"
+                android:singleLine="true"
                 android:text="@string/app_name"
                 android:textColor="@color/white"
                 android:textSize="24dp" />

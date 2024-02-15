@@ -46,7 +46,9 @@ public class JianPian implements Source.Extractor {
     @Override
     public void stop() {
         try {
-            if (p2p != null) p2p.P2Pdoxpause(path.getBytes("GBK"));
+            if (p2p == null || path == null) return;
+            p2p.P2Pdoxpause(path.getBytes("GBK"));
+            path = null;
         } catch (Exception e) {
             e.printStackTrace();
         }

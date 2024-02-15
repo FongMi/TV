@@ -11,7 +11,7 @@ android {
         minSdk 21
         targetSdk 28
         versionCode 225
-        versionName "0212"
+        versionName "0214"
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
@@ -110,7 +110,6 @@ dependencies {
     implementation 'androidx.biometric:biometric:1.1.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.7.0'
     implementation 'androidx.room:room-runtime:2.6.1'
-    implementation 'androidx.media:media:1.7.0'
     implementation 'cat.ereza:customactivityoncrash:2.4.0'
     implementation 'com.github.bassaer:materialdesigncolors:1.0.0'
     implementation 'com.github.bumptech.glide:glide:4.16.0'
