@@ -75,8 +75,8 @@
     <string name="setting_backup_auto">自動</string>
     <string name="setting_version">版本</string>
     <string name="setting_storage">權限</string>
-    <string name="setting_off">關閉</string>
-    <string name="setting_on">開啟</string>
+    <string name="setting_off">關</string>
+    <string name="setting_on">開</string>
 
     <!-- Player -->
     <string name="player">播放核心</string>
