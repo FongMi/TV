@@ -45,6 +45,8 @@ public class Live {
     @Ignore
     @SerializedName("jar")
     private String jar;
+
+    @Ignore
     @SerializedName("logo")
     private String logo;
 
