@@ -333,6 +333,7 @@ public class Channel {
 
     public Channel copy(Channel item) {
         setPlayerType(item.getPlayerType());
+        setCatchup(item.getCatchup());
         setReferer(item.getReferer());
         setHeader(item.getHeader());
         setNumber(item.getNumber());
