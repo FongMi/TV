@@ -3,6 +3,7 @@ package com.fongmi.android.tv.player.extractor;
 import android.net.Uri;
 
 import com.fongmi.android.tv.player.Source;
+import com.fongmi.android.tv.utils.FileUtil;
 import com.github.catvod.utils.Path;
 import com.p2p.P2PClass;
 
@@ -27,8 +28,16 @@ public class JianPian implements Source.Extractor {
     public String fetch(String url) throws Exception {
         init();
         stop();
+        check();
         start(url);
         return "http://127.0.0.1:" + p2p.port + "/" + URLEncoder.encode(Uri.parse(path).getLastPathSegment(), "GBK");
+    }
+
+    private void check() {
+        double cache = FileUtil.getDirectorySize(Path.jpa());
+        double avail = FileUtil.getAvailableStorageSpace(Path.jpa());
+        int usage = (int) (cache / avail * 100);
+        if (usage > 30) Path.clear(Path.jpa());
     }
 
     private void start(String url) {
@@ -48,14 +57,14 @@ public class JianPian implements Source.Extractor {
         try {
             if (p2p == null || path == null) return;
             p2p.P2Pdoxpause(path.getBytes("GBK"));
-            path = null;
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            path = null;
         }
     }
 
     @Override
     public void exit() {
-        Path.clear(Path.jpa());
     }
 }

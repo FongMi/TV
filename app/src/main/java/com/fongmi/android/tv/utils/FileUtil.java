@@ -3,6 +3,7 @@ package com.fongmi.android.tv.utils;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.os.StatFs;
 import android.text.TextUtils;
 
 import androidx.core.content.FileProvider;
@@ -55,9 +56,35 @@ public class FileUtil {
 
     public static void getCacheSize(Callback callback) {
         App.execute(() -> {
-            String result = byteCountToDisplaySize(getFolderSize(Path.cache()));
-            App.post(() -> callback.success(result));
+            String usage = byteCountToDisplaySize(getDirectorySize(Path.cache()));
+            App.post(() -> callback.success(usage));
         });
+    }
+
+    public static long getDirectorySize(File file) {
+        long size = 0;
+        if (file == null) return 0;
+        if (file.isDirectory()) for (File f : Path.list(file)) size += getDirectorySize(f);
+        else size = file.length();
+        return size;
+    }
+
+    public static long getTotalStorageSpace(File file) {
+        try {
+            StatFs stat = new StatFs(file.getAbsolutePath());
+            return stat.getBlockCountLong() * stat.getBlockSizeLong();
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    public static long getAvailableStorageSpace(File file) {
+        try {
+            StatFs stat = new StatFs(file.getAbsolutePath());
+            return stat.getAvailableBlocksLong() * stat.getBlockSizeLong();
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     public static Uri getShareUri(String path) {
@@ -71,14 +98,6 @@ public class FileUtil {
     private static String getMimeType(String fileName) {
         String mimeType = URLConnection.guessContentTypeFromName(fileName);
         return TextUtils.isEmpty(mimeType) ? "*/*" : mimeType;
-    }
-
-    private static long getFolderSize(File file) {
-        long size = 0;
-        if (file == null) return 0;
-        if (file.isDirectory()) for (File f : Path.list(file)) size += getFolderSize(f);
-        else size = file.length();
-        return size;
     }
 
     private static String byteCountToDisplaySize(long size) {
