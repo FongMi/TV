@@ -71,10 +71,10 @@
             android:id="@+id/recordRecycler"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="10dp"
             android:clipChildren="false"
             android:clipToPadding="false"
             android:overScrollMode="never"
-            android:padding="8dp"
             tools:itemCount="5"
             tools:listitem="@layout/adapter_collect_record" />
 
@@ -92,10 +92,10 @@
             android:id="@+id/wordRecycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_margin="10dp"
             android:clipChildren="false"
             android:clipToPadding="false"
             android:overScrollMode="never"
-            android:padding="8dp"
             tools:itemCount="5"
             tools:listitem="@layout/adapter_collect_word" />
 
