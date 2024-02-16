@@ -288,6 +288,11 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     private void setEpisodeSelectedPosition(int position) {
         getEpisodeView().setSelectedPosition(position);
+        if (hasKeyEvent) return;
+        getEpisodeView().postDelayed(() -> {
+            View selectedItem = getEpisodeView().getLayoutManager().findViewByPosition(position);
+            if (selectedItem != null) selectedItem.requestFocus();
+        }, 300);
     }
 
     private boolean isReplay() {
@@ -367,10 +372,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mBinding.flag.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
-                if (mFlagAdapter.size() > 0) {
-                    setFlagActivated((Flag) mFlagAdapter.get(position));
-                    hasKeyEvent = false;
-                }
+                if (mFlagAdapter.size() > 0) setFlagActivated((Flag) mFlagAdapter.get(position));
             }
         });
         getEpisodeView().addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
@@ -738,6 +740,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void updateFocus() {
+        hasKeyEvent = false;
         mEpisodePresenter.setNextFocusDown(findFocusDown(Setting.getEpisode() == 0 ? 2 : 4));
         mEpisodePresenter.setNextFocusUp(findFocusUp(Setting.getEpisode() == 0 ? 2 : 4));
         mQualityAdapter.setNextFocusDown(findFocusDown(1));
@@ -1079,6 +1082,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private void showControl(View view) {
         mBinding.control.danmu.setVisibility(mBinding.danmaku.isPrepared() ? View.VISIBLE : View.GONE);
         mBinding.control.getRoot().setVisibility(View.VISIBLE);
+        mBinding.control.episodes.setVisibility(Setting.getFullscreenMenuKey() == 0 ? View.VISIBLE : View.GONE);
         view.requestFocus();
         setR1Callback();
     }
