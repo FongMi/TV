@@ -377,6 +377,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
+                    android:layout_marginRight="16dp"
                     android:text="@string/setting_incognito"
                     android:textColor="@color/white"
                     android:textSize="18sp" />
@@ -391,7 +392,6 @@
                     tools:text="Off" />
 
             </LinearLayout>
-
         </LinearLayout>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
