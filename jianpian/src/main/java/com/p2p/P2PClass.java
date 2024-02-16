@@ -15,6 +15,10 @@ public class P2PClass {
         return doxstarthttpd(bArr, bArr2);
     }
 
+    public void P2Pdoxendhttpd() {
+        doxendhttpd();
+    }
+
     public void P2Pdoxstart(byte[] bArr) {
         doxstart(bArr);
     }
@@ -32,6 +36,8 @@ public class P2PClass {
     }
 
     private native int doxstarthttpd(byte[] bArr, byte[] bArr2);
+
+    private native int doxendhttpd();
 
     private native int doxstart(byte[] bArr);
 
