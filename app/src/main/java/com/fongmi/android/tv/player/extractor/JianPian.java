@@ -2,6 +2,7 @@ package com.fongmi.android.tv.player.extractor;
 
 import android.net.Uri;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.player.Source;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.github.catvod.utils.Path;
@@ -66,6 +67,6 @@ public class JianPian implements Source.Extractor {
 
     @Override
     public void exit() {
-        check();
+        App.execute(this::check);
     }
 }
