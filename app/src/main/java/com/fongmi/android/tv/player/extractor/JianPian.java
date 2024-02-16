@@ -33,11 +33,13 @@ public class JianPian implements Source.Extractor {
 
     private void start(String url) {
         try {
+            if (path != null) p2p.P2Pdoxdel(path.getBytes("GBK"));
             path = URLDecoder.decode(url).split("\\|")[0];
             path = path.replace("jianpian://pathtype=url&path=", "");
             path = path.replace("tvbox-xg://", "").replace("tvbox-xg:", "");
             path = path.replace("xg://", "ftp://").replace("xgplay://", "ftp://");
             p2p.P2Pdoxstart(path.getBytes("GBK"));
+            p2p.P2Pdoxadd(path.getBytes("GBK"));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -46,9 +48,7 @@ public class JianPian implements Source.Extractor {
     @Override
     public void stop() {
         try {
-            if (p2p == null || path == null) return;
-            p2p.P2Pdoxpause(path.getBytes("GBK"));
-            path = null;
+            if (p2p != null && path != null) p2p.P2Pdoxpause(path.getBytes("GBK"));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -56,6 +56,13 @@ public class JianPian implements Source.Extractor {
 
     @Override
     public void exit() {
+        try {
+            if (p2p != null && path != null) p2p.P2Pdoxpause(path.getBytes("GBK"));
+            if (p2p != null && path != null) p2p.P2Pdoxdel(path.getBytes("GBK"));
+            if (p2p != null) p2p.P2Pdoxendhttpd();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         Path.clear(Path.jpa());
     }
 }
