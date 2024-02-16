@@ -1194,7 +1194,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         mHistory.setPosition(position = mPlayers.getPosition());
         mHistory.setDuration(duration = mPlayers.getDuration());
         if (position >= 0 && duration > 0 && !Setting.isIncognito()) App.execute(() -> mHistory.update());
-        if (position >= 0 && duration > 0) App.execute(() -> mHistory.update());
         if (mHistory.getEnding() > 0 && duration > 0 && mHistory.getEnding() + position >= duration) {
             mClock.setCallback(null);
             checkNext();

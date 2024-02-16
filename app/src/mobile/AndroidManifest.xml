@@ -72,7 +72,8 @@
         <activity
             android:name=".ui.activity.CollectActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout"
-            android:screenOrientation="fullUser" />
+            android:screenOrientation="fullUser"
+            android:windowSoftInputMode="adjustPan" />
 
         <activity
             android:name=".ui.activity.DetailActivity"
