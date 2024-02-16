@@ -1,8 +1,6 @@
 package com.fongmi.android.tv.ui.activity;
 
-import android.Manifest;
 import android.content.Intent;
-import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 
@@ -58,7 +56,6 @@ import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.UrlUtil;
 import com.google.common.collect.Lists;
-import com.permissionx.guolindev.PermissionX;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -182,23 +179,12 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
             @Override
             public void error(String msg) {
-                if (TextUtils.isEmpty(msg) && AppDatabase.getBackup().exists()) onRestore();
-                else mBinding.progressLayout.showContent();
+                mBinding.progressLayout.showContent();
                 mResult = Result.empty();
                 Notify.show(msg);
                 setFocus();
             }
         };
-    }
-
-    private void onRestore() {
-        PermissionX.init(this).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> AppDatabase.restore(new Callback() {
-            @Override
-            public void success() {
-                if (allGranted) initConfig();
-                else mBinding.progressLayout.showContent();
-            }
-        }));
     }
 
     private void loadLive(String url) {
