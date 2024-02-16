@@ -1,5 +1,7 @@
 package com.github.catvod.net.interceptor;
 
+import android.net.Uri;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -45,9 +47,13 @@ public class DefaultInterceptor implements Interceptor {
     }
 
     private void checkAuth(Response response, String location) {
-        URI uri = URI.create(location);
-        if (uri.getUserInfo() == null) return;
-        response.header(HttpHeaders.AUTHORIZATION, Util.basic(uri.getUserInfo()));
+        try {
+            Uri uri = Uri.parse(location);
+            if (uri.getUserInfo() == null) return;
+            response.header(HttpHeaders.AUTHORIZATION, Util.basic(uri.getUserInfo()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private Response deflate(Response response) {
