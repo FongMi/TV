@@ -184,7 +184,6 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
     @SuppressLint("ClickableViewAccessibility")
     protected void initEvent() {
         mBinding.control.seek.setListener(mPlayers);
-        mBinding.arrow.setOnClickListener(view -> onArrow());
         mBinding.control.cast.setOnClickListener(view -> onCast());
         mBinding.control.info.setOnClickListener(view -> onInfo());
         mBinding.control.right.back.setOnClickListener(view -> onBack());
@@ -319,7 +318,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         int padding = ResUtil.dp2px(60);
         if (group.isKeep()) group.setWidth(0);
         if (group.getWidth() == 0) for (Channel item : group.getChannel()) group.setWidth(Math.max(group.getWidth(), (item.getLogo().isEmpty() ? 0 : logo) + ResUtil.getTextWidth(item.getNumber() + item.getName(), 14)));
-        mBinding.channel.getLayoutParams().width = group.getWidth() == 0 ? 0 : Math.min(group.getWidth() + padding, ResUtil.getScreenWidth() / 2);
+        mBinding.channel.getLayoutParams().width = group.getWidth() == 0 ? 0 : Math.min(group.getWidth() + padding, ResUtil.getScreenWidth() / 3);
     }
 
     private void setWidth(Epg epg) {
@@ -350,10 +349,6 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         if (change) mChannelAdapter.setSelected(mGroup.getPosition());
         mBinding.channel.scrollToPosition(mGroup.getPosition());
         mBinding.group.scrollToPosition(position);
-    }
-
-    private void onArrow() {
-        showEpg();
     }
 
     private void onCast() {
@@ -491,8 +486,10 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         hideEpg();
     }
 
-    private void showEpg() {
-        mBinding.widget.epgData.scrollToPosition(mChannel.getData().getSelected());
+    @Override
+    public void showEpg(Channel item) {
+        if (mChannel == null || mChannel.getData().getList().isEmpty() || mEpgDataAdapter.getItemCount() == 0 || !mChannel.equals(item)) return;
+        mBinding.widget.epgData.scrollToPosition(item.getData().getSelected());
         mBinding.widget.epg.setVisibility(View.VISIBLE);
         hideUI();
     }
@@ -666,7 +663,6 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         mViewModel.getEpg(mChannel);
         mBinding.widget.play.setText("");
         mChannel.loadLogo(mBinding.widget.logo);
-        mBinding.arrow.setVisibility(View.GONE);
         mBinding.widget.name.setText(mChannel.getName());
         mBinding.control.title.setText(mChannel.getName());
         mBinding.widget.namePip.setText(mChannel.getName());
@@ -683,8 +679,8 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         String epg = mChannel.getData().getEpg();
         List<EpgData> data = mChannel.getData().getList();
         if (epg.length() > 0) mBinding.widget.name.setMaxEms(12);
-        mBinding.arrow.setVisibility(data.isEmpty() ? View.GONE : View.VISIBLE);
         mBinding.widget.play.setText(epg);
+        mChannelAdapter.changed(mChannel);
         mEpgDataAdapter.addAll(data);
         setWidth(mChannel.getData());
         setMetadata();
