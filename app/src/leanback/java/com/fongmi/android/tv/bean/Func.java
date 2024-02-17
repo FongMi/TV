@@ -1,10 +1,10 @@
 package com.fongmi.android.tv.bean;
 
 import android.annotation.SuppressLint;
-import android.view.View;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.ViewUtil;
 
 public class Func {
 
@@ -20,7 +20,7 @@ public class Func {
 
     public Func(int resId) {
         this.resId = resId;
-        this.id = View.generateViewId();
+        this.id = ViewUtil.generateViewId();
         this.setDrawable();
     }
 
