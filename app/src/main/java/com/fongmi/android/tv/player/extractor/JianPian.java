@@ -36,9 +36,9 @@ public class JianPian implements Source.Extractor {
 
     private void check() {
         double cache = FileUtil.getDirectorySize(Path.jpa());
-        double avail = FileUtil.getAvailableStorageSpace(Path.jpa());
-        int usage = (int) (cache / avail * 100);
-        if (usage > 30) Path.clear(Path.jpa());
+        double total = cache + FileUtil.getAvailableStorageSpace(Path.jpa());
+        int percent = (int) (cache / total * 100);
+        if (percent > 10) Path.clear(Path.jpa());
     }
 
     private void start(String url) {

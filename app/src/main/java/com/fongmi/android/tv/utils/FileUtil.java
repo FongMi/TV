@@ -100,7 +100,7 @@ public class FileUtil {
         return TextUtils.isEmpty(mimeType) ? "*/*" : mimeType;
     }
 
-    private static String byteCountToDisplaySize(long size) {
+    public static String byteCountToDisplaySize(long size) {
         if (size <= 0) return "0 KB";
         String[] units = new String[]{"bytes", "KB", "MB", "GB", "TB"};
         int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
