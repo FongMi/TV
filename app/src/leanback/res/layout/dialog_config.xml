@@ -27,6 +27,12 @@
         android:textSize="18sp"
         tools:text="@string/push_info" />
 
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
     <EditText
         android:id="@+id/text"
         android:layout_width="match_parent"

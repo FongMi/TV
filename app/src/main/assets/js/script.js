@@ -13,7 +13,7 @@ function push() {
 }
 
 function setting() {
-    doAction('setting', { text: $('#setting_text').val() });
+    doAction('setting', { text: $('#setting_text').val(), name: $('#setting_name').val() });
 }
 
 function file(path) {

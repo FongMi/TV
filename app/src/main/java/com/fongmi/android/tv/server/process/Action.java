@@ -77,8 +77,9 @@ public class Action implements Process {
 
     private void onSetting(Map<String, String> params) {
         String text = params.get("text");
+        String name = params.get("name");
         if (TextUtils.isEmpty(text)) return;
-        ServerEvent.setting(text);
+        ServerEvent.setting(text, name);
     }
 
     private void onFile(Map<String, String> params) {
