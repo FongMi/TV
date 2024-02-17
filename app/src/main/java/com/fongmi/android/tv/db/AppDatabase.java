@@ -54,7 +54,7 @@ public abstract class AppDatabase extends RoomDatabase {
     }
 
     public static String getDate() {
-        return Setting.isBackupAuto() ? ResUtil.getString(R.string.setting_backup_auto) : getBackup().exists() ? Util.format(new SimpleDateFormat("MMddHHmmss", Locale.getDefault()), getBackup().lastModified()) : "";
+        return Setting.isBackupAuto() ? ResUtil.getString(R.string.setting_backup_auto) : getBackup().exists() ? Util.format(new SimpleDateFormat("MMdd", Locale.getDefault()), getBackup().lastModified()) : "";
     }
 
     public static void backup() {

@@ -132,6 +132,7 @@
 
     <!-- UNIT -->
     <string name="all">All</string>
+    <string name="none">None</string>
     <string name="times">times</string>
     <string name="lines">lines</string>
 

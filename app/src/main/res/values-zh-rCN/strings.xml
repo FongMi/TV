@@ -132,6 +132,7 @@
 
     <!-- UNIT -->
     <string name="all">全部</string>
+    <string name="none">无</string>
     <string name="times">倍</string>
     <string name="lines">行</string>
 

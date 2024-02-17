@@ -65,6 +65,10 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         return getString(value ? R.string.setting_on : R.string.setting_off);
     }
 
+    private String getProxy(String proxy) {
+        return proxy.isEmpty() ? getString(R.string.none) : UrlUtil.scheme(proxy);
+    }
+
     private int getDohIndex() {
         return Math.max(0, VodConfig.get().getDoh().indexOf(Doh.objectFrom(Setting.getDoh())));
     }
@@ -92,7 +96,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.backupText.setText(AppDatabase.getDate());
         mBinding.dohText.setText(getDohList()[getDohIndex()]);
         mBinding.versionText.setText(BuildConfig.VERSION_NAME);
-        mBinding.proxyText.setText(UrlUtil.scheme(Setting.getProxy()));
+        mBinding.proxyText.setText(getProxy(Setting.getProxy()));
         mBinding.incognitoText.setText(getSwitch(Setting.isIncognito()));
         mBinding.sizeText.setText((size = ResUtil.getStringArray(R.array.select_size))[Setting.getSize()]);
         setCacheText();
@@ -329,7 +333,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         OkHttp.get().setProxy(proxy);
         Notify.progress(getActivity());
         VodConfig.load(Config.vod(), getCallback());
-        mBinding.proxyText.setText(UrlUtil.scheme(proxy));
+        mBinding.proxyText.setText(getProxy(proxy));
     }
 
     private void onCache(View view) {
