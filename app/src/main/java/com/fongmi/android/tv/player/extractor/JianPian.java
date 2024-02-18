@@ -3,7 +3,6 @@ package com.fongmi.android.tv.player.extractor;
 import android.net.Uri;
 
 import com.fongmi.android.tv.player.Source;
-import com.github.catvod.utils.Path;
 import com.p2p.P2PClass;
 
 import java.net.URLDecoder;
@@ -33,11 +32,12 @@ public class JianPian implements Source.Extractor {
 
     private void start(String url) {
         try {
-            if (path != null) p2p.P2Pdoxdel(path.getBytes("GBK"));
+            String lastPath = path;
             path = URLDecoder.decode(url).split("\\|")[0];
             path = path.replace("jianpian://pathtype=url&path=", "");
             path = path.replace("tvbox-xg://", "").replace("tvbox-xg:", "");
             path = path.replace("xg://", "ftp://").replace("xgplay://", "ftp://");
+            if (lastPath != null && !lastPath.equals(path)) p2p.P2Pdoxdel(lastPath.getBytes("GBK"));
             p2p.P2Pdoxstart(path.getBytes("GBK"));
             p2p.P2Pdoxadd(path.getBytes("GBK"));
         } catch (Exception e) {
@@ -58,11 +58,8 @@ public class JianPian implements Source.Extractor {
     public void exit() {
         try {
             if (p2p != null && path != null) p2p.P2Pdoxpause(path.getBytes("GBK"));
-            if (p2p != null && path != null) p2p.P2Pdoxdel(path.getBytes("GBK"));
-            if (p2p != null) p2p.P2Pdoxendhttpd();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Path.clear(Path.jpa());
     }
 }

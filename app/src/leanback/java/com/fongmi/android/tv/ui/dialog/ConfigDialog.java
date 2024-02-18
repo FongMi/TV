@@ -139,10 +139,12 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
     }
 
     private void onPositive(View view) {
+        String name = binding.name.getText().toString().trim();
         String text = binding.text.getText().toString().trim();
         if (edit) Config.find(url, type).url(text).update();
         if (text.isEmpty()) Config.delete(url, type);
-        callback.setConfig(Config.find(text, type));
+        if (name.isEmpty()) callback.setConfig(Config.find(text, type));
+        else callback.setConfig(Config.find(text, name, type));
         dialog.dismiss();
     }
 
@@ -153,6 +155,7 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onServerEvent(ServerEvent event) {
         if (event.getType() != ServerEvent.Type.SETTING) return;
+        binding.name.setText(event.getName());
         binding.text.setText(event.getText());
         binding.text.setSelection(binding.text.getText().length());
     }
