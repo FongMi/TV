@@ -42,10 +42,11 @@ public class JianPian implements Source.Extractor {
             path = path.replace("jianpian://pathtype=url&path=", "");
             path = path.replace("tvbox-xg://", "").replace("tvbox-xg:", "");
             path = path.replace("xg://", "ftp://").replace("xgplay://", "ftp://");
-            if (lastPath != null && !lastPath.equals(path)) p2p.P2Pdoxdel(lastPath.getBytes("GBK"));
+            boolean isDiff = lastPath != null && !lastPath.equals(path);
+            if (isDiff) p2p.P2Pdoxdel(lastPath.getBytes("GBK"));
             p2p.P2Pdoxstart(path.getBytes("GBK"));
-            if (lastPath != null && !lastPath.equals(path)) p2p.P2Pdoxadd(lastPath.getBytes("GBK"));
-            if (lastPath != null && !lastPath.equals(path) && pathPaused.containsKey(lastPath)) pathPaused.remove(lastPath);
+            if (isDiff) p2p.P2Pdoxadd(lastPath.getBytes("GBK"));
+            if (isDiff && pathPaused.containsKey(lastPath)) pathPaused.remove(lastPath);
             pathPaused.put(path, false);
         } catch (Exception e) {
             e.printStackTrace();
