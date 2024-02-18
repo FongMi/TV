@@ -1583,6 +1583,11 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         hasKeyEvent = true;
+        if (!isFullscreen() && KeyUtil.isBackKey(event) && Setting.getSmallWindowBackKey() == 1 && getFocus1() != mBinding.video) {
+            mBinding.video.requestFocus();
+            mFocus1 = mBinding.video;
+            return true;
+        }
         if (isFullscreen() && KeyUtil.isMenuKey(event) && Setting.getFullscreenMenuKey() == 0) onToggle();
         if (isFullscreen() && KeyUtil.isMenuKey(event) && Setting.getFullscreenMenuKey() == 1) onEpisodes();
         if (isVisible(mBinding.control.getRoot())) setR1Callback();

@@ -405,4 +405,12 @@ public class Setting {
         Prefers.put("incognito", incognito);
     }
 
+    public static void putSmallWindowBackKey(int key) {
+        Prefers.put("small_window_back_key", key);
+    }
+
+    public static int getSmallWindowBackKey() {
+        return Prefers.getInt("small_window_back_key", 0);
+    }
+
 }
