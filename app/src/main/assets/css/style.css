@@ -1156,8 +1156,6 @@ input.weui-btn_mini {
 
 .weui-cells:before {
   top: 0;
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
-  border-top: 1px solid var(--weui-FG-3);
   -webkit-transform-origin: 0 0;
   transform-origin: 0 0;
   -webkit-transform: scaleY(0.5);
@@ -1178,8 +1176,6 @@ input.weui-btn_mini {
 
 .weui-cells:after {
   bottom: 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  border-bottom: 1px solid var(--weui-FG-3);
   -webkit-transform-origin: 0 100%;
   transform-origin: 0 100%;
   -webkit-transform: scaleY(0.5);
@@ -1243,8 +1239,6 @@ input.weui-btn_mini {
   top: 0;
   right: 0;
   height: 1px;
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
-  border-top: 1px solid var(--weui-FG-3);
   color: rgba(0, 0, 0, 0.1);
   color: var(--weui-FG-3);
   -webkit-transform-origin: 0 0;
@@ -3296,9 +3290,11 @@ page {
 .weui-tabbar__item.weui-bar__item_on .weui-tabbar__label {
   color: #07c160;
   color: var(--weui-BRAND);
+
   svg {
     fill: #07c160;
   }
+
   svg {
     fill: var(--weui-BRAND);
   }
@@ -3307,9 +3303,11 @@ page {
 .weui-tabbar__icon {
   display: inline-block;
   margin-bottom: 6px;
+
   svg {
     fill: rgba(0, 0, 0, 0.9);
   }
+
   svg {
     fill: var(--weui-FG-0);
   }
