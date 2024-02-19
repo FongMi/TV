@@ -378,7 +378,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         getEpisodeView().addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
-                if (child != null && mBinding.video != mFocus1) mFocus1 = child.itemView;
+                if (child != null) mFocus1 = child.itemView;
             }
         });
         mBinding.array.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
@@ -1583,9 +1583,9 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         hasKeyEvent = true;
-        if (!isFullscreen() && KeyUtil.isBackKey(event) && Setting.getSmallWindowBackKey() == 1 && getFocus1() != mBinding.video) {
-            mBinding.video.requestFocus();
+        if (!isFullscreen() && KeyUtil.isBackKey(event) && Setting.getSmallWindowBackKey() == 1 && getCurrentFocus() != mBinding.video) {
             mFocus1 = mBinding.video;
+            getFocus1().requestFocus();
             return true;
         }
         if (isFullscreen() && KeyUtil.isMenuKey(event) && Setting.getFullscreenMenuKey() == 0) onToggle();
