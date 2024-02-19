@@ -20,6 +20,7 @@ public class SettingCustomActivity extends BaseActivity {
     private String[] size;
     private String[] episode;
     private String[] fullscreenMenuKey;
+    private String[] smallWindowBackKey;
 
     @Override
     protected ViewBinding getBinding() {
@@ -48,6 +49,7 @@ public class SettingCustomActivity extends BaseActivity {
         mBinding.fullscreenMenuKeyText.setText((fullscreenMenuKey = ResUtil.getStringArray(R.array.select_fullscreen_menu_key))[Setting.getFullscreenMenuKey()]);
         mBinding.homeSiteLockText.setText(getSwitch(Setting.isHomeSiteLock()));
         mBinding.incognitoText.setText(getSwitch(Setting.isIncognito()));
+        mBinding.smallWindowBackKeyText.setText((smallWindowBackKey = ResUtil.getStringArray(R.array.select_small_window_back_key))[Setting.getSmallWindowBackKey()]);
     }
 
     @Override
@@ -61,9 +63,10 @@ public class SettingCustomActivity extends BaseActivity {
         mBinding.displayMiniProgress.setOnClickListener(this::setDisplayMiniProgress);
         mBinding.speed.setOnClickListener(this::setSpeed);
         mBinding.speed.setOnLongClickListener(this::resetSpeed);
-        mBinding.fullscreenMenuKey.setOnClickListener(this::setfullscreenMenuKey);
+        mBinding.fullscreenMenuKey.setOnClickListener(this::setFullscreenMenuKey);
         mBinding.homeSiteLock.setOnClickListener(this::setHomeSiteLock);
         mBinding.incognito.setOnClickListener(this::setIncognito);
+        mBinding.smallWindowBackKey.setOnClickListener(this::setSmallWindowBackKey);
     }
 
     private void setQuality(View view) {
@@ -120,7 +123,7 @@ public class SettingCustomActivity extends BaseActivity {
         return true;
     }
 
-    private void setfullscreenMenuKey(View view) {
+    private void setFullscreenMenuKey(View view) {
         int index = Setting.getFullscreenMenuKey();
         Setting.putFullscreenMenuKey(index = index == fullscreenMenuKey.length - 1 ? 0 : ++index);
         mBinding.fullscreenMenuKeyText.setText(fullscreenMenuKey[index]);
@@ -134,6 +137,12 @@ public class SettingCustomActivity extends BaseActivity {
     private void setIncognito(View view) {
         Setting.putIncognito(!Setting.isIncognito());
         mBinding.incognitoText.setText(getSwitch(Setting.isIncognito()));
+    }
+
+    private void setSmallWindowBackKey(View view) {
+        int index = Setting.getSmallWindowBackKey();
+        Setting.putSmallWindowBackKey(index = index == smallWindowBackKey.length - 1 ? 0 : ++index);
+        mBinding.smallWindowBackKeyText.setText(smallWindowBackKey[index]);
     }
 
 }
