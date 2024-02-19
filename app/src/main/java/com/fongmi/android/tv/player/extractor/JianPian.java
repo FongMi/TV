@@ -3,15 +3,19 @@ package com.fongmi.android.tv.player.extractor;
 import android.net.Uri;
 
 import com.fongmi.android.tv.player.Source;
+import com.github.catvod.utils.Path;
 import com.p2p.P2PClass;
 
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
 
 public class JianPian implements Source.Extractor {
 
     private P2PClass p2p;
     private String path;
+    private Map<String, Boolean> pathPaused;
 
     @Override
     public boolean match(String scheme, String host) {
@@ -20,6 +24,7 @@ public class JianPian implements Source.Extractor {
 
     private void init() {
         if (p2p == null) p2p = new P2PClass();
+        if (pathPaused == null) pathPaused = new HashMap<>();
     }
 
     @Override
@@ -37,9 +42,12 @@ public class JianPian implements Source.Extractor {
             path = path.replace("jianpian://pathtype=url&path=", "");
             path = path.replace("tvbox-xg://", "").replace("tvbox-xg:", "");
             path = path.replace("xg://", "ftp://").replace("xgplay://", "ftp://");
-            if (lastPath != null && !lastPath.equals(path)) p2p.P2Pdoxdel(lastPath.getBytes("GBK"));
+            boolean isDiff = lastPath != null && !lastPath.equals(path);
+            if (isDiff) p2p.P2Pdoxdel(lastPath.getBytes("GBK"));
             p2p.P2Pdoxstart(path.getBytes("GBK"));
-            p2p.P2Pdoxadd(path.getBytes("GBK"));
+            if (lastPath == null || isDiff) p2p.P2Pdoxadd(path.getBytes("GBK"));
+            if (isDiff && pathPaused.containsKey(lastPath)) pathPaused.remove(lastPath);
+            pathPaused.put(path, false);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -48,7 +56,10 @@ public class JianPian implements Source.Extractor {
     @Override
     public void stop() {
         try {
-            if (p2p != null && path != null) p2p.P2Pdoxpause(path.getBytes("GBK"));
+            if (p2p == null || path == null) return;
+            if (pathPaused.containsKey(path) && pathPaused.get(path)) return;
+            p2p.P2Pdoxpause(path.getBytes("GBK"));
+            pathPaused.put(path, true);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -56,10 +67,6 @@ public class JianPian implements Source.Extractor {
 
     @Override
     public void exit() {
-        try {
-            if (p2p != null && path != null) p2p.P2Pdoxpause(path.getBytes("GBK"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Path.clear(Path.jpa());
     }
 }
