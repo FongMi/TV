@@ -45,7 +45,7 @@ public class JianPian implements Source.Extractor {
             boolean isDiff = lastPath != null && !lastPath.equals(path);
             if (isDiff) p2p.P2Pdoxdel(lastPath.getBytes("GBK"));
             p2p.P2Pdoxstart(path.getBytes("GBK"));
-            if (isDiff) p2p.P2Pdoxadd(lastPath.getBytes("GBK"));
+            if (lastPath == null || isDiff) p2p.P2Pdoxadd(path.getBytes("GBK"));
             if (isDiff && pathPaused.containsKey(lastPath)) pathPaused.remove(lastPath);
             pathPaused.put(path, false);
         } catch (Exception e) {
