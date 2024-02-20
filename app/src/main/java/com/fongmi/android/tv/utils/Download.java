@@ -40,10 +40,10 @@ public class Download {
 
     private void doInBackground() {
         try {
-            Path.clear(file);
+            Path.create(file);
             Response response = OkHttp.newCall(url).execute();
             download(response.body().byteStream(), Double.parseDouble(response.header(HttpHeaders.CONTENT_LENGTH, "1")));
-            if (callback != null) App.post(() -> callback.success(Path.chmod(file)));
+            if (callback != null) App.post(() -> callback.success(file));
         } catch (Exception e) {
             if (callback != null) App.post(() -> callback.error(e.getMessage()));
         }
