@@ -18,8 +18,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
-import androidx.annotation.RequiresApi;
-
 import com.fongmi.android.tv.App;
 import com.github.catvod.Init;
 
