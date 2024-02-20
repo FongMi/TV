@@ -144,13 +144,13 @@ public class Path {
 
     public static File write(File file, byte[] data) {
         try {
-            FileOutputStream fos = new FileOutputStream(file);
+            FileOutputStream fos = new FileOutputStream(create(file));
             fos.write(data);
             fos.flush();
             fos.close();
-            chmod(file);
             return file;
         } catch (Exception ignored) {
+            ignored.printStackTrace();
             return file;
         }
     }
@@ -171,18 +171,10 @@ public class Path {
         try {
             int read;
             byte[] buffer = new byte[8192];
-            FileOutputStream fos = new FileOutputStream(out);
+            FileOutputStream fos = new FileOutputStream(create(out));
             while ((read = in.read(buffer)) != -1) fos.write(buffer, 0, read);
             fos.close();
             in.close();
-            chmod(out);
-        } catch (Exception ignored) {
-        }
-    }
-
-    public static void newFile(File file) {
-        try {
-            file.createNewFile();
         } catch (Exception ignored) {
         }
     }
@@ -198,8 +190,10 @@ public class Path {
         if (dir.delete()) Log.d(TAG, "Deleted:" + dir.getAbsolutePath());
     }
 
-    public static File chmod(File file) {
+    public static File create(File file) throws Exception {
         try {
+            if (!file.canWrite()) file.setWritable(true);
+            if (!file.exists()) file.createNewFile();
             Shell.exec("chmod 777 " + file);
             return file;
         } catch (Exception e) {
