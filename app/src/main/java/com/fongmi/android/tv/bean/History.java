@@ -272,7 +272,8 @@ public class History {
 
     private void merge(List<History> items, boolean force) {
         for (History item : items) {
-            if (!force && (getKey().equals(item.getKey()) || Math.abs(item.getDuration() - getDuration()) > 10 * 60 * 1000)) continue;
+            if (getDuration() > 0 && item.getDuration() > 0 && Math.abs(getDuration() - item.getDuration()) > 10 * 60 * 1000) continue;
+            if (!force && getKey().equals(item.getKey())) continue;
             checkParam(item);
             item.delete();
         }
