@@ -150,7 +150,6 @@ public class Path {
             fos.write(data);
             fos.flush();
             fos.close();
-            chmod(file);
             return file;
         } catch (Exception ignored) {
             ignored.printStackTrace();
@@ -178,7 +177,6 @@ public class Path {
             while ((read = in.read(buffer)) != -1) fos.write(buffer, 0, read);
             fos.close();
             in.close();
-            chmod(out);
         } catch (Exception ignored) {
         }
     }
@@ -194,20 +192,20 @@ public class Path {
         if (dir.delete()) Log.d(TAG, "Deleted:" + dir.getAbsolutePath());
     }
 
-    public static File chmod(File file) {
+    public static File create(File file) throws Exception {
         try {
-            Shell.exec("chmod 777 " + file);
-            return file;
+            if (!file.exists()) file.createNewFile();
+            if (!file.canWrite()) file.setWritable(true);
+            return chmod(file);
         } catch (Exception e) {
             e.printStackTrace();
             return file;
         }
     }
 
-    public static File create(File file) throws Exception {
+    public static File chmod(File file) {
         try {
-            if (!file.exists()) file.createNewFile();
-            if (!file.canWrite()) file.setWritable(true);
+            Shell.exec("chmod 777 " + file);
             return file;
         } catch (Exception e) {
             e.printStackTrace();
