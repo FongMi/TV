@@ -194,17 +194,8 @@ public class Path {
 
     public static File create(File file) throws Exception {
         try {
-            if (!file.exists()) file.createNewFile();
             if (!file.canWrite()) file.setWritable(true);
-            return chmod(file);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return file;
-        }
-    }
-
-    public static File chmod(File file) {
-        try {
+            if (!file.exists()) file.createNewFile();
             Shell.exec("chmod 777 " + file);
             return file;
         } catch (Exception e) {
