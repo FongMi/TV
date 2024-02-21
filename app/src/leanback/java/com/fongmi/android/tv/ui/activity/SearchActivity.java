@@ -128,7 +128,7 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 if (mBinding.keyword.getText().toString().trim().isEmpty()) return;
                 List<String> items = Suggest.get(response.body().string());
-                App.post(() -> mWordAdapter.addAll(items), 200);
+                App.post(() -> mWordAdapter.appendAll(items), 200);
             }
         });
     }
