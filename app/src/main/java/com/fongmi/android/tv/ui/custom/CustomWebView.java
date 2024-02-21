@@ -74,7 +74,6 @@ public class CustomWebView extends WebView {
         getSettings().setDisplayZoomControls(false);
         getSettings().setLoadWithOverviewMode(true);
         getSettings().setUserAgentString(Setting.getUa());
-        getSettings().setMediaPlaybackRequiresUserGesture(false);
         getSettings().setJavaScriptCanOpenWindowsAutomatically(false);
         if (Build.VERSION.SDK_INT >= 17) getSettings().setMediaPlaybackRequiresUserGesture(false);
         if (Build.VERSION.SDK_INT >= 21) CookieManager.getInstance().setAcceptThirdPartyCookies(this, true);
