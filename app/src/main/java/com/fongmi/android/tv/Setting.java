@@ -89,12 +89,12 @@ public class Setting {
         Prefers.put("player_live", player);
     }
 
-    public static int getDecode() {
-        return Prefers.getInt("decode", Players.HARD);
+    public static int getDecode(int player) {
+        return Prefers.getInt("decode_" + player, Players.HARD);
     }
 
-    public static void putDecode(int decode) {
-        Prefers.put("decode", decode);
+    public static void putDecode(int player, int decode) {
+        Prefers.put("decode_" + player, decode);
     }
 
     public static int getRender() {

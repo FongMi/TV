@@ -1001,6 +1001,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private void onPlayer() {
         mPlayers.togglePlayer();
         setPlayerView();
+        setDecodeView();
         onRefresh();
     }
 
@@ -1364,6 +1365,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private void nextPlayer() {
         mPlayers.nextPlayer();
         setPlayerView();
+        setDecodeView();
         onRefresh();
     }
 
