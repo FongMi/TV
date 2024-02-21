@@ -249,6 +249,7 @@ public class VodConfig {
     }
 
     public void setRecent(String jar) {
+        if (jarLoader == null) jarLoader = new JarLoader();
         jarLoader.parseJar(Util.md5(jar), jar);
         jarLoader.setRecent(jar);
     }
