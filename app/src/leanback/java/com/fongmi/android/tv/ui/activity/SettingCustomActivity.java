@@ -13,6 +13,8 @@ import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.utils.ResUtil;
 
+import java.util.Locale;
+
 public class SettingCustomActivity extends BaseActivity {
 
     private ActivitySettingCustomBinding mBinding;
@@ -45,7 +47,7 @@ public class SettingCustomActivity extends BaseActivity {
         mBinding.displayNetspeedText.setText(getSwitch(Setting.isDisplaySpeed()));
         mBinding.displayDurationText.setText(getSwitch(Setting.isDisplayDuration()));
         mBinding.displayMiniProgressText.setText(getSwitch(Setting.isDisplayMiniProgress()));
-        mBinding.speedText.setText(Setting.getPlaySpeed() + "x");
+        mBinding.speedText.setText(getSpeedText());
         mBinding.fullscreenMenuKeyText.setText((fullscreenMenuKey = ResUtil.getStringArray(R.array.select_fullscreen_menu_key))[Setting.getFullscreenMenuKey()]);
         mBinding.homeSiteLockText.setText(getSwitch(Setting.isHomeSiteLock()));
         mBinding.incognitoText.setText(getSwitch(Setting.isIncognito()));
@@ -109,17 +111,21 @@ public class SettingCustomActivity extends BaseActivity {
         mBinding.displayMiniProgressText.setText(getSwitch(Setting.isDisplayMiniProgress()));
     }
 
+    private String getSpeedText() {
+        return String.format(Locale.getDefault(), "%.2f", Setting.getPlaySpeed());
+    }
+
     private void setSpeed(View view) {
         float speed = Setting.getPlaySpeed();
-        float addon = speed >= 2 ? 1f : 0.1f;
+        float addon = speed >= 2 ? 1.0f : 0.1f;
         speed = speed >= 5 ? 0.2f : Math.min(speed + addon, 5.0f);
         Setting.putPlaySpeed(speed);
-        mBinding.speedText.setText(Setting.getPlaySpeed() + "x");
+        mBinding.speedText.setText(getSpeedText());
     }
 
     private boolean resetSpeed(View view) {
         Setting.putPlaySpeed(1.0f);
-        mBinding.speedText.setText(Setting.getPlaySpeed() + "x");
+        mBinding.speedText.setText(getSpeedText());
         return true;
     }
 
