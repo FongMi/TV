@@ -35,7 +35,7 @@ public class EpisodePresenter extends Presenter {
     }
 
     public int getNumColumns() {
-        return numColumns;
+        return this.numColumns;
     }
 
     public void setNumColumns(int numColumns) {

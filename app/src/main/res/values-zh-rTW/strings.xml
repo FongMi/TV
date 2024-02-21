@@ -33,9 +33,15 @@
     <string name="play_ed">片尾</string>
     <string name="play_next">下集</string>
     <string name="play_prev">上集</string>
+    <string name="play_episodes">選集</string>
     <string name="play_loop">循環</string>
     <string name="play_timer">定時</string>
+    <string name="play_time">時間</string>
+    <string name="play_netspeed">網速</string>
+    <string name="play_duration">進度</string>
+    <string name="play_mini_progress">迷你進度</string>
     <string name="play_danmu">彈幕</string>
+    <string name="play_speed">倍速</string>
     <string name="play_change">換源</string>
     <string name="play_forward">→</string>
     <string name="play_backward">←</string>
@@ -66,8 +72,13 @@
     <string name="setting_live">直播</string>
     <string name="setting_wall">壁紙</string>
     <string name="setting_player">播放設定</string>
+    <string name="setting_danmu">彈幕設定</string>
+    <string name="setting_custom">個性設定</string>
     <string name="setting_quality">圖片品質</string>
     <string name="setting_size">圖片尺寸</string>
+    <string name="setting_fullscreen_menu_key">全屏選單鍵</string>
+    <string name="setting_home_site_lock">首頁源鎖定</string>
+    <string name="setting_incognito">無痕模式</string>
     <string name="setting_doh">DoH</string>
     <string name="setting_proxy">Proxy</string>
     <string name="setting_cache">暫存</string>
@@ -89,6 +100,7 @@
     <string name="player_danmu_size">彈幕大小</string>
     <string name="player_danmu_line">彈幕行數</string>
     <string name="player_danmu_alpha">彈幕透明</string>
+    <string name="player_danmu_sync">彈幕同步</string>
     <string name="player_background">背景播放</string>
     <string name="player_flag">線路播放</string>
     <string name="player_episode">選集樣式</string>
@@ -134,6 +146,9 @@
     <string name="crash_details">錯誤訊息</string>
     <string name="crash_details_title">錯誤訊息</string>
     <string name="crash_details_close">關閉</string>
+
+    <!-- Hint -->
+    <string name="copied">已複製</string>
 
     <!-- UNIT -->
     <string name="all">全部</string>
@@ -197,6 +212,11 @@
     <string-array name="select_episode">
         <item>單行</item>
         <item>多行</item>
+    </string-array>
+
+    <string-array name="select_fullscreen_menu_key">
+        <item>控製欄</item>
+        <item>選集</item>
     </string-array>
 
     <string-array name="select_caption">

@@ -33,6 +33,7 @@ import com.fongmi.android.tv.receiver.ShortcutReceiver;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.FragmentStateManager;
+import com.fongmi.android.tv.ui.fragment.SettingCustomFragment;
 import com.fongmi.android.tv.ui.fragment.SettingFragment;
 import com.fongmi.android.tv.ui.fragment.SettingPlayerFragment;
 import com.fongmi.android.tv.ui.fragment.VodFragment;
@@ -64,8 +65,8 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
 
     @Override
     protected void initView(Bundle savedInstanceState) {
+        Updater.get().release().start(this);
         initFragment(savedInstanceState);
-        Updater.get().release().start();
         Server.get().start();
         initConfig();
     }
@@ -95,6 +96,7 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
                 if (position == 0) return VodFragment.newInstance();
                 if (position == 1) return SettingFragment.newInstance();
                 if (position == 2) return SettingPlayerFragment.newInstance();
+                if (position == 3) return SettingCustomFragment.newInstance();
                 return null;
             }
         };
@@ -208,6 +210,8 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
     protected void onBackPress() {
         if (!mBinding.navigation.getMenu().findItem(R.id.vod).isVisible()) {
             setNavigation();
+        } else if (mManager.isVisible(3)) {
+            change(1);
         } else if (mManager.isVisible(2)) {
             change(1);
         } else if (mManager.isVisible(1)) {

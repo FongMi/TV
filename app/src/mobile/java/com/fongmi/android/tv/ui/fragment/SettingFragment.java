@@ -54,7 +54,6 @@ import java.util.List;
 public class SettingFragment extends BaseFragment implements ConfigCallback, SiteCallback, LiveCallback, ProxyCallback {
 
     private FragmentSettingBinding mBinding;
-    private String[] size;
     private int type;
 
     public static SettingFragment newInstance() {
@@ -89,7 +88,6 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.dohText.setText(getDohList()[getDohIndex()]);
         mBinding.versionText.setText(BuildConfig.VERSION_NAME);
         mBinding.proxyText.setText(UrlUtil.scheme(Setting.getProxy()));
-        mBinding.sizeText.setText((size = ResUtil.getStringArray(R.array.select_size))[Setting.getSize()]);
         setCacheText();
     }
 
@@ -123,8 +121,8 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.liveHistory.setOnClickListener(this::onLiveHistory);
         mBinding.wallDefault.setOnClickListener(this::setWallDefault);
         mBinding.wallRefresh.setOnClickListener(this::setWallRefresh);
-        mBinding.size.setOnClickListener(this::setSize);
         mBinding.doh.setOnClickListener(this::setDoh);
+        mBinding.custom.setOnClickListener(this::onCustom);
     }
 
     @Override
@@ -258,12 +256,16 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         getRoot().change(2);
     }
 
+    private void onCustom(View view) {
+        getRoot().change(3);
+    }
+
     private void onVersion(View view) {
-        Updater.get().force().release().start();
+        Updater.get().force().release().start(getActivity());
     }
 
     private boolean onVersionDev(View view) {
-        Updater.get().force().dev().start();
+        Updater.get().force().dev().start(getActivity());
         return true;
     }
 
@@ -280,15 +282,6 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
                 setCacheText();
             }
         });
-    }
-
-    private void setSize(View view) {
-        new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.setting_size).setNegativeButton(R.string.dialog_negative, null).setSingleChoiceItems(size, Setting.getSize(), (dialog, which) -> {
-            mBinding.sizeText.setText(size[which]);
-            Setting.putSize(which);
-            RefreshEvent.size();
-            dialog.dismiss();
-        }).show();
     }
 
     private void setDoh(View view) {

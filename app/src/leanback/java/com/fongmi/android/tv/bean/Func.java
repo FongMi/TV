@@ -4,11 +4,15 @@ import android.annotation.SuppressLint;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.ViewUtil;
 
 public class Func {
 
     private final int resId;
+    private final int id;
     private int drawable;
+    private int nextFocusLeft;
+    private int nextFocusRight;
 
     public static Func create(int resId) {
         return new Func(resId);
@@ -16,6 +20,7 @@ public class Func {
 
     public Func(int resId) {
         this.resId = resId;
+        this.id = ViewUtil.generateViewId();
         this.setDrawable();
     }
 
@@ -23,8 +28,28 @@ public class Func {
         return resId;
     }
 
+    public int getId() {
+        return id;
+    }
+
     public int getDrawable() {
         return drawable;
+    }
+
+    public int getNextFocusLeft() {
+        return nextFocusLeft;
+    }
+
+    public void setNextFocusLeft(int nextFocusLeft) {
+        this.nextFocusLeft = nextFocusLeft;
+    }
+
+    public int getNextFocusRight() {
+        return nextFocusRight;
+    }
+
+    public void setNextFocusRight(int nextFocusRight) {
+        this.nextFocusRight = nextFocusRight;
     }
 
     public String getText() {

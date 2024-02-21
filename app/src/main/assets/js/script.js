@@ -13,7 +13,7 @@ function push() {
 }
 
 function setting() {
-    doAction('setting', { text: $('#setting_text').val() });
+    doAction('setting', { text: $('#setting_text').val(), name: $('#setting_name').val() });
 }
 
 function file(path) {
@@ -29,10 +29,10 @@ function doAction(action, kv) {
 }
 
 function tpl_top(path) {
-    return `<a class="weui-cell  weui-cell_access" href="javascript:void(0)" onclick="listFile('` + path + `')">
-    <div class="weui-cell__hd"><img src="`+ ic_dir + `" alt="" style="width: 32px; margin-right: 16px; display: block;"></div>
+    return `<a class="weui-cell weui-cell_access" href="javascript:void(0)" onclick="listFile('` + path + `')">
+    <div class="weui-cell__hd"><img src="` + ic_dir + `" alt="" style="width: 32px; margin-right: 16px; display: block;"></div>
     <span class="weui-cell__bd">
-        <span>..</span>
+        <span class="weui-cell__name">..</span>
     </span>
     <span class="weui-cell__ft">
     </span>
@@ -40,11 +40,11 @@ function tpl_top(path) {
 }
 
 function tpl_dir(name, time, path) {
-    return `<a class="weui-cell  weui-cell_access" href="#" onclick="listFile('` + path + `')">
-    <div class="weui-cell__hd"><img src="`+ ic_dir + `" alt="" style="width: 32px; margin-right: 16px; display: block;"></div>
+    return `<a class="weui-cell weui-cell_access" href="#" onclick="listFile('` + path + `')">
+    <div class="weui-cell__hd"><img src="` + ic_dir + `" alt="" style="width: 32px; margin-right: 16px; display: block;"></div>
     <span class="weui-cell__bd">
-    <span>`+ name + `</span>
-        <div class="weui-cell__desc">`+ time + `</div>
+    <span class="weui-cell__name">` + name + `</span>
+        <div class="weui-cell__desc">` + time + `</div>
     </span>
     <span class="weui-cell__ft">
     </span>
@@ -52,11 +52,11 @@ function tpl_dir(name, time, path) {
 }
 
 function tpl_file(name, time, path, canDel) {
-    return `<a class="weui-cell  weui-cell_access" href="javascript:void(0)" onclick="selectFile('` + path + `', ` + canDel + `)">
-    <div class="weui-cell__hd"><img src="`+ ic_file + `" alt="" style="width: 32px; margin-right: 16px; display: block;"></div>
+    return `<a class="weui-cell weui-cell_access" href="javascript:void(0)" onclick="selectFile('` + path + `', ` + canDel + `)">
+    <div class="weui-cell__hd"><img src="` + ic_file + `" alt="" style="width: 32px; margin-right: 16px; display: block;"></div>
     <span class="weui-cell__bd">
-        <span>`+ name + `</span>
-        <div class="weui-cell__desc">`+ time + `</div>
+        <span class="weui-cell__name">` + name + `</span>
+        <div class="weui-cell__desc">` + time + `</div>
     </span>
     </a>`;
 }
@@ -234,4 +234,17 @@ $(function () {
     $('.weui-tabbar__item').on('click', function () {
         showPanel(parseInt($(this).attr('id').substr(3)));
     });
+});
+
+$(document).ready(function () {
+    var url = window.location.search;
+    if (url.indexOf('tab=2') > 0) {
+        showPanel(2);
+    } else if (url.indexOf('tab=3') > 0) {
+        showPanel(3);
+    } else if (url.indexOf('tab=4') > 0) {
+        showPanel(4);
+    } else {
+        showPanel(1);
+    }
 });

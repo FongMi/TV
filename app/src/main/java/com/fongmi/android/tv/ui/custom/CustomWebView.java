@@ -109,7 +109,7 @@ public class CustomWebView extends WebView {
                 if (TextUtils.isEmpty(host) || VodConfig.get().getAds().contains(host)) return empty;
                 if (url.contains("challenges.cloudflare.com/cdn-cgi")) App.post(() -> showDialog());
                 if (detect && url.contains("player/?url=")) onParseAdd(headers, url);
-                else if (isVideoFormat(headers, url)) interrupt(headers, url);
+                else if (isVideoFormat(url)) interrupt(headers, url);
                 return super.shouldInterceptRequest(view, request);
             }
 
@@ -140,7 +140,7 @@ public class CustomWebView extends WebView {
     }
 
     private void showDialog() {
-        if (dialog != null) return;
+        if (dialog != null || App.activity() == null) return;
         if (getParent() != null) ((ViewGroup) getParent()).removeView(this);
         dialog = new AlertDialog.Builder(App.activity()).setView(this).show();
     }
@@ -166,15 +166,15 @@ public class CustomWebView extends WebView {
         }
     }
 
-    private boolean isVideoFormat(Map<String, String> headers, String url) {
+    private boolean isVideoFormat(String url) {
         try {
             Logger.t(TAG).d(url);
             Site site = VodConfig.get().getSite(key);
             Spider spider = VodConfig.get().getSpider(site);
             if (spider.manualVideoCheck()) return spider.isVideoFormat(url);
-            return Sniffer.isVideoFormat(url, headers);
+            return Sniffer.isVideoFormat(url);
         } catch (Exception ignored) {
-            return Sniffer.isVideoFormat(url, headers);
+            return Sniffer.isVideoFormat(url);
         }
     }
 

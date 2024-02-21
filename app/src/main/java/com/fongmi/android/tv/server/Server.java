@@ -28,16 +28,16 @@ public class Server {
         return getAddress(false);
     }
 
+    public String getAddress(int tab) {
+        return getAddress(false) + "?tab=" + tab;
+    }
+
     public String getAddress(String path) {
         return getAddress(true) + "/" + path;
     }
 
     public String getAddress(boolean local) {
         return "http://" + (local ? "127.0.0.1" : Util.getIp()) + ":" + getPort();
-    }
-
-    public void go() {
-        Go.start();
     }
 
     public void start() {
@@ -59,6 +59,5 @@ public class Server {
     public void stop() {
         if (nano != null) nano.stop();
         nano = null;
-        Go.stop();
     }
 }

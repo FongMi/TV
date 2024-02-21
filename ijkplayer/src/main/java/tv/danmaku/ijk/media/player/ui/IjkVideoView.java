@@ -63,7 +63,7 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     private int mCurrentRender;
     private int mCurrentPlayer;
     private int mCurrentAspectRatio;
-    private int mStartPosition;
+    private long mStartPosition;
 
     private int mCurrentBufferPercentage;
     private long mCurrentBufferPosition;
@@ -193,7 +193,12 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
     }
 
     public void setMediaSource(MediaSource source) {
+        setMediaSource(source, 0);
+    }
+
+    public void setMediaSource(MediaSource source, long position) {
         setVideoURI(source.getUri(), source.getHeaders());
+        mStartPosition = position;
     }
 
     private void setVideoURI(Uri uri, Map<String, String> headers) {
@@ -283,15 +288,12 @@ public class IjkVideoView extends FrameLayout implements MediaController.MediaPl
 
     @Override
     public void seekTo(int positionMs) {
-        if (!isInPlaybackState()) return;
-        onInfo(mPlayer, IMediaPlayer.MEDIA_INFO_BUFFERING_START, 0);
-        mPlayer.seekTo(positionMs);
-        mStartPosition = 0;
+        seekTo((long) positionMs);
     }
 
     public void seekTo(long positionMs) {
-        mStartPosition = (int) positionMs;
-        seekTo(mStartPosition);
+        onInfo(mPlayer, IMediaPlayer.MEDIA_INFO_BUFFERING_START, 0);
+        mPlayer.seekTo(positionMs);
     }
 
     public void setSpeed(float speed) {

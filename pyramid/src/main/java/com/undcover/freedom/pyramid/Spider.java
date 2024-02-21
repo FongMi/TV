@@ -11,7 +11,6 @@ import com.github.catvod.utils.Json;
 import com.google.common.net.HttpHeaders;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 import java.io.ByteArrayInputStream;
 import java.util.HashMap;
@@ -91,7 +90,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
     @Override
     public Object[] proxyLocal(Map<String, String> params) throws Exception {
         List<PyObject> list = app.callAttr("localProxy", obj, gson.toJson(params)).asList();
-        JsonObject action = JsonParser.parseString(list.get(2).toString()).getAsJsonObject();
+        JsonObject action = Json.parse(list.get(2).toString()).getAsJsonObject();
         Map<String, String> headers = Json.toMap(action.get("header"));
         String url = action.get("url").getAsString();
         String content = list.get(3).toString();

@@ -69,6 +69,7 @@ import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
 import com.fongmi.android.tv.ui.custom.CustomMovement;
 import com.fongmi.android.tv.ui.dialog.DescDialog;
+import com.fongmi.android.tv.ui.dialog.EpisodeDialog;
 import com.fongmi.android.tv.ui.dialog.TrackDialog;
 import com.fongmi.android.tv.ui.presenter.ArrayPresenter;
 import com.fongmi.android.tv.ui.presenter.EpisodePresenter;
@@ -153,6 +154,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private Clock mClock;
     private View mFocus1;
     private View mFocus2;
+    private boolean hasKeyEvent;
 
     public static void push(FragmentActivity activity, String text) {
         if (FileChooser.isValid(activity, Uri.parse(text))) file(activity, FileChooser.getPathFromUri(activity, Uri.parse(text)));
@@ -285,8 +287,12 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void setEpisodeSelectedPosition(int position) {
-        if (Setting.getEpisode() == 1) position += 3 * mEpisodePresenter.getNumColumns();//temporary solution
         getEpisodeView().setSelectedPosition(position);
+        if (hasKeyEvent) return;
+        getEpisodeView().postDelayed(() -> {
+            View selectedItem = getEpisodeView().getLayoutManager().findViewByPosition(position);
+            if (selectedItem != null) selectedItem.requestFocus();
+        }, 300);
     }
 
     private boolean isReplay() {
@@ -306,7 +312,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     protected void initView() {
         mKeyDown = CustomKeyDownVod.create(this, mBinding.video);
         mFrameParams = mBinding.video.getLayoutParams();
-        mClock = Clock.create(mBinding.widget.time);
+        mClock = Clock.create(mBinding.display.time);
         mDanmakuContext = DanmakuContext.create();
         mPlayers = new Players().init(this);
         mBroken = new ArrayList<>();
@@ -318,6 +324,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         setRecyclerView();
         setEpisodeView();
         setVideoView();
+        setDisplayView();
         setDanmuView();
         setViewModel();
         checkCast();
@@ -347,6 +354,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mBinding.control.danmu.setOnClickListener(view -> onDanmu());
         mBinding.control.next.setOnClickListener(view -> checkNext());
         mBinding.control.prev.setOnClickListener(view -> checkPrev());
+        mBinding.control.episodes.setOnClickListener(view -> onEpisodes());
         mBinding.control.scale.setOnClickListener(view -> onScale());
         mBinding.control.speed.setOnClickListener(view -> onSpeed());
         mBinding.control.reset.setOnClickListener(view -> onReset());
@@ -376,7 +384,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mBinding.array.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
-                if (mEpisodeAdapter.size() > getGroupSize() && position > 1) setEpisodeSelectedPosition((position - 2) * getGroupSize() + 1);
+                if (mEpisodeAdapter.size() > getGroupSize() && position > 1 && hasKeyEvent) setEpisodeSelectedPosition((position - 2) * getGroupSize());
             }
         });
     }
@@ -425,20 +433,26 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         float[] range = {2.4f, 1.8f, 1.2f, 0.8f};
         float speed = range[Setting.getDanmuSpeed()];
         float alpha = Setting.getDanmuAlpha() / 100.0f;
+        float sizeScale = Setting.getDanmuSize();
         HashMap<Integer, Integer> maxLines = new HashMap<>();
         maxLines.put(BaseDanmaku.TYPE_FIX_TOP, maxLine);
         maxLines.put(BaseDanmaku.TYPE_SCROLL_RL, maxLine);
         maxLines.put(BaseDanmaku.TYPE_SCROLL_LR, maxLine);
         maxLines.put(BaseDanmaku.TYPE_FIX_BOTTOM, maxLine);
-        mDanmakuContext.setDanmakuStyle(IDisplayer.DANMAKU_STYLE_STROKEN, 3).setMaximumLines(maxLines).setScrollSpeedFactor(speed).setDanmakuTransparency(alpha).setDanmakuMargin(12).setScaleTextSize(0.8f);
+        mDanmakuContext.setDanmakuStyle(IDisplayer.DANMAKU_STYLE_STROKEN, 3).setMaximumLines(maxLines).setScrollSpeedFactor(speed).setDanmakuTransparency(alpha).setDanmakuMargin(12).setScaleTextSize(sizeScale);
         mBinding.control.danmu.setActivated(Setting.isDanmu());
+    }
+
+    private void setDisplayView() {
+        mBinding.display.getRoot().setVisibility(View.VISIBLE);
+        showDisplayInfo();
     }
 
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mViewModel.result.observe(this, this::setDetail);
         mViewModel.player.observe(this, this::setPlayer);
-        mViewModel.search.observe(this, result -> setSearch(result.getList()));
+        mViewModel.search.observe(this, this::setSearch);
     }
 
     private void checkCast() {
@@ -493,7 +507,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mBinding.widget.title.setText(getString(R.string.detail_title, mBinding.name.getText(), episode.getName()));
         mViewModel.playerContent(getKey(), flag.getFlag(), episode.getUrl());
         updateHistory(episode, replay);
-        mPlayers.clean();
+        mPlayers.clear();
         showProgress();
         setMetadata();
         hidePreview();
@@ -615,7 +629,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         if (isVisible(mBinding.episodeVert)) setEpisodeView(items);
         mEpisodeAdapter.setItems(items, null);
         setArrayAdapter(items.size());
-        setR2Callback();
+        setR2Callback(50);
     }
 
     private void setEpisodeView(List<Episode> items) {
@@ -631,7 +645,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         else if (episodeNameLength > 15) numColumns = 3;
         else if (episodeNameLength > 10) numColumns = 4;
         else if (episodeNameLength > 6) numColumns = 6;
-        else if (episodeNameLength > 2) numColumns = 8;
+        else if (episodeNameLength > 4) numColumns = 8;
         int rowNum = (int) Math.ceil((double) size / (double) numColumns);
         int width = ResUtil.getScreenWidth() - ResUtil.dp2px(48);
         ViewGroup.LayoutParams params = mBinding.episodeVert.getLayoutParams();
@@ -640,6 +654,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mBinding.episodeVert.setNumColumns(numColumns);
         mBinding.episodeVert.setColumnWidth((width - ((numColumns - 1) * ResUtil.dp2px(8))) / numColumns);
         mBinding.episodeVert.setLayoutParams(params);
+        mBinding.episodeVert.setWindowAlignmentOffsetPercent(10f);
         mEpisodePresenter.setNumColumns(numColumns);
         mEpisodePresenter.setNumRows(rowNum);
     }
@@ -660,7 +675,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         }
     }
 
-    private void setEpisodeActivated(Episode item) {
+    public void setEpisodeActivated(Episode item) {
         if (shouldEnterFullscreen(item)) return;
         setCurrentFlag(mBinding.flag.getSelectedPosition());
         for (int i = 0; i < mFlagAdapter.size(); i++) ((Flag) mFlagAdapter.get(i)).toggle(getCurrentFlag() == i, item);
@@ -673,7 +688,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     private void setQualityVisible(boolean visible) {
         mBinding.quality.setVisibility(visible ? View.VISIBLE : View.GONE);
-        setR2Callback();
+        setR2Callback(100);
     }
 
     private void setQualityActivated(Result result) {
@@ -725,6 +740,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void updateFocus() {
+        hasKeyEvent = false;
         mEpisodePresenter.setNextFocusDown(findFocusDown(Setting.getEpisode() == 0 ? 2 : 4));
         mEpisodePresenter.setNextFocusUp(findFocusUp(Setting.getEpisode() == 0 ? 2 : 4));
         mQualityAdapter.setNextFocusDown(findFocusDown(1));
@@ -734,9 +750,25 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mPartPresenter.setNextFocusUp(findFocusUp(5));
         notifyItemChanged(getEpisodeView(), mEpisodeAdapter);
         notifyItemChanged(mBinding.quality, mQualityAdapter);
-        notifyItemChanged(mBinding.array, mArrayAdapter);
         notifyItemChanged(mBinding.part, mPartAdapter);
+        notifyItemChanged(mBinding.array, mArrayAdapter);
         notifyItemChanged(mBinding.flag, mFlagAdapter);
+    }
+
+    private void showDisplayInfo() {
+        mBinding.display.time.setVisibility(Setting.isDisplayTime() || isVisible(mBinding.widget.info)  ? View.VISIBLE : View.GONE);
+        mBinding.display.netspeed.setVisibility(Setting.isDisplaySpeed() && !isVisible(mBinding.control.getRoot()) ? View.VISIBLE : View.GONE);
+        mBinding.display.duration.setVisibility(Setting.isDisplayDuration() && !isVisible(mBinding.control.getRoot()) ? View.VISIBLE : View.GONE);
+        mBinding.display.progress.setVisibility(Setting.isDisplayMiniProgress() && !isVisible(mBinding.control.getRoot()) ? View.VISIBLE : View.GONE);
+    }
+
+    private void onTimeChangeDisplaySpeed() {
+        boolean visible = !isVisible(mBinding.control.getRoot());
+        long position = mPlayers.getPosition();
+        if (Setting.isDisplaySpeed() && visible) Traffic.setSpeed(mBinding.display.netspeed);
+        if (Setting.isDisplayDuration() && visible && position > 0) mBinding.display.duration.setText(mPlayers.getPositionTime(0) + "/" + mPlayers.getDurationTime());
+        if (Setting.isDisplayMiniProgress() && visible && position > 0) mBinding.display.progress.setProgress((int)(position * 100 / mPlayers.getDuration()));
+        showDisplayInfo();
     }
 
     @Override
@@ -764,7 +796,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mBinding.video.setForeground(null);
         mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
         mBinding.flag.setSelectedPosition(getCurrentFlag());
-        mDanmakuContext.setScaleTextSize(1.2f);
+        mDanmakuContext.setScaleTextSize(1.2f * Setting.getDanmuSize());
         setSubtitle(Setting.getSubtitle());
         mKeyDown.setFull(true);
         setFullscreen(true);
@@ -775,7 +807,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private void exitFullscreen() {
         mBinding.video.setForeground(ResUtil.getDrawable(R.drawable.selector_video));
         mBinding.video.setLayoutParams(mFrameParams);
-        mDanmakuContext.setScaleTextSize(0.8f);
+        mDanmakuContext.setScaleTextSize(0.8f * Setting.getDanmuSize());
         getFocus1().requestFocus();
         mKeyDown.setFull(false);
         setFullscreen(false);
@@ -819,6 +851,11 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private void showDanmu() {
         if (Setting.isDanmu()) mBinding.danmaku.show();
         else mBinding.danmaku.hide();
+    }
+
+    private void onEpisodes() {
+        EpisodeDialog.create().episodes(getFlag().getEpisodes()).show(this);
+        hideControl();
     }
 
     private void checkNext() {
@@ -886,6 +923,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     private void onReset(boolean replay) {
         mClock.setCallback(null);
+        mBinding.control.seek.reset();
         if (mFlagAdapter.size() == 0) return;
         if (mEpisodeAdapter.size() == 0) return;
         getPlayer(getFlag(), getEpisode(), replay);
@@ -1023,10 +1061,12 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     private void showInfo() {
         mBinding.widget.info.setVisibility(View.VISIBLE);
+        showDisplayInfo();
     }
 
     private void hideInfo() {
         mBinding.widget.info.setVisibility(View.GONE);
+        showDisplayInfo();
     }
 
     private void showInfoAndCenter() {
@@ -1042,6 +1082,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private void showControl(View view) {
         mBinding.control.danmu.setVisibility(mBinding.danmaku.isPrepared() ? View.VISIBLE : View.GONE);
         mBinding.control.getRoot().setVisibility(View.VISIBLE);
+        mBinding.control.episodes.setVisibility(Setting.getFullscreenMenuKey() == 0 ? View.VISIBLE : View.GONE);
         view.requestFocus();
         setR1Callback();
     }
@@ -1082,8 +1123,8 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         App.post(mR1, Constant.INTERVAL_HIDE);
     }
 
-    private void setR2Callback() {
-        App.post(mR2, 500);
+    private void setR2Callback(long delayMillis) {
+        App.post(mR2, delayMillis);
     }
 
     private void setArtwork(String url) {
@@ -1131,7 +1172,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private void setPartAdapter(List<String> items) {
         mBinding.part.setVisibility(View.VISIBLE);
         mPartAdapter.setItems(items, null);
-        setR2Callback();
+        setR2Callback(1000);
     }
 
     private void checkFlag(Vod item) {
@@ -1149,7 +1190,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mHistory = History.find(getHistoryKey());
         mHistory = mHistory == null ? createHistory(item) : mHistory;
         if (!TextUtils.isEmpty(getMark())) mHistory.setVodRemarks(getMark());
-        if (!getSite().isRecordable() && mHistory.getKey().equals(getHistoryKey())) mHistory.delete();
+        if (Setting.isIncognito() && mHistory.getKey().equals(getHistoryKey())) mHistory.delete();
         mBinding.control.opening.setText(mHistory.getOpening() == 0 ? getString(R.string.play_op) : mPlayers.stringToTime(mHistory.getOpening()));
         mBinding.control.ending.setText(mHistory.getEnding() == 0 ? getString(R.string.play_ed) : mPlayers.stringToTime(mHistory.getEnding()));
         mBinding.control.speed.setText(mPlayers.setSpeed(mHistory.getSpeed()));
@@ -1166,6 +1207,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         history.setVodPic(item.getVodPic());
         history.setVodName(item.getVodName());
         history.findEpisode(item.getVodFlags());
+        history.setSpeed(Setting.getPlaySpeed());
         return history;
     }
 
@@ -1177,6 +1219,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mHistory.setVodRemarks(item.getName());
         mHistory.setVodFlag(getFlag().getFlag());
         mHistory.setCreateTime(System.currentTimeMillis());
+        mPlayers.setPosition(Math.max(mHistory.getOpening(), mHistory.getPosition()));
     }
 
     private void checkKeep() {
@@ -1202,10 +1245,11 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     @Override
     public void onTimeChanged() {
+        onTimeChangeDisplaySpeed();
         long position, duration;
         mHistory.setPosition(position = mPlayers.getPosition());
         mHistory.setDuration(duration = mPlayers.getDuration());
-        if (position >= 0 && duration > 0 && getSite().isRecordable()) App.execute(() -> mHistory.update());
+        if (position >= 0 && duration > 0 && !Setting.isIncognito()) App.execute(() -> mHistory.update());
         if (mHistory.getEnding() > 0 && duration > 0 && mHistory.getEnding() + position >= duration) {
             mClock.setCallback(null);
             checkNext();
@@ -1240,10 +1284,10 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         if (isBackground()) return;
         switch (event.getState()) {
             case 0:
-                setPosition();
                 setInitTrack(true);
                 setTrackVisible(false);
                 mClock.setCallback(this);
+                mBinding.control.seek.start();
                 break;
             case Player.STATE_IDLE:
                 break;
@@ -1265,10 +1309,6 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
                 checkEnded();
                 break;
         }
-    }
-
-    private void setPosition() {
-        mPlayers.seekTo(Math.max(mHistory.getOpening(), mHistory.getPosition()), false);
     }
 
     private void checkEnded() {
@@ -1401,7 +1441,8 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         }
     }
 
-    private void setSearch(List<Vod> items) {
+    private void setSearch(Result result) {
+        List<Vod> items = result.getList();
         Iterator<Vod> iterator = items.iterator();
         while (iterator.hasNext()) if (mismatch(iterator.next())) iterator.remove();
         mQuickAdapter.addAll(mQuickAdapter.size(), items);
@@ -1419,7 +1460,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private boolean mismatch(Vod item) {
         if (getId().equals(item.getVodId())) return true;
         if (mBroken.contains(item.getVodId())) return true;
-        String keyword = mBinding.part.getTag().toString();
+        String keyword = Objects.toString(mBinding.part.getTag(), "");
         if (isAutoMode()) return !item.getVodName().equals(keyword);
         else return !item.getVodName().contains(keyword);
     }
@@ -1467,7 +1508,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         this.background = background;
     }
 
-    private boolean isFullscreen() {
+    public boolean isFullscreen() {
         return fullscreen;
     }
 
@@ -1541,12 +1582,9 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (!isFullscreen() && KeyUtil.isBackKey(event) && getFocus1() != mBinding.video) {
-            mBinding.video.requestFocus();
-            mFocus1 = null;
-            return true;
-        }
-        if (isFullscreen() && KeyUtil.isMenuKey(event)) onToggle();
+        hasKeyEvent = true;
+        if (isFullscreen() && KeyUtil.isMenuKey(event) && Setting.getFullscreenMenuKey() == 0) onToggle();
+        if (isFullscreen() && KeyUtil.isMenuKey(event) && Setting.getFullscreenMenuKey() == 1) onEpisodes();
         if (isVisible(mBinding.control.getRoot())) setR1Callback();
         if (isVisible(mBinding.control.getRoot())) mFocus2 = getCurrentFocus();
         if (isFullscreen() && isGone(mBinding.control.getRoot()) && mKeyDown.hasEvent(event)) return mKeyDown.onKeyDown(event);

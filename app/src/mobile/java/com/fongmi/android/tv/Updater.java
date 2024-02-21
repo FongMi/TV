@@ -69,21 +69,21 @@ public class Updater implements Download.Callback {
         return this;
     }
 
-    public void start() {
-        App.execute(this::doInBackground);
+    public void start(Activity activity) {
+        App.execute(() -> doInBackground(activity));
     }
 
     private boolean need(int code, String name) {
         return Setting.getUpdate() && (dev ? !name.equals(BuildConfig.VERSION_NAME) && code >= BuildConfig.VERSION_CODE : code > BuildConfig.VERSION_CODE);
     }
 
-    private void doInBackground() {
+    private void doInBackground(Activity activity) {
         try {
             JSONObject object = new JSONObject(OkHttp.string(getJson()));
             String name = object.optString("name");
             String desc = object.optString("desc");
             int code = object.optInt("code");
-            if (need(code, name)) App.post(() -> show(App.activity(), name, desc));
+            if (need(code, name)) App.post(() -> show(activity, name, desc));
         } catch (Exception e) {
             e.printStackTrace();
         }

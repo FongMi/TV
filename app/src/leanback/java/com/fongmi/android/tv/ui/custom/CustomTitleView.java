@@ -12,6 +12,7 @@ import androidx.appcompat.widget.AppCompatTextView;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.impl.SiteCallback;
@@ -53,6 +54,7 @@ public class CustomTitleView extends AppCompatTextView {
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
+        if (Setting.isHomeSiteLock()) return false;
         if (VodConfig.get().getSites().isEmpty()) return false;
         if (hasEvent(event)) return onKeyDown(event);
         else return super.dispatchKeyEvent(event);
