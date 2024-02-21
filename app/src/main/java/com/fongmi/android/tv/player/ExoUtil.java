@@ -76,7 +76,7 @@ public class ExoUtil {
     }
 
     public static RenderersFactory buildRenderersFactory() {
-        return new DefaultRenderersFactory(App.get()).setEnableDecoderFallback(true).setExtensionRendererMode(Math.abs(Setting.getDecode() - 2));
+        return new DefaultRenderersFactory(App.get()).setEnableDecoderFallback(true).setExtensionRendererMode(Math.abs(Setting.getDecode(Players.EXO) - 2));
     }
 
     public static CaptionStyleCompat getCaptionStyle() {
@@ -144,7 +144,7 @@ public class ExoUtil {
         MediaItem.Builder builder = new MediaItem.Builder().setUri(uri);
         if (subs.size() > 0) builder.setSubtitleConfigurations(getSubtitles(subs));
         if (drm != null) builder.setDrmConfiguration(drm.get());
-        builder.setAllowChunklessPreparation(Players.isHard());
+        builder.setAllowChunklessPreparation(Players.isHard(Players.EXO));
         if (mimeType != null) builder.setMimeType(mimeType);
         builder.setAds(Sniffer.getRegex(uri));
         return builder.build();
