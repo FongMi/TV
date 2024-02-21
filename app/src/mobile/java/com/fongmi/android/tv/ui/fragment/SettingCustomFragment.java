@@ -16,6 +16,8 @@ import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import java.util.Locale;
+
 public class SettingCustomFragment extends BaseFragment {
 
     private FragmentSettingCustomBinding mBinding;
