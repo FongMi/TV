@@ -33,6 +33,15 @@ public class WordAdapter extends RecyclerView.Adapter<WordAdapter.ViewHolder> {
         notifyDataSetChanged();
     }
 
+    public void clear() {
+        mItems.clear();
+    }
+
+    public void appendAll(List<String> items) {
+        mItems.addAll(items.subList(0, Math.min(items.size(), 20)));
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getItemCount() {
         return mItems.size();
