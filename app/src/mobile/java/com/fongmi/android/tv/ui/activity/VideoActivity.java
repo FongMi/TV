@@ -1655,7 +1655,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         if (!isFullscreen()) {
             App.post(this::enterFullscreen, 250);
         } else if (mPlayers.isPlaying()) {
-            showControl();
             onPaused();
         } else {
             hideControl();
