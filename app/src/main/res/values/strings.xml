@@ -92,6 +92,7 @@
 
     <!-- Player -->
     <string name="player">Player</string>
+    <string name="player_decode">Decode</string>
     <string name="player_render">Render</string>
     <string name="player_scale">Scale</string>
     <string name="player_caption">Caption style</string>

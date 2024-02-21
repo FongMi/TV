@@ -403,6 +403,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     private void setDecodeView() {
         mBinding.control.action.decode.setText(mPlayers.getDecodeText());
+        if (mControlDialog != null && mControlDialog.isVisible()) mControlDialog.updateDecode();
     }
 
     private void setVideoView() {
@@ -856,6 +857,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private void onPlayer() {
         mPlayers.togglePlayer();
         setPlayerView();
+        setDecodeView();
         setR1Callback();
         onRefresh();
     }
@@ -1333,6 +1335,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private void nextPlayer() {
         mPlayers.nextPlayer();
         setPlayerView();
+        setDecodeView();
         onRefresh();
     }
 

@@ -215,6 +215,10 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
         binding.player.setText(parent.control.action.player.getText());
     }
 
+    public void updateDecode() {
+        binding.decode.setText(parent.control.action.decode.getText());
+    }
+
     public void setParseVisible(boolean visible) {
         binding.parse.setVisibility(visible ? View.VISIBLE : View.GONE);
         binding.parseText.setVisibility(visible ? View.VISIBLE : View.GONE);
