@@ -19,7 +19,7 @@ public class Path {
 
     private static final String TAG = Path.class.getSimpleName();
 
-    private static File check(File file) {
+    private static File mkdir(File file) {
         if (!file.exists()) file.mkdirs();
         return file;
     }
@@ -45,39 +45,39 @@ public class Path {
     }
 
     public static File tv() {
-        return check(new File(root() + File.separator + "TV"));
+        return mkdir(new File(root() + File.separator + "TV"));
     }
 
     public static File so() {
-        return check(new File(files() + File.separator + "so"));
+        return mkdir(new File(files() + File.separator + "so"));
     }
 
     public static File js() {
-        return check(new File(cache() + File.separator + "js"));
+        return mkdir(new File(cache() + File.separator + "js"));
     }
 
     public static File py() {
-        return check(new File(cache() + File.separator + "py"));
+        return mkdir(new File(cache() + File.separator + "py"));
     }
 
     public static File jar() {
-        return check(new File(cache() + File.separator + "jar"));
+        return mkdir(new File(cache() + File.separator + "jar"));
     }
 
     public static File doh() {
-        return check(new File(cache() + File.separator + "doh"));
+        return mkdir(new File(cache() + File.separator + "doh"));
     }
 
     public static File exo() {
-        return check(new File(cache() + File.separator + "exo"));
+        return mkdir(new File(cache() + File.separator + "exo"));
     }
 
     public static File jpa() {
-        return check(new File(cache() + File.separator + "jpa"));
+        return mkdir(new File(cache() + File.separator + "jpa"));
     }
 
     public static File thunder() {
-        return check(new File(cache() + File.separator + "thunder"));
+        return mkdir(new File(cache() + File.separator + "thunder"));
     }
 
     public static File root(String name) {
@@ -85,7 +85,7 @@ public class Path {
     }
 
     public static File root(String child, String name) {
-        return new File(check(new File(root(), child)), name);
+        return new File(mkdir(new File(root(), child)), name);
     }
 
     public static File cache(String name) {
@@ -107,7 +107,7 @@ public class Path {
     }
 
     public static File thunder(String name) {
-        return check(new File(thunder(), name));
+        return mkdir(new File(thunder(), name));
     }
 
     public static File local(String path) {
