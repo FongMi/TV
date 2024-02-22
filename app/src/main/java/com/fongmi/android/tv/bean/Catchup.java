@@ -27,6 +27,10 @@ public class Catchup {
         return item;
     }
 
+    public static Catchup create() {
+        return new Catchup();
+    }
+
     public String getType() {
         return TextUtils.isEmpty(type) ? "" : type;
     }
@@ -61,6 +65,10 @@ public class Catchup {
 
     public boolean match(String url) {
         return url.contains(getRegex()) || Pattern.compile(getRegex()).matcher(url).find();
+    }
+
+    public boolean isEmpty() {
+        return getSource().isEmpty();
     }
 
     public String format(EpgData data) {

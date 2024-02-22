@@ -1,7 +1,9 @@
 package com.fongmi.android.tv.api;
 
 import android.util.Base64;
+import android.util.Log;
 
+import com.fongmi.android.tv.bean.Catchup;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.ClearKey;
 import com.fongmi.android.tv.bean.Drm;
@@ -21,6 +23,8 @@ import java.util.regex.Pattern;
 
 public class LiveParser {
 
+    private static final Pattern CATCHUP_SOURCE = Pattern.compile(".*catchup-source=\"(.?|.+?)\".*");
+    private static final Pattern CATCHUP = Pattern.compile(".*catchup=\"(.?|.+?)\".*");
     private static final Pattern GROUP = Pattern.compile(".*group-title=\"(.?|.+?)\".*");
     private static final Pattern LOGO = Pattern.compile(".*tvg-logo=\"(.?|.+?)\".*");
     private static final Pattern NAME = Pattern.compile(".*,(.+?)$");
@@ -62,15 +66,20 @@ public class LiveParser {
 
     private static void m3u(Live live, String text) {
         Setting setting = Setting.create();
+        Catchup catchup = Catchup.create();
         Channel channel = Channel.create("");
         for (String line : text.split("\n")) {
             if (Thread.interrupted()) break;
             if (setting.find(line)) {
                 setting.check(line);
+            } else if (line.startsWith("#EXTM3U")) {
+                catchup.setType(extract(line, CATCHUP));
+                catchup.setSource(extract(line, CATCHUP_SOURCE));
             } else if (line.startsWith("#EXTINF:")) {
                 Group group = live.find(Group.create(extract(line, GROUP), live.isPass()));
                 channel = group.find(Channel.create(extract(line, NAME)));
                 channel.setLogo(extract(line, LOGO));
+                channel.setCatchup(catchup);
             } else if (!line.startsWith("#") && line.contains("://")) {
                 String[] split = line.split("\\|");
                 if (split.length > 1) setting.headers(Arrays.copyOfRange(split, 1, split.length));
