@@ -30,6 +30,7 @@ https://github.com/CatVodTVOfficial/CatVodTVJarLoader
 | timeout    | 15    | 播放超時  | 單位：秒             |
 | header     | none  | 請求標頭  | 格式：json          |
 | click      | none  | 點擊js  | javascript       |
+| catchup    | none  | 回看參數  |                  |
 
 ### 樣式
 
@@ -164,5 +165,5 @@ scheme://username:password@host:port
 [發布頻道](https://t.me/fongmi_release)
 
 ### 贊助
-![photo_2024-01-10_11-39-12](https://github.com/FongMi/TV/assets/3471963/fdc12771-386c-4d5d-9a4d-d0bec0276fa7)
 
+![photo_2024-01-10_11-39-12](https://github.com/FongMi/TV/assets/3471963/fdc12771-386c-4d5d-9a4d-d0bec0276fa7)

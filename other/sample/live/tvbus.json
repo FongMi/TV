@@ -8,8 +8,7 @@
       "core": {
         "auth": "",
         "name": "",
-        "pass": "",
-        "broker": ""
+        "pass": ""
       }
     }
   ]
