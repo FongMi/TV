@@ -10,7 +10,6 @@ https://github.com/CatVodTVOfficial/CatVodTVJarLoader
 |------------|------|------|------------------|
 | searchable | 1    | 是否搜索 | 0：關閉；1：啟用        |
 | changeable | 1    | 是否換源 | 0：關閉；1：啟用        |
-| recordable | 1    | 是否紀錄 | 0：關閉；1：啟用        |
 | playerType | none | 播放器  | 0：系統；1：IJK；2：EXO |
 | timeout    | 15   | 播放超時 | 單位：秒             |
 | header     | none | 請求標頭 | 格式：json          |
