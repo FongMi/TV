@@ -25,8 +25,11 @@ import com.fongmi.android.tv.ui.adapter.TrackAdapter;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.github.catvod.utils.Path;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.obsez.android.lib.filechooser.ChooserDialog;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,9 +41,11 @@ public final class TrackDialog extends BaseDialog implements TrackAdapter.OnClic
     private final TrackAdapter adapter;
     private DialogTrackBinding binding;
     private FragmentActivity activity;
+    private ChooserDialog cDialog;
     private Listener listener;
     private Players player;
     private int type;
+    private boolean tv;
 
     public static TrackDialog create() {
         return new TrackDialog();
@@ -53,6 +58,11 @@ public final class TrackDialog extends BaseDialog implements TrackAdapter.OnClic
 
     public TrackDialog type(int type) {
         this.type = type;
+        return this;
+    }
+
+    public TrackDialog tv(boolean tv) {
+        this.tv = tv;
         return this;
     }
 
@@ -97,8 +107,23 @@ public final class TrackDialog extends BaseDialog implements TrackAdapter.OnClic
     }
 
     private void showChooser(View view) {
-        FileChooser.from(this).show(new String[]{MimeTypes.APPLICATION_SUBRIP, MimeTypes.TEXT_SSA, MimeTypes.TEXT_VTT, MimeTypes.APPLICATION_TTML, "text/*", "application/octet-stream"});
+        if (tv) showFileChooser(view);
+        else FileChooser.from(this).show(new String[]{MimeTypes.APPLICATION_SUBRIP, MimeTypes.TEXT_SSA, MimeTypes.TEXT_VTT, MimeTypes.APPLICATION_TTML, "text/*", "application/octet-stream"});
         player.pause();
+    }
+
+    private void showFileChooser(View view) {
+        if (cDialog != null) cDialog.dismiss();
+        cDialog = new ChooserDialog(getActivity());
+        cDialog.withFilter(false, false, "srt", "ass", "scc", "stl", "ttml");
+        cDialog.withStartFile(Path.downloadPath());
+        cDialog.withChosenListener(this::onChoosePath);
+        cDialog.build().show();
+    }
+
+    private void onChoosePath(String path, File pathFile) {
+        player.setSub(Sub.from(pathFile.getAbsolutePath()));
+        if (cDialog != null) cDialog.dismiss();
     }
 
     private List<Track> getTrack() {
