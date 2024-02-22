@@ -842,7 +842,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     private void onReset(boolean replay) {
         mClock.setCallback(null);
-        mBinding.control.seek.reset();
         if (mFlagAdapter.isEmpty()) return;
         if (mEpisodeAdapter.isEmpty()) return;
         getPlayer(getFlag(), getEpisode(), replay);
@@ -1244,7 +1243,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
                 setInitTrack(true);
                 setTrackVisible(false);
                 mClock.setCallback(this);
-                mBinding.control.seek.start();
                 break;
             case Player.STATE_IDLE:
                 break;

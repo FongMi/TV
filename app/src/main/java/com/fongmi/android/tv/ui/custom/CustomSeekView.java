@@ -26,7 +26,7 @@ public class CustomSeekView extends FrameLayout implements TimeBar.OnScrubListen
     private TextView durationView;
     private DefaultTimeBar timeBar;
 
-    private Runnable runnable;
+    private Runnable refresh;
     private Players player;
 
     private long currentDuration;
@@ -46,35 +46,27 @@ public class CustomSeekView extends FrameLayout implements TimeBar.OnScrubListen
         super(context, attrs, defStyleAttr);
         LayoutInflater.from(context).inflate(R.layout.view_control_seek, this);
         init();
+        start();
     }
 
     private void init() {
-        timeBar = findViewById(R.id.timeBar);
         positionView = findViewById(R.id.position);
         durationView = findViewById(R.id.duration);
-        runnable = this::updateProgress;
+        timeBar = findViewById(R.id.timeBar);
         timeBar.addListener(this);
-        reset();
+        refresh = this::refresh;
     }
 
     public void setListener(Players player) {
         this.player = player;
     }
 
-    public void reset() {
-        timeBar.setPosition(0);
-        timeBar.setDuration(0);
-        removeCallbacks(runnable);
-        positionView.setText("00:00");
-        durationView.setText("00:00");
+    private void start() {
+        removeCallbacks(refresh);
+        post(refresh);
     }
 
-    public void start() {
-        removeCallbacks(runnable);
-        post(runnable);
-    }
-
-    private void updateProgress() {
+    private void refresh() {
         if (player.isRelease()) return;
         long duration = player.getDuration();
         long position = player.getPosition();
@@ -97,11 +89,17 @@ public class CustomSeekView extends FrameLayout implements TimeBar.OnScrubListen
         if (bufferedChanged) {
             timeBar.setBufferedPosition(buffered);
         }
-        removeCallbacks(runnable);
+        if (player.isEmpty()) {
+            timeBar.setPosition(0);
+            timeBar.setDuration(0);
+            positionView.setText("00:00");
+            durationView.setText("00:00");
+        }
+        removeCallbacks(refresh);
         if (player.isPlaying()) {
-            postDelayed(runnable, delayMs(position));
+            postDelayed(refresh, delayMs(position));
         } else {
-            postDelayed(runnable, MAX_UPDATE_INTERVAL_MS);
+            postDelayed(refresh, MAX_UPDATE_INTERVAL_MS);
         }
     }
 
@@ -132,13 +130,13 @@ public class CustomSeekView extends FrameLayout implements TimeBar.OnScrubListen
 
     private void seekToTimeBarPosition(long positionMs) {
         player.seekTo(positionMs);
-        updateProgress();
+        refresh();
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        removeCallbacks(runnable);
+        removeCallbacks(refresh);
     }
 
     @Override
