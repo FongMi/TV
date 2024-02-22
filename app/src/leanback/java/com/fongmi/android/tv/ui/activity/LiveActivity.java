@@ -591,6 +591,8 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         Notify.show(getString(R.string.play_ready, item.getTitle()));
         mViewModel.getUrl(mChannel, item);
         setActivated(item);
+        mPlayers.clear();
+        showProgress();
         hideEpg();
     }
 
@@ -648,7 +650,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private void fetch() {
         if (mChannel == null) return;
         LiveConfig.get().setKeep(mChannel);
-        mBinding.control.seek.reset();
         mViewModel.getUrl(mChannel);
         mPlayers.clear();
         showProgress();
@@ -723,7 +724,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         switch (event.getState()) {
             case 0:
                 setTrackVisible(false);
-                mBinding.control.seek.start();
                 break;
             case Player.STATE_IDLE:
                 break;

@@ -780,7 +780,6 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     private void onReset(boolean replay) {
         mClock.setCallback(null);
-        mBinding.control.seek.reset();
         if (mFlagAdapter.size() == 0) return;
         if (mEpisodeAdapter.size() == 0) return;
         getPlayer(getFlag(), getEpisode(), replay);
@@ -1111,7 +1110,6 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
                 setInitTrack(true);
                 setTrackVisible(false);
                 mClock.setCallback(this);
-                mBinding.control.seek.start();
                 break;
             case Player.STATE_IDLE:
                 break;
