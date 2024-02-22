@@ -1,7 +1,6 @@
 package com.fongmi.android.tv.api;
 
 import android.util.Base64;
-import android.util.Log;
 
 import com.fongmi.android.tv.bean.Catchup;
 import com.fongmi.android.tv.bean.Channel;

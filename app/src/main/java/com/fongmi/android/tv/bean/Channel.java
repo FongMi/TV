@@ -159,7 +159,7 @@ public class Channel {
     }
 
     public Catchup getCatchup() {
-        return catchup;
+        return catchup == null ? new Catchup() : catchup;
     }
 
     public void setCatchup(Catchup catchup) {
@@ -287,9 +287,9 @@ public class Channel {
     }
 
     public boolean hasCatchup() {
-        if (getCatchup() == null && getCurrent().contains("/PLTV/")) setCatchup(Catchup.PLTV());
-        if (getCatchup() != null && !getCatchup().getRegex().isEmpty()) return getCatchup().match(getCurrent());
-        return getCatchup() != null && !getCatchup().isEmpty();
+        if (getCatchup().isEmpty() && getCurrent().contains("/PLTV/")) setCatchup(Catchup.PLTV());
+        if (!getCatchup().getRegex().isEmpty()) return getCatchup().match(getCurrent());
+        return !getCatchup().isEmpty();
     }
 
     public String getLineText() {
@@ -313,6 +313,7 @@ public class Channel {
         if (live.getHeader() != null && getHeader() == null) setHeader(live.getHeader());
         if (live.getClick().length() > 0 && getClick().isEmpty()) setClick(live.getClick());
         if (live.getOrigin().length() > 0 && getOrigin().isEmpty()) setOrigin(live.getOrigin());
+        if (!live.getCatchup().isEmpty() && getCatchup().isEmpty()) setCatchup(live.getCatchup());
         if (live.getReferer().length() > 0 && getReferer().isEmpty()) setReferer(live.getReferer());
         if (live.getPlayerType() != -1 && getPlayerType() == -1) setPlayerType(live.getPlayerType());
         if (!getEpg().startsWith("http")) setEpg(live.getEpg().replace("{name}", getName()).replace("{epg}", getEpg()));
