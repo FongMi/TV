@@ -115,7 +115,6 @@ dependencies {
     implementation 'com.github.bumptech.glide:annotations:4.16.0'
     implementation 'com.github.bumptech.glide:okhttp3-integration:4.16.0'
     implementation 'com.github.ctiao:DanmakuFlameMaster:0.9.25'
-    implementation 'com.github.hedzr:android-file-chooser:v1.2.0-final'
     implementation 'com.github.jahirfiquitiva:TextDrawable:1.0.3'
     implementation('com.github.TeamNewPipe:NewPipeExtractor:v0.23.1') { exclude group: 'org.jsoup', module: 'jsoup' }
     implementation 'com.github.thegrizzlylabs:sardine-android:0.8'
@@ -135,6 +134,7 @@ dependencies {
     implementation(ext: 'aar', name: 'dlna-core', group: 'fongmi', version: 'release')
     leanbackImplementation(ext: 'aar', name: 'dlna-dmr', group: 'fongmi', version: 'release')
     leanbackImplementation 'androidx.leanback:leanback:1.2.0-alpha04'
+    leanbackImplementation 'com.github.hedzr:android-file-chooser:v1.2.0-final'
     leanbackImplementation 'me.jessyan:autosize:1.2.1'
     mobileImplementation(ext: 'aar', name: 'dlna-dmc', group: 'fongmi', version: 'release')
     mobileImplementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
