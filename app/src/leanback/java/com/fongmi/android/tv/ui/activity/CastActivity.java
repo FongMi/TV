@@ -318,7 +318,6 @@ public class CastActivity extends BaseActivity implements CustomKeyDownCast.List
             case 0:
                 setTrackVisible(false);
                 mClock.setCallback(this);
-                mBinding.control.seek.start();
                 setState(RenderState.PREPARING);
                 break;
             case Player.STATE_IDLE:
