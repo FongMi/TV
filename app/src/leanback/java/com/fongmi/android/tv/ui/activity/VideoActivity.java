@@ -989,7 +989,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                List<String> items = List.of(source);
+                List<String> items = Arrays.asList(source);
                 App.post(() -> setPartAdapter(items));
             }
         });
