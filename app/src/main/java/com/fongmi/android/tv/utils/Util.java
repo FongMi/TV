@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
-import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.Parcelable;
@@ -154,12 +153,6 @@ public class Util {
             }
         }
         return false;
-    }
-
-    public static String getDownloadUrl(String url) {
-        if (url == null) return "";
-        if (!url.startsWith("http://127.0.0.1:7777")) return url;
-        return Uri.parse(url).getQueryParameter("url");
     }
 
 }
