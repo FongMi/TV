@@ -80,13 +80,13 @@ public class InfoDialog {
         dialog.dismiss();
     }
 
-    private String convert(String url) {
-        return url.startsWith("http://127.0.0.1:7777") ? Uri.parse(url).getQueryParameter("url") : url;
-    }
-
     private boolean onCopy(String text) {
         Util.copy(text);
         return true;
+    }
+
+    private String convert(String url) {
+        return url.startsWith("http://127.0.0.1:7777") ? Uri.parse(url).getQueryParameter("url") : url;
     }
 
     public interface Listener {
