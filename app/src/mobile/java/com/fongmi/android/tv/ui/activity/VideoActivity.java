@@ -1663,7 +1663,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     @Override
     public void onShare(CharSequence title, String url) {
-        if (IDMUtil.downloadFile(this, Util.getDownloadUrl(url), title.toString(), mPlayers.getHeaders(), false, false)) return;
+        if (IDMUtil.downloadFile(this, url, title.toString(), mPlayers.getHeaders(), false, false)) return;
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra(Intent.EXTRA_TEXT, url);
