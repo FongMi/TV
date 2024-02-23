@@ -7,8 +7,6 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.player.extractor.Magnet;
-import com.fongmi.android.tv.utils.Sniffer;
 import com.fongmi.android.tv.utils.Util;
 import com.github.catvod.utils.Trans;
 import com.google.gson.annotations.SerializedName;
@@ -18,7 +16,6 @@ import org.simpleframework.xml.Text;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
@@ -123,20 +120,6 @@ public class Flag implements Parcelable {
         Flag item = Flag.create(flag);
         item.getEpisodes().add(Episode.create(name, url));
         return Arrays.asList(item);
-    }
-
-    public List<Magnet> getMagnet() {
-        Iterator<Episode> iterator = getEpisodes().iterator();
-        List<Magnet> items = new ArrayList<>();
-        while (iterator.hasNext()) addMagnet(iterator, items);
-        return items;
-    }
-
-    private void addMagnet(Iterator<Episode> iterator, List<Magnet> items) {
-        String url = iterator.next().getUrl();
-        if (!Sniffer.isThunder(url)) return;
-        items.add(Magnet.get(url));
-        iterator.remove();
     }
 
     @Override

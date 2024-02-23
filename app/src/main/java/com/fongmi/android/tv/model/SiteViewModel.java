@@ -20,6 +20,7 @@ import com.fongmi.android.tv.bean.Url;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.exception.ExtractException;
 import com.fongmi.android.tv.player.Source;
+import com.fongmi.android.tv.player.extractor.Thunder;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Sniffer;
 import com.github.catvod.crawler.Spider;
@@ -32,6 +33,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -269,9 +271,23 @@ public class SiteViewModel extends ViewModel {
     private void checkThunder(List<Flag> flags) throws Exception {
         for (Flag flag : flags) {
             ExecutorService executor = Executors.newFixedThreadPool(Constant.THREAD_POOL * 2);
-            for (Future<List<Episode>> future : executor.invokeAll(flag.getMagnet(), 30, TimeUnit.SECONDS)) flag.getEpisodes().addAll(future.get());
+            for (Future<List<Episode>> future : executor.invokeAll(getThunder(flag), 30, TimeUnit.SECONDS)) flag.getEpisodes().addAll(future.get());
             executor.shutdownNow();
         }
+    }
+
+    private List<Thunder.Parser> getThunder(Flag flag) {
+        List<Thunder.Parser> items = new ArrayList<>();
+        Iterator<Episode> iterator = flag.getEpisodes().iterator();
+        while (iterator.hasNext()) addThunder(iterator, items);
+        return items;
+    }
+
+    private void addThunder(Iterator<Episode> iterator, List<Thunder.Parser> items) {
+        String url = iterator.next().getUrl();
+        if (!Sniffer.isThunder(url)) return;
+        items.add(Thunder.Parser.get(url));
+        iterator.remove();
     }
 
     private void post(Site site, Result result) {
