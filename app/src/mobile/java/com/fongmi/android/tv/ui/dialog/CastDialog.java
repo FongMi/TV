@@ -1,5 +1,6 @@
 package com.fongmi.android.tv.ui.dialog;
 
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -78,6 +79,7 @@ public class CastDialog extends BaseDialog implements DeviceAdapter.OnClickListe
         String fd = history.getVodId();
         if (fd.startsWith("/")) fd = Server.get().getAddress() + "/file" + fd.replace(Path.rootPath(), "");
         if (fd.startsWith("file")) fd = Server.get().getAddress() + "/" + fd.replace(Path.rootPath(), "");
+        if (fd.startsWith("http://127.0.0.1:7777")) fd = Uri.parse(fd).getQueryParameter("url");
         if (fd.contains("127.0.0.1")) fd = fd.replace("127.0.0.1", Util.getIp());
         body.add("history", history.toString().replace(id, fd));
         return this;
