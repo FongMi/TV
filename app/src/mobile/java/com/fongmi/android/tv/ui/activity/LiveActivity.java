@@ -1077,8 +1077,9 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra(Intent.EXTRA_TEXT, url);
-        intent.putExtra("name", title);
+        intent.putExtra("extra_headers", mPlayers.getHeaderBundle());
         intent.putExtra("title", title);
+        intent.putExtra("name", title);
         intent.setType("text/plain");
         startActivity(Util.getChooser(intent));
         setRedirect(true);
