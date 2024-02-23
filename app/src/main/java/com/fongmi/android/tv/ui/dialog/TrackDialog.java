@@ -27,6 +27,7 @@ import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import tv.danmaku.ijk.media.player.misc.ITrackInfo;
@@ -148,7 +149,7 @@ public final class TrackDialog extends BaseDialog implements TrackAdapter.OnClic
     @Override
     public void onItemClick(Track item) {
         if (listener != null) listener.onTrackClick(item);
-        player.setTrack(List.of(item));
+        player.setTrack(Arrays.asList(item));
         if (item.isAdaptive()) return;
         dismiss();
     }
