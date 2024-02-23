@@ -89,6 +89,7 @@ import com.fongmi.android.tv.ui.dialog.InfoDialog;
 import com.fongmi.android.tv.ui.dialog.TrackDialog;
 import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.FileChooser;
+import com.fongmi.android.tv.utils.IDMUtil;
 import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.PiP;
@@ -721,8 +722,8 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private boolean onCopy() {
+        Notify.show(R.string.copied);
         Util.copy(mBinding.content.getText().toString());
-        Notify.show(getString(R.string.copy_success));
         return true;
     }
 
@@ -1653,7 +1654,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         if (!isFullscreen()) {
             App.post(this::enterFullscreen, 250);
         } else if (mPlayers.isPlaying()) {
-            showControl();
             onPaused();
         } else {
             hideControl();
@@ -1663,6 +1663,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     @Override
     public void onShare(CharSequence title, String url) {
+        if (IDMUtil.downloadFile(this, Util.getDownloadUrl(url), title.toString(), mPlayers.getHeaders(), false, false)) return;
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra(Intent.EXTRA_TEXT, url);

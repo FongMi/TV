@@ -70,6 +70,7 @@ import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
 import com.fongmi.android.tv.ui.custom.CustomMovement;
 import com.fongmi.android.tv.ui.dialog.DescDialog;
 import com.fongmi.android.tv.ui.dialog.EpisodeDialog;
+import com.fongmi.android.tv.ui.dialog.FileChooserDialog;
 import com.fongmi.android.tv.ui.dialog.TrackDialog;
 import com.fongmi.android.tv.ui.presenter.ArrayPresenter;
 import com.fongmi.android.tv.ui.presenter.EpisodePresenter;
@@ -116,7 +117,7 @@ import okhttp3.Call;
 import okhttp3.Response;
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class VideoActivity extends BaseActivity implements CustomKeyDownVod.Listener, TrackDialog.Listener, ArrayPresenter.OnClickListener, Clock.Callback, SubtitleCallback {
+public class VideoActivity extends BaseActivity implements CustomKeyDownVod.Listener, TrackDialog.Listener, TrackDialog.ChooserListener, ArrayPresenter.OnClickListener, Clock.Callback, SubtitleCallback {
 
     private ActivityVideoBinding mBinding;
     private ViewGroup.LayoutParams mFrameParams;
@@ -1012,7 +1013,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void onTrack(View view) {
-        TrackDialog.create().player(mPlayers).type(Integer.parseInt(view.getTag().toString())).show(this);
+        TrackDialog.create().player(mPlayers).chooser(this).type(Integer.parseInt(view.getTag().toString())).show(this);
         hideControl();
     }
 
@@ -1234,6 +1235,11 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         keep.setVodName(mBinding.name.getText().toString());
         keep.setCreateTime(System.currentTimeMillis());
         keep.save();
+    }
+
+    @Override
+    public void showChooser(TrackDialog dialog) {
+        FileChooserDialog.create().player(mPlayers).trackDialog(dialog).show(this);
     }
 
     @Override

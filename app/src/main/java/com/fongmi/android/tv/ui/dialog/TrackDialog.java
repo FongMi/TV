@@ -26,7 +26,6 @@ import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,6 +38,7 @@ public final class TrackDialog extends BaseDialog implements TrackAdapter.OnClic
     private DialogTrackBinding binding;
     private FragmentActivity activity;
     private Listener listener;
+    private ChooserListener cListener;
     private Players player;
     private int type;
 
@@ -53,6 +53,11 @@ public final class TrackDialog extends BaseDialog implements TrackAdapter.OnClic
 
     public TrackDialog type(int type) {
         this.type = type;
+        return this;
+    }
+
+    public TrackDialog chooser(ChooserListener listener) {
+        this.cListener = listener;
         return this;
     }
 
@@ -97,7 +102,8 @@ public final class TrackDialog extends BaseDialog implements TrackAdapter.OnClic
     }
 
     private void showChooser(View view) {
-        FileChooser.from(this).show(new String[]{MimeTypes.APPLICATION_SUBRIP, MimeTypes.TEXT_SSA, MimeTypes.TEXT_VTT, MimeTypes.APPLICATION_TTML, "text/*", "application/octet-stream"});
+        if (cListener != null) cListener.showChooser(this);
+        else FileChooser.from(this).show(new String[]{MimeTypes.APPLICATION_SUBRIP, MimeTypes.TEXT_SSA, MimeTypes.TEXT_VTT, MimeTypes.APPLICATION_TTML, "text/*", "application/octet-stream"});
         player.pause();
     }
 
@@ -158,5 +164,10 @@ public final class TrackDialog extends BaseDialog implements TrackAdapter.OnClic
     public interface Listener {
 
         void onTrackClick(Track item);
+    }
+
+    public interface ChooserListener {
+
+        void showChooser(TrackDialog dialog);
     }
 }

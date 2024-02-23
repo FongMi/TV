@@ -32,6 +32,10 @@ public class Path {
         return Environment.getExternalStorageDirectory();
     }
 
+    public static File download() {
+        return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+    }
+
     public static File cache() {
         return Init.context().getCacheDir();
     }
@@ -42,6 +46,10 @@ public class Path {
 
     public static String rootPath() {
         return root().getAbsolutePath();
+    }
+
+    public static String downloadPath() {
+        return download().getAbsolutePath();
     }
 
     public static File tv() {
