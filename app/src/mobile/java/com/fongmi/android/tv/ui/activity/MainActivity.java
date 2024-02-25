@@ -103,7 +103,7 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
         if (savedInstanceState == null) mManager.change(0);
     }
 
-    private void initConfig() {
+    public void initConfig() {
         WallConfig.get().init();
         LiveConfig.get().init().load();
         VodConfig.get().init().load(getCallback());
