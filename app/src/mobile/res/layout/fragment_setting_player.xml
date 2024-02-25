@@ -72,6 +72,35 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/decode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/shape_item"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:text="@string/player_decode"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/decodeText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="middle"
+                    android:gravity="end"
+                    android:singleLine="true"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    tools:text="Hard" />
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/render"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

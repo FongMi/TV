@@ -10,8 +10,8 @@ android {
         applicationId "com.fongmi.android.tv"
         minSdk 21
         targetSdk 28
-        versionCode 227
-        versionName "2.2.7"
+        versionCode 228
+        versionName "2.2.8"
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
@@ -131,6 +131,7 @@ dependencies {
     implementation(ext: 'aar', name: 'dlna-core', group: 'fongmi', version: 'release')
     leanbackImplementation(ext: 'aar', name: 'dlna-dmr', group: 'fongmi', version: 'release')
     leanbackImplementation 'androidx.leanback:leanback:1.2.0-alpha04'
+    leanbackImplementation 'com.github.hedzr:android-file-chooser:v1.2.0-final'
     leanbackImplementation 'me.jessyan:autosize:1.2.1'
     mobileImplementation(ext: 'aar', name: 'dlna-dmc', group: 'fongmi', version: 'release')
     mobileImplementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'

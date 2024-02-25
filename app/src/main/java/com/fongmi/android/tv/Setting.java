@@ -89,12 +89,12 @@ public class Setting {
         Prefers.put("player_live", player);
     }
 
-    public static int getDecode() {
-        return Prefers.getInt("decode", Players.HARD);
+    public static int getDecode(int player) {
+        return Prefers.getInt("decode_" + player, Players.HARD);
     }
 
-    public static void putDecode(int decode) {
-        Prefers.put("decode", decode);
+    public static void putDecode(int player, int decode) {
+        Prefers.put("decode_" + player, decode);
     }
 
     public static int getRender() {
@@ -403,6 +403,14 @@ public class Setting {
 
     public static void putIncognito(boolean incognito) {
         Prefers.put("incognito", incognito);
+    }
+
+    public static void putSmallWindowBackKey(int key) {
+        Prefers.put("small_window_back_key", key);
+    }
+
+    public static int getSmallWindowBackKey() {
+        return Prefers.getInt("small_window_back_key", 0);
     }
 
 }

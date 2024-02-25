@@ -1,24 +1,15 @@
 package com.github.catvod.utils;
 
-import java.io.DataOutputStream;
+import com.orhanobut.logger.Logger;
 
 public class Shell {
 
-    private static final String COMMAND_SH = "sh";
-    private static final String COMMAND_EXIT = "exit\n";
-    private static final String COMMAND_LINE_END = "\n";
+    private static final String TAG = Shell.class.getSimpleName();
 
     public static void exec(String command) {
         try {
-            Process p = Runtime.getRuntime().exec(COMMAND_SH);
-            DataOutputStream dos = new DataOutputStream(p.getOutputStream());
-            dos.write(command.getBytes());
-            dos.writeBytes(COMMAND_LINE_END);
-            dos.writeBytes(COMMAND_EXIT);
-            dos.flush();
-            dos.close();
-            p.waitFor();
-            p.destroy();
+            int code = Runtime.getRuntime().exec(command).waitFor();
+            if (code != 0) Logger.t(TAG).d("Shell command '%s' failed with exit code '%s'", command, code);
         } catch (Exception e) {
             e.printStackTrace();
         }

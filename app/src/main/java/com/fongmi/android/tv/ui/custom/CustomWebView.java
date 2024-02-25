@@ -69,6 +69,7 @@ public class CustomWebView extends WebView {
         getSettings().setBuiltInZoomControls(true);
         getSettings().setDisplayZoomControls(false);
         getSettings().setLoadWithOverviewMode(true);
+        getSettings().setUserAgentString(Setting.getUa());
         getSettings().setMediaPlaybackRequiresUserGesture(false);
         getSettings().setJavaScriptCanOpenWindowsAutomatically(false);
         getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
@@ -76,27 +77,27 @@ public class CustomWebView extends WebView {
         setWebViewClient(webViewClient());
     }
 
-    private void setUserAgent(Map<String, String> headers) {
-        if (headers.isEmpty()) {
-            getSettings().setUserAgentString(Setting.getUa());
-        } else for (String key : headers.keySet()) {
-            if (key.equalsIgnoreCase(HttpHeaders.USER_AGENT)) {
-                getSettings().setUserAgentString(headers.get(key));
-                break;
-            }
-        }
-    }
-
     public CustomWebView start(String key, String from, Map<String, String> headers, String url, String click, ParseCallback callback, boolean detect) {
         App.post(timer, Constant.TIMEOUT_PARSE_WEB);
         this.callback = callback;
-        setUserAgent(headers);
-        loadUrl(url, headers);
         this.detect = detect;
         this.click = click;
         this.from = from;
         this.key = key;
+        start(url, headers);
         return this;
+    }
+
+    private void start(String url, Map<String, String> headers) {
+        checkHeader(url, headers);
+        loadUrl(url, headers);
+    }
+
+    private void checkHeader(String url, Map<String, String> headers) {
+        for (String key : headers.keySet()) {
+            if (key.equalsIgnoreCase(HttpHeaders.COOKIE)) CookieManager.getInstance().setCookie(url, headers.get(key));
+            if (key.equalsIgnoreCase(HttpHeaders.USER_AGENT)) getSettings().setUserAgentString(headers.get(key));
+        }
     }
 
     private WebViewClient webViewClient() {

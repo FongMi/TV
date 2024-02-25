@@ -79,6 +79,7 @@
     <string name="setting_fullscreen_menu_key">全屏菜单键</string>
     <string name="setting_home_site_lock">首页源锁定</string>
     <string name="setting_incognito">无痕模式</string>
+    <string name="setting_small_window_back_key">小窗返回键</string>
     <string name="setting_doh">DoH</string>
     <string name="setting_proxy">Proxy</string>
     <string name="setting_cache">缓存</string>
@@ -91,6 +92,7 @@
 
     <!-- Player -->
     <string name="player">播放核心</string>
+    <string name="player_decode">解码方式</string>
     <string name="player_render">渲染方式</string>
     <string name="player_scale">缩放比例</string>
     <string name="player_caption">字幕样式</string>
@@ -217,6 +219,11 @@
     <string-array name="select_fullscreen_menu_key">
         <item>控制栏</item>
         <item>选集</item>
+    </string-array>
+
+    <string-array name="select_small_window_back_key">
+        <item>返回</item>
+        <item>焦点移动</item>
     </string-array>
 
     <string-array name="select_caption">

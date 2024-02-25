@@ -19,6 +19,7 @@ import com.journeyapps.barcodescanner.BarcodeResult;
 import com.journeyapps.barcodescanner.CaptureManager;
 import com.journeyapps.barcodescanner.DefaultDecoderFactory;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class ScanActivity extends BaseActivity implements BarcodeCallback {
@@ -44,7 +45,7 @@ public class ScanActivity extends BaseActivity implements BarcodeCallback {
     @Override
     protected void initView(Bundle savedInstanceState) {
         mCapture = new CaptureManager(this, mBinding.scanner);
-        mBinding.scanner.getBarcodeView().setDecoderFactory(new DefaultDecoderFactory(List.of(BarcodeFormat.QR_CODE)));
+        mBinding.scanner.getBarcodeView().setDecoderFactory(new DefaultDecoderFactory(Arrays.asList(BarcodeFormat.QR_CODE)));
     }
 
     @Override

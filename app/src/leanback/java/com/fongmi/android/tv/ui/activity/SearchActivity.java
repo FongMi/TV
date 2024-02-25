@@ -17,6 +17,7 @@ import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.bean.Hot;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Suggest;
+import com.fongmi.android.tv.bean.SuggestTwo;
 import com.fongmi.android.tv.databinding.ActivitySearchBinding;
 import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.impl.SiteCallback;
@@ -113,12 +114,21 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
 
     private void getSuggest(String text) {
         mBinding.hint.setText(R.string.search_suggest);
+        mWordAdapter.clear();
+        OkHttp.newCall("https://tv.aiseet.atianqi.com/i-tvbin/qtv_video/search/get_search_smart_box?format=json&page_num=0&page_size=10&key=" + text).enqueue(new Callback() {
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                if (mBinding.keyword.getText().toString().trim().isEmpty()) return;
+                List<String> items = SuggestTwo.get(response.body().string());
+                App.post(() -> mWordAdapter.appendAll(items));
+            }
+        });
         OkHttp.newCall("https://suggest.video.iqiyi.com/?if=mobile&key=" + text).enqueue(new Callback() {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 if (mBinding.keyword.getText().toString().trim().isEmpty()) return;
                 List<String> items = Suggest.get(response.body().string());
-                App.post(() -> mWordAdapter.addAll(items));
+                App.post(() -> mWordAdapter.appendAll(items), 200);
             }
         });
     }

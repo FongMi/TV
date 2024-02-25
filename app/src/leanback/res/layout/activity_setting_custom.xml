@@ -353,6 +353,36 @@
             android:orientation="horizontal">
 
             <LinearLayout
+                android:id="@+id/smallWindowBackKey"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_weight="1"
+                android:background="@drawable/selector_item"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:text="@string/setting_small_window_back_key"
+                    android:textColor="@color/white"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/smallWindowBackKeyText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    tools:text="返回" />
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/incognito"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

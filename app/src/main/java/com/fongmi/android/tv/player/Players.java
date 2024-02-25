@@ -81,7 +81,6 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     private long position;
     private float speed;
-    private int decode;
     private int player;
     private int error;
     private int retry;
@@ -91,8 +90,8 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         return type == EXO;
     }
 
-    public static boolean isHard() {
-        return Setting.getDecode() == HARD;
+    public static boolean isHard(int player) {
+        return Setting.getDecode(player) == HARD;
     }
 
     public boolean isExo() {
@@ -105,7 +104,6 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     public Players init(Activity activity) {
         player = Setting.getPlayer();
-        decode = Setting.getDecode();
         builder = new StringBuilder();
         runnable = ErrorEvent::timeout;
         formatter = new Formatter(builder, Locale.getDefault());
@@ -142,7 +140,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     private void setupIjk(IjkVideoView view) {
-        ijkPlayer = view.render(Setting.getRender()).decode(decode);
+        ijkPlayer = view.render(Setting.getRender()).decode(Setting.getDecode(IJK));
         ijkPlayer.addListener(this);
         ijkPlayer.setPlayer(player);
     }
@@ -191,12 +189,12 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         this.player = player;
     }
 
-    public int getDecode() {
-        return decode;
+    public int getDecode(int player) {
+        return Setting.getDecode(player);
     }
 
-    public void setDecode(int decode) {
-        this.decode = decode;
+    public void setDecode(int player, int decode) {
+        Setting.putDecode(player, decode);
     }
 
     public void setPosition(long position) {
@@ -297,7 +295,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     public String getDecodeText() {
-        return ResUtil.getStringArray(R.array.select_decode)[decode];
+        return ResUtil.getStringArray(R.array.select_decode)[Setting.getDecode(player)];
     }
 
     public String setSpeed(float speed) {
@@ -308,8 +306,8 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     public String addSpeed() {
         float speed = getSpeed();
-        float addon = speed >= 2 ? 1f : 0.25f;
-        speed = speed >= 5 ? 0.25f : Math.min(speed + addon, 5.0f);
+        float addon = speed >= 2 ? 1f : 0.1f;
+        speed = speed >= 5 ? 0.2f : Math.min(speed + addon, 5.0f);
         return setSpeed(speed);
     }
 
@@ -321,7 +319,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
 
     public String subSpeed(float value) {
         float speed = getSpeed();
-        speed = Math.max(speed - value, 0.25f);
+        speed = Math.max(speed - value, 0.2f);
         return setSpeed(speed);
     }
 
@@ -340,8 +338,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
     }
 
     public void toggleDecode() {
-        setDecode(decode == HARD ? SOFT : HARD);
-        Setting.putDecode(decode);
+        setDecode(player, getDecode(player) == HARD ? SOFT : HARD);
     }
 
     public String getPositionTime(long time) {

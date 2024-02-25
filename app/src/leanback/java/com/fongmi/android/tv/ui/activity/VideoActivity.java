@@ -70,6 +70,7 @@ import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
 import com.fongmi.android.tv.ui.custom.CustomMovement;
 import com.fongmi.android.tv.ui.dialog.DescDialog;
 import com.fongmi.android.tv.ui.dialog.EpisodeDialog;
+import com.fongmi.android.tv.ui.dialog.FileChooserDialog;
 import com.fongmi.android.tv.ui.dialog.TrackDialog;
 import com.fongmi.android.tv.ui.presenter.ArrayPresenter;
 import com.fongmi.android.tv.ui.presenter.EpisodePresenter;
@@ -116,7 +117,7 @@ import okhttp3.Call;
 import okhttp3.Response;
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class VideoActivity extends BaseActivity implements CustomKeyDownVod.Listener, TrackDialog.Listener, ArrayPresenter.OnClickListener, Clock.Callback, SubtitleCallback {
+public class VideoActivity extends BaseActivity implements CustomKeyDownVod.Listener, TrackDialog.Listener, TrackDialog.ChooserListener, ArrayPresenter.OnClickListener, Clock.Callback, SubtitleCallback {
 
     private ActivityVideoBinding mBinding;
     private ViewGroup.LayoutParams mFrameParams;
@@ -361,7 +362,6 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mBinding.control.player.setOnClickListener(view -> onPlayer());
         mBinding.control.decode.setOnClickListener(view -> onDecode());
         mBinding.control.ending.setOnClickListener(view -> onEnding());
-        mBinding.control.change2.setOnClickListener(view -> onChange());
         mBinding.control.opening.setOnClickListener(view -> onOpening());
         mBinding.control.player.setOnLongClickListener(view -> onChoose());
         mBinding.control.speed.setOnLongClickListener(view -> onSpeedLong());
@@ -378,7 +378,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         getEpisodeView().addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
-                if (child != null && mBinding.video != mFocus1) mFocus1 = child.itemView;
+                if (child != null) mFocus1 = child.itemView;
             }
         });
         mBinding.array.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
@@ -898,12 +898,12 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void onSpeedAdd() {
-        mBinding.control.speed.setText(mPlayers.addSpeed(0.25f));
+        mBinding.control.speed.setText(mPlayers.addSpeed(0.1f));
         mHistory.setSpeed(mPlayers.getSpeed());
     }
 
     private void onSpeedSub() {
-        mBinding.control.speed.setText(mPlayers.subSpeed(0.25f));
+        mBinding.control.speed.setText(mPlayers.subSpeed(0.1f));
         mHistory.setSpeed(mPlayers.getSpeed());
     }
 
@@ -923,7 +923,6 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
     private void onReset(boolean replay) {
         mClock.setCallback(null);
-        mBinding.control.seek.reset();
         if (mFlagAdapter.size() == 0) return;
         if (mEpisodeAdapter.size() == 0) return;
         getPlayer(getFlag(), getEpisode(), replay);
@@ -1002,6 +1001,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private void onPlayer() {
         mPlayers.togglePlayer();
         setPlayerView();
+        setDecodeView();
         onRefresh();
     }
 
@@ -1013,7 +1013,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void onTrack(View view) {
-        TrackDialog.create().player(mPlayers).type(Integer.parseInt(view.getTag().toString())).show(this);
+        TrackDialog.create().player(mPlayers).chooser(this).type(Integer.parseInt(view.getTag().toString())).show(this);
         hideControl();
     }
 
@@ -1153,7 +1153,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     private void getPart(String source) {
-        OkHttp.newCall("http://api.pullword.com/get.php?source=" + URLEncoder.encode(source.trim()) + "&param1=0&param2=0&json=1").enqueue(new Callback() {
+        OkHttp.newCall("https://api.yesapi.cn/?service=App.Scws.GetWords&app_key=CEE4B8A091578B252AC4C92FB4E893C3&text=" + URLEncoder.encode(source.trim())).enqueue(new Callback() {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 List<String> items = Part.get(response.body().string());
@@ -1163,7 +1163,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
 
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                List<String> items = List.of(source);
+                List<String> items = Arrays.asList(source);
                 App.post(() -> setPartAdapter(items));
             }
         });
@@ -1238,6 +1238,11 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     @Override
+    public void showChooser(TrackDialog dialog) {
+        FileChooserDialog.create().player(mPlayers).trackDialog(dialog).show(this);
+    }
+
+    @Override
     public void onTrackClick(Track item) {
         item.setKey(getHistoryKey());
         item.save();
@@ -1287,7 +1292,6 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
                 setInitTrack(true);
                 setTrackVisible(false);
                 mClock.setCallback(this);
-                mBinding.control.seek.start();
                 break;
             case Player.STATE_IDLE:
                 break;
@@ -1365,6 +1369,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private void nextPlayer() {
         mPlayers.nextPlayer();
         setPlayerView();
+        setDecodeView();
         onRefresh();
     }
 
@@ -1583,6 +1588,11 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         hasKeyEvent = true;
+        if (!isFullscreen() && KeyUtil.isBackKey(event) && Setting.getSmallWindowBackKey() == 1 && getCurrentFocus() != mBinding.video) {
+            mFocus1 = mBinding.video;
+            getFocus1().requestFocus();
+            return true;
+        }
         if (isFullscreen() && KeyUtil.isMenuKey(event) && Setting.getFullscreenMenuKey() == 0) onToggle();
         if (isFullscreen() && KeyUtil.isMenuKey(event) && Setting.getFullscreenMenuKey() == 1) onEpisodes();
         if (isVisible(mBinding.control.getRoot())) setR1Callback();
