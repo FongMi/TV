@@ -16,6 +16,8 @@ import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import java.util.Locale;
+
 public class SettingCustomFragment extends BaseFragment {
 
     private FragmentSettingCustomBinding mBinding;
@@ -38,7 +40,7 @@ public class SettingCustomFragment extends BaseFragment {
     protected void initView() {
         mBinding.sizeText.setText((size = ResUtil.getStringArray(R.array.select_size))[Setting.getSize()]);
         mBinding.danmuSyncText.setText(getSwitch(Setting.isDanmuSync()));
-        mBinding.speedText.setText(Setting.getPlaySpeed() + "x");
+        mBinding.speedText.setText(getSpeedText());
         mBinding.incognitoText.setText(getSwitch(Setting.isIncognito()));
     }
 
@@ -71,17 +73,21 @@ public class SettingCustomFragment extends BaseFragment {
         mBinding.danmuSyncText.setText(getSwitch(Setting.isDanmuSync()));
     }
 
+    private String getSpeedText() {
+        return String.format(Locale.getDefault(), "%.2f", Setting.getPlaySpeed());
+    }
+
     private void setSpeed(View view) {
         float speed = Setting.getPlaySpeed();
-        float addon = speed >= 2 ? 1f : 0.25f;
-        speed = speed >= 5 ? 0.25f : Math.min(speed + addon, 5.0f);
+        float addon = speed >= 2 ? 1.0f : 0.1f;
+        speed = speed >= 5 ? 0.2f : Math.min(speed + addon, 5.0f);
         Setting.putPlaySpeed(speed);
-        mBinding.speedText.setText(Setting.getPlaySpeed() + "x");
+        mBinding.speedText.setText(getSpeedText());
     }
 
     private boolean resetSpeed(View view) {
         Setting.putPlaySpeed(1.0f);
-        mBinding.speedText.setText(Setting.getPlaySpeed() + "x");
+        mBinding.speedText.setText(getSpeedText());
         return true;
     }
 

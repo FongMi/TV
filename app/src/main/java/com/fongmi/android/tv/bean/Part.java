@@ -4,34 +4,48 @@ import android.text.TextUtils;
 
 import com.fongmi.android.tv.App;
 import com.google.gson.annotations.SerializedName;
-import com.google.gson.reflect.TypeToken;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Part {
 
-    @SerializedName("t")
-    private String t;
+    @SerializedName("data")
+    private Data data;
 
-    private static List<Part> arrayFrom(String str) {
-        try {
-            Type listType = new TypeToken<List<Part>>() {}.getType();
-            return App.gson().fromJson(str, listType);
-        } catch (Exception e) {
-            return new ArrayList<>();
-        }
+    public static Part objectFrom(String str) {
+        return App.gson().fromJson(str, Part.class);
     }
 
     public static List<String> get(String str) {
         List<String> items = new ArrayList<>();
         if (TextUtils.isEmpty(str)) return items;
-        for (Part item : arrayFrom(str)) items.add(item.getT());
+        for (Data.Word word : objectFrom(str).getData().getWords()) items.add(word.getWord());
         return items;
     }
 
-    public String getT() {
-        return TextUtils.isEmpty(t) ? "" : t;
+    public Data getData() {
+        return data == null ? new Data() : data;
+    }
+
+    public static class Data {
+
+        @SerializedName("words")
+        private List<Word> words;
+
+        public List<Word> getWords() {
+            return words == null ? Collections.emptyList() : words;
+        }
+
+        public static class Word {
+
+            @SerializedName("word")
+            private String word;
+
+            public String getWord() {
+                return TextUtils.isEmpty(word) ? "" : word;
+            }
+        }
     }
 }

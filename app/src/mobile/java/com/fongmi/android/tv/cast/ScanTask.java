@@ -6,6 +6,7 @@ import com.fongmi.android.tv.server.Server;
 import com.github.catvod.net.OkHttp;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -33,7 +34,7 @@ public class ScanTask {
     }
 
     public void start(String url) {
-        App.execute(() -> run(List.of(url)));
+        App.execute(() -> run(Arrays.asList(url)));
     }
 
     private void run(List<String> items) {

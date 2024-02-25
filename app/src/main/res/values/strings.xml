@@ -79,6 +79,7 @@
     <string name="setting_fullscreen_menu_key">Fullscreen menu key</string>
     <string name="setting_home_site_lock">Home site lock</string>
     <string name="setting_incognito">Incognito mode</string>
+    <string name="setting_small_window_back_key">Small window back key</string>
     <string name="setting_doh">DoH</string>
     <string name="setting_proxy">Proxy</string>
     <string name="setting_cache">Cache</string>
@@ -91,6 +92,7 @@
 
     <!-- Player -->
     <string name="player">Player</string>
+    <string name="player_decode">Decode</string>
     <string name="player_render">Render</string>
     <string name="player_scale">Scale</string>
     <string name="player_caption">Caption style</string>
@@ -222,6 +224,11 @@
     <string-array name="select_fullscreen_menu_key">
         <item>Control</item>
         <item>Episodes</item>
+    </string-array>
+
+    <string-array name="select_small_window_back_key">
+        <item>Back</item>
+        <item>Focus move</item>
     </string-array>
 
     <string-array name="select_caption">

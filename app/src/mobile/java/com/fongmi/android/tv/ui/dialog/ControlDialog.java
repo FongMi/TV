@@ -89,7 +89,7 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
     protected void initView() {
         if (player == null) dismiss();
         if (player == null) return;
-        binding.speed.setValue(Math.max(player.getSpeed(), 0.5f));
+        binding.speed.setValue(Math.max(player.getSpeed(), 0.2f));
         binding.player.setText(parent.control.action.player.getText());
         binding.decode.setText(parent.control.action.decode.getText());
         binding.ending.setText(parent.control.action.ending.getText());
@@ -213,6 +213,10 @@ public class ControlDialog extends BaseDialog implements ParseAdapter.OnClickLis
 
     public void updatePlayer() {
         binding.player.setText(parent.control.action.player.getText());
+    }
+
+    public void updateDecode() {
+        binding.decode.setText(parent.control.action.decode.getText());
     }
 
     public void setParseVisible(boolean visible) {

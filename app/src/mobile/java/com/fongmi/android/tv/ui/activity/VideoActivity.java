@@ -89,6 +89,7 @@ import com.fongmi.android.tv.ui.dialog.InfoDialog;
 import com.fongmi.android.tv.ui.dialog.TrackDialog;
 import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.FileChooser;
+import com.fongmi.android.tv.utils.IDMUtil;
 import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.PiP;
@@ -403,6 +404,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     private void setDecodeView() {
         mBinding.control.action.decode.setText(mPlayers.getDecodeText());
+        if (mControlDialog != null && mControlDialog.isVisible()) mControlDialog.updateDecode();
     }
 
     private void setVideoView() {
@@ -720,6 +722,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     }
 
     private boolean onCopy() {
+        Notify.show(R.string.copied);
         Util.copy(mBinding.content.getText().toString());
         return true;
     }
@@ -840,7 +843,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     private void onReset(boolean replay) {
         mClock.setCallback(null);
-        mBinding.control.seek.reset();
         if (mFlagAdapter.isEmpty()) return;
         if (mEpisodeAdapter.isEmpty()) return;
         getPlayer(getFlag(), getEpisode(), replay);
@@ -855,6 +857,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private void onPlayer() {
         mPlayers.togglePlayer();
         setPlayerView();
+        setDecodeView();
         setR1Callback();
         onRefresh();
     }
@@ -1241,7 +1244,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
                 setInitTrack(true);
                 setTrackVisible(false);
                 mClock.setCallback(this);
-                mBinding.control.seek.start();
                 break;
             case Player.STATE_IDLE:
                 break;
@@ -1332,6 +1334,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private void nextPlayer() {
         mPlayers.nextPlayer();
         setPlayerView();
+        setDecodeView();
         onRefresh();
     }
 
@@ -1651,7 +1654,6 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
         if (!isFullscreen()) {
             App.post(this::enterFullscreen, 250);
         } else if (mPlayers.isPlaying()) {
-            showControl();
             onPaused();
         } else {
             hideControl();
@@ -1661,6 +1663,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
 
     @Override
     public void onShare(CharSequence title, String url) {
+        if (IDMUtil.downloadFile(this, url, title.toString(), mPlayers.getHeaders(), false, false)) return;
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra(Intent.EXTRA_TEXT, url);

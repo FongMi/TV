@@ -1,6 +1,7 @@
 package com.fongmi.android.tv.ui.dialog;
 
 import android.app.Activity;
+import android.net.Uri;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -77,7 +78,7 @@ public class InfoDialog {
     }
 
     private void onShare(View view) {
-        callback.onShare(title, url);
+        callback.onShare(title, convert(url));
         dialog.dismiss();
     }
 
@@ -85,6 +86,10 @@ public class InfoDialog {
         Notify.show(R.string.copied);
         Util.copy(text);
         return true;
+    }
+
+    private String convert(String url) {
+        return url.startsWith("http://127.0.0.1:7777") ? Uri.parse(url).getQueryParameter("url") : url;
     }
 
     public interface Listener {

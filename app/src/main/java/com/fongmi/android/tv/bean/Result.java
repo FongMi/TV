@@ -23,6 +23,7 @@ import org.simpleframework.xml.Root;
 import org.simpleframework.xml.core.Persister;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -125,13 +126,13 @@ public class Result implements Parcelable {
         type.setTypeFlag("1");
         type.setTypeId(item.getVodId());
         type.setTypeName(item.getVodName());
-        result.setTypes(List.of(type));
+        result.setTypes(Arrays.asList(type));
         return result;
     }
 
     public static Result type(String json) {
         Result result = new Result();
-        result.setTypes(List.of(Class.objectFrom(json)));
+        result.setTypes(Arrays.asList(Class.objectFrom(json)));
         return result.trans();
     }
 
@@ -142,7 +143,7 @@ public class Result implements Parcelable {
     }
 
     public static Result vod(Vod item) {
-        return list(List.of(item));
+        return list(Arrays.asList(item));
     }
 
     public Result() {
