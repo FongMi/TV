@@ -12,7 +12,7 @@
     </item>
     <item >
         <shape android:shape="oval">
-            <solid android:color="@color/grey_600"/>
+            <solid android:color="@color/transparent"/>
         </shape>
     </item>
 </selector>

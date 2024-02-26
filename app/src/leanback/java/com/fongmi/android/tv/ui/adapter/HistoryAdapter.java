@@ -1,28 +1,41 @@
-package com.fongmi.android.tv.ui.presenter;
+package com.fongmi.android.tv.ui.adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.leanback.widget.Presenter;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.databinding.AdapterVodBinding;
 import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.ResUtil;
 
-public class HistoryPresenter extends Presenter {
+import java.util.ArrayList;
+import java.util.List;
+
+public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHolder> {
 
     private final OnClickListener mListener;
+    private final List<History> mItems;
     private int width, height;
     private boolean delete;
 
-    public HistoryPresenter(OnClickListener listener) {
+    public HistoryAdapter(OnClickListener listener) {
+        this.mItems = new ArrayList<>();
         this.mListener = listener;
         setLayoutSize();
+    }
+
+    private void setLayoutSize() {
+        int space = ResUtil.dp2px(48) + ResUtil.dp2px(16 * (Product.getColumn() - 1));
+        int base = ResUtil.getScreenWidth() - space;
+        width = base / Product.getColumn();
+        height = (int) (width / 0.75f);
     }
 
     public interface OnClickListener {
@@ -40,17 +53,37 @@ public class HistoryPresenter extends Presenter {
 
     public void setDelete(boolean delete) {
         this.delete = delete;
+        notifyItemRangeChanged(0, mItems.size());
     }
 
-    private void setLayoutSize() {
-        int space = ResUtil.dp2px(48) + ResUtil.dp2px(16 * (Product.getColumn() - 1));
-        int base = ResUtil.getScreenWidth() - space;
-        width = base / Product.getColumn();
-        height = (int) (width / 0.75f);
+    public void addAll(List<History> items) {
+        mItems.clear();
+        mItems.addAll(items);
+        notifyDataSetChanged();
+    }
+
+    public void clear() {
+        mItems.clear();
+        setDelete(false);
+        notifyDataSetChanged();
+        History.delete(VodConfig.getCid());
+    }
+
+    public void delete(History item) {
+        int index = mItems.indexOf(item);
+        if (index == -1) return;
+        mItems.remove(index);
+        notifyItemRemoved(index);
     }
 
     @Override
-    public Presenter.ViewHolder onCreateViewHolder(ViewGroup parent) {
+    public int getItemCount() {
+        return mItems.size();
+    }
+
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         ViewHolder holder = new ViewHolder(AdapterVodBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
         holder.binding.getRoot().getLayoutParams().width = width;
         holder.binding.getRoot().getLayoutParams().height = height;
@@ -58,10 +91,10 @@ public class HistoryPresenter extends Presenter {
     }
 
     @Override
-    public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object object) {
-        History item = (History) object;
-        ViewHolder holder = (ViewHolder) viewHolder;
-        setClickListener(holder.view, item);
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        History item = mItems.get(position);
+        setFocusListener(holder.binding);
+        setClickListener(holder.itemView, item);
         holder.binding.name.setText(item.getVodName());
         holder.binding.site.setText(item.getSiteName());
         holder.binding.site.setVisibility(item.getSiteVisible());
@@ -69,6 +102,10 @@ public class HistoryPresenter extends Presenter {
         holder.binding.delete.setVisibility(!delete ? View.GONE : View.VISIBLE);
         holder.binding.remark.setText(ResUtil.getString(R.string.vod_last, item.getVodRemarks()));
         ImgUtil.loadVod(item.getVodName(), item.getVodPic(), holder.binding.image);
+    }
+
+    private void setFocusListener(AdapterVodBinding binding) {
+        binding.getRoot().setOnFocusChangeListener((v, hasFocus) -> binding.name.setSelected(hasFocus));
     }
 
     private void setClickListener(View root, History item) {
@@ -79,11 +116,7 @@ public class HistoryPresenter extends Presenter {
         });
     }
 
-    @Override
-    public void onUnbindViewHolder(Presenter.ViewHolder viewHolder) {
-    }
-
-    public static class ViewHolder extends Presenter.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
 
         private final AdapterVodBinding binding;
 
