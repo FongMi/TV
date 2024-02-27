@@ -156,7 +156,6 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private View mFocus1;
     private View mFocus2;
     private boolean hasKeyEvent;
-    private boolean firstTime;
 
     public static void push(FragmentActivity activity, String text) {
         if (FileChooser.isValid(activity, Uri.parse(text))) file(activity, FileChooser.getPathFromUri(activity, Uri.parse(text)));
@@ -293,9 +292,9 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         if (hasKeyEvent) return;
         getEpisodeView().postDelayed(() -> {
             View selectedItem = getEpisodeView().getLayoutManager().findViewByPosition(position);
+            View focusedView = getCurrentFocus();
             if (selectedItem != null) selectedItem.requestFocus();
-            if (firstTime) mBinding.video.requestFocus();
-            firstTime = false;
+            if (focusedView == mBinding.video) mBinding.video.requestFocus();
         }, 300);
     }
 
@@ -324,7 +323,6 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mR2 = this::updateFocus;
         mR3 = this::setTraffic;
         mR4 = this::showEmpty;
-        firstTime = true;
         setBackground(false);
         setRecyclerView();
         setEpisodeView();
