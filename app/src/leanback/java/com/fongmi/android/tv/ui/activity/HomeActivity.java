@@ -114,6 +114,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     @Override
     protected void initEvent() {
         mBinding.title.setListener(this);
+        mBinding.settingVodHistory.setOnClickListener(this::onSettingVodHistory);
         mBinding.recycler.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
@@ -137,6 +138,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     private void setTitleView() {
         mBinding.homeSiteLock.setVisibility(Setting.isHomeSiteLock() ? View.VISIBLE : View.GONE);
+        mBinding.settingVodHistory.setVisibility(Setting.isHomeSiteLock() ? View.GONE : View.VISIBLE);
     }
 
     private void setRecyclerView() {
@@ -167,8 +169,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         recommend = homeRecommend;
     }
 
-    @Override
-    public void onSettingVodHistory() {
+    private void onSettingVodHistory(View view) {
         HistoryDialog.create(this).type(0).show();
     }
 
