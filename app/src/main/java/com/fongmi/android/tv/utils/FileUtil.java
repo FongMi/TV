@@ -49,7 +49,7 @@ public class FileUtil {
     public static void clearCache(Callback callback) {
         App.execute(() -> {
             Path.clear(Path.cache());
-            App.post(callback::success);
+            if (callback != null) App.post(callback::success);
         });
     }
 
