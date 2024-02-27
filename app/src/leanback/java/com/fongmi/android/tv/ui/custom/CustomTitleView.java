@@ -42,7 +42,7 @@ public class CustomTitleView extends AppCompatTextView {
     }
 
     private boolean hasEvent(KeyEvent event) {
-        return KeyUtil.isEnterKey(event) || KeyUtil.isLeftKey(event) || KeyUtil.isRightKey(event) || (KeyUtil.isUpKey(event) && !coolDown);
+        return KeyUtil.isEnterKey(event) || KeyUtil.isLeftKey(event) || KeyUtil.isRightKey(event) || (KeyUtil.isUpKey(event) && !coolDown) || (KeyUtil.isDownKey(event) && !coolDown);
     }
 
     @Override
@@ -69,6 +69,8 @@ public class CustomTitleView extends AppCompatTextView {
             listener.setSite(getSite(false));
         } else if (event.getAction() == KeyEvent.ACTION_DOWN && KeyUtil.isUpKey(event)) {
             onKeyUp();
+        } else if (event.getAction() == KeyEvent.ACTION_DOWN && KeyUtil.isDownKey(event)) {
+            onKeyDown();
         }
         return true;
     }
@@ -76,6 +78,12 @@ public class CustomTitleView extends AppCompatTextView {
     private void onKeyUp() {
         App.post(() -> coolDown = false, 3000);
         listener.onRefresh();
+        coolDown = true;
+    }
+
+    private void onKeyDown() {
+        App.post(() -> coolDown = false, 3000);
+        listener.onSettingVodHistory();
         coolDown = true;
     }
 
@@ -92,5 +100,7 @@ public class CustomTitleView extends AppCompatTextView {
         void showDialog();
 
         void onRefresh();
+
+        void onSettingVodHistory();
     }
 }
