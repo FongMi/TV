@@ -6,6 +6,7 @@ import android.view.View;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.viewbinding.ViewBinding;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.databinding.ActivityHistoryBinding;
@@ -54,7 +55,7 @@ public class HistoryActivity extends BaseActivity implements HistoryAdapter.OnCl
     private void getHistory() {
         mAdapter.addAll(History.get());
         mBinding.delete.setVisibility(mAdapter.getItemCount() > 0 ? View.VISIBLE : View.GONE);
-        mBinding.recycler.requestFocus();
+        App.post(() -> mBinding.recycler.requestFocus(), 300);
     }
 
     private void onDelete(View view) {

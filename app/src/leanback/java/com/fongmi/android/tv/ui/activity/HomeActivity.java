@@ -401,8 +401,10 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     public void onRefresh() {
+        Notify.progress(this);
         FileUtil.clearCache(null);
         initConfig();
+        App.post(() -> Notify.show(ResUtil.getString(R.string.config_refreshed)), 2000);
     }
 
     @Override
