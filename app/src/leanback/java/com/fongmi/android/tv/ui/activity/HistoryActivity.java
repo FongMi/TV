@@ -54,6 +54,7 @@ public class HistoryActivity extends BaseActivity implements HistoryAdapter.OnCl
     private void getHistory() {
         mAdapter.addAll(History.get());
         mBinding.delete.setVisibility(mAdapter.getItemCount() > 0 ? View.VISIBLE : View.GONE);
+        mBinding.recycler.requestFocus();
     }
 
     private void onDelete(View view) {

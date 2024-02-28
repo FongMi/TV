@@ -28,8 +28,16 @@
                 android:id="@+id/logo"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
+                android:layout_marginEnd="12dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_logo" />
+
+            <ImageView
+                android:id="@+id/settingVodHistory"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_setting_vod_history" />
 
             <LinearLayout
                 android:layout_width="0dp"

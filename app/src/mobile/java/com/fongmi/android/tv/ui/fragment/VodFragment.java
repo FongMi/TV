@@ -1,5 +1,6 @@
 package com.fongmi.android.tv.ui.fragment;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -19,6 +20,7 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Class;
+import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Hot;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
@@ -27,6 +29,7 @@ import com.fongmi.android.tv.databinding.FragmentVodBinding;
 import com.fongmi.android.tv.event.CastEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.impl.Callback;
+import com.fongmi.android.tv.impl.ConfigCallback;
 import com.fongmi.android.tv.impl.FilterCallback;
 import com.fongmi.android.tv.impl.SiteCallback;
 import com.fongmi.android.tv.model.SiteViewModel;
@@ -38,14 +41,17 @@ import com.fongmi.android.tv.ui.activity.VideoActivity;
 import com.fongmi.android.tv.ui.adapter.TypeAdapter;
 import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.dialog.FilterDialog;
+import com.fongmi.android.tv.ui.dialog.HistoryDialog;
 import com.fongmi.android.tv.ui.dialog.LinkDialog;
 import com.fongmi.android.tv.ui.dialog.ReceiveDialog;
 import com.fongmi.android.tv.ui.dialog.SiteDialog;
 import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.FileUtil;
+import com.fongmi.android.tv.utils.Notify;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Trans;
 import com.google.common.net.HttpHeaders;
+import com.permissionx.guolindev.PermissionX;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -60,7 +66,7 @@ import okhttp3.Call;
 import okhttp3.Headers;
 import okhttp3.Response;
 
-public class VodFragment extends BaseFragment implements SiteCallback, FilterCallback, TypeAdapter.OnClickListener {
+public class VodFragment extends BaseFragment implements SiteCallback, FilterCallback, TypeAdapter.OnClickListener, ConfigCallback {
 
     private FragmentVodBinding mBinding;
     private SiteViewModel mViewModel;
@@ -103,6 +109,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         mBinding.link.setOnClickListener(this::onLink);
         mBinding.logo.setOnClickListener(this::onLogo);
         mBinding.logo.setOnLongClickListener(this::onRefresh);
+        mBinding.settingVodHistory.setOnClickListener(this::onSettingVodHistory);
         mBinding.keep.setOnClickListener(this::onKeep);
         mBinding.retry.setOnClickListener(this::onRetry);
         mBinding.filter.setOnClickListener(this::onFilter);
@@ -207,6 +214,10 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
         return true;
     }
 
+    private void onSettingVodHistory(View view) {
+        HistoryDialog.create(this).type(0).show();
+    }
+
     private void onKeep(View view) {
         KeepActivity.start(getActivity());
     }
@@ -250,6 +261,45 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
 
     public Result getResult() {
         return mResult == null ? new Result() : mResult;
+    }
+
+    private void setConfig() {
+        Notify.dismiss();
+        RefreshEvent.video();
+        RefreshEvent.config();
+    }
+
+    @Override
+    public void setConfig(Config config) {
+        if (config.getUrl().startsWith("file") && !PermissionX.isGranted(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            PermissionX.init(this).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> load(config));
+        } else {
+            load(config);
+        }
+    }
+
+    private void load(Config config) {
+        switch (config.getType()) {
+            case 0:
+                Notify.progress(getActivity());
+                VodConfig.load(config, getCallback());
+                break;
+        }
+    }
+
+    private Callback getCallback() {
+        return new Callback() {
+            @Override
+            public void success() {
+                setConfig();
+            }
+
+            @Override
+            public void error(String msg) {
+                Notify.show(msg);
+                setConfig();
+            }
+        };
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

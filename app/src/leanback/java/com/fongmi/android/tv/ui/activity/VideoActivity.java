@@ -292,7 +292,9 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         if (hasKeyEvent) return;
         getEpisodeView().postDelayed(() -> {
             View selectedItem = getEpisodeView().getLayoutManager().findViewByPosition(position);
+            View focusedView = getCurrentFocus();
             if (selectedItem != null) selectedItem.requestFocus();
+            if (focusedView == mBinding.video) mBinding.video.requestFocus();
         }, 300);
     }
 
@@ -379,6 +381,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
                 if (child != null) mFocus1 = child.itemView;
+                setEpisodeChildKeyListener(child, position);
             }
         });
         mBinding.array.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
@@ -387,6 +390,26 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
                 if (mEpisodeAdapter.size() > getGroupSize() && position > 1 && hasKeyEvent) setEpisodeSelectedPosition((position - 2) * getGroupSize());
             }
         });
+    }
+
+    private void setEpisodeChildKeyListener(RecyclerView.ViewHolder child, int position) {
+        if (getEpisodeView() != mBinding.episodeVert) return;
+        int itemCount = getEpisodeView().getAdapter().getItemCount();
+        if (itemCount <= 0) return;
+        int columns = mEpisodePresenter.getNumColumns();
+        int numRows = mEpisodePresenter.getNumRows();
+        if (((int)Math.ceil((position + 1)/columns) + 1 == numRows) && (position + columns >= itemCount)) {
+            child.itemView.setOnKeyListener(new View.OnKeyListener() {
+                @Override
+                public boolean onKey(View v, int keyCode, KeyEvent event) {
+                    if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN && event.getAction() == KeyEvent.ACTION_DOWN) {
+                        View lastItem =  getEpisodeView().getLayoutManager().findViewByPosition(itemCount - 1);
+                        if (lastItem != null) lastItem.requestFocus();
+                    }
+                    return false;
+                }
+            });
+        }
     }
 
     private void setRecyclerView() {
@@ -641,6 +664,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
             if (length > episodeNameLength) episodeNameLength = length;
         }
         int numColumns = 10;
+        if (episodeNameLength > 60) numColumns = 1;
         if (episodeNameLength > 30) numColumns = 2;
         else if (episodeNameLength > 15) numColumns = 3;
         else if (episodeNameLength > 10) numColumns = 4;

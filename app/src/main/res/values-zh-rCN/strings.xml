@@ -80,6 +80,7 @@
     <string name="setting_home_site_lock">首页源锁定</string>
     <string name="setting_incognito">无痕模式</string>
     <string name="setting_small_window_back_key">小窗返回键</string>
+    <string name="setting_home_recommend">首页推荐位</string>
     <string name="setting_doh">DoH</string>
     <string name="setting_proxy">Proxy</string>
     <string name="setting_cache">缓存</string>
@@ -224,6 +225,11 @@
     <string-array name="select_small_window_back_key">
         <item>返回</item>
         <item>焦点移动</item>
+    </string-array>
+
+    <string-array name="select_home_recommend">
+        <item>播放历史</item>
+        <item>站点推荐</item>
     </string-array>
 
     <string-array name="select_caption">
