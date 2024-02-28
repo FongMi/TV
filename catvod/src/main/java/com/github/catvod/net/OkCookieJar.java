@@ -1,9 +1,11 @@
-package com.github.catvod.net.cookie;
+package com.github.catvod.net;
 
 import android.text.TextUtils;
 import android.webkit.CookieManager;
 
 import androidx.annotation.NonNull;
+
+import com.github.catvod.bean.WrappedCookie;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -14,12 +16,12 @@ import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.HttpUrl;
 
-public class MemoryCookieJar implements CookieJar {
+public class OkCookieJar implements CookieJar {
 
     private final Set<WrappedCookie> cache;
     private final CookieManager manager;
 
-    public MemoryCookieJar() {
+    public OkCookieJar() {
         cache = new HashSet<>();
         manager = CookieManager.getInstance();
     }

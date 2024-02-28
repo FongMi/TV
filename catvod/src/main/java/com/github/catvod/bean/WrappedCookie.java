@@ -1,4 +1,4 @@
-package com.github.catvod.net.cookie;
+package com.github.catvod.bean;
 
 import okhttp3.Cookie;
 import okhttp3.HttpUrl;
