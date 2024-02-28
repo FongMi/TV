@@ -1,4 +1,4 @@
-package com.github.catvod.net.interceptor;
+package com.github.catvod.net;
 
 import android.net.Uri;
 
@@ -22,7 +22,7 @@ import okhttp3.ResponseBody;
 import okio.BufferedSource;
 import okio.Okio;
 
-public class DefaultInterceptor implements Interceptor {
+public class OkInterceptor implements Interceptor {
 
     @NonNull
     @Override
