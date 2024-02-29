@@ -10,7 +10,7 @@
     </item>
     <item>
         <shape  android:shape="oval">
-            <solid android:color="@color/black_20"/>
+            <solid android:color="@color/transparent"/>
         </shape>
     </item>
 </selector>

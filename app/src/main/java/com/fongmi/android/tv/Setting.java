@@ -413,4 +413,12 @@ public class Setting {
         return Prefers.getInt("small_window_back_key", 0);
     }
 
+    public static void putHomeRecommend(int recommend) {
+        Prefers.put("home_recommend", recommend);
+    }
+
+    public static int getHomeRecommend() {
+        return Prefers.getInt("home_recommend", 0);
+    }
+
 }
