@@ -38,7 +38,8 @@ public class Config {
     private String parse;
 
     public static List<Config> arrayFrom(String str) {
-        Type listType = new TypeToken<List<Config>>() {}.getType();
+        Type listType = new TypeToken<List<Config>>() {
+        }.getType();
         List<Config> items = App.gson().fromJson(str, listType);
         return items == null ? Collections.emptyList() : items;
     }
@@ -221,12 +222,17 @@ public class Config {
         return this;
     }
 
+    public Config save() {
+        if (isEmpty()) return this;
+        AppDatabase.get().getConfigDao().update(this);
+        return this;
+    }
+
     public Config update() {
         if (isEmpty()) return this;
         setTime(System.currentTimeMillis());
         Prefers.put("config_" + getType(), getUrl());
-        AppDatabase.get().getConfigDao().update(this);
-        return this;
+        return save();
     }
 
     public void delete() {
