@@ -152,6 +152,7 @@
 
     <!-- Hint -->
     <string name="copied">Copied</string>
+    <string name="config_refreshed">Config rereshed</string>
 
     <!-- UNIT -->
     <string name="all">All</string>

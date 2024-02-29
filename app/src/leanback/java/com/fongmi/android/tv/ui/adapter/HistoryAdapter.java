@@ -69,11 +69,12 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         History.delete(VodConfig.getCid());
     }
 
-    public void delete(History item) {
+    public int delete(History item) {
         int index = mItems.indexOf(item);
-        if (index == -1) return;
+        if (index == -1) return index;
         mItems.remove(index);
         notifyItemRemoved(index);
+        return index;
     }
 
     @Override

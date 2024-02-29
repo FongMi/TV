@@ -152,6 +152,7 @@
 
     <!-- Hint -->
     <string name="copied">已複製</string>
+    <string name="config_refreshed">接口已刷新</string>
 
     <!-- UNIT -->
     <string name="all">全部</string>

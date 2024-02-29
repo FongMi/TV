@@ -397,8 +397,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         int itemCount = getEpisodeView().getAdapter().getItemCount();
         if (itemCount <= 0) return;
         int columns = mEpisodePresenter.getNumColumns();
-        int numRows = mEpisodePresenter.getNumRows();
-        if (((int)Math.ceil((position + 1)/columns) + 1 == numRows) && (position + columns >= itemCount)) {
+        if ((position + columns >= itemCount) && ((position % columns) + 1 > (itemCount % columns))) {
             child.itemView.setOnKeyListener(new View.OnKeyListener() {
                 @Override
                 public boolean onKey(View v, int keyCode, KeyEvent event) {

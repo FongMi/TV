@@ -17,6 +17,7 @@ import androidx.viewbinding.ViewBinding;
 import androidx.viewpager.widget.ViewPager;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Class;
@@ -48,6 +49,7 @@ import com.fongmi.android.tv.ui.dialog.SiteDialog;
 import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Notify;
+import com.fongmi.android.tv.utils.ResUtil;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Trans;
 import com.google.common.net.HttpHeaders;
@@ -211,6 +213,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     private boolean onRefresh(View view) {
         FileUtil.clearCache(null);
         if (getActivity() instanceof MainActivity) ((MainActivity) getActivity()).initConfig();
+        App.post(() -> Notify.show(ResUtil.getString(R.string.config_refreshed)), 2000);
         return true;
     }
 
