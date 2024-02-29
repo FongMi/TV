@@ -42,7 +42,6 @@ public class CustomTitleView extends AppCompatTextView {
     }
 
     private boolean hasEvent(KeyEvent event) {
-        if (Setting.isHomeChangeConfig()) return KeyUtil.isEnterKey(event) || (KeyUtil.isUpKey(event) && !coolDown);
         return KeyUtil.isEnterKey(event) || KeyUtil.isLeftKey(event) || KeyUtil.isRightKey(event) || (KeyUtil.isUpKey(event) && !coolDown);
     }
 

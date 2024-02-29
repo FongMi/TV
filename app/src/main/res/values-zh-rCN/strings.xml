@@ -78,6 +78,7 @@
     <string name="setting_size">图片尺寸</string>
     <string name="setting_aggregated_search">聚合搜索</string>
     <string name="setting_fullscreen_menu_key">全屏菜单键</string>
+    <string name="setting_home_menu_key">首页菜单键</string>
     <string name="setting_home_site_lock">首页源锁定</string>
     <string name="setting_incognito">无痕模式</string>
     <string name="setting_small_window_back_key">小窗返回键</string>
@@ -230,6 +231,13 @@
     <string-array name="select_small_window_back_key">
         <item>返回</item>
         <item>焦点移动</item>
+    </string-array>
+
+    <string-array name="select_home_menu_key">
+        <item>选项弹窗</item>
+        <item>切换站源</item>
+        <item>切换线路</item>
+        <item>历史页面</item>
     </string-array>
 
     <string-array name="select_home_recommend">

@@ -420,7 +420,7 @@
             android:orientation="horizontal">
 
             <LinearLayout
-                android:id="@+id/homeChangeConfig"
+                android:id="@+id/homeMenuKey"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
@@ -434,18 +434,18 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
-                    android:text="@string/setting_home_change_config"
+                    android:text="@string/setting_home_menu_key"
                     android:textColor="@color/white"
                     android:textSize="18sp" />
 
                 <TextView
-                    android:id="@+id/homeChangeConfigText"
+                    android:id="@+id/homeMenuKeyText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="end"
                     android:textColor="@color/white"
                     android:textSize="18sp"
-                    tools:text="开" />
+                    tools:text="切换站源" />
 
             </LinearLayout>
 
