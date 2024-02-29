@@ -420,7 +420,7 @@
             android:orientation="horizontal">
 
             <LinearLayout
-                android:id="@+id/homeRecommoned"
+                android:id="@+id/homeChangConfig"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -433,18 +433,18 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
-                    android:text="@string/setting_home_recommend"
+                    android:text="@string/setting_home_change_config"
                     android:textColor="@color/white"
                     android:textSize="18sp" />
 
                 <TextView
-                    android:id="@+id/homeRecommonedText"
+                    android:id="@+id/homeChangConfigText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="end"
                     android:textColor="@color/white"
                     android:textSize="18sp"
-                    tools:text="歷史" />
+                    tools:text="开" />
 
             </LinearLayout>
 

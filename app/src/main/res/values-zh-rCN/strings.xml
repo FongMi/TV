@@ -80,7 +80,7 @@
     <string name="setting_home_site_lock">首页源锁定</string>
     <string name="setting_incognito">无痕模式</string>
     <string name="setting_small_window_back_key">小窗返回键</string>
-    <string name="setting_home_recommend">首页推荐位</string>
+    <string name="setting_home_change_config">首页换线</string>
     <string name="setting_doh">DoH</string>
     <string name="setting_proxy">Proxy</string>
     <string name="setting_cache">缓存</string>
