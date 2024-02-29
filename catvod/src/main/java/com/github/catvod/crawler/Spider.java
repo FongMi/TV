@@ -67,7 +67,7 @@ public abstract class Spider {
         return OkHttp.dns();
     }
 
-    public OkHttpClient client() {
+    public static OkHttpClient client() {
         return OkHttp.client();
     }
 }

@@ -42,6 +42,10 @@ public class EpisodePresenter extends Presenter {
         this.numColumns = numColumns;
     }
 
+    public int getNumRows() {
+        return this.numRows;
+    }
+
     public void setNumRows(int numRows) {
         this.numRows = numRows;
     }

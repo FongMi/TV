@@ -13,9 +13,13 @@ public class UrlAdapter implements JsonDeserializer<Url> {
 
     @Override
     public Url deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        if (json.isJsonArray()) return convert(json.getAsJsonArray());
+        if (json.isJsonObject()) return Url.objectFrom(json);
+        return Url.create().add(json.getAsString());
+    }
+
+    private Url convert(JsonArray array) {
         Url url = Url.create();
-        if (!json.isJsonArray()) return url.add(json.getAsString());
-        JsonArray array = json.getAsJsonArray();
         for (int i = 0; i < array.size(); i += 2) url.add(array.get(i).getAsString(), array.get(i + 1).getAsString());
         return url;
     }

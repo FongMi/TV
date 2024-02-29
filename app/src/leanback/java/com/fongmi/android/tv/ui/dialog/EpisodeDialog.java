@@ -107,23 +107,27 @@ public class EpisodeDialog extends BaseDialog implements ArrayPresenter.OnClickL
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
                 super.onChildViewHolderSelected(parent, child, position, subposition);
                 if (child != null ) mFocus1 = child.itemView;
-                int itemCount = binding.episodeVert.getAdapter().getItemCount();
-                if (itemCount <= 0) return;
-                int columns = mEpisodePresenter.getNumColumns();
-                if (position + columns >= itemCount && (position % columns) + 1 > itemCount % columns) {
-                    child.itemView.setOnKeyListener(new View.OnKeyListener() {
-                        @Override
-                        public boolean onKey(View v, int keyCode, KeyEvent event) {
-                            if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN && event.getAction() == KeyEvent.ACTION_DOWN) {
-                                View lastItem =  binding.episodeVert.getLayoutManager().findViewByPosition(itemCount - 1);
-                                if (lastItem != null) lastItem.requestFocus();
-                            }
-                            return false;
-                        }
-                    });
-                }
+                setEpisodeChildKeyListener(child, position);
             }
         });
+    }
+
+    private void setEpisodeChildKeyListener(RecyclerView.ViewHolder child, int position) {
+        int itemCount = binding.episodeVert.getAdapter().getItemCount();
+        if (itemCount <= 0) return;
+        int columns = mEpisodePresenter.getNumColumns();
+        if ((position + columns >= itemCount) && ((position % columns) + 1 > (itemCount % columns))) {
+            child.itemView.setOnKeyListener(new View.OnKeyListener() {
+                @Override
+                public boolean onKey(View v, int keyCode, KeyEvent event) {
+                    if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN && event.getAction() == KeyEvent.ACTION_DOWN) {
+                        View lastItem =  binding.episodeVert.getLayoutManager().findViewByPosition(itemCount - 1);
+                        if (lastItem != null) lastItem.requestFocus();
+                    }
+                    return false;
+                }
+            });
+        }
     }
 
     private void setEpisodeSelectedPosition(int position) {

@@ -23,6 +23,7 @@ public class SettingCustomActivity extends BaseActivity {
     private String[] episode;
     private String[] fullscreenMenuKey;
     private String[] smallWindowBackKey;
+    private String[] homeRecommend;
 
     @Override
     protected ViewBinding getBinding() {
@@ -52,6 +53,7 @@ public class SettingCustomActivity extends BaseActivity {
         mBinding.homeSiteLockText.setText(getSwitch(Setting.isHomeSiteLock()));
         mBinding.incognitoText.setText(getSwitch(Setting.isIncognito()));
         mBinding.smallWindowBackKeyText.setText((smallWindowBackKey = ResUtil.getStringArray(R.array.select_small_window_back_key))[Setting.getSmallWindowBackKey()]);
+        mBinding.homeRecommonedText.setText((homeRecommend = ResUtil.getStringArray(R.array.select_home_recommend))[Setting.getHomeRecommend()]);
     }
 
     @Override
@@ -69,6 +71,7 @@ public class SettingCustomActivity extends BaseActivity {
         mBinding.homeSiteLock.setOnClickListener(this::setHomeSiteLock);
         mBinding.incognito.setOnClickListener(this::setIncognito);
         mBinding.smallWindowBackKey.setOnClickListener(this::setSmallWindowBackKey);
+        mBinding.homeRecommoned.setOnClickListener(this::setHomeRecommend);
     }
 
     private void setQuality(View view) {
@@ -149,6 +152,12 @@ public class SettingCustomActivity extends BaseActivity {
         int index = Setting.getSmallWindowBackKey();
         Setting.putSmallWindowBackKey(index = index == smallWindowBackKey.length - 1 ? 0 : ++index);
         mBinding.smallWindowBackKeyText.setText(smallWindowBackKey[index]);
+    }
+
+    private void setHomeRecommend(View view) {
+        int index = Setting.getHomeRecommend();
+        Setting.putHomeRecommend(index = index == homeRecommend.length - 1 ? 0 : ++index);
+        mBinding.homeRecommonedText.setText(homeRecommend[index]);
     }
 
 }

@@ -80,6 +80,7 @@
     <string name="setting_home_site_lock">首頁源鎖定</string>
     <string name="setting_incognito">無痕模式</string>
     <string name="setting_small_window_back_key">小窗返回鍵</string>
+    <string name="setting_home_recommend">首页推薦位</string>
     <string name="setting_doh">DoH</string>
     <string name="setting_proxy">Proxy</string>
     <string name="setting_cache">暫存</string>
@@ -151,6 +152,7 @@
 
     <!-- Hint -->
     <string name="copied">已複製</string>
+    <string name="config_refreshed">接口已刷新</string>
 
     <!-- UNIT -->
     <string name="all">全部</string>
@@ -224,6 +226,11 @@
     <string-array name="select_small_window_back_key">
         <item>返回</item>
         <item>焦點移動</item>
+    </string-array>
+
+    <string-array name="select_home_recommend">
+        <item>播放歷史</item>
+        <item>站點推薦</item>
     </string-array>
 
     <string-array name="select_caption">
