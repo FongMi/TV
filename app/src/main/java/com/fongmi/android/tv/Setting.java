@@ -421,4 +421,12 @@ public class Setting {
         return Prefers.getBoolean("home_change_config", false);
     }
 
+    public static boolean isAggregatedSearch() {
+        return Prefers.getBoolean("aggregated_search", false);
+    }
+
+    public static void putAggregatedSearch(boolean search) {
+        Prefers.put("aggregated_search", search);
+    }
+
 }

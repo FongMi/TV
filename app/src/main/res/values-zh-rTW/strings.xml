@@ -76,6 +76,7 @@
     <string name="setting_custom">個性設定</string>
     <string name="setting_quality">圖片品質</string>
     <string name="setting_size">圖片尺寸</string>
+    <string name="setting_aggregated_search">聚合搜索</string>
     <string name="setting_fullscreen_menu_key">全屏選單鍵</string>
     <string name="setting_home_site_lock">首頁源鎖定</string>
     <string name="setting_incognito">無痕模式</string>

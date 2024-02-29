@@ -53,6 +53,7 @@ public class SettingCustomActivity extends BaseActivity {
         mBinding.incognitoText.setText(getSwitch(Setting.isIncognito()));
         mBinding.smallWindowBackKeyText.setText((smallWindowBackKey = ResUtil.getStringArray(R.array.select_small_window_back_key))[Setting.getSmallWindowBackKey()]);
         mBinding.homeChangeConfigText.setText(getSwitch(Setting.isHomeChangeConfig()));
+        mBinding.aggregatedSearchText.setText(getSwitch(Setting.isAggregatedSearch()));
     }
 
     @Override
@@ -71,6 +72,7 @@ public class SettingCustomActivity extends BaseActivity {
         mBinding.incognito.setOnClickListener(this::setIncognito);
         mBinding.smallWindowBackKey.setOnClickListener(this::setSmallWindowBackKey);
         mBinding.homeChangeConfig.setOnClickListener(this::setHomeChangeConfig);
+        mBinding.aggregatedSearch.setOnClickListener(this::setAggregatedSearch);
     }
 
     private void setQuality(View view) {
@@ -156,6 +158,11 @@ public class SettingCustomActivity extends BaseActivity {
     private void setHomeChangeConfig(View view) {
         Setting.putHomeChangeConfig(!Setting.isHomeChangeConfig());
         mBinding.homeChangeConfigText.setText(getSwitch(Setting.isHomeChangeConfig()));
+    }
+
+    private void setAggregatedSearch(View view) {
+        Setting.putAggregatedSearch(!Setting.isAggregatedSearch());
+        mBinding.aggregatedSearchText.setText(getSwitch(Setting.isAggregatedSearch()));
     }
 
 }
