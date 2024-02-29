@@ -771,11 +771,11 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mFlagPresenter.setNextFocusDown(findFocusDown(0));
         mArrayPresenter.setNextFocusUp(findFocusUp(3));
         mPartPresenter.setNextFocusUp(findFocusUp(5));
-        notifyItemChanged(getEpisodeView(), mEpisodeAdapter);
-        notifyItemChanged(mBinding.quality, mQualityAdapter);
-        notifyItemChanged(mBinding.part, mPartAdapter);
-        notifyItemChanged(mBinding.array, mArrayAdapter);
         notifyItemChanged(mBinding.flag, mFlagAdapter);
+        notifyItemChanged(mBinding.quality, mQualityAdapter);
+        notifyItemChanged(mBinding.array, mArrayAdapter);
+        notifyItemChanged(getEpisodeView(), mEpisodeAdapter);
+        notifyItemChanged(mBinding.part, mPartAdapter);
     }
 
     private void showDisplayInfo() {
@@ -1195,7 +1195,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private void setPartAdapter(List<String> items) {
         mBinding.part.setVisibility(View.VISIBLE);
         mPartAdapter.setItems(items, null);
-        setR2Callback(1000);
+        setR2Callback(2000);
     }
 
     private void checkFlag(Vod item) {

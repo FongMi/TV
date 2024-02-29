@@ -80,6 +80,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     private boolean confirm;
     private Result mResult;
     private Clock mClock;
+    private int homeMenuKey;
 
     private Site getHome() {
         return VodConfig.get().getHome();
@@ -163,6 +164,14 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         mAdapter.add(R.string.home_history);
         mAdapter.add(R.string.home_recommend);
         mHistoryAdapter = new ArrayObjectAdapter(mPresenter = new HistoryPresenter(this));
+        homeMenuKey = Setting.getHomeMenuKey();
+    }
+
+    private void refreshFuncRow() {
+        if (homeMenuKey == Setting.getHomeMenuKey()) return;
+        homeMenuKey = Setting.getHomeMenuKey();
+        mAdapter.removeItems(0, 1);
+        mAdapter.add(0, getFuncRow());
     }
 
     public void showSettingVodHistory() {
@@ -271,7 +280,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         adapter.add(Func.create(R.string.home_search));
         adapter.add(Func.create(R.string.home_keep));
         adapter.add(Func.create(R.string.home_push));
-        if (Setting.getHomeMenuKey() == 2 || Setting.getHomeMenuKey() == 3) adapter.add(Func.create(R.string.home_history));
+        if (Setting.getHomeMenuKey() == 1 || Setting.getHomeMenuKey() == 2) adapter.add(Func.create(R.string.home_history));
         adapter.add(Func.create(R.string.home_setting));
         ((Func) adapter.get(0)).setNextFocusLeft(((Func) adapter.get(adapter.size() - 1)).getId());
         ((Func) adapter.get(adapter.size() - 1)).setNextFocusRight(((Func) adapter.get(0)).getId());
@@ -484,6 +493,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         super.onResume();
         mClock.start();
         setTitleView();
+        refreshFuncRow();
     }
 
     @Override
