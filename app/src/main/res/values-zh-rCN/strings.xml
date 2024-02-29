@@ -125,6 +125,9 @@
     <string name="dialog_config_hint">请输入接口…</string>
     <string name="dialog_config_name">请输入名称…</string>
     <string name="dialog_config_url">请输入地址…</string>
+    <string name="dialog_delete_record">删除全部纪录？</string>
+    <string name="dialog_delete_keep">收藏纪录将会全部删除。</string>
+    <string name="dialog_delete_history">观看纪录将会全部删除。</string>
 
     <!-- Error -->
     <string name="error_config_get">配置取得失败</string>
