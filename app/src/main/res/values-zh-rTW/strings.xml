@@ -76,11 +76,12 @@
     <string name="setting_custom">個性設定</string>
     <string name="setting_quality">圖片品質</string>
     <string name="setting_size">圖片尺寸</string>
+    <string name="setting_aggregated_search">聚合搜索</string>
     <string name="setting_fullscreen_menu_key">全屏選單鍵</string>
     <string name="setting_home_site_lock">首頁源鎖定</string>
     <string name="setting_incognito">無痕模式</string>
     <string name="setting_small_window_back_key">小窗返回鍵</string>
-    <string name="setting_home_recommend">首页推薦位</string>
+    <string name="setting_home_change_config">首页換線</string>
     <string name="setting_doh">DoH</string>
     <string name="setting_proxy">Proxy</string>
     <string name="setting_cache">暫存</string>
@@ -125,6 +126,9 @@
     <string name="dialog_config_hint">請輸入接口…</string>
     <string name="dialog_config_name">請輸入名稱…</string>
     <string name="dialog_config_url">請輸入網址…</string>
+    <string name="dialog_delete_record">刪除全部紀錄？</string>
+    <string name="dialog_delete_keep">收藏紀錄將會全部刪除。</string>
+    <string name="dialog_delete_history">觀看紀錄將會全部刪除。</string>
 
     <!-- Error -->
     <string name="error_config_get">配置取得失敗</string>

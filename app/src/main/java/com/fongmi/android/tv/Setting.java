@@ -413,12 +413,20 @@ public class Setting {
         return Prefers.getInt("small_window_back_key", 0);
     }
 
-    public static void putHomeRecommend(int recommend) {
-        Prefers.put("home_recommend", recommend);
+    public static void putHomeChangeConfig(boolean change) {
+        Prefers.put("home_change_config", change);
     }
 
-    public static int getHomeRecommend() {
-        return Prefers.getInt("home_recommend", 0);
+    public static boolean isHomeChangeConfig() {
+        return Prefers.getBoolean("home_change_config", false);
+    }
+
+    public static boolean isAggregatedSearch() {
+        return Prefers.getBoolean("aggregated_search", false);
+    }
+
+    public static void putAggregatedSearch(boolean search) {
+        Prefers.put("aggregated_search", search);
     }
 
 }

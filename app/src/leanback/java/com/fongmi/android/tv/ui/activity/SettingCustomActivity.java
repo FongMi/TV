@@ -23,7 +23,6 @@ public class SettingCustomActivity extends BaseActivity {
     private String[] episode;
     private String[] fullscreenMenuKey;
     private String[] smallWindowBackKey;
-    private String[] homeRecommend;
 
     @Override
     protected ViewBinding getBinding() {
@@ -53,7 +52,8 @@ public class SettingCustomActivity extends BaseActivity {
         mBinding.homeSiteLockText.setText(getSwitch(Setting.isHomeSiteLock()));
         mBinding.incognitoText.setText(getSwitch(Setting.isIncognito()));
         mBinding.smallWindowBackKeyText.setText((smallWindowBackKey = ResUtil.getStringArray(R.array.select_small_window_back_key))[Setting.getSmallWindowBackKey()]);
-        mBinding.homeRecommonedText.setText((homeRecommend = ResUtil.getStringArray(R.array.select_home_recommend))[Setting.getHomeRecommend()]);
+        mBinding.homeChangeConfigText.setText(getSwitch(Setting.isHomeChangeConfig()));
+        mBinding.aggregatedSearchText.setText(getSwitch(Setting.isAggregatedSearch()));
     }
 
     @Override
@@ -71,7 +71,8 @@ public class SettingCustomActivity extends BaseActivity {
         mBinding.homeSiteLock.setOnClickListener(this::setHomeSiteLock);
         mBinding.incognito.setOnClickListener(this::setIncognito);
         mBinding.smallWindowBackKey.setOnClickListener(this::setSmallWindowBackKey);
-        mBinding.homeRecommoned.setOnClickListener(this::setHomeRecommend);
+        mBinding.homeChangeConfig.setOnClickListener(this::setHomeChangeConfig);
+        mBinding.aggregatedSearch.setOnClickListener(this::setAggregatedSearch);
     }
 
     private void setQuality(View view) {
@@ -154,10 +155,14 @@ public class SettingCustomActivity extends BaseActivity {
         mBinding.smallWindowBackKeyText.setText(smallWindowBackKey[index]);
     }
 
-    private void setHomeRecommend(View view) {
-        int index = Setting.getHomeRecommend();
-        Setting.putHomeRecommend(index = index == homeRecommend.length - 1 ? 0 : ++index);
-        mBinding.homeRecommonedText.setText(homeRecommend[index]);
+    private void setHomeChangeConfig(View view) {
+        Setting.putHomeChangeConfig(!Setting.isHomeChangeConfig());
+        mBinding.homeChangeConfigText.setText(getSwitch(Setting.isHomeChangeConfig()));
+    }
+
+    private void setAggregatedSearch(View view) {
+        Setting.putAggregatedSearch(!Setting.isAggregatedSearch());
+        mBinding.aggregatedSearchText.setText(getSwitch(Setting.isAggregatedSearch()));
     }
 
 }
