@@ -42,6 +42,7 @@ public class SettingCustomFragment extends BaseFragment {
         mBinding.danmuSyncText.setText(getSwitch(Setting.isDanmuSync()));
         mBinding.speedText.setText(getSpeedText());
         mBinding.incognitoText.setText(getSwitch(Setting.isIncognito()));
+        mBinding.homeChangeConfigText.setText(getSwitch(Setting.isHomeChangeConfig()));
     }
 
     @Override
@@ -52,6 +53,7 @@ public class SettingCustomFragment extends BaseFragment {
         mBinding.speed.setOnClickListener(this::setSpeed);
         mBinding.speed.setOnLongClickListener(this::resetSpeed);
         mBinding.incognito.setOnClickListener(this::setIncognito);
+        mBinding.homeChangeConfig.setOnClickListener(this::setHomeChangeConfig);
     }
 
     private boolean onTitle(View view) {
@@ -94,6 +96,12 @@ public class SettingCustomFragment extends BaseFragment {
     private void setIncognito(View view) {
         Setting.putIncognito(!Setting.isIncognito());
         mBinding.incognitoText.setText(getSwitch(Setting.isIncognito()));
+    }
+
+    private void setHomeChangeConfig(View view) {
+        Setting.putHomeChangeConfig(!Setting.isHomeChangeConfig());
+        mBinding.homeChangeConfigText.setText(getSwitch(Setting.isHomeChangeConfig()));
+        RefreshEvent.config();
     }
 
 }

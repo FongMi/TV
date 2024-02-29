@@ -52,7 +52,7 @@ public class SettingCustomActivity extends BaseActivity {
         mBinding.homeSiteLockText.setText(getSwitch(Setting.isHomeSiteLock()));
         mBinding.incognitoText.setText(getSwitch(Setting.isIncognito()));
         mBinding.smallWindowBackKeyText.setText((smallWindowBackKey = ResUtil.getStringArray(R.array.select_small_window_back_key))[Setting.getSmallWindowBackKey()]);
-        mBinding.homeChangConfigText.setText(getSwitch(Setting.isHomeChangeConfig()));
+        mBinding.homeChangeConfigText.setText(getSwitch(Setting.isHomeChangeConfig()));
     }
 
     @Override
@@ -70,7 +70,7 @@ public class SettingCustomActivity extends BaseActivity {
         mBinding.homeSiteLock.setOnClickListener(this::setHomeSiteLock);
         mBinding.incognito.setOnClickListener(this::setIncognito);
         mBinding.smallWindowBackKey.setOnClickListener(this::setSmallWindowBackKey);
-        mBinding.homeChangConfig.setOnClickListener(this::setHomeChangeConfig);
+        mBinding.homeChangeConfig.setOnClickListener(this::setHomeChangeConfig);
     }
 
     private void setQuality(View view) {
@@ -155,7 +155,7 @@ public class SettingCustomActivity extends BaseActivity {
 
     private void setHomeChangeConfig(View view) {
         Setting.putHomeChangeConfig(!Setting.isHomeChangeConfig());
-        mBinding.homeChangConfigText.setText(getSwitch(Setting.isHomeChangeConfig()));
+        mBinding.homeChangeConfigText.setText(getSwitch(Setting.isHomeChangeConfig()));
     }
 
 }

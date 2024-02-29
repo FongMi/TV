@@ -420,7 +420,7 @@
             android:orientation="horizontal">
 
             <LinearLayout
-                android:id="@+id/homeChangConfig"
+                android:id="@+id/homeChangeConfig"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -438,7 +438,7 @@
                     android:textSize="18sp" />
 
                 <TextView
-                    android:id="@+id/homeChangConfigText"
+                    android:id="@+id/homeChangeConfigText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="end"
