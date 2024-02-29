@@ -256,7 +256,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         if (mAdapter.size() > index && index > -1) mAdapter.removeItems(index, mAdapter.size() - index);
         if (getHome().getKey().isEmpty()) return;
         mViewModel.homeContent();
-        mAdapter.add("progress");
+        if (Setting.getHomeRecommend() == 1) mAdapter.add("progress");
     }
 
     private void addVideo(Result result) {

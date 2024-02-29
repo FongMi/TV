@@ -54,8 +54,11 @@ public class HistoryActivity extends BaseActivity implements HistoryAdapter.OnCl
 
     private void getHistory() {
         mAdapter.addAll(History.get());
-        mBinding.delete.setVisibility(mAdapter.getItemCount() > 0 ? View.VISIBLE : View.GONE);
-        App.post(() -> mBinding.recycler.requestFocus(), 300);
+        App.post(() -> {
+            mBinding.delete.setVisibility(mAdapter.getItemCount() > 0 ? View.VISIBLE : View.GONE);
+            mBinding.delete.setFocusable(true);
+        }, 500);
+        mBinding.recycler.requestFocus();
     }
 
     private void onDelete(View view) {
@@ -75,8 +78,18 @@ public class HistoryActivity extends BaseActivity implements HistoryAdapter.OnCl
 
     @Override
     public void onItemDelete(History item) {
-        mAdapter.delete(item.delete());
+        mBinding.delete.setFocusable(false);
+        int index = mAdapter.delete(item.delete());
         if (mAdapter.getItemCount() == 0) mAdapter.setDelete(false);
+        App.post(() -> {
+            mBinding.delete.setFocusable(true);
+        }, 300);
+        if (mAdapter.getItemCount() > 0) {
+            int nextIndex = index + 1;
+            if (index == mAdapter.getItemCount()) nextIndex = index - 1;
+            View view  = mBinding.recycler.getLayoutManager().findViewByPosition(nextIndex);
+            if (view != null) view.requestFocus();
+        }
     }
 
     @Override
