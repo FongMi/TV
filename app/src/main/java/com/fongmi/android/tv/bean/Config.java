@@ -221,12 +221,17 @@ public class Config {
         return this;
     }
 
+    public Config save() {
+        if (isEmpty()) return this;
+        AppDatabase.get().getConfigDao().update(this);
+        return this;
+    }
+
     public Config update() {
         if (isEmpty()) return this;
         setTime(System.currentTimeMillis());
         Prefers.put("config_" + getType(), getUrl());
-        AppDatabase.get().getConfigDao().update(this);
-        return this;
+        return save();
     }
 
     public void delete() {
