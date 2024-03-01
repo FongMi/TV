@@ -76,10 +76,13 @@
     <string name="setting_custom">Custom setting</string>
     <string name="setting_quality">Image quality</string>
     <string name="setting_size">Image size</string>
+    <string name="setting_aggregated_search">Aggregated search</string>
     <string name="setting_fullscreen_menu_key">Fullscreen menu key</string>
+    <string name="setting_home_menu_key">Home menu key</string>
     <string name="setting_home_site_lock">Home site lock</string>
     <string name="setting_incognito">Incognito mode</string>
     <string name="setting_small_window_back_key">Small window back key</string>
+    <string name="setting_home_change_config">Home change config</string>
     <string name="setting_doh">DoH</string>
     <string name="setting_proxy">Proxy</string>
     <string name="setting_cache">Cache</string>
@@ -124,6 +127,9 @@
     <string name="dialog_config_hint">Please enter the config…</string>
     <string name="dialog_config_name">Please enter the name…</string>
     <string name="dialog_config_url">Please enter the url…</string>
+    <string name="dialog_delete_record">Delete all records?</string>
+    <string name="dialog_delete_keep">All keep records will be removed.</string>
+    <string name="dialog_delete_history">All history records will be removed.</string>
 
     <!-- Error -->
     <string name="error_config_get">Configuration get failed</string>
@@ -151,6 +157,7 @@
 
     <!-- Hint -->
     <string name="copied">Copied</string>
+    <string name="config_refreshed">Config rereshed</string>
 
     <!-- UNIT -->
     <string name="all">All</string>
@@ -226,9 +233,21 @@
         <item>Episodes</item>
     </string-array>
 
+    <string-array name="select_home_menu_key">
+        <item>Select dialog</item>
+        <item>Change site</item>
+        <item>Change config</item>
+        <item>History page</item>
+    </string-array>
+
     <string-array name="select_small_window_back_key">
         <item>Back</item>
         <item>Focus move</item>
+    </string-array>
+
+    <string-array name="select_home_recommend">
+        <item>History</item>
+        <item>Site recommend</item>
     </string-array>
 
     <string-array name="select_caption">

@@ -41,6 +41,7 @@ public class HistoryDialog implements ConfigAdapter.OnClickListener {
     public void show() {
         setRecyclerView();
         setDialog();
+        binding.recycler.requestFocus();
     }
 
     private void setRecyclerView() {

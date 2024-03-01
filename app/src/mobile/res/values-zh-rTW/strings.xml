@@ -32,11 +32,6 @@
     <string name="control_other">其它</string>
     <string name="control_display">螢幕顯示</string>
 
-    <!-- Dialog -->
-    <string name="dialog_delete_record">刪除全部紀錄？</string>
-    <string name="dialog_delete_keep">收藏紀錄將會全部刪除。</string>
-    <string name="dialog_delete_history">觀看紀錄將會全部刪除。</string>
-
     <!-- Timer -->
     <string name="timer_5">5 分鐘</string>
     <string name="timer_15">15 分鐘</string>

@@ -1,18 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_focused="true">
-        <shape android:shape="oval">
-            <solid android:color="@color/blue_500"/>
+        <shape  android:shape="oval">
+            <stroke
+                android:width="1.5dp"
+                android:color="@color/white" />
+            <solid android:color="@color/black_20"/>
         </shape>
     </item>
-    <item android:state_activated="true">
-        <shape android:shape="oval">
-            <solid android:color="@color/grey_600"/>
-        </shape>
-    </item>
-    <item >
-        <shape android:shape="oval">
-            <solid android:color="@color/grey_600"/>
+    <item>
+        <shape  android:shape="oval">
+            <solid android:color="@color/transparent"/>
         </shape>
     </item>
 </selector>

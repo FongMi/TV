@@ -23,6 +23,7 @@ public class SettingCustomActivity extends BaseActivity {
     private String[] episode;
     private String[] fullscreenMenuKey;
     private String[] smallWindowBackKey;
+    private String[] homeMenuKey;
 
     @Override
     protected ViewBinding getBinding() {
@@ -52,6 +53,8 @@ public class SettingCustomActivity extends BaseActivity {
         mBinding.homeSiteLockText.setText(getSwitch(Setting.isHomeSiteLock()));
         mBinding.incognitoText.setText(getSwitch(Setting.isIncognito()));
         mBinding.smallWindowBackKeyText.setText((smallWindowBackKey = ResUtil.getStringArray(R.array.select_small_window_back_key))[Setting.getSmallWindowBackKey()]);
+        mBinding.homeMenuKeyText.setText((homeMenuKey = ResUtil.getStringArray(R.array.select_home_menu_key))[Setting.getHomeMenuKey()]);
+        mBinding.aggregatedSearchText.setText(getSwitch(Setting.isAggregatedSearch()));
     }
 
     @Override
@@ -69,6 +72,8 @@ public class SettingCustomActivity extends BaseActivity {
         mBinding.homeSiteLock.setOnClickListener(this::setHomeSiteLock);
         mBinding.incognito.setOnClickListener(this::setIncognito);
         mBinding.smallWindowBackKey.setOnClickListener(this::setSmallWindowBackKey);
+        mBinding.homeMenuKey.setOnClickListener(this::setHomeMenuKey);
+        mBinding.aggregatedSearch.setOnClickListener(this::setAggregatedSearch);
     }
 
     private void setQuality(View view) {
@@ -149,6 +154,17 @@ public class SettingCustomActivity extends BaseActivity {
         int index = Setting.getSmallWindowBackKey();
         Setting.putSmallWindowBackKey(index = index == smallWindowBackKey.length - 1 ? 0 : ++index);
         mBinding.smallWindowBackKeyText.setText(smallWindowBackKey[index]);
+    }
+
+    private void setHomeMenuKey(View view) {
+        int index = Setting.getHomeMenuKey();
+        Setting.putHomeMenuKey(index = index == homeMenuKey.length - 1 ? 0 : ++index);
+        mBinding.homeMenuKeyText.setText(homeMenuKey[index]);
+    }
+
+    private void setAggregatedSearch(View view) {
+        Setting.putAggregatedSearch(!Setting.isAggregatedSearch());
+        mBinding.aggregatedSearchText.setText(getSwitch(Setting.isAggregatedSearch()));
     }
 
 }
