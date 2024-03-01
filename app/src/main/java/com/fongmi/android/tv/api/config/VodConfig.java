@@ -194,7 +194,7 @@ public class VodConfig {
     }
 
     private void initLive(JsonObject object) {
-        Config temp = Config.find(config, 1);
+        Config temp = Config.find(config, 1).save();
         boolean sync = LiveConfig.get().needSync(config.getUrl());
         if (sync) LiveConfig.get().clear().config(temp).parse(object);
     }
@@ -360,14 +360,14 @@ public class VodConfig {
     public void setParse(Parse parse) {
         this.parse = parse;
         this.parse.setActivated(true);
-        config.parse(parse.getName()).update();
+        config.parse(parse.getName()).save();
         for (Parse item : getParses()) item.setActivated(parse);
     }
 
     public void setHome(Site home) {
         this.home = home;
         this.home.setActivated(true);
-        config.home(home.getKey()).update();
+        config.home(home.getKey()).save();
         for (Site item : getSites()) item.setActivated(home);
     }
 

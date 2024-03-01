@@ -11,6 +11,7 @@ import androidx.room.PrimaryKey;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
+import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.gson.ExtAdapter;
 import com.github.catvod.utils.Json;
@@ -194,6 +195,7 @@ public class Site implements Parcelable {
     }
 
     public Integer getIndexs() {
+        if (Setting.isAggregatedSearch() && (indexs == null || indexs == 1)) return 1;
         return indexs == null ? 0 : indexs;
     }
 
