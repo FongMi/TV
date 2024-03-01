@@ -61,6 +61,7 @@ public class Util {
 
     public static String md5(File file) {
         try {
+            if (!file.exists()) return "";
             MessageDigest digest = MessageDigest.getInstance("MD5");
             FileInputStream fis = new FileInputStream(file);
             byte[] byteArray = new byte[1024];

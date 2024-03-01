@@ -35,16 +35,16 @@
 
             <ImageView
                 android:id="@+id/homeSiteLock"
-                android:layout_width="22dp"
-                android:layout_height="22dp"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:layout_gravity="bottom"
+                android:layout_marginRight="6dp"
                 android:layout_marginBottom="2dp"
                 android:background="@drawable/ic_home_lock"
                 android:focusable="false"
                 android:visibility="gone"
                 tools:visibility="visible" />
         </LinearLayout>
-
 
         <TextView
             android:id="@+id/time"

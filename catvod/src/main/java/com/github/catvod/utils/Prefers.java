@@ -100,8 +100,6 @@ public class Prefers {
             for (Map.Entry<String, ?> entry : map.entrySet()) Prefers.put(entry.getKey(), convert(entry));
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            Path.clear(file);
         }
     }
 

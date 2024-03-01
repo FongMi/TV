@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ViewUtil {
 
-    private static final AtomicInteger viewIdGenerator = new AtomicInteger(1);
+    private static final AtomicInteger viewIdGenerator = new AtomicInteger(15000000);
 
     public static int generateViewId() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) return View.generateViewId();

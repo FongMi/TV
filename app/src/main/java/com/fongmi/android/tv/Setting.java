@@ -389,6 +389,14 @@ public class Setting {
         return Prefers.getInt("fullscreen_menu_key", 0);
     }
 
+    public static void putHomeMenuKey(int key) {
+        Prefers.put("home_menu_key", key);
+    }
+
+    public static int getHomeMenuKey() {
+        return Prefers.getInt("home_menu_key", 0);
+    }
+
     public static boolean isHomeSiteLock() {
         return Prefers.getBoolean("home_site_lock", false);
     }
@@ -411,6 +419,14 @@ public class Setting {
 
     public static int getSmallWindowBackKey() {
         return Prefers.getInt("small_window_back_key", 0);
+    }
+
+    public static boolean isAggregatedSearch() {
+        return Prefers.getBoolean("aggregated_search", false);
+    }
+
+    public static void putAggregatedSearch(boolean search) {
+        Prefers.put("aggregated_search", search);
     }
 
 }

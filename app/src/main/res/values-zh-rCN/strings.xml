@@ -76,10 +76,13 @@
     <string name="setting_custom">个性设置</string>
     <string name="setting_quality">图片品质</string>
     <string name="setting_size">图片尺寸</string>
+    <string name="setting_aggregated_search">聚合搜索</string>
     <string name="setting_fullscreen_menu_key">全屏菜单键</string>
+    <string name="setting_home_menu_key">首页菜单键</string>
     <string name="setting_home_site_lock">首页源锁定</string>
     <string name="setting_incognito">无痕模式</string>
     <string name="setting_small_window_back_key">小窗返回键</string>
+    <string name="setting_home_change_config">首页换线</string>
     <string name="setting_doh">DoH</string>
     <string name="setting_proxy">Proxy</string>
     <string name="setting_cache">缓存</string>
@@ -124,6 +127,9 @@
     <string name="dialog_config_hint">请输入接口…</string>
     <string name="dialog_config_name">请输入名称…</string>
     <string name="dialog_config_url">请输入地址…</string>
+    <string name="dialog_delete_record">删除全部纪录？</string>
+    <string name="dialog_delete_keep">收藏纪录将会全部删除。</string>
+    <string name="dialog_delete_history">观看纪录将会全部删除。</string>
 
     <!-- Error -->
     <string name="error_config_get">配置取得失败</string>
@@ -151,6 +157,7 @@
 
     <!-- Hint -->
     <string name="copied">已复制</string>
+    <string name="config_refreshed">接口已刷新</string>
 
     <!-- UNIT -->
     <string name="all">全部</string>
@@ -224,6 +231,18 @@
     <string-array name="select_small_window_back_key">
         <item>返回</item>
         <item>焦点移动</item>
+    </string-array>
+
+    <string-array name="select_home_menu_key">
+        <item>选项弹窗</item>
+        <item>切换站源</item>
+        <item>切换线路</item>
+        <item>历史页面</item>
+    </string-array>
+
+    <string-array name="select_home_recommend">
+        <item>播放历史</item>
+        <item>站点推荐</item>
     </string-array>
 
     <string-array name="select_caption">
