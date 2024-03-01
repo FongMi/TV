@@ -11,7 +11,7 @@ android {
         minSdk 16
         targetSdk 28
         versionCode 228
-        versionName "0229"
+        versionName "0301"
         multiDexEnabled true
         ndk { abiFilters "armeabi-v7a" }
         javaCompileOptions {
@@ -100,7 +100,7 @@ dependencies {
     implementation 'com.github.hedzr:android-file-chooser:v1.2.0-final'
     implementation 'com.github.jahirfiquitiva:TextDrawable:1.0.3'
     implementation('com.github.TeamNewPipe:NewPipeExtractor:v0.23.1') { exclude group: 'org.jsoup', module: 'jsoup' }
-    implementation 'com.github.thegrizzlylabs:sardine-android:0.8'
+    implementation 'com.github.thegrizzlylabs:sardine-android:0.9'
     implementation 'com.google.android.material:material:1.11.0'
     implementation 'com.google.net.cronet:cronet-okhttp:0.1.0'
     implementation 'com.google.zxing:core:3.3.0'

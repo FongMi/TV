@@ -769,11 +769,11 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         mFlagPresenter.setNextFocusDown(findFocusDown(0));
         mArrayPresenter.setNextFocusUp(findFocusUp(3));
         mPartPresenter.setNextFocusUp(findFocusUp(5));
-        notifyItemChanged(getEpisodeView(), mEpisodeAdapter);
-        notifyItemChanged(mBinding.quality, mQualityAdapter);
-        notifyItemChanged(mBinding.part, mPartAdapter);
-        notifyItemChanged(mBinding.array, mArrayAdapter);
         notifyItemChanged(mBinding.flag, mFlagAdapter);
+        notifyItemChanged(mBinding.quality, mQualityAdapter);
+        notifyItemChanged(mBinding.array, mArrayAdapter);
+        notifyItemChanged(getEpisodeView(), mEpisodeAdapter);
+        notifyItemChanged(mBinding.part, mPartAdapter);
     }
 
     private void showDisplayInfo() {
@@ -1177,13 +1177,13 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 List<String> items = Part.get(response.body().string());
                 if (!items.contains(source)) items.add(0, source);
-                App.post(() -> setPartAdapter(items));
+                App.post(() -> setPartAdapter(items), 1000);
             }
 
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 List<String> items = Arrays.asList(source);
-                App.post(() -> setPartAdapter(items));
+                App.post(() -> setPartAdapter(items), 1000);
             }
         });
     }
@@ -1577,7 +1577,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         hasKeyEvent = true;
-        if (!isFullscreen() && KeyUtil.isBackKey(event) && Setting.getSmallWindowBackKey() == 1 && getCurrentFocus() != mBinding.video) {
+        if (mBinding.progressLayout.isContent() && !isFullscreen() && KeyUtil.isBackKey(event) && Setting.getSmallWindowBackKey() == 1 && getCurrentFocus() != mBinding.video) {
             mFocus1 = mBinding.video;
             getFocus1().requestFocus();
             return true;
