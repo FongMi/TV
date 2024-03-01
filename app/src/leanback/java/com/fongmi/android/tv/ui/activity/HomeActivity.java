@@ -47,6 +47,7 @@ import com.fongmi.android.tv.ui.custom.CustomRowPresenter;
 import com.fongmi.android.tv.ui.custom.CustomSelector;
 import com.fongmi.android.tv.ui.custom.CustomTitleView;
 import com.fongmi.android.tv.ui.dialog.HistoryDialog;
+import com.fongmi.android.tv.ui.dialog.MenuDialog;
 import com.fongmi.android.tv.ui.dialog.SiteDialog;
 import com.fongmi.android.tv.ui.presenter.FuncPresenter;
 import com.fongmi.android.tv.ui.presenter.HeaderPresenter;
@@ -79,6 +80,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     private boolean confirm;
     private Result mResult;
     private Clock mClock;
+    private int homeMenuKey;
 
     private Site getHome() {
         return VodConfig.get().getHome();
@@ -113,7 +115,6 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     @Override
     protected void initEvent() {
         mBinding.title.setListener(this);
-        mBinding.settingVodHistory.setOnClickListener(this::onSettingVodHistory);
         mBinding.recycler.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
@@ -137,7 +138,6 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     private void setTitleView() {
         mBinding.homeSiteLock.setVisibility(Setting.isHomeSiteLock() ? View.VISIBLE : View.GONE);
-        mBinding.settingVodHistory.setVisibility(Setting.isHomeSiteLock() || !Setting.isHomeChangeConfig() ? View.GONE : View.VISIBLE);
     }
 
     private void setRecyclerView() {
@@ -164,9 +164,17 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         mAdapter.add(R.string.home_history);
         mAdapter.add(R.string.home_recommend);
         mHistoryAdapter = new ArrayObjectAdapter(mPresenter = new HistoryPresenter(this));
+        homeMenuKey = Setting.getHomeMenuKey();
     }
 
-    private void onSettingVodHistory(View view) {
+    private void refreshFuncRow() {
+        if (homeMenuKey == Setting.getHomeMenuKey()) return;
+        homeMenuKey = Setting.getHomeMenuKey();
+        mAdapter.removeItems(0, 1);
+        mAdapter.add(0, getFuncRow());
+    }
+
+    public void showSettingVodHistory() {
         HistoryDialog.create(this).type(0).show();
     }
 
@@ -272,7 +280,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         adapter.add(Func.create(R.string.home_search));
         adapter.add(Func.create(R.string.home_keep));
         adapter.add(Func.create(R.string.home_push));
-        adapter.add(Func.create(R.string.home_history));
+        if (Setting.getHomeMenuKey() == 1 || Setting.getHomeMenuKey() == 2) adapter.add(Func.create(R.string.home_history));
         adapter.add(Func.create(R.string.home_setting));
         ((Func) adapter.get(0)).setNextFocusLeft(((Func) adapter.get(adapter.size() - 1)).getId());
         ((Func) adapter.get(adapter.size() - 1)).setNextFocusRight(((Func) adapter.get(0)).getId());
@@ -473,7 +481,10 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (KeyUtil.isMenuKey(event)) showDialog();
+        if (KeyUtil.isMenuKey(event) && Setting.getHomeMenuKey() == 0) MenuDialog.create(this).show();
+        if (KeyUtil.isMenuKey(event) && Setting.getHomeMenuKey() == 1) showDialog();
+        if (KeyUtil.isMenuKey(event) && Setting.getHomeMenuKey() == 2) showSettingVodHistory();
+        if (KeyUtil.isMenuKey(event) && Setting.getHomeMenuKey() == 3) HistoryActivity.start(this);
         return super.dispatchKeyEvent(event);
     }
 
@@ -482,6 +493,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         super.onResume();
         mClock.start();
         setTitleView();
+        refreshFuncRow();
     }
 
     @Override
