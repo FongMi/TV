@@ -43,8 +43,8 @@ public class CustomEditText extends AppCompatEditText {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        View view = focusSearch(event);
-        if (view != null) view.requestFocus();
+        View v = focusSearch(event);
+        if (v != null) return v.requestFocus();
         return super.onKeyDown(keyCode, event);
     }
 
