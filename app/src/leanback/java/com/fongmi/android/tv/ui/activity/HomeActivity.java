@@ -280,7 +280,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         adapter.add(Func.create(R.string.home_search));
         adapter.add(Func.create(R.string.home_keep));
         adapter.add(Func.create(R.string.home_push));
-        if (Setting.getHomeMenuKey() == 1 || Setting.getHomeMenuKey() == 2) adapter.add(Func.create(R.string.home_history));
+        if (Setting.getHomeMenuKey() == 1 || Setting.getHomeMenuKey() == 2) adapter.add(Func.create(R.string.home_history_short));
         adapter.add(Func.create(R.string.home_setting));
         ((Func) adapter.get(0)).setNextFocusLeft(((Func) adapter.get(adapter.size() - 1)).getId());
         ((Func) adapter.get(adapter.size() - 1)).setNextFocusRight(((Func) adapter.get(0)).getId());
