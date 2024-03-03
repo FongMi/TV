@@ -83,10 +83,10 @@ public class ProxyDialog implements DialogInterface.OnDismissListener {
     }
 
     private void detect(String s) {
-        if (append && s.equalsIgnoreCase("h")) {
+        if (append && "h".equalsIgnoreCase(s)) {
             append = false;
             binding.text.append("ttp://");
-        } else if (append && s.equalsIgnoreCase("s")) {
+        } else if (append && "s".equalsIgnoreCase(s)) {
             append = false;
             binding.text.append("ocks5://");
         } else if (append && s.length() == 1) {

@@ -24,7 +24,7 @@ public class ZLive implements Source.Extractor {
 
     @Override
     public boolean match(String scheme, String host) {
-        return scheme.equals("zlive");
+        return "zlive".equals(scheme);
     }
 
     @Override

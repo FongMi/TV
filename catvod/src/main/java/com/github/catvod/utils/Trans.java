@@ -23,7 +23,7 @@ public class Trans {
     private Trans() {
         s2t = new HashMap<>();
         t2s = new HashMap<>();
-        trans = Locale.getDefault().getCountry().equals("TW");
+        trans = "TW".equals(Locale.getDefault().getCountry());
         if (trans) init();
     }
 
