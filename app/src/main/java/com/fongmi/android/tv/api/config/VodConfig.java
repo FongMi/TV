@@ -219,12 +219,12 @@ public class VodConfig {
     }
 
     private String parseApi(String api) {
-        if (api.startsWith("file") || api.startsWith("assets")) return UrlUtil.convert(api);
+        if (api.startsWith("file") || api.startsWith("clan") || api.startsWith("assets")) return UrlUtil.convert(api);
         return api;
     }
 
     private String parseExt(String ext) {
-        if (ext.startsWith("file") || ext.startsWith("assets")) return UrlUtil.convert(ext);
+        if (ext.startsWith("file") || ext.startsWith("clan") || ext.startsWith("assets")) return UrlUtil.convert(ext);
         if (ext.startsWith("img+")) return Decoder.getExt(ext);
         return ext;
     }

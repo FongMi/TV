@@ -35,7 +35,7 @@ public class LiveParser {
         if (live.getGroups().size() > 0) return;
         if (live.getType() == 0) text(live, getText(live.getUrl()));
         if (live.getType() == 1) json(live, getText(live.getUrl()));
-        if (live.getType() == 2) proxy(live, getText(live.getUrl()));
+        if (live.getType() == 2) proxy(live, getText(UrlUtil.convert(live.getUrl())));
     }
 
     public static void text(Live live, String text) {
