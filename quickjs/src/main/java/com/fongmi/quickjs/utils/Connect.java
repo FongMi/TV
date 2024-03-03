@@ -7,6 +7,7 @@ import com.github.catvod.utils.Util;
 import com.google.common.net.HttpHeaders;
 import com.whl.quickjs.wrapper.JSObject;
 import com.whl.quickjs.wrapper.QuickJSContext;
+import java.security.SecureRandom;
 
 import java.util.List;
 import java.util.Map;
@@ -84,7 +85,7 @@ public class Connect {
     }
 
     private static RequestBody getFormDataBody(Req req) {
-        String boundary = "--dio-boundary-" + new Random().nextInt(42949) + "" + new Random().nextInt(67296);
+        String boundary = "--dio-boundary-" + new SecureRandom().nextInt(42949) + "" + new SecureRandom().nextInt(67296);
         MultipartBody.Builder builder = new MultipartBody.Builder(boundary).setType(MultipartBody.FORM);
         Map<String, String> params = Json.toMap(req.getData());
         for (String key : params.keySet()) builder.addFormDataPart(key, params.get(key));
