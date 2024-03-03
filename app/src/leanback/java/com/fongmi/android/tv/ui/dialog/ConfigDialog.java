@@ -122,13 +122,13 @@ public class ConfigDialog implements DialogInterface.OnDismissListener {
     }
 
     private void detect(String s) {
-        if (append && s.equalsIgnoreCase("h")) {
+        if (append && "h".equalsIgnoreCase(s)) {
             append = false;
             binding.text.append("ttp://");
-        } else if (append && s.equalsIgnoreCase("f")) {
+        } else if (append && "f".equalsIgnoreCase(s)) {
             append = false;
             binding.text.append("ile://");
-        } else if (append && s.equalsIgnoreCase("a")) {
+        } else if (append && "a".equalsIgnoreCase(s)) {
             append = false;
             binding.text.append("ssets://");
         } else if (s.length() > 1) {
