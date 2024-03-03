@@ -78,11 +78,11 @@
     <string name="setting_size">圖片尺寸</string>
     <string name="setting_aggregated_search">聚合搜索</string>
     <string name="setting_fullscreen_menu_key">全屏選單鍵</string>
-    <string name="setting_home_menu_key">首页選單鍵</string>
+    <string name="setting_home_menu_key">首頁選單鍵</string>
     <string name="setting_home_site_lock">首頁源鎖定</string>
     <string name="setting_incognito">無痕模式</string>
     <string name="setting_small_window_back_key">小窗返回鍵</string>
-    <string name="setting_home_change_config">首页換線</string>
+    <string name="setting_home_change_config">首頁換線</string>
     <string name="setting_doh">DoH</string>
     <string name="setting_proxy">Proxy</string>
     <string name="setting_cache">暫存</string>
