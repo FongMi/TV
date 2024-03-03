@@ -188,7 +188,7 @@ public class ParseJob implements ParseCallback {
 
     private Map<String, String> getHeader(JsonObject object) {
         Map<String, String> headers = new HashMap<>();
-        for (String key : object.keySet()) if (key.equalsIgnoreCase(HttpHeaders.USER_AGENT) || key.equalsIgnoreCase(HttpHeaders.REFERER)) headers.put(UrlUtil.fixHeader(key), object.get(key).getAsString());
+        for (String key : object.keySet()) if (HttpHeaders.USER_AGENT.equalsIgnoreCase(key) || HttpHeaders.REFERER.equalsIgnoreCase(key)) headers.put(UrlUtil.fixHeader(key), object.get(key).getAsString());
         if (headers.isEmpty()) return parse.getHeaders();
         return headers;
     }

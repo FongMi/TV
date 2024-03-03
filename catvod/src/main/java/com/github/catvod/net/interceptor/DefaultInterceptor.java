@@ -27,7 +27,7 @@ public class DefaultInterceptor implements Interceptor {
     public Response intercept(@NonNull Chain chain) throws IOException {
         Response response = chain.proceed(getRequest(chain.request()));
         String encoding = response.header(HttpHeaders.CONTENT_ENCODING);
-        if (response.body() == null || encoding == null || !encoding.equals("deflate")) return response;
+        if (response.body() == null || encoding == null || !"deflate".equals(encoding)) return response;
         InflaterInputStream is = new InflaterInputStream(response.body().byteStream(), new Inflater(true));
         return response.newBuilder().headers(response.headers()).body(new ResponseBody() {
             @Nullable

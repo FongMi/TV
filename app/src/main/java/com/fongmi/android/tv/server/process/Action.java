@@ -30,7 +30,7 @@ public class Action implements Process {
 
     @Override
     public boolean isRequest(NanoHTTPD.IHTTPSession session, String path) {
-        return path.equals("/action");
+        return "/action".equals(path);
     }
 
     @Override

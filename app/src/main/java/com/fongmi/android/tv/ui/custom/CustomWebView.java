@@ -80,7 +80,7 @@ public class CustomWebView extends WebView {
         if (headers.isEmpty()) {
             getSettings().setUserAgentString(Setting.getUa());
         } else for (String key : headers.keySet()) {
-            if (key.equalsIgnoreCase(HttpHeaders.USER_AGENT)) {
+            if (HttpHeaders.USER_AGENT.equalsIgnoreCase(key)) {
                 getSettings().setUserAgentString(headers.get(key));
                 break;
             }

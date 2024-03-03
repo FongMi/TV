@@ -23,7 +23,7 @@ public class Force implements Source.Extractor {
 
     @Override
     public boolean match(String scheme, String host) {
-        return !scheme.equals("push") && scheme.startsWith("p") || scheme.equals("mitv");
+        return !"push".equals(scheme) && scheme.startsWith("p") || "mitv".equals(scheme);
     }
 
     private void init(String scheme) {
