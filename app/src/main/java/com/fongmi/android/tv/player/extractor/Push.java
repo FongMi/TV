@@ -10,7 +10,7 @@ public class Push implements Source.Extractor {
 
     @Override
     public boolean match(String scheme, String host) {
-        return scheme.equals("push");
+        return "push".equals(scheme);
     }
 
     @Override

@@ -69,7 +69,7 @@ public class M3U8 {
 
     private static Headers getHeader(Map<String, String> headers) {
         Headers.Builder builder = new Headers.Builder();
-        for (Map.Entry<String, String> header : headers.entrySet()) if (header.getKey().equalsIgnoreCase(HttpHeaders.USER_AGENT) || header.getKey().equalsIgnoreCase(HttpHeaders.REFERER) || header.getKey().equalsIgnoreCase(HttpHeaders.COOKIE)) builder.add(header.getKey(), header.getValue());
+        for (Map.Entry<String, String> header : headers.entrySet()) if (HttpHeaders.USER_AGENT.equalsIgnoreCase(header.getKey()) || HttpHeaders.REFERER.equalsIgnoreCase(header.getKey()) || HttpHeaders.COOKIE.equalsIgnoreCase(header.getKey())) builder.add(header.getKey(), header.getValue());
         builder.add(HttpHeaders.RANGE, "bytes=0-");
         return builder.build();
     }

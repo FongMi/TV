@@ -29,7 +29,7 @@ public class Util {
 
     public static String scheme(String url) {
         String scheme = Uri.parse(url).getScheme();
-        if (scheme.equals("P2p")) scheme = "mitv";
+        if ("P2p".equals(scheme)) scheme = "mitv";
         return scheme.toLowerCase();
     }
 

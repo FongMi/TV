@@ -117,9 +117,9 @@ public class Parser {
 
     public String pdfh(String html, String rule, String addUrl) {
         Document doc = cache.getPdfh(html);
-        if (rule.equals("body&&Text") || rule.equals("Text")) {
+        if ("body&&Text".equals(rule) || "Text".equals(rule)) {
             return doc.text();
-        } else if (rule.equals("body&&Html") || rule.equals("Html")) {
+        } else if ("body&&Html".equals(rule) || "Html".equals(rule)) {
             return doc.html();
         }
         String option = "";
@@ -138,9 +138,9 @@ public class Parser {
             if (elements.isEmpty()) return "";
         }
         if (TextUtils.isEmpty(option)) return elements.outerHtml();
-        if (option.equals("Text")) {
+        if ("Text".equals(option)) {
             return elements.text();
-        } else if (option.equals("Html")) {
+        } else if ("Html".equals(option)) {
             return elements.html();
         } else {
             String result = elements.attr(option);
