@@ -72,6 +72,8 @@
             android:layout_toEndOf="@+id/mic"
             android:layout_toRightOf="@+id/mic"
             android:background="@null"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:hint="@string/search_keyword"
             android:imeOptions="actionDone"
             android:inputType="textCapWords|textAutoCorrect|textAutoComplete"
