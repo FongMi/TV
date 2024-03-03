@@ -59,7 +59,7 @@ public class Func {
     @SuppressLint("NonConstantResourceId")
     public void setDrawable() {
         switch (resId) {
-            case R.string.home_history:
+            case R.string.home_history_short:
                 this.drawable = R.drawable.ic_home_history;
                 break;
             case R.string.home_vod:
