@@ -121,7 +121,7 @@ public class Class implements Parcelable {
     }
 
     public boolean isHome() {
-        return getTypeId().equals("home");
+        return "home".equals(getTypeId());
     }
 
     public void trans() {

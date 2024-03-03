@@ -104,7 +104,7 @@ public class Prefers {
     }
 
     private static Object convert(Map.Entry<String, ?> entry) {
-        if (entry.getKey().equals("danmu_size")) {
+        if ("danmu_size".equals(entry.getKey())) {
             return Float.parseFloat(entry.getValue().toString());
         } else {
             return entry.getValue();
