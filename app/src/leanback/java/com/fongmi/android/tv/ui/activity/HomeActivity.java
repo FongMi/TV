@@ -341,7 +341,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     @Override
     public void onItemClick(Func item) {
         switch (item.getResId()) {
-            case R.string.home_history:
+            case R.string.home_history_short:
                 HistoryActivity.start(this);
                 break;
             case R.string.home_vod:
