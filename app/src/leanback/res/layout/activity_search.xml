@@ -57,7 +57,7 @@
             android:scaleType="fitCenter"
             android:src="@drawable/ic_search_mic" />
 
-        <com.fongmi.android.tv.ui.custom.CustomEditText
+        <com.fongmi.android.tv.ui.custom.CustomSearchView
             android:id="@+id/keyword"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
