@@ -1,4 +1,4 @@
-package com.fongmi.android.tv.player;
+package com.fongmi.android.tv.utils;
 
 import android.os.CountDownTimer;
 
