@@ -27,7 +27,7 @@
         android:textSize="18sp"
         tools:text="@string/push_info" />
 
-    <EditText
+    <com.fongmi.android.tv.ui.custom.CustomEditText
         android:id="@+id/text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

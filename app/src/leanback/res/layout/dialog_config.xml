@@ -33,7 +33,7 @@
         android:layout_height="wrap_content"
         android:visibility="gone" />
 
-    <EditText
+    <com.fongmi.android.tv.ui.custom.CustomEditText
         android:id="@+id/text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
