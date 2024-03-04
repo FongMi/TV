@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.leanback.widget.Presenter;
 
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Flag;
 import com.fongmi.android.tv.databinding.AdapterFlagBinding;
 
@@ -16,6 +17,7 @@ public class FlagPresenter extends Presenter {
 
     public FlagPresenter(OnClickListener listener) {
         this.mListener = listener;
+        this.nextFocusDown = R.id.episode;
     }
 
     public interface OnClickListener {
