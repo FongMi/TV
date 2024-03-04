@@ -4,6 +4,7 @@ import android.net.Uri;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.player.Source;
+import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.github.catvod.utils.Path;
 import com.p2p.P2PClass;
@@ -11,10 +12,11 @@ import com.p2p.P2PClass;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 
-public class JianPian implements Source.Extractor {
+public class JianPian implements Source.Extractor, Clock.Callback {
 
     private P2PClass p2p;
     private String path;
+    private Clock clock;
 
     @Override
     public boolean match(String scheme, String host) {
@@ -23,6 +25,7 @@ public class JianPian implements Source.Extractor {
 
     private void init() {
         if (p2p == null) p2p = new P2PClass();
+        if (clock == null) clock = Clock.create();
     }
 
     @Override
@@ -31,6 +34,8 @@ public class JianPian implements Source.Extractor {
         stop();
         check();
         start(url);
+        clock.stop().start();
+        clock.setCallback(this);
         return "http://127.0.0.1:" + p2p.port + "/" + URLEncoder.encode(Uri.parse(path).getLastPathSegment(), "GBK");
     }
 
@@ -56,6 +61,7 @@ public class JianPian implements Source.Extractor {
     @Override
     public void stop() {
         try {
+            if (clock != null) clock.stop();
             if (p2p == null || path == null) return;
             p2p.P2Pdoxpause(path.getBytes("GBK"));
         } catch (Exception e) {
@@ -68,5 +74,12 @@ public class JianPian implements Source.Extractor {
     @Override
     public void exit() {
         App.execute(this::check);
+        if (clock != null) clock.release();
+    }
+
+    @Override
+    public void onTimeChanged() {
+        long seconds = System.currentTimeMillis() / 1000 % 60;
+        if (seconds == 0) App.execute(this::check);
     }
 }
