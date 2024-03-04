@@ -34,8 +34,6 @@ public class JianPian implements Source.Extractor, Clock.Callback {
         stop();
         check();
         start(url);
-        clock.stop().start();
-        clock.setCallback(this);
         return "http://127.0.0.1:" + p2p.port + "/" + URLEncoder.encode(Uri.parse(path).getLastPathSegment(), "GBK");
     }
 
@@ -53,6 +51,8 @@ public class JianPian implements Source.Extractor, Clock.Callback {
             path = path.replace("tvbox-xg://", "").replace("tvbox-xg:", "");
             path = path.replace("xg://", "ftp://").replace("xgplay://", "ftp://");
             p2p.P2Pdoxstart(path.getBytes("GBK"));
+            clock.setCallback(this);
+            clock.stop().start();
         } catch (Exception e) {
             e.printStackTrace();
         }
