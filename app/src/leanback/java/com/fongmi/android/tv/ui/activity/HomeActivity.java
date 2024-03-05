@@ -68,7 +68,6 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 public class HomeActivity extends BaseActivity implements CustomTitleView.Listener, TypePresenter.OnClickListener, ConfigCallback {
 
@@ -265,7 +264,8 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     public void onItemClick(Class item) {
-        updateFilter(item);
+        if (mBinding.pager.getCurrentItem() == 0) showDialog();
+        else updateFilter(item);
     }
 
     @Override
