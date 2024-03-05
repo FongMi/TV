@@ -15,7 +15,6 @@ import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Func;
 import com.fongmi.android.tv.bean.History;
@@ -34,6 +33,7 @@ import com.fongmi.android.tv.ui.activity.PushActivity;
 import com.fongmi.android.tv.ui.activity.SearchActivity;
 import com.fongmi.android.tv.ui.activity.SettingActivity;
 import com.fongmi.android.tv.ui.activity.VideoActivity;
+import com.fongmi.android.tv.ui.activity.VodActivity;
 import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.custom.CustomRowPresenter;
 import com.fongmi.android.tv.ui.custom.CustomSelector;
@@ -55,7 +55,6 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
     private ArrayObjectAdapter mHistoryAdapter;
     public HistoryPresenter mPresenter;
     private ArrayObjectAdapter mAdapter;
-    private int homeMenuKey;
 
     private Site getHome() {
         return VodConfig.get().getHome();
@@ -113,14 +112,6 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
         mAdapter.add(R.string.home_history);
         mAdapter.add(R.string.home_recommend);
         mHistoryAdapter = new ArrayObjectAdapter(mPresenter = new HistoryPresenter(this));
-        homeMenuKey = Setting.getHomeMenuKey();
-    }
-
-    private void refreshFuncRow() {
-        if (homeMenuKey == Setting.getHomeMenuKey()) return;
-        homeMenuKey = Setting.getHomeMenuKey();
-        mAdapter.removeItems(0, 1);
-        mAdapter.add(0, getFuncRow());
     }
 
     public void addVideo(Result result) {
@@ -245,12 +236,6 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
     public boolean onLongClick(Vod item) {
         CollectActivity.start(getActivity(), item.getVodName());
         return true;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        refreshFuncRow();
     }
 
 }
