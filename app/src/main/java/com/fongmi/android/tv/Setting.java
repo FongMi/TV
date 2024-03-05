@@ -437,4 +437,12 @@ public class Setting {
         Prefers.put("aggregated_search", search);
     }
 
+    public static void putHomeUI(int key) {
+        Prefers.put("home_ui", key);
+    }
+
+    public static int getHomeUI() {
+        return Prefers.getInt("home_ui", 0);
+    }
+
 }

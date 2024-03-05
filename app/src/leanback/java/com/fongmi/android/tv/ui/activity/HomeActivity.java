@@ -68,6 +68,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class HomeActivity extends BaseActivity implements CustomTitleView.Listener, TypePresenter.OnClickListener, ConfigCallback {
 
@@ -75,7 +76,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     private ArrayObjectAdapter mAdapter;
     private HomeActivity.PageAdapter mPageAdapter;
     private SiteViewModel mViewModel;
-    private Result mResult;
+    public Result mResult;
     private boolean loading;
     private boolean coolDown;
     private View mOldView;
@@ -145,9 +146,15 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     }
 
     private void setRecyclerView() {
+        setHomeUI();
         mBinding.recycler.setHorizontalSpacing(ResUtil.dp2px(16));
         mBinding.recycler.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         mBinding.recycler.setAdapter(new ItemBridgeAdapter(mAdapter = new ArrayObjectAdapter(new TypePresenter(this))));
+    }
+
+    private void setHomeUI() {
+        if (Setting.getHomeUI() == 0) mBinding.recycler.setVisibility(View.GONE);
+        else mBinding.recycler.setVisibility(View.VISIBLE);
     }
 
     private void setViewModel() {
@@ -428,7 +435,10 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     private void setFocus() {
         setLoading(false);
         App.post(() -> mBinding.title.setFocusable(true), 500);
-        if (!mBinding.title.hasFocus()) mBinding.recycler.requestFocus();
+        if (!mBinding.title.hasFocus()) {
+            if (Setting.getHomeUI() == 0) getHomeFragment().mBinding.recycler.requestFocus();
+            else mBinding.recycler.requestFocus();
+        }
     }
 
     @Override
@@ -448,6 +458,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         super.onResume();
         mClock.start();
         setTitleView();
+        setHomeUI();
     }
 
     @Override

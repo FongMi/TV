@@ -15,6 +15,7 @@ import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Func;
 import com.fongmi.android.tv.bean.History;
@@ -33,6 +34,7 @@ import com.fongmi.android.tv.ui.activity.PushActivity;
 import com.fongmi.android.tv.ui.activity.SearchActivity;
 import com.fongmi.android.tv.ui.activity.SettingActivity;
 import com.fongmi.android.tv.ui.activity.VideoActivity;
+import com.fongmi.android.tv.ui.activity.VodActivity;
 import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.custom.CustomRowPresenter;
 import com.fongmi.android.tv.ui.custom.CustomSelector;
@@ -54,6 +56,7 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
     private ArrayObjectAdapter mHistoryAdapter;
     public HistoryPresenter mPresenter;
     private ArrayObjectAdapter mAdapter;
+    private int homeUI;
 
     private Site getHome() {
         return VodConfig.get().getHome();
@@ -110,6 +113,7 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
         mAdapter.add(R.string.home_history);
         mAdapter.add(R.string.home_recommend);
         mHistoryAdapter = new ArrayObjectAdapter(mPresenter = new HistoryPresenter(this));
+        homeUI = Setting.getHomeUI();
     }
 
     public void addVideo(Result result) {
@@ -125,16 +129,23 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
 
     private ListRow getFuncRow() {
         ArrayObjectAdapter adapter = new ArrayObjectAdapter(new FuncPresenter(this));
-//        adapter.add(Func.create(R.string.home_vod));
-        adapter.add(Func.create(R.string.home_history_short));
+        adapter.add(Func.create(R.string.home_vod));
         adapter.add(Func.create(R.string.home_live));
         adapter.add(Func.create(R.string.home_search));
         adapter.add(Func.create(R.string.home_keep));
         adapter.add(Func.create(R.string.home_push));
+        adapter.add(Func.create(R.string.home_history_short));
         adapter.add(Func.create(R.string.home_setting));
         ((Func) adapter.get(0)).setNextFocusLeft(((Func) adapter.get(adapter.size() - 1)).getId());
         ((Func) adapter.get(adapter.size() - 1)).setNextFocusRight(((Func) adapter.get(0)).getId());
         return new ListRow(adapter);
+    }
+
+    private void refreshFuncRow() {
+        if (homeUI == Setting.getHomeUI()) return;
+        homeUI = Setting.getHomeUI();
+        mAdapter.removeItems(0, 1);
+        mAdapter.add(0, getFuncRow());
     }
 
     public void refreshRecommond() {
@@ -185,6 +196,9 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
             case R.string.home_history_short:
                 HistoryActivity.start(getActivity());
                 break;
+            case R.string.home_vod:
+                VodActivity.start(getActivity(), getHomeActicity().mResult.clear());
+                break;
             case R.string.home_live:
                 LiveActivity.start(getActivity());
                 break;
@@ -233,6 +247,12 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
     public boolean onLongClick(Vod item) {
         CollectActivity.start(getActivity(), item.getVodName());
         return true;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        refreshFuncRow();
     }
 
 }

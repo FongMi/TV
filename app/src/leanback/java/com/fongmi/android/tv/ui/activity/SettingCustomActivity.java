@@ -24,6 +24,7 @@ public class SettingCustomActivity extends BaseActivity {
     private String[] fullscreenMenuKey;
     private String[] smallWindowBackKey;
     private String[] homeMenuKey;
+    private String[] homeUI;
 
     @Override
     protected ViewBinding getBinding() {
@@ -55,6 +56,7 @@ public class SettingCustomActivity extends BaseActivity {
         mBinding.smallWindowBackKeyText.setText((smallWindowBackKey = ResUtil.getStringArray(R.array.select_small_window_back_key))[Setting.getSmallWindowBackKey()]);
         mBinding.homeMenuKeyText.setText((homeMenuKey = ResUtil.getStringArray(R.array.select_home_menu_key))[Setting.getHomeMenuKey()]);
         mBinding.aggregatedSearchText.setText(getSwitch(Setting.isAggregatedSearch()));
+        mBinding.homeUIText.setText((homeUI = ResUtil.getStringArray(R.array.select_home_ui))[Setting.getHomeUI()]);
     }
 
     @Override
@@ -74,6 +76,7 @@ public class SettingCustomActivity extends BaseActivity {
         mBinding.smallWindowBackKey.setOnClickListener(this::setSmallWindowBackKey);
         mBinding.homeMenuKey.setOnClickListener(this::setHomeMenuKey);
         mBinding.aggregatedSearch.setOnClickListener(this::setAggregatedSearch);
+        mBinding.homeUI.setOnClickListener(this::setHomeUI);
     }
 
     private void setQuality(View view) {
@@ -165,6 +168,12 @@ public class SettingCustomActivity extends BaseActivity {
     private void setAggregatedSearch(View view) {
         Setting.putAggregatedSearch(!Setting.isAggregatedSearch());
         mBinding.aggregatedSearchText.setText(getSwitch(Setting.isAggregatedSearch()));
+    }
+
+    private void setHomeUI(View view) {
+        int index = Setting.getHomeUI();
+        Setting.putHomeUI(index = index == homeUI.length - 1 ? 0 : ++index);
+        mBinding.homeUIText.setText(homeUI[index]);
     }
 
 }
