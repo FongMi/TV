@@ -1,8 +1,5 @@
 package com.fongmi.android.tv.ui.fragment;
 
-import android.Manifest;
-import android.content.Intent;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,18 +10,13 @@ import androidx.leanback.widget.ArrayObjectAdapter;
 import androidx.leanback.widget.ItemBridgeAdapter;
 import androidx.leanback.widget.ListRow;
 import androidx.leanback.widget.OnChildViewHolderSelectedListener;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
-import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
-import com.fongmi.android.tv.api.config.LiveConfig;
 import com.fongmi.android.tv.api.config.VodConfig;
-import com.fongmi.android.tv.api.config.WallConfig;
-import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Func;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Result;
@@ -33,10 +25,6 @@ import com.fongmi.android.tv.bean.Style;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.ActivityHomeBinding;
 import com.fongmi.android.tv.databinding.FragmentHomeBinding;
-import com.fongmi.android.tv.db.AppDatabase;
-import com.fongmi.android.tv.event.RefreshEvent;
-import com.fongmi.android.tv.impl.Callback;
-import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.ui.activity.CollectActivity;
 import com.fongmi.android.tv.ui.activity.HistoryActivity;
 import com.fongmi.android.tv.ui.activity.HomeActivity;
@@ -46,7 +34,6 @@ import com.fongmi.android.tv.ui.activity.PushActivity;
 import com.fongmi.android.tv.ui.activity.SearchActivity;
 import com.fongmi.android.tv.ui.activity.SettingActivity;
 import com.fongmi.android.tv.ui.activity.VideoActivity;
-import com.fongmi.android.tv.ui.activity.VodActivity;
 import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.custom.CustomRowPresenter;
 import com.fongmi.android.tv.ui.custom.CustomSelector;
@@ -55,12 +42,8 @@ import com.fongmi.android.tv.ui.presenter.HeaderPresenter;
 import com.fongmi.android.tv.ui.presenter.HistoryPresenter;
 import com.fongmi.android.tv.ui.presenter.ProgressPresenter;
 import com.fongmi.android.tv.ui.presenter.VodPresenter;
-import com.fongmi.android.tv.utils.FileChooser;
-import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
-import com.fongmi.android.tv.utils.UrlUtil;
 import com.google.common.collect.Lists;
-import com.permissionx.guolindev.PermissionX;
 
 import java.util.List;
 
@@ -72,9 +55,6 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
     private ArrayObjectAdapter mHistoryAdapter;
     public HistoryPresenter mPresenter;
     private ArrayObjectAdapter mAdapter;
-    private SiteViewModel mViewModel;
-    private boolean loading;
-    private Result mResult;
     private int homeMenuKey;
 
     private Site getHome() {
@@ -89,16 +69,14 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
     @Override
     protected void initView() {
         mBinding.progressLayout.showProgress();
-        mResult = Result.empty();
         setRecyclerView();
-        setViewModel();
         setAdapter();
         initEvent();
     }
 
     @Override
     protected void initData() {
-        initConfig();
+        getHistory();
     }
 
     protected void initEvent() {
@@ -119,18 +97,6 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
         return (HomeActivity) getActivity();
     }
 
-    private void checkAction(Intent intent) {
-        if (Intent.ACTION_SEND.equals(intent.getAction())) {
-            VideoActivity.push(getActivity(), intent.getStringExtra(Intent.EXTRA_TEXT));
-        } else if (Intent.ACTION_VIEW.equals(intent.getAction()) && intent.getData() != null) {
-            if ("text/plain".equals(intent.getType()) || UrlUtil.path(intent.getData()).endsWith(".m3u")) {
-                loadLive("file:/" + FileChooser.getPathFromUri(getActivity(), intent.getData()));
-            } else {
-                VideoActivity.push(getActivity(), intent.getData().toString());
-            }
-        }
-    }
-
     private void setRecyclerView() {
         CustomSelector selector = new CustomSelector();
         selector.addPresenter(Integer.class, new HeaderPresenter());
@@ -140,15 +106,6 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
         selector.addPresenter(ListRow.class, new CustomRowPresenter(16), HistoryPresenter.class);
         mBinding.recycler.setAdapter(new ItemBridgeAdapter(mAdapter = new ArrayObjectAdapter(selector)));
         mBinding.recycler.setVerticalSpacing(ResUtil.dp2px(16));
-    }
-
-    private void setViewModel() {
-        mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
-        mViewModel.result.observe(this, result -> {
-            mAdapter.remove("progress");
-            addVideo(mResult = result);
-            getHomeActicity().setTypes(mResult);
-        });
     }
 
     private void setAdapter() {
@@ -166,98 +123,16 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
         mAdapter.add(0, getFuncRow());
     }
 
-    public void initConfig() {
-        if (isLoading()) return;
-        WallConfig.get().init();
-        LiveConfig.get().init().load();
-        VodConfig.get().init().load(getCallback());
-        setLoading(true);
-    }
-
-    private Callback getCallback() {
-        return new Callback() {
-            @Override
-            public void success() {
-                Notify.dismiss();
-                mBinding.progressLayout.showContent();
-                checkAction(getActivity().getIntent());
-                getHistory();
-                getVideo();
-                setFocus();
-            }
-
-            @Override
-            public void error(String msg) {
-                Notify.dismiss();
-                if (TextUtils.isEmpty(msg) && AppDatabase.getBackup().exists()) onRestore();
-                else mBinding.progressLayout.showContent();
-                mResult = Result.empty();
-                Notify.show(msg);
-                setFocus();
-            }
-        };
-    }
-
-    private void onRestore() {
-        PermissionX.init(this).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> AppDatabase.restore(new Callback() {
-            @Override
-            public void success() {
-                if (allGranted) initConfig();
-                else mBinding.progressLayout.showContent();
-            }
-        }));
-    }
-
-    public void setConfig(Config config) {
-        if (config.getUrl().startsWith("file") && !PermissionX.isGranted(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            PermissionX.init(this).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> load(config));
-        } else {
-            load(config);
-        }
-    }
-
-    private void load(Config config) {
-        switch (config.getType()) {
-            case 0:
-                Notify.progress(getActivity());
-                VodConfig.load(config, getCallback());
-                break;
-        }
-    }
-
-    private void loadLive(String url) {
-        LiveConfig.load(Config.find(url, 1), new Callback() {
-            @Override
-            public void success() {
-                LiveActivity.start(getActivity());
-            }
-        });
-    }
-
-    private void setFocus() {
-        setLoading(false);
-        App.post(() -> getActivityHomeBinding().title.setFocusable(true), 500);
-        if (!getActivityHomeBinding().title.hasFocus()) mBinding.recycler.requestFocus();
-    }
-
-    public void getVideo() {
-        mResult = Result.empty();
+    public void addVideo(Result result) {
         int index = getRecommendIndex();
-        String title = getHome().getName();
-        getActivityHomeBinding().title.setText(title.isEmpty() ? ResUtil.getString(R.string.app_name) : title);
         if (mAdapter.size() > index) mAdapter.removeItems(index, mAdapter.size() - index);
-        if (getHome().getKey().isEmpty()) return;
-        mViewModel.homeContent();
-        mAdapter.add("progress");
-    }
-
-    private void addVideo(Result result) {
         Style style = result.getStyle(getHome().getStyle());
         for (List<Vod> items : Lists.partition(result.getList(), Product.getColumn(style))) {
             ArrayObjectAdapter adapter = new ArrayObjectAdapter(new VodPresenter(this, style));
             adapter.setItems(items, null);
             mAdapter.add(new ListRow(adapter));
         }
+        mBinding.progressLayout.showContent();
     }
 
     private ListRow getFuncRow() {
@@ -316,22 +191,11 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
         return -1;
     }
 
-    public boolean isLoading() {
-        return loading;
-    }
-
-    public void setLoading(boolean loading) {
-        this.loading = loading;
-    }
-
     @Override
     public void onItemClick(Func item) {
         switch (item.getResId()) {
             case R.string.home_history_short:
                 HistoryActivity.start(getActivity());
-                break;
-            case R.string.home_vod:
-                VodActivity.start(getActivity(), mResult.clear());
                 break;
             case R.string.home_live:
                 LiveActivity.start(getActivity());
@@ -381,6 +245,12 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
     public boolean onLongClick(Vod item) {
         CollectActivity.start(getActivity(), item.getVodName());
         return true;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        refreshFuncRow();
     }
 
 }
