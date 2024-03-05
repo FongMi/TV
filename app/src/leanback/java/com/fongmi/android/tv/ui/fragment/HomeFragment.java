@@ -33,7 +33,6 @@ import com.fongmi.android.tv.ui.activity.PushActivity;
 import com.fongmi.android.tv.ui.activity.SearchActivity;
 import com.fongmi.android.tv.ui.activity.SettingActivity;
 import com.fongmi.android.tv.ui.activity.VideoActivity;
-import com.fongmi.android.tv.ui.activity.VodActivity;
 import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.custom.CustomRowPresenter;
 import com.fongmi.android.tv.ui.custom.CustomSelector;
@@ -67,7 +66,6 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
 
     @Override
     protected void initView() {
-        mBinding.progressLayout.showProgress();
         setRecyclerView();
         setAdapter();
         initEvent();
@@ -123,7 +121,6 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
             adapter.setItems(items, null);
             mAdapter.add(new ListRow(adapter));
         }
-        mBinding.progressLayout.showContent();
     }
 
     private ListRow getFuncRow() {
