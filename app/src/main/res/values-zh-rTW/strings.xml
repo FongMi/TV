@@ -84,6 +84,7 @@
     <string name="setting_small_window_back_key">小窗返回鍵</string>
     <string name="setting_home_change_config">首頁換線</string>
     <string name="setting_home_ui">首頁UI</string>
+    <string name="setting_home_buttons">首頁按鈕</string>
     <string name="setting_doh">DoH</string>
     <string name="setting_proxy">Proxy</string>
     <string name="setting_cache">暫存</string>

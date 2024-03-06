@@ -11,6 +11,7 @@ import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.databinding.ActivitySettingCustomBinding;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.ui.base.BaseActivity;
+import com.fongmi.android.tv.ui.dialog.ButtonsDialog;
 import com.fongmi.android.tv.utils.ResUtil;
 
 import java.util.Locale;
@@ -77,6 +78,7 @@ public class SettingCustomActivity extends BaseActivity {
         mBinding.homeMenuKey.setOnClickListener(this::setHomeMenuKey);
         mBinding.aggregatedSearch.setOnClickListener(this::setAggregatedSearch);
         mBinding.homeUI.setOnClickListener(this::setHomeUI);
+        mBinding.homeButtons.setOnClickListener(this::setHomeButtons);
     }
 
     private void setQuality(View view) {
@@ -174,6 +176,10 @@ public class SettingCustomActivity extends BaseActivity {
         int index = Setting.getHomeUI();
         Setting.putHomeUI(index = index == homeUI.length - 1 ? 0 : ++index);
         mBinding.homeUIText.setText(homeUI[index]);
+    }
+
+    private void setHomeButtons(View view) {
+        ButtonsDialog.create(this).show();
     }
 
 }

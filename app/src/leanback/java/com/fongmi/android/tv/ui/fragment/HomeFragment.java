@@ -17,6 +17,7 @@ import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.api.config.VodConfig;
+import com.fongmi.android.tv.bean.Button;
 import com.fongmi.android.tv.bean.Func;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Result;
@@ -44,6 +45,7 @@ import com.fongmi.android.tv.ui.presenter.HistoryPresenter;
 import com.fongmi.android.tv.ui.presenter.ProgressPresenter;
 import com.fongmi.android.tv.ui.presenter.VodPresenter;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.github.catvod.utils.Prefers;
 import com.google.common.collect.Lists;
 
 import java.util.List;
@@ -57,6 +59,7 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
     public HistoryPresenter mPresenter;
     private ArrayObjectAdapter mAdapter;
     private int homeUI;
+    private String button;
 
     private Site getHome() {
         return VodConfig.get().getHome();
@@ -114,6 +117,7 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
         mAdapter.add(R.string.home_recommend);
         mHistoryAdapter = new ArrayObjectAdapter(mPresenter = new HistoryPresenter(this));
         homeUI = Setting.getHomeUI();
+        button = Prefers.getString("home_buttons");
     }
 
     public void addVideo(Result result) {
@@ -129,21 +133,21 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
 
     private ListRow getFuncRow() {
         ArrayObjectAdapter adapter = new ArrayObjectAdapter(new FuncPresenter(this));
-        adapter.add(Func.create(R.string.home_vod));
-        adapter.add(Func.create(R.string.home_live));
-        adapter.add(Func.create(R.string.home_search));
-        adapter.add(Func.create(R.string.home_keep));
-        adapter.add(Func.create(R.string.home_push));
-        adapter.add(Func.create(R.string.home_history_short));
-        adapter.add(Func.create(R.string.home_setting));
-        ((Func) adapter.get(0)).setNextFocusLeft(((Func) adapter.get(adapter.size() - 1)).getId());
-        ((Func) adapter.get(adapter.size() - 1)).setNextFocusRight(((Func) adapter.get(0)).getId());
+        List<Button> buttonList = Button.getButtons();
+        for(int i=0; i<buttonList.size(); i++) {
+            adapter.add(Func.create(buttonList.get(i).getResId()));
+        }
+        if (adapter.size() > 1) {
+            ((Func) adapter.get(0)).setNextFocusLeft(((Func) adapter.get(adapter.size() - 1)).getId());
+            ((Func) adapter.get(adapter.size() - 1)).setNextFocusRight(((Func) adapter.get(0)).getId());
+        }
         return new ListRow(adapter);
     }
 
     private void refreshFuncRow() {
-        if (homeUI == Setting.getHomeUI()) return;
+        if (homeUI == Setting.getHomeUI() && button == Prefers.getString("home_buttons")) return;
         homeUI = Setting.getHomeUI();
+        button = Prefers.getString("home_buttons");
         mAdapter.removeItems(0, 1);
         mAdapter.add(0, getFuncRow());
     }
