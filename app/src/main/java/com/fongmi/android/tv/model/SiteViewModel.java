@@ -185,7 +185,7 @@ public class SiteViewModel extends ViewModel {
             } else {
                 Url url = Url.create().add(id);
                 String type = Uri.parse(id).getQueryParameter("type");
-                if (type != null && "json".equals(type)) url = Result.fromJson(OkHttp.newCall(id, site.getHeaders()).execute().body().string()).getUrl();
+                if ("json".equals(type)) url = Result.fromJson(OkHttp.newCall(id, site.getHeaders()).execute().body().string()).getUrl();
                 Result result = new Result();
                 result.setUrl(url);
                 result.setFlag(flag);
