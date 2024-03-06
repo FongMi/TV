@@ -32,16 +32,16 @@ public class JianPian implements Source.Extractor, Clock.Callback {
     public String fetch(String url) throws Exception {
         init();
         stop();
-        check();
+        check(10);
         start(url);
         return "http://127.0.0.1:" + p2p.port + "/" + URLEncoder.encode(Uri.parse(path).getLastPathSegment(), "GBK");
     }
 
-    private void check() {
+    private void check(int limit) {
         double cache = FileUtil.getDirectorySize(Path.jpa());
         double total = cache + FileUtil.getAvailableStorageSpace(Path.jpa());
         int percent = (int) (cache / total * 100);
-        if (percent > 10) Path.clear(Path.jpa());
+        if (percent > limit) Path.clear(Path.jpa());
     }
 
     private void start(String url) {
@@ -73,13 +73,13 @@ public class JianPian implements Source.Extractor, Clock.Callback {
 
     @Override
     public void exit() {
-        App.execute(this::check);
+        App.execute(() -> check(10));
         if (clock != null) clock.release();
     }
 
     @Override
     public void onTimeChanged() {
         long seconds = System.currentTimeMillis() / 1000 % 60;
-        if (seconds == 0) App.execute(this::check);
+        if (seconds % 30 == 0) App.execute(() -> check(80));
     }
 }
