@@ -175,7 +175,7 @@ public class VodFragment extends BaseFragment implements CustomScroller.Callback
     }
 
     private void getVideo(String typeId, String page) {
-        boolean first = page.equals("1");
+        boolean first = "1".equals(page);
         if (first) mLast = null;
         if (first) showProgress();
         int filterSize = mOpen ? mFilters.size() : 0;

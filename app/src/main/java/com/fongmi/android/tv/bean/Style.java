@@ -51,15 +51,15 @@ public class Style implements Parcelable {
     }
 
     public boolean isRect() {
-        return getType().equals("rect");
+        return "rect".equals(getType());
     }
 
     public boolean isOval() {
-        return getType().equals("oval");
+        return "oval".equals(getType());
     }
 
     public boolean isList() {
-        return getType().equals("list");
+        return "list".equals(getType());
     }
 
     public boolean isLand() {

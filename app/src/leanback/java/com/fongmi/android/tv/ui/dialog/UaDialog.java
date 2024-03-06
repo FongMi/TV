@@ -84,10 +84,10 @@ public class UaDialog implements DialogInterface.OnDismissListener {
     }
 
     private void detect(String s) {
-        if (append && s.equalsIgnoreCase("c")) {
+        if (append && "c".equalsIgnoreCase(s)) {
             append = false;
             binding.text.setText(Util.CHROME);
-        } else if (append && s.equalsIgnoreCase("o")) {
+        } else if (append && "o".equalsIgnoreCase(s)) {
             append = false;
             binding.text.setText(okhttp3.internal.Util.userAgent);
         } else if (s.length() > 1) {

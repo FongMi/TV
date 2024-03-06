@@ -295,7 +295,7 @@ public class CollectActivity extends BaseActivity implements CustomScroller.Call
     @Override
     public void onLoadMore(String page) {
         Collect activated = mCollectAdapter.getActivated();
-        if (activated.getSite().getKey().equals("all")) return;
+        if ("all".equals(activated.getSite().getKey())) return;
         mViewModel.searchContent(activated.getSite(), mBinding.keyword.getText().toString(), page);
         activated.setPage(Integer.parseInt(page));
         mScroller.setLoading(true);
