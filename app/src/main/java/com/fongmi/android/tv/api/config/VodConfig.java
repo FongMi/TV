@@ -255,9 +255,9 @@ public class VodConfig {
     }
 
     public Object[] proxyLocal(Map<String, String> params) {
-        if (params.containsKey("do") && params.get("do").equals("js")) {
+        if (params.containsKey("do") && "js".equals(params.get("do"))) {
             return jsLoader.proxyInvoke(params);
-        } else if (params.containsKey("do") && params.get("do").equals("py")) {
+        } else if (params.containsKey("do") && "py".equals(params.get("do"))) {
             return pyLoader.proxyInvoke(params);
         } else {
             return jarLoader.proxyInvoke(params);

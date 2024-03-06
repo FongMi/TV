@@ -128,7 +128,7 @@ public class CollectFragment extends BaseFragment implements CustomScroller.Call
 
     @Override
     public void onLoadMore(String page) {
-        if (mCollect == null || mCollect.getSite().getKey().equals("all")) return;
+        if (mCollect == null || "all".equals(mCollect.getSite().getKey())) return;
         mViewModel.searchContent(mCollect.getSite(), getKeyword(), page);
         mScroller.setLoading(true);
     }

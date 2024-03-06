@@ -228,11 +228,11 @@ public class Vod implements Parcelable {
     }
 
     public boolean isFolder() {
-        return getVodTag().equals("folder") || getCate() != null;
+        return "folder".equals(getVodTag()) || getCate() != null;
     }
 
     public boolean isManga() {
-        return getVodTag().equals("manga");
+        return "manga".equals(getVodTag());
     }
 
     public Style getStyle(Style style) {
