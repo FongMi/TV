@@ -83,6 +83,8 @@
     <string name="setting_incognito">無痕模式</string>
     <string name="setting_small_window_back_key">小窗返回鍵</string>
     <string name="setting_home_change_config">首頁換線</string>
+    <string name="setting_home_ui">首頁UI</string>
+    <string name="setting_home_buttons">首頁按鈕</string>
     <string name="setting_doh">DoH</string>
     <string name="setting_proxy">Proxy</string>
     <string name="setting_cache">暫存</string>
@@ -238,11 +240,20 @@
         <item>切換站源</item>
         <item>切換線路</item>
         <item>歷史頁面</item>
+        <item>搜索頁面</item>
+        <item>推送頁面</item>
+        <item>收藏頁面</item>
+        <item>设置頁面</item>
     </string-array>
 
     <string-array name="select_home_recommend">
         <item>播放歷史</item>
         <item>站點推薦</item>
+    </string-array>
+
+    <string-array name="select_home_ui">
+        <item>簡潔風格</item>
+        <item>TVBox風格</item>
     </string-array>
 
     <string-array name="select_caption">

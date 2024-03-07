@@ -175,7 +175,6 @@ public class IjkMediaMeta {
     }
 
     private static String convertLang(String text) {
-        if (text == null) return null;
         if ("chi".equals(text)) return "zh";
         if ("cze".equals(text)) return "cs";
         if ("dut".equals(text)) return "nl";

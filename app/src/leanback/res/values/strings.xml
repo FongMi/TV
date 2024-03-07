@@ -1,6 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools" xmlns:xliff="http://schemas.android.com/apk/res-auto" tools:ignore="MissingTranslation">
 
     <!-- Home -->
+    <string name="home">Home</string>
     <string name="home_vod">Vod</string>
     <string name="home_live">Live</string>
     <string name="home_search">Search</string>
