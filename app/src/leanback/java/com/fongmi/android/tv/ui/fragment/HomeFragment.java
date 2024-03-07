@@ -1,5 +1,6 @@
 package com.fongmi.android.tv.ui.fragment;
 
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -147,9 +148,9 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
 
     private void refreshFuncRow() {
         if (homeUI == Setting.getHomeUI() && Setting.getHomeButtons("").equals(button)) return;
+        if (!TextUtils.isEmpty(button)) mAdapter.removeItems(0, 1);
         homeUI = Setting.getHomeUI();
         button = Setting.getHomeButtons("");
-        mAdapter.removeItems(0, 1);
         ListRow funcRow = getFuncRow();
         if (funcRow != null) mAdapter.add(0, funcRow);
     }

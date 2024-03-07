@@ -262,10 +262,14 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         coolDown = true;
     }
 
+    private boolean hasSettingButton() {
+        return Setting.getHomeButtons("").contains("6");
+    }
+
     @Override
     public void onItemClick(Class item) {
         if (mBinding.pager.getCurrentItem() == 0) {
-            if ("".equals(Setting.getHomeButtons(""))) MenuDialog.create(this).show();
+            if (!hasSettingButton()) MenuDialog.create(this).show();
             else SiteDialog.create(this).show();
         } else {
             updateFilter(item);
@@ -352,7 +356,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     public void showDialog() {
-        if ("".equals(Setting.getHomeButtons(""))) {
+        if (!hasSettingButton()) {
             MenuDialog.create(this).show();
             return;
         }
@@ -454,7 +458,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         boolean isHomeFragment = mBinding.pager.getCurrentItem() == 0;
-        if (isHomeFragment && "".equals(Setting.getHomeButtons(""))) {
+        if (isHomeFragment && !hasSettingButton()) {
             MenuDialog.create(this).show();
         } else if (isHomeFragment && KeyUtil.isMenuKey(event)) {
             if (Setting.getHomeMenuKey() == 0) MenuDialog.create(this).show();
