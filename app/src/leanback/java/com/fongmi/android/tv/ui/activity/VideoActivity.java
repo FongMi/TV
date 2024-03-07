@@ -795,6 +795,12 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     }
 
     @Override
+    public boolean onArrayItemTouch() {
+        hasKeyEvent = true;
+        return false;
+    }
+
+    @Override
     public void onRevSort() {
         mHistory.setRevSort(!mHistory.isRevSort());
         reverseEpisode(false);
