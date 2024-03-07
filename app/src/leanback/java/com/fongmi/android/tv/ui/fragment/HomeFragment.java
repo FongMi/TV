@@ -85,7 +85,7 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
         mBinding.recycler.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
-                getActivityHomeBinding().toolbar.setVisibility(position == 0 ? View.VISIBLE : View.GONE);
+                getActivityHomeBinding().toolbar.setVisibility(position < 2 ? View.VISIBLE : View.GONE);
                 if (mPresenter != null && mPresenter.isDelete()) setHistoryDelete(false);
             }
         });
@@ -111,7 +111,8 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
     }
 
     private void setAdapter() {
-        mAdapter.add(getFuncRow());
+        ListRow funcRow = getFuncRow();
+        if (funcRow != null) mAdapter.add(funcRow);
         mAdapter.add(R.string.home_history);
         mAdapter.add(R.string.home_recommend);
         mHistoryAdapter = new ArrayObjectAdapter(mPresenter = new HistoryPresenter(this));
@@ -131,8 +132,9 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
     }
 
     private ListRow getFuncRow() {
-        ArrayObjectAdapter adapter = new ArrayObjectAdapter(new FuncPresenter(this));
         List<Button> buttonList = Button.getButtons();
+        if (buttonList.isEmpty()) return null;
+        ArrayObjectAdapter adapter = new ArrayObjectAdapter(new FuncPresenter(this));
         for(int i=0; i<buttonList.size(); i++) {
             adapter.add(Func.create(buttonList.get(i).getResId()));
         }
@@ -148,7 +150,8 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
         homeUI = Setting.getHomeUI();
         button = Setting.getHomeButtons("");
         mAdapter.removeItems(0, 1);
-        mAdapter.add(0, getFuncRow());
+        ListRow funcRow = getFuncRow();
+        if (funcRow != null) mAdapter.add(0, funcRow);
     }
 
     public void refreshRecommond() {
