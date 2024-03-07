@@ -55,8 +55,12 @@ public class Button {
         return map;
     }
 
+    public static String getDefaultButtons() {
+        return Setting.getHomeUI() == 0 ? "0,1,2,3,4,5,6" : "1,2,3,4,5,6";
+    }
+
     public static List<Button> getButtons() {
-        String buttons = Setting.getHomeButtons("0,1,2,3,4,5,6");
+        String buttons = Setting.getHomeButtons(getDefaultButtons());
         if (TextUtils.isEmpty(buttons)) return new ArrayList<>();
         String[] buttonsArr = buttons.split(",");
         List<Button> buttonList = new ArrayList<>();

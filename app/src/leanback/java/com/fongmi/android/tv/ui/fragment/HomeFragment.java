@@ -118,7 +118,7 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
         mAdapter.add(R.string.home_recommend);
         mHistoryAdapter = new ArrayObjectAdapter(mPresenter = new HistoryPresenter(this));
         homeUI = Setting.getHomeUI();
-        button = Setting.getHomeButtons("");
+        button = Setting.getHomeButtons(Button.getDefaultButtons());
     }
 
     public void addVideo(Result result) {
@@ -147,10 +147,10 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
     }
 
     private void refreshFuncRow() {
-        if (homeUI == Setting.getHomeUI() && Setting.getHomeButtons("").equals(button)) return;
+        if (homeUI == Setting.getHomeUI() && Setting.getHomeButtons(Button.getDefaultButtons()).equals(button)) return;
         if (!TextUtils.isEmpty(button)) mAdapter.removeItems(0, 1);
         homeUI = Setting.getHomeUI();
-        button = Setting.getHomeButtons("");
+        button = Setting.getHomeButtons(Button.getDefaultButtons());
         ListRow funcRow = getFuncRow();
         if (funcRow != null) mAdapter.add(0, funcRow);
     }
