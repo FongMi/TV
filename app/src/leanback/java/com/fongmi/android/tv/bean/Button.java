@@ -3,8 +3,8 @@ package com.fongmi.android.tv.bean;
 import android.text.TextUtils;
 
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.utils.ResUtil;
-import com.github.catvod.utils.Prefers;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -33,7 +33,7 @@ public class Button {
     }
 
     public static List<Button> sortedAll() {
-        String buttons = Prefers.getString("home_buttons_sorted", "0,1,2,3,4,5,6");
+        String buttons = Setting.getHomeButtonsSorted("0,1,2,3,4,5,6");
         if (TextUtils.isEmpty(buttons)) return all();
         String[] buttonsArr = buttons.split(",");
         List<Button> buttonList = new ArrayList<>();
@@ -56,7 +56,7 @@ public class Button {
     }
 
     public static List<Button> getButtons() {
-        String buttons = Prefers.getString("home_buttons", "0,1,2,3,4,5,6");
+        String buttons = Setting.getHomeButtons("0,1,2,3,4,5,6");
         if (TextUtils.isEmpty(buttons)) return new ArrayList<>();
         String[] buttonsArr = buttons.split(",");
         List<Button> buttonList = new ArrayList<>();
@@ -80,7 +80,7 @@ public class Button {
             }
         }
         String buttonsStr = TextUtils.join(",", ids);
-        Prefers.put("home_buttons", buttonsStr);
+        Setting.putHomeButtons(buttonsStr);
     }
 
     public static void saveSorted(Map<Integer, Button> map) {
@@ -91,7 +91,7 @@ public class Button {
             }
         }
         String buttonsStr = TextUtils.join(",", ids);
-        Prefers.put("home_buttons_sorted", buttonsStr);
+        Setting.putHomeButtonsSorted(buttonsStr);
     }
 
     public Button(int id, int resId) {

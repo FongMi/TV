@@ -56,7 +56,7 @@ public class ButtonsAdapter extends RecyclerView.Adapter<ButtonsAdapter.ViewHold
         Map<Integer, Button> map = Button.getButtonsMap();
         if (checked) map.remove(item.getId());
         else map.put(item.getId(), item);
-        Button.save(map);
+        save(mItems, map);
         notifyItemRangeChanged(0, getItemCount());
     }
 
@@ -78,13 +78,16 @@ public class ButtonsAdapter extends RecyclerView.Adapter<ButtonsAdapter.ViewHold
         Map<Integer, Button> map = Button.getMap(buttonList);
         Button.saveSorted(map);
         mItems = Button.sortedAll();
+        save(mItems, Button.getButtonsMap());
+        notifyItemRangeChanged(0, getItemCount());
+    }
+
+    private void save(List<Button> sortedItems, Map<Integer, Button> btnsMap) {
         List<Button> btns = new ArrayList<>();
-        Map<Integer, Button> btnsMap= Button.getButtonsMap();
-        for(int i=0; i<mItems.size(); i++) {
-            if (btnsMap.containsKey(mItems.get(i).getId())) btns.add(mItems.get(i));
+        for(int i=0; i<sortedItems.size(); i++) {
+            if (btnsMap.containsKey(sortedItems.get(i).getId())) btns.add(sortedItems.get(i));
         }
         Button.save(Button.getMap(btns));
-        notifyItemRangeChanged(0, getItemCount());
     }
 
 

@@ -1,6 +1,7 @@
 <resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
 
     <!-- Home -->
+    <string name="home">首页</string>
     <string name="home_vod">点播</string>
     <string name="home_live">直播</string>
     <string name="home_search">搜索</string>

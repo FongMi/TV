@@ -45,7 +45,6 @@ import com.fongmi.android.tv.ui.presenter.HistoryPresenter;
 import com.fongmi.android.tv.ui.presenter.ProgressPresenter;
 import com.fongmi.android.tv.ui.presenter.VodPresenter;
 import com.fongmi.android.tv.utils.ResUtil;
-import com.github.catvod.utils.Prefers;
 import com.google.common.collect.Lists;
 
 import java.util.List;
@@ -117,7 +116,7 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
         mAdapter.add(R.string.home_recommend);
         mHistoryAdapter = new ArrayObjectAdapter(mPresenter = new HistoryPresenter(this));
         homeUI = Setting.getHomeUI();
-        button = Prefers.getString("home_buttons");
+        button = Setting.getHomeButtons("");
     }
 
     public void addVideo(Result result) {
@@ -145,9 +144,9 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
     }
 
     private void refreshFuncRow() {
-        if (homeUI == Setting.getHomeUI() && button == Prefers.getString("home_buttons")) return;
+        if (homeUI == Setting.getHomeUI() && Setting.getHomeButtons("").equals(button)) return;
         homeUI = Setting.getHomeUI();
-        button = Prefers.getString("home_buttons");
+        button = Setting.getHomeButtons("");
         mAdapter.removeItems(0, 1);
         mAdapter.add(0, getFuncRow());
     }

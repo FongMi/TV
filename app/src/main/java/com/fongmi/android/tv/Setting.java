@@ -445,4 +445,20 @@ public class Setting {
         return Prefers.getInt("home_ui", 0);
     }
 
+    public static void putHomeButtons(String buttons) {
+        Prefers.put("home_buttons", buttons);
+    }
+
+    public static String getHomeButtons(String defaultValue) {
+        return Prefers.getString("home_buttons", defaultValue);
+    }
+
+    public static void putHomeButtonsSorted(String buttons) {
+        Prefers.put("home_buttons_sorted", buttons);
+    }
+
+    public static String getHomeButtonsSorted(String defaultValue) {
+        return Prefers.getString("home_buttons_sorted", defaultValue);
+    }
+
 }

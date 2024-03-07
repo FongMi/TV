@@ -188,7 +188,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     private void setHomeType() {
         Class home = new Class();
         home.setTypeId("home");
-        home.setTypeName("首页");
+        home.setTypeName(ResUtil.getString(R.string.home));
         mAdapter.add(home);
     }
 
@@ -264,19 +264,18 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     public void onItemClick(Class item) {
-        if (mBinding.pager.getCurrentItem() == 0) showDialog();
-        else updateFilter(item);
+        if (mBinding.pager.getCurrentItem() == 0) {
+            if ("".equals(Setting.getHomeButtons(""))) MenuDialog.create(this).show();
+            else SiteDialog.create(this).show();
+        } else {
+            updateFilter(item);
+        }
     }
 
     @Override
     public void onRefresh(Class item) {
         if (mBinding.pager.getCurrentItem() == 0) mBinding.title.requestFocus();
         else getFragment().onRefresh();
-    }
-
-
-    public void showSettingVodHistory() {
-        HistoryDialog.create(this).type(0).show();
     }
 
     @Override
@@ -353,6 +352,10 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     public void showDialog() {
+        if ("".equals(Setting.getHomeButtons(""))) {
+            MenuDialog.create(this).show();
+            return;
+        }
         if (Setting.isHomeSiteLock()) return;
         SiteDialog.create(this).show();
     }
@@ -451,10 +454,18 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         boolean isHomeFragment = mBinding.pager.getCurrentItem() == 0;
-        if (isHomeFragment && KeyUtil.isMenuKey(event) && Setting.getHomeMenuKey() == 0) MenuDialog.create(this).show();
-        if (isHomeFragment && KeyUtil.isMenuKey(event) && Setting.getHomeMenuKey() == 1) showDialog();
-        if (isHomeFragment && KeyUtil.isMenuKey(event) && Setting.getHomeMenuKey() == 2) showSettingVodHistory();
-        if (isHomeFragment && KeyUtil.isMenuKey(event) && Setting.getHomeMenuKey() == 3) HistoryActivity.start(this);
+        if (isHomeFragment && "".equals(Setting.getHomeButtons(""))) {
+            MenuDialog.create(this).show();
+        } else if (isHomeFragment && KeyUtil.isMenuKey(event)) {
+            if (Setting.getHomeMenuKey() == 0) MenuDialog.create(this).show();
+            if (Setting.getHomeMenuKey() == 1) SiteDialog.create(this).show();
+            if (Setting.getHomeMenuKey() == 2) HistoryDialog.create(this).type(0).show();
+            if (Setting.getHomeMenuKey() == 3) HistoryActivity.start(this);
+            if (Setting.getHomeMenuKey() == 4) SearchActivity.start(this);
+            if (Setting.getHomeMenuKey() == 5) PushActivity.start(this);
+            if (Setting.getHomeMenuKey() == 6) KeepActivity.start(this);
+            if (Setting.getHomeMenuKey() == 7) SettingActivity.start(this);
+        }
         if (!isHomeFragment && KeyUtil.isMenuKey(event)) updateFilter((Class) mAdapter.get(mBinding.pager.getCurrentItem()));
         if (!isHomeFragment && KeyUtil.isBackKey(event) && event.isLongPress() && getFragment().goRoot()) setCoolDown();
         return super.dispatchKeyEvent(event);
