@@ -210,6 +210,11 @@ public class EpisodeDialog extends BaseDialog implements ArrayPresenter.OnClickL
     }
 
     @Override
+    public boolean onArrayItemTouch() {
+        return false;
+    }
+
+    @Override
     public void onRevSort() {
 
     }

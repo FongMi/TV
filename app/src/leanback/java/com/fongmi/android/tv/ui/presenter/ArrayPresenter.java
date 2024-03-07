@@ -32,6 +32,8 @@ public class ArrayPresenter extends Presenter {
         void onRevSort();
 
         void onRevPlay(TextView view);
+
+        boolean onArrayItemTouch();
     }
 
     public void setNextFocusDown(int nextFocusDown) {
@@ -54,6 +56,7 @@ public class ArrayPresenter extends Presenter {
         holder.binding.text.setText(text);
         holder.binding.text.setNextFocusUpId(nextFocusUp);
         holder.binding.text.setNextFocusDownId(nextFocusDown);
+        holder.binding.text.setOnTouchListener((view, event) -> mListener.onArrayItemTouch());
         if (text.equals(reverse)) setOnClickListener(holder, view -> mListener.onRevSort());
         else if (text.equals(backward) || text.equals(forward)) setOnClickListener(holder, view -> mListener.onRevPlay(holder.binding.text));
         else setOnClickListener(holder, null);
