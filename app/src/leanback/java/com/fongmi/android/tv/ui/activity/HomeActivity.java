@@ -215,6 +215,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     private void setPager() {
         mBinding.pager.setAdapter(mPageAdapter = new HomeActivity.PageAdapter(getSupportFragmentManager()));
+        mBinding.pager.setNoScrollItem(0);
     }
 
     private void onChildSelected(@Nullable RecyclerView.ViewHolder child) {
@@ -461,17 +462,15 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         boolean isHomeFragment = mBinding.pager.getCurrentItem() == 0;
-        if (isHomeFragment && !hasSettingButton()) {
-            MenuDialog.create(this).show();
-        } else if (isHomeFragment && KeyUtil.isMenuKey(event)) {
+        if (isHomeFragment && KeyUtil.isMenuKey(event)) {
             if (Setting.getHomeMenuKey() == 0) MenuDialog.create(this).show();
-            if (Setting.getHomeMenuKey() == 1) SiteDialog.create(this).show();
-            if (Setting.getHomeMenuKey() == 2) HistoryDialog.create(this).type(0).show();
-            if (Setting.getHomeMenuKey() == 3) HistoryActivity.start(this);
-            if (Setting.getHomeMenuKey() == 4) SearchActivity.start(this);
-            if (Setting.getHomeMenuKey() == 5) PushActivity.start(this);
-            if (Setting.getHomeMenuKey() == 6) KeepActivity.start(this);
-            if (Setting.getHomeMenuKey() == 7) SettingActivity.start(this);
+            else if (Setting.getHomeMenuKey() == 1) SiteDialog.create(this).show();
+            else if (Setting.getHomeMenuKey() == 2) HistoryDialog.create(this).type(0).show();
+            else if (Setting.getHomeMenuKey() == 3) HistoryActivity.start(this);
+            else if (Setting.getHomeMenuKey() == 4) SearchActivity.start(this);
+            else if (Setting.getHomeMenuKey() == 5) PushActivity.start(this);
+            else if (Setting.getHomeMenuKey() == 6) KeepActivity.start(this);
+            else if (Setting.getHomeMenuKey() == 7) SettingActivity.start(this);
         }
         if (!isHomeFragment && KeyUtil.isMenuKey(event)) updateFilter((Class) mAdapter.get(mBinding.pager.getCurrentItem()));
         if (!isHomeFragment && KeyUtil.isBackKey(event) && event.isLongPress() && getFragment().goRoot()) setCoolDown();
