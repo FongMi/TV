@@ -175,15 +175,14 @@ public class IjkMediaMeta {
     }
 
     private static String convertLang(String text) {
-        if (text == null) return null;
-        if (text.equals("chi")) return "zh";
-        if (text.equals("cze")) return "cs";
-        if (text.equals("dut")) return "nl";
-        if (text.equals("fre")) return "fr";
-        if (text.equals("ger")) return "de";
-        if (text.equals("gre")) return "el";
-        if (text.equals("ice")) return "is";
-        if (text.equals("rum")) return "ro";
+        if ("chi".equals(text)) return "zh";
+        if ("cze".equals(text)) return "cs";
+        if ("dut".equals(text)) return "nl";
+        if ("fre".equals(text)) return "fr";
+        if ("ger".equals(text)) return "de";
+        if ("gre".equals(text)) return "el";
+        if ("ice".equals(text)) return "is";
+        if ("rum".equals(text)) return "ro";
         return text;
     }
 
@@ -217,7 +216,7 @@ public class IjkMediaMeta {
             streamMeta.mCodecLongName = streamMeta.getString(IJKM_KEY_CODEC_LONG_NAME);
             streamMeta.mBitrate = streamMeta.getInt(IJKM_KEY_BITRATE);
 
-            if (streamMeta.mType.equalsIgnoreCase(IJKM_VAL_TYPE__VIDEO)) {
+            if (IJKM_VAL_TYPE__VIDEO.equalsIgnoreCase(streamMeta.mType)) {
                 streamMeta.mWidth = streamMeta.getInt(IJKM_KEY_WIDTH);
                 streamMeta.mHeight = streamMeta.getInt(IJKM_KEY_HEIGHT);
                 streamMeta.mFpsNum = streamMeta.getInt(IJKM_KEY_FPS_NUM);
@@ -226,7 +225,7 @@ public class IjkMediaMeta {
                 streamMeta.mTbrDen = streamMeta.getInt(IJKM_KEY_TBR_DEN);
                 streamMeta.mSarNum = streamMeta.getInt(IJKM_KEY_SAR_NUM);
                 streamMeta.mSarDen = streamMeta.getInt(IJKM_KEY_SAR_DEN);
-            } else if (streamMeta.mType.equalsIgnoreCase(IJKM_VAL_TYPE__AUDIO)) {
+            } else if (IJKM_VAL_TYPE__AUDIO.equalsIgnoreCase(streamMeta.mType)) {
                 streamMeta.mSampleRate = streamMeta.getInt(IJKM_KEY_SAMPLE_RATE);
                 streamMeta.mChannelLayout = streamMeta.getLong(IJKM_KEY_CHANNEL_LAYOUT);
             }

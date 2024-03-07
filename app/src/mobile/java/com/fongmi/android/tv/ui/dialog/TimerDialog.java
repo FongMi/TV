@@ -11,7 +11,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.databinding.DialogTimerBinding;
-import com.fongmi.android.tv.player.Timer;
+import com.fongmi.android.tv.utils.Timer;
 import com.fongmi.android.tv.utils.Util;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 

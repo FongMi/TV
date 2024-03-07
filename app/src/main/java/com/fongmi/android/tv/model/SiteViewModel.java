@@ -127,7 +127,7 @@ public class SiteViewModel extends ViewModel {
                 if (!result.getList().isEmpty()) result.getList().get(0).setVodFlags();
                 if (!result.getList().isEmpty()) checkThunder(result.getList().get(0).getVodFlags());
                 return result;
-            } else if (site.isEmpty() && key.equals("push_agent")) {
+            } else if (site.isEmpty() && "push_agent".equals(key)) {
                 Vod vod = new Vod();
                 vod.setVodId(id);
                 vod.setVodName(id);
@@ -175,7 +175,7 @@ public class SiteViewModel extends ViewModel {
                 result.setUrl(Source.get().fetch(result));
                 result.setHeader(site.getHeader());
                 return result;
-            } else if (site.isEmpty() && key.equals("push_agent")) {
+            } else if (site.isEmpty() && "push_agent".equals(key)) {
                 Result result = new Result();
                 result.setParse(0);
                 result.setFlag(flag);
@@ -185,7 +185,7 @@ public class SiteViewModel extends ViewModel {
             } else {
                 Url url = Url.create().add(id);
                 String type = Uri.parse(id).getQueryParameter("type");
-                if (type != null && type.equals("json")) url = Result.fromJson(OkHttp.newCall(id, site.getHeaders()).execute().body().string()).getUrl();
+                if ("json".equals(type)) url = Result.fromJson(OkHttp.newCall(id, site.getHeaders()).execute().body().string()).getUrl();
                 Result result = new Result();
                 result.setUrl(url);
                 result.setFlag(flag);

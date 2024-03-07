@@ -14,7 +14,7 @@ public class Cache implements Process {
 
     @Override
     public boolean isRequest(NanoHTTPD.IHTTPSession session, String path) {
-        return path.equals("/cache");
+        return "/cache".equals(path);
     }
 
     private String getKey(String rule, String key) {

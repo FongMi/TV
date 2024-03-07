@@ -18,7 +18,7 @@ public class TVBus implements Source.Extractor, Listener {
 
     @Override
     public boolean match(String scheme, String host) {
-        return scheme.equals("tvbus");
+        return "tvbus".equals(scheme);
     }
 
     private void init(Core core) {
