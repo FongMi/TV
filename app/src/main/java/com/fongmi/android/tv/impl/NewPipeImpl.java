@@ -25,7 +25,7 @@ public class NewPipeImpl extends Downloader {
         String url = request.url();
         RequestBody reqBody = null;
         byte[] dataToSend = request.dataToSend();
-        if (dataToSend != null) reqBody = RequestBody.create(dataToSend, null);
+        if (dataToSend != null) reqBody = RequestBody.create(dataToSend);
         okhttp3.Request.Builder builder = new okhttp3.Request.Builder().method(request.httpMethod(), reqBody).url(url).addHeader(HttpHeaders.USER_AGENT, Util.CHROME);
         for (Map.Entry<String, List<String>> pair : request.headers().entrySet()) {
             String headerName = pair.getKey();
