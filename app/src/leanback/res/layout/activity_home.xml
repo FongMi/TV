@@ -69,6 +69,14 @@
         android:paddingTop="12dp"
         android:orientation="vertical">
 
+        <LinearLayout
+            android:id="@+id/blank"
+            android:layout_width="match_parent"
+            android:layout_height="12dp"
+            android:orientation="horizontal"
+            android:visibility="gone">
+        </LinearLayout>
+
         <com.fongmi.android.tv.ui.custom.CustomHorizontalGridView
             android:id="@+id/recycler"
             android:layout_width="match_parent"

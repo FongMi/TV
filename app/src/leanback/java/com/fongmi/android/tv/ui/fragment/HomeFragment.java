@@ -2,7 +2,6 @@ package com.fongmi.android.tv.ui.fragment;
 
 import android.text.TextUtils;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -86,14 +85,11 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
         mBinding.recycler.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
-                getActivityHomeBinding().toolbar.setVisibility(position < 2 ? View.VISIBLE : View.GONE);
+                if (position < 2) getHomeActicity().showToolBar();
+                else getHomeActicity().hideToolBar();
                 if (mPresenter != null && mPresenter.isDelete()) setHistoryDelete(false);
             }
         });
-    }
-
-    private ActivityHomeBinding getActivityHomeBinding() {
-        return getHomeActicity().mBinding;
     }
 
     private HomeActivity getHomeActicity() {
