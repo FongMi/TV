@@ -19,7 +19,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
-    <uses-sdk tools:overrideLibrary="androidx.leanback.widget" />
+    <uses-sdk tools:overrideLibrary="androidx.leanback.widget,androidx.media" />
 
     <application android:banner="@drawable/ic_banner">
 
