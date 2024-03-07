@@ -95,6 +95,8 @@ public class JarLoader {
             load(key, Path.local(jar));
         } else if (jar.startsWith("assets")) {
             parseJar(key, UrlUtil.convert(jar));
+        } else if (!jar.isEmpty()) {
+            parseJar(key, UrlUtil.convert(jar));
         }
     }
 
