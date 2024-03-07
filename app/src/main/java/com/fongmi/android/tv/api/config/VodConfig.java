@@ -219,12 +219,12 @@ public class VodConfig {
     }
 
     private String parseApi(String api) {
-        if (api.startsWith("file") || api.startsWith("assets")) return UrlUtil.convert(api);
+        if (api.startsWith("file") || api.startsWith("clan") || api.startsWith("assets")) return UrlUtil.convert(api);
         return api;
     }
 
     private String parseExt(String ext) {
-        if (ext.startsWith("file") || ext.startsWith("assets")) return UrlUtil.convert(ext);
+        if (ext.startsWith("file") || ext.startsWith("clan") || ext.startsWith("assets")) return UrlUtil.convert(ext);
         if (ext.startsWith("img+")) return Decoder.getExt(ext);
         return ext;
     }
@@ -255,9 +255,9 @@ public class VodConfig {
     }
 
     public Object[] proxyLocal(Map<String, String> params) {
-        if (params.containsKey("do") && "js".equals(params.get("do"))) {
+        if ("js".equals(params.get("do"))) {
             return jsLoader.proxyInvoke(params);
-        } else if (params.containsKey("do") && "py".equals(params.get("do"))) {
+        } else if ("py".equals(params.get("do"))) {
             return pyLoader.proxyInvoke(params);
         } else {
             return jarLoader.proxyInvoke(params);

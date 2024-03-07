@@ -83,6 +83,8 @@
     <string name="setting_incognito">Incognito mode</string>
     <string name="setting_small_window_back_key">Small window back key</string>
     <string name="setting_home_change_config">Home change config</string>
+    <string name="setting_home_ui">Home ui style</string>
+    <string name="setting_home_buttons">Home buttons</string>
     <string name="setting_doh">DoH</string>
     <string name="setting_proxy">Proxy</string>
     <string name="setting_cache">Cache</string>
@@ -238,6 +240,10 @@
         <item>Change site</item>
         <item>Change config</item>
         <item>History page</item>
+        <item>Search page</item>
+        <item>Push page</item>
+        <item>Keep page</item>
+        <item>Setting page</item>
     </string-array>
 
     <string-array name="select_small_window_back_key">
@@ -248,6 +254,11 @@
     <string-array name="select_home_recommend">
         <item>History</item>
         <item>Site recommend</item>
+    </string-array>
+
+    <string-array name="select_home_ui">
+        <item>Simple style</item>
+        <item>TVBox style</item>
     </string-array>
 
     <string-array name="select_caption">

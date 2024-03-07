@@ -17,13 +17,13 @@
 
 package tv.danmaku.ijk.media.player.pragma;
 
-import java.util.Locale;
-
-
 import android.util.Log;
+
+import java.util.Locale;
 
 @SuppressWarnings({"SameParameterValue", "WeakerAccess"})
 public class DebugLog {
+
     public static final boolean ENABLE_ERROR = Pragma.ENABLE_VERBOSE;
     public static final boolean ENABLE_INFO = Pragma.ENABLE_VERBOSE;
     public static final boolean ENABLE_WARN = Pragma.ENABLE_VERBOSE;
@@ -128,16 +128,6 @@ public class DebugLog {
     public static void printStackTrace(Throwable e) {
         if (ENABLE_WARN) {
             e.printStackTrace();
-        }
-    }
-
-    public static void printCause(Throwable e) {
-        if (ENABLE_WARN) {
-            Throwable cause = e.getCause();
-            if (cause != null)
-                e = cause;
-
-            printStackTrace(e);
         }
     }
 }
