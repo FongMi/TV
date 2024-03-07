@@ -24,7 +24,6 @@ import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Style;
 import com.fongmi.android.tv.bean.Vod;
-import com.fongmi.android.tv.databinding.ActivityHomeBinding;
 import com.fongmi.android.tv.databinding.FragmentHomeBinding;
 import com.fongmi.android.tv.ui.activity.CollectActivity;
 import com.fongmi.android.tv.ui.activity.HistoryActivity;
@@ -45,6 +44,7 @@ import com.fongmi.android.tv.ui.presenter.HistoryPresenter;
 import com.fongmi.android.tv.ui.presenter.ProgressPresenter;
 import com.fongmi.android.tv.ui.presenter.VodPresenter;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.common.collect.Lists;
 
 import java.util.List;
@@ -235,8 +235,11 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
 
     @Override
     public boolean onLongClick() {
-        if (mPresenter.isDelete()) clearHistory();
-        else setHistoryDelete(true);
+        if (mPresenter.isDelete()) {
+            new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.dialog_delete_record).setMessage(R.string.dialog_delete_history).setNegativeButton(R.string.dialog_negative, null).setPositiveButton(R.string.dialog_positive, (dialog, which) -> clearHistory()).show();
+        } else {
+            setHistoryDelete(true);
+        }
         return true;
     }
 
