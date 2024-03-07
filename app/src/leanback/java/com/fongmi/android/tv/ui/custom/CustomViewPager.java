@@ -23,6 +23,7 @@ public class CustomViewPager extends ViewPager {
 
     private Animation shake;
     private Rect rect;
+    private int noScrollItem;
 
     public CustomViewPager(@NonNull Context context) {
         super(context);
@@ -36,6 +37,11 @@ public class CustomViewPager extends ViewPager {
     private void init() {
         this.rect = new Rect();
         this.shake = ResUtil.getAnim(R.anim.shake);
+        this.noScrollItem = -1;
+    }
+
+    public void setNoScrollItem(int item) {
+        this.noScrollItem = item;
     }
 
     @Override
@@ -46,6 +52,7 @@ public class CustomViewPager extends ViewPager {
     @Override
     public boolean executeKeyEvent(@NonNull KeyEvent event) {
         if (findFocus() instanceof TextView) return false;
+        if (getCurrentItem() == noScrollItem) return false;
         if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_DPAD_LEFT) return arrowScroll(FOCUS_LEFT);
         if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_DPAD_RIGHT) return arrowScroll(FOCUS_RIGHT);
         return false;
