@@ -120,4 +120,10 @@ public class HistoryActivity extends BaseActivity implements HistoryAdapter.OnCl
         else super.onBackPressed();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        RefreshEvent.history();
+    }
+
 }
