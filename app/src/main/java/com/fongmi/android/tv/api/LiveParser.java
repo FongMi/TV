@@ -113,7 +113,7 @@ public class LiveParser {
     private static String getText(String url) {
         if (url.startsWith("file")) return Path.read(url);
         if (url.startsWith("http")) return OkHttp.string(url);
-        if (url.startsWith("assets") || url.startsWith("proxy")) return getText(UrlUtil.convert(url));
+        if (url.startsWith("assets") || url.startsWith("clan") ||  url.startsWith("proxy")) return getText(UrlUtil.convert(url));
         if (url.length() > 0 && url.length() % 4 == 0) return getText(new String(Base64.decode(url, Base64.DEFAULT)));
         return "";
     }
