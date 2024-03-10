@@ -41,6 +41,7 @@
     <string name="play_duration">进度</string>
     <string name="play_mini_progress">迷你进度</string>
     <string name="play_danmu">弹幕</string>
+    <string name="play_display">屏显</string>
     <string name="play_speed">倍速</string>
     <string name="play_change">换源</string>
     <string name="play_forward">→</string>

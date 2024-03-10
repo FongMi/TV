@@ -461,4 +461,12 @@ public class Setting {
         return Prefers.getString("home_buttons_sorted", defaultValue);
     }
 
+    public static boolean isHomeHistory() {
+        return Prefers.getBoolean("home_history", true);
+    }
+
+    public static void putHomeHistory(boolean show) {
+        Prefers.put("home_history", show);
+    }
+
 }
