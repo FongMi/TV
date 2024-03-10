@@ -85,7 +85,7 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
         mBinding.recycler.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
-                if (position < 2) getHomeActicity().showToolBar();
+                if (position < 4) getHomeActicity().showToolBar();
                 else getHomeActicity().hideToolBar();
                 if (mPresenter != null && mPresenter.isDelete()) setHistoryDelete(false);
             }

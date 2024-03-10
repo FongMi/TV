@@ -10,8 +10,8 @@ android {
         applicationId "com.fongmi.android.tv"
         minSdk 16
         targetSdk 28
-        versionCode 229
-        versionName "0308"
+        versionCode 230
+        versionName "2.3.0"
         multiDexEnabled true
         ndk { abiFilters "armeabi-v7a" }
         javaCompileOptions {
