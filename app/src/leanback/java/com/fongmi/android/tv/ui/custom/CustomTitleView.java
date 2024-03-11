@@ -42,6 +42,7 @@ public class CustomTitleView extends AppCompatTextView {
     }
 
     private boolean hasEvent(KeyEvent event) {
+        if (Setting.isHomeSiteLock()) return false;
         return KeyUtil.isEnterKey(event) || KeyUtil.isLeftKey(event) || KeyUtil.isRightKey(event) || (KeyUtil.isUpKey(event) && !coolDown);
     }
 
@@ -54,7 +55,6 @@ public class CustomTitleView extends AppCompatTextView {
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (Setting.isHomeSiteLock()) return false;
         if (VodConfig.get().getSites().isEmpty()) return false;
         if (hasEvent(event)) return onKeyDown(event);
         else return super.dispatchKeyEvent(event);
