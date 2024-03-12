@@ -167,7 +167,6 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mViewModel.result.observe(this, result -> {
             setTypes(mResult = result);
-            App.post(() -> Notify.dismiss(), 200);
         });
     }
 
@@ -197,7 +196,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         String title = getHome().getName();
         mBinding.title.setText(title.isEmpty() ? ResUtil.getString(R.string.app_name) : title);
         if (getHome().getKey().isEmpty()) return;
-        Notify.progress(this);
+        getHomeFragment().mBinding.progressLayout.showProgress();
         mViewModel.homeContent();
     }
 
@@ -210,6 +209,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         setPager();
         mPageAdapter.notifyDataSetChanged();
         getHomeFragment().addVideo(result);
+        getHomeFragment().mBinding.progressLayout.showContent();
         setFocus();
     }
 
@@ -295,26 +295,28 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     }
 
     public void initConfig() {
+        initConfig("");
+    }
+
+    public void initConfig(String success) {
         if (isLoading()) return;
-        Notify.progress(this);
         WallConfig.get().init();
         LiveConfig.get().init().load();
-        VodConfig.get().init().load(getCallback(), true);
+        VodConfig.get().init().load(getCallback(success), true);
         setLoading(true);
     }
 
-    private Callback getCallback() {
+    private Callback getCallback(String success) {
         return new Callback() {
             @Override
             public void success() {
-                Notify.dismiss();
                 checkAction(getIntent());
                 RefreshEvent.video();
+                if (!TextUtils.isEmpty(success)) Notify.show(success);
             }
 
             @Override
             public void error(String msg) {
-                Notify.dismiss();
                 if (TextUtils.isEmpty(msg) && AppDatabase.getBackup().exists()) onRestore();
                 mResult = Result.empty();
                 Notify.show(msg);
@@ -327,7 +329,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
             @Override
             public void success() {
                 if (allGranted) initConfig();
-                else Notify.dismiss();
+                else getHomeFragment().mBinding.progressLayout.showContent();;
             }
         }));
     }
@@ -335,8 +337,8 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     private void load(Config config) {
         switch (config.getType()) {
             case 0:
-                Notify.progress(this);
-                VodConfig.load(config, getCallback());
+                getHomeFragment().mBinding.progressLayout.showProgress();
+                VodConfig.load(config, getCallback(""));
                 break;
         }
     }
@@ -369,10 +371,13 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     public void onRefresh() {
-        Notify.progress(this);
-        FileUtil.clearCache(null);
-        initConfig();
-        App.post(() -> Notify.show(ResUtil.getString(R.string.config_refreshed)), 2000);
+        FileUtil.clearCache(new Callback() {
+            @Override
+            public void success() {
+                VodConfig.get().getConfig().json("").save();
+                initConfig(ResUtil.getString(R.string.config_refreshed));
+            }
+        });
     }
 
     @Override

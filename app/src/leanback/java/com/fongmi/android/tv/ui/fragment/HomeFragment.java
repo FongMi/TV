@@ -71,6 +71,7 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
 
     @Override
     protected void initView() {
+        mBinding.progressLayout.showProgress();
         setRecyclerView();
         setAdapter();
         initEvent();

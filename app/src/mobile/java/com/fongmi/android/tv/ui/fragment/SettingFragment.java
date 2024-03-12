@@ -340,6 +340,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         FileUtil.clearCache(new Callback() {
             @Override
             public void success() {
+                VodConfig.get().getConfig().json("").save();
                 setCacheText();
             }
         });
@@ -349,8 +350,9 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         FileUtil.clearCache(new Callback() {
             @Override
             public void success() {
+                VodConfig.get().getConfig().json("").save();
                 setCacheText();
-                setConfig(Config.vod());
+                setConfig(VodConfig.get().getConfig());
             }
         });
         return true;

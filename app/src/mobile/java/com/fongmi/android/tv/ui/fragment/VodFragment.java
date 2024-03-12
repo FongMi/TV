@@ -216,9 +216,13 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     }
 
     private boolean onRefresh(View view) {
-        FileUtil.clearCache(null);
-        if (getActivity() instanceof MainActivity) ((MainActivity) getActivity()).initConfig();
-        App.post(() -> Notify.show(ResUtil.getString(R.string.config_refreshed)), 2000);
+        FileUtil.clearCache(new Callback() {
+            @Override
+            public void success() {
+                VodConfig.get().getConfig().json("").save();
+                if (getActivity() instanceof MainActivity) ((MainActivity) getActivity()).initConfig(ResUtil.getString(R.string.config_refreshed));
+            }
+        });
         return true;
     }
 
