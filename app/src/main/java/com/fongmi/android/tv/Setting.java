@@ -474,7 +474,7 @@ public class Setting {
     }
 
     public static int getConfigCache() {
-        return Prefers.getInt("config_cache", 0);
+        return Math.min(Prefers.getInt("config_cache", 0), 8);
     }
 
 }
