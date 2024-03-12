@@ -2,7 +2,6 @@
 
     <!-- App -->
     <string name="app_name">TV</string>
-    <string name="app_exit">Press back again to exit</string>
 
     <!-- Vod -->
     <string name="vod_last">Last seen <xliff:g name="name">%s</xliff:g></string>

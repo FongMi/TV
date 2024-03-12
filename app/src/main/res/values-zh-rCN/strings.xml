@@ -2,7 +2,6 @@
 
     <!-- App -->
     <string name="app_name">影视</string>
-    <string name="app_exit">再按一次返回键退出</string>
 
     <!-- Vod -->
     <string name="vod_last">上次看到<xliff:g name="name">%s</xliff:g></string>

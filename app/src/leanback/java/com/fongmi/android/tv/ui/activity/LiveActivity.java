@@ -94,7 +94,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     private Runnable mR3;
     private Runnable mR4;
     private Clock mClock;
-    private boolean confirm;
     private int toggleCount;
     private int count;
 
@@ -850,12 +849,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         hideCenter();
     }
 
-    private void setConfirm() {
-        confirm = true;
-        Notify.show(R.string.app_exit);
-        App.post(() -> confirm = false, 5000);
-    }
-
     public int getToggleCount() {
         return toggleCount;
     }
@@ -1009,8 +1002,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
             hideEpg();
         } else if (isVisible(mBinding.recycler)) {
             hideUI();
-        } else if (!confirm) {
-            setConfirm();
         } else {
             super.onBackPressed();
         }

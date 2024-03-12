@@ -72,7 +72,6 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     private ArrayObjectAdapter mAdapter;
     private SiteViewModel mViewModel;
     private boolean loading;
-    private boolean confirm;
     private Result mResult;
     private Clock mClock;
 
@@ -278,12 +277,6 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         return -1;
     }
 
-    private void setConfirm() {
-        confirm = true;
-        Notify.show(R.string.app_exit);
-        App.post(() -> confirm = false, 5000);
-    }
-
     public boolean isLoading() {
         return loading;
     }
@@ -457,8 +450,6 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
             setHistoryDelete(false);
         } else if (mBinding.recycler.getSelectedPosition() != 0) {
             mBinding.recycler.scrollToPosition(0);
-        } else if (!confirm) {
-            setConfirm();
         } else {
             finish();
         }

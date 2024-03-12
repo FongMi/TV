@@ -49,7 +49,6 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
 
     private ActivityMainBinding mBinding;
     private FragmentStateManager mManager;
-    private boolean confirm;
 
     @Override
     protected ViewBinding getBinding() {
@@ -163,12 +162,6 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
         return true;
     }
 
-    private void setConfirm() {
-        confirm = true;
-        Notify.show(R.string.app_exit);
-        App.post(() -> confirm = false, 5000);
-    }
-
     public void change(int position) {
         mManager.change(position);
     }
@@ -213,8 +206,7 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
         } else if (mManager.isVisible(1)) {
             mBinding.navigation.setSelectedItemId(R.id.vod);
         } else if (mManager.canBack(0)) {
-            if (!confirm) setConfirm();
-            else finish();
+            finish();
         }
     }
 
