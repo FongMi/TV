@@ -469,4 +469,12 @@ public class Setting {
         Prefers.put("home_history", show);
     }
 
+    public static void putConfigCache(int key) {
+        Prefers.put("config_cache", key);
+    }
+
+    public static int getConfigCache() {
+        return Prefers.getInt("config_cache", 0);
+    }
+
 }

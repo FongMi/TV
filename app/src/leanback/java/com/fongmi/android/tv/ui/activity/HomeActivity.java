@@ -299,7 +299,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         Notify.progress(this);
         WallConfig.get().init();
         LiveConfig.get().init().load();
-        VodConfig.get().init().load(getCallback());
+        VodConfig.get().init().load(getCallback(), true);
         setLoading(true);
     }
 

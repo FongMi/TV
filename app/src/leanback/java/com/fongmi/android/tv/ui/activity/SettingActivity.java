@@ -8,6 +8,7 @@ import android.view.View;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.BuildConfig;
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.Updater;
 import com.fongmi.android.tv.api.config.LiveConfig;
@@ -35,6 +36,7 @@ import com.fongmi.android.tv.ui.dialog.ProxyDialog;
 import com.fongmi.android.tv.ui.dialog.SiteDialog;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Notify;
+import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.bean.Doh;
 import com.github.catvod.net.OkHttp;
@@ -47,6 +49,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
 
     private ActivitySettingBinding mBinding;
     private int type;
+    private String[] configCache;
 
     public static void start(Activity activity) {
         activity.startActivity(new Intent(activity, SettingActivity.class));
@@ -77,6 +80,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.dohText.setText(getDohList()[getDohIndex()]);
         mBinding.versionText.setText(BuildConfig.VERSION_NAME);
         mBinding.proxyText.setText(UrlUtil.scheme(Setting.getProxy()));
+        mBinding.configCacheText.setText((configCache = ResUtil.getStringArray(R.array.select_config_cache))[Setting.getConfigCache()]);
         setCacheText();
     }
 
@@ -113,6 +117,8 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.wallRefresh.setOnClickListener(this::setWallRefresh);
         mBinding.custom.setOnClickListener(this::onCustom);
         mBinding.doh.setOnClickListener(this::setDoh);
+        mBinding.configCache.setOnClickListener(this::setConfigCache);
+        mBinding.reset.setOnClickListener(this::onReset);
     }
 
     @Override
@@ -275,6 +281,16 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
 
     private void onCustom(View view) {
         SettingCustomActivity.start(this);
+    }
+
+    private void setConfigCache(View view) {
+        int index = Setting.getConfigCache();
+        Setting.putConfigCache(index = index == configCache.length - 1 ? 0 : ++index);
+        mBinding.configCacheText.setText(configCache[index]);
+    }
+
+    private void onReset(View view) {
+
     }
 
     private void setDoh(View view) {
