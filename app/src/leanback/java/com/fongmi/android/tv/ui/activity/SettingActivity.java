@@ -327,4 +327,10 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.backupText.setText(AppDatabase.getDate());
         return true;
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        RefreshEvent.history();
+    }
 }

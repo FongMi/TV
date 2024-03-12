@@ -273,8 +273,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     @Override
     public void onItemClick(Class item) {
         if (mBinding.pager.getCurrentItem() == 0) {
-            if (!hasSettingButton()) MenuDialog.create(this).show();
-            else SiteDialog.create(this).show();
+            SiteDialog.create(this).show();
         } else {
             updateFilter(item);
         }
