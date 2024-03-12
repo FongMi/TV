@@ -41,6 +41,7 @@
     <string name="play_duration">Duration</string>
     <string name="play_mini_progress">Mini Progress</string>
     <string name="play_danmu">Danmu</string>
+    <string name="play_display">Display</string>
     <string name="play_speed">Speed</string>
     <string name="play_change">Change</string>
     <string name="play_forward">→</string>

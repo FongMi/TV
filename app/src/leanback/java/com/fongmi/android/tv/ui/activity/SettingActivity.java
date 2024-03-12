@@ -314,4 +314,10 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         Notify.show("不支持的功能");
         return true;
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        RefreshEvent.history();
+    }
 }
