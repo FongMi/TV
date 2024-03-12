@@ -40,6 +40,17 @@
     </LinearLayout>
 
     <ImageView
+        android:id="@+id/down"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="10dp"
+        android:background="@drawable/selector_text"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:padding="8dp"
+        android:src="@drawable/ic_action_down"  />
+
+    <ImageView
         android:id="@+id/up"
         android:layout_width="40dp"
         android:layout_height="40dp"
