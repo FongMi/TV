@@ -318,6 +318,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
             @Override
             public void error(String msg) {
                 if (TextUtils.isEmpty(msg) && AppDatabase.getBackup().exists()) onRestore();
+                getHomeFragment().mBinding.progressLayout.showContent();
                 mResult = Result.empty();
                 Notify.show(msg);
             }
@@ -329,7 +330,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
             @Override
             public void success() {
                 if (allGranted) initConfig();
-                else getHomeFragment().mBinding.progressLayout.showContent();;
+                else getHomeFragment().mBinding.progressLayout.showContent();
             }
         }));
     }
