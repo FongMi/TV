@@ -886,7 +886,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private void exitFullscreen() {
         if (!isFullscreen()) return;
         setRequestedOrientation(isPort() ? ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_FULL_USER);
-        mBinding.episode.scrollToPosition(mEpisodeAdapter.getPosition());
+        App.post(() -> mBinding.episode.scrollToPosition(mEpisodeAdapter.getPosition()), 50);
         mBinding.control.full.setVisibility(View.VISIBLE);
         mBinding.video.setLayoutParams(mFrameParams);
         setRotate(false, false);
