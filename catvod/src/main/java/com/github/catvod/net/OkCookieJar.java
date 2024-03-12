@@ -30,7 +30,7 @@ public class OkCookieJar implements CookieJar {
     }
 
     @Override
-    public synchronized void saveFromResponse(@NonNull HttpUrl url, List<Cookie> cookies) {
+    public synchronized void saveFromResponse(@NonNull HttpUrl url, @NonNull List<Cookie> cookies) {
         try {
             for (Cookie cookie : cookies) CookieManager.getInstance().setCookie(url.toString(), cookie.toString());
         } catch (Throwable ignored) {
