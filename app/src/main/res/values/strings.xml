@@ -135,6 +135,8 @@
     <string name="dialog_delete_record">Delete all records?</string>
     <string name="dialog_delete_keep">All keep records will be removed.</string>
     <string name="dialog_delete_history">All history records will be removed.</string>
+    <string name="dialog_reset_app">Reset app?</string>
+    <string name="dialog_reset_app_data">All app data will be reset, and app will be shutdown.</string>
 
     <!-- Error -->
     <string name="error_config_get">Configuration get failed</string>

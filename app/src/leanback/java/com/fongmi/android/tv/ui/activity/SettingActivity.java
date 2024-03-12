@@ -7,6 +7,7 @@ import android.view.View;
 
 import androidx.viewbinding.ViewBinding;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.BuildConfig;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
@@ -40,6 +41,8 @@ import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.bean.Doh;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.Shell;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.permissionx.guolindev.PermissionX;
 
 import java.util.ArrayList;
@@ -100,6 +103,7 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         mBinding.wall.setOnClickListener(this::onWall);
         mBinding.proxy.setOnClickListener(this::onProxy);
         mBinding.cache.setOnClickListener(this::onCache);
+        mBinding.cache.setOnLongClickListener(this::onCacheLongClick);
         mBinding.backup.setOnClickListener(this::onBackup);
         mBinding.player.setOnClickListener(this::onPlayer);
         mBinding.danmu.setOnClickListener(this::onDanmu);
@@ -290,7 +294,13 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
     }
 
     private void onReset(View view) {
+        new MaterialAlertDialogBuilder(this).setTitle(R.string.dialog_reset_app).setMessage(R.string.dialog_reset_app_data).setNegativeButton(R.string.dialog_negative, null).setPositiveButton(R.string.dialog_positive, (dialog, which) -> reset()).show();
+    }
 
+    private void reset() {
+        new Thread(() -> {
+            Shell.exec("pm clear " + App.get().getPackageName());
+        }).start();
     }
 
     private void setDoh(View view) {
@@ -327,6 +337,17 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
                 setCacheText();
             }
         });
+    }
+
+    private boolean onCacheLongClick(View view) {
+        FileUtil.clearCache(new Callback() {
+            @Override
+            public void success() {
+                setCacheText();
+                setConfig(Config.vod());
+            }
+        });
+        return true;
     }
 
     private void onBackup(View view) {

@@ -135,6 +135,8 @@
     <string name="dialog_delete_record">删除全部纪录？</string>
     <string name="dialog_delete_keep">收藏纪录将会全部删除。</string>
     <string name="dialog_delete_history">观看纪录将会全部删除。</string>
+    <string name="dialog_reset_app">重置App?</string>
+    <string name="dialog_reset_app_data">所有数据将会被重置，App即将被关闭.</string>
 
     <!-- Error -->
     <string name="error_config_get">配置取得失败</string>
