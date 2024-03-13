@@ -103,24 +103,19 @@ public class MainActivity extends BaseActivity implements NavigationBarView.OnIt
         if (savedInstanceState == null) mManager.change(0);
     }
 
-    public void initConfig() {
-        initConfig("");
-    }
-
-    public void initConfig(String success) {
+    private void initConfig() {
         WallConfig.get().init();
         LiveConfig.get().init().load();
-        VodConfig.get().init().load(getCallback(success), true);
+        VodConfig.get().init().load(getCallback(), true);
     }
 
-    private Callback getCallback(String success) {
+    private Callback getCallback() {
         return new Callback() {
             @Override
             public void success() {
                 checkAction(getIntent());
                 RefreshEvent.config();
                 RefreshEvent.video();
-                if (!TextUtils.isEmpty(success)) Notify.show(success);
             }
 
             @Override

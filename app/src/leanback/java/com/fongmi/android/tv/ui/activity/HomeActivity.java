@@ -287,22 +287,22 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     public void setConfig(Config config) {
+        setConfig(config, "");
+    }
+
+    private void setConfig(Config config, String success) {
         if (config.getUrl().startsWith("file") && !PermissionX.isGranted(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            PermissionX.init(this).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> load(config));
+            PermissionX.init(this).permissions(Manifest.permission.WRITE_EXTERNAL_STORAGE).request((allGranted, grantedList, deniedList) -> load(config, success));
         } else {
-            load(config);
+            load(config, success);
         }
     }
 
     public void initConfig() {
-        initConfig("");
-    }
-
-    public void initConfig(String success) {
         if (isLoading()) return;
         WallConfig.get().init();
         LiveConfig.get().init().load();
-        VodConfig.get().init().load(getCallback(success), true);
+        VodConfig.get().init().load(getCallback(""), true);
         setLoading(true);
     }
 
@@ -335,11 +335,11 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         }));
     }
 
-    private void load(Config config) {
+    private void load(Config config, String success) {
         switch (config.getType()) {
             case 0:
                 getHomeFragment().mBinding.progressLayout.showProgress();
-                VodConfig.load(config, getCallback(""));
+                VodConfig.load(config, getCallback(success));
                 break;
         }
     }
@@ -375,11 +375,18 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         FileUtil.clearCache(new Callback() {
             @Override
             public void success() {
-                VodConfig.get().getConfig().json("").save();
-                initConfig(ResUtil.getString(R.string.config_refreshed));
+                setConfig(VodConfig.get().getConfig().json("").save(), ResUtil.getString(R.string.config_refreshed));
             }
         });
     }
+
+    @Override
+    public boolean onItemLongClick(Class item) {
+        if (mBinding.pager.getCurrentItem() != 0) return true;
+        onRefresh();
+        return true;
+    }
+
 
     @Override
     public void setSite(Site item) {
