@@ -344,9 +344,8 @@ public class SettingActivity extends BaseActivity implements ConfigCallback, Sit
         FileUtil.clearCache(new Callback() {
             @Override
             public void success() {
-                VodConfig.get().getConfig().json("").save();
                 setCacheText();
-                setConfig(VodConfig.get().getConfig());
+                setConfig(VodConfig.get().getConfig().json("").save());
             }
         });
         return true;
