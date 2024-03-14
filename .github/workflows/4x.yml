@@ -1,5 +1,5 @@
 kitkat
-name: Test Build
+name: Test4x Build
 
 on:
   workflow_dispatch:
