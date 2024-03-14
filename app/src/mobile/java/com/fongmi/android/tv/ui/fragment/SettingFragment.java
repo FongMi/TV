@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.viewbinding.ViewBinding;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.BuildConfig;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
@@ -45,6 +46,7 @@ import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.bean.Doh;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Path;
+import com.github.catvod.utils.Shell;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.permissionx.guolindev.PermissionX;
 
@@ -55,6 +57,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
 
     private FragmentSettingBinding mBinding;
     private int type;
+    private String[] configCache;
 
     public static SettingFragment newInstance() {
         return new SettingFragment();
@@ -88,6 +91,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.dohText.setText(getDohList()[getDohIndex()]);
         mBinding.versionText.setText(BuildConfig.VERSION_NAME);
         mBinding.proxyText.setText(UrlUtil.scheme(Setting.getProxy()));
+        mBinding.configCacheText.setText((configCache = ResUtil.getStringArray(R.array.select_config_cache))[Setting.getConfigCache()]);
         setCacheText();
     }
 
@@ -107,6 +111,7 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.wall.setOnClickListener(this::onWall);
         mBinding.proxy.setOnClickListener(this::onProxy);
         mBinding.cache.setOnClickListener(this::onCache);
+        mBinding.cache.setOnLongClickListener(this::onCacheLongClick);
         mBinding.backup.setOnClickListener(this::onBackup);
         mBinding.player.setOnClickListener(this::onPlayer);
         mBinding.version.setOnClickListener(this::onVersion);
@@ -123,6 +128,8 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         mBinding.wallRefresh.setOnClickListener(this::setWallRefresh);
         mBinding.doh.setOnClickListener(this::setDoh);
         mBinding.custom.setOnClickListener(this::onCustom);
+        mBinding.configCache.setOnClickListener(this::setConfigCache);
+        mBinding.reset.setOnClickListener(this::onReset);
     }
 
     @Override
@@ -260,6 +267,22 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         getRoot().change(3);
     }
 
+    private void setConfigCache(View view) {
+        int index = Setting.getConfigCache();
+        Setting.putConfigCache(index = index == configCache.length - 1 ? 0 : ++index);
+        mBinding.configCacheText.setText(configCache[index]);
+    }
+
+    private void onReset(View view) {
+        new MaterialAlertDialogBuilder(getActivity()).setTitle(R.string.dialog_reset_app).setMessage(R.string.dialog_reset_app_data).setNegativeButton(R.string.dialog_negative, null).setPositiveButton(R.string.dialog_positive, (dialog, which) -> reset()).show();
+    }
+
+    private void reset() {
+        new Thread(() -> {
+            Shell.exec("pm clear " + App.get().getPackageName());
+        }).start();
+    }
+
     private void onVersion(View view) {
         Updater.get().force().release().start(getActivity());
     }
@@ -317,9 +340,21 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
         FileUtil.clearCache(new Callback() {
             @Override
             public void success() {
+                VodConfig.get().getConfig().json("").save();
                 setCacheText();
             }
         });
+    }
+
+    private boolean onCacheLongClick(View view) {
+        FileUtil.clearCache(new Callback() {
+            @Override
+            public void success() {
+                setCacheText();
+                setConfig(VodConfig.get().getConfig().json("").save());
+            }
+        });
+        return true;
     }
 
     private void onBackup(View view) {

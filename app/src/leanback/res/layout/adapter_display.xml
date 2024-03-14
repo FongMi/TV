@@ -25,7 +25,7 @@
             android:singleLine="true"
             android:textColor="@color/text"
             android:textSize="18sp"
-            tools:text="泥巴" />
+            tools:text="時間" />
 
         <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/check"
@@ -38,27 +38,5 @@
             android:focusable="false"
             android:focusableInTouchMode="false" />
     </LinearLayout>
-
-    <ImageView
-        android:id="@+id/down"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginLeft="10dp"
-        android:background="@drawable/selector_text"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:padding="8dp"
-        android:src="@drawable/ic_action_down"  />
-
-    <ImageView
-        android:id="@+id/up"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginLeft="10dp"
-        android:background="@drawable/selector_text"
-        android:focusable="true"
-        android:focusableInTouchMode="true"
-        android:padding="8dp"
-        android:src="@drawable/ic_action_up"  />
 
 </LinearLayout>

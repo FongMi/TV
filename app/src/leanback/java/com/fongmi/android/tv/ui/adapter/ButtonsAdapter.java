@@ -18,9 +18,13 @@ import java.util.Map;
 public class ButtonsAdapter extends RecyclerView.Adapter<ButtonsAdapter.ViewHolder> {
 
     private List<Button> mItems;
+    private int upFocus;
+    private int downFocus;
 
     public ButtonsAdapter() {
         this.mItems = Button.sortedAll();
+        this.upFocus = -1;
+        this.downFocus = -1;
     }
 
     @Override
@@ -42,7 +46,10 @@ public class ButtonsAdapter extends RecyclerView.Adapter<ButtonsAdapter.ViewHold
         holder.binding.select.setOnLongClickListener(v -> onItemLongClick(item));
         holder.binding.select.setOnClickListener(v -> onItemClick(item, position));
         holder.binding.text.setGravity(Gravity.START);
+        holder.binding.down.setOnClickListener(v -> onDownClick(item, position));
         holder.binding.up.setOnClickListener(v -> onUpClick(item, position));
+        if (upFocus == position) holder.binding.up.requestFocus();
+        else if (downFocus == position) holder.binding.down.requestFocus();
     }
 
     private boolean getChecked(Button item) {
@@ -69,6 +76,21 @@ public class ButtonsAdapter extends RecyclerView.Adapter<ButtonsAdapter.ViewHold
         return true;
     }
 
+    private void onDownClick(Button item, int position) {
+        if (position == getItemCount() - 1) return;
+        List<Button> buttonList = Button.sortedAll();
+        Button button = buttonList.get(position);
+        buttonList.remove(position);
+        buttonList.add(position + 1, button);
+        Map<Integer, Button> map = Button.getMap(buttonList);
+        Button.saveSorted(map);
+        mItems = Button.sortedAll();
+        save(mItems, Button.getButtonsMap());
+        downFocus = position + 1;
+        upFocus = -1;
+        notifyItemRangeChanged(0, getItemCount());
+    }
+
     private void onUpClick(Button item, int position) {
         if (position == 0) return;
         List<Button> buttonList = Button.sortedAll();
@@ -79,6 +101,8 @@ public class ButtonsAdapter extends RecyclerView.Adapter<ButtonsAdapter.ViewHold
         Button.saveSorted(map);
         mItems = Button.sortedAll();
         save(mItems, Button.getButtonsMap());
+        upFocus = position - 1;
+        downFocus = -1;
         notifyItemRangeChanged(0, getItemCount());
     }
 
