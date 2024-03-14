@@ -274,4 +274,12 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
         refreshFuncRow();
     }
 
+    public boolean canBack() {
+        return mBinding.recycler.getSelectedPosition() != 0;
+    }
+
+    public void goBack() {
+        mBinding.recycler.scrollToPosition(0);
+    }
+
 }

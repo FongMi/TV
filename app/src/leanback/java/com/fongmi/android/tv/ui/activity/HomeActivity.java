@@ -515,8 +515,8 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
             getHomeFragment().mBinding.progressLayout.showContent();
         } else if (mPageAdapter != null && getHomeFragment().mPresenter != null && getHomeFragment().mPresenter.isDelete()) {
             getHomeFragment().setHistoryDelete(false);
-        } else if (mBinding.recycler.getSelectedPosition() != 0) {
-            mBinding.recycler.scrollToPosition(0);
+        } else if (getHomeFragment().canBack()) {
+            getHomeFragment().goBack();
         } else if (!confirm) {
             setConfirm();
         } else {
