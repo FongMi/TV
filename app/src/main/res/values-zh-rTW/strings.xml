@@ -75,6 +75,8 @@
     <string name="setting_player">播放設定</string>
     <string name="setting_danmu">彈幕設定</string>
     <string name="setting_custom">個性設定</string>
+    <string name="setting_config_cache">接口暫存</string>
+    <string name="setting_reset">重置App</string>
     <string name="setting_quality">圖片品質</string>
     <string name="setting_size">圖片尺寸</string>
     <string name="setting_aggregated_search">聚合搜索</string>
@@ -133,6 +135,8 @@
     <string name="dialog_delete_record">刪除全部紀錄？</string>
     <string name="dialog_delete_keep">收藏紀錄將會全部刪除。</string>
     <string name="dialog_delete_history">觀看紀錄將會全部刪除。</string>
+    <string name="dialog_reset_app">重置App?</string>
+    <string name="dialog_reset_app_data">所有數據將會被重置，App即將被關閉.</string>
 
     <!-- Error -->
     <string name="error_config_get">配置取得失敗</string>
@@ -255,6 +259,14 @@
     <string-array name="select_home_ui">
         <item>簡潔風格</item>
         <item>TVBox風格</item>
+    </string-array>
+
+    <string-array name="select_config_cache">
+        <item>關閉</item>
+        <item>1小時</item>
+        <item>2小時</item>
+        <item>3小時</item>
+        <item>4小時</item>
     </string-array>
 
     <string-array name="select_caption">
