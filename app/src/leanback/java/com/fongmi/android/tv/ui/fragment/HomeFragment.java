@@ -71,6 +71,7 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
 
     @Override
     protected void initView() {
+        mBinding.progressLayout.showProgress();
         setRecyclerView();
         setAdapter();
         initEvent();
@@ -110,7 +111,7 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
     private void setAdapter() {
         ListRow funcRow = getFuncRow();
         if (funcRow != null) mAdapter.add(funcRow);
-        mAdapter.add(R.string.home_history);
+        if (Setting.isHomeHistory()) mAdapter.add(R.string.home_history);
         mAdapter.add(R.string.home_recommend);
         mHistoryAdapter = new ArrayObjectAdapter(mPresenter = new HistoryPresenter(this));
         homeUI = Setting.getHomeUI();
@@ -161,9 +162,21 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
     }
 
     public void getHistory(boolean renew) {
-        List<History> items = History.get();
         int historyIndex = getHistoryIndex();
         int recommendIndex = getRecommendIndex();
+        if (historyIndex == -1) {
+            if (!Setting.isHomeHistory()) return;
+            int historyStringIndex = recommendIndex - 1;
+            historyStringIndex = historyStringIndex < 0 ? 0 : historyStringIndex;
+            mAdapter.add(historyStringIndex, R.string.home_history);
+        }
+        if (!Setting.isHomeHistory()) {
+            mAdapter.removeItems(historyIndex - 1, 2);
+            return;
+        }
+        historyIndex = getHistoryIndex();
+        recommendIndex = getRecommendIndex();
+        List<History> items = History.get();
         boolean exist = recommendIndex - historyIndex == 2;
         if (renew) mHistoryAdapter = new ArrayObjectAdapter(mPresenter = new HistoryPresenter(this));
         if ((items.isEmpty() && exist) || (renew && exist)) mAdapter.removeItems(historyIndex, 1);
@@ -259,6 +272,14 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
     public void onResume() {
         super.onResume();
         refreshFuncRow();
+    }
+
+    public boolean canBack() {
+        return mBinding.recycler.getSelectedPosition() != 0;
+    }
+
+    public void goBack() {
+        mBinding.recycler.scrollToPosition(0);
     }
 
 }
