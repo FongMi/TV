@@ -161,6 +161,11 @@ public class VodActivity extends BaseActivity implements TypePresenter.OnClickLi
     }
 
     @Override
+    public boolean onItemLongClick(Class item) {
+        return true;
+    }
+
+    @Override
     public void onRefresh(Class item) {
         getFragment().onRefresh();
     }
