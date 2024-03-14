@@ -511,7 +511,9 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     protected void onBackPress() {
-        if (mPageAdapter != null && getHomeFragment().mBinding.progressLayout.isProgress()) {
+        if (mBinding.recycler.getSelectedPosition() != 0) {
+            mBinding.recycler.scrollToPosition(0);
+        } else if (mPageAdapter != null && getHomeFragment().mBinding.progressLayout.isProgress()) {
             getHomeFragment().mBinding.progressLayout.showContent();
         } else if (mPageAdapter != null && getHomeFragment().mPresenter != null && getHomeFragment().mPresenter.isDelete()) {
             getHomeFragment().setHistoryDelete(false);
