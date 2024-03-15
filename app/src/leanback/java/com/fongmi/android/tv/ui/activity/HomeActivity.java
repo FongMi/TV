@@ -319,7 +319,8 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
             @Override
             public void error(String msg) {
                 if (TextUtils.isEmpty(msg) && AppDatabase.getBackup().exists()) onRestore();
-                getHomeFragment().mBinding.progressLayout.showContent();
+                else if (getHomeFragment().init) getHomeFragment().mBinding.progressLayout.showContent();
+                else App.post(() -> getHomeFragment().mBinding.progressLayout.showContent(), 1000);
                 mResult = Result.empty();
                 Notify.show(msg);
             }
@@ -511,11 +512,11 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     protected void onBackPress() {
-        if (mBinding.recycler.getSelectedPosition() != 0) {
+        if (isVisible(mBinding.recycler) && mBinding.recycler.getSelectedPosition() != 0) {
             mBinding.recycler.scrollToPosition(0);
-        } else if (mPageAdapter != null && getHomeFragment().mBinding.progressLayout.isProgress()) {
+        } else if (mPageAdapter != null && getHomeFragment().init && getHomeFragment().mBinding.progressLayout.isProgress()) {
             getHomeFragment().mBinding.progressLayout.showContent();
-        } else if (mPageAdapter != null && getHomeFragment().mPresenter != null && getHomeFragment().mPresenter.isDelete()) {
+        } else if (mPageAdapter != null && getHomeFragment().init && getHomeFragment().mPresenter != null && getHomeFragment().mPresenter.isDelete()) {
             getHomeFragment().setHistoryDelete(false);
         } else if (getHomeFragment().canBack()) {
             getHomeFragment().goBack();
