@@ -82,6 +82,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     private View mOldView;
     private boolean confirm;
     private Clock mClock;
+    private View mFocus;
 
     private Site getHome() {
         return VodConfig.get().getHome();
@@ -197,6 +198,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         String title = getHome().getName();
         mBinding.title.setText(title.isEmpty() ? ResUtil.getString(R.string.app_name) : title);
         if (getHome().getKey().isEmpty()) return;
+        mFocus = getCurrentFocus();
         getHomeFragment().mBinding.progressLayout.showProgress();
         mViewModel.homeContent();
     }
@@ -211,7 +213,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         mPageAdapter.notifyDataSetChanged();
         getHomeFragment().addVideo(result);
         getHomeFragment().mBinding.progressLayout.showContent();
-        setFocus();
+        App.post(() -> setFocus(), 200);
     }
 
     private void setPager() {
@@ -319,7 +321,8 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
             @Override
             public void error(String msg) {
                 if (TextUtils.isEmpty(msg) && AppDatabase.getBackup().exists()) onRestore();
-                getHomeFragment().mBinding.progressLayout.showContent();
+                else if (getHomeFragment().init) getHomeFragment().mBinding.progressLayout.showContent();
+                else App.post(() -> getHomeFragment().mBinding.progressLayout.showContent(), 1000);
                 mResult = Result.empty();
                 Notify.show(msg);
             }
@@ -465,8 +468,8 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     private void setFocus() {
         setLoading(false);
-        App.post(() -> mBinding.title.setFocusable(true), 500);
-        if (!mBinding.title.hasFocus()) {
+        if (!mBinding.title.isFocusable()) App.post(() -> mBinding.title.setFocusable(true), 500);
+        if (mFocus != mBinding.title) {
             if (Setting.getHomeUI() == 0) getHomeFragment().mBinding.recycler.requestFocus();
             else mBinding.recycler.requestFocus();
         }
@@ -511,11 +514,11 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     protected void onBackPress() {
-        if (mBinding.recycler.getSelectedPosition() != 0) {
+        if (isVisible(mBinding.recycler) && mBinding.recycler.getSelectedPosition() != 0) {
             mBinding.recycler.scrollToPosition(0);
-        } else if (mPageAdapter != null && getHomeFragment().mBinding.progressLayout.isProgress()) {
+        } else if (mPageAdapter != null && getHomeFragment().init && getHomeFragment().mBinding.progressLayout.isProgress()) {
             getHomeFragment().mBinding.progressLayout.showContent();
-        } else if (mPageAdapter != null && getHomeFragment().mPresenter != null && getHomeFragment().mPresenter.isDelete()) {
+        } else if (mPageAdapter != null && getHomeFragment().init && getHomeFragment().mPresenter != null && getHomeFragment().mPresenter.isDelete()) {
             getHomeFragment().setHistoryDelete(false);
         } else if (getHomeFragment().canBack()) {
             getHomeFragment().goBack();

@@ -57,6 +57,7 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
     private ArrayObjectAdapter mHistoryAdapter;
     public HistoryPresenter mPresenter;
     private ArrayObjectAdapter mAdapter;
+    public boolean init;
     private int homeUI;
     private String button;
 
@@ -75,6 +76,7 @@ public class HomeFragment extends BaseFragment implements VodPresenter.OnClickLi
         setRecyclerView();
         setAdapter();
         initEvent();
+        init = true;
     }
 
     @Override
