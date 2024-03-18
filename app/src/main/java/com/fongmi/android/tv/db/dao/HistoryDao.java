@@ -10,8 +10,8 @@ import java.util.List;
 @Dao
 public abstract class HistoryDao extends BaseDao<History> {
 
-    @Query("SELECT * FROM History WHERE cid = :cid ORDER BY createTime DESC")
-    public abstract List<History> find(int cid);
+    @Query("SELECT * FROM History WHERE cid = :cid AND createTime >= :createTime ORDER BY createTime DESC")
+    public abstract List<History> find(int cid, long createTime);
 
     @Query("SELECT * FROM History WHERE cid = :cid AND `key` = :key")
     public abstract History find(int cid, String key);

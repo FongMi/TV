@@ -18,6 +18,7 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Entity
 public class History {
@@ -253,7 +254,7 @@ public class History {
     }
 
     public static List<History> get(int cid) {
-        return AppDatabase.get().getHistoryDao().find(cid);
+        return AppDatabase.get().getHistoryDao().find(cid, System.currentTimeMillis() - TimeUnit.DAYS.toMillis(14));
     }
 
     public static History find(String key) {
