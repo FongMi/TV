@@ -38,7 +38,6 @@ import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.impl.SubtitleCallback;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
-import com.fongmi.android.tv.player.Source;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownCast;
 import com.fongmi.android.tv.ui.dialog.TrackDialog;
@@ -551,7 +550,6 @@ public class CastActivity extends BaseActivity implements CustomKeyDownCast.List
         super.onDestroy();
         mClock.release();
         mPlayers.release();
-        Source.get().stop();
         unbindService(this);
         mService.bindRealPlayer(null);
         App.removeCallbacks(mR1, mR2);

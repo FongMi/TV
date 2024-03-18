@@ -1526,7 +1526,6 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
         stopSearch();
         mClock.release();
         mPlayers.release();
-        Source.get().stop();
         RefreshEvent.history();
         App.removeCallbacks(mR1, mR2, mR3, mR4);
     }

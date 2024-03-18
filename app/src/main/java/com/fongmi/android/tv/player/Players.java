@@ -376,6 +376,7 @@ public class Players implements Player.Listener, IMediaPlayer.Listener, Analytic
         session.release();
         if (isExo()) releaseExo();
         if (isIjk()) releaseIjk();
+        App.execute(() -> Source.get().stop());
     }
 
     public void start(Channel channel, int timeout) {

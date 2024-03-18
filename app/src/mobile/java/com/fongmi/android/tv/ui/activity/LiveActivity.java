@@ -48,7 +48,6 @@ import com.fongmi.android.tv.impl.SubtitleCallback;
 import com.fongmi.android.tv.model.LiveViewModel;
 import com.fongmi.android.tv.player.ExoUtil;
 import com.fongmi.android.tv.player.Players;
-import com.fongmi.android.tv.player.Source;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.service.PlaybackService;
 import com.fongmi.android.tv.ui.adapter.ChannelAdapter;
@@ -1179,7 +1178,6 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         super.onDestroy();
         mClock.release();
         mPlayers.release();
-        Source.get().stop();
         PlaybackService.stop();
         App.removeCallbacks(mR0, mR1, mR2, mR3);
         mViewModel.url.removeObserver(mObserveUrl);
