@@ -76,6 +76,7 @@ android {
     configurations.configureEach {
         resolutionStrategy {
             force 'com.squareup.okhttp3:okhttp:' + okhttpVersion
+            force 'androidx.recyclerview:recyclerview:' + androidxRecyclerViewVersion
         }
     }
 
