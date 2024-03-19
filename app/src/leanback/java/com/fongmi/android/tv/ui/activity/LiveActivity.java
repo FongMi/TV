@@ -57,7 +57,6 @@ import com.fongmi.android.tv.ui.dialog.TrackDialog;
 import com.fongmi.android.tv.ui.presenter.ChannelPresenter;
 import com.fongmi.android.tv.ui.presenter.EpgDataPresenter;
 import com.fongmi.android.tv.ui.presenter.GroupPresenter;
-import com.fongmi.android.tv.utils.Biometric;
 import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.Notify;
@@ -74,7 +73,7 @@ import java.util.List;
 
 import tv.danmaku.ijk.media.player.ui.IjkVideoView;
 
-public class LiveActivity extends BaseActivity implements GroupPresenter.OnClickListener, ChannelPresenter.OnClickListener, EpgDataPresenter.OnClickListener, CustomKeyDownLive.Listener, CustomLiveListView.Callback, TrackDialog.Listener, Biometric.Callback, PassCallback, LiveCallback, SubtitleCallback {
+public class LiveActivity extends BaseActivity implements GroupPresenter.OnClickListener, ChannelPresenter.OnClickListener, EpgDataPresenter.OnClickListener, CustomKeyDownLive.Listener, CustomLiveListView.Callback, TrackDialog.Listener, PassCallback, LiveCallback, SubtitleCallback {
 
     private ActivityLiveBinding mBinding;
     private ArrayObjectAdapter mChannelAdapter;
@@ -560,8 +559,7 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
         mChannelAdapter.setItems(setWidth(item).getChannel(), null);
         mBinding.channel.setSelectedPosition(Math.max(item.getPosition(), 0));
         if (!item.isKeep() || ++count < 5 || mHides.isEmpty()) return;
-        if (Biometric.enable()) Biometric.show(this);
-        else PassDialog.create().show(this);
+        PassDialog.create().show(this);
         App.removeCallbacks(mR4);
         resetPass();
     }
@@ -682,11 +680,6 @@ public class LiveActivity extends BaseActivity implements GroupPresenter.OnClick
     @Override
     public void setPass(String pass) {
         unlock(pass);
-    }
-
-    @Override
-    public void onBiometricSuccess() {
-        unlock(null);
     }
 
     private void unlock(String pass) {
