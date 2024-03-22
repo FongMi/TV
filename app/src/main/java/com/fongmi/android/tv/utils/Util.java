@@ -14,6 +14,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.os.Parcelable;
 import android.provider.Settings;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -85,8 +86,14 @@ public class Util {
         }
     }
 
-    public static String getDeviceId() {
-        return Settings.Secure.getString(Init.context().getContentResolver(), Settings.Secure.ANDROID_ID);
+    public static String getAndroidId() {
+        try {
+            String id = Settings.Secure.getString(Init.context().getContentResolver(), Settings.Secure.ANDROID_ID);
+            if (TextUtils.isEmpty(id)) throw new NullPointerException();
+            return id;
+        } catch (Exception e) {
+            return "0200000000000000";
+        }
     }
 
     public static String getDeviceName() {
