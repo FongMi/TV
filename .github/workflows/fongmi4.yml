@@ -1,0 +1,50 @@
+name: Test Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/setup-node@v4  # Use the latest version of setup-node
+        with:
+          node-version: 16  # Explicitly set Node.js version to 16
+
+      - uses: actions/checkout@v2 
+
+      - name: Set up JDK and Gradle
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+
+      - name: Release Apk Sign
+        run: |
+          signingConfigs='c2lnbmluZ0NvbmZpZ3Mge1wKICAgICAgICBpZiAocHJvamVjdC5oYXNQcm9wZXJ0eSgiRk9OR01JQk9YX1NUT1JFX0ZJTEUiKSkge1wKICAgICAgICAgICAgbXlDb25maWcge1wKICAgICAgICAgICAgICAgIHN0b3JlRmlsZSBmaWxlKEZPTkdNSUJPWF9TVE9SRV9GSUxFKVwKICAgICAgICAgICAgICAgIHN0b3JlUGFzc3dvcmQgRk9OR01JQk9YX1NUT1JFX1BBU1NXT1JEXAogICAgICAgICAgICAgICAga2V5QWxpYXMgRk9OR01JQk9YX0tFWV9BTElBU1wKICAgICAgICAgICAgICAgIGtleVBhc3N3b3JkIEZPTkdNSUJPWF9LRVlfUEFTU1dPUkRcCiAgICAgICAgICAgICAgICB2MVNpZ25pbmdFbmFibGVkIHRydWVcCiAgICAgICAgICAgICAgICB2MlNpZ25pbmdFbmFibGVkIHRydWVcCiAgICAgICAgICAgICAgICBlbmFibGVWM1NpZ25pbmcgPSB0cnVlXAogICAgICAgICAgICAgICAgZW5hYmxlVjRTaWduaW5nID0gdHJ1ZVwKICAgICAgICAgICAgfVwKICAgICAgICB9XAogICAgfVwKXA=='
+          signingConfig='aWYgKHByb2plY3QuaGFzUHJvcGVydHkoIkZPTkdNSUJPWF9TVE9SRV9GSUxFIikpIHtcCiAgICAgICAgICAgICAgICBzaWduaW5nQ29uZmlnIHNpZ25pbmdDb25maWdzLm15Q29uZmlnXAogICAgICAgICAgICB9XA=='
+          signingConfigs="$(echo "$signingConfigs" |base64 -d )"
+          signingConfig="$(echo "$signingConfig" |base64 -d )"
+          sed -i -e "/defaultConfig {/i\\$signingConfigs " -e "/debug {/a\\$signingConfig " -e "/fongmibox {/a\\$signingConfig " app/build.gradle
+          cp -f ${{ github.workspace }}/.github/workflows/TVBoxOSC.jks app/TVBoxOSC.jks
+          sed -i '$a\RELEASE_STORE_FILE=./TVBoxOSC.jks'     ./gradle.properties
+          sed -i '$a\RELEASE_KEY_ALIAS=TVBoxOSC'            ./gradle.properties
+          sed -i '$a\RELEASE_STORE_PASSWORD=TVBoxOSC'       ./gradle.properties
+          sed -i '$a\RELEASE_KEY_PASSWORD=TVBoxOSC'         ./gradle.properties
+
+      - name: Build With Gradle
+        run: |
+          chmod +x gradlew
+          ./gradlew clean assembleRelease --parallel --daemon --warning-mode all --stacktrace
+
+      - name: Prepare App
+        run: |
+          mkdir -p ${{ github.workspace }}/apk/
+          find . -name "*.apk" -exec mv {} ${{ github.workspace }}/apk/ \;
+
+      - name: Upload App To Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: com.github.tvbox.fongmi4x
+          path: ${{ github.workspace }}/apk/*
