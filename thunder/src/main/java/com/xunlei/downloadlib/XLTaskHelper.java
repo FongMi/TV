@@ -41,8 +41,8 @@ public class XLTaskHelper {
     }
 
     private synchronized GetTaskId startTask(GetTaskId taskId, int index) {
-        getManager().setTaskLxState(taskId.getTaskId(), index, 1);
         getManager().startTask(taskId.getTaskId());
+        getManager().setTaskGsState(taskId.getTaskId(), index, 2);
         return taskId;
     }
 
@@ -64,7 +64,7 @@ public class XLTaskHelper {
     public synchronized GetTaskId addThunderTask(String url, File savePath) {
         String fileName = getManager().getFileNameFromUrl(url);
         GetTaskId taskId = new GetTaskId(savePath, fileName, url);
-        if (url.startsWith("ftp://") || url.startsWith("http://") || url.startsWith("https://")) {
+        if (url.startsWith("ftp://")) {
             P2spTaskParam param = new P2spTaskParam();
             param.setFilePath(savePath.getAbsolutePath());
             param.setSeqId(getSeq().incrementAndGet());
@@ -77,6 +77,8 @@ public class XLTaskHelper {
             param.setPass("");
             int code = getManager().createP2spTask(param, taskId);
             if (code != XLConstant.XLErrorCode.NO_ERROR) return taskId;
+            getManager().setDownloadTaskOrigin(taskId.getTaskId(), "out_app/out_app_paste");
+            getManager().setOriginUserAgent(taskId.getTaskId(), "AndroidDownloadManager/5.41.2.4980 (Linux; U; Android 4.4.4; Build/KTU84Q)");
         } else if (url.startsWith("ed2k://")) {
             EmuleTaskParam param = new EmuleTaskParam();
             param.setFilePath(savePath.getAbsolutePath());
@@ -87,8 +89,6 @@ public class XLTaskHelper {
             int code = getManager().createEmuleTask(param, taskId);
             if (code != XLConstant.XLErrorCode.NO_ERROR) return taskId;
         }
-        getManager().setDownloadTaskOrigin(taskId.getTaskId(), "out_app/out_app_paste");
-        getManager().setOriginUserAgent(taskId.getTaskId(), "AndroidDownloadManager/4.4.4 (Linux; U; Android 4.4.4; Build/KTU84Q)");
         return startTask(taskId, 0);
     }
 
@@ -115,8 +115,7 @@ public class XLTaskHelper {
             for (int i = 0; i < list.size(); i++) btIndexSet.mIndexSet[i] = list.get(i);
             getManager().deselectBtSubTask(taskId.getTaskId(), btIndexSet);
         }
-        startTask(taskId, index);
-        return taskId;
+        return startTask(taskId, index);
     }
 
     public synchronized TorrentInfo getTorrentInfo(File file) {

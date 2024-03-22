@@ -8,11 +8,11 @@ import java.util.List;
 
 public class TorrentInfo {
 
-    public int mFileCount;
-    public String mInfoHash;
-    public boolean mIsMultiFiles;
-    public String mMultiFileBaseFolder;
     public TorrentFileInfo[] mSubFileInfo;
+    public String mMultiFileBaseFolder;
+    public boolean mIsMultiFiles;
+    public String mInfoHash;
+    public int mFileCount;
     public File mFile;
 
     public TorrentInfo(File file) {

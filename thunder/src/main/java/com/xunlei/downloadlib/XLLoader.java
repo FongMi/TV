@@ -1,7 +1,5 @@
 package com.xunlei.downloadlib;
 
-import android.content.Context;
-
 import com.xunlei.downloadlib.parameter.BtIndexSet;
 import com.xunlei.downloadlib.parameter.BtSubTaskDetail;
 import com.xunlei.downloadlib.parameter.GetDownloadLibVersion;
@@ -12,9 +10,10 @@ import com.xunlei.downloadlib.parameter.TorrentInfo;
 import com.xunlei.downloadlib.parameter.XLTaskInfo;
 import com.xunlei.downloadlib.parameter.XLTaskLocalUrl;
 
-public class XLLoader {
+class XLLoader {
 
     public XLLoader() {
+        System.loadLibrary("xl_stat");
         System.loadLibrary("xl_thunder_sdk");
     }
 
@@ -40,13 +39,11 @@ public class XLLoader {
 
     public native int getTorrentInfo(String str, TorrentInfo torrentInfo);
 
-    public native int init(Context context, String str, String str2, String str3, String str4, String str5, String str6, String str7, int i, int i2);
+    public native int init(String str, String str2, String str3, String str4, String str5, String str6, String str7, String str8, int i, int i2, int i3);
 
     public native int parserThunderUrl(String str, ThunderUrlInfo thunderUrlInfo);
 
     public native int releaseTask(long j);
-
-    public native int setAccelerateToken(long j, int i, long j2, int i2, String str);
 
     public native int setDownloadTaskOrigin(long j, String str);
 
@@ -62,11 +59,7 @@ public class XLLoader {
 
     public native int setTaskGsState(long j, int i, int i2);
 
-    public native int setTaskLxState(long j, int i, int i2);
-
-    public native int setUserId(String str);
-
-    public native int startTask(long j, boolean z);
+    public native int startTask(long j);
 
     public native int stopTask(long j);
 

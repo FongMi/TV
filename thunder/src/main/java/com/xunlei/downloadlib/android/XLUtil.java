@@ -1,8 +1,5 @@
 package com.xunlei.downloadlib.android;
 
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.util.Base64;
 
 import java.util.Random;
@@ -46,53 +43,5 @@ public class XLUtil {
         bArr[length + 2] = (byte) ((s >> 8) & 255);
         bArr[length + 3] = b;
         return new String(Base64.encode(bArr, 0)).trim();
-    }
-
-    public static int getNetworkTypeComplete(Context context) {
-        if (context == null) {
-            return 0;
-        }
-        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        int i = 0;
-        if (connectivityManager != null) {
-            NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-            i = 0;
-            if (activeNetworkInfo != null) {
-                int type = activeNetworkInfo.getType();
-                if (type == 1) {
-                    i = 9;
-                } else if (type == 0) {
-                    switch (activeNetworkInfo.getSubtype()) {
-                        case 1:
-                        case 2:
-                        case 4:
-                        case 7:
-                        case 11:
-                            i = 2;
-                            break;
-                        case 3:
-                        case 5:
-                        case 6:
-                        case 8:
-                        case 9:
-                        case 10:
-                        case 12:
-                        case 14:
-                        case 15:
-                            i = 3;
-                            break;
-                        case 13:
-                            i = 4;
-                            break;
-                        default:
-                            i = 0;
-                            break;
-                    }
-                } else {
-                    i = 5;
-                }
-            }
-        }
-        return i;
     }
 }

@@ -1,6 +1,1 @@
-<manifest package="com.ghost.thunder" xmlns:android="http://schemas.android.com/apk/res/android">
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <application>
-        <meta-data android:name="com.xunlei.download.APP_KEY" android:value="bpIzNjAxNTsxNTA0MDk0ODg4LjQyODAwMA&amp;&amp;OxNw==21^5e1c1b6a73^c76f3^cd3c0e331d164^ed3c62==2974DD65D2^39222^5954C5914A8267D"/>
-    </application>
-</manifest>
+<manifest package="com.ghost.thunder" />

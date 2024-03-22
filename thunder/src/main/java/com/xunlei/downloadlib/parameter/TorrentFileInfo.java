@@ -10,11 +10,13 @@ import java.util.Comparator;
 import java.util.List;
 
 public class TorrentFileInfo {
-    public int mFileIndex;
+
+    public boolean isSelected;
     public String mFileName;
-    public long mFileSize;
-    public int mRealIndex;
     public String mSubPath;
+    public long mFileSize;
+    public int mFileIndex;
+    public int mRealIndex;
     public File mFile;
 
     public String getFileName() {
