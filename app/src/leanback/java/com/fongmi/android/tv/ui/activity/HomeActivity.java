@@ -82,6 +82,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     private View mOldView;
     private boolean confirm;
     private Clock mClock;
+    private View mFocus;
 
     private Site getHome() {
         return VodConfig.get().getHome();
@@ -198,6 +199,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         String title = getHome().getName();
         mBinding.title.setText(title.isEmpty() ? ResUtil.getString(R.string.app_name) : title);
         if (getHome().getKey().isEmpty()) return;
+        mFocus = getCurrentFocus();
         getHomeFragment().mBinding.progressLayout.showProgress();
         mViewModel.homeContent();
     }
@@ -212,7 +214,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         mPageAdapter.notifyDataSetChanged();
         getHomeFragment().addVideo(result);
         getHomeFragment().mBinding.progressLayout.showContent();
-        setFocus();
+        App.post(() -> setFocus(), 200);
     }
 
     private void setPager() {
@@ -455,8 +457,8 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     private void setFocus() {
         setLoading(false);
-        App.post(() -> mBinding.title.setFocusable(true), 500);
-        if (!mBinding.title.hasFocus()) {
+        if (!mBinding.title.isFocusable()) App.post(() -> mBinding.title.setFocusable(true), 500);
+        if (mFocus != mBinding.title) {
             if (Setting.getHomeUI() == 0) getHomeFragment().mBinding.recycler.requestFocus();
             else mBinding.recycler.requestFocus();
         }
@@ -550,7 +552,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         public Fragment getItem(int position) {
             if (position == 0) return new HomeFragment();
             Class type = (Class) mAdapter.get(position);
-            return VodFragment.newInstance(getHome().getKey(), type.getTypeId(), type.getStyle(), type.getExtend(false), type.getTypeFlag().equals("1"));
+            return VodFragment.newInstance(getHome().getKey(), type.getTypeId(), type.getStyle(), type.getExtend(false), "1".equals(type.getTypeFlag()));
         }
 
         @Override
