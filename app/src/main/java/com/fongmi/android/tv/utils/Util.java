@@ -92,7 +92,7 @@ public class Util {
             if (TextUtils.isEmpty(id)) throw new NullPointerException();
             return id;
         } catch (Exception e) {
-            return "0200000000000000";
+            return "0000000000000000";
         }
     }
 
