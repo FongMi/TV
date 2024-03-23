@@ -34,7 +34,7 @@ public class Device {
 
     public static Device get() {
         Device device = new Device();
-        device.setUuid(Util.getDeviceId());
+        device.setUuid(Util.getAndroidId());
         device.setName(Util.getDeviceName());
         device.setIp(Server.get().getAddress());
         device.setType(Product.getDeviceType());
