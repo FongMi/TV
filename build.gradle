@@ -1,6 +1,6 @@
 plugins {
-    id 'com.android.application' version '8.8.2' apply false
-    id 'com.android.library' version '8.8.2' apply false
+    id 'com.android.application' version '8.8.0-alpha05' apply false
+    id 'com.android.library' version '8.8.0-alpha05' apply false
     id 'com.chaquo.python' version '15.0.1' apply false
 }
 

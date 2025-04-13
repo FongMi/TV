@@ -4,6 +4,12 @@ pluginManagement {
         mavenCentral()
         jcenter()
         google()
+        maven { url "https://jitpack.io" }
+        maven {
+            url "http://4thline.org/m2"
+            allowInsecureProtocol = true
+        }
+        maven { url "https://chaquo.com/maven" }
     }
 }
 dependencyResolutionManagement {
@@ -18,6 +24,7 @@ dependencyResolutionManagement {
             url "http://4thline.org/m2"
             allowInsecureProtocol = true
         }
+        maven { url "https://chaquo.com/maven" }
     }
 }
 include ':app'

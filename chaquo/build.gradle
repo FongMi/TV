@@ -14,6 +14,7 @@ android {
         targetSdk 28
         python {
             version "3.8"
+            buildPython "/usr/local/bin/python3"
             pip {
                 install "lxml"
                 install "ujson"
