@@ -38,14 +38,12 @@ import io.github.anilbeesetti.nextlib.media3ext.ffdecoder.NextRenderersFactory;
 
 public class ExoUtil {
 
-    private static int ID = 10000;
-
     public static String getUa() {
         return Util.getUserAgent(App.get(), BuildConfig.APPLICATION_ID);
     }
 
     public static LoadControl buildLoadControl() {
-        return new DefaultLoadControl.Builder().setBufferDurationsMs(DefaultLoadControl.DEFAULT_MIN_BUFFER_MS * Setting.getBuffer(), DefaultLoadControl.DEFAULT_MAX_BUFFER_MS * Setting.getBuffer(), DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_MS, DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS).setBackBuffer(30000, true).build();
+        return new DefaultLoadControl.Builder().setBufferDurationsMs(DefaultLoadControl.DEFAULT_MIN_BUFFER_MS * Setting.getBuffer(), DefaultLoadControl.DEFAULT_MAX_BUFFER_MS * Setting.getBuffer(), DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_MS, DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS).build();
     }
 
     public static TrackSelector buildTrackSelector() {
@@ -127,7 +125,7 @@ public class ExoUtil {
 
     private static List<MediaItem.SubtitleConfiguration> getSubtitleConfigs(List<Sub> subs) {
         List<MediaItem.SubtitleConfiguration> configs = new ArrayList<>();
-        for (Sub sub : subs) configs.add(sub.getConfig(++ID));
+        if (subs != null) for (Sub sub : subs) configs.add(sub.config());
         return configs;
     }
 

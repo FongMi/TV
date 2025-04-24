@@ -6,8 +6,6 @@ import androidx.annotation.Nullable;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.io.File;
-
 public class Danmaku {
 
     @SerializedName("name")
@@ -18,24 +16,9 @@ public class Danmaku {
     private boolean selected;
 
     public static Danmaku from(String path) {
-        if (path.startsWith("http")) {
-            return http(path);
-        } else {
-            return file(path);
-        }
-    }
-
-    public static Danmaku http(String path) {
         Danmaku danmaku = new Danmaku();
         danmaku.setName(path);
         danmaku.setUrl(path);
-        return danmaku;
-    }
-
-    public static Danmaku file(String path) {
-        Danmaku danmaku = new Danmaku();
-        danmaku.setName(new File(path).getName());
-        danmaku.setUrl("file:/" + path);
         return danmaku;
     }
 

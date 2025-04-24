@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 
 import okhttp3.Headers;
 
-public class Force implements Source.Extractor {
+public class Force implements Source.Extractor, ServiceConnection {
 
     private static final Pattern PATTERN = Pattern.compile("(?i)(p[2-9]p|mitv)");
     private final HashSet<String> set = new HashSet<>();
@@ -29,7 +29,7 @@ public class Force implements Source.Extractor {
     }
 
     private void init(String scheme) {
-        App.get().bindService(Util.intent(App.get(), scheme), mConn, Context.BIND_AUTO_CREATE);
+        App.get().bindService(Util.intent(App.get(), scheme), this, Context.BIND_AUTO_CREATE);
     }
 
     @Override
@@ -53,7 +53,7 @@ public class Force implements Source.Extractor {
     @Override
     public void exit() {
         try {
-            if (!set.isEmpty()) App.get().unbindService(mConn);
+            if (!set.isEmpty()) App.get().unbindService(this);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -61,15 +61,13 @@ public class Force implements Source.Extractor {
         }
     }
 
-    private final ServiceConnection mConn = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            set.add(Util.trans(name));
-        }
+    @Override
+    public void onServiceConnected(ComponentName name, IBinder service) {
+        set.add(Util.trans(name));
+    }
 
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            set.remove(Util.trans(name));
-        }
-    };
+    @Override
+    public void onServiceDisconnected(ComponentName name) {
+        set.remove(Util.trans(name));
+    }
 }

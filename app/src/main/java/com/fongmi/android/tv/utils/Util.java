@@ -116,6 +116,7 @@ public class Util {
         try {
             StringBuilder sb = new StringBuilder();
             NetworkInterface nif = NetworkInterface.getByName(name);
+            if (nif.getHardwareAddress() == null) return "";
             for (byte b : nif.getHardwareAddress()) sb.append(String.format("%02X:", b));
             return substring(sb.toString());
         } catch (Exception e) {

@@ -100,7 +100,7 @@ public class Catchup {
     }
 
     private String append(String url, String result) {
-        String[] splits = getReplace().split(",");
+        String[] splits = getReplace().split(",", 2);
         if (splits.length == 2) url = url.replaceAll(splits[0], splits[1]);
         if (!TextUtils.isEmpty(URI.create(url).getQuery())) result = result.replace("?", "&");
         return url + result;

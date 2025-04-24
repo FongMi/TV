@@ -7,30 +7,30 @@ import java.util.List;
 
 public class ColorGenerator {
 
-    private static final List<Integer> PALETTE_500;
+    private static final List<Integer> PALETTE_400;
     private static final List<Integer> PALETTE_700;
 
     static {
-        PALETTE_500 = new ArrayList<>();
-        PALETTE_500.add(MDColor.RED_500);
-        PALETTE_500.add(MDColor.PINK_500);
-        PALETTE_500.add(MDColor.PURPLE_500);
-        PALETTE_500.add(MDColor.DEEP_PURPLE_500);
-        PALETTE_500.add(MDColor.INDIGO_500);
-        PALETTE_500.add(MDColor.BLUE_500);
-        PALETTE_500.add(MDColor.LIGHT_BLUE_500);
-        PALETTE_500.add(MDColor.CYAN_500);
-        PALETTE_500.add(MDColor.TEAL_500);
-        PALETTE_500.add(MDColor.GREEN_500);
-        PALETTE_500.add(MDColor.LIGHT_GREEN_500);
-        PALETTE_500.add(MDColor.LIME_500);
-        PALETTE_500.add(MDColor.YELLOW_500);
-        PALETTE_500.add(MDColor.AMBER_500);
-        PALETTE_500.add(MDColor.ORANGE_500);
-        PALETTE_500.add(MDColor.DEEP_ORANGE_500);
-        PALETTE_500.add(MDColor.BROWN_500);
-        PALETTE_500.add(MDColor.GREY_500);
-        PALETTE_500.add(MDColor.BLUE_GREY_500);
+        PALETTE_400 = new ArrayList<>();
+        PALETTE_400.add(MDColor.RED_400);
+        PALETTE_400.add(MDColor.PINK_400);
+        PALETTE_400.add(MDColor.PURPLE_400);
+        PALETTE_400.add(MDColor.DEEP_PURPLE_400);
+        PALETTE_400.add(MDColor.INDIGO_400);
+        PALETTE_400.add(MDColor.BLUE_400);
+        PALETTE_400.add(MDColor.LIGHT_BLUE_400);
+        PALETTE_400.add(MDColor.CYAN_400);
+        PALETTE_400.add(MDColor.TEAL_400);
+        PALETTE_400.add(MDColor.GREEN_400);
+        PALETTE_400.add(MDColor.LIGHT_GREEN_400);
+        PALETTE_400.add(MDColor.LIME_400);
+        PALETTE_400.add(MDColor.YELLOW_400);
+        PALETTE_400.add(MDColor.AMBER_400);
+        PALETTE_400.add(MDColor.ORANGE_400);
+        PALETTE_400.add(MDColor.DEEP_ORANGE_400);
+        PALETTE_400.add(MDColor.BROWN_400);
+        PALETTE_400.add(MDColor.GREY_400);
+        PALETTE_400.add(MDColor.BLUE_GREY_400);
 
         PALETTE_700 = new ArrayList<>();
         PALETTE_700.add(MDColor.RED_700);
@@ -54,11 +54,11 @@ public class ColorGenerator {
         PALETTE_700.add(MDColor.BLUE_GREY_700);
     }
 
-    public static int get500(String key) {
-        return PALETTE_500.get(Math.abs(key.hashCode()) % PALETTE_500.size());
+    public static int get400(String key) {
+        return PALETTE_400.get((key.hashCode() & Integer.MAX_VALUE) % PALETTE_400.size());
     }
 
     public static int get700(String key) {
-        return PALETTE_700.get(Math.abs(key.hashCode()) % PALETTE_700.size());
+        return PALETTE_700.get((key.hashCode() & Integer.MAX_VALUE) % PALETTE_700.size());
     }
 }

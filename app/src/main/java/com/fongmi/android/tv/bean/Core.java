@@ -74,6 +74,6 @@ public class Core {
         if (this == obj) return true;
         if (!(obj instanceof Core)) return false;
         Core it = (Core) obj;
-        return getSo().equals(it.getSo());
+        return getSign().equals(it.getSign());
     }
 }

@@ -28,7 +28,7 @@ public class Constant {
     public static final int TIMEOUT_PARSE_LIVE = 10 * 1000;
     //同步超時時間
     public static final int TIMEOUT_SYNC = 2 * 1000;
-    //搜尋線程數量
+    //主要線程數量
     public static final int THREAD_POOL = 10;
 
 }

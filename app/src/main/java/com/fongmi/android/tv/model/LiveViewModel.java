@@ -77,7 +77,7 @@ public class LiveViewModel extends ViewModel {
         String date = formatDate.format(new Date());
         String url = item.getEpg().replace("{date}", date);
         execute(EPG, () -> {
-            if (!url.isEmpty() && !item.getData().equal(date)) item.setData(Epg.objectFrom(OkHttp.string(url), item.getTvgName(), formatTime));
+            if (url.startsWith("http") && !item.getData().equal(date)) item.setData(Epg.objectFrom(OkHttp.string(url), item.getTvgId(), formatTime));
             return item.getData().selected();
         });
     }

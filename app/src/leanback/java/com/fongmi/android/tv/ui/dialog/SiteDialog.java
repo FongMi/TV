@@ -27,6 +27,7 @@ public class SiteDialog implements SiteAdapter.OnClickListener {
     private final SiteCallback callback;
     private final SiteAdapter adapter;
     private final AlertDialog dialog;
+    private final int GRID_COUNT = 10;
     private int type;
 
     public static SiteDialog create(Activity activity) {
@@ -57,11 +58,11 @@ public class SiteDialog implements SiteAdapter.OnClickListener {
     }
 
     private boolean list() {
-        return Setting.getSiteMode() == 0 || adapter.getItemCount() < 20;
+        return Setting.getSiteMode() == 0 || adapter.getItemCount() < GRID_COUNT;
     }
 
     private int getCount() {
-        return list() ? 1 : Math.max(2, Math.min((int) (Math.ceil(adapter.getItemCount() / 20.0f)), 3));
+        return list() ? 1 : Math.max(2, Math.min((int) Math.ceil((double) adapter.getItemCount() / GRID_COUNT), 3));
     }
 
     private int getIcon() {
@@ -106,8 +107,8 @@ public class SiteDialog implements SiteAdapter.OnClickListener {
     }
 
     private void setMode() {
-        if (adapter.getItemCount() < 20) Setting.putSiteMode(0);
-        binding.mode.setEnabled(adapter.getItemCount() >= 20);
+        if (adapter.getItemCount() < GRID_COUNT) Setting.putSiteMode(0);
+        binding.mode.setEnabled(adapter.getItemCount() >= GRID_COUNT);
         binding.mode.setImageResource(getIcon());
     }
 

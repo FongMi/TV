@@ -52,7 +52,7 @@ public class CustomKeyDownLive extends GestureDetector.SimpleOnGestureListener {
         if (changeSpeed && e.getAction() == MotionEvent.ACTION_UP) listener.onSpeedEnd();
         if (changeBright && e.getAction() == MotionEvent.ACTION_UP) listener.onBrightEnd();
         if (changeVolume && e.getAction() == MotionEvent.ACTION_UP) listener.onVolumeEnd();
-        return e.getPointerCount() == 1 && detector.onTouchEvent(e);
+        return detector.onTouchEvent(e);
     }
 
     public void setLock(boolean lock) {
@@ -65,7 +65,7 @@ public class CustomKeyDownLive extends GestureDetector.SimpleOnGestureListener {
 
     @Override
     public boolean onDown(@NonNull MotionEvent e) {
-        if (isEdge(e) || lock) return true;
+        if (isEdge(e) || lock || e.getPointerCount() > 1) return true;
         volume = manager.getStreamVolume(AudioManager.STREAM_MUSIC);
         bright = Util.getBrightness(activity);
         changeBright = false;
@@ -79,14 +79,14 @@ public class CustomKeyDownLive extends GestureDetector.SimpleOnGestureListener {
 
     @Override
     public void onLongPress(@NonNull MotionEvent e) {
-        if (isEdge(e) || lock) return;
+        if (isEdge(e) || lock || e.getPointerCount() > 1) return;
         changeSpeed = true;
         listener.onSpeedUp();
     }
 
     @Override
     public boolean onScroll(@NonNull MotionEvent e1, @NonNull MotionEvent e2, float distanceX, float distanceY) {
-        if (isEdge(e1) || lock) return true;
+        if (isEdge(e1) || lock || e1.getPointerCount() > 1) return true;
         float deltaX = e2.getX() - e1.getX();
         float deltaY = e1.getY() - e2.getY();
         if (touch) checkFunc(distanceX, distanceY, e2);

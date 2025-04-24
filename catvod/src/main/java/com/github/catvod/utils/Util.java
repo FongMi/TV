@@ -3,7 +3,6 @@ package com.github.catvod.utils;
 import android.content.Context;
 import android.net.wifi.WifiManager;
 import android.text.TextUtils;
-import android.text.format.Formatter;
 import android.util.Base64;
 
 import com.github.catvod.Init;
@@ -18,8 +17,15 @@ import java.net.SocketException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import okhttp3.OkHttp;
+import okhttp3.Request;
 
 public class Util {
 
@@ -52,6 +58,7 @@ public class Util {
     }
 
     public static String basic(String userInfo) {
+        if (!userInfo.contains(":")) userInfo += ":";
         return "Basic " + base64(userInfo, Base64.NO_WRAP);
     }
 
@@ -114,25 +121,70 @@ public class Util {
 
     public static String getIp() {
         try {
-            WifiManager manager = (WifiManager) Init.context().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-            int address = manager.getConnectionInfo().getIpAddress();
-            if (address != 0) return Formatter.formatIpAddress(address);
-            return getHostAddress();
+            String ip = getHostAddress("wlan");
+            if (!ip.isEmpty()) return ip;
+            ip = getHostAddress("eth");
+            if (!ip.isEmpty()) return ip;
+            ip = getWifiAddress();
+            if (!ip.isEmpty()) return ip;
+            return getHostAddress("");
         } catch (Exception e) {
             return "";
         }
     }
 
-    private static String getHostAddress() throws SocketException {
+    private static String getWifiAddress() {
+        WifiManager manager = (WifiManager) Init.context().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        int ip = manager.getConnectionInfo().getIpAddress();
+        return ip == 0 ? "" : String.format(Locale.getDefault(), "%d.%d.%d.%d", ip & 0xFF, (ip >> 8) & 0xFF, (ip >> 16) & 0xFF, (ip >> 24) & 0xFF);
+    }
+
+    private static String getHostAddress(String keyword) throws SocketException {
         for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
-            NetworkInterface interfaces = en.nextElement();
-            for (Enumeration<InetAddress> addresses = interfaces.getInetAddresses(); addresses.hasMoreElements(); ) {
-                InetAddress inetAddress = addresses.nextElement();
-                if (!inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address) {
-                    return inetAddress.getHostAddress();
+            NetworkInterface nif = en.nextElement();
+            if (!keyword.isEmpty() && !nif.getName().startsWith(keyword)) continue;
+            for (Enumeration<InetAddress> addresses = nif.getInetAddresses(); addresses.hasMoreElements(); ) {
+                InetAddress addr = addresses.nextElement();
+                if (!addr.isLoopbackAddress() && addr instanceof Inet4Address) {
+                    return addr.getHostAddress();
                 }
             }
         }
         return "";
+    }
+
+    public static String digest(String userInfo, String header, Request request) {
+        Map<String, String> params = parse(header.substring(7));
+        String[] parts = userInfo.split(":", 2);
+        String nc = "00000001";
+        String username = parts[0];
+        String password = parts.length > 1 ? parts[1] : "";
+        String qop = params.get("qop");
+        String realm = params.get("realm");
+        String nonce = params.get("nonce");
+        String opaque = params.get("opaque");
+        String uri = request.url().encodedPath();
+        String hash1 = Util.md5(username + ":" + realm + ":" + password);
+        String hash2 = Util.md5(request.method() + ":" + uri);
+        String cnonce = UUID.randomUUID().toString().replace("-", "");
+        String response = Util.md5(hash1 + ":" + nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + hash2);
+        StringBuilder sb = new StringBuilder("Digest ");
+        sb.append("username=\"").append(username).append("\", ");
+        sb.append("realm=\"").append(realm).append("\", ");
+        sb.append("nonce=\"").append(nonce).append("\", ");
+        sb.append("uri=\"").append(uri).append("\", ");
+        sb.append("cnonce=\"").append(cnonce).append("\", ");
+        sb.append("nc=").append(nc).append(", ");
+        sb.append("qop=\"").append(qop).append("\", ");
+        sb.append("response=\"").append(response).append("\"");
+        if (opaque != null) sb.append(", opaque=\"").append(opaque).append("\"");
+        return sb.toString();
+    }
+
+    private static Map<String, String> parse(String header) {
+        Map<String, String> params = new HashMap<>();
+        Matcher matcher = Pattern.compile("(\\w+)=\"([^\"]*)\"").matcher(header);
+        while (matcher.find()) params.put(matcher.group(1), matcher.group(2));
+        return params;
     }
 }

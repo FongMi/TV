@@ -101,6 +101,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 
 public class VideoActivity extends BaseActivity implements CustomKeyDownVod.Listener, TrackDialog.Listener, ArrayPresenter.OnClickListener, Clock.Callback {
@@ -782,6 +783,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private void onOpening() {
         long current = mPlayers.getPosition();
         long duration = mPlayers.getDuration();
+        if (current > TimeUnit.MINUTES.toMillis(10)) return;
         if (current < 0 || duration < 0 || current > duration / 2) return;
         setOpening(current);
     }
@@ -811,6 +813,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private void onEnding() {
         long current = mPlayers.getPosition();
         long duration = mPlayers.getDuration();
+        if (duration - current > TimeUnit.MINUTES.toMillis(10)) return;
         if (current < 0 || duration < 0 || current < duration / 2) return;
         setEnding(duration - current);
     }
@@ -1172,7 +1175,7 @@ public class VideoActivity extends BaseActivity implements CustomKeyDownVod.List
     private void startSearch(String keyword) {
         mQuickAdapter.clear();
         List<Site> sites = new ArrayList<>();
-        mExecutor = Executors.newFixedThreadPool(Constant.THREAD_POOL);
+        mExecutor = Executors.newFixedThreadPool(10);
         for (Site site : VodConfig.get().getSites()) if (isPass(site)) sites.add(site);
         for (Site site : sites) mExecutor.execute(() -> search(site, keyword));
     }

@@ -58,7 +58,7 @@ public class Group {
     }
 
     private void parse(boolean pass) {
-        String[] splits = name.split("_");
+        String[] splits = name.split("_", 2);
         setName(splits[0]);
         if (pass || splits.length == 1) return;
         setPass(splits[1]);

@@ -399,28 +399,28 @@ public class Players implements Player.Listener, ParseCallback {
     }
 
     public void start(Channel channel, int timeout) {
-        if (channel.hasMsg()) {
+        if (channel.getDrm() != null && !FrameworkMediaDrm.isCryptoSchemeSupported(channel.getDrm().getUUID())) {
+            ErrorEvent.drm(tag);
+        } else if (channel.hasMsg()) {
             ErrorEvent.extract(tag, channel.getMsg());
-        } else if (isIllegal(channel.getUrl())) {
-            ErrorEvent.url(tag);
         } else if (channel.getParse() == 1) {
             startParse(channel.result(), false);
-        } else if (channel.getDrm() != null && !FrameworkMediaDrm.isCryptoSchemeSupported(channel.getDrm().getUUID())) {
-            ErrorEvent.drm(tag);
+        } else if (isIllegal(channel.getUrl())) {
+            ErrorEvent.url(tag);
         } else {
             setMediaItem(channel, timeout);
         }
     }
 
     public void start(Result result, boolean useParse, int timeout) {
-        if (result.hasMsg()) {
+        if (result.getDrm() != null && !FrameworkMediaDrm.isCryptoSchemeSupported(result.getDrm().getUUID())) {
+            ErrorEvent.drm(tag);
+        } else if (result.hasMsg()) {
             ErrorEvent.extract(tag, result.getMsg());
+        } else if (result.getParse() == 1 || result.getJx() == 1) {
+            startParse(result, useParse);
         } else if (isIllegal(result.getRealUrl())) {
             ErrorEvent.url(tag);
-        } else if (result.getParse(1) == 1 || result.getJx() == 1) {
-            startParse(result, useParse);
-        } else if (result.getDrm() != null && !FrameworkMediaDrm.isCryptoSchemeSupported(result.getDrm().getUUID())) {
-            ErrorEvent.drm(tag);
         } else {
             setMediaItem(result, timeout);
         }
@@ -428,6 +428,10 @@ public class Players implements Player.Listener, ParseCallback {
 
     private void startParse(Result result, boolean useParse) {
         stopParse();
+        drm = result.getDrm();
+        subs = result.getSubs();
+        format = result.getFormat();
+        danmakus = result.getDanmaku();
         parseJob = ParseJob.create(this).start(result, useParse);
     }
 
@@ -443,6 +447,7 @@ public class Players implements Player.Listener, ParseCallback {
     }
 
     private List<Sub> checkSub(List<Sub> subs) {
+        if (subs == null) subs = this.subs = new ArrayList<>();
         if (sub == null || subs.contains(sub)) return subs;
         subs.add(0, sub);
         return subs;
@@ -457,7 +462,7 @@ public class Players implements Player.Listener, ParseCallback {
     }
 
     private void setMediaItem(Map<String, String> headers, String url) {
-        setMediaItem(headers, url, null, null, new ArrayList<>(), new ArrayList<>(), Constant.TIMEOUT_PLAY);
+        setMediaItem(headers, url, format, drm, subs, danmakus, Constant.TIMEOUT_PLAY);
     }
 
     private void setMediaItem(Channel channel, int timeout) {
@@ -479,7 +484,7 @@ public class Players implements Player.Listener, ParseCallback {
     }
 
     private void setDanmaku(List<Danmaku> items) {
-        setDanmaku(items.isEmpty() ? Danmaku.empty() : items.get(0));
+        setDanmaku(items == null || items.isEmpty() ? Danmaku.empty() : items.get(0));
     }
 
     public void setDanmaku(Danmaku item) {
@@ -519,8 +524,6 @@ public class Players implements Player.Listener, ParseCallback {
         String host = UrlUtil.host(uri);
         String scheme = UrlUtil.scheme(uri);
         if ("data".equals(scheme)) return false;
-        if (url.startsWith("json:")) return false;
-        if (url.startsWith("parse:")) return false;
         return scheme.isEmpty() || "file".equals(scheme) ? !Path.exists(url) : host.isEmpty();
     }
 

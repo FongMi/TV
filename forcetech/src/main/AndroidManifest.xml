@@ -5,15 +5,18 @@
 
         <service
             android:name="com.forcetech.service.P2PService"
-            android:exported="false" />
+            android:exported="false"
+            android:process=":p2p" />
 
         <service
             android:name="com.forcetech.service.P3PService"
-            android:exported="false" />
+            android:exported="false"
+            android:process=":p3p" />
 
         <service
             android:name="com.gsoft.mitv.MainActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:process=":mitv" />
 
     </application>
 </manifest>

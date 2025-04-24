@@ -137,14 +137,6 @@ public class Setting {
         Prefers.put("background", background);
     }
 
-    public static int getRtsp() {
-        return Prefers.getInt("rtsp");
-    }
-
-    public static void putRtsp(int rtsp) {
-        Prefers.put("rtsp", rtsp);
-    }
-
     public static int getSiteMode() {
         return Prefers.getInt("site_mode");
     }
@@ -215,14 +207,6 @@ public class Setting {
 
     public static void putCaption(boolean caption) {
         Prefers.put("caption", caption);
-    }
-
-    public static boolean isLibAss() {
-        return Prefers.getBoolean("libass");
-    }
-
-    public static void putLibAss(boolean libass) {
-        Prefers.put("libass", libass);
     }
 
     public static boolean isTunnel() {

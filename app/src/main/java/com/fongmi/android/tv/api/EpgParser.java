@@ -62,28 +62,35 @@ public class EpgParser {
     private static void readXml(Live live, File file) throws Exception {
         Set<String> exist = new HashSet<>();
         Map<String, Epg> epgMap = new HashMap<>();
-        Map<String, String> mapping = new HashMap<>();
+        Map<String, String> srcMap = new HashMap<>();
+        Map<String, Tv.Channel> mapping = new HashMap<>();
         String today = formatDate.format(new Date());
         Tv tv = new Persister().read(Tv.class, Path.read(file), false);
-        for (Group group : live.getGroups()) for (Channel channel : group.getChannel()) exist.add(channel.getTvgName());
-        for (Tv.Channel channel : tv.getChannel()) mapping.put(channel.getId(), channel.getDisplayName());
+        for (Group group : live.getGroups()) for (Channel channel : group.getChannel()) exist.add(channel.getTvgId());
+        for (Tv.Channel channel : tv.getChannel()) mapping.put(channel.getId(), channel);
         for (Tv.Programme programme : tv.getProgramme()) {
             String key = programme.getChannel();
-            String name = mapping.get(programme.getChannel());
-            if (!exist.contains(key) && exist.contains(name)) key = name;
+            Tv.Channel channel = mapping.get(key);
+            if (!exist.contains(key)) key = find(exist, channel);
             Date startDate = formatFull.parse(programme.getStart());
             Date endDate = formatFull.parse(programme.getStop());
             if (!exist.contains(key) || !isToday(startDate)) continue;
             if (!epgMap.containsKey(key)) epgMap.put(key, Epg.create(key, today));
             epgMap.get(key).getList().add(getEpgData(startDate, endDate, programme));
+            if (channel != null && channel.hasSrc()) srcMap.put(key, channel.getSrc());
         }
         for (Group group : live.getGroups()) {
             for (Channel channel : group.getChannel()) {
-                if (epgMap.containsKey(channel.getTvgName())) {
-                    channel.setData(epgMap.get(channel.getTvgName()));
-                }
+                if (epgMap.containsKey(channel.getTvgId())) channel.setData(epgMap.get(channel.getTvgId()));
+                if (srcMap.containsKey(channel.getTvgId())) channel.setLogo(srcMap.get(channel.getTvgId()));
             }
         }
+    }
+
+    private static String find(Set<String> exist, Tv.Channel channel) {
+        if (channel == null) return "";
+        for (Tv.DisplayName name : channel.getDisplayName()) if (exist.contains(name.getText())) return name.getText();
+        return "";
     }
 
     public static Epg getEpg(String xml, String key) throws Exception {

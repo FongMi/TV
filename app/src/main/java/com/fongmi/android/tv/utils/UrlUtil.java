@@ -41,11 +41,11 @@ public class UrlUtil {
 
     public static String convert(String url) {
         String scheme = scheme(url);
-        if ("local".equals(scheme)) return url.replace("local://", Server.get().getAddress("/"));
-        if ("assets".equals(scheme)) return url.replace("assets://", Server.get().getAddress("/"));
-        if ("file".equals(scheme)) return url.replace("file://", Server.get().getAddress("/file/"));
-        if ("proxy".equals(scheme)) return url.replace("proxy://", Server.get().getAddress("/proxy?"));
-        return url;
+        String path = null;
+        if ("file".equals(scheme)) path = "/file/";
+        else if ("proxy".equals(scheme)) path = "/proxy?";
+        else if ("local".equals(scheme) || "assets".equals(scheme)) path = "/";
+        return path != null ? url.replace(scheme + "://", Server.get().getAddress(path)) : url;
     }
 
     public static String fixHeader(String key) {

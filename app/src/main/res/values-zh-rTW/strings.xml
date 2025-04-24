@@ -101,7 +101,6 @@
     <string name="player_tunnel">隧道模式</string>
     <string name="player_buffer">緩衝時間</string>
     <string name="player_speed">長按倍速</string>
-    <string name="player_rtsp">RTSP 通道</string>
     <string name="player_ua">User-Agent</string>
 
     <!-- Search -->

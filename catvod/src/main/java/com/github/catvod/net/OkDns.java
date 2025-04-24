@@ -33,7 +33,7 @@ public class OkDns implements Dns {
     public synchronized void addAll(List<String> hosts) {
         for (String host : hosts) {
             if (!host.contains("=")) continue;
-            String[] splits = host.split("=");
+            String[] splits = host.split("=", 2);
             String oldHost = splits[0];
             String newHost = splits[1];
             map.put(oldHost, newHost);

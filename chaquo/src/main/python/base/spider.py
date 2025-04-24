@@ -4,10 +4,10 @@ import json
 import time
 import requests
 from lxml import etree
+from com.github.catvod import Proxy
 from com.chaquo.python import Python
 from abc import abstractmethod, ABCMeta
 from importlib.machinery import SourceFileLoader
-from com.github.catvod import Proxy
 
 
 class Spider(metaclass=ABCMeta):

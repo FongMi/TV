@@ -91,7 +91,7 @@ public class Flag implements Parcelable {
     public void createEpisode(String data) {
         String[] urls = data.contains("#") ? data.split("#") : new String[]{data};
         for (int i = 0; i < urls.length; i++) {
-            String[] split = urls[i].split("\\$");
+            String[] split = urls[i].split("\\$", 2);
             String number = String.format(Locale.getDefault(), "%02d", i + 1);
             Episode episode = split.length > 1 ? Episode.create(split[0].isEmpty() ? number : split[0].trim(), split[1]) : Episode.create(number, urls[i]);
             if (!getEpisodes().contains(episode)) getEpisodes().add(episode);

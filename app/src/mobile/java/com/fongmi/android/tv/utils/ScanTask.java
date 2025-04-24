@@ -73,7 +73,7 @@ public class ScanTask {
         Set<String> urls = new HashSet<>(ips);
         String local = Server.get().getAddress();
         String base = local.substring(0, local.lastIndexOf(".") + 1);
-        for (int i = 1; i < 256; i++) urls.add(base + i + ":9978");
+        for (int i = 1; i < 256; i++) urls.add(base + i + ":8964");
         return new ArrayList<>(urls);
     }
 

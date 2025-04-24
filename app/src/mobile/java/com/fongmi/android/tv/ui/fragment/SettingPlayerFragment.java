@@ -33,7 +33,6 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
     private String[] caption;
     private String[] render;
     private String[] scale;
-    private String[] rtsp;
 
     public static SettingPlayerFragment newInstance() {
         return new SettingPlayerFragment();
@@ -58,7 +57,6 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
         mBinding.audioDecodeText.setText(getSwitch(Setting.isAudioPrefer()));
         mBinding.danmakuLoadText.setText(getSwitch(Setting.isDanmakuLoad()));
         mBinding.caption.setVisibility(Setting.hasCaption() ? View.VISIBLE : View.GONE);
-        mBinding.rtspText.setText((rtsp = ResUtil.getStringArray(R.array.select_rtsp))[Setting.getRtsp()]);
         mBinding.scaleText.setText((scale = ResUtil.getStringArray(R.array.select_scale))[Setting.getScale()]);
         mBinding.renderText.setText((render = ResUtil.getStringArray(R.array.select_render))[Setting.getRender()]);
         mBinding.captionText.setText((caption = ResUtil.getStringArray(R.array.select_caption))[Setting.isCaption() ? 1 : 0]);
@@ -68,7 +66,6 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
     @Override
     protected void initEvent() {
         mBinding.ua.setOnClickListener(this::onUa);
-        mBinding.rtsp.setOnClickListener(this::setRtsp);
         mBinding.scale.setOnClickListener(this::onScale);
         mBinding.speed.setOnClickListener(this::onSpeed);
         mBinding.buffer.setOnClickListener(this::onBuffer);
@@ -89,12 +86,6 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
     public void setUa(String ua) {
         mBinding.uaText.setText(ua);
         Setting.putUa(ua);
-    }
-
-    private void setRtsp(View view) {
-        int index = Setting.getRtsp();
-        Setting.putRtsp(index = index == rtsp.length - 1 ? 0 : ++index);
-        mBinding.rtspText.setText(rtsp[index]);
     }
 
     private void onScale(View view) {

@@ -17,9 +17,11 @@ import com.tvbus.engine.Listener;
 import com.tvbus.engine.TVCore;
 
 import java.io.File;
+import java.util.concurrent.CountDownLatch;
 
 public class TVBus implements Source.Extractor, Listener {
 
+    private CountDownLatch latch;
     private volatile String hls;
     private TVCore tvcore;
     private Core core;
@@ -50,26 +52,15 @@ public class TVBus implements Source.Extractor, Listener {
         Core c = LiveConfig.get().getHome().getCore();
         if (core != null && !core.equals(c)) change();
         if (tvcore == null) init(core = c);
+        latch = new CountDownLatch(1);
         tvcore.start(url);
-        onWait();
-        onCheck();
-        return hls;
+        latch.await();
+        return check();
     }
 
-    private void onCheck() throws Exception {
+    private String check() throws Exception {
         if (hls.startsWith("-")) throw new ExtractException(ResUtil.getString(R.string.error_play_code, hls));
-    }
-
-    private void onWait() throws Exception {
-        synchronized (this) {
-            wait();
-        }
-    }
-
-    private void onNotify() {
-        synchronized (this) {
-            notify();
-        }
+        return hls;
     }
 
     private void change() {
@@ -94,14 +85,14 @@ public class TVBus implements Source.Extractor, Listener {
         JsonObject json = App.gson().fromJson(result, JsonObject.class);
         if (json.get("hls") == null) return;
         hls = json.get("hls").getAsString();
-        onNotify();
+        latch.countDown();
     }
 
     @Override
     public void onStop(String result) {
         JsonObject json = App.gson().fromJson(result, JsonObject.class);
         hls = json.get("errno").getAsString();
-        if (hls.startsWith("-")) onNotify();
+        if (hls.startsWith("-")) latch.countDown();
     }
 
     @Override

@@ -262,12 +262,8 @@ public class Result implements Parcelable {
         return pagecount == null ? 0 : pagecount;
     }
 
-    public Integer getParse(Integer def) {
-        return parse == null ? def : parse;
-    }
-
     public Integer getParse() {
-        return getParse(0);
+        return parse == null ? 0 : parse;
     }
 
     public void setParse(Integer parse) {

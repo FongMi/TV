@@ -28,6 +28,7 @@ public class Loader implements ILoader {
     public void load(String url) throws IllegalDataException {
         try {
             OkHttp.cancel("danmaku");
+            if (url.startsWith("/")) url = "file:/" + url;
             load(OkHttp.newCall(OkHttp.client(Constant.TIMEOUT_DANMAKU), UrlUtil.convert(url), "danmaku").execute().body().byteStream());
         } catch (IOException e) {
             e.printStackTrace();

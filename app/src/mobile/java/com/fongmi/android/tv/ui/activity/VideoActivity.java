@@ -111,6 +111,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 
 public class VideoActivity extends BaseActivity implements Clock.Callback, CustomKeyDownVod.Listener, TrackDialog.Listener, ControlDialog.Listener, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, QualityAdapter.OnClickListener, QuickAdapter.OnClickListener, ParseAdapter.OnClickListener, CastDialog.Listener, InfoDialog.Listener {
@@ -798,6 +799,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private void onEnding() {
         long current = mPlayers.getPosition();
         long duration = mPlayers.getDuration();
+        if (duration - current > TimeUnit.MINUTES.toMillis(10)) return;
         if (current < 0 || duration < 0 || current < duration / 2) return;
         mHistory.setEnding(duration - current);
         mBinding.control.action.ending.setText(mPlayers.stringToTime(mHistory.getEnding()));
@@ -814,6 +816,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private void onOpening() {
         long current = mPlayers.getPosition();
         long duration = mPlayers.getDuration();
+        if (current > TimeUnit.MINUTES.toMillis(10)) return;
         if (current < 0 || duration < 0 || current > duration / 2) return;
         mHistory.setOpening(current);
         mBinding.control.action.opening.setText(mPlayers.stringToTime(mHistory.getOpening()));
@@ -1246,7 +1249,7 @@ public class VideoActivity extends BaseActivity implements Clock.Callback, Custo
     private void startSearch(String keyword) {
         mQuickAdapter.clear();
         List<Site> sites = new ArrayList<>();
-        mExecutor = Executors.newFixedThreadPool(Constant.THREAD_POOL * 2);
+        mExecutor = Executors.newFixedThreadPool(20);
         for (Site item : VodConfig.get().getSites()) if (isPass(item)) sites.add(item);
         for (Site site : sites) mExecutor.execute(() -> search(site, keyword));
     }

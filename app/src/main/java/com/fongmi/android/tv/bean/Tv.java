@@ -6,7 +6,9 @@ import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
+import org.simpleframework.xml.Text;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -40,15 +42,30 @@ public class Tv {
         @Attribute(name = "id", required = false)
         private String id;
 
-        @Element(name = "display-name", required = false)
-        private String displayName;
+        @Element(name = "icon", required = false)
+        private Icon icon;
+
+        @ElementList(entry = "display-name", required = false, inline = true)
+        private List<DisplayName> displayName;
 
         public String getId() {
             return TextUtils.isEmpty(id) ? "" : id;
         }
 
-        public String getDisplayName() {
-            return TextUtils.isEmpty(displayName) ? "" : displayName;
+        private Icon getIcon() {
+            return icon == null ? new Icon() : icon;
+        }
+
+        public List<DisplayName> getDisplayName() {
+            return displayName == null ? new ArrayList<>() : displayName;
+        }
+
+        public String getSrc() {
+            return getIcon().getSrc();
+        }
+
+        public boolean hasSrc() {
+            return !getIcon().getSrc().isEmpty();
         }
     }
 
@@ -81,6 +98,28 @@ public class Tv {
 
         public String getTitle() {
             return TextUtils.isEmpty(title) ? "" : title;
+        }
+    }
+
+    @Root(name = "icon")
+    public static class Icon {
+
+        @Attribute(name = "src")
+        private String src;
+
+        public String getSrc() {
+            return TextUtils.isEmpty(src) ? "" : src;
+        }
+    }
+
+    @Root(name = "display-name")
+    public static class DisplayName {
+
+        @Text
+        private String text;
+
+        public String getText() {
+            return TextUtils.isEmpty(text) ? "" : text;
         }
     }
 }

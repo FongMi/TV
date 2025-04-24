@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
@@ -189,7 +188,7 @@ public class CollectActivity extends BaseActivity implements CustomScroller.Call
         mBinding.view.setVisibility(View.VISIBLE);
         mBinding.result.setVisibility(View.VISIBLE);
         if (mExecutor != null) mExecutor.shutdownNow();
-        mExecutor = new PauseExecutor(Constant.THREAD_POOL * 2);
+        mExecutor = new PauseExecutor(20);
         String keyword = mBinding.keyword.getText().toString().trim();
         for (Site site : mSites) mExecutor.execute(() -> search(site, keyword));
         App.post(() -> mRecordAdapter.add(keyword), 250);
