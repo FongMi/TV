@@ -30,7 +30,7 @@ public class Connect {
     }
 
     public static JSObject success(QuickJSContext ctx, Req req, Response res) {
-        try {
+        try (res) {
             JSObject jsObject = ctx.createNewJSObject();
             JSObject jsHeader = ctx.createNewJSObject();
             setHeader(ctx, res, jsHeader);

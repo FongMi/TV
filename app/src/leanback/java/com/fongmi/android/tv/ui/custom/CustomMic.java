@@ -9,7 +9,6 @@ import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
-import android.view.animation.Animation;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,7 +25,6 @@ public class CustomMic extends AppCompatImageView {
 
     private SpeechRecognizer recognizer;
     private FragmentActivity activity;
-    private Animation flicker;
     private boolean listen;
 
     public CustomMic(@NonNull Context context) {
@@ -35,12 +33,6 @@ public class CustomMic extends AppCompatImageView {
 
     public CustomMic(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        initView(context);
-    }
-
-    private void initView(Context context) {
-        flicker = ResUtil.getAnim(R.anim.flicker);
-        recognizer = SpeechRecognizer.createSpeechRecognizer(context);
     }
 
     private boolean isListen() {
@@ -52,14 +44,19 @@ public class CustomMic extends AppCompatImageView {
     }
 
     public void setListener(FragmentActivity activity, CustomTextListener listener) {
+        if (recognizer == null) recognizer = SpeechRecognizer.createSpeechRecognizer(activity);
         this.recognizer.setRecognitionListener(listener);
         this.activity = activity;
     }
 
     private void checkPermission() {
-        PermissionX.init(activity).permissions(Manifest.permission.RECORD_AUDIO).request((allGranted, grantedList, deniedList) -> {
-            if (allGranted) start();
-        });
+        if (PermissionX.isGranted(activity, Manifest.permission.RECORD_AUDIO)) {
+            start();
+        } else {
+            PermissionX.init(activity).permissions(Manifest.permission.RECORD_AUDIO).request((allGranted, grantedList, deniedList) -> {
+                if (allGranted) start();
+            });
+        }
     }
 
     private void startListening() {
@@ -71,20 +68,28 @@ public class CustomMic extends AppCompatImageView {
         }
     }
 
-    public void start() {
-        setColorFilter(MDColor.RED_500, PorterDuff.Mode.SRC_IN);
-        startAnimation(flicker);
+    private void start() {
         startListening();
-        setListen(true);
         requestFocus();
+        updateUI(true);
     }
 
     public boolean stop() {
-        setColorFilter(MDColor.WHITE, PorterDuff.Mode.SRC_IN);
         recognizer.stopListening();
-        clearAnimation();
-        setListen(false);
+        updateUI(false);
         return true;
+    }
+
+    private void updateUI(boolean listening) {
+        if (listening) {
+            setListen(true);
+            startAnimation(ResUtil.getAnim(R.anim.flicker));
+            setColorFilter(MDColor.RED_500, PorterDuff.Mode.SRC_IN);
+        } else {
+            setListen(false);
+            clearAnimation();
+            setColorFilter(MDColor.WHITE, PorterDuff.Mode.SRC_IN);
+        }
     }
 
     @Override

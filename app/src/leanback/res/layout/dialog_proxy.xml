@@ -34,7 +34,7 @@
         android:layout_above="@+id/bottom"
         android:layout_alignStart="@+id/info"
         android:layout_marginBottom="10dp"
-        android:hint="socks5://127.0.0.1:8964"
+        android:hint="socks5://127.0.0.1:9978"
         android:imeOptions="actionDone"
         android:importantForAutofill="no"
         android:inputType="text"

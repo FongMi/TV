@@ -8,6 +8,7 @@
 
     <!-- Live -->
     <string name="live_pass">Pass</string>
+    <string name="live_refresh">Refresh</string>
     <string name="live_line">Line <xliff:g name="name">%s</xliff:g></string>
 
     <!-- Detail -->
@@ -28,6 +29,7 @@
 
     <!-- Play -->
     <string name="play">Play</string>
+    <string name="pause">Pause</string>
     <string name="play_op">OP</string>
     <string name="play_ed">ED</string>
     <string name="play_exo">EXO</string>
@@ -98,6 +100,7 @@
     <string name="player_caption">Caption style</string>
     <string name="player_background">Background play</string>
     <string name="player_audio_decode">Audio software decode</string>
+    <string name="player_aac_track">Prefer aac track</string>
     <string name="player_danmaku_load">Danmaku load</string>
     <string name="player_tunnel">Tunnel mode</string>
     <string name="player_buffer">Buffer time</string>

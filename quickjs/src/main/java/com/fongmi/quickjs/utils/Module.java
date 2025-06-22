@@ -37,9 +37,9 @@ public class Module {
     private String request(String url) {
         try {
             Uri uri = Uri.parse(url);
+            byte[] data = OkHttp.bytes(url);
             File file = Path.js(uri.getLastPathSegment());
             boolean cache = !"127.0.0.1".equals(uri.getHost());
-            byte[] data = OkHttp.newCall(url).execute().body().bytes();
             if (cache) new Thread(() -> Path.write(file, data)).start();
             return new String(data, StandardCharsets.UTF_8);
         } catch (Exception e) {

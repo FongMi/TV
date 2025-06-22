@@ -19,7 +19,7 @@ public class EpgDataPresenter extends Presenter {
 
     public interface OnClickListener {
 
-        void showUI();
+        void hideEpg();
 
         void onItemClick(EpgData item);
     }
@@ -36,7 +36,7 @@ public class EpgDataPresenter extends Presenter {
         holder.binding.time.setText(item.getTime());
         holder.binding.title.setText(item.getTitle());
         holder.binding.getRoot().setSelected(item.isSelected());
-        holder.binding.getRoot().setLeftListener(mListener::showUI);
+        holder.binding.getRoot().setLeftListener(mListener::hideEpg);
         setOnClickListener(holder, view -> {
             if (!item.isFuture()) mListener.onItemClick(item);
         });

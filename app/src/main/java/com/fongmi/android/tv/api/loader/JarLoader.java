@@ -78,7 +78,7 @@ public class JarLoader {
 
     private File download(String url) {
         try {
-            return Path.write(Path.jar(url), OkHttp.newCall(url).execute().body().bytes());
+            return Path.write(Path.jar(url), OkHttp.bytes(url));
         } catch (Exception e) {
             return Path.jar(url);
         }

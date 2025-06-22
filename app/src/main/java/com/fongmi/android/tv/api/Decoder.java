@@ -23,12 +23,12 @@ public class Decoder {
     private static final Pattern JS_URI = Pattern.compile("\"(\\.|\\.\\.)/(.?|.+?)\\.js\\?(.?|.+?)\"");
 
     public static String getJson(String url, String tag) throws Exception {
-        url = UrlUtil.convert(url);
-        int size = HttpUrl.parse(url).querySize();
-        Response res = OkHttp.newCall(url, tag).execute();
-        HttpUrl httpUrl = res.request().url();
-        if (httpUrl.querySize() == size) url = httpUrl.toString();
-        return verify(url, res.body().string());
+        try (Response res = OkHttp.newCall(url, tag).execute()) {
+            HttpUrl httpUrl = res.request().url();
+            int size = HttpUrl.parse(url).querySize();
+            if (httpUrl.querySize() == size) url = httpUrl.toString();
+            return verify(url, res.body().string());
+        }
     }
 
     private static String verify(String url, String data) throws Exception {

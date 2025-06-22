@@ -24,7 +24,7 @@ android {
 
 dependencies {
     implementation project(':catvod')
-    implementation 'wang.harlon.quickjs:wrapper-java:2.4.5'
-    implementation 'wang.harlon.quickjs:wrapper-android:2.4.5'
+    implementation 'wang.harlon.quickjs:wrapper-java:3.2.0'
+    implementation 'wang.harlon.quickjs:wrapper-android:3.2.0'
     implementation 'net.sourceforge.streamsupport:android-retrofuture:1.7.4'
 }

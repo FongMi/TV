@@ -16,14 +16,7 @@ android {
             version "3.8"
             buildPython "/usr/local/bin/python3"
             pip {
-                install "lxml"
-                install "ujson"
-                install "pyquery"
-                install "requests"
-                install "jsonpath"
-                install "cachetools"
-                install 'pycryptodome'
-                install 'beautifulsoup4'
+                install("-r", "requirements.txt")
             }
         }
     }

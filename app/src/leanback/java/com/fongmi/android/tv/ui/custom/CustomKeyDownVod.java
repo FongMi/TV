@@ -17,7 +17,7 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
     private final Listener listener;
     private boolean changeSpeed;
     private boolean full;
-    private int holdTime;
+    private long holdTime;
 
     public static CustomKeyDownVod create(Activity activity) {
         return new CustomKeyDownVod(activity);
@@ -79,11 +79,11 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
         return true;
     }
 
-    private int addTime() {
+    private long addTime() {
         return holdTime = holdTime + Constant.INTERVAL_SEEK;
     }
 
-    private int subTime() {
+    private long subTime() {
         return holdTime = holdTime - Constant.INTERVAL_SEEK;
     }
 
@@ -93,9 +93,9 @@ public class CustomKeyDownVod extends GestureDetector.SimpleOnGestureListener {
 
     public interface Listener {
 
-        void onSeeking(int time);
+        void onSeeking(long time);
 
-        void onSeekTo(int time);
+        void onSeekTo(long time);
 
         void onSpeedUp();
 

@@ -112,7 +112,7 @@ public class VodConfig {
     private void loadConfig(Callback callback) {
         try {
             OkHttp.cancel("vod");
-            checkJson(Json.parse(Decoder.getJson(config.getUrl(), "vod")).getAsJsonObject(), callback);
+            checkJson(Json.parse(Decoder.getJson(UrlUtil.convert(config.getUrl()), "vod")).getAsJsonObject(), callback);
         } catch (Throwable e) {
             if (TextUtils.isEmpty(config.getUrl())) App.post(() -> callback.error(""));
             else loadCache(callback, e);
@@ -257,7 +257,7 @@ public class VodConfig {
     }
 
     public void setHeaders(List<JsonElement> items) {
-        OkHttp.requestInterceptor().setHeaders(items);
+        OkHttp.responseInterceptor().setHeaders(items);
     }
 
     public List<String> getFlags() {

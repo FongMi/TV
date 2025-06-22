@@ -139,12 +139,9 @@ public class Util {
         return text;
     }
 
-    public static long format(SimpleDateFormat format, String src) {
-        try {
-            return format.parse(src).getTime();
-        } catch (Exception e) {
-            return 0;
-        }
+    public static long format(String src, List<SimpleDateFormat> formats) {
+        for (SimpleDateFormat format : formats) try { return format.parse(src).getTime(); } catch (Exception ignored) {}
+        return 0;
     }
 
     public static boolean isLeanback() {

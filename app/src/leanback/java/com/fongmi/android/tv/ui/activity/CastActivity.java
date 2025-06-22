@@ -448,7 +448,7 @@ public class CastActivity extends BaseActivity implements CustomKeyDownCast.List
     }
 
     @Override
-    public void onSeeking(int time) {
+    public void onSeeking(long time) {
         if (mPlayers.isEmpty()) return;
         mBinding.widget.center.setVisibility(View.VISIBLE);
         mBinding.widget.exoDuration.setText(mPlayers.getDurationTime());
@@ -458,10 +458,10 @@ public class CastActivity extends BaseActivity implements CustomKeyDownCast.List
     }
 
     @Override
-    public void onSeekTo(int time) {
+    public void onSeekTo(long time) {
         if (mPlayers.isEmpty()) return;
         mKeyDown.resetTime();
-        mPlayers.seekTo(time);
+        mPlayers.seek(time);
         showProgress();
         onPlay();
     }

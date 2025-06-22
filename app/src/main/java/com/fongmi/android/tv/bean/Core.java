@@ -4,8 +4,10 @@ import android.text.TextUtils;
 
 import androidx.annotation.Nullable;
 
+import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.utils.UrlUtil;
 import com.fongmi.hook.Hook;
+import com.github.catvod.net.OkHttp;
 import com.google.gson.annotations.SerializedName;
 
 public class Core {
@@ -30,43 +32,47 @@ public class Core {
     private String so;
 
     public String getAuth() {
-        return TextUtils.isEmpty(auth) ? "" : UrlUtil.convert(auth);
+        return !getResp().isEmpty() ? Server.get().getAddress("/tvbus") : TextUtils.isEmpty(auth) ? "" : UrlUtil.convert(auth);
     }
 
     public String getName() {
-        return TextUtils.isEmpty(name) ? "" : name;
+        return TextUtils.isEmpty(name) ? "" : getString(name);
     }
 
     public String getPass() {
-        return TextUtils.isEmpty(pass) ? "" : pass;
+        return TextUtils.isEmpty(pass) ? "" : getString(pass);
     }
 
     public String getBroker() {
-        return TextUtils.isEmpty(broker) ? "" : broker;
+        return TextUtils.isEmpty(broker) ? "" : UrlUtil.convert(broker);
     }
 
     public String getDomain() {
-        return TextUtils.isEmpty(domain) ? "" : domain;
+        return TextUtils.isEmpty(domain) ? "" : getString(domain);
     }
 
     public String getResp() {
-        return TextUtils.isEmpty(resp) ? "" : resp;
+        return TextUtils.isEmpty(resp) ? "" : getString(resp);
     }
 
     public String getSign() {
-        return TextUtils.isEmpty(sign) ? "" : sign;
+        return TextUtils.isEmpty(sign) ? "" : getString(sign);
     }
 
     public String getPkg() {
-        return TextUtils.isEmpty(pkg) ? "" : pkg;
+        return TextUtils.isEmpty(pkg) ? "" : getString(pkg);
     }
 
     public String getSo() {
-        return TextUtils.isEmpty(so) ? "" : so;
+        return TextUtils.isEmpty(so) ? "" : UrlUtil.convert(so);
     }
 
     public Hook getHook() {
         return !getPkg().isEmpty() && !getSign().isEmpty() ? new Hook(getSign(), getPkg()) : null;
+    }
+
+    private String getString(String value) {
+        return (value = UrlUtil.convert(value)).startsWith("http") ? OkHttp.string(value) : value;
     }
 
     @Override

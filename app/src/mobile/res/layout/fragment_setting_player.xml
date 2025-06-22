@@ -250,6 +250,33 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/aac"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/shape_item"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:text="@string/player_aac_track"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/aacText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    tools:text="開" />
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/danmakuLoad"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

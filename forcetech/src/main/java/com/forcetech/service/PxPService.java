@@ -30,6 +30,6 @@ public abstract class PxPService extends Service {
     @Override
     public boolean onUnbind(Intent intent) {
         if (forceTV != null) forceTV.stop();
-        return super.onUnbind(intent);
+        return false;
     }
 }

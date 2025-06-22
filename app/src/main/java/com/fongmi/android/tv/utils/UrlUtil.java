@@ -42,9 +42,9 @@ public class UrlUtil {
     public static String convert(String url) {
         String scheme = scheme(url);
         String path = null;
-        if ("file".equals(scheme)) path = "/file/";
+        if ("assets".equals(scheme)) path = "/";
+        else if ("file".equals(scheme)) path = "/file/";
         else if ("proxy".equals(scheme)) path = "/proxy?";
-        else if ("local".equals(scheme) || "assets".equals(scheme)) path = "/";
         return path != null ? url.replace(scheme + "://", Server.get().getAddress(path)) : url;
     }
 

@@ -1,13 +1,12 @@
 package com.fongmi.android.tv.server.impl;
 
-import org.nanohttpd.protocols.http.IHTTPSession;
-import org.nanohttpd.protocols.http.response.Response;
-
 import java.util.Map;
+
+import fi.iki.elonen.NanoHTTPD;
 
 public interface Process {
 
-    boolean isRequest(IHTTPSession session, String path);
+    boolean isRequest(NanoHTTPD.IHTTPSession session, String url);
 
-    Response doResponse(IHTTPSession session, String path, Map<String, String> files);
+    NanoHTTPD.Response doResponse(NanoHTTPD.IHTTPSession session, String url, Map<String, String> files);
 }

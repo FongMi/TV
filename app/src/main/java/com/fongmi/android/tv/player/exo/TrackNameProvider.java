@@ -80,6 +80,8 @@ public class TrackNameProvider {
 
     private String buildLanguageString(Format format) {
         String language = format.language;
+        if ("chs".equals(language)) language = "zh-Hans";
+        if ("cht".equals(language)) language = "zh-Hant";
         if (TextUtils.isEmpty(language) || C.LANGUAGE_UNDETERMINED.equals(language)) return "";
         Locale languageLocale = Util.SDK_INT >= 21 ? Locale.forLanguageTag(language) : new Locale(language);
         Locale displayLocale = Util.getDefaultDisplayLocale();
@@ -133,91 +135,47 @@ public class TrackNameProvider {
     }
 
     private String buildMimeString(String mimeType) {
-        switch (mimeType) {
-            case MimeTypes.AUDIO_DTS:
-                return "DTS";
-            case MimeTypes.AUDIO_DTS_HD:
-                return "DTS-HD";
-            case MimeTypes.AUDIO_DTS_EXPRESS:
-                return "DTS Express";
-            case MimeTypes.AUDIO_TRUEHD:
-                return "TrueHD";
-            case MimeTypes.AUDIO_AC3:
-                return "AC-3";
-            case MimeTypes.AUDIO_E_AC3:
-                return "E-AC-3";
-            case MimeTypes.AUDIO_E_AC3_JOC:
-                return "E-AC-3-JOC";
-            case MimeTypes.AUDIO_AC4:
-                return "AC-4";
-            case MimeTypes.AUDIO_AAC:
-                return "AAC";
-            case MimeTypes.AUDIO_MPEG:
-                return "MP3";
-            case MimeTypes.AUDIO_MPEG_L2:
-                return "MP2";
-            case MimeTypes.AUDIO_VORBIS:
-                return "Vorbis";
-            case MimeTypes.AUDIO_OPUS:
-                return "Opus";
-            case MimeTypes.AUDIO_FLAC:
-                return "FLAC";
-            case MimeTypes.AUDIO_ALAC:
-                return "ALAC";
-            case MimeTypes.AUDIO_WAV:
-                return "WAV";
-            case MimeTypes.AUDIO_AMR:
-                return "AMR";
-            case MimeTypes.AUDIO_AMR_NB:
-                return "AMR-NB";
-            case MimeTypes.AUDIO_AMR_WB:
-                return "AMR-WB";
-            case MimeTypes.VIDEO_MP4:
-                return "MP4";
-            case MimeTypes.VIDEO_FLV:
-                return "FLV";
-            case MimeTypes.VIDEO_AV1:
-                return "AV1";
-            case MimeTypes.VIDEO_AVI:
-                return "AVI";
-            case MimeTypes.VIDEO_MPEG:
-                return "MPEG";
-            case MimeTypes.VIDEO_MPEG2:
-                return "MPEG2";
-            case MimeTypes.VIDEO_H263:
-                return "H263";
-            case MimeTypes.VIDEO_H264:
-                return "H264";
-            case MimeTypes.VIDEO_H265:
-                return "H265";
-            case MimeTypes.VIDEO_VC1:
-                return "VC1";
-            case MimeTypes.VIDEO_VP8:
-                return "VP8";
-            case MimeTypes.VIDEO_VP9:
-                return "VP9";
-            case MimeTypes.VIDEO_DIVX:
-                return "DIVX";
-            case MimeTypes.VIDEO_DOLBY_VISION:
-                return "DOLBY";
-            case MimeTypes.TEXT_SSA:
-                return "SSA";
-            case MimeTypes.TEXT_VTT:
-                return "VTT";
-            case MimeTypes.APPLICATION_PGS:
-                return "PGS";
-            case MimeTypes.APPLICATION_SUBRIP:
-                return "SRT";
-            case MimeTypes.APPLICATION_TTML:
-                return "TTML";
-            case MimeTypes.APPLICATION_TX3G:
-                return "TX3G";
-            case MimeTypes.APPLICATION_DVBSUBS:
-                return "DVB";
-            case MimeTypes.APPLICATION_MEDIA3_CUES:
-                return "CUES";
-            default:
-                return mimeType;
-        }
+        if (mimeType.contains(MimeTypes.AUDIO_DTS)) return "DTS";
+        else if (mimeType.contains(MimeTypes.AUDIO_DTS_HD)) return "DTS-HD";
+        else if (mimeType.contains(MimeTypes.AUDIO_DTS_EXPRESS)) return "DTS Express";
+        else if (mimeType.contains(MimeTypes.AUDIO_TRUEHD)) return "TrueHD";
+        else if (mimeType.contains(MimeTypes.AUDIO_AC3)) return "AC-3";
+        else if (mimeType.contains(MimeTypes.AUDIO_E_AC3)) return "E-AC-3";
+        else if (mimeType.contains(MimeTypes.AUDIO_E_AC3_JOC)) return "E-AC-3-JOC";
+        else if (mimeType.contains(MimeTypes.AUDIO_AC4)) return "AC-4";
+        else if (mimeType.contains(MimeTypes.AUDIO_AAC)) return "AAC";
+        else if (mimeType.contains(MimeTypes.AUDIO_MPEG)) return "MP3";
+        else if (mimeType.contains(MimeTypes.AUDIO_MPEG_L2)) return "MP2";
+        else if (mimeType.contains(MimeTypes.AUDIO_VORBIS)) return "Vorbis";
+        else if (mimeType.contains(MimeTypes.AUDIO_OPUS)) return "Opus";
+        else if (mimeType.contains(MimeTypes.AUDIO_FLAC)) return "FLAC";
+        else if (mimeType.contains(MimeTypes.AUDIO_ALAC)) return "ALAC";
+        else if (mimeType.contains(MimeTypes.AUDIO_WAV)) return "WAV";
+        else if (mimeType.contains(MimeTypes.AUDIO_AMR)) return "AMR";
+        else if (mimeType.contains(MimeTypes.AUDIO_AMR_NB)) return "AMR-NB";
+        else if (mimeType.contains(MimeTypes.AUDIO_AMR_WB)) return "AMR-WB";
+        else if (mimeType.contains(MimeTypes.VIDEO_MP4)) return "MP4";
+        else if (mimeType.contains(MimeTypes.VIDEO_FLV)) return "FLV";
+        else if (mimeType.contains(MimeTypes.VIDEO_AV1)) return "AV1";
+        else if (mimeType.contains(MimeTypes.VIDEO_AVI)) return "AVI";
+        else if (mimeType.contains(MimeTypes.VIDEO_MPEG)) return "MPEG";
+        else if (mimeType.contains(MimeTypes.VIDEO_MPEG2)) return "MPEG2";
+        else if (mimeType.contains(MimeTypes.VIDEO_H263)) return "H263";
+        else if (mimeType.contains(MimeTypes.VIDEO_H264)) return "H264";
+        else if (mimeType.contains(MimeTypes.VIDEO_H265)) return "H265";
+        else if (mimeType.contains(MimeTypes.VIDEO_VC1)) return "VC1";
+        else if (mimeType.contains(MimeTypes.VIDEO_VP8)) return "VP8";
+        else if (mimeType.contains(MimeTypes.VIDEO_VP9)) return "VP9";
+        else if (mimeType.contains(MimeTypes.VIDEO_DIVX)) return "DIVX";
+        else if (mimeType.contains(MimeTypes.VIDEO_DOLBY_VISION)) return "DOLBY";
+        else if (mimeType.contains(MimeTypes.TEXT_SSA)) return "SSA";
+        else if (mimeType.contains(MimeTypes.TEXT_VTT)) return "VTT";
+        else if (mimeType.contains(MimeTypes.APPLICATION_PGS)) return "PGS";
+        else if (mimeType.contains(MimeTypes.APPLICATION_SUBRIP)) return "SRT";
+        else if (mimeType.contains(MimeTypes.APPLICATION_TTML)) return "TTML";
+        else if (mimeType.contains(MimeTypes.APPLICATION_TX3G)) return "TX3G";
+        else if (mimeType.contains(MimeTypes.APPLICATION_DVBSUBS)) return "DVB";
+        else if (mimeType.contains(MimeTypes.APPLICATION_MEDIA3_CUES)) return "CUES";
+        else return mimeType;
     }
 }

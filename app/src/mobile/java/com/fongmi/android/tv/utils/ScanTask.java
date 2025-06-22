@@ -15,6 +15,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import okhttp3.OkHttpClient;
+import okhttp3.Response;
 
 public class ScanTask {
 
@@ -64,7 +65,7 @@ public class ScanTask {
     }
 
     private void getDevice(List<String> urls) throws Exception {
-        CountDownLatch cd = new CountDownLatch(urls.size());
+        CountDownLatch cd = new CountDownLatch(urls.size() - 1);
         for (String url : urls) executor.execute(() -> findDevice(cd, url));
         cd.await();
     }
@@ -73,17 +74,15 @@ public class ScanTask {
         Set<String> urls = new HashSet<>(ips);
         String local = Server.get().getAddress();
         String base = local.substring(0, local.lastIndexOf(".") + 1);
-        for (int i = 1; i < 256; i++) urls.add(base + i + ":8964");
+        for (int i = 1; i < 256; i++) urls.add(base + i + ":9978");
         return new ArrayList<>(urls);
     }
 
     private void findDevice(CountDownLatch cd, String url) {
-        try {
-            if (url.contains(Server.get().getAddress())) return;
-            String result = OkHttp.newCall(client, url.concat("/device")).execute().body().string();
-            Device device = Device.objectFrom(result);
-            if (device == null) return;
-            devices.add(device.save());
+        if (url.contains(Server.get().getAddress())) return;
+        try (Response res = OkHttp.newCall(client, url.concat("/device")).execute()) {
+            Device device = Device.objectFrom(res.body().string());
+            if (device != null) devices.add(device.save());
         } catch (Exception ignored) {
         } finally {
             cd.countDown();

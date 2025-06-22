@@ -9,7 +9,6 @@ import com.github.catvod.bean.Doh;
 import com.github.catvod.net.interceptor.AuthInterceptor;
 import com.github.catvod.net.interceptor.RequestInterceptor;
 import com.github.catvod.net.interceptor.ResponseInterceptor;
-import com.github.catvod.utils.Path;
 
 import java.net.ProxySelector;
 import java.security.SecureRandom;
@@ -22,7 +21,6 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import okhttp3.Cache;
 import okhttp3.Call;
 import okhttp3.FormBody;
 import okhttp3.Headers;
@@ -30,13 +28,13 @@ import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import okhttp3.Response;
 import okhttp3.dnsoverhttps.DnsOverHttps;
 import okhttp3.logging.HttpLoggingInterceptor;
 
 public class OkHttp {
 
-    private static final int TIMEOUT = 30 * 1000;
-    private static final int CACHE = 100 * 1024 * 1024;
+    private static final long TIMEOUT = TimeUnit.SECONDS.toMillis(30);
     private static final ProxySelector defaultSelector;
 
     private ResponseInterceptor responseInterceptor;
@@ -66,11 +64,11 @@ public class OkHttp {
         selector().clear();
         authInterceptor().clear();
         requestInterceptor().clear();
+        responseInterceptor().clear();
     }
 
     public void setDoh(Doh doh) {
-        OkHttpClient c = new OkHttpClient.Builder().cache(new Cache(Path.doh(), CACHE)).build();
-        dns().setDoh(doh.getUrl().isEmpty() ? null : new DnsOverHttps.Builder().client(c).url(HttpUrl.get(doh.getUrl())).bootstrapDnsHosts(doh.getHosts()).build());
+        dns().setDoh(doh.getUrl().isEmpty() ? null : new DnsOverHttps.Builder().client(new OkHttpClient()).url(HttpUrl.get(doh.getUrl())).bootstrapDnsHosts(doh.getHosts()).build());
         client = null;
     }
 
@@ -111,21 +109,22 @@ public class OkHttp {
         return get().client = getBuilder().build();
     }
 
-    public static OkHttpClient client(int timeout) {
+    public static OkHttpClient client(long timeout) {
         return client().newBuilder().connectTimeout(timeout, TimeUnit.MILLISECONDS).readTimeout(timeout, TimeUnit.MILLISECONDS).writeTimeout(timeout, TimeUnit.MILLISECONDS).build();
     }
 
-    public static OkHttpClient noRedirect(int timeout) {
+    public static OkHttpClient noRedirect(long timeout) {
         return client().newBuilder().connectTimeout(timeout, TimeUnit.MILLISECONDS).readTimeout(timeout, TimeUnit.MILLISECONDS).writeTimeout(timeout, TimeUnit.MILLISECONDS).followRedirects(false).followSslRedirects(false).build();
     }
 
-    public static OkHttpClient client(boolean redirect, int timeout) {
+    public static OkHttpClient client(boolean redirect, long timeout) {
         return redirect ? client(timeout) : noRedirect(timeout);
     }
 
     public static String string(String url) {
-        try {
-            return url.startsWith("http") ? newCall(url).execute().body().string() : "";
+        if (!url.startsWith("http")) return "";
+        try (Response res = newCall(url).execute()) {
+            return res.body().string();
         } catch (Exception e) {
             e.printStackTrace();
             return "";
@@ -133,11 +132,22 @@ public class OkHttp {
     }
 
     public static String string(String url, Map<String, String> headers) {
-        try {
-            return url.startsWith("http") ? newCall(url, Headers.of(headers)).execute().body().string() : "";
+        if (!url.startsWith("http")) return "";
+        try (Response res = newCall(url, Headers.of(headers)).execute()) {
+            return res.body().string();
         } catch (Exception e) {
             e.printStackTrace();
             return "";
+        }
+    }
+
+    public static byte[] bytes(String url) {
+        if (!url.startsWith("http")) return new byte[0];
+        try (Response res = newCall(url).execute()) {
+            return res.body().bytes();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new byte[0];
         }
     }
 

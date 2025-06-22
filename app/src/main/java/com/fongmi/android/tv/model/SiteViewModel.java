@@ -1,6 +1,5 @@
 package com.fongmi.android.tv.model;
 
-import android.net.Uri;
 import android.text.TextUtils;
 
 import androidx.collection.ArrayMap;
@@ -37,6 +36,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
+import okhttp3.Response;
 
 public class SiteViewModel extends ViewModel {
 
@@ -79,8 +79,10 @@ public class SiteViewModel extends ViewModel {
                 SpiderDebug.log(homeContent);
                 return Result.fromJson(homeContent);
             } else {
-                String homeContent = OkHttp.newCall(site.getApi(), site.getHeaders()).execute().body().string();
+                Response response = OkHttp.newCall(site.getApi(), site.getHeaders()).execute();
+                String homeContent = response.body().string();
                 SpiderDebug.log(homeContent);
+                response.close();
                 return fetchPic(site, Result.fromType(site.getType(), homeContent));
             }
         });
@@ -175,8 +177,6 @@ public class SiteViewModel extends ViewModel {
                 return result;
             } else {
                 Url url = Url.create().add(id);
-                String type = Uri.parse(id).getQueryParameter("type");
-                if ("json".equals(type)) url = Result.fromJson(OkHttp.newCall(id, site.getHeaders()).execute().body().string()).getUrl();
                 Result result = new Result();
                 result.setUrl(url);
                 result.setFlag(flag);
@@ -241,7 +241,10 @@ public class SiteViewModel extends ViewModel {
         if (!site.getExt().isEmpty()) params.put("extend", site.getExt());
         Call get = OkHttp.newCall(site.getApi(), site.getHeaders(), params);
         Call post = OkHttp.newCall(site.getApi(), site.getHeaders(), OkHttp.toBody(params));
-        return (site.getExt().length() <= 1000 ? get : post).execute().body().string();
+        Response response = (site.getExt().length() <= 1000 ? get : post).execute();
+        String result = response.body().string();
+        response.close();
+        return result;
     }
 
     private Result fetchPic(Site site, Result result) throws Exception {
@@ -253,8 +256,9 @@ public class SiteViewModel extends ViewModel {
         ArrayMap<String, String> params = new ArrayMap<>();
         params.put("ac", site.getType() == 0 ? "videolist" : "detail");
         params.put("ids", TextUtils.join(",", ids));
-        String response = OkHttp.newCall(site.getApi(), site.getHeaders(), params).execute().body().string();
-        result.setList(Result.fromType(site.getType(), response).getList());
+        Response response = OkHttp.newCall(site.getApi(), site.getHeaders(), params).execute();
+        result.setList(Result.fromType(site.getType(), response.body().string()).getList());
+        response.close();
         return result;
     }
 

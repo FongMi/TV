@@ -1,6 +1,7 @@
 package com.fongmi.android.tv.player.extractor;
 
 import android.net.Uri;
+import android.text.TextUtils;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
@@ -41,9 +42,11 @@ public class TVBus implements Source.Extractor, Listener {
         }
     }
 
-    private String getPath(String url) throws Exception {
-        File file = new File(Path.so(), Uri.parse(url).getLastPathSegment());
-        if (file.length() < 10240) Path.write(file, OkHttp.newCall(url).execute().body().bytes());
+    private String getPath(String url) {
+        String name = Uri.parse(url).getLastPathSegment();
+        if (TextUtils.isEmpty(name)) name = "tvcore.so";
+        File file = new File(Path.so(), name);
+        if (file.length() < 10240) Path.write(file, OkHttp.bytes(url));
         return file.getAbsolutePath();
     }
 
@@ -58,14 +61,16 @@ public class TVBus implements Source.Extractor, Listener {
         return check();
     }
 
-    private String check() throws Exception {
-        if (hls.startsWith("-")) throw new ExtractException(ResUtil.getString(R.string.error_play_code, hls));
-        return hls;
+    private void change() throws Exception {
+        Setting.putBootLive(true);
+        App.post(() -> System.exit(0), 100);
+        throw new ExtractException(ResUtil.getString(R.string.error_play_url));
     }
 
-    private void change() {
-        Setting.putBootLive(true);
-        App.post(() -> System.exit(0), 250);
+    private String check() throws Exception {
+        if (hls == null) return "";
+        if (!hls.startsWith("-")) return hls;
+        throw new ExtractException(ResUtil.getString(R.string.error_play_code, hls));
     }
 
     @Override

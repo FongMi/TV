@@ -230,7 +230,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
             getVideo(item.getVodId(), "1");
         } else {
             if (getSite().isIndex()) CollectActivity.start(getActivity(), item.getVodName());
-            else VideoActivity.start(getActivity(), getKey(), item.getVodId(), item.getVodName(), item.getVodPic(), isFolder() ? item.getVodName() : null, false);
+            else VideoActivity.start(getActivity(), getKey(), item.getVodId(), item.getVodName(), item.getVodPic(), isFolder() ? item.getVodName() : null);
         }
     }
 

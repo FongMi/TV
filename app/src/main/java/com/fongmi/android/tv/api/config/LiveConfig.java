@@ -114,7 +114,7 @@ public class LiveConfig {
     private void loadConfig(Callback callback) {
         try {
             OkHttp.cancel("live");
-            parseConfig(Decoder.getJson(config.getUrl(), "live"), callback);
+            parseConfig(Decoder.getJson(UrlUtil.convert(config.getUrl()), "live"), callback);
         } catch (Throwable e) {
             if (TextUtils.isEmpty(config.getUrl())) App.post(() -> callback.error(""));
             else App.post(() -> callback.error(Notify.getError(R.string.error_config_get, e)));
@@ -269,7 +269,7 @@ public class LiveConfig {
     }
 
     public void setHeaders(List<JsonElement> items) {
-        OkHttp.requestInterceptor().setHeaders(items);
+        OkHttp.responseInterceptor().setHeaders(items);
     }
 
     public void setHosts(List<String> hosts) {

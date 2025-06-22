@@ -6,16 +6,15 @@ import com.fongmi.android.tv.server.Nano;
 import com.fongmi.android.tv.server.impl.Process;
 import com.github.catvod.utils.Prefers;
 
-import org.nanohttpd.protocols.http.IHTTPSession;
-import org.nanohttpd.protocols.http.response.Response;
-
 import java.util.Map;
+
+import fi.iki.elonen.NanoHTTPD;
 
 public class Cache implements Process {
 
     @Override
-    public boolean isRequest(IHTTPSession session, String path) {
-        return "/cache".equals(path);
+    public boolean isRequest(NanoHTTPD.IHTTPSession session, String url) {
+        return url.startsWith("/cache");
     }
 
     private String getKey(String rule, String key) {
@@ -23,7 +22,7 @@ public class Cache implements Process {
     }
 
     @Override
-    public Response doResponse(IHTTPSession session, String path, Map<String, String> files) {
+    public NanoHTTPD.Response doResponse(NanoHTTPD.IHTTPSession session, String url, Map<String, String> files) {
         Map<String, String> params = session.getParms();
         String action = params.get("do");
         String rule = params.get("rule");

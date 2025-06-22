@@ -108,7 +108,6 @@ public class Catchup {
 
     public String format(String url, EpgData data) {
         String result = getSource();
-        if (data.isInRange()) return url;
         Matcher matcher = Pattern.compile("(\\$?\\{[^}]*\\})").matcher(result);
         while (matcher.find()) result = result.replace(matcher.group(1), format(matcher.group(1), data.getStartTime(), data.getEndTime()));
         return isDefault() ? result : append(url, result);

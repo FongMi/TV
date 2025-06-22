@@ -62,6 +62,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
 import okhttp3.Headers;
@@ -153,7 +154,7 @@ public class VodFragment extends BaseFragment implements SiteCallback, FilterCal
     }
 
     private void updateHot() {
-        App.post(mRunnable, 10 * 1000);
+        App.post(mRunnable, TimeUnit.SECONDS.toMillis(10));
         if (mHots.isEmpty() || mHots.size() < 10) return;
         mBinding.hot.setText(mHots.get(new Random().nextInt(11)));
     }

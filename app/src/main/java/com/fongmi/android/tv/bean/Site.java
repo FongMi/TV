@@ -25,6 +25,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Headers;
 
@@ -186,8 +187,8 @@ public class Site implements Parcelable {
         return indexs == null ? 0 : indexs;
     }
 
-    public Integer getTimeout() {
-        return timeout == null ? Constant.TIMEOUT_PLAY : Math.max(timeout, 1) * 1000;
+    public long getTimeout() {
+        return timeout == null ? Constant.TIMEOUT_PLAY : TimeUnit.SECONDS.toMillis(Math.max(timeout, 1));
     }
 
     public Integer getSearchable() {

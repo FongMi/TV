@@ -208,40 +208,9 @@
             android:id="@+id/line"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="12dp"
             android:textColor="@color/white"
             android:textSize="14sp"
             tools:text="來源 1" />
-
-        <TextView
-            android:id="@+id/clock"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            tools:text="16:50" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/epg"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:background="@drawable/shape_live_list"
-        android:orientation="vertical"
-        android:visibility="gone"
-        tools:visibility="visible">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/epg_data"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:clipChildren="false"
-            android:clipToPadding="false"
-            android:padding="8dp"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:itemCount="5"
-            tools:listitem="@layout/adapter_epg_data" />
 
     </LinearLayout>
 

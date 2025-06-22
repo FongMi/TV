@@ -8,6 +8,7 @@
 
     <!-- Live -->
     <string name="live_pass">密碼</string>
+    <string name="live_refresh">刷新</string>
     <string name="live_line">來源 <xliff:g name="name">%s</xliff:g></string>
 
     <!-- Detail -->
@@ -28,6 +29,7 @@
 
     <!-- Play -->
     <string name="play">播放</string>
+    <string name="pause">暫停</string>
     <string name="play_op">片頭</string>
     <string name="play_ed">片尾</string>
     <string name="play_exo">EXO</string>
@@ -97,6 +99,7 @@
     <string name="player_caption">字幕樣式</string>
     <string name="player_background">背景播放</string>
     <string name="player_audio_decode">音訊軟解</string>
+    <string name="player_aac_track">AAC優先</string>
     <string name="player_danmaku_load">彈幕載入</string>
     <string name="player_tunnel">隧道模式</string>
     <string name="player_buffer">緩衝時間</string>

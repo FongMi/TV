@@ -9,6 +9,7 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.db.AppDatabase;
@@ -244,7 +245,7 @@ public class History {
     }
 
     public static List<History> get(int cid) {
-        return AppDatabase.get().getHistoryDao().find(cid, System.currentTimeMillis() - TimeUnit.DAYS.toMillis(14));
+        return AppDatabase.get().getHistoryDao().find(cid, System.currentTimeMillis() - Constant.HISTORY_TIME);
     }
 
     public static History find(String key) {
@@ -263,7 +264,7 @@ public class History {
 
     private void merge(List<History> items, boolean force) {
         for (History item : items) {
-            if (getDuration() > 0 && item.getDuration() > 0 && Math.abs(getDuration() - item.getDuration()) > 10 * 60 * 1000) continue;
+            if (getDuration() > 0 && item.getDuration() > 0 && Math.abs(getDuration() - item.getDuration()) > TimeUnit.MINUTES.toMillis(10)) continue;
             if (!force && getKey().equals(item.getKey())) continue;
             checkParam(item);
             item.delete();

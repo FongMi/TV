@@ -64,10 +64,6 @@ public class Path {
         return mkdir(new File(cache() + File.separator + "jar"));
     }
 
-    public static File doh() {
-        return mkdir(new File(cache() + File.separator + "doh"));
-    }
-
     public static File exo() {
         return mkdir(new File(cache() + File.separator + "exo"));
     }
@@ -166,8 +162,8 @@ public class Path {
             fos.flush();
             fos.close();
             return file;
-        } catch (Exception ignored) {
-            ignored.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
             return file;
         }
     }
@@ -216,7 +212,7 @@ public class Path {
         if (dir.delete()) Log.d(TAG, "Deleted:" + dir.getAbsolutePath());
     }
 
-    public static File create(File file) throws Exception {
+    public static File create(File file) {
         try {
             if (file.getParentFile() != null) mkdir(file.getParentFile());
             if (!file.canWrite()) file.setWritable(true);

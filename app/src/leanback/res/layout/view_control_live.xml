@@ -18,7 +18,7 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/player"
+            android:id="@+id/home"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="12dp"
@@ -26,6 +26,30 @@
             android:focusable="true"
             android:focusableInTouchMode="true"
             android:nextFocusLeft="@id/change"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            tools:text="首頁" />
+
+        <TextView
+            android:id="@+id/action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/selector_text"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:text="@string/play"
+            android:textColor="@color/white"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/player"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/selector_text"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:text="@string/play_exo"
             android:textColor="@color/white"
             android:textSize="14sp" />
@@ -67,18 +91,6 @@
             android:textColor="@color/white"
             android:textSize="14sp"
             tools:text="預設" />
-
-        <TextView
-            android:id="@+id/home"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="12dp"
-            android:background="@drawable/selector_text"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            tools:text="首頁" />
 
         <TextView
             android:id="@+id/line"
@@ -170,7 +182,7 @@
             android:background="@drawable/selector_text"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            android:nextFocusRight="@id/player"
+            android:nextFocusRight="@id/home"
             android:text="@string/play_change"
             android:textColor="@color/text"
             android:textSize="14sp" />

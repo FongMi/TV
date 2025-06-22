@@ -40,12 +40,6 @@ public class ChannelAdapter extends RecyclerView.Adapter<ChannelAdapter.ViewHold
         notifyDataSetChanged();
     }
 
-    public void changed(Channel item) {
-        int position = mItems.indexOf(item);
-        if (position == -1) return;
-        notifyItemChanged(position);
-    }
-
     public void remove(Channel item) {
         int position = mItems.indexOf(item);
         if (position == -1) return;

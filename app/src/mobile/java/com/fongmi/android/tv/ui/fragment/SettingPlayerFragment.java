@@ -51,6 +51,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
     protected void initView() {
         format = new DecimalFormat("0.#");
         mBinding.uaText.setText(Setting.getUa());
+        mBinding.aacText.setText(getSwitch(Setting.isPreferAAC()));
         mBinding.tunnelText.setText(getSwitch(Setting.isTunnel()));
         mBinding.speedText.setText(format.format(Setting.getSpeed()));
         mBinding.bufferText.setText(String.valueOf(Setting.getBuffer()));
@@ -66,6 +67,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
     @Override
     protected void initEvent() {
         mBinding.ua.setOnClickListener(this::onUa);
+        mBinding.aac.setOnClickListener(this::setAAC);
         mBinding.scale.setOnClickListener(this::onScale);
         mBinding.speed.setOnClickListener(this::onSpeed);
         mBinding.buffer.setOnClickListener(this::onBuffer);
@@ -86,6 +88,11 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
     public void setUa(String ua) {
         mBinding.uaText.setText(ua);
         Setting.putUa(ua);
+    }
+
+    private void setAAC(View view) {
+        Setting.putPreferAAC(!Setting.isPreferAAC());
+        mBinding.aacText.setText(getSwitch(Setting.isPreferAAC()));
     }
 
     private void onScale(View view) {

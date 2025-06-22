@@ -18,8 +18,10 @@ import com.fongmi.android.tv.player.Source;
 import com.github.catvod.net.OkHttp;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.Callable;
@@ -34,8 +36,8 @@ public class LiveViewModel extends ViewModel {
     private static final int URL = 2;
     private static final int XML = 3;
 
+    private final List<SimpleDateFormat> formatTime;
     private final SimpleDateFormat formatDate;
-    private final SimpleDateFormat formatTime;
 
     public MutableLiveData<Channel> url;
     public MutableLiveData<Boolean> xml;
@@ -48,12 +50,14 @@ public class LiveViewModel extends ViewModel {
     private ExecutorService executor4;
 
     public LiveViewModel() {
-        this.formatTime = new SimpleDateFormat("yyyy-MM-ddHH:mm", Locale.getDefault());
-        this.formatDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         this.live = new MutableLiveData<>();
         this.epg = new MutableLiveData<>();
         this.url = new MutableLiveData<>();
         this.xml = new MutableLiveData<>();
+        this.formatTime = new ArrayList<>();
+        this.formatDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        this.formatTime.add(new SimpleDateFormat("yyyy-MM-ddHH:mm", Locale.getDefault()));
+        this.formatTime.add(new SimpleDateFormat("yyyy-MM-ddHH:mm:ss", Locale.getDefault()));
     }
 
     public void getLive(Live item) {
@@ -93,7 +97,9 @@ public class LiveViewModel extends ViewModel {
 
     public void getUrl(Channel item, EpgData data) {
         execute(URL, () -> {
-            item.setUrl(item.getCatchup().format(item.getCurrent(), data));
+            item.setMsg(null);
+            Source.get().stop();
+            item.setUrl(item.getCatchup().format(Source.get().fetch(item), data));
             return item;
         });
     }
@@ -101,8 +107,8 @@ public class LiveViewModel extends ViewModel {
     private void setTimeZone(Live live) {
         try {
             TimeZone timeZone = live.getTimeZone().isEmpty() ? TimeZone.getDefault() : TimeZone.getTimeZone(live.getTimeZone());
+            for (SimpleDateFormat format : formatTime) format.setTimeZone(timeZone);
             formatDate.setTimeZone(timeZone);
-            formatTime.setTimeZone(timeZone);
         } catch (Exception ignored) {
         }
     }

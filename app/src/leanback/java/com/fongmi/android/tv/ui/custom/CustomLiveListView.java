@@ -34,14 +34,14 @@ public class CustomLiveListView extends VerticalGridView {
 
     private boolean onKeyDown() {
         if (getSelectedPosition() != getAdapter().getItemCount() - 1) return false;
-        if (getId() == R.id.channel) setSelectedPosition(0);
+        if (getId() == R.id.channel || getId() == R.id.epgData) setSelectedPosition(0);
         else if (listener != null) listener.nextGroup(false);
         return true;
     }
 
     private boolean onKeyUp() {
         if (getSelectedPosition() != 0) return false;
-        if (getId() == R.id.channel) setSelectedPosition(getAdapter().getItemCount());
+        if (getId() == R.id.channel || getId() == R.id.epgData) setSelectedPosition(getAdapter().getItemCount());
         else if (listener != null) listener.prevGroup(false);
         return true;
     }

@@ -18,6 +18,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
+            android:layout_toStartOf="@+id/clock"
             android:ellipsize="marquee"
             android:shadowColor="@color/grey_900"
             android:shadowDx="2"
@@ -26,11 +27,11 @@
             android:singleLine="true"
             android:textColor="@color/white"
             android:textSize="20sp"
-            tools:text="CCTV-1" />
+            tools:text="民視" />
 
         <TextView
             android:id="@+id/size"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/title"
             android:layout_alignStart="@+id/title"
@@ -41,6 +42,21 @@
             android:textColor="@color/white"
             android:textSize="16sp"
             tools:text="1920 x 1080" />
+
+        <TextView
+            android:id="@+id/clock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:shadowColor="@color/grey_900"
+            android:shadowDx="2"
+            android:shadowDy="2"
+            android:shadowRadius="1"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            tools:text="09:20:00" />
 
     </RelativeLayout>
 
@@ -99,16 +115,17 @@
         android:id="@+id/digital"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="top|end"
-        android:layout_margin="16dp"
+        android:layout_gravity="center"
+        android:background="@drawable/shape_widget"
         android:includeFontPadding="false"
         android:letterSpacing="0.05"
+        android:padding="16dp"
         android:shadowColor="@color/grey_900"
         android:shadowDx="2"
         android:shadowDy="2"
         android:shadowRadius="1"
         android:textColor="@color/white"
-        android:textSize="30sp"
+        android:textSize="64sp"
         android:textStyle="bold"
         android:visibility="gone"
         tools:text="05"
@@ -225,38 +242,10 @@
             android:id="@+id/line"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="12dp"
             android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold"
             tools:text="來源 1" />
-
-        <TextView
-            android:id="@+id/clock"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            tools:text="16:50" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/epg"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:background="@drawable/shape_live_list"
-        android:orientation="vertical"
-        android:visibility="gone"
-        tools:visibility="visible">
-
-        <androidx.leanback.widget.VerticalGridView
-            android:id="@+id/epg_data"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            tools:itemCount="5"
-            tools:listitem="@layout/adapter_epg_data" />
 
     </LinearLayout>
 </FrameLayout>

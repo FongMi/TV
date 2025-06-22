@@ -9,7 +9,6 @@ import androidx.annotation.NonNull;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
-import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.utils.KeyUtil;
 import com.fongmi.android.tv.utils.ResUtil;
 
@@ -18,7 +17,7 @@ public class CustomKeyDownLive extends GestureDetector.SimpleOnGestureListener {
     private final GestureDetector detector;
     private final StringBuilder text;
     private final Listener listener;
-    private int holdTime;
+    private long holdTime;
 
     private final Runnable runnable = new Runnable() {
         @Override
@@ -56,11 +55,9 @@ public class CustomKeyDownLive extends GestureDetector.SimpleOnGestureListener {
         } else if (event.getAction() == KeyEvent.ACTION_DOWN && KeyUtil.isRightKey(event)) {
             listener.onSeeking(addTime());
         } else if (event.getAction() == KeyEvent.ACTION_DOWN && KeyUtil.isUpKey(event)) {
-            if (Setting.isInvert()) listener.onKeyDown();
-            else listener.onKeyUp();
+            listener.onKeyUp();
         } else if (event.getAction() == KeyEvent.ACTION_DOWN && KeyUtil.isDownKey(event)) {
-            if (Setting.isInvert()) listener.onKeyUp();
-            else listener.onKeyDown();
+            listener.onKeyDown();
         } else if (event.getAction() == KeyEvent.ACTION_UP && KeyUtil.isLeftKey(event)) {
             listener.onKeyLeft(holdTime);
         } else if (event.getAction() == KeyEvent.ACTION_UP && KeyUtil.isRightKey(event)) {
@@ -100,11 +97,11 @@ public class CustomKeyDownLive extends GestureDetector.SimpleOnGestureListener {
         return keyCode >= 144 ? keyCode - 144 : keyCode - 7;
     }
 
-    private int addTime() {
+    private long addTime() {
         return holdTime = holdTime + Constant.INTERVAL_SEEK;
     }
 
-    private int subTime() {
+    private long subTime() {
         return holdTime = holdTime - Constant.INTERVAL_SEEK;
     }
 
@@ -120,15 +117,15 @@ public class CustomKeyDownLive extends GestureDetector.SimpleOnGestureListener {
 
         void onFind(String number);
 
-        void onSeeking(int time);
+        void onSeeking(long time);
 
         void onKeyUp();
 
         void onKeyDown();
 
-        void onKeyLeft(int time);
+        void onKeyLeft(long time);
 
-        void onKeyRight(int time);
+        void onKeyRight(long time);
 
         void onKeyCenter();
 

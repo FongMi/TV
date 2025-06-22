@@ -8,7 +8,6 @@ public class Server {
 
     private Players player;
     private Nano nano;
-    private int port;
 
     private static class Loader {
         static volatile Server INSTANCE = new Server();
@@ -16,14 +15,6 @@ public class Server {
 
     public static Server get() {
         return Loader.INSTANCE;
-    }
-
-    public Server() {
-        this.port = 8964;
-    }
-
-    public int getPort() {
-        return port;
     }
 
     public Players getPlayer() {
@@ -47,20 +38,19 @@ public class Server {
     }
 
     public String getAddress(boolean local) {
-        return "http://" + (local ? "127.0.0.1" : Util.getIp()) + ":" + getPort();
+        return "http://" + (local ? "127.0.0.1" : Util.getIp()) + ":" + Proxy.getPort();
     }
 
     public void start() {
         if (nano != null) return;
-        while (port < 9999) {
+        for (int i = 9978; i < 9999; i++) {
             try {
-                nano = new Nano(port);
-                Proxy.set(port);
-                nano.start();
-                return;
-            } catch (Exception e) {
+                nano = new Nano(i);
+                nano.start(500);
+                Proxy.set(i);
+                break;
+            } catch (Throwable e) {
                 nano = null;
-                port++;
             }
         }
     }

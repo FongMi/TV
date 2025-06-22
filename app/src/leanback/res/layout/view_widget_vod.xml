@@ -5,7 +5,7 @@
     android:layout_height="match_parent">
 
     <RelativeLayout
-        android:id="@+id/info"
+        android:id="@+id/top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -33,7 +33,6 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/title"
             android:layout_alignStart="@+id/title"
-            android:layout_marginBottom="16dp"
             android:shadowColor="@color/grey_900"
             android:shadowDx="2"
             android:shadowDy="2"

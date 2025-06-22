@@ -74,6 +74,12 @@ public class Global {
 
     @Keep
     @JSMethod
+    public Integer getPort() {
+        return Proxy.getPort();
+    }
+
+    @Keep
+    @JSMethod
     public String getProxy(Boolean local) {
         return Proxy.getUrl(local) + "?do=js";
     }

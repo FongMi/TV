@@ -4,13 +4,15 @@ import android.content.Context;
 
 import com.github.catvod.Init;
 
-public class TVCore {
+public class TVCore implements Runnable {
 
+    private final Thread thread;
     private final long handle;
 
-    public TVCore(String so) {
-        System.load(so);
+    public TVCore(String path) {
+        System.load(path);
         handle = initialise();
+        thread = new Thread(this);
     }
 
     public TVCore listener(Listener listener) {
@@ -95,16 +97,8 @@ public class TVCore {
     }
 
     public TVCore init() {
-        new Thread(this::start).start();
+        thread.start();
         return this;
-    }
-
-    private void start() {
-        try {
-            init(handle, Init.context());
-            run(handle);
-        } catch (Throwable ignored) {
-        }
     }
 
     public void start(String url) {
@@ -124,6 +118,16 @@ public class TVCore {
     public void quit() {
         try {
             quit(handle);
+            thread.interrupt();
+        } catch (Throwable ignored) {
+        }
+    }
+
+    @Override
+    public void run() {
+        try {
+            init(handle, Init.context());
+            run(handle);
         } catch (Throwable ignored) {
         }
     }

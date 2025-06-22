@@ -8,7 +8,6 @@ import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.IBinder;
 import android.support.v4.media.MediaMetadataCompat;
-import android.util.Log;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.Nullable;

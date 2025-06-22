@@ -45,10 +45,9 @@ public class Download {
     }
 
     private void doInBackground() {
-        try {
+        try (Response res = OkHttp.newCall(url, url).execute()) {
             Path.create(file);
-            Response response = OkHttp.newCall(url, url).execute();
-            download(response.body().byteStream(), Double.parseDouble(response.header(HttpHeaders.CONTENT_LENGTH, "1")));
+            download(res.body().byteStream(), Double.parseDouble(res.header(HttpHeaders.CONTENT_LENGTH, "1")));
             App.post(() -> {if (callback != null) callback.success(file);});
         } catch (Exception e) {
             App.post(() -> {if (callback != null) callback.error(e.getMessage());});
@@ -56,8 +55,7 @@ public class Download {
     }
 
     private void download(InputStream is, double length) throws Exception {
-        FileOutputStream os = new FileOutputStream(file);
-        try (BufferedInputStream input = new BufferedInputStream(is)) {
+        try (BufferedInputStream input = new BufferedInputStream(is); FileOutputStream os = new FileOutputStream(file)) {
             byte[] buffer = new byte[4096];
             int readBytes;
             long totalBytes = 0;

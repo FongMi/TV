@@ -225,6 +225,14 @@ public class Setting {
         Prefers.put("audio_prefer", audioPrefer);
     }
 
+    public static boolean isPreferAAC() {
+        return Prefers.getBoolean("prefer_aac");
+    }
+
+    public static void putPreferAAC(boolean preferAAC) {
+        Prefers.put("prefer_aac", preferAAC);
+    }
+
     public static boolean isDanmakuLoad() {
         return Prefers.getBoolean("danmaku_load");
     }

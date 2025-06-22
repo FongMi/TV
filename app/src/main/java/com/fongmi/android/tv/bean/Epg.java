@@ -26,10 +26,10 @@ public class Epg {
 
     private int width;
 
-    public static Epg objectFrom(String str, String key, SimpleDateFormat format) throws Exception {
+    public static Epg objectFrom(String str, String key, List<SimpleDateFormat> formats) throws Exception {
         if (!Json.isObj(str)) return EpgParser.getEpg(str, key);
         Epg item = App.gson().fromJson(str, Epg.class);
-        item.setTime(format);
+        item.setTime(formats);
         item.setKey(key);
         return item;
     }
@@ -78,19 +78,19 @@ public class Epg {
         return getDate().equals(date);
     }
 
-    private void setTime(SimpleDateFormat format) {
+    private void setTime(List<SimpleDateFormat> formats) {
         setList(new ArrayList<>(new LinkedHashSet<>(getList())));
         for (EpgData item : getList()) {
-            item.setStartTime(Util.format(format, getDate().concat(item.getStart())));
-            item.setEndTime(Util.format(format, getDate().concat(item.getEnd())));
+            item.setStartTime(Util.format(getDate().concat(item.getStart()), formats));
+            item.setEndTime(Util.format(getDate().concat(item.getEnd()), formats));
             if (item.getEndTime() < item.getStartTime()) item.checkDay();
             item.setTitle(Trans.s2t(item.getTitle()));
         }
     }
 
-    public String getEpg() {
-        for (EpgData item : getList()) if (item.isSelected()) return item.format();
-        return "";
+    public EpgData getEpgData() {
+        for (EpgData item : getList()) if (item.isSelected()) return item;
+        return new EpgData();
     }
 
     public Epg selected() {

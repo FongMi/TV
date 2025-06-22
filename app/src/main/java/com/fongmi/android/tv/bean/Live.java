@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Entity
 public class Live {
@@ -219,8 +220,8 @@ public class Live {
         this.keep = keep;
     }
 
-    public Integer getTimeout() {
-        return timeout == null ? Constant.TIMEOUT_PLAY : Math.max(timeout, 1) * 1000;
+    public long getTimeout() {
+        return timeout == null ? Constant.TIMEOUT_PLAY : TimeUnit.SECONDS.toMillis(Math.max(timeout, 1));
     }
 
     public JsonElement getHeader() {
