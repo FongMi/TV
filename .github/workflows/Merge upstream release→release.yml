@@ -1,0 +1,47 @@
+name: Merge upstream release→release (Preserve Local)  # 同步上游release分支（保留本地修改）
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # 每小时执行一次
+  workflow_dispatch:     # 允许手动触发
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 获取完整提交历史
+
+      - name: 配置Git用户
+        run: |
+          git config user.name "xinyi1984"
+          git config user.email "xinyi1984@users.noreply.github.com"
+
+      - name: 添加上游仓库
+        run: |
+          git remote add upstream https://github.com/FongMi/TV.git
+          git fetch upstream
+
+      - name: 备份本地修改
+        run: |
+          git checkout release
+          git branch backup/release  # 创建备份分支
+
+      - name: 获取上游最新代码
+        run: |
+          git reset --hard upstream/release  # 重置到上游最新状态
+
+      - name: 恢复本地修改
+        run: |
+          git checkout backup/release -- .  # 用备份覆盖当前代码
+          git commit -am "合并本地修改到上游最新版本" --allow-empty
+
+      - name: 推送到远程仓库
+        run: |
+          git push --force origin release
+
+      - name: 清理备份
+        run: |
+          git branch -D backup/release
