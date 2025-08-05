@@ -1,9 +1,9 @@
-name: Merge upstream release→release (Preserve Local)
+name: Merge upstream release→release (Preserve Local)  # 同步上游fongmi分支（保留本地修改）
 
 on:
   schedule:
     - cron: '0 * * * *'  # 每小时执行一次
-  workflow_dispatch:
+  workflow_dispatch:  # 允许手动触发
 
 jobs:
   merge:
@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: release  # 明确检出 release 分支
-          fetch-depth: 0
+          fetch-depth: 0  # 获取完整提交历史
 
       - name: 配置Git用户
         run: |
