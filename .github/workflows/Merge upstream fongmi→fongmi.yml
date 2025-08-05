@@ -1,9 +1,9 @@
-name: Merge upstream fongmi→fongmi (Preserve Local)
+name: Merge upstream fongmi→fongmi (Preserve Local)  # 同步上游fongmi分支（保留本地修改）
 
 on:
   schedule:
     - cron: '0 * * * *'  # 每小时执行一次
-  workflow_dispatch:
+  workflow_dispatch:  # 允许手动触发
 
 jobs:
   merge:
@@ -12,8 +12,8 @@ jobs:
       - name: 检出代码
         uses: actions/checkout@v4
         with:
-          ref: fongmi
-          fetch-depth: 0
+          ref: fongmi  # 明确检出 fongmi 分支
+          fetch-depth: 0  # 获取完整提交历史
 
       - name: 配置Git用户
         run: |
