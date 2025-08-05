@@ -1,9 +1,9 @@
-name: Merge upstream release→release (Preserve Local)  # 同步上游release分支（保留本地修改）
+name: Merge upstream release→release (Preserve Local)
 
 on:
   schedule:
     - cron: '0 * * * *'  # 每小时执行一次
-  workflow_dispatch:     # 允许手动触发
+  workflow_dispatch:
 
 jobs:
   merge:
@@ -12,36 +12,63 @@ jobs:
       - name: 检出代码
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # 获取完整提交历史
+          ref: release  # 明确检出 release 分支
+          fetch-depth: 0
 
       - name: 配置Git用户
         run: |
           git config user.name "xinyi1984"
           git config user.email "xinyi1984@users.noreply.github.com"
-
+          
       - name: 添加上游仓库
         run: |
           git remote add upstream https://github.com/FongMi/TV.git
           git fetch upstream
-
-      - name: 备份本地修改
+          
+      - name: 检查上游更新
+        id: check_update
         run: |
-          git checkout release
-          git branch backup/release  # 创建备份分支
+          # 获取当前分支的上游基础commit
+          if git show-ref --verify --quiet refs/remotes/origin/release; then
+            BASE_COMMIT=$(git merge-base origin/release upstream/release)
+          else
+            # 首次运行时没有本地分支
+            BASE_COMMIT=$(git rev-parse upstream/release)
+          fi
+          
+          # 获取上游最新commit
+          UPSTREAM_COMMIT=$(git rev-parse upstream/release)
+          
+          # 比较上游基础commit和当前最新commit
+          if [ "$BASE_COMMIT" = "$UPSTREAM_COMMIT" ]; then
+            echo "上游无新提交，跳过同步"
+            echo "has_update=false" >> $GITHUB_ENV
+          else
+            echo "检测到上游更新，开始同步"
+            echo "has_update=true" >> $GITHUB_ENV
+            echo "上游更新数量: $(git rev-list $BASE_COMMIT..$UPSTREAM_COMMIT --count)"
+          fi
 
-      - name: 获取上游最新代码
-        run: |
-          git reset --hard upstream/release  # 重置到上游最新状态
+      # 以下步骤仅在检测到上游更新时执行
+      - name: 创建备份分支
+        if: ${{ env.has_update == 'true' }}
+        run: git branch backup/release
+
+      - name: 重置到上游最新状态
+        if: ${{ env.has_update == 'true' }}
+        run: git reset --hard upstream/release
 
       - name: 恢复本地修改
+        if: ${{ env.has_update == 'true' }}
         run: |
-          git checkout backup/release -- .  # 用备份覆盖当前代码
-          git commit -am "合并本地修改到上游最新版本" --allow-empty
+          git checkout backup/release -- .
+          git add -A
+          git commit -m "合并本地修改到上游最新版本" --allow-empty
 
-      - name: 推送到远程仓库
-        run: |
-          git push --force origin release
+      - name: 强制推送到远程
+        if: ${{ env.has_update == 'true' }}
+        run: git push --force origin release
 
-      - name: 清理备份
-        run: |
-          git branch -D backup/release
+      - name: 清理备份分支
+        if: ${{ env.has_update == 'true' }}
+        run: git branch -D backup/release
