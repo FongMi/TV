@@ -109,7 +109,6 @@ dependencies {
     implementation 'androidx.media3:media3-ui:' + media3Version
     implementation 'androidx.room:room-runtime:2.7.2'
     implementation 'cat.ereza:customactivityoncrash:2.4.0'
-    implementation('com.github.anilbeesetti.nextlib:nextlib-media3ext:0.8.4') { exclude group: 'androidx.media3' }
     implementation 'com.github.bassaer:materialdesigncolors:1.0.0'
     implementation 'com.github.bumptech.glide:glide:4.16.0'
     implementation 'com.github.bumptech.glide:annotations:4.16.0'
@@ -123,6 +122,7 @@ dependencies {
     implementation 'com.guolindev.permissionx:permissionx:1.8.1'
     implementation 'com.hierynomus:smbj:0.14.0'
     implementation 'io.antmedia:rtmp-client:3.2.0'
+    implementation 'io.github.anilbeesetti:nextlib-media3ext:1.8.0-0.9.0'
     implementation 'javax.servlet:javax.servlet-api:3.1.0'
     implementation 'org.aomedia.avif.android:avif:1.1.1.14d8e3c4'
     implementation 'org.eclipse.jetty:jetty-client:8.1.21.v20160908'
