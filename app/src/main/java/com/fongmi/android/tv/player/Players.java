@@ -104,7 +104,7 @@ public class Players implements Player.Listener, ParseCallback {
     }
 
     private Players(Activity activity) {
-        decode = Setting.getDecode();
+        decode = HARD;
         builder = new StringBuilder();
         runnable = () -> ErrorEvent.timeout(tag);
         formatter = new Formatter(builder, Locale.getDefault());
