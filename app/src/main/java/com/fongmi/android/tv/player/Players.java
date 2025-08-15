@@ -104,7 +104,7 @@ public class Players implements Player.Listener, ParseCallback {
     }
 
     private Players(Activity activity) {
-        decode = HARD;
+        decode = HARD; // 强制设为硬解码（HARD=1）
         builder = new StringBuilder();
         runnable = () -> ErrorEvent.timeout(tag);
         formatter = new Formatter(builder, Locale.getDefault());
