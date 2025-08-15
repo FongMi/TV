@@ -104,7 +104,7 @@ public class Players implements Player.Listener, ParseCallback {
     }
 
     private Players(Activity activity) {
-        decode = HARD; // 强制设为硬解码（HARD=1）
+        decode = Setting.getDecode();
         builder = new StringBuilder();
         runnable = () -> ErrorEvent.timeout(tag);
         formatter = new Formatter(builder, Locale.getDefault());
@@ -668,8 +668,7 @@ public class Players implements Player.Listener, ParseCallback {
             case PlaybackException.ERROR_CODE_DECODER_INIT_FAILED:
             case PlaybackException.ERROR_CODE_DECODER_QUERY_FAILED:
             case PlaybackException.ERROR_CODE_DECODING_FAILED:
-                //toggleDecode();/ 注释掉自动切换逻辑，仅提示错误
-                ErrorEvent.extract(tag, "硬解码失败，设备不支持该格式");
+                toggleDecode();
                 break;
             case PlaybackException.ERROR_CODE_IO_UNSPECIFIED:
             case PlaybackException.ERROR_CODE_PARSING_CONTAINER_MALFORMED:
