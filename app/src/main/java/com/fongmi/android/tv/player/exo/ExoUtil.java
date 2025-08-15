@@ -59,7 +59,7 @@ public class ExoUtil {
     }
 
     public static RenderersFactory buildRenderersFactory(int renderMode) {
-        return new NextRenderersFactory(App.get()).setEnableDecoderFallback(true).setExtensionRendererMode(EXTENSION_RENDERER_MODE_ON); // 强制启用硬解码扩展
+        return new NextRenderersFactory(App.get()).setEnableDecoderFallback(false).setExtensionRendererMode(renderMode); // 关闭解码器回退
     }
 
     public static MediaSource.Factory buildMediaSourceFactory() {
