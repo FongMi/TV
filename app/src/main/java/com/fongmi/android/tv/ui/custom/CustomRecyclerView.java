@@ -5,7 +5,6 @@ import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewConfiguration;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,7 +16,6 @@ import com.fongmi.android.tv.utils.ResUtil;
 public class CustomRecyclerView extends RecyclerView {
 
     private int maxHeight;
-    private int touchSlop;
     private float x1;
     private float y1;
 
@@ -42,7 +40,6 @@ public class CustomRecyclerView extends RecyclerView {
     private void init(Context context, AttributeSet attrs) {
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.CustomRecyclerView);
         maxHeight = a.getLayoutDimension(R.styleable.CustomRecyclerView_maxHeight, maxHeight);
-        touchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
         setOverScrollMode(View.OVER_SCROLL_NEVER);
         a.recycle();
     }
@@ -87,7 +84,7 @@ public class CustomRecyclerView extends RecyclerView {
                 float y2 = event.getY();
                 float offsetX = Math.abs(x2 - x1);
                 float offsetY = Math.abs(y2 - y1);
-                if (offsetX > offsetY && offsetX > touchSlop) getParent().requestDisallowInterceptTouchEvent(false);
+                if (Math.abs(offsetX) > Math.abs(offsetY)) getParent().requestDisallowInterceptTouchEvent(false);
                 break;
         }
         return super.dispatchTouchEvent(event);

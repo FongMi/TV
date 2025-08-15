@@ -1,0 +1,35 @@
+#==========================================================================
+# https://github.com/ophub/amlogic-s9xxx-armbian
+# Description: Delete older releases and workflows runs
+#==========================================================================
+
+name: Delete older releases and workflows
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+# 这里默认12小时执行一次
+
+  workflow_dispatch:
+    
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.repository.owner.id }} == ${{ github.event.sender.id }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Delete releases and workflows runs
+        uses: xinyi1984/delete-releases-workflows@main
+        with:
+          #delete_releases: true
+          #delete_tags: true
+          #releases_keep_latest: 1
+          #releases_keep_keyword: true
+          delete_workflows: true
+          workflows_keep_day: true
+          workflows_keep_keyword: 0
+          out_log: false
+          gh_token: ${{ secrets.GITHUB_TOKEN }}

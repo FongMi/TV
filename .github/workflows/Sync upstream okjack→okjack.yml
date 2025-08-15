@@ -1,0 +1,33 @@
+name: Sync upstream okjack→okjack
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # 在每小时的 0分钟 执行   语法中配置五个部分（minute (0 - 59) hour (0 - 23) day of the month (1 - 31) month (1 - 12) day of the week (0 - 6)）
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: okjack  # 检出自己仓库的multiThread分支
+
+      - name: 配置 Git 用户
+        run: |
+          git config --global user.name 'xinyi1984'
+          git config --global user.email 'xinyi1984@users.noreply.github.com'
+          
+      - name: 重置到上游分支
+        run: |
+          # 添加上游仓库
+          git remote add upstream https://github.com/FongMi/TV.git || true
+          
+          # 获取上游更新
+          git fetch upstream okjack
+          
+          # 强制重置到上游分支
+          git reset --hard upstream/okjack # 这会将本地分支完全重置为上游分支的状态，丢弃本地所有提交和更改，确保100%一致
+      - name: 强制推送到自己仓库
+        run: |
+          git push origin okjack --force  # 覆盖自己仓库的分支历史，确保远程分支与上游完全一致

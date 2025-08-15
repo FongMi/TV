@@ -25,8 +25,7 @@
                 android:id="@+id/exo"
                 style="@style/Player.Vod"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:surface_type="none" />
+                android:layout_height="match_parent" />
 
             <master.flame.danmaku.ui.widget.DanmakuView
                 android:id="@+id/danmaku"
@@ -42,6 +41,13 @@
             <include
                 android:id="@+id/control"
                 layout="@layout/view_control_vod"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone" />
+
+            <include
+                android:id="@+id/display"
+                layout="@layout/view_widget_display"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:visibility="gone" />

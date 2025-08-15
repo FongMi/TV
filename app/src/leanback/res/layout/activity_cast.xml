@@ -11,8 +11,7 @@
         android:id="@+id/exo"
         style="@style/Player.Vod"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:surface_type="none" />
+        android:layout_height="match_parent" />
 
     <include
         android:id="@+id/widget"

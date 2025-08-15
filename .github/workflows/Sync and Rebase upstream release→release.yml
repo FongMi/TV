@@ -1,0 +1,61 @@
+name: Sync and Rebase upstream release→release
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # 在每小时的 0分钟 执行
+  workflow_dispatch:
+
+jobs:
+  sync-and-rebase:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: release
+          fetch-depth: 0  # 获取完整历史记录
+
+      - name: 配置 Git 用户
+        run: |
+          git config --global user.name 'xinyi1984'
+          git config --global user.email 'xinyi1984@users.noreply.github.com'
+          
+      - name: 添加上游仓库
+        run: |
+          git remote add upstream https://github.com/FongMi/TV.git || true
+          git fetch upstream release
+          
+      - name: 重置并应用本地更改
+        run: |
+          # 检出自己仓库的更改（临时分支）
+          # git fetch origin fongmi1:fongmi1 || true
+          # 保存当前本地更改到临时分支
+          git branch -f xy
+          echo "已保存本地更改到临时分支 xy"
+          
+          # 重置到上游分支状态
+          git reset --hard upstream/release
+          echo "已重置到上游分支状态"
+          
+          # 尝试变基应用本地更改
+          echo "开始应用本地更改..."
+          if git rebase xy; then
+            echo "✅ 本地更改已成功应用"
+          else
+            echo "⚠️ 存在冲突，优先上游版本"
+            
+            # 使用上游版本解决所有冲突
+            git checkout --theirs .
+            git add .
+            
+            # 继续变基
+            git rebase --continue
+            echo "✅ 冲突已解决（优先上游版本）"
+          fi
+          
+          # 清理临时分支
+          git branch -D xy
+          
+      - name: 强制推送到自己仓库
+        run: |
+          git push origin release --force
+          echo "已强制推送到远程仓库"
