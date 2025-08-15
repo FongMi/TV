@@ -53,7 +53,7 @@ public class ExoUtil {
         if (Setting.isPreferAAC()) builder.setPreferredAudioMimeType(MimeTypes.AUDIO_AAC);
         builder.setPreferredTextLanguage(Locale.getDefault().getISO3Language());
         builder.setTunnelingEnabled(Setting.isTunnel());
-        // builder.setForceHighestSupportedBitrate(true);// 注释掉强制最高码率，让播放器自动选择适合设备性能的码率
+        builder.setForceHighestSupportedBitrate(false); // 让播放器自动选择适合设备性能的码率
         trackSelector.setParameters(builder.build());
         return trackSelector;
     }
