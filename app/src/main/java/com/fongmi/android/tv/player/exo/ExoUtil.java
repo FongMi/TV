@@ -53,13 +53,13 @@ public class ExoUtil {
         if (Setting.isPreferAAC()) builder.setPreferredAudioMimeType(MimeTypes.AUDIO_AAC);
         builder.setPreferredTextLanguage(Locale.getDefault().getISO3Language());
         builder.setTunnelingEnabled(Setting.isTunnel());
-        builder.setForceHighestSupportedBitrate(false); // 让播放器自动选择适合设备性能的码率
+        builder.setForceHighestSupportedBitrate(true);
         trackSelector.setParameters(builder.build());
         return trackSelector;
     }
 
     public static RenderersFactory buildRenderersFactory(int renderMode) {
-        return new NextRenderersFactory(App.get()).setEnableDecoderFallback(false).setExtensionRendererMode(renderMode); // 关闭解码器回退
+        return new NextRenderersFactory(App.get()).setAudioPrefer(Setting.isAudioPrefer()).setVideoPrefer(Setting.isVideoPrefer()).setEnableDecoderFallback(true).setExtensionRendererMode(renderMode);
     }
 
     public static MediaSource.Factory buildMediaSourceFactory() {
