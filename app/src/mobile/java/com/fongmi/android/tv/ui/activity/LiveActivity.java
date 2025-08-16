@@ -239,11 +239,6 @@ public class LiveActivity extends BaseActivity implements CustomKeyDownLive.List
         onTimeChangeDisplaySpeed();
     }
 
-    private void hideControl() {
-        mBinding.control.getRoot().setVisibility(View.GONE);
-        App.removeCallbacks(mR1);
-    }
-
     private void setDecode() {
         mBinding.control.action.decode.setText(mPlayers.getDecodeText());
     }
