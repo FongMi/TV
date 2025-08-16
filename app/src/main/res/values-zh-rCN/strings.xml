@@ -37,6 +37,12 @@
     <string name="play_prev">上集</string>
     <string name="play_loop">循环</string>
     <string name="play_timer">定时</string>
+    <string name="play_time">时间</string>
+    <string name="play_netspeed">网速</string>
+    <string name="play_duration">进度</string>
+    <string name="play_mini_progress">迷你进度</string>
+    <string name="play_video_title">标题</string>
+    <string name="play_display">屏显</string>
     <string name="play_change">换源</string>
     <string name="play_forward">→</string>
     <string name="play_backward">←</string>
