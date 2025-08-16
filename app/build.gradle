@@ -8,7 +8,7 @@ android {
     compileSdk 36
 
     defaultConfig {
-        applicationId "com.fongmi.android.tv"
+        applicationId "com.fongmi.android.xytv"
         minSdk 21
         //noinspection ExpiredTargetSdkVersion
         targetSdk 28
