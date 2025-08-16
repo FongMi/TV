@@ -12,6 +12,10 @@ dependencyResolutionManagement {
         google()
         flatDir { dirs "$rootDir/app/libs" }
         maven { url "https://jitpack.io" }
+        maven { url 'https://download.01.org/crosswalk/releases/crosswalk/android/maven2' }
+        maven { url "https://maven.aliyun.com/repository/releases" }
+        maven { url "https://maven.aliyun.com/repository/public" }
+
         maven {
             url "http://4thline.org/m2"
             allowInsecureProtocol = true
@@ -23,3 +27,5 @@ include ':catvod'
 include ':chaquo'
 include ':quickjs'
 rootProject.name = "TV"
+gradle.ext.androidxMediaModulePrefix = 'media-'
+apply from: file("/home/runner/work/TVBox-TV/TVBox-TV/TVBox-TV/core_settings.gradle")
