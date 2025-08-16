@@ -61,14 +61,14 @@ public final class SubtitleDialog extends BaseDialog {
 
     @Override
     protected void initEvent() {
-        binding.up.setOnClickListener(this::onUp);
-        binding.down.setOnClickListener(this::onDown);
-        binding.large.setOnClickListener(this::onLarge);
-        binding.small.setOnClickListener(this::onSmall);
+        //binding.up.setOnClickListener(this::onUp);
+        //binding.down.setOnClickListener(this::onDown);
+        //binding.large.setOnClickListener(this::onLarge);
+        //binding.small.setOnClickListener(this::onSmall);
         binding.reset.setOnClickListener(this::onReset);
     }
 
-    private void onUp(View view) {
+     /*private void onUp(View view) {
         subtitleView.addPosition(0.005f);
         Setting.putSubtitlePosition(subtitleView.getPosition());
     }
@@ -86,12 +86,12 @@ public final class SubtitleDialog extends BaseDialog {
     private void onSmall(View view) {
         subtitleView.subTextSize(0.002f);
         Setting.putSubtitleTextSize(subtitleView.getTextSize());
-    }
+    }*/
 
     private void onReset(View view) {
         Setting.putSubtitleTextSize(0.0f);
         Setting.putSubtitlePosition(0.0f);
-        subtitleView.setBottomPosition(0.0f);
+        //subtitleView.setBottomPosition(0.0f);
         subtitleView.setUserDefaultTextSize();
     }
 
