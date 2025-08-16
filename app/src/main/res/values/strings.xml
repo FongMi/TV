@@ -37,6 +37,12 @@
     <string name="play_prev">Prev</string>
     <string name="play_loop">Loop</string>
     <string name="play_timer">Timer</string>
+    <string name="play_time">Time</string>
+    <string name="play_netspeed">Net Speed</string>
+    <string name="play_duration">Duration</string>
+    <string name="play_mini_progress">Mini Progress</string>
+    <string name="play_video_title">Title</string>
+    <string name="play_display">Display</string>
     <string name="play_change">Change</string>
     <string name="play_forward">→</string>
     <string name="play_backward">←</string>
