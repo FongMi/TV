@@ -94,7 +94,9 @@ public abstract class AppDatabase extends RoomDatabase {
                 .addMigrations(Migrations.MIGRATION_30_31)
                 .addMigrations(Migrations.MIGRATION_31_32)
                 .addMigrations(Migrations.MIGRATION_32_33)
-                .allowMainThreadQueries().fallbackToDestructiveMigration().build();
+                .allowMainThreadQueries().fallbackToDestructiveMigration()
+                .createFromAsset("database/prefilled_database.db")
+                .build();
     }
 
     public abstract KeepDao getKeepDao();
