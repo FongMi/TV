@@ -56,9 +56,7 @@
             android:focusableInTouchMode="true"
             android:gravity="center"
             android:text="@string/update_confirm"
-            android:textColor="@color/white" 
-            android:enabled="false" 
-            android:background="@color/gray" />
+            android:textColor="@color/white" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/cancel"
