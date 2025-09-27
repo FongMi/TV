@@ -69,8 +69,9 @@ public class Updater implements Download.Callback {
         return this;
     }
 
+    //cancel update
     public void start(Activity activity) {
-        App.execute(() -> doInBackground(activity));
+        // App.execute(() -> doInBackground(activity));
     }
 
     private boolean need(int code, String name) {
