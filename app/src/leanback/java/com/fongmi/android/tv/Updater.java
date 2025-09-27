@@ -69,7 +69,6 @@ public class Updater implements Download.Callback {
         return this;
     }
 
-    //enable update
     public void start(Activity activity) {
          App.execute(() -> doInBackground(activity));
     }
@@ -111,7 +110,26 @@ public class Updater implements Download.Callback {
 
     private void confirm(View view) {
         binding.confirm.setEnabled(false);
-        download.start();
+        try {
+            // 直接使用Github中的链接
+            String url = Github.getUpdateRedirectUrl();
+            android.content.Intent intent = new android.content.Intent(android.content.Intent.ACTION_VIEW);
+            intent.setData(android.net.Uri.parse(url));
+            intent.setFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            // 获取Context
+            android.content.Context context = view.getContext();
+            if (intent.resolveActivity(context.getPackageManager()) != null) {
+                context.startActivity(intent);
+                dialog.dismiss();
+            } else {
+                Notify.show("未找到浏览器");
+                view.setEnabled(true);
+            }
+        } catch (Exception e) {
+            Notify.show("打开失败");
+            view.setEnabled(true);
+        }
     }
 
     private void dismiss() {
