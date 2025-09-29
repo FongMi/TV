@@ -2,7 +2,7 @@ package com.fongmi.android.tv.utils;
 
 public class Github {
 
-    public static final String URL = "https://gongdian.top/fongmi";
+    public static final String URL = "https://gongdian.top/fongmi/update";
 
     // 添加更新链接常量
     public static final String UPDATE_REDIRECT_URL = "https://gongdian.top/fongmi/download";
@@ -12,16 +12,17 @@ public class Github {
         return UPDATE_REDIRECT_URL;
     }
 
-    private static String getUrl(String path, String name) {
-        return URL + "/" + path + "/" + name;
+    private static String getUrl(String name) {
+        return URL + "/" + name;
     }
 
+
     public static String getJson(boolean dev, String name) {
-        return getUrl("apk/" + (dev ? "dev" : "release"), name + ".json");
+        return getUrl(name + ".json");
     }
 
     public static String getApk(boolean dev, String name) {
-        return getUrl("apk/" + (dev ? "dev" : "release"), name + ".apk");
+        return getUrl("apk/" + name + ".apk");
     }
 }
 
