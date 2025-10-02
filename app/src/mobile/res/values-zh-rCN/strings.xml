@@ -14,7 +14,6 @@
     <string name="menu_delete">删除</string>
     <string name="menu_search">搜索</string>
     <string name="menu_site">站点</string>
-    <string name="menu_view">切换</string>
     <string name="menu_reset">重置</string>
 
     <!-- Vod -->
@@ -22,7 +21,6 @@
 
     <!-- Detail -->
     <string name="detail_flag">线路</string>
-    <string name="detail_more">更多</string>
     <string name="detail_episode">选集</string>
     <string name="detail_quality">画质</string>
     <string name="detail_content">简介</string>

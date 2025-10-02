@@ -72,7 +72,7 @@ public class TVBus implements Source.Extractor, Listener {
     private String check() throws Exception {
         if (hls == null) return "";
         if (!hls.startsWith("-")) return hls;
-        throw new ExtractException(ResUtil.getString(R.string.error_play_code, hls));
+        throw new ExtractException(ResUtil.getString(R.string.error_play_url));
     }
 
     @Override

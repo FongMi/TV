@@ -37,10 +37,6 @@ public class Sniffer {
         return SNIFFER.matcher(url).find();
     }
 
-    public static List<String> getRegex(Uri uri) {
-        return getRule(uri).getRegex();
-    }
-
     public static List<String> getScript(Uri uri) {
         return getRule(uri).getScript();
     }

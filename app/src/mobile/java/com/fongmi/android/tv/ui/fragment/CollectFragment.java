@@ -13,12 +13,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.MenuProvider;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.viewbinding.ViewBinding;
 
-import com.fongmi.android.tv.Product;
-import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Collect;
 import com.fongmi.android.tv.bean.Result;
@@ -30,9 +26,7 @@ import com.fongmi.android.tv.ui.activity.FolderActivity;
 import com.fongmi.android.tv.ui.activity.VideoActivity;
 import com.fongmi.android.tv.ui.adapter.CollectAdapter;
 import com.fongmi.android.tv.ui.adapter.SearchAdapter;
-import com.fongmi.android.tv.ui.adapter.VodAdapter;
 import com.fongmi.android.tv.ui.base.BaseFragment;
-import com.fongmi.android.tv.ui.base.ViewType;
 import com.fongmi.android.tv.ui.custom.CustomScroller;
 import com.fongmi.android.tv.utils.PauseExecutor;
 import com.fongmi.android.tv.utils.ResUtil;
@@ -40,7 +34,7 @@ import com.fongmi.android.tv.utils.ResUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CollectFragment extends BaseFragment implements MenuProvider, CollectAdapter.OnClickListener, VodAdapter.OnClickListener, CustomScroller.Callback {
+public class CollectFragment extends BaseFragment implements MenuProvider, CollectAdapter.OnClickListener, SearchAdapter.OnClickListener, CustomScroller.Callback {
 
     private FragmentCollectBinding mBinding;
     private CollectAdapter mCollectAdapter;
@@ -48,6 +42,7 @@ public class CollectFragment extends BaseFragment implements MenuProvider, Colle
     private CustomScroller mScroller;
     private SiteViewModel mViewModel;
     private PauseExecutor mExecutor;
+    private int maxWidth;
 
     public static CollectFragment newInstance(String keyword) {
         Bundle args = new Bundle();
@@ -78,45 +73,34 @@ public class CollectFragment extends BaseFragment implements MenuProvider, Colle
 
     @Override
     protected void initView() {
+        maxWidth = ResUtil.getScreenWidth() / (ResUtil.isLand(requireActivity()) ? 3 : 2) - ResUtil.dp2px(32);
         mScroller = new CustomScroller(this);
         setRecyclerView();
         setViewModel();
-        setViewType();
         search();
     }
 
     private void setRecyclerView() {
-        mBinding.collect.setHasFixedSize(true);
+        mBinding.collect.setMaxWidth(maxWidth);
         mBinding.collect.setItemAnimator(null);
+        mBinding.collect.setHasFixedSize(false);
         mBinding.collect.setAdapter(mCollectAdapter = new CollectAdapter(this));
         mBinding.recycler.setHasFixedSize(true);
         mBinding.recycler.addOnScrollListener(mScroller);
         mBinding.recycler.setAdapter(mSearchAdapter = new SearchAdapter(this));
     }
 
-    private void setViewType() {
-        setViewType(Setting.getViewType(ViewType.GRID));
-    }
-
-    private void setViewType(int viewType) {
-        int count = Product.getColumn(requireActivity()) - 1;
-        mSearchAdapter.setViewType(viewType, count);
-        mSearchAdapter.setSize(Product.getSpec(requireActivity(), ResUtil.dp2px(128 + 8 + count * 16), count));
-        ((GridLayoutManager) mBinding.recycler.getLayoutManager()).setSpanCount(mSearchAdapter.isGrid() ? count : 1);
-        requireActivity().invalidateOptionsMenu();
-    }
-
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mViewModel.search.observe(this, result -> {
-            if (mCollectAdapter.getPosition() == 0) mSearchAdapter.addAll(result.getList());
-            mCollectAdapter.add(Collect.create(result.getList()));
+            if (mCollectAdapter.getPosition() == 0) mSearchAdapter.addItems(result.getList());
+            mCollectAdapter.addItem(Collect.create(result.getList()));
             mCollectAdapter.add(result.getList());
         });
         mViewModel.result.observe(this, result -> {
             boolean same = !result.getList().isEmpty() && mCollectAdapter.getActivated().getSite().equals(result.getList().get(0).getSite());
             if (same) mCollectAdapter.getActivated().getList().addAll(result.getList());
-            if (same) mSearchAdapter.addAll(result.getList());
+            if (same) mSearchAdapter.addItems(result.getList());
             mScroller.endLoading(result);
         });
     }
@@ -128,10 +112,8 @@ public class CollectFragment extends BaseFragment implements MenuProvider, Colle
     }
 
     private void search() {
-        mSearchAdapter.clear();
-        mCollectAdapter.clear();
-        if (mExecutor != null) mExecutor.shutdownNow();
         mExecutor = new PauseExecutor(20);
+        mCollectAdapter.setItems(List.of(Collect.all()));
         for (Site site : getSites()) mExecutor.execute(() -> search(site, getKeyword()));
     }
 
@@ -142,15 +124,10 @@ public class CollectFragment extends BaseFragment implements MenuProvider, Colle
         }
     }
 
-    private void onView() {
-        setViewType(mSearchAdapter.isGrid() ? ViewType.LIST : ViewType.GRID);
-    }
-
     @Override
     public void onItemClick(int position, Collect item) {
-        mBinding.recycler.scrollToPosition(0);
+        mSearchAdapter.setItems(item.getList(), () -> mBinding.recycler.scrollToPosition(0));
         mCollectAdapter.setActivated(position);
-        mSearchAdapter.setAll(item.getList());
         mScroller.setPage(item.getPage());
     }
 
@@ -158,11 +135,6 @@ public class CollectFragment extends BaseFragment implements MenuProvider, Colle
     public void onItemClick(Vod item) {
         if (item.isFolder()) FolderActivity.start(requireActivity(), item.getSiteKey(), Result.folder(item));
         else VideoActivity.collect(requireActivity(), item.getSiteKey(), item.getVodId(), item.getVodName(), item.getVodPic());
-    }
-
-    @Override
-    public boolean onLongClick(Vod item) {
-        return false;
     }
 
     @Override
@@ -176,18 +148,11 @@ public class CollectFragment extends BaseFragment implements MenuProvider, Colle
 
     @Override
     public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-        menuInflater.inflate(R.menu.menu_collect, menu);
-    }
-
-    @Override
-    public void onPrepareMenu(@NonNull Menu menu) {
-        menu.findItem(R.id.action_view).setIcon(Setting.getViewType(ViewType.GRID) == ViewType.GRID ? R.drawable.ic_action_list : R.drawable.ic_action_grid);
     }
 
     @Override
     public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
         if (menuItem.getItemId() == android.R.id.home) requireActivity().getOnBackPressedDispatcher().onBackPressed();
-        if (menuItem.getItemId() == R.id.action_view) onView();
         return true;
     }
 

@@ -74,51 +74,29 @@
         android:gravity="center"
         android:orientation="horizontal">
 
-        <FrameLayout
-            android:id="@+id/prevRoot"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/shape_control">
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/prev"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/shape_control"
+            android:src="@drawable/exo_icon_previous" />
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/prev"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/exo_icon_previous" />
-
-        </FrameLayout>
-
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/play"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
             android:layout_marginStart="48dp"
             android:layout_marginEnd="48dp"
-            android:background="@drawable/shape_control">
+            android:background="@drawable/shape_control"
+            android:src="@drawable/exo_icon_play" />
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/play"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/exo_icon_play" />
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/next"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/shape_control"
+            android:src="@drawable/exo_icon_next" />
 
-        </FrameLayout>
-
-        <FrameLayout
-            android:id="@+id/nextRoot"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/shape_control">
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/next"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/exo_icon_next" />
-
-        </FrameLayout>
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <include

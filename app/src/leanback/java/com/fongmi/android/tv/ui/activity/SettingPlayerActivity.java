@@ -50,6 +50,7 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
         mBinding.uaText.setText(Setting.getUa());
         mBinding.aacText.setText(getSwitch(Setting.isPreferAAC()));
         mBinding.tunnelText.setText(getSwitch(Setting.isTunnel()));
+        mBinding.adblockText.setText(getSwitch(Setting.isAdblock()));
         mBinding.speedText.setText(format.format(Setting.getSpeed()));
         mBinding.bufferText.setText(String.valueOf(Setting.getBuffer()));
         mBinding.backgroundText.setText(getSwitch(Setting.isBackgroundOn()));
@@ -71,6 +72,7 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
         mBinding.render.setOnClickListener(this::setRender);
         mBinding.tunnel.setOnClickListener(this::setTunnel);
         mBinding.caption.setOnClickListener(this::setCaption);
+        mBinding.adblock.setOnClickListener(this::setAdblock);
         mBinding.caption.setOnLongClickListener(this::onCaption);
         mBinding.background.setOnClickListener(this::onBackground);
         mBinding.audioDecode.setOnClickListener(this::setAudioDecode);
@@ -140,6 +142,11 @@ public class SettingPlayerActivity extends BaseActivity implements UaCallback, B
     private void setCaption(View view) {
         Setting.putCaption(!Setting.isCaption());
         mBinding.captionText.setText(caption[Setting.isCaption() ? 1 : 0]);
+    }
+
+    private void setAdblock(View view) {
+        Setting.putAdblock(!Setting.isAdblock());
+        mBinding.adblockText.setText(getSwitch(Setting.isAdblock()));
     }
 
     private boolean onCaption(View view) {

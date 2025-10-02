@@ -3,13 +3,16 @@ package com.fongmi.android.tv.bean;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.Nullable;
+
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.impl.Diffable;
 import com.fongmi.android.tv.utils.ResUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Collect implements Parcelable {
+public class Collect implements Parcelable, Diffable<Collect> {
 
     private boolean activated;
     private List<Vod> list;
@@ -59,6 +62,13 @@ public class Collect implements Parcelable {
     }
 
     @Override
+    public boolean equals(@Nullable Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Collect it)) return false;
+        return getSite().equals(it.getSite()) && activated == it.activated;
+    }
+
+    @Override
     public int describeContents() {
         return 0;
     }
@@ -76,6 +86,16 @@ public class Collect implements Parcelable {
         this.list = in.createTypedArrayList(Vod.CREATOR);
         this.site = in.readParcelable(Site.class.getClassLoader());
         this.page = in.readInt();
+    }
+
+    @Override
+    public boolean isSameItem(Collect other) {
+        return getSite().equals(other.getSite());
+    }
+
+    @Override
+    public boolean isSameContent(Collect other) {
+        return equals(other);
     }
 
     public static final Creator<Collect> CREATOR = new Creator<>() {

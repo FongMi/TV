@@ -228,7 +228,7 @@
                             android:layout_height="20dp"
                             android:layout_marginStart="8dp"
                             android:background="?attr/selectableItemBackgroundBorderless"
-                            android:src="@drawable/ic_detail_reverse"
+                            android:src="@drawable/ic_action_reverse"
                             android:visibility="gone"
                             tools:visibility="visible" />
 
@@ -237,16 +237,13 @@
                             android:layout_height="0dp"
                             android:layout_weight="1" />
 
-                        <com.google.android.material.textview.MaterialTextView
+                        <androidx.appcompat.widget.AppCompatImageView
                             android:id="@+id/more"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:text="@string/detail_more"
-                            android:textColor="@color/white"
-                            android:textSize="14sp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:src="@drawable/ic_action_more"
                             android:visibility="gone"
-                            app:drawableEndCompat="@drawable/ic_detail_more"
                             tools:visibility="visible" />
 
                     </androidx.appcompat.widget.LinearLayoutCompat>

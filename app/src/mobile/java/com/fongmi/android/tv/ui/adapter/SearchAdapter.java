@@ -6,87 +6,48 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.fongmi.android.tv.Setting;
 import com.fongmi.android.tv.bean.Vod;
-import com.fongmi.android.tv.databinding.AdapterVodOneBinding;
-import com.fongmi.android.tv.databinding.AdapterVodRectBinding;
-import com.fongmi.android.tv.ui.base.BaseVodHolder;
-import com.fongmi.android.tv.ui.base.ViewType;
-import com.fongmi.android.tv.ui.holder.VodOneHolder;
-import com.fongmi.android.tv.ui.holder.VodRectHolder;
+import com.fongmi.android.tv.databinding.AdapterSearchBinding;
+import com.fongmi.android.tv.utils.ImgUtil;
 
-import java.util.ArrayList;
-import java.util.List;
+public class SearchAdapter extends BaseDiffAdapter<Vod, SearchAdapter.ViewHolder> {
 
-public class SearchAdapter extends RecyclerView.Adapter<BaseVodHolder> {
+    private final OnClickListener listener;
 
-    private final VodAdapter.OnClickListener mListener;
-    private final List<Vod> mItems;
-    private int viewType;
-    private int[] size;
-
-    public SearchAdapter(VodAdapter.OnClickListener listener) {
-        this.mListener = listener;
-        this.mItems = new ArrayList<>();
+    public SearchAdapter(OnClickListener listener) {
+        this.listener = listener;
     }
 
-    public void setViewType(int viewType, int count) {
-        if (this.viewType > 0 && this.viewType != viewType && count == 1) notifyDataSetChanged();
-        Setting.putViewType(viewType);
-        this.viewType = viewType;
-    }
+    public interface OnClickListener {
 
-    public void setSize(int[] size) {
-        this.size = size;
-    }
-
-    public int getWidth() {
-        return size[0];
-    }
-
-    public boolean isList() {
-        return viewType == ViewType.LIST;
-    }
-
-    public boolean isGrid() {
-        return viewType == ViewType.GRID;
-    }
-
-    public void setAll(List<Vod> items) {
-        clear().addAll(items);
-    }
-
-    public void addAll(List<Vod> items) {
-        int position = mItems.size() + 1;
-        mItems.addAll(items);
-        notifyItemRangeInserted(position, items.size());
-    }
-
-    public SearchAdapter clear() {
-        mItems.clear();
-        notifyDataSetChanged();
-        return this;
-    }
-
-    @Override
-    public int getItemCount() {
-        return mItems.size();
-    }
-
-    @Override
-    public int getItemViewType(int position) {
-        return viewType;
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull BaseVodHolder holder, int position) {
-        holder.initView(mItems.get(position));
+        void onItemClick(Vod item);
     }
 
     @NonNull
     @Override
-    public BaseVodHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        if (viewType == ViewType.LIST) return new VodOneHolder(AdapterVodOneBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), mListener);
-        else return new VodRectHolder(AdapterVodRectBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), mListener).size(size);
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        return new ViewHolder(AdapterSearchBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        Vod item = getItem(position);
+        holder.binding.name.setText(item.getVodName());
+        holder.binding.site.setText(item.getSiteName());
+        holder.binding.remark.setText(item.getVodRemarks());
+        holder.binding.site.setVisibility(item.getSiteVisible());
+        holder.binding.remark.setVisibility(item.getRemarkVisible());
+        holder.binding.getRoot().setOnClickListener(v -> listener.onItemClick(item));
+        ImgUtil.load(item.getVodName(), item.getVodPic(), holder.binding.image);
+    }
+
+    public class ViewHolder extends RecyclerView.ViewHolder {
+
+        private final AdapterSearchBinding binding;
+
+        ViewHolder(@NonNull AdapterSearchBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+        }
     }
 }

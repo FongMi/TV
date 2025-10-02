@@ -10,17 +10,14 @@ import com.fongmi.android.tv.bean.Collect;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.AdapterCollectBinding;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class CollectAdapter extends RecyclerView.Adapter<CollectAdapter.ViewHolder> {
+public class CollectAdapter extends BaseDiffAdapter<Collect, CollectAdapter.ViewHolder> {
 
-    private final OnClickListener mListener;
-    private final List<Collect> mItems;
+    private final OnClickListener listener;
 
     public CollectAdapter(OnClickListener listener) {
-        this.mListener = listener;
-        this.mItems = new ArrayList<>();
+        this.listener = listener;
     }
 
     public interface OnClickListener {
@@ -28,38 +25,23 @@ public class CollectAdapter extends RecyclerView.Adapter<CollectAdapter.ViewHold
         void onItemClick(int position, Collect item);
     }
 
-    public void clear() {
-        mItems.clear();
-        mItems.add(Collect.all());
-        notifyDataSetChanged();
-    }
-
-    public void add(Collect item) {
-        mItems.add(item);
-        notifyItemInserted(mItems.size() - 1);
-    }
-
     public void add(List<Vod> items) {
-        mItems.get(0).getList().addAll(items);
+        if (getItemCount() == 0) return;
+        getItem(0).getList().addAll(items);
     }
 
     public int getPosition() {
-        for (int i = 0; i < mItems.size(); i++) if (mItems.get(i).isActivated()) return i;
+        for (int i = 0; i < getItemCount(); i++) if (getItem(i).isActivated()) return i;
         return 0;
     }
 
     public Collect getActivated() {
-        return mItems.get(getPosition());
+        return getItems().get(getPosition());
     }
 
     public void setActivated(int position) {
-        for (int i = 0; i < mItems.size(); i++) mItems.get(i).setActivated(i == position);
+        for (int i = 0; i < getItemCount(); i++) getItem(i).setActivated(i == position);
         notifyItemRangeChanged(0, getItemCount());
-    }
-
-    @Override
-    public int getItemCount() {
-        return mItems.size();
     }
 
     @NonNull
@@ -70,10 +52,11 @@ public class CollectAdapter extends RecyclerView.Adapter<CollectAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Collect item = mItems.get(position);
+        Collect item = getItem(position);
+        holder.binding.text.setSelected(item.isActivated());
         holder.binding.text.setActivated(item.isActivated());
         holder.binding.text.setText(item.getSite().getName());
-        holder.binding.text.setOnClickListener(v -> mListener.onItemClick(position, item));
+        holder.binding.text.setOnClickListener(v -> listener.onItemClick(position, item));
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

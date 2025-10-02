@@ -56,7 +56,7 @@ public class ErrorEvent {
 
     public String getMsg() {
         if (type == Type.URL) return ResUtil.getString(R.string.error_play_url);
-        if (type == Type.DRM) return ResUtil.getString(R.string.error_play_drm_scheme);
+        if (type == Type.DRM) return ResUtil.getString(R.string.error_play_drm);
         if (type == Type.FLAG) return ResUtil.getString(R.string.error_play_flag);
         if (type == Type.PARSE) return ResUtil.getString(R.string.error_play_parse);
         if (type == Type.TIMEOUT) return ResUtil.getString(R.string.error_play_timeout);

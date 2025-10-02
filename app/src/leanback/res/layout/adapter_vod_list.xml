@@ -15,12 +15,13 @@
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/image"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_margin="16dp"
-            tools:src="@drawable/ic_img_error" />
+            android:scaleType="fitCenter"
+            app:shapeAppearanceOverlay="@style/Vod.Grid.Large" />
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"

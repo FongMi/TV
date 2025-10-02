@@ -48,6 +48,7 @@ import com.fongmi.android.tv.impl.ParseCallback;
 import com.fongmi.android.tv.impl.SessionCallback;
 import com.fongmi.android.tv.player.danmaku.DanPlayer;
 import com.fongmi.android.tv.player.exo.CacheManager;
+import com.fongmi.android.tv.player.exo.ErrorMsgProvider;
 import com.fongmi.android.tv.player.exo.ExoUtil;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.utils.FileUtil;
@@ -77,6 +78,7 @@ public class Players implements Player.Listener, ParseCallback {
     public static final int SOFT = 0;
     public static final int HARD = 1;
 
+    private final ErrorMsgProvider provider;
     private final AudioManager audioManager;
     private final StringBuilder builder;
     private final Formatter formatter;
@@ -110,6 +112,7 @@ public class Players implements Player.Listener, ParseCallback {
     private Players(Activity activity) {
         decode = Setting.getDecode();
         builder = new StringBuilder();
+        provider = new ErrorMsgProvider();
         runnable = () -> ErrorEvent.timeout(tag);
         formatter = new Formatter(builder, Locale.getDefault());
         audioManager = (AudioManager) activity.getSystemService(Context.AUDIO_SERVICE);
@@ -672,7 +675,7 @@ public class Players implements Player.Listener, ParseCallback {
     @Override
     public void onPlayerError(@NonNull PlaybackException error) {
         Logger.t(TAG).e(error.errorCode + "," + url);
-        if (retried()) ErrorEvent.extract(tag, error.getErrorCodeName());
+        if (retried()) ErrorEvent.extract(tag, provider.get(error));
         else switch (error.errorCode) {
             case PlaybackException.ERROR_CODE_BEHIND_LIVE_WINDOW:
                 seekToDefaultPosition();

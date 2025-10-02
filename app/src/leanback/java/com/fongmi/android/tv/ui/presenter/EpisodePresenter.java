@@ -6,18 +6,20 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.leanback.widget.Presenter;
 
-import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.bean.Episode;
 import com.fongmi.android.tv.databinding.AdapterEpisodeBinding;
+import com.fongmi.android.tv.utils.ResUtil;
 
 public class EpisodePresenter extends Presenter {
 
-    private final OnClickListener mListener;
+    private final OnClickListener listener;
+    private final int maxWidth;
     private int nextFocusDown;
     private int nextFocusUp;
 
     public EpisodePresenter(OnClickListener listener) {
-        this.mListener = listener;
+        this.listener = listener;
+        this.maxWidth = ResUtil.getScreenWidth() - ResUtil.dp2px(48);
     }
 
     public interface OnClickListener {
@@ -41,12 +43,12 @@ public class EpisodePresenter extends Presenter {
     public void onBindViewHolder(Presenter.ViewHolder viewHolder, Object object) {
         Episode item = (Episode) object;
         ViewHolder holder = (ViewHolder) viewHolder;
-        holder.binding.text.setMaxEms(Product.getEms());
+        holder.binding.text.setMaxWidth(maxWidth);
         holder.binding.text.setNextFocusUpId(nextFocusUp);
         holder.binding.text.setNextFocusDownId(nextFocusDown);
         holder.binding.text.setActivated(item.isActivated());
         holder.binding.text.setText(item.getDesc().concat(item.getName()));
-        setOnClickListener(holder, view -> mListener.onItemClick(item));
+        setOnClickListener(holder, view -> listener.onItemClick(item));
     }
 
     @Override

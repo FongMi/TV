@@ -14,7 +14,6 @@
     <string name="menu_delete">Delete</string>
     <string name="menu_search">Search</string>
     <string name="menu_site">Site</string>
-    <string name="menu_view">Switch</string>
     <string name="menu_reset">Reset</string>
 
     <!-- Vod -->
@@ -22,7 +21,6 @@
 
     <!-- Detail -->
     <string name="detail_flag">Flag</string>
-    <string name="detail_more">More</string>
     <string name="detail_episode">Episode</string>
     <string name="detail_quality">Quality</string>
     <string name="detail_content">Summary</string>

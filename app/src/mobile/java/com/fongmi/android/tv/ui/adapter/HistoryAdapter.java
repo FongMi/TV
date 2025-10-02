@@ -14,12 +14,12 @@ import com.fongmi.android.tv.utils.ImgUtil;
 
 public class HistoryAdapter extends BaseDiffAdapter<History, HistoryAdapter.ViewHolder> {
 
-    private final OnClickListener mListener;
+    private final OnClickListener listener;
     private int width, height;
     private boolean delete;
 
     public HistoryAdapter(OnClickListener listener) {
-        this.mListener = listener;
+        this.listener = listener;
     }
 
     public interface OnClickListener {
@@ -78,10 +78,10 @@ public class HistoryAdapter extends BaseDiffAdapter<History, HistoryAdapter.View
     }
 
     private void setClickListener(View root, History item) {
-        root.setOnLongClickListener(view -> mListener.onLongClick());
+        root.setOnLongClickListener(view -> listener.onLongClick());
         root.setOnClickListener(view -> {
-            if (isDelete()) mListener.onItemDelete(item);
-            else mListener.onItemClick(item);
+            if (isDelete()) listener.onItemDelete(item);
+            else listener.onItemClick(item);
         });
     }
 

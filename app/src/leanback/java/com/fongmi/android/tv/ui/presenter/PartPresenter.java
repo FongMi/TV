@@ -6,16 +6,18 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.leanback.widget.Presenter;
 
-import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.databinding.AdapterPartBinding;
+import com.fongmi.android.tv.utils.ResUtil;
 
 public class PartPresenter extends Presenter {
 
-    private final OnClickListener mListener;
+    private final OnClickListener listener;
+    private final int maxWidth;
     private int nextFocusUp;
 
     public PartPresenter(OnClickListener listener) {
-        this.mListener = listener;
+        this.listener = listener;
+        this.maxWidth = ResUtil.getScreenWidth() - ResUtil.dp2px(48);
     }
 
     public interface OnClickListener {
@@ -36,9 +38,9 @@ public class PartPresenter extends Presenter {
         String text = object.toString();
         ViewHolder holder = (ViewHolder) viewHolder;
         holder.binding.text.setText(text);
-        holder.binding.text.setMaxEms(Product.getEms());
+        holder.binding.text.setMaxWidth(maxWidth);
         holder.binding.text.setNextFocusUpId(nextFocusUp);
-        setOnClickListener(holder, view -> mListener.onItemClick(text));
+        setOnClickListener(holder, view -> listener.onItemClick(text));
     }
 
     @Override

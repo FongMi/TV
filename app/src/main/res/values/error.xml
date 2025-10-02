@@ -1,0 +1,44 @@
+<resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
+    <string name="error_unspecified">An unknown error occurred</string>
+    <string name="error_remote_error">A remote error occurred</string>
+    <string name="error_behind_live_window">Content is behind live window</string>
+    <string name="error_timeout">The operation timed out</string>
+    <string name="error_failed_runtime_check">A system check failed</string>
+    <string name="error_io_unspecified">An unknown network error occurred</string>
+    <string name="error_io_network_connection_failed">Network connection failed</string>
+    <string name="error_io_network_connection_timeout">Network connection timed out</string>
+    <string name="error_io_invalid_http_content_type">Invalid content type</string>
+    <string name="error_io_bad_http_status">Server error occurred</string>
+    <string name="error_io_file_not_found">File not found</string>
+    <string name="error_io_no_permission">You do not have permission to access this</string>
+    <string name="error_io_cleartext_not_permitted">Insecure connection not permitted</string>
+    <string name="error_io_read_position_out_of_range">Unable to read data</string>
+    <string name="error_parsing_container_malformed">Media file is corrupted</string>
+    <string name="error_parsing_manifest_malformed">Media info is corrupted</string>
+    <string name="error_parsing_container_unsupported">Unsupported file format</string>
+    <string name="error_parsing_manifest_unsupported">Unsupported media type</string>
+    <string name="error_decoder_init_failed">Decoder initialization failed</string>
+    <string name="error_decoder_query_failed">Decoder query failed</string>
+    <string name="error_decoding_failed">Decoding failed</string>
+    <string name="error_decoding_format_exceeds_capabilities">Decoding format exceeds capabilities</string>
+    <string name="error_decoding_format_unsupported">Unsupported decoding format</string>
+    <string name="error_decoding_resources_reclaimed">Decoding resources reclaimed</string>
+    <string name="error_audio_track_init_failed">Could not initialize audio</string>
+    <string name="error_audio_track_write_failed">Could not write audio data</string>
+    <string name="error_audio_track_offload_write_failed">Audio hardware decoding write error</string>
+    <string name="error_audio_track_offload_init_failed">Audio hardware decoding init error</string>
+    <string name="error_drm_unspecified">Unspecified DRM error</string>
+    <string name="error_drm_provisioning_failed">DRM provisioning failed</string>
+    <string name="error_drm_content_error">DRM content error</string>
+    <string name="error_drm_license_acquisition_failed">DRM license acquisition failed</string>
+    <string name="error_drm_disallowed_operation">DRM disallowed operation</string>
+    <string name="error_drm_system_error">DRM system error</string>
+    <string name="error_drm_device_revoked">DRM device revoked</string>
+    <string name="error_drm_license_expired">DRM license expired</string>
+    <string name="error_video_frame_processor_init_failed">Could not initialize video processor</string>
+    <string name="error_video_frame_processing_failed">Video processing failed</string>
+    <string name="error_no_decoder">This device does not provide a decoder for <xliff:g id="mime_type">%1$s</xliff:g></string>
+    <string name="error_no_secure_decoder">This device does not provide a secure decoder for <xliff:g id="mime_type">%1$s</xliff:g></string>
+    <string name="error_querying_decoders">Unable to query device decoders</string>
+    <string name="error_instantiating_decoder">Unable to instantiate decoder <xliff:g id="decoder_name">%1$s</xliff:g></string>
+</resources>

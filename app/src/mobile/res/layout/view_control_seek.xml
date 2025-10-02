@@ -11,6 +11,7 @@
         android:id="@+id/position"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:includeFontPadding="false"
         android:textColor="@color/white"
         android:textSize="14sp"
         tools:text="00:00:00" />
@@ -28,6 +29,7 @@
         android:id="@+id/duration"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:includeFontPadding="false"
         android:textColor="@color/white"
         android:textSize="14sp"
         tools:text="00:00:00" />

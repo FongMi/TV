@@ -10,7 +10,6 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        app:menu="@menu/menu_collect"
         app:navigationIconTint="@android:color/white"
         app:titleTextAppearance="@style/ToolbarTextAppearance" />
 
@@ -19,13 +18,14 @@
         android:layout_height="match_parent"
         android:orientation="horizontal">
 
-        <androidx.recyclerview.widget.RecyclerView
+        <com.fongmi.android.tv.ui.custom.CustomRecyclerView
             android:id="@+id/collect"
-            android:layout_width="128dp"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_marginTop="-8dp"
             android:clipChildren="false"
             android:clipToPadding="false"
+            android:minWidth="120dp"
             android:overScrollMode="never"
             android:paddingStart="8dp"
             android:paddingEnd="0dp"
@@ -44,9 +44,8 @@
             android:paddingStart="0dp"
             android:paddingEnd="8dp"
             android:paddingBottom="8dp"
-            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-            app:spanCount="2"
-            tools:listitem="@layout/adapter_vod_rect" />
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/adapter_search" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 </androidx.appcompat.widget.LinearLayoutCompat>

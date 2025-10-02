@@ -83,14 +83,6 @@ public class Setting {
         Prefers.put("size", size);
     }
 
-    public static int getViewType(int viewType) {
-        return Prefers.getInt("viewType", viewType);
-    }
-
-    public static void putViewType(int viewType) {
-        Prefers.put("viewType", viewType);
-    }
-
     public static int getScale() {
         return Prefers.getInt("scale");
     }
@@ -233,6 +225,14 @@ public class Setting {
 
     public static void putDanmakuLoad(boolean danmakuLoad) {
         Prefers.put("danmaku_load", danmakuLoad);
+    }
+
+    public static boolean isAdblock() {
+        return Prefers.getBoolean("adblock", true);
+    }
+
+    public static void putAdblock(boolean adblock) {
+        Prefers.put("adblock", adblock);
     }
 
     public static boolean isDanmakuShow() {

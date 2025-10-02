@@ -170,7 +170,7 @@ public class LiveParser {
             else if (line.startsWith("#EXTHTTP:")) header(line);
             else if (line.startsWith("#EXTVLCOPT:http-origin")) origin(line);
             else if (line.startsWith("#EXTVLCOPT:http-user-agent")) ua(line);
-            else if (line.startsWith("#EXTVLCOPT:http-referrer")) referer(line);
+            else if (line.startsWith("#EXTVLCOPT:http-referrer")) referrer(line);
             else if (line.startsWith("#KODIPROP:inputstream.adaptive.license_key")) key(line);
             else if (line.startsWith("#KODIPROP:inputstream.adaptive.license_type")) type(line);
             else if (line.startsWith("#KODIPROP:inputstream.adaptive.drm_legacy")) drmLegacy(line);
@@ -203,6 +203,14 @@ public class LiveParser {
         private void referer(String line) {
             try {
                 referer = line.split("(?i)referer=")[1].trim().replace("\"", "");
+            } catch (Exception e) {
+                referer = null;
+            }
+        }
+
+        private void referrer(String line) {
+            try {
+                referer = line.split("(?i)referrer=")[1].trim().replace("\"", "");
             } catch (Exception e) {
                 referer = null;
             }

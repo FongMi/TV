@@ -286,6 +286,12 @@ public class SettingFragment extends BaseFragment implements ConfigCallback, Sit
                 Notify.dismiss();
                 setCacheText();
             }
+
+            @Override
+            public void error(String msg) {
+                Notify.dismiss();
+                Notify.show(msg);
+            }
         });
     }
 

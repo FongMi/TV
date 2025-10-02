@@ -42,8 +42,6 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import kotlin.Unit;
 import okhttp3.Call;
@@ -128,10 +126,7 @@ public class CastDialog extends BaseDialog implements DeviceAdapter.OnClickListe
     }
 
     private void getDevice() {
-        List<Device> items = new ArrayList<>();
-        if (fm) items.addAll(Device.getAll());
-        items.addAll(DLNADevice.get().getAll());
-        adapter.setItems(items, () -> {
+        adapter.setItems(Device.getAll(), () -> {
             if (adapter.getItemCount() == 0) onRefresh();
         });
     }
@@ -147,6 +142,7 @@ public class CastDialog extends BaseDialog implements DeviceAdapter.OnClickListe
 
     private void onRefresh() {
         adapter.clear();
+        DLNADevice.get().disconnect();
         DLNACastManager.INSTANCE.search(null);
         if (fm) scanTask.start(adapter.getIps());
     }
@@ -173,7 +169,7 @@ public class CastDialog extends BaseDialog implements DeviceAdapter.OnClickListe
 
     @Override
     public void onDeviceRemoved(@NonNull org.fourthline.cling.model.meta.Device<?, ?, ?> device) {
-        DLNADevice.get().remove(device);
+        adapter.remove(DLNADevice.get().remove(device));
     }
 
     @Override

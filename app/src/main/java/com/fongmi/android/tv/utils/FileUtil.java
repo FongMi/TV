@@ -33,6 +33,10 @@ public class FileUtil {
         return Path.files("wallpaper_" + index);
     }
 
+    public static File getWallCache() {
+        return Path.files("wallpaper_cache");
+    }
+
     public static void openFile(File file) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

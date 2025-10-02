@@ -15,10 +15,10 @@ import java.util.List;
 
 public class DeviceAdapter extends BaseDiffAdapter<Device, DeviceAdapter.ViewHolder> {
 
-    private final OnClickListener mListener;
+    private final OnClickListener listener;
 
     public DeviceAdapter(OnClickListener listener) {
-        this.mListener = listener;
+        this.listener = listener;
     }
 
     public interface OnClickListener {
@@ -65,8 +65,8 @@ public class DeviceAdapter extends BaseDiffAdapter<Device, DeviceAdapter.ViewHol
         holder.binding.name.setText(item.getName());
         holder.binding.host.setText(item.getHost());
         holder.binding.type.setImageResource(getIcon(item));
-        holder.binding.getRoot().setOnClickListener(v -> mListener.onItemClick(item));
-        holder.binding.getRoot().setOnLongClickListener(v -> mListener.onLongClick(item));
+        holder.binding.getRoot().setOnClickListener(v -> listener.onItemClick(item));
+        holder.binding.getRoot().setOnLongClickListener(v -> listener.onLongClick(item));
     }
 
     private int getIcon(Device item) {

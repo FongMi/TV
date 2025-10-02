@@ -54,19 +54,13 @@ public class TrackNameProvider {
     private String buildAudioChannelString(Format format) {
         int channelCount = format.channelCount;
         if (channelCount < 1) return "";
-        switch (channelCount) {
-            case 1:
-                return resources.getString(R.string.exo_track_mono);
-            case 2:
-                return resources.getString(R.string.exo_track_stereo);
-            case 6:
-            case 7:
-                return resources.getString(R.string.exo_track_surround_5_point_1);
-            case 8:
-                return resources.getString(R.string.exo_track_surround_7_point_1);
-            default:
-                return resources.getString(R.string.exo_track_surround);
-        }
+        return switch (channelCount) {
+            case 1 -> resources.getString(R.string.exo_track_mono);
+            case 2 -> resources.getString(R.string.exo_track_stereo);
+            case 6, 7 -> resources.getString(R.string.exo_track_surround_5_point_1);
+            case 8 -> resources.getString(R.string.exo_track_surround_7_point_1);
+            default -> resources.getString(R.string.exo_track_surround);
+        };
     }
 
     private String buildLanguageOrLabelString(Format format) {

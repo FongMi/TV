@@ -1,0 +1,44 @@
+<resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
+    <string name="error_unspecified">发生未知错误</string>
+    <string name="error_remote_error">发生远程错误</string>
+    <string name="error_behind_live_window">直播内容已过期</string>
+    <string name="error_timeout">操作超时</string>
+    <string name="error_failed_runtime_check">系统检查失败</string>
+    <string name="error_io_unspecified">发生未知网络错误</string>
+    <string name="error_io_network_connection_failed">网络连接失败</string>
+    <string name="error_io_network_connection_timeout">网络连接超时</string>
+    <string name="error_io_invalid_http_content_type">内容类型无效</string>
+    <string name="error_io_bad_http_status">服务器发生错误</string>
+    <string name="error_io_file_not_found">找不到文件</string>
+    <string name="error_io_no_permission">您没有访问权限</string>
+    <string name="error_io_cleartext_not_permitted">不允许不安全的连接</string>
+    <string name="error_io_read_position_out_of_range">无法读取数据</string>
+    <string name="error_parsing_container_malformed">媒体文件已损坏</string>
+    <string name="error_parsing_manifest_malformed">媒体信息已损坏</string>
+    <string name="error_parsing_container_unsupported">不支持的文件格式</string>
+    <string name="error_parsing_manifest_unsupported">不支持的媒体类型</string>
+    <string name="error_decoder_init_failed">解码器初始化失败</string>
+    <string name="error_decoder_query_failed">解码器查询失败</string>
+    <string name="error_decoding_failed">解码失败</string>
+    <string name="error_decoding_format_exceeds_capabilities">解码格式超出设备能力</string>
+    <string name="error_decoding_format_unsupported">不支持的解码格式</string>
+    <string name="error_decoding_resources_reclaimed">解码资源已回收</string>
+    <string name="error_audio_track_init_failed">无法初始化音频</string>
+    <string name="error_audio_track_write_failed">无法写入音频数据</string>
+    <string name="error_audio_track_offload_write_failed">音频硬件解码写入错误</string>
+    <string name="error_audio_track_offload_init_failed">音频硬件解码初始化错误</string>
+    <string name="error_drm_unspecified">未指定的数字版权管理错误</string>
+    <string name="error_drm_provisioning_failed">数字版权管理配制失败</string>
+    <string name="error_drm_content_error">数字版权管理内容错误</string>
+    <string name="error_drm_license_acquisition_failed">数字版权管理授权获取失败</string>
+    <string name="error_drm_disallowed_operation">数字版权管理不允许的操作</string>
+    <string name="error_drm_system_error">数字版权管理系统错误</string>
+    <string name="error_drm_device_revoked">数字版权管理设备已撤销</string>
+    <string name="error_drm_license_expired">数字版权管理授权已过期</string>
+    <string name="error_video_frame_processor_init_failed">无法初始化视频处理器</string>
+    <string name="error_video_frame_processing_failed">视频处理失败</string>
+    <string name="error_no_decoder">此设备不支持 <xliff:g id="mime_type">%1$s</xliff:g> 格式</string>
+    <string name="error_no_secure_decoder">此设备无法安全播放 <xliff:g id="mime_type">%1$s</xliff:g> 格式</string>
+    <string name="error_querying_decoders">无法查询设备的播放功能</string>
+    <string name="error_instantiating_decoder">无法启用播放组件 <xliff:g id="decoder_name">%1$s</xliff:g></string>
+</resources>

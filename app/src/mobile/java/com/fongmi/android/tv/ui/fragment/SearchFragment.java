@@ -208,7 +208,7 @@ public class SearchFragment extends BaseFragment implements MenuProvider, WordAd
 
     @Override
     public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-        if (menuItem.getItemId() == android.R.id.home) getActivity().getOnBackPressedDispatcher().onBackPressed();
+        if (menuItem.getItemId() == android.R.id.home) requireActivity().getOnBackPressedDispatcher().onBackPressed();
         if (menuItem.getItemId() == R.id.action_reset) onReset();
         if (menuItem.getItemId() == R.id.action_site) onSite();
         return true;

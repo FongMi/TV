@@ -22,6 +22,7 @@ import com.github.catvod.utils.Path;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class FileChooser {
@@ -81,7 +82,7 @@ public class FileChooser {
         if (DocumentsContract.isDocumentUri(context, uri)) path = getPathFromDocumentUri(context, uri);
         else if (ContentResolver.SCHEME_CONTENT.equals(uri.getScheme())) path = getDataColumn(context, uri);
         else if (ContentResolver.SCHEME_FILE.equalsIgnoreCase(uri.getScheme())) path = uri.getPath();
-        return path != null ? URLDecoder.decode(path) : createFileFromUri(context, uri);
+        return path != null ? URLDecoder.decode(path, StandardCharsets.UTF_8) : createFileFromUri(context, uri);
     }
 
     private static String getPathFromDocumentUri(Context context, Uri uri) {
@@ -113,22 +114,17 @@ public class FileChooser {
     }
 
     private static String getPath(Context context, String[] split) {
-        switch (split[0]) {
-            case "image":
-                return getDataColumn(context, ContentUris.withAppendedId(getImageUri(), Long.parseLong(split[1])));
-            case "video":
-                return getDataColumn(context, ContentUris.withAppendedId(getVideoUri(), Long.parseLong(split[1])));
-            case "audio":
-                return getDataColumn(context, ContentUris.withAppendedId(getAudioUri(), Long.parseLong(split[1])));
-            default:
-                return getDataColumn(context, ContentUris.withAppendedId(MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL), Long.parseLong(split[1])));
-        }
+        return switch (split[0]) {
+            case "image" -> getDataColumn(context, ContentUris.withAppendedId(getImageUri(), Long.parseLong(split[1])));
+            case "video" -> getDataColumn(context, ContentUris.withAppendedId(getVideoUri(), Long.parseLong(split[1])));
+            case "audio" -> getDataColumn(context, ContentUris.withAppendedId(getAudioUri(), Long.parseLong(split[1])));
+            default -> getDataColumn(context, ContentUris.withAppendedId(getFilesUri(), Long.parseLong(split[1])));
+        };
     }
 
     private static String createFileFromUri(Context context, Uri uri) {
         String[] projection = {MediaStore.MediaColumns.DISPLAY_NAME};
-        Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
-        try (cursor) {
+        try (Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null)) {
             if (cursor == null || !cursor.moveToFirst()) return null;
             InputStream is = context.getContentResolver().openInputStream(uri);
             if (is == null) return null;
@@ -143,8 +139,7 @@ public class FileChooser {
 
     private static String getDataColumn(Context context, Uri uri) {
         String[] projection = {MediaStore.MediaColumns.DATA};
-        Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
-        try (cursor) {
+        try (Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null)) {
             if (cursor == null || !cursor.moveToFirst()) return null;
             return cursor.getString(cursor.getColumnIndexOrThrow(projection[0]));
         } catch (Exception e) {
@@ -154,8 +149,7 @@ public class FileChooser {
 
     private static String getNameColumn(Context context, Uri uri) {
         String[] projection = {MediaStore.MediaColumns.DISPLAY_NAME};
-        Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
-        try (cursor) {
+        try (Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null)) {
             if (cursor == null || !cursor.moveToFirst()) return null;
             return cursor.getString(cursor.getColumnIndexOrThrow(projection[0]));
         } catch (Exception e) {
@@ -184,6 +178,14 @@ public class FileChooser {
             return MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL);
         } else {
             return MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        }
+    }
+
+    public static Uri getFilesUri() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            return MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL);
+        } else {
+            return MediaStore.Files.getContentUri("external");
         }
     }
 

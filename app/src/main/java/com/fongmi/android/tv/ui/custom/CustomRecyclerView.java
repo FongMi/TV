@@ -12,10 +12,12 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.utils.ResUtil;
 
 public class CustomRecyclerView extends RecyclerView {
 
+    private int minWidth;
+    private int minHeight;
+    private int maxWidth;
     private int maxHeight;
     private int touchSlop;
     private float x1;
@@ -23,6 +25,7 @@ public class CustomRecyclerView extends RecyclerView {
 
     public CustomRecyclerView(@NonNull Context context) {
         super(context);
+        init(context, null);
     }
 
     public CustomRecyclerView(@NonNull Context context, @Nullable AttributeSet attrs) {
@@ -35,16 +38,50 @@ public class CustomRecyclerView extends RecyclerView {
         init(context, attrs);
     }
 
-    public void setMaxHeight(int maxHeight) {
-        this.maxHeight = ResUtil.dp2px(maxHeight);
+    private void init(Context context, @Nullable AttributeSet attrs) {
+        touchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
+        if (attrs != null) setAttrs(context, attrs);
+        setOverScrollMode(View.OVER_SCROLL_NEVER);
     }
 
-    private void init(Context context, AttributeSet attrs) {
+    private void setAttrs(Context context, AttributeSet attrs) {
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.CustomRecyclerView);
-        maxHeight = a.getLayoutDimension(R.styleable.CustomRecyclerView_maxHeight, maxHeight);
-        touchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
-        setOverScrollMode(View.OVER_SCROLL_NEVER);
+        minWidth = a.getDimensionPixelSize(R.styleable.CustomRecyclerView_android_minWidth, 0);
+        minHeight = a.getDimensionPixelSize(R.styleable.CustomRecyclerView_android_minHeight, 0);
+        maxWidth = a.getDimensionPixelSize(R.styleable.CustomRecyclerView_maxWidth, 0);
+        maxHeight = a.getDimensionPixelSize(R.styleable.CustomRecyclerView_maxHeight, 0);
         a.recycle();
+    }
+
+    public void setMinWidth(int minWidth) {
+        this.minWidth = minWidth;
+    }
+
+    public void setMaxWidth(int maxWidth) {
+        this.maxWidth = maxWidth;
+    }
+
+    public void setMinHeight(int minHeight) {
+        this.minHeight = minHeight;
+    }
+
+    public void setMaxHeight(int maxHeight) {
+        this.maxHeight = maxHeight;
+    }
+
+    private int getConstrainedSize(int measuredSize, int minSize, int maxSize) {
+        int finalSize = measuredSize;
+        if (maxSize > 0) finalSize = Math.min(finalSize, maxSize);
+        if (minSize > 0) finalSize = Math.max(finalSize, minSize);
+        return finalSize;
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        int finalWidth = getConstrainedSize(getMeasuredWidth(), minWidth, maxWidth);
+        int finalHeight = getConstrainedSize(getMeasuredHeight(), minHeight, maxHeight);
+        setMeasuredDimension(finalWidth, finalHeight);
     }
 
     private void focus(int position) {
@@ -52,22 +89,10 @@ public class CustomRecyclerView extends RecyclerView {
         if (holder != null) holder.itemView.requestFocus();
     }
 
-    private int getNewSpec(int heightMeasureSpec) {
-        int newHeight = MeasureSpec.makeMeasureSpec(maxHeight, MeasureSpec.AT_MOST);
-        if (heightMeasureSpec > newHeight) heightMeasureSpec = newHeight;
-        return heightMeasureSpec;
-    }
-
     @Override
     public void scrollToPosition(int position) {
         super.scrollToPosition(position);
         postDelayed(() -> focus(position), 50);
-    }
-
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        if (maxHeight != 0) heightMeasureSpec = getNewSpec(heightMeasureSpec);
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
     @Override

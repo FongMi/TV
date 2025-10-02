@@ -102,7 +102,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     protected void initView() {
-        mClock = Clock.create(mBinding.clock).format("HH:mm:ss");
+        mClock = Clock.create(mBinding.clock);
         mBinding.progressLayout.showProgress();
         Updater.create().release().start(this);
         PermissionUtil.requestNotify(this);

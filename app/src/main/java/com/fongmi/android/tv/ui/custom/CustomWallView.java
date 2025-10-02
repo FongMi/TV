@@ -1,29 +1,28 @@
 package com.fongmi.android.tv.ui.custom;
 
-import static android.widget.ImageView.ScaleType.CENTER_CROP;
-import static androidx.media3.exoplayer.DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON;
-
 import android.content.Context;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
+import android.util.AttributeSet;
+import android.view.LayoutInflater;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 
 import androidx.activity.ComponentActivity;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.DefaultLifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.media3.common.MediaItem;
 import androidx.media3.exoplayer.ExoPlayer;
-import androidx.media3.ui.AspectRatioFrameLayout;
-import androidx.media3.ui.PlayerView;
 
-import com.fongmi.android.tv.App;
+import com.bumptech.glide.Glide;
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.Setting;
+import com.fongmi.android.tv.databinding.ViewWallBinding;
 import com.fongmi.android.tv.event.RefreshEvent;
-import com.fongmi.android.tv.player.exo.ExoUtil;
 import com.fongmi.android.tv.utils.FileUtil;
-import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.ResUtil;
 
 import org.greenrobot.eventbus.EventBus;
@@ -34,42 +33,32 @@ import java.io.File;
 
 public class CustomWallView extends FrameLayout implements DefaultLifecycleObserver {
 
-    private ImageView image;
+    private ViewWallBinding binding;
     private ExoPlayer player;
-    private PlayerView video;
+    private Drawable cache;
 
-    public CustomWallView(@NonNull Context context) {
-        super(context);
-        init(context);
+    public CustomWallView(@NonNull Context context, @Nullable AttributeSet attrs) {
+        super(context, attrs);
     }
 
-    private void init(Context context) {
-        ((ComponentActivity) context).getLifecycle().addObserver(this);
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        if (!isInEditMode()) init();
+    }
+
+    private void init() {
+        binding = ViewWallBinding.inflate(LayoutInflater.from(getContext()), this, true);
+        ((ComponentActivity) getContext()).getLifecycle().addObserver(this);
         createPlayer();
-        addImageView();
-        addVideoView();
         refresh();
     }
 
     private void createPlayer() {
-        player = new ExoPlayer.Builder(App.get()).setRenderersFactory(ExoUtil.buildRenderersFactory(EXTENSION_RENDERER_MODE_ON)).setMediaSourceFactory(ExoUtil.buildMediaSourceFactory()).build();
+        player = new ExoPlayer.Builder(getContext()).build();
         player.setRepeatMode(ExoPlayer.REPEAT_MODE_ALL);
         player.setPlayWhenReady(true);
         player.setVolume(0);
-    }
-
-    private void addImageView() {
-        image = new ImageView(getContext());
-        image.setScaleType(CENTER_CROP);
-        addView(image, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-    }
-
-    private void addVideoView() {
-        video = new PlayerView(getContext());
-        video.setUseController(false);
-        video.setKeepContentOnPlayerReset(true);
-        video.setResizeMode(AspectRatioFrameLayout.RESIZE_MODE_ZOOM);
-        addView(video, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
     }
 
     private boolean isVideo(File file) {
@@ -81,40 +70,58 @@ public class CustomWallView extends FrameLayout implements DefaultLifecycleObser
         }
     }
 
+    private boolean isGif(File file) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(file.getAbsolutePath(), options);
+        return "image/gif".equals(options.outMimeType);
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRefreshEvent(RefreshEvent event) {
         if (event.getType() == RefreshEvent.Type.WALL) refresh();
     }
 
     private void refresh() {
+        cache = Drawable.createFromPath(FileUtil.getWallCache().getAbsolutePath());
         load(FileUtil.getWall(Setting.getWall()));
     }
 
     private void load(File file) {
         if (!file.getName().endsWith("0")) loadRes(ResUtil.getDrawable(file.getName()));
         else if (isVideo(file)) loadVideo(file);
-        else loadImage(file);
+        else if (isGif(file)) loadGif(file);
+        else loadImage();
     }
 
     private void loadRes(int resId) {
-        video.setPlayer(null);
         player.clearMediaItems();
-        video.setVisibility(GONE);
-        image.setImageResource(resId);
-    }
-
-    private void loadImage(File file) {
-        video.setPlayer(null);
-        player.clearMediaItems();
-        video.setVisibility(GONE);
-        ImgUtil.load(file, image);
+        binding.video.setPlayer(null);
+        binding.video.setVisibility(GONE);
+        binding.image.setImageResource(resId);
     }
 
     private void loadVideo(File file) {
+        binding.video.setPlayer(player);
+        binding.video.setVisibility(VISIBLE);
+        binding.image.setImageDrawable(cache);
         player.setMediaItem(MediaItem.fromUri(Uri.fromFile(file)));
-        video.setVisibility(VISIBLE);
-        video.setPlayer(player);
         player.prepare();
+    }
+
+    private void loadGif(File file) {
+        player.clearMediaItems();
+        binding.video.setPlayer(null);
+        binding.video.setVisibility(GONE);
+        Glide.with(binding.image).load(file).placeholder(cache).error(cache).override(ResUtil.getScreenWidth(), ResUtil.getScreenHeight()).into(binding.image);
+    }
+
+    private void loadImage() {
+        player.clearMediaItems();
+        binding.video.setPlayer(null);
+        binding.video.setVisibility(GONE);
+        if (cache != null) binding.image.setImageDrawable(cache);
+        else binding.image.setImageResource(R.drawable.wallpaper_1);
     }
 
     @Override
@@ -123,10 +130,26 @@ public class CustomWallView extends FrameLayout implements DefaultLifecycleObser
     }
 
     @Override
+    public void onResume(@NonNull LifecycleOwner owner) {
+        if (binding.video.getVisibility() != VISIBLE || player == null || player.getMediaItemCount() == 0) return;
+        binding.video.setPlayer(player);
+        player.play();
+    }
+
+    @Override
+    public void onPause(@NonNull LifecycleOwner owner) {
+        if (binding.video.getVisibility() != VISIBLE || player == null || player.getMediaItemCount() == 0) return;
+        binding.video.setPlayer(null);
+        player.pause();
+    }
+
+    @Override
     public void onDestroy(@NonNull LifecycleOwner owner) {
         EventBus.getDefault().unregister(this);
-        video.setPlayer(null);
+        binding.video.setPlayer(null);
         player.release();
+        binding = null;
         player = null;
+        cache = null;
     }
 }

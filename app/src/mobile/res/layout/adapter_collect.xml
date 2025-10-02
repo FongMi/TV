@@ -6,6 +6,7 @@
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
     android:background="@drawable/shape_item"
+    android:ellipsize="marquee"
     android:gravity="center"
     android:padding="8dp"
     android:singleLine="true"

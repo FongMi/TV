@@ -99,6 +99,7 @@
     <string name="player_video_decode">Video software decode</string>
     <string name="player_aac_track">Prefer aac track</string>
     <string name="player_danmaku_load">Danmaku load</string>
+    <string name="player_adblock">Remove ads</string>
     <string name="player_tunnel">Tunnel mode</string>
     <string name="player_buffer">Buffer time</string>
     <string name="player_speed">Press speed</string>
@@ -124,8 +125,7 @@
     <string name="error_play_next">It\'s the last episode!</string>
     <string name="error_play_prev">It\'s the first episode!</string>
     <string name="error_play_parse">Unable to parse url</string>
-    <string name="error_play_drm_scheme">This device does not support the required DRM scheme</string>
-    <string name="error_play_code">Error code: <xliff:g name="name">%s</xliff:g></string>
+    <string name="error_play_drm">This device does not support the required DRM scheme</string>
     <string name="error_play_url">Unable to load url</string>
     <string name="error_play_flag">No flag data</string>
     <string name="error_play_timeout">Timed out</string>

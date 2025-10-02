@@ -4,9 +4,7 @@ import com.android.cast.dlna.dmc.DLNACastManager;
 import com.fongmi.android.tv.bean.Device;
 
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class DLNADevice {
 
@@ -24,10 +22,6 @@ public class DLNADevice {
         this.devices = new LinkedHashSet<>();
     }
 
-    public List<Device> getAll() {
-        return devices.stream().map(Device::get).collect(Collectors.toList());
-    }
-
     public Device add(org.fourthline.cling.model.meta.Device<?, ?, ?> item) {
         devices.add(item);
         return Device.get(item);
@@ -40,6 +34,7 @@ public class DLNADevice {
 
     public void disconnect() {
         devices.forEach(DLNACastManager.INSTANCE::disconnectDevice);
+        devices.clear();
     }
 
     public org.fourthline.cling.model.meta.Device<?, ?, ?> find(Device item) {

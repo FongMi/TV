@@ -53,6 +53,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
         mBinding.uaText.setText(Setting.getUa());
         mBinding.aacText.setText(getSwitch(Setting.isPreferAAC()));
         mBinding.tunnelText.setText(getSwitch(Setting.isTunnel()));
+        mBinding.adblockText.setText(getSwitch(Setting.isAdblock()));
         mBinding.speedText.setText(format.format(Setting.getSpeed()));
         mBinding.bufferText.setText(String.valueOf(Setting.getBuffer()));
         mBinding.audioDecodeText.setText(getSwitch(Setting.isAudioPrefer()));
@@ -75,6 +76,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
         mBinding.render.setOnClickListener(this::setRender);
         mBinding.tunnel.setOnClickListener(this::setTunnel);
         mBinding.caption.setOnClickListener(this::setCaption);
+        mBinding.adblock.setOnClickListener(this::setAdblock);
         mBinding.caption.setOnLongClickListener(this::onCaption);
         mBinding.background.setOnClickListener(this::onBackground);
         mBinding.audioDecode.setOnClickListener(this::setAudioDecode);
@@ -146,6 +148,11 @@ public class SettingPlayerFragment extends BaseFragment implements UaCallback, B
     private boolean onCaption(View view) {
         if (Setting.isCaption()) startActivity(new Intent(Settings.ACTION_CAPTIONING_SETTINGS));
         return Setting.isCaption();
+    }
+
+    private void setAdblock(View view) {
+        Setting.putAdblock(!Setting.isAdblock());
+        mBinding.adblockText.setText(getSwitch(Setting.isAdblock()));
     }
 
     private void onBackground(View view) {

@@ -5,16 +5,14 @@ plugins {
 android {
     namespace 'com.fongmi.android.tv'
 
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId "com.fongmi.android.tv"
         minSdk 24
         targetSdk 36
-        versionCode 427
-        versionName "4.2.7"
+        versionCode 436
+        versionName "4.3.6"
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = ["room.schemaLocation": "$projectDir/schemas".toString(), "eventBusIndex": "com.fongmi.android.tv.event.EventIndex"]

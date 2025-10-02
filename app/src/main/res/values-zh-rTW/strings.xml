@@ -98,6 +98,7 @@
     <string name="player_video_decode">視訊軟解</string>
     <string name="player_aac_track">AAC優先</string>
     <string name="player_danmaku_load">彈幕載入</string>
+    <string name="player_adblock">智慧去廣</string>
     <string name="player_tunnel">隧道模式</string>
     <string name="player_buffer">緩衝時間</string>
     <string name="player_speed">長按倍速</string>
@@ -123,8 +124,7 @@
     <string name="error_play_next">已經是最後一集了！</string>
     <string name="error_play_prev">已經是第一集了！</string>
     <string name="error_play_parse">播放網址解析失敗</string>
-    <string name="error_play_drm_scheme">本設備不支援所需的 DRM scheme</string>
-    <string name="error_play_code">錯誤代碼：<xliff:g name="name">%s</xliff:g></string>
+    <string name="error_play_drm">本設備不支援所需的 DRM scheme</string>
     <string name="error_play_url">播放網址載入失敗</string>
     <string name="error_play_flag">暫無線路資料</string>
     <string name="error_play_timeout">連線逾時</string>
